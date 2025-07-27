@@ -1,9 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@100;200;300;400;500;600;700;800;900&family=Quicksand:wght@300;400;500;600;700&family=Work+Sans:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 @custom-variant dark (&:is(.dark *));
 
 :root {
@@ -123,16 +119,12 @@
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border outline-ring/50;
   }
 
   body {
     @apply bg-background text-foreground;
     font-family: 'Quicksand', sans-serif;
-    touch-action: manipulation;
-    overscroll-behavior: none;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
   }
 }
 
@@ -203,64 +195,16 @@ html {
   font-size: var(--font-size);
 }
 
-/* Mobile-first responsive utilities */
-.touch-target {
-  min-height: 44px;
-  min-width: 44px;
-}
-
-.safe-area-bottom {
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-}
-
-.safe-area-top {
-  padding-top: env(safe-area-inset-top, 0px);
-}
-
-/* Touch-friendly drag and drop */
-.draggable {
-  cursor: grab;
-  transition: transform 0.2s ease;
-  -webkit-user-drag: element;
-}
-
-.draggable:active {
-  cursor: grabbing;
-  transform: scale(1.05);
-}
-
-.drop-zone {
-  transition: all 0.2s ease;
-}
-
-.drop-zone.drag-over {
-  border-color: var(--primary);
-  background-color: hsl(var(--primary) / 0.1);
-}
-
-/* Glass effect for modern PWA feel */
-.glass-effect {
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-
-/* Hide scrollbar for mobile */
-.hide-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-/* Custom shadows for mobile */
-.card-shadow {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-}
-
-.card-shadow-lg {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+/* Brand spacing system - Tighter for mobile */
+:root {
+  --spacing-xs: 0.125rem; /* 2px */
+  --spacing-sm: 0.25rem;  /* 4px */
+  --spacing-md: 0.5rem;   /* 8px */
+  --spacing-lg: 0.75rem;  /* 12px */
+  --spacing-xl: 1rem;     /* 16px */
+  --spacing-2xl: 1.25rem; /* 20px */
+  --spacing-3xl: 1.5rem;  /* 24px */
+  --spacing-4xl: 2rem;    /* 32px */
 }
 
 /* Custom animations */
@@ -297,21 +241,6 @@ html {
   }
 }
 
-@keyframes slideUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-@keyframes bounceGentle {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
-}
-
-@keyframes pulseGentle {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
-}
-
 .animate-slide-in {
   animation: slideIn 0.3s ease-out;
 }
@@ -322,90 +251,6 @@ html {
 
 .animate-scale-in {
   animation: scaleIn 0.3s ease-out;
-}
-
-.animate-slide-up {
-  animation: slideUp 0.3s ease-out;
-}
-
-.animate-bounce-gentle {
-  animation: bounceGentle 0.6s ease-in-out;
-}
-
-.animate-pulse-gentle {
-  animation: pulseGentle 2s infinite;
-}
-
-/* Touch feedback */
-button:active, .touch-target:active {
-  transform: scale(0.98);
-  transition: transform 0.1s ease;
-}
-
-/* PWA viewport handling */
-@media screen and (display-mode: standalone) {
-  body {
-    -webkit-user-select: none;
-    -webkit-tap-highlight-color: transparent;
-  }
-}
-
-/* Improved focus states for accessibility */
-*:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-}
-
-/* Loading states */
-.loading {
-  opacity: 0.6;
-  pointer-events: none;
-}
-
-/* Enhanced mobile navigation */
-.bottom-nav-safe {
-  padding-bottom: max(env(safe-area-inset-bottom), 8px);
-}
-
-/* Better image handling */
-img {
-  display: block;
-  max-width: 100%;
-  height: auto;
-}
-
-img[src=""] {
-  display: none;
-}
-
-/* Dark mode enhancements */
-@media (prefers-color-scheme: dark) {
-  .card-shadow {
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.1);
-  }
-  
-  .card-shadow-lg {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
-  }
-}
-
-/* Enhanced touch interactions */
-@media (hover: none) and (pointer: coarse) {
-  .hover\:shadow-md:hover {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  }
-}
-
-/* Brand spacing system - Tighter for mobile */
-:root {
-  --spacing-xs: 0.125rem; /* 2px */
-  --spacing-sm: 0.25rem;  /* 4px */
-  --spacing-md: 0.5rem;   /* 8px */
-  --spacing-lg: 0.75rem;  /* 12px */
-  --spacing-xl: 1rem;     /* 16px */
-  --spacing-2xl: 1.25rem; /* 20px */
-  --spacing-3xl: 1.5rem;  /* 24px */
-  --spacing-4xl: 2rem;    /* 32px */
 }
 
 /* Brand component spacing utilities */
@@ -425,6 +270,14 @@ img[src=""] {
 .brand-padding-2xl { padding: var(--spacing-2xl); }
 .brand-padding-3xl { padding: var(--spacing-3xl); }
 
+.brand-margin-xs { margin: var(--spacing-xs); }
+.brand-margin-sm { margin: var(--spacing-sm); }
+.brand-margin-md { margin: var(--spacing-md); }
+.brand-margin-lg { margin: var(--spacing-lg); }
+.brand-margin-xl { margin: var(--spacing-xl); }
+.brand-margin-2xl { margin: var(--spacing-2xl); }
+.brand-margin-3xl { margin: var(--spacing-3xl); }
+
 /* Hover and tap animations */
 .btn-animate {
   transition: all 0.2s ease;
@@ -439,12 +292,12 @@ img[src=""] {
   transform: translateY(0);
 }
 
-/* Brand-consistent card spacing - Tighter layouts */
 /* Custom gradient for cards */
 .card-gradient {
   background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
 }
 
+/* Brand-consistent card spacing - Tighter layouts */
 .brand-card {
   padding: var(--spacing-lg);
   margin-bottom: var(--spacing-md);
@@ -475,6 +328,99 @@ img[src=""] {
   margin-top: var(--spacing-md);
   padding-top: var(--spacing-sm);
   border-top: 1px solid var(--border);
+}
+
+/* Tight component spacing utilities */
+.tight-spacing > * + * {
+  margin-top: var(--spacing-sm);
+}
+
+.ultra-tight-spacing > * + * {
+  margin-top: var(--spacing-xs);
+}
+
+.seamless-layout {
+  gap: var(--spacing-xs);
+}
+
+.compact-layout {
+  gap: var(--spacing-sm);
+}
+
+/* Header-content integration - Updated for taller header */
+.header-content-tight {
+  padding-top: var(--spacing-xl);
+}
+
+.header-content-seamless {
+  padding-top: var(--spacing-lg);
+}
+
+.under-header {
+  margin-top: calc(-1 * var(--spacing-md));
+}
+
+/* Enhanced header styling */
+.enhanced-header {
+  min-height: 4rem; /* Minimum height for the enhanced header */
+}
+
+.enhanced-header-content {
+  padding-top: 2.5rem; /* Account for taller header */
+}
+
+/* Footer-content integration */
+.content-footer-tight {
+  padding-bottom: var(--spacing-2xl);
+}
+
+.content-footer-seamless {
+  padding-bottom: var(--spacing-xl);
+}
+
+.above-footer {
+  margin-bottom: calc(-1 * var(--spacing-sm));
+}
+
+/* Food image styles */
+.food-image {
+  transition: transform 0.3s ease;
+  background-color: var(--muted);
+  object-fit: cover;
+}
+
+.food-image:hover {
+  transform: scale(1.05);
+}
+
+/* Image loading states */
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+img[src=""] {
+  display: none;
+}
+
+/* Ensure proper image rendering */
+.image-container {
+  background-color: var(--muted);
+  position: relative;
+  overflow: hidden;
+}
+
+.image-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--pastel-yellow) 0%, var(--pastel-blue) 100%);
+  opacity: 0.1;
+  z-index: -1;
 }
 
 /* Enhanced scroll styles for CalorieCalculator with drag-aware behavior */
@@ -523,10 +469,21 @@ img[src=""] {
   scroll-margin: 8px;
   scroll-snap-align: start;
   transition: all 0.2s ease;
-  min-height: 44px; /* Touch target size */
 }
 
-/* Drag and drop enhancements */
+/* Scroll disabled state during drag */
+.scroll-disabled {
+  overflow: hidden !important;
+  scroll-behavior: auto !important;
+  touch-action: none !important;
+  -webkit-overflow-scrolling: auto !important;
+}
+
+.scroll-disabled::-webkit-scrollbar-thumb {
+  opacity: 0.2 !important;
+}
+
+/* Drag-aware scroll container states */
 .ingredients-scrollable {
   touch-action: pan-y pinch-zoom;
   -webkit-overflow-scrolling: touch;
@@ -541,6 +498,15 @@ img[src=""] {
   overflow: hidden;
 }
 
+.ingredients-dragging * {
+  pointer-events: none;
+}
+
+.ingredients-dragging .dragging-item {
+  pointer-events: auto;
+}
+
+/* Dragging item state */
 .dragging-item {
   position: relative;
   z-index: 1000 !important;
@@ -551,26 +517,230 @@ img[src=""] {
   touch-action: none !important;
 }
 
-/* Food database enhancements */
-.food-database-item {
-  transition: all 0.2s ease;
-  border-left: 3px solid transparent;
+/* Improved touch handling for drag items */
+.group.cursor-grab {
+  cursor: grab;
+  -webkit-user-drag: element;
 }
 
-.food-database-item:hover {
-  border-left-color: hsl(var(--primary));
-  background: linear-gradient(90deg, hsl(var(--primary) / 0.05) 0%, transparent 100%);
+.group.cursor-grab:active {
+  cursor: grabbing;
 }
 
-/* Nutrition progress enhancements */
-.nutrition-progress {
+/* Prevent scroll during potential drag */
+.ingredients-scroll-area.touch-dragging {
+  overflow: hidden !important;
+  touch-action: none !important;
+}
+
+/* Touch target improvements */
+.hover-scroll-item {
+  min-height: 44px; /* Improved touch target size */
+  position: relative;
+}
+
+/* Tap highlight removal for better UX */
+.hover-scroll-item * {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+/* Auto-scroll enabled state during drag */
+.drag-scroll-enabled {
+  /* Allow main window scroll during drag */
+  overflow: visible !important;
+  touch-action: manipulation !important;
+}
+
+.drag-scroll-enabled * {
+  /* Prevent child elements from interfering with drag */
+  pointer-events: none;
+}
+
+.drag-scroll-enabled .dragging-item {
+  /* Ensure dragged item remains interactive */
+  pointer-events: auto !important;
+}
+
+.drag-scroll-enabled .group {
+  /* Allow drag source to remain interactive */
+  pointer-events: auto;
+}
+
+/* Auto-scroll zone styling */
+.auto-scroll-zone {
+  position: fixed;
+  left: 0;
+  right: 0;
+  height: 80px;
+  z-index: 40;
+  pointer-events: none;
   transition: all 0.3s ease;
-  background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--muted)) 100%);
 }
 
-.nutrition-progress:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+.auto-scroll-zone.active {
+  background: linear-gradient(var(--primary)/20, transparent);
+}
+
+.auto-scroll-zone.top {
+  top: 0;
+  background: linear-gradient(to bottom, var(--primary)/10, transparent);
+}
+
+.auto-scroll-zone.bottom {
+  bottom: 0;
+  background: linear-gradient(to top, var(--primary)/10, transparent);
+}
+
+/* Scroll velocity indicator */
+.scroll-velocity-indicator {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.scroll-velocity-indicator.active {
+  opacity: 1;
+}
+
+/* Enhanced drag feedback */
+.drag-feedback-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  pointer-events: none;
+  background: rgba(168, 218, 220, 0.05);
+  backdrop-filter: blur(1px);
+  transition: all 0.2s ease;
+}
+
+/* Improved dragging item with auto-scroll awareness */
+.dragging-item-enhanced {
+  position: fixed !important;
+  z-index: 1000 !important;
+  pointer-events: none !important;
+  transform: rotate(2deg) scale(1.05) !important;
+  box-shadow: 0 15px 35px rgba(168, 218, 220, 0.4) !important;
+  border: 2px solid var(--primary) !important;
+  background: white !important;
+}
+
+/* Auto-scroll animation */
+@keyframes autoScrollPulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+.auto-scroll-active .auto-scroll-indicator {
+  animation: autoScrollPulse 1s infinite;
+}
+
+/* Smooth scroll snap for mobile with drag considerations */
+@media (max-width: 768px) {
+  .hover-scroll-area {
+    scroll-snap-type: y proximity;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .hover-scroll-area.scroll-disabled {
+    -webkit-overflow-scrolling: auto;
+    scroll-snap-type: none;
+  }
+}
+
+/* Ingredients library specific enhancements with drag states */
+.ingredients-scroll-area {
+  position: relative;
+  isolation: isolate;
+}
+
+.ingredients-scroll-area::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background: linear-gradient(to bottom, var(--background) 60%, transparent);
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.ingredients-scroll-area::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background: linear-gradient(to top, var(--background) 60%, transparent);
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* Show fade gradients during scroll or hover */
+.ingredients-scroll-area:hover::before,
+.ingredients-scroll-area:hover::after,
+.ingredients-scroll-area.scrolling::before,
+.ingredients-scroll-area.scrolling::after {
+  opacity: 1;
+}
+
+/* Hide gradients during drag */
+.ingredients-dragging .ingredients-scroll-area::before,
+.ingredients-dragging .ingredients-scroll-area::after {
+  opacity: 0 !important;
+}
+
+/* Auto-scroll zones for drag operations */
+.ingredients-scroll-area .scroll-zone-top,
+.ingredients-scroll-area .scroll-zone-bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 40px;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.ingredients-scroll-area .scroll-zone-top {
+  top: 0;
+  background: linear-gradient(to bottom, var(--primary)/10, transparent);
+}
+
+.ingredients-scroll-area .scroll-zone-bottom {
+  bottom: 0;
+  background: linear-gradient(to top, var(--primary)/10, transparent);
+}
+
+/* Show scroll zones during drag near edges */
+.ingredients-dragging .ingredients-scroll-area .scroll-zone-top:hover,
+.ingredients-dragging .ingredients-scroll-area .scroll-zone-bottom:hover {
+  opacity: 1;
+}
+
+/* Scroll indicator animation */
+@keyframes scrollPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+.scroll-indicator {
+  animation: scrollPulse 2s infinite;
 }
 
 /* Text truncation utilities */
@@ -595,131 +765,17 @@ img[src=""] {
   overflow: hidden;
 }
 
-/* Tight component spacing utilities */
-.tight-spacing > * + * {
-  margin-top: var(--spacing-sm);
-}
-
-.ultra-tight-spacing > * + * {
-  margin-top: var(--spacing-xs);
-}
-
-.seamless-layout {
-  gap: var(--spacing-xs);
-}
-
-.compact-layout {
-  gap: var(--spacing-sm);
-}
-
-/* Enhanced header styling */
-.enhanced-header {
-  min-height: 4rem;
-}
-
-.enhanced-header-content {
-  padding-top: 2.5rem;
-}
-
-/* Food image styles */
-.food-image {
-  transition: transform 0.3s ease;
-  background-color: var(--muted);
-  object-fit: cover;
-}
-
-.food-image:hover {
-  transform: scale(1.05);
-}
-
 /* Enhanced food database list styling */
 .food-database-list {
   scroll-behavior: smooth;
 }
 
-/* Scroll disabled state during drag */
-.scroll-disabled {
-  overflow: hidden !important;
-  scroll-behavior: auto !important;
-  touch-action: none !important;
-  -webkit-overflow-scrolling: auto !important;
+.food-database-item {
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
 }
 
-.scroll-disabled::-webkit-scrollbar-thumb {
-  opacity: 0.2 !important;
-}
-
-/* Improved dragging item with auto-scroll awareness */
-.dragging-item-enhanced {
-  position: fixed !important;
-  z-index: 1000 !important;
-  pointer-events: none !important;
-  transform: rotate(2deg) scale(1.05) !important;
-  box-shadow: 0 15px 35px rgba(168, 218, 220, 0.4) !important;
-  border: 2px solid var(--primary) !important;
-  background: white !important;
-}
-
-/* Improved touch handling for drag items */
-.group.cursor-grab {
-  cursor: grab;
-  -webkit-user-drag: element;
-}
-
-.group.cursor-grab:active {
-  cursor: grabbing;
-}
-
-/* Tap highlight removal for better UX */
-.hover-scroll-item * {
-  -webkit-tap-highlight-color: transparent;
-  -webkit-touch-callout: none;
-}
-
-/* Smooth scroll snap for mobile with drag considerations */
-@media (max-width: 768px) {
-  .hover-scroll-area {
-    scroll-snap-type: y proximity;
-    -webkit-overflow-scrolling: touch;
-  }
-  
-  .hover-scroll-area.scroll-disabled {
-    -webkit-overflow-scrolling: auto;
-    scroll-snap-type: none;
-  }
-}
-
-/* Header-content integration - Updated for taller header */
-.header-content-tight {
-  padding-top: var(--spacing-xl);
-}
-
-.header-content-seamless {
-  padding-top: var(--spacing-lg);
-}
-
-.under-header {
-  margin-top: calc(-1 * var(--spacing-md));
-}
-
-/* Footer-content integration */
-.content-footer-tight {
-  padding-bottom: var(--spacing-2xl);
-}
-
-.content-footer-seamless {
-  padding-bottom: var(--spacing-xl);
-}
-
-.above-footer {
-  margin-bottom: calc(-1 * var(--spacing-sm));
-}
-
-/* Reduced motion for accessibility */
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
+.food-database-item:hover {
+  border-left-color: var(--primary);
+  background: linear-gradient(90deg, var(--primary)/5 0%, transparent 100%);
 }
