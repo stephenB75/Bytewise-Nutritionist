@@ -240,7 +240,7 @@ export class DatabaseStorage implements IStorage {
         eq(meals.userId, userId),
         gte(meals.date, startDate),
         lte(meals.date, endDate)
-      );
+      )!;
     }
 
     const userMeals = await db
@@ -273,7 +273,11 @@ export class DatabaseStorage implements IStorage {
 
         return {
           ...meal,
-          foods: mealFoodItems,
+          foods: mealFoodItems.map(item => ({
+            ...item,
+            food: item.food || undefined,
+            recipe: item.recipe || undefined,
+          })),
         };
       })
     );
@@ -307,7 +311,11 @@ export class DatabaseStorage implements IStorage {
 
     return {
       ...meal,
-      foods: mealFoodItems,
+      foods: mealFoodItems.map(item => ({
+        ...item,
+        food: item.food || undefined,
+        recipe: item.recipe || undefined,
+      })),
     };
   }
 

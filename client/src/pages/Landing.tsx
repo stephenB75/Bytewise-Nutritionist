@@ -10,7 +10,9 @@ export default function Landing() {
   const [password, setPassword] = useState('');
 
   const handleLogin = () => {
-    window.location.href = '/api/login';
+    // Use the proper Replit domain for authentication
+    const replitDomain = import.meta.env.VITE_REPLIT_DOMAIN || window.location.host;
+    window.location.href = `/api/login`;
   };
 
   return (
