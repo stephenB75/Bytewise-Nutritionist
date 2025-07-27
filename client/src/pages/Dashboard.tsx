@@ -15,12 +15,18 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
   const { user } = useAuth();
   const today = new Date().toISOString().split('T')[0];
 
-  const { data: stats } = useQuery({
+  const { data: stats } = useQuery<{
+    totalCalories: number;
+    totalProtein: number;
+    totalCarbs: number;
+    totalFat: number;
+    waterGlasses: number;
+  }>({
     queryKey: ['/api/stats', today],
     enabled: !!user,
   });
 
-  const { data: recentMeals } = useQuery({
+  const { data: recentMeals } = useQuery<Array<any>>({
     queryKey: ['/api/meals'],
     enabled: !!user,
   });
