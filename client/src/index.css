@@ -325,6 +325,107 @@ html {
 }
 
 .animate-slide-up {
+  animation: slideUp 0.4s ease-out;
+}
+
+.animate-bounce-gentle {
+  animation: bounceGentle 2s ease-in-out infinite;
+}
+
+.animate-pulse-gentle {
+  animation: pulseGentle 3s ease-in-out infinite;
+}
+
+/* Brand spacing system */
+.brand-spacing-xs { margin: 0.125rem; }
+.brand-spacing-sm { margin: 0.25rem; }
+.brand-spacing-md { margin: 0.5rem; }
+.brand-spacing-lg { margin: 1rem; }
+.brand-spacing-xl { margin: 1.5rem; }
+
+.brand-padding-xs { padding: 0.125rem; }
+.brand-padding-sm { padding: 0.25rem; }
+.brand-padding-md { padding: 0.5rem; }
+.brand-padding-lg { padding: 1rem; }
+.brand-padding-xl { padding: 1.5rem; }
+
+.brand-margin-xs { margin: 0.125rem; }
+.brand-margin-sm { margin: 0.25rem; }
+.brand-margin-md { margin: 0.5rem; }
+.brand-margin-lg { margin: 1rem; }
+.brand-margin-xl { margin: 1.5rem; }
+
+/* Brand typography classes */
+.brand-text-primary {
+  font-family: 'League Spartan', sans-serif;
+  color: var(--pastel-blue);
+}
+
+.brand-text-secondary {
+  font-family: 'League Spartan', sans-serif;
+  color: var(--foreground);
+}
+
+.brand-text-accent {
+  font-family: 'Work Sans', sans-serif;
+  color: var(--accent);
+}
+
+/* Brand logo styling */
+.brand-logo {
+  font-family: 'League Spartan', sans-serif;
+}
+
+.brand-logo .brand-text-primary {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.brand-logo .brand-text-secondary {
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+/* Brand button animations */
+.btn-animate {
+  transition: all 0.2s ease;
+}
+
+.btn-animate:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+}
+
+.btn-animate:active {
+  transform: translateY(0);
+}
+
+/* Brand card styling */
+.brand-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: all 0.3s ease;
+}
+
+.brand-card:hover {
+  border-color: var(--primary);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Compact layout for mobile */
+.compact-layout > * + * {
+  margin-top: 0.75rem;
+}
+
+/* Safe area support for iOS */
+.safe-area-inset {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+.animate-slide-up {
   animation: slideUp 0.3s ease-out;
 }
 
