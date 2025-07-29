@@ -129,6 +129,9 @@
   body {
     @apply bg-background text-foreground;
     font-family: 'Quicksand', sans-serif;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.6;
     touch-action: manipulation;
     overscroll-behavior: none;
     -webkit-font-smoothing: antialiased;
@@ -137,78 +140,285 @@
 }
 
 /**
- * Base typography. This is not applied to elements which have an ancestor with a Tailwind text class.
+ * Bytewise Typography System - Brand Guidelines Compliant
+ * Primary: League Spartan (headings, brand elements)
+ * Secondary: Work Sans (subheadings, labels, buttons)
+ * Body: Quicksand (body text, inputs)
+ * MOBILE: All inputs minimum 16px to prevent auto-zoom
+ * MOBILE-OPTIMIZED: Responsive sizing for better horizontal fit
  */
 @layer base {
   :where(:not(:has([class*=" text-"]), :not(:has([class^="text-"])))) {
     h1 {
-      font-size: 2rem;
-      font-weight: 600;
-      line-height: 1.2;
+      font-size: 1.75rem; /* Reduced from 2rem for mobile fit */
+      font-weight: 700;
+      line-height: 1.1; /* Tighter line height */
+      letter-spacing: -0.025em; /* Slight compression */
       font-family: 'League Spartan', sans-serif;
     }
 
     h2 {
-      font-size: 1.5rem;
+      font-size: 1.375rem; /* Reduced from 1.5rem */
       font-weight: 600;
-      line-height: 1.3;
+      line-height: 1.2; /* Tighter line height */
+      letter-spacing: -0.015em;
       font-family: 'League Spartan', sans-serif;
     }
 
     h3 {
-      font-size: 1.25rem;
+      font-size: 1.125rem; /* Reduced from 1.25rem */
+      font-weight: 600;
+      line-height: 1.3; /* Tighter line height */
+      letter-spacing: -0.01em;
+      font-family: 'Work Sans', sans-serif;
+    }
+
+    h4 {
+      font-size: 1rem; /* Reduced from 1.125rem */
+      font-weight: 500;
+      line-height: 1.4;
+      letter-spacing: -0.005em;
+      font-family: 'Work Sans', sans-serif;
+    }
+
+    h5 {
+      font-size: 0.875rem; /* Reduced from 1rem */
       font-weight: 500;
       line-height: 1.4;
       font-family: 'Work Sans', sans-serif;
     }
 
-    h4 {
-      font-size: 1rem;
+    h6 {
+      font-size: 0.75rem; /* Reduced from 0.875rem */
       font-weight: 500;
-      line-height: 1.5;
+      line-height: 1.4;
       font-family: 'Work Sans', sans-serif;
     }
 
     p {
-      font-size: 1rem;
+      font-size: 0.875rem; /* Reduced from 1rem for mobile */
       font-weight: 400;
-      line-height: 1.6;
+      line-height: 1.5; /* Slightly tighter */
       font-family: 'Quicksand', sans-serif;
     }
 
     label {
-      font-size: 0.875rem;
+      font-size: 0.75rem; /* Reduced from 0.875rem */
       font-weight: 500;
-      line-height: 1.5;
+      line-height: 1.4;
       font-family: 'Work Sans', sans-serif;
     }
 
     button {
-      font-size: 1rem;
+      font-size: max(16px, 0.875rem); /* Minimum 16px for mobile, but smaller default */
       font-weight: 500;
-      line-height: 1.5;
+      line-height: 1.4; /* Tighter line height */
+      letter-spacing: 0.01em; /* Slight spacing for readability */
       font-family: 'Work Sans', sans-serif;
     }
 
     input {
-      font-size: 1rem;
+      font-size: max(16px, 1rem) !important; /* Critical: Minimum 16px prevents mobile zoom */
       font-weight: 400;
-      line-height: 1.5;
+      line-height: 1.4; /* Slightly tighter */
       font-family: 'Quicksand', sans-serif;
+    }
+
+    textarea {
+      font-size: max(16px, 1rem) !important; /* Critical: Minimum 16px prevents mobile zoom */
+      font-weight: 400;
+      line-height: 1.4; /* Slightly tighter */
+      font-family: 'Quicksand', sans-serif;
+    }
+
+    select {
+      font-size: max(16px, 1rem) !important; /* Critical: Minimum 16px prevents mobile zoom */
+      font-weight: 400;
+      line-height: 1.4; /* Slightly tighter */
+      font-family: 'Quicksand', sans-serif;
+    }
+
+    /* Brand Logo Typography */
+    .brand-logo {
+      font-family: 'League Spartan', sans-serif;
+      font-weight: 700;
+      color: var(--pastel-blue);
+    }
+
+    .brand-tagline {
+      font-family: 'League Spartan', sans-serif;
+      font-weight: 400;
+      color: var(--foreground);
+    }
+  }
+  
+  /* Mobile-specific typography adjustments */
+  @media screen and (max-width: 640px) {
+    :where(:not(:has([class*=" text-"]), :not(:has([class^="text-"])))) {
+      h1 {
+        font-size: 1.5rem; /* Even smaller on mobile */
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+      }
+      
+      h2 {
+        font-size: 1.25rem;
+        line-height: 1.2;
+        letter-spacing: -0.015em;
+      }
+      
+      h3 {
+        font-size: 1rem;
+        line-height: 1.3;
+        letter-spacing: -0.01em;
+      }
+      
+      p {
+        font-size: 0.8125rem; /* 13px for very tight mobile layouts */
+        line-height: 1.5;
+      }
+      
+      label {
+        font-size: 0.6875rem; /* 11px for compact labels */
+        line-height: 1.4;
+      }
     }
   }
 }
 
 html {
   font-size: var(--font-size);
+  /* Prevent zoom on iOS Safari and other mobile browsers */
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
-/* Mobile-first responsive utilities */
+/* MOBILE VIEWPORT CONTROLS - PREVENT AUTO-ZOOM ON INPUT FOCUS */
+/* Critical: All input fields must be 16px or larger to prevent mobile zoom */
+
+/* Base input styling to prevent zoom */
+input, 
+textarea, 
+select,
+button {
+  /* Minimum 16px font-size prevents mobile browsers from zooming */
+  font-size: max(16px, 1rem) !important;
+  /* Prevent zoom on focus in iOS Safari */
+  -webkit-text-size-adjust: 100%;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Specific input types that commonly trigger zoom */
+input[type="text"],
+input[type="email"], 
+input[type="password"],
+input[type="tel"],
+input[type="url"],
+input[type="search"],
+input[type="number"],
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+textarea,
+select {
+  font-size: 16px !important; /* Critical for preventing zoom */
+  line-height: 1.5 !important;
+  /* Additional mobile optimizations */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border-radius: 0; /* Prevents iOS from adding default styling */
+}
+
+/* Ensure form elements maintain minimum size on mobile while being more compact */
+@media screen and (max-width: 768px) {
+  input, 
+  textarea, 
+  select,
+  button {
+    min-height: 44px; /* iOS minimum touch target */
+    font-size: 16px !important;
+    padding: 10px 12px !important; /* Reduced from 12px 16px for better fit */
+  }
+  
+  /* Compact button variants for mobile */
+  .btn-mobile-compact {
+    min-height: 40px !important;
+    padding: 8px 12px !important;
+    font-size: 16px !important;
+  }
+  
+  .btn-mobile-small {
+    min-height: 36px !important;
+    padding: 6px 10px !important;
+    font-size: 14px !important;
+  }
+  
+  /* Override any component library font sizes that might be smaller */
+  .text-sm input,
+  .text-xs input,
+  input.text-sm,
+  input.text-xs {
+    font-size: 16px !important;
+  }
+  
+  /* Search inputs often have smaller default font sizes */
+  input[type="search"] {
+    font-size: 16px !important;
+    -webkit-appearance: none;
+    padding: 8px 12px !important; /* More compact for search */
+  }
+  
+  /* Compact form layouts */
+  .form-mobile-compact label {
+    font-size: 12px !important;
+    margin-bottom: 4px !important;
+  }
+  
+  .form-mobile-compact input,
+  .form-mobile-compact select,
+  .form-mobile-compact textarea {
+    padding: 8px 12px !important;
+    margin-bottom: 12px !important;
+  }
+  
+  /* Mobile-optimized select elements */
+  select {
+    padding: 8px 32px 8px 12px !important; /* Space for dropdown arrow */
+  }
+}
+
+/* Custom Brand Styles */
+.brand-text-primary {
+  font-family: "League Spartan", sans-serif;
+  font-weight: 700;
+  color: hsl(var(--foreground));
+}
+
+/* Touch Interactions */
 .touch-target {
   min-height: 44px;
   min-width: 44px;
 }
 
+/* Button Animations */
+.btn-animate {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-animate:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-animate:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Safe Area Support */
 .safe-area-bottom {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
@@ -263,6 +473,46 @@ html {
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
+/* Grid Pattern Background */
+.bg-grid-pattern {
+  background-image: 
+    linear-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Progress Animations */
+.progress-bar {
+  transition: width 0.6s ease-in-out;
+}
+
+/* Drag and Drop States */
+.drag-over {
+  border: 2px dashed hsl(var(--primary));
+  background-color: hsl(var(--primary) / 0.1);
+}
+
+.dragging {
+  opacity: 0.7;
+  transform: rotate(2deg);
+}
+
+/* Focus States for Accessibility */
+.focus-visible:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .btn-animate,
+  .animate-pulse,
+  .progress-bar {
+    transition: none;
+    animation: none;
+  }
+}
+
 /* Custom animations */
 @keyframes slideIn {
   from {
@@ -278,11 +528,9 @@ html {
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(20px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
@@ -297,530 +545,82 @@ html {
   }
 }
 
-@keyframes slideUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-@keyframes bounceGentle {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
-}
-
-@keyframes pulseGentle {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
-}
-
 .animate-slide-in {
   animation: slideIn 0.3s ease-out;
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.5s ease-out;
+  animation: fadeIn 0.3s ease-out;
 }
 
 .animate-scale-in {
-  animation: scaleIn 0.3s ease-out;
+  animation: scaleIn 0.2s ease-out;
 }
 
-.animate-slide-up {
-  animation: slideUp 0.4s ease-out;
-}
-
-.animate-bounce-gentle {
-  animation: bounceGentle 2s ease-in-out infinite;
-}
-
-.animate-pulse-gentle {
-  animation: pulseGentle 3s ease-in-out infinite;
-}
-
-/* Brand spacing system */
-.brand-spacing-xs { margin: 0.125rem; }
-.brand-spacing-sm { margin: 0.25rem; }
-.brand-spacing-md { margin: 0.5rem; }
-.brand-spacing-lg { margin: 1rem; }
-.brand-spacing-xl { margin: 1.5rem; }
-
-.brand-padding-xs { padding: 0.125rem; }
-.brand-padding-sm { padding: 0.25rem; }
-.brand-padding-md { padding: 0.5rem; }
-.brand-padding-lg { padding: 1rem; }
-.brand-padding-xl { padding: 1.5rem; }
-
-.brand-margin-xs { margin: 0.125rem; }
-.brand-margin-sm { margin: 0.25rem; }
-.brand-margin-md { margin: 0.5rem; }
-.brand-margin-lg { margin: 1rem; }
-.brand-margin-xl { margin: 1.5rem; }
-
-/* Brand typography classes */
-.brand-text-primary {
-  font-family: 'League Spartan', sans-serif;
-  color: var(--pastel-blue);
-}
-
-.brand-text-secondary {
-  font-family: 'League Spartan', sans-serif;
-  color: var(--foreground);
-}
-
-.brand-text-accent {
-  font-family: 'Work Sans', sans-serif;
-  color: var(--accent);
-}
-
-/* Brand logo styling */
-.brand-logo {
-  font-family: 'League Spartan', sans-serif;
-}
-
-.brand-logo .brand-text-primary {
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
-.brand-logo .brand-text-secondary {
-  font-weight: 500;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-}
-
-/* Brand button animations */
-.btn-animate {
-  transition: all 0.2s ease;
-}
-
-.btn-animate:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
-}
-
-.btn-animate:active {
-  transform: translateY(0);
-}
-
-/* Brand card styling */
-.brand-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  transition: all 0.3s ease;
-}
-
-.brand-card:hover {
-  border-color: var(--primary);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-}
-
-/* Compact layout for mobile */
-.compact-layout > * + * {
-  margin-top: 0.75rem;
-}
-
-/* Safe area support for iOS */
-.safe-area-inset {
-  padding-left: env(safe-area-inset-left);
-  padding-right: env(safe-area-inset-right);
-}
-
-.animate-slide-up {
-  animation: slideUp 0.3s ease-out;
-}
-
-.animate-bounce-gentle {
-  animation: bounceGentle 0.6s ease-in-out;
-}
-
-.animate-pulse-gentle {
-  animation: pulseGentle 2s infinite;
-}
-
-/* Touch feedback */
-button:active, .touch-target:active {
-  transform: scale(0.98);
-  transition: transform 0.1s ease;
-}
-
-/* PWA viewport handling */
-@media screen and (display-mode: standalone) {
-  body {
-    -webkit-user-select: none;
-    -webkit-tap-highlight-color: transparent;
-  }
-}
-
-/* Improved focus states for accessibility */
-*:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-}
-
-/* Loading states */
-.loading {
-  opacity: 0.6;
-  pointer-events: none;
-}
-
-/* Enhanced mobile navigation */
-.bottom-nav-safe {
-  padding-bottom: max(env(safe-area-inset-bottom), 8px);
-}
-
-/* Better image handling */
-img {
-  display: block;
-  max-width: 100%;
-  height: auto;
-}
-
-img[src=""] {
-  display: none;
-}
-
-/* Dark mode enhancements */
-@media (prefers-color-scheme: dark) {
-  .card-shadow {
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.1);
+/* Mobile-specific overrides for component libraries */
+@media screen and (max-width: 768px) {
+  /* Override ShadCN UI component font sizes for mobile - Compact variants */
+  .ui-input,
+  .ui-textarea,
+  .ui-select,
+  [data-radix-select-trigger],
+  [data-radix-combobox-input] {
+    font-size: 16px !important;
+    min-height: 44px !important;
+    padding: 10px 12px !important; /* More compact padding */
   }
   
-  .card-shadow-lg {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
-  }
-}
-
-/* Enhanced touch interactions */
-@media (hover: none) and (pointer: coarse) {
-  .hover\:shadow-md:hover {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  }
-}
-
-/* Brand spacing system - Tighter for mobile */
-:root {
-  --spacing-xs: 0.125rem; /* 2px */
-  --spacing-sm: 0.25rem;  /* 4px */
-  --spacing-md: 0.5rem;   /* 8px */
-  --spacing-lg: 0.75rem;  /* 12px */
-  --spacing-xl: 1rem;     /* 16px */
-  --spacing-2xl: 1.25rem; /* 20px */
-  --spacing-3xl: 1.5rem;  /* 24px */
-  --spacing-4xl: 2rem;    /* 32px */
-}
-
-/* Brand component spacing utilities */
-.brand-spacing-xs { gap: var(--spacing-xs); }
-.brand-spacing-sm { gap: var(--spacing-sm); }
-.brand-spacing-md { gap: var(--spacing-md); }
-.brand-spacing-lg { gap: var(--spacing-lg); }
-.brand-spacing-xl { gap: var(--spacing-xl); }
-.brand-spacing-2xl { gap: var(--spacing-2xl); }
-.brand-spacing-3xl { gap: var(--spacing-3xl); }
-
-.brand-padding-xs { padding: var(--spacing-xs); }
-.brand-padding-sm { padding: var(--spacing-sm); }
-.brand-padding-md { padding: var(--spacing-md); }
-.brand-padding-lg { padding: var(--spacing-lg); }
-.brand-padding-xl { padding: var(--spacing-xl); }
-.brand-padding-2xl { padding: var(--spacing-2xl); }
-.brand-padding-3xl { padding: var(--spacing-3xl); }
-
-/* Hover and tap animations */
-.btn-animate {
-  transition: all 0.2s ease;
-}
-
-.btn-animate:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(168, 218, 220, 0.3);
-}
-
-.btn-animate:active {
-  transform: translateY(0);
-}
-
-/* Brand-consistent card spacing - Tighter layouts */
-/* Custom gradient for cards */
-.card-gradient {
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-}
-
-.brand-card {
-  padding: var(--spacing-lg);
-  margin-bottom: var(--spacing-md);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  background: var(--card);
-}
-
-.brand-card-compact {
-  padding: var(--spacing-md);
-  margin-bottom: var(--spacing-sm);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  background: var(--card);
-}
-
-.brand-card-header {
-  margin-bottom: var(--spacing-md);
-  padding-bottom: var(--spacing-sm);
-  border-bottom: 1px solid var(--border);
-}
-
-.brand-card-content {
-  margin-bottom: var(--spacing-md);
-}
-
-.brand-card-footer {
-  margin-top: var(--spacing-md);
-  padding-top: var(--spacing-sm);
-  border-top: 1px solid var(--border);
-}
-
-/* Enhanced scroll styles for CalorieCalculator with drag-aware behavior */
-.hover-scroll-area {
-  scrollbar-width: thin;
-  scrollbar-color: var(--primary) transparent;
-  scroll-behavior: smooth;
-  overscroll-behavior: contain;
-  transition: all 0.2s ease;
-}
-
-.hover-scroll-area::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-.hover-scroll-area::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.05);
-  border-radius: 3px;
-}
-
-.hover-scroll-area::-webkit-scrollbar-thumb {
-  background: var(--primary);
-  border-radius: 3px;
-  opacity: 0.4;
-  transition: opacity 0.2s ease;
-}
-
-.hover-scroll-area::-webkit-scrollbar-thumb:hover {
-  opacity: 0.8;
-  background: var(--pastel-blue-dark);
-}
-
-.hover-scroll-area::-webkit-scrollbar-corner {
-  background: transparent;
-}
-
-/* Show scrollbar on hover or focus */
-.hover-scroll-container:hover .hover-scroll-area::-webkit-scrollbar-thumb,
-.hover-scroll-area:focus-within::-webkit-scrollbar-thumb {
-  opacity: 0.6;
-}
-
-/* Enhanced scroll item spacing with drag states */
-.hover-scroll-item {
-  scroll-margin: 8px;
-  scroll-snap-align: start;
-  transition: all 0.2s ease;
-  min-height: 44px; /* Touch target size */
-}
-
-/* Drag and drop enhancements */
-.ingredients-scrollable {
-  touch-action: pan-y pinch-zoom;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
-}
-
-.ingredients-dragging {
-  touch-action: none !important;
-  user-select: none;
-  -webkit-user-select: none;
-  pointer-events: auto;
-  overflow: hidden;
-}
-
-.dragging-item {
-  position: relative;
-  z-index: 1000 !important;
-  box-shadow: 0 10px 25px rgba(168, 218, 220, 0.4) !important;
-  transform: rotate(2deg) scale(1.05) !important;
-  transition: none !important;
-  pointer-events: auto !important;
-  touch-action: none !important;
-}
-
-/* Food database enhancements */
-.food-database-item {
-  transition: all 0.2s ease;
-  border-left: 3px solid transparent;
-}
-
-.food-database-item:hover {
-  border-left-color: hsl(var(--primary));
-  background: linear-gradient(90deg, hsl(var(--primary) / 0.05) 0%, transparent 100%);
-}
-
-/* Nutrition progress enhancements */
-.nutrition-progress {
-  transition: all 0.3s ease;
-  background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--muted)) 100%);
-}
-
-.nutrition-progress:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Text truncation utilities */
-.line-clamp-1 {
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.line-clamp-3 {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-/* Tight component spacing utilities */
-.tight-spacing > * + * {
-  margin-top: var(--spacing-sm);
-}
-
-.ultra-tight-spacing > * + * {
-  margin-top: var(--spacing-xs);
-}
-
-.seamless-layout {
-  gap: var(--spacing-xs);
-}
-
-.compact-layout {
-  gap: var(--spacing-sm);
-}
-
-/* Enhanced header styling */
-.enhanced-header {
-  min-height: 4rem;
-}
-
-.enhanced-header-content {
-  padding-top: 2.5rem;
-}
-
-/* Food image styles */
-.food-image {
-  transition: transform 0.3s ease;
-  background-color: var(--muted);
-  object-fit: cover;
-}
-
-.food-image:hover {
-  transform: scale(1.05);
-}
-
-/* Enhanced food database list styling */
-.food-database-list {
-  scroll-behavior: smooth;
-}
-
-/* Scroll disabled state during drag */
-.scroll-disabled {
-  overflow: hidden !important;
-  scroll-behavior: auto !important;
-  touch-action: none !important;
-  -webkit-overflow-scrolling: auto !important;
-}
-
-.scroll-disabled::-webkit-scrollbar-thumb {
-  opacity: 0.2 !important;
-}
-
-/* Improved dragging item with auto-scroll awareness */
-.dragging-item-enhanced {
-  position: fixed !important;
-  z-index: 1000 !important;
-  pointer-events: none !important;
-  transform: rotate(2deg) scale(1.05) !important;
-  box-shadow: 0 15px 35px rgba(168, 218, 220, 0.4) !important;
-  border: 2px solid var(--primary) !important;
-  background: white !important;
-}
-
-/* Improved touch handling for drag items */
-.group.cursor-grab {
-  cursor: grab;
-  -webkit-user-drag: element;
-}
-
-.group.cursor-grab:active {
-  cursor: grabbing;
-}
-
-/* Tap highlight removal for better UX */
-.hover-scroll-item * {
-  -webkit-tap-highlight-color: transparent;
-  -webkit-touch-callout: none;
-}
-
-/* Smooth scroll snap for mobile with drag considerations */
-@media (max-width: 768px) {
-  .hover-scroll-area {
-    scroll-snap-type: y proximity;
-    -webkit-overflow-scrolling: touch;
+  /* Compact UI components */
+  .ui-compact .ui-input,
+  .ui-compact .ui-textarea,
+  .ui-compact .ui-select {
+    min-height: 40px !important;
+    padding: 8px 12px !important;
+    font-size: 16px !important;
   }
   
-  .hover-scroll-area.scroll-disabled {
-    -webkit-overflow-scrolling: auto;
-    scroll-snap-type: none;
+  /* Ultra-compact UI components */
+  .ui-ultra-compact .ui-input,
+  .ui-ultra-compact .ui-textarea,
+  .ui-ultra-compact .ui-select {
+    min-height: 36px !important;
+    padding: 6px 10px !important;
+    font-size: 16px !important;
   }
-}
-
-/* Header-content integration - Updated for taller header */
-.header-content-tight {
-  padding-top: var(--spacing-xl);
-}
-
-.header-content-seamless {
-  padding-top: var(--spacing-lg);
-}
-
-.under-header {
-  margin-top: calc(-1 * var(--spacing-md));
-}
-
-/* Footer-content integration */
-.content-footer-tight {
-  padding-bottom: var(--spacing-2xl);
-}
-
-.content-footer-seamless {
-  padding-bottom: var(--spacing-xl);
-}
-
-.above-footer {
-  margin-bottom: calc(-1 * var(--spacing-sm));
-}
-
-/* Reduced motion for accessibility */
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+  
+  /* ShadCN Button overrides for mobile */
+  .ui-button,
+  [data-radix-dialog-trigger],
+  [data-radix-popover-trigger] {
+    font-size: 14px !important;
+    padding: 8px 16px !important;
+    min-height: 40px !important;
+  }
+  
+  .ui-button-sm {
+    font-size: 13px !important;
+    padding: 6px 12px !important;
+    min-height: 36px !important;
+  }
+  
+  .ui-button-xs {
+    font-size: 12px !important;
+    padding: 4px 8px !important;
+    min-height: 32px !important;
+  }
+  
+  /* ShadCN Card components - more compact */
+  .ui-card,
+  [data-radix-card] {
+    padding: 12px !important; /* Reduced from default */
+  }
+  
+  .ui-card-compact {
+    padding: 8px !important;
+  }
+  
+  .ui-card-header {
+    padding-bottom: 8px !important;
+    margin-bottom: 8px !important;
   }
 }
