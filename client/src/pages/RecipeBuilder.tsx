@@ -1,473 +1,518 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAuth } from '@/hooks/useAuth';
-import { useDragDrop } from '@/components/DragDropProvider';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { IngredientCard } from '@/components/IngredientCard';
-import { RecipeNutritionSummary } from '@/components/RecipeNutritionSummary';
-import { ArrowLeft, Save, Plus, Edit, Trash2, Clock } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import { ChefHat, Plus, Search, Clock, Users, Trash2, Save } from 'lucide-react';
 import { apiRequest } from '@/lib/queryClient';
-import { useToast } from '@/hooks/use-toast';
-import { Food, Recipe, RecipeIngredient } from '@shared/schema';
-import { isUnauthorizedError } from '@/lib/authUtils';
+import { formatCalories } from '@/lib/utils';
+import { useDragDrop } from '@/components/DragDropProvider';
 
 interface RecipeBuilderProps {
-  onNavigate: (page: string) => void;
+  onNavigate: (tab: string) => void;
+  showToast: (message: string, type?: 'default' | 'destructive') => void;
+  notifications: string[];
+  setNotifications: (notifications: string[]) => void;
 }
 
-interface RecipeFormData {
-  name: string;
-  description: string;
-  servings: number;
-  prepTime: number;
-  cookTime: number;
-  instructions: string;
-}
-
-interface RecipeIngredientWithFood extends RecipeIngredient {
-  food: Food;
-}
-
-export default function RecipeBuilder({ onNavigate }: RecipeBuilderProps) {
-  const { user } = useAuth();
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const { setOnDrop } = useDragDrop();
-
-  const [recipe, setRecipe] = useState<RecipeFormData>({
-    name: 'My Protein Bowl',
-    description: '',
-    servings: 2,
-    prepTime: 15,
-    cookTime: 0,
-    instructions: '',
-  });
-
-  const [ingredients, setIngredients] = useState<RecipeIngredientWithFood[]>([]);
+export default function RecipeBuilder({ onNavigate, showToast, notifications, setNotifications }: RecipeBuilderProps) {
+  const [recipeName, setRecipeName] = useState('');
+  const [description, setDescription] = useState('');
+  const [servings, setServings] = useState(4);
+  const [prepTime, setPrepTime] = useState(15);
+  const [cookTime, setCookTime] = useState(30);
+  const [instructions, setInstructions] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [showAddIngredient, setShowAddIngredient] = useState(false);
+  const [ingredients, setIngredients] = useState<any[]>([]);
+  
+  const queryClient = useQueryClient();
+  const { isDragging, setIsDragging, draggedItem, setDraggedItem } = useDragDrop();
 
-  // Search foods for adding ingredients
-  const { data: searchResults, isLoading: isSearching } = useQuery({
-    queryKey: ['/api/foods/search', { q: searchQuery }],
+  // Fetch foods for search
+  const { data: foods, isLoading: foodsLoading } = useQuery({
+    queryKey: ['/api/foods', searchQuery],
     enabled: searchQuery.length > 2,
-  });
-
-  // Popular foods
-  const { data: popularFoods } = useQuery({
-    queryKey: ['/api/foods/popular'],
+    retry: false,
   });
 
   // Create recipe mutation
   const createRecipeMutation = useMutation({
     mutationFn: async (recipeData: any) => {
-      const response = await apiRequest('POST', '/api/recipes', recipeData);
-      return response.json();
+      return apiRequest('POST', '/api/recipes', recipeData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/recipes'] });
-      toast({
-        title: "Recipe saved successfully",
-        description: "Your recipe has been saved to your collection",
-      });
-      setRecipe({
-        name: 'My Protein Bowl',
-        description: '',
-        servings: 2,
-        prepTime: 15,
-        cookTime: 0,
-        instructions: '',
-      });
-      setIngredients([]);
+      resetForm();
+      showToast('Recipe created successfully!');
     },
-    onError: (error) => {
-      if (isUnauthorizedError(error)) {
-        toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          window.location.href = "/api/login";
-        }, 500);
-        return;
-      }
-      toast({
-        title: "Error saving recipe",
-        description: error.message,
-        variant: "destructive",
-      });
+    onError: () => {
+      showToast('Failed to create recipe. Please try again.', 'destructive');
     },
   });
 
-  // Set up drop handler for drag and drop
-  useEffect(() => {
-    setOnDrop((food: Food) => {
-      handleAddIngredient(food);
-    });
-  }, [ingredients]);
+  // Mock food search results
+  const mockFoods = [
+    {
+      id: 1,
+      name: 'Chicken Breast',
+      brand: 'Fresh',
+      category: 'Protein',
+      servingSize: '100g',
+      calories: 165,
+      protein: 31,
+      carbs: 0,
+      fat: 3.6,
+    },
+    {
+      id: 2,
+      name: 'Brown Rice',
+      brand: 'Organic',
+      category: 'Grains',
+      servingSize: '1 cup cooked',
+      calories: 218,
+      protein: 5,
+      carbs: 45,
+      fat: 1.8,
+    },
+    {
+      id: 3,
+      name: 'Broccoli',
+      brand: 'Fresh',
+      category: 'Vegetables',
+      servingSize: '1 cup',
+      calories: 25,
+      protein: 3,
+      carbs: 5,
+      fat: 0.3,
+    },
+    {
+      id: 4,
+      name: 'Olive Oil',
+      brand: 'Extra Virgin',
+      category: 'Oils',
+      servingSize: '1 tbsp',
+      calories: 120,
+      protein: 0,
+      carbs: 0,
+      fat: 14,
+    },
+  ];
 
-  const handleAddIngredient = (food: Food) => {
-    const existingIngredient = ingredients.find(ing => ing.foodId === food.id);
-    
-    if (existingIngredient) {
-      // Increase quantity if already exists
-      setIngredients(prev => prev.map(ing => 
-        ing.foodId === food.id 
-          ? { ...ing, quantity: String(Number(ing.quantity) + 1) }
-          : ing
-      ));
-    } else {
-      // Add new ingredient
-      const newIngredient: RecipeIngredientWithFood = {
-        id: Date.now(), // Temporary ID
-        recipeId: 0, // Will be set when recipe is saved
-        foodId: food.id!,
-        quantity: '1',
-        unit: food.servingSize,
-        order: ingredients.length,
-        food,
-      };
-      setIngredients(prev => [...prev, newIngredient]);
-    }
+  const filteredFoods = foods || (searchQuery.length > 0 ? mockFoods.filter(food =>
+    food.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    food.category.toLowerCase().includes(searchQuery.toLowerCase())
+  ) : []);
 
-    toast({
-      title: "Ingredient added",
-      description: `${food.name} added to recipe`,
-    });
+  const addIngredient = (food: any) => {
+    const newIngredient = {
+      ...food,
+      quantity: 1,
+      unit: 'serving',
+      order: ingredients.length
+    };
+    setIngredients(prev => [...prev, newIngredient]);
+    showToast(`${food.name} added to recipe`);
+    setSearchQuery('');
   };
 
-  const handleRemoveIngredient = (foodId: number) => {
-    setIngredients(prev => prev.filter(ing => ing.foodId !== foodId));
-    toast({
-      title: "Ingredient removed",
-      description: "Ingredient removed from recipe",
-    });
+  const removeIngredient = (index: number) => {
+    const ingredient = ingredients[index];
+    setIngredients(prev => prev.filter((_, i) => i !== index));
+    showToast(`${ingredient.name} removed from recipe`);
   };
 
-  const handleUpdateQuantity = (foodId: number, quantity: string, unit: string) => {
-    setIngredients(prev => prev.map(ing => 
-      ing.foodId === foodId 
-        ? { ...ing, quantity, unit }
-        : ing
+  const updateIngredientQuantity = (index: number, quantity: number) => {
+    if (quantity <= 0) return;
+    setIngredients(prev => prev.map((item, i) => 
+      i === index ? { ...item, quantity } : item
     ));
   };
 
-  const calculateNutrition = () => {
-    const totals = ingredients.reduce((acc, ingredient) => {
-      const multiplier = Number(ingredient.quantity) || 0;
-      const servingMultiplier = ingredient.food.servingSizeGrams 
-        ? multiplier / Number(ingredient.food.servingSizeGrams) 
-        : multiplier;
-
-      return {
-        calories: acc.calories + (Number(ingredient.food.calories) * servingMultiplier),
-        protein: acc.protein + (Number(ingredient.food.protein) * servingMultiplier),
-        carbs: acc.carbs + (Number(ingredient.food.carbs) * servingMultiplier),
-        fat: acc.fat + (Number(ingredient.food.fat) * servingMultiplier),
-        fiber: acc.fiber + (Number(ingredient.food.fiber) * servingMultiplier),
-        sugar: acc.sugar + (Number(ingredient.food.sugar) * servingMultiplier),
-        sodium: acc.sodium + (Number(ingredient.food.sodium) * servingMultiplier),
-      };
-    }, {
-      calories: 0,
-      protein: 0,
-      carbs: 0,
-      fat: 0,
-      fiber: 0,
-      sugar: 0,
-      sodium: 0,
-    });
-
-    return totals;
+  const updateIngredientUnit = (index: number, unit: string) => {
+    setIngredients(prev => prev.map((item, i) => 
+      i === index ? { ...item, unit } : item
+    ));
   };
 
-  const handleSaveRecipe = async () => {
-    if (!recipe.name.trim()) {
-      toast({
-        title: "Recipe name required",
-        description: "Please enter a name for your recipe",
-        variant: "destructive",
-      });
+  const calculateNutritionTotals = () => {
+    return ingredients.reduce((totals, ingredient) => ({
+      calories: totals.calories + (ingredient.calories * ingredient.quantity),
+      protein: totals.protein + (ingredient.protein * ingredient.quantity),
+      carbs: totals.carbs + (ingredient.carbs * ingredient.quantity),
+      fat: totals.fat + (ingredient.fat * ingredient.quantity),
+    }), { calories: 0, protein: 0, carbs: 0, fat: 0 });
+  };
+
+  const calculatePerServing = () => {
+    const totals = calculateNutritionTotals();
+    return {
+      calories: totals.calories / servings,
+      protein: totals.protein / servings,
+      carbs: totals.carbs / servings,
+      fat: totals.fat / servings,
+    };
+  };
+
+  const resetForm = () => {
+    setRecipeName('');
+    setDescription('');
+    setServings(4);
+    setPrepTime(15);
+    setCookTime(30);
+    setInstructions('');
+    setIngredients([]);
+    setSearchQuery('');
+  };
+
+  const saveRecipe = () => {
+    if (!recipeName.trim()) {
+      showToast('Please enter a recipe name', 'destructive');
       return;
     }
 
     if (ingredients.length === 0) {
-      toast({
-        title: "No ingredients",
-        description: "Please add at least one ingredient to your recipe",
-        variant: "destructive",
-      });
+      showToast('Please add at least one ingredient', 'destructive');
       return;
     }
 
-    const nutrition = calculateNutrition();
-    
+    const totals = calculateNutritionTotals();
     const recipeData = {
-      ...recipe,
-      totalCalories: nutrition.calories.toString(),
-      totalProtein: nutrition.protein.toString(),
-      totalCarbs: nutrition.carbs.toString(),
-      totalFat: nutrition.fat.toString(),
-      totalFiber: nutrition.fiber.toString(),
-      totalSugar: nutrition.sugar.toString(),
-      totalSodium: nutrition.sodium.toString(),
+      name: recipeName,
+      description,
+      servings,
+      prepTime,
+      cookTime,
+      instructions,
+      ingredients: ingredients.map(ing => ({
+        foodId: ing.id,
+        quantity: ing.quantity,
+        unit: ing.unit,
+        order: ing.order
+      })),
+      totalCalories: totals.calories,
+      totalProtein: totals.protein,
+      totalCarbs: totals.carbs,
+      totalFat: totals.fat,
     };
 
-    await createRecipeMutation.mutateAsync(recipeData);
+    createRecipeMutation.mutate(recipeData);
   };
 
-  const nutrition = calculateNutrition();
+  const totals = calculateNutritionTotals();
+  const perServing = calculatePerServing();
+
+  // Drag and drop handlers
+  const handleDragStart = (e: React.DragEvent, ingredient: any, index: number) => {
+    setIsDragging(true);
+    setDraggedItem({ ingredient, index });
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragEnd = () => {
+    setIsDragging(false);
+    setDraggedItem(null);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    if (!draggedItem) return;
+
+    const { index: dragIndex } = draggedItem;
+    if (dragIndex === dropIndex) return;
+
+    const newIngredients = [...ingredients];
+    const [draggedIngredient] = newIngredients.splice(dragIndex, 1);
+    newIngredients.splice(dropIndex, 0, draggedIngredient);
+    
+    // Update order
+    const updatedIngredients = newIngredients.map((ing, idx) => ({
+      ...ing,
+      order: idx
+    }));
+    
+    setIngredients(updatedIngredients);
+    setIsDragging(false);
+    setDraggedItem(null);
+    showToast('Ingredient order updated');
+  };
 
   return (
-    <div className="flex-1 overflow-y-auto hide-scrollbar">
+    <div className="min-h-screen bg-background p-4 pb-20">
       {/* Header */}
-      <div className="bg-surface p-4 card-shadow">
-        <div className="flex items-center space-x-3">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onNavigate('dashboard')}
-            className="w-10 h-10 rounded-full p-0"
-          >
-            <ArrowLeft size={20} />
-          </Button>
-          <h1 className="text-xl font-bold flex-1">Recipe Builder</h1>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleSaveRecipe}
-            disabled={createRecipeMutation.isPending}
-            className="w-10 h-10 rounded-full p-0"
-          >
-            <Save size={20} />
-          </Button>
-        </div>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold brand-text-primary mb-2">Recipe Builder</h1>
+        <p className="text-muted-foreground">Create and save your custom recipes</p>
       </div>
 
-      <div className="p-4 space-y-6">
-        {/* Recipe Info */}
-        <Card className="p-4">
-          <h2 className="text-lg font-semibold mb-4">Recipe Details</h2>
-          <div className="space-y-3">
+      {/* Recipe Details */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <ChefHat className="h-5 w-5 text-primary" />
+            <span>Recipe Details</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <Label htmlFor="recipe-name">Recipe Name *</Label>
             <Input
-              type="text"
-              placeholder="Recipe name..."
-              value={recipe.name}
-              onChange={(e) => setRecipe(prev => ({ ...prev, name: e.target.value }))}
+              id="recipe-name"
+              placeholder="Enter recipe name..."
+              value={recipeName}
+              onChange={(e) => setRecipeName(e.target.value)}
               className="touch-target"
             />
-            <Textarea
-              placeholder="Description (optional)..."
-              value={recipe.description}
-              onChange={(e) => setRecipe(prev => ({ ...prev, description: e.target.value }))}
-              className="touch-target min-h-[80px]"
+          </div>
+
+          <div>
+            <Label htmlFor="description">Description</Label>
+            <Input
+              id="description"
+              placeholder="Brief description of your recipe..."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="touch-target"
             />
-            <div className="grid grid-cols-3 gap-3">
-              <div>
-                <label className="text-xs text-muted-foreground block mb-1">Servings</label>
-                <Input
-                  type="number"
-                  min="1"
-                  value={recipe.servings}
-                  onChange={(e) => setRecipe(prev => ({ ...prev, servings: parseInt(e.target.value) || 1 }))}
-                  className="touch-target"
-                />
-              </div>
-              <div>
-                <label className="text-xs text-muted-foreground block mb-1">Prep (min)</label>
-                <Input
-                  type="number"
-                  min="0"
-                  value={recipe.prepTime}
-                  onChange={(e) => setRecipe(prev => ({ ...prev, prepTime: parseInt(e.target.value) || 0 }))}
-                  className="touch-target"
-                />
-              </div>
-              <div>
-                <label className="text-xs text-muted-foreground block mb-1">Cook (min)</label>
-                <Input
-                  type="number"
-                  min="0"
-                  value={recipe.cookTime}
-                  onChange={(e) => setRecipe(prev => ({ ...prev, cookTime: parseInt(e.target.value) || 0 }))}
-                  className="touch-target"
-                />
-              </div>
-            </div>
-          </div>
-        </Card>
-
-        {/* Ingredients Section */}
-        <Card className="p-4">
-          <h2 className="text-lg font-semibold mb-4">Ingredients</h2>
-          
-          {/* Drop Zone */}
-          <div className="border-2 border-dashed border-muted-foreground/20 rounded-xl p-6 mb-4 text-center bg-muted/20">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
-              <Plus className="w-8 h-8 text-primary" />
-            </div>
-            <p className="text-sm font-medium mb-1">Drop ingredients here</p>
-            <p className="text-xs text-muted-foreground">Or tap to add manually</p>
           </div>
 
-          {/* Current Ingredients */}
-          <div className="space-y-3">
-            {ingredients.length > 0 && (
-              <h3 className="font-medium text-sm">Added Ingredients</h3>
-            )}
-            
-            {ingredients.map((ingredient) => (
-              <div key={ingredient.foodId} className="flex items-center space-x-3 p-3 bg-muted/30 rounded-xl">
-                <div className="w-2 h-8 bg-primary rounded-full"></div>
-                <div className="flex-1">
-                  <p className="font-medium text-sm">{ingredient.food.name}</p>
-                  <div className="flex items-center space-x-4 text-xs text-muted-foreground">
-                    <span>{ingredient.quantity} {ingredient.unit}</span>
-                    <span>{Math.round(Number(ingredient.food.calories) * Number(ingredient.quantity))} cal</span>
-                    <span>{Math.round(Number(ingredient.food.protein) * Number(ingredient.quantity))}g protein</span>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-8 h-8 p-0"
-                    onClick={() => {
-                      const newQuantity = prompt('Enter quantity:', ingredient.quantity);
-                      if (newQuantity && !isNaN(Number(newQuantity))) {
-                        handleUpdateQuantity(ingredient.foodId, newQuantity, ingredient.unit);
-                      }
-                    }}
-                  >
-                    <Edit size={12} />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-8 h-8 p-0 text-destructive border-destructive/20 hover:bg-destructive/10"
-                    onClick={() => handleRemoveIngredient(ingredient.foodId)}
-                  >
-                    <Trash2 size={12} />
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <Button
-            variant="outline"
-            className="w-full mt-4 touch-target"
-            onClick={() => setShowAddIngredient(!showAddIngredient)}
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Add More Ingredients
-          </Button>
-        </Card>
-
-        {/* Add Ingredient Panel */}
-        {showAddIngredient && (
-          <Card className="p-4">
-            <h3 className="font-semibold mb-3">Add Ingredient</h3>
-            <div className="relative mb-4">
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <Label htmlFor="servings">Servings</Label>
               <Input
-                type="text"
-                placeholder="Search for ingredients..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                id="servings"
+                type="number"
+                min="1"
+                value={servings}
+                onChange={(e) => setServings(parseInt(e.target.value) || 1)}
                 className="touch-target"
               />
             </div>
+            <div>
+              <Label htmlFor="prep-time">Prep Time (min)</Label>
+              <Input
+                id="prep-time"
+                type="number"
+                min="0"
+                value={prepTime}
+                onChange={(e) => setPrepTime(parseInt(e.target.value) || 0)}
+                className="touch-target"
+              />
+            </div>
+            <div>
+              <Label htmlFor="cook-time">Cook Time (min)</Label>
+              <Input
+                id="cook-time"
+                type="number"
+                min="0"
+                value={cookTime}
+                onChange={(e) => setCookTime(parseInt(e.target.value) || 0)}
+                className="touch-target"
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
-            {searchQuery.length > 2 ? (
-              <div className="space-y-2">
-                {isSearching ? (
-                  <p className="text-center text-muted-foreground">Searching...</p>
-                ) : searchResults && searchResults.length > 0 ? (
-                  searchResults.slice(0, 5).map((food: Food) => (
-                    <IngredientCard
-                      key={food.id}
-                      food={food}
-                      onClick={() => {
-                        handleAddIngredient(food);
-                        setSearchQuery('');
-                        setShowAddIngredient(false);
-                      }}
-                      draggable={false}
+      {/* Ingredient Search */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Search className="h-5 w-5 text-primary" />
+            <span>Add Ingredients</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="relative mb-4">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input
+              placeholder="Search for ingredients..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 touch-target"
+            />
+          </div>
+
+          {/* Search Results */}
+          {searchQuery.length > 0 && (
+            <div className="space-y-3 max-h-48 overflow-y-auto">
+              {(filteredFoods || []).map((food: any) => (
+                <div
+                  key={food.id}
+                  className="flex items-center space-x-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors cursor-pointer touch-target"
+                  onClick={() => addIngredient(food)}
+                >
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-2 mb-1">
+                      <h4 className="font-medium">{food.name}</h4>
+                      <Badge variant="outline" className="text-xs">
+                        {food.category}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-1">
+                      {food.brand} • {food.servingSize}
+                    </p>
+                    <div className="flex space-x-3 text-xs">
+                      <span className="font-medium">{formatCalories(food.calories)} cal</span>
+                      <span className="text-chart-2">{food.protein}g protein</span>
+                      <span className="text-chart-3">{food.carbs}g carbs</span>
+                      <span className="text-chart-1">{food.fat}g fat</span>
+                    </div>
+                  </div>
+                  <Button size="sm" variant="outline">
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+              {(filteredFoods || []).length === 0 && !foodsLoading && (
+                <p className="text-center text-muted-foreground py-4">
+                  No ingredients found. Try a different search term.
+                </p>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Recipe Ingredients */}
+      {ingredients.length > 0 && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <span className="flex items-center space-x-2">
+                <Plus className="h-5 w-5 text-primary" />
+                <span>Recipe Ingredients ({ingredients.length})</span>
+              </span>
+              <Badge className="text-xs">
+                {formatCalories(totals.calories)} total calories
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3 mb-6">
+              {ingredients.map((ingredient, index) => (
+                <div
+                  key={index}
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, ingredient, index)}
+                  onDragEnd={handleDragEnd}
+                  onDragOver={handleDragOver}
+                  onDrop={(e) => handleDrop(e, index)}
+                  className={`flex items-center space-x-3 p-3 rounded-lg border transition-all ${
+                    isDragging ? 'opacity-70' : ''
+                  } hover:bg-muted/50 cursor-move`}
+                >
+                  <div className="flex-1">
+                    <h4 className="font-medium text-sm">{ingredient.name}</h4>
+                    <p className="text-xs text-muted-foreground">{ingredient.category}</p>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Input
+                      type="number"
+                      min="0.1"
+                      step="0.1"
+                      value={ingredient.quantity}
+                      onChange={(e) => updateIngredientQuantity(index, parseFloat(e.target.value) || 0)}
+                      className="w-16 h-8 text-sm"
                     />
-                  ))
-                ) : (
-                  <p className="text-center text-muted-foreground">No ingredients found</p>
-                )}
-              </div>
-            ) : popularFoods ? (
-              <div className="space-y-2">
-                <p className="text-sm font-medium">Popular Ingredients</p>
-                {popularFoods.slice(0, 3).map((food: Food) => (
-                  <IngredientCard
-                    key={food.id}
-                    food={food}
-                    onClick={() => {
-                      handleAddIngredient(food);
-                      setShowAddIngredient(false);
-                    }}
-                    draggable={false}
-                  />
-                ))}
-              </div>
-            ) : null}
-          </Card>
-        )}
+                    <select
+                      value={ingredient.unit}
+                      onChange={(e) => updateIngredientUnit(index, e.target.value)}
+                      className="px-2 py-1 border rounded text-sm bg-background"
+                    >
+                      <option value="serving">serving</option>
+                      <option value="cup">cup</option>
+                      <option value="tbsp">tbsp</option>
+                      <option value="tsp">tsp</option>
+                      <option value="oz">oz</option>
+                      <option value="g">g</option>
+                      <option value="piece">piece</option>
+                    </select>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => removeIngredient(index)}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
 
-        {/* Nutrition Summary */}
-        {ingredients.length > 0 && (
-          <RecipeNutritionSummary
-            nutrition={nutrition}
-            servings={recipe.servings}
-          />
-        )}
-
-        {/* Instructions */}
-        <Card className="p-4">
-          <h2 className="text-lg font-semibold mb-4">Instructions</h2>
-          <Textarea
-            placeholder="Enter cooking instructions..."
-            value={recipe.instructions}
-            onChange={(e) => setRecipe(prev => ({ ...prev, instructions: e.target.value }))}
-            className="touch-target min-h-[120px]"
-          />
+            {/* Nutrition Summary */}
+            <div className="bg-primary/10 rounded-lg p-4 mb-4">
+              <h4 className="font-medium mb-3 flex items-center">
+                <Users className="h-4 w-4 mr-2" />
+                Nutrition Per Serving ({servings} servings)
+              </h4>
+              <div className="grid grid-cols-4 gap-4 text-center">
+                <div>
+                  <p className="text-lg font-bold">{formatCalories(perServing.calories)}</p>
+                  <p className="text-xs text-muted-foreground">Calories</p>
+                </div>
+                <div>
+                  <p className="text-lg font-bold text-chart-2">{Math.round(perServing.protein)}g</p>
+                  <p className="text-xs text-muted-foreground">Protein</p>
+                </div>
+                <div>
+                  <p className="text-lg font-bold text-chart-3">{Math.round(perServing.carbs)}g</p>
+                  <p className="text-xs text-muted-foreground">Carbs</p>
+                </div>
+                <div>
+                  <p className="text-lg font-bold text-chart-1">{Math.round(perServing.fat)}g</p>
+                  <p className="text-xs text-muted-foreground">Fat</p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
         </Card>
+      )}
 
-        {/* Save Actions */}
-        <div className="grid grid-cols-2 gap-3">
-          <Button
-            variant="outline"
-            className="touch-target"
-            onClick={() => {
-              // Save as draft logic could go here
-              toast({
-                title: "Draft saved",
-                description: "Recipe saved as draft",
-              });
-            }}
-          >
-            Save Draft
-          </Button>
-          <Button
-            className="touch-target"
-            onClick={handleSaveRecipe}
-            disabled={createRecipeMutation.isPending}
-          >
-            {createRecipeMutation.isPending ? 'Saving...' : 'Save Recipe'}
-          </Button>
-        </div>
+      {/* Instructions */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Clock className="h-5 w-5 text-primary" />
+            <span>Cooking Instructions</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Textarea
+            placeholder="Enter step-by-step cooking instructions..."
+            value={instructions}
+            onChange={(e) => setInstructions(e.target.value)}
+            className="min-h-[120px] touch-target"
+          />
+        </CardContent>
+      </Card>
 
-        {/* Bottom spacing */}
-        <div className="h-20"></div>
+      {/* Save Recipe */}
+      <div className="flex space-x-3">
+        <Button
+          variant="outline"
+          onClick={resetForm}
+          className="flex-1 touch-target"
+        >
+          Clear All
+        </Button>
+        <Button
+          onClick={saveRecipe}
+          disabled={createRecipeMutation.isPending || !recipeName.trim() || ingredients.length === 0}
+          className="flex-1 touch-target btn-animate"
+        >
+          <Save className="h-4 w-4 mr-2" />
+          {createRecipeMutation.isPending ? 'Saving...' : 'Save Recipe'}
+        </Button>
       </div>
     </div>
   );

@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from './hooks/useAuth';
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { DragDropProvider } from '@/components/DragDropProvider';
 import { Navigation } from '@/components/Navigation';
+import { useToast } from '@/hooks/useToast';
 
 // Pages
 import Landing from '@/pages/Landing';
@@ -87,6 +88,49 @@ function PWAInstallPrompt() {
 function AppRouter() {
   const { isAuthenticated, isLoading } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [notifications, setNotifications] = useState<string[]>([]);
+  const { toast } = useToast();
+
+  // Enhanced notification system
+  const showToast = useCallback((message: string, type: 'default' | 'destructive' = 'default') => {
+    toast({
+      description: message,
+      variant: type,
+      duration: 3000
+    });
+  }, [toast]);
+
+  // Development keyboard shortcuts
+  useEffect(() => {
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    if (!isDevelopment) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl/Cmd + Shift + D = Go to Dashboard
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'D') {
+        e.preventDefault();
+        setActiveTab('dashboard');
+        showToast('Navigated to Dashboard');
+      }
+      
+      // Ctrl/Cmd + Shift + M = Go to Meals
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'M') {
+        e.preventDefault();
+        setActiveTab('meals');
+        showToast('Navigated to Meal Logger');
+      }
+      
+      // Ctrl/Cmd + Shift + R = Go to Recipe Builder
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'R') {
+        e.preventDefault();
+        setActiveTab('recipe-builder');
+        showToast('Navigated to Recipe Builder');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showToast]);
 
   // Handle URL shortcuts from PWA manifest
   useEffect(() => {
@@ -118,19 +162,26 @@ function AppRouter() {
 
   // Main app interface
   const renderCurrentPage = () => {
+    const commonProps = {
+      onNavigate: setActiveTab,
+      showToast,
+      notifications,
+      setNotifications
+    };
+
     switch (activeTab) {
       case 'dashboard':
-        return <Dashboard onNavigate={setActiveTab} />;
+        return <Dashboard {...commonProps} />;
       case 'meals':
-        return <MealLogger onNavigate={setActiveTab} />;
+        return <MealLogger {...commonProps} />;
       case 'recipe-builder':
-        return <RecipeBuilder onNavigate={setActiveTab} />;
+        return <RecipeBuilder {...commonProps} />;
       case 'calendar':
-        return <Calendar onNavigate={setActiveTab} />;
+        return <Calendar {...commonProps} />;
       case 'profile':
-        return <Profile onNavigate={setActiveTab} />;
+        return <Profile {...commonProps} />;
       default:
-        return <Dashboard onNavigate={setActiveTab} />;
+        return <Dashboard {...commonProps} />;
     }
   };
 

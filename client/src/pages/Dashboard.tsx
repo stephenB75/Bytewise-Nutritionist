@@ -1,274 +1,258 @@
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useAuth } from '@/hooks/useAuth';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { ProgressRing } from '@/components/ProgressRing';
-import { MealCard } from '@/components/MealCard';
-import { TrendingUp, Calendar, Calculator, Bell, Droplets, Utensils, Trophy } from 'lucide-react';
+import { Calendar, Plus, TrendingUp, Target, Droplets, Clock } from 'lucide-react';
+import { formatCalories, calculatePercentage, formatDate } from '@/lib/utils';
 
 interface DashboardProps {
-  onNavigate: (page: string) => void;
+  onNavigate: (tab: string) => void;
+  showToast: (message: string, type?: 'default' | 'destructive') => void;
+  notifications: string[];
+  setNotifications: (notifications: string[]) => void;
 }
 
-export default function Dashboard({ onNavigate }: DashboardProps) {
-  const { user } = useAuth();
-  const today = new Date().toISOString().split('T')[0];
+export default function Dashboard({ onNavigate, showToast, notifications, setNotifications }: DashboardProps) {
+  const [currentDate, setCurrentDate] = useState(new Date());
 
-  const { data: stats } = useQuery<{
-    totalCalories: number;
-    totalProtein: number;
-    totalCarbs: number;
-    totalFat: number;
-    waterGlasses: number;
-  }>({
-    queryKey: ['/api/stats', today],
-    enabled: !!user,
+  // Fetch user's daily nutrition data
+  const { data: todayStats, isLoading } = useQuery({
+    queryKey: ['/api/meals/today'],
+    retry: false,
   });
 
-  const { data: recentMeals } = useQuery<Array<any>>({
-    queryKey: ['/api/meals'],
-    enabled: !!user,
+  // Fetch user profile with goals
+  const { data: userProfile } = useQuery({
+    queryKey: ['/api/auth/user'],
+    retry: false,
   });
 
-  const userStats = stats || {
-    totalCalories: 0,
-    totalProtein: 0,
-    totalCarbs: 0,
-    totalFat: 0,
-    waterGlasses: 0,
+  // Mock data for demonstration (will be replaced with real API data)
+  const mockStats = {
+    calories: { consumed: 1420, goal: userProfile?.dailyCalorieGoal || 2000 },
+    protein: { consumed: 85, goal: userProfile?.dailyProteinGoal || 150 },
+    carbs: { consumed: 180, goal: userProfile?.dailyCarbGoal || 200 },
+    fat: { consumed: 65, goal: userProfile?.dailyFatGoal || 70 },
+    water: { consumed: 6, goal: userProfile?.dailyWaterGoal || 8 }
   };
 
-  const goals = {
-    calories: user?.dailyCalorieGoal || 2000,
-    protein: user?.dailyProteinGoal || 150,
-    carbs: user?.dailyCarbGoal || 200,
-    fat: user?.dailyFatGoal || 70,
-    water: user?.dailyWaterGoal || 8,
-  };
+  const stats = todayStats || mockStats;
 
-  const calorieProgress = Math.round((userStats.totalCalories / goals.calories) * 100);
-  const proteinProgress = Math.round((userStats.totalProtein / goals.protein) * 100);
+  // Quick actions
+  const quickActions = [
+    {
+      title: 'Log Breakfast',
+      icon: '🌅',
+      action: () => {
+        onNavigate('meals');
+        showToast('Opening Meal Logger for breakfast');
+      }
+    },
+    {
+      title: 'Add Recipe',
+      icon: '👨‍🍳',
+      action: () => {
+        onNavigate('recipe-builder');
+        showToast('Opening Recipe Builder');
+      }
+    },
+    {
+      title: 'Log Water',
+      icon: '💧',
+      action: () => {
+        showToast('Added 1 glass of water!');
+        // TODO: Implement water logging API call
+      }
+    },
+    {
+      title: 'View Calendar',
+      icon: '📅',
+      action: () => {
+        onNavigate('calendar');
+        showToast('Opening nutrition calendar');
+      }
+    }
+  ];
 
-  return (
-    <div className="flex-1 overflow-y-auto hide-scrollbar safe-area-top">
-      {/* Header */}
-      <div className="bg-primary text-white p-4">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-              {user?.profileImageUrl ? (
-                <img 
-                  src={user.profileImageUrl} 
-                  alt="Profile" 
-                  className="w-8 h-8 rounded-full object-cover"
-                />
-              ) : (
-                <span className="text-sm font-bold">
-                  {user?.firstName?.[0] || user?.email?.[0]?.toUpperCase()}
-                </span>
-              )}
-            </div>
-            <div>
-              <p className="text-sm font-medium">
-                Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening'}, {user?.firstName || 'there'}
-              </p>
-              <p className="text-xs opacity-90">Ready to track your nutrition?</p>
-            </div>
-          </div>
-          <Button 
-            variant="ghost" 
-            size="sm"
-            className="w-10 h-10 bg-white/20 rounded-full p-0 text-white hover:bg-white/30"
-          >
-            <Bell size={16} />
-          </Button>
+  // Calculate daily progress
+  const calorieProgress = calculatePercentage(stats.calories.consumed, stats.calories.goal);
+  const proteinProgress = calculatePercentage(stats.protein.consumed, stats.protein.goal);
+  const carbProgress = calculatePercentage(stats.carbs.consumed, stats.carbs.goal);
+  const fatProgress = calculatePercentage(stats.fat.consumed, stats.fat.goal);
+  const waterProgress = calculatePercentage(stats.water.consumed, stats.water.goal);
+
+  // Overall progress calculation
+  const overallProgress = (calorieProgress + proteinProgress + carbProgress + fatProgress) / 4;
+
+  useEffect(() => {
+    // Welcome message for first-time users
+    if (!notifications.includes('welcome') && userProfile) {
+      setNotifications([...notifications, 'welcome']);
+      showToast(`Welcome back, ${userProfile.firstName || 'there'}! Ready to track your nutrition?`);
+    }
+  }, [userProfile, notifications, setNotifications, showToast]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-pulse space-y-4">
+          <div className="h-4 bg-muted rounded w-32"></div>
+          <div className="h-32 bg-muted rounded"></div>
         </div>
       </div>
+    );
+  }
 
-      <div className="p-4 space-y-6">
-        {/* Daily Progress */}
-        <Card className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">Today's Progress</h2>
-            <Badge 
-              variant={calorieProgress >= 80 ? "default" : "secondary"}
-              className="text-xs"
-            >
-              {calorieProgress >= 80 ? 'On Track' : 'Keep Going'}
+  return (
+    <div className="min-h-screen bg-background p-4 pb-20">
+      {/* Header */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-2">
+          <h1 className="text-2xl font-bold brand-text-primary">Dashboard</h1>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onNavigate('calendar')}
+            className="touch-target"
+          >
+            <Calendar className="h-4 w-4 mr-2" />
+            {formatDate(currentDate)}
+          </Button>
+        </div>
+        <p className="text-muted-foreground">Track your daily nutrition progress</p>
+      </div>
+
+      {/* Daily Progress Overview */}
+      <Card className="mb-6 brand-card">
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Target className="h-5 w-5 text-primary" />
+            <span>Today's Progress</span>
+            <Badge variant="outline" className="ml-auto">
+              {Math.round(overallProgress)}% Complete
             </Badge>
-          </div>
-          
-          {/* Circular Progress */}
-          <div className="flex items-center justify-center mb-6">
-            <ProgressRing
-              value={userStats.totalCalories}
-              max={goals.calories}
-              size={128}
-              color="hsl(var(--primary))"
-            >
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary">
-                  {Math.round(userStats.totalCalories)}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  of {goals.calories} cal
-                </div>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {/* Calories */}
+            <div>
+              <div className="flex justify-between text-sm mb-2">
+                <span className="font-medium">Calories</span>
+                <span className="text-muted-foreground">
+                  {formatCalories(stats.calories.consumed)} / {formatCalories(stats.calories.goal)}
+                </span>
               </div>
-            </ProgressRing>
-          </div>
+              <Progress value={calorieProgress} className="h-2" />
+            </div>
 
-          {/* Macro Breakdown */}
-          <div className="grid grid-cols-3 gap-4">
-            <div className="text-center">
-              <div className="w-full bg-muted rounded-full h-2 mb-2">
-                <div 
-                  className="bg-chart-2 h-2 rounded-full transition-all"
-                  style={{ width: `${Math.min(proteinProgress, 100)}%` }}
-                ></div>
+            {/* Macros */}
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <div className="flex justify-between text-xs mb-1">
+                  <span className="text-chart-2 font-medium">Protein</span>
+                  <span>{stats.protein.consumed}g</span>
+                </div>
+                <Progress value={proteinProgress} className="h-1.5" />
               </div>
-              <p className="text-sm font-medium">Protein</p>
-              <p className="text-xs text-muted-foreground">
-                {Math.round(userStats.totalProtein)}g / {goals.protein}g
-              </p>
+              <div>
+                <div className="flex justify-between text-xs mb-1">
+                  <span className="text-chart-3 font-medium">Carbs</span>
+                  <span>{stats.carbs.consumed}g</span>
+                </div>
+                <Progress value={carbProgress} className="h-1.5" />
+              </div>
+              <div>
+                <div className="flex justify-between text-xs mb-1">
+                  <span className="text-chart-1 font-medium">Fat</span>
+                  <span>{stats.fat.consumed}g</span>
+                </div>
+                <Progress value={fatProgress} className="h-1.5" />
+              </div>
             </div>
-            <div className="text-center">
-              <div className="w-full bg-muted rounded-full h-2 mb-2">
-                <div 
-                  className="bg-chart-4 h-2 rounded-full transition-all"
-                  style={{ width: `${Math.min((userStats.totalCarbs / goals.carbs) * 100, 100)}%` }}
-                ></div>
+
+            {/* Water */}
+            <div>
+              <div className="flex justify-between text-sm mb-2">
+                <span className="font-medium flex items-center">
+                  <Droplets className="h-4 w-4 mr-1 text-blue-500" />
+                  Water
+                </span>
+                <span className="text-muted-foreground">
+                  {stats.water.consumed} / {stats.water.goal} glasses
+                </span>
               </div>
-              <p className="text-sm font-medium">Carbs</p>
-              <p className="text-xs text-muted-foreground">
-                {Math.round(userStats.totalCarbs)}g / {goals.carbs}g
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-full bg-muted rounded-full h-2 mb-2">
-                <div 
-                  className="bg-chart-3 h-2 rounded-full transition-all"
-                  style={{ width: `${Math.min((userStats.totalFat / goals.fat) * 100, 100)}%` }}
-                ></div>
-              </div>
-              <p className="text-sm font-medium">Fat</p>
-              <p className="text-xs text-muted-foreground">
-                {Math.round(userStats.totalFat)}g / {goals.fat}g
-              </p>
+              <Progress value={waterProgress} className="h-2" />
             </div>
           </div>
-        </Card>
+        </CardContent>
+      </Card>
 
-        {/* Quick Actions */}
-        <Card className="p-4">
-          <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
+      {/* Quick Actions */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Plus className="h-5 w-5 text-primary" />
+            <span>Quick Actions</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
           <div className="grid grid-cols-2 gap-3">
-            <Button
-              variant="outline"
-              className="flex items-center justify-start space-x-3 p-4 h-auto touch-target"
-              onClick={() => onNavigate('meals')}
-            >
-              <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
-                <Utensils className="w-5 h-5 text-primary" />
-              </div>
-              <div className="text-left">
-                <p className="font-medium text-sm">Log Meal</p>
-                <p className="text-xs text-muted-foreground">Add food to diary</p>
-              </div>
-            </Button>
-            <Button
-              variant="outline"
-              className="flex items-center justify-start space-x-3 p-4 h-auto touch-target"
-              onClick={() => onNavigate('recipe-builder')}
-            >
-              <div className="w-10 h-10 bg-secondary/10 rounded-xl flex items-center justify-center">
-                <Calculator className="w-5 h-5 text-secondary" />
-              </div>
-              <div className="text-left">
-                <p className="font-medium text-sm">Create Recipe</p>
-                <p className="text-xs text-muted-foreground">Build & analyze</p>
-              </div>
-            </Button>
-          </div>
-        </Card>
-
-        {/* Water Intake */}
-        <Card className="p-4">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center space-x-2">
-              <Droplets className="w-5 h-5 text-blue-500" />
-              <h3 className="font-semibold">Water Intake</h3>
-            </div>
-            <span className="text-sm font-medium">
-              {userStats.waterGlasses} / {goals.water}
-            </span>
-          </div>
-          <div className="flex space-x-1">
-            {Array.from({ length: goals.water }).map((_, i) => (
-              <div
-                key={i}
-                className={`flex-1 h-2 rounded-full ${
-                  i < userStats.waterGlasses ? 'bg-blue-500' : 'bg-muted'
-                }`}
-              />
+            {quickActions.map((action, index) => (
+              <Button
+                key={index}
+                variant="outline"
+                className="h-16 flex flex-col items-center justify-center space-y-1 touch-target btn-animate"
+                onClick={action.action}
+              >
+                <span className="text-xl">{action.icon}</span>
+                <span className="text-xs font-medium">{action.title}</span>
+              </Button>
             ))}
           </div>
-        </Card>
+        </CardContent>
+      </Card>
 
-        {/* Recent Meals */}
-        <Card className="p-4">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold">Recent Meals</h3>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => onNavigate('meals')}
+      {/* Recent Activity */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Clock className="h-5 w-5 text-primary" />
+            <span>Recent Activity</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            <div className="flex items-center space-x-3 p-3 rounded-lg bg-muted/50">
+              <span className="text-lg">🥗</span>
+              <div className="flex-1">
+                <p className="font-medium text-sm">Greek Salad added</p>
+                <p className="text-xs text-muted-foreground">Lunch • 2 hours ago</p>
+              </div>
+              <Badge variant="outline" className="text-xs">320 cal</Badge>
+            </div>
+            
+            <div className="flex items-center space-x-3 p-3 rounded-lg bg-muted/50">
+              <span className="text-lg">💧</span>
+              <div className="flex-1">
+                <p className="font-medium text-sm">2 glasses of water</p>
+                <p className="text-xs text-muted-foreground">3 hours ago</p>
+              </div>
+              <Badge variant="outline" className="text-xs">16 oz</Badge>
+            </div>
+
+            <Button
+              variant="ghost"
+              className="w-full text-primary"
+              onClick={() => onNavigate('calendar')}
             >
-              View All
+              View All Activity
             </Button>
           </div>
-          <div className="space-y-3">
-            {recentMeals && recentMeals.length > 0 ? (
-              recentMeals.slice(0, 3).map((meal: any) => (
-                <MealCard 
-                  key={meal.id} 
-                  meal={meal}
-                />
-              ))
-            ) : (
-              <div className="text-center py-6 text-muted-foreground">
-                <p className="text-sm">No meals logged yet</p>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="mt-2"
-                  onClick={() => onNavigate('meals')}
-                >
-                  Log Your First Meal
-                </Button>
-              </div>
-            )}
-          </div>
-        </Card>
-
-        {/* Nutrition Tip */}
-        <Card className="p-4 bg-gradient-to-r from-primary/5 to-secondary/5">
-          <div className="flex items-start space-x-3">
-            <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
-              <Trophy className="w-5 h-5 text-primary" />
-            </div>
-            <div>
-              <h4 className="font-semibold text-sm mb-1">Today's Tip</h4>
-              <p className="text-xs text-muted-foreground">
-                Try adding more colorful vegetables to your meals for a wider range of nutrients and antioxidants.
-              </p>
-            </div>
-          </div>
-        </Card>
-
-        {/* Bottom spacing for navigation */}
-        <div className="h-20"></div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

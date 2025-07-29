@@ -1,314 +1,331 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useAuth } from '@/hooks/useAuth';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { MealCard } from '@/components/MealCard';
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, BarChart3 } from 'lucide-react';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, isToday } from 'date-fns';
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, TrendingUp, Target } from 'lucide-react';
+import { formatDate, formatCalories, calculatePercentage } from '@/lib/utils';
 
 interface CalendarProps {
-  onNavigate: (page: string) => void;
+  onNavigate: (tab: string) => void;
+  showToast: (message: string, type?: 'default' | 'destructive') => void;
+  notifications: string[];
+  setNotifications: (notifications: string[]) => void;
 }
 
-export default function Calendar({ onNavigate }: CalendarProps) {
-  const { user } = useAuth();
+export default function Calendar({ onNavigate, showToast, notifications, setNotifications }: CalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
 
-  const monthStart = startOfMonth(currentDate);
-  const monthEnd = endOfMonth(currentDate);
-  const monthDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
-
-  // Get meals for the selected date
-  const selectedDateStr = format(selectedDate, 'yyyy-MM-dd');
-  const { data: selectedDateMeals } = useQuery({
-    queryKey: ['/api/meals', { startDate: selectedDateStr, endDate: selectedDateStr }],
-    enabled: !!user,
+  // Fetch nutrition data for the selected month
+  const { data: monthlyData } = useQuery({
+    queryKey: ['/api/meals/monthly', currentDate.getFullYear(), currentDate.getMonth()],
+    retry: false,
   });
 
-  // Get stats for the selected date
-  const { data: selectedDateStats } = useQuery({
-    queryKey: ['/api/stats', selectedDateStr],
-    enabled: !!user,
+  // Fetch specific day data
+  const { data: dayData } = useQuery({
+    queryKey: ['/api/meals/date', selectedDate.toISOString().split('T')[0]],
+    retry: false,
   });
 
-  // Get meals for the entire month (for calendar dots)
-  const monthStartStr = format(monthStart, 'yyyy-MM-dd');
-  const monthEndStr = format(monthEnd, 'yyyy-MM-dd');
-  const { data: monthMeals } = useQuery({
-    queryKey: ['/api/meals', { startDate: monthStartStr, endDate: monthEndStr }],
-    enabled: !!user,
-  });
-
-  const handlePrevMonth = () => {
-    setCurrentDate(prev => subMonths(prev, 1));
+  // Mock monthly data for demonstration
+  const mockMonthlyData = {
+    '2024-01-15': { calories: 1850, protein: 145, carbs: 180, fat: 65, complete: true },
+    '2024-01-16': { calories: 2100, protein: 160, carbs: 210, fat: 78, complete: true },
+    '2024-01-17': { calories: 1920, protein: 138, carbs: 195, fat: 68, complete: true },
+    '2024-01-18': { calories: 1680, protein: 125, carbs: 165, fat: 58, complete: false },
+    '2024-01-19': { calories: 2250, protein: 175, carbs: 225, fat: 85, complete: true },
+    '2024-01-20': { calories: 1950, protein: 148, carbs: 188, fat: 72, complete: true },
   };
 
-  const handleNextMonth = () => {
-    setCurrentDate(prev => addMonths(prev, 1));
+  const nutritionData = monthlyData || mockMonthlyData;
+
+  // Generate calendar days
+  const generateCalendarDays = () => {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const startDate = new Date(firstDay);
+    startDate.setDate(startDate.getDate() - firstDay.getDay());
+    
+    const days = [];
+    const currentDay = new Date(startDate);
+    
+    for (let i = 0; i < 42; i++) {
+      days.push(new Date(currentDay));
+      currentDay.setDate(currentDay.getDate() + 1);
+    }
+    
+    return days;
   };
 
-  const handleDateClick = (date: Date) => {
-    setSelectedDate(date);
+  const calendarDays = generateCalendarDays();
+
+  const navigateMonth = (direction: 'prev' | 'next') => {
+    const newDate = new Date(currentDate);
+    if (direction === 'prev') {
+      newDate.setMonth(newDate.getMonth() - 1);
+    } else {
+      newDate.setMonth(newDate.getMonth() + 1);
+    }
+    setCurrentDate(newDate);
   };
 
-  const getDayMeals = (date: Date) => {
-    if (!monthMeals) return [];
-    const dateStr = format(date, 'yyyy-MM-dd');
-    return monthMeals.filter((meal: any) => 
-      format(new Date(meal.date), 'yyyy-MM-dd') === dateStr
-    );
+  const getDayData = (date: Date) => {
+    const dateKey = date.toISOString().split('T')[0];
+    return nutritionData[dateKey];
   };
 
-  const hasDataForDate = (date: Date) => {
-    const dayMeals = getDayMeals(date);
-    return dayMeals.length > 0;
+  const getDayStatus = (date: Date) => {
+    const data = getDayData(date);
+    if (!data) return 'none';
+    
+    const calorieGoal = 2000; // Should come from user profile
+    const calorieProgress = calculatePercentage(data.calories, calorieGoal);
+    
+    if (calorieProgress < 50) return 'low';
+    if (calorieProgress >= 50 && calorieProgress < 90) return 'good';
+    if (calorieProgress >= 90 && calorieProgress <= 110) return 'perfect';
+    return 'high';
   };
 
-  // Calculate weekly stats
-  const weeklyStats = {
-    mealsLogged: selectedDateMeals?.length || 0,
-    avgCalories: selectedDateStats?.totalCalories || 0,
-    goalsMet: selectedDateStats ? 
-      Math.round(((selectedDateStats.totalCalories / (user?.dailyCalorieGoal || 2000)) * 100)) : 0
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'low': return 'bg-red-100 text-red-700 border-red-200';
+      case 'good': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
+      case 'perfect': return 'bg-green-100 text-green-700 border-green-200';
+      case 'high': return 'bg-orange-100 text-orange-700 border-orange-200';
+      default: return 'bg-muted text-muted-foreground border-border';
+    }
   };
 
-  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const isToday = (date: Date) => {
+    const today = new Date();
+    return date.toDateString() === today.toDateString();
+  };
 
-  // Calculate the starting day of the month
-  const startDay = monthStart.getDay();
-  const emptyDays = Array.from({ length: startDay }, (_, i) => i);
+  const isCurrentMonth = (date: Date) => {
+    return date.getMonth() === currentDate.getMonth();
+  };
+
+  const selectedDayData = getDayData(selectedDate);
 
   return (
-    <div className="flex-1 overflow-y-auto hide-scrollbar">
+    <div className="min-h-screen bg-background p-4 pb-20">
       {/* Header */}
-      <div className="bg-surface p-4 card-shadow">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-xl font-bold">Meal Calendar</h1>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="w-10 h-10 rounded-full p-0"
-          >
-            <CalendarIcon size={20} />
-          </Button>
-        </div>
-        
-        {/* Month Navigation */}
-        <div className="flex items-center justify-between">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handlePrevMonth}
-            className="w-10 h-10 rounded-full p-0"
-          >
-            <ChevronLeft size={20} />
-          </Button>
-          <h2 className="text-lg font-semibold">
-            {format(currentDate, 'MMMM yyyy')}
-          </h2>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleNextMonth}
-            className="w-10 h-10 rounded-full p-0"
-          >
-            <ChevronRight size={20} />
-          </Button>
-        </div>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold brand-text-primary mb-2">Nutrition Calendar</h1>
+        <p className="text-muted-foreground">Track your daily nutrition progress over time</p>
       </div>
 
-      <div className="p-4 space-y-6">
-        {/* Calendar Grid */}
-        <Card className="p-4">
-          {/* Days of Week */}
-          <div className="grid grid-cols-7 gap-1 mb-2">
-            {days.map((day) => (
-              <div key={day} className="text-center text-xs font-medium text-muted-foreground py-2">
+      {/* Calendar Navigation */}
+      <Card className="mb-6">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigateMonth('prev')}
+              className="touch-target"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <h2 className="text-lg font-semibold flex items-center space-x-2">
+              <CalendarIcon className="h-5 w-5 text-primary" />
+              <span>
+                {currentDate.toLocaleDateString('en-US', { 
+                  month: 'long', 
+                  year: 'numeric' 
+                })}
+              </span>
+            </h2>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigateMonth('next')}
+              className="touch-target"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {/* Calendar Grid */}
+          <div className="grid grid-cols-7 gap-2 mb-4">
+            {/* Day headers */}
+            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+              <div key={day} className="text-center text-xs font-medium text-muted-foreground p-2">
                 {day}
               </div>
             ))}
-          </div>
-          
-          {/* Calendar Days */}
-          <div className="grid grid-cols-7 gap-1">
-            {/* Empty cells for month start */}
-            {emptyDays.map((index) => (
-              <div key={`empty-${index}`} className="aspect-square"></div>
-            ))}
             
-            {/* Month days */}
-            {monthDays.map((date) => {
-              const isSelected = isSameDay(date, selectedDate);
-              const isCurrentDay = isToday(date);
-              const hasData = hasDataForDate(date);
+            {/* Calendar days */}
+            {calendarDays.map((date, index) => {
+              const status = getDayStatus(date);
+              const dayData = getDayData(date);
+              const isSelected = date.toDateString() === selectedDate.toDateString();
               
               return (
                 <button
-                  key={date.toISOString()}
-                  onClick={() => handleDateClick(date)}
-                  className={`aspect-square relative rounded-lg transition-all touch-target text-sm ${
-                    isSelected
-                      ? 'bg-primary text-white'
-                      : isCurrentDay
-                      ? 'bg-primary/20 text-primary font-medium'
-                      : 'hover:bg-muted'
-                  }`}
+                  key={index}
+                  onClick={() => setSelectedDate(date)}
+                  className={`
+                    relative p-2 text-sm rounded-lg border-2 transition-all touch-target
+                    ${isSelected ? 'border-primary bg-primary/10' : 'border-transparent'}
+                    ${isCurrentMonth(date) ? '' : 'opacity-40'}
+                    ${getStatusColor(status)}
+                    ${isToday(date) ? 'ring-2 ring-primary/50' : ''}
+                    hover:scale-105 active:scale-95
+                  `}
                 >
-                  <span>{format(date, 'd')}</span>
-                  {hasData && (
-                    <div className={`absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 rounded-full ${
-                      isSelected ? 'bg-white' : 'bg-primary'
-                    }`}></div>
+                  <div className="font-medium">{date.getDate()}</div>
+                  {dayData && (
+                    <div className="text-xs mt-1">
+                      {formatCalories(dayData.calories)}
+                    </div>
+                  )}
+                  {isToday(date) && (
+                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full"></div>
                   )}
                 </button>
               );
             })}
           </div>
-        </Card>
 
-        {/* Selected Date Details */}
-        <Card className="p-4">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold">
-              {format(selectedDate, 'EEEE, MMM d')}
-            </h3>
-            <Badge 
-              variant={selectedDateMeals && selectedDateMeals.length > 0 ? "default" : "secondary"}
-              className="text-xs"
-            >
-              {selectedDateMeals && selectedDateMeals.length > 0 ? 'Logged' : 'No Data'}
-            </Badge>
+          {/* Legend */}
+          <div className="flex flex-wrap gap-2 text-xs">
+            <div className="flex items-center space-x-1">
+              <div className="w-3 h-3 rounded bg-red-100 border border-red-200"></div>
+              <span>Under target</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <div className="w-3 h-3 rounded bg-yellow-100 border border-yellow-200"></div>
+              <span>Good progress</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <div className="w-3 h-3 rounded bg-green-100 border border-green-200"></div>
+              <span>On target</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <div className="w-3 h-3 rounded bg-orange-100 border border-orange-200"></div>
+              <span>Over target</span>
+            </div>
           </div>
-          
-          {selectedDateMeals && selectedDateMeals.length > 0 ? (
-            <div>
-              <div className="grid grid-cols-3 gap-4 text-center mb-4 p-3 bg-muted/30 rounded-lg">
-                <div>
-                  <div className="font-bold text-primary">
-                    {selectedDateMeals.length}
-                  </div>
-                  <div className="text-xs text-muted-foreground">Meals</div>
-                </div>
-                <div>
-                  <div className="font-bold text-primary">
-                    {Math.round(selectedDateStats?.totalCalories || 0)}
-                  </div>
-                  <div className="text-xs text-muted-foreground">Calories</div>
-                </div>
-                <div>
-                  <div className="font-bold text-primary">
-                    {Math.round(selectedDateStats?.totalProtein || 0)}g
-                  </div>
-                  <div className="text-xs text-muted-foreground">Protein</div>
-                </div>
+        </CardContent>
+      </Card>
+
+      {/* Selected Day Details */}
+      {selectedDayData && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Target className="h-5 w-5 text-primary" />
+              <span>{formatDate(selectedDate)} Details</span>
+              <Badge 
+                variant="outline" 
+                className={getStatusColor(getDayStatus(selectedDate))}
+              >
+                {formatCalories(selectedDayData.calories)} calories
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-4 gap-4 text-center">
+              <div>
+                <div className="text-2xl font-bold">{formatCalories(selectedDayData.calories)}</div>
+                <div className="text-xs text-muted-foreground">Calories</div>
               </div>
-              
-              <div className="space-y-3">
-                {selectedDateMeals.map((meal: any) => (
-                  <MealCard key={meal.id} meal={meal} />
-                ))}
+              <div>
+                <div className="text-2xl font-bold text-chart-2">{selectedDayData.protein}g</div>
+                <div className="text-xs text-muted-foreground">Protein</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-chart-3">{selectedDayData.carbs}g</div>
+                <div className="text-xs text-muted-foreground">Carbs</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-chart-1">{selectedDayData.fat}g</div>
+                <div className="text-xs text-muted-foreground">Fat</div>
               </div>
             </div>
-          ) : (
-            <div className="text-center py-6 text-muted-foreground">
-              <CalendarIcon className="w-12 h-12 mx-auto mb-2 opacity-50" />
-              <p className="text-sm mb-2">No meals logged for this date</p>
+            
+            <div className="mt-4 flex space-x-3">
               <Button
                 variant="outline"
-                size="sm"
-                onClick={() => onNavigate('meals')}
+                className="flex-1 touch-target"
+                onClick={() => {
+                  onNavigate('meals');
+                  showToast(`Opening meal logger for ${formatDate(selectedDate)}`);
+                }}
               >
-                Log a Meal
+                View Meals
+              </Button>
+              <Button
+                variant="outline"
+                className="flex-1 touch-target"
+                onClick={() => {
+                  onNavigate('meals');
+                  showToast('Add meal for this day');
+                }}
+              >
+                Add Meal
               </Button>
             </div>
-          )}
+          </CardContent>
         </Card>
+      )}
 
-        {/* Weekly/Monthly Stats */}
-        <Card className="p-4">
-          <div className="flex items-center mb-3">
-            <BarChart3 className="w-5 h-5 text-primary mr-2" />
-            <h3 className="font-semibold">This Week</h3>
+      {/* Monthly Summary */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <TrendingUp className="h-5 w-5 text-primary" />
+            <span>Monthly Summary</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="text-center p-4 rounded-lg bg-muted/50">
+                <div className="text-lg font-bold">
+                  {Object.keys(nutritionData).length}
+                </div>
+                <div className="text-sm text-muted-foreground">Days Tracked</div>
+              </div>
+              <div className="text-center p-4 rounded-lg bg-muted/50">
+                <div className="text-lg font-bold">
+                  {Object.values(nutritionData).filter((day: any) => day.complete).length}
+                </div>
+                <div className="text-sm text-muted-foreground">Complete Days</div>
+              </div>
+            </div>
+
+            <div className="text-center">
+              <div className="text-2xl font-bold text-primary">
+                {Math.round(
+                  Object.values(nutritionData).reduce((avg: number, day: any) => avg + day.calories, 0) / 
+                  Object.keys(nutritionData).length
+                )}
+              </div>
+              <div className="text-sm text-muted-foreground">Average Daily Calories</div>
+            </div>
+
+            <Button
+              variant="outline"
+              className="w-full touch-target"
+              onClick={() => {
+                onNavigate('dashboard');
+                showToast('Viewing detailed analytics');
+              }}
+            >
+              View Detailed Analytics
+            </Button>
           </div>
-          <div className="grid grid-cols-3 gap-4 text-center">
-            <div>
-              <div className="text-lg font-bold">12</div>
-              <div className="text-xs text-muted-foreground">Meals</div>
-            </div>
-            <div>
-              <div className="text-lg font-bold">1,847</div>
-              <div className="text-xs text-muted-foreground">Avg Calories</div>
-            </div>
-            <div>
-              <div className="text-lg font-bold">85%</div>
-              <div className="text-xs text-muted-foreground">Goal Met</div>
-            </div>
-          </div>
-        </Card>
-
-        {/* Nutrition Goals for Selected Date */}
-        {selectedDateStats && (
-          <Card className="p-4">
-            <h3 className="font-semibold mb-3">Daily Goals Progress</h3>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Calories</span>
-                <div className="flex items-center space-x-2">
-                  <div className="w-20 bg-muted rounded-full h-2">
-                    <div 
-                      className="bg-primary h-2 rounded-full transition-all"
-                      style={{ 
-                        width: `${Math.min((selectedDateStats.totalCalories / (user?.dailyCalorieGoal || 2000)) * 100, 100)}%` 
-                      }}
-                    ></div>
-                  </div>
-                  <span className="text-xs font-medium">
-                    {Math.round((selectedDateStats.totalCalories / (user?.dailyCalorieGoal || 2000)) * 100)}%
-                  </span>
-                </div>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Protein</span>
-                <div className="flex items-center space-x-2">
-                  <div className="w-20 bg-muted rounded-full h-2">
-                    <div 
-                      className="bg-chart-2 h-2 rounded-full transition-all"
-                      style={{ 
-                        width: `${Math.min((selectedDateStats.totalProtein / (user?.dailyProteinGoal || 150)) * 100, 100)}%` 
-                      }}
-                    ></div>
-                  </div>
-                  <span className="text-xs font-medium">
-                    {Math.round((selectedDateStats.totalProtein / (user?.dailyProteinGoal || 150)) * 100)}%
-                  </span>
-                </div>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Water</span>
-                <div className="flex items-center space-x-2">
-                  <div className="w-20 bg-muted rounded-full h-2">
-                    <div 
-                      className="bg-blue-500 h-2 rounded-full transition-all"
-                      style={{ 
-                        width: `${Math.min((selectedDateStats.waterGlasses / (user?.dailyWaterGoal || 8)) * 100, 100)}%` 
-                      }}
-                    ></div>
-                  </div>
-                  <span className="text-xs font-medium">
-                    {Math.round((selectedDateStats.waterGlasses / (user?.dailyWaterGoal || 8)) * 100)}%
-                  </span>
-                </div>
-              </div>
-            </div>
-          </Card>
-        )}
-
-        {/* Bottom spacing */}
-        <div className="h-20"></div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

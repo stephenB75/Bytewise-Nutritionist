@@ -1,126 +1,225 @@
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
-import { BrandStandard } from '@/components/Brand';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Target, Calendar, ChefHat, TrendingUp, Smartphone, Shield, Zap } from 'lucide-react';
 
 export default function Landing() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const features = [
+    {
+      icon: Target,
+      title: 'Smart Nutrition Tracking',
+      description: 'Track calories, macros, and nutrients with precision. Set personalized goals and monitor your progress.',
+      color: 'text-chart-2'
+    },
+    {
+      icon: ChefHat,
+      title: 'Recipe Builder',
+      description: 'Create custom recipes with automatic nutrition calculations. Build your personal recipe collection.',
+      color: 'text-chart-1'
+    },
+    {
+      icon: Calendar,
+      title: 'Progress Calendar',
+      description: 'Visualize your nutrition journey over time. Identify patterns and celebrate milestones.',
+      color: 'text-chart-3'
+    },
+    {
+      icon: TrendingUp,
+      title: 'Analytics & Insights',
+      description: 'Get detailed analytics on your eating habits. Make data-driven decisions for better health.',
+      color: 'text-primary'
+    }
+  ];
 
-  const handleLogin = async () => {
-    setIsLoading(true);
-    // Simulate a brief loading state before redirect
-    setTimeout(() => {
-      window.location.href = `/api/login`;
-    }, 300);
-  };
+  const benefits = [
+    {
+      icon: Smartphone,
+      title: 'Mobile-First Design',
+      description: 'Optimized for mobile devices with touch-friendly interfaces and offline capabilities.'
+    },
+    {
+      icon: Shield,
+      title: 'Secure & Private',
+      description: 'Your data is encrypted and secure. We respect your privacy and never sell your information.'
+    },
+    {
+      icon: Zap,
+      title: 'Lightning Fast',
+      description: 'Built with modern technology for instant loading and smooth interactions.'
+    }
+  ];
 
   return (
-    <div className="min-h-[100dvh] bg-background flex flex-col justify-center px-4 py-8 safe-area-inset animate-fade-in">
-      {/* Mobile-optimized container */}
-      <div className="w-full max-w-sm mx-auto">
-        {/* Brand section with mobile sizing */}
-        <div className="text-center mb-6">
-          <BrandStandard size="md" className="mb-6" />
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
+      {/* Hero Section */}
+      <div className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+        <div className="relative z-10 px-4 py-16 text-center">
+          {/* Logo */}
+          <div className="mb-8 flex justify-center">
+            <div className="w-20 h-20 bg-primary rounded-3xl flex items-center justify-center shadow-xl">
+              <span className="text-3xl font-bold text-white">B</span>
+            </div>
+          </div>
+
+          {/* Brand Name */}
+          <h1 className="text-4xl font-bold brand-text-primary mb-4">
+            Byte<span className="text-primary">wise</span>
+          </h1>
           
-          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground mb-2">
-            Welcome back
-          </h2>
-          <p className="text-sm text-muted-foreground mb-6">
-            Sign in to track your nutrition journey
-          </p>
-        </div>
-
-        {/* Form with mobile-optimized spacing */}
-        <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); handleLogin(); }}>
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
-              Email address
-            </label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={18} />
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="pl-10 h-12 text-base bg-input-background border-border touch-target"
-                placeholder="Enter your email"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-foreground mb-2">
-              Password
-            </label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={18} />
-              <Input
-                id="password"
-                name="password"
-                type={showPassword ? 'text' : 'password'}
-                autoComplete="current-password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="pl-10 pr-12 h-12 text-base bg-input-background border-border touch-target"
-                placeholder="Enter your password"
-              />
-              <button
-                type="button"
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground touch-target p-1"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between py-2">
-            <button
-              type="button"
-              className="text-sm text-primary hover:text-primary/80 font-medium touch-target p-2"
-            >
-              Forgot password?
-            </button>
-          </div>
-
-          <Button
-            type="submit"
-            className="w-full h-12 text-base bg-primary text-primary-foreground btn-animate touch-target"
-            disabled={isLoading}
-          >
-            {isLoading ? 'Signing in...' : 'Sign in with Replit'}
-          </Button>
-        </form>
-
-        {/* Mobile-optimized footer */}
-        <div className="mt-6 text-center">
-          <p className="text-sm text-muted-foreground">
-            Don't have an account?{' '}
-            <button
-              onClick={handleLogin}
-              className="font-medium text-primary hover:text-primary/80 touch-target p-1"
-            >
-              Sign up
-            </button>
-          </p>
-
           {/* Tagline */}
-          <div className="mt-4 text-center">
-            <p className="text-xs text-muted-foreground/80">
-              Track. Plan. Thrive.
+          <p className="text-xl text-muted-foreground mb-2 max-w-md mx-auto">
+            Smart Nutrition Tracking for a Healthier You
+          </p>
+          
+          {/* Beta Badge */}
+          <Badge variant="outline" className="mb-8 bg-primary/10 border-primary/20">
+            🚀 Now Available
+          </Badge>
+
+          {/* CTA Buttons */}
+          <div className="space-y-4 max-w-sm mx-auto">
+            <Button 
+              onClick={() => window.location.href = '/api/login'}
+              className="w-full h-12 text-lg font-semibold touch-target btn-animate"
+              size="lg"
+            >
+              Start Tracking Now
+            </Button>
+            
+            <p className="text-sm text-muted-foreground">
+              Sign in with your Replit account to get started
             </p>
           </div>
         </div>
       </div>
+
+      {/* Features Section */}
+      <section className="px-4 py-12">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold text-center mb-8">
+            Everything You Need for Nutrition Success
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {features.map((feature, index) => (
+              <Card key={index} className="hover:shadow-lg transition-shadow duration-300">
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-3">
+                    <feature.icon className={`h-6 w-6 ${feature.color}`} />
+                    <span>{feature.title}</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">{feature.description}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Benefits Section */}
+      <section className="px-4 py-12 bg-muted/20">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold text-center mb-8">
+            Why Choose Bytewise?
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {benefits.map((benefit, index) => (
+              <div key={index} className="text-center">
+                <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <benefit.icon className="h-8 w-8 text-primary" />
+                </div>
+                <h3 className="font-semibold mb-2">{benefit.title}</h3>
+                <p className="text-sm text-muted-foreground">{benefit.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Demo Section */}
+      <section className="px-4 py-12">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-2xl font-bold mb-4">
+            See It In Action
+          </h2>
+          <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
+            Bytewise makes nutrition tracking simple and intuitive. Track meals, build recipes, 
+            and monitor your progress with our comprehensive dashboard.
+          </p>
+          
+          {/* Mock Phone Preview */}
+          <div className="relative max-w-sm mx-auto">
+            <div className="bg-gradient-to-br from-muted to-muted/50 rounded-3xl p-8 shadow-2xl">
+              <div className="bg-background rounded-2xl p-6 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold">Today's Progress</h3>
+                  <Badge variant="outline">85% Complete</Badge>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="flex justify-between text-sm">
+                    <span>Calories</span>
+                    <span>1,680 / 2,000</span>
+                  </div>
+                  <div className="w-full bg-muted rounded-full h-2">
+                    <div className="bg-primary h-2 rounded-full" style={{ width: '84%' }}></div>
+                  </div>
+                  
+                  <div className="grid grid-cols-3 gap-2 text-xs">
+                    <div>
+                      <div className="w-full bg-muted rounded-full h-1.5">
+                        <div className="bg-chart-2 h-1.5 rounded-full" style={{ width: '90%' }}></div>
+                      </div>
+                      <span className="text-chart-2">Protein</span>
+                    </div>
+                    <div>
+                      <div className="w-full bg-muted rounded-full h-1.5">
+                        <div className="bg-chart-3 h-1.5 rounded-full" style={{ width: '75%' }}></div>
+                      </div>
+                      <span className="text-chart-3">Carbs</span>
+                    </div>
+                    <div>
+                      <div className="w-full bg-muted rounded-full h-1.5">
+                        <div className="bg-chart-1 h-1.5 rounded-full" style={{ width: '80%' }}></div>
+                      </div>
+                      <span className="text-chart-1">Fat</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="px-4 py-12 text-center">
+        <div className="max-w-2xl mx-auto">
+          <h2 className="text-3xl font-bold mb-4">
+            Ready to Transform Your Nutrition?
+          </h2>
+          <p className="text-muted-foreground mb-8">
+            Join thousands of users who are already achieving their health goals with Bytewise.
+          </p>
+          
+          <Button 
+            onClick={() => window.location.href = '/api/login'}
+            className="h-12 px-8 text-lg font-semibold touch-target btn-animate"
+            size="lg"
+          >
+            Get Started Free
+          </Button>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="px-4 py-8 border-t border-border text-center text-sm text-muted-foreground">
+        <p>© 2024 Bytewise Nutrition Tracker. Built with 💚 for healthier living.</p>
+      </footer>
     </div>
   );
 }
