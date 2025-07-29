@@ -97,7 +97,7 @@ export default function MealLogger({ onNavigate, showToast, notifications, setNo
     },
   ];
 
-  const filteredFoods = foods || (searchQuery.length > 0 ? mockFoods.filter(food =>
+  const filteredFoods = (foods as any) || (searchQuery.length > 0 ? mockFoods.filter(food =>
     food.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     food.brand.toLowerCase().includes(searchQuery.toLowerCase())
   ) : []);
@@ -207,7 +207,7 @@ export default function MealLogger({ onNavigate, showToast, notifications, setNo
           {/* Search Results */}
           {searchQuery.length > 0 && (
             <div className="space-y-3 max-h-64 overflow-y-auto">
-              {filteredFoods.map((food) => (
+              {(filteredFoods as any).map((food: any) => (
                 <div
                   key={food.id}
                   className="flex items-center space-x-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors cursor-pointer touch-target"
@@ -235,7 +235,7 @@ export default function MealLogger({ onNavigate, showToast, notifications, setNo
                   </Button>
                 </div>
               ))}
-              {filteredFoods.length === 0 && !foodsLoading && (
+              {(filteredFoods as any).length === 0 && !foodsLoading && (
                 <p className="text-center text-muted-foreground py-4">
                   No foods found. Try a different search term.
                 </p>

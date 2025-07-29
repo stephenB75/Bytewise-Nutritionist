@@ -101,7 +101,7 @@ export default function RecipeBuilder({ onNavigate, showToast, notifications, se
     },
   ];
 
-  const filteredFoods = foods || (searchQuery.length > 0 ? mockFoods.filter(food =>
+  const filteredFoods = (foods as any) || (searchQuery.length > 0 ? mockFoods.filter(food =>
     food.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     food.category.toLowerCase().includes(searchQuery.toLowerCase())
   ) : []);

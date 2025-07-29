@@ -31,14 +31,14 @@ export default function Dashboard({ onNavigate, showToast, notifications, setNot
 
   // Mock data for demonstration (will be replaced with real API data)
   const mockStats = {
-    calories: { consumed: 1420, goal: userProfile?.dailyCalorieGoal || 2000 },
-    protein: { consumed: 85, goal: userProfile?.dailyProteinGoal || 150 },
-    carbs: { consumed: 180, goal: userProfile?.dailyCarbGoal || 200 },
-    fat: { consumed: 65, goal: userProfile?.dailyFatGoal || 70 },
-    water: { consumed: 6, goal: userProfile?.dailyWaterGoal || 8 }
+    calories: { consumed: 1420, goal: (userProfile as any)?.dailyCalorieGoal || 2000 },
+    protein: { consumed: 85, goal: (userProfile as any)?.dailyProteinGoal || 150 },
+    carbs: { consumed: 180, goal: (userProfile as any)?.dailyCarbGoal || 200 },
+    fat: { consumed: 65, goal: (userProfile as any)?.dailyFatGoal || 70 },
+    water: { consumed: 6, goal: (userProfile as any)?.dailyWaterGoal || 8 }
   };
 
-  const stats = todayStats || mockStats;
+  const stats = (todayStats as any) || mockStats;
 
   // Quick actions
   const quickActions = [
@@ -90,7 +90,7 @@ export default function Dashboard({ onNavigate, showToast, notifications, setNot
     // Welcome message for first-time users
     if (!notifications.includes('welcome') && userProfile) {
       setNotifications([...notifications, 'welcome']);
-      showToast(`Welcome back, ${userProfile.firstName || 'there'}! Ready to track your nutrition?`);
+      showToast(`Welcome back, ${(userProfile as any)?.firstName || 'there'}! Ready to track your nutrition?`);
     }
   }, [userProfile, notifications, setNotifications, showToast]);
 
