@@ -18,6 +18,20 @@ import grapesImg from "@assets/grapes-2032838_1920_1753859477808.jpg";
 import churrosImg from "@assets/churros-2188871_1920_1753859477808.jpg";
 import macaronsImg from "@assets/macarons-2179198_1920_1753859477809.jpg";
 
+// New food images batch 2
+import appleImg from "@assets/apple-3313209_1920_1753859530078.jpg";
+import mangoImg from "@assets/mango-1534061_1920_1753859530079.jpg";
+import oatmealImg from "@assets/oatmeal-1839515_1920_1753859530080.jpg";
+import pizzaImg from "@assets/pizza-2068272_1920_1753859530080.jpg";
+import rawChickenImg from "@assets/raw-chicken-6946604_1920_1753859530081.jpg";
+import steakImg from "@assets/steak-6278031_1920_1753859530081.jpg";
+import steak2Img from "@assets/steak-7423231_1920_1753859530082.jpg";
+import swedishImg from "@assets/swedish-6053292_1920_1753859530083.jpg";
+import burgersImg from "@assets/burgers-5590503_1920_1753859530083.jpg";
+import chicken2Img from "@assets/chicken-2443901_1920_1753859530084.jpg";
+import chickenNuggetsImg from "@assets/chicken-nuggets-1108_1920_1753859530084.jpg";
+import saladImg from "@assets/salad-6948004_1920_1753859530085.jpg";
+
 export const FOOD_IMAGES = {
   chocolate: chocolateImg,
   cupcakes: cupcakesImg,
@@ -31,6 +45,19 @@ export const FOOD_IMAGES = {
   grapes: grapesImg,
   churros: churrosImg,
   macarons: macaronsImg,
+  // New additions
+  apple: appleImg,
+  mango: mangoImg,
+  oatmeal: oatmealImg,
+  pizza: pizzaImg,
+  rawChicken: rawChickenImg,
+  steak: steakImg,
+  steak2: steak2Img,
+  swedish: swedishImg,
+  burgers: burgersImg,
+  chicken2: chicken2Img,
+  chickenNuggets: chickenNuggetsImg,
+  salad: saladImg,
 };
 
 export const FOOD_IMAGE_LIST = Object.values(FOOD_IMAGES);
@@ -39,12 +66,12 @@ export const FOOD_IMAGE_LIST = Object.values(FOOD_IMAGES);
 export const COMPONENT_IMAGES = {
   calculator: FOOD_IMAGES.blueberries,
   logger: FOOD_IMAGES.pancakes,
-  dashboard: FOOD_IMAGES.vegetable,
-  profile: FOOD_IMAGES.grapes,
-  login: FOOD_IMAGES.spaghetti,
-  meals: FOOD_IMAGES.tomatoes,
+  dashboard: FOOD_IMAGES.salad,
+  profile: FOOD_IMAGES.apple,
+  login: FOOD_IMAGES.pizza,
+  meals: FOOD_IMAGES.burgers,
   recipes: FOOD_IMAGES.chocolate,
-  planning: FOOD_IMAGES.macarons,
+  planning: FOOD_IMAGES.oatmeal,
 };
 
 /**
@@ -69,19 +96,24 @@ export function getTimeBasedFoodImage(): string {
   
   if (hour >= 6 && hour < 10) {
     // Morning: breakfast foods
-    return Math.random() > 0.5 ? FOOD_IMAGES.pancakes : FOOD_IMAGES.blueberries;
+    const morningFoods = [FOOD_IMAGES.pancakes, FOOD_IMAGES.oatmeal, FOOD_IMAGES.blueberries, FOOD_IMAGES.apple];
+    return morningFoods[Math.floor(Math.random() * morningFoods.length)];
   } else if (hour >= 10 && hour < 15) {
     // Lunch: savory foods
-    return Math.random() > 0.5 ? FOOD_IMAGES.spaghetti : FOOD_IMAGES.tomatoes;
+    const lunchFoods = [FOOD_IMAGES.pizza, FOOD_IMAGES.burgers, FOOD_IMAGES.salad, FOOD_IMAGES.spaghetti];
+    return lunchFoods[Math.floor(Math.random() * lunchFoods.length)];
   } else if (hour >= 15 && hour < 19) {
-    // Afternoon: snacks
-    return Math.random() > 0.5 ? FOOD_IMAGES.fries : FOOD_IMAGES.grapes;
+    // Afternoon: snacks & fruits
+    const snackFoods = [FOOD_IMAGES.mango, FOOD_IMAGES.grapes, FOOD_IMAGES.apple, FOOD_IMAGES.chickenNuggets];
+    return snackFoods[Math.floor(Math.random() * snackFoods.length)];
   } else if (hour >= 19 && hour < 22) {
     // Dinner: main dishes
-    return Math.random() > 0.5 ? FOOD_IMAGES.spaghetti2 : FOOD_IMAGES.vegetable;
+    const dinnerFoods = [FOOD_IMAGES.steak, FOOD_IMAGES.steak2, FOOD_IMAGES.chicken2, FOOD_IMAGES.swedish];
+    return dinnerFoods[Math.floor(Math.random() * dinnerFoods.length)];
   } else {
     // Late night: desserts
-    return Math.random() > 0.5 ? FOOD_IMAGES.chocolate : FOOD_IMAGES.cupcakes;
+    const dessertFoods = [FOOD_IMAGES.chocolate, FOOD_IMAGES.cupcakes, FOOD_IMAGES.churros, FOOD_IMAGES.macarons];
+    return dessertFoods[Math.floor(Math.random() * dessertFoods.length)];
   }
 }
 
