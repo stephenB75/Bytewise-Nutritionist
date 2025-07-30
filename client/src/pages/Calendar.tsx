@@ -14,9 +14,10 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Calendar, ChevronLeft, ChevronRight, Plus, TrendingUp, Flame, Utensils, Target, RefreshCw, AlertCircle, Database } from 'lucide-react';
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus, TrendingUp, Flame, Utensils, Target, RefreshCw, AlertCircle, Database } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ImageWithFallback } from '@/components/ui/ImageWithFallback';
 
 interface CalendarProps {
@@ -41,7 +42,7 @@ interface DayMealData {
   };
 }
 
-export default function Calendar({ onNavigate }: CalendarProps) {
+export default function Calendar({ onNavigate, showToast }: CalendarProps) {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [mealData, setMealData] = useState<{ [key: string]: DayMealData }>({});
@@ -209,9 +210,26 @@ export default function Calendar({ onNavigate }: CalendarProps) {
     loadMealData();
   };
 
+  const calculatePercentage = (value: number, target: number) => {
+    return target > 0 ? (value / target) * 100 : 0;
+  };
+
+  const formatCalories = (calories: number) => {
+    return calories.toLocaleString();
+  };
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+  };
+
   const getDayData = (date: Date) => {
-    const dateKey = date.toISOString().split('T')[0];
-    return nutritionData[dateKey];
+    const dateKey = formatDateKey(date);
+    return mealData[dateKey];
   };
 
   const getDayStatus = (date: Date) => {
@@ -237,13 +255,8 @@ export default function Calendar({ onNavigate }: CalendarProps) {
     }
   };
 
-  const isToday = (date: Date) => {
-    const today = new Date();
-    return date.toDateString() === today.toDateString();
-  };
-
   const isCurrentMonth = (date: Date) => {
-    return date.getMonth() === currentDate.getMonth();
+    return date.getMonth() === currentMonth.getMonth();
   };
 
   const selectedDayData = getDayData(selectedDate);
@@ -271,7 +284,7 @@ export default function Calendar({ onNavigate }: CalendarProps) {
             <h2 className="text-lg font-semibold flex items-center space-x-2">
               <CalendarIcon className="h-5 w-5 text-primary" />
               <span>
-                {currentDate.toLocaleDateString('en-US', { 
+                {currentMonth.toLocaleDateString('en-US', { 
                   month: 'long', 
                   year: 'numeric' 
                 })}
@@ -298,7 +311,8 @@ export default function Calendar({ onNavigate }: CalendarProps) {
             ))}
             
             {/* Calendar days */}
-            {calendarDays.map((date, index) => {
+            {days.map((date, index) => {
+              if (!date) return <div key={index} className="p-2"></div>;
               const status = getDayStatus(date);
               const dayData = getDayData(date);
               const isSelected = date.toDateString() === selectedDate.toDateString();
@@ -392,8 +406,8 @@ export default function Calendar({ onNavigate }: CalendarProps) {
                 variant="outline"
                 className="flex-1 touch-target"
                 onClick={() => {
-                  onNavigate('meals');
-                  showToast(`Opening meal logger for ${formatDate(selectedDate)}`);
+                  onNavigate?.('meals');
+                  showToast?.(`Opening meal logger for ${formatDate(selectedDate)}`);
                 }}
               >
                 View Meals
@@ -402,8 +416,8 @@ export default function Calendar({ onNavigate }: CalendarProps) {
                 variant="outline"
                 className="flex-1 touch-target"
                 onClick={() => {
-                  onNavigate('meals');
-                  showToast('Add meal for this day');
+                  onNavigate?.('meals');
+                  showToast?.('Add meal for this day');
                 }}
               >
                 Add Meal
@@ -426,13 +440,13 @@ export default function Calendar({ onNavigate }: CalendarProps) {
             <div className="grid grid-cols-2 gap-4">
               <div className="text-center p-4 rounded-lg bg-muted/50">
                 <div className="text-lg font-bold">
-                  {Object.keys(nutritionData).length}
+                  {Object.keys(mealData).length}
                 </div>
                 <div className="text-sm text-muted-foreground">Days Tracked</div>
               </div>
               <div className="text-center p-4 rounded-lg bg-muted/50">
                 <div className="text-lg font-bold">
-                  {Object.values(nutritionData).filter((day: any) => day.complete).length}
+                  {Object.values(mealData).filter((day) => day.status === 'complete').length}
                 </div>
                 <div className="text-sm text-muted-foreground">Complete Days</div>
               </div>
@@ -440,10 +454,10 @@ export default function Calendar({ onNavigate }: CalendarProps) {
 
             <div className="text-center">
               <div className="text-2xl font-bold text-primary">
-                {Math.round(
-                  Object.values(nutritionData).reduce((avg: number, day: any) => avg + day.calories, 0) / 
-                  Object.keys(nutritionData).length
-                )}
+                {Object.keys(mealData).length > 0 ? Math.round(
+                  Object.values(mealData).reduce((avg: number, day) => avg + day.calories, 0) / 
+                  Object.keys(mealData).length
+                ) : 0}
               </div>
               <div className="text-sm text-muted-foreground">Average Daily Calories</div>
             </div>
@@ -452,8 +466,8 @@ export default function Calendar({ onNavigate }: CalendarProps) {
               variant="outline"
               className="w-full touch-target"
               onClick={() => {
-                onNavigate('dashboard');
-                showToast('Viewing detailed analytics');
+                onNavigate?.('dashboard');
+                showToast?.('Viewing detailed analytics');
               }}
             >
               View Detailed Analytics
