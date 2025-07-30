@@ -58,6 +58,11 @@ export default function CalorieCalculatorWrapper({ onNavigate }: CalorieCalculat
         <CalorieCalculator 
           onNavigate={onNavigate} 
           onCaloriesCalculated={addCalculatedCalories}
+          onLogToWeekly={(logData) => {
+            // Handle logging to weekly logger
+            console.log('Logging to weekly:', logData);
+            // This could trigger navigation to logger or show success message
+          }}
         />
       </div>
     </div>

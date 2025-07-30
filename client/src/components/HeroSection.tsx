@@ -44,12 +44,13 @@ export function HeroSection({
   const progressPercentage = Math.min((caloriesConsumed / caloriesGoal) * 100, 100);
   
   return (
-    <div className={`relative bg-gradient-to-br from-blue-600 to-purple-700 text-white px-4 py-6 overflow-hidden ${className}`} style={{ marginTop: '100px' }}>
+    <div className={`relative bg-gradient-to-br from-blue-600 to-purple-700 text-white px-4 py-8 overflow-hidden ${className}`} style={{ marginTop: '88px' }}>
       {/* Food Background Image */}
       <div 
-        className="absolute inset-0 bg-cover bg-center opacity-15"
+        className="absolute inset-0 opacity-20"
         style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3Cpattern id='food' patternUnits='userSpaceOnUse' width='20' height='20'%3E%3Ccircle cx='10' cy='5' r='2' fill='%23ffffff' opacity='0.1'/%3E%3Ccircle cx='5' cy='15' r='1.5' fill='%23ffffff' opacity='0.08'/%3E%3Crect x='12' y='12' width='3' height='3' rx='1' fill='%23ffffff' opacity='0.1'/%3E%3Cpath d='M15 7c0-1 1-2 2-2s2 1 2 2-1 2-2 2-2-1-2-2z' fill='%23ffffff' opacity='0.06'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100' height='100' fill='url(%23food)'/%3E%3C/svg%3E")`
+          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cdefs%3E%3Cpattern id='foodPattern' patternUnits='userSpaceOnUse' width='40' height='40'%3E%3Ccircle cx='8' cy='8' r='3' fill='%23ffffff' opacity='0.15'/%3E%3Ccircle cx='25' cy='15' r='2' fill='%23ffffff' opacity='0.12'/%3E%3Crect x='15' y='25' width='6' height='6' rx='2' fill='%23ffffff' opacity='0.1'/%3E%3Cpath d='M30 5c0-2 2-4 4-4s4 2 4 4-2 4-4 4-4-2-4-4z' fill='%23ffffff' opacity='0.08'/%3E%3Cpath d='M5 30l3-2 3 2-3 5z' fill='%23ffffff' opacity='0.1'/%3E%3Cellipse cx='35' cy='35' rx='4' ry='2' fill='%23ffffff' opacity='0.12'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='200' height='200' fill='url(%23foodPattern)'/%3E%3C/svg%3E")`,
+          backgroundSize: '60px 60px'
         }}
       />
       <div className="relative z-10">

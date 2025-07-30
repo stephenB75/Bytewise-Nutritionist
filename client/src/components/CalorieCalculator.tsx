@@ -23,7 +23,8 @@ import {
   Wheat,
   Droplets,
   Apple,
-  Scale
+  Scale,
+  Calendar
 } from 'lucide-react';
 
 interface IngredientAnalysis {
@@ -44,10 +45,20 @@ interface CalorieCalculatorProps {
   onAddToMeal?: (ingredient: IngredientAnalysis) => void;
   onNavigate?: (page: string) => void;
   onCaloriesCalculated?: (calories: any) => void;
+  onLogToWeekly?: (logData: {
+    name: string;
+    calories: number;
+    protein: number;
+    carbs: number;
+    fat: number;
+    date: string;
+    time: string;
+    category: 'breakfast' | 'lunch' | 'dinner' | 'snack';
+  }) => void;
   isCompact?: boolean;
 }
 
-function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, isCompact = false }: CalorieCalculatorProps) {
+function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLogToWeekly, isCompact = false }: CalorieCalculatorProps) {
   const [ingredient, setIngredient] = useState('');
   const [measurement, setMeasurement] = useState('');
   const [recentAnalyses, setRecentAnalyses] = useState<IngredientAnalysis[]>([]);
@@ -100,6 +111,30 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, isCo
   const handleAddToMeal = (analysis: IngredientAnalysis) => {
     if (onAddToMeal) {
       onAddToMeal(analysis);
+    }
+  };
+
+  const handleLogToWeekly = (analysis: IngredientAnalysis) => {
+    if (onLogToWeekly) {
+      const now = new Date();
+      const hour = now.getHours();
+      let category: 'breakfast' | 'lunch' | 'dinner' | 'snack';
+      
+      if (hour < 11) category = 'breakfast';
+      else if (hour < 15) category = 'lunch';
+      else if (hour < 19) category = 'dinner';
+      else category = 'snack';
+
+      onLogToWeekly({
+        name: `${analysis.ingredient} (${analysis.measurement})`,
+        calories: analysis.estimatedCalories,
+        protein: analysis.nutritionPer100g?.protein || 0,
+        carbs: analysis.nutritionPer100g?.carbs || 0,
+        fat: analysis.nutritionPer100g?.fat || 0,
+        date: now.toISOString().split('T')[0],
+        time: now.toLocaleTimeString(),
+        category
+      });
     }
   };
 
@@ -334,15 +369,24 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, isCo
                   </div>
                 )}
 
-                {onAddToMeal && (
+                <div className="flex gap-2">
+                  {onAddToMeal && (
+                    <Button
+                      onClick={() => handleAddToMeal(analysis)}
+                      className="flex-1 bg-green-600 hover:bg-green-700"
+                    >
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      Add to Meal
+                    </Button>
+                  )}
                   <Button
-                    onClick={() => handleAddToMeal(analysis)}
-                    className="w-full bg-green-600 hover:bg-green-700"
+                    onClick={() => handleLogToWeekly(analysis)}
+                    className="flex-1 bg-blue-600 hover:bg-blue-700"
                   >
-                    <CheckCircle className="w-4 h-4 mr-2" />
-                    Add to Current Meal
+                    <Calendar className="w-4 h-4 mr-2" />
+                    Log to Weekly
                   </Button>
-                )}
+                </div>
               </div>
             ))}
           </div>
