@@ -1,23 +1,15 @@
 /**
- * Login Screen Component
+ * Simple Login Screen Component
  * 
- * Provides authentication interface with Replit OIDC integration
- * Features brand-compliant design and mobile optimization
+ * Clean authentication interface with food background image
+ * Features simple sign-in popup with Replit OIDC integration
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { 
-  LogIn, 
-  Smartphone, 
-  Shield, 
-  TrendingUp,
-  Users,
-  Star,
-  CheckCircle
-} from 'lucide-react';
+import { LogIn } from 'lucide-react';
+import { LogoBrand } from '@/components/LogoBrand';
 
 interface LoginScreenProps {
   onNavigate: (page: string) => void;
@@ -28,162 +20,91 @@ function LoginScreen({ onNavigate }: LoginScreenProps) {
 
   const handleLogin = () => {
     setIsLoading(true);
-    // Redirect to Replit authentication
+    // Redirect to Replit OIDC login
     window.location.href = '/api/login';
   };
 
-  const features = [
-    {
-      icon: TrendingUp,
-      title: "Track Nutrition",
-      description: "Monitor calories, macros, and micronutrients with USDA-verified data",
-      color: "text-blue-600"
-    },
-    {
-      icon: Smartphone,
-      title: "Mobile Optimized",
-      description: "Native app experience with offline capabilities and PWA support",
-      color: "text-green-600"
-    },
-    {
-      icon: Shield,
-      title: "Secure & Private",
-      description: "Your data is encrypted and protected with enterprise-grade security",
-      color: "text-purple-600"
-    },
-    {
-      icon: Users,
-      title: "Personalized Insights",
-      description: "AI-powered recommendations based on your unique nutrition patterns",
-      color: "text-orange-600"
-    }
-  ];
-
-  const benefits = [
-    "300,000+ USDA verified foods",
-    "Offline nutrition tracking",
-    "Personalized meal suggestions",
-    "Achievement tracking system",
-    "Detailed nutrition analytics",
-    "Smart habit analysis"
-  ];
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-100">
-      {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200">
-        <div className="max-w-md mx-auto px-4 py-4">
-          <div className="bytewise-logo bytewise-logo-md text-center">
-            <div className="bytewise-logo-main">bytewise</div>
-            <div className="bytewise-logo-tagline">Nutritionist</div>
-          </div>
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Food Background Image */}
+      <div 
+        className="absolute inset-0 z-0"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='food-pattern' x='0' y='0' width='100' height='100' patternUnits='userSpaceOnUse'%3E%3Cg fill='%23f0f9ff' fill-opacity='0.1'%3E%3Ccircle cx='20' cy='20' r='8'/%3E%3Crect x='60' y='10' width='15' height='20' rx='3'/%3E%3Cellipse cx='30' cy='70' rx='12' ry='8'/%3E%3Cpath d='M70 60 Q80 50 90 60 Q80 70 70 60' fill='%23dcfce7'/%3E%3Ccircle cx='15' cy='85' r='6'/%3E%3Crect x='75' y='25' width='10' height='15' rx='2'/%3E%3Cellipse cx='45' cy='45' rx='8' ry='12'/%3E%3Cpath d='M85 80 Q95 70 100 80 Q95 90 85 80' fill='%23fef3c7'/%3E%3C/g%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23food-pattern)'/%3E%3C/svg%3E")`,
+          backgroundColor: '#f8fafc'
+        }}
+      />
+      
+      {/* Food Elements Overlay */}
+      <div className="absolute inset-0 z-10">
+        {/* Floating food icons */}
+        <div className="absolute top-20 left-10 w-16 h-16 bg-green-100/30 rounded-full flex items-center justify-center backdrop-blur-sm animate-bounce" style={{ animationDelay: '0s', animationDuration: '3s' }}>
+          <span className="text-2xl">🥗</span>
+        </div>
+        <div className="absolute top-32 right-16 w-12 h-12 bg-orange-100/30 rounded-full flex items-center justify-center backdrop-blur-sm animate-bounce" style={{ animationDelay: '1s', animationDuration: '4s' }}>
+          <span className="text-xl">🍎</span>
+        </div>
+        <div className="absolute bottom-32 left-20 w-14 h-14 bg-yellow-100/30 rounded-full flex items-center justify-center backdrop-blur-sm animate-bounce" style={{ animationDelay: '2s', animationDuration: '3.5s' }}>
+          <span className="text-xl">🥑</span>
+        </div>
+        <div className="absolute bottom-20 right-12 w-18 h-18 bg-red-100/30 rounded-full flex items-center justify-center backdrop-blur-sm animate-bounce" style={{ animationDelay: '0.5s', animationDuration: '4.5s' }}>
+          <span className="text-2xl">🍅</span>
+        </div>
+        <div className="absolute top-1/2 left-6 w-12 h-12 bg-purple-100/30 rounded-full flex items-center justify-center backdrop-blur-sm animate-bounce" style={{ animationDelay: '1.5s', animationDuration: '3.8s' }}>
+          <span className="text-xl">🫐</span>
+        </div>
+        <div className="absolute top-1/3 right-8 w-16 h-16 bg-pink-100/30 rounded-full flex items-center justify-center backdrop-blur-sm animate-bounce" style={{ animationDelay: '2.5s', animationDuration: '4.2s' }}>
+          <span className="text-2xl">🥕</span>
         </div>
       </div>
 
-      <div className="max-w-md mx-auto px-4 py-6">
-        {/* Welcome Message */}
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Welcome to Bytewise
-          </h1>
-          <p className="text-gray-600">
-            Your intelligent nutrition companion for healthier living
-          </p>
-          <Badge variant="secondary" className="mt-2">
-            Professional Grade Nutrition Tracking
-          </Badge>
-        </div>
+      {/* Login Popup */}
+      <div className="relative z-20 min-h-screen flex items-center justify-center p-6">
+        <div className="w-full max-w-md">
+          
+          {/* Logo */}
+          <div className="text-center mb-8">
+            <LogoBrand size="lg" />
+          </div>
 
-        {/* Login Card */}
-        <Card className="p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg mb-6">
-          <div className="text-center mb-6">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-700 rounded-full flex items-center justify-center mx-auto mb-4">
-              <LogIn className="w-8 h-8 text-white" />
+          {/* Login Card - Simple Popup */}
+          <Card className="p-8 bg-white/95 backdrop-blur-md border-0 shadow-2xl">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <LogIn className="w-8 h-8 text-white" />
+              </div>
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                Welcome to Bytewise
+              </h1>
+              <p className="text-gray-600">
+                Your personal nutrition companion
+              </p>
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">
-              Sign In to Continue
-            </h2>
-            <p className="text-sm text-gray-600">
+
+            <Button 
+              onClick={handleLogin}
+              disabled={isLoading}
+              className="w-full h-12 bg-gradient-to-r from-emerald-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700 text-white font-semibold rounded-lg transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl"
+            >
+              {isLoading ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Signing In...
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <LogIn className="w-5 h-5" />
+                  Sign In to Continue
+                </div>
+              )}
+            </Button>
+
+            {/* Simple footer */}
+            <p className="text-xs text-gray-500 text-center mt-6">
               Secure authentication powered by Replit
             </p>
-          </div>
+          </Card>
 
-          <Button 
-            onClick={handleLogin}
-            disabled={isLoading}
-            className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-700 hover:from-blue-700 hover:to-purple-800 text-white font-semibold rounded-lg transition-all duration-200"
-          >
-            {isLoading ? (
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Signing In...
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <LogIn className="w-5 h-5" />
-                Sign In with Replit
-              </div>
-            )}
-          </Button>
-
-          <div className="mt-4 text-center">
-            <p className="text-xs text-gray-500">
-              By signing in, you agree to our Terms of Service and Privacy Policy
-            </p>
-          </div>
-        </Card>
-
-        {/* Features Section */}
-        <div className="space-y-4 mb-6">
-          <h3 className="text-lg font-bold text-gray-900 text-center">
-            Why Choose Bytewise?
-          </h3>
-          
-          <div className="grid grid-cols-1 gap-4">
-            {features.map((feature, index) => {
-              const IconComponent = feature.icon;
-              return (
-                <Card key={index} className="p-4 bg-white/70 backdrop-blur-sm border-0 shadow-md">
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 bg-gray-50 rounded-lg">
-                      <IconComponent className={`w-5 h-5 ${feature.color}`} />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-gray-900 mb-1">
-                        {feature.title}
-                      </h4>
-                      <p className="text-sm text-gray-600">
-                        {feature.description}
-                      </p>
-                    </div>
-                  </div>
-                </Card>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Benefits List */}
-        <Card className="p-4 bg-white/70 backdrop-blur-sm border-0 shadow-md">
-          <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-            <Star className="w-4 h-4 text-yellow-500" />
-            Premium Features Included
-          </h4>
-          <div className="space-y-2">
-            {benefits.map((benefit, index) => (
-              <div key={index} className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600" />
-                <span className="text-sm text-gray-700">{benefit}</span>
-              </div>
-            ))}
-          </div>
-        </Card>
-
-        {/* Footer */}
-        <div className="text-center mt-8">
-          <p className="text-xs text-gray-500">
-            Trusted by nutrition professionals worldwide
-          </p>
         </div>
       </div>
     </div>
