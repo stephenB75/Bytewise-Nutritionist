@@ -67,6 +67,7 @@ export default function Profile({ onNavigate, onLogout }: ProfileProps) {
 
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isEditingGoals, setIsEditingGoals] = useState(false);
+  const [showAllAchievements, setShowAllAchievements] = useState(false);
   const [tempProfile, setTempProfile] = useState(userProfile);
 
   // Sample achievements
@@ -175,10 +176,20 @@ export default function Profile({ onNavigate, onLogout }: ProfileProps) {
 
       {/* Main Content */}
       <div className="px-4 space-y-6">
-        {/* Profile Overview */}
-        <Card className="p-4">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-brand-subheading">Profile Overview</h3>
+        {/* Profile Overview - Data Management Card Style */}
+        <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <h4 className="font-medium text-gray-900">Profile Overview</h4>
+              <p className="text-sm text-gray-600">Manage your personal information and settings</p>
+            </div>
+            <Badge variant="outline" className="text-blue-600 border-blue-600">
+              <User className="w-3 h-3 mr-1" />
+              {getProfileCompletion()}% Complete
+            </Badge>
+          </div>
+          
+          <div className="grid grid-cols-1 gap-3 mb-4">
             <Button 
               variant="outline" 
               size="sm"
@@ -186,10 +197,10 @@ export default function Profile({ onNavigate, onLogout }: ProfileProps) {
                 setIsEditingProfile(!isEditingProfile);
                 setTempProfile(userProfile);
               }}
-              className="text-brand-button"
+              className="border-blue-600 text-blue-600 hover:bg-blue-50"
             >
               <Edit size={16} className="mr-1" />
-              {isEditingProfile ? 'Cancel' : 'Edit'}
+              {isEditingProfile ? 'Cancel Edit' : 'Edit Profile'}
             </Button>
           </div>
 
@@ -251,7 +262,7 @@ export default function Profile({ onNavigate, onLogout }: ProfileProps) {
           </div>
         </Card>
 
-        {/* Stats Grid */}
+        {/* Stats Grid - Data Management Card Style */}
         <div className="grid grid-cols-2 gap-4">
           <Card className="p-4">
             <div className="flex items-center space-x-3">
@@ -310,8 +321,8 @@ export default function Profile({ onNavigate, onLogout }: ProfileProps) {
           </Card>
         </div>
 
-        {/* Nutrition Goals */}
-        <Card className="p-4">
+        {/* Nutrition Goals - Data Management Card Style */}
+        <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-brand-subheading">Nutrition Goals</h3>
             <Button 
@@ -391,16 +402,25 @@ export default function Profile({ onNavigate, onLogout }: ProfileProps) {
           )}
         </Card>
 
-        {/* Achievements */}
-        <Card className="p-4">
-          <h3 className="text-lg font-semibold mb-4 text-brand-subheading">Achievements</h3>
+        {/* Achievements - Data Management Card Style */}
+        <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <h4 className="font-medium text-gray-900">Achievements</h4>
+              <p className="text-sm text-gray-600">Track your progress and unlock rewards</p>
+            </div>
+            <Badge variant="outline" className="text-yellow-600 border-yellow-600">
+              <Trophy className="w-3 h-3 mr-1" />
+              {achievements.filter(a => a.earned).length}/{achievements.length} Earned
+            </Badge>
+          </div>
           
-          <div className="grid grid-cols-1 gap-3">
-            {achievements.map((achievement) => (
+          <div className="space-y-2">
+            {achievements.slice(0, 3).map((achievement) => (
               <div 
                 key={achievement.id}
                 className={`
-                  p-3 rounded-lg border-2 transition-all
+                  p-3 rounded-lg border transition-all
                   ${achievement.earned 
                     ? 'border-green-200 bg-green-50' 
                     : 'border-gray-200 bg-gray-50'
@@ -414,17 +434,17 @@ export default function Profile({ onNavigate, onLogout }: ProfileProps) {
                       ${achievement.earned ? 'bg-green-200' : 'bg-gray-200'}
                     `}>
                       <achievement.icon 
-                        size={20} 
+                        size={16} 
                         className={achievement.earned ? 'text-green-600' : 'text-gray-500'} 
                       />
                     </div>
                     <div>
-                      <h4 className="font-medium text-brand-subheading">{achievement.title}</h4>
-                      <p className="text-sm text-muted-foreground text-brand-body">
+                      <h5 className="font-medium text-gray-900 text-sm">{achievement.title}</h5>
+                      <p className="text-xs text-gray-600">
                         {achievement.description}
                       </p>
                       {achievement.earnedDate && (
-                        <p className="text-xs text-green-600 text-brand-body">
+                        <p className="text-xs text-green-600">
                           Earned {new Date(achievement.earnedDate).toLocaleDateString()}
                         </p>
                       )}
@@ -432,17 +452,17 @@ export default function Profile({ onNavigate, onLogout }: ProfileProps) {
                   </div>
                   
                   {achievement.earned ? (
-                    <Badge className="bg-green-100 text-green-700 text-brand-label">
-                      Earned
+                    <Badge className="bg-green-100 text-green-700 text-xs">
+                      ✓ Earned
                     </Badge>
                   ) : (
                     <div className="text-right">
-                      <p className="text-sm font-medium text-brand-subheading">
+                      <p className="text-xs font-medium text-gray-900">
                         {achievement.progress}/{achievement.maxProgress}
                       </p>
-                      <div className="w-16 bg-gray-200 rounded-full h-2 mt-1">
+                      <div className="w-12 bg-gray-200 rounded-full h-1 mt-1">
                         <div 
-                          className="bg-primary h-2 rounded-full transition-all duration-300"
+                          className="bg-blue-500 h-1 rounded-full transition-all duration-300"
                           style={{ 
                             width: `${(achievement.progress! / achievement.maxProgress!) * 100}%` 
                           }}
@@ -454,10 +474,26 @@ export default function Profile({ onNavigate, onLogout }: ProfileProps) {
               </div>
             ))}
           </div>
+          
+          <div className="grid grid-cols-1 gap-2 mt-4">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => {
+                // Show all achievements modal or navigate to achievements page
+                console.log('Showing all achievements');
+                setShowAllAchievements(true);
+              }}
+              className="border-yellow-600 text-yellow-600 hover:bg-yellow-50"
+            >
+              <Trophy className="w-4 h-4 mr-1" />
+              View All Achievements ({achievements.length})
+            </Button>
+          </div>
         </Card>
 
-        {/* Settings Tabs */}
-        <Card className="p-4">
+        {/* Settings Tabs - Data Management Card Style */}
+        <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
           <Tabs defaultValue="display" className="w-full">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="display" className="text-xs text-brand-label">
@@ -544,8 +580,8 @@ export default function Profile({ onNavigate, onLogout }: ProfileProps) {
           </Tabs>
         </Card>
 
-        {/* Account Actions */}
-        <Card className="p-4">
+        {/* Account Actions - Data Management Card Style */}
+        <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
           <h3 className="text-lg font-semibold mb-4 text-brand-subheading">Account Actions</h3>
           
           <div className="space-y-3">

@@ -64,22 +64,22 @@ function Dashboard({ onNavigate }: DashboardProps) {
 
   // Update stats when data changes
   useEffect(() => {
-    // Combine calories from calculator and logged meals
+    // Real-time data integration: Combine calories from calculator and logged meals
     const calculatorCalories = dailyStats.calories || 0;
     const mealCalories = Array.isArray(mealStats) ? mealStats.reduce((total: number, meal: any) => 
-      total + (parseFloat(meal.totalCalories) || 0), 0) : 0;
+      total + (parseFloat(meal.calories) || 0), 0) : 0;
     
     const calculatorProtein = dailyStats.protein || 0;
     const mealProtein = Array.isArray(mealStats) ? mealStats.reduce((total: number, meal: any) => 
-      total + (parseFloat(meal.totalProtein) || 0), 0) : 0;
-
+      total + (parseFloat(meal.protein) || 0), 0) : 0;
+    
     const calculatorCarbs = dailyStats.carbs || 0;
     const mealCarbs = Array.isArray(mealStats) ? mealStats.reduce((total: number, meal: any) => 
-      total + (parseFloat(meal.totalCarbs) || 0), 0) : 0;
-
+      total + (parseFloat(meal.carbs) || 0), 0) : 0;
+    
     const calculatorFat = dailyStats.fat || 0;
     const mealFat = Array.isArray(mealStats) ? mealStats.reduce((total: number, meal: any) => 
-      total + (parseFloat(meal.totalFat) || 0), 0) : 0;
+      total + (parseFloat(meal.fat) || 0), 0) : 0;
 
     setUserStats(prev => ({
       ...prev,

@@ -74,6 +74,9 @@ export function useCalorieTracking() {
     setCalculatedCalories(prev => [...prev, newEntry]);
     setDailyTotal(prev => prev + calories.calories);
     
+    // Automatically log to weekly logger
+    logCaloriesMutation.mutate(newEntry);
+    
     // Store in localStorage for persistence
     const stored = localStorage.getItem('calculatedCalories');
     const existing = stored ? JSON.parse(stored) : [];

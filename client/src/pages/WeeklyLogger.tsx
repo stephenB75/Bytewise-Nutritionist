@@ -172,54 +172,69 @@ export default function WeeklyLogger({ onNavigate }: WeeklyLoggerProps) {
       />
 
       <div className="px-4 space-y-6">
-        {/* Calculator Connection Status */}
-        <Card className="p-4 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-          <div className="bg-blue-50 p-3 rounded-lg">
-            <div className="flex items-center gap-2">
-              <Target className="w-4 h-4 text-blue-600" />
-              <span className="text-sm font-medium text-blue-900">Calculator Data Connection</span>
+        {/* Calculator Connection Status - Data Management Card Style */}
+        <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <h4 className="font-medium text-gray-900">Calculator Integration</h4>
+              <p className="text-sm text-gray-600">Track calories calculated and logged entries</p>
             </div>
-            <div className="text-xs text-blue-700 mt-1">
-              Today's calculated entries: {calculatedItemsCount} • Total calories: {calculatedCaloriesTotal} • Status: Active
+            <Badge variant="outline" className="text-green-600 border-green-600">
+              <Target className="w-3 h-3 mr-1" />
+              Active Connection
+            </Badge>
+          </div>
+          
+          <div className="grid grid-cols-3 gap-2">
+            <div className="text-center p-2 bg-blue-50 rounded-lg">
+              <Calculator className="w-4 h-4 mx-auto text-blue-600 mb-1" />
+              <p className="text-xs text-gray-600">Calculated</p>
+              <p className="font-bold text-gray-900 text-sm">{calculatedItemsCount}</p>
             </div>
-            <div className="grid grid-cols-2 gap-4 mt-3 text-xs">
-              <div className="flex justify-between">
-                <span>Calculator Entries:</span>
-                <span className="font-medium">{calculatedItemsCount}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Logger Entries:</span>
-                <span className="font-medium">{weeklyTotals.meals}</span>
-              </div>
+            <div className="text-center p-2 bg-green-50 rounded-lg">
+              <Utensils className="w-4 h-4 mx-auto text-green-600 mb-1" />
+              <p className="text-xs text-gray-600">Logged</p>
+              <p className="font-bold text-gray-900 text-sm">{weeklyTotals.meals}</p>
+            </div>
+            <div className="text-center p-2 bg-orange-50 rounded-lg">
+              <Flame className="w-4 h-4 mx-auto text-orange-600 mb-1" />
+              <p className="text-xs text-gray-600">Calories</p>
+              <p className="font-bold text-gray-900 text-sm">{calculatedCaloriesTotal}</p>
             </div>
           </div>
         </Card>
 
-        {/* Week Navigation */}
-        <Card className="p-4 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-          <div className="flex items-center justify-between mb-4">
+        {/* Week Navigation - Data Management Card Style */}
+        <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <h4 className="font-medium text-gray-900">Weekly Overview</h4>
+              <p className="text-sm text-gray-600">{format(weekStart, 'MMM d')} - {format(addDays(weekStart, 6), 'MMM d, yyyy')}</p>
+            </div>
+            <Badge variant="outline" className="text-blue-600 border-blue-600">
+              <Calendar className="w-3 h-3 mr-1" />
+              Week {Math.ceil((new Date().getTime() - weekStart.getTime()) / (7 * 24 * 60 * 60 * 1000)) + 1}
+            </Badge>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
             <Button
               variant="outline"
               size="sm"
               onClick={() => navigateWeek('prev')}
-              className="flex items-center gap-2"
+              className="border-blue-600 text-blue-600 hover:bg-blue-50"
             >
-              <ChevronLeft size={16} />
-              Previous
+              <ChevronLeft size={16} className="mr-1" />
+              Previous Week
             </Button>
-            
-            <h3 className="font-bold text-lg text-gray-900">
-              {format(weekStart, 'MMM d')} - {format(addDays(weekStart, 6), 'MMM d, yyyy')}
-            </h3>
-            
             <Button
               variant="outline"
               size="sm"
               onClick={() => navigateWeek('next')}
-              className="flex items-center gap-2"
+              className="border-blue-600 text-blue-600 hover:bg-blue-50"
             >
-              Next
-              <ChevronRight size={16} />
+              Next Week
+              <ChevronRight size={16} className="ml-1" />
             </Button>
           </div>
 
@@ -271,7 +286,7 @@ export default function WeeklyLogger({ onNavigate }: WeeklyLoggerProps) {
           </div>
         </Card>
 
-        {/* Selected Day Details */}
+        {/* Selected Day Details - Data Management Card Style */}
         <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-bold text-gray-900">
