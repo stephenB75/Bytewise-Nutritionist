@@ -37,7 +37,7 @@ export function FoodDatabaseProvider({ children }: { children: React.ReactNode }
     try {
       setIsLoading(true);
       const response = await apiRequest('GET', `/api/foods/search?q=${encodeURIComponent(query)}&limit=${limit}`);
-      return response;
+      return response as unknown as LocalFoodItem[];
     } catch (error) {
       console.error('Error searching foods:', error);
       return [];
@@ -50,7 +50,7 @@ export function FoodDatabaseProvider({ children }: { children: React.ReactNode }
     try {
       setIsLoading(true);
       const response = await apiRequest('GET', `/api/foods/${id}`);
-      return response;
+      return response as unknown as LocalFoodItem | null;
     } catch (error) {
       console.error('Error fetching food:', error);
       return null;

@@ -86,7 +86,7 @@ export default function Calendar({ onNavigate }: CalendarProps) {
     setCurrentMonth(newMonth);
   };
 
-  const selectedDateData = mealData[formatDateKey(selectedDate)];
+  const selectedDateData = (mealData as any)[formatDateKey(selectedDate)];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pastel-yellow via-white to-pastel-blue">
@@ -149,7 +149,7 @@ export default function Calendar({ onNavigate }: CalendarProps) {
               }
 
               const dateKey = formatDateKey(day);
-              const dayData = mealData[dateKey];
+              const dayData = (mealData as any)[dateKey];
               const isSelected = isSameDate(day, selectedDate);
               const isTodayDate = isToday(day);
 

@@ -1,4 +1,4 @@
-import { CalorieCalculator } from '@/components/CalorieCalculator';
+import CalorieCalculator from '@/components/CalorieCalculator';
 
 interface MealLoggerProps {
   onNavigate: (tab: string) => void;

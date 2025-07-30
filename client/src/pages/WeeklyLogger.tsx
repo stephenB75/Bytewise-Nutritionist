@@ -187,7 +187,7 @@ export default function WeeklyLogger({ onNavigate }: WeeklyLoggerProps) {
           
           <div className="grid grid-cols-3 gap-2">
             <div className="text-center p-2 bg-blue-50 rounded-lg">
-              <Calculator className="w-4 h-4 mx-auto text-blue-600 mb-1" />
+              <div className="w-4 h-4 mx-auto bg-blue-600 rounded mb-1"></div>
               <p className="text-xs text-gray-600">Calculated</p>
               <p className="font-bold text-gray-900 text-sm">{calculatedItemsCount}</p>
             </div>

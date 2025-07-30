@@ -92,6 +92,10 @@ export default function App() {
           <NotificationDropdown
             isOpen={showNotifications}
             onClose={() => setShowNotifications(false)}
+            notifications={[]}
+            onMarkAsRead={() => {}}
+            onMarkAllAsRead={() => {}}
+            onDeleteNotification={() => {}}
           />
 
           {/* Fixed Header */}

@@ -156,8 +156,7 @@ export default function Profile({ onNavigate, onLogout }: ProfileProps) {
     <div className="min-h-screen bg-background pb-20">
       {/* Hero Section */}
       <HeroSection
-        backgroundImage="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600&q=80"
-        backgroundAlt="Personal wellness and health journey"
+        component="profile"
         title={`${userProfile.name}'s Profile`}
         subtitle="Your nutrition journey"
         description="Track progress and manage your account"
