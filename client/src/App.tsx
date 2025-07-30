@@ -6,6 +6,7 @@ import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { DragDropProvider } from '@/components/DragDropProvider';
 import { Navigation } from '@/components/Navigation';
+import { Header } from '@/components/Header';
 import { useToast } from '@/hooks/useToast';
 
 // Pages
@@ -144,12 +145,15 @@ function AppRouter() {
     }
   }, []);
 
-  // Show loading state
+  // Show loading state with LogoBrand
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="w-20 h-20 bg-primary rounded-2xl flex items-center justify-center animate-pulse">
-          <span className="text-2xl font-bold text-white">B</span>
+        <div className="animate-pulse">
+          <div className="bytewise-logo bytewise-logo-lg">
+            <div className="bytewise-logo-main">bytewise</div>
+            <div className="bytewise-logo-tagline">Nutritionist</div>
+          </div>
         </div>
       </div>
     );
@@ -190,8 +194,11 @@ function AppRouter() {
       <div className="min-h-screen flex flex-col bg-background text-foreground">
         <PWAInstallPrompt />
         
-        {/* Main Content */}
-        <main className="flex-1 flex flex-col">
+        {/* Header */}
+        <Header onNavigate={setActiveTab} />
+        
+        {/* Main Content - No top padding for seamless hero integration */}
+        <main className="flex-1 flex flex-col pt-16">
           {renderCurrentPage()}
         </main>
 

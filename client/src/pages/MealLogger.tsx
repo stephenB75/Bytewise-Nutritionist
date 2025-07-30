@@ -5,10 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Search, Clock, Utensils, Coffee, Moon } from 'lucide-react';
+import { Plus, Search, Clock, Utensils, Coffee, Moon, Flame } from 'lucide-react';
 import { apiRequest } from '@/lib/queryClient';
 import { formatCalories, formatDate, getTodayDateString } from '@/lib/utils';
 import { useDragDrop } from '@/components/DragDropProvider';
+import { ImageWithFallback } from '@/components/ImageWithFallback';
 
 interface MealLoggerProps {
   onNavigate: (tab: string) => void;

@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Target, Calendar, ChefHat, TrendingUp, Smartphone, Shield, Zap } from 'lucide-react';
+import { LogoBrand } from '@/components/LogoBrand';
 
 export default function Landing() {
   const features = [
@@ -55,20 +56,13 @@ export default function Landing() {
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
         <div className="relative z-10 px-4 py-16 text-center">
-          {/* Logo */}
+          {/* Brand Logo */}
           <div className="mb-8 flex justify-center">
-            <div className="w-20 h-20 bg-primary rounded-3xl flex items-center justify-center shadow-xl">
-              <span className="text-3xl font-bold text-white">B</span>
-            </div>
+            <LogoBrand size="lg" />
           </div>
-
-          {/* Brand Name */}
-          <h1 className="text-4xl font-bold brand-text-primary mb-4">
-            Byte<span className="text-primary">wise</span>
-          </h1>
           
           {/* Tagline */}
-          <p className="text-xl text-muted-foreground mb-2 max-w-md mx-auto">
+          <p className="text-xl text-muted-foreground mb-2 max-w-md mx-auto" style={{ fontFamily: "'Quicksand', sans-serif", fontSize: "1.25rem", fontWeight: 400 }}>
             Smart Nutrition Tracking for a Healthier You
           </p>
           
@@ -97,7 +91,7 @@ export default function Landing() {
       {/* Features Section */}
       <section className="px-4 py-12">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold text-center mb-8">
+          <h2 className="text-2xl font-bold text-center mb-8" style={{ fontFamily: "'League Spartan', sans-serif", fontSize: "1.875rem", fontWeight: 700, lineHeight: 1.2 }}>
             Everything You Need for Nutrition Success
           </h2>
           

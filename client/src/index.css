@@ -390,11 +390,93 @@ select {
   }
 }
 
-/* Custom Brand Styles */
-.brand-text-primary {
-  font-family: "League Spartan", sans-serif;
+/* Bytewise Logo System */
+.bytewise-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.bytewise-logo-main {
+  font-family: 'League Spartan', sans-serif;
   font-weight: 700;
-  color: hsl(var(--foreground));
+  color: #a8dadc;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.bytewise-logo-tagline {
+  font-family: 'League Spartan', sans-serif;
+  font-weight: 400;
+  color: var(--foreground);
+  letter-spacing: 0.15em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+/* Logo Size Variants */
+.bytewise-logo-sm .bytewise-logo-main {
+  font-size: 1.5rem; /* 24px */
+}
+
+.bytewise-logo-sm .bytewise-logo-tagline {
+  font-size: 0.75rem; /* 12px */
+  margin-top: 0.125rem; /* 2px */
+  text-indent: 1.8ch;
+}
+
+.bytewise-logo-md .bytewise-logo-main {
+  font-size: 2.25rem; /* 36px */
+}
+
+.bytewise-logo-md .bytewise-logo-tagline {
+  font-size: 1rem; /* 16px */
+  margin-top: 0.25rem; /* 4px */
+  text-indent: 2.0ch;
+}
+
+.bytewise-logo-lg .bytewise-logo-main {
+  font-size: 3rem; /* 48px */
+}
+
+.bytewise-logo-lg .bytewise-logo-tagline {
+  font-size: 1.25rem; /* 20px */
+  margin-top: 0.375rem; /* 6px */
+  text-indent: 2.2ch;
+}
+
+/* Dark theme support */
+.dark .bytewise-logo-tagline {
+  color: var(--foreground);
+}
+
+/* Brand Typography Utility Classes */
+.text-brand-heading {
+  font-family: 'League Spartan', sans-serif;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.text-brand-subheading {
+  font-family: 'Work Sans', sans-serif;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.text-brand-label {
+  font-family: 'Work Sans', sans-serif;
+  font-weight: 500;
+}
+
+.text-brand-body {
+  font-family: 'Quicksand', sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.text-brand-button {
+  font-family: 'Work Sans', sans-serif;
+  font-weight: 500;
 }
 
 /* Touch Interactions */

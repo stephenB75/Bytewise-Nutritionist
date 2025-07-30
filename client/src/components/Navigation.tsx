@@ -1,4 +1,5 @@
 import { Home, Target, Calendar, Plus, User } from 'lucide-react';
+import { LogoBrand } from '@/components/LogoBrand';
 
 interface NavigationProps {
   activeTab: string;
