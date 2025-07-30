@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { HeroSection } from '@/components/HeroSection';
 import { 
@@ -236,70 +237,89 @@ export default function WeeklyLogger({ onNavigate }: WeeklyLoggerProps) {
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6 mt-6">
-            {/* Week Progress Card */}
+            {/* Week Progress Card - Data Management Style */}
             <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-              <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Week Progress</h3>
+              
+              <div className="space-y-6">
+                {/* Week Navigation Section */}
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900">Week Progress</h3>
-                  <p className="text-sm text-gray-600">{format(weekStart, 'MMM d')} - {format(addDays(weekStart, 6), 'MMM d, yyyy')}</p>
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => navigateWeek('prev')}
-                    className="h-8 w-8 p-0"
-                  >
-                    <ChevronLeft size={14} />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => navigateWeek('next')}
-                    className="h-8 w-8 p-0"
-                  >
-                    <ChevronRight size={14} />
-                  </Button>
-                </div>
-              </div>
-
-              {/* Weekly Stats */}
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="p-4 bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-orange-200 rounded-lg">
-                      <Flame className="w-5 h-5 text-orange-600" />
-                    </div>
+                  <div className="flex items-center justify-between mb-3">
                     <div>
-                      <p className="text-sm text-orange-700">Total Calories</p>
-                      <p className="text-xl font-bold text-orange-800">{(weeklyTotals.calories + calculatedCaloriesTotal).toLocaleString()}</p>
+                      <h4 className="font-medium text-gray-900">Week Navigation</h4>
+                      <p className="text-sm text-gray-600">{format(weekStart, 'MMM d')} - {format(addDays(weekStart, 6), 'MMM d, yyyy')}</p>
+                    </div>
+                    <Badge variant="outline" className="text-blue-600 border-blue-600">
+                      <Calendar className="w-3 h-3 mr-1" />
+                      Current Week
+                    </Badge>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <Button
+                      variant="outline"
+                      onClick={() => navigateWeek('prev')}
+                      className="border-blue-600 text-blue-600 hover:bg-blue-50"
+                    >
+                      <ChevronLeft className="w-4 h-4 mr-2" />
+                      Previous Week
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => navigateWeek('next')}
+                      className="border-blue-600 text-blue-600 hover:bg-blue-50"
+                    >
+                      <ChevronRight className="w-4 h-4 mr-2" />
+                      Next Week
+                    </Button>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Weekly Statistics Section */}
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <h4 className="font-medium text-gray-900">Weekly Statistics</h4>
+                      <p className="text-sm text-gray-600">Nutrition tracking progress and insights</p>
+                    </div>
+                    <Badge variant="outline" className="text-green-600 border-green-600">
+                      <BarChart3 className="w-3 h-3 mr-1" />
+                      {Math.round((weeklyTotals.calories + calculatedCaloriesTotal) / (dailyCalorieGoal * 7) * 100)}% Complete
+                    </Badge>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div className="text-center p-3 bg-gray-50 rounded-lg">
+                      <Flame className="w-5 h-5 mx-auto text-orange-600 mb-1" />
+                      <p className="text-xs text-gray-600">Total Calories</p>
+                      <p className="font-bold text-gray-900">{(weeklyTotals.calories + calculatedCaloriesTotal).toLocaleString()}</p>
+                    </div>
+                    <div className="text-center p-3 bg-gray-50 rounded-lg">
+                      <Activity className="w-5 h-5 mx-auto text-green-600 mb-1" />
+                      <p className="text-xs text-gray-600">Daily Average</p>
+                      <p className="font-bold text-gray-900">{Math.round((weeklyTotals.calories + calculatedCaloriesTotal) / 7)}</p>
+                    </div>
+                    <div className="text-center p-3 bg-gray-50 rounded-lg">
+                      <Target className="w-5 h-5 mx-auto text-blue-600 mb-1" />
+                      <p className="text-xs text-gray-600">Weekly Goal</p>
+                      <p className="font-bold text-gray-900">{(dailyCalorieGoal * 7).toLocaleString()}</p>
+                    </div>
+                    <div className="text-center p-3 bg-gray-50 rounded-lg">
+                      <TrendingUp className="w-5 h-5 mx-auto text-purple-600 mb-1" />
+                      <p className="text-xs text-gray-600">Progress</p>
+                      <p className="font-bold text-gray-900">{Math.round((weeklyTotals.calories + calculatedCaloriesTotal) / (dailyCalorieGoal * 7) * 100)}%</p>
                     </div>
                   </div>
-                  <Progress 
-                    value={Math.min((weeklyTotals.calories + calculatedCaloriesTotal) / (dailyCalorieGoal * 7) * 100, 100)} 
-                    className="mt-3 h-2"
-                  />
                 </div>
-                
-                <div className="p-4 bg-gradient-to-r from-green-50 to-green-100 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-green-200 rounded-lg">
-                      <Activity className="w-5 h-5 text-green-600" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-green-700">Avg Daily</p>
-                      <p className="text-xl font-bold text-green-800">{Math.round((weeklyTotals.calories + calculatedCaloriesTotal) / 7)}</p>
-                    </div>
-                  </div>
-                  <Progress 
-                    value={Math.min(Math.round((weeklyTotals.calories + calculatedCaloriesTotal) / 7) / dailyCalorieGoal * 100, 100)} 
-                    className="mt-3 h-2"
-                  />
-                </div>
-              </div>
 
-              {/* Daily Cards */}
-              <div className="grid grid-cols-1 gap-3">
+                <Separator />
+
+                {/* Daily Overview Section */}
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-3">Daily Overview</h4>
+                  <div className="grid grid-cols-1 gap-3">
                 {weekDays.map((day, index) => {
                   const dayTotals = getDayTotals(day);
                   const progress = Math.min((dayTotals.calories / dailyCalorieGoal) * 100, 100);
@@ -344,6 +364,8 @@ export default function WeeklyLogger({ onNavigate }: WeeklyLoggerProps) {
                     </div>
                   );
                 })}
+                  </div>
+                </div>
               </div>
             </Card>
           </TabsContent>
