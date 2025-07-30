@@ -373,7 +373,7 @@ function Dashboard({ onNavigate }: DashboardProps) {
                       <p className="font-medium text-gray-900">{meal.name}</p>
                       <div className="flex items-center gap-2 text-sm text-gray-600">
                         <span>{meal.time}</span>
-                        <Badge variant="outline" size="sm" className="text-xs">
+                        <Badge variant="outline" className="text-xs">
                           {meal.source === 'calculator' ? '🧮 Calc' : '📝 Logger'}
                         </Badge>
                       </div>

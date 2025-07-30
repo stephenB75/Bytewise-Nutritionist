@@ -114,10 +114,11 @@ export default function WeeklyLogger({ onNavigate }: WeeklyLoggerProps) {
   // Include calculated calories in weekly stats
   const todaysCalculated = getTodaysCalories();
   const calculatedCaloriesTotal = todaysCalculated.reduce((sum, item) => sum + item.calories, 0);
+  const calculatedItemsCount = todaysCalculated.length;
   
   const heroStats = [
     {
-      label: 'Weekly Calories',
+      label: 'Weekly Total',
       value: (weeklyTotals.calories + calculatedCaloriesTotal).toLocaleString(),
       icon: Flame,
       color: 'text-orange-600',
@@ -171,6 +172,29 @@ export default function WeeklyLogger({ onNavigate }: WeeklyLoggerProps) {
       />
 
       <div className="px-4 space-y-6">
+        {/* Calculator Connection Status */}
+        <Card className="p-4 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+          <div className="bg-blue-50 p-3 rounded-lg">
+            <div className="flex items-center gap-2">
+              <Target className="w-4 h-4 text-blue-600" />
+              <span className="text-sm font-medium text-blue-900">Calculator Data Connection</span>
+            </div>
+            <div className="text-xs text-blue-700 mt-1">
+              Today's calculated entries: {calculatedItemsCount} • Total calories: {calculatedCaloriesTotal} • Status: Active
+            </div>
+            <div className="grid grid-cols-2 gap-4 mt-3 text-xs">
+              <div className="flex justify-between">
+                <span>Calculator Entries:</span>
+                <span className="font-medium">{calculatedItemsCount}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Logger Entries:</span>
+                <span className="font-medium">{weeklyTotals.meals}</span>
+              </div>
+            </div>
+          </div>
+        </Card>
+
         {/* Week Navigation */}
         <Card className="p-4 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
           <div className="flex items-center justify-between mb-4">

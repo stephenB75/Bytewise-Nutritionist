@@ -29,14 +29,14 @@ export function Header({
     switch (currentPage) {
       case 'dashboard':
         return 'Dashboard';
-      case 'recipe-builder':
-        return 'Recipe Builder';
-      case 'planner':
-        return 'Meal Planner';
+      case 'calculator':
+        return 'Calculator';
+      case 'logger':
+        return 'Weekly Logger';
       case 'profile':
         return 'Profile';
       default:
-        return 'Bytewise';
+        return 'Nutrition App';
     }
   };
 
@@ -46,11 +46,14 @@ export function Header({
         <div className="flex items-center justify-between">
           {/* Logo - Left Side */}
           <div className="flex-shrink-0 flex items-center">
-            <LogoBrand 
-              size="md" 
-              clickable 
+            <Button
+              variant="ghost"
+              className="h-8 px-2 text-lg font-bold"
               onClick={() => onNavigate('dashboard')}
-            />
+              style={{ fontFamily: "'League Spartan', sans-serif" }}
+            >
+              🍎
+            </Button>
           </div>
           
           {/* Page Title - Center */}
