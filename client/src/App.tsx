@@ -12,7 +12,7 @@ import { AuthWrapper } from './components/AuthWrapper';
 import { Header } from './components/Header';
 import { Navigation } from './components/Navigation';
 import Dashboard from './pages/Dashboard';
-import CalorieCalculator from './components/CalorieCalculator';
+import CalorieCalculatorWrapper from './components/CalorieCalculatorWrapper';
 import WeeklyLogger from './pages/WeeklyLogger';
 import ProfileEnhanced from './pages/ProfileEnhanced';
 
@@ -38,7 +38,7 @@ export default function App() {
       case 'dashboard':
         return <Dashboard onNavigate={handleNavigate} />;
       case 'calculator':
-        return <CalorieCalculator onNavigate={handleNavigate} />;
+        return <CalorieCalculatorWrapper onNavigate={handleNavigate} />;
       case 'logger':
         return <WeeklyLogger onNavigate={handleNavigate} />;
       case 'profile':

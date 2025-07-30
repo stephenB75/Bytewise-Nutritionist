@@ -41,6 +41,7 @@ import {
   Smartphone
 } from 'lucide-react';
 import { HeroSection } from '@/components/HeroSection';
+import { AchievementCelebration } from '@/components/AchievementCelebration';
 
 interface ProfileProps {
   onNavigate: (page: string) => void;
@@ -90,6 +91,8 @@ interface Achievement {
 
 function ProfileEnhanced({ onNavigate }: ProfileProps) {
   const [activeSection, setActiveSection] = useState('profile');
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [celebrationAchievement, setCelebrationAchievement] = useState<any>(null);
   const queryClient = useQueryClient();
   const { user: authUser } = useAuth();
 
@@ -172,10 +175,21 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
                   Verified
                 </Badge>
               ) : (
-                <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => {
+                    setCelebrationAchievement({
+                      title: 'Email Sent!',
+                      description: 'Please check your inbox to confirm your email address.',
+                      icon: Mail
+                    });
+                    setShowCelebration(true);
+                  }}
+                >
                   <Mail className="w-3 h-3 mr-1" />
-                  Verify
-                </Badge>
+                  Confirm Email
+                </Button>
               )}
             </div>
           </div>
@@ -195,21 +209,30 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Height (cm)
+                Height (ft'in")
               </label>
-              <Input 
-                type="number"
-                placeholder="170"
-                className="text-base"
-              />
+              <div className="flex gap-2">
+                <Input 
+                  type="number"
+                  placeholder="5"
+                  className="text-base flex-1"
+                />
+                <span className="text-sm text-gray-500 self-center">ft</span>
+                <Input 
+                  type="number"
+                  placeholder="8"
+                  className="text-base flex-1"
+                />
+                <span className="text-sm text-gray-500 self-center">in</span>
+              </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Weight (kg)
+                Weight (lbs)
               </label>
               <Input 
                 type="number"
-                placeholder="70"
+                placeholder="154"
                 className="text-base"
               />
             </div>
@@ -251,37 +274,113 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
     </div>
   );
 
+  // Sample achievements with detailed information
+  const sampleAchievements = [
+    {
+      id: 1,
+      title: "First Steps",
+      description: "Logged your first meal and started your nutrition journey",
+      icon: Target,
+      colorClass: "bg-green-100 text-green-600",
+      trophyType: "Bronze",
+      earnedAt: "2025-01-15",
+      points: 50,
+      category: "Getting Started"
+    },
+    {
+      id: 2,
+      title: "Week Warrior",
+      description: "Maintained consistent logging for 7 consecutive days",
+      icon: Calendar,
+      colorClass: "bg-blue-100 text-blue-600",
+      trophyType: "Silver",
+      earnedAt: "2025-01-22",
+      points: 100,
+      category: "Consistency"
+    },
+    {
+      id: 3,
+      title: "Calorie Master",
+      description: "Successfully tracked 10,000 total calories",
+      icon: Flame,
+      colorClass: "bg-orange-100 text-orange-600",
+      trophyType: "Gold",
+      earnedAt: "2025-01-28",
+      points: 200,
+      category: "Tracking"
+    }
+  ];
+
   const renderAchievements = () => (
     <div className="space-y-6">
       <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">Achievement Gallery</h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-bold text-gray-900">Achievement Gallery</h3>
+          <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
+            <Star className="w-3 h-3 mr-1" />
+            {sampleAchievements.reduce((sum, a) => sum + a.points, 0)} Points
+          </Badge>
+        </div>
         
-        {achievements.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {Array.isArray(achievements) && achievements.map((achievement: Achievement) => (
-              <div key={achievement.id} className="p-4 border border-gray-200 rounded-lg bg-gradient-to-r from-gray-50 to-gray-100">
-                <div className="flex items-center gap-3">
-                  <div className={`p-3 rounded-lg ${achievement.colorClass || 'bg-blue-100'}`}>
-                    <Trophy className="w-6 h-6 text-blue-600" />
+        <div className="grid grid-cols-1 gap-4">
+          {sampleAchievements.map((achievement) => {
+            const IconComponent = achievement.icon;
+            return (
+              <div 
+                key={achievement.id} 
+                className="p-4 border border-gray-200 rounded-lg bg-gradient-to-r from-gray-50 to-gray-100 hover:shadow-md transition-shadow cursor-pointer"
+                onClick={() => {
+                  setCelebrationAchievement({
+                    title: achievement.title,
+                    description: achievement.description,
+                    icon: achievement.icon
+                  });
+                  setShowCelebration(true);
+                }}
+              >
+                <div className="flex items-center gap-4">
+                  <div className={`p-3 rounded-lg ${achievement.colorClass}`}>
+                    <IconComponent className="w-6 h-6" />
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-bold text-gray-900">{achievement.title}</h4>
-                    <p className="text-sm text-gray-600">{achievement.description}</p>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Earned {new Date(achievement.earnedAt).toLocaleDateString()}
-                    </p>
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4 className="font-bold text-gray-900">{achievement.title}</h4>
+                      <Badge variant="outline" className="text-xs">
+                        {achievement.trophyType}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-2">{achievement.description}</p>
+                    <div className="flex items-center justify-between text-xs text-gray-500">
+                      <span>Category: {achievement.category}</span>
+                      <span>{achievement.points} points</span>
+                      <span>Earned {new Date(achievement.earnedAt).toLocaleDateString()}</span>
+                    </div>
                   </div>
+                  <Trophy className="w-5 h-5 text-yellow-500" />
                 </div>
               </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-8">
-            <Award className="w-12 h-12 mx-auto text-gray-400 mb-3" />
-            <p className="text-gray-600">No achievements yet</p>
-            <p className="text-sm text-gray-500">Keep tracking your nutrition to earn your first achievement!</p>
-          </div>
-        )}
+            );
+          })}
+        </div>
+        
+        <Separator className="my-4" />
+        
+        <div className="text-center">
+          <Button 
+            variant="outline"
+            onClick={() => {
+              setCelebrationAchievement({
+                title: "Keep Going!",
+                description: "Continue tracking your nutrition to unlock more achievements!",
+                icon: Trophy
+              });
+              setShowCelebration(true);
+            }}
+          >
+            <Trophy className="w-4 h-4 mr-2" />
+            View All Achievements
+          </Button>
+        </div>
       </Card>
     </div>
   );
@@ -592,6 +691,13 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
       <div className="flex-1 px-4 pb-6">
         {renderSection()}
       </div>
+
+      {/* Achievement Celebration Modal */}
+      <AchievementCelebration
+        isOpen={showCelebration}
+        onClose={() => setShowCelebration(false)}
+        achievement={celebrationAchievement}
+      />
     </div>
   );
 }

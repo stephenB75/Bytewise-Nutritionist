@@ -17,24 +17,42 @@ import {
 interface HeroSectionProps {
   title: string;
   subtitle?: string;
-  caloriesConsumed: number;
-  caloriesGoal: number;
-  currentStreak: number;
+  caloriesConsumed?: number;
+  caloriesGoal?: number;
+  currentStreak?: number;
   showProgress?: boolean;
+  className?: string;
+  stats?: Array<{
+    label: string;
+    value: string;
+    icon: any;
+    color: string;
+    bgColor: string;
+  }>;
 }
 
 export function HeroSection({ 
   title, 
   subtitle, 
-  caloriesConsumed, 
-  caloriesGoal, 
-  currentStreak,
-  showProgress = true 
+  caloriesConsumed = 0, 
+  caloriesGoal = 2000, 
+  currentStreak = 0,
+  showProgress = true,
+  className = '',
+  stats = []
 }: HeroSectionProps) {
   const progressPercentage = Math.min((caloriesConsumed / caloriesGoal) * 100, 100);
   
   return (
-    <div className="bg-gradient-to-br from-blue-600 to-purple-700 text-white px-4 py-6">
+    <div className={`relative bg-gradient-to-br from-blue-600 to-purple-700 text-white px-4 py-6 overflow-hidden ${className}`}>
+      {/* Faded Background Image */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center opacity-10"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+        }}
+      />
+      <div className="relative z-10">
       <div className="max-w-md mx-auto">
         {/* Header */}
         <div className="text-center mb-6">
@@ -103,6 +121,25 @@ export function HeroSection({
             </div>
           </>
         )}
+
+        {/* Stats Grid */}
+        {stats.length > 0 && (
+          <div className="grid grid-cols-3 gap-3 mt-6">
+            {stats.map((stat, index) => {
+              const IconComponent = stat.icon;
+              return (
+                <div key={index} className="text-center">
+                  <div className={`p-2 ${stat.bgColor} rounded-lg mb-2 mx-auto w-fit`}>
+                    <IconComponent className={`w-5 h-5 ${stat.color}`} />
+                  </div>
+                  <div className="text-lg font-bold">{stat.value}</div>
+                  <div className="text-xs text-blue-100">{stat.label}</div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
       </div>
     </div>
   );

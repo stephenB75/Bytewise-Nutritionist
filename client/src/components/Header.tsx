@@ -42,7 +42,7 @@ export function Header({
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border safe-area-inset-top">
-      <div className="w-full max-w-lg mx-auto px-3 py-3.5">
+      <div className="w-full max-w-lg mx-auto px-3 py-4">
         <div className="flex items-center justify-between">
           {/* Logo - Left Side */}
           <div className="flex-shrink-0">

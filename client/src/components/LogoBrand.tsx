@@ -23,7 +23,8 @@ export function LogoBrand({
 }: LogoBrandProps) {
   const Component = clickable ? 'button' : 'div';
   
-  const baseClasses = `bytewise-logo bytewise-logo-${size}`;
+  // Increased size classes
+  const baseClasses = `bytewise-logo bytewise-logo-${size === 'sm' ? 'md' : size === 'md' ? 'lg' : 'xl'}`;
   const clickableClasses = clickable 
     ? 'hover:scale-102 transition-transform duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg'
     : '';
