@@ -4,7 +4,11 @@ import { Badge } from '@/components/ui/badge';
 import { Target, Calendar, ChefHat, TrendingUp, Smartphone, Shield, Zap } from 'lucide-react';
 import { LogoBrand } from '@/components/LogoBrand';
 
-export default function Landing() {
+interface LandingProps {
+  onNavigateToForgotPassword?: () => void;
+}
+
+export default function Landing({ onNavigateToForgotPassword }: LandingProps) {
   const features = [
     {
       icon: Target,
@@ -77,13 +81,26 @@ export default function Landing() {
               onClick={() => window.location.href = '/api/login'}
               className="w-full h-12 text-lg font-semibold touch-target btn-animate"
               size="lg"
+              style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "1rem", fontWeight: 500 }}
             >
               Start Tracking Now
             </Button>
             
-            <p className="text-sm text-muted-foreground">
-              Sign in with your Replit account to get started
-            </p>
+            <div className="flex flex-col space-y-2">
+              <p className="text-sm text-muted-foreground" style={{ fontFamily: "'Quicksand', sans-serif", fontSize: "0.875rem", fontWeight: 400 }}>
+                Sign in with your Replit account to get started
+              </p>
+              
+              {onNavigateToForgotPassword && (
+                <button
+                  onClick={onNavigateToForgotPassword}
+                  className="text-sm text-primary hover:text-primary/80 transition-colors"
+                  style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "0.875rem", fontWeight: 500 }}
+                >
+                  Need help with your account?
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>

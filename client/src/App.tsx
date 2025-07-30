@@ -16,6 +16,7 @@ import MealLogger from '@/pages/MealLogger';
 import RecipeBuilder from '@/pages/RecipeBuilder';
 import Calendar from '@/pages/Calendar';
 import Profile from '@/pages/Profile';
+import ForgotPassword from '@/pages/ForgotPassword';
 
 // PWA Install prompt
 function PWAInstallPrompt() {
@@ -89,6 +90,7 @@ function PWAInstallPrompt() {
 function AppRouter() {
   const { isAuthenticated, isLoading } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [currentPage, setCurrentPage] = useState('landing'); // landing, forgot-password, app
   const [notifications, setNotifications] = useState<string[]>([]);
   const { toast } = useToast();
 
@@ -161,7 +163,17 @@ function AppRouter() {
 
   // Show landing page if not authenticated
   if (!isAuthenticated) {
-    return <Landing />;
+    if (currentPage === 'forgot-password') {
+      return (
+        <ForgotPassword 
+          onNavigateToLogin={() => setCurrentPage('landing')}
+          showToast={showToast}
+        />
+      );
+    }
+    return (
+      <Landing onNavigateToForgotPassword={() => setCurrentPage('forgot-password')} />
+    );
   }
 
   // Main app interface
