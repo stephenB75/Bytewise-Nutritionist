@@ -1,0 +1,719 @@
+import { useState } from 'react';
+import { Eye, EyeOff, Mail, Lock, User, Calendar, Target, Activity } from 'lucide-react';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { BrandStandard } from '../Brand';
+import { Card } from '../ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { Checkbox } from '../ui/checkbox';
+
+export interface SignupFormData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  age: string;
+  gender: string;
+  activityLevel: string;
+  goal: string;
+  weight: string;
+  height: string;
+  calorieGoal: string;
+  proteinGoal: string;
+  fatGoal: string;
+  carbGoal: string;
+}
+
+interface SignupScreenProps {
+  onSignup: (formData: SignupFormData) => void;
+  onNavigateToLogin: () => void;
+}
+
+export function SignupScreen({ onSignup, onNavigateToLogin }: SignupScreenProps) {
+  const [formData, setFormData] = useState<SignupFormData>({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    age: '',
+    gender: '',
+    activityLevel: '',
+    goal: '',
+    weight: '',
+    height: '',
+    calorieGoal: '',
+    proteinGoal: '',
+    fatGoal: '',
+    carbGoal: ''
+  });
+  
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    // Clear field-specific errors when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }));
+    }
+  };
+
+  const validateStep1 = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = 'First name is required';
+    }
+
+    if (!formData.lastName.trim()) {
+      newErrors.lastName = 'Last name is required';
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    } else if (formData.password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters';
+    }
+
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = 'Please confirm your password';
+    } else if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // Auto-verify email when user enters a valid email during signup
+  const handleEmailVerification = (email: string) => {
+    if (email && /\S+@\S+\.\S+/.test(email)) {
+      // Dispatch event to auto-verify email during signup process
+      window.dispatchEvent(new CustomEvent('bytewise-auto-verify-signup-email', {
+        detail: { email }
+      }));
+    }
+  };
+
+  const validateStep2 = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.age.trim()) {
+      newErrors.age = 'Age is required';
+    } else {
+      const age = parseInt(formData.age);
+      if (isNaN(age) || age < 13 || age > 120) {
+        newErrors.age = 'Please enter a valid age (13-120)';
+      }
+    }
+
+    if (!formData.gender) {
+      newErrors.gender = 'Please select your gender';
+    }
+
+    if (!formData.activityLevel) {
+      newErrors.activityLevel = 'Please select your activity level';
+    }
+
+    if (!formData.goal) {
+      newErrors.goal = 'Please select your primary goal';
+    }
+
+    if (formData.weight && (isNaN(parseFloat(formData.weight)) || parseFloat(formData.weight) <= 0)) {
+      newErrors.weight = 'Please enter a valid weight';
+    }
+
+    if (formData.height && (isNaN(parseFloat(formData.height)) || parseFloat(formData.height) <= 0)) {
+      newErrors.height = 'Please enter a valid height';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateStep3 = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.calorieGoal.trim()) {
+      newErrors.calorieGoal = 'Daily calorie goal is required';
+    } else {
+      const calories = parseInt(formData.calorieGoal);
+      if (isNaN(calories) || calories < 800 || calories > 5000) {
+        newErrors.calorieGoal = 'Please enter a valid calorie goal (800-5000)';
+      }
+    }
+
+    if (formData.proteinGoal && (isNaN(parseInt(formData.proteinGoal)) || parseInt(formData.proteinGoal) < 0)) {
+      newErrors.proteinGoal = 'Please enter a valid protein goal';
+    }
+
+    if (formData.fatGoal && (isNaN(parseInt(formData.fatGoal)) || parseInt(formData.fatGoal) < 0)) {
+      newErrors.fatGoal = 'Please enter a valid fat goal';
+    }
+
+    if (formData.carbGoal && (isNaN(parseInt(formData.carbGoal)) || parseInt(formData.carbGoal) < 0)) {
+      newErrors.carbGoal = 'Please enter a valid carb goal';
+    }
+
+    if (!agreedToTerms) {
+      newErrors.terms = 'You must agree to the terms and conditions';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const nextStep = () => {
+    let isValid = false;
+    
+    if (currentStep === 1) {
+      isValid = validateStep1();
+    } else if (currentStep === 2) {
+      isValid = validateStep2();
+    }
+
+    if (isValid && currentStep < 3) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const prevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+      setErrors({}); // Clear errors when going back
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateStep3()) {
+      return;
+    }
+
+    setIsLoading(true);
+    
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Pass the complete form data to the signup handler
+      onSignup(formData);
+    } catch (error) {
+      console.error('Signup failed:', error);
+      setErrors({ submit: 'Account creation failed. Please try again.' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const calculateMacros = () => {
+    const calories = parseInt(formData.calorieGoal) || 2000;
+    const protein = Math.round(calories * 0.25 / 4); // 25% protein
+    const fat = Math.round(calories * 0.30 / 9); // 30% fat
+    const carbs = Math.round(calories * 0.45 / 4); // 45% carbs
+    
+    setFormData(prev => ({
+      ...prev,
+      proteinGoal: protein.toString(),
+      fatGoal: fat.toString(),
+      carbGoal: carbs.toString()
+    }));
+  };
+
+  const renderStep1 = () => (
+    <div className="space-y-4">
+      <div className="text-center mb-6">
+        <h2 className="text-2xl font-bold text-foreground mb-2" style={{ fontFamily: "'League Spartan', sans-serif", fontSize: "1.5rem", fontWeight: 700 }}>
+          Create Account
+        </h2>
+        <p className="text-muted-foreground text-brand-body" style={{ fontFamily: "'Quicksand', sans-serif", fontSize: "0.875rem", fontWeight: 400 }}>
+          Let's get you started with Bytewise
+        </p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="block font-medium text-foreground mb-2 text-brand-label" style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "0.875rem", fontWeight: 500 }}>
+            First Name
+          </label>
+          <Input
+            value={formData.firstName}
+            onChange={(e) => handleInputChange('firstName', e.target.value)}
+            placeholder="John"
+            className={`mobile-safe-input bg-input-background ${errors.firstName ? 'border-red-500' : ''}`}
+          />
+          {errors.firstName && (
+            <p className="text-red-500 text-xs mt-1 text-brand-body" style={{ fontFamily: "'Quicksand', sans-serif", fontSize: "0.75rem", fontWeight: 400 }}>
+              {errors.firstName}
+            </p>
+          )}
+        </div>
+        <div>
+          <label className="block font-medium text-foreground mb-2 text-brand-label" style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "0.875rem", fontWeight: 500 }}>
+            Last Name
+          </label>
+          <Input
+            value={formData.lastName}
+            onChange={(e) => handleInputChange('lastName', e.target.value)}
+            placeholder="Doe"
+            className={`mobile-safe-input bg-input-background ${errors.lastName ? 'border-red-500' : ''}`}
+          />
+          {errors.lastName && (
+            <p className="text-red-500 text-xs mt-1 text-brand-body" style={{ fontFamily: "'Quicksand', sans-serif", fontSize: "0.75rem", fontWeight: 400 }}>
+              {errors.lastName}
+            </p>
+          )}
+        </div>
+      </div>
+
+      <div>
+        <label className="block font-medium text-foreground mb-2 text-brand-label" style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "0.875rem", fontWeight: 500 }}>
+          Email
+        </label>
+        <div className="input-container">
+          <Mail className="input-icon-left" size={20} />
+          <Input
+            type="email"
+            value={formData.email}
+            onChange={(e) => {
+              const email = e.target.value;
+              handleInputChange('email', email);
+              handleEmailVerification(email);
+            }}
+            placeholder="john@example.com"
+            className={`input-with-left-icon mobile-safe-input bg-input-background ${errors.email ? 'border-red-500' : ''}`}
+          />
+        </div>
+        {errors.email && (
+          <p className="text-red-500 text-xs mt-1 text-brand-body" style={{ fontFamily: "'Quicksand', sans-serif", fontSize: "0.75rem", fontWeight: 400 }}>
+            {errors.email}
+          </p>
+        )}
+      </div>
+
+      <div>
+        <label className="block font-medium text-foreground mb-2 text-brand-label" style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "0.875rem", fontWeight: 500 }}>
+          Password
+        </label>
+        <div className="input-container">
+          <Lock className="input-icon-left" size={20} />
+          <Input
+            type={showPassword ? 'text' : 'password'}
+            value={formData.password}
+            onChange={(e) => handleInputChange('password', e.target.value)}
+            placeholder="Create a secure password"
+            className={`input-with-both-icons mobile-safe-input bg-input-background ${errors.password ? 'border-red-500' : ''}`}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="input-icon-right input-icon-interactive"
+          >
+            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+          </button>
+        </div>
+        {errors.password && (
+          <p className="text-red-500 text-xs mt-1 text-brand-body" style={{ fontFamily: "'Quicksand', sans-serif", fontSize: "0.75rem", fontWeight: 400 }}>
+            {errors.password}
+          </p>
+        )}
+      </div>
+
+      <div>
+        <label className="block font-medium text-foreground mb-2 text-brand-label" style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "0.875rem", fontWeight: 500 }}>
+          Confirm Password
+        </label>
+        <div className="input-container">
+          <Lock className="input-icon-left" size={20} />
+          <Input
+            type={showConfirmPassword ? 'text' : 'password'}
+            value={formData.confirmPassword}
+            onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+            placeholder="Confirm your password"
+            className={`input-with-both-icons mobile-safe-input bg-input-background ${errors.confirmPassword ? 'border-red-500' : ''}`}
+          />
+          <button
+            type="button"
+            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+            className="input-icon-right input-icon-interactive"
+          >
+            {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+          </button>
+        </div>
+        {errors.confirmPassword && (
+          <p className="text-red-500 text-xs mt-1 text-brand-body" style={{ fontFamily: "'Quicksand', sans-serif", fontSize: "0.75rem", fontWeight: 400 }}>
+            {errors.confirmPassword}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+
+  const renderStep2 = () => (
+    <div className="space-y-4">
+      <div className="text-center mb-6">
+        <h2 className="text-2xl font-bold text-foreground mb-2" style={{ fontFamily: "'League Spartan', sans-serif", fontSize: "1.5rem", fontWeight: 700 }}>
+          Personal Details
+        </h2>
+        <p className="text-muted-foreground text-brand-body" style={{ fontFamily: "'Quicksand', sans-serif", fontSize: "0.875rem", fontWeight: 400 }}>
+          Help us personalize your experience
+        </p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="block font-medium text-foreground mb-2 text-brand-label" style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "0.875rem", fontWeight: 500 }}>
+            Age
+          </label>
+          <Input
+            type="number"
+            value={formData.age}
+            onChange={(e) => handleInputChange('age', e.target.value)}
+            placeholder="25"
+            className={`mobile-safe-input bg-input-background ${errors.age ? 'border-red-500' : ''}`}
+          />
+          {errors.age && (
+            <p className="text-red-500 text-xs mt-1 text-brand-body" style={{ fontFamily: "'Quicksand', sans-serif", fontSize: "0.75rem", fontWeight: 400 }}>
+              {errors.age}
+            </p>
+          )}
+        </div>
+        <div>
+          <label className="block font-medium text-foreground mb-2 text-brand-label" style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "0.875rem", fontWeight: 500 }}>
+            Gender
+          </label>
+          <Select value={formData.gender} onValueChange={(value) => handleInputChange('gender', value)}>
+            <SelectTrigger className={`mobile-safe-input bg-input-background ${errors.gender ? 'border-red-500' : ''}`}>
+              <SelectValue placeholder="Select" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="male">Male</SelectItem>
+              <SelectItem value="female">Female</SelectItem>
+              <SelectItem value="other">Other</SelectItem>
+              <SelectItem value="prefer_not_to_say">Prefer not to say</SelectItem>
+            </SelectContent>
+          </Select>
+          {errors.gender && (
+            <p className="text-red-500 text-xs mt-1 text-brand-body" style={{ fontFamily: "'Quicksand', sans-serif", fontSize: "0.75rem", fontWeight: 400 }}>
+              {errors.gender}
+            </p>
+          )}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="block font-medium text-foreground mb-2 text-brand-label" style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "0.875rem", fontWeight: 500 }}>
+            Weight (lbs)
+          </label>
+          <Input
+            type="number"
+            value={formData.weight}
+            onChange={(e) => handleInputChange('weight', e.target.value)}
+            placeholder="150"
+            className={`mobile-safe-input bg-input-background ${errors.weight ? 'border-red-500' : ''}`}
+          />
+          {errors.weight && (
+            <p className="text-red-500 text-xs mt-1 text-brand-body" style={{ fontFamily: "'Quicksand', sans-serif", fontSize: "0.75rem", fontWeight: 400 }}>
+              {errors.weight}
+            </p>
+          )}
+        </div>
+        <div>
+          <label className="block font-medium text-foreground mb-2 text-brand-label" style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "0.875rem", fontWeight: 500 }}>
+            Height (ft.)
+          </label>
+          <Input
+            type="number"
+            step="0.1"
+            value={formData.height}
+            onChange={(e) => handleInputChange('height', e.target.value)}
+            placeholder="5.8"
+            className={`mobile-safe-input bg-input-background ${errors.height ? 'border-red-500' : ''}`}
+          />
+          {errors.height && (
+            <p className="text-red-500 text-xs mt-1 text-brand-body" style={{ fontFamily: "'Quicksand', sans-serif", fontSize: "0.75rem", fontWeight: 400 }}>
+              {errors.height}
+            </p>
+          )}
+        </div>
+      </div>
+
+      <div>
+        <label className="block font-medium text-foreground mb-2 text-brand-label" style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "0.875rem", fontWeight: 500 }}>
+          Activity Level
+        </label>
+        <Select value={formData.activityLevel} onValueChange={(value) => handleInputChange('activityLevel', value)}>
+          <SelectTrigger className={`bg-input-background ${errors.activityLevel ? 'border-red-500' : ''}`}>
+            <SelectValue placeholder="Select your activity level" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="sedentary">Sedentary (little to no exercise)</SelectItem>
+            <SelectItem value="lightly_active">Lightly active (light exercise 1-3 days/week)</SelectItem>
+            <SelectItem value="moderately_active">Moderately active (moderate exercise 3-5 days/week)</SelectItem>
+            <SelectItem value="very_active">Very active (hard exercise 6-7 days/week)</SelectItem>
+            <SelectItem value="extremely_active">Extra active (very hard exercise, physical job)</SelectItem>
+          </SelectContent>
+        </Select>
+        {errors.activityLevel && (
+          <p className="text-red-500 text-xs mt-1 text-brand-body" style={{ fontFamily: "'Quicksand', sans-serif", fontSize: "0.75rem", fontWeight: 400 }}>
+            {errors.activityLevel}
+          </p>
+        )}
+      </div>
+
+      <div>
+        <label className="block font-medium text-foreground mb-2 text-brand-label" style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "0.875rem", fontWeight: 500 }}>
+          Primary Goal
+        </label>
+        <Select value={formData.goal} onValueChange={(value) => handleInputChange('goal', value)}>
+          <SelectTrigger className={`bg-input-background ${errors.goal ? 'border-red-500' : ''}`}>
+            <SelectValue placeholder="What's your main goal?" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="lose-weight">Lose weight</SelectItem>
+            <SelectItem value="gain-weight">Gain weight</SelectItem>
+            <SelectItem value="maintain-weight">Maintain weight</SelectItem>
+            <SelectItem value="build-muscle">Build muscle</SelectItem>
+            <SelectItem value="improve-health">Improve overall health</SelectItem>
+          </SelectContent>
+        </Select>
+        {errors.goal && (
+          <p className="text-red-500 text-xs mt-1 text-brand-body" style={{ fontFamily: "'Quicksand', sans-serif", fontSize: "0.75rem", fontWeight: 400 }}>
+            {errors.goal}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+
+  const renderStep3 = () => (
+    <div className="space-y-4">
+      <div className="text-center mb-6">
+        <h2 className="text-2xl font-bold text-foreground mb-2" style={{ fontFamily: "'League Spartan', sans-serif", fontSize: "1.5rem", fontWeight: 700 }}>
+          Nutrition Goals
+        </h2>
+        <p className="text-muted-foreground text-brand-body" style={{ fontFamily: "'Quicksand', sans-serif", fontSize: "0.875rem", fontWeight: 400 }}>
+          Set your daily macro targets
+        </p>
+      </div>
+
+      <div>
+        <label className="block font-medium text-foreground mb-2 text-brand-label" style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "0.875rem", fontWeight: 500 }}>
+          Daily Calorie Goal
+        </label>
+        <div className="flex space-x-2">
+          <Input
+            type="number"
+            value={formData.calorieGoal}
+            onChange={(e) => handleInputChange('calorieGoal', e.target.value)}
+            placeholder="2000"
+            className={`bg-input-background ${errors.calorieGoal ? 'border-red-500' : ''}`}
+          />
+          <Button
+            type="button"
+            variant="outline"
+            onClick={calculateMacros}
+            className="whitespace-nowrap text-brand-button"
+            style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "0.875rem", fontWeight: 500 }}
+          >
+            Auto Calculate
+          </Button>
+        </div>
+        {errors.calorieGoal && (
+          <p className="text-red-500 text-xs mt-1 text-brand-body" style={{ fontFamily: "'Quicksand', sans-serif", fontSize: "0.75rem", fontWeight: 400 }}>
+            {errors.calorieGoal}
+          </p>
+        )}
+      </div>
+
+      <div className="grid grid-cols-3 gap-3">
+        <div>
+          <label className="block font-medium text-foreground mb-2 text-brand-label" style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "0.875rem", fontWeight: 500 }}>
+            Protein (g)
+          </label>
+          <Input
+            type="number"
+            value={formData.proteinGoal}
+            onChange={(e) => handleInputChange('proteinGoal', e.target.value)}
+            placeholder="150"
+            className={`bg-input-background ${errors.proteinGoal ? 'border-red-500' : ''}`}
+          />
+          {errors.proteinGoal && (
+            <p className="text-red-500 text-xs mt-1 text-brand-body" style={{ fontFamily: "'Quicksand', sans-serif", fontSize: "0.75rem", fontWeight: 400 }}>
+              {errors.proteinGoal}
+            </p>
+          )}
+        </div>
+        <div>
+          <label className="block font-medium text-foreground mb-2 text-brand-label" style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "0.875rem", fontWeight: 500 }}>
+            Fat (g)
+          </label>
+          <Input
+            type="number"
+            value={formData.fatGoal}
+            onChange={(e) => handleInputChange('fatGoal', e.target.value)}
+            placeholder="67"
+            className={`bg-input-background ${errors.fatGoal ? 'border-red-500' : ''}`}
+          />
+          {errors.fatGoal && (
+            <p className="text-red-500 text-xs mt-1 text-brand-body" style={{ fontFamily: "'Quicksand', sans-serif", fontSize: "0.75rem", fontWeight: 400 }}>
+              {errors.fatGoal}
+            </p>
+          )}
+        </div>
+        <div>
+          <label className="block font-medium text-foreground mb-2 text-brand-label" style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "0.875rem", fontWeight: 500 }}>
+            Carbs (g)
+          </label>
+          <Input
+            type="number"
+            value={formData.carbGoal}
+            onChange={(e) => handleInputChange('carbGoal', e.target.value)}
+            placeholder="225"
+            className={`bg-input-background ${errors.carbGoal ? 'border-red-500' : ''}`}
+          />
+          {errors.carbGoal && (
+            <p className="text-red-500 text-xs mt-1 text-brand-body" style={{ fontFamily: "'Quicksand', sans-serif", fontSize: "0.75rem", fontWeight: 400 }}>
+              {errors.carbGoal}
+            </p>
+          )}
+        </div>
+      </div>
+
+      <Card className="p-4 bg-primary/10 border-primary/20">
+        <h3 className="font-semibold text-primary mb-2 text-brand-subheading" style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "1rem", fontWeight: 600 }}>
+          Macro Distribution
+        </h3>
+        <div className="space-y-2 text-sm text-brand-body" style={{ fontFamily: "'Quicksand', sans-serif", fontSize: "0.875rem", fontWeight: 400 }}>
+          <div className="flex justify-between">
+            <span>Protein:</span>
+            <span>{formData.proteinGoal ? Math.round((parseInt(formData.proteinGoal) * 4) / parseInt(formData.calorieGoal || '2000') * 100) : 25}%</span>
+          </div>
+          <div className="flex justify-between">
+            <span>Fat:</span>
+            <span>{formData.fatGoal ? Math.round((parseInt(formData.fatGoal) * 9) / parseInt(formData.calorieGoal || '2000') * 100) : 30}%</span>
+          </div>
+          <div className="flex justify-between">
+            <span>Carbs:</span>
+            <span>{formData.carbGoal ? Math.round((parseInt(formData.carbGoal) * 4) / parseInt(formData.calorieGoal || '2000') * 100) : 45}%</span>
+          </div>
+        </div>
+      </Card>
+
+      <div className="flex items-center space-x-2">
+        <Checkbox
+          id="terms"
+          checked={agreedToTerms}
+          onCheckedChange={(checked) => setAgreedToTerms(checked as boolean)}
+        />
+        <label htmlFor="terms" className="text-sm text-brand-body" style={{ fontFamily: "'Quicksand', sans-serif", fontSize: "0.875rem", fontWeight: 400 }}>
+          I agree to the <span className="text-primary">Terms of Service</span> and <span className="text-primary">Privacy Policy</span>
+        </label>
+      </div>
+      {errors.terms && (
+        <p className="text-red-500 text-xs mt-1 text-brand-body" style={{ fontFamily: "'Quicksand', sans-serif", fontSize: "0.75rem", fontWeight: 400 }}>
+          {errors.terms}
+        </p>
+      )}
+      {errors.submit && (
+        <p className="text-red-500 text-sm mt-2 text-center text-brand-body" style={{ fontFamily: "'Quicksand', sans-serif", fontSize: "0.875rem", fontWeight: 400 }}>
+          {errors.submit}
+        </p>
+      )}
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-background flex flex-col justify-center px-6 py-12 animate-fade-in">
+      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+        <BrandStandard size="lg" className="mb-8" />
+        
+        {/* Progress Indicator */}
+        <div className="flex justify-center mb-6">
+          <div className="flex space-x-2">
+            {[1, 2, 3].map((step) => (
+              <div
+                key={step}
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
+                  step <= currentStep
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted text-muted-foreground'
+                }`}
+                style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "0.875rem", fontWeight: 500 }}
+              >
+                {step}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+        <form className="space-y-6" onSubmit={handleSubmit}>
+          {currentStep === 1 && renderStep1()}
+          {currentStep === 2 && renderStep2()}
+          {currentStep === 3 && renderStep3()}
+
+          <div className="flex space-x-3">
+            {currentStep > 1 && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={prevStep}
+                className="flex-1 text-brand-button"
+                style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "0.875rem", fontWeight: 500 }}
+              >
+                Previous
+              </Button>
+            )}
+            {currentStep < 3 ? (
+              <Button
+                type="button"
+                onClick={nextStep}
+                className="flex-1 bg-primary text-primary-foreground btn-animate text-brand-button"
+                style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "0.875rem", fontWeight: 500 }}
+              >
+                Next
+              </Button>
+            ) : (
+              <Button
+                type="submit"
+                className="flex-1 bg-primary text-primary-foreground btn-animate text-brand-button"
+                style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "0.875rem", fontWeight: 500 }}
+                disabled={isLoading}
+              >
+                {isLoading ? 'Creating Account...' : 'Create Account'}
+              </Button>
+            )}
+          </div>
+        </form>
+
+        <div className="mt-6 text-center">
+          <p className="text-muted-foreground text-brand-body" style={{ fontFamily: "'Quicksand', sans-serif", fontSize: "0.875rem", fontWeight: 400 }}>
+            Already have an account?{' '}
+            <button
+              onClick={onNavigateToLogin}
+              className="font-medium text-primary hover:text-primary/80"
+            >
+              Sign in
+            </button>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}

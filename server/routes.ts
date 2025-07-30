@@ -212,6 +212,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/meals/:id', isAuthenticated, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid meal ID" });
+      }
       const meal = await storage.getMealById(id);
       if (!meal) {
         return res.status(404).json({ message: "Meal not found" });
@@ -241,6 +244,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch('/api/meals/:id', isAuthenticated, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid meal ID" });
+      }
       const mealData = req.body;
       const meal = await storage.updateMeal(id, mealData);
       res.json(meal);
@@ -253,6 +259,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete('/api/meals/:id', isAuthenticated, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid meal ID" });
+      }
       await storage.deleteMeal(id);
       res.status(204).send();
     } catch (error) {
@@ -265,6 +274,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/meals/:id/foods', isAuthenticated, async (req, res) => {
     try {
       const mealId = parseInt(req.params.id);
+      if (isNaN(mealId)) {
+        return res.status(400).json({ message: "Invalid meal ID" });
+      }
       const mealFoodData = insertMealFoodSchema.parse({ ...req.body, mealId });
       const mealFood = await storage.addMealFood(mealFoodData);
       res.status(201).json(mealFood);
