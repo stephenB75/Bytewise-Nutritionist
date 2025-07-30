@@ -9,7 +9,7 @@ import { Plus, Search, Clock, Utensils, Coffee, Moon, Flame } from 'lucide-react
 import { apiRequest } from '@/lib/queryClient';
 import { formatCalories, formatDate, getTodayDateString } from '@/lib/utils';
 import { useDragDrop } from '@/components/DragDropProvider';
-import { ImageWithFallback } from '@/components/ImageWithFallback';
+import { ImageWithFallback } from '@/components/ui/ImageWithFallback';
 
 interface MealLoggerProps {
   onNavigate: (tab: string) => void;
