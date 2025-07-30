@@ -38,24 +38,8 @@ export function LogoBrand({ size = 'md', className = '' }: LogoBrandProps) {
 
   return (
     <div className={`brand-logo relative ${className}`}>
-      {/* Main logo text */}
-      <div 
-        className={`${sizeClasses[size]} font-bold leading-none brand-text-primary`}
-      >
-        bytewise
-      </div>
-      
-      {/* Tagline positioned so 'N' aligns under 't' of "bytewise" */}
-      <div 
-        className={`font-medium ${taglineSpacing[size]} leading-none brand-text-secondary`}
-        style={{ 
-          fontSize: taglineSizes[size],
-          letterSpacing: '0.2em',
-          textIndent: getTaglineIndent()
-        }}
-      >
-        Nutritionist
-      </div>
+      {/* Use LogoBrand component instead of duplicating styles */}
+      <LogoBrand size={size} />
     </div>
   );
 }
@@ -78,9 +62,7 @@ export function BrandStandard({ size = 'md', className = '' }: BrandStandardProp
 export function BrandCompact({ className = '' }: { className?: string }) {
   return (
     <div className={`flex items-center space-x-2 ${className}`}>
-      <span className="text-xl font-bold brand-text-primary">
-        bytewise
-      </span>
+      <LogoBrand size="sm" />
     </div>
   );
 }

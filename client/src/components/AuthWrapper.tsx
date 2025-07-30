@@ -7,6 +7,7 @@
 
 import { useAuth } from '@/hooks/useAuth';
 import LoginScreen from '@/pages/LoginScreen';
+import { LogoBrand } from '@/components/LogoBrand';
 
 interface AuthWrapperProps {
   children: React.ReactNode;
@@ -21,10 +22,7 @@ export function AuthWrapper({ children, onNavigate }: AuthWrapperProps) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-100 flex items-center justify-center">
         <div className="text-center">
-          <div className="bytewise-logo bytewise-logo-lg mb-6">
-            <div className="bytewise-logo-main">bytewise</div>
-            <div className="bytewise-logo-tagline">Nutritionist</div>
-          </div>
+          <LogoBrand size="lg" className="mb-6" />
           <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
           <p className="text-gray-600 mt-4">Loading your nutrition dashboard...</p>
         </div>

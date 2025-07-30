@@ -61,7 +61,10 @@ export async function generateProgressReportPDF(): Promise<void> {
 </head>
 <body>
     <div class="header">
-        <div class="logo">bytewise</div>
+        <div class="logo">
+            <div style="font-size: 28px; font-weight: bold; color: #a8dadc;">bytewise</div>
+            <div style="font-size: 14px; color: #666; margin-left: 2.2ch;">Nutritionist</div>
+        </div>
         <div class="subtitle">6-Month Progress Report • Generated ${new Date().toLocaleDateString()}</div>
     </div>
 
