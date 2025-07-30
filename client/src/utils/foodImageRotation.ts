@@ -32,6 +32,12 @@ import chicken2Img from "@assets/chicken-2443901_1920_1753859530084.jpg";
 import chickenNuggetsImg from "@assets/chicken-nuggets-1108_1920_1753859530084.jpg";
 import saladImg from "@assets/salad-6948004_1920_1753859530085.jpg";
 
+// New food images batch 3
+import friedPrawnImg from "@assets/fried-prawn-1737593_1920_1753859794686.jpg";
+import sandwichImg from "@assets/sandwich-6935938_1920_1753859794687.jpg";
+import fishImg from "@assets/food-993457_1920_1753859794688.jpg";
+import salmonImg from "@assets/new-years-eve-518032_1920_1753859794689.jpg";
+
 export const FOOD_IMAGES = {
   chocolate: chocolateImg,
   cupcakes: cupcakesImg,
@@ -58,6 +64,11 @@ export const FOOD_IMAGES = {
   chicken2: chicken2Img,
   chickenNuggets: chickenNuggetsImg,
   salad: saladImg,
+  // Latest additions
+  friedPrawn: friedPrawnImg,
+  sandwich: sandwichImg,
+  fish: fishImg,
+  salmon: salmonImg,
 };
 
 export const FOOD_IMAGE_LIST = Object.values(FOOD_IMAGES);
@@ -100,15 +111,15 @@ export function getTimeBasedFoodImage(): string {
     return morningFoods[Math.floor(Math.random() * morningFoods.length)];
   } else if (hour >= 10 && hour < 15) {
     // Lunch: savory foods
-    const lunchFoods = [FOOD_IMAGES.pizza, FOOD_IMAGES.burgers, FOOD_IMAGES.salad, FOOD_IMAGES.spaghetti];
+    const lunchFoods = [FOOD_IMAGES.pizza, FOOD_IMAGES.burgers, FOOD_IMAGES.salad, FOOD_IMAGES.spaghetti, FOOD_IMAGES.sandwich, FOOD_IMAGES.salmon];
     return lunchFoods[Math.floor(Math.random() * lunchFoods.length)];
   } else if (hour >= 15 && hour < 19) {
     // Afternoon: snacks & fruits
-    const snackFoods = [FOOD_IMAGES.mango, FOOD_IMAGES.grapes, FOOD_IMAGES.apple, FOOD_IMAGES.chickenNuggets];
+    const snackFoods = [FOOD_IMAGES.mango, FOOD_IMAGES.grapes, FOOD_IMAGES.apple, FOOD_IMAGES.chickenNuggets, FOOD_IMAGES.friedPrawn];
     return snackFoods[Math.floor(Math.random() * snackFoods.length)];
   } else if (hour >= 19 && hour < 22) {
     // Dinner: main dishes
-    const dinnerFoods = [FOOD_IMAGES.steak, FOOD_IMAGES.steak2, FOOD_IMAGES.chicken2, FOOD_IMAGES.swedish];
+    const dinnerFoods = [FOOD_IMAGES.steak, FOOD_IMAGES.steak2, FOOD_IMAGES.chicken2, FOOD_IMAGES.swedish, FOOD_IMAGES.fish, FOOD_IMAGES.salmon];
     return dinnerFoods[Math.floor(Math.random() * dinnerFoods.length)];
   } else {
     // Late night: desserts
