@@ -34,6 +34,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // USDA Calorie Calculator Route
+  app.post('/api/calculate-calories', async (req, res) => {
+    try {
+      const { ingredient, measurement } = req.body;
+      
+      if (!ingredient || !measurement) {
+        return res.status(400).json({ 
+          message: "Both 'ingredient' and 'measurement' are required" 
+        });
+      }
+
+      // Use USDA service to calculate calories
+      const { usdaService } = await import('./services/usdaService');
+      const result = await usdaService.calculateIngredientCalories(
+        ingredient.trim(),
+        measurement.trim()
+      );
+      
+      res.json(result);
+    } catch (error) {
+      console.error("Error calculating calories:", error);
+      res.status(500).json({ 
+        message: "Failed to calculate calories",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
   // Food routes
   app.get('/api/foods/search', async (req, res) => {
     try {
@@ -352,6 +380,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching daily stats:", error);
       res.status(500).json({ message: "Failed to fetch daily stats" });
+    }
+  });
+
+  // Achievement routes
+  app.get("/api/achievements", isAuthenticated, async (req: any, res) => {
+    try {
+      const achievements = [
+        {
+          id: 1,
+          title: "First Week Complete",
+          description: "You have successfully tracked meals for 7 days in a row!",
+          iconName: "trophy",
+          colorClass: "bg-yellow-100",
+          earnedAt: new Date().toISOString(),
+          achievementType: "streak"
+        }
+      ];
+      res.json(achievements);
+    } catch (error) {
+      console.error("Error fetching achievements:", error);
+      res.status(500).json({ message: "Failed to fetch achievements" });
+    }
+  });
+
+  // Food suggestions route
+  app.get("/api/food-suggestions", isAuthenticated, async (req: any, res) => {
+    try {
+      const suggestions = [
+        {
+          id: 1,
+          suggestionType: "protein_boost",
+          title: "Boost Your Protein",
+          description: "Based on your recent meals, try adding more protein",
+          recommendedFoods: [],
+          priority: 1,
+          reasoning: "Low protein intake detected"
+        }
+      ];
+      res.json(suggestions);
+    } catch (error) {
+      console.error("Error fetching food suggestions:", error);
+      res.status(500).json({ message: "Failed to fetch suggestions" });
     }
   });
 

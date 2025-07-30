@@ -10,8 +10,8 @@ import { Header } from './components/Header';
 import { Navigation } from './components/Navigation';
 import Dashboard from './pages/Dashboard';
 import RecipeBuilder from './pages/RecipeBuilder';
-import MealPlanner from './pages/MealPlanner';
-import Profile from './pages/Profile';
+import MealPlannerEnhanced from './pages/MealPlannerEnhanced';
+import ProfileEnhanced from './pages/ProfileEnhanced';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('dashboard');
@@ -64,9 +64,9 @@ export default function App() {
       case 'recipe-builder':
         return <RecipeBuilder onNavigate={handleNavigate} />;
       case 'planner':
-        return <MealPlanner onNavigate={handleNavigate} />;
+        return <MealPlannerEnhanced onNavigate={handleNavigate} />;
       case 'profile':
-        return <Profile onNavigate={handleNavigate} onLogout={handleLogout} />;
+        return <ProfileEnhanced onNavigate={handleNavigate} />;
       default:
         return <Dashboard onNavigate={handleNavigate} />;
     }

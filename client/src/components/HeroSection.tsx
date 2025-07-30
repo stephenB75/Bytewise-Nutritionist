@@ -1,215 +1,108 @@
 /**
- * Bytewise Hero Section Component
+ * Hero Section Component for Mobile PWA
  * 
- * Reusable hero component following brand guidelines
- * Seamless header integration with contextual content
+ * Provides contextual header with progress rings and user stats
+ * Consistent across all main app screens
  */
 
-import React from 'react';
-import { ImageWithFallback } from './ImageWithFallback';
-import { LucideIcon } from 'lucide-react';
-
-interface ProgressRingProps {
-  percentage: number;
-  color: string;
-  label: string;
-  size?: number;
-}
-
-function ProgressRing({ percentage, color, label, size = 80 }: ProgressRingProps) {
-  const radius = 35;
-  const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference * (1 - percentage / 100);
-
-  return (
-    <div className="relative" style={{ width: size, height: size }}>
-      <svg 
-        className="transform -rotate-90" 
-        viewBox="0 0 100 100"
-        style={{ width: size, height: size }}
-      >
-        <circle 
-          cx="50" 
-          cy="50" 
-          r={radius} 
-          stroke="rgba(255,255,255,0.3)" 
-          strokeWidth="6" 
-          fill="transparent" 
-        />
-        <circle 
-          cx="50" 
-          cy="50" 
-          r={radius} 
-          stroke={color} 
-          strokeWidth="6" 
-          fill="transparent"
-          strokeDasharray={circumference}
-          strokeDashoffset={strokeDashoffset}
-          strokeLinecap="round"
-          className="transition-all duration-500 ease-in-out"
-        />
-      </svg>
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="text-center text-white">
-          <div 
-            className="font-bold"
-            style={{ 
-              fontFamily: "'League Spartan', sans-serif", 
-              fontSize: "1.125rem", 
-              fontWeight: 700 
-            }}
-          >
-            {Math.round(percentage)}%
-          </div>
-          <div 
-            className="text-xs opacity-75"
-            style={{ 
-              fontFamily: "'Quicksand', sans-serif", 
-              fontSize: "0.75rem", 
-              fontWeight: 400 
-            }}
-          >
-            {label}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-interface StatCardProps {
-  icon: LucideIcon;
-  value: string | number;
-  label: string;
-  iconColor?: string;
-}
-
-function StatCard({ icon: Icon, value, label, iconColor = "white" }: StatCardProps) {
-  return (
-    <div className="text-center bg-white/20 backdrop-blur-sm rounded-2xl px-4 py-3">
-      <div className="flex items-center space-x-2 mb-1 justify-center">
-        <Icon className={`text-${iconColor}`} size={16} />
-        <span 
-          className="text-2xl font-bold text-white"
-          style={{ 
-            fontFamily: "'League Spartan', sans-serif", 
-            fontSize: "1.5rem", 
-            fontWeight: 700 
-          }}
-        >
-          {value}
-        </span>
-      </div>
-      <p 
-        className="text-xs opacity-90 text-white"
-        style={{ 
-          fontFamily: "'Quicksand', sans-serif", 
-          fontSize: "0.75rem", 
-          fontWeight: 400 
-        }}
-      >
-        {label}
-      </p>
-    </div>
-  );
-}
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { 
+  Flame, 
+  Target, 
+  TrendingUp, 
+  Calendar 
+} from 'lucide-react';
 
 interface HeroSectionProps {
-  backgroundImage: string;
-  backgroundAlt: string;
   title: string;
   subtitle?: string;
-  description?: string;
-  statCard?: {
-    icon: LucideIcon;
-    value: string | number;
-    label: string;
-    iconColor?: string;
-  };
-  progressRing?: {
-    percentage: number;
-    color: string;
-    label: string;
-  };
-  containerClass?: string;
+  caloriesConsumed: number;
+  caloriesGoal: number;
+  currentStreak: number;
+  showProgress?: boolean;
 }
 
-export function HeroSection({
-  backgroundImage,
-  backgroundAlt,
-  title,
-  subtitle,
-  description,
-  statCard,
-  progressRing,
-  containerClass = "-mx-3"
+export function HeroSection({ 
+  title, 
+  subtitle, 
+  caloriesConsumed, 
+  caloriesGoal, 
+  currentStreak,
+  showProgress = true 
 }: HeroSectionProps) {
+  const progressPercentage = Math.min((caloriesConsumed / caloriesGoal) * 100, 100);
+  
   return (
-    <div className={`relative ${containerClass} mb-6`}>
-      <div className="h-64 relative overflow-hidden">
-        <ImageWithFallback
-          src={backgroundImage}
-          alt={backgroundAlt}
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-        
-        {/* Content Overlay */}
-        <div className="absolute inset-x-4 bottom-6 top-16 flex flex-col justify-end text-white">
-          <div className="flex items-center justify-between mb-4">
-            {/* Left Column - Title & Description */}
-            <div className="flex-1 pr-4">
-              {subtitle && (
-                <p 
-                  className="text-sm opacity-90 mb-1"
-                  style={{ 
-                    fontFamily: "'Quicksand', sans-serif", 
-                    fontSize: "0.875rem", 
-                    fontWeight: 400 
-                  }}
-                >
-                  {subtitle}
-                </p>
-              )}
-              <h1 
-                style={{ 
-                  fontFamily: "'League Spartan', sans-serif", 
-                  fontSize: "1.875rem", 
-                  fontWeight: 700, 
-                  lineHeight: 1.2 
-                }}
-              >
-                {title}
-              </h1>
-              {description && (
-                <p 
-                  className="text-sm opacity-90 mt-1"
-                  style={{ 
-                    fontFamily: "'Quicksand', sans-serif", 
-                    fontSize: "0.875rem", 
-                    fontWeight: 400 
-                  }}
-                >
-                  {description}
-                </p>
-              )}
-            </div>
-            
-            {/* Right Column - Stat Card */}
-            {statCard && (
-              <div className="flex-shrink-0">
-                <StatCard {...statCard} />
-              </div>
-            )}
-          </div>
-          
-          {/* Center - Progress Ring */}
-          {progressRing && (
-            <div className="flex justify-center">
-              <ProgressRing {...progressRing} />
-            </div>
+    <div className="bg-gradient-to-br from-blue-600 to-purple-700 text-white px-4 py-6">
+      <div className="max-w-md mx-auto">
+        {/* Header */}
+        <div className="text-center mb-6">
+          <h1 className="text-2xl font-bold mb-2">{title}</h1>
+          {subtitle && (
+            <p className="text-blue-100 text-sm">{subtitle}</p>
           )}
         </div>
+
+        {showProgress && (
+          <>
+            {/* Progress Ring */}
+            <div className="flex justify-center mb-6">
+              <div className="relative w-32 h-32">
+                <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 100 100">
+                  {/* Background circle */}
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="40"
+                    stroke="rgba(255,255,255,0.2)"
+                    strokeWidth="8"
+                    fill="transparent"
+                  />
+                  {/* Progress circle */}
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="40"
+                    stroke="white"
+                    strokeWidth="8"
+                    fill="transparent"
+                    strokeDasharray={`${progressPercentage * 2.51} 251`}
+                    strokeLinecap="round"
+                    className="transition-all duration-500"
+                  />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <div className="text-center">
+                    <p className="text-2xl font-bold">{Math.round(progressPercentage)}%</p>
+                    <p className="text-xs text-blue-100">Daily Goal</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Stats Cards */}
+            <div className="grid grid-cols-3 gap-3">
+              <Card className="p-3 bg-white/10 backdrop-blur-sm border-0 text-center">
+                <Flame className="w-5 h-5 mx-auto text-orange-300 mb-1" />
+                <p className="text-lg font-bold">{caloriesConsumed}</p>
+                <p className="text-xs text-blue-100">Consumed</p>
+              </Card>
+              
+              <Card className="p-3 bg-white/10 backdrop-blur-sm border-0 text-center">
+                <Target className="w-5 h-5 mx-auto text-green-300 mb-1" />
+                <p className="text-lg font-bold">{caloriesGoal}</p>
+                <p className="text-xs text-blue-100">Goal</p>
+              </Card>
+              
+              <Card className="p-3 bg-white/10 backdrop-blur-sm border-0 text-center">
+                <TrendingUp className="w-5 h-5 mx-auto text-yellow-300 mb-1" />
+                <p className="text-lg font-bold">{currentStreak}</p>
+                <p className="text-xs text-blue-100">Day Streak</p>
+              </Card>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

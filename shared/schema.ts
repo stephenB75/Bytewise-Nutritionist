@@ -201,6 +201,22 @@ export const usersRelations = relations(users, ({ many }) => ({
   recipes: many(recipes),
   meals: many(meals),
   waterIntake: many(waterIntake),
+  achievements: many(achievements),
+  foodSuggestions: many(foodSuggestions),
+}));
+
+export const achievementsRelations = relations(achievements, ({ one }) => ({
+  user: one(users, {
+    fields: [achievements.userId],
+    references: [users.id],
+  }),
+}));
+
+export const foodSuggestionsRelations = relations(foodSuggestions, ({ one }) => ({
+  user: one(users, {
+    fields: [foodSuggestions.userId],
+    references: [users.id],
+  }),
 }));
 
 export const recipesRelations = relations(recipes, ({ one, many }) => ({
@@ -295,6 +311,22 @@ export const insertWaterIntakeSchema = createInsertSchema(waterIntake).omit({
   createdAt: true,
 });
 
+export const insertAchievementSchema = createInsertSchema(achievements).omit({
+  id: true,
+  earnedAt: true,
+  createdAt: true,
+});
+
+export const insertFoodSuggestionSchema = createInsertSchema(foodSuggestions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertUsdaFoodCacheSchema = createInsertSchema(usdaFoodCache).omit({
+  id: true,
+  lastUpdated: true,
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -310,6 +342,12 @@ export type MealFood = typeof mealFoods.$inferSelect;
 export type InsertMealFood = z.infer<typeof insertMealFoodSchema>;
 export type WaterIntake = typeof waterIntake.$inferSelect;
 export type InsertWaterIntake = z.infer<typeof insertWaterIntakeSchema>;
+export type Achievement = typeof achievements.$inferSelect;
+export type InsertAchievement = z.infer<typeof insertAchievementSchema>;
+export type FoodSuggestion = typeof foodSuggestions.$inferSelect;
+export type InsertFoodSuggestion = z.infer<typeof insertFoodSuggestionSchema>;
+export type UsdaFoodCache = typeof usdaFoodCache.$inferSelect;
+export type InsertUsdaFoodCache = z.infer<typeof insertUsdaFoodCacheSchema>;
 
 // Extended types for API responses
 export type RecipeWithIngredients = Recipe & {
