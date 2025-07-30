@@ -96,29 +96,41 @@ function Dashboard({ onNavigate }: DashboardProps) {
     }));
   }, [dailyStats, mealStats, user]);
 
-  const [todayMeals] = useState([
-    {
-      name: "Greek Yogurt Bowl",
-      time: "8:30 AM",
-      calories: 320,
-      type: "breakfast",
-      color: "from-orange-100 to-orange-200"
-    },
-    {
-      name: "Quinoa Salad",
-      time: "12:45 PM",
-      calories: 485,
-      type: "lunch",
+  // Get today's meals from multiple sources
+  const todaysMealsFromLogger = mealStats?.filter((meal: any) => {
+    const mealDate = meal.date || meal.created_at?.split('T')[0];
+    const today = new Date().toISOString().split('T')[0];
+    return mealDate === today;
+  }) || [];
+
+  const todaysMealsFromCalculator = todaysCalculations.map(calc => ({
+    name: calc.name,
+    time: calc.time,
+    calories: calc.calories,
+    type: 'calculated',
+    source: 'calculator',
+    color: "from-blue-100 to-blue-200"
+  }));
+
+  // Combine all today's meals
+  const combinedMeals = [
+    ...todaysMealsFromLogger.map((meal: any) => ({
+      name: meal.name || 'Logged Meal',
+      time: meal.time || new Date(meal.created_at).toLocaleTimeString(),
+      calories: Math.round(parseFloat(meal.totalCalories) || meal.calories || 0),
+      type: meal.mealType || meal.type || 'meal',
+      source: 'logger',
       color: "from-green-100 to-green-200"
-    },
-    {
-      name: "Grilled Chicken",
-      time: "7:20 PM",
-      calories: 520,
-      type: "dinner",
-      color: "from-blue-100 to-blue-200"
-    }
-  ]);
+    })),
+    ...todaysMealsFromCalculator
+  ];
+
+  // Sort by time for chronological display
+  const todayMeals = combinedMeals.sort((a, b) => {
+    const timeA = new Date(`1970-01-01 ${a.time}`).getTime();
+    const timeB = new Date(`1970-01-01 ${b.time}`).getTime();
+    return timeA - timeB;
+  });
 
   const [achievements] = useState([
     { id: 1, title: "7 Day Streak", icon: Flame, color: "text-orange-500" },
@@ -281,34 +293,67 @@ function Dashboard({ onNavigate }: DashboardProps) {
         <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-bold text-gray-900">Today's Meals</h3>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => onNavigate('calculator')}
-              className="text-blue-600 hover:text-blue-700"
-            >
-              <Plus className="w-4 h-4 mr-1" />
-              Add Meal
-            </Button>
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="text-xs">
+                📊 {todayMeals.length} entries
+              </Badge>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => onNavigate('calculator')}
+                className="text-blue-600 hover:text-blue-700"
+              >
+                <Plus className="w-4 h-4 mr-1" />
+                Add Meal
+              </Button>
+            </div>
+          </div>
+
+          {/* Data Source Status */}
+          <div className="bg-green-50 p-3 rounded-lg mb-4">
+            <div className="flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-green-600" />
+              <span className="text-sm font-medium text-green-900">Live Data Connection</span>
+            </div>
+            <div className="text-xs text-green-700 mt-1">
+              Calculator: {todaysMealsFromCalculator.length} • Logger: {todaysMealsFromLogger.length} • Last sync: {dataSource.lastUpdate}
+            </div>
           </div>
           
           <div className="space-y-3">
-            {todayMeals.map((meal, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-gradient-to-r bg-gray-50 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-white rounded-lg shadow-sm">
-                    <Utensils className="w-4 h-4 text-gray-600" />
+            {todayMeals.length > 0 ? (
+              todayMeals.map((meal, index) => (
+                <div key={index} className={`flex items-center justify-between p-3 bg-gradient-to-r ${meal.color} rounded-lg border`}>
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-white rounded-lg shadow-sm">
+                      {meal.source === 'calculator' ? (
+                        <Target className="w-4 h-4 text-blue-600" />
+                      ) : (
+                        <Utensils className="w-4 h-4 text-green-600" />
+                      )}
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">{meal.name}</p>
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <span>{meal.time}</span>
+                        <Badge variant="outline" size="sm" className="text-xs">
+                          {meal.source === 'calculator' ? '🧮 Calc' : '📝 Logger'}
+                        </Badge>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-medium text-gray-900">{meal.name}</p>
-                    <p className="text-sm text-gray-600">{meal.time}</p>
-                  </div>
+                  <Badge variant="secondary" className="bg-white">
+                    {meal.calories} cal
+                  </Badge>
                 </div>
-                <Badge variant="secondary" className="bg-white">
-                  {meal.calories} cal
-                </Badge>
+              ))
+            ) : (
+              <div className="text-center py-8">
+                <Utensils className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-500 mb-2">No meals logged today</p>
+                <p className="text-sm text-gray-400">Use the calculator or logger to add entries</p>
               </div>
-            ))}
+            )}
           </div>
         </Card>
 
