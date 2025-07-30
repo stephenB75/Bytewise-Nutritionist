@@ -1,162 +1,231 @@
-const CACHE_NAME = 'bytewise-v1';
+// Bytewise Nutrition Tracker - Service Worker
+// Provides offline functionality and caching for PWA experience
+
+const CACHE_NAME = 'bytewise-v1.0.0';
+const STATIC_CACHE = 'bytewise-static-v1';
+const DYNAMIC_CACHE = 'bytewise-dynamic-v1';
+const API_CACHE = 'bytewise-api-v1';
+
+// Critical resources to cache immediately
 const STATIC_ASSETS = [
   '/',
+  '/index.html',
   '/manifest.json',
-  '/static/js/bundle.js',
-  '/static/css/main.css'
+  '/icon-192.png',
+  '/icon-512.png'
 ];
 
+// API endpoints to cache for offline functionality
 const API_ENDPOINTS = [
-  '/api/foods/popular',
-  '/api/auth/user'
+  '/api/auth/user',
+  '/api/version',
+  '/api/foods',
+  '/api/usda/search'
 ];
 
 // Install event - cache static assets
-self.addEventListener('install', (event) => {
+self.addEventListener('install', event => {
+  console.log('🔧 Service Worker installing...');
+  
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        // Add assets one by one to avoid failures from single bad requests
-        return Promise.allSettled(
-          STATIC_ASSETS.map(asset => cache.add(asset))
-        );
+    caches.open(STATIC_CACHE)
+      .then(cache => {
+        console.log('📦 Caching static assets');
+        return cache.addAll(STATIC_ASSETS);
       })
       .then(() => {
-        self.skipWaiting();
+        console.log('✅ Static assets cached successfully');
+        return self.skipWaiting();
       })
-      .catch((error) => {
-        console.debug('SW install cache error:', error.message);
-        self.skipWaiting(); // Still skip waiting even if cache fails
+      .catch(err => {
+        console.error('❌ Failed to cache static assets:', err);
       })
   );
 });
 
 // Activate event - clean up old caches
-self.addEventListener('activate', (event) => {
+self.addEventListener('activate', event => {
+  console.log('🚀 Service Worker activating...');
+  
   event.waitUntil(
     caches.keys()
-      .then((cacheNames) => {
+      .then(cacheNames => {
         return Promise.all(
-          cacheNames.map((cacheName) => {
-            if (cacheName !== CACHE_NAME) {
+          cacheNames
+            .filter(cacheName => {
+              return cacheName !== STATIC_CACHE && 
+                     cacheName !== DYNAMIC_CACHE && 
+                     cacheName !== API_CACHE;
+            })
+            .map(cacheName => {
+              console.log('🗑️ Deleting old cache:', cacheName);
               return caches.delete(cacheName);
-            }
-          })
+            })
         );
       })
       .then(() => {
-        self.clients.claim();
+        console.log('✅ Service Worker activated');
+        return self.clients.claim();
       })
   );
 });
 
-// Fetch event - implement caching strategy
-self.addEventListener('fetch', (event) => {
+// Fetch event - implement caching strategies
+self.addEventListener('fetch', event => {
   const { request } = event;
   const url = new URL(request.url);
-
-  // Skip non-HTTP(S) requests (chrome-extension:, moz-extension:, etc.)
-  if (!url.protocol.startsWith('http')) {
+  
+  // Skip non-GET requests
+  if (request.method !== 'GET') {
     return;
   }
-
-  // Skip cross-origin requests that we can't cache
-  if (url.origin !== location.origin) {
-    return;
-  }
-
-  // Handle navigation requests
-  if (request.mode === 'navigate') {
-    event.respondWith(
-      fetch(request)
-        .catch(() => {
-          return caches.match('/');
-        })
-    );
-    return;
-  }
-
+  
   // Handle API requests
   if (url.pathname.startsWith('/api/')) {
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
-          // Cache successful GET requests for specific endpoints
-          if (request.method === 'GET' && 
-              response.ok && 
-              API_ENDPOINTS.some(endpoint => url.pathname.startsWith(endpoint))) {
-            const responseClone = response.clone();
-            caches.open(CACHE_NAME)
-              .then((cache) => {
-                cache.put(request, responseClone);
-              });
-          }
-          return response;
-        })
-        .catch(() => {
-          // Return cached version if available
-          return caches.match(request);
-        })
-    );
+    event.respondWith(handleApiRequest(request));
     return;
   }
-
+  
   // Handle static assets
-  event.respondWith(
-    caches.match(request)
-      .then((response) => {
-        if (response) {
-          return response;
-        }
-        return fetch(request)
-          .then((response) => {
-            // Cache successful responses for same-origin requests only
-            if (response.ok && url.origin === location.origin) {
-              const responseClone = response.clone();
-              caches.open(CACHE_NAME)
-                .then((cache) => {
-                  cache.put(request, responseClone);
-                })
-                .catch((error) => {
-                  // Silently ignore cache errors for unsupported requests
-                  console.debug('Cache put failed:', error.message);
-                });
-            }
-            return response;
-          });
-      })
-  );
+  if (STATIC_ASSETS.some(asset => url.pathname === asset || url.pathname.endsWith(asset))) {
+    event.respondWith(handleStaticRequest(request));
+    return;
+  }
+  
+  // Handle other requests (CSS, JS, images)
+  event.respondWith(handleDynamicRequest(request));
 });
 
-// Background sync for offline actions
-self.addEventListener('sync', (event) => {
-  if (event.tag === 'background-sync') {
-    event.waitUntil(
-      // Handle queued offline actions
-      handleBackgroundSync()
-    );
+// Cache-first strategy for static assets
+async function handleStaticRequest(request) {
+  try {
+    const cachedResponse = await caches.match(request);
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+    
+    const networkResponse = await fetch(request);
+    const cache = await caches.open(STATIC_CACHE);
+    cache.put(request, networkResponse.clone());
+    
+    return networkResponse;
+  } catch (error) {
+    console.error('Static request failed:', error);
+    
+    // Return offline fallback for HTML requests
+    if (request.headers.get('accept').includes('text/html')) {
+      return new Response(
+        `<!DOCTYPE html>
+        <html>
+        <head>
+          <title>Bytewise - Offline</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <style>
+            body { font-family: system-ui, sans-serif; text-align: center; padding: 2rem; color: #334155; }
+            .offline { max-width: 400px; margin: 2rem auto; }
+            .icon { font-size: 4rem; margin-bottom: 1rem; }
+            .title { font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem; }
+            .message { margin-bottom: 2rem; color: #64748b; }
+            .retry { background: #7dd3fc; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 0.5rem; cursor: pointer; }
+          </style>
+        </head>
+        <body>
+          <div class="offline">
+            <div class="icon">🍎</div>
+            <div class="title">Bytewise</div>
+            <div class="message">You're offline. Please check your connection and try again.</div>
+            <button class="retry" onclick="location.reload()">Retry</button>
+          </div>
+        </body>
+        </html>`,
+        { headers: { 'Content-Type': 'text/html' } }
+      );
+    }
+    
+    throw error;
+  }
+}
+
+// Network-first strategy for API requests with fallback
+async function handleApiRequest(request) {
+  try {
+    const networkResponse = await fetch(request);
+    
+    // Cache successful API responses
+    if (networkResponse.ok) {
+      const cache = await caches.open(API_CACHE);
+      cache.put(request, networkResponse.clone());
+    }
+    
+    return networkResponse;
+  } catch (error) {
+    console.log('Network failed, trying cache for:', request.url);
+    
+    // Try to return cached version
+    const cachedResponse = await caches.match(request);
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+    
+    // Return offline indicator for critical API calls
+    if (request.url.includes('/api/auth/user')) {
+      return new Response(JSON.stringify({ offline: true }), {
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    
+    throw error;
+  }
+}
+
+// Stale-while-revalidate strategy for dynamic content
+async function handleDynamicRequest(request) {
+  const cache = await caches.open(DYNAMIC_CACHE);
+  const cachedResponse = await cache.match(request);
+  
+  const fetchPromise = fetch(request).then(networkResponse => {
+    cache.put(request, networkResponse.clone());
+    return networkResponse;
+  }).catch(() => cachedResponse);
+  
+  return cachedResponse || fetchPromise;
+}
+
+// Handle background sync for offline actions
+self.addEventListener('sync', event => {
+  console.log('🔄 Background sync triggered:', event.tag);
+  
+  if (event.tag === 'meal-sync') {
+    event.waitUntil(syncOfflineMeals());
   }
 });
 
-async function handleBackgroundSync() {
-  // Implement offline action handling
-  // This could include syncing meal logs, recipe updates, etc.
-  console.log('Background sync triggered');
+// Sync offline meal logs when connection is restored
+async function syncOfflineMeals() {
+  try {
+    // Get offline meal data from IndexedDB if implemented
+    console.log('📤 Syncing offline meal data...');
+    // Implementation would depend on offline storage strategy
+  } catch (error) {
+    console.error('Failed to sync offline meals:', error);
+  }
 }
 
-// Push notifications
-self.addEventListener('push', (event) => {
+// Handle push notifications (future enhancement)
+self.addEventListener('push', event => {
+  if (!event.data) return;
+  
+  const data = event.data.json();
   const options = {
-    body: event.data ? event.data.text() : 'New notification from Bytewise',
+    body: data.body || 'New nutrition insight available!',
     icon: '/icon-192.png',
-    badge: '/icon-192.png',
+    badge: '/icon-96.png',
     tag: 'bytewise-notification',
     requireInteraction: false,
     actions: [
       {
-        action: 'view',
-        title: 'View',
-        icon: '/icon-192.png'
+        action: 'open',
+        title: 'Open App'
       },
       {
         action: 'dismiss',
@@ -164,19 +233,21 @@ self.addEventListener('push', (event) => {
       }
     ]
   };
-
+  
   event.waitUntil(
-    self.registration.showNotification('Bytewise Nutritionist', options)
+    self.registration.showNotification(data.title || 'Bytewise', options)
   );
 });
 
-// Notification click handler
-self.addEventListener('notificationclick', (event) => {
+// Handle notification clicks
+self.addEventListener('notificationclick', event => {
   event.notification.close();
-
-  if (event.action === 'view') {
+  
+  if (event.action === 'open' || !event.action) {
     event.waitUntil(
       clients.openWindow('/')
     );
   }
 });
+
+console.log('🍎 Bytewise Service Worker loaded successfully');

@@ -12,6 +12,7 @@ import { AuthWrapper } from './components/AuthWrapper';
 import { Header } from './components/Header';
 import { Navigation } from './components/Navigation';
 import { NotificationDropdown } from './components/NotificationDropdown';
+import { PWAInstallPrompt, IOSInstallInstructions } from './components/PWAInstallPrompt';
 import { useImageRotation } from './hooks/useImageRotation';
 import Dashboard from './pages/Dashboard';
 import CalorieCalculatorWrapper from './components/CalorieCalculatorWrapper';
@@ -134,6 +135,10 @@ export default function App() {
             activeTab={activeTab}
             onTabChange={handleTabChange}
           />
+          
+          {/* PWA Install Prompts */}
+          <PWAInstallPrompt />
+          <IOSInstallInstructions />
         </div>
       </AuthWrapper>
     </QueryClientProvider>

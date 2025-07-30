@@ -1,54 +1,71 @@
 {
   "name": "Bytewise Nutritionist",
   "short_name": "Bytewise",
-  "description": "Track nutrition, plan meals, and achieve your health goals",
+  "description": "Advanced nutrition tracking and meal planning app with USDA food database integration",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#FAFAFA",
-  "theme_color": "#7DD3FC",
-  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#7dd3fc",
+  "orientation": "portrait-primary",
   "scope": "/",
   "lang": "en",
-  "categories": ["health", "lifestyle", "productivity"],
+  "categories": ["health", "fitness", "lifestyle", "productivity"],
   "icons": [
     {
-      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iNDAiIGZpbGw9IiM3REQzRkMiLz4KPHBhdGggZD0iTTQ4IDk2QzQ4IDY5LjQ5MDMgNjkuNDkwMyA0OCA5NiA0OEMxMjIuNTEgNDggMTQ0IDY5LjQ5MDMgMTQ0IDk2QzE0NCAxMjIuNTEgMTIyLjUxIDE0NCA5NiAxNDRDNjkuNDkwMyAxNDQgNDggMTIyLjUxIDQ4IDk2WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTcyIDk2QzcyIDgyLjc0NTIgODIuNzQ1MiA3MiA5NiA3MkMxMDkuMjU1IDcyIDEyMCA4Mi43NDUyIDEyMCA5NkMxMjAgMTA5LjI1NSAxMDkuMjU1IDEyMCA5NiAxMjBDODIuNzQ1MiAxMjAgNzIgMTA5LjI1NSA3MiA5NloiIGZpbGw9IiM3REQzRkMiLz4KPC9zdmc+",
+      "src": "/icon-192.svg",
       "sizes": "192x192",
       "type": "image/svg+xml",
       "purpose": "any maskable"
     },
     {
-      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiByeD0iMTA0IiBmaWxsPSIjN0REM0ZDIi8+CjxwYXRoIGQ9Ik0xMjggMjU2QzEyOCAxODUuMzA3IDE4NS4zMDcgMTI4IDI1NiAxMjhDMzI2LjY5MyAxMjggMzg0IDE4NS4zMDcgMzg0IDI1NkMzODQgMzI2LjY5MyAzMjYuNjkzIDM4NCAyNTYgMzg0QzE4NS4zMDcgMzg0IDEyOCAzMjYuNjkzIDEyOCAyNTZaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMTkyIDI1NkMxOTIgMjIwLjY1NCAyMjAuNjU0IDE5MiAyNTYgMTkyQzI5MS4zNDYgMTkyIDMyMCAyMjAuNjU0IDMyMCAyNTZDMzIwIDI5MS4zNDYgMjkxLjM0NiAzMjAgMjU2IDMyMEMyMjAuNjU0IDMyMCAxOTIgMjkxLjM0NiAxOTIgMjU2WiIgZmlsbD0iIzdERDNGQyIvPgo8L3N2Zz4=",
-      "sizes": "512x512",
+      "src": "/icon-512.svg",
+      "sizes": "512x512", 
       "type": "image/svg+xml",
       "purpose": "any maskable"
     }
   ],
-  "shortcuts": [
+  "screenshots": [
     {
-      "name": "Log Meal",
-      "short_name": "Log Meal",
-      "description": "Quickly log a meal",
-      "url": "/?action=log-meal",
-      "icons": [
-        {
-          "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDJMMTMuMDkgOC4yNkwyMSA5TDEzLjA5IDE1Ljc0TDEyIDIyTDEwLjkxIDE1Ljc0TDMgOUwxMC45MSA4LjI2TDEyIDJaIiBmaWxsPSIjN0REM0ZDIi8+Cjwvc3ZnPg==",
-          "sizes": "24x24"
-        }
-      ]
+      "src": "/screenshot-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Bytewise Dashboard - Nutrition tracking overview"
     },
     {
-      "name": "Create Recipe",
-      "short_name": "Recipe",
-      "description": "Build a new recipe",
-      "url": "/?action=create-recipe",
-      "icons": [
-        {
-          "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDJWMjJNMiAxMkgyMiIgc3Ryb2tlPSIjN0REM0ZDIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4=",
-          "sizes": "24x24"
-        }
-      ]
+      "src": "/screenshot-narrow.png",
+      "sizes": "720x1280",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Bytewise Mobile - Calorie calculator and meal logging"
     }
   ],
-  "prefer_related_applications": false
+  "shortcuts": [
+    {
+      "name": "Calculate Calories",
+      "short_name": "Calculator",
+      "description": "Quick access to USDA-powered calorie calculator",
+      "url": "/?tab=calculator",
+      "icons": [{ "src": "/icon-192.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Log Meal",
+      "short_name": "Logger",
+      "description": "Track your weekly nutrition progress",
+      "url": "/?tab=logger",
+      "icons": [{ "src": "/icon-192.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "View Profile",
+      "short_name": "Profile",
+      "description": "Manage goals and achievements",
+      "url": "/?tab=profile",
+      "icons": [{ "src": "/icon-192.svg", "sizes": "192x192" }]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": 400
+  }
 }
