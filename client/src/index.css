@@ -639,8 +639,68 @@ select {
   animation: scaleIn 0.2s ease-out;
 }
 
-/* Mobile-specific overrides for component libraries */
+/* Mobile-only device optimizations */
 @media screen and (max-width: 768px) {
+  /* Force mobile-first layout */
+  .desktop-only {
+    display: none !important;
+  }
+  
+  /* Enhanced touch targets for better usability */
+  .touch-target {
+    min-height: 44px !important;
+    min-width: 44px !important;
+    touch-action: manipulation !important;
+  }
+  
+  /* Mobile typography improvements */
+  h1, h2, h3 {
+    line-height: 1.2 !important;
+  }
+  
+  /* Mobile container optimization */
+  .container {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    max-width: 100% !important;
+  }
+  
+  /* Prevent horizontal overflow */
+  body, html {
+    overflow-x: hidden !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  /* Mobile scroll optimization */
+  .mobile-scroll {
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;
+  }
+  
+  /* Mobile safe areas */
+  .mobile-safe-top {
+    padding-top: env(safe-area-inset-top) !important;
+  }
+  
+  .mobile-safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom) !important;
+  }
+  
+  /* Mobile-specific card spacing */
+  .mobile-card {
+    margin: 0.5rem !important;
+    border-radius: 1rem !important;
+  }
+  
+  /* Mobile button optimization */
+  .mobile-button {
+    font-size: 16px !important;
+    padding: 0.75rem 1rem !important;
+    border-radius: 0.75rem !important;
+  }
+
+/* Mobile-specific overrides for component libraries */
   /* Override ShadCN UI component font sizes for mobile - Compact variants */
   .ui-input,
   .ui-textarea,

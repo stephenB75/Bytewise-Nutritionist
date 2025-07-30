@@ -41,8 +41,8 @@ export function Navigation({ activeTab, onTabChange }: NavigationProps) {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-background border-t border-border safe-area-bottom">
-      <div className="flex items-center justify-around py-2 px-4">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-sm border-t border-border" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+      <div className="flex items-center justify-around py-1 px-2" style={{ minHeight: '4rem' }}>
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
@@ -52,22 +52,23 @@ export function Navigation({ activeTab, onTabChange }: NavigationProps) {
               key={item.id}
               onClick={() => onTabChange(item.id)}
               className={`
-                flex flex-col items-center justify-center p-2 rounded-lg transition-all duration-200 touch-target
+                relative flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-200 touch-target min-w-[3.5rem] min-h-[3rem]
                 ${isActive 
-                  ? 'bg-primary/10 scale-105' 
-                  : 'hover:bg-muted/50 active:scale-95'
+                  ? 'bg-primary/15 scale-105' 
+                  : 'hover:bg-muted/30 active:scale-95'
                 }
               `}
             >
               <Icon 
-                className={`h-5 w-5 mb-1 transition-colors ${
+                className={`h-5 w-5 mb-0.5 transition-colors ${
                   isActive ? 'text-primary' : 'text-muted-foreground'
                 }`}
               />
               <span 
-                className={`text-xs font-medium transition-colors ${
+                className={`text-[10px] font-medium transition-colors leading-tight ${
                   isActive ? 'text-primary' : 'text-muted-foreground'
                 }`}
+                style={{ fontFamily: "'Work Sans', sans-serif" }}
               >
                 {item.label}
               </span>

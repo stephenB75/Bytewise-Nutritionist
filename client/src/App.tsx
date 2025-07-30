@@ -203,27 +203,29 @@ function AppRouter() {
 
   return (
     <DragDropProvider>
-      <div className="min-h-screen flex flex-col bg-background text-foreground">
+      <div className="min-h-screen min-h-[100dvh] flex flex-col bg-background text-foreground overflow-hidden">
         <PWAInstallPrompt />
         
-        {/* Header */}
+        {/* Mobile-optimized Header */}
         <Header onNavigate={setActiveTab} />
         
-        {/* Main Content - No top padding for seamless hero integration */}
-        <main className="flex-1 flex flex-col pt-16">
-          {renderCurrentPage()}
+        {/* Mobile Main Content - Full viewport usage */}
+        <main className="flex-1 overflow-y-auto overflow-x-hidden pt-16" style={{ paddingBottom: 'calc(4rem + env(safe-area-inset-bottom))' }}>
+          <div className="w-full max-w-full">
+            {renderCurrentPage()}
+          </div>
         </main>
 
-        {/* Bottom Navigation */}
+        {/* Mobile Bottom Navigation - Fixed with safe area */}
         <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
 
-        {/* Floating Action Button */}
+        {/* Mobile-optimized Floating Action Button */}
         <button
           onClick={() => setActiveTab('recipe-builder')}
-          className="fixed bottom-20 right-4 w-14 h-14 bg-primary text-white rounded-full shadow-lg flex items-center justify-center z-30 touch-target transition-all active:scale-95 animate-bounce"
-          style={{ animationDuration: '2s', animationIterationCount: 3 }}
+          className="fixed bottom-20 right-4 w-12 h-12 bg-primary text-white rounded-full shadow-lg flex items-center justify-center z-30 touch-target transition-all active:scale-95"
+          style={{ bottom: 'calc(4rem + env(safe-area-inset-bottom) + 0.5rem)' }}
         >
-          <span className="text-2xl">+</span>
+          <span className="text-xl font-bold">+</span>
         </button>
       </div>
     </DragDropProvider>
