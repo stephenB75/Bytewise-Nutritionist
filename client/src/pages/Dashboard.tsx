@@ -138,6 +138,13 @@ function Dashboard({ onNavigate }: DashboardProps) {
     retry: false,
   });
 
+  // Calculate progress percentages first
+  const calorieProgress = Math.round((userStats.caloriesConsumed / userStats.caloriesGoal) * 100);
+  const proteinProgress = Math.round((userStats.proteinConsumed / userStats.proteinGoal) * 100);
+  const carbsProgress = Math.round((userStats.carbsConsumed / userStats.carbsGoal) * 100);
+  const fatProgress = Math.round((userStats.fatConsumed / userStats.fatGoal) * 100);
+  const waterProgress = Math.round((userStats.waterConsumed / userStats.waterGoal) * 100);
+
   // Calculate dynamic achievements based on current progress
   const calculateAchievements = () => {
     const achievements = [];
@@ -174,13 +181,6 @@ function Dashboard({ onNavigate }: DashboardProps) {
   };
 
   const achievements = calculateAchievements();
-
-  // Calculate progress percentages
-  const calorieProgress = Math.round((userStats.caloriesConsumed / userStats.caloriesGoal) * 100);
-  const proteinProgress = Math.round((userStats.proteinConsumed / userStats.proteinGoal) * 100);
-  const carbsProgress = Math.round((userStats.carbsConsumed / userStats.carbsGoal) * 100);
-  const fatProgress = Math.round((userStats.fatConsumed / userStats.fatGoal) * 100);
-  const waterProgress = Math.round((userStats.waterConsumed / userStats.waterGoal) * 100);
 
   // Data source indicators
   const dataSource = {
