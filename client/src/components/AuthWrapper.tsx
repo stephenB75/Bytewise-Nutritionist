@@ -1,0 +1,42 @@
+/**
+ * Authentication Wrapper Component
+ * 
+ * Handles authentication flow and loading states
+ * Shows login screen for unauthenticated users
+ */
+
+import { useAuth } from '@/hooks/useAuth';
+import LoginScreen from '@/pages/LoginScreen';
+
+interface AuthWrapperProps {
+  children: React.ReactNode;
+  onNavigate: (page: string) => void;
+}
+
+export function AuthWrapper({ children, onNavigate }: AuthWrapperProps) {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  // Loading screen
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="bytewise-logo bytewise-logo-lg mb-6">
+            <div className="bytewise-logo-main">bytewise</div>
+            <div className="bytewise-logo-tagline">Nutritionist</div>
+          </div>
+          <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="text-gray-600 mt-4">Loading your nutrition dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show login screen if not authenticated
+  if (!isAuthenticated) {
+    return <LoginScreen onNavigate={onNavigate} />;
+  }
+
+  // Show authenticated content
+  return <>{children}</>;
+}

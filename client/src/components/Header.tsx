@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { LogoBrand } from './LogoBrand';
-import { Bell, Settings, Search } from 'lucide-react';
+import { Bell, Settings, Search, LogOut } from 'lucide-react';
 import { Button } from './ui/button';
 
 interface HeaderProps {
@@ -15,13 +15,15 @@ interface HeaderProps {
   onNavigate: (page: string) => void;
   showNotifications?: boolean;
   notificationCount?: number;
+  onLogout?: () => void;
 }
 
 export function Header({ 
   currentPage, 
   onNavigate, 
   showNotifications = false, 
-  notificationCount = 0 
+  notificationCount = 0,
+  onLogout
 }: HeaderProps) {
   const getPageTitle = () => {
     switch (currentPage) {
@@ -87,6 +89,18 @@ export function Header({
             >
               <Settings size={18} />
             </Button>
+            
+            {onLogout && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-9 w-9 p-0 touch-target"
+                onClick={onLogout}
+                title="Sign Out"
+              >
+                <LogOut size={18} />
+              </Button>
+            )}
           </div>
         </div>
       </div>

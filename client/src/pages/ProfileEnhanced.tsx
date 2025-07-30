@@ -6,6 +6,8 @@
  */
 
 import { useState } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { UserProfile } from '@/components/UserProfile';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -89,12 +91,16 @@ interface Achievement {
 function ProfileEnhanced({ onNavigate }: ProfileProps) {
   const [activeSection, setActiveSection] = useState('profile');
   const queryClient = useQueryClient();
+  const { user: authUser } = useAuth();
 
   // Fetch user profile
-  const { data: user, isLoading } = useQuery({
+  const { data: userProfile, isLoading } = useQuery({
     queryKey: ['/api/auth/user'],
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
+
+  // Use auth user data as fallback
+  const user = userProfile || authUser;
 
   // Fetch user achievements
   const { data: achievements = [] } = useQuery({
@@ -133,7 +139,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
                 First Name
               </label>
               <Input 
-                defaultValue={user?.firstName || ''}
+                defaultValue={(user as any)?.firstName || ''}
                 placeholder="Enter your first name"
                 className="text-base"
               />
@@ -143,7 +149,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
                 Last Name
               </label>
               <Input 
-                defaultValue={user?.lastName || ''}
+                defaultValue={(user as any)?.lastName || ''}
                 placeholder="Enter your last name"
                 className="text-base"
               />
@@ -156,11 +162,11 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
             </label>
             <div className="flex items-center gap-2">
               <Input 
-                defaultValue={user?.email || ''}
+                defaultValue={(user as any)?.email || ''}
                 placeholder="Enter your email"
                 className="flex-1 text-base"
               />
-              {user?.emailVerified ? (
+              {(user as any)?.emailVerified ? (
                 <Badge variant="default" className="bg-green-100 text-green-800">
                   <CheckCircle className="w-3 h-3 mr-1" />
                   Verified
@@ -252,7 +258,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
         
         {achievements.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {achievements.map((achievement: Achievement) => (
+            {Array.isArray(achievements) && achievements.map((achievement: Achievement) => (
               <div key={achievement.id} className="p-4 border border-gray-200 rounded-lg bg-gradient-to-r from-gray-50 to-gray-100">
                 <div className="flex items-center gap-3">
                   <div className={`p-3 rounded-lg ${achievement.colorClass || 'bg-blue-100'}`}>
@@ -548,7 +554,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100">
       {/* Hero Section */}
       <HeroSection
-        title={`Welcome, ${user?.firstName || 'User'}!`}
+        title={`Welcome, ${(user as any)?.firstName || 'User'}!`}
         subtitle="Manage your profile and app preferences"
         caloriesConsumed={userStats.caloriesTracked}
         caloriesGoal={userStats.totalMealsLogged}
