@@ -7,6 +7,7 @@
 
 import React from 'react';
 import { LogoBrand } from './LogoBrand';
+import { LogoIcon } from './LogoIcon';
 import { Bell, Settings, Search, LogOut } from 'lucide-react';
 import { Button } from './ui/button';
 
