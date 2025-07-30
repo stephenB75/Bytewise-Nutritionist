@@ -523,7 +523,6 @@ select {
   button {
     min-height: 44px; /* iOS minimum touch target */
     font-size: 16px !important;
-    padding: 10px 12px !important; /* Reduced from 12px 16px for better fit */
   }
   
   /* Compact button variants for mobile */
@@ -572,6 +571,53 @@ select {
     padding: 8px 32px 8px 12px !important; /* Space for dropdown arrow */
   }
 }
+
+/* Square footer buttons when clicked/active */
+.navigation-button:active,
+.navigation-button.active {
+  border-radius: 0.125rem; /* 2px - much more square than default rounded */
+  transform: scale(0.95);
+  transition: all 0.1s ease-out;
+}
+
+/* Navigation button base styling */
+.navigation-button {
+  border-radius: 0.5rem; /* Default rounded */
+  transition: all 0.2s ease-in-out;
+}
+  
+  /* Override any component library font sizes that might be smaller */
+  .text-sm input,
+  .text-xs input,
+  input.text-sm,
+  input.text-xs {
+    font-size: 16px !important;
+  }
+  
+  /* Search inputs often have smaller default font sizes */
+  input[type="search"] {
+    font-size: 16px !important;
+    -webkit-appearance: none;
+    padding: 8px 12px !important; /* More compact for search */
+  }
+  
+  /* Compact form layouts */
+  .form-mobile-compact label {
+    font-size: 12px !important;
+    margin-bottom: 4px !important;
+  }
+  
+  .form-mobile-compact input,
+  .form-mobile-compact select,
+  .form-mobile-compact textarea {
+    padding: 8px 12px !important;
+    margin-bottom: 12px !important;
+  }
+  
+  /* Mobile-optimized select elements */
+  select {
+    padding: 8px 32px 8px 12px !important; /* Space for dropdown arrow */
+  }
 
 /* Prevent zoom on specific UI component inputs */
 [role="searchbox"],

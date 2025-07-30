@@ -7,7 +7,7 @@
 
 import { db } from '../db';
 import { usdaFoodCache } from '@shared/schema';
-import { eq, like, desc, asc } from 'drizzle-orm';
+import { eq, like, desc, asc, sql } from 'drizzle-orm';
 
 interface USDANutrient {
   id: number;
@@ -254,7 +254,13 @@ export class USDAService {
             nutrients: nutrients,
             searchCount: 1,
           })
-          .onConflictDoNothing();
+          .onConflictDoUpdate({
+            target: [usdaFoodCache.fdcId],
+            set: {
+              searchCount: sql`${usdaFoodCache.searchCount} + 1`,
+              lastUpdated: new Date(),
+            },
+          });
       } catch (error) {
         console.error('Cache insert error:', error);
       }

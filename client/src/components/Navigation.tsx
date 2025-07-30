@@ -70,9 +70,9 @@ export function Navigation({ activeTab, onTabChange }: NavigationProps) {
                 variant={isActive ? "default" : "ghost"}
                 size="sm"
                 className={`
-                  flex flex-col items-center justify-center h-16 touch-target relative
+                  navigation-button flex flex-col items-center justify-center h-16 touch-target relative
                   ${isActive 
-                    ? 'bg-primary text-primary-foreground shadow-sm' 
+                    ? 'bg-primary text-primary-foreground shadow-sm active' 
                     : 'text-muted-foreground hover:text-foreground'
                   }
                 `}

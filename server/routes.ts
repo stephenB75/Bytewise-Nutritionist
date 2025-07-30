@@ -11,7 +11,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth routes
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = (req.user as any)?.claims?.sub;
       const user = await storage.getUser(userId);
       res.json(user);
     } catch (error) {
@@ -23,7 +23,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Meals API for logger
   app.post('/api/meals/logged', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = (req.user as any)?.claims?.sub;
       const mealData = {
         ...req.body,
         userId,
@@ -42,7 +42,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/meals/logged', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = (req.user as any)?.claims?.sub;
       
       // Return logged meals for the user
       const meals: any[] = []; // Implement meal retrieval from storage
@@ -60,10 +60,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { ingredient, measurement } = req.body;
       
       // Use real USDA service for calorie calculation
-      const calorieData = await usdaService.calculateCalories(ingredient, measurement);
+      const calorieData = await usdaService.calculateIngredientCalories(ingredient, measurement);
       
       res.json(calorieData);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error calculating calories:", error);
       res.status(500).json({ message: "Failed to calculate calories" });
     }
@@ -117,15 +117,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ 
         success: false,
         message: "Failed to sync food database",
-        error: error.message
+        error: (error as Error).message
       });
     }
   });
 
   // User Data Sync API
-  app.post('/api/sync/user-data', isAuthenticated, async (req, res) => {
+  app.post('/api/sync/user-data', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = (req.user as any)?.claims?.sub;
       console.log('Starting user data sync for:', userId);
       
       // Sync user meals, achievements, and preferences
@@ -142,7 +142,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         data: syncData,
         timestamp: new Date().toISOString()
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error syncing user data:", error);
       res.status(500).json({ 
         success: false,

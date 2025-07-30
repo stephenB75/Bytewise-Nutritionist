@@ -82,14 +82,7 @@ export function Header({
               </Button>
             )}
             
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-9 w-9 p-0 touch-target"
-              onClick={() => console.log('Search clicked')}
-            >
-              <Search size={20} />
-            </Button>
+
             
             <Button
               variant="ghost"
