@@ -58,7 +58,7 @@ const navItems: NavItem[] = [
 export function Navigation({ activeTab, onTabChange }: NavigationProps) {
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-sm border-t border-border safe-area-inset-bottom">
-      <div className="w-full max-w-lg mx-auto px-4 py-3">
+      <div className="w-full max-w-lg mx-auto px-4 py-4">
         <div className="grid grid-cols-4 gap-1">
           {navItems.map((item) => {
             const isActive = activeTab === item.id;
@@ -79,7 +79,7 @@ export function Navigation({ activeTab, onTabChange }: NavigationProps) {
                 onClick={() => onTabChange(item.id)}
               >
                 <IconComponent 
-                  size={20} 
+                  size={22} 
                   className={`mb-1 ${isActive ? 'text-primary-foreground' : ''}`} 
                 />
                 <span 
