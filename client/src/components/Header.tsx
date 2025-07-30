@@ -107,8 +107,8 @@ export function Header({
             </h2>
           </div>
           
-          {/* Action Buttons - Right Side */}
-          <div className="flex items-center gap-2 flex-shrink-0">
+          {/* Action Buttons - Right Side - moved 10% left */}
+          <div className="flex items-center gap-2 flex-shrink-0 -mr-4">
             {showNotifications && (
               <div className="relative">
                 <Button

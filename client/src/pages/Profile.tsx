@@ -188,7 +188,7 @@ export default function Profile({ onNavigate, onLogout }: ProfileProps) {
             </Badge>
           </div>
           
-          <div className="grid grid-cols-1 gap-3 mb-4">
+          <div className="flex justify-end mb-4">
             <Button 
               variant="outline" 
               size="sm"
@@ -239,7 +239,7 @@ export default function Profile({ onNavigate, onLogout }: ProfileProps) {
             </div>
 
             {isEditingProfile && (
-              <div className="flex space-x-2">
+              <div className="flex justify-end space-x-2">
                 <Button 
                   size="sm" 
                   onClick={saveProfile}
