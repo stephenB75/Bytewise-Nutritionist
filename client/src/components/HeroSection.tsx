@@ -50,7 +50,7 @@ export function HeroSection({
   const foodImage = getComponentFoodImage(component);
   
   return (
-    <div className={`relative bg-gradient-to-br from-emerald-500 to-blue-600 text-white px-4 py-6 overflow-hidden ${className}`} style={{ marginTop: '72px' }}>
+    <div className={`relative bg-gradient-to-br from-[var(--pastel-blue)] to-[var(--pastel-blue-dark)] text-white px-4 py-6 overflow-hidden ${className}`} style={{ marginTop: '88px' }}>
       {/* Food Background Image */}
       <div 
         className="absolute inset-0 opacity-30"

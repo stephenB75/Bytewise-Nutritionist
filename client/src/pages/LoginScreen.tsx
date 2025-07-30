@@ -26,40 +26,25 @@ function LoginScreen({ onNavigate }: LoginScreenProps) {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Food Background Image */}
+      {/* Dish Background Image */}
       <div 
         className="absolute inset-0 z-0"
         style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='food-pattern' x='0' y='0' width='100' height='100' patternUnits='userSpaceOnUse'%3E%3Cg fill='%23f0f9ff' fill-opacity='0.1'%3E%3Ccircle cx='20' cy='20' r='8'/%3E%3Crect x='60' y='10' width='15' height='20' rx='3'/%3E%3Cellipse cx='30' cy='70' rx='12' ry='8'/%3E%3Cpath d='M70 60 Q80 50 90 60 Q80 70 70 60' fill='%23dcfce7'/%3E%3Ccircle cx='15' cy='85' r='6'/%3E%3Crect x='75' y='25' width='10' height='15' rx='2'/%3E%3Cellipse cx='45' cy='45' rx='8' ry='12'/%3E%3Cpath d='M85 80 Q95 70 100 80 Q95 90 85 80' fill='%23fef3c7'/%3E%3C/g%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23food-pattern)'/%3E%3C/svg%3E")`,
-          backgroundColor: '#f8fafc'
+          backgroundImage: `url(/attached_assets/food-3262796_1920_1753859530086.jpg)`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          filter: 'blur(3px) brightness(0.7)'
         }}
       />
       
-      {/* Food Elements Overlay */}
-      <div className="absolute inset-0 z-10">
-        {/* Floating food icons */}
-        <div className="absolute top-20 left-10 w-16 h-16 bg-green-100/30 rounded-full flex items-center justify-center backdrop-blur-sm animate-bounce" style={{ animationDelay: '0s', animationDuration: '3s' }}>
-          <span className="text-2xl">🥗</span>
-        </div>
-        <div className="absolute top-32 right-16 w-12 h-12 bg-orange-100/30 rounded-full flex items-center justify-center backdrop-blur-sm animate-bounce" style={{ animationDelay: '1s', animationDuration: '4s' }}>
-          <span className="text-xl">🍎</span>
-        </div>
-        <div className="absolute bottom-32 left-20 w-14 h-14 bg-yellow-100/30 rounded-full flex items-center justify-center backdrop-blur-sm animate-bounce" style={{ animationDelay: '2s', animationDuration: '3.5s' }}>
-          <span className="text-xl">🥑</span>
-        </div>
-        <div className="absolute bottom-20 right-12 w-18 h-18 bg-red-100/30 rounded-full flex items-center justify-center backdrop-blur-sm animate-bounce" style={{ animationDelay: '0.5s', animationDuration: '4.5s' }}>
-          <span className="text-2xl">🍅</span>
-        </div>
-        <div className="absolute top-1/2 left-6 w-12 h-12 bg-purple-100/30 rounded-full flex items-center justify-center backdrop-blur-sm animate-bounce" style={{ animationDelay: '1.5s', animationDuration: '3.8s' }}>
-          <span className="text-xl">🫐</span>
-        </div>
-        <div className="absolute top-1/3 right-8 w-16 h-16 bg-pink-100/30 rounded-full flex items-center justify-center backdrop-blur-sm animate-bounce" style={{ animationDelay: '2.5s', animationDuration: '4.2s' }}>
-          <span className="text-2xl">🥕</span>
-        </div>
-      </div>
+      {/* Overlay for better readability */}
+      <div className="absolute inset-0 z-5 bg-black/20" />
+      
+
 
       {/* Login Popup */}
-      <div className="relative z-20 min-h-screen flex items-center justify-center p-6">
+      <div className="relative z-30 min-h-screen flex items-center justify-center p-6">
         <div className="w-full max-w-md">
           
           {/* Logo */}

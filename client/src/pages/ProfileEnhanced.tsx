@@ -423,12 +423,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
               <Button 
                 className="w-full justify-start bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.05] hover:-translate-y-1"
                 onClick={() => {
-                  setCelebrationAchievement({
-                    title: "Password Change",
-                    description: "Feature coming soon! You'll be able to change your password here.",
-                    icon: Lock
-                  });
-                  setShowCelebration(true);
+                  console.log('Password change feature coming soon');
                 }}
               >
                 <Lock className="w-5 h-5 mr-3" />
@@ -437,12 +432,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
               <Button 
                 className="w-full justify-start bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.05] hover:-translate-y-1"
                 onClick={() => {
-                  setCelebrationAchievement({
-                    title: "Two-Factor Authentication",
-                    description: "Enhanced security feature coming soon! Keep your account extra safe.",
-                    icon: Shield
-                  });
-                  setShowCelebration(true);
+                  console.log('Two-factor authentication feature coming soon');
                 }}
               >
                 <Shield className="w-5 h-5 mr-3" />
@@ -470,12 +460,6 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
               defaultChecked={true} 
               onCheckedChange={(checked) => {
                 console.log('Meal reminders:', checked);
-                setCelebrationAchievement({
-                  title: checked ? "Meal Reminders Enabled" : "Meal Reminders Disabled",
-                  description: checked ? "You'll receive helpful meal logging reminders!" : "Meal reminders have been turned off.",
-                  icon: Bell
-                });
-                setShowCelebration(true);
               }}
             />
           </div>
@@ -503,12 +487,6 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
               defaultChecked={false}
               onCheckedChange={(checked) => {
                 console.log('Weekly reports:', checked);
-                setCelebrationAchievement({
-                  title: checked ? "Weekly Reports Enabled" : "Weekly Reports Disabled",
-                  description: checked ? "You'll receive weekly nutrition summaries!" : "Weekly reports have been turned off.",
-                  icon: TrendingUp
-                });
-                setShowCelebration(true);
               }}
             />
           </div>
@@ -522,12 +500,6 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
               defaultChecked={true}
               onCheckedChange={(checked) => {
                 console.log('App updates:', checked);
-                setCelebrationAchievement({
-                  title: checked ? "App Updates Enabled" : "App Updates Disabled",
-                  description: checked ? "You'll be notified about new features and updates!" : "App update notifications have been turned off.",
-                  icon: RefreshCw
-                });
-                setShowCelebration(true);
               }}
             />
           </div>
@@ -551,12 +523,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
                 variant="outline" 
                 className="justify-start hover:bg-blue-50 hover:border-blue-300 transition-all duration-200"
                 onClick={() => {
-                  setCelebrationAchievement({
-                    title: "Auto Theme",
-                    description: "Theme will automatically switch between light and dark based on your device settings.",
-                    icon: Smartphone
-                  });
-                  setShowCelebration(true);
+                  console.log('Auto theme selected');
                 }}
               >
                 <Smartphone className="w-4 h-4 mr-2" />
@@ -566,12 +533,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
                 variant="outline" 
                 className="justify-start hover:bg-blue-50 hover:border-blue-300 transition-all duration-200"
                 onClick={() => {
-                  setCelebrationAchievement({
-                    title: "Light Theme",
-                    description: "Switched to light theme! Easy on the eyes during the day.",
-                    icon: Eye
-                  });
-                  setShowCelebration(true);
+                  console.log('Light theme selected');
                 }}
               >
                 Light
@@ -580,12 +542,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
                 variant="outline" 
                 className="justify-start hover:bg-blue-50 hover:border-blue-300 transition-all duration-200"
                 onClick={() => {
-                  setCelebrationAchievement({
-                    title: "Dark Theme",
-                    description: "Switched to dark theme! Perfect for nighttime use.",
-                    icon: EyeOff
-                  });
-                  setShowCelebration(true);
+                  console.log('Dark theme selected');
                 }}
               >
                 Dark
@@ -601,7 +558,6 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
               <Button 
                 className="justify-start bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.08] hover:-translate-y-2"
                 onClick={() => {
-                  // Switch to metric units without achievement popup
                   console.log('Switched to metric units');
                 }}
               >
@@ -629,12 +585,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
               variant="outline" 
               className="w-full justify-start hover:bg-blue-50 hover:border-blue-300 transition-all duration-200"
               onClick={() => {
-                setCelebrationAchievement({
-                  title: "Language Setting",
-                  description: "Currently using English (US). More languages coming soon!",
-                  icon: Globe
-                });
-                setShowCelebration(true);
+                console.log('Language setting: English (US)');
               }}
             >
               <Globe className="w-4 h-4 mr-2" />
@@ -659,12 +610,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
               variant="outline" 
               className="w-full justify-start hover:bg-green-50 hover:border-green-300 transition-all duration-200 shadow-sm"
               onClick={() => {
-                setCelebrationAchievement({
-                  title: "Data Export",
-                  description: "Your nutrition data is being prepared for download. You'll receive a CSV file with all your meal logs and calculations.",
-                  icon: Download
-                });
-                setShowCelebration(true);
+                console.log('Preparing data export...');
                 // Simulate download
                 setTimeout(() => {
                   console.log('Download CSV data...');
@@ -687,12 +633,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
               onClick={async () => {
                 try {
                   // Start sync animations
-                  setCelebrationAchievement({
-                    title: "Syncing Data...",
-                    description: "Synchronizing USDA food database and user data. Please wait...",
-                    icon: RefreshCw
-                  });
-                  setShowCelebration(true);
+                  console.log('Starting data synchronization...');
 
                   // Sync USDA food database
                   const foodSyncResponse = await fetch('/api/sync/food-database', {
@@ -710,23 +651,13 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
 
                   // Show success result
                   setTimeout(() => {
-                    setCelebrationAchievement({
-                      title: "Sync Complete!",
-                      description: `Successfully synced USDA food database and user data. ${foodSyncResult.message || 'Food database updated'} and ${userSyncResult.message || 'user data synchronized'}.`,
-                      icon: CheckCircle
-                    });
-                    setShowCelebration(true);
+                    console.log('Sync Complete! Food database and user data synchronized.');
                   }, 1500);
 
                 } catch (error) {
                   console.error('Sync error:', error);
                   setTimeout(() => {
-                    setCelebrationAchievement({
-                      title: "Sync Failed",
-                      description: "Unable to complete data synchronization. Please check your connection and try again.",
-                      icon: RefreshCw
-                    });
-                    setShowCelebration(true);
+                    console.log('Sync Failed: Unable to complete data synchronization.');
                   }, 1500);
                 }
               }}
