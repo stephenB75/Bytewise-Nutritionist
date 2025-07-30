@@ -273,7 +273,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
           </Badge>
         </div>
         
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           <div className="text-center p-3 bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-lg">
             <Flame className="w-6 h-6 mx-auto text-orange-500 mb-2" />
             <p className="text-2xl font-bold text-gray-900">{userStats.currentStreak || 0}</p>
@@ -477,7 +477,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
               </Badge>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3">
               <Button 
                 variant="outline"
                 className="border-red-600 text-red-600 hover:bg-red-50"
@@ -506,7 +506,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
           {/* Security Summary */}
           <div>
             <h4 className="font-medium text-gray-900 mb-3">Security Status</h4>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               <div className="text-center p-3 bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-lg">
                 <Shield className="w-5 h-5 mx-auto text-green-600 mb-1" />
                 <p className="text-xs text-gray-600">Account Status</p>
@@ -597,7 +597,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
               </Badge>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3">
               <div className="flex items-center justify-between p-3 rounded-lg bg-purple-50 hover:bg-purple-100 transition-colors">
                 <div className="flex items-center gap-2">
                   <Award className="w-4 h-4 text-purple-600" />
@@ -631,7 +631,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
           {/* Notification Summary */}
           <div>
             <h4 className="font-medium text-gray-900 mb-3">Notification Summary</h4>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               <div className="text-center p-3 bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-lg">
                 <Bell className="w-5 h-5 mx-auto text-green-600 mb-1" />
                 <p className="text-xs text-gray-600">Total Enabled</p>
@@ -678,7 +678,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
               </Badge>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 gap-3">
               <div className="flex items-center justify-between p-3 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors">
                 <div className="flex items-center gap-2">
                   <Smartphone className="w-4 h-4 text-blue-600" />
@@ -759,7 +759,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
           {/* Display Summary */}
           <div>
             <h4 className="font-medium text-gray-900 mb-3">Display Summary</h4>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               <div className="text-center p-3 bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-lg">
                 <Palette className="w-5 h-5 mx-auto text-blue-600 mb-1" />
                 <p className="text-xs text-gray-600">Theme</p>
@@ -820,7 +820,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
               <p className="text-gray-600">Your Personal Nutrition Companion</p>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3">
               <Button 
                 variant="outline"
                 className="border-blue-600 text-blue-600 hover:bg-blue-50"
@@ -879,7 +879,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
           {/* App Status Summary */}
           <div>
             <h4 className="font-medium text-gray-900 mb-3">App Status</h4>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               <div className="text-center p-3 bg-gray-50 rounded-lg">
                 <Star className="w-5 h-5 mx-auto text-green-600 mb-1" />
                 <p className="text-xs text-gray-600">Version</p>
