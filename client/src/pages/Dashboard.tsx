@@ -80,6 +80,7 @@ function Dashboard({ onNavigate }: DashboardProps) {
       <HeroSection
         title={`Good morning, ${userStats.name}!`}
         subtitle="Keep up your amazing progress"
+        component="dashboard"
         caloriesConsumed={userStats.caloriesConsumed}
         caloriesGoal={userStats.caloriesGoal}
         currentStreak={userStats.currentStreak}

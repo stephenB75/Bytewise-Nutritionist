@@ -164,6 +164,9 @@ export default function WeeklyLogger({ onNavigate }: WeeklyLoggerProps) {
       <HeroSection
         title="Weekly Logger"
         subtitle="Track your calculated calories and meals"
+        component="logger"
+        stats={heroStats}
+        showProgress={false}
         className="pb-6"
       />
 

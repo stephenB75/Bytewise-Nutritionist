@@ -48,6 +48,7 @@ export default function CalorieCalculatorWrapper({ onNavigate }: CalorieCalculat
       <HeroSection
         title="Calorie Calculator"
         subtitle="Calculate nutrition using USDA database"
+        component="calculator"
         stats={heroStats}
         showProgress={false}
         className="pb-6"

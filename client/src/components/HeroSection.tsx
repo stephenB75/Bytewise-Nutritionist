@@ -2,7 +2,7 @@
  * Hero Section Component for Mobile PWA
  * 
  * Provides contextual header with progress rings and user stats
- * Consistent across all main app screens
+ * Consistent across all main app screens with food image backgrounds
  */
 
 import { Card } from '@/components/ui/card';
@@ -13,6 +13,7 @@ import {
   TrendingUp, 
   Calendar 
 } from 'lucide-react';
+import { getComponentFoodImage, createFoodBackgroundStyle } from '@/utils/foodImageRotation';
 
 interface HeroSectionProps {
   title: string;
@@ -22,6 +23,7 @@ interface HeroSectionProps {
   currentStreak?: number;
   showProgress?: boolean;
   className?: string;
+  component?: 'calculator' | 'logger' | 'dashboard' | 'profile' | 'login' | 'meals' | 'recipes' | 'planning';
   stats?: Array<{
     label: string;
     value: string;
@@ -39,19 +41,20 @@ export function HeroSection({
   currentStreak = 0,
   showProgress = true,
   className = '',
+  component = 'dashboard',
   stats = []
 }: HeroSectionProps) {
   const progressPercentage = Math.min((caloriesConsumed / caloriesGoal) * 100, 100);
   
+  // Get food background image for this component
+  const foodImage = getComponentFoodImage(component);
+  
   return (
     <div className={`relative bg-gradient-to-br from-emerald-500 to-blue-600 text-white px-4 py-6 overflow-hidden ${className}`} style={{ marginTop: '72px' }}>
-      {/* Enhanced Food Background Image */}
+      {/* Food Background Image */}
       <div 
-        className="absolute inset-0 opacity-25"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cdefs%3E%3Cpattern id='foodBg' patternUnits='userSpaceOnUse' width='80' height='80'%3E%3Ccircle cx='15' cy='15' r='4' fill='%23ffffff' opacity='0.2'/%3E%3Ccircle cx='50' cy='30' r='3' fill='%23ffffff' opacity='0.15'/%3E%3Crect x='30' y='50' width='8' height='8' rx='3' fill='%23ffffff' opacity='0.18'/%3E%3Cpath d='M60 10c0-3 3-6 6-6s6 3 6 6-3 6-6 6-6-3-6-6z' fill='%23ffffff' opacity='0.12'/%3E%3Cpath d='M10 60l5-3 5 3-5 8z' fill='%23ffffff' opacity='0.16'/%3E%3Cellipse cx='70' cy='70' rx='6' ry='3' fill='%23ffffff' opacity='0.14'/%3E%3Cpath d='M25 40c2-2 6-2 8 0s2 6 0 8-6 2-8 0-2-6 0-8z' fill='%23ffffff' opacity='0.1'/%3E%3Ccircle cx='45' cy='65' r='2.5' fill='%23ffffff' opacity='0.13'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='400' height='400' fill='url(%23foodBg)'/%3E%3C/svg%3E")`,
-          backgroundSize: '100px 100px'
-        }}
+        className="absolute inset-0 opacity-30"
+        style={createFoodBackgroundStyle(foodImage, 0.15)}
       />
       <div className="relative z-10">
       <div className="max-w-md mx-auto">

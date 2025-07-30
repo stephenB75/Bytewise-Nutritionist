@@ -1,52 +1,75 @@
 /**
- * Enhanced Image Component with Fallback
+ * Image with Fallback Component
  * 
- * Provides reliable image loading with graceful fallbacks
- * Optimized for hero sections and component backgrounds
+ * Handles image loading with fallback support for food images
+ * Provides consistent image display across the app
  */
 
-import React, { useState, useCallback } from 'react';
+import { useState } from 'react';
+import { ImageOff } from 'lucide-react';
 
 interface ImageWithFallbackProps {
   src: string;
   alt: string;
   className?: string;
-  fallbackSrc?: string;
-  onLoad?: () => void;
-  onError?: () => void;
+  fallbackClassName?: string;
+  width?: number;
+  height?: number;
 }
 
-export function ImageWithFallback({
-  src,
-  alt,
-  className = '',
-  fallbackSrc,
-  onLoad,
-  onError
+export function ImageWithFallback({ 
+  src, 
+  alt, 
+  className = '', 
+  fallbackClassName = '',
+  width,
+  height 
 }: ImageWithFallbackProps) {
-  const [currentSrc, setCurrentSrc] = useState(src);
-  const [hasError, setHasError] = useState(false);
+  const [imageError, setImageError] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const handleError = useCallback(() => {
-    if (!hasError && fallbackSrc) {
-      setHasError(true);
-      setCurrentSrc(fallbackSrc);
-    }
-    onError?.();
-  }, [hasError, fallbackSrc, onError]);
+  const handleImageError = () => {
+    setImageError(true);
+    setIsLoading(false);
+  };
 
-  const handleLoad = useCallback(() => {
-    onLoad?.();
-  }, [onLoad]);
+  const handleImageLoad = () => {
+    setIsLoading(false);
+  };
+
+  if (imageError) {
+    return (
+      <div 
+        className={`flex items-center justify-center bg-gray-100 ${fallbackClassName || className}`}
+        style={{ width, height }}
+      >
+        <div className="text-center">
+          <ImageOff className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+          <p className="text-xs text-gray-500">{alt}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <img
-      src={currentSrc}
-      alt={alt}
-      className={className}
-      onError={handleError}
-      onLoad={handleLoad}
-      loading="lazy"
-    />
+    <div className="relative">
+      {isLoading && (
+        <div 
+          className={`absolute inset-0 flex items-center justify-center bg-gray-100 animate-pulse ${className}`}
+          style={{ width, height }}
+        >
+          <div className="w-6 h-6 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
+        </div>
+      )}
+      <img
+        src={src}
+        alt={alt}
+        className={`${className} ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
+        onError={handleImageError}
+        onLoad={handleImageLoad}
+        width={width}
+        height={height}
+      />
+    </div>
   );
 }

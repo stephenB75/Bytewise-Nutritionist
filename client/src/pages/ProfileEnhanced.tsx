@@ -963,6 +963,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
       <HeroSection
         title={`Welcome, ${(user as any)?.firstName || 'User'}!`}
         subtitle="Manage your profile and app preferences"
+        component="profile"
         caloriesConsumed={userStats.caloriesTracked}
         caloriesGoal={userStats.totalMealsLogged}
         currentStreak={userStats.currentStreak}
