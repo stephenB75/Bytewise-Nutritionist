@@ -180,35 +180,90 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
     }
   };
 
-  const handleLogToWeekly = (analysis: IngredientAnalysis) => {
-    if (onLogToWeekly) {
-      const now = new Date();
-      const hour = now.getHours();
-      let category: 'breakfast' | 'lunch' | 'dinner' | 'snack';
-      
-      // Enhanced category assignment logic based on time
-      if (hour >= 5 && hour < 11) category = 'breakfast';
-      else if (hour >= 11 && hour < 16) category = 'lunch';  
-      else if (hour >= 16 && hour < 21) category = 'dinner';
-      else category = 'snack';
+  const handleLogToWeekly = async (analysis: IngredientAnalysis) => {
+    const now = new Date();
+    const hour = now.getHours();
+    let mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack';
+    
+    // Enhanced category assignment logic based on time
+    if (hour >= 5 && hour < 11) mealType = 'breakfast';
+    else if (hour >= 11 && hour < 16) mealType = 'lunch';  
+    else if (hour >= 16 && hour < 21) mealType = 'dinner';
+    else mealType = 'snack';
 
-      // Log to weekly tracker with proper categorization
-      onLogToWeekly({
-        name: `${analysis.ingredient} (${analysis.measurement})`,
-        calories: analysis.estimatedCalories,
-        protein: analysis.nutritionPer100g?.protein || 0,
-        carbs: analysis.nutritionPer100g?.carbs || 0,
-        fat: analysis.nutritionPer100g?.fat || 0,
-        date: now.toISOString().split('T')[0],
-        time: now.toLocaleTimeString('en-US', { 
-          hour: '2-digit', 
-          minute: '2-digit',
-          hour12: true 
-        }),
-        category
+    const mealData = {
+      name: `${analysis.ingredient} (${analysis.measurement})`,
+      calories: analysis.estimatedCalories,
+      protein: analysis.nutritionPer100g?.protein || 0,
+      carbs: analysis.nutritionPer100g?.carbs || 0,
+      fat: analysis.nutritionPer100g?.fat || 0,
+      fiber: 0,
+      sugar: 0,
+      sodium: 0,
+      date: now.toISOString().split('T')[0],
+      time: now.toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: true 
+      }),
+      mealType,
+      source: 'calculator'
+    };
+
+    try {
+      // Direct API call to log meal
+      const response = await fetch('/api/meals/logged', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(mealData),
+        credentials: 'include',
       });
+
+      if (response.ok) {
+        console.log(`✅ Successfully logged to ${mealType}: ${analysis.ingredient} - ${analysis.estimatedCalories} cal`);
+        
+        // Trigger events for UI updates
+        const logEvent = new CustomEvent('calories-logged', {
+          detail: { ...mealData, timestamp: new Date().toISOString() }
+        });
+        window.dispatchEvent(logEvent);
+        
+        // Show success toast
+        const toastEvent = new CustomEvent('show-toast', {
+          detail: { 
+            message: `Logged ${analysis.ingredient} to ${mealType}!`,
+            type: 'success'
+          }
+        });
+        window.dispatchEvent(toastEvent);
+      } else {
+        throw new Error('Failed to log meal');
+      }
+    } catch (error) {
+      console.error('❌ Failed to log to weekly:', error);
       
-      console.log(`Logging to ${category}: ${analysis.ingredient} - ${analysis.estimatedCalories} cal`);
+      // Show error toast
+      const toastEvent = new CustomEvent('show-toast', {
+        detail: { 
+          message: `Failed to log meal. Please try again.`,
+          type: 'error'
+        }
+      });
+      window.dispatchEvent(toastEvent);
+    }
+
+    // Also call the original callback if it exists
+    if (onLogToWeekly) {
+      onLogToWeekly({
+        name: mealData.name,
+        calories: mealData.calories,
+        protein: mealData.protein,
+        carbs: mealData.carbs,
+        fat: mealData.fat,
+        date: mealData.date,
+        time: mealData.time,
+        category: mealType
+      });
     }
   };
 
@@ -296,7 +351,10 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
                   {onLogToWeekly && (
                     <Button
                       size="sm"
-                      onClick={() => handleLogToWeekly(analysis)}
+                      onClick={() => {
+                        console.log('Log to Weekly button clicked for:', analysis);
+                        handleLogToWeekly(analysis);
+                      }}
                       className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                     >
                       Log to Weekly Tracker

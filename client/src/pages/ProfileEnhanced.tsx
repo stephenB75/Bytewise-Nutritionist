@@ -257,9 +257,11 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
           </div>
         </div>
 
-        <Button className="mt-6 bg-blue-600 hover:bg-blue-700">
-          Save Changes
-        </Button>
+        <div className="mt-6 flex justify-end">
+          <Button className="bg-white/80 backdrop-blur-sm border-0 shadow-lg bg-blue-600 hover:bg-blue-700 text-white">
+            Save Changes
+          </Button>
+        </div>
       </Card>
 
       {/* Your Journey Card - Validated */}
@@ -272,25 +274,25 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
         </div>
         
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="text-center p-3 bg-orange-50 rounded-lg border border-orange-200">
+          <div className="text-center p-3 bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-lg">
             <Flame className="w-6 h-6 mx-auto text-orange-500 mb-2" />
             <p className="text-2xl font-bold text-gray-900">{userStats.currentStreak || 0}</p>
             <p className="text-sm text-gray-600">Day Streak</p>
             <p className="text-xs text-orange-600 mt-1">Real tracking data</p>
           </div>
-          <div className="text-center p-3 bg-blue-50 rounded-lg border border-blue-200">
+          <div className="text-center p-3 bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-lg">
             <Calendar className="w-6 h-6 mx-auto text-blue-500 mb-2" />
             <p className="text-2xl font-bold text-gray-900">{userStats.totalMealsLogged || 0}</p>
             <p className="text-sm text-gray-600">Meals Logged</p>
             <p className="text-xs text-blue-600 mt-1">Calculator + Logger</p>
           </div>
-          <div className="text-center p-3 bg-green-50 rounded-lg border border-green-200">
+          <div className="text-center p-3 bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-lg">
             <Target className="w-6 h-6 mx-auto text-green-500 mb-2" />
             <p className="text-2xl font-bold text-gray-900">{(userStats.caloriesTracked || 0).toLocaleString()}</p>
             <p className="text-sm text-gray-600">Calories Tracked</p>
             <p className="text-xs text-green-600 mt-1">USDA verified</p>
           </div>
-          <div className="text-center p-3 bg-purple-50 rounded-lg border border-purple-200">
+          <div className="text-center p-3 bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-lg">
             <Star className="w-6 h-6 mx-auto text-purple-500 mb-2" />
             <p className="text-lg font-bold text-gray-900">{userStats.favoriteFood || 'None yet'}</p>
             <p className="text-sm text-gray-600">Top Food</p>
@@ -505,22 +507,22 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
           <div>
             <h4 className="font-medium text-gray-900 mb-3">Security Status</h4>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div className="text-center p-3 bg-gray-50 rounded-lg">
+              <div className="text-center p-3 bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-lg">
                 <Shield className="w-5 h-5 mx-auto text-green-600 mb-1" />
                 <p className="text-xs text-gray-600">Account Status</p>
                 <p className="font-bold text-gray-900">Secure</p>
               </div>
-              <div className="text-center p-3 bg-gray-50 rounded-lg">
+              <div className="text-center p-3 bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-lg">
                 <Lock className="w-5 h-5 mx-auto text-blue-600 mb-1" />
                 <p className="text-xs text-gray-600">Last Login</p>
                 <p className="font-bold text-gray-900">Today</p>
               </div>
-              <div className="text-center p-3 bg-gray-50 rounded-lg">
+              <div className="text-center p-3 bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-lg">
                 <Users className="w-5 h-5 mx-auto text-purple-600 mb-1" />
                 <p className="text-xs text-gray-600">Data Privacy</p>
                 <p className="font-bold text-gray-900">Protected</p>
               </div>
-              <div className="text-center p-3 bg-gray-50 rounded-lg">
+              <div className="text-center p-3 bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-lg">
                 <Eye className="w-5 h-5 mx-auto text-orange-600 mb-1" />
                 <p className="text-xs text-gray-600">Visibility</p>
                 <p className="font-bold text-gray-900">Private</p>
@@ -630,22 +632,22 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
           <div>
             <h4 className="font-medium text-gray-900 mb-3">Notification Summary</h4>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div className="text-center p-3 bg-gray-50 rounded-lg">
+              <div className="text-center p-3 bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-lg">
                 <Bell className="w-5 h-5 mx-auto text-green-600 mb-1" />
                 <p className="text-xs text-gray-600">Total Enabled</p>
                 <p className="font-bold text-gray-900">3/4</p>
               </div>
-              <div className="text-center p-3 bg-gray-50 rounded-lg">
+              <div className="text-center p-3 bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-lg">
                 <Utensils className="w-5 h-5 mx-auto text-amber-600 mb-1" />
                 <p className="text-xs text-gray-600">Meal Alerts</p>
                 <p className="font-bold text-gray-900">On</p>
               </div>
-              <div className="text-center p-3 bg-gray-50 rounded-lg">
+              <div className="text-center p-3 bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-lg">
                 <Award className="w-5 h-5 mx-auto text-purple-600 mb-1" />
                 <p className="text-xs text-gray-600">Achievements</p>
                 <p className="font-bold text-gray-900">On</p>
               </div>
-              <div className="text-center p-3 bg-gray-50 rounded-lg">
+              <div className="text-center p-3 bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-lg">
                 <RefreshCw className="w-5 h-5 mx-auto text-blue-600 mb-1" />
                 <p className="text-xs text-gray-600">App Updates</p>
                 <p className="font-bold text-gray-900">On</p>
@@ -758,22 +760,22 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
           <div>
             <h4 className="font-medium text-gray-900 mb-3">Display Summary</h4>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div className="text-center p-3 bg-gray-50 rounded-lg">
+              <div className="text-center p-3 bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-lg">
                 <Palette className="w-5 h-5 mx-auto text-blue-600 mb-1" />
                 <p className="text-xs text-gray-600">Theme</p>
                 <p className="font-bold text-gray-900">Light</p>
               </div>
-              <div className="text-center p-3 bg-gray-50 rounded-lg">
+              <div className="text-center p-3 bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-lg">
                 <Type className="w-5 h-5 mx-auto text-purple-600 mb-1" />
                 <p className="text-xs text-gray-600">Text Size</p>
                 <p className="font-bold text-gray-900">Normal</p>
               </div>
-              <div className="text-center p-3 bg-gray-50 rounded-lg">
+              <div className="text-center p-3 bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-lg">
                 <Globe className="w-5 h-5 mx-auto text-green-600 mb-1" />
                 <p className="text-xs text-gray-600">Units</p>
                 <p className="font-bold text-gray-900">Imperial</p>
               </div>
-              <div className="text-center p-3 bg-gray-50 rounded-lg">
+              <div className="text-center p-3 bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-lg">
                 <Smartphone className="w-5 h-5 mx-auto text-blue-600 mb-1" />
                 <p className="text-xs text-gray-600">Mode</p>
                 <p className="font-bold text-gray-900">Auto</p>
