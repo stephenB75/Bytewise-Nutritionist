@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Target, Calendar, ChefHat, TrendingUp, Smartphone, Shield, Zap, ArrowRight, Star, Users } from 'lucide-react';
-import { LogoBrand } from '@/components/LogoBrand';
+import { NewLogoBrand } from '@/components/NewLogoBrand';
 import varietyFoodImage from '@assets/variety-5044809_1920.jpg';
 
 interface LandingProps {
@@ -72,7 +72,7 @@ export default function Landing({ onNavigateToForgotPassword }: LandingProps) {
         <div className="relative z-10 px-4 py-16 text-center">
           {/* Brand Logo */}
           <div className="mb-8 flex justify-center animate-fade-in">
-            <LogoBrand size="lg" className="drop-shadow-lg" />
+            <NewLogoBrand size="xl" className="drop-shadow-lg" />
           </div>
           
           {/* Welcome Message */}

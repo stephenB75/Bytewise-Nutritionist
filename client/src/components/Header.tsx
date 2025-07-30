@@ -6,7 +6,7 @@
  */
 
 import React, { useState } from 'react';
-import { LogoBrand } from './LogoBrand';
+import { NewLogoBrand } from './NewLogoBrand';
 import { Bell, Settings, Search, LogOut } from 'lucide-react';
 import { Button } from './ui/button';
 import { NotificationDropdown } from './NotificationDropdown';
@@ -88,7 +88,7 @@ export function Header({
         <div className="flex items-center justify-between">
           {/* Logo - Left Side */}
           <div className="flex-shrink-0 flex items-center">
-            <LogoBrand 
+            <NewLogoBrand 
               size="sm" 
               clickable={true}
               onClick={() => onNavigate('dashboard')}

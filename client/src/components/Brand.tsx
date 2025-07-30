@@ -1,3 +1,5 @@
+import { NewLogoBrand } from './NewLogoBrand';
+
 interface LogoBrandProps {
   size?: 'sm' | 'md' | 'lg';
   className?: string;
@@ -38,8 +40,8 @@ export function LogoBrand({ size = 'md', className = '' }: LogoBrandProps) {
 
   return (
     <div className={`brand-logo relative ${className}`}>
-      {/* Use LogoBrand component instead of duplicating styles */}
-      <LogoBrand size={size} />
+      {/* Use NewLogoBrand component instead of duplicating styles */}
+      <NewLogoBrand size={size} />
     </div>
   );
 }
@@ -53,7 +55,7 @@ interface BrandStandardProps {
 export function BrandStandard({ size = 'md', className = '' }: BrandStandardProps) {
   return (
     <div className={`flex flex-col items-center ${className}`}>
-      <LogoBrand size={size} />
+      <NewLogoBrand size={size} />
     </div>
   );
 }
@@ -62,7 +64,7 @@ export function BrandStandard({ size = 'md', className = '' }: BrandStandardProp
 export function BrandCompact({ className = '' }: { className?: string }) {
   return (
     <div className={`flex items-center space-x-2 ${className}`}>
-      <LogoBrand size="sm" />
+      <NewLogoBrand size="sm" />
     </div>
   );
 }

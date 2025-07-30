@@ -9,7 +9,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { LogIn } from 'lucide-react';
-import { LogoBrand } from '@/components/LogoBrand';
+import { NewLogoBrand } from '@/components/NewLogoBrand';
 import dishImage from '@assets/food-3262796_1920_1753859530086.jpg';
 
 interface LoginScreenProps {
@@ -50,7 +50,7 @@ function LoginScreen({ onNavigate }: LoginScreenProps) {
           
           {/* Logo - Increased size by 45% */}
           <div className="text-center mb-8">
-            <LogoBrand size="lg" className="transform scale-[1.45] drop-shadow-lg" />
+            <NewLogoBrand size="xl" className="drop-shadow-lg" />
           </div>
 
           {/* Login Card - Simple Popup */}

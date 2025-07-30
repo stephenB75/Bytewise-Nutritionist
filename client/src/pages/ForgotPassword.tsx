@@ -1,4 +1,4 @@
-import { LogoBrand } from '@/components/LogoBrand';
+import { NewLogoBrand } from '@/components/NewLogoBrand';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -43,7 +43,7 @@ export default function ForgotPassword({ onNavigateToLogin, showToast }: ForgotP
       <div className="max-w-md w-full space-y-8">
         {/* Brand Logo */}
         <div className="text-center">
-          <LogoBrand size="lg" />
+          <NewLogoBrand size="xl" />
         </div>
         
         <Card>
