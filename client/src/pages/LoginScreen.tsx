@@ -48,9 +48,9 @@ function LoginScreen({ onNavigate }: LoginScreenProps) {
       <div className="relative z-30 min-h-screen flex items-center justify-center p-6">
         <div className="w-full max-w-md">
           
-          {/* Logo */}
+          {/* Logo - Increased size by 45% */}
           <div className="text-center mb-8">
-            <LogoBrand size="lg" />
+            <LogoBrand size="lg" className="transform scale-[1.45] drop-shadow-lg" />
           </div>
 
           {/* Login Card - Simple Popup */}
