@@ -38,6 +38,13 @@ import sandwichImg from "@assets/sandwich-6935938_1920_1753859794687.jpg";
 import fishImg from "@assets/food-993457_1920_1753859794688.jpg";
 import salmonImg from "@assets/new-years-eve-518032_1920_1753859794689.jpg";
 
+// Additional food images batch 4
+import chickenImg from "@assets/chicken-762531_1920_1753859530086.jpg";
+import foodVarietyImg from "@assets/food-3262796_1920_1753859530086.jpg";
+import varietyImg from "@assets/variety-5044809_1920_1753859530087.jpg";
+import plumsImg from "@assets/plums-1898196_1920_1753859477809.jpg";
+import strawberryImg from "@assets/strawberry-7224875_1920_1753859477810.jpg";
+
 export const FOOD_IMAGES = {
   chocolate: chocolateImg,
   cupcakes: cupcakesImg,
@@ -69,6 +76,12 @@ export const FOOD_IMAGES = {
   sandwich: sandwichImg,
   fish: fishImg,
   salmon: salmonImg,
+  // Additional variety
+  chicken: chickenImg,
+  foodVariety: foodVarietyImg,
+  variety: varietyImg,
+  plums: plumsImg,
+  strawberry: strawberryImg,
 };
 
 export const FOOD_IMAGE_LIST = Object.values(FOOD_IMAGES);
@@ -86,10 +99,47 @@ export const COMPONENT_IMAGES = {
 };
 
 /**
- * Get a food image for a specific component
+ * Generate a rotation key based on app session and current date
+ */
+function getRotationKey(): string {
+  const date = new Date();
+  const dayOfYear = Math.floor((date.getTime() - new Date(date.getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24));
+  const sessionId = sessionStorage.getItem('app-session-id') || String(Date.now());
+  
+  // Store session ID if not exists
+  if (!sessionStorage.getItem('app-session-id')) {
+    sessionStorage.setItem('app-session-id', sessionId);
+  }
+  
+  return `${dayOfYear}-${sessionId}`;
+}
+
+/**
+ * Get rotation index based on app sessions and time
+ */
+function getRotationIndex(component: string): number {
+  const rotationKey = getRotationKey();
+  const hash = Array.from(rotationKey + component).reduce((acc, char) => {
+    return char.charCodeAt(0) + ((acc << 5) - acc);
+  }, 0);
+  
+  return Math.abs(hash) % FOOD_IMAGE_LIST.length;
+}
+
+/**
+ * Get a rotating food image for a specific component that changes each app session
  */
 export function getComponentFoodImage(component: keyof typeof COMPONENT_IMAGES): string {
-  return COMPONENT_IMAGES[component] || FOOD_IMAGES.blueberries;
+  // Check if we should use rotation or fixed mapping
+  const useRotation = localStorage.getItem('food-image-rotation') !== 'false';
+  
+  if (!useRotation) {
+    return COMPONENT_IMAGES[component] || FOOD_IMAGES.blueberries;
+  }
+  
+  // Use rotation system - different image each app open/close cycle
+  const rotationIndex = getRotationIndex(component);
+  return FOOD_IMAGE_LIST[rotationIndex];
 }
 
 /**
@@ -126,6 +176,59 @@ export function getTimeBasedFoodImage(): string {
     const dessertFoods = [FOOD_IMAGES.chocolate, FOOD_IMAGES.cupcakes, FOOD_IMAGES.churros, FOOD_IMAGES.macarons];
     return dessertFoods[Math.floor(Math.random() * dessertFoods.length)];
   }
+}
+
+/**
+ * Reset rotation to get new images (triggered on app close/open)
+ */
+export function resetImageRotation(): void {
+  sessionStorage.removeItem('app-session-id');
+  // Trigger new session ID generation on next getComponentFoodImage call
+}
+
+/**
+ * Enable/disable image rotation feature
+ */
+export function setImageRotation(enabled: boolean): void {
+  localStorage.setItem('food-image-rotation', enabled ? 'true' : 'false');
+}
+
+/**
+ * Get current rotation status
+ */
+export function isImageRotationEnabled(): boolean {
+  return localStorage.getItem('food-image-rotation') !== 'false';
+}
+
+/**
+ * Get the total number of available food images
+ */
+export function getFoodImageCount(): number {
+  return FOOD_IMAGE_LIST.length;
+}
+
+/**
+ * Get a preview of the next rotation images for all components
+ */
+export function getNextRotationPreview(): Record<string, string> {
+  const preview: Record<string, string> = {};
+  
+  // Temporarily create a new session to preview next images
+  const originalSessionId = sessionStorage.getItem('app-session-id');
+  sessionStorage.setItem('app-session-id', String(Date.now() + 1000));
+  
+  Object.keys(COMPONENT_IMAGES).forEach(component => {
+    preview[component] = getComponentFoodImage(component as keyof typeof COMPONENT_IMAGES);
+  });
+  
+  // Restore original session
+  if (originalSessionId) {
+    sessionStorage.setItem('app-session-id', originalSessionId);
+  } else {
+    sessionStorage.removeItem('app-session-id');
+  }
+  
+  return preview;
 }
 
 /**

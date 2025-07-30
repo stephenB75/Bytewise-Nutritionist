@@ -12,6 +12,7 @@ import { AuthWrapper } from './components/AuthWrapper';
 import { Header } from './components/Header';
 import { Navigation } from './components/Navigation';
 import { NotificationDropdown } from './components/NotificationDropdown';
+import { useImageRotation } from './hooks/useImageRotation';
 import Dashboard from './pages/Dashboard';
 import CalorieCalculatorWrapper from './components/CalorieCalculatorWrapper';
 import WeeklyLogger from './pages/WeeklyLogger';
@@ -21,6 +22,9 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [showNotifications, setShowNotifications] = useState(false);
   const [notificationCount, setNotificationCount] = useState(3); // Example notification count
+  
+  // Initialize image rotation system
+  useImageRotation();
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);

@@ -52,6 +52,7 @@ import { HeroSection } from '@/components/HeroSection';
 import { AchievementCelebration } from '@/components/AchievementCelebration';
 import { ProfileInfoCard } from '@/components/ProfileInfoCard';
 import { DataManagementPanel } from '@/components/DataManagementPanel';
+import { setImageRotation, isImageRotationEnabled, resetImageRotation, getFoodImageCount } from '@/utils/foodImageRotation';
 import { CombinedProfileInfo } from '@/components/CombinedProfileInfo';
 import { NotificationDropdown } from '@/components/NotificationDropdown';
 import { getCurrentVersion, checkForUpdates, updateApp, formatVersion, formatBuildDate } from '@/utils/appVersion';
@@ -104,6 +105,7 @@ interface Achievement {
 
 function ProfileEnhanced({ onNavigate }: ProfileProps) {
   const [activeSection, setActiveSection] = useState('profile');
+  const [imageRotationEnabled, setImageRotationEnabledState] = useState(isImageRotationEnabled());
 
   // Handle section navigation from notification dropdown
   useEffect(() => {
@@ -793,6 +795,24 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
                   }}
                 />
               </div>
+              
+              <div className="flex items-center justify-between p-3 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors">
+                <div className="flex items-center gap-2">
+                  <RefreshCw className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm">Rotate background images</span>
+                </div>
+                <Switch 
+                  checked={imageRotationEnabled}
+                  onCheckedChange={(checked) => {
+                    setImageRotation(checked);
+                    setImageRotationEnabledState(checked);
+                    if (checked) {
+                      resetImageRotation(); // Apply new rotation immediately
+                    }
+                    console.log('Image rotation:', checked);
+                  }}
+                />
+              </div>
             </div>
           </div>
 
@@ -821,6 +841,16 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
                 <Smartphone className="w-5 h-5 mx-auto text-blue-600 mb-1" />
                 <p className="text-xs text-gray-600">Mode</p>
                 <p className="font-bold text-gray-900">Auto</p>
+              </div>
+              <div className="text-center p-3 bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-lg">
+                <RefreshCw className="w-5 h-5 mx-auto text-blue-600 mb-1" />
+                <p className="text-xs text-gray-600">Food Images</p>
+                <p className="font-bold text-gray-900">{getFoodImageCount()} Total</p>
+              </div>
+              <div className="text-center p-3 bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-lg">
+                <Palette className="w-5 h-5 mx-auto text-purple-600 mb-1" />
+                <p className="text-xs text-gray-600">Rotation</p>
+                <p className="font-bold text-gray-900">{imageRotationEnabled ? 'On' : 'Off'}</p>
               </div>
             </div>
           </div>
