@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Target, Calendar, ChefHat, TrendingUp, Smartphone, Shield, Zap } from 'lucide-react';
+import { Target, Calendar, ChefHat, TrendingUp, Smartphone, Shield, Zap, ArrowRight, Star, Users } from 'lucide-react';
 import { LogoBrand } from '@/components/LogoBrand';
 
 interface LandingProps {
@@ -61,14 +61,31 @@ export default function Landing({ onNavigateToForgotPassword }: LandingProps) {
         <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
         <div className="relative z-10 px-4 py-16 text-center">
           {/* Brand Logo */}
-          <div className="mb-8 flex justify-center">
+          <div className="mb-8 flex justify-center animate-fade-in">
             <LogoBrand size="lg" />
           </div>
           
+          {/* Welcome Message */}
+          <h1 className="text-3xl font-bold tracking-tight text-foreground mb-2" style={{ fontFamily: "'League Spartan', sans-serif", fontSize: "2rem", fontWeight: 700 }}>
+            Welcome to ByteWise
+          </h1>
+          
           {/* Tagline */}
-          <p className="text-xl text-muted-foreground mb-2 max-w-md mx-auto" style={{ fontFamily: "'Quicksand', sans-serif", fontSize: "1.25rem", fontWeight: 400 }}>
-            Smart Nutrition Tracking for a Healthier You
+          <p className="text-xl text-muted-foreground mb-6 max-w-md mx-auto" style={{ fontFamily: "'Quicksand', sans-serif", fontSize: "1.125rem", fontWeight: 400 }}>
+            Your personal nutrition companion for smarter eating habits
           </p>
+          
+          {/* Social Proof */}
+          <div className="flex items-center justify-center space-x-4 mb-6 text-sm text-muted-foreground">
+            <div className="flex items-center space-x-1">
+              <Users className="h-4 w-4" />
+              <span>Join thousands of users</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+              <span>Loved by nutritionists</span>
+            </div>
+          </div>
           
           {/* Beta Badge */}
           <Badge variant="outline" className="mb-8 bg-primary/10 border-primary/20">
@@ -79,50 +96,70 @@ export default function Landing({ onNavigateToForgotPassword }: LandingProps) {
           <div className="space-y-4 max-w-sm mx-auto">
             <Button 
               onClick={() => window.location.href = '/api/login'}
-              className="w-full h-12 text-lg font-semibold touch-target btn-animate"
+              className="w-full h-12 text-lg font-semibold touch-target btn-animate group"
               size="lg"
               style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "1rem", fontWeight: 500 }}
             >
-              Start Tracking Now
+              Start Your Journey
+              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Button>
             
-            <div className="flex flex-col space-y-2">
+            <div className="flex flex-col space-y-3">
               <p className="text-sm text-muted-foreground" style={{ fontFamily: "'Quicksand', sans-serif", fontSize: "0.875rem", fontWeight: 400 }}>
                 Sign in with your Replit account to get started
               </p>
               
-              {onNavigateToForgotPassword && (
+              <div className="flex justify-center space-x-4">
+                {onNavigateToForgotPassword && (
+                  <button
+                    onClick={onNavigateToForgotPassword}
+                    className="text-sm text-primary hover:text-primary/80 transition-colors"
+                    style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "0.875rem", fontWeight: 500 }}
+                  >
+                    Need help?
+                  </button>
+                )}
+                <span className="text-sm text-muted-foreground">•</span>
                 <button
-                  onClick={onNavigateToForgotPassword}
+                  onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
                   className="text-sm text-primary hover:text-primary/80 transition-colors"
                   style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "0.875rem", fontWeight: 500 }}
                 >
-                  Need help with your account?
+                  Learn more
                 </button>
-              )}
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Features Section */}
-      <section className="px-4 py-12">
+      <section id="features" className="px-4 py-12">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold text-center mb-8" style={{ fontFamily: "'League Spartan', sans-serif", fontSize: "1.875rem", fontWeight: 700, lineHeight: 1.2 }}>
-            Everything You Need for Nutrition Success
-          </h2>
+          <div className="text-center mb-12">
+            <h2 className="text-2xl font-bold mb-4" style={{ fontFamily: "'League Spartan', sans-serif", fontSize: "1.875rem", fontWeight: 700, lineHeight: 1.2 }}>
+              Everything You Need for Nutrition Success
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto" style={{ fontFamily: "'Quicksand', sans-serif", fontSize: "1rem", fontWeight: 400 }}>
+              Track your meals, build custom recipes, and achieve your health goals with our comprehensive nutrition platform
+            </p>
+          </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((feature, index) => (
-              <Card key={index} className="hover:shadow-lg transition-shadow duration-300">
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-3">
-                    <feature.icon className={`h-6 w-6 ${feature.color}`} />
+              <Card key={index} className="hover:shadow-lg transition-all duration-300 hover:scale-105 border-muted/50">
+                <CardHeader className="pb-4">
+                  <CardTitle className="flex items-center space-x-3" style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "1.125rem", fontWeight: 600 }}>
+                    <div className={`p-2 rounded-lg ${feature.color} bg-opacity-10`}>
+                      <feature.icon className={`h-5 w-5 ${feature.color}`} />
+                    </div>
                     <span>{feature.title}</span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-muted-foreground">{feature.description}</p>
+                  <p className="text-muted-foreground" style={{ fontFamily: "'Quicksand', sans-serif", fontSize: "0.875rem", fontWeight: 400 }}>
+                    {feature.description}
+                  </p>
                 </CardContent>
               </Card>
             ))}
