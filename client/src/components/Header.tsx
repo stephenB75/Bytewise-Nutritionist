@@ -46,14 +46,12 @@ export function Header({
         <div className="flex items-center justify-between">
           {/* Logo - Left Side */}
           <div className="flex-shrink-0 flex items-center">
-            <Button
-              variant="ghost"
-              className="h-8 px-2 text-lg font-bold"
+            <LogoBrand 
+              size="sm" 
+              clickable={true}
               onClick={() => onNavigate('dashboard')}
-              style={{ fontFamily: "'League Spartan', sans-serif" }}
-            >
-              bytewise
-            </Button>
+              className="hover:opacity-80 transition-opacity duration-200"
+            />
           </div>
           
           {/* Page Title - Center */}
