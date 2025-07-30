@@ -1,7 +1,7 @@
 /**
- * Weekly Logger - Track calories calculated and added as meals by user
- * Mobile-first responsive design with Bytewise brand identity
- * Features daily logging, weekly overview, and meal tracking
+ * Weekly Logger - Advanced nutrition tracking with enhanced visual design
+ * Mobile-first responsive design with improved user experience
+ * Features meal timeline, progress visualization, and smart insights
  */
 
 import { useState, useEffect } from 'react';
@@ -10,6 +10,8 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { HeroSection } from '@/components/HeroSection';
 import { 
   Calendar,
@@ -21,9 +23,19 @@ import {
   ChevronLeft,
   ChevronRight,
   BookOpen,
-  Utensils
+  Utensils,
+  Activity,
+  Zap,
+  Award,
+  Eye,
+  BarChart3,
+  PieChart,
+  Coffee,
+  Moon,
+  Sun,
+  Sunrise
 } from 'lucide-react';
-import { format, startOfWeek, addDays, addWeeks, subWeeks } from 'date-fns';
+import { format, startOfWeek, addDays, addWeeks, subWeeks, isToday, isYesterday } from 'date-fns';
 import { useCalorieTracking } from '@/hooks/useCalorieTracking';
 
 interface WeeklyLoggerProps {
@@ -51,6 +63,20 @@ export default function WeeklyLogger({ onNavigate }: WeeklyLoggerProps) {
   const queryClient = useQueryClient();
   const { getTodaysCalories, getDailyStats, calculatedCalories } = useCalorieTracking();
 
+  // Constants for calculations
+  const dailyCalorieGoal = 2000;
+  const calculatedCaloriesTotal = getTodaysCalories();
+  const calculatedItemsCount = Object.keys(calculatedCalories).length;
+
+  // Navigation functions
+  const navigateWeek = (direction: 'prev' | 'next') => {
+    if (direction === 'prev') {
+      setCurrentWeek(subWeeks(currentWeek, 1));
+    } else {
+      setCurrentWeek(addWeeks(currentWeek, 1));
+    }
+  };
+
   // Listen for calculator events to refresh data
   useEffect(() => {
     const handleRefreshData = () => {
@@ -59,7 +85,6 @@ export default function WeeklyLogger({ onNavigate }: WeeklyLoggerProps) {
 
     const handleCaloriesLogged = (event: CustomEvent) => {
       console.log('WeeklyLogger received calories:', event.detail);
-      // Refresh meal data to show new entries
       setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: ['/api/meals/logged'] });
       }, 500);
@@ -82,20 +107,6 @@ export default function WeeklyLogger({ onNavigate }: WeeklyLoggerProps) {
   const { data: loggedMeals = [], isLoading } = useQuery({
     queryKey: ['/api/meals/logged', format(weekStart, 'yyyy-MM-dd')],
     staleTime: 1000 * 60 * 5, // 5 minutes
-  });
-
-  // Add meal mutation
-  const addMealMutation = useMutation({
-    mutationFn: async (meal: Omit<LoggedMeal, 'id'>) =>
-      fetch('/api/meals/logged', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(meal),
-        credentials: 'include',
-      }).then(res => res.json()),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/meals/logged'] });
-    },
   });
 
   // Calculate daily totals
@@ -131,44 +142,29 @@ export default function WeeklyLogger({ onNavigate }: WeeklyLoggerProps) {
     { calories: 0, protein: 0, carbs: 0, fat: 0, meals: 0 }
   );
 
-  const dailyCalorieGoal = 2000; // Default goal
-  const avgDailyCalories = Math.round(weeklyTotals.calories / 7);
-
-  // Include calculated calories in weekly stats
-  const todaysCalculated = getTodaysCalories();
-  const calculatedCaloriesTotal = todaysCalculated.reduce((sum, item) => sum + item.calories, 0);
-  const calculatedItemsCount = todaysCalculated.length;
-  
+  // Hero stats
   const heroStats = [
     {
-      label: 'Weekly Total',
-      value: (weeklyTotals.calories + calculatedCaloriesTotal).toLocaleString(),
       icon: Flame,
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-50',
+      label: 'Weekly Cal',
+      value: (weeklyTotals.calories + calculatedCaloriesTotal).toLocaleString(),
+      color: 'text-orange-600'
     },
     {
-      label: 'Meals Logged',
-      value: (weeklyTotals.meals + todaysCalculated.length).toString(),
       icon: Utensils,
-      color: 'text-green-600',
-      bgColor: 'bg-green-50',
+      label: 'Meals Logged',
+      value: weeklyTotals.meals.toString(),
+      color: 'text-green-600'
     },
     {
-      label: 'Daily Average',
-      value: Math.round((weeklyTotals.calories + calculatedCaloriesTotal) / 7).toLocaleString(),
-      icon: Target,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
-    },
+      icon: TrendingUp,
+      label: 'Daily Avg',
+      value: Math.round((weeklyTotals.calories + calculatedCaloriesTotal) / 7).toString(),
+      color: 'text-blue-600'
+    }
   ];
 
-  const navigateWeek = (direction: 'prev' | 'next') => {
-    setCurrentWeek(prev => 
-      direction === 'prev' ? subWeeks(prev, 1) : addWeeks(prev, 1)
-    );
-  };
-
+  // Get meals by type for a specific day
   const getMealsByType = (date: Date) => {
     const dayMeals = (loggedMeals as LoggedMeal[]).filter(
       meal => meal.date === format(date, 'yyyy-MM-dd')
@@ -182,12 +178,38 @@ export default function WeeklyLogger({ onNavigate }: WeeklyLoggerProps) {
     };
   };
 
+  const getMealIcon = (mealType: string) => {
+    switch (mealType) {
+      case 'breakfast': return Sunrise;
+      case 'lunch': return Sun;
+      case 'dinner': return Moon;
+      case 'snack': return Coffee;
+      default: return Utensils;
+    }
+  };
+
+  const getMealColor = (mealType: string) => {
+    switch (mealType) {
+      case 'breakfast': return 'bg-orange-50 border-orange-200 text-orange-700';
+      case 'lunch': return 'bg-yellow-50 border-yellow-200 text-yellow-700';
+      case 'dinner': return 'bg-indigo-50 border-indigo-200 text-indigo-700';
+      case 'snack': return 'bg-purple-50 border-purple-200 text-purple-700';
+      default: return 'bg-gray-50 border-gray-200 text-gray-700';
+    }
+  };
+
+  const getDateLabel = (date: Date) => {
+    if (isToday(date)) return 'Today';
+    if (isYesterday(date)) return 'Yesterday';
+    return format(date, 'MMM d');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#a8dadc]/10 to-[#fef7cd]/10">
       {/* Hero Section */}
       <HeroSection
         title="Weekly Logger"
-        subtitle="Track your calculated calories and meals"
+        subtitle="Advanced nutrition tracking and insights"
         component="logger"
         stats={heroStats}
         showProgress={false}
@@ -195,220 +217,357 @@ export default function WeeklyLogger({ onNavigate }: WeeklyLoggerProps) {
       />
 
       <div className="px-4 space-y-6">
-        {/* Calculator Connection Status - Data Management Card Style */}
-        <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-          <div className="flex items-center justify-between mb-3">
-            <div>
-              <h4 className="font-medium text-gray-900">Calculator Integration</h4>
-              <p className="text-sm text-gray-600">Track calories calculated and logged entries</p>
-            </div>
-            <Badge variant="outline" className="text-green-600 border-green-600">
-              <Target className="w-3 h-3 mr-1" />
-              Active Connection
-            </Badge>
-          </div>
-          
-          <div className="grid grid-cols-3 gap-2">
-            <div className="text-center p-2 bg-blue-50 rounded-lg">
-              <div className="w-4 h-4 mx-auto bg-blue-600 rounded mb-1"></div>
-              <p className="text-xs text-gray-600">Calculated</p>
-              <p className="font-bold text-gray-900 text-sm">{calculatedItemsCount}</p>
-            </div>
-            <div className="text-center p-2 bg-green-50 rounded-lg">
-              <Utensils className="w-4 h-4 mx-auto text-green-600 mb-1" />
-              <p className="text-xs text-gray-600">Logged</p>
-              <p className="font-bold text-gray-900 text-sm">{weeklyTotals.meals}</p>
-            </div>
-            <div className="text-center p-2 bg-orange-50 rounded-lg">
-              <Flame className="w-4 h-4 mx-auto text-orange-600 mb-1" />
-              <p className="text-xs text-gray-600">Calories</p>
-              <p className="font-bold text-gray-900 text-sm">{calculatedCaloriesTotal}</p>
-            </div>
-          </div>
-        </Card>
+        {/* Navigation Tabs */}
+        <Tabs defaultValue="overview" className="w-full">
+          <TabsList className="grid w-full grid-cols-3 bg-white/80 backdrop-blur-sm">
+            <TabsTrigger value="overview" className="flex items-center gap-2">
+              <BarChart3 size={16} />
+              Overview
+            </TabsTrigger>
+            <TabsTrigger value="timeline" className="flex items-center gap-2">
+              <Clock size={16} />
+              Timeline
+            </TabsTrigger>
+            <TabsTrigger value="insights" className="flex items-center gap-2">
+              <Award size={16} />
+              Insights
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Week Navigation - Data Management Card Style */}
-        <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-          <div className="flex items-center justify-between mb-3">
-            <div>
-              <h4 className="font-medium text-gray-900">Weekly Overview</h4>
-              <p className="text-sm text-gray-600">{format(weekStart, 'MMM d')} - {format(addDays(weekStart, 6), 'MMM d, yyyy')}</p>
-            </div>
-            <Badge variant="outline" className="text-blue-600 border-blue-600">
-              <Calendar className="w-3 h-3 mr-1" />
-              Week {Math.ceil((new Date().getTime() - weekStart.getTime()) / (7 * 24 * 60 * 60 * 1000)) + 1}
-            </Badge>
-          </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigateWeek('prev')}
-              className="border-blue-600 text-blue-600 hover:bg-blue-50"
-            >
-              <ChevronLeft size={16} className="mr-1" />
-              Previous Week
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigateWeek('next')}
-              className="border-blue-600 text-blue-600 hover:bg-blue-50"
-            >
-              Next Week
-              <ChevronRight size={16} className="ml-1" />
-            </Button>
-          </div>
-
-          {/* Week Overview Grid */}
-          <div className="grid grid-cols-7 gap-2">
-            {weekDays.map((day, index) => {
-              const dayTotals = getDayTotals(day);
-              const isToday = format(day, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
-              const isSelected = format(day, 'yyyy-MM-dd') === format(selectedDay, 'yyyy-MM-dd');
-              const progress = Math.min((dayTotals.calories / dailyCalorieGoal) * 100, 100);
-              
-              return (
-                <div
-                  key={index}
-                  className={`
-                    p-3 rounded-lg cursor-pointer transition-all duration-200 text-center
-                    ${isSelected ? 'bg-blue-100 ring-2 ring-blue-500' : 'bg-gray-50 hover:bg-gray-100'}
-                    ${isToday ? 'ring-2 ring-green-500' : ''}
-                  `}
-                  onClick={() => setSelectedDay(day)}
-                >
-                  <div className="text-xs font-medium text-gray-600 mb-1">
-                    {format(day, 'EEE')}
-                  </div>
-                  <div className="text-sm font-bold text-gray-900 mb-2">
-                    {format(day, 'd')}
-                  </div>
-                  
-                  {/* Progress bar */}
-                  <div className="w-full bg-gray-200 rounded-full h-2 mb-1">
-                    <div
-                      className="bg-green-500 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${progress}%` }}
-                    />
-                  </div>
-                  
-                  <div className="text-xs text-gray-600">
-                    {dayTotals.calories > 0 ? `${dayTotals.calories}` : '-'}
-                  </div>
-                  
-                  {dayTotals.meals > 0 && (
-                    <Badge variant="secondary" className="text-xs mt-1">
-                      {dayTotals.meals} meals
-                    </Badge>
-                  )}
+          {/* Overview Tab */}
+          <TabsContent value="overview" className="space-y-6 mt-6">
+            {/* Week Progress Card */}
+            <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900">Week Progress</h3>
+                  <p className="text-sm text-gray-600">{format(weekStart, 'MMM d')} - {format(addDays(weekStart, 6), 'MMM d, yyyy')}</p>
                 </div>
-              );
-            })}
-          </div>
-        </Card>
-
-        {/* Selected Day Details - Data Management Card Style */}
-        <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-gray-900">
-              {format(selectedDay, 'EEEE, MMMM d')}
-            </h3>
-            <Button
-              variant="default"
-              size="sm"
-              onClick={() => onNavigate('calculator')}
-              className="flex items-center gap-2"
-            >
-              <Plus size={16} />
-              Add Meal
-            </Button>
-          </div>
-
-          {/* Daily Summary */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            {[
-              { label: 'Calories', value: getDayTotals(selectedDay).calories, color: 'text-orange-600' },
-              { label: 'Protein', value: `${getDayTotals(selectedDay).protein}g`, color: 'text-red-600' },
-              { label: 'Carbs', value: `${getDayTotals(selectedDay).carbs}g`, color: 'text-blue-600' },
-              { label: 'Fat', value: `${getDayTotals(selectedDay).fat}g`, color: 'text-yellow-600' },
-            ].map((stat, index) => (
-              <div key={index} className="text-center p-3 bg-gray-50 rounded-lg">
-                <div className={`text-2xl font-bold ${stat.color}`}>
-                  {stat.value}
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigateWeek('prev')}
+                    className="h-8 w-8 p-0"
+                  >
+                    <ChevronLeft size={14} />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigateWeek('next')}
+                    className="h-8 w-8 p-0"
+                  >
+                    <ChevronRight size={14} />
+                  </Button>
                 </div>
-                <div className="text-sm text-gray-600">{stat.label}</div>
               </div>
-            ))}
-          </div>
 
-          {/* Meals by Type */}
-          {['breakfast', 'lunch', 'dinner', 'snack'].map((mealType) => {
-            const meals = getMealsByType(selectedDay)[mealType as keyof ReturnType<typeof getMealsByType>];
-            
-            return (
-              <div key={mealType} className="mb-6">
-                <h4 className="font-semibold text-gray-900 mb-3 capitalize flex items-center gap-2">
-                  <Clock size={16} />
-                  {mealType}
-                  {meals.length > 0 && (
-                    <Badge variant="secondary">{meals.length}</Badge>
-                  )}
-                </h4>
-                
-                {meals.length === 0 ? (
-                  <div className="text-gray-500 text-sm italic p-4 bg-gray-50 rounded-lg text-center">
-                    No {mealType} logged yet
+              {/* Weekly Stats */}
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="p-4 bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-orange-200 rounded-lg">
+                      <Flame className="w-5 h-5 text-orange-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-orange-700">Total Calories</p>
+                      <p className="text-xl font-bold text-orange-800">{(weeklyTotals.calories + calculatedCaloriesTotal).toLocaleString()}</p>
+                    </div>
                   </div>
-                ) : (
-                  <div className="space-y-2">
-                    {meals.map((meal, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-                      >
-                        <div className="flex-1">
-                          <div className="font-medium text-gray-900">{meal.name}</div>
-                          <div className="text-sm text-gray-600">{meal.time}</div>
-                        </div>
-                        <div className="text-right">
-                          <div className="font-bold text-orange-600">{meal.calories} cal</div>
-                          <div className="text-xs text-gray-600">
-                            P: {meal.protein}g | C: {meal.carbs}g | F: {meal.fat}g
+                  <Progress 
+                    value={Math.min((weeklyTotals.calories + calculatedCaloriesTotal) / (dailyCalorieGoal * 7) * 100, 100)} 
+                    className="mt-3 h-2"
+                  />
+                </div>
+                
+                <div className="p-4 bg-gradient-to-r from-green-50 to-green-100 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-green-200 rounded-lg">
+                      <Activity className="w-5 h-5 text-green-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-green-700">Avg Daily</p>
+                      <p className="text-xl font-bold text-green-800">{Math.round((weeklyTotals.calories + calculatedCaloriesTotal) / 7)}</p>
+                    </div>
+                  </div>
+                  <Progress 
+                    value={Math.min(Math.round((weeklyTotals.calories + calculatedCaloriesTotal) / 7) / dailyCalorieGoal * 100, 100)} 
+                    className="mt-3 h-2"
+                  />
+                </div>
+              </div>
+
+              {/* Daily Cards */}
+              <div className="grid grid-cols-1 gap-3">
+                {weekDays.map((day, index) => {
+                  const dayTotals = getDayTotals(day);
+                  const progress = Math.min((dayTotals.calories / dailyCalorieGoal) * 100, 100);
+                  const dayLabel = getDateLabel(day);
+                  
+                  return (
+                    <div
+                      key={index}
+                      className={`
+                        p-4 rounded-lg border transition-all duration-200 cursor-pointer
+                        ${format(day, 'yyyy-MM-dd') === format(selectedDay, 'yyyy-MM-dd') 
+                          ? 'bg-blue-50 border-blue-200 ring-2 ring-blue-300' 
+                          : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+                        }
+                        ${isToday(day) ? 'ring-2 ring-green-300' : ''}
+                      `}
+                      onClick={() => setSelectedDay(day)}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="text-center">
+                            <div className="text-xs font-medium text-gray-600">{format(day, 'EEE')}</div>
+                            <div className="text-lg font-bold text-gray-900">{format(day, 'd')}</div>
+                            {dayLabel !== format(day, 'MMM d') && (
+                              <Badge variant="secondary" className="text-xs mt-1">{dayLabel}</Badge>
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-sm font-medium text-gray-700">
+                                {dayTotals.calories} / {dailyCalorieGoal} cal
+                              </span>
+                              <span className="text-xs text-gray-500">{Math.round(progress)}%</span>
+                            </div>
+                            <Progress value={progress} className="h-2" />
+                            {dayTotals.meals > 0 && (
+                              <p className="text-xs text-gray-600 mt-1">{dayTotals.meals} meals logged</p>
+                            )}
                           </div>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                )}
+                    </div>
+                  );
+                })}
               </div>
-            );
-          })}
-        </Card>
+            </Card>
+          </TabsContent>
 
-        {/* Quick Actions */}
-        <Card className="p-4 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-          <h4 className="font-semibold text-gray-900 mb-3">Quick Actions</h4>
-          <div className="grid grid-cols-2 gap-3">
-            <Button
-              variant="outline"
-              onClick={() => onNavigate('calculator')}
-              className="flex items-center gap-2"
-            >
-              <Plus size={16} />
-              Calculate Meal
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => onNavigate('dashboard')}
-              className="flex items-center gap-2"
-            >
-              <TrendingUp size={16} />
-              View Progress
-            </Button>
-          </div>
-        </Card>
+          {/* Timeline Tab */}
+          <TabsContent value="timeline" className="space-y-6 mt-6">
+            {/* Daily Meal Timeline */}
+            <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900">
+                    {getDateLabel(selectedDay)} - {format(selectedDay, 'EEEE, MMM d')}
+                  </h3>
+                  <p className="text-sm text-gray-600">Daily meal timeline and nutrition breakdown</p>
+                </div>
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={() => onNavigate('calculator')}
+                  className="flex items-center gap-2"
+                >
+                  <Plus size={16} />
+                  Add Meal
+                </Button>
+              </div>
+
+              {/* Meal Timeline */}
+              <div className="space-y-4">
+                {['breakfast', 'lunch', 'dinner', 'snack'].map((mealType) => {
+                  const meals = getMealsByType(selectedDay)[mealType as keyof ReturnType<typeof getMealsByType>];
+                  const MealIcon = getMealIcon(mealType);
+                  const mealColorClass = getMealColor(mealType);
+                  const mealTotal = meals.reduce((sum, meal) => sum + meal.calories, 0);
+
+                  return (
+                    <div key={mealType} className={`p-4 rounded-lg border-2 ${mealColorClass}`}>
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-white rounded-lg shadow-sm">
+                            <MealIcon className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <h4 className="font-semibold capitalize">{mealType}</h4>
+                            <p className="text-sm opacity-75">{meals.length} {meals.length === 1 ? 'item' : 'items'}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-lg">{mealTotal} cal</p>
+                          <p className="text-sm opacity-75">
+                            {Math.round((mealTotal / dailyCalorieGoal) * 100)}% of daily goal
+                          </p>
+                        </div>
+                      </div>
+
+                      {meals.length === 0 ? (
+                        <div className="text-center py-4 opacity-60">
+                          <p className="text-sm">No {mealType} logged yet</p>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onNavigate('calculator')}
+                            className="mt-2 text-xs"
+                          >
+                            <Plus size={12} className="mr-1" />
+                            Add {mealType}
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          {meals.map((meal) => (
+                            <div
+                              key={meal.id}
+                              className="flex items-center justify-between p-3 bg-white/70 rounded-lg"
+                            >
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <h5 className="font-medium text-gray-900">{meal.name}</h5>
+                                  <Badge variant="outline" className="text-xs">
+                                    <Clock className="w-3 h-3 mr-1" />
+                                    {meal.time}
+                                  </Badge>
+                                </div>
+                                <div className="text-xs text-gray-600">
+                                  P: {meal.protein}g • C: {meal.carbs}g • F: {meal.fat}g
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <div className="font-bold text-orange-600">{meal.calories} cal</div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </Card>
+          </TabsContent>
+
+          {/* Insights Tab */}
+          <TabsContent value="insights" className="space-y-6 mt-6">
+            {/* Calculator Integration Status */}
+            <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900">Calculator Integration</h3>
+                  <p className="text-sm text-gray-600">Real-time connection to calorie calculator</p>
+                </div>
+                <Badge variant="outline" className="text-green-600 border-green-600">
+                  <Activity className="w-3 h-3 mr-1" />
+                  Active
+                </Badge>
+              </div>
+              
+              <div className="grid grid-cols-3 gap-4">
+                <div className="text-center p-4 bg-blue-50 rounded-lg">
+                  <div className="w-8 h-8 bg-blue-600 rounded-full mx-auto mb-2 flex items-center justify-center">
+                    <Zap className="w-4 h-4 text-white" />
+                  </div>
+                  <p className="text-xl font-bold text-blue-600">{calculatedItemsCount}</p>
+                  <p className="text-xs text-gray-600">Items Calculated</p>
+                </div>
+                <div className="text-center p-4 bg-green-50 rounded-lg">
+                  <div className="w-8 h-8 bg-green-600 rounded-full mx-auto mb-2 flex items-center justify-center">
+                    <Utensils className="w-4 h-4 text-white" />
+                  </div>
+                  <p className="text-xl font-bold text-green-600">{weeklyTotals.meals}</p>
+                  <p className="text-xs text-gray-600">Meals Logged</p>
+                </div>
+                <div className="text-center p-4 bg-orange-50 rounded-lg">
+                  <div className="w-8 h-8 bg-orange-600 rounded-full mx-auto mb-2 flex items-center justify-center">
+                    <Flame className="w-4 h-4 text-white" />
+                  </div>
+                  <p className="text-xl font-bold text-orange-600">{calculatedCaloriesTotal}</p>
+                  <p className="text-xs text-gray-600">Total Calories</p>
+                </div>
+              </div>
+            </Card>
+
+            {/* Weekly Insights */}
+            <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900">Weekly Insights</h3>
+                  <p className="text-sm text-gray-600">Smart analysis of your nutrition patterns</p>
+                </div>
+                <Badge variant="outline" className="text-purple-600 border-purple-600">
+                  <Award className="w-3 h-3 mr-1" />
+                  AI Powered
+                </Badge>
+              </div>
+
+              <div className="space-y-4">
+                <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+                  <div className="flex items-center gap-3 mb-2">
+                    <TrendingUp className="w-5 h-5 text-blue-600" />
+                    <span className="font-semibold text-blue-900">Progress Trend</span>
+                  </div>
+                  <p className="text-sm text-blue-800">
+                    You're averaging {Math.round((weeklyTotals.calories + calculatedCaloriesTotal) / 7)} calories per day this week. 
+                    {Math.round((weeklyTotals.calories + calculatedCaloriesTotal) / 7) < dailyCalorieGoal 
+                      ? ' Consider adding more nutritious meals to reach your daily goal.' 
+                      : ' Great job staying consistent with your nutrition goals!'}
+                  </p>
+                </div>
+
+                <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200">
+                  <div className="flex items-center gap-3 mb-2">
+                    <Target className="w-5 h-5 text-green-600" />
+                    <span className="font-semibold text-green-900">Goal Achievement</span>
+                  </div>
+                  <p className="text-sm text-green-800">
+                    You've logged {weeklyTotals.meals + calculatedItemsCount} meals this week across {weekDays.filter(day => getDayTotals(day).meals > 0).length} days. 
+                    Keep up the consistent tracking!
+                  </p>
+                </div>
+
+                <div className="p-4 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-lg border border-amber-200">
+                  <div className="flex items-center gap-3 mb-2">
+                    <Eye className="w-5 h-5 text-amber-600" />
+                    <span className="font-semibold text-amber-900">Recommendation</span>
+                  </div>
+                  <p className="text-sm text-amber-800">
+                    Use the calorie calculator to plan tomorrow's meals and maintain your nutrition momentum.
+                  </p>
+                </div>
+              </div>
+            </Card>
+
+            {/* Quick Actions */}
+            <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+              <h4 className="font-semibold text-gray-900 mb-4">Quick Actions</h4>
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => onNavigate('calculator')}
+                  className="flex items-center gap-2 p-4 h-auto"
+                >
+                  <div className="p-2 bg-blue-100 rounded-lg">
+                    <Plus className="w-4 h-4 text-blue-600" />
+                  </div>
+                  <div className="text-left">
+                    <p className="font-medium">Calculate Meal</p>
+                    <p className="text-xs text-gray-600">Add new nutrition</p>
+                  </div>
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => onNavigate('dashboard')}
+                  className="flex items-center gap-2 p-4 h-auto"
+                >
+                  <div className="p-2 bg-green-100 rounded-lg">
+                    <BarChart3 className="w-4 h-4 text-green-600" />
+                  </div>
+                  <div className="text-left">
+                    <p className="font-medium">View Progress</p>
+                    <p className="text-xs text-gray-600">See dashboard</p>
+                  </div>
+                </Button>
+              </div>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
