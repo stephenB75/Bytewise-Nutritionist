@@ -58,8 +58,8 @@ const navItems: NavItem[] = [
 export function Navigation({ activeTab, onTabChange }: NavigationProps) {
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-sm border-t border-border safe-area-inset-bottom">
-      <div className="w-full max-w-lg mx-auto px-4 py-4">
-        <div className="grid grid-cols-4 gap-1">
+      <div className="w-full max-w-lg mx-auto responsive-padding">
+        <div className="responsive-grid grid-cols-4 fluid-gap-sm">
           {navItems.map((item) => {
             const isActive = activeTab === item.id;
             const IconComponent = isActive && item.activeIcon ? item.activeIcon : item.icon;
@@ -70,7 +70,7 @@ export function Navigation({ activeTab, onTabChange }: NavigationProps) {
                 variant={isActive ? "default" : "ghost"}
                 size="sm"
                 className={`
-                  navigation-button flex flex-col items-center justify-center h-16 touch-target relative
+                  navigation-button flex flex-col items-center justify-center fluid-p-sm touch-target relative
                   ${isActive 
                     ? 'bg-primary text-primary-foreground shadow-sm active' 
                     : 'text-muted-foreground hover:text-foreground'
@@ -83,11 +83,10 @@ export function Navigation({ activeTab, onTabChange }: NavigationProps) {
                   className={`mb-1 ${isActive ? 'text-primary-foreground' : ''}`} 
                 />
                 <span 
-                  className={`text-xs leading-none ${isActive ? 'text-primary-foreground' : ''}`}
+                  className={`fluid-text-sm leading-none ${isActive ? 'text-primary-foreground' : ''}`}
                   style={{ 
                     fontFamily: "'Work Sans', sans-serif", 
-                    fontWeight: isActive ? 600 : 500,
-                    fontSize: "0.6875rem"
+                    fontWeight: isActive ? 600 : 500
                   }}
                 >
                   {item.label}
