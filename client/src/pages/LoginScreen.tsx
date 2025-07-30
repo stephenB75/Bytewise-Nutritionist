@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { LogIn } from 'lucide-react';
 import { LogoBrand } from '@/components/LogoBrand';
+import dishImage from '@assets/food-3262796_1920_1753859530086.jpg';
 
 interface LoginScreenProps {
   onNavigate: (page: string) => void;
@@ -26,15 +27,15 @@ function LoginScreen({ onNavigate }: LoginScreenProps) {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Food Background Image - Updated to use different image */}
+      {/* Food Background Image - Beautiful dish background */}
       <div 
         className="absolute inset-0 z-0"
         style={{
-          backgroundImage: `url(/attached_assets/variety-5044809_1920_1753859530087.jpg)`,
+          backgroundImage: `url(${dishImage})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
-          filter: 'blur(3px) brightness(0.7)'
+          filter: 'blur(2px) brightness(0.6)'
         }}
       />
       
