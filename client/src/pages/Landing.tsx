@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Target, Calendar, ChefHat, TrendingUp, Smartphone, Shield, Zap, ArrowRight, Star, Users } from 'lucide-react';
 import { LogoBrand } from '@/components/LogoBrand';
+import varietyFoodImage from '@assets/variety-5044809_1920.jpg';
 
 interface LandingProps {
   onNavigateToForgotPassword?: () => void;
@@ -55,10 +56,19 @@ export default function Landing({ onNavigateToForgotPassword }: LandingProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
+    <div className="min-h-screen relative">
+      {/* Food Background Image */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ 
+          backgroundImage: `url(${varietyFoodImage})`,
+        }}
+      >
+        <div className="absolute inset-0 bg-black/60"></div>
+      </div>
+      
       {/* Hero Section */}
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+      <div className="relative z-10 overflow-hidden">
         <div className="relative z-10 px-4 py-16 text-center">
           {/* Brand Logo */}
           <div className="mb-8 flex justify-center animate-fade-in">
@@ -66,17 +76,17 @@ export default function Landing({ onNavigateToForgotPassword }: LandingProps) {
           </div>
           
           {/* Welcome Message */}
-          <h1 className="text-3xl font-bold tracking-tight text-foreground mb-2" style={{ fontFamily: "'League Spartan', sans-serif", fontSize: "2rem", fontWeight: 700 }}>
+          <h1 className="text-3xl font-bold tracking-tight text-white mb-2" style={{ fontFamily: "'League Spartan', sans-serif", fontSize: "2rem", fontWeight: 700 }}>
             Welcome to ByteWise
           </h1>
           
           {/* Tagline */}
-          <p className="text-xl text-muted-foreground mb-6 max-w-md mx-auto" style={{ fontFamily: "'Quicksand', sans-serif", fontSize: "1.125rem", fontWeight: 400 }}>
+          <p className="text-xl text-white/90 mb-6 max-w-md mx-auto" style={{ fontFamily: "'Quicksand', sans-serif", fontSize: "1.125rem", fontWeight: 400 }}>
             Your personal nutrition companion for smarter eating habits
           </p>
           
           {/* Social Proof */}
-          <div className="flex items-center justify-center space-x-4 mb-6 text-sm text-muted-foreground">
+          <div className="flex items-center justify-center space-x-4 mb-6 text-sm text-white/80">
             <div className="flex items-center space-x-1">
               <Users className="h-4 w-4" />
               <span>Join thousands of users</span>
@@ -88,7 +98,7 @@ export default function Landing({ onNavigateToForgotPassword }: LandingProps) {
           </div>
           
           {/* Beta Badge */}
-          <Badge variant="outline" className="mb-8 bg-primary/10 border-primary/20">
+          <Badge variant="outline" className="mb-8 bg-white/20 border-white/30 text-white">
             🚀 Now Available
           </Badge>
 
@@ -114,7 +124,7 @@ export default function Landing({ onNavigateToForgotPassword }: LandingProps) {
             </Button>
             
             <div className="flex flex-col space-y-3 mt-4">
-              <p className="text-sm text-muted-foreground" style={{ fontFamily: "'Quicksand', sans-serif", fontSize: "0.875rem", fontWeight: 400 }}>
+              <p className="text-sm text-white/80" style={{ fontFamily: "'Quicksand', sans-serif", fontSize: "0.875rem", fontWeight: 400 }}>
                 Free to use • No credit card required • Secure authentication
               </p>
               
@@ -122,16 +132,16 @@ export default function Landing({ onNavigateToForgotPassword }: LandingProps) {
                 {onNavigateToForgotPassword && (
                   <button
                     onClick={onNavigateToForgotPassword}
-                    className="text-sm text-primary hover:text-primary/80 transition-colors underline"
+                    className="text-sm text-white hover:text-white/80 transition-colors underline"
                     style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "0.875rem", fontWeight: 500 }}
                   >
                     Need help signing in?
                   </button>
                 )}
-                <span className="text-sm text-muted-foreground">•</span>
+                <span className="text-sm text-white/60">•</span>
                 <button
                   onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="text-sm text-primary hover:text-primary/80 transition-colors underline"
+                  className="text-sm text-white hover:text-white/80 transition-colors underline"
                   style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "0.875rem", fontWeight: 500 }}
                 >
                   Learn more
