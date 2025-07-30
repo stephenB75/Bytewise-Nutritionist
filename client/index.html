@@ -2,24 +2,23 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <!-- Enhanced Responsive Viewport: Fully adaptive for all screen sizes -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover, shrink-to-fit=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
   
   <!-- PWA Meta Tags -->
-  <meta name="theme-color" content="#a8dadc" />
+  <meta name="theme-color" content="#7DD3FC" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Bytewise" />
   <meta name="mobile-web-app-capable" content="yes" />
   
   <!-- SEO Meta Tags -->
-  <title>Bytewise Nutritionist - Mobile Nutrition Tracking App</title>
-  <meta name="description" content="Mobile-first nutrition tracking app. Log meals, calculate calories, track weekly progress, and achieve your health goals with Bytewise Nutritionist." />
-  <meta name="keywords" content="mobile nutrition tracker, meal planner, calorie counter, mobile diet app, health goals, nutrition calculator" />
+  <title>Bytewise Nutritionist - Track Nutrition, Plan Meals & Achieve Health Goals</title>
+  <meta name="description" content="Mobile nutrition tracking app. Log meals, create recipes, plan your diet, and achieve your health goals with Bytewise Nutritionist. Free nutrition calculator and meal planner." />
+  <meta name="keywords" content="nutrition tracker, meal planner, calorie counter, recipe builder, diet app, health goals, mobile nutrition" />
   
   <!-- Open Graph Tags -->
   <meta property="og:title" content="Bytewise Nutritionist - Mobile Nutrition Tracking" />
-  <meta property="og:description" content="Track nutrition, plan meals, and achieve your health goals with our mobile-first nutrition app." />
+  <meta property="og:description" content="Track nutrition, plan meals, and achieve your health goals with our comprehensive mobile nutrition app." />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="/icon-512.png" />
   
@@ -32,18 +31,20 @@
   <link rel="manifest" href="/manifest.json" />
   
   <!-- Icons -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iI2E4ZGFkYyIvPgo8cGF0aCBkPSJNOCAxNkM4IDExLjU4MTcgMTEuNTgxNyA4IDE2IDhDMjAuNDE4MyA4IDI0IDExLjU4MTcgMjQgMTZDMjQgMjAuNDE4MyAyMC40MTgzIDI0IDE2IDI0QzExLjU4MTcgMjQgOCAyMC40MTgzIDggMTZaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMTIgMTZDMTIgMTMuNzkwOSAxMy43OTA5IDEyIDE2IDEyQzE4LjIwOTEgMTIgMjAgMTMuNzkwOSAyMCAxNkMyMCAxOC4yMDkxIDE4LjIwOTEgMjAgMTYgMjBDMTMuNzkwOSAyMCAxMiAxOC4yMDkxIDEyIDE2WiIgZmlsbD0iI2E4ZGFkYyIvPgo8L3N2Zz4=" />
-  <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDE4MCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxODAiIGhlaWdodD0iMTgwIiByeD0iNDAiIGZpbGw9IiNhOGRhZGMiLz4KPHBhdGggZD0iTTQ1IDkwQzQ1IDY1LjE0NzIgNjUuMTQ3MiA0NSA5MCA0NUMxMTQuODUzIDQ1IDEzNSA2NS4xNDcyIDEzNSA5MEMxMzUgMTE0Ljg1MyAxMTQuODUzIDEzNSA5MCAxMzVDNjUuMTQ3MiAxMzUgNDUgMTE0Ljg1MyA0NSA5MFoiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik02NyA5MEM2NyA3Ny4yOTc5IDc3LjI5NzkgNjcgOTAgNjdDMTAyLjcwMiA2NyAxMTMgNzcuMjk3OSAxMTMgOTBDMTEzIDEwMi43MDIgMTAyLjcwMiAxMTMgOTAgMTEzQzc3LjI5NzkgMTEzIDY3IDEwMi43MDIgNjcgOTBaIiBmaWxsPSIjYThkYWRjIi8+Cjwvc3ZnPg==" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzdERDNGQyIvPgo8cGF0aCBkPSJNOCAxNkM4IDExLjU4MTcgMTEuNTgxNyA4IDE2IDhDMjAuNDE4MyA4IDI0IDExLjU4MTcgMjQgMTZDMjQgMjAuNDE4MyAyMC40MTgzIDI0IDE2IDI0QzExLjU4MTcgMjQgOCAyMC40MTgzIDggMTZaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMTIgMTZDMTIgMTMuNzkwOSAxMy43OTA5IDEyIDE2IDEyQzE4LjIwOTEgMTIgMjAgMTMuNzkwOSAyMCAxNkMyMCAxOC4yMDkxIDE4LjIwOTEgMjAgMTYgMjBDMTMuNzkwOSAyMCAxMiAxOC4yMDkxIDEyIDE2WiIgZmlsbD0iIzdERDNGQyIvPgo8L3N2Zz4=" />
+  <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDE4MCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxODAiIGhlaWdodD0iMTgwIiByeD0iNDAiIGZpbGw9IiM3REQzRkMiLz4KPHBhdGggZD0iTTQ1IDkwQzQ1IDY1LjE0NzIgNjUuMTQ3MiA0NSA5MCA0NUMxMTQuODUzIDQ1IDEzNSA2NS4xNDcyIDEzNSA5MEMxMzUgMTE0Ljg1MyAxMTQuODUzIDEzNSA5MCAxMzVDNjUuMTQ3MiAxMzUgNDUgMTE0Ljg1MyA0NSA5MFoiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik02NyA5MEM2NyA3Ny4yOTc5IDc3LjI5NzkgNjcgOTAgNjdDMTAyLjcwMiA2NyAxMTMgNzcuMjk3OSAxMTMgOTBDMTEzIDEwMi43MDIgMTAyLjcwMiAxMTMgOTAgMTEzQzc3LjI5NzkgMTEzIDY3IDEwMi43MDIgNjcgOTBaIiBmaWxsPSIjN0REM0ZDIi8+Cjwvc3ZnPg==" />
   
   <!-- Preload critical fonts -->
-  <link rel="preload" href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@300;400;500;600;700&family=Quicksand:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+  
+  <!-- Viewport for PWA -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   
   <!-- Content Security Policy for development -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://fonts.googleapis.com https://replit.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' ws: wss:;">
   
-  <!-- Enhanced mobile responsiveness and zoom prevention -->
+  <!-- Prevent zoom on form inputs -->
   <style>
-    /* Prevent zoom on form inputs - critical for mobile UX */
     input[type="color"],
     input[type="date"],
     input[type="datetime"],
@@ -61,45 +62,6 @@
     select:focus,
     textarea {
       font-size: 16px !important;
-    }
-    
-    /* Enhanced responsive body layout */
-    body {
-      -webkit-text-size-adjust: 100%;
-      -ms-text-size-adjust: 100%;
-      text-size-adjust: 100%;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-    }
-    
-    /* Dynamic responsive root font sizing with fluid scaling */
-    html {
-      font-size: clamp(14px, 4vw, 18px);
-    }
-    
-    @media screen and (max-width: 320px) {
-      html { font-size: 14px; }
-      .container { max-width: 100vw; padding: 0.5rem; }
-    }
-    
-    @media screen and (min-width: 321px) and (max-width: 375px) {
-      html { font-size: 15px; }
-      .container { max-width: 100vw; padding: 0.75rem; }
-    }
-    
-    @media screen and (min-width: 376px) and (max-width: 414px) {
-      html { font-size: 16px; }
-      .container { max-width: 100vw; padding: 1rem; }
-    }
-    
-    @media screen and (min-width: 415px) and (max-width: 768px) {
-      html { font-size: 17px; }
-      .container { max-width: 100vw; padding: 1.25rem; }
-    }
-    
-    @media screen and (min-width: 769px) {
-      html { font-size: 18px; }
-      .container { max-width: 430px; padding: 1.5rem; margin: 0 auto; }
     }
   </style>
 </head>

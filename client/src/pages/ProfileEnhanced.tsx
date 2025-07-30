@@ -151,22 +151,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
   const renderPersonalInfo = () => (
     <div className="space-y-6">
       <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-        {/* Header Section - Data Management Style */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center border-2 border-blue-200">
-              <User className="w-5 h-5 text-blue-600" />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-gray-900">Personal Information</h3>
-              <p className="text-sm text-gray-600">Manage your profile and personal details</p>
-            </div>
-          </div>
-          <Badge variant="outline" className="text-blue-600 border-blue-600">
-            <User className="w-3 h-3 mr-1" />
-            Profile
-          </Badge>
-        </div>
+        <h3 className="text-lg font-bold text-gray-900 mb-4">Profile Information</h3>
         
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -219,7 +204,6 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
                     });
                     setShowCelebration(true);
                   }}
-                  className="border-blue-600 text-blue-600 hover:bg-blue-50"
                 >
                   <Mail className="w-3 h-3 mr-1" />
                   Confirm Email
@@ -273,16 +257,9 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
           </div>
         </div>
 
-        {/* Bottom Edit Buttons - Data Management Style */}
-        <Separator className="my-6" />
-        <div className="grid grid-cols-1 gap-3">
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-            <User className="w-4 h-4 mr-2" />
+        <div className="mt-6 flex justify-end">
+          <Button className="bg-white/80 backdrop-blur-sm border-0 shadow-lg bg-blue-600 hover:bg-blue-700 text-white">
             Save Changes
-          </Button>
-          <Button variant="outline" className="border-gray-300 text-gray-600 hover:bg-gray-50">
-            <RefreshCw className="w-4 h-4 mr-2" />
-            Reset to Defaults
           </Button>
         </div>
       </Card>
@@ -440,35 +417,27 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
   const renderPrivacySettings = () => (
     <div className="space-y-6">
       <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-        {/* Header Section - Data Management Style */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center border-2 border-green-200">
-              <Shield className="w-5 h-5 text-green-600" />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-gray-900">Privacy & Security</h3>
-              <p className="text-sm text-gray-600">Manage your data protection and account security</p>
-            </div>
-          </div>
-          <Badge variant="outline" className="text-green-600 border-green-600">
-            <Shield className="w-3 h-3 mr-1" />
-            Secure
-          </Badge>
-        </div>
+        <h3 className="text-lg font-bold text-gray-900 mb-4">Privacy & Security</h3>
         
         <div className="space-y-6">
           {/* Privacy Controls Section */}
           <div>
-            <h4 className="font-medium text-gray-900 mb-3">Privacy Controls</h4>
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <h4 className="font-medium text-gray-900">Privacy Controls</h4>
+                <p className="text-sm text-gray-600">Manage your data visibility and sharing preferences</p>
+              </div>
+              <Badge variant="outline" className="text-blue-600 border-blue-600">
+                <Eye className="w-3 h-3 mr-1" />
+                Private
+              </Badge>
+            </div>
+            
             <div className="grid grid-cols-1 gap-3">
-              <div className="flex items-center justify-between p-4 rounded-lg bg-[#fef7cd]/30 hover:bg-[#fef7cd]/50 transition-colors border border-[#a8dadc]/20">
-                <div className="flex items-center gap-3">
-                  <Eye className="w-5 h-5 text-[#a8dadc]" />
-                  <div>
-                    <span className="text-sm font-medium text-gray-900">Profile visibility to others</span>
-                    <p className="text-xs text-gray-600">Control who can see your profile information</p>
-                  </div>
+              <div className="flex items-center justify-between p-3 rounded-lg bg-purple-50 hover:bg-purple-100 transition-colors">
+                <div className="flex items-center gap-2">
+                  <Eye className="w-4 h-4 text-purple-600" />
+                  <span className="text-sm">Profile visibility to others</span>
                 </div>
                 <Switch 
                   defaultChecked={false}
@@ -478,13 +447,10 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
                 />
               </div>
               
-              <div className="flex items-center justify-between p-4 rounded-lg bg-[#a8dadc]/30 hover:bg-[#a8dadc]/50 transition-colors border border-[#fef7cd]/20">
-                <div className="flex items-center gap-3">
-                  <Users className="w-5 h-5 text-[#fef7cd]" />
-                  <div>
-                    <span className="text-sm font-medium text-gray-900">Share analytics for improvement</span>
-                    <p className="text-xs text-gray-600">Help us improve your experience with anonymized data</p>
-                  </div>
+              <div className="flex items-center justify-between p-3 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors">
+                <div className="flex items-center gap-2">
+                  <Users className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm">Share analytics for improvement</span>
                 </div>
                 <Switch 
                   defaultChecked={true}
@@ -500,26 +466,30 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
 
           {/* Security Section */}
           <div>
-            <h4 className="font-medium text-gray-900 mb-3">Account Security</h4>
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <h4 className="font-medium text-gray-900">Account Security</h4>
+                <p className="text-sm text-gray-600">Enhance your account protection</p>
+              </div>
+              <Badge variant="outline" className="text-green-600 border-green-600">
+                <Shield className="w-3 h-3 mr-1" />
+                Secure
+              </Badge>
+            </div>
+            
             <div className="grid grid-cols-1 gap-3">
               <Button 
                 variant="outline"
-                className="border-[#a8dadc] text-[#a8dadc] hover:bg-[#a8dadc]/10 justify-start h-auto p-4"
+                className="border-red-600 text-red-600 hover:bg-red-50"
               >
-                <Lock className="w-5 h-5 mr-3" />
-                <div className="text-left">
-                  <div className="font-medium">Change Password</div>
-                  <div className="text-xs text-gray-600">Update your account password</div>
-                </div>
+                <Lock className="w-4 h-4 mr-2" />
+                Change Password
               </Button>
               
-              <div className="flex items-center justify-between p-4 rounded-lg bg-green-50 hover:bg-green-100 transition-colors border border-green-200">
-                <div className="flex items-center gap-3">
-                  <Shield className="w-5 h-5 text-green-600" />
-                  <div>
-                    <span className="text-sm font-medium text-gray-900">Enable 2FA</span>
-                    <p className="text-xs text-gray-600">Add an extra layer of security to your account</p>
-                  </div>
+              <div className="flex items-center justify-between p-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 transition-colors">
+                <div className="flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-emerald-600" />
+                  <span className="text-sm">Enable 2FA</span>
                 </div>
                 <Switch 
                   defaultChecked={false}
@@ -692,35 +662,27 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
   const renderDisplaySettings = () => (
     <div className="space-y-6">
       <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-        {/* Header Section - Data Management Style */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center border-2 border-purple-200">
-              <Palette className="w-5 h-5 text-purple-600" />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-gray-900">Display Preferences</h3>
-              <p className="text-sm text-gray-600">Customize your app appearance and interface</p>
-            </div>
-          </div>
-          <Badge variant="outline" className="text-purple-600 border-purple-600">
-            <Palette className="w-3 h-3 mr-1" />
-            Light Mode
-          </Badge>
-        </div>
+        <h3 className="text-lg font-bold text-gray-900 mb-4">Display Preferences</h3>
         
         <div className="space-y-6">
           {/* Theme Settings */}
           <div>
-            <h4 className="font-medium text-gray-900 mb-3">Theme Settings</h4>
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <h4 className="font-medium text-gray-900">Theme Preferences</h4>
+                <p className="text-sm text-gray-600">Customize your app appearance</p>
+              </div>
+              <Badge variant="outline" className="text-blue-600 border-blue-600">
+                <Palette className="w-3 h-3 mr-1" />
+                Light Mode
+              </Badge>
+            </div>
+            
             <div className="grid grid-cols-1 gap-3">
-              <div className="flex items-center justify-between p-4 rounded-lg bg-[#fef7cd]/30 hover:bg-[#fef7cd]/50 transition-colors border border-[#a8dadc]/20">
-                <div className="flex items-center gap-3">
-                  <Smartphone className="w-5 h-5 text-blue-600" />
-                  <div>
-                    <span className="text-sm font-medium text-gray-900">Auto theme detection</span>
-                    <p className="text-xs text-gray-600">Follow system light/dark mode preferences</p>
-                  </div>
+              <div className="flex items-center justify-between p-3 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors">
+                <div className="flex items-center gap-2">
+                  <Smartphone className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm">Auto theme</span>
                 </div>
                 <Switch 
                   defaultChecked={true}

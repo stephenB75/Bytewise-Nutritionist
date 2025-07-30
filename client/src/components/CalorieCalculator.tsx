@@ -536,31 +536,6 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
         </Card>
       )}
 
-      {/* Quick Navigation to Weekly Logger */}
-      <Card className="p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center border-2 border-purple-200">
-              <Calendar className="w-5 h-5 text-purple-600" />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-gray-900">Weekly Logger Integration</h3>
-              <p className="text-sm text-gray-600">View all your logged meals and progress</p>
-            </div>
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-1 gap-3">
-          <Button
-            onClick={() => onNavigate && onNavigate('logger')}
-            className="w-full bg-gradient-to-r from-[#a8dadc] to-[#fef7cd] hover:from-[#a8dadc]/80 hover:to-[#fef7cd]/80 text-gray-900 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] border border-[#a8dadc]/30"
-          >
-            <Calendar className="w-5 h-5 mr-2" />
-            View Weekly Logger
-          </Button>
-        </div>
-      </Card>
-
       {/* Examples Card */}
       <Card className="p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg">
         <h3 className="text-lg font-bold text-gray-900 mb-4">Example Calculations</h3>
