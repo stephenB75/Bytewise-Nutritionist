@@ -5,23 +5,20 @@
  * Features seamless hero integration and real-time data
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
   Plus, 
-  TrendingUp, 
   Target, 
   Flame, 
-  Clock,
   Utensils,
   BarChart3,
   Award,
-  Apple,
   Beef,
-  Wheat,
-  Droplets
+  Droplets,
+  Calendar
 } from 'lucide-react';
 import { HeroSection } from '@/components/HeroSection';
 
@@ -29,9 +26,9 @@ interface DashboardProps {
   onNavigate: (page: string) => void;
 }
 
-export default function Dashboard({ onNavigate }: DashboardProps) {
+function Dashboard({ onNavigate }: DashboardProps) {
   // Sample data - in real app this would come from API
-  const [userStats, setUserStats] = useState({
+  const [userStats] = useState({
     name: "Alex",
     currentStreak: 7,
     caloriesConsumed: 1847,
@@ -42,7 +39,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
     waterGoal: 8
   });
 
-  const [todayMeals, setTodayMeals] = useState([
+  const [todayMeals] = useState([
     {
       name: "Greek Yogurt Bowl",
       time: "8:30 AM",
@@ -52,189 +49,155 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
     },
     {
       name: "Quinoa Salad",
-      time: "12:45 PM", 
+      time: "12:45 PM",
       calories: 485,
       type: "lunch",
       color: "from-green-100 to-green-200"
     },
     {
-      name: "Almonds",
-      time: "3:20 PM",
-      calories: 164,
-      type: "snack", 
-      color: "from-purple-100 to-purple-200"
+      name: "Grilled Chicken",
+      time: "7:20 PM",
+      calories: 520,
+      type: "dinner",
+      color: "from-blue-100 to-blue-200"
     }
   ]);
 
-  const calorieProgress = (userStats.caloriesConsumed / userStats.caloriesGoal) * 100;
-  const proteinProgress = (userStats.proteinConsumed / userStats.proteinGoal) * 100;
+  const [achievements] = useState([
+    { id: 1, title: "7 Day Streak", icon: Flame, color: "text-orange-500" },
+    { id: 2, title: "Goal Crusher", icon: Target, color: "text-green-500" },
+    { id: 3, title: "Meal Master", icon: Award, color: "text-purple-500" }
+  ]);
+
+  // Calculate progress percentages
+  const calorieProgress = Math.round((userStats.caloriesConsumed / userStats.caloriesGoal) * 100);
+  const proteinProgress = Math.round((userStats.proteinConsumed / userStats.proteinGoal) * 100);
+  const waterProgress = Math.round((userStats.waterConsumed / userStats.waterGoal) * 100);
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Hero Section */}
       <HeroSection
-        backgroundImage="https://images.unsplash.com/photo-1490645935967-10de6ba17061?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600&q=80"
-        backgroundAlt="Fresh healthy ingredients"
-        title={`Welcome, ${userStats.name}`}
-        subtitle="Today's progress"
-        description="Track every ingredient, master your nutrition"
-        containerClass="-mx-4"
-        statCard={{
-          icon: Flame,
-          value: userStats.currentStreak,
-          label: "day streak",
-          iconColor: "orange-400"
-        }}
-        progressRing={{
-          percentage: calorieProgress,
-          color: "#a8dadc",
-          label: "calories"
-        }}
+        title={`Good morning, ${userStats.name}!`}
+        subtitle="Keep up your amazing progress"
+        caloriesConsumed={userStats.caloriesConsumed}
+        caloriesGoal={userStats.caloriesGoal}
+        currentStreak={userStats.currentStreak}
       />
 
       {/* Main Content */}
-      <div className="px-4 space-y-6">
+      <div className="flex-1 px-4 py-6 space-y-6">
         {/* Quick Stats Grid */}
         <div className="grid grid-cols-2 gap-4">
-          <Card className="p-4">
+          <Card className="p-4 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
             <div className="flex items-center space-x-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Target className="text-blue-600" size={20} />
+              <div className="p-2 bg-green-100 rounded-lg">
+                <Beef className="w-5 h-5 text-green-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-brand-heading">
-                  {userStats.caloriesConsumed}
+                <p className="text-sm text-gray-600">Protein</p>
+                <p className="text-lg font-bold text-gray-900">
+                  {userStats.proteinConsumed}g / {userStats.proteinGoal}g
                 </p>
-                <p className="text-sm text-muted-foreground text-brand-body">
-                  of {userStats.caloriesGoal} cal
-                </p>
+                <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1">
+                  <div 
+                    className="bg-green-500 h-1.5 rounded-full" 
+                    style={{ width: `${Math.min(proteinProgress, 100)}%` }}
+                  ></div>
+                </div>
               </div>
             </div>
           </Card>
 
-          <Card className="p-4">
+          <Card className="p-4 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
             <div className="flex items-center space-x-3">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <Beef className="text-green-600" size={20} />
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Droplets className="w-5 h-5 text-blue-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-brand-heading">
-                  {userStats.proteinConsumed}g
+                <p className="text-sm text-gray-600">Water</p>
+                <p className="text-lg font-bold text-gray-900">
+                  {userStats.waterConsumed} / {userStats.waterGoal} cups
                 </p>
-                <p className="text-sm text-muted-foreground text-brand-body">
-                  of {userStats.proteinGoal}g protein
-                </p>
+                <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1">
+                  <div 
+                    className="bg-blue-500 h-1.5 rounded-full" 
+                    style={{ width: `${Math.min(waterProgress, 100)}%` }}
+                  ></div>
+                </div>
               </div>
             </div>
           </Card>
         </div>
 
         {/* Today's Meals */}
-        <Card className="p-4">
+        <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-brand-subheading">Today's Meals</h3>
+            <h3 className="text-lg font-bold text-gray-900">Today's Meals</h3>
             <Button 
-              size="sm" 
+              variant="ghost" 
+              size="sm"
               onClick={() => onNavigate('recipe-builder')}
-              className="text-brand-button"
+              className="text-blue-600 hover:text-blue-700"
             >
-              <Plus size={16} className="mr-1" />
+              <Plus className="w-4 h-4 mr-1" />
               Add Meal
             </Button>
           </div>
           
           <div className="space-y-3">
             {todayMeals.map((meal, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-gradient-to-r rounded-lg border">
+              <div key={index} className="flex items-center justify-between p-3 bg-gradient-to-r bg-gray-50 rounded-lg">
                 <div className="flex items-center space-x-3">
                   <div className="p-2 bg-white rounded-lg shadow-sm">
-                    <Utensils size={16} className="text-gray-600" />
+                    <Utensils className="w-4 h-4 text-gray-600" />
                   </div>
                   <div>
-                    <p className="font-medium text-brand-subheading">{meal.name}</p>
-                    <p className="text-sm text-muted-foreground text-brand-body">{meal.time}</p>
+                    <p className="font-medium text-gray-900">{meal.name}</p>
+                    <p className="text-sm text-gray-600">{meal.time}</p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="font-semibold text-brand-heading">{meal.calories}</p>
-                  <p className="text-xs text-muted-foreground text-brand-body">calories</p>
-                </div>
+                <Badge variant="secondary" className="bg-white">
+                  {meal.calories} cal
+                </Badge>
               </div>
             ))}
           </div>
         </Card>
 
-        {/* Nutrition Progress */}
-        <Card className="p-4">
-          <h3 className="text-lg font-semibold mb-4 text-brand-subheading">Nutrition Goals</h3>
-          
-          <div className="space-y-4">
-            {/* Calories Progress */}
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium text-brand-label">Calories</span>
-                <span className="text-sm text-muted-foreground text-brand-body">
-                  {userStats.caloriesConsumed}/{userStats.caloriesGoal}
-                </span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div 
-                  className="bg-primary h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${Math.min(calorieProgress, 100)}%` }}
-                />
-              </div>
-            </div>
-
-            {/* Protein Progress */}
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium text-brand-label">Protein</span>
-                <span className="text-sm text-muted-foreground text-brand-body">
-                  {userStats.proteinConsumed}g/{userStats.proteinGoal}g
-                </span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div 
-                  className="bg-green-500 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${Math.min(proteinProgress, 100)}%` }}
-                />
-              </div>
-            </div>
-
-            {/* Water Progress */}
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium text-brand-label">Water</span>
-                <span className="text-sm text-muted-foreground text-brand-body">
-                  {userStats.waterConsumed}/{userStats.waterGoal} glasses
-                </span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div 
-                  className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${(userStats.waterConsumed / userStats.waterGoal) * 100}%` }}
-                />
-              </div>
-            </div>
+        {/* Achievements */}
+        <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+          <h3 className="text-lg font-bold text-gray-900 mb-4">Recent Achievements</h3>
+          <div className="grid grid-cols-3 gap-4">
+            {achievements.map((achievement) => {
+              const IconComponent = achievement.icon;
+              return (
+                <div key={achievement.id} className="text-center">
+                  <div className="p-3 bg-gray-50 rounded-lg mb-2 mx-auto w-fit">
+                    <IconComponent className={`w-6 h-6 ${achievement.color}`} />
+                  </div>
+                  <p className="text-xs font-medium text-gray-700">{achievement.title}</p>
+                </div>
+              );
+            })}
           </div>
         </Card>
 
         {/* Quick Actions */}
         <div className="grid grid-cols-2 gap-4">
           <Button 
-            variant="outline" 
-            className="h-16 text-brand-button"
-            onClick={() => onNavigate('planner')}
+            onClick={() => onNavigate('planner')} 
+            className="h-16 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white border-0 shadow-lg"
           >
-            <BarChart3 className="mr-2" size={20} />
+            <Calendar className="w-5 h-5 mr-2" />
             Plan Meals
           </Button>
           <Button 
-            variant="outline" 
-            className="h-16 text-brand-button"
-            onClick={() => onNavigate('profile')}
+            onClick={() => onNavigate('profile')} 
+            variant="outline"
+            className="h-16 bg-white/80 backdrop-blur-sm border-gray-200 shadow-lg hover:bg-white"
           >
-            <Award className="mr-2" size={20} />
+            <BarChart3 className="w-5 h-5 mr-2" />
             View Progress
           </Button>
         </div>
@@ -242,3 +205,5 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
     </div>
   );
 }
+
+export default Dashboard;

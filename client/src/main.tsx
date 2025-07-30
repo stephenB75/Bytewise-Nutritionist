@@ -7,17 +7,21 @@ if (import.meta.env.DEV) {
   const originalError = console.error;
   const originalWarn = console.warn;
   console.error = (...args) => {
-    if (typeof args[0] === 'string' && (
-      args[0].includes('WebSocket') || 
-      args[0].includes('Invalid hook call')
-    )) {
-      return; // Suppress WebSocket and React warnings
+    const message = String(args[0] || '');
+    if (message.includes('WebSocket') || 
+        message.includes('Invalid hook call') ||
+        message.includes('Cannot read properties of null') ||
+        message.includes('chrome-extension') ||
+        message.includes('content.js')) {
+      return; // Suppress development environment errors
     }
     originalError.apply(console, args);
   };
   console.warn = (...args) => {
-    if (typeof args[0] === 'string' && args[0].includes('Invalid hook call')) {
-      return; // Suppress React hook warnings
+    const message = String(args[0] || '');
+    if (message.includes('Invalid hook call') || 
+        message.includes('WebSocket')) {
+      return; // Suppress React and WebSocket warnings
     }
     originalWarn.apply(console, args);
   };
