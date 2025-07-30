@@ -46,12 +46,15 @@ export const queryClient = new QueryClient({
     queries: {
       queryFn: getQueryFn({ on401: "throw" }),
       refetchInterval: false,
-      refetchOnWindowFocus: false,
-      staleTime: Infinity,
-      retry: false,
+      refetchOnWindowFocus: true, // Enabled for production
+      staleTime: 1000 * 60 * 2, // 2 minutes for real-time feel
+      gcTime: 1000 * 60 * 15, // 15 minutes cache (TanStack Query v5)
+      retry: 3, // Enable retries for production
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
     },
     mutations: {
-      retry: false,
+      retry: 2, // Enable mutation retries
+      retryDelay: 1000,
     },
   },
 });
