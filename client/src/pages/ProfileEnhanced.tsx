@@ -40,7 +40,8 @@ import {
   Globe,
   Smartphone,
   TrendingUp,
-  FileText
+  FileText,
+  LogOut
 } from 'lucide-react';
 import { HeroSection } from '@/components/HeroSection';
 import { AchievementCelebration } from '@/components/AchievementCelebration';
@@ -878,6 +879,38 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
               }}
             >
               Terms of Service
+            </Button>
+          </div>
+        </div>
+      </Card>
+
+      {/* Sign Out Section */}
+      <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+        <h3 className="text-lg font-bold text-gray-900 mb-4">Account Actions</h3>
+        
+        <div className="space-y-4">
+          <div className="text-center py-4">
+            <h4 className="font-medium text-gray-900 mb-2">Need to sign out?</h4>
+            <p className="text-sm text-gray-600 mb-4">You'll be redirected to the sign-in page</p>
+            
+            <Button
+              className="bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1"
+              onClick={() => {
+                setCelebrationAchievement({
+                  title: "Signing Out",
+                  description: "Thanks for using Bytewise! You'll be redirected to the sign-in page.",
+                  icon: LogOut
+                });
+                setShowCelebration(true);
+                
+                // Redirect to logout after showing celebration
+                setTimeout(() => {
+                  window.location.href = '/api/logout';
+                }, 2000);
+              }}
+            >
+              <LogOut className="w-5 h-5 mr-3" />
+              Sign Out of Account
             </Button>
           </div>
         </div>
