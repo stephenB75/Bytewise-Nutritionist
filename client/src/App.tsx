@@ -8,6 +8,8 @@ import { DragDropProvider } from '@/components/DragDropProvider';
 import { Navigation } from '@/components/Navigation';
 import { Header } from '@/components/Header';
 import { useToast } from '@/hooks/useToast';
+import { FoodDatabaseProvider } from '@/components/FoodDatabaseManager';
+import { NotificationProvider } from '@/components/NotificationSystem';
 
 // Pages
 import Landing from '@/pages/Landing';
@@ -236,8 +238,12 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Toaster />
-        <AppRouter />
+        <FoodDatabaseProvider>
+          <NotificationProvider>
+            <Toaster />
+            <AppRouter />
+          </NotificationProvider>
+        </FoodDatabaseProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );

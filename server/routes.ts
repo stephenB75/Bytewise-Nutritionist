@@ -209,6 +209,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get today's meals
+  app.get('/api/meals/today', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const today = new Date().toISOString().split('T')[0];
+      const meals = await storage.getMealsByDate(userId, today);
+      res.json(meals || []);
+    } catch (error) {
+      console.error("Error fetching today's meals:", error);
+      res.status(500).json({ message: "Failed to fetch today's meals" });
+    }
+  });
+
   app.get('/api/meals/:id', isAuthenticated, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
