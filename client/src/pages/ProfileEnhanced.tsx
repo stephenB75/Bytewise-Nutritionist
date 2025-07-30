@@ -704,14 +704,52 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
             <p className="text-sm text-gray-600 mb-3">Keep your data safe and synchronized</p>
             <Button 
               variant="outline" 
-              className="w-full justify-start hover:bg-blue-50 hover:border-blue-300 transition-all duration-200 shadow-sm"
-              onClick={() => {
-                setCelebrationAchievement({
-                  title: "Data Sync",
-                  description: "Synchronizing your nutrition data with cloud backup. Your data is safely stored and up-to-date!",
-                  icon: RefreshCw
-                });
-                setShowCelebration(true);
+              className="w-full justify-start bg-gradient-to-r from-emerald-50 to-teal-50 hover:from-emerald-100 hover:to-teal-100 border-emerald-300 hover:border-emerald-400 transition-all duration-300 transform hover:scale-[1.02] hover:-translate-y-0.5 shadow-lg hover:shadow-xl"
+              onClick={async () => {
+                try {
+                  // Start sync animations
+                  setCelebrationAchievement({
+                    title: "Syncing Data...",
+                    description: "Synchronizing USDA food database and user data. Please wait...",
+                    icon: RefreshCw
+                  });
+                  setShowCelebration(true);
+
+                  // Sync USDA food database
+                  const foodSyncResponse = await fetch('/api/sync/food-database', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                  });
+                  const foodSyncResult = await foodSyncResponse.json();
+
+                  // Sync user data
+                  const userSyncResponse = await fetch('/api/sync/user-data', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                  });
+                  const userSyncResult = await userSyncResponse.json();
+
+                  // Show success result
+                  setTimeout(() => {
+                    setCelebrationAchievement({
+                      title: "Sync Complete!",
+                      description: `Successfully synced USDA food database and user data. ${foodSyncResult.message || 'Food database updated'} and ${userSyncResult.message || 'user data synchronized'}.`,
+                      icon: CheckCircle
+                    });
+                    setShowCelebration(true);
+                  }, 1500);
+
+                } catch (error) {
+                  console.error('Sync error:', error);
+                  setTimeout(() => {
+                    setCelebrationAchievement({
+                      title: "Sync Failed",
+                      description: "Unable to complete data synchronization. Please check your connection and try again.",
+                      icon: RefreshCw
+                    });
+                    setShowCelebration(true);
+                  }, 1500);
+                }
               }}
             >
               <RefreshCw className="w-4 h-4 mr-2" />

@@ -144,7 +144,7 @@ export function LogoIconMinimal({ size = 'md', className = '' }: LogoIconProps) 
 }
 
 // Geometric abstract version
-export function LogoIconGeometric({ size = 'md', className = '' }: LogoIconProps) {
+export function LogoIconGeometric({ size = 'md', className = '', onClick }: LogoIconProps) {
   const sizeClasses = {
     sm: 'w-8 h-8',
     md: 'w-12 h-12', 
@@ -152,8 +152,15 @@ export function LogoIconGeometric({ size = 'md', className = '' }: LogoIconProps
     xl: 'w-20 h-20'
   };
 
+  const Component = onClick ? 'button' : 'div';
+  const clickableClasses = onClick ? 'cursor-pointer hover:scale-110 transition-transform duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg' : '';
+
   return (
-    <div className={`${sizeClasses[size]} ${className} relative inline-block`}>
+    <Component 
+      className={`${sizeClasses[size]} ${className} ${clickableClasses} relative inline-block`}
+      onClick={onClick}
+      type={onClick ? "button" : undefined}
+    >
       <div className="w-full h-full relative">
         {/* Main shape - hexagon */}
         <div 
@@ -207,7 +214,7 @@ export function LogoIconGeometric({ size = 'md', className = '' }: LogoIconProps
           </div>
         </div>
       </div>
-    </div>
+    </Component>
   );
 }
 

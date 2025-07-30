@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { LogoBrand } from './LogoBrand';
-import { LogoIcon } from './LogoIcon';
+import { LogoIconGeometric } from './LogoIcon';
 import { Bell, Settings, Search, LogOut } from 'lucide-react';
 import { Button } from './ui/button';
 
@@ -46,7 +46,12 @@ export function Header({
       <div className="w-full max-w-lg mx-auto px-3 py-6">
         <div className="flex items-center justify-between">
           {/* Logo - Left Side */}
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 flex items-center gap-2">
+            <LogoIconGeometric 
+              size="md" 
+              className="cursor-pointer hover:scale-110 transition-transform duration-200"
+              onClick={() => onNavigate('dashboard')}
+            />
             <LogoBrand 
               size="sm" 
               clickable 
