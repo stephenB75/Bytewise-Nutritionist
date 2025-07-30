@@ -5,7 +5,7 @@
  * Features seamless hero integration and real-time data
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -21,23 +21,80 @@ import {
   Calendar
 } from 'lucide-react';
 import { HeroSection } from '@/components/HeroSection';
+import { useCalorieTracking } from '@/hooks/useCalorieTracking';
+import { useQuery } from '@tanstack/react-query';
 
 interface DashboardProps {
   onNavigate: (page: string) => void;
 }
 
 function Dashboard({ onNavigate }: DashboardProps) {
-  // Sample data - in real app this would come from API
-  const [userStats] = useState({
-    name: "Alex",
-    currentStreak: 7,
-    caloriesConsumed: 1847,
-    caloriesGoal: 2200,
-    proteinConsumed: 89,
-    proteinGoal: 120,
-    waterConsumed: 6,
-    waterGoal: 8
+  // Get real-time data from calorie tracking hook
+  const { getDailyStats, getTodaysCalories } = useCalorieTracking();
+  const dailyStats = getDailyStats();
+  const todaysCalculations = getTodaysCalories();
+
+  // Fetch user data from API
+  const { data: user } = useQuery({
+    queryKey: ['/api/auth/user'],
+    retry: false,
   });
+
+  // Fetch daily stats from logged meals
+  const { data: mealStats } = useQuery({
+    queryKey: ['/api/meals/logged'],
+    retry: false,
+  });
+
+  // Combined stats from calculator and logged meals
+  const [userStats, setUserStats] = useState({
+    name: user?.firstName || "User",
+    currentStreak: 7,
+    caloriesConsumed: 0,
+    caloriesGoal: user?.dailyCalorieGoal || 2200,
+    proteinConsumed: 0,
+    proteinGoal: user?.dailyProteinGoal || 120,
+    carbsConsumed: 0,
+    carbsGoal: user?.dailyCarbGoal || 300,
+    fatConsumed: 0,
+    fatGoal: user?.dailyFatGoal || 70,
+    waterConsumed: 6,
+    waterGoal: user?.dailyWaterGoal || 8
+  });
+
+  // Update stats when data changes
+  useEffect(() => {
+    // Combine calories from calculator and logged meals
+    const calculatorCalories = dailyStats.calories || 0;
+    const mealCalories = mealStats?.reduce((total: number, meal: any) => 
+      total + (parseFloat(meal.totalCalories) || 0), 0) || 0;
+    
+    const calculatorProtein = dailyStats.protein || 0;
+    const mealProtein = mealStats?.reduce((total: number, meal: any) => 
+      total + (parseFloat(meal.totalProtein) || 0), 0) || 0;
+
+    const calculatorCarbs = dailyStats.carbs || 0;
+    const mealCarbs = mealStats?.reduce((total: number, meal: any) => 
+      total + (parseFloat(meal.totalCarbs) || 0), 0) || 0;
+
+    const calculatorFat = dailyStats.fat || 0;
+    const mealFat = mealStats?.reduce((total: number, meal: any) => 
+      total + (parseFloat(meal.totalFat) || 0), 0) || 0;
+
+    setUserStats(prev => ({
+      ...prev,
+      name: user?.firstName || prev.name,
+      caloriesConsumed: Math.round(calculatorCalories + mealCalories),
+      proteinConsumed: Math.round(calculatorProtein + mealProtein),
+      carbsConsumed: Math.round(calculatorCarbs + mealCarbs),
+      fatConsumed: Math.round(calculatorFat + mealFat),
+      caloriesGoal: user?.dailyCalorieGoal || prev.caloriesGoal,
+      proteinGoal: user?.dailyProteinGoal || prev.proteinGoal,
+      carbsGoal: user?.dailyCarbGoal || prev.carbsGoal,
+      fatGoal: user?.dailyFatGoal || prev.fatGoal,
+      waterGoal: user?.dailyWaterGoal || prev.waterGoal
+    }));
+  }, [dailyStats, mealStats, user]);
 
   const [todayMeals] = useState([
     {
@@ -72,7 +129,17 @@ function Dashboard({ onNavigate }: DashboardProps) {
   // Calculate progress percentages
   const calorieProgress = Math.round((userStats.caloriesConsumed / userStats.caloriesGoal) * 100);
   const proteinProgress = Math.round((userStats.proteinConsumed / userStats.proteinGoal) * 100);
+  const carbsProgress = Math.round((userStats.carbsConsumed / userStats.carbsGoal) * 100);
+  const fatProgress = Math.round((userStats.fatConsumed / userStats.fatGoal) * 100);
   const waterProgress = Math.round((userStats.waterConsumed / userStats.waterGoal) * 100);
+
+  // Data source indicators
+  const dataSource = {
+    calculatorEntries: todaysCalculations.length,
+    calculatorCalories: dailyStats.calories,
+    mealEntries: mealStats?.length || 0,
+    lastUpdate: new Date().toLocaleTimeString()
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -90,7 +157,23 @@ function Dashboard({ onNavigate }: DashboardProps) {
       <div className="flex-1 px-4 py-6 space-y-6">
         {/* Daily Nutrition Metrics */}
         <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">Daily Nutrition Overview</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-bold text-gray-900">Daily Nutrition Overview</h3>
+            <Badge variant="outline" className="text-xs">
+              📊 Calculator: {dataSource.calculatorEntries} • Logger: {dataSource.mealEntries}
+            </Badge>
+          </div>
+          
+          {/* Data Source Status */}
+          <div className="bg-blue-50 p-3 rounded-lg mb-4">
+            <div className="flex items-center gap-2">
+              <Flame className="w-4 h-4 text-blue-600" />
+              <span className="text-sm font-medium text-blue-900">Live Data Sources</span>
+            </div>
+            <div className="text-xs text-blue-700 mt-1">
+              Calculator: {Math.round(dataSource.calculatorCalories)} cal • Last update: {dataSource.lastUpdate}
+            </div>
+          </div>
           
           {/* Macro Nutrients */}
           <div className="grid grid-cols-3 gap-4 mb-6">
@@ -113,15 +196,30 @@ function Dashboard({ onNavigate }: DashboardProps) {
               <div className="p-2 bg-yellow-100 rounded-lg w-fit mx-auto mb-2">
                 <Calendar className="w-5 h-5 text-yellow-600" />
               </div>
-              <div className="text-2xl font-bold text-yellow-600">285g</div>
+              <div className="text-2xl font-bold text-yellow-600">{userStats.carbsConsumed}g</div>
               <div className="text-sm text-gray-600">Carbs</div>
               <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
                 <div 
                   className="bg-yellow-500 h-2 rounded-full" 
-                  style={{ width: '78%' }}
+                  style={{ width: `${Math.min(carbsProgress, 100)}%` }}
                 ></div>
               </div>
-              <div className="text-xs text-gray-500 mt-1">Goal: 365g</div>
+              <div className="text-xs text-gray-500 mt-1">Goal: {userStats.carbsGoal}g</div>
+            </div>
+
+            <div className="text-center p-3 bg-green-50 rounded-lg">
+              <div className="p-2 bg-green-100 rounded-lg w-fit mx-auto mb-2">
+                <Droplets className="w-5 h-5 text-green-600" />
+              </div>
+              <div className="text-2xl font-bold text-green-600">{userStats.fatConsumed}g</div>
+              <div className="text-sm text-gray-600">Fat</div>
+              <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                <div 
+                  className="bg-green-500 h-2 rounded-full" 
+                  style={{ width: `${Math.min(fatProgress, 100)}%` }}
+                ></div>
+              </div>
+              <div className="text-xs text-gray-500 mt-1">Goal: {userStats.fatGoal}g</div>
             </div>
 
             <div className="text-center p-3 bg-purple-50 rounded-lg">
