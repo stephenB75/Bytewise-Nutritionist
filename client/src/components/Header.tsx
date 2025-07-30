@@ -52,7 +52,7 @@ export function Header({
               onClick={() => onNavigate('dashboard')}
               style={{ fontFamily: "'League Spartan', sans-serif" }}
             >
-              🍎
+              bytewise
             </Button>
           </div>
           
@@ -90,14 +90,12 @@ export function Header({
                   }, 1000);
                 }}
               >
-                <Bell size={20} />
+                <Bell size={22} className="text-gray-700" />
                 {notificationCount > 0 && (
                   <>
-                    <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white rounded-full text-xs flex items-center justify-center animate-pulse">
+                    <span className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center font-bold">
                       {notificationCount > 9 ? '9+' : notificationCount}
                     </span>
-                    {/* Badge animation */}
-                    <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 rounded-full animate-ping opacity-75" />
                   </>
                 )}
               </Button>

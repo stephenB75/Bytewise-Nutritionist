@@ -47,6 +47,7 @@ import { HeroSection } from '@/components/HeroSection';
 import { AchievementCelebration } from '@/components/AchievementCelebration';
 import { ProfileInfoCard } from '@/components/ProfileInfoCard';
 import { DataManagementPanel } from '@/components/DataManagementPanel';
+import { CombinedProfileInfo } from '@/components/CombinedProfileInfo';
 import { NotificationDropdown } from '@/components/NotificationDropdown';
 import { getCurrentVersion, checkForUpdates, updateApp, formatVersion, formatBuildDate } from '@/utils/appVersion';
 
@@ -646,45 +647,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
 
   const renderDataManagement = () => (
     <div className="space-y-6">
-      <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">Data Management</h3>
-        
-        <div className="space-y-4">
-          <div>
-            <h4 className="font-medium text-gray-900 mb-2">Export Data</h4>
-            <p className="text-sm text-gray-600 mb-3">Download all your nutrition data</p>
-            {/* This export button will be replaced by DataManagementPanel */}
-          </div>
-
-          <Separator />
-
-          <div>
-            <h4 className="font-medium text-gray-900 mb-2">Sync & Backup</h4>
-            <p className="text-sm text-gray-600 mb-3">Keep your data safe and synchronized</p>
-            {/* This sync button will be replaced by DataManagementPanel */}
-          </div>
-
-          <Separator />
-
-          <div>
-            <h4 className="font-medium text-red-700 mb-2">Danger Zone</h4>
-            <p className="text-sm text-gray-600 mb-3">Permanently delete all your data</p>
-            <Button 
-              variant="destructive" 
-              className="w-full justify-start hover:bg-red-600 transition-all duration-200 shadow-sm"
-              onClick={() => {
-                // Show confirmation dialog for data deletion (no achievement popup)
-                if (confirm("Are you sure you want to delete all your data? This action cannot be undone.")) {
-                  console.log('Data deletion confirmed');
-                }
-              }}
-            >
-              <Trash2 className="w-4 h-4 mr-2" />
-              Delete All Data
-            </Button>
-          </div>
-        </div>
-      </Card>
+      <DataManagementPanel />
     </div>
   );
 
@@ -865,8 +828,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
     switch (activeSection) {
       case 'profile': return (
         <div className="space-y-6">
-          <ProfileInfoCard user={user} />
-          {renderPersonalInfo()}
+          <CombinedProfileInfo user={user} />
         </div>
       );
       case 'achievements': return renderAchievements();
@@ -882,8 +844,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
       case 'about': return renderAboutBytewise();
       default: return (
         <div className="space-y-6">
-          <ProfileInfoCard user={user} />
-          {renderPersonalInfo()}
+          <CombinedProfileInfo user={user} />
         </div>
       );
     }

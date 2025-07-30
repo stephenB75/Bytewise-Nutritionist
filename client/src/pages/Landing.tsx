@@ -72,7 +72,7 @@ export default function Landing({ onNavigateToForgotPassword }: LandingProps) {
         <div className="relative z-10 px-4 py-16 text-center">
           {/* Brand Logo */}
           <div className="mb-8 flex justify-center animate-fade-in">
-            <LogoBrand size="lg" />
+            <LogoBrand size="lg" className="drop-shadow-lg" />
           </div>
           
           {/* Welcome Message */}
@@ -102,11 +102,16 @@ export default function Landing({ onNavigateToForgotPassword }: LandingProps) {
             🚀 Now Available
           </Badge>
 
-          {/* CTA Buttons */}
-          <div className="space-y-4 max-w-sm mx-auto">
+          {/* Sign-in Window */}
+          <div className="bg-white/95 backdrop-blur-md rounded-2xl p-8 shadow-2xl border border-white/20 max-w-sm mx-auto">
+            <div className="text-center mb-6">
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">Welcome Back</h3>
+              <p className="text-gray-600">Sign in to continue your nutrition journey</p>
+            </div>
+            
             <Button 
               onClick={() => window.location.href = '/api/login'}
-              className="w-full h-14 text-lg font-semibold touch-target btn-animate group bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white shadow-lg hover:shadow-xl"
+              className="w-full h-14 text-lg font-semibold touch-target btn-animate group bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-black shadow-lg hover:shadow-xl"
               size="lg"
               style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "1.125rem", fontWeight: 600 }}
             >
@@ -114,40 +119,9 @@ export default function Landing({ onNavigateToForgotPassword }: LandingProps) {
               <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Button>
             
-            <Button 
-              variant="outline"
-              onClick={() => window.location.href = '/api/login'}
-              className="w-full h-12 text-base font-medium touch-target hover:bg-primary/10 hover:border-primary/50"
-              style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "1rem", fontWeight: 500 }}
-            >
-              Get Started Free
-            </Button>
-            
-            <div className="flex flex-col space-y-3 mt-4">
-              <p className="text-sm text-white/80" style={{ fontFamily: "'Quicksand', sans-serif", fontSize: "0.875rem", fontWeight: 400 }}>
-                Free to use • No credit card required • Secure authentication
-              </p>
-              
-              <div className="flex justify-center space-x-4">
-                {onNavigateToForgotPassword && (
-                  <button
-                    onClick={onNavigateToForgotPassword}
-                    className="text-sm text-white hover:text-white/80 transition-colors underline"
-                    style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "0.875rem", fontWeight: 500 }}
-                  >
-                    Need help signing in?
-                  </button>
-                )}
-                <span className="text-sm text-white/60">•</span>
-                <button
-                  onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="text-sm text-white hover:text-white/80 transition-colors underline"
-                  style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "0.875rem", fontWeight: 500 }}
-                >
-                  Learn more
-                </button>
-              </div>
-            </div>
+            <p className="text-gray-500 text-xs text-center mt-4">
+              Secure authentication powered by Replit
+            </p>
           </div>
         </div>
       </div>
