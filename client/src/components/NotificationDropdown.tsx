@@ -21,7 +21,9 @@ import {
   Target,
   Flame,
   TrendingUp,
-  X
+  X,
+  Settings,
+  Clock
 } from 'lucide-react';
 
 interface NotificationItem {
@@ -228,26 +230,70 @@ export function NotificationDropdown({
         </div>
 
         {/* Footer Actions */}
-        {notifications.length > 0 && (
-          <>
-            <Separator className="my-4" />
-            <div className="text-center">
+        <>
+          <Separator className="my-4" />
+          
+          {/* View All Notifications Section */}
+          <div className="bg-gray-50 -mx-6 -mb-6 px-6 py-4 rounded-b-lg">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <h4 className="text-sm font-medium text-gray-900">Notification Center</h4>
+                <p className="text-xs text-gray-600">Manage all your notifications and preferences</p>
+              </div>
               <Button
-                variant="ghost"
+                variant="outline"
                 size="sm"
-                className="text-xs text-gray-500 hover:text-gray-700"
+                className="text-xs"
                 onClick={() => {
                   // Navigate to detailed notifications view
-                  const event = new CustomEvent('navigate-to-notifications');
+                  const event = new CustomEvent('navigate-to-notifications', {
+                    detail: { page: 'profile', section: 'notifications' }
+                  });
                   window.dispatchEvent(event);
                   onClose();
                 }}
               >
-                View detailed notification history
+                View All
               </Button>
             </div>
-          </>
-        )}
+            
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="justify-start text-xs text-gray-600 hover:text-gray-900 h-8"
+                onClick={() => {
+                  // Navigate to notification settings
+                  const event = new CustomEvent('navigate-to-settings', {
+                    detail: { section: 'notifications' }
+                  });
+                  window.dispatchEvent(event);
+                  onClose();
+                }}
+              >
+                <Settings className="w-3 h-3 mr-1" />
+                Settings
+              </Button>
+              
+              <Button
+                variant="ghost"
+                size="sm"
+                className="justify-start text-xs text-gray-600 hover:text-gray-900 h-8"
+                onClick={() => {
+                  // Navigate to notification history
+                  const event = new CustomEvent('navigate-to-history', {
+                    detail: { type: 'notifications' }
+                  });
+                  window.dispatchEvent(event);
+                  onClose();
+                }}
+              >
+                <Clock className="w-3 h-3 mr-1" />
+                History
+              </Button>
+            </div>
+          </div>
+        </>
       </Card>
     </div>
   );
