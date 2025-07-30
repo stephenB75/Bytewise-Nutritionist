@@ -7,7 +7,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --font-size: 14px;
+  --font-size: 16px;
   --pastel-yellow: #fef7cd;
   --pastel-blue: #a8dadc;
   --pastel-blue-dark: #89c4c7;
@@ -726,17 +726,152 @@ select {
   }
 }
 
-/* Prevent zoom on focus for all form elements */
+/* Mobile-only viewport optimizations */
 @media screen and (max-width: 768px) {
+  /* Ensure all text inputs are 16px minimum to prevent zoom */
   input:focus,
   textarea:focus,
   select:focus {
     font-size: 16px !important;
-    /* Additional focus state optimizations */
     outline: none;
     transform: none;
     zoom: 1;
   }
+  
+  /* Mobile-specific layout optimizations */
+  .container {
+    max-width: 100vw;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  /* Optimize touch targets for mobile */
+  button, .button, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+    touch-action: manipulation;
+  }
+  
+  /* Prevent horizontal scroll */
+  body {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+  
+  /* Mobile-first grid adjustments */
+  .grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem;
+  }
+  
+  /* Mobile typography scaling */
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.25rem; }
+  h3 { font-size: 1.125rem; }
+  h4 { font-size: 1rem; }
+  
+  /* Mobile card spacing */
+  .card {
+    margin-bottom: 1rem;
+    border-radius: 0.75rem;
+  }
+  
+  /* Force mobile-only design */
+  .desktop-only {
+    display: none !important;
+  }
+  
+  /* Mobile app-like header */
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(20px);
+  }
+  
+  /* Mobile navigation */
+  .mobile-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  /* Safe area support for iOS */
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  /* Mobile content area */
+  .mobile-content {
+    padding-bottom: calc(80px + env(safe-area-inset-bottom));
+  }
+}
+
+/* Add mobile-specific utility classes */
+@media (min-width: 769px) {
+  /* Hide app on desktop devices - mobile only */
+  .mobile-only-app {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: linear-gradient(135deg, var(--pastel-blue), var(--pastel-yellow));
+    text-align: center;
+    padding: 2rem;
+  }
+  
+  .mobile-only-message {
+    max-width: 500px;
+    background: white;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  }
+}
+
+/* Additional Mobile Optimizations */
+@media screen and (max-width: 768px) {
+  /* Ensure proper mobile layout */
+  * {
+    box-sizing: border-box;
+  }
+  
+  /* Mobile-first breakpoints */
+  .sm\:grid-cols-2 {
+    grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+  }
+  
+  .sm\:grid-cols-3 {
+    grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+  }
+  
+  .sm\:grid-cols-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  
+  /* Mobile text sizes */
+  .text-3xl { font-size: 1.5rem !important; }
+  .text-2xl { font-size: 1.25rem !important; }
+  .text-xl { font-size: 1.125rem !important; }
+  .text-lg { font-size: 1rem !important; }
+  
+  /* Mobile spacing */
+  .p-6 { padding: 1rem !important; }
+  .p-8 { padding: 1.5rem !important; }
+  .px-6 { padding-left: 1rem !important; padding-right: 1rem !important; }
+  .py-6 { padding-top: 1rem !important; padding-bottom: 1rem !important; }
+  
+  /* Mobile gaps */
+  .gap-6 { gap: 1rem !important; }
+  .gap-8 { gap: 1.5rem !important; }
 }
 
 /* Bytewise Brand Spacing System - Mobile-First Ultra-Tight Layout */

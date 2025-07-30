@@ -17,10 +17,69 @@ import CalorieCalculatorWrapper from './components/CalorieCalculatorWrapper';
 import WeeklyLogger from './pages/WeeklyLogger';
 import ProfileEnhanced from './pages/ProfileEnhanced';
 
+// Mobile detection hook
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(true);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  
+  return isMobile;
+}
+
+// Desktop warning component
+function DesktopWarning() {
+  return (
+    <div className="mobile-only-app">
+      <div className="mobile-only-message">
+        <div className="text-center mb-6">
+          <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full mx-auto mb-4 flex items-center justify-center">
+            <span className="text-2xl">📱</span>
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Bytewise Nutritionist</h1>
+          <p className="text-gray-600">Mobile Nutrition Tracking App</p>
+        </div>
+        
+        <div className="space-y-4">
+          <div className="p-4 bg-blue-50 rounded-lg">
+            <h2 className="font-semibold text-blue-900 mb-2">📱 Mobile-Only Experience</h2>
+            <p className="text-blue-700 text-sm">
+              This app is designed exclusively for mobile devices to provide the best nutrition tracking experience.
+            </p>
+          </div>
+          
+          <div className="space-y-2 text-sm text-gray-600">
+            <p><strong>To access Bytewise:</strong></p>
+            <ul className="list-disc list-inside space-y-1">
+              <li>Open this URL on your smartphone</li>
+              <li>Add to your home screen for a native app experience</li>
+              <li>Enjoy seamless nutrition tracking on-the-go</li>
+            </ul>
+          </div>
+          
+          <div className="mt-6 p-3 bg-gray-50 rounded-lg">
+            <p className="text-xs text-gray-500 text-center">
+              Optimized for iOS Safari and Android Chrome browsers
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [showNotifications, setShowNotifications] = useState(false);
-  const [notificationCount, setNotificationCount] = useState(3); // Example notification count
+  const [notificationCount, setNotificationCount] = useState(3);
+  const isMobile = useIsMobile();
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
@@ -31,7 +90,6 @@ export default function App() {
   };
 
   const handleLogout = () => {
-    // Redirect to logout endpoint
     window.location.href = '/api/logout';
   };
 
@@ -71,7 +129,7 @@ export default function App() {
       window.removeEventListener('show-toast', handleToast as EventListener);
       window.removeEventListener('calories-logged', handleCaloriesLogged as EventListener);
     };
-  }, []);
+  }, [activeTab]);
 
   // Render current page component
   const renderCurrentPage = () => {
@@ -89,39 +147,50 @@ export default function App() {
     }
   };
 
+  // Show desktop warning if not on mobile (after all hooks)
+  if (!isMobile) {
+    return <DesktopWarning />;
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthWrapper onNavigate={handleNavigate}>
-        <div className="min-h-screen bg-background">
-          {/* Global Notification Dropdown */}
-          <NotificationDropdown
-            isOpen={showNotifications}
-            onClose={() => setShowNotifications(false)}
-            notifications={[]}
-            onMarkAsRead={() => {}}
-            onMarkAllAsRead={() => {}}
-            onDeleteNotification={() => {}}
-          />
+        <div className="min-h-screen bg-[#fef7cd] bg-gradient-to-br from-[#fef7cd] via-[#ffffff] to-[#a8dadc] mobile-content">
+          {/* Mobile Header with Safe Area */}
+          <div className="safe-area-top">
+            <Header 
+              currentPage={activeTab}
+              onNavigate={handleNavigate}
+              showNotifications={showNotifications}
+              notificationCount={notificationCount}
+              onLogout={handleLogout}
+            />
+          </div>
 
-          {/* Fixed Header */}
-          <Header 
-            currentPage={activeTab}
-            onNavigate={handleNavigate}
-            showNotifications={true}
-            notificationCount={notificationCount}
-            onLogout={handleLogout}
-          />
-
-          {/* Main Content Area with top/bottom padding for fixed elements */}
-          <main className="pt-16 pb-20">
+          {/* Main Content - Mobile Optimized */}
+          <main className="pb-20">
             {renderCurrentPage()}
           </main>
 
-          {/* Fixed Bottom Navigation */}
-          <Navigation 
-            activeTab={activeTab}
-            onTabChange={handleTabChange}
-          />
+          {/* Bottom Navigation with Safe Area */}
+          <div className="mobile-nav safe-area-bottom">
+            <Navigation 
+              activeTab={activeTab}
+              onTabChange={handleTabChange}
+            />
+          </div>
+
+          {/* Notification Dropdown */}
+          {showNotifications && (
+            <NotificationDropdown
+              isOpen={showNotifications}
+              onClose={() => setShowNotifications(false)}
+              notifications={[]}
+              onMarkAsRead={() => {}}
+              onMarkAllAsRead={() => {}}
+              onDeleteNotification={() => {}}
+            />
+          )}
         </div>
       </AuthWrapper>
     </QueryClientProvider>
