@@ -11,6 +11,7 @@ import { queryClient } from '@/lib/queryClient';
 import { AuthWrapper } from './components/AuthWrapper';
 import { Header } from './components/Header';
 import { Navigation } from './components/Navigation';
+import { NotificationDropdown } from './components/NotificationDropdown';
 import Dashboard from './pages/Dashboard';
 import CalorieCalculatorWrapper from './components/CalorieCalculatorWrapper';
 import WeeklyLogger from './pages/WeeklyLogger';
@@ -18,6 +19,8 @@ import ProfileEnhanced from './pages/ProfileEnhanced';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('dashboard');
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notificationCount, setNotificationCount] = useState(3); // Example notification count
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
@@ -31,6 +34,26 @@ export default function App() {
     // Redirect to logout endpoint
     window.location.href = '/api/logout';
   };
+
+  // Add global notification event listener
+  useEffect(() => {
+    const handleShowNotifications = () => {
+      setShowNotifications(true);
+    };
+
+    const handleToast = (event: CustomEvent) => {
+      console.log('Toast:', event.detail.message);
+      // Handle toast notifications here if needed
+    };
+
+    window.addEventListener('show-notifications', handleShowNotifications);
+    window.addEventListener('show-toast', handleToast as EventListener);
+    
+    return () => {
+      window.removeEventListener('show-notifications', handleShowNotifications);
+      window.removeEventListener('show-toast', handleToast as EventListener);
+    };
+  }, []);
 
   // Render current page component
   const renderCurrentPage = () => {
@@ -52,12 +75,18 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <AuthWrapper onNavigate={handleNavigate}>
         <div className="min-h-screen bg-background">
+          {/* Global Notification Dropdown */}
+          <NotificationDropdown
+            isOpen={showNotifications}
+            onClose={() => setShowNotifications(false)}
+          />
+
           {/* Fixed Header */}
           <Header 
             currentPage={activeTab}
             onNavigate={handleNavigate}
             showNotifications={true}
-            notificationCount={0}
+            notificationCount={notificationCount}
             onLogout={handleLogout}
           />
 

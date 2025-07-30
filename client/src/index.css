@@ -572,12 +572,14 @@ select {
   }
 }
 
-/* Square footer buttons when clicked/active */
+/* Square footer buttons when clicked/active - Full height when clicked */
 .navigation-button:active,
 .navigation-button.active {
   border-radius: 0.125rem; /* 2px - much more square than default rounded */
   transform: scale(0.95);
   transition: all 0.1s ease-out;
+  height: 100% !important; /* Full height of footer when clicked */
+  min-height: 64px !important;
 }
 
 /* Navigation button base styling */

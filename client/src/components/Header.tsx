@@ -70,14 +70,24 @@ export function Header({
               <Button
                 variant="ghost"
                 size="sm"
-                className="relative h-9 w-9 p-0 touch-target"
-                onClick={() => console.log('Notifications clicked')}
+                className="relative h-9 w-9 p-0 touch-target hover:bg-accent/80 transition-all duration-200"
+                onClick={() => {
+                  // Show notification dropdown or modal
+                  const event = new CustomEvent('show-notifications', {
+                    detail: { notifications: [] }
+                  });
+                  window.dispatchEvent(event);
+                }}
               >
                 <Bell size={20} />
                 {notificationCount > 0 && (
-                  <span className="absolute -top-1 -right-1 h-4 w-4 bg-destructive text-destructive-foreground rounded-full text-xs flex items-center justify-center">
-                    {notificationCount > 9 ? '9+' : notificationCount}
-                  </span>
+                  <>
+                    <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white rounded-full text-xs flex items-center justify-center animate-pulse">
+                      {notificationCount > 9 ? '9+' : notificationCount}
+                    </span>
+                    {/* Badge animation */}
+                    <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 rounded-full animate-ping opacity-75" />
+                  </>
                 )}
               </Button>
             )}

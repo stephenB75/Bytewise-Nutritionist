@@ -5,7 +5,7 @@
  * Features achievements, settings, privacy controls, and app information
  */
 
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { UserProfile } from '@/components/UserProfile';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -45,6 +45,9 @@ import {
 } from 'lucide-react';
 import { HeroSection } from '@/components/HeroSection';
 import { AchievementCelebration } from '@/components/AchievementCelebration';
+import { ProfileInfoCard } from '@/components/ProfileInfoCard';
+import { DataManagementPanel } from '@/components/DataManagementPanel';
+import { NotificationDropdown } from '@/components/NotificationDropdown';
 import { getCurrentVersion, checkForUpdates, updateApp, formatVersion, formatBuildDate } from '@/utils/appVersion';
 
 interface ProfileProps {
@@ -99,6 +102,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
   const [celebrationAchievement, setCelebrationAchievement] = useState<any>(null);
   const [updateAvailable, setUpdateAvailable] = useState<any>(null);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   const queryClient = useQueryClient();
   const { user: authUser } = useAuth();
   
@@ -606,20 +610,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
           <div>
             <h4 className="font-medium text-gray-900 mb-2">Export Data</h4>
             <p className="text-sm text-gray-600 mb-3">Download all your nutrition data</p>
-            <Button 
-              variant="outline" 
-              className="w-full justify-start hover:bg-green-50 hover:border-green-300 transition-all duration-200 shadow-sm"
-              onClick={() => {
-                console.log('Preparing data export...');
-                // Simulate download
-                setTimeout(() => {
-                  console.log('Download CSV data...');
-                }, 1000);
-              }}
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Export All Data (CSV)
-            </Button>
+            {/* This export button will be replaced by DataManagementPanel */}
           </div>
 
           <Separator />
@@ -627,44 +618,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
           <div>
             <h4 className="font-medium text-gray-900 mb-2">Sync & Backup</h4>
             <p className="text-sm text-gray-600 mb-3">Keep your data safe and synchronized</p>
-            <Button 
-              variant="outline" 
-              className="w-full justify-start bg-gradient-to-r from-emerald-50 to-teal-50 hover:from-emerald-100 hover:to-teal-100 border-emerald-300 hover:border-emerald-400 transition-all duration-300 transform hover:scale-[1.02] hover:-translate-y-0.5 shadow-lg hover:shadow-xl"
-              onClick={async () => {
-                try {
-                  // Start sync animations
-                  console.log('Starting data synchronization...');
-
-                  // Sync USDA food database
-                  const foodSyncResponse = await fetch('/api/sync/food-database', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
-                  });
-                  const foodSyncResult = await foodSyncResponse.json();
-
-                  // Sync user data
-                  const userSyncResponse = await fetch('/api/sync/user-data', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
-                  });
-                  const userSyncResult = await userSyncResponse.json();
-
-                  // Show success result
-                  setTimeout(() => {
-                    console.log('Sync Complete! Food database and user data synchronized.');
-                  }, 1500);
-
-                } catch (error) {
-                  console.error('Sync error:', error);
-                  setTimeout(() => {
-                    console.log('Sync Failed: Unable to complete data synchronization.');
-                  }, 1500);
-                }
-              }}
-            >
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Sync Now
-            </Button>
+            {/* This sync button will be replaced by DataManagementPanel */}
           </div>
 
           <Separator />
@@ -866,16 +820,43 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
 
   const renderSection = () => {
     switch (activeSection) {
-      case 'profile': return renderPersonalInfo();
+      case 'profile': return (
+        <div className="space-y-6">
+          <ProfileInfoCard user={user} />
+          {renderPersonalInfo()}
+        </div>
+      );
       case 'achievements': return renderAchievements();
       case 'privacy': return renderPrivacySettings();
       case 'notifications': return renderNotificationSettings();
       case 'display': return renderDisplaySettings();
-      case 'data': return renderDataManagement();
+      case 'data': return (
+        <div className="space-y-6">
+          <DataManagementPanel />
+          {renderDataManagement()}
+        </div>
+      );
       case 'about': return renderAboutBytewise();
-      default: return renderPersonalInfo();
+      default: return (
+        <div className="space-y-6">
+          <ProfileInfoCard user={user} />
+          {renderPersonalInfo()}
+        </div>
+      );
     }
   };
+
+  // Add notification event listener
+  useEffect(() => {
+    const handleShowNotifications = () => {
+      setShowNotifications(true);
+    };
+
+    window.addEventListener('show-notifications', handleShowNotifications);
+    return () => {
+      window.removeEventListener('show-notifications', handleShowNotifications);
+    };
+  }, []);
 
   if (isLoading) {
     return (
@@ -890,6 +871,12 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100">
+      {/* Notification Dropdown */}
+      <NotificationDropdown
+        isOpen={showNotifications}
+        onClose={() => setShowNotifications(false)}
+      />
+
       {/* Hero Section */}
       <HeroSection
         title={`Welcome, ${(user as any)?.firstName || 'User'}!`}
