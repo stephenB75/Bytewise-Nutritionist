@@ -42,6 +42,7 @@ import {
 } from 'lucide-react';
 import { HeroSection } from '@/components/HeroSection';
 import { AchievementCelebration } from '@/components/AchievementCelebration';
+import { getCurrentVersion, checkForUpdates, updateApp, formatVersion, formatBuildDate } from '@/utils/appVersion';
 
 interface ProfileProps {
   onNavigate: (page: string) => void;
@@ -93,8 +94,12 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
   const [activeSection, setActiveSection] = useState('profile');
   const [showCelebration, setShowCelebration] = useState(false);
   const [celebrationAchievement, setCelebrationAchievement] = useState<any>(null);
+  const [updateAvailable, setUpdateAvailable] = useState<any>(null);
+  const [isUpdating, setIsUpdating] = useState(false);
   const queryClient = useQueryClient();
   const { user: authUser } = useAuth();
+  
+  const currentVersion = getCurrentVersion();
 
   // Fetch user profile
   const { data: userProfile, isLoading } = useQuery({
@@ -420,11 +425,19 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
           <div>
             <h4 className="font-medium text-gray-900 mb-3">Account Security</h4>
             <div className="space-y-3">
-              <Button variant="outline" className="w-full justify-start">
+              <Button 
+                variant="outline" 
+                className="w-full justify-start hover:bg-gray-50 transition-colors"
+                onClick={() => console.log('Change password clicked')}
+              >
                 <Lock className="w-4 h-4 mr-2" />
                 Change Password
               </Button>
-              <Button variant="outline" className="w-full justify-start">
+              <Button 
+                variant="outline" 
+                className="w-full justify-start hover:bg-gray-50 transition-colors"
+                onClick={() => console.log('Two-factor auth clicked')}
+              >
                 <Shield className="w-4 h-4 mr-2" />
                 Two-Factor Authentication
               </Button>
@@ -441,36 +454,48 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
         <h3 className="text-lg font-bold text-gray-900 mb-4">Notification Preferences</h3>
         
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors">
             <div>
               <h4 className="font-medium text-gray-900">Meal Reminders</h4>
               <p className="text-sm text-gray-600">Get reminded to log your meals</p>
             </div>
-            <Switch defaultChecked={true} />
+            <Switch 
+              defaultChecked={true} 
+              onCheckedChange={(checked) => console.log('Meal reminders:', checked)}
+            />
           </div>
 
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors">
             <div>
               <h4 className="font-medium text-gray-900">Achievement Alerts</h4>
               <p className="text-sm text-gray-600">Celebrate when you earn new achievements</p>
             </div>
-            <Switch defaultChecked={true} />
+            <Switch 
+              defaultChecked={true}
+              onCheckedChange={(checked) => console.log('Achievement alerts:', checked)}
+            />
           </div>
 
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors">
             <div>
               <h4 className="font-medium text-gray-900">Weekly Reports</h4>
               <p className="text-sm text-gray-600">Receive your weekly nutrition summary</p>
             </div>
-            <Switch defaultChecked={false} />
+            <Switch 
+              defaultChecked={false}
+              onCheckedChange={(checked) => console.log('Weekly reports:', checked)}
+            />
           </div>
 
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors">
             <div>
               <h4 className="font-medium text-gray-900">App Updates</h4>
               <p className="text-sm text-gray-600">Stay informed about new features</p>
             </div>
-            <Switch defaultChecked={true} />
+            <Switch 
+              defaultChecked={true}
+              onCheckedChange={(checked) => console.log('App updates:', checked)}
+            />
           </div>
         </div>
       </Card>
@@ -590,15 +615,68 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
           <div className="space-y-3 text-sm text-gray-600">
             <div className="flex justify-between">
               <span>App Version</span>
-              <span className="font-medium">2.1.0</span>
+              <span className="font-medium">{formatVersion(currentVersion.version)}</span>
             </div>
             <div className="flex justify-between">
-              <span>Build</span>
-              <span className="font-medium">2024.01.15</span>
+              <span>Build Date</span>
+              <span className="font-medium">{formatBuildDate(currentVersion.buildDate)}</span>
             </div>
             <div className="flex justify-between">
               <span>Database</span>
               <span className="font-medium">USDA FoodData Central</span>
+            </div>
+          </div>
+
+          <Separator />
+
+          <div className="space-y-3">
+            <h4 className="font-medium text-gray-900">App Management</h4>
+            <div className="space-y-2">
+              <Button 
+                variant="outline" 
+                className="w-full justify-start hover:bg-gray-50 transition-colors"
+                onClick={async () => {
+                  const update = await checkForUpdates();
+                  setUpdateAvailable(update);
+                  if (!update) {
+                    console.log('App is up to date!');
+                  }
+                }}
+              >
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Check for Updates
+              </Button>
+              
+              {updateAvailable && (
+                <Button 
+                  variant="default" 
+                  className="w-full justify-start"
+                  onClick={async () => {
+                    setIsUpdating(true);
+                    await updateApp();
+                  }}
+                  disabled={isUpdating}
+                >
+                  <RefreshCw className={`w-4 h-4 mr-2 ${isUpdating ? 'animate-spin' : ''}`} />
+                  {isUpdating ? 'Updating...' : `Update to ${formatVersion(updateAvailable.version)}`}
+                </Button>
+              )}
+              
+              <Button 
+                variant="outline" 
+                className="w-full justify-start hover:bg-gray-50 transition-colors"
+                onClick={() => {
+                  setCelebrationAchievement({
+                    title: "What's New",
+                    description: currentVersion.changelog.join(' • '),
+                    icon: Star
+                  });
+                  setShowCelebration(true);
+                }}
+              >
+                <Star className="w-4 h-4 mr-2" />
+                View Changelog
+              </Button>
             </div>
           </div>
 

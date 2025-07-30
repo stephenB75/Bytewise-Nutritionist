@@ -24,6 +24,7 @@ import {
   Utensils
 } from 'lucide-react';
 import { format, startOfWeek, addDays, addWeeks, subWeeks } from 'date-fns';
+import { useCalorieTracking } from '@/hooks/useCalorieTracking';
 
 interface WeeklyLoggerProps {
   onNavigate: (page: string) => void;
@@ -48,6 +49,7 @@ export default function WeeklyLogger({ onNavigate }: WeeklyLoggerProps) {
   const [currentWeek, setCurrentWeek] = useState(new Date());
   const [selectedDay, setSelectedDay] = useState(new Date());
   const queryClient = useQueryClient();
+  const { getTodaysCalories, getDailyStats, calculatedCalories } = useCalorieTracking();
 
   // Get week dates
   const weekStart = startOfWeek(currentWeek, { weekStartsOn: 1 });
@@ -109,24 +111,28 @@ export default function WeeklyLogger({ onNavigate }: WeeklyLoggerProps) {
   const dailyCalorieGoal = 2000; // Default goal
   const avgDailyCalories = Math.round(weeklyTotals.calories / 7);
 
+  // Include calculated calories in weekly stats
+  const todaysCalculated = getTodaysCalories();
+  const calculatedCaloriesTotal = todaysCalculated.reduce((sum, item) => sum + item.calories, 0);
+  
   const heroStats = [
     {
       label: 'Weekly Calories',
-      value: weeklyTotals.calories.toLocaleString(),
+      value: (weeklyTotals.calories + calculatedCaloriesTotal).toLocaleString(),
       icon: Flame,
       color: 'text-orange-600',
       bgColor: 'bg-orange-50',
     },
     {
       label: 'Meals Logged',
-      value: weeklyTotals.meals.toString(),
+      value: (weeklyTotals.meals + todaysCalculated.length).toString(),
       icon: Utensils,
       color: 'text-green-600',
       bgColor: 'bg-green-50',
     },
     {
       label: 'Daily Average',
-      value: avgDailyCalories.toLocaleString(),
+      value: Math.round((weeklyTotals.calories + calculatedCaloriesTotal) / 7).toLocaleString(),
       icon: Target,
       color: 'text-blue-600',
       bgColor: 'bg-blue-50',

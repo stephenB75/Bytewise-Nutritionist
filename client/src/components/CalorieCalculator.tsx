@@ -43,10 +43,11 @@ interface IngredientAnalysis {
 interface CalorieCalculatorProps {
   onAddToMeal?: (ingredient: IngredientAnalysis) => void;
   onNavigate?: (page: string) => void;
+  onCaloriesCalculated?: (calories: any) => void;
   isCompact?: boolean;
 }
 
-function CalorieCalculator({ onAddToMeal, onNavigate, isCompact = false }: CalorieCalculatorProps) {
+function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, isCompact = false }: CalorieCalculatorProps) {
   const [ingredient, setIngredient] = useState('');
   const [measurement, setMeasurement] = useState('');
   const [recentAnalyses, setRecentAnalyses] = useState<IngredientAnalysis[]>([]);
@@ -71,6 +72,21 @@ function CalorieCalculator({ onAddToMeal, onNavigate, isCompact = false }: Calor
       setRecentAnalyses(prev => [data, ...prev.slice(0, 4)]);
       setIngredient('');
       setMeasurement('');
+      
+      // Send calculated calories to tracking hook
+      if (onCaloriesCalculated) {
+        onCaloriesCalculated({
+          name: `${data.ingredient} (${data.measurement})`,
+          calories: data.estimatedCalories,
+          protein: data.nutritionPer100g?.protein || 0,
+          carbs: data.nutritionPer100g?.carbs || 0,
+          fat: data.nutritionPer100g?.fat || 0,
+          fiber: 0,
+          sugar: 0,
+          sodium: 0,
+          ingredients: [data.ingredient]
+        });
+      }
     },
   });
 

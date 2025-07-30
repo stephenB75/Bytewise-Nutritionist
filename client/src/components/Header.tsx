@@ -41,8 +41,8 @@ export function Header({
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border safe-area-inset-top">
-      <div className="w-full max-w-lg mx-auto px-3 py-4">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border safe-area-inset-top mb-4">
+      <div className="w-full max-w-lg mx-auto px-3 py-6">
         <div className="flex items-center justify-between">
           {/* Logo - Left Side */}
           <div className="flex-shrink-0">
@@ -71,8 +71,9 @@ export function Header({
                 variant="ghost"
                 size="sm"
                 className="relative h-9 w-9 p-0 touch-target"
+                onClick={() => console.log('Notifications clicked')}
               >
-                <Bell size={18} />
+                <Bell size={20} />
                 {notificationCount > 0 && (
                   <span className="absolute -top-1 -right-1 h-4 w-4 bg-destructive text-destructive-foreground rounded-full text-xs flex items-center justify-center">
                     {notificationCount > 9 ? '9+' : notificationCount}
@@ -85,9 +86,18 @@ export function Header({
               variant="ghost"
               size="sm"
               className="h-9 w-9 p-0 touch-target"
+              onClick={() => console.log('Search clicked')}
+            >
+              <Search size={20} />
+            </Button>
+            
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-9 w-9 p-0 touch-target"
               onClick={() => onNavigate('profile')}
             >
-              <Settings size={18} />
+              <Settings size={20} />
             </Button>
             
             {onLogout && (
@@ -98,7 +108,7 @@ export function Header({
                 onClick={onLogout}
                 title="Sign Out"
               >
-                <LogOut size={18} />
+                <LogOut size={20} />
               </Button>
             )}
           </div>

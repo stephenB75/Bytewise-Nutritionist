@@ -8,30 +8,34 @@
 import CalorieCalculator from './CalorieCalculator';
 import { HeroSection } from './HeroSection';
 import { Calculator, Target, Zap } from 'lucide-react';
+import { useCalorieTracking } from '@/hooks/useCalorieTracking';
 
 interface CalorieCalculatorWrapperProps {
   onNavigate?: (page: string) => void;
 }
 
 export default function CalorieCalculatorWrapper({ onNavigate }: CalorieCalculatorWrapperProps) {
+  const { getDailyStats, addCalculatedCalories } = useCalorieTracking();
+  const dailyStats = getDailyStats();
+
   const heroStats = [
     {
-      label: 'Calculate',
-      value: 'Food',
+      label: 'Today Calculated',
+      value: dailyStats.calories.toLocaleString(),
       icon: Calculator,
       color: 'text-blue-600',
       bgColor: 'bg-blue-50',
     },
     {
-      label: 'Track',
-      value: 'Nutrition',
+      label: 'Items Tracked',
+      value: dailyStats.count.toString(),
       icon: Target,
       color: 'text-green-600',
       bgColor: 'bg-green-50',
     },
     {
-      label: 'Achieve',
-      value: 'Goals',
+      label: 'Protein (g)',
+      value: Math.round(dailyStats.protein).toString(),
       icon: Zap,
       color: 'text-orange-600',
       bgColor: 'bg-orange-50',
@@ -51,7 +55,10 @@ export default function CalorieCalculatorWrapper({ onNavigate }: CalorieCalculat
 
       {/* Calculator Content */}
       <div className="px-4">
-        <CalorieCalculator onNavigate={onNavigate} />
+        <CalorieCalculator 
+          onNavigate={onNavigate} 
+          onCaloriesCalculated={addCalculatedCalories}
+        />
       </div>
     </div>
   );

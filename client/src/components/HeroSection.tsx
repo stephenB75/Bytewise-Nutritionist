@@ -44,12 +44,12 @@ export function HeroSection({
   const progressPercentage = Math.min((caloriesConsumed / caloriesGoal) * 100, 100);
   
   return (
-    <div className={`relative bg-gradient-to-br from-blue-600 to-purple-700 text-white px-4 py-6 overflow-hidden ${className}`}>
-      {/* Faded Background Image */}
+    <div className={`relative bg-gradient-to-br from-blue-600 to-purple-700 text-white px-4 py-6 overflow-hidden ${className}`} style={{ marginTop: '80px' }}>
+      {/* Food Background Image */}
       <div 
-        className="absolute inset-0 bg-cover bg-center opacity-10"
+        className="absolute inset-0 bg-cover bg-center opacity-15"
         style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3Cpattern id='food' patternUnits='userSpaceOnUse' width='20' height='20'%3E%3Ccircle cx='10' cy='5' r='2' fill='%23ffffff' opacity='0.1'/%3E%3Ccircle cx='5' cy='15' r='1.5' fill='%23ffffff' opacity='0.08'/%3E%3Crect x='12' y='12' width='3' height='3' rx='1' fill='%23ffffff' opacity='0.1'/%3E%3Cpath d='M15 7c0-1 1-2 2-2s2 1 2 2-1 2-2 2-2-1-2-2z' fill='%23ffffff' opacity='0.06'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100' height='100' fill='url(%23food)'/%3E%3C/svg%3E")`
         }}
       />
       <div className="relative z-10">
