@@ -26,11 +26,11 @@ function LoginScreen({ onNavigate }: LoginScreenProps) {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Dish Background Image */}
+      {/* Food Background Image - Updated to use different image */}
       <div 
         className="absolute inset-0 z-0"
         style={{
-          backgroundImage: `url(/attached_assets/food-3262796_1920_1753859530086.jpg)`,
+          backgroundImage: `url(/attached_assets/variety-5044809_1920_1753859530087.jpg)`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',

@@ -35,10 +35,14 @@ export default function App() {
     window.location.href = '/api/logout';
   };
 
-  // Add global notification event listener
+  // Add global notification event listeners
   useEffect(() => {
     const handleShowNotifications = () => {
       setShowNotifications(true);
+    };
+
+    const handleUpdateNotificationCount = (event: CustomEvent) => {
+      setNotificationCount(event.detail.count);
     };
 
     const handleToast = (event: CustomEvent) => {
@@ -46,12 +50,21 @@ export default function App() {
       // Handle toast notifications here if needed
     };
 
+    const handleCaloriesLogged = (event: CustomEvent) => {
+      console.log('Calories logged from calculator:', event.detail);
+      // Handle weekly logger communication
+    };
+
     window.addEventListener('show-notifications', handleShowNotifications);
+    window.addEventListener('update-notification-count', handleUpdateNotificationCount as EventListener);
     window.addEventListener('show-toast', handleToast as EventListener);
+    window.addEventListener('calories-logged', handleCaloriesLogged as EventListener);
     
     return () => {
       window.removeEventListener('show-notifications', handleShowNotifications);
+      window.removeEventListener('update-notification-count', handleUpdateNotificationCount as EventListener);
       window.removeEventListener('show-toast', handleToast as EventListener);
+      window.removeEventListener('calories-logged', handleCaloriesLogged as EventListener);
     };
   }, []);
 

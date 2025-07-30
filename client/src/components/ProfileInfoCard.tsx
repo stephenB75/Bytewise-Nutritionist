@@ -1,7 +1,8 @@
 /**
- * Profile Info Card Component with Accordion Animation
+ * Combined Profile Info Card Component with Dropdown Functionality
  * 
- * Interactive profile information display with smooth accordion dropdown
+ * Integrated profile information display with accordion animation and profile dropdown
+ * Combines ProfileInfoCard and profile dropdown into one component
  */
 
 import { useState } from 'react';
@@ -9,6 +10,8 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
+import { Separator } from '@/components/ui/separator';
 import { 
   User, 
   Mail, 
@@ -20,7 +23,14 @@ import {
   Edit3, 
   Check, 
   X,
-  Verified
+  Verified,
+  Settings,
+  Shield,
+  Bell,
+  Palette,
+  Globe,
+  LogOut,
+  Camera
 } from 'lucide-react';
 
 interface ProfileInfoCardProps {
@@ -43,6 +53,7 @@ interface ProfileInfoCardProps {
 export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
   const [editedData, setEditedData] = useState({
     firstName: user?.firstName || '',
     lastName: user?.lastName || '',
@@ -139,6 +150,14 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
             <Button
               variant="ghost"
               size="sm"
+              className="h-8 w-8 p-0 relative"
+              onClick={() => setShowDropdown(!showDropdown)}
+            >
+              <Settings className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
               className="h-8 w-8 p-0"
               onClick={() => setIsExpanded(!isExpanded)}
             >
@@ -149,6 +168,81 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
               )}
             </Button>
           </div>
+
+          {/* Profile Dropdown Menu */}
+          {showDropdown && (
+            <div className="absolute top-20 right-4 z-50 w-64 bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden">
+              <div className="p-3 border-b border-gray-100 bg-blue-50">
+                <h3 className="font-semibold text-gray-900 text-sm">Profile Settings</h3>
+              </div>
+              
+              <div className="py-2">
+                <button 
+                  className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
+                  onClick={() => {
+                    setIsEditing(true);
+                    setShowDropdown(false);
+                  }}
+                >
+                  <Edit3 className="w-4 h-4 text-gray-500" />
+                  Edit Profile
+                </button>
+                
+                <button 
+                  className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
+                  onClick={() => {
+                    console.log('Change profile photo');
+                    setShowDropdown(false);
+                  }}
+                >
+                  <Camera className="w-4 h-4 text-gray-500" />
+                  Change Photo
+                </button>
+                
+                <Separator className="my-2" />
+                
+                <button 
+                  className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
+                  onClick={() => {
+                    const event = new CustomEvent('navigate-to-section', {
+                      detail: { section: 'privacy' }
+                    });
+                    window.dispatchEvent(event);
+                    setShowDropdown(false);
+                  }}
+                >
+                  <Shield className="w-4 h-4 text-gray-500" />
+                  Privacy Settings
+                </button>
+                
+                <button 
+                  className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
+                  onClick={() => {
+                    const event = new CustomEvent('navigate-to-section', {
+                      detail: { section: 'notifications' }
+                    });
+                    window.dispatchEvent(event);
+                    setShowDropdown(false);
+                  }}
+                >
+                  <Bell className="w-4 h-4 text-gray-500" />
+                  Notifications
+                </button>
+                
+                <Separator className="my-2" />
+                
+                <button 
+                  className="w-full px-4 py-2 text-left text-sm hover:bg-red-50 text-red-600 flex items-center gap-2"
+                  onClick={() => {
+                    window.location.href = '/api/logout';
+                  }}
+                >
+                  <LogOut className="w-4 h-4" />
+                  Sign Out
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

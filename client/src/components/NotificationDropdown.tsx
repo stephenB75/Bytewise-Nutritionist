@@ -249,7 +249,12 @@ export function NotificationDropdown({ isOpen, onClose }: NotificationDropdownPr
               size="sm"
               className="w-full text-xs text-muted-foreground hover:text-foreground"
               onClick={() => {
-                console.log('View all notifications');
+                // Mark all as read and navigate to notifications page
+                markAllAsRead();
+                const event = new CustomEvent('navigate-to-notifications', {
+                  detail: { page: 'profile', section: 'notifications' }
+                });
+                window.dispatchEvent(event);
                 onClose();
               }}
             >

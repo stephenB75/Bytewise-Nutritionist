@@ -21,6 +21,7 @@ import {
   Target,
   Award
 } from 'lucide-react';
+import { generateProgressReportPDF } from '@/utils/pdfExport';
 
 interface DataManagementPanelProps {
   className?: string;
@@ -58,40 +59,8 @@ export function DataManagementPanel({ className = '' }: DataManagementPanelProps
     setIsExporting(true);
     
     try {
-      // Simulate PDF generation process
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      
-      // Create sample PDF data for the last 6 months
-      const pdfData = {
-        title: 'ByteWise - 6 Month Progress Report',
-        generatedDate: new Date(),
-        userStats: {
-          totalMealsLogged: 156,
-          averageDailyCalories: 1850,
-          streakRecord: 21,
-          goalCompletionRate: 78,
-          achievements: 12
-        },
-        monthlyBreakdown: [
-          { month: 'January', calories: 52000, meals: 28, goals: 22 },
-          { month: 'February', calories: 48000, meals: 26, goals: 20 },
-          { month: 'March', calories: 55000, meals: 30, goals: 25 },
-          { month: 'April', calories: 51000, meals: 27, goals: 23 },
-          { month: 'May', calories: 56000, meals: 31, goals: 26 },
-          { month: 'June', calories: 53000, meals: 29, goals: 24 }
-        ]
-      };
-      
-      // Create and download PDF
-      const pdfBlob = new Blob([JSON.stringify(pdfData, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(pdfBlob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `bytewise-progress-report-${new Date().toISOString().split('T')[0]}.json`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      // Generate and download actual PDF report
+      await generateProgressReportPDF();
       
       // Show success message
       const event = new CustomEvent('show-toast', {

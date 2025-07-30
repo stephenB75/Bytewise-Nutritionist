@@ -60,7 +60,7 @@ export default function CalorieCalculatorWrapper({ onNavigate }: CalorieCalculat
           onNavigate={onNavigate} 
           onCaloriesCalculated={addCalculatedCalories}
           onLogToWeekly={(logData) => {
-            // Add calculated calories to daily tracking
+            // Add calculated calories to daily tracking and communicate with weekly logger
             addCalculatedCalories({
               name: logData.name,
               calories: logData.calories,
@@ -72,6 +72,16 @@ export default function CalorieCalculatorWrapper({ onNavigate }: CalorieCalculat
               sodium: 0,
               ingredients: [logData.name]
             });
+            
+            // Trigger event for weekly logger communication
+            const logEvent = new CustomEvent('calories-logged', {
+              detail: { 
+                ...logData,
+                timestamp: new Date().toISOString(),
+                source: 'calculator'
+              }
+            });
+            window.dispatchEvent(logEvent);
             
             // Show success feedback
             console.log('Successfully logged to weekly:', logData);

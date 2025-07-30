@@ -72,11 +72,19 @@ export function Header({
                 size="sm"
                 className="relative h-9 w-9 p-0 touch-target hover:bg-accent/80 transition-all duration-200"
                 onClick={() => {
-                  // Show notification dropdown or modal
+                  // Mark notifications as seen and show dropdown
                   const event = new CustomEvent('show-notifications', {
-                    detail: { notifications: [] }
+                    detail: { markAsSeen: true }
                   });
                   window.dispatchEvent(event);
+                  
+                  // Update notification count to 0 after viewing
+                  setTimeout(() => {
+                    const updateEvent = new CustomEvent('update-notification-count', {
+                      detail: { count: 0 }
+                    });
+                    window.dispatchEvent(updateEvent);
+                  }, 1000);
                 }}
               >
                 <Bell size={20} />

@@ -395,28 +395,43 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
         <h3 className="text-lg font-bold text-gray-900 mb-4">Privacy & Security</h3>
         
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
             <div>
               <h4 className="font-medium text-gray-900">Profile Visibility</h4>
               <p className="text-sm text-gray-600">Control who can see your profile information</p>
             </div>
-            <Switch defaultChecked={false} />
+            <Switch 
+              defaultChecked={false} 
+              onCheckedChange={(checked) => {
+                console.log('Profile visibility:', checked);
+              }}
+            />
           </div>
 
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
             <div>
               <h4 className="font-medium text-gray-900">Data Sharing</h4>
               <p className="text-sm text-gray-600">Allow anonymized data to improve app features</p>
             </div>
-            <Switch defaultChecked={true} />
+            <Switch 
+              defaultChecked={true} 
+              onCheckedChange={(checked) => {
+                console.log('Data sharing:', checked);
+              }}
+            />
           </div>
 
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
             <div>
               <h4 className="font-medium text-gray-900">Analytics</h4>
               <p className="text-sm text-gray-600">Help us understand how you use the app</p>
             </div>
-            <Switch defaultChecked={true} />
+            <Switch 
+              defaultChecked={true} 
+              onCheckedChange={(checked) => {
+                console.log('Analytics:', checked);
+              }}
+            />
           </div>
 
           <Separator />
@@ -424,24 +439,39 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
           <div>
             <h4 className="font-medium text-gray-900 mb-3">Account Security</h4>
             <div className="space-y-3">
-              <Button 
-                className="w-full justify-start bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.05] hover:-translate-y-1"
-                onClick={() => {
-                  console.log('Password change feature coming soon');
-                }}
-              >
-                <Lock className="w-5 h-5 mr-3" />
-                Change Password
-              </Button>
-              <Button 
-                className="w-full justify-start bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.05] hover:-translate-y-1"
-                onClick={() => {
-                  console.log('Two-factor authentication feature coming soon');
-                }}
-              >
-                <Shield className="w-5 h-5 mr-3" />
-                Two-Factor Authentication
-              </Button>
+              <div className="flex items-center justify-between p-4 rounded-lg bg-red-50 hover:bg-red-100 transition-colors">
+                <div className="flex items-center gap-3">
+                  <Lock className="w-5 h-5 text-red-600" />
+                  <div>
+                    <h4 className="font-medium text-gray-900">Change Password</h4>
+                    <p className="text-sm text-gray-600">Update your account password</p>
+                  </div>
+                </div>
+                <Switch 
+                  defaultChecked={false}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      console.log('Password change initiated');
+                    }
+                  }}
+                />
+              </div>
+              
+              <div className="flex items-center justify-between p-4 rounded-lg bg-emerald-50 hover:bg-emerald-100 transition-colors">
+                <div className="flex items-center gap-3">
+                  <Shield className="w-5 h-5 text-emerald-600" />
+                  <div>
+                    <h4 className="font-medium text-gray-900">Two-Factor Authentication</h4>
+                    <p className="text-sm text-gray-600">Enable extra security for your account</p>
+                  </div>
+                </div>
+                <Switch 
+                  defaultChecked={false}
+                  onCheckedChange={(checked) => {
+                    console.log('Two-factor authentication:', checked);
+                  }}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -523,34 +553,40 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
               Theme
             </label>
             <div className="grid grid-cols-3 gap-2">
-              <Button 
-                variant="outline" 
-                className="justify-start hover:bg-blue-50 hover:border-blue-300 transition-all duration-200"
-                onClick={() => {
-                  console.log('Auto theme selected');
-                }}
-              >
-                <Smartphone className="w-4 h-4 mr-2" />
-                Auto
-              </Button>
-              <Button 
-                variant="outline" 
-                className="justify-start hover:bg-blue-50 hover:border-blue-300 transition-all duration-200"
-                onClick={() => {
-                  console.log('Light theme selected');
-                }}
-              >
-                Light
-              </Button>
-              <Button 
-                variant="outline" 
-                className="justify-start hover:bg-blue-50 hover:border-blue-300 transition-all duration-200"
-                onClick={() => {
-                  console.log('Dark theme selected');
-                }}
-              >
-                Dark
-              </Button>
+              <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
+                <div className="flex items-center gap-2">
+                  <Smartphone className="w-4 h-4 text-gray-600" />
+                  <span className="text-sm">Auto Theme</span>
+                </div>
+                <Switch 
+                  defaultChecked={true}
+                  onCheckedChange={(checked) => {
+                    console.log('Auto theme:', checked);
+                  }}
+                />
+              </div>
+              <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm">Light Theme</span>
+                </div>
+                <Switch 
+                  defaultChecked={false}
+                  onCheckedChange={(checked) => {
+                    console.log('Light theme:', checked);
+                  }}
+                />
+              </div>
+              <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm">Dark Theme</span>
+                </div>
+                <Switch 
+                  defaultChecked={false}
+                  onCheckedChange={(checked) => {
+                    console.log('Dark theme:', checked);
+                  }}
+                />
+              </div>
             </div>
           </div>
 
@@ -558,26 +594,31 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Units
             </label>
-            <div className="grid grid-cols-2 gap-2">
-              <Button 
-                className="justify-start bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.08] hover:-translate-y-2"
-                onClick={() => {
-                  console.log('Switched to metric units');
-                }}
-              >
-                <Globe className="w-5 h-5 mr-3" />
-                Metric (kg, cm)
-              </Button>
-              <Button 
-                className="justify-start bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.08] hover:-translate-y-2"
-                onClick={() => {
-                  // Switch to imperial units without achievement popup
-                  console.log('Switched to imperial units');
-                }}
-              >
-                <Target className="w-5 h-5 mr-3" />
-                Imperial (lb, ft)
-              </Button>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between p-3 rounded-lg bg-violet-50 hover:bg-violet-100 transition-colors">
+                <div className="flex items-center gap-2">
+                  <Globe className="w-4 h-4 text-violet-600" />
+                  <span className="text-sm">Metric (kg, cm)</span>
+                </div>
+                <Switch 
+                  defaultChecked={false}
+                  onCheckedChange={(checked) => {
+                    console.log('Metric units:', checked);
+                  }}
+                />
+              </div>
+              <div className="flex items-center justify-between p-3 rounded-lg bg-cyan-50 hover:bg-cyan-100 transition-colors">
+                <div className="flex items-center gap-2">
+                  <Target className="w-4 h-4 text-cyan-600" />
+                  <span className="text-sm">Imperial (lb, ft)</span>
+                </div>
+                <Switch 
+                  defaultChecked={true}
+                  onCheckedChange={(checked) => {
+                    console.log('Imperial units:', checked);
+                  }}
+                />
+              </div>
             </div>
           </div>
 
@@ -585,16 +626,18 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Language
             </label>
-            <Button 
-              variant="outline" 
-              className="w-full justify-start hover:bg-blue-50 hover:border-blue-300 transition-all duration-200"
-              onClick={() => {
-                console.log('Language setting: English (US)');
-              }}
-            >
-              <Globe className="w-4 h-4 mr-2" />
-              English (US)
-            </Button>
+            <div className="flex items-center justify-between p-3 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors">
+              <div className="flex items-center gap-2">
+                <Globe className="w-4 h-4 text-blue-600" />
+                <span className="text-sm">English (US)</span>
+              </div>
+              <Switch 
+                defaultChecked={true}
+                onCheckedChange={(checked) => {
+                  console.log('English (US):', checked);
+                }}
+              />
+            </div>
           </div>
         </div>
       </Card>
