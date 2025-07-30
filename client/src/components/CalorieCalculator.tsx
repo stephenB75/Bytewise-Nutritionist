@@ -369,22 +369,22 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
                   </div>
                 )}
 
-                <div className="flex gap-2">
+                <div className="space-y-2">
                   {onAddToMeal && (
                     <Button
                       onClick={() => handleAddToMeal(analysis)}
-                      className="flex-1 bg-green-600 hover:bg-green-700"
+                      className="w-full bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
                     >
                       <CheckCircle className="w-4 h-4 mr-2" />
-                      Add to Meal
+                      Add to Current Meal
                     </Button>
                   )}
                   <Button
                     onClick={() => handleLogToWeekly(analysis)}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700"
+                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
                   >
-                    <Calendar className="w-4 h-4 mr-2" />
-                    Log to Weekly
+                    <Calendar className="w-5 h-5 mr-2" />
+                    Log to Weekly Tracker
                   </Button>
                 </div>
               </div>

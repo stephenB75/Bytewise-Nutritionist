@@ -44,13 +44,13 @@ export function HeroSection({
   const progressPercentage = Math.min((caloriesConsumed / caloriesGoal) * 100, 100);
   
   return (
-    <div className={`relative bg-gradient-to-br from-blue-600 to-purple-700 text-white px-4 py-8 overflow-hidden ${className}`} style={{ marginTop: '88px' }}>
-      {/* Food Background Image */}
+    <div className={`relative bg-gradient-to-br from-emerald-500 to-blue-600 text-white px-4 py-6 overflow-hidden ${className}`} style={{ marginTop: '72px' }}>
+      {/* Enhanced Food Background Image */}
       <div 
-        className="absolute inset-0 opacity-20"
+        className="absolute inset-0 opacity-25"
         style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cdefs%3E%3Cpattern id='foodPattern' patternUnits='userSpaceOnUse' width='40' height='40'%3E%3Ccircle cx='8' cy='8' r='3' fill='%23ffffff' opacity='0.15'/%3E%3Ccircle cx='25' cy='15' r='2' fill='%23ffffff' opacity='0.12'/%3E%3Crect x='15' y='25' width='6' height='6' rx='2' fill='%23ffffff' opacity='0.1'/%3E%3Cpath d='M30 5c0-2 2-4 4-4s4 2 4 4-2 4-4 4-4-2-4-4z' fill='%23ffffff' opacity='0.08'/%3E%3Cpath d='M5 30l3-2 3 2-3 5z' fill='%23ffffff' opacity='0.1'/%3E%3Cellipse cx='35' cy='35' rx='4' ry='2' fill='%23ffffff' opacity='0.12'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='200' height='200' fill='url(%23foodPattern)'/%3E%3C/svg%3E")`,
-          backgroundSize: '60px 60px'
+          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cdefs%3E%3Cpattern id='foodBg' patternUnits='userSpaceOnUse' width='80' height='80'%3E%3Ccircle cx='15' cy='15' r='4' fill='%23ffffff' opacity='0.2'/%3E%3Ccircle cx='50' cy='30' r='3' fill='%23ffffff' opacity='0.15'/%3E%3Crect x='30' y='50' width='8' height='8' rx='3' fill='%23ffffff' opacity='0.18'/%3E%3Cpath d='M60 10c0-3 3-6 6-6s6 3 6 6-3 6-6 6-6-3-6-6z' fill='%23ffffff' opacity='0.12'/%3E%3Cpath d='M10 60l5-3 5 3-5 8z' fill='%23ffffff' opacity='0.16'/%3E%3Cellipse cx='70' cy='70' rx='6' ry='3' fill='%23ffffff' opacity='0.14'/%3E%3Cpath d='M25 40c2-2 6-2 8 0s2 6 0 8-6 2-8 0-2-6 0-8z' fill='%23ffffff' opacity='0.1'/%3E%3Ccircle cx='45' cy='65' r='2.5' fill='%23ffffff' opacity='0.13'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='400' height='400' fill='url(%23foodBg)'/%3E%3C/svg%3E")`,
+          backgroundSize: '100px 100px'
         }}
       />
       <div className="relative z-10">

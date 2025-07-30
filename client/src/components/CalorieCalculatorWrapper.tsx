@@ -59,9 +59,21 @@ export default function CalorieCalculatorWrapper({ onNavigate }: CalorieCalculat
           onNavigate={onNavigate} 
           onCaloriesCalculated={addCalculatedCalories}
           onLogToWeekly={(logData) => {
-            // Handle logging to weekly logger
-            console.log('Logging to weekly:', logData);
-            // This could trigger navigation to logger or show success message
+            // Add calculated calories to daily tracking
+            addCalculatedCalories({
+              name: logData.name,
+              calories: logData.calories,
+              protein: logData.protein,
+              carbs: logData.carbs,
+              fat: logData.fat,
+              fiber: 0,
+              sugar: 0,
+              sodium: 0,
+              ingredients: [logData.name]
+            });
+            
+            // Show success feedback
+            console.log('Successfully logged to weekly:', logData);
           }}
         />
       </div>

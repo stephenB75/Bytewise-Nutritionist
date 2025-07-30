@@ -428,7 +428,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
             <h4 className="font-medium text-gray-900 mb-3">Account Security</h4>
             <div className="space-y-3">
               <Button 
-                className="w-full justify-start bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                className="w-full justify-start bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.05] hover:-translate-y-1"
                 onClick={() => {
                   setCelebrationAchievement({
                     title: "Password Change",
@@ -438,11 +438,11 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
                   setShowCelebration(true);
                 }}
               >
-                <Lock className="w-4 h-4 mr-2" />
+                <Lock className="w-5 h-5 mr-3" />
                 Change Password
               </Button>
               <Button 
-                className="w-full justify-start bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                className="w-full justify-start bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.05] hover:-translate-y-1"
                 onClick={() => {
                   setCelebrationAchievement({
                     title: "Two-Factor Authentication",
@@ -452,7 +452,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
                   setShowCelebration(true);
                 }}
               >
-                <Shield className="w-4 h-4 mr-2" />
+                <Shield className="w-5 h-5 mr-3" />
                 Two-Factor Authentication
               </Button>
             </div>
@@ -468,10 +468,10 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
         <h3 className="text-lg font-bold text-gray-900 mb-4">Notification Preferences</h3>
         
         <div className="space-y-4">
-          <div className="flex items-center justify-between p-5 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02]">
+          <div className="flex items-center justify-between p-6 rounded-2xl bg-gradient-to-r from-amber-50 via-yellow-50 to-orange-50 border-2 border-amber-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.03] hover:-translate-y-1">
             <div>
-              <h4 className="font-bold text-gray-900">Meal Reminders</h4>
-              <p className="text-sm text-blue-700">Get reminded to log your meals</p>
+              <h4 className="font-bold text-gray-900 text-lg">Meal Reminders</h4>
+              <p className="text-sm text-amber-700 font-medium">Get reminded to log your meals</p>
             </div>
             <Switch 
               defaultChecked={true} 
@@ -487,10 +487,10 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
             />
           </div>
 
-          <div className="flex items-center justify-between p-5 rounded-xl bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02]">
+          <div className="flex items-center justify-between p-6 rounded-2xl bg-gradient-to-r from-purple-50 via-indigo-50 to-blue-50 border-2 border-purple-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.03] hover:-translate-y-1">
             <div>
-              <h4 className="font-bold text-gray-900">Achievement Alerts</h4>
-              <p className="text-sm text-orange-700">Celebrate when you earn new achievements</p>
+              <h4 className="font-bold text-gray-900 text-lg">Achievement Alerts</h4>
+              <p className="text-sm text-purple-700 font-medium">Celebrate when you earn new achievements</p>
             </div>
             <Switch 
               defaultChecked={true}
@@ -506,10 +506,10 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
             />
           </div>
 
-          <div className="flex items-center justify-between p-4 rounded-lg hover:bg-blue-50 transition-all duration-200 border border-transparent hover:border-blue-200 shadow-sm">
+          <div className="flex items-center justify-between p-6 rounded-2xl bg-gradient-to-r from-emerald-50 via-teal-50 to-cyan-50 border-2 border-emerald-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.03] hover:-translate-y-1">
             <div>
-              <h4 className="font-medium text-gray-900">Weekly Reports</h4>
-              <p className="text-sm text-gray-600">Receive your weekly nutrition summary</p>
+              <h4 className="font-bold text-gray-900 text-lg">Weekly Reports</h4>
+              <p className="text-sm text-emerald-700 font-medium">Receive your weekly nutrition summary</p>
             </div>
             <Switch 
               defaultChecked={false}
@@ -525,10 +525,10 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
             />
           </div>
 
-          <div className="flex items-center justify-between p-4 rounded-lg hover:bg-blue-50 transition-all duration-200 border border-transparent hover:border-blue-200 shadow-sm">
+          <div className="flex items-center justify-between p-6 rounded-2xl bg-gradient-to-r from-rose-50 via-pink-50 to-red-50 border-2 border-rose-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.03] hover:-translate-y-1">
             <div>
-              <h4 className="font-medium text-gray-900">App Updates</h4>
-              <p className="text-sm text-gray-600">Stay informed about new features</p>
+              <h4 className="font-bold text-gray-900 text-lg">App Updates</h4>
+              <p className="text-sm text-rose-700 font-medium">Stay informed about new features</p>
             </div>
             <Switch 
               defaultChecked={true}
@@ -611,7 +611,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
             </label>
             <div className="grid grid-cols-2 gap-2">
               <Button 
-                className="justify-start bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                className="justify-start bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.08] hover:-translate-y-2"
                 onClick={() => {
                   setCelebrationAchievement({
                     title: "Metric System",
@@ -621,11 +621,11 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
                   setShowCelebration(true);
                 }}
               >
-                <Globe className="w-4 h-4 mr-2" />
+                <Globe className="w-5 h-5 mr-3" />
                 Metric (kg, cm)
               </Button>
               <Button 
-                className="justify-start bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                className="justify-start bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.08] hover:-translate-y-2"
                 onClick={() => {
                   setCelebrationAchievement({
                     title: "Imperial System",
@@ -635,6 +635,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
                   setShowCelebration(true);
                 }}
               >
+                <Target className="w-5 h-5 mr-3" />
                 Imperial (lb, ft)
               </Button>
             </div>
