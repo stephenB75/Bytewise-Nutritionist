@@ -94,8 +94,8 @@ export function NotificationDropdown({
   };
 
   return (
-    <div className="absolute top-full right-0 mt-2 w-96 z-50">
-      <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+    <div className="absolute top-full right-0 mt-2 w-80 max-h-96 z-50">
+      <Card className="p-4 bg-white/80 backdrop-blur-sm border-0 shadow-lg max-h-96 overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">

@@ -224,66 +224,74 @@ function Dashboard({ onNavigate }: DashboardProps) {
             </div>
           </div>
           
-          {/* Macro Nutrients */}
-          <div className="grid grid-cols-3 gap-4 mb-6">
+          {/* Macro Nutrients - 4 Column Layout with Vertical Bars */}
+          <div className="grid grid-cols-4 gap-3 mb-6">
             <div className="text-center p-3 bg-red-50 rounded-lg">
               <div className="p-2 bg-red-100 rounded-lg w-fit mx-auto mb-2">
-                <Beef className="w-5 h-5 text-red-600" />
+                <Beef className="w-4 h-4 text-red-600" />
               </div>
-              <div className="text-2xl font-bold text-red-600">{userStats.proteinConsumed}g</div>
-              <div className="text-sm text-gray-600">Protein</div>
-              <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+              <div className="text-xl font-bold text-red-600">{userStats.proteinConsumed}g</div>
+              <div className="text-xs text-gray-600 mb-2">Protein</div>
+              
+              {/* Vertical Bar */}
+              <div className="h-16 w-3 bg-gray-200 rounded-full mx-auto mb-2 relative">
                 <div 
-                  className="bg-red-500 h-2 rounded-full" 
-                  style={{ width: `${Math.min(proteinProgress, 100)}%` }}
+                  className="bg-red-500 w-full rounded-full absolute bottom-0 transition-all duration-500" 
+                  style={{ height: `${Math.min(proteinProgress, 100)}%` }}
                 ></div>
               </div>
-              <div className="text-xs text-gray-500 mt-1">Goal: {userStats.proteinGoal}g</div>
+              <div className="text-xs text-gray-500">{userStats.proteinGoal}g</div>
             </div>
 
             <div className="text-center p-3 bg-yellow-50 rounded-lg">
               <div className="p-2 bg-yellow-100 rounded-lg w-fit mx-auto mb-2">
-                <Calendar className="w-5 h-5 text-yellow-600" />
+                <Calendar className="w-4 h-4 text-yellow-600" />
               </div>
-              <div className="text-2xl font-bold text-yellow-600">{userStats.carbsConsumed}g</div>
-              <div className="text-sm text-gray-600">Carbs</div>
-              <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+              <div className="text-xl font-bold text-yellow-600">{userStats.carbsConsumed}g</div>
+              <div className="text-xs text-gray-600 mb-2">Carbs</div>
+              
+              {/* Vertical Bar */}
+              <div className="h-16 w-3 bg-gray-200 rounded-full mx-auto mb-2 relative">
                 <div 
-                  className="bg-yellow-500 h-2 rounded-full" 
-                  style={{ width: `${Math.min(carbsProgress, 100)}%` }}
+                  className="bg-yellow-500 w-full rounded-full absolute bottom-0 transition-all duration-500" 
+                  style={{ height: `${Math.min(carbsProgress, 100)}%` }}
                 ></div>
               </div>
-              <div className="text-xs text-gray-500 mt-1">Goal: {userStats.carbsGoal}g</div>
+              <div className="text-xs text-gray-500">{userStats.carbsGoal}g</div>
             </div>
 
             <div className="text-center p-3 bg-green-50 rounded-lg">
               <div className="p-2 bg-green-100 rounded-lg w-fit mx-auto mb-2">
-                <Droplets className="w-5 h-5 text-green-600" />
+                <Droplets className="w-4 h-4 text-green-600" />
               </div>
-              <div className="text-2xl font-bold text-green-600">{userStats.fatConsumed}g</div>
-              <div className="text-sm text-gray-600">Fat</div>
-              <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+              <div className="text-xl font-bold text-green-600">{userStats.fatConsumed}g</div>
+              <div className="text-xs text-gray-600 mb-2">Fat</div>
+              
+              {/* Vertical Bar */}
+              <div className="h-16 w-3 bg-gray-200 rounded-full mx-auto mb-2 relative">
                 <div 
-                  className="bg-green-500 h-2 rounded-full" 
-                  style={{ width: `${Math.min(fatProgress, 100)}%` }}
+                  className="bg-green-500 w-full rounded-full absolute bottom-0 transition-all duration-500" 
+                  style={{ height: `${Math.min(fatProgress, 100)}%` }}
                 ></div>
               </div>
-              <div className="text-xs text-gray-500 mt-1">Goal: {userStats.fatGoal}g</div>
+              <div className="text-xs text-gray-500">{userStats.fatGoal}g</div>
             </div>
 
-            <div className="text-center p-3 bg-purple-50 rounded-lg">
-              <div className="p-2 bg-purple-100 rounded-lg w-fit mx-auto mb-2">
-                <Droplets className="w-5 h-5 text-purple-600" />
+            <div className="text-center p-3 bg-blue-50 rounded-lg">
+              <div className="p-2 bg-blue-100 rounded-lg w-fit mx-auto mb-2">
+                <Droplets className="w-4 h-4 text-blue-600" />
               </div>
-              <div className="text-2xl font-bold text-purple-600">67g</div>
-              <div className="text-sm text-gray-600">Fat</div>
-              <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+              <div className="text-xl font-bold text-blue-600">{userStats.waterConsumed}</div>
+              <div className="text-xs text-gray-600 mb-2">Water</div>
+              
+              {/* Vertical Bar */}
+              <div className="h-16 w-3 bg-gray-200 rounded-full mx-auto mb-2 relative">
                 <div 
-                  className="bg-purple-500 h-2 rounded-full" 
-                  style={{ width: '85%' }}
+                  className="bg-blue-500 w-full rounded-full absolute bottom-0 transition-all duration-500" 
+                  style={{ height: `${Math.min(waterProgress, 100)}%` }}
                 ></div>
               </div>
-              <div className="text-xs text-gray-500 mt-1">Goal: 79g</div>
+              <div className="text-xs text-gray-500">{userStats.waterGoal} cups</div>
             </div>
           </div>
 

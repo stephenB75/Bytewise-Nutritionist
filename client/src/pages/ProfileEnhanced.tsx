@@ -1022,7 +1022,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
       />
 
       {/* Navigation Tabs */}
-      <div className="px-4 py-4">
+      <div className="max-w-lg mx-auto w-full px-4 py-4">
         <div className="bg-white/80 backdrop-blur-sm rounded-lg p-2 shadow-lg">
           <div className="grid grid-cols-3 md:grid-cols-7 gap-1">
             {profileSections.map((section) => {
@@ -1049,7 +1049,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
       </div>
 
       {/* Content */}
-      <div className="flex-1 px-4 pb-6">
+      <div className="flex-1 max-w-lg mx-auto w-full px-4 pb-20">
         {renderSection()}
       </div>
 
