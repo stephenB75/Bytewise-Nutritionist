@@ -214,16 +214,28 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
 
           <Separator />
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Age
-              </label>
-              <Input 
-                type="number"
-                placeholder="25"
-                className="text-base"
-              />
+          <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Age
+                </label>
+                <Input 
+                  type="number"
+                  placeholder="25"
+                  className="text-base"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Weight (lbs)
+                </label>
+                <Input 
+                  type="number"
+                  placeholder="154"
+                  className="text-base"
+                />
+              </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -244,16 +256,6 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
                 <span className="text-sm text-gray-500 self-center">in</span>
               </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Weight (lbs)
-              </label>
-              <Input 
-                type="number"
-                placeholder="154"
-                className="text-base"
-              />
-            </div>
           </div>
         </div>
 
@@ -273,30 +275,34 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
           </Badge>
         </div>
         
-        <div className="grid grid-cols-2 gap-4">
-          <div className="text-center p-3 bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-lg">
-            <Flame className="w-6 h-6 mx-auto text-orange-500 mb-2" />
-            <p className="text-2xl font-bold text-gray-900">{userStats.currentStreak || 0}</p>
-            <p className="text-sm text-gray-600">Day Streak</p>
-            <p className="text-xs text-orange-600 mt-1">Real tracking data</p>
+        <div className="grid grid-cols-1 gap-3">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="text-center p-3 bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-lg">
+              <Flame className="w-6 h-6 mx-auto text-orange-500 mb-2" />
+              <p className="text-xl font-bold text-gray-900">{userStats.currentStreak || 0}</p>
+              <p className="text-sm text-gray-600">Day Streak</p>
+              <p className="text-xs text-orange-600 mt-1">Real tracking data</p>
+            </div>
+            <div className="text-center p-3 bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-lg">
+              <Calendar className="w-6 h-6 mx-auto text-blue-500 mb-2" />
+              <p className="text-xl font-bold text-gray-900">{userStats.totalMealsLogged || 0}</p>
+              <p className="text-sm text-gray-600">Meals Logged</p>
+              <p className="text-xs text-blue-600 mt-1">Calculator + Logger</p>
+            </div>
           </div>
-          <div className="text-center p-3 bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-lg">
-            <Calendar className="w-6 h-6 mx-auto text-blue-500 mb-2" />
-            <p className="text-2xl font-bold text-gray-900">{userStats.totalMealsLogged || 0}</p>
-            <p className="text-sm text-gray-600">Meals Logged</p>
-            <p className="text-xs text-blue-600 mt-1">Calculator + Logger</p>
-          </div>
-          <div className="text-center p-3 bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-lg">
-            <Target className="w-6 h-6 mx-auto text-green-500 mb-2" />
-            <p className="text-2xl font-bold text-gray-900">{(userStats.caloriesTracked || 0).toLocaleString()}</p>
-            <p className="text-sm text-gray-600">Calories Tracked</p>
-            <p className="text-xs text-green-600 mt-1">USDA verified</p>
-          </div>
-          <div className="text-center p-3 bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-lg">
-            <Star className="w-6 h-6 mx-auto text-purple-500 mb-2" />
-            <p className="text-lg font-bold text-gray-900">{userStats.favoriteFood || 'None yet'}</p>
-            <p className="text-sm text-gray-600">Top Food</p>
-            <p className="text-xs text-purple-600 mt-1">Based on frequency</p>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="text-center p-3 bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-lg">
+              <Target className="w-6 h-6 mx-auto text-green-500 mb-2" />
+              <p className="text-xl font-bold text-gray-900">{(userStats.caloriesTracked || 0).toLocaleString()}</p>
+              <p className="text-sm text-gray-600">Calories Tracked</p>
+              <p className="text-xs text-green-600 mt-1">USDA verified</p>
+            </div>
+            <div className="text-center p-3 bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-lg">
+              <Star className="w-6 h-6 mx-auto text-purple-500 mb-2" />
+              <p className="text-lg font-bold text-gray-900">{userStats.favoriteFood || 'None yet'}</p>
+              <p className="text-sm text-gray-600">Top Food</p>
+              <p className="text-xs text-purple-600 mt-1">Based on frequency</p>
+            </div>
           </div>
         </div>
         
@@ -506,26 +512,30 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
           {/* Security Summary */}
           <div>
             <h4 className="font-medium text-gray-900 mb-3">Security Status</h4>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="text-center p-3 bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-lg">
-                <Shield className="w-5 h-5 mx-auto text-green-600 mb-1" />
-                <p className="text-xs text-gray-600">Account Status</p>
-                <p className="font-bold text-gray-900">Secure</p>
+            <div className="grid grid-cols-1 gap-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="text-center p-3 bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-lg">
+                  <Shield className="w-5 h-5 mx-auto text-green-600 mb-1" />
+                  <p className="text-xs text-gray-600">Account Status</p>
+                  <p className="font-bold text-gray-900">Secure</p>
+                </div>
+                <div className="text-center p-3 bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-lg">
+                  <Lock className="w-5 h-5 mx-auto text-blue-600 mb-1" />
+                  <p className="text-xs text-gray-600">Last Login</p>
+                  <p className="font-bold text-gray-900">Today</p>
+                </div>
               </div>
-              <div className="text-center p-3 bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-lg">
-                <Lock className="w-5 h-5 mx-auto text-blue-600 mb-1" />
-                <p className="text-xs text-gray-600">Last Login</p>
-                <p className="font-bold text-gray-900">Today</p>
-              </div>
-              <div className="text-center p-3 bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-lg">
-                <Users className="w-5 h-5 mx-auto text-purple-600 mb-1" />
-                <p className="text-xs text-gray-600">Data Privacy</p>
-                <p className="font-bold text-gray-900">Protected</p>
-              </div>
-              <div className="text-center p-3 bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-lg">
-                <Eye className="w-5 h-5 mx-auto text-orange-600 mb-1" />
-                <p className="text-xs text-gray-600">Visibility</p>
-                <p className="font-bold text-gray-900">Private</p>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="text-center p-3 bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-lg">
+                  <Users className="w-5 h-5 mx-auto text-purple-600 mb-1" />
+                  <p className="text-xs text-gray-600">Data Privacy</p>
+                  <p className="font-bold text-gray-900">Protected</p>
+                </div>
+                <div className="text-center p-3 bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-lg">
+                  <Eye className="w-5 h-5 mx-auto text-orange-600 mb-1" />
+                  <p className="text-xs text-gray-600">Visibility</p>
+                  <p className="font-bold text-gray-900">Private</p>
+                </div>
               </div>
             </div>
           </div>
@@ -879,26 +889,30 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
           {/* App Status Summary */}
           <div>
             <h4 className="font-medium text-gray-900 mb-3">App Status</h4>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="text-center p-3 bg-gray-50 rounded-lg">
-                <Star className="w-5 h-5 mx-auto text-green-600 mb-1" />
-                <p className="text-xs text-gray-600">Version</p>
-                <p className="font-bold text-gray-900">Latest</p>
+            <div className="grid grid-cols-1 gap-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="text-center p-3 bg-gray-50 rounded-lg">
+                  <Star className="w-5 h-5 mx-auto text-green-600 mb-1" />
+                  <p className="text-xs text-gray-600">Version</p>
+                  <p className="font-bold text-gray-900">Latest</p>
+                </div>
+                <div className="text-center p-3 bg-gray-50 rounded-lg">
+                  <Database className="w-5 h-5 mx-auto text-blue-600 mb-1" />
+                  <p className="text-xs text-gray-600">Database</p>
+                  <p className="font-bold text-gray-900">USDA</p>
+                </div>
               </div>
-              <div className="text-center p-3 bg-gray-50 rounded-lg">
-                <Database className="w-5 h-5 mx-auto text-blue-600 mb-1" />
-                <p className="text-xs text-gray-600">Database</p>
-                <p className="font-bold text-gray-900">USDA</p>
-              </div>
-              <div className="text-center p-3 bg-gray-50 rounded-lg">
-                <Shield className="w-5 h-5 mx-auto text-purple-600 mb-1" />
-                <p className="text-xs text-gray-600">Security</p>
-                <p className="font-bold text-gray-900">Secure</p>
-              </div>
-              <div className="text-center p-3 bg-gray-50 rounded-lg">
-                <Settings className="w-5 h-5 mx-auto text-orange-600 mb-1" />
-                <p className="text-xs text-gray-600">Status</p>
-                <p className="font-bold text-gray-900">Stable</p>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="text-center p-3 bg-gray-50 rounded-lg">
+                  <Shield className="w-5 h-5 mx-auto text-purple-600 mb-1" />
+                  <p className="text-xs text-gray-600">Security</p>
+                  <p className="font-bold text-gray-900">Secure</p>
+                </div>
+                <div className="text-center p-3 bg-gray-50 rounded-lg">
+                  <Settings className="w-5 h-5 mx-auto text-orange-600 mb-1" />
+                  <p className="text-xs text-gray-600">Status</p>
+                  <p className="font-bold text-gray-900">Stable</p>
+                </div>
               </div>
             </div>
           </div>
@@ -1022,7 +1036,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
       />
 
       {/* Navigation Tabs */}
-      <div className="max-w-lg mx-auto w-full px-4 py-4">
+      <div className="max-w-md mx-auto w-full px-3 py-4">
         <div className="bg-white/80 backdrop-blur-sm rounded-lg p-2 shadow-lg">
           <div className="grid grid-cols-3 md:grid-cols-7 gap-1">
             {profileSections.map((section) => {

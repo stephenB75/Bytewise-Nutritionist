@@ -70,8 +70,8 @@ export function CombinedProfileInfo({ user }: CombinedProfileInfoProps) {
   return (
     <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
       {/* Header with Profile Info */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-4">
+      <div className="mb-4">
+        <div className="flex items-center gap-4 mb-4">
           <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center">
             <User className="w-8 h-8 text-blue-600" />
           </div>
@@ -87,49 +87,6 @@ export function CombinedProfileInfo({ user }: CombinedProfileInfoProps) {
               )}
             </div>
           </div>
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="flex items-center gap-2"
-          >
-            {isExpanded ? (
-              <>
-                <ChevronUp className="w-4 h-4" />
-                Less Info
-              </>
-            ) : (
-              <>
-                <ChevronDown className="w-4 h-4" />
-                More Info
-              </>
-            )}
-          </Button>
-          
-          {!isEditing ? (
-            <Button
-              size="sm"
-              onClick={() => setIsEditing(true)}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              <Edit className="w-4 h-4 mr-2" />
-              Edit
-            </Button>
-          ) : (
-            <div className="flex gap-2">
-              <Button size="sm" onClick={handleSave} className="bg-green-600 hover:bg-green-700">
-                <Save className="w-4 h-4 mr-2" />
-                Save
-              </Button>
-              <Button size="sm" variant="outline" onClick={handleCancel}>
-                <X className="w-4 h-4 mr-2" />
-                Cancel
-              </Button>
-            </div>
-          )}
         </div>
       </div>
 
@@ -171,28 +128,30 @@ export function CombinedProfileInfo({ user }: CombinedProfileInfoProps) {
               {/* Basic Information */}
               <div>
                 <h4 className="font-medium text-gray-900 mb-3">Basic Information</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      First Name
-                    </label>
-                    <Input
-                      value={formData.firstName}
-                      onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                      placeholder="Enter first name"
-                    />
+                <div className="grid grid-cols-1 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        First Name
+                      </label>
+                      <Input
+                        value={formData.firstName}
+                        onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                        placeholder="Enter first name"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Last Name
+                      </label>
+                      <Input
+                        value={formData.lastName}
+                        onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                        placeholder="Enter last name"
+                      />
+                    </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Last Name
-                    </label>
-                    <Input
-                      value={formData.lastName}
-                      onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                      placeholder="Enter last name"
-                    />
-                  </div>
-                  <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Email Address
                     </label>
@@ -209,33 +168,30 @@ export function CombinedProfileInfo({ user }: CombinedProfileInfoProps) {
               {/* Physical Details */}
               <div>
                 <h4 className="font-medium text-gray-900 mb-3">Physical Details</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Age
-                    </label>
-                    <Input
-                      type="number"
-                      value={formData.age}
-                      onChange={(e) => setFormData({ ...formData, age: e.target.value })}
-                      placeholder="Enter age"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Gender
-                    </label>
-                    <select
-                      value={formData.gender}
-                      onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-                      className="w-full p-2 border border-gray-300 rounded-md"
-                    >
-                      <option value="">Select gender</option>
-                      <option value="male">Male</option>
-                      <option value="female">Female</option>
-                      <option value="other">Other</option>
-                      <option value="prefer-not-to-say">Prefer not to say</option>
-                    </select>
+                <div className="grid grid-cols-1 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Age
+                      </label>
+                      <Input
+                        type="number"
+                        value={formData.age}
+                        onChange={(e) => setFormData({ ...formData, age: e.target.value })}
+                        placeholder="Enter age"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Weight (lbs)
+                      </label>
+                      <Input
+                        type="number"
+                        value={formData.weight}
+                        onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
+                        placeholder="Enter weight in pounds"
+                      />
+                    </div>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -260,16 +216,21 @@ export function CombinedProfileInfo({ user }: CombinedProfileInfoProps) {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Weight (lbs)
+                      Gender
                     </label>
-                    <Input
-                      type="number"
-                      value={formData.weight}
-                      onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
-                      placeholder="Enter weight in pounds"
-                    />
+                    <select
+                      value={formData.gender}
+                      onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+                      className="w-full p-2 border border-gray-300 rounded-md"
+                    >
+                      <option value="">Select gender</option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                      <option value="other">Other</option>
+                      <option value="prefer-not-to-say">Prefer not to say</option>
+                    </select>
                   </div>
-                  <div className="md:col-span-2">
+                  <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Activity Level
                     </label>
@@ -327,6 +288,50 @@ export function CombinedProfileInfo({ user }: CombinedProfileInfoProps) {
           )}
         </>
       )}
+      
+      {/* Moved buttons to bottom of card */}
+      <div className="flex items-center justify-center gap-2 mt-6 pt-4 border-t border-gray-100">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="flex items-center gap-2 flex-1"
+        >
+          {isExpanded ? (
+            <>
+              <ChevronUp className="w-4 h-4" />
+              Less Info
+            </>
+          ) : (
+            <>
+              <ChevronDown className="w-4 h-4" />
+              More Info
+            </>
+          )}
+        </Button>
+        
+        {!isEditing ? (
+          <Button
+            size="sm"
+            onClick={() => setIsEditing(true)}
+            className="bg-blue-600 hover:bg-blue-700 flex-1"
+          >
+            <Edit className="w-4 h-4 mr-2" />
+            Edit
+          </Button>
+        ) : (
+          <div className="flex gap-2 flex-1">
+            <Button size="sm" onClick={handleSave} className="bg-green-600 hover:bg-green-700 flex-1">
+              <Save className="w-4 h-4 mr-2" />
+              Save
+            </Button>
+            <Button size="sm" variant="outline" onClick={handleCancel} className="flex-1">
+              <X className="w-4 h-4 mr-2" />
+              Cancel
+            </Button>
+          </div>
+        )}
+      </div>
     </Card>
   );
 }
