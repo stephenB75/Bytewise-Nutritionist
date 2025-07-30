@@ -96,33 +96,42 @@ export default function Landing({ onNavigateToForgotPassword }: LandingProps) {
           <div className="space-y-4 max-w-sm mx-auto">
             <Button 
               onClick={() => window.location.href = '/api/login'}
-              className="w-full h-12 text-lg font-semibold touch-target btn-animate group"
+              className="w-full h-14 text-lg font-semibold touch-target btn-animate group bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white shadow-lg hover:shadow-xl"
               size="lg"
-              style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "1rem", fontWeight: 500 }}
+              style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "1.125rem", fontWeight: 600 }}
             >
-              Start Your Journey
-              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              Sign In with Replit
+              <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Button>
             
-            <div className="flex flex-col space-y-3">
+            <Button 
+              variant="outline"
+              onClick={() => window.location.href = '/api/login'}
+              className="w-full h-12 text-base font-medium touch-target hover:bg-primary/10 hover:border-primary/50"
+              style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "1rem", fontWeight: 500 }}
+            >
+              Get Started Free
+            </Button>
+            
+            <div className="flex flex-col space-y-3 mt-4">
               <p className="text-sm text-muted-foreground" style={{ fontFamily: "'Quicksand', sans-serif", fontSize: "0.875rem", fontWeight: 400 }}>
-                Sign in with your Replit account to get started
+                Free to use • No credit card required • Secure authentication
               </p>
               
               <div className="flex justify-center space-x-4">
                 {onNavigateToForgotPassword && (
                   <button
                     onClick={onNavigateToForgotPassword}
-                    className="text-sm text-primary hover:text-primary/80 transition-colors"
+                    className="text-sm text-primary hover:text-primary/80 transition-colors underline"
                     style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "0.875rem", fontWeight: 500 }}
                   >
-                    Need help?
+                    Need help signing in?
                   </button>
                 )}
                 <span className="text-sm text-muted-foreground">•</span>
                 <button
                   onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="text-sm text-primary hover:text-primary/80 transition-colors"
+                  className="text-sm text-primary hover:text-primary/80 transition-colors underline"
                   style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "0.875rem", fontWeight: 500 }}
                 >
                   Learn more
@@ -132,6 +141,35 @@ export default function Landing({ onNavigateToForgotPassword }: LandingProps) {
           </div>
         </div>
       </div>
+
+      {/* Quick Access Section */}
+      <section className="px-4 py-8 bg-muted/30">
+        <div className="max-w-2xl mx-auto text-center">
+          <h3 className="text-lg font-semibold mb-4" style={{ fontFamily: "'League Spartan', sans-serif", fontSize: "1.25rem", fontWeight: 600 }}>
+            Ready to Transform Your Nutrition Journey?
+          </h3>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
+            <Button 
+              onClick={() => window.location.href = '/api/login'}
+              className="flex-1 h-12 font-semibold touch-target btn-animate bg-primary hover:bg-primary/90 text-white"
+              style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "1rem", fontWeight: 500 }}
+            >
+              Login Now
+            </Button>
+            <Button 
+              variant="outline"
+              onClick={() => window.location.href = '/api/login'}
+              className="flex-1 h-12 font-semibold touch-target hover:bg-primary/10"
+              style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "1rem", fontWeight: 500 }}
+            >
+              Sign Up Free
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground mt-3" style={{ fontFamily: "'Quicksand', sans-serif", fontSize: "0.75rem", fontWeight: 400 }}>
+            Both options use your secure Replit account
+          </p>
+        </div>
+      </section>
 
       {/* Features Section */}
       <section id="features" className="px-4 py-12">
