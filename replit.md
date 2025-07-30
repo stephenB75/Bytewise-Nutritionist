@@ -55,14 +55,16 @@ Preferred communication style: Simple, everyday language.
 - **Theme System**: CSS variables with light/dark mode support
 
 ### Component Library
-- **Base**: Complete shadcn/ui component library (30+ components) built on Radix UI primitives
-- **Core Components**: Button, Input, Card, Dialog, Tabs, Calendar, Carousel, Form, etc.
-- **Navigation**: Pagination, Breadcrumb, Navigation Menu, Sidebar
-- **Layout**: Resizable panels, Separator, Aspect Ratio
-- **Feedback**: Toast, Progress, Hover Card, Tooltip
+- **Base**: Complete shadcn/ui component library (35+ components) built on Radix UI primitives
+- **Core Components**: Button, Input, Card, Dialog, Tabs, Calendar, Carousel, Form, Checkbox, etc.
+- **Navigation**: Pagination, Breadcrumb, Navigation Menu, Sidebar, Menubar
+- **Layout**: Resizable panels, Separator, Aspect Ratio, Table, Skeleton
+- **Feedback**: Toast, Progress, Hover Card, Tooltip, Alert Dialog
+- **Data Display**: Chart, Table, Accordion, Sheet
 - **Custom Components**: Nutrition-specific components (progress rings, meal cards)
 - **Typography**: Custom font system with League Spartan, Quicksand, and Work Sans
 - **Icons**: Lucide React icon library
+- **Mobile Hook**: useIsMobile hook for responsive behavior
 
 ### Enhanced Styling System
 - **Brand Spacing**: Consistent spacing system with mobile-optimized values (xs: 2px to 4xl: 32px)
@@ -148,6 +150,7 @@ Preferred communication style: Simple, everyday language.
 
 ### Major System Updates (January 2025)
 - **Enhanced Component Integration**: Successfully integrated CalorieCalculator, Profile, Calendar, and MealLogger components with consistent Bytewise design
+- **Expanded Component Library**: Added 10+ new shadcn/ui components including Menubar, Checkbox, Skeleton, Table, Navigation Menu with mobile-responsive hooks
 - **Food Database System**: Created FoodDatabaseProvider with unified API access for food search and nutrition data
 - **Notification System**: Implemented NotificationProvider with toast notifications for meal logging and user feedback
 - **API Route Fixes**: Fixed "Invalid meal ID" error by adding proper /api/meals/today endpoint in server routes
