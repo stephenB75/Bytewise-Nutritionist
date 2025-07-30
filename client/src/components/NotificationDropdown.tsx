@@ -1,29 +1,32 @@
 /**
  * Notification Dropdown Component
  * 
- * Displays user notifications with badge animations and clear/mark as read functionality
+ * Data management card styled notification popup for header bell icon
+ * Features comprehensive notification display with proper sizing
  */
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { 
-  Bell, 
-  Check, 
-  X, 
-  Trophy, 
-  Target, 
-  Calendar, 
-  Info,
+  Bell,
   CheckCircle,
-  AlertCircle
+  Info,
+  AlertTriangle,
+  XCircle,
+  Trash2,
+  Calendar,
+  Target,
+  Flame,
+  TrendingUp,
+  X
 } from 'lucide-react';
 
-interface Notification {
+interface NotificationItem {
   id: string;
-  type: 'achievement' | 'goal' | 'reminder' | 'info';
+  type: 'success' | 'info' | 'warning' | 'error' | 'achievement';
   title: string;
   message: string;
   timestamp: Date;
@@ -34,204 +37,187 @@ interface Notification {
 interface NotificationDropdownProps {
   isOpen: boolean;
   onClose: () => void;
+  notifications: NotificationItem[];
+  onMarkAsRead: (id: string) => void;
+  onMarkAllAsRead: () => void;
+  onDeleteNotification: (id: string) => void;
 }
 
-export function NotificationDropdown({ isOpen, onClose }: NotificationDropdownProps) {
-  const [notifications, setNotifications] = useState<Notification[]>([
-    {
-      id: '1',
-      type: 'achievement',
-      title: 'New Achievement!',
-      message: 'You earned the "Calorie Counter" badge for logging meals 7 days in a row!',
-      timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
-      read: false,
-      icon: Trophy
-    },
-    {
-      id: '2',
-      type: 'goal',
-      title: 'Daily Goal Reached!',
-      message: 'Congratulations! You met your daily calorie goal of 2000 calories.',
-      timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 hours ago
-      read: false,
-      icon: Target
-    },
-    {
-      id: '3',
-      type: 'reminder',
-      title: 'Meal Reminder',
-      message: 'Don\'t forget to log your dinner! Keep your streak going.',
-      timestamp: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1 hour ago
-      read: true,
-      icon: Calendar
-    }
-  ]);
+export function NotificationDropdown({
+  isOpen,
+  onClose,
+  notifications,
+  onMarkAsRead,
+  onMarkAllAsRead,
+  onDeleteNotification
+}: NotificationDropdownProps) {
+  const [mounted, setMounted] = useState(false);
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-  const markAsRead = (id: string) => {
-    setNotifications(prev => 
-      prev.map(n => n.id === id ? { ...n, read: true } : n)
-    );
-  };
+  if (!mounted || !isOpen) return null;
 
-  const markAllAsRead = () => {
-    setNotifications(prev => 
-      prev.map(n => ({ ...n, read: true }))
-    );
-  };
-
-  const clearNotification = (id: string) => {
-    setNotifications(prev => prev.filter(n => n.id !== id));
-  };
-
-  const getNotificationIcon = (type: string, IconComponent?: any) => {
-    if (IconComponent) return IconComponent;
+  const getNotificationIcon = (type: string, customIcon?: any) => {
+    if (customIcon) return customIcon;
     
     switch (type) {
-      case 'achievement':
-        return Trophy;
-      case 'goal':
-        return Target;
-      case 'reminder':
-        return Calendar;
-      default:
-        return Info;
+      case 'success': return CheckCircle;
+      case 'warning': return AlertTriangle;
+      case 'error': return XCircle;
+      case 'achievement': return Target;
+      default: return Info;
     }
   };
 
   const getNotificationColor = (type: string) => {
     switch (type) {
-      case 'achievement':
-        return 'text-yellow-600 bg-yellow-100';
-      case 'goal':
-        return 'text-green-600 bg-green-100';
-      case 'reminder':
-        return 'text-blue-600 bg-blue-100';
-      default:
-        return 'text-gray-600 bg-gray-100';
+      case 'success': return 'text-green-600';
+      case 'warning': return 'text-yellow-600';
+      case 'error': return 'text-red-600';
+      case 'achievement': return 'text-blue-600';
+      default: return 'text-blue-600';
     }
   };
 
-  const formatTimestamp = (timestamp: Date) => {
-    const now = new Date();
-    const diffMs = now.getTime() - timestamp.getTime();
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffDays = Math.floor(diffHours / 24);
-
-    if (diffDays > 0) {
-      return `${diffDays}d ago`;
-    } else if (diffHours > 0) {
-      return `${diffHours}h ago`;
-    } else {
-      return 'Just now';
+  const getBadgeVariant = (type: string) => {
+    switch (type) {
+      case 'success': return 'default';
+      case 'warning': return 'secondary';
+      case 'error': return 'destructive';
+      case 'achievement': return 'default';
+      default: return 'secondary';
     }
   };
-
-  if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm" onClick={onClose}>
-      <Card className="absolute top-20 right-4 w-80 max-h-96 overflow-hidden shadow-xl border border-border/50" onClick={e => e.stopPropagation()}>
+    <div className="absolute top-full right-0 mt-2 w-80 z-50">
+      <Card className="p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg">
         {/* Header */}
-        <div className="p-4 border-b border-border/50 bg-gradient-to-r from-blue-50 to-blue-100">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Bell size={20} className="text-blue-600" />
-              <h3 className="font-semibold text-blue-900">Notifications</h3>
-              {unreadCount > 0 && (
-                <Badge variant="destructive" className="text-xs animate-pulse">
-                  {unreadCount}
-                </Badge>
-              )}
-            </div>
-            <div className="flex items-center gap-2">
-              {unreadCount > 0 && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-xs text-blue-600 hover:text-blue-800"
-                  onClick={markAllAsRead}
-                >
-                  Mark all read
-                </Button>
-              )}
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 w-6 p-0"
-                onClick={onClose}
-              >
-                <X size={16} />
-              </Button>
-            </div>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Bell className="w-5 h-5 text-blue-600" />
+            <h3 className="text-lg font-bold text-gray-900">Notifications</h3>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClose}
+            className="h-8 w-8 p-0"
+          >
+            <X className="w-4 h-4" />
+          </Button>
+        </div>
+
+        <Separator className="mb-4" />
+
+        {/* Summary Stats */}
+        <div className="grid grid-cols-3 gap-3 mb-4">
+          <div className="text-center p-3 bg-blue-50 rounded-lg">
+            <Bell className="w-4 h-4 mx-auto text-blue-600 mb-1" />
+            <p className="text-xs text-gray-600">Total</p>
+            <p className="font-bold text-gray-900">{notifications.length}</p>
+          </div>
+          <div className="text-center p-3 bg-green-50 rounded-lg">
+            <CheckCircle className="w-4 h-4 mx-auto text-green-600 mb-1" />
+            <p className="text-xs text-gray-600">Read</p>
+            <p className="font-bold text-gray-900">{notifications.filter(n => n.read).length}</p>
+          </div>
+          <div className="text-center p-3 bg-orange-50 rounded-lg">
+            <AlertTriangle className="w-4 h-4 mx-auto text-orange-600 mb-1" />
+            <p className="text-xs text-gray-600">Unread</p>
+            <p className="font-bold text-gray-900">{notifications.filter(n => !n.read).length}</p>
           </div>
         </div>
 
+        <Separator className="mb-4" />
+
+        {/* Action Buttons */}
+        {notifications.length > 0 && (
+          <div className="flex gap-2 mb-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onMarkAllAsRead}
+              className="flex-1 text-xs"
+            >
+              <CheckCircle className="w-3 h-3 mr-1" />
+              Mark All Read
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => notifications.forEach(n => onDeleteNotification(n.id))}
+              className="flex-1 text-xs"
+            >
+              <Trash2 className="w-3 h-3 mr-1" />
+              Clear All
+            </Button>
+          </div>
+        )}
+
         {/* Notifications List */}
-        <div className="max-h-64 overflow-y-auto">
+        <div className="space-y-3 max-h-80 overflow-y-auto">
           {notifications.length === 0 ? (
-            <div className="p-8 text-center text-muted-foreground">
-              <Bell size={32} className="mx-auto mb-2 opacity-50" />
-              <p>No notifications yet</p>
+            <div className="text-center py-8 text-gray-500">
+              <Bell className="w-8 h-8 mx-auto mb-2 opacity-50" />
+              <p className="text-sm">No notifications</p>
+              <p className="text-xs text-gray-400">You're all caught up!</p>
             </div>
           ) : (
             notifications.map((notification) => {
               const IconComponent = getNotificationIcon(notification.type, notification.icon);
-              const colorClass = getNotificationColor(notification.type);
               
               return (
                 <div
                   key={notification.id}
-                  className={`p-4 border-b border-border/30 hover:bg-accent/50 transition-colors ${
-                    !notification.read ? 'bg-blue-50/50 border-l-4 border-l-blue-500' : ''
+                  className={`p-3 rounded-lg border transition-all duration-200 ${
+                    notification.read 
+                      ? 'bg-gray-50 border-gray-200' 
+                      : 'bg-blue-50 border-blue-200 shadow-sm'
                   }`}
                 >
                   <div className="flex items-start gap-3">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${colorClass}`}>
-                      <IconComponent size={16} />
-                    </div>
-                    
+                    <IconComponent 
+                      className={`w-4 h-4 mt-0.5 flex-shrink-0 ${getNotificationColor(notification.type)}`} 
+                    />
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <h4 className="text-sm font-medium text-foreground truncate">
-                          {notification.title}
-                        </h4>
-                        <div className="flex items-center gap-1">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1">
+                          <h4 className="text-sm font-medium text-gray-900 mb-1">
+                            {notification.title}
+                          </h4>
+                          <p className="text-xs text-gray-600 leading-relaxed">
+                            {notification.message}
+                          </p>
+                          <p className="text-xs text-gray-400 mt-2">
+                            {notification.timestamp.toLocaleTimeString()}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-1 flex-shrink-0">
+                          <Badge variant={getBadgeVariant(notification.type)} className="text-xs">
+                            {notification.type}
+                          </Badge>
                           {!notification.read && (
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-6 w-6 p-0 opacity-60 hover:opacity-100"
-                              onClick={() => markAsRead(notification.id)}
-                              title="Mark as read"
+                              onClick={() => onMarkAsRead(notification.id)}
+                              className="h-6 w-6 p-0"
                             >
-                              <CheckCircle size={12} />
+                              <CheckCircle className="w-3 h-3" />
                             </Button>
                           )}
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-6 w-6 p-0 opacity-60 hover:opacity-100"
-                            onClick={() => clearNotification(notification.id)}
-                            title="Clear notification"
+                            onClick={() => onDeleteNotification(notification.id)}
+                            className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
                           >
-                            <X size={12} />
+                            <X className="w-3 h-3" />
                           </Button>
                         </div>
-                      </div>
-                      
-                      <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
-                        {notification.message}
-                      </p>
-                      
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-muted-foreground">
-                          {formatTimestamp(notification.timestamp)}
-                        </span>
-                        {!notification.read && (
-                          <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
-                        )}
                       </div>
                     </div>
                   </div>
@@ -241,26 +227,26 @@ export function NotificationDropdown({ isOpen, onClose }: NotificationDropdownPr
           )}
         </div>
 
-        {/* Footer */}
+        {/* Footer Actions */}
         {notifications.length > 0 && (
-          <div className="p-3 border-t border-border/50 bg-muted/30">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full text-xs text-muted-foreground hover:text-foreground"
-              onClick={() => {
-                // Mark all as read and navigate to notifications page
-                markAllAsRead();
-                const event = new CustomEvent('navigate-to-notifications', {
-                  detail: { page: 'profile', section: 'notifications' }
-                });
-                window.dispatchEvent(event);
-                onClose();
-              }}
-            >
-              View all notifications
-            </Button>
-          </div>
+          <>
+            <Separator className="my-4" />
+            <div className="text-center">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-xs text-gray-500 hover:text-gray-700"
+                onClick={() => {
+                  // Navigate to detailed notifications view
+                  const event = new CustomEvent('navigate-to-notifications');
+                  window.dispatchEvent(event);
+                  onClose();
+                }}
+              >
+                View detailed notification history
+              </Button>
+            </div>
+          </>
         )}
       </Card>
     </div>

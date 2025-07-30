@@ -103,9 +103,75 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
 
   const handleCalculate = (e: React.FormEvent) => {
     e.preventDefault();
-    if (ingredient.trim() && measurement.trim()) {
-      calculateCalories.mutate({ ingredient: ingredient.trim(), measurement: measurement.trim() });
+    
+    // Enhanced measurement validation
+    const cleanIngredient = ingredient.trim();
+    const cleanMeasurement = measurement.trim();
+    
+    if (!cleanIngredient || !cleanMeasurement) {
+      return;
     }
+    
+    // Validate measurement format
+    const measurementValidation = validateMeasurement(cleanMeasurement);
+    if (!measurementValidation.isValid) {
+      // Show validation error notification
+      const event = new CustomEvent('show-notification', {
+        detail: {
+          type: 'warning',
+          title: 'Invalid Measurement',
+          message: measurementValidation.suggestion || 'Please use format like "1 cup", "100g", "2 tbsp", "1 medium"'
+        }
+      });
+      window.dispatchEvent(event);
+      return;
+    }
+    
+    calculateCalories.mutate({ ingredient: cleanIngredient, measurement: cleanMeasurement });
+  };
+
+  // Measurement validation function
+  const validateMeasurement = (measurement: string): { isValid: boolean; suggestion?: string } => {
+    const measurementLower = measurement.toLowerCase();
+    
+    // Common valid patterns
+    const validPatterns = [
+      /^\d+(\.\d+)?\s*(g|gram|grams)$/,
+      /^\d+(\.\d+)?\s*(oz|ounce|ounces)$/,
+      /^\d+(\.\d+)?\s*(lb|lbs|pound|pounds)$/,
+      /^\d+(\.\d+)?\s*(cup|cups)$/,
+      /^\d+(\.\d+)?\s*(tbsp|tablespoon|tablespoons)$/,
+      /^\d+(\.\d+)?\s*(tsp|teaspoon|teaspoons)$/,
+      /^\d+(\.\d+)?\s*(piece|pieces)$/,
+      /^\d+(\.\d+)?\s*(slice|slices)$/,
+      /^\d+(\.\d+)?\s*(small|medium|large)$/,
+      /^\d+(\.\d+)?\s*(ml|milliliter|milliliters)$/,
+      /^\d+(\.\d+)?\s*(liter|liters|l)$/
+    ];
+    
+    const isValid = validPatterns.some(pattern => pattern.test(measurementLower));
+    
+    if (!isValid) {
+      // Suggest corrections
+      if (/^\d+/.test(measurementLower)) {
+        return { 
+          isValid: false, 
+          suggestion: 'Add a unit like "g", "cup", "tbsp", "medium", etc.' 
+        };
+      } else if (/^(small|medium|large)$/.test(measurementLower)) {
+        return { 
+          isValid: false, 
+          suggestion: 'Add a number like "1 medium", "2 large", etc.' 
+        };
+      } else {
+        return { 
+          isValid: false, 
+          suggestion: 'Use format like "100g", "1 cup", "2 tbsp", "1 medium"' 
+        };
+      }
+    }
+    
+    return { isValid: true };
   };
 
   const handleAddToMeal = (analysis: IngredientAnalysis) => {
@@ -126,7 +192,7 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
       else if (hour >= 15 && hour < 20) category = 'dinner';
       else category = 'snack';
 
-      // Log with explicit source tracking
+      // Log to weekly tracker (removed source field to fix TypeScript error)
       onLogToWeekly({
         name: `[Calculator] ${analysis.ingredient} (${analysis.measurement})`,
         calories: analysis.estimatedCalories,
@@ -135,8 +201,7 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
         fat: analysis.nutritionPer100g?.fat || 0,
         date: now.toISOString().split('T')[0],
         time: now.toLocaleTimeString(),
-        category,
-        source: 'calculator'
+        category
       });
     }
   };
