@@ -11,8 +11,8 @@ const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png'
+  '/icon-192.svg',
+  '/icon-512.svg'
 ];
 
 // API endpoints to cache for offline functionality
@@ -218,8 +218,8 @@ self.addEventListener('push', event => {
   const data = event.data.json();
   const options = {
     body: data.body || 'New nutrition insight available!',
-    icon: '/icon-192.png',
-    badge: '/icon-96.png',
+    icon: '/icon-192.svg',
+    badge: '/icon-192.svg',
     tag: 'bytewise-notification',
     requireInteraction: false,
     actions: [

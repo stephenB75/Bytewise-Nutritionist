@@ -21,6 +21,7 @@ import {
   Calendar
 } from 'lucide-react';
 import { HeroSection } from '@/components/HeroSection';
+import { PWAStatus } from '@/components/PWAStatus';
 import { useCalorieTracking } from '@/hooks/useCalorieTracking';
 import { useQuery } from '@tanstack/react-query';
 
