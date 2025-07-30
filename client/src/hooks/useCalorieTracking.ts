@@ -27,32 +27,6 @@ export function useCalorieTracking() {
   const [dailyTotal, setDailyTotal] = useState(0);
   const queryClient = useQueryClient();
 
-  // Add calculated calories
-  const addCalculatedCalories = useCallback((calories: Omit<CalculatedCalories, 'id' | 'date' | 'time' | 'source'>) => {
-    const newEntry: CalculatedCalories = {
-      ...calories,
-      id: Date.now().toString(),
-      date: new Date().toISOString().split('T')[0],
-      time: new Date().toLocaleTimeString(),
-      source: 'calculator'
-    };
-    
-    setCalculatedCalories(prev => [...prev, newEntry]);
-    setDailyTotal(prev => prev + calories.calories);
-    
-    // Store in localStorage for persistence
-    const stored = localStorage.getItem('calculatedCalories');
-    const existing = stored ? JSON.parse(stored) : [];
-    localStorage.setItem('calculatedCalories', JSON.stringify([...existing, newEntry]));
-    
-    // Automatically log to meals API
-    setTimeout(() => {
-      logCaloriesMutation.mutate(newEntry);
-    }, 100);
-    
-    return newEntry;
-  }, [logCaloriesMutation]);
-
   // Log calories to meals (for weekly logger)
   const logCaloriesMutation = useMutation({
     mutationFn: async (calorieEntry: CalculatedCalories) => {
@@ -86,6 +60,32 @@ export function useCalorieTracking() {
       queryClient.invalidateQueries({ queryKey: ['/api/meals/logged'] });
     },
   });
+
+  // Add calculated calories
+  const addCalculatedCalories = useCallback((calories: Omit<CalculatedCalories, 'id' | 'date' | 'time' | 'source'>) => {
+    const newEntry: CalculatedCalories = {
+      ...calories,
+      id: Date.now().toString(),
+      date: new Date().toISOString().split('T')[0],
+      time: new Date().toLocaleTimeString(),
+      source: 'calculator'
+    };
+    
+    setCalculatedCalories(prev => [...prev, newEntry]);
+    setDailyTotal(prev => prev + calories.calories);
+    
+    // Store in localStorage for persistence
+    const stored = localStorage.getItem('calculatedCalories');
+    const existing = stored ? JSON.parse(stored) : [];
+    localStorage.setItem('calculatedCalories', JSON.stringify([...existing, newEntry]));
+    
+    // Automatically log to meals API
+    setTimeout(() => {
+      logCaloriesMutation.mutate(newEntry);
+    }, 100);
+    
+    return newEntry;
+  }, [logCaloriesMutation]);
 
   // Get meal type based on time
   const getMealType = (): 'breakfast' | 'lunch' | 'dinner' | 'snack' => {

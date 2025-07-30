@@ -38,7 +38,9 @@ import {
   Trash2,
   RefreshCw,
   Globe,
-  Smartphone
+  Smartphone,
+  TrendingUp,
+  FileText
 } from 'lucide-react';
 import { HeroSection } from '@/components/HeroSection';
 import { AchievementCelebration } from '@/components/AchievementCelebration';
