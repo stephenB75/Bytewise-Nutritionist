@@ -203,7 +203,7 @@ function Dashboard({ onNavigate }: DashboardProps) {
       />
 
       {/* Main Content */}
-      <div className="flex-1 px-4 py-6 space-y-6">
+      <div className="flex-1 max-w-md mx-auto w-full px-3 py-6 space-y-6">
         {/* Daily Nutrition Metrics */}
         <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
           <div className="flex items-center justify-between mb-4">

@@ -216,6 +216,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
                 <Button 
                   variant="outline" 
                   size="sm"
+                  className="border-blue-600 text-blue-600 hover:bg-blue-50"
                   onClick={() => {
                     setCelebrationAchievement({
                       title: 'Email Sent!',
@@ -424,9 +425,10 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
         
         <Separator className="my-4" />
         
-        <div className="text-center">
+        <div className="flex justify-center">
           <Button 
             variant="outline"
+            className="border-blue-600 text-blue-600 hover:bg-blue-50"
             onClick={() => {
               // Navigate to achievements page (no celebration popup)
               console.log('Navigate to achievements page');
@@ -503,13 +505,21 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
               </Badge>
             </div>
             
-            <div className="grid grid-cols-1 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Button 
                 variant="outline"
-                className="border-red-600 text-red-600 hover:bg-red-50"
+                className="border-blue-600 text-blue-600 hover:bg-blue-50"
               >
                 <Lock className="w-4 h-4 mr-2" />
                 Change Password
+              </Button>
+              
+              <Button 
+                variant="outline"
+                className="border-blue-600 text-blue-600 hover:bg-blue-50"
+              >
+                <Shield className="w-4 h-4 mr-2" />
+                Security Settings
               </Button>
               
               <div className="flex items-center justify-between p-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 transition-colors">
@@ -722,21 +732,23 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
                 />
               </div>
               
-              <Button 
-                variant="outline"
-                className="border-yellow-600 text-yellow-600 hover:bg-yellow-50"
-              >
-                <Sun className="w-4 h-4 mr-2" />
-                Light Mode
-              </Button>
-              
-              <Button 
-                variant="outline"
-                className="border-gray-600 text-gray-600 hover:bg-gray-50"
-              >
-                <Moon className="w-4 h-4 mr-2" />
-                Dark Mode
-              </Button>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <Button 
+                  variant="outline"
+                  className="border-blue-600 text-blue-600 hover:bg-blue-50"
+                >
+                  <Sun className="w-4 h-4 mr-2" />
+                  Light Mode
+                </Button>
+                
+                <Button 
+                  variant="outline"
+                  className="border-blue-600 text-blue-600 hover:bg-blue-50"
+                >
+                  <Moon className="w-4 h-4 mr-2" />
+                  Dark Mode
+                </Button>
+              </div>
             </div>
           </div>
 
@@ -850,7 +862,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
               <p className="text-gray-600">Your Personal Nutrition Companion</p>
             </div>
             
-            <div className="grid grid-cols-1 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Button 
                 variant="outline"
                 className="border-blue-600 text-blue-600 hover:bg-blue-50"
@@ -861,7 +873,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
               
               <Button 
                 variant="outline"
-                className="border-purple-600 text-purple-600 hover:bg-purple-50"
+                className="border-blue-600 text-blue-600 hover:bg-blue-50"
               >
                 <FileText className="w-4 h-4 mr-2" />
                 Release Notes
@@ -1083,7 +1095,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
       </div>
 
       {/* Content */}
-      <div className="flex-1 max-w-lg mx-auto w-full px-4 pb-20">
+      <div className="flex-1 max-w-md mx-auto w-full px-3 pb-20">
         {renderSection()}
       </div>
 

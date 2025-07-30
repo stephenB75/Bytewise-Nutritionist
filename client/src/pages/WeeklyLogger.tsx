@@ -216,7 +216,7 @@ export default function WeeklyLogger({ onNavigate }: WeeklyLoggerProps) {
         className="pb-6"
       />
 
-      <div className="px-4 space-y-6">
+      <div className="max-w-md mx-auto w-full px-3 space-y-6">
         {/* Navigation Tabs */}
         <Tabs defaultValue="overview" className="w-full">
           <TabsList className="grid w-full grid-cols-3 bg-white/80 backdrop-blur-sm">

@@ -55,7 +55,7 @@ export default function CalorieCalculatorWrapper({ onNavigate }: CalorieCalculat
       />
 
       {/* Calculator Content */}
-      <div className="px-4">
+      <div className="max-w-md mx-auto w-full px-3">
         <CalorieCalculator 
           onNavigate={onNavigate} 
           onCaloriesCalculated={addCalculatedCalories}
