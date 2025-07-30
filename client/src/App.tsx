@@ -5,7 +5,7 @@
  * Features brand-compliant design and seamless navigation
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Header } from './components/Header';
 import { Navigation } from './components/Navigation';
 import Dashboard from './pages/Dashboard';
