@@ -48,60 +48,60 @@ function Dashboard({ onNavigate }: DashboardProps) {
 
   // Combined stats from calculator and logged meals
   const [userStats, setUserStats] = useState({
-    name: user?.firstName || "User",
+    name: "User",
     currentStreak: 7,
     caloriesConsumed: 0,
-    caloriesGoal: user?.dailyCalorieGoal || 2200,
+    caloriesGoal: 2200,
     proteinConsumed: 0,
-    proteinGoal: user?.dailyProteinGoal || 120,
+    proteinGoal: 120,
     carbsConsumed: 0,
-    carbsGoal: user?.dailyCarbGoal || 300,
+    carbsGoal: 300,
     fatConsumed: 0,
-    fatGoal: user?.dailyFatGoal || 70,
+    fatGoal: 70,
     waterConsumed: 6,
-    waterGoal: user?.dailyWaterGoal || 8
+    waterGoal: 8
   });
 
   // Update stats when data changes
   useEffect(() => {
     // Combine calories from calculator and logged meals
     const calculatorCalories = dailyStats.calories || 0;
-    const mealCalories = mealStats?.reduce((total: number, meal: any) => 
-      total + (parseFloat(meal.totalCalories) || 0), 0) || 0;
+    const mealCalories = Array.isArray(mealStats) ? mealStats.reduce((total: number, meal: any) => 
+      total + (parseFloat(meal.totalCalories) || 0), 0) : 0;
     
     const calculatorProtein = dailyStats.protein || 0;
-    const mealProtein = mealStats?.reduce((total: number, meal: any) => 
-      total + (parseFloat(meal.totalProtein) || 0), 0) || 0;
+    const mealProtein = Array.isArray(mealStats) ? mealStats.reduce((total: number, meal: any) => 
+      total + (parseFloat(meal.totalProtein) || 0), 0) : 0;
 
     const calculatorCarbs = dailyStats.carbs || 0;
-    const mealCarbs = mealStats?.reduce((total: number, meal: any) => 
-      total + (parseFloat(meal.totalCarbs) || 0), 0) || 0;
+    const mealCarbs = Array.isArray(mealStats) ? mealStats.reduce((total: number, meal: any) => 
+      total + (parseFloat(meal.totalCarbs) || 0), 0) : 0;
 
     const calculatorFat = dailyStats.fat || 0;
-    const mealFat = mealStats?.reduce((total: number, meal: any) => 
-      total + (parseFloat(meal.totalFat) || 0), 0) || 0;
+    const mealFat = Array.isArray(mealStats) ? mealStats.reduce((total: number, meal: any) => 
+      total + (parseFloat(meal.totalFat) || 0), 0) : 0;
 
     setUserStats(prev => ({
       ...prev,
-      name: user?.firstName || prev.name,
+      name: (user as any)?.firstName || prev.name,
       caloriesConsumed: Math.round(calculatorCalories + mealCalories),
       proteinConsumed: Math.round(calculatorProtein + mealProtein),
       carbsConsumed: Math.round(calculatorCarbs + mealCarbs),
       fatConsumed: Math.round(calculatorFat + mealFat),
-      caloriesGoal: user?.dailyCalorieGoal || prev.caloriesGoal,
-      proteinGoal: user?.dailyProteinGoal || prev.proteinGoal,
-      carbsGoal: user?.dailyCarbGoal || prev.carbsGoal,
-      fatGoal: user?.dailyFatGoal || prev.fatGoal,
-      waterGoal: user?.dailyWaterGoal || prev.waterGoal
+      caloriesGoal: (user as any)?.dailyCalorieGoal || prev.caloriesGoal,
+      proteinGoal: (user as any)?.dailyProteinGoal || prev.proteinGoal,
+      carbsGoal: (user as any)?.dailyCarbGoal || prev.carbsGoal,
+      fatGoal: (user as any)?.dailyFatGoal || prev.fatGoal,
+      waterGoal: (user as any)?.dailyWaterGoal || prev.waterGoal
     }));
   }, [dailyStats, mealStats, user]);
 
   // Get today's meals from multiple sources
-  const todaysMealsFromLogger = mealStats?.filter((meal: any) => {
+  const todaysMealsFromLogger = Array.isArray(mealStats) ? mealStats.filter((meal: any) => {
     const mealDate = meal.date || meal.created_at?.split('T')[0];
     const today = new Date().toISOString().split('T')[0];
     return mealDate === today;
-  }) || [];
+  }) : [];
 
   const todaysMealsFromCalculator = todaysCalculations.map(calc => ({
     name: calc.name,
@@ -132,11 +132,48 @@ function Dashboard({ onNavigate }: DashboardProps) {
     return timeA - timeB;
   });
 
-  const [achievements] = useState([
-    { id: 1, title: "7 Day Streak", icon: Flame, color: "text-orange-500" },
-    { id: 2, title: "Goal Crusher", icon: Target, color: "text-green-500" },
-    { id: 3, title: "Meal Master", icon: Award, color: "text-purple-500" }
-  ]);
+  // Fetch achievements from API
+  const { data: userAchievements } = useQuery({
+    queryKey: ['/api/achievements'],
+    retry: false,
+  });
+
+  // Calculate dynamic achievements based on current progress
+  const calculateAchievements = () => {
+    const achievements = [];
+    
+    // Daily goal achievements
+    if (calorieProgress >= 100) {
+      achievements.push({ id: 1, title: "Daily Goal", icon: Target, color: "text-green-500" });
+    }
+    if (proteinProgress >= 100) {
+      achievements.push({ id: 2, title: "Protein Power", icon: Beef, color: "text-red-500" });
+    }
+    
+    // Weekly streak achievements
+    if (userStats.currentStreak >= 7) {
+      achievements.push({ id: 3, title: "Week Warrior", icon: Flame, color: "text-orange-500" });
+    }
+    
+    // Data tracking achievements
+    if (todayMeals.length >= 3) {
+      achievements.push({ id: 4, title: "Meal Master", icon: Utensils, color: "text-blue-500" });
+    }
+    
+    // Calculator usage achievements
+    if (todaysMealsFromCalculator.length >= 2) {
+      achievements.push({ id: 5, title: "Calculator Pro", icon: Target, color: "text-purple-500" });
+    }
+    
+    // Logger usage achievements
+    if (todaysMealsFromLogger.length >= 2) {
+      achievements.push({ id: 6, title: "Logger Champion", icon: Calendar, color: "text-indigo-500" });
+    }
+    
+    return achievements.slice(0, 3); // Show top 3 achievements
+  };
+
+  const achievements = calculateAchievements();
 
   // Calculate progress percentages
   const calorieProgress = Math.round((userStats.caloriesConsumed / userStats.caloriesGoal) * 100);
@@ -149,7 +186,7 @@ function Dashboard({ onNavigate }: DashboardProps) {
   const dataSource = {
     calculatorEntries: todaysCalculations.length,
     calculatorCalories: dailyStats.calories,
-    mealEntries: mealStats?.length || 0,
+    mealEntries: Array.isArray(mealStats) ? mealStats.length : 0,
     lastUpdate: new Date().toLocaleTimeString()
   };
 
@@ -357,21 +394,78 @@ function Dashboard({ onNavigate }: DashboardProps) {
           </div>
         </Card>
 
-        {/* Achievements */}
+        {/* Recent Achievements */}
         <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">Recent Achievements</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-bold text-gray-900">Recent Achievements</h3>
+            <Badge variant="outline" className="text-xs">
+              🏆 {achievements.length} earned today
+            </Badge>
+          </div>
+
+          {/* Achievement Status */}
+          <div className="bg-yellow-50 p-3 rounded-lg mb-4">
+            <div className="flex items-center gap-2">
+              <Award className="w-4 h-4 text-yellow-600" />
+              <span className="text-sm font-medium text-yellow-900">Achievement System Active</span>
+            </div>
+            <div className="text-xs text-yellow-700 mt-1">
+              Tracking daily & weekly nutrition goals • Next reward at {Math.max(100 - calorieProgress, 0)}% progress
+            </div>
+          </div>
+          
           <div className="grid grid-cols-3 gap-4">
-            {achievements.map((achievement) => {
-              const IconComponent = achievement.icon;
-              return (
-                <div key={achievement.id} className="text-center">
-                  <div className="p-3 bg-gray-50 rounded-lg mb-2 mx-auto w-fit">
-                    <IconComponent className={`w-6 h-6 ${achievement.color}`} />
+            {achievements.length > 0 ? (
+              achievements.map((achievement) => {
+                const IconComponent = achievement.icon;
+                return (
+                  <div key={achievement.id} className="text-center">
+                    <div className="p-3 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-lg mb-2 mx-auto w-fit border border-yellow-200">
+                      <IconComponent className={`w-6 h-6 ${achievement.color}`} />
+                    </div>
+                    <p className="text-xs font-medium text-gray-700">{achievement.title}</p>
+                    <div className="w-2 h-2 bg-green-500 rounded-full mx-auto mt-1"></div>
                   </div>
-                  <p className="text-xs font-medium text-gray-700">{achievement.title}</p>
-                </div>
-              );
-            })}
+                );
+              })
+            ) : (
+              <div className="col-span-3 text-center py-4">
+                <Award className="w-12 h-12 text-gray-300 mx-auto mb-2" />
+                <p className="text-gray-500 text-sm">Complete nutrition goals to earn achievements</p>
+                <p className="text-xs text-gray-400 mt-1">Track calories & meet daily targets</p>
+              </div>
+            )}
+          </div>
+
+          {/* Achievement Progress */}
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <div className="text-xs text-gray-600 mb-2">Today's Progress</div>
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="flex justify-between">
+                <span>Calories:</span>
+                <span className={calorieProgress >= 100 ? "text-green-600 font-medium" : "text-gray-600"}>
+                  {calorieProgress}%
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>Protein:</span>
+                <span className={proteinProgress >= 100 ? "text-green-600 font-medium" : "text-gray-600"}>
+                  {proteinProgress}%
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>Meals logged:</span>
+                <span className={todayMeals.length >= 3 ? "text-green-600 font-medium" : "text-gray-600"}>
+                  {todayMeals.length}/3
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>Streak:</span>
+                <span className={userStats.currentStreak >= 7 ? "text-green-600 font-medium" : "text-gray-600"}>
+                  {userStats.currentStreak} days
+                </span>
+              </div>
+            </div>
           </div>
         </Card>
 
