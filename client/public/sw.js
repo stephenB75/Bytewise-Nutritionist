@@ -16,10 +16,17 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        return cache.addAll(STATIC_ASSETS);
+        // Add assets one by one to avoid failures from single bad requests
+        return Promise.allSettled(
+          STATIC_ASSETS.map(asset => cache.add(asset))
+        );
       })
       .then(() => {
         self.skipWaiting();
+      })
+      .catch((error) => {
+        console.debug('SW install cache error:', error.message);
+        self.skipWaiting(); // Still skip waiting even if cache fails
       })
   );
 });
@@ -47,6 +54,16 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
+
+  // Skip non-HTTP(S) requests (chrome-extension:, moz-extension:, etc.)
+  if (!url.protocol.startsWith('http')) {
+    return;
+  }
+
+  // Skip cross-origin requests that we can't cache
+  if (url.origin !== location.origin) {
+    return;
+  }
 
   // Handle navigation requests
   if (request.mode === 'navigate') {
@@ -93,12 +110,16 @@ self.addEventListener('fetch', (event) => {
         }
         return fetch(request)
           .then((response) => {
-            // Cache successful responses
-            if (response.ok) {
+            // Cache successful responses for same-origin requests only
+            if (response.ok && url.origin === location.origin) {
               const responseClone = response.clone();
               caches.open(CACHE_NAME)
                 .then((cache) => {
                   cache.put(request, responseClone);
+                })
+                .catch((error) => {
+                  // Silently ignore cache errors for unsupported requests
+                  console.debug('Cache put failed:', error.message);
                 });
             }
             return response;
