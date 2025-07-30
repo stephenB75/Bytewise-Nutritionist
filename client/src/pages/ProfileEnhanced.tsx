@@ -104,6 +104,26 @@ interface Achievement {
 
 function ProfileEnhanced({ onNavigate }: ProfileProps) {
   const [activeSection, setActiveSection] = useState('profile');
+
+  // Handle section navigation from notification dropdown
+  useEffect(() => {
+    const handleSectionNavigation = (event: CustomEvent) => {
+      const { section } = event.detail;
+      if (section === 'notifications') {
+        setActiveSection('notifications');
+      } else if (section === 'settings') {
+        setActiveSection('notifications');
+      } else if (section === 'history') {
+        setActiveSection('data');
+      }
+    };
+
+    window.addEventListener('navigate-to-profile-section', handleSectionNavigation as EventListener);
+    
+    return () => {
+      window.removeEventListener('navigate-to-profile-section', handleSectionNavigation as EventListener);
+    };
+  }, []);
   const [showCelebration, setShowCelebration] = useState(false);
   const [celebrationAchievement, setCelebrationAchievement] = useState<any>(null);
   const [updateAvailable, setUpdateAvailable] = useState<any>(null);

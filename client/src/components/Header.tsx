@@ -13,7 +13,7 @@ import { NotificationDropdown } from './NotificationDropdown';
 
 interface HeaderProps {
   currentPage: string;
-  onNavigate: (page: string) => void;
+  onNavigate: (page: string, section?: string) => void;
   showNotifications?: boolean;
   notificationCount?: number;
   onLogout?: () => void;
@@ -114,7 +114,7 @@ export function Header({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="relative h-10 w-10 p-0 touch-target hover:bg-accent/80 transition-all duration-200"
+                  className="relative h-16 w-16 p-0 touch-target hover:bg-accent/80 transition-all duration-200"
                   onClick={() => setIsNotificationDropdownOpen(!isNotificationDropdownOpen)}
                 >
                   <Bell size={20} className="text-gray-700" />
@@ -132,6 +132,7 @@ export function Header({
                   onMarkAsRead={handleMarkAsRead}
                   onMarkAllAsRead={handleMarkAllAsRead}
                   onDeleteNotification={handleDeleteNotification}
+                  onNavigate={onNavigate}
                 />
               </div>
             )}
@@ -141,7 +142,7 @@ export function Header({
             <Button
               variant="ghost"
               size="sm"
-              className="h-10 w-10 p-0 touch-target hover:bg-accent/80 transition-all duration-200"
+              className="h-16 w-16 p-0 touch-target hover:bg-accent/80 transition-all duration-200"
               onClick={() => onNavigate('profile')}
             >
               <Settings size={20} className="text-gray-700" />
@@ -151,7 +152,7 @@ export function Header({
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-10 w-10 p-0 touch-target hover:bg-accent/80 transition-all duration-200"
+                className="h-16 w-16 p-0 touch-target hover:bg-accent/80 transition-all duration-200"
                 onClick={onLogout}
                 title="Sign Out"
               >

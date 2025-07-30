@@ -26,8 +26,16 @@ export default function App() {
     setActiveTab(tab);
   };
 
-  const handleNavigate = (page: string) => {
+  const handleNavigate = (page: string, section?: string) => {
     setActiveTab(page);
+    if (section && page === 'profile') {
+      // Navigate to specific profile section
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('navigate-to-profile-section', {
+          detail: { section }
+        }));
+      }, 100);
+    }
   };
 
   const handleLogout = () => {

@@ -43,6 +43,7 @@ interface NotificationDropdownProps {
   onMarkAsRead: (id: string) => void;
   onMarkAllAsRead: () => void;
   onDeleteNotification: (id: string) => void;
+  onNavigate?: (page: string, section?: string) => void;
 }
 
 export function NotificationDropdown({
@@ -51,7 +52,8 @@ export function NotificationDropdown({
   notifications,
   onMarkAsRead,
   onMarkAllAsRead,
-  onDeleteNotification
+  onDeleteNotification,
+  onNavigate
 }: NotificationDropdownProps) {
   const [mounted, setMounted] = useState(false);
 
@@ -255,11 +257,9 @@ export function NotificationDropdown({
                 size="sm"
                 className="text-xs"
                 onClick={() => {
-                  // Navigate to detailed notifications view
-                  const event = new CustomEvent('navigate-to-notifications', {
-                    detail: { page: 'profile', section: 'notifications' }
-                  });
-                  window.dispatchEvent(event);
+                  if (onNavigate) {
+                    onNavigate('profile', 'notifications');
+                  }
                   onClose();
                 }}
               >
@@ -273,11 +273,9 @@ export function NotificationDropdown({
                 size="sm"
                 className="justify-start text-xs text-gray-600 hover:text-gray-900 h-8"
                 onClick={() => {
-                  // Navigate to notification settings
-                  const event = new CustomEvent('navigate-to-settings', {
-                    detail: { section: 'notifications' }
-                  });
-                  window.dispatchEvent(event);
+                  if (onNavigate) {
+                    onNavigate('profile', 'settings');
+                  }
                   onClose();
                 }}
               >
@@ -290,11 +288,9 @@ export function NotificationDropdown({
                 size="sm"
                 className="justify-start text-xs text-gray-600 hover:text-gray-900 h-8"
                 onClick={() => {
-                  // Navigate to notification history
-                  const event = new CustomEvent('navigate-to-history', {
-                    detail: { type: 'notifications' }
-                  });
-                  window.dispatchEvent(event);
+                  if (onNavigate) {
+                    onNavigate('profile', 'history');
+                  }
                   onClose();
                 }}
               >
