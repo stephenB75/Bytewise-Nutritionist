@@ -713,16 +713,106 @@ select {
 }
 
 /* Mobile viewport meta controls for React apps */
-/* These should be added via Next.js Head or index.html:
-   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+/* Responsive viewport configuration in index.html:
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover" />
 */
 
-/* Additional mobile optimizations */
+/* Enhanced mobile optimizations for better responsiveness */
 @supports (-webkit-touch-callout: none) {
   /* iOS Safari specific optimizations */
   input, textarea, select {
     font-size: 16px !important;
     transform: scale(1); /* Prevents iOS zoom behavior */
+  }
+}
+
+/* Device-specific responsive enhancements */
+@media screen and (max-width: 320px) {
+  /* iPhone SE and small devices */
+  .mobile-responsive,
+  .card,
+  .button {
+    font-size: 14px;
+    padding: 0.625rem;
+  }
+  
+  h1 { font-size: 1.25rem !important; }
+  h2 { font-size: 1.125rem !important; }
+  h3 { font-size: 1rem !important; }
+}
+
+@media screen and (min-width: 321px) and (max-width: 375px) {
+  /* iPhone 12 mini and similar */
+  .mobile-responsive,
+  .card,
+  .button {
+    font-size: 15px;
+    padding: 0.75rem;
+  }
+  
+  h1 { font-size: 1.375rem !important; }
+  h2 { font-size: 1.25rem !important; }
+  h3 { font-size: 1.125rem !important; }
+}
+
+@media screen and (min-width: 376px) and (max-width: 414px) {
+  /* iPhone 12 Pro and similar */
+  .mobile-responsive,
+  .card,
+  .button {
+    font-size: 16px;
+    padding: 0.875rem;
+  }
+  
+  h1 { font-size: 1.5rem !important; }
+  h2 { font-size: 1.375rem !important; }
+  h3 { font-size: 1.25rem !important; }
+}
+
+@media screen and (min-width: 415px) and (max-width: 768px) {
+  /* Large mobile devices and small tablets */
+  .mobile-responsive,
+  .card,
+  .button {
+    font-size: 17px;
+    padding: 1rem;
+  }
+  
+  h1 { font-size: 1.75rem !important; }
+  h2 { font-size: 1.5rem !important; }
+  h3 { font-size: 1.375rem !important; }
+}
+
+/* Responsive design breakpoints for mobile devices */
+@media screen and (max-width: 320px) {
+  /* Small mobile devices (iPhone SE, etc.) */
+  .mobile-responsive {
+    font-size: 14px;
+    padding: 0.75rem;
+  }
+}
+
+@media screen and (min-width: 321px) and (max-width: 375px) {
+  /* Standard mobile devices (iPhone 12 mini, etc.) */
+  .mobile-responsive {
+    font-size: 15px;
+    padding: 0.875rem;
+  }
+}
+
+@media screen and (min-width: 376px) and (max-width: 414px) {
+  /* Large mobile devices (iPhone 12 Pro, etc.) */
+  .mobile-responsive {
+    font-size: 16px;
+    padding: 1rem;
+  }
+}
+
+@media screen and (min-width: 415px) and (max-width: 768px) {
+  /* Extra large mobile devices and small tablets */
+  .mobile-responsive {
+    font-size: 17px;
+    padding: 1.125rem;
   }
 }
 
@@ -743,6 +833,40 @@ select {
     max-width: 100vw;
     padding-left: 1rem;
     padding-right: 1rem;
+    margin: 0 auto;
+  }
+  
+  /* Enhanced responsive container adjustments */
+  @media screen and (max-width: 320px) {
+    .container {
+      max-width: 320px;
+      padding-left: 0.75rem;
+      padding-right: 0.75rem;
+    }
+  }
+
+  @media screen and (min-width: 321px) and (max-width: 375px) {
+    .container {
+      max-width: 375px;
+      padding-left: 0.875rem;
+      padding-right: 0.875rem;
+    }
+  }
+
+  @media screen and (min-width: 376px) and (max-width: 414px) {
+    .container {
+      max-width: 414px;
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+  }
+
+  @media screen and (min-width: 415px) and (max-width: 768px) {
+    .container {
+      max-width: 430px;
+      padding-left: 1.125rem;
+      padding-right: 1.125rem;
+    }
   }
   
   /* Optimize touch targets for mobile */

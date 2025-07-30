@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <!-- Mobile-Only Viewport: Strict mobile device targeting -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <!-- Responsive Mobile Viewport: Optimized for all mobile devices -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover" />
   
   <!-- PWA Meta Tags -->
   <meta name="theme-color" content="#a8dadc" />
@@ -41,8 +41,9 @@
   <!-- Content Security Policy for development -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://fonts.googleapis.com https://replit.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' ws: wss:;">
   
-  <!-- Prevent zoom on form inputs -->
+  <!-- Enhanced mobile responsiveness and zoom prevention -->
   <style>
+    /* Prevent zoom on form inputs - critical for mobile UX */
     input[type="color"],
     input[type="date"],
     input[type="datetime"],
@@ -60,6 +61,32 @@
     select:focus,
     textarea {
       font-size: 16px !important;
+    }
+    
+    /* Enhanced responsive body layout */
+    body {
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    /* Responsive root font sizing */
+    @media screen and (max-width: 320px) {
+      html { font-size: 14px; }
+    }
+    
+    @media screen and (min-width: 321px) and (max-width: 375px) {
+      html { font-size: 15px; }
+    }
+    
+    @media screen and (min-width: 376px) and (max-width: 414px) {
+      html { font-size: 16px; }
+    }
+    
+    @media screen and (min-width: 415px) {
+      html { font-size: 17px; }
     }
   </style>
 </head>
