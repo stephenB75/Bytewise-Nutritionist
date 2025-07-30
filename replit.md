@@ -207,6 +207,7 @@ Preferred communication style: Simple, everyday language.
 ✓ **Offline Capabilities**: Local caching of popular USDA foods for offline nutrition analysis  
 ✓ **Achievement System**: Tracks user progress with personalized achievements and milestone celebrations  
 ✓ **Simple Login Screen**: Redesigned with clean food background imagery, floating food icons, and simple sign-in popup window for improved user experience  
+✓ **Goal-Based Achievement System**: Refactored achievement system to only trigger for daily and weekly nutrition goals, removing achievement spam from settings and utility actions  
 
 ### December 2024 - Bytewise Design System Implementation
 ✓ Implemented complete Bytewise design system with brand typography (League Spartan, Work Sans, Quicksand)  

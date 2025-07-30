@@ -338,12 +338,8 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
                 key={achievement.id} 
                 className="p-4 border border-gray-200 rounded-lg bg-gradient-to-r from-gray-50 to-gray-100 hover:shadow-md transition-shadow cursor-pointer"
                 onClick={() => {
-                  setCelebrationAchievement({
-                    title: achievement.title,
-                    description: achievement.description,
-                    icon: achievement.icon
-                  });
-                  setShowCelebration(true);
+                  // View achievement details (no celebration popup for viewing)
+                  console.log('Viewing achievement:', achievement.title);
                 }}
               >
                 <div className="flex items-center gap-4">
@@ -377,12 +373,8 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
           <Button 
             variant="outline"
             onClick={() => {
-              setCelebrationAchievement({
-                title: "Keep Going!",
-                description: "Continue tracking your nutrition to unlock more achievements!",
-                icon: Trophy
-              });
-              setShowCelebration(true);
+              // Navigate to achievements page (no celebration popup)
+              console.log('Navigate to achievements page');
             }}
           >
             <Trophy className="w-4 h-4 mr-2" />
@@ -497,12 +489,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
               defaultChecked={true}
               onCheckedChange={(checked) => {
                 console.log('Achievement alerts:', checked);
-                setCelebrationAchievement({
-                  title: checked ? "Achievement Alerts Enabled" : "Achievement Alerts Disabled",
-                  description: checked ? "You'll be notified when you earn new achievements!" : "Achievement notifications have been turned off.",
-                  icon: Star
-                });
-                setShowCelebration(true);
+                // Update settings without achievement popup
               }}
             />
           </div>
@@ -614,12 +601,8 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
               <Button 
                 className="justify-start bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.08] hover:-translate-y-2"
                 onClick={() => {
-                  setCelebrationAchievement({
-                    title: "Metric System",
-                    description: "Switched to metric units (kg, cm, ml). International standard measurements.",
-                    icon: Globe
-                  });
-                  setShowCelebration(true);
+                  // Switch to metric units without achievement popup
+                  console.log('Switched to metric units');
                 }}
               >
                 <Globe className="w-5 h-5 mr-3" />
@@ -628,12 +611,8 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
               <Button 
                 className="justify-start bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.08] hover:-translate-y-2"
                 onClick={() => {
-                  setCelebrationAchievement({
-                    title: "Imperial System",
-                    description: "Already using imperial units (lb, ft, oz). Perfect for US measurements!",
-                    icon: Target
-                  });
-                  setShowCelebration(true);
+                  // Switch to imperial units without achievement popup
+                  console.log('Switched to imperial units');
                 }}
               >
                 <Target className="w-5 h-5 mr-3" />
@@ -766,12 +745,10 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
               variant="destructive" 
               className="w-full justify-start hover:bg-red-600 transition-all duration-200 shadow-sm"
               onClick={() => {
-                setCelebrationAchievement({
-                  title: "Delete All Data",
-                  description: "This will permanently delete all your nutrition data, meal logs, and achievements. This action cannot be undone. Please contact support if you need assistance.",
-                  icon: Trash2
-                });
-                setShowCelebration(true);
+                // Show confirmation dialog for data deletion (no achievement popup)
+                if (confirm("Are you sure you want to delete all your data? This action cannot be undone.")) {
+                  console.log('Data deletion confirmed');
+                }
               }}
             >
               <Trash2 className="w-4 h-4 mr-2" />
