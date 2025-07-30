@@ -73,18 +73,28 @@ export default function CalorieCalculatorWrapper({ onNavigate }: CalorieCalculat
               ingredients: [logData.name]
             });
             
-            // Trigger event for weekly logger communication
+            // Trigger event for weekly logger communication with proper category
             const logEvent = new CustomEvent('calories-logged', {
               detail: { 
                 ...logData,
                 timestamp: new Date().toISOString(),
-                source: 'calculator'
+                source: 'calculator',
+                mealType: logData.category // Use the category from the calculator
               }
             });
             window.dispatchEvent(logEvent);
             
-            // Show success feedback
-            console.log('Successfully logged to weekly:', logData);
+            // Show success feedback with category
+            console.log(`Successfully logged to weekly ${logData.category}:`, logData);
+            
+            // Show toast notification
+            const toastEvent = new CustomEvent('show-toast', {
+              detail: { 
+                message: `Logged ${logData.name} to ${logData.category}!`,
+                type: 'success'
+              }
+            });
+            window.dispatchEvent(toastEvent);
           }}
         />
       </div>

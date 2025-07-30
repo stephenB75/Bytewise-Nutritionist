@@ -90,12 +90,12 @@ export function useCalorieTracking() {
     return newEntry;
   }, [logCaloriesMutation]);
 
-  // Get meal type based on time
+  // Get meal type based on time (enhanced logic)
   const getMealType = (): 'breakfast' | 'lunch' | 'dinner' | 'snack' => {
     const hour = new Date().getHours();
-    if (hour < 11) return 'breakfast';
-    if (hour < 15) return 'lunch';
-    if (hour < 19) return 'dinner';
+    if (hour >= 5 && hour < 11) return 'breakfast';
+    if (hour >= 11 && hour < 16) return 'lunch';
+    if (hour >= 16 && hour < 21) return 'dinner';
     return 'snack';
   };
 

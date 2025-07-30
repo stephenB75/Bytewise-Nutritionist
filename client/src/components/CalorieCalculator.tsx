@@ -186,23 +186,29 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
       const hour = now.getHours();
       let category: 'breakfast' | 'lunch' | 'dinner' | 'snack';
       
-      // Fixed category assignment logic
-      if (hour >= 6 && hour < 11) category = 'breakfast';
-      else if (hour >= 11 && hour < 15) category = 'lunch';  
-      else if (hour >= 15 && hour < 20) category = 'dinner';
+      // Enhanced category assignment logic based on time
+      if (hour >= 5 && hour < 11) category = 'breakfast';
+      else if (hour >= 11 && hour < 16) category = 'lunch';  
+      else if (hour >= 16 && hour < 21) category = 'dinner';
       else category = 'snack';
 
-      // Log to weekly tracker (removed source field to fix TypeScript error)
+      // Log to weekly tracker with proper categorization
       onLogToWeekly({
-        name: `[Calculator] ${analysis.ingredient} (${analysis.measurement})`,
+        name: `${analysis.ingredient} (${analysis.measurement})`,
         calories: analysis.estimatedCalories,
         protein: analysis.nutritionPer100g?.protein || 0,
         carbs: analysis.nutritionPer100g?.carbs || 0,
         fat: analysis.nutritionPer100g?.fat || 0,
         date: now.toISOString().split('T')[0],
-        time: now.toLocaleTimeString(),
+        time: now.toLocaleTimeString('en-US', { 
+          hour: '2-digit', 
+          minute: '2-digit',
+          hour12: true 
+        }),
         category
       });
+      
+      console.log(`Logging to ${category}: ${analysis.ingredient} - ${analysis.estimatedCalories} cal`);
     }
   };
 

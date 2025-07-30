@@ -4,7 +4,7 @@
  * Features daily logging, weekly overview, and meal tracking
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -50,6 +50,29 @@ export default function WeeklyLogger({ onNavigate }: WeeklyLoggerProps) {
   const [selectedDay, setSelectedDay] = useState(new Date());
   const queryClient = useQueryClient();
   const { getTodaysCalories, getDailyStats, calculatedCalories } = useCalorieTracking();
+
+  // Listen for calculator events to refresh data
+  useEffect(() => {
+    const handleRefreshData = () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/meals/logged'] });
+    };
+
+    const handleCaloriesLogged = (event: CustomEvent) => {
+      console.log('WeeklyLogger received calories:', event.detail);
+      // Refresh meal data to show new entries
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ['/api/meals/logged'] });
+      }, 500);
+    };
+
+    window.addEventListener('refresh-weekly-data', handleRefreshData);
+    window.addEventListener('calories-logged', handleCaloriesLogged as EventListener);
+    
+    return () => {
+      window.removeEventListener('refresh-weekly-data', handleRefreshData);
+      window.removeEventListener('calories-logged', handleCaloriesLogged as EventListener);
+    };
+  }, [queryClient]);
 
   // Get week dates
   const weekStart = startOfWeek(currentWeek, { weekStartsOn: 1 });

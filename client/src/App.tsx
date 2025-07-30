@@ -53,6 +53,11 @@ export default function App() {
     const handleCaloriesLogged = (event: CustomEvent) => {
       console.log('Calories logged from calculator:', event.detail);
       // Handle weekly logger communication
+      // Refresh weekly logger data if it's the active tab
+      if (activeTab === 'logger') {
+        // Force refresh of weekly logger data
+        window.dispatchEvent(new CustomEvent('refresh-weekly-data'));
+      }
     };
 
     window.addEventListener('show-notifications', handleShowNotifications);
