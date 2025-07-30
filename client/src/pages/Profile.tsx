@@ -138,7 +138,7 @@ export default function Profile({ onNavigate, showToast, notifications, setNotif
           </div>
         </CardHeader>
         <CardContent>
-          {user && (
+          {user ? (
             <div className="space-y-4">
               {/* Profile Picture */}
               <div className="flex items-center space-x-4">
@@ -225,7 +225,7 @@ export default function Profile({ onNavigate, showToast, notifications, setNotif
                 </div>
               ) : null}
             </div>
-          )}
+          ) : null}
         </CardContent>
       </Card>
 
