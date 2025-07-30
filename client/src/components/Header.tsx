@@ -107,17 +107,17 @@ export function Header({
             </h2>
           </div>
           
-          {/* Action Buttons - Right Side - moved 10% left */}
-          <div className="flex items-center gap-2 flex-shrink-0 -mr-4">
+          {/* Action Buttons - Right Side - moved 10% left with improved spacing */}
+          <div className="flex items-center gap-1.5 flex-shrink-0 -mr-6">
             {showNotifications && (
               <div className="relative">
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="relative h-9 w-9 p-0 touch-target hover:bg-accent/80 transition-all duration-200"
+                  className="relative h-10 w-10 p-0 touch-target hover:bg-accent/80 transition-all duration-200"
                   onClick={() => setIsNotificationDropdownOpen(!isNotificationDropdownOpen)}
                 >
-                  <Bell size={22} className="text-gray-700" />
+                  <Bell size={20} className="text-gray-700" />
                   {notifications.filter(n => !n.read).length > 0 && (
                     <span className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center font-bold">
                       {notifications.filter(n => !n.read).length > 9 ? '9+' : notifications.filter(n => !n.read).length}
@@ -141,21 +141,21 @@ export function Header({
             <Button
               variant="ghost"
               size="sm"
-              className="h-9 w-9 p-0 touch-target"
+              className="h-10 w-10 p-0 touch-target hover:bg-accent/80 transition-all duration-200"
               onClick={() => onNavigate('profile')}
             >
-              <Settings size={20} />
+              <Settings size={20} className="text-gray-700" />
             </Button>
             
             {onLogout && (
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-9 w-9 p-0 touch-target"
+                className="h-10 w-10 p-0 touch-target hover:bg-accent/80 transition-all duration-200"
                 onClick={onLogout}
                 title="Sign Out"
               >
-                <LogOut size={20} />
+                <LogOut size={20} className="text-gray-700" />
               </Button>
             )}
           </div>

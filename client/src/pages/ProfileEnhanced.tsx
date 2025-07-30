@@ -1005,6 +1005,10 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
       <NotificationDropdown
         isOpen={showNotifications}
         onClose={() => setShowNotifications(false)}
+        notifications={[]}
+        onMarkAsRead={() => {}}
+        onMarkAllAsRead={() => {}}
+        onDeleteNotification={() => {}}
       />
 
       {/* Hero Section */}
