@@ -87,48 +87,96 @@ function Dashboard({ onNavigate }: DashboardProps) {
 
       {/* Main Content */}
       <div className="flex-1 px-4 py-6 space-y-6">
-        {/* Quick Stats Grid */}
-        <div className="grid grid-cols-2 gap-4">
-          <Card className="p-4 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <Beef className="w-5 h-5 text-green-600" />
+        {/* Daily Nutrition Metrics */}
+        <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+          <h3 className="text-lg font-bold text-gray-900 mb-4">Daily Nutrition Overview</h3>
+          
+          {/* Macro Nutrients */}
+          <div className="grid grid-cols-3 gap-4 mb-6">
+            <div className="text-center p-3 bg-red-50 rounded-lg">
+              <div className="p-2 bg-red-100 rounded-lg w-fit mx-auto mb-2">
+                <Beef className="w-5 h-5 text-red-600" />
               </div>
-              <div>
-                <p className="text-sm text-gray-600">Protein</p>
-                <p className="text-lg font-bold text-gray-900">
-                  {userStats.proteinConsumed}g / {userStats.proteinGoal}g
-                </p>
-                <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1">
-                  <div 
-                    className="bg-green-500 h-1.5 rounded-full" 
-                    style={{ width: `${Math.min(proteinProgress, 100)}%` }}
-                  ></div>
-                </div>
+              <div className="text-2xl font-bold text-red-600">{userStats.proteinConsumed}g</div>
+              <div className="text-sm text-gray-600">Protein</div>
+              <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                <div 
+                  className="bg-red-500 h-2 rounded-full" 
+                  style={{ width: `${Math.min(proteinProgress, 100)}%` }}
+                ></div>
               </div>
+              <div className="text-xs text-gray-500 mt-1">Goal: {userStats.proteinGoal}g</div>
             </div>
-          </Card>
 
-          <Card className="p-4 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Droplets className="w-5 h-5 text-blue-600" />
+            <div className="text-center p-3 bg-yellow-50 rounded-lg">
+              <div className="p-2 bg-yellow-100 rounded-lg w-fit mx-auto mb-2">
+                <Calendar className="w-5 h-5 text-yellow-600" />
               </div>
-              <div>
-                <p className="text-sm text-gray-600">Water</p>
-                <p className="text-lg font-bold text-gray-900">
-                  {userStats.waterConsumed} / {userStats.waterGoal} cups
-                </p>
-                <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1">
-                  <div 
-                    className="bg-blue-500 h-1.5 rounded-full" 
-                    style={{ width: `${Math.min(waterProgress, 100)}%` }}
-                  ></div>
+              <div className="text-2xl font-bold text-yellow-600">285g</div>
+              <div className="text-sm text-gray-600">Carbs</div>
+              <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                <div 
+                  className="bg-yellow-500 h-2 rounded-full" 
+                  style={{ width: '78%' }}
+                ></div>
+              </div>
+              <div className="text-xs text-gray-500 mt-1">Goal: 365g</div>
+            </div>
+
+            <div className="text-center p-3 bg-purple-50 rounded-lg">
+              <div className="p-2 bg-purple-100 rounded-lg w-fit mx-auto mb-2">
+                <Droplets className="w-5 h-5 text-purple-600" />
+              </div>
+              <div className="text-2xl font-bold text-purple-600">67g</div>
+              <div className="text-sm text-gray-600">Fat</div>
+              <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                <div 
+                  className="bg-purple-500 h-2 rounded-full" 
+                  style={{ width: '85%' }}
+                ></div>
+              </div>
+              <div className="text-xs text-gray-500 mt-1">Goal: 79g</div>
+            </div>
+          </div>
+
+          {/* Micro Nutrients */}
+          <div className="border-t pt-4">
+            <h4 className="font-semibold text-gray-900 mb-3">Key Micronutrients</h4>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                <div>
+                  <div className="font-medium text-gray-900">Fiber</div>
+                  <div className="text-sm text-gray-600">28g / 35g</div>
                 </div>
+                <div className="text-green-600 font-bold">80%</div>
+              </div>
+              
+              <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                <div>
+                  <div className="font-medium text-gray-900">Sodium</div>
+                  <div className="text-sm text-gray-600">1,890mg / 2,300mg</div>
+                </div>
+                <div className="text-blue-600 font-bold">82%</div>
+              </div>
+
+              <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
+                <div>
+                  <div className="font-medium text-gray-900">Vitamin C</div>
+                  <div className="text-sm text-gray-600">67mg / 90mg</div>
+                </div>
+                <div className="text-orange-600 font-bold">74%</div>
+              </div>
+
+              <div className="flex items-center justify-between p-3 bg-indigo-50 rounded-lg">
+                <div>
+                  <div className="font-medium text-gray-900">Iron</div>
+                  <div className="text-sm text-gray-600">12mg / 18mg</div>
+                </div>
+                <div className="text-indigo-600 font-bold">67%</div>
               </div>
             </div>
-          </Card>
-        </div>
+          </div>
+        </Card>
 
         {/* Today's Meals */}
         <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
@@ -137,7 +185,7 @@ function Dashboard({ onNavigate }: DashboardProps) {
             <Button 
               variant="ghost" 
               size="sm"
-              onClick={() => onNavigate('recipe-builder')}
+              onClick={() => onNavigate('calculator')}
               className="text-blue-600 hover:text-blue-700"
             >
               <Plus className="w-4 h-4 mr-1" />
@@ -186,19 +234,19 @@ function Dashboard({ onNavigate }: DashboardProps) {
         {/* Quick Actions */}
         <div className="grid grid-cols-2 gap-4">
           <Button 
-            onClick={() => onNavigate('planner')} 
+            onClick={() => onNavigate('calculator')} 
             className="h-16 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white border-0 shadow-lg"
           >
-            <Calendar className="w-5 h-5 mr-2" />
-            Plan Meals
+            <Plus className="w-5 h-5 mr-2" />
+            Calculate Calories
           </Button>
           <Button 
-            onClick={() => onNavigate('profile')} 
+            onClick={() => onNavigate('logger')} 
             variant="outline"
             className="h-16 bg-white/80 backdrop-blur-sm border-gray-200 shadow-lg hover:bg-white"
           >
-            <BarChart3 className="w-5 h-5 mr-2" />
-            View Progress
+            <Calendar className="w-5 h-5 mr-2" />
+            Weekly Logger
           </Button>
         </div>
       </div>

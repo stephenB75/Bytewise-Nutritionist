@@ -12,8 +12,8 @@ import { AuthWrapper } from './components/AuthWrapper';
 import { Header } from './components/Header';
 import { Navigation } from './components/Navigation';
 import Dashboard from './pages/Dashboard';
-import RecipeBuilder from './pages/RecipeBuilder';
-import MealPlannerEnhanced from './pages/MealPlannerEnhanced';
+import CalorieCalculator from './components/CalorieCalculator';
+import WeeklyLogger from './pages/WeeklyLogger';
 import ProfileEnhanced from './pages/ProfileEnhanced';
 
 export default function App() {
@@ -37,10 +37,10 @@ export default function App() {
     switch (activeTab) {
       case 'dashboard':
         return <Dashboard onNavigate={handleNavigate} />;
-      case 'recipe-builder':
-        return <RecipeBuilder onNavigate={handleNavigate} />;
-      case 'planner':
-        return <MealPlannerEnhanced onNavigate={handleNavigate} />;
+      case 'calculator':
+        return <CalorieCalculator onNavigate={handleNavigate} />;
+      case 'logger':
+        return <WeeklyLogger onNavigate={handleNavigate} />;
       case 'profile':
         return <ProfileEnhanced onNavigate={handleNavigate} />;
       default:

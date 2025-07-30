@@ -25,8 +25,8 @@ interface NavigationProps {
 interface NavItem {
   id: string;
   label: string;
-  icon: React.ComponentType<{ size?: number; className?: string }>;
-  activeIcon?: React.ComponentType<{ size?: number; className?: string }>;
+  icon: any;
+  activeIcon?: any;
 }
 
 const navItems: NavItem[] = [
@@ -37,13 +37,13 @@ const navItems: NavItem[] = [
     activeIcon: HomeIcon
   },
   {
-    id: 'recipe-builder',
-    label: 'Recipes',
+    id: 'calculator',
+    label: 'Calculator',
     icon: ChefHat
   },
   {
-    id: 'planner',
-    label: 'Planner',
+    id: 'logger',
+    label: 'Logger',
     icon: Calendar,
     activeIcon: CalendarIcon
   },

@@ -165,6 +165,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Implementation Updates
 
+### January 2025 - Recipe Components Replaced with Calorie Calculator & Weekly Logger
+✓ **Replaced Recipe Components**: Removed RecipeBuilder and MealPlanner, replaced with CalorieCalculator and WeeklyLogger modules
+✓ **Enhanced Dashboard**: Added comprehensive daily nutrition metrics card showing macro/micro nutrients with progress tracking
+✓ **Weekly Logger Implementation**: Created weekly meal tracking system to log calories calculated and added as meals by users
+✓ **Navigation Updates**: Updated bottom navigation from "Recipes/Planner" to "Calculator/Logger" for better user flow
+✓ **Calorie Calculator Integration**: Maintained existing USDA-powered calorie calculator functionality without changes
+✓ **Metrics Visualization**: Added detailed macro nutrients (protein, carbs, fat) and micronutrients (fiber, sodium, vitamins) display
+
 ### January 2025 - USDA Food Database Integration & Enhanced Features
 ✓ **USDA FoodData Central API Integration**: Complete integration with over 300,000 foods, offline caching, and intelligent search capabilities  
 ✓ **Enhanced Calorie Calculator**: USDA-powered ingredient analysis with detailed nutrition breakdown and measurement conversions (cups, tablespoons, grams, oz)  

@@ -42,10 +42,11 @@ interface IngredientAnalysis {
 
 interface CalorieCalculatorProps {
   onAddToMeal?: (ingredient: IngredientAnalysis) => void;
+  onNavigate?: (page: string) => void;
   isCompact?: boolean;
 }
 
-function CalorieCalculator({ onAddToMeal, isCompact = false }: CalorieCalculatorProps) {
+function CalorieCalculator({ onAddToMeal, onNavigate, isCompact = false }: CalorieCalculatorProps) {
   const [ingredient, setIngredient] = useState('');
   const [measurement, setMeasurement] = useState('');
   const [recentAnalyses, setRecentAnalyses] = useState<IngredientAnalysis[]>([]);
