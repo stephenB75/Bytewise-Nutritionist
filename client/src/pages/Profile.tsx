@@ -1,389 +1,585 @@
 /**
- * Bytewise Enhanced Profile Screen
+ * Bytewise Profile Component
  * 
- * Comprehensive user profile and account management interface
- * Features:
- * - Seamless header-hero integration with user stats
- * - Enhanced horizontal tabs with icons above text
- * - Functional account settings components
- * - Editable calorie goal with validation
- * - Dynamic app version tracking with history
- * - Clean user data management with clearing options
- * - Responsive design with Bytewise brand guidelines
+ * User profile and account management interface
+ * Features achievement tracking and settings
  */
 
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Input } from '@/components/ui/input';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   User, 
   Settings, 
   Bell, 
   Shield, 
-  Monitor,
-  Database,
   Trophy,
   Calendar,
   TrendingUp,
   Target,
   Flame,
-  ChefHat,
-  Clock,
   Award,
-  LogOut,
   Edit,
-  BarChart3,
-  Activity,
-  Palette,
+  Save,
   Eye,
-  Info,
+  LogOut,
   Smartphone,
-  Copyright,
-  Building,
-  Check,
-  X,
-  History,
-  Download,
-  RefreshCw,
-  Trash2,
-  AlertTriangle
+  Palette,
+  Database
 } from 'lucide-react';
+import { HeroSection } from '@/components/HeroSection';
 
-interface ProfileProps {
-  onNavigate: (tab: string) => void;
-  showToast: (message: string, type?: 'default' | 'destructive') => void;
-  notifications: string[];
-  setNotifications: (notifications: string[]) => void;
+interface Achievement {
+  id: string;
+  title: string;
+  description: string;
+  icon: React.ComponentType<{ size?: number; className?: string }>;
+  earned: boolean;
+  earnedDate?: string;
+  progress?: number;
+  maxProgress?: number;
 }
 
-export default function Profile({ onNavigate, showToast }: ProfileProps) {
-  const [activeSettingsTab, setActiveSettingsTab] = useState('personal');
-  const [showAchievements, setShowAchievements] = useState(false);
-  const [isEditingCalories, setIsEditingCalories] = useState(false);
-  const [editCaloriesValue, setEditCaloriesValue] = useState('2000');
-  const [calorieEditError, setCalorieEditError] = useState('');
+interface ProfileProps {
+  onNavigate: (page: string) => void;
+  onLogout?: () => void;
+}
 
-  // Mock user data
-  const user = {
-    personalInfo: {
-      firstName: 'John',
-      lastName: 'Doe',
-      email: 'john.doe@example.com',
-      avatar: null
+export default function Profile({ onNavigate, onLogout }: ProfileProps) {
+  const [userProfile, setUserProfile] = useState({
+    name: "Alex Chen",
+    email: "alex.chen@example.com",
+    joinDate: "2024-01-15",
+    avatar: "",
+    stats: {
+      totalMealsLogged: 156,
+      currentStreak: 7,
+      totalRecipes: 12,
+      daysActive: 45,
+      calorieGoal: 2200,
+      proteinGoal: 120
+    }
+  });
+
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [isEditingGoals, setIsEditingGoals] = useState(false);
+  const [tempProfile, setTempProfile] = useState(userProfile);
+
+  // Sample achievements
+  const [achievements, setAchievements] = useState<Achievement[]>([
+    {
+      id: '1',
+      title: 'First Week',
+      description: 'Log meals for 7 consecutive days',
+      icon: Calendar,
+      earned: true,
+      earnedDate: '2024-01-22',
+      progress: 7,
+      maxProgress: 7
     },
-    nutritionGoals: {
-      dailyCalories: 2000
+    {
+      id: '2',
+      title: 'Recipe Creator',
+      description: 'Create your first custom recipe',
+      icon: Trophy,
+      earned: true,
+      earnedDate: '2024-01-25',
+      progress: 1,
+      maxProgress: 1
     },
-    accountInfo: {
-      joinDate: '2024-01-01'
+    {
+      id: '3',
+      title: 'Consistency King',
+      description: 'Maintain a 30-day streak',
+      icon: Flame,
+      earned: false,
+      progress: 7,
+      maxProgress: 30
     },
-    achievements: [
-      {
-        id: '1',
-        name: 'First Week',
-        description: 'Logged meals for 7 days',
-        dateEarned: '2024-01-07'
+    {
+      id: '4',
+      title: 'Nutrition Master',
+      description: 'Hit protein goal 50 times',
+      icon: Target,
+      earned: false,
+      progress: 23,
+      maxProgress: 50
+    }
+  ]);
+
+  const saveProfile = () => {
+    setUserProfile(tempProfile);
+    setIsEditingProfile(false);
+    // In real app, save to backend
+  };
+
+  const saveGoals = () => {
+    setUserProfile(prev => ({
+      ...prev,
+      stats: {
+        ...prev.stats,
+        calorieGoal: tempProfile.stats.calorieGoal,
+        proteinGoal: tempProfile.stats.proteinGoal
       }
-    ]
+    }));
+    setIsEditingGoals(false);
+    // In real app, save to backend
   };
 
-  // Calculate profile completion percentage
-  const calculateProfileCompletion = () => {
-    let completed = 0;
-    const total = 10;
-    
-    if (user.personalInfo.firstName) completed++;
-    if (user.personalInfo.lastName) completed++;
-    if (user.personalInfo.email) completed++;
-    if (user.nutritionGoals.dailyCalories > 0) completed++;
-    
-    return Math.round((completed / total) * 100);
-  };
-
-  // Calculate days since joining
   const getDaysSinceJoining = () => {
-    const joinDate = new Date(user.accountInfo.joinDate);
+    const joinDate = new Date(userProfile.joinDate);
     const now = new Date();
     const diffTime = Math.abs(now.getTime() - joinDate.getTime());
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   };
 
-  // Handle calorie goal editing
-  const handleEditCaloriesStart = () => {
-    setEditCaloriesValue(user.nutritionGoals.dailyCalories.toString());
-    setIsEditingCalories(true);
-    setCalorieEditError('');
-  };
-
-  const handleEditCaloriesCancel = () => {
-    setIsEditingCalories(false);
-    setEditCaloriesValue('');
-    setCalorieEditError('');
-  };
-
-  const handleEditCaloriesSave = async () => {
-    const newCalories = parseInt(editCaloriesValue);
+  const getProfileCompletion = () => {
+    let completed = 0;
+    const total = 6;
     
-    // Validation
-    if (isNaN(newCalories)) {
-      setCalorieEditError('Please enter a valid number');
-      return;
-    }
+    if (userProfile.name) completed++;
+    if (userProfile.email) completed++;
+    if (userProfile.avatar) completed++;
+    if (userProfile.stats.calorieGoal > 0) completed++;
+    if (userProfile.stats.proteinGoal > 0) completed++;
+    if (userProfile.stats.totalMealsLogged > 0) completed++;
     
-    if (newCalories < 800) {
-      setCalorieEditError('Calorie goal should be at least 800 calories');
-      return;
-    }
-    
-    if (newCalories > 5000) {
-      setCalorieEditError('Calorie goal should not exceed 5000 calories');
-      return;
-    }
-
-    try {
-      // In a real app, this would update the user's calorie goal
-      setIsEditingCalories(false);
-      setEditCaloriesValue('');
-      setCalorieEditError('');
-      showToast(`Daily calorie goal updated to ${newCalories} calories!`);
-    } catch (error) {
-      console.error('Failed to update calorie goal:', error);
-      setCalorieEditError('Failed to update calorie goal');
-    }
+    return Math.round((completed / total) * 100);
   };
-
-  const handleCalorieInputKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleEditCaloriesSave();
-    } else if (e.key === 'Escape') {
-      handleEditCaloriesCancel();
-    }
-  };
-
-  const profileCompletion = calculateProfileCompletion();
-  const daysSinceJoining = getDaysSinceJoining();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pastel-yellow via-white to-pastel-blue">
+    <div className="min-h-screen bg-background pb-20">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-pastel-yellow to-pastel-blue p-6 pt-8">
-        <div className="max-w-lg mx-auto">
-          <div className="flex items-center gap-4 mb-4">
-            <Avatar className="w-16 h-16">
-              <AvatarImage src={user.personalInfo.avatar || undefined} />
-              <AvatarFallback className="bg-white/20 text-black text-lg font-bold">
-                {user.personalInfo.firstName?.[0]}{user.personalInfo.lastName?.[0]}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1">
-              <h1 
-                className="text-2xl font-bold text-black"
-                style={{ fontFamily: "'League Spartan', sans-serif" }}
-              >
-                {user.personalInfo.firstName} {user.personalInfo.lastName}
-              </h1>
-              <p 
-                className="text-sm text-black/70"
-                style={{ fontFamily: "'Quicksand', sans-serif" }}
-              >
-                {user.personalInfo.email}
-              </p>
-              <div className="flex items-center gap-2 mt-2">
-                <Badge variant="secondary" className="bg-white/20 text-black border-0">
-                  {profileCompletion}% Complete
-                </Badge>
-                <Badge variant="secondary" className="bg-white/20 text-black border-0">
-                  Day {daysSinceJoining}
-                </Badge>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <HeroSection
+        backgroundImage="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600&q=80"
+        backgroundAlt="Personal wellness and health journey"
+        title={`${userProfile.name}'s Profile`}
+        subtitle="Your nutrition journey"
+        description="Track progress and manage your account"
+        statCard={{
+          icon: Trophy,
+          value: achievements.filter(a => a.earned).length,
+          label: "achievements",
+          iconColor: "yellow-400"
+        }}
+        progressRing={{
+          percentage: getProfileCompletion(),
+          color: "#a8dadc",
+          label: "complete"
+        }}
+      />
 
       {/* Main Content */}
-      <div className="max-w-lg mx-auto p-4 -mt-4">
-        {/* Quick Stats */}
-        <Card className="mb-6 p-4 shadow-lg bg-white/80 backdrop-blur-sm border-0">
-          <div className="grid grid-cols-3 gap-4 text-center">
-            <div>
-              <div className="w-12 h-12 bg-pastel-blue/20 rounded-full flex items-center justify-center mx-auto mb-2">
-                <Target className="w-6 h-6 text-pastel-blue" />
+      <div className="px-4 space-y-6">
+        {/* Profile Overview */}
+        <Card className="p-4">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-brand-subheading">Profile Overview</h3>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => {
+                setIsEditingProfile(!isEditingProfile);
+                setTempProfile(userProfile);
+              }}
+              className="text-brand-button"
+            >
+              <Edit size={16} className="mr-1" />
+              {isEditingProfile ? 'Cancel' : 'Edit'}
+            </Button>
+          </div>
+
+          <div className="space-y-4">
+            {/* User Info */}
+            <div className="flex items-center space-x-4">
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+                <User size={24} className="text-primary" />
               </div>
-              <p className="text-sm text-gray-600">Daily Goal</p>
-              <div className="flex items-center justify-center gap-1">
-                {isEditingCalories ? (
-                  <div className="flex flex-col items-center gap-1">
+              <div className="flex-1">
+                {isEditingProfile ? (
+                  <div className="space-y-2">
                     <Input
-                      type="number"
-                      value={editCaloriesValue}
-                      onChange={(e) => setEditCaloriesValue(e.target.value)}
-                      onKeyDown={handleCalorieInputKeyPress}
-                      className="w-20 h-6 text-xs text-center"
-                      min="800"
-                      max="5000"
+                      value={tempProfile.name}
+                      onChange={(e) => setTempProfile(prev => ({ ...prev, name: e.target.value }))}
+                      placeholder="Full name"
+                      className="text-brand-body"
                     />
-                    <div className="flex gap-1">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={handleEditCaloriesSave}
-                        className="h-6 w-6 p-0"
-                      >
-                        <Check className="w-3 h-3" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={handleEditCaloriesCancel}
-                        className="h-6 w-6 p-0"
-                      >
-                        <X className="w-3 h-3" />
-                      </Button>
-                    </div>
-                    {calorieEditError && (
-                      <p className="text-xs text-red-500">{calorieEditError}</p>
-                    )}
+                    <Input
+                      value={tempProfile.email}
+                      onChange={(e) => setTempProfile(prev => ({ ...prev, email: e.target.value }))}
+                      placeholder="Email address"
+                      type="email"
+                      className="text-brand-body"
+                    />
                   </div>
                 ) : (
-                  <div className="flex items-center gap-1">
-                    <p className="font-bold">{user.nutritionGoals.dailyCalories}</p>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={handleEditCaloriesStart}
-                      className="h-4 w-4 p-0"
-                    >
-                      <Edit className="w-3 h-3" />
-                    </Button>
+                  <div>
+                    <h4 className="text-lg font-semibold text-brand-subheading">{userProfile.name}</h4>
+                    <p className="text-sm text-muted-foreground text-brand-body">{userProfile.email}</p>
+                    <p className="text-xs text-muted-foreground text-brand-body">
+                      Member since {new Date(userProfile.joinDate).toLocaleDateString()}
+                    </p>
                   </div>
                 )}
               </div>
-              <p className="text-xs text-gray-500">calories</p>
             </div>
-            <div>
-              <div className="w-12 h-12 bg-pastel-yellow/20 rounded-full flex items-center justify-center mx-auto mb-2">
-                <Flame className="w-6 h-6 text-pastel-yellow" />
+
+            {isEditingProfile && (
+              <div className="flex space-x-2">
+                <Button 
+                  size="sm" 
+                  onClick={saveProfile}
+                  className="text-brand-button"
+                >
+                  <Save size={16} className="mr-1" />
+                  Save
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setIsEditingProfile(false)}
+                  className="text-brand-button"
+                >
+                  Cancel
+                </Button>
               </div>
-              <p className="text-sm text-gray-600">Streak</p>
-              <p className="font-bold">7</p>
-              <p className="text-xs text-gray-500">days</p>
-            </div>
-            <div>
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                <Trophy className="w-6 h-6 text-green-600" />
+            )}
+          </div>
+        </Card>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 gap-4">
+          <Card className="p-4">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Calendar className="text-blue-600" size={20} />
               </div>
-              <p className="text-sm text-gray-600">Achievements</p>
-              <p className="font-bold">{user.achievements.length}</p>
-              <p className="text-xs text-gray-500">earned</p>
+              <div>
+                <p className="text-2xl font-bold text-brand-heading">
+                  {getDaysSinceJoining()}
+                </p>
+                <p className="text-sm text-muted-foreground text-brand-body">days active</p>
+              </div>
             </div>
+          </Card>
+
+          <Card className="p-4">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <TrendingUp className="text-green-600" size={20} />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-brand-heading">
+                  {userProfile.stats.totalMealsLogged}
+                </p>
+                <p className="text-sm text-muted-foreground text-brand-body">meals logged</p>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-4">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-orange-100 rounded-lg">
+                <Flame className="text-orange-600" size={20} />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-brand-heading">
+                  {userProfile.stats.currentStreak}
+                </p>
+                <p className="text-sm text-muted-foreground text-brand-body">day streak</p>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-4">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <Trophy className="text-purple-600" size={20} />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-brand-heading">
+                  {userProfile.stats.totalRecipes}
+                </p>
+                <p className="text-sm text-muted-foreground text-brand-body">recipes created</p>
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        {/* Nutrition Goals */}
+        <Card className="p-4">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-brand-subheading">Nutrition Goals</h3>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => {
+                setIsEditingGoals(!isEditingGoals);
+                setTempProfile(userProfile);
+              }}
+              className="text-brand-button"
+            >
+              <Edit size={16} className="mr-1" />
+              {isEditingGoals ? 'Cancel' : 'Edit'}
+            </Button>
+          </div>
+
+          {isEditingGoals ? (
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium text-brand-label">Daily Calorie Goal</label>
+                <Input
+                  type="number"
+                  value={tempProfile.stats.calorieGoal}
+                  onChange={(e) => setTempProfile(prev => ({
+                    ...prev,
+                    stats: { ...prev.stats, calorieGoal: parseInt(e.target.value) || 0 }
+                  }))}
+                  className="text-brand-body"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-brand-label">Daily Protein Goal (g)</label>
+                <Input
+                  type="number"
+                  value={tempProfile.stats.proteinGoal}
+                  onChange={(e) => setTempProfile(prev => ({
+                    ...prev,
+                    stats: { ...prev.stats, proteinGoal: parseInt(e.target.value) || 0 }
+                  }))}
+                  className="text-brand-body"
+                />
+              </div>
+              <div className="flex space-x-2">
+                <Button 
+                  size="sm" 
+                  onClick={saveGoals}
+                  className="text-brand-button"
+                >
+                  <Save size={16} className="mr-1" />
+                  Save Goals
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setIsEditingGoals(false)}
+                  className="text-brand-button"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-4">
+              <div className="text-center p-3 bg-blue-50 rounded-lg">
+                <p className="text-xl font-bold text-blue-600 text-brand-heading">
+                  {userProfile.stats.calorieGoal}
+                </p>
+                <p className="text-sm text-muted-foreground text-brand-body">Daily Calories</p>
+              </div>
+              <div className="text-center p-3 bg-green-50 rounded-lg">
+                <p className="text-xl font-bold text-green-600 text-brand-heading">
+                  {userProfile.stats.proteinGoal}g
+                </p>
+                <p className="text-sm text-muted-foreground text-brand-body">Daily Protein</p>
+              </div>
+            </div>
+          )}
+        </Card>
+
+        {/* Achievements */}
+        <Card className="p-4">
+          <h3 className="text-lg font-semibold mb-4 text-brand-subheading">Achievements</h3>
+          
+          <div className="grid grid-cols-1 gap-3">
+            {achievements.map((achievement) => (
+              <div 
+                key={achievement.id}
+                className={`
+                  p-3 rounded-lg border-2 transition-all
+                  ${achievement.earned 
+                    ? 'border-green-200 bg-green-50' 
+                    : 'border-gray-200 bg-gray-50'
+                  }
+                `}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className={`
+                      p-2 rounded-lg
+                      ${achievement.earned ? 'bg-green-200' : 'bg-gray-200'}
+                    `}>
+                      <achievement.icon 
+                        size={20} 
+                        className={achievement.earned ? 'text-green-600' : 'text-gray-500'} 
+                      />
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-brand-subheading">{achievement.title}</h4>
+                      <p className="text-sm text-muted-foreground text-brand-body">
+                        {achievement.description}
+                      </p>
+                      {achievement.earnedDate && (
+                        <p className="text-xs text-green-600 text-brand-body">
+                          Earned {new Date(achievement.earnedDate).toLocaleDateString()}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {achievement.earned ? (
+                    <Badge className="bg-green-100 text-green-700 text-brand-label">
+                      Earned
+                    </Badge>
+                  ) : (
+                    <div className="text-right">
+                      <p className="text-sm font-medium text-brand-subheading">
+                        {achievement.progress}/{achievement.maxProgress}
+                      </p>
+                      <div className="w-16 bg-gray-200 rounded-full h-2 mt-1">
+                        <div 
+                          className="bg-primary h-2 rounded-full transition-all duration-300"
+                          style={{ 
+                            width: `${(achievement.progress! / achievement.maxProgress!) * 100}%` 
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
         </Card>
 
         {/* Settings Tabs */}
-        <Card className="shadow-lg bg-white/80 backdrop-blur-sm border-0">
-          <Tabs value={activeSettingsTab} onValueChange={setActiveSettingsTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-4 bg-gray-100">
-              <TabsTrigger value="personal" className="flex flex-col gap-1 py-3">
-                <User className="w-4 h-4" />
-                <span className="text-xs">Personal</span>
+        <Card className="p-4">
+          <Tabs defaultValue="display" className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="display" className="text-xs text-brand-label">
+                Display
               </TabsTrigger>
-              <TabsTrigger value="nutrition" className="flex flex-col gap-1 py-3">
-                <Target className="w-4 h-4" />
-                <span className="text-xs">Goals</span>
+              <TabsTrigger value="notifications" className="text-xs text-brand-label">
+                Notifications
               </TabsTrigger>
-              <TabsTrigger value="notifications" className="flex flex-col gap-1 py-3">
-                <Bell className="w-4 h-4" />
-                <span className="text-xs">Alerts</span>
-              </TabsTrigger>
-              <TabsTrigger value="account" className="flex flex-col gap-1 py-3">
-                <Settings className="w-4 h-4" />
-                <span className="text-xs">Account</span>
+              <TabsTrigger value="privacy" className="text-xs text-brand-label">
+                Privacy
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="personal" className="p-4 space-y-4">
-              <div>
-                <h3 className="font-semibold mb-2">Personal Information</h3>
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-sm font-medium">First Name</label>
-                    <Input value={user.personalInfo.firstName} readOnly />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Last Name</label>
-                    <Input value={user.personalInfo.lastName} readOnly />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Email</label>
-                    <Input value={user.personalInfo.email} readOnly />
-                  </div>
+            <TabsContent value="display" className="mt-4 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium text-brand-subheading">Dark Mode</p>
+                  <p className="text-sm text-muted-foreground text-brand-body">Switch to dark theme</p>
                 </div>
+                <Button variant="outline" size="sm" className="text-brand-button">
+                  <Palette size={16} className="mr-1" />
+                  Theme
+                </Button>
+              </div>
+              
+              <Separator />
+              
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium text-brand-subheading">Language</p>
+                  <p className="text-sm text-muted-foreground text-brand-body">App language preference</p>
+                </div>
+                <Badge variant="outline" className="text-brand-label">English</Badge>
               </div>
             </TabsContent>
 
-            <TabsContent value="nutrition" className="p-4 space-y-4">
-              <div>
-                <h3 className="font-semibold mb-2">Nutrition Goals</h3>
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-sm font-medium">Daily Calories</label>
-                    <Input value={user.nutritionGoals.dailyCalories} readOnly />
-                  </div>
-                  <Button 
-                    variant="outline" 
-                    className="w-full"
-                    onClick={() => onNavigate('dashboard')}
-                  >
-                    <Target className="w-4 h-4 mr-2" />
-                    Update Goals
-                  </Button>
+            <TabsContent value="notifications" className="mt-4 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium text-brand-subheading">Meal Reminders</p>
+                  <p className="text-sm text-muted-foreground text-brand-body">Get reminded to log meals</p>
                 </div>
+                <Button variant="outline" size="sm" className="text-brand-button">
+                  <Bell size={16} />
+                </Button>
+              </div>
+              
+              <Separator />
+              
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium text-brand-subheading">Goal Achievements</p>
+                  <p className="text-sm text-muted-foreground text-brand-body">Celebrate your progress</p>
+                </div>
+                <Button variant="outline" size="sm" className="text-brand-button">
+                  <Award size={16} />
+                </Button>
               </div>
             </TabsContent>
 
-            <TabsContent value="notifications" className="p-4 space-y-4">
-              <div>
-                <h3 className="font-semibold mb-2">Notification Settings</h3>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Meal Reminders</span>
-                    <Button variant="outline" size="sm">Enable</Button>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Goal Notifications</span>
-                    <Button variant="outline" size="sm">Enable</Button>
-                  </div>
+            <TabsContent value="privacy" className="mt-4 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium text-brand-subheading">Data Export</p>
+                  <p className="text-sm text-muted-foreground text-brand-body">Download your data</p>
                 </div>
+                <Button variant="outline" size="sm" className="text-brand-button">
+                  <Database size={16} />
+                </Button>
               </div>
-            </TabsContent>
-
-            <TabsContent value="account" className="p-4 space-y-4">
-              <div>
-                <h3 className="font-semibold mb-2">Account Actions</h3>
-                <div className="space-y-3">
-                  <Button variant="outline" className="w-full justify-start">
-                    <Download className="w-4 h-4 mr-2" />
-                    Export Data
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start">
-                    <RefreshCw className="w-4 h-4 mr-2" />
-                    Reset Progress
-                  </Button>
-                  <Separator />
-                  <Button variant="destructive" className="w-full justify-start">
-                    <LogOut className="w-4 h-4 mr-2" />
-                    Sign Out
-                  </Button>
+              
+              <Separator />
+              
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium text-brand-subheading">Account Security</p>
+                  <p className="text-sm text-muted-foreground text-brand-body">Manage security settings</p>
                 </div>
+                <Button variant="outline" size="sm" className="text-brand-button">
+                  <Shield size={16} />
+                </Button>
               </div>
             </TabsContent>
           </Tabs>
+        </Card>
+
+        {/* Account Actions */}
+        <Card className="p-4">
+          <h3 className="text-lg font-semibold mb-4 text-brand-subheading">Account Actions</h3>
+          
+          <div className="space-y-3">
+            <Button 
+              variant="outline" 
+              className="w-full justify-start text-brand-button"
+              onClick={() => onNavigate('dashboard')}
+            >
+              <TrendingUp className="mr-2" size={16} />
+              View Dashboard
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              className="w-full justify-start text-brand-button"
+              onClick={() => onNavigate('planner')}
+            >
+              <Calendar className="mr-2" size={16} />
+              Meal Planner
+            </Button>
+            
+            <Separator />
+            
+            {onLogout && (
+              <Button 
+                variant="destructive" 
+                className="w-full justify-start"
+                onClick={onLogout}
+              >
+                <LogOut className="mr-2" size={16} />
+                Sign Out
+              </Button>
+            )}
+          </div>
         </Card>
       </div>
     </div>
