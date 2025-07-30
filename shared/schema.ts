@@ -30,9 +30,15 @@ export const sessions = pgTable(
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   email: varchar("email").unique(),
+  emailVerified: boolean("email_verified").default(false),
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
+  // Enhanced profile information
+  personalInfo: jsonb("personal_info"), // age, height, weight, activity level, etc.
+  privacySettings: jsonb("privacy_settings"), // profile visibility, data sharing preferences
+  notificationSettings: jsonb("notification_settings"), // meal reminders, achievement alerts
+  displaySettings: jsonb("display_settings"), // theme, units (metric/imperial), language
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
   // Nutrition goals
@@ -43,9 +49,12 @@ export const users = pgTable("users", {
   dailyWaterGoal: integer("daily_water_goal").default(8), // glasses
 });
 
-// Food database
+// Food database - Enhanced with USDA integration
 export const foods = pgTable("foods", {
   id: serial("id").primaryKey(),
+  // USDA FoodData Central integration
+  fdcId: integer("fdc_id"), // USDA FDC ID for API reference
+  usdaDataType: varchar("usda_data_type", { length: 50 }), // Branded, Foundation, Survey, etc.
   name: varchar("name", { length: 255 }).notNull(),
   brand: varchar("brand", { length: 255 }),
   category: varchar("category", { length: 100 }),
@@ -58,9 +67,17 @@ export const foods = pgTable("foods", {
   fiber: decimal("fiber", { precision: 8, scale: 2 }).default('0'),
   sugar: decimal("sugar", { precision: 8, scale: 2 }).default('0'),
   sodium: decimal("sodium", { precision: 8, scale: 2 }).default('0'), // in mg
+  // Additional USDA nutrients
+  allNutrients: jsonb("all_nutrients"), // Complete USDA nutrient data
   verified: boolean("verified").default(false),
+  isFromUsda: boolean("is_from_usda").default(false),
+  lastUsdaSync: timestamp("last_usda_sync"),
   createdAt: timestamp("created_at").defaultNow(),
-});
+}, (table) => ({
+  fdcIdIdx: index("foods_fdc_id_idx").on(table.fdcId),
+  nameIdx: index("foods_name_idx").on(table.name),
+  categoryIdx: index("foods_category_idx").on(table.category),
+}));
 
 // User recipes
 export const recipes = pgTable("recipes", {
@@ -129,6 +146,55 @@ export const waterIntake = pgTable("water_intake", {
   glasses: integer("glasses").notNull().default(0),
   createdAt: timestamp("created_at").defaultNow(),
 });
+
+// User achievements system
+export const achievements = pgTable("achievements", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  achievementType: varchar("achievement_type", { length: 100 }).notNull(),
+  title: varchar("title", { length: 200 }).notNull(),
+  description: text("description"),
+  iconName: varchar("icon_name", { length: 100 }),
+  colorClass: varchar("color_class", { length: 100 }),
+  earnedAt: timestamp("earned_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Food suggestions based on user habits
+export const foodSuggestions = pgTable("food_suggestions", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  suggestionType: varchar("suggestion_type", { length: 100 }).notNull(), // improve_protein, reduce_sodium, etc.
+  title: varchar("title", { length: 200 }).notNull(),
+  description: text("description"),
+  recommendedFoods: jsonb("recommended_foods"), // Array of food recommendations
+  reasoningData: jsonb("reasoning_data"), // Analysis data that led to suggestion
+  priority: integer("priority").default(1), // 1-5 priority level
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// USDA food cache for offline access
+export const usdaFoodCache = pgTable("usda_food_cache", {
+  id: serial("id").primaryKey(),
+  fdcId: integer("fdc_id").notNull().unique(),
+  description: varchar("description", { length: 500 }).notNull(),
+  dataType: varchar("data_type", { length: 50 }).notNull(),
+  foodCategory: varchar("food_category", { length: 200 }),
+  brandOwner: varchar("brand_owner", { length: 200 }),
+  brandName: varchar("brand_name", { length: 200 }),
+  ingredients: text("ingredients"),
+  servingSize: decimal("serving_size", { precision: 8, scale: 2 }),
+  servingSizeUnit: varchar("serving_size_unit", { length: 50 }),
+  householdServingFullText: varchar("household_serving_full_text", { length: 200 }),
+  nutrients: jsonb("nutrients").notNull(), // Complete nutrition data as JSON
+  lastUpdated: timestamp("last_updated").defaultNow().notNull(),
+  searchCount: integer("search_count").default(0), // Track popularity for caching priority
+}, (table) => ({
+  descriptionIdx: index("usda_cache_description_idx").on(table.description),
+  categoryIdx: index("usda_cache_category_idx").on(table.foodCategory),
+  searchCountIdx: index("usda_cache_search_count_idx").on(table.searchCount),
+}));
 
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
