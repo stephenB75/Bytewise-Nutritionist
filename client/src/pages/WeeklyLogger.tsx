@@ -81,22 +81,37 @@ export default function WeeklyLogger({ onNavigate }: WeeklyLoggerProps) {
   // Listen for calculator events to refresh data
   useEffect(() => {
     const handleRefreshData = () => {
+      console.log('🔄 Refreshing weekly logger data...');
       queryClient.invalidateQueries({ queryKey: ['/api/meals/logged'] });
+      queryClient.refetchQueries({ queryKey: ['/api/meals/logged'] });
     };
 
     const handleCaloriesLogged = (event: CustomEvent) => {
-      console.log('WeeklyLogger received calories:', event.detail);
+      console.log('📥 WeeklyLogger received calories:', event.detail);
+      // Immediate refresh for real-time updates
+      queryClient.invalidateQueries({ queryKey: ['/api/meals/logged'] });
+      queryClient.refetchQueries({ queryKey: ['/api/meals/logged'] });
+      
+      // Also refresh after a short delay to ensure API has processed
       setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: ['/api/meals/logged'] });
-      }, 500);
+        queryClient.refetchQueries({ queryKey: ['/api/meals/logged'] });
+      }, 1000);
+    };
+
+    // Listen for app focus events to refresh data
+    const handleWindowFocus = () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/meals/logged'] });
     };
 
     window.addEventListener('refresh-weekly-data', handleRefreshData);
     window.addEventListener('calories-logged', handleCaloriesLogged as EventListener);
+    window.addEventListener('focus', handleWindowFocus);
     
     return () => {
       window.removeEventListener('refresh-weekly-data', handleRefreshData);
       window.removeEventListener('calories-logged', handleCaloriesLogged as EventListener);
+      window.removeEventListener('focus', handleWindowFocus);
     };
   }, [queryClient]);
 
@@ -104,11 +119,29 @@ export default function WeeklyLogger({ onNavigate }: WeeklyLoggerProps) {
   const weekStart = startOfWeek(currentWeek, { weekStartsOn: 1 });
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
 
-  // Fetch logged meals for the week
-  const { data: loggedMeals = [], isLoading } = useQuery({
+  // Fetch logged meals for the week  
+  const { data: loggedMeals = [], isLoading, error, refetch } = useQuery({
     queryKey: ['/api/meals/logged', format(weekStart, 'yyyy-MM-dd')],
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 30, // 30 seconds for more frequent updates
+    refetchInterval: 1000 * 60, // Refetch every minute
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+    retry: 3,
   });
+
+  // Force refresh when meals are logged
+  useEffect(() => {
+    const handleMealLogged = () => {
+      console.log('🔄 Forcing meal data refresh...');
+      refetch();
+    };
+
+    window.addEventListener('meal-logged-success', handleMealLogged);
+    
+    return () => {
+      window.removeEventListener('meal-logged-success', handleMealLogged);
+    };
+  }, [refetch]);
 
   // Calculate daily totals
   const getDayTotals = (date: Date) => {
@@ -220,16 +253,16 @@ export default function WeeklyLogger({ onNavigate }: WeeklyLoggerProps) {
       <div className="max-w-md mx-auto w-full px-3 space-y-6">
         {/* Navigation Tabs */}
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 bg-white/80 backdrop-blur-sm">
-            <TabsTrigger value="overview" className="flex items-center gap-2">
+          <TabsList className="grid w-full grid-cols-3 bg-white/80 backdrop-blur-sm h-12">
+            <TabsTrigger value="overview" className="flex items-center justify-center gap-2 h-10 px-3 py-2 text-sm font-medium">
               <BarChart3 size={16} />
               Overview
             </TabsTrigger>
-            <TabsTrigger value="timeline" className="flex items-center gap-2">
+            <TabsTrigger value="timeline" className="flex items-center justify-center gap-2 h-10 px-3 py-2 text-sm font-medium">
               <Clock size={16} />
               Timeline
             </TabsTrigger>
-            <TabsTrigger value="insights" className="flex items-center gap-2">
+            <TabsTrigger value="insights" className="flex items-center justify-center gap-2 h-10 px-3 py-2 text-sm font-medium">
               <Award size={16} />
               Insights
             </TabsTrigger>

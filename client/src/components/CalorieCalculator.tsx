@@ -24,7 +24,8 @@ import {
   Droplets,
   Apple,
   Scale,
-  Calendar
+  Calendar,
+  Plus
 } from 'lucide-react';
 
 interface IngredientAnalysis {
@@ -222,16 +223,22 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
       if (response.ok) {
         console.log(`✅ Successfully logged to ${mealType}: ${analysis.ingredient} - ${analysis.estimatedCalories} cal`);
         
-        // Trigger events for UI updates
+        // Trigger multiple events for comprehensive UI updates
         const logEvent = new CustomEvent('calories-logged', {
           detail: { ...mealData, timestamp: new Date().toISOString() }
         });
         window.dispatchEvent(logEvent);
+
+        // Trigger success event for immediate refresh
+        const successEvent = new CustomEvent('meal-logged-success', {
+          detail: { ...mealData, timestamp: new Date().toISOString() }
+        });
+        window.dispatchEvent(successEvent);
         
         // Show success toast
         const toastEvent = new CustomEvent('show-toast', {
           detail: { 
-            message: `Logged ${analysis.ingredient} to ${mealType}!`,
+            message: `✅ Logged ${analysis.ingredient} to ${mealType}!`,
             type: 'success'
           }
         });
@@ -348,18 +355,17 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
                       Add to Meal
                     </Button>
                   )}
-                  {onLogToWeekly && (
-                    <Button
-                      size="sm"
-                      onClick={() => {
-                        console.log('Log to Weekly button clicked for:', analysis);
-                        handleLogToWeekly(analysis);
-                      }}
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                    >
-                      Log to Weekly Tracker
-                    </Button>
-                  )}
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      console.log('Log to Weekly button clicked for:', analysis);
+                      handleLogToWeekly(analysis);
+                    }}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    <Plus className="w-3 h-3 mr-1" />
+                    Log to Weekly Tracker
+                  </Button>
                 </div>
               </div>
             ))}
