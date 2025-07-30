@@ -91,7 +91,7 @@ export function DataManagementPanel() {
             </Badge>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3">
             <Button 
               onClick={handleExportData}
               disabled={isExporting}
@@ -108,29 +108,6 @@ export function DataManagementPanel() {
                   Export to PDF
                 </>
               )}
-            </Button>
-            
-            <Button 
-              variant="outline"
-              onClick={() => {
-                // Export as JSON
-                const data = {
-                  exportDate: new Date().toISOString(),
-                  meals: [],
-                  recipes: [],
-                  achievements: []
-                };
-                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `bytewise-data-${new Date().toISOString().split('T')[0]}.json`;
-                a.click();
-                URL.revokeObjectURL(url);
-              }}
-            >
-              <Database className="w-4 h-4 mr-2" />
-              Export JSON
             </Button>
           </div>
         </div>
