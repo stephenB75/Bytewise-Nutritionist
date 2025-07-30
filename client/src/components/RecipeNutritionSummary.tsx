@@ -37,9 +37,9 @@ export function RecipeNutritionSummary({ nutrition, servings }: RecipeNutritionS
     protein: isNaN(nutrition?.protein) ? 0 : nutrition?.protein || 0,
     carbs: isNaN(nutrition?.carbs) ? 0 : nutrition?.carbs || 0,
     fat: isNaN(nutrition?.fat) ? 0 : nutrition?.fat || 0,
-    fiber: isNaN(nutrition?.fiber) ? 0 : nutrition?.fiber || 0,
-    sugar: isNaN(nutrition?.sugar) ? 0 : nutrition?.sugar || 0,
-    sodium: isNaN(nutrition?.sodium) ? 0 : nutrition?.sodium || 0
+    fiber: isNaN(Number(nutrition?.fiber)) ? 0 : Number(nutrition?.fiber) || 0,
+    sugar: isNaN(Number(nutrition?.sugar)) ? 0 : Number(nutrition?.sugar) || 0,
+    sodium: isNaN(Number(nutrition?.sodium)) ? 0 : Number(nutrition?.sodium) || 0
   };
 
   const safeServings = isNaN(servings) || servings < 1 ? 1 : servings;

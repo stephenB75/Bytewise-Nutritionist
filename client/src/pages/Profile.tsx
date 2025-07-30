@@ -56,15 +56,16 @@ export default function Profile({ onNavigate, showToast, notifications, setNotif
   // Update form data when user data loads
   useEffect(() => {
     if (user) {
+      const userData = user as any;
       setFormData({
-        firstName: user.firstName || '',
-        lastName: user.lastName || '',
-        email: user.email || '',
-        dailyCalorieGoal: user.dailyCalorieGoal || 2000,
-        dailyProteinGoal: user.dailyProteinGoal || 150,
-        dailyCarbGoal: user.dailyCarbGoal || 200,
-        dailyFatGoal: user.dailyFatGoal || 70,
-        dailyWaterGoal: user.dailyWaterGoal || 8,
+        firstName: userData.firstName || '',
+        lastName: userData.lastName || '',
+        email: userData.email || '',
+        dailyCalorieGoal: userData.dailyCalorieGoal || 2000,
+        dailyProteinGoal: userData.dailyProteinGoal || 150,
+        dailyCarbGoal: userData.dailyCarbGoal || 200,
+        dailyFatGoal: userData.dailyFatGoal || 70,
+        dailyWaterGoal: userData.dailyWaterGoal || 8,
       });
     }
   }, [user]);
@@ -79,15 +80,16 @@ export default function Profile({ onNavigate, showToast, notifications, setNotif
 
   const handleCancel = () => {
     if (user) {
+      const userData = user as any;
       setFormData({
-        firstName: user.firstName || '',
-        lastName: user.lastName || '',
-        email: user.email || '',
-        dailyCalorieGoal: user.dailyCalorieGoal || 2000,
-        dailyProteinGoal: user.dailyProteinGoal || 150,
-        dailyCarbGoal: user.dailyCarbGoal || 200,
-        dailyFatGoal: user.dailyFatGoal || 70,
-        dailyWaterGoal: user.dailyWaterGoal || 8,
+        firstName: userData.firstName || '',
+        lastName: userData.lastName || '',
+        email: userData.email || '',
+        dailyCalorieGoal: userData.dailyCalorieGoal || 2000,
+        dailyProteinGoal: userData.dailyProteinGoal || 150,
+        dailyCarbGoal: userData.dailyCarbGoal || 200,
+        dailyFatGoal: userData.dailyFatGoal || 70,
+        dailyWaterGoal: userData.dailyWaterGoal || 8,
       });
     }
     setIsEditing(false);
@@ -141,9 +143,9 @@ export default function Profile({ onNavigate, showToast, notifications, setNotif
               {/* Profile Picture */}
               <div className="flex items-center space-x-4">
                 <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-                  {user.profileImageUrl ? (
+                  {(user as any).profileImageUrl ? (
                     <img 
-                      src={user.profileImageUrl} 
+                      src={(user as any).profileImageUrl} 
                       alt="Profile" 
                       className="w-16 h-16 rounded-full object-cover"
                     />
@@ -153,14 +155,14 @@ export default function Profile({ onNavigate, showToast, notifications, setNotif
                 </div>
                 <div>
                   <h3 className="font-semibold">
-                    {user.firstName || user.lastName ? 
-                      `${user.firstName || ''} ${user.lastName || ''}`.trim() : 
+                    {(user as any).firstName || (user as any).lastName ? 
+                      `${(user as any).firstName || ''} ${(user as any).lastName || ''}`.trim() : 
                       'User'
                     }
                   </h3>
-                  <p className="text-sm text-muted-foreground">{user.email}</p>
+                  <p className="text-sm text-muted-foreground">{(user as any).email}</p>
                   <Badge variant="outline" className="text-xs mt-1">
-                    Member since {formatDate(new Date(user.createdAt))}
+                    Member since {formatDate(new Date((user as any).createdAt || Date.now()))}
                   </Badge>
                 </div>
               </div>

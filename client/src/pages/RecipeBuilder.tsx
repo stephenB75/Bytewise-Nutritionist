@@ -10,7 +10,7 @@ import { ChefHat, Plus, Search, Clock, Users, Trash2, Save } from 'lucide-react'
 import { apiRequest } from '@/lib/queryClient';
 import { formatCalories } from '@/lib/utils';
 import { useDragDrop } from '@/components/DragDropProvider';
-import { ImageWithFallback } from '@/components/ImageWithFallback';
+import { ImageWithFallback } from '@/components/ui/ImageWithFallback';
 
 interface RecipeBuilderProps {
   onNavigate: (tab: string) => void;

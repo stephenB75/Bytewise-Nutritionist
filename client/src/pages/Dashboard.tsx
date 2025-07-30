@@ -6,7 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Plus, TrendingUp, Target, Droplets, Clock, Flame } from 'lucide-react';
 import { formatCalories, calculatePercentage, formatDate } from '@/lib/utils';
-import { ImageWithFallback } from '@/components/ImageWithFallback';
+import { ImageWithFallback } from '@/components/ui/ImageWithFallback';
 
 interface DashboardProps {
   onNavigate: (tab: string) => void;
