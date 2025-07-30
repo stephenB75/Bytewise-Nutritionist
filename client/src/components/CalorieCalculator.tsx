@@ -120,20 +120,23 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
       const hour = now.getHours();
       let category: 'breakfast' | 'lunch' | 'dinner' | 'snack';
       
-      if (hour < 11) category = 'breakfast';
-      else if (hour < 15) category = 'lunch';
-      else if (hour < 19) category = 'dinner';
+      // Fixed category assignment logic
+      if (hour >= 6 && hour < 11) category = 'breakfast';
+      else if (hour >= 11 && hour < 15) category = 'lunch';  
+      else if (hour >= 15 && hour < 20) category = 'dinner';
       else category = 'snack';
 
+      // Log with explicit source tracking
       onLogToWeekly({
-        name: `${analysis.ingredient} (${analysis.measurement})`,
+        name: `[Calculator] ${analysis.ingredient} (${analysis.measurement})`,
         calories: analysis.estimatedCalories,
         protein: analysis.nutritionPer100g?.protein || 0,
         carbs: analysis.nutritionPer100g?.carbs || 0,
         fat: analysis.nutritionPer100g?.fat || 0,
         date: now.toISOString().split('T')[0],
         time: now.toLocaleTimeString(),
-        category
+        category,
+        source: 'calculator'
       });
     }
   };
@@ -208,16 +211,27 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
                   </Badge>
                 </div>
                 
-                {onAddToMeal && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleAddToMeal(analysis)}
-                    className="mt-2 w-full"
-                  >
-                    Add to Meal
-                  </Button>
-                )}
+                <div className="mt-2 space-y-2">
+                  {onAddToMeal && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleAddToMeal(analysis)}
+                      className="w-full"
+                    >
+                      Add to Meal
+                    </Button>
+                  )}
+                  {onLogToWeekly && (
+                    <Button
+                      size="sm"
+                      onClick={() => handleLogToWeekly(analysis)}
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      Log to Weekly Tracker
+                    </Button>
+                  )}
+                </div>
               </div>
             ))}
           </div>
