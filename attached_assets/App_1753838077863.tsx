@@ -1,0 +1,665 @@
+/**
+ * Bytewise Nutrition Tracking App
+ * 
+ * Main application component with enhanced user management integration
+ * Features:
+ * - User authentication and comprehensive profile management
+ * - Food database integration with USDA data
+ * - Recipe Builder with drag and drop functionality
+ * - Meal planning and progress tracking
+ * - Achievement system with confetti celebrations
+ * - Enhanced version tracking and management
+ * - Development tools and system monitoring
+ * - Comprehensive data clearing for testing
+ * - Complete signup form data integration
+ * - Test notifications disabled for development
+ * - FIXED: All critical issues resolved while maintaining functionality
+ * - ADDED: User Entry Tracking Validation tool
+ * - ADDED: Test Food Entries tool for component validation
+ */
+
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { LoginScreen } from './components/auth/LoginScreen';
+import { SignupScreen, SignupFormData } from './components/auth/SignupScreen';
+import { ForgotPasswordScreen } from './components/auth/ForgotPasswordScreen';
+import { AppContent } from './components/AppContent';
+import { FoodDatabaseProvider } from './components/FoodDatabaseManager';
+import { UserProvider } from './components/user/UserManager';
+import { VersionManagerProvider } from './components/utils/VersionManager';
+import { DataClearingPanel, quickClearAllData } from './components/utils/DataClearingUtils';
+import { DataValidationPanel } from './components/utils/DataValidationUtils';
+import { UserEntryTrackingValidation } from './components/UserEntryTrackingValidation';
+import { USDADatabaseValidation } from './components/USDADatabaseValidation';
+import { TestFoodEntries } from './components/TestFoodEntries';
+
+// Import utilities and constants
+import {
+  createLoginHandler,
+  createSignupHandler,
+  createLogoutHandler,
+  createForgotPasswordHandler,
+  validateSession,
+  initializeAuthState,
+  persistAuthState,
+  AuthState
+} from './components/utils/AuthUtils';
+import { 
+  DEFAULT_SYSTEM_STATUS, 
+  AUTH_MODES, 
+  TOAST_DURATIONS,
+  ACHIEVEMENT_DELAYS 
+} from './components/utils/AppConstants';
+import { SystemStatus } from './components/utils/DevTools';
+
+// Main App Component
+export default function App() {
+  // Core application state
+  const [isAuthenticated, setIsAuthenticated] = useState(() => initializeAuthState());
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [authMode, setAuthMode] = useState<'login' | 'signup' | 'forgot'>('login');
+  const [notifications, setNotifications] = useState<string[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isScrolling, setIsScrolling] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [systemStatus, setSystemStatus] = useState<SystemStatus>(DEFAULT_SYSTEM_STATUS);
+
+  // Development tools state
+  const [showSystemStatus, setShowSystemStatus] = useState(false);
+  const [showDatabaseVerification, setShowDatabaseVerification] = useState(false);
+  const [showRecipeBuilderVerification, setShowRecipeBuilderVerification] = useState(false);
+  const [showDataClearing, setShowDataClearing] = useState(false);
+  const [showDataValidation, setShowDataValidation] = useState(false);
+  const [showUserEntryTracking, setShowUserEntryTracking] = useState(false);
+  const [showUSDAValidation, setShowUSDAValidation] = useState(false);
+  const [showTestFoodEntries, setShowTestFoodEntries] = useState(false); // NEW
+
+  // Development mode detection
+  const isDevelopment = process.env.NODE_ENV === 'development';
+
+  // FIXED: Optimized helper function to show toast messages
+  const showToast = useCallback((message: string, duration = TOAST_DURATIONS.MEDIUM) => {
+    console.log('🔔 Showing toast:', message);
+    setToastMessage(message);
+    setTimeout(() => setToastMessage(null), duration);
+  }, []);
+
+  // FIXED: Optimized data clearing handler
+  const handleDataCleared = useCallback(() => {
+    console.log('🧹 Data cleared, resetting application state...');
+    
+    // Reset all application state
+    setIsAuthenticated(false);
+    setActiveTab('dashboard');
+    setAuthMode('login');
+    setNotifications([]);
+    setToastMessage(null);
+    setSystemStatus(DEFAULT_SYSTEM_STATUS);
+    
+    // Reset development tools state
+    setShowSystemStatus(false);
+    setShowDatabaseVerification(false);
+    setShowRecipeBuilderVerification(false);
+    setShowDataClearing(false);
+    setShowDataValidation(false);
+    setShowUserEntryTracking(false);
+    setShowUSDAValidation(false);
+    setShowTestFoodEntries(false); // NEW
+    
+    // Show confirmation
+    showToast('🧹 All data cleared! Application reset to fresh state.', TOAST_DURATIONS.LONG);
+    
+    // Dispatch reset events
+    window.dispatchEvent(new CustomEvent('bytewise-app-reset'));
+    window.dispatchEvent(new CustomEvent('bytewise-data-cleared'));
+  }, [showToast]);
+
+  // FIXED: Create auth state object with useMemo for performance optimization
+  const authState: AuthState = useMemo(() => ({
+    isAuthenticated,
+    setIsAuthenticated,
+    setSystemStatus,
+    showToast,
+    setActiveTab,
+    setAuthMode,
+    setNotifications
+  }), [isAuthenticated, setIsAuthenticated, setSystemStatus, showToast, setActiveTab, setAuthMode, setNotifications]);
+
+  // FIXED: Stabilized authentication handlers with useCallback
+  const handleLogin = useCallback(
+    (credentials: any) => createLoginHandler(authState)(credentials),
+    [authState]
+  );
+
+  const handleSignup = useCallback(
+    (credentials: any) => createSignupHandler(authState)(credentials),
+    [authState]
+  );
+
+  const handleLogout = useCallback(
+    () => createLogoutHandler(authState)(),
+    [authState]
+  );
+
+  const handleForgotPassword = useCallback(
+    (email: string) => createForgotPasswordHandler(authState)(email),
+    [authState]
+  );
+
+  // Enhanced signup handler that receives complete form data
+  const handleSignupWithFormData = useCallback((formData: SignupFormData) => {
+    console.log('📝 Processing complete signup form data:', formData);
+    handleSignup(formData);
+  }, [handleSignup]);
+
+  // FIXED: Persist authentication state with proper dependencies
+  useEffect(() => {
+    persistAuthState(isAuthenticated, setSystemStatus);
+  }, [isAuthenticated]);
+
+  // FIXED: Session validation with proper dependencies
+  useEffect(() => {
+    validateSession(authState);
+  }, [authState]);
+
+  // TEST NOTIFICATIONS DISABLED
+  // Achievement trigger for early adopter - DISABLED FOR DEVELOPMENT
+  // useEffect(() => {
+  //   if (isAuthenticated) {
+  //     // Trigger early adopter achievement for new users
+  //     setTimeout(() => {
+  //       window.dispatchEvent(new CustomEvent('bytewise-check-achievements'));
+  //     }, ACHIEVEMENT_DELAYS.EARLY_ADOPTER);
+  //   }
+  // }, [isAuthenticated]);
+
+  // TEST NOTIFICATIONS DISABLED
+  // Version update listener - DISABLED FOR DEVELOPMENT
+  // useEffect(() => {
+  //   const handleVersionUpdate = (e: Event) => {
+  //     const customEvent = e as CustomEvent;
+  //     const { previousVersion, newVersion, features } = customEvent.detail;
+  //     showToast(
+  //       `🚀 Updated to v${newVersion}! ${features.length} new features available.`,
+  //       TOAST_DURATIONS.LONG
+  //     );
+  //   };
+
+  //   const handleFirstInstall = (e: Event) => {
+  //     const customEvent = e as CustomEvent;
+  //     const { version } = customEvent.detail;
+  //     showToast(
+  //       `🎉 Welcome to Bytewise v${version}! Let's start tracking your nutrition.`,
+  //       TOAST_DURATIONS.LONG
+  //     );
+  //   };
+
+  //   window.addEventListener('bytewise-version-updated', handleVersionUpdate);
+  //   window.addEventListener('bytewise-first-install', handleFirstInstall);
+  //   window.addEventListener('bytewise-data-cleared', handleDataCleared);
+
+  //   return () => {
+  //     window.removeEventListener('bytewise-version-updated', handleVersionUpdate);
+  //     window.removeEventListener('bytewise-first-install', handleFirstInstall);
+  //     window.removeEventListener('bytewise-data-cleared', handleDataCleared);
+  //   };
+  // }, [showToast, handleDataCleared]);
+
+  // FIXED: Data clearing event listener with proper typing and dependencies
+  useEffect(() => {
+    const handleDataClearedEvent = (e: Event) => {
+      console.log('🧹 Received data cleared event');
+      handleDataCleared();
+    };
+
+    window.addEventListener('bytewise-data-cleared', handleDataClearedEvent);
+
+    return () => {
+      window.removeEventListener('bytewise-data-cleared', handleDataClearedEvent);
+    };
+  }, [handleDataCleared]);
+
+  // FIXED: Optimized development keyboard shortcuts with useCallback
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    // Ctrl/Cmd + Shift + C = Open data clearing panel
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'C') {
+      e.preventDefault();
+      setShowDataClearing(prev => !prev);
+      console.log('🛠️ Data clearing panel toggled');
+    }
+    
+    // Ctrl/Cmd + Shift + V = Open data validation panel
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'V') {
+      e.preventDefault();
+      setShowDataValidation(prev => !prev);
+      console.log('🛠️ Data validation panel toggled');
+    }
+    
+    // Ctrl/Cmd + Shift + T = Open user entry tracking validation panel
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'T') {
+      e.preventDefault();
+      setShowUserEntryTracking(prev => !prev);
+      console.log('🛠️ User entry tracking validation panel toggled');
+    }
+    
+    // Ctrl/Cmd + Shift + U = Open USDA database validation panel
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'U') {
+      e.preventDefault();
+      setShowUSDAValidation(prev => !prev);
+      console.log('🛠️ USDA database validation panel toggled');
+    }
+    
+    // NEW: Ctrl/Cmd + Shift + E = Open test food entries panel
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'E') {
+      e.preventDefault();
+      setShowTestFoodEntries(prev => !prev);
+      console.log('🛠️ Test food entries panel toggled');
+    }
+    
+    // Ctrl/Cmd + Shift + R = Quick clear all data (with confirmation)
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'R') {
+      e.preventDefault();
+      if (confirm('🧹 Quick clear all Bytewise data? This cannot be undone!')) {
+        quickClearAllData();
+      }
+    }
+  }, []);
+
+  // FIXED: Development keyboard shortcuts with proper dependencies
+  useEffect(() => {
+    if (!isDevelopment) return;
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isDevelopment, handleKeyDown]);
+
+  // Development console helpers
+  useEffect(() => {
+    if (isDevelopment) {
+      console.log('🛠️ Development Mode Active');
+      console.log('📢 Test notifications DISABLED for development');
+      console.log('🔑 Keyboard Shortcuts:');
+      console.log('  • Ctrl/Cmd + Shift + C: Toggle Data Clearing Panel');
+      console.log('  • Ctrl/Cmd + Shift + V: Toggle Data Validation Panel');
+      console.log('  • Ctrl/Cmd + Shift + T: Toggle User Entry Tracking Validation');
+      console.log('  • Ctrl/Cmd + Shift + U: Toggle USDA Database Validation');
+      console.log('  • Ctrl/Cmd + Shift + E: Toggle Test Food Entries Tool'); // NEW
+      console.log('  • Ctrl/Cmd + Shift + R: Quick Clear All Data');
+      console.log('🔧 Console Helpers:');
+      console.log('  • bytewiseClearData(): Clear all data');
+      console.log('  • bytewiseValidateData(): View storage validation report');
+      console.log('  • bytewiseDataReport(): Get detailed data analysis');
+    }
+  }, [isDevelopment]);
+
+  // FIXED: Optimized authentication screen rendering
+  const renderAuthScreen = useCallback(() => {
+    console.log('🔐 Rendering auth screen:', authMode);
+    
+    const authContent = (() => {
+      switch (authMode) {
+        case AUTH_MODES.LOGIN:
+          return (
+            <LoginScreen
+              onLogin={handleLogin}
+              onNavigateToSignup={() => {
+                console.log('🧭 Navigating to signup from login');
+                setAuthMode('signup');
+              }}
+              onNavigateToForgotPassword={() => {
+                console.log('🧭 Navigating to forgot password from login');
+                setAuthMode('forgot');
+              }}
+            />
+          );
+          
+        case AUTH_MODES.SIGNUP:
+          return (
+            <SignupScreen
+              onSignup={handleSignupWithFormData}
+              onNavigateToLogin={() => {
+                console.log('🧭 Navigating to login from signup');
+                setAuthMode('login');
+              }}
+            />
+          );
+          
+        case AUTH_MODES.FORGOT:
+          return (
+            <ForgotPasswordScreen
+              onResetRequest={handleForgotPassword}
+              onNavigateToLogin={() => {
+                console.log('🧭 Returning to login from forgot password');
+                setAuthMode('login');
+              }}
+              showToast={showToast}
+            />
+          );
+          
+        default:
+          console.error('❌ Unknown auth mode:', authMode);
+          return null;
+      }
+    })();
+
+    return (
+      <div className="min-h-screen relative">
+        {authContent}
+        
+        {/* Development Data Clearing Panel Overlay */}
+        {isDevelopment && showDataClearing && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 p-4 overflow-y-auto">
+            <div className="max-w-2xl mx-auto mt-8 mb-8">
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="text-brand-heading text-white" style={{ fontFamily: "'League Spartan', sans-serif", fontSize: "1.5rem", fontWeight: 600 }}>
+                  Development Data Clearing
+                </h2>
+                <button
+                  onClick={() => setShowDataClearing(false)}
+                  className="text-white hover:text-red-300 transition-colors mobile-safe-input"
+                  aria-label="Close data clearing panel"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              
+              <div className="bg-white rounded-lg overflow-hidden">
+                <DataClearingPanel onDataCleared={handleDataCleared} />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Development Data Validation Panel Overlay */}
+        {isDevelopment && showDataValidation && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 p-4 overflow-y-auto">
+            <div className="max-w-6xl mx-auto mt-8 mb-8">
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="text-brand-heading text-white" style={{ fontFamily: "'League Spartan', sans-serif", fontSize: "1.5rem", fontWeight: 600 }}>
+                  Local Storage Validation
+                </h2>
+                <button
+                  onClick={() => setShowDataValidation(false)}
+                  className="text-white hover:text-red-300 transition-colors mobile-safe-input"
+                  aria-label="Close data validation panel"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              
+              <div className="bg-white rounded-lg overflow-hidden">
+                <DataValidationPanel />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* User Entry Tracking Validation Panel Overlay */}
+        {isDevelopment && showUserEntryTracking && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 p-4 overflow-y-auto">
+            <div className="max-w-6xl mx-auto mt-8 mb-8">
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="text-brand-heading text-white" style={{ fontFamily: "'League Spartan', sans-serif", fontSize: "1.5rem", fontWeight: 600 }}>
+                  User Entry Tracking Validation
+                </h2>
+                <button
+                  onClick={() => setShowUserEntryTracking(false)}
+                  className="text-white hover:text-red-300 transition-colors mobile-safe-input"
+                  aria-label="Close user entry tracking panel"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              
+              <div className="bg-white rounded-lg overflow-hidden">
+                <UserEntryTrackingValidation onClose={() => setShowUserEntryTracking(false)} />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* USDA Database Validation Panel Overlay */}
+        {isDevelopment && showUSDAValidation && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 p-4 overflow-y-auto">
+            <div className="max-w-6xl mx-auto mt-8 mb-8">
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="text-brand-heading text-white" style={{ fontFamily: "'League Spartan', sans-serif", fontSize: "1.5rem", fontWeight: 600 }}>
+                  USDA Database Validation
+                </h2>
+                <button
+                  onClick={() => setShowUSDAValidation(false)}
+                  className="text-white hover:text-red-300 transition-colors mobile-safe-input"
+                  aria-label="Close USDA validation panel"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              
+              <div className="bg-white rounded-lg overflow-hidden">
+                <USDADatabaseValidation onClose={() => setShowUSDAValidation(false)} />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* NEW: Test Food Entries Panel Overlay */}
+        {isDevelopment && showTestFoodEntries && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 p-4 overflow-y-auto">
+            <div className="max-w-6xl mx-auto mt-8 mb-8">
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="text-brand-heading text-white" style={{ fontFamily: "'League Spartan', sans-serif", fontSize: "1.5rem", fontWeight: 600 }}>
+                  Test Food Entries Tool
+                </h2>
+                <button
+                  onClick={() => setShowTestFoodEntries(false)}
+                  className="text-white hover:text-red-300 transition-colors mobile-safe-input"
+                  aria-label="Close test food entries panel"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              
+              <div className="bg-white rounded-lg overflow-hidden">
+                <TestFoodEntries onClose={() => setShowTestFoodEntries(false)} />
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }, [authMode, handleLogin, handleSignupWithFormData, handleForgotPassword, showToast, isDevelopment, showDataClearing, showDataValidation, showUserEntryTracking, showUSDAValidation, showTestFoodEntries, handleDataCleared]);
+
+  // Render authentication screens if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <VersionManagerProvider>
+        <div className="min-h-screen">
+          {renderAuthScreen()}
+        </div>
+      </VersionManagerProvider>
+    );
+  }
+
+  // Main application interface - Wrapped with providers
+  return (
+    <VersionManagerProvider>
+      <FoodDatabaseProvider>
+        <UserProvider>
+          <div className="relative">
+            <AppContent
+              isAuthenticated={isAuthenticated}
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              isDragging={isDragging}
+              setIsDragging={setIsDragging}
+              isScrolling={isScrolling}
+              setIsScrolling={setIsScrolling}
+              toastMessage={toastMessage}
+              setToastMessage={setToastMessage}
+              systemStatus={systemStatus}
+              setSystemStatus={setSystemStatus}
+              notifications={notifications}
+              setNotifications={setNotifications}
+              showSystemStatus={showSystemStatus}
+              setShowSystemStatus={setShowSystemStatus}
+              showDatabaseVerification={showDatabaseVerification}
+              setShowDatabaseVerification={setShowDatabaseVerification}
+              showRecipeBuilderVerification={showRecipeBuilderVerification}
+              setShowRecipeBuilderVerification={setShowRecipeBuilderVerification}
+              showToast={showToast}
+              handleLogout={handleLogout}
+            />
+
+            {/* Development Data Clearing Panel Overlay */}
+            {isDevelopment && showDataClearing && (
+              <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 p-4 overflow-y-auto">
+                <div className="max-w-2xl mx-auto mt-8 mb-8">
+                  <div className="mb-4 flex items-center justify-between">
+                    <h2 className="text-brand-heading text-white" style={{ fontFamily: "'League Spartan', sans-serif", fontSize: "1.5rem", fontWeight: 600 }}>
+                      Development Data Clearing
+                    </h2>
+                    <button
+                      onClick={() => setShowDataClearing(false)}
+                      className="text-white hover:text-red-300 transition-colors mobile-safe-input"
+                      aria-label="Close data clearing panel"
+                    >
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                  
+                  <div className="bg-white rounded-lg overflow-hidden">
+                    <DataClearingPanel onDataCleared={handleDataCleared} />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Development Data Validation Panel Overlay */}
+            {isDevelopment && showDataValidation && (
+              <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 p-4 overflow-y-auto">
+                <div className="max-w-6xl mx-auto mt-8 mb-8">
+                  <div className="mb-4 flex items-center justify-between">
+                    <h2 className="text-brand-heading text-white" style={{ fontFamily: "'League Spartan', sans-serif", fontSize: "1.5rem", fontWeight: 600 }}>
+                      Local Storage Validation
+                    </h2>
+                    <button
+                      onClick={() => setShowDataValidation(false)}
+                      className="text-white hover:text-red-300 transition-colors mobile-safe-input"
+                      aria-label="Close data validation panel"
+                    >
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                  
+                  <div className="bg-white rounded-lg overflow-hidden">
+                    <DataValidationPanel />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* User Entry Tracking Validation Panel Overlay */}
+            {isDevelopment && showUserEntryTracking && (
+              <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 p-4 overflow-y-auto">
+                <div className="max-w-6xl mx-auto mt-8 mb-8">
+                  <div className="mb-4 flex items-center justify-between">
+                    <h2 className="text-brand-heading text-white" style={{ fontFamily: "'League Spartan', sans-serif", fontSize: "1.5rem", fontWeight: 600 }}>
+                      User Entry Tracking Validation
+                    </h2>
+                    <button
+                      onClick={() => setShowUserEntryTracking(false)}
+                      className="text-white hover:text-red-300 transition-colors mobile-safe-input"
+                      aria-label="Close user entry tracking panel"
+                    >
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                  
+                  <div className="bg-white rounded-lg overflow-hidden">
+                    <UserEntryTrackingValidation onClose={() => setShowUserEntryTracking(false)} />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* USDA Database Validation Panel Overlay */}
+            {isDevelopment && showUSDAValidation && (
+              <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 p-4 overflow-y-auto">
+                <div className="max-w-6xl mx-auto mt-8 mb-8">
+                  <div className="mb-4 flex items-center justify-between">
+                    <h2 className="text-brand-heading text-white" style={{ fontFamily: "'League Spartan', sans-serif", fontSize: "1.5rem", fontWeight: 600 }}>
+                      USDA Database Validation
+                    </h2>
+                    <button
+                      onClick={() => setShowUSDAValidation(false)}
+                      className="text-white hover:text-red-300 transition-colors mobile-safe-input"
+                      aria-label="Close USDA validation panel"
+                    >
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                  
+                  <div className="bg-white rounded-lg overflow-hidden">
+                    <USDADatabaseValidation onClose={() => setShowUSDAValidation(false)} />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* NEW: Test Food Entries Panel Overlay */}
+            {isDevelopment && showTestFoodEntries && (
+              <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 p-4 overflow-y-auto">
+                <div className="max-w-6xl mx-auto mt-8 mb-8">
+                  <div className="mb-4 flex items-center justify-between">
+                    <h2 className="text-brand-heading text-white" style={{ fontFamily: "'League Spartan', sans-serif", fontSize: "1.5rem", fontWeight: 600 }}>
+                      Test Food Entries Tool
+                    </h2>
+                    <button
+                      onClick={() => setShowTestFoodEntries(false)}
+                      className="text-white hover:text-red-300 transition-colors mobile-safe-input"
+                      aria-label="Close test food entries panel"
+                    >
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                  
+                  <div className="bg-white rounded-lg overflow-hidden">
+                    <TestFoodEntries onClose={() => setShowTestFoodEntries(false)} />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Development Mode Indicator */}
+            {isDevelopment && (
+              <div className="fixed bottom-4 left-4 z-40">
+                <div className="bg-yellow-500 text-black px-2 py-1 rounded-md text-xs font-medium shadow-lg mobile-safe-text">
+                  DEV
+                </div>
+              </div>
+            )}
+          </div>
+        </UserProvider>
+      </FoodDatabaseProvider>
+    </VersionManagerProvider>
+  );
+}
