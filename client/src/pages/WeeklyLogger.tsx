@@ -67,7 +67,7 @@ export default function WeeklyLogger({ onNavigate }: WeeklyLoggerProps) {
   // Constants for calculations
   const dailyCalorieGoal = 2000;
   const calculatedCaloriesTotal = getTodaysCalories();
-  const calculatedItemsCount = Object.keys(calculatedCalories).length;
+  const calculatedItemsCount = calculatedCalories.length;
 
   // Navigation functions
   const navigateWeek = (direction: 'prev' | 'next') => {
@@ -182,19 +182,22 @@ export default function WeeklyLogger({ onNavigate }: WeeklyLoggerProps) {
       icon: Flame,
       label: 'Weekly Cal',
       value: (weeklyTotals.calories + calculatedCaloriesTotal).toLocaleString(),
-      color: 'text-orange-600'
+      color: 'text-orange-600',
+      bgColor: 'bg-orange-50'
     },
     {
       icon: Utensils,
       label: 'Meals Logged',
       value: weeklyTotals.meals.toString(),
-      color: 'text-green-600'
+      color: 'text-green-600',
+      bgColor: 'bg-green-50'
     },
     {
       icon: TrendingUp,
       label: 'Daily Avg',
       value: Math.round((weeklyTotals.calories + calculatedCaloriesTotal) / 7).toString(),
-      color: 'text-blue-600'
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-50'
     }
   ];
 
