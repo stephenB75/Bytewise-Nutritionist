@@ -44,7 +44,7 @@ export function HeroSection({
   const progressPercentage = Math.min((caloriesConsumed / caloriesGoal) * 100, 100);
   
   return (
-    <div className={`relative bg-gradient-to-br from-blue-600 to-purple-700 text-white px-4 py-6 overflow-hidden ${className}`} style={{ marginTop: '80px' }}>
+    <div className={`relative bg-gradient-to-br from-blue-600 to-purple-700 text-white px-4 py-6 overflow-hidden ${className}`} style={{ marginTop: '100px' }}>
       {/* Food Background Image */}
       <div 
         className="absolute inset-0 bg-cover bg-center opacity-15"

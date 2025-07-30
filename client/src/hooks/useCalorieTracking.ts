@@ -45,8 +45,13 @@ export function useCalorieTracking() {
     const existing = stored ? JSON.parse(stored) : [];
     localStorage.setItem('calculatedCalories', JSON.stringify([...existing, newEntry]));
     
+    // Automatically log to meals API
+    setTimeout(() => {
+      logCaloriesMutation.mutate(newEntry);
+    }, 100);
+    
     return newEntry;
-  }, []);
+  }, [logCaloriesMutation]);
 
   // Log calories to meals (for weekly logger)
   const logCaloriesMutation = useMutation({

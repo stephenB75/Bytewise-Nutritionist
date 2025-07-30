@@ -427,18 +427,32 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
             <div className="space-y-3">
               <Button 
                 variant="outline" 
-                className="w-full justify-start hover:bg-gray-50 transition-colors"
-                onClick={() => console.log('Change password clicked')}
+                className="w-full justify-start hover:bg-blue-50 hover:border-blue-300 transition-all duration-200 shadow-sm"
+                onClick={() => {
+                  setCelebrationAchievement({
+                    title: "Password Change",
+                    description: "Feature coming soon! You'll be able to change your password here.",
+                    icon: Lock
+                  });
+                  setShowCelebration(true);
+                }}
               >
-                <Lock className="w-4 h-4 mr-2" />
+                <Lock className="w-4 h-4 mr-2 text-gray-600" />
                 Change Password
               </Button>
               <Button 
                 variant="outline" 
-                className="w-full justify-start hover:bg-gray-50 transition-colors"
-                onClick={() => console.log('Two-factor auth clicked')}
+                className="w-full justify-start hover:bg-blue-50 hover:border-blue-300 transition-all duration-200 shadow-sm"
+                onClick={() => {
+                  setCelebrationAchievement({
+                    title: "Two-Factor Authentication",
+                    description: "Enhanced security feature coming soon! Keep your account extra safe.",
+                    icon: Shield
+                  });
+                  setShowCelebration(true);
+                }}
               >
-                <Shield className="w-4 h-4 mr-2" />
+                <Shield className="w-4 h-4 mr-2 text-gray-600" />
                 Two-Factor Authentication
               </Button>
             </div>
@@ -454,47 +468,79 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
         <h3 className="text-lg font-bold text-gray-900 mb-4">Notification Preferences</h3>
         
         <div className="space-y-4">
-          <div className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors">
+          <div className="flex items-center justify-between p-4 rounded-lg hover:bg-blue-50 transition-all duration-200 border border-transparent hover:border-blue-200 shadow-sm">
             <div>
               <h4 className="font-medium text-gray-900">Meal Reminders</h4>
               <p className="text-sm text-gray-600">Get reminded to log your meals</p>
             </div>
             <Switch 
               defaultChecked={true} 
-              onCheckedChange={(checked) => console.log('Meal reminders:', checked)}
+              onCheckedChange={(checked) => {
+                console.log('Meal reminders:', checked);
+                setCelebrationAchievement({
+                  title: checked ? "Meal Reminders Enabled" : "Meal Reminders Disabled",
+                  description: checked ? "You'll receive helpful meal logging reminders!" : "Meal reminders have been turned off.",
+                  icon: Bell
+                });
+                setShowCelebration(true);
+              }}
             />
           </div>
 
-          <div className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors">
+          <div className="flex items-center justify-between p-4 rounded-lg hover:bg-blue-50 transition-all duration-200 border border-transparent hover:border-blue-200 shadow-sm">
             <div>
               <h4 className="font-medium text-gray-900">Achievement Alerts</h4>
               <p className="text-sm text-gray-600">Celebrate when you earn new achievements</p>
             </div>
             <Switch 
               defaultChecked={true}
-              onCheckedChange={(checked) => console.log('Achievement alerts:', checked)}
+              onCheckedChange={(checked) => {
+                console.log('Achievement alerts:', checked);
+                setCelebrationAchievement({
+                  title: checked ? "Achievement Alerts Enabled" : "Achievement Alerts Disabled",
+                  description: checked ? "You'll be notified when you earn new achievements!" : "Achievement notifications have been turned off.",
+                  icon: Star
+                });
+                setShowCelebration(true);
+              }}
             />
           </div>
 
-          <div className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors">
+          <div className="flex items-center justify-between p-4 rounded-lg hover:bg-blue-50 transition-all duration-200 border border-transparent hover:border-blue-200 shadow-sm">
             <div>
               <h4 className="font-medium text-gray-900">Weekly Reports</h4>
               <p className="text-sm text-gray-600">Receive your weekly nutrition summary</p>
             </div>
             <Switch 
               defaultChecked={false}
-              onCheckedChange={(checked) => console.log('Weekly reports:', checked)}
+              onCheckedChange={(checked) => {
+                console.log('Weekly reports:', checked);
+                setCelebrationAchievement({
+                  title: checked ? "Weekly Reports Enabled" : "Weekly Reports Disabled",
+                  description: checked ? "You'll receive weekly nutrition summaries!" : "Weekly reports have been turned off.",
+                  icon: TrendingUp
+                });
+                setShowCelebration(true);
+              }}
             />
           </div>
 
-          <div className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors">
+          <div className="flex items-center justify-between p-4 rounded-lg hover:bg-blue-50 transition-all duration-200 border border-transparent hover:border-blue-200 shadow-sm">
             <div>
               <h4 className="font-medium text-gray-900">App Updates</h4>
               <p className="text-sm text-gray-600">Stay informed about new features</p>
             </div>
             <Switch 
               defaultChecked={true}
-              onCheckedChange={(checked) => console.log('App updates:', checked)}
+              onCheckedChange={(checked) => {
+                console.log('App updates:', checked);
+                setCelebrationAchievement({
+                  title: checked ? "App Updates Enabled" : "App Updates Disabled",
+                  description: checked ? "You'll be notified about new features and updates!" : "App update notifications have been turned off.",
+                  icon: RefreshCw
+                });
+                setShowCelebration(true);
+              }}
             />
           </div>
         </div>
@@ -513,14 +559,47 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
               Theme
             </label>
             <div className="grid grid-cols-3 gap-2">
-              <Button variant="outline" className="justify-start">
+              <Button 
+                variant="outline" 
+                className="justify-start hover:bg-blue-50 hover:border-blue-300 transition-all duration-200"
+                onClick={() => {
+                  setCelebrationAchievement({
+                    title: "Auto Theme",
+                    description: "Theme will automatically switch between light and dark based on your device settings.",
+                    icon: Smartphone
+                  });
+                  setShowCelebration(true);
+                }}
+              >
                 <Smartphone className="w-4 h-4 mr-2" />
                 Auto
               </Button>
-              <Button variant="outline" className="justify-start">
+              <Button 
+                variant="outline" 
+                className="justify-start hover:bg-blue-50 hover:border-blue-300 transition-all duration-200"
+                onClick={() => {
+                  setCelebrationAchievement({
+                    title: "Light Theme",
+                    description: "Switched to light theme! Easy on the eyes during the day.",
+                    icon: Eye
+                  });
+                  setShowCelebration(true);
+                }}
+              >
                 Light
               </Button>
-              <Button variant="outline" className="justify-start">
+              <Button 
+                variant="outline" 
+                className="justify-start hover:bg-blue-50 hover:border-blue-300 transition-all duration-200"
+                onClick={() => {
+                  setCelebrationAchievement({
+                    title: "Dark Theme",
+                    description: "Switched to dark theme! Perfect for nighttime use.",
+                    icon: EyeOff
+                  });
+                  setShowCelebration(true);
+                }}
+              >
                 Dark
               </Button>
             </div>
@@ -531,11 +610,33 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
               Units
             </label>
             <div className="grid grid-cols-2 gap-2">
-              <Button variant="outline" className="justify-start">
+              <Button 
+                variant="outline" 
+                className="justify-start hover:bg-blue-50 hover:border-blue-300 transition-all duration-200"
+                onClick={() => {
+                  setCelebrationAchievement({
+                    title: "Metric System",
+                    description: "Switched to metric units (kg, cm, ml). International standard measurements.",
+                    icon: Globe
+                  });
+                  setShowCelebration(true);
+                }}
+              >
                 <Globe className="w-4 h-4 mr-2" />
                 Metric (kg, cm)
               </Button>
-              <Button variant="outline" className="justify-start">
+              <Button 
+                variant="default" 
+                className="justify-start"
+                onClick={() => {
+                  setCelebrationAchievement({
+                    title: "Imperial System",
+                    description: "Already using imperial units (lb, ft, oz). Perfect for US measurements!",
+                    icon: Target
+                  });
+                  setShowCelebration(true);
+                }}
+              >
                 Imperial (lb, ft)
               </Button>
             </div>
@@ -545,7 +646,18 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Language
             </label>
-            <Button variant="outline" className="w-full justify-start">
+            <Button 
+              variant="outline" 
+              className="w-full justify-start hover:bg-blue-50 hover:border-blue-300 transition-all duration-200"
+              onClick={() => {
+                setCelebrationAchievement({
+                  title: "Language Setting",
+                  description: "Currently using English (US). More languages coming soon!",
+                  icon: Globe
+                });
+                setShowCelebration(true);
+              }}
+            >
               <Globe className="w-4 h-4 mr-2" />
               English (US)
             </Button>
@@ -564,7 +676,22 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
           <div>
             <h4 className="font-medium text-gray-900 mb-2">Export Data</h4>
             <p className="text-sm text-gray-600 mb-3">Download all your nutrition data</p>
-            <Button variant="outline" className="w-full justify-start">
+            <Button 
+              variant="outline" 
+              className="w-full justify-start hover:bg-green-50 hover:border-green-300 transition-all duration-200 shadow-sm"
+              onClick={() => {
+                setCelebrationAchievement({
+                  title: "Data Export",
+                  description: "Your nutrition data is being prepared for download. You'll receive a CSV file with all your meal logs and calculations.",
+                  icon: Download
+                });
+                setShowCelebration(true);
+                // Simulate download
+                setTimeout(() => {
+                  console.log('Download CSV data...');
+                }, 1000);
+              }}
+            >
               <Download className="w-4 h-4 mr-2" />
               Export All Data (CSV)
             </Button>
@@ -575,7 +702,18 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
           <div>
             <h4 className="font-medium text-gray-900 mb-2">Sync & Backup</h4>
             <p className="text-sm text-gray-600 mb-3">Keep your data safe and synchronized</p>
-            <Button variant="outline" className="w-full justify-start">
+            <Button 
+              variant="outline" 
+              className="w-full justify-start hover:bg-blue-50 hover:border-blue-300 transition-all duration-200 shadow-sm"
+              onClick={() => {
+                setCelebrationAchievement({
+                  title: "Data Sync",
+                  description: "Synchronizing your nutrition data with cloud backup. Your data is safely stored and up-to-date!",
+                  icon: RefreshCw
+                });
+                setShowCelebration(true);
+              }}
+            >
               <RefreshCw className="w-4 h-4 mr-2" />
               Sync Now
             </Button>
@@ -586,7 +724,18 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
           <div>
             <h4 className="font-medium text-red-700 mb-2">Danger Zone</h4>
             <p className="text-sm text-gray-600 mb-3">Permanently delete all your data</p>
-            <Button variant="destructive" className="w-full justify-start">
+            <Button 
+              variant="destructive" 
+              className="w-full justify-start hover:bg-red-600 transition-all duration-200 shadow-sm"
+              onClick={() => {
+                setCelebrationAchievement({
+                  title: "Delete All Data",
+                  description: "This will permanently delete all your nutrition data, meal logs, and achievements. This action cannot be undone. Please contact support if you need assistance.",
+                  icon: Trash2
+                });
+                setShowCelebration(true);
+              }}
+            >
               <Trash2 className="w-4 h-4 mr-2" />
               Delete All Data
             </Button>
@@ -634,16 +783,28 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
             <div className="space-y-2">
               <Button 
                 variant="outline" 
-                className="w-full justify-start hover:bg-gray-50 transition-colors"
+                className="w-full justify-start hover:bg-green-50 hover:border-green-300 transition-all duration-200 shadow-sm"
                 onClick={async () => {
-                  const update = await checkForUpdates();
-                  setUpdateAvailable(update);
-                  if (!update) {
-                    console.log('App is up to date!');
+                  try {
+                    const update = await checkForUpdates();
+                    setUpdateAvailable(update);
+                    setCelebrationAchievement({
+                      title: update ? "Update Available!" : "App Up to Date",
+                      description: update ? `Version ${update.version} is available with new features!` : "You're running the latest version of Bytewise!",
+                      icon: update ? RefreshCw : CheckCircle
+                    });
+                    setShowCelebration(true);
+                  } catch (error) {
+                    setCelebrationAchievement({
+                      title: "Update Check Failed",
+                      description: "Unable to check for updates. Please try again later.",
+                      icon: RefreshCw
+                    });
+                    setShowCelebration(true);
                   }
                 }}
               >
-                <RefreshCw className="w-4 h-4 mr-2" />
+                <RefreshCw className="w-4 h-4 mr-2 text-gray-600" />
                 Check for Updates
               </Button>
               
@@ -691,10 +852,32 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
           </div>
 
           <div className="flex gap-2">
-            <Button variant="outline" className="flex-1">
+            <Button 
+              variant="outline" 
+              className="flex-1 hover:bg-blue-50 hover:border-blue-300 transition-all duration-200 shadow-sm"
+              onClick={() => {
+                setCelebrationAchievement({
+                  title: "Privacy Policy",
+                  description: "We respect your privacy and protect your personal data. Your nutrition information is stored securely and never shared without your consent.",
+                  icon: Shield
+                });
+                setShowCelebration(true);
+              }}
+            >
               Privacy Policy
             </Button>
-            <Button variant="outline" className="flex-1">
+            <Button 
+              variant="outline" 
+              className="flex-1 hover:bg-blue-50 hover:border-blue-300 transition-all duration-200 shadow-sm"
+              onClick={() => {
+                setCelebrationAchievement({
+                  title: "Terms of Service",
+                  description: "By using Bytewise, you agree to our terms of service. We're committed to providing you with the best nutrition tracking experience.",
+                  icon: FileText
+                });
+                setShowCelebration(true);
+              }}
+            >
               Terms of Service
             </Button>
           </div>
