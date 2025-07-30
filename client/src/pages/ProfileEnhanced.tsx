@@ -41,7 +41,12 @@ import {
   Smartphone,
   TrendingUp,
   FileText,
-  LogOut
+  LogOut,
+  Users,
+  Utensils,
+  Sun,
+  Moon,
+  Type
 } from 'lucide-react';
 import { HeroSection } from '@/components/HeroSection';
 import { AchievementCelebration } from '@/components/AchievementCelebration';
@@ -413,75 +418,76 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
         <h3 className="text-lg font-bold text-gray-900 mb-4">Privacy & Security</h3>
         
         <div className="space-y-6">
-          <div className="flex items-center justify-between p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
-            <div>
-              <h4 className="font-medium text-gray-900">Profile Visibility</h4>
-              <p className="text-sm text-gray-600">Control who can see your profile information</p>
-            </div>
-            <Switch 
-              defaultChecked={false} 
-              onCheckedChange={(checked) => {
-                console.log('Profile visibility:', checked);
-              }}
-            />
-          </div>
-
-          <div className="flex items-center justify-between p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
-            <div>
-              <h4 className="font-medium text-gray-900">Data Sharing</h4>
-              <p className="text-sm text-gray-600">Allow anonymized data to improve app features</p>
-            </div>
-            <Switch 
-              defaultChecked={true} 
-              onCheckedChange={(checked) => {
-                console.log('Data sharing:', checked);
-              }}
-            />
-          </div>
-
-          <div className="flex items-center justify-between p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
-            <div>
-              <h4 className="font-medium text-gray-900">Analytics</h4>
-              <p className="text-sm text-gray-600">Help us understand how you use the app</p>
-            </div>
-            <Switch 
-              defaultChecked={true} 
-              onCheckedChange={(checked) => {
-                console.log('Analytics:', checked);
-              }}
-            />
-          </div>
-
-          <Separator />
-
+          {/* Privacy Controls Section */}
           <div>
-            <h4 className="font-medium text-gray-900 mb-3">Account Security</h4>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between p-4 rounded-lg bg-red-50 hover:bg-red-100 transition-colors">
-                <div className="flex items-center gap-3">
-                  <Lock className="w-5 h-5 text-red-600" />
-                  <div>
-                    <h4 className="font-medium text-gray-900">Change Password</h4>
-                    <p className="text-sm text-gray-600">Update your account password</p>
-                  </div>
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <h4 className="font-medium text-gray-900">Privacy Controls</h4>
+                <p className="text-sm text-gray-600">Manage your data visibility and sharing preferences</p>
+              </div>
+              <Badge variant="outline" className="text-blue-600 border-blue-600">
+                <Eye className="w-3 h-3 mr-1" />
+                Private
+              </Badge>
+            </div>
+            
+            <div className="grid grid-cols-1 gap-3">
+              <div className="flex items-center justify-between p-3 rounded-lg bg-purple-50 hover:bg-purple-100 transition-colors">
+                <div className="flex items-center gap-2">
+                  <Eye className="w-4 h-4 text-purple-600" />
+                  <span className="text-sm">Profile visibility to others</span>
                 </div>
                 <Switch 
                   defaultChecked={false}
                   onCheckedChange={(checked) => {
-                    if (checked) {
-                      console.log('Password change initiated');
-                    }
+                    console.log('Profile visibility:', checked);
                   }}
                 />
               </div>
               
-              <div className="flex items-center justify-between p-4 rounded-lg bg-emerald-50 hover:bg-emerald-100 transition-colors">
-                <div className="flex items-center gap-3">
-                  <Shield className="w-5 h-5 text-emerald-600" />
-                  <div>
-                    <h4 className="font-medium text-gray-900">Two-Factor Authentication</h4>
-                    <p className="text-sm text-gray-600">Enable extra security for your account</p>
-                  </div>
+              <div className="flex items-center justify-between p-3 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors">
+                <div className="flex items-center gap-2">
+                  <Users className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm">Share analytics for improvement</span>
+                </div>
+                <Switch 
+                  defaultChecked={true}
+                  onCheckedChange={(checked) => {
+                    console.log('Data sharing:', checked);
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Security Section */}
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <h4 className="font-medium text-gray-900">Account Security</h4>
+                <p className="text-sm text-gray-600">Enhance your account protection</p>
+              </div>
+              <Badge variant="outline" className="text-green-600 border-green-600">
+                <Shield className="w-3 h-3 mr-1" />
+                Secure
+              </Badge>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Button 
+                variant="outline"
+                className="border-red-600 text-red-600 hover:bg-red-50"
+              >
+                <Lock className="w-4 h-4 mr-2" />
+                Change Password
+              </Button>
+              
+              <div className="flex items-center justify-between p-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 transition-colors">
+                <div className="flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-emerald-600" />
+                  <span className="text-sm">Enable 2FA</span>
                 </div>
                 <Switch 
                   defaultChecked={false}
@@ -489,6 +495,35 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
                     console.log('Two-factor authentication:', checked);
                   }}
                 />
+              </div>
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Security Summary */}
+          <div>
+            <h4 className="font-medium text-gray-900 mb-3">Security Status</h4>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="text-center p-3 bg-gray-50 rounded-lg">
+                <Shield className="w-5 h-5 mx-auto text-green-600 mb-1" />
+                <p className="text-xs text-gray-600">Account Status</p>
+                <p className="font-bold text-gray-900">Secure</p>
+              </div>
+              <div className="text-center p-3 bg-gray-50 rounded-lg">
+                <Lock className="w-5 h-5 mx-auto text-blue-600 mb-1" />
+                <p className="text-xs text-gray-600">Last Login</p>
+                <p className="font-bold text-gray-900">Today</p>
+              </div>
+              <div className="text-center p-3 bg-gray-50 rounded-lg">
+                <Users className="w-5 h-5 mx-auto text-purple-600 mb-1" />
+                <p className="text-xs text-gray-600">Data Privacy</p>
+                <p className="font-bold text-gray-900">Protected</p>
+              </div>
+              <div className="text-center p-3 bg-gray-50 rounded-lg">
+                <Eye className="w-5 h-5 mx-auto text-orange-600 mb-1" />
+                <p className="text-xs text-gray-600">Visibility</p>
+                <p className="font-bold text-gray-900">Private</p>
               </div>
             </div>
           </div>
@@ -502,58 +537,120 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
       <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
         <h3 className="text-lg font-bold text-gray-900 mb-4">Notification Preferences</h3>
         
-        <div className="space-y-4">
-          <div className="flex items-center justify-between p-6 rounded-2xl bg-gradient-to-r from-amber-50 via-yellow-50 to-orange-50 border-2 border-amber-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.03] hover:-translate-y-1">
-            <div>
-              <h4 className="font-bold text-gray-900 text-lg">Meal Reminders</h4>
-              <p className="text-sm text-amber-700 font-medium">Get reminded to log your meals</p>
+        <div className="space-y-6">
+          {/* Meal & Health Notifications */}
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <h4 className="font-medium text-gray-900">Meal & Health Notifications</h4>
+                <p className="text-sm text-gray-600">Stay on track with your nutrition goals</p>
+              </div>
+              <Badge variant="outline" className="text-green-600 border-green-600">
+                <Bell className="w-3 h-3 mr-1" />
+                Active
+              </Badge>
             </div>
-            <Switch 
-              defaultChecked={true} 
-              onCheckedChange={(checked) => {
-                console.log('Meal reminders:', checked);
-              }}
-            />
+            
+            <div className="grid grid-cols-1 gap-3">
+              <div className="flex items-center justify-between p-3 rounded-lg bg-amber-50 hover:bg-amber-100 transition-colors">
+                <div className="flex items-center gap-2">
+                  <Utensils className="w-4 h-4 text-amber-600" />
+                  <span className="text-sm">Meal reminders</span>
+                </div>
+                <Switch 
+                  defaultChecked={true}
+                  onCheckedChange={(checked) => {
+                    console.log('Meal reminders:', checked);
+                  }}
+                />
+              </div>
+              
+              <div className="flex items-center justify-between p-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 transition-colors">
+                <div className="flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-emerald-600" />
+                  <span className="text-sm">Weekly nutrition reports</span>
+                </div>
+                <Switch 
+                  defaultChecked={false}
+                  onCheckedChange={(checked) => {
+                    console.log('Weekly reports:', checked);
+                  }}
+                />
+              </div>
+            </div>
           </div>
 
-          <div className="flex items-center justify-between p-6 rounded-2xl bg-gradient-to-r from-purple-50 via-indigo-50 to-blue-50 border-2 border-purple-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.03] hover:-translate-y-1">
-            <div>
-              <h4 className="font-bold text-gray-900 text-lg">Achievement Alerts</h4>
-              <p className="text-sm text-purple-700 font-medium">Celebrate when you earn new achievements</p>
+          <Separator />
+
+          {/* App Notifications */}
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <h4 className="font-medium text-gray-900">App Notifications</h4>
+                <p className="text-sm text-gray-600">Updates and achievement alerts</p>
+              </div>
+              <Badge variant="outline" className="text-purple-600 border-purple-600">
+                <Star className="w-3 h-3 mr-1" />
+                Enabled
+              </Badge>
             </div>
-            <Switch 
-              defaultChecked={true}
-              onCheckedChange={(checked) => {
-                console.log('Achievement alerts:', checked);
-                // Update settings without achievement popup
-              }}
-            />
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="flex items-center justify-between p-3 rounded-lg bg-purple-50 hover:bg-purple-100 transition-colors">
+                <div className="flex items-center gap-2">
+                  <Award className="w-4 h-4 text-purple-600" />
+                  <span className="text-sm">Achievement alerts</span>
+                </div>
+                <Switch 
+                  defaultChecked={true}
+                  onCheckedChange={(checked) => {
+                    console.log('Achievement alerts:', checked);
+                  }}
+                />
+              </div>
+              
+              <div className="flex items-center justify-between p-3 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors">
+                <div className="flex items-center gap-2">
+                  <RefreshCw className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm">App update notifications</span>
+                </div>
+                <Switch 
+                  defaultChecked={true}
+                  onCheckedChange={(checked) => {
+                    console.log('App updates:', checked);
+                  }}
+                />
+              </div>
+            </div>
           </div>
 
-          <div className="flex items-center justify-between p-6 rounded-2xl bg-gradient-to-r from-emerald-50 via-teal-50 to-cyan-50 border-2 border-emerald-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.03] hover:-translate-y-1">
-            <div>
-              <h4 className="font-bold text-gray-900 text-lg">Weekly Reports</h4>
-              <p className="text-sm text-emerald-700 font-medium">Receive your weekly nutrition summary</p>
-            </div>
-            <Switch 
-              defaultChecked={false}
-              onCheckedChange={(checked) => {
-                console.log('Weekly reports:', checked);
-              }}
-            />
-          </div>
+          <Separator />
 
-          <div className="flex items-center justify-between p-6 rounded-2xl bg-gradient-to-r from-rose-50 via-pink-50 to-red-50 border-2 border-rose-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.03] hover:-translate-y-1">
-            <div>
-              <h4 className="font-bold text-gray-900 text-lg">App Updates</h4>
-              <p className="text-sm text-rose-700 font-medium">Stay informed about new features</p>
+          {/* Notification Summary */}
+          <div>
+            <h4 className="font-medium text-gray-900 mb-3">Notification Summary</h4>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="text-center p-3 bg-gray-50 rounded-lg">
+                <Bell className="w-5 h-5 mx-auto text-green-600 mb-1" />
+                <p className="text-xs text-gray-600">Total Enabled</p>
+                <p className="font-bold text-gray-900">3/4</p>
+              </div>
+              <div className="text-center p-3 bg-gray-50 rounded-lg">
+                <Utensils className="w-5 h-5 mx-auto text-amber-600 mb-1" />
+                <p className="text-xs text-gray-600">Meal Alerts</p>
+                <p className="font-bold text-gray-900">On</p>
+              </div>
+              <div className="text-center p-3 bg-gray-50 rounded-lg">
+                <Award className="w-5 h-5 mx-auto text-purple-600 mb-1" />
+                <p className="text-xs text-gray-600">Achievements</p>
+                <p className="font-bold text-gray-900">On</p>
+              </div>
+              <div className="text-center p-3 bg-gray-50 rounded-lg">
+                <RefreshCw className="w-5 h-5 mx-auto text-blue-600 mb-1" />
+                <p className="text-xs text-gray-600">App Updates</p>
+                <p className="font-bold text-gray-900">On</p>
+              </div>
             </div>
-            <Switch 
-              defaultChecked={true}
-              onCheckedChange={(checked) => {
-                console.log('App updates:', checked);
-              }}
-            />
           </div>
         </div>
       </Card>
@@ -565,16 +662,25 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
       <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
         <h3 className="text-lg font-bold text-gray-900 mb-4">Display Preferences</h3>
         
-        <div className="space-y-4">
+        <div className="space-y-6">
+          {/* Theme Settings */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Theme
-            </label>
-            <div className="grid grid-cols-3 gap-2">
-              <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <h4 className="font-medium text-gray-900">Theme Preferences</h4>
+                <p className="text-sm text-gray-600">Customize your app appearance</p>
+              </div>
+              <Badge variant="outline" className="text-blue-600 border-blue-600">
+                <Palette className="w-3 h-3 mr-1" />
+                Light Mode
+              </Badge>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="flex items-center justify-between p-3 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors">
                 <div className="flex items-center gap-2">
-                  <Smartphone className="w-4 h-4 text-gray-600" />
-                  <span className="text-sm">Auto Theme</span>
+                  <Smartphone className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm">Auto theme</span>
                 </div>
                 <Switch 
                   defaultChecked={true}
@@ -583,52 +689,58 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
                   }}
                 />
               </div>
-              <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm">Light Theme</span>
-                </div>
-                <Switch 
-                  defaultChecked={false}
-                  onCheckedChange={(checked) => {
-                    console.log('Light theme:', checked);
-                  }}
-                />
-              </div>
-              <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm">Dark Theme</span>
-                </div>
-                <Switch 
-                  defaultChecked={false}
-                  onCheckedChange={(checked) => {
-                    console.log('Dark theme:', checked);
-                  }}
-                />
-              </div>
+              
+              <Button 
+                variant="outline"
+                className="border-yellow-600 text-yellow-600 hover:bg-yellow-50"
+              >
+                <Sun className="w-4 h-4 mr-2" />
+                Light Mode
+              </Button>
+              
+              <Button 
+                variant="outline"
+                className="border-gray-600 text-gray-600 hover:bg-gray-50"
+              >
+                <Moon className="w-4 h-4 mr-2" />
+                Dark Mode
+              </Button>
             </div>
           </div>
 
+          <Separator />
+
+          {/* Display Options */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Units
-            </label>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between p-3 rounded-lg bg-violet-50 hover:bg-violet-100 transition-colors">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <h4 className="font-medium text-gray-900">Display Options</h4>
+                <p className="text-sm text-gray-600">Adjust text size and layout preferences</p>
+              </div>
+              <Badge variant="outline" className="text-green-600 border-green-600">
+                <Type className="w-3 h-3 mr-1" />
+                Optimized
+              </Badge>
+            </div>
+            
+            <div className="grid grid-cols-1 gap-3">
+              <div className="flex items-center justify-between p-3 rounded-lg bg-purple-50 hover:bg-purple-100 transition-colors">
                 <div className="flex items-center gap-2">
-                  <Globe className="w-4 h-4 text-violet-600" />
-                  <span className="text-sm">Metric (kg, cm)</span>
+                  <Type className="w-4 h-4 text-purple-600" />
+                  <span className="text-sm">Large text size</span>
                 </div>
                 <Switch 
                   defaultChecked={false}
                   onCheckedChange={(checked) => {
-                    console.log('Metric units:', checked);
+                    console.log('Large text:', checked);
                   }}
                 />
               </div>
-              <div className="flex items-center justify-between p-3 rounded-lg bg-cyan-50 hover:bg-cyan-100 transition-colors">
+              
+              <div className="flex items-center justify-between p-3 rounded-lg bg-green-50 hover:bg-green-100 transition-colors">
                 <div className="flex items-center gap-2">
-                  <Target className="w-4 h-4 text-cyan-600" />
-                  <span className="text-sm">Imperial (lb, ft)</span>
+                  <Globe className="w-4 h-4 text-green-600" />
+                  <span className="text-sm">Imperial units (lb, ft)</span>
                 </div>
                 <Switch 
                   defaultChecked={true}
@@ -640,21 +752,32 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
             </div>
           </div>
 
+          <Separator />
+
+          {/* Display Summary */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Language
-            </label>
-            <div className="flex items-center justify-between p-3 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors">
-              <div className="flex items-center gap-2">
-                <Globe className="w-4 h-4 text-blue-600" />
-                <span className="text-sm">English (US)</span>
+            <h4 className="font-medium text-gray-900 mb-3">Display Summary</h4>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="text-center p-3 bg-gray-50 rounded-lg">
+                <Palette className="w-5 h-5 mx-auto text-blue-600 mb-1" />
+                <p className="text-xs text-gray-600">Theme</p>
+                <p className="font-bold text-gray-900">Light</p>
               </div>
-              <Switch 
-                defaultChecked={true}
-                onCheckedChange={(checked) => {
-                  console.log('English (US):', checked);
-                }}
-              />
+              <div className="text-center p-3 bg-gray-50 rounded-lg">
+                <Type className="w-5 h-5 mx-auto text-purple-600 mb-1" />
+                <p className="text-xs text-gray-600">Text Size</p>
+                <p className="font-bold text-gray-900">Normal</p>
+              </div>
+              <div className="text-center p-3 bg-gray-50 rounded-lg">
+                <Globe className="w-5 h-5 mx-auto text-green-600 mb-1" />
+                <p className="text-xs text-gray-600">Units</p>
+                <p className="font-bold text-gray-900">Imperial</p>
+              </div>
+              <div className="text-center p-3 bg-gray-50 rounded-lg">
+                <Smartphone className="w-5 h-5 mx-auto text-blue-600 mb-1" />
+                <p className="text-xs text-gray-600">Mode</p>
+                <p className="font-bold text-gray-900">Auto</p>
+              </div>
             </div>
           </div>
         </div>
@@ -673,169 +796,149 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
       <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
         <h3 className="text-lg font-bold text-gray-900 mb-4">About Bytewise Nutritionist</h3>
         
-        <div className="space-y-4">
-          <div className="text-center py-4">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <Star className="w-8 h-8 text-blue-600" />
+        <div className="space-y-6">
+          {/* App Information Section */}
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <h4 className="font-medium text-gray-900">App Information</h4>
+                <p className="text-sm text-gray-600">Version details and system status</p>
+              </div>
+              <Badge variant="outline" className="text-green-600 border-green-600">
+                <Star className="w-3 h-3 mr-1" />
+                v{formatVersion(currentVersion.version)}
+              </Badge>
             </div>
-            <h4 className="text-xl font-bold text-gray-900">Bytewise</h4>
-            <p className="text-gray-600">Your Personal Nutrition Companion</p>
-          </div>
-
-          <Separator />
-
-          <div className="space-y-3 text-sm text-gray-600">
-            <div className="flex justify-between">
-              <span>App Version</span>
-              <span className="font-medium">{formatVersion(currentVersion.version)}</span>
+            
+            <div className="text-center py-4 mb-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Star className="w-8 h-8 text-blue-600" />
+              </div>
+              <h4 className="text-xl font-bold text-gray-900">🍎 Bytewise</h4>
+              <p className="text-gray-600">Your Personal Nutrition Companion</p>
             </div>
-            <div className="flex justify-between">
-              <span>Build Date</span>
-              <span className="font-medium">{formatBuildDate(currentVersion.buildDate)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Database</span>
-              <span className="font-medium">USDA FoodData Central</span>
-            </div>
-          </div>
-
-          <Separator />
-
-          <div className="space-y-3">
-            <h4 className="font-medium text-gray-900">App Management</h4>
-            <div className="space-y-2">
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Button 
-                variant="outline" 
-                className="w-full justify-start hover:bg-green-50 hover:border-green-300 transition-all duration-200 shadow-sm"
-                onClick={async () => {
-                  try {
-                    const update = await checkForUpdates();
-                    setUpdateAvailable(update);
-                    setCelebrationAchievement({
-                      title: update ? "Update Available!" : "App Up to Date",
-                      description: update ? `Version ${update.version} is available with new features!` : "You're running the latest version of Bytewise!",
-                      icon: update ? RefreshCw : CheckCircle
-                    });
-                    setShowCelebration(true);
-                  } catch (error) {
-                    setCelebrationAchievement({
-                      title: "Update Check Failed",
-                      description: "Unable to check for updates. Please try again later.",
-                      icon: RefreshCw
-                    });
-                    setShowCelebration(true);
-                  }
-                }}
+                variant="outline"
+                className="border-blue-600 text-blue-600 hover:bg-blue-50"
               >
-                <RefreshCw className="w-4 h-4 mr-2 text-gray-600" />
-                Check for Updates
+                <Download className="w-4 h-4 mr-2" />
+                Check Updates
               </Button>
               
-              {updateAvailable && (
-                <Button 
-                  variant="default" 
-                  className="w-full justify-start"
-                  onClick={async () => {
-                    setIsUpdating(true);
-                    await updateApp();
-                  }}
-                  disabled={isUpdating}
-                >
-                  <RefreshCw className={`w-4 h-4 mr-2 ${isUpdating ? 'animate-spin' : ''}`} />
-                  {isUpdating ? 'Updating...' : `Update to ${formatVersion(updateAvailable.version)}`}
-                </Button>
-              )}
-              
               <Button 
-                variant="outline" 
-                className="w-full justify-start hover:bg-gray-50 transition-colors"
-                onClick={() => {
-                  setCelebrationAchievement({
-                    title: "What's New",
-                    description: currentVersion.changelog.join(' • '),
-                    icon: Star
-                  });
-                  setShowCelebration(true);
-                }}
+                variant="outline"
+                className="border-purple-600 text-purple-600 hover:bg-purple-50"
               >
-                <Star className="w-4 h-4 mr-2" />
-                View Changelog
+                <FileText className="w-4 h-4 mr-2" />
+                Release Notes
               </Button>
             </div>
           </div>
 
           <Separator />
 
-          <div className="text-center text-sm text-gray-600">
-            <p>© 2024 Bytewise Nutritionist</p>
-            <p>Developed with ❤️ for healthy living</p>
-            <p className="mt-2">
-              Powered by USDA FoodData Central and designed for mobile-first nutrition tracking
-            </p>
+          {/* Technical Information */}
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <h4 className="font-medium text-gray-900">Technical Details</h4>
+                <p className="text-sm text-gray-600">System information and build details</p>
+              </div>
+              <Badge variant="outline" className="text-purple-600 border-purple-600">
+                <Settings className="w-3 h-3 mr-1" />
+                Stable
+              </Badge>
+            </div>
+            
+            <div className="space-y-3 text-sm text-gray-600">
+              <div className="flex justify-between p-3 bg-gray-50 rounded-lg">
+                <span>App Version</span>
+                <span className="font-medium text-gray-900">{formatVersion(currentVersion.version)}</span>
+              </div>
+              <div className="flex justify-between p-3 bg-gray-50 rounded-lg">
+                <span>Build Date</span>
+                <span className="font-medium text-gray-900">{formatBuildDate(currentVersion.buildDate)}</span>
+              </div>
+              <div className="flex justify-between p-3 bg-gray-50 rounded-lg">
+                <span>Database</span>
+                <span className="font-medium text-gray-900">USDA FoodData Central</span>
+              </div>
+              <div className="flex justify-between p-3 bg-gray-50 rounded-lg">
+                <span>Platform</span>
+                <span className="font-medium text-gray-900">Progressive Web App</span>
+              </div>
+            </div>
           </div>
 
-          <div className="flex gap-2">
-            <Button 
-              variant="outline" 
-              className="flex-1 hover:bg-blue-50 hover:border-blue-300 transition-all duration-200 shadow-sm"
-              onClick={() => {
-                setCelebrationAchievement({
-                  title: "Privacy Policy",
-                  description: "We respect your privacy and protect your personal data. Your nutrition information is stored securely and never shared without your consent.",
-                  icon: Shield
-                });
-                setShowCelebration(true);
-              }}
-            >
-              Privacy Policy
-            </Button>
-            <Button 
-              variant="outline" 
-              className="flex-1 hover:bg-blue-50 hover:border-blue-300 transition-all duration-200 shadow-sm"
-              onClick={() => {
-                setCelebrationAchievement({
-                  title: "Terms of Service",
-                  description: "By using Bytewise, you agree to our terms of service. We're committed to providing you with the best nutrition tracking experience.",
-                  icon: FileText
-                });
-                setShowCelebration(true);
-              }}
-            >
-              Terms of Service
-            </Button>
+          <Separator />
+
+          {/* App Status Summary */}
+          <div>
+            <h4 className="font-medium text-gray-900 mb-3">App Status</h4>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="text-center p-3 bg-gray-50 rounded-lg">
+                <Star className="w-5 h-5 mx-auto text-green-600 mb-1" />
+                <p className="text-xs text-gray-600">Version</p>
+                <p className="font-bold text-gray-900">Latest</p>
+              </div>
+              <div className="text-center p-3 bg-gray-50 rounded-lg">
+                <Database className="w-5 h-5 mx-auto text-blue-600 mb-1" />
+                <p className="text-xs text-gray-600">Database</p>
+                <p className="font-bold text-gray-900">USDA</p>
+              </div>
+              <div className="text-center p-3 bg-gray-50 rounded-lg">
+                <Shield className="w-5 h-5 mx-auto text-purple-600 mb-1" />
+                <p className="text-xs text-gray-600">Security</p>
+                <p className="font-bold text-gray-900">Secure</p>
+              </div>
+              <div className="text-center p-3 bg-gray-50 rounded-lg">
+                <Settings className="w-5 h-5 mx-auto text-orange-600 mb-1" />
+                <p className="text-xs text-gray-600">Status</p>
+                <p className="font-bold text-gray-900">Stable</p>
+              </div>
+            </div>
           </div>
         </div>
       </Card>
+    </div>
+  );
 
-      {/* Sign Out Section */}
+  const renderAboutByteweiseAdditional = () => (
+    <div className="space-y-6">
       <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">Account Actions</h3>
+        <h3 className="text-lg font-bold text-gray-900 mb-4">Legal Information</h3>
         
-        <div className="space-y-4">
-          <div className="text-center py-4">
-            <h4 className="font-medium text-gray-900 mb-2">Need to sign out?</h4>
-            <p className="text-sm text-gray-600 mb-4">You'll be redirected to the sign-in page</p>
-            
-            <Button
-              className="bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1"
-              onClick={() => {
-                setCelebrationAchievement({
-                  title: "Signing Out",
-                  description: "Thanks for using Bytewise! You'll be redirected to the sign-in page.",
-                  icon: LogOut
-                });
-                setShowCelebration(true);
-                
-                // Redirect to logout after showing celebration
-                setTimeout(() => {
-                  window.location.href = '/api/logout';
-                }, 2000);
-              }}
-            >
-              <LogOut className="w-5 h-5 mr-3" />
-              Sign Out of Account
-            </Button>
-          </div>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            className="flex-1 hover:bg-blue-50 hover:border-blue-300 transition-all duration-200 shadow-sm"
+            onClick={() => {
+              setCelebrationAchievement({
+                title: "Privacy Policy",
+                description: "We respect your privacy and protect your personal data. Your nutrition information is stored securely and never shared without your consent.",
+                icon: Shield
+              });
+              setShowCelebration(true);
+            }}
+          >
+            Privacy Policy
+          </Button>
+          <Button 
+            variant="outline" 
+            className="flex-1 hover:bg-blue-50 hover:border-blue-300 transition-all duration-200 shadow-sm"
+            onClick={() => {
+              setCelebrationAchievement({
+                title: "Terms of Service",
+                description: "By using Bytewise, you agree to our terms of service. We're committed to providing you with the best nutrition tracking experience.",
+                icon: FileText
+              });
+              setShowCelebration(true);
+            }}
+          >
+            Terms of Service
+          </Button>
         </div>
       </Card>
     </div>
@@ -857,7 +960,12 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
           <DataManagementPanel />
         </div>
       );
-      case 'about': return renderAboutBytewise();
+      case 'about': return (
+        <>
+          {renderAboutBytewise()}
+          {renderAboutByteweiseAdditional()}
+        </>
+      );
       default: return (
         <div className="space-y-6">
           <CombinedProfileInfo user={user} />
