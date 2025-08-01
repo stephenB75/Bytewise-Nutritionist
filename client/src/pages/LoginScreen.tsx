@@ -208,13 +208,12 @@ function LoginScreen({ onNavigate }: LoginScreenProps) {
             <form onSubmit={handleEmailAuth} className="space-y-4 mb-4">
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email</Label>
-                <div className="input-with-icon">
-                  <Mail className="input-icon left-3 top-1/2 transform -translate-y-1/2 h-4 w-4" />
+                <div className="relative">
                   <Input
                     id="email"
                     type="email"
                     placeholder="Enter your email"
-                    className="pl-11 pr-4 h-11 text-gray-900 bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500 focus:ring-1 relative z-1"
+                    className="pl-4 pr-11 h-11 text-gray-900 bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500 focus:ring-1"
                     style={{ 
                       backgroundColor: 'white !important',
                       color: '#1f2937 !important'
@@ -223,19 +222,19 @@ function LoginScreen({ onNavigate }: LoginScreenProps) {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                   />
+                  <Mail className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 </div>
               </div>
 
               {mode !== 'forgot' && (
                 <div className="space-y-2">
                   <Label htmlFor="password" className="text-sm font-medium text-gray-700">Password</Label>
-                  <div className="input-with-icon">
-                    <Lock className="input-icon left-3 top-1/2 transform -translate-y-1/2 h-4 w-4" />
+                  <div className="relative">
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
                       placeholder="Enter your password"
-                      className="pl-11 pr-11 h-11 text-gray-900 bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500 focus:ring-1 relative z-1"
+                      className="pl-4 pr-20 h-11 text-gray-900 bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500 focus:ring-1"
                       style={{ 
                         backgroundColor: 'white !important',
                         color: '#1f2937 !important'
@@ -244,6 +243,7 @@ function LoginScreen({ onNavigate }: LoginScreenProps) {
                       onChange={(e) => setPassword(e.target.value)}
                       required
                     />
+                    <Lock className="absolute right-10 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <button
                       type="button"
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 z-10 focus:outline-none"
