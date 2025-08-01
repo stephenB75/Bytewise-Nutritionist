@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bytewise Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 16px 24px;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .header-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: #2563eb;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .header-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1f2937;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .user-email {
+            color: #6b7280;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .logout-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        
+        .logout-btn:hover {
+            background: #dc2626;
+        }
+        
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 28px;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border: 1px solid #f1f5f9;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 12px;
+        }
+        
+        .stat-value {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .stat-goal {
+            font-size: 14px;
+            color: #6b7280;
+        }
+        
+        .calories { color: #3b82f6; }
+        .protein { color: #10b981; }
+        .water { color: #06b6d4; }
+        .carbs { color: #f59e0b; }
+        
+        .progress-bar {
+            height: 8px;
+            background: #f1f5f9;
+            border-radius: 4px;
+            margin-top: 12px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border: 1px solid #f1f5f9;
+        }
+        
+        .section-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+        
+        .section-subtitle {
+            color: #6b7280;
+            margin-bottom: 24px;
+        }
+        
+        .meal-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .meal-info h4 {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+        
+        .meal-info p {
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        .meal-calories {
+            font-weight: bold;
+            color: #3b82f6;
+            font-size: 18px;
+        }
+        
+        .add-meal-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        
+        .add-meal-btn:hover {
+            background: #1d4ed8;
+        }
+        
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-content {
+                padding: 20px 16px;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="header-logo">
+                <div class="header-logo-icon">B</div>
+                <h1 class="header-title">Bytewise</h1>
+            </div>
+            <div class="user-info">
+                <span class="user-email" id="userEmail">Loading...</span>
+                <button id="logoutBtn" class="logout-btn">Sign Out</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3 class="stat-title">Daily Calories</h3>
+                <div class="stat-value calories">1,847</div>
+                <div class="stat-goal">Goal: 2,000 cal (92% complete)</div>
+                <div class="progress-bar">
+                    <div class="progress-fill calories" style="width: 92%; background: #3b82f6;"></div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <h3 class="stat-title">Protein Intake</h3>
+                <div class="stat-value protein">127g</div>
+                <div class="stat-goal">Goal: 150g (85% complete)</div>
+                <div class="progress-bar">
+                    <div class="progress-fill protein" style="width: 85%; background: #10b981;"></div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <h3 class="stat-title">Water Intake</h3>
+                <div class="stat-value water">2.1L</div>
+                <div class="stat-goal">Goal: 2.5L (84% complete)</div>
+                <div class="progress-bar">
+                    <div class="progress-fill water" style="width: 84%; background: #06b6d4;"></div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <h3 class="stat-title">Carbohydrates</h3>
+                <div class="stat-value carbs">201g</div>
+                <div class="stat-goal">Goal: 250g (80% complete)</div>
+                <div class="progress-bar">
+                    <div class="progress-fill carbs" style="width: 80%; background: #f59e0b;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">Today's Meals</h2>
+            <p class="section-subtitle">Track your daily nutrition intake and build healthy eating habits</p>
+            
+            <div class="meal-item">
+                <div class="meal-info">
+                    <h4>Breakfast</h4>
+                    <p>Greek yogurt with berries and granola</p>
+                </div>
+                <div class="meal-calories">342 cal</div>
+            </div>
+
+            <div class="meal-item">
+                <div class="meal-info">
+                    <h4>Lunch</h4>
+                    <p>Grilled chicken salad with mixed vegetables</p>
+                </div>
+                <div class="meal-calories">485 cal</div>
+            </div>
+
+            <div class="meal-item">
+                <div class="meal-info">
+                    <h4>Snack</h4>
+                    <p>Apple with almond butter</p>
+                </div>
+                <div class="meal-calories">167 cal</div>
+            </div>
+
+            <div class="meal-item">
+                <div class="meal-info">
+                    <h4>Dinner</h4>
+                    <p>Salmon with quinoa and roasted vegetables</p>
+                </div>
+                <div class="meal-calories">623 cal</div>
+            </div>
+
+            <button class="add-meal-btn">+ Add New Meal</button>
+        </div>
+    </main>
+
+    <script>
+        console.log('📊 Dashboard loaded');
+        
+        // Check if user is logged in
+        const userData = localStorage.getItem('bytewise-user');
+        if (!userData) {
+            console.log('❌ No user data, redirecting to login');
+            window.location.href = '/simple-login';
+            throw new Error('Not logged in');
+        }
+        
+        const user = JSON.parse(userData);
+        console.log('✅ User authenticated:', user.email);
+        
+        // Display user email
+        document.getElementById('userEmail').textContent = user.email;
+        
+        // Handle logout
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            console.log('🔓 Logging out');
+            localStorage.removeItem('bytewise-user');
+            window.location.href = '/simple-login';
+        });
+        
+        // Add meal functionality
+        document.querySelector('.add-meal-btn').addEventListener('click', function() {
+            alert(`Add Meal feature for ${user.email} - This would open meal logging in the full app!`);
+        });
+        
+        console.log('✅ Dashboard ready');
+    </script>
+</body>
+</html>

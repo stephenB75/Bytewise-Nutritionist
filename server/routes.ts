@@ -18,6 +18,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.sendFile(workingPath);
   });
 
+  // Simple login page
+  app.get('/simple-login', (req, res) => {
+    const loginPath = path.resolve(import.meta.dirname, '..', 'client', 'simple-login.html');
+    res.sendFile(loginPath);
+  });
+
+  // Simple dashboard page
+  app.get('/dashboard', (req, res) => {
+    const dashboardPath = path.resolve(import.meta.dirname, '..', 'client', 'dashboard.html');
+    res.sendFile(dashboardPath);
+  });
+
   // Simple API routes (Supabase auth handled in frontend)
 
   // Meals API for logger
