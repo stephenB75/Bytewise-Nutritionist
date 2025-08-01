@@ -125,7 +125,7 @@ export function MealTimeline({
   const dailyProgress = Math.min((dailyTotals.calories / dailyCalorieGoal) * 100, 100);
 
   return (
-    <Card className="p-6 bg-gradient-to-br from-white to-slate-50/50 border-0 shadow-xl">
+    <Card className="p-6 bg-gradient-to-br from-white via-orange-50/20 to-yellow-50/30 border-0 shadow-xl backdrop-blur-sm">
       {/* Header with Daily Summary */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-4">
@@ -137,7 +137,7 @@ export function MealTimeline({
           </div>
           <Button
             onClick={() => onNavigate('calculator')}
-            className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg"
+            className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg transition-all duration-200 transform hover:scale-105"
           >
             <Plus className="w-4 h-4 mr-2" />
             Add Meal
@@ -145,10 +145,10 @@ export function MealTimeline({
         </div>
 
         {/* Daily Progress Summary */}
-        <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
+        <div className="p-4 bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 rounded-xl border border-blue-200 shadow-lg">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-md">
                 <Target className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -159,11 +159,11 @@ export function MealTimeline({
               </div>
             </div>
             <div className="text-right">
-              <p className="text-2xl font-bold text-blue-900">{Math.round(dailyProgress)}%</p>
+              <p className="text-2xl font-bold bg-gradient-to-r from-blue-900 to-indigo-900 bg-clip-text text-transparent">{Math.round(dailyProgress)}%</p>
               <p className="text-xs text-blue-700">{dailyTotals.meals} meals</p>
             </div>
           </div>
-          <Progress value={dailyProgress} className="h-3 bg-blue-100 [&>div]:bg-blue-500" />
+          <Progress value={dailyProgress} className="h-3 bg-blue-100 [&>div]:bg-gradient-to-r [&>div]:from-blue-500 [&>div]:to-indigo-600" />
         </div>
       </div>
 
@@ -241,7 +241,7 @@ export function MealTimeline({
                   {meals.map((meal, index) => (
                     <div
                       key={meal.id}
-                      className="bg-white/70 backdrop-blur-sm p-4 rounded-xl border border-white/50 transition-all duration-200 hover:bg-white/90 hover:shadow-md"
+                      className="bg-white/70 backdrop-blur-sm p-4 rounded-xl border border-white/50 transition-all duration-300 hover:bg-white/90 hover:shadow-lg hover:scale-[1.02] transform"
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex-1">

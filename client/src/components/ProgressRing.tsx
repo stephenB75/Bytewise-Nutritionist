@@ -1,66 +1,86 @@
+/**
+ * Enhanced Progress Ring Component
+ * Reusable circular progress indicator with animations and customization
+ */
+
+import { Trophy, Target, CheckCircle } from 'lucide-react';
+
 interface ProgressRingProps {
-  value: number;
-  max: number;
-  size?: number;
-  strokeWidth?: number;
-  color?: string;
-  backgroundColor?: string;
-  children?: React.ReactNode;
+  progress: number;
+  size?: 'sm' | 'md' | 'lg';
+  showAchievement?: boolean;
+  color?: 'blue' | 'green' | 'orange' | 'purple';
+  animated?: boolean;
+  className?: string;
 }
 
-export function ProgressRing({
-  value,
-  max,
-  size = 120,
-  strokeWidth = 8,
-  color = '#7DD3FC',
-  backgroundColor = '#E5E7EB',
-  children
+export function ProgressRing({ 
+  progress, 
+  size = 'md', 
+  showAchievement = true,
+  color = 'blue',
+  animated = true,
+  className = ''
 }: ProgressRingProps) {
-  const normalizedValue = Math.min(value, max);
-  const percentage = max > 0 ? (normalizedValue / max) * 100 : 0;
-  
-  const radius = (size - strokeWidth) / 2;
-  const circumference = radius * 2 * Math.PI;
-  const strokeDasharray = circumference;
-  const strokeDashoffset = circumference - (percentage / 100) * circumference;
+  const sizeMap = {
+    sm: { ring: 'w-20 h-20', text: 'text-lg', badge: 'w-6 h-6' },
+    md: { ring: 'w-32 h-32', text: 'text-2xl', badge: 'w-8 h-8' },
+    lg: { ring: 'w-40 h-40', text: 'text-3xl', badge: 'w-10 h-10' }
+  };
+
+  const colorMap = {
+    blue: { stroke: '#3b82f6', bg: 'bg-blue-500', shadow: 'rgba(59, 130, 246, 0.4)' },
+    green: { stroke: '#10b981', bg: 'bg-green-500', shadow: 'rgba(16, 185, 129, 0.4)' },
+    orange: { stroke: '#f59e0b', bg: 'bg-orange-500', shadow: 'rgba(245, 158, 11, 0.4)' },
+    purple: { stroke: '#8b5cf6', bg: 'bg-purple-500', shadow: 'rgba(139, 92, 246, 0.4)' }
+  };
+
+  const currentSize = sizeMap[size];
+  const currentColor = colorMap[color];
+  const isComplete = progress >= 100;
 
   return (
-    <div className="relative" style={{ width: size, height: size }}>
-      <svg
-        width={size}
-        height={size}
-        className="transform -rotate-90"
-        viewBox={`0 0 ${size} ${size}`}
-      >
-        {/* Background circle */}
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke={backgroundColor}
-          strokeWidth={strokeWidth}
-        />
-        {/* Progress circle */}
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke={color}
-          strokeWidth={strokeWidth}
-          strokeDasharray={strokeDasharray}
-          strokeDashoffset={strokeDashoffset}
-          strokeLinecap="round"
-          className="transition-all duration-300 ease-in-out"
-        />
-      </svg>
+    <div className={`relative ${className}`}>
+      <div className="flex items-center justify-center">
+        <div className={`relative ${currentSize.ring}`}>
+          {/* Background circle */}
+          <svg className={`${currentSize.ring} transform -rotate-90`} viewBox="0 0 36 36">
+            <path
+              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+              fill="none"
+              stroke="#f1f5f9"
+              strokeWidth="3"
+            />
+            <path
+              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+              fill="none"
+              stroke={currentColor.stroke}
+              strokeWidth="3.5"
+              strokeDasharray={`${Math.min(progress, 100)}, 100`}
+              strokeLinecap="round"
+              className={animated ? "transition-all duration-1500 ease-out" : ""}
+              style={{
+                filter: `drop-shadow(0 0 8px ${currentColor.shadow})`
+              }}
+            />
+          </svg>
+          
+          {/* Center content */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <div className={`${currentSize.text} font-bold text-gray-900 transition-all duration-500`}>
+              {Math.round(progress)}%
+            </div>
+            <div className="text-xs text-gray-600 font-medium">Complete</div>
+          </div>
+        </div>
+      </div>
       
-      {/* Content in center */}
-      {children && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          {children}
+      {/* Achievement Badge */}
+      {showAchievement && isComplete && (
+        <div className="absolute -top-2 -right-2 animate-bounce">
+          <div className={`${currentSize.badge} ${currentColor.bg} rounded-full flex items-center justify-center shadow-lg`}>
+            <Trophy className="w-3 h-3 text-white" />
+          </div>
         </div>
       )}
     </div>

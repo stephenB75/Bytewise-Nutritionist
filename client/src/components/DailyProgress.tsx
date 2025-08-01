@@ -80,7 +80,7 @@ export function DailyProgress({
   };
 
   return (
-    <Card className="p-6 bg-gradient-to-br from-white to-slate-50/50 border-0 shadow-xl">
+    <Card className="p-6 bg-gradient-to-br from-white via-green-50/20 to-blue-50/30 border-0 shadow-xl backdrop-blur-sm">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="text-xl font-bold text-gray-900 mb-1">Daily Progress</h3>
@@ -106,12 +106,12 @@ export function DailyProgress({
             <div
               key={index}
               className={`
-                relative p-5 rounded-2xl border-2 transition-all duration-300 cursor-pointer transform hover:scale-[1.02]
+                relative p-5 rounded-2xl border-2 transition-all duration-300 cursor-pointer transform hover:scale-[1.02] hover:shadow-lg
                 ${isSelected 
-                  ? 'border-blue-300 bg-gradient-to-r from-blue-50 to-indigo-50 shadow-lg ring-2 ring-blue-200' 
-                  : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-md'
+                  ? 'border-blue-300 bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 shadow-xl ring-2 ring-blue-300' 
+                  : 'border-gray-200 bg-gradient-to-br from-white to-gray-50/50 hover:border-gray-300 hover:shadow-md'
                 }
-                ${isTodayDate && !isSelected ? 'ring-2 ring-green-200 border-green-300' : ''}
+                ${isTodayDate && !isSelected ? 'ring-2 ring-green-300 border-green-300 bg-gradient-to-r from-green-50 to-emerald-50' : ''}
                 ${status === 'future' ? 'opacity-60' : ''}
               `}
               onClick={() => onSelectDay(day)}
@@ -170,10 +170,10 @@ export function DailyProgress({
                   
                   <Progress 
                     value={progress} 
-                    className={`h-3 mb-3 ${
-                      status === 'complete' ? '[&>div]:bg-green-500' :
-                      status === 'good' ? '[&>div]:bg-blue-500' :
-                      status === 'started' ? '[&>div]:bg-yellow-500' :
+                    className={`h-3 mb-3 transition-all duration-700 ${
+                      status === 'complete' ? '[&>div]:bg-gradient-to-r [&>div]:from-green-500 [&>div]:to-emerald-600' :
+                      status === 'good' ? '[&>div]:bg-gradient-to-r [&>div]:from-blue-500 [&>div]:to-indigo-600' :
+                      status === 'started' ? '[&>div]:bg-gradient-to-r [&>div]:from-yellow-500 [&>div]:to-orange-500' :
                       '[&>div]:bg-gray-300'
                     }`}
                   />

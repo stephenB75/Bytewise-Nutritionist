@@ -20,6 +20,7 @@ import {
   Trophy,
   BarChart3
 } from 'lucide-react';
+import { ProgressRing } from './ProgressRing';
 import { format, addDays } from 'date-fns';
 
 interface WeekProgressProps {
@@ -53,7 +54,7 @@ export function WeekProgress({
   const isOnTrack = weekProgress >= 70;
   
   return (
-    <Card className="p-6 bg-gradient-to-br from-white to-slate-50/50 border-0 shadow-xl">
+    <Card className="p-6 bg-gradient-to-br from-white via-blue-50/20 to-purple-50/30 border-0 shadow-xl backdrop-blur-sm">
       {/* Header with Navigation */}
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -67,7 +68,7 @@ export function WeekProgress({
             variant="ghost"
             size="sm"
             onClick={() => onNavigateWeek('prev')}
-            className="h-9 w-9 p-0"
+            className="h-9 w-9 p-0 hover:bg-blue-100 transition-colors"
           >
             <ChevronLeft className="w-4 h-4" />
           </Button>
@@ -75,7 +76,7 @@ export function WeekProgress({
             variant="ghost"
             size="sm"
             onClick={() => onNavigateWeek('next')}
-            className="h-9 w-9 p-0"
+            className="h-9 w-9 p-0 hover:bg-blue-100 transition-colors"
           >
             <ChevronRight className="w-4 h-4" />
           </Button>
@@ -83,42 +84,14 @@ export function WeekProgress({
       </div>
 
       {/* Main Progress Ring */}
-      <div className="relative mb-8">
-        <div className="flex items-center justify-center">
-          <div className="relative w-32 h-32">
-            {/* Background circle */}
-            <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 36 36">
-              <path
-                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                fill="none"
-                stroke="#f1f5f9"
-                strokeWidth="3"
-              />
-              <path
-                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                fill="none"
-                stroke={isGoalReached ? "#10b981" : isOnTrack ? "#3b82f6" : "#f59e0b"}
-                strokeWidth="3"
-                strokeDasharray={`${weekProgress}, 100`}
-                className="transition-all duration-1000 ease-out"
-              />
-            </svg>
-            {/* Center content */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <div className="text-2xl font-bold text-gray-900">{Math.round(weekProgress)}%</div>
-              <div className="text-xs text-gray-600">Complete</div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Achievement Badge */}
-        {isGoalReached && (
-          <div className="absolute -top-2 -right-2">
-            <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center animate-pulse">
-              <Trophy className="w-4 h-4 text-white" />
-            </div>
-          </div>
-        )}
+      <div className="flex justify-center mb-8">
+        <ProgressRing
+          progress={weekProgress}
+          size="lg"
+          color={isGoalReached ? "green" : isOnTrack ? "blue" : "orange"}
+          showAchievement={true}
+          animated={true}
+        />
       </div>
 
       {/* Stats Grid */}
@@ -197,10 +170,10 @@ export function WeekProgress({
         <Badge 
           variant={isGoalReached ? "default" : isOnTrack ? "secondary" : "outline"}
           className={`
-            px-4 py-2 text-sm font-medium
-            ${isGoalReached ? 'bg-green-100 text-green-800 border-green-200' : ''}
-            ${isOnTrack && !isGoalReached ? 'bg-blue-100 text-blue-800 border-blue-200' : ''}
-            ${!isOnTrack ? 'bg-orange-100 text-orange-800 border-orange-200' : ''}
+            px-4 py-2 text-sm font-medium transition-all duration-300 transform hover:scale-105
+            ${isGoalReached ? 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border-green-200 shadow-lg' : ''}
+            ${isOnTrack && !isGoalReached ? 'bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border-blue-200 shadow-md' : ''}
+            ${!isOnTrack ? 'bg-gradient-to-r from-orange-100 to-yellow-100 text-orange-800 border-orange-200' : ''}
           `}
         >
           <BarChart3 className="w-3 h-3 mr-2" />
