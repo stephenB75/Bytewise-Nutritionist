@@ -6,6 +6,12 @@ const config: CapacitorConfig = {
   webDir: 'dist/public',
   backgroundColor: '#fef7cd',
   
+  // iOS-specific configuration
+  ios: {
+    scheme: 'ByteWise Nutritionist',
+    path: 'ios'
+  },
+  
   plugins: {
     SplashScreen: {
       launchShowDuration: 2000,
