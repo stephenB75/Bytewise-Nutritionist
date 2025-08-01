@@ -485,12 +485,25 @@
         
         let currentUser = null;
 
-        // Check if user is already logged in
-        checkAuthState();
+        // Ensure login screen is visible immediately
+        showLogin();
+        
+        // Then check authentication state
+        setTimeout(() => {
+            checkAuthState();
+        }, 100);
 
         async function checkAuthState() {
+            console.log('🔍 Checking authentication state...');
+            
+            // Always show login first to ensure it's visible
+            showLogin();
+            
             try {
                 const { data: { session }, error } = await supabaseClient.auth.getSession();
+                
+                console.log('📊 Session data:', session);
+                console.log('❌ Session error:', error);
                 
                 if (error) {
                     console.error('Auth state check error:', error);
@@ -499,9 +512,11 @@
                 }
 
                 if (session && session.user) {
+                    console.log('✅ User authenticated:', session.user.email);
                     currentUser = session.user;
                     showDashboard();
                 } else {
+                    console.log('❌ No active session, showing login');
                     showLogin();
                 }
             } catch (error) {
@@ -601,7 +616,9 @@
         });
 
         function showDashboard() {
+            console.log('📊 Showing dashboard...');
             loginScreen.style.display = 'none';
+            dashboard.style.display = 'block';
             dashboard.classList.add('active');
             
             // Update dashboard with user info if available
@@ -614,8 +631,11 @@
         }
 
         function showLogin() {
+            console.log('🔐 Showing login screen...');
             dashboard.classList.remove('active');
+            dashboard.style.display = 'none';
             loginScreen.style.display = 'flex';
+            loginScreen.style.visibility = 'visible';
             document.getElementById('email').value = '';
             document.getElementById('password').value = '';
         }
@@ -685,6 +705,13 @@
             }
         });
 
+        // Final safety check - ensure login is visible
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!currentUser) {
+                showLogin();
+            }
+        });
+        
         console.log('🥗 Bytewise Nutrition Tracker with Supabase Auth loaded successfully!');
     </script>
 </body>
