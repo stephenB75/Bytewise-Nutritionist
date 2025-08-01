@@ -37,8 +37,8 @@ export const ENHANCED_FOOD_DATABASE: FoodDatabase = {
         "usdaQuery": "all purpose flour",
         "units": {
           "cup": 120,
-          "tbsp": 7.5,
-          "tsp": 2.5,
+          "tbsp": 9,
+          "tsp": 3,
           "oz": 28.35,
           "g": 1,
           "lb": 453.6
@@ -69,14 +69,15 @@ export const ENHANCED_FOOD_DATABASE: FoodDatabase = {
       },
       "bread_flour": {
         "displayName": "Bread Flour",
-        "aliases": ["high protein flour", "strong flour"],
+        "aliases": ["high protein flour", "strong flour", "artisan bread flour"],
         "usdaQuery": "bread flour",
         "units": {
-          "cup": 127,
-          "tbsp": 8,
-          "tsp": 2.7,
-          "oz": 28,
-          "g": 127
+          "cup": 120,
+          "tbsp": 9,
+          "tsp": 3,
+          "oz": 28.35,
+          "g": 1,
+          "lb": 453.6
         },
         "tags": {
           "isCommon": true,
@@ -86,20 +87,78 @@ export const ENHANCED_FOOD_DATABASE: FoodDatabase = {
         }
       },
       "cake_flour": {
-        "displayName": "Cake Flour",
+        "displayName": "Cake Flour (Unbleached)",
         "aliases": ["soft flour", "pastry flour"],
         "usdaQuery": "cake flour",
         "units": {
-          "cup": 114,
-          "tbsp": 7.1,
-          "tsp": 2.4,
-          "oz": 28,
-          "g": 114
+          "cup": 120,
+          "tbsp": 9,
+          "tsp": 3,
+          "oz": 28.35,
+          "g": 1,
+          "lb": 453.6
         },
         "tags": {
-          "isCommon": false,
+          "isCommon": true,
           "densityType": "dry",
           "dietType": ["vegetarian", "vegan"],
+          "categoryColor": "#F4E1A1"
+        }
+      },
+      "whole_wheat_flour": {
+        "displayName": "Whole Wheat Flour",
+        "aliases": ["whole grain flour", "graham flour", "premium 100%"],
+        "usdaQuery": "whole wheat flour",
+        "units": {
+          "cup": 113,
+          "tbsp": 8.5,
+          "tsp": 2.8,
+          "oz": 28.35,
+          "g": 1,
+          "lb": 453.6
+        },
+        "tags": {
+          "isCommon": true,
+          "densityType": "dry",
+          "dietType": ["vegetarian", "vegan", "whole-grain"],
+          "categoryColor": "#F4E1A1"
+        }
+      },
+      "almond_flour": {
+        "displayName": "Almond Flour (Blanched)",
+        "aliases": ["ground almonds", "almond meal", "toasted almond flour"],
+        "usdaQuery": "almond flour",
+        "units": {
+          "cup": 96,
+          "tbsp": 6,
+          "tsp": 2,
+          "oz": 28.35,
+          "g": 1,
+          "lb": 453.6
+        },
+        "tags": {
+          "isCommon": true,
+          "densityType": "dry",
+          "dietType": ["vegetarian", "vegan", "gluten-free", "keto", "paleo"],
+          "categoryColor": "#F4E1A1"
+        }
+      },
+      "coconut_flour": {
+        "displayName": "Coconut Flour",
+        "aliases": ["desiccated coconut flour"],
+        "usdaQuery": "coconut flour",
+        "units": {
+          "cup": 128,
+          "tbsp": 8,
+          "tsp": 2.7,
+          "oz": 28.35,
+          "g": 1,
+          "lb": 453.6
+        },
+        "tags": {
+          "isCommon": true,
+          "densityType": "dry",
+          "dietType": ["vegetarian", "vegan", "gluten-free", "keto", "paleo"],
           "categoryColor": "#F4E1A1"
         }
       }
@@ -111,18 +170,19 @@ export const ENHANCED_FOOD_DATABASE: FoodDatabase = {
         "usdaQuery": "olive oil",
         "units": {
           "cup": 216,
-          "tbsp": 13.5,
-          "tsp": 4.5,
+          "tbsp": 14,
+          "tsp": 5,
           "fl_oz": 27,
           "oz": 28.35,
           "ml": 1,
           "liter": 1000,
           "gal": 3785,
           "qt": 946,
-          "pt": 473
+          "pt": 473,
+          "g": 1
         },
         "volumeConversions": {
-          "cup": 237,
+          "cup": 240,
           "tbsp": 15,
           "tsp": 5,
           "fl_oz": 30
@@ -211,12 +271,12 @@ export const ENHANCED_FOOD_DATABASE: FoodDatabase = {
         "aliases": ["unsalted butter", "salted butter", "sweet butter"],
         "usdaQuery": "butter",
         "units": {
-          "cup": 227,
-          "tbsp": 14.2,
-          "tsp": 4.7,
+          "cup": 230,
+          "tbsp": 15,
+          "tsp": 5,
           "oz": 28.35,
-          "stick": 113.4,
-          "lb": 453.6,
+          "stick": 115,
+          "lb": 455,
           "g": 1
         },
         "tags": {
@@ -246,15 +306,16 @@ export const ENHANCED_FOOD_DATABASE: FoodDatabase = {
     },
     "Sugars & Sweeteners": {
       "sugar_white": {
-        "displayName": "White Sugar",
-        "aliases": ["granulated sugar", "table sugar"],
-        "usdaQuery": "white sugar",
+        "displayName": "Granulated Sugar",
+        "aliases": ["white sugar", "table sugar", "granulated sugar"],
+        "usdaQuery": "granulated sugar",
         "units": {
-          "cup": 200,
-          "tbsp": 12.5,
-          "tsp": 4,
-          "oz": 28,
-          "g": 200
+          "cup": 198,
+          "tbsp": 13,
+          "tsp": 4.3,
+          "oz": 28.35,
+          "g": 1,
+          "lb": 453.6
         },
         "tags": {
           "isCommon": true,
@@ -264,15 +325,16 @@ export const ENHANCED_FOOD_DATABASE: FoodDatabase = {
         }
       },
       "brown_sugar": {
-        "displayName": "Brown Sugar",
+        "displayName": "Brown Sugar (Packed)",
         "aliases": ["light brown sugar", "dark brown sugar"],
         "usdaQuery": "brown sugar",
         "units": {
           "cup": 213,
-          "tbsp": 13,
-          "tsp": 4.3,
-          "oz": 28,
-          "g": 213
+          "tbsp": 15,
+          "tsp": 5,
+          "oz": 28.35,
+          "g": 1,
+          "lb": 453.6
         },
         "tags": {
           "isCommon": true,
@@ -286,16 +348,69 @@ export const ENHANCED_FOOD_DATABASE: FoodDatabase = {
         "aliases": ["raw honey", "clover honey"],
         "usdaQuery": "honey",
         "units": {
-          "cup": 340,
-          "tbsp": 21,
-          "tsp": 7,
-          "oz": 28,
-          "g": 340
+          "cup": 320,
+          "tbsp": 20,
+          "tsp": 6.7,
+          "fl_oz": 40,
+          "oz": 28.35,
+          "ml": 1.4,
+          "g": 1
+        },
+        "volumeConversions": {
+          "cup": 237,
+          "tbsp": 15,
+          "tsp": 5,
+          "fl_oz": 30
         },
         "tags": {
           "isCommon": true,
           "densityType": "liquid",
           "dietType": ["vegetarian"],
+          "categoryColor": "#F8E6FF"
+        }
+      },
+      "maple_syrup": {
+        "displayName": "Maple Syrup",
+        "aliases": ["pure maple syrup", "grade A maple syrup"],
+        "usdaQuery": "maple syrup",
+        "units": {
+          "cup": 320,
+          "tbsp": 20,
+          "tsp": 6.7,
+          "fl_oz": 40,
+          "oz": 28.35,
+          "ml": 1.4,
+          "g": 1
+        },
+        "volumeConversions": {
+          "cup": 237,
+          "tbsp": 15,
+          "tsp": 5,
+          "fl_oz": 30
+        },
+        "tags": {
+          "isCommon": true,
+          "densityType": "liquid",
+          "dietType": ["vegetarian", "vegan"],
+          "categoryColor": "#F8E6FF"
+        }
+      },
+      "confectioners_sugar": {
+        "displayName": "Confectioners' Sugar (Powdered)",
+        "aliases": ["powdered sugar", "icing sugar"],
+        "usdaQuery": "confectioners sugar",
+        "units": {
+          "cup": 113,
+          "tbsp": 10,
+          "tsp": 3.3,
+          "oz": 28.35,
+          "g": 1,
+          "lb": 453.6
+        },
+        "tags": {
+          "isCommon": true,
+          "densityType": "dry",
+          "dietType": ["vegetarian", "vegan"],
           "categoryColor": "#F8E6FF"
         }
       }
@@ -671,6 +786,159 @@ export const ENHANCED_FOOD_DATABASE: FoodDatabase = {
           "densityType": "dry",
           "dietType": ["vegetarian", "vegan"],
           "categoryColor": "#F5F5F5"
+        }
+      }
+    },
+    "Nuts & Seeds": {
+      "almonds_whole": {
+        "displayName": "Almonds (Whole, Unblanched)",
+        "aliases": ["raw almonds", "whole almonds"],
+        "usdaQuery": "almonds whole",
+        "units": {
+          "cup": 142,
+          "tbsp": 9,
+          "tsp": 3,
+          "oz": 28.35,
+          "g": 1,
+          "lb": 453.6
+        },
+        "tags": {
+          "isCommon": true,
+          "densityType": "solid",
+          "dietType": ["vegetarian", "vegan", "keto", "paleo"],
+          "categoryColor": "#D7CCC8"
+        }
+      },
+      "almonds_sliced": {
+        "displayName": "Almonds (Sliced)",
+        "aliases": ["sliced almonds"],
+        "usdaQuery": "almonds sliced",
+        "units": {
+          "cup": 100,
+          "half_cup": 43,
+          "tbsp": 6,
+          "tsp": 2,
+          "oz": 28.35,
+          "g": 1
+        },
+        "tags": {
+          "isCommon": true,
+          "densityType": "solid",
+          "dietType": ["vegetarian", "vegan", "keto", "paleo"],
+          "categoryColor": "#D7CCC8"
+        }
+      },
+      "walnuts_halves": {
+        "displayName": "Walnut Halves",
+        "aliases": ["shelled walnuts", "walnut pieces"],
+        "usdaQuery": "walnuts",
+        "units": {
+          "cup": 90,
+          "half_cup": 64,
+          "tbsp": 6,
+          "tsp": 2,
+          "oz": 28.35,
+          "g": 1
+        },
+        "tags": {
+          "isCommon": true,
+          "densityType": "solid",
+          "dietType": ["vegetarian", "vegan", "keto", "paleo"],
+          "categoryColor": "#D7CCC8"
+        }
+      },
+      "pecans_whole": {
+        "displayName": "Pecans (Whole)",
+        "aliases": ["pecan halves"],
+        "usdaQuery": "pecans",
+        "units": {
+          "cup": 105,
+          "half_cup": 57,
+          "tbsp": 7,
+          "tsp": 2.3,
+          "oz": 28.35,
+          "g": 1
+        },
+        "tags": {
+          "isCommon": true,
+          "densityType": "solid",
+          "dietType": ["vegetarian", "vegan", "keto", "paleo"],
+          "categoryColor": "#D7CCC8"
+        }
+      }
+    },
+    "Eggs & Dairy": {
+      "egg_large": {
+        "displayName": "Egg (Large, Fresh)",
+        "aliases": ["chicken egg", "whole egg"],
+        "usdaQuery": "egg",
+        "units": {
+          "whole": 50,
+          "yolk": 14,
+          "white": 35,
+          "oz": 28.35,
+          "g": 1
+        },
+        "tags": {
+          "isCommon": true,
+          "densityType": "liquid",
+          "dietType": ["vegetarian"],
+          "categoryColor": "#FFF8E1"
+        }
+      },
+      "milk_whole": {
+        "displayName": "Milk (Whole)",
+        "aliases": ["whole milk", "cow milk"],
+        "usdaQuery": "milk whole",
+        "units": {
+          "cup": 240,
+          "tbsp": 15,
+          "tsp": 5,
+          "fl_oz": 30,
+          "ml": 1,
+          "qt": 946,
+          "pt": 473,
+          "gal": 3785,
+          "oz": 28.35,
+          "g": 1
+        },
+        "volumeConversions": {
+          "cup": 237,
+          "tbsp": 15,
+          "tsp": 5,
+          "fl_oz": 30
+        },
+        "tags": {
+          "isCommon": true,
+          "densityType": "liquid",
+          "dietType": ["vegetarian"],
+          "categoryColor": "#FFF8E1"
+        }
+      },
+      "heavy_cream": {
+        "displayName": "Heavy Cream",
+        "aliases": ["whipping cream", "heavy whipping cream"],
+        "usdaQuery": "heavy cream",
+        "units": {
+          "cup": 240,
+          "tbsp": 15,
+          "tsp": 5,
+          "fl_oz": 30,
+          "ml": 1,
+          "oz": 28.35,
+          "g": 1
+        },
+        "volumeConversions": {
+          "cup": 237,
+          "tbsp": 15,
+          "tsp": 5,
+          "fl_oz": 30
+        },
+        "tags": {
+          "isCommon": true,
+          "densityType": "liquid",
+          "dietType": ["vegetarian", "keto"],
+          "categoryColor": "#FFF8E1"
         }
       }
     }

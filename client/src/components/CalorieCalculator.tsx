@@ -726,10 +726,12 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
               Oven Temperatures
             </h4>
             <div className="text-sm text-gray-700 space-y-1">
-              <div>350°F = 180°C (moderate)</div>
-              <div>375°F = 190°C (moderately hot)</div>
-              <div>400°F = 200°C (fairly hot)</div>
-              <div>425°F = 220°C (hot)</div>
+              <div>250°F = 120°C = Gas Mark 1/2</div>
+              <div>350°F = 175°C = Gas Mark 4</div>
+              <div>375°F = 190°C = Gas Mark 5</div>
+              <div>400°F = 200°C = Gas Mark 6</div>
+              <div>425°F = 220°C = Gas Mark 7</div>
+              <div>450°F = 230°C = Gas Mark 8</div>
             </div>
           </div>
 
@@ -740,9 +742,11 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
               Common Substitutions
             </h4>
             <div className="text-sm text-gray-700 space-y-1">
-              <div>1 cup milk → 1/2 cup evap + 1/2 cup water</div>
-              <div>1 egg → 2 egg yolks</div>
-              <div>1 tsp baking powder → 1/4 tsp baking soda + 1/2 cup buttermilk</div>
+              <div>1 cup milk → 1/2 cup evap milk + 1/2 cup water</div>
+              <div>1 egg → 2 egg yolks (for richness)</div>
+              <div>1 tsp baking powder → 1/4 tsp baking soda + 1/2 tsp cream of tartar</div>
+              <div>1 cup butter → 3/4 cup olive oil (healthier)</div>
+              <div>1 cup all-purpose flour → 1 cup + 2 tbsp cake flour</div>
             </div>
           </div>
         </div>
