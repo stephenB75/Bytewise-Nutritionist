@@ -65,6 +65,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### August 2025 - GitHub Pages Migration Complete
+✓ **GitHub Pages Deployment**: Complete migration from Replit to GitHub Pages hosting
+✓ **Domain Change**: App now hosted at https://stephtonybro.github.io/Bytewise-Nutritionist/  
+✓ **Path Configuration**: All absolute paths converted to relative for GitHub Pages compatibility
+✓ **SPA Routing**: Implemented GitHub Pages SPA routing with 404.html redirect system
+✓ **PWA Optimization**: Updated manifest.json and service worker paths for new domain
+✓ **Authentication UI**: Enhanced text field positioning with icons on right side and improved spacing
+✓ **Deployment Package**: Complete production-ready deployment in github-pages-deploy/ directory
+✓ **Build Process**: Optimized build pipeline for GitHub Pages with proper asset handling
+
 ### August 2025 - IPA Creation Ready & Manifest Optimization Complete
 ✓ **PWA Manifest**: Complete IPA-ready manifest with all required, recommended, and optional fields
 ✓ **Icon Generation**: Full set of PNG icons (20px-1024px) generated for iOS and PWA compatibility

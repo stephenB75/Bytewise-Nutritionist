@@ -3,9 +3,9 @@
 # ByteWise GitHub Pages Deployment Script
 echo "🚀 Deploying ByteWise to GitHub Pages..."
 
-# Build the application
-echo "📦 Building production version..."
-npm run build
+# Build the application for GitHub Pages
+echo "📦 Building production version for GitHub Pages..."
+GITHUB_PAGES=true npm run build
 
 # Create GitHub Pages deployment branch
 echo "🌐 Setting up GitHub Pages deployment..."
@@ -27,8 +27,23 @@ find . -maxdepth 1 ! -name '.git' ! -name '.' -exec rm -rf {} +
 echo "📋 Copying build files..."
 cp -r dist/public/* .
 
-# Create CNAME file for custom domain (optional)
-echo "bytewise-nutritionist.github.io" > CNAME
+# Update all absolute paths to relative paths for GitHub Pages
+echo "🔧 Configuring paths for GitHub Pages..."
+if [ -f "index.html" ]; then
+    # Update asset paths for GitHub Pages base path
+    sed -i 's|="/assets/|="./assets/|g' index.html
+    sed -i 's|="/icons/|="./icons/|g' index.html
+    sed -i 's|="/"||g' index.html
+fi
+
+# Update manifest.json for GitHub Pages
+if [ -f "manifest.json" ]; then
+    sed -i 's|"start_url": "/"|"start_url": "./"|g' manifest.json
+    sed -i 's|"/icons/|"./icons/|g' manifest.json
+fi
+
+# Create CNAME file for custom domain (optional - remove if using username.github.io/repo-name)
+# echo "your-custom-domain.com" > CNAME
 
 # Create .nojekyll to disable Jekyll processing
 touch .nojekyll
@@ -89,7 +104,7 @@ echo ""
 echo "✅ Deployment complete!"
 echo ""
 echo "Your ByteWise app will be available at:"
-echo "🌐 https://yourusername.github.io/bytewise-nutritionist"
+echo "🌐 https://stephtonybro.github.io/Bytewise-Nutritionist"
 echo ""
 echo "GitHub Pages setup:"
 echo "1. Go to your repository settings"

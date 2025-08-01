@@ -1,5 +1,4 @@
 {
-  "id": "com.bytewise.nutritionist",
   "name": "Bytewise Nutritionist",
   "short_name": "Bytewise",
   "description": "Advanced nutrition tracking and meal planning app with USDA food database integration",
@@ -10,12 +9,7 @@
   "orientation": "portrait-primary",
   "scope": "./",
   "lang": "en",
-  "dir": "ltr",
   "categories": ["health", "fitness", "lifestyle", "productivity"],
-  "launch_handler": {
-    "client_mode": "navigate-existing"
-  },
-  "prefer_related_applications": false,
   "icons": [
     {
       "src": "./icon-192.svg",
@@ -32,14 +26,14 @@
   ],
   "screenshots": [
     {
-      "src": "./screenshot-wide.png",
+      "src": "/screenshot-wide.png",
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide",
       "label": "Bytewise Dashboard - Nutrition tracking overview"
     },
     {
-      "src": "./screenshot-narrow.png",
+      "src": "/screenshot-narrow.png",
       "sizes": "720x1280",
       "type": "image/png",
       "form_factor": "narrow",
@@ -52,24 +46,25 @@
       "short_name": "Calculator",
       "description": "Quick access to USDA-powered calorie calculator",
       "url": "/?tab=calculator",
-      "icons": [{ "src": "./icon-192.svg", "sizes": "192x192" }]
+      "icons": [{ "src": "/icon-192.svg", "sizes": "192x192" }]
     },
     {
       "name": "Log Meal",
       "short_name": "Logger",
       "description": "Track your weekly nutrition progress",
       "url": "/?tab=logger",
-      "icons": [{ "src": "./icon-192.svg", "sizes": "192x192" }]
+      "icons": [{ "src": "/icon-192.svg", "sizes": "192x192" }]
     },
     {
       "name": "View Profile",
       "short_name": "Profile",
       "description": "Manage goals and achievements",
       "url": "/?tab=profile",
-      "icons": [{ "src": "./icon-192.svg", "sizes": "192x192" }]
+      "icons": [{ "src": "/icon-192.svg", "sizes": "192x192" }]
     }
   ],
   "related_applications": [],
+  "prefer_related_applications": false,
   "edge_side_panel": {
     "preferred_width": 400
   }
