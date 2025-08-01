@@ -4,6 +4,36 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Input field text visibility fixes */
+.input-with-icon {
+  @apply relative;
+}
+
+.input-with-icon input {
+  position: relative;
+  z-index: 1;
+  background-color: white !important;
+  color: #1f2937 !important;
+  font-weight: 400;
+}
+
+.input-with-icon input::placeholder {
+  color: #9ca3af !important;
+  opacity: 1;
+}
+
+.input-with-icon input:focus {
+  color: #1f2937 !important;
+  background-color: white !important;
+}
+
+.input-icon {
+  position: absolute;
+  z-index: 10;
+  pointer-events: none;
+  color: #9ca3af;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 :root {

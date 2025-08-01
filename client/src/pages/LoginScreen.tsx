@@ -201,14 +201,18 @@ function LoginScreen({ onNavigate }: LoginScreenProps) {
 
             <form onSubmit={handleEmailAuth} className="space-y-4 mb-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email</Label>
+                <div className="input-with-icon">
+                  <Mail className="input-icon left-3 top-1/2 transform -translate-y-1/2 h-4 w-4" />
                   <Input
                     id="email"
                     type="email"
                     placeholder="Enter your email"
-                    className="pl-10"
+                    className="pl-11 pr-4 h-11 text-gray-900 bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500 focus:ring-1 relative z-1"
+                    style={{ 
+                      backgroundColor: 'white !important',
+                      color: '#1f2937 !important'
+                    }}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -218,21 +222,25 @@ function LoginScreen({ onNavigate }: LoginScreenProps) {
 
               {mode !== 'forgot' && (
                 <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Label htmlFor="password" className="text-sm font-medium text-gray-700">Password</Label>
+                  <div className="input-with-icon">
+                    <Lock className="input-icon left-3 top-1/2 transform -translate-y-1/2 h-4 w-4" />
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
                       placeholder="Enter your password"
-                      className="pl-10 pr-10"
+                      className="pl-11 pr-11 h-11 text-gray-900 bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500 focus:ring-1 relative z-1"
+                      style={{ 
+                        backgroundColor: 'white !important',
+                        color: '#1f2937 !important'
+                      }}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
                     />
                     <button
                       type="button"
-                      className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 z-10 focus:outline-none"
                       onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
