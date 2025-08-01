@@ -178,6 +178,7 @@ export const foodSuggestions = pgTable("food_suggestions", {
 export const usdaFoodCache = pgTable("usda_food_cache", {
   id: serial("id").primaryKey(),
   fdcId: integer("fdc_id").notNull().unique(),
+  createdAt: timestamp("created_at").defaultNow(),
   description: varchar("description", { length: 500 }).notNull(),
   dataType: varchar("data_type", { length: 50 }).notNull(),
   foodCategory: varchar("food_category", { length: 200 }),

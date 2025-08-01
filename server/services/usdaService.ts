@@ -248,7 +248,7 @@ export class USDAService {
             brandOwner: food.brandOwner || null,
             brandName: food.brandName || null,
             ingredients: food.ingredients || null,
-            servingSize: food.servingSize || null,
+            servingSize: food.servingSize ? food.servingSize.toString() : null,
             servingSizeUnit: food.servingSizeUnit || null,
             householdServingFullText: food.householdServingFullText || null,
             nutrients: nutrients,
@@ -282,6 +282,12 @@ export class USDAService {
     };
 
     for (const nutrient of foodNutrients) {
+      // Safely access nutrient properties with null checks
+      if (!nutrient || !nutrient.nutrient || !nutrient.nutrient.name) {
+        console.warn('Invalid nutrient data:', nutrient);
+        continue;
+      }
+      
       const name = nutrient.nutrient.name.toLowerCase();
       const amount = nutrient.amount || 0;
 

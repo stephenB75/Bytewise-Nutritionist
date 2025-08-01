@@ -27,37 +27,45 @@ export function useCalorieTracking() {
   const [dailyTotal, setDailyTotal] = useState(0);
   const queryClient = useQueryClient();
 
-  // Log calories to meals (for weekly logger)
+  // Log calories to meals (for weekly logger) - simplified without auth requirement
   const logCaloriesMutation = useMutation({
     mutationFn: async (calorieEntry: CalculatedCalories) => {
-      const response = await fetch('/api/meals/logged', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: calorieEntry.name,
-          calories: calorieEntry.calories,
-          protein: calorieEntry.protein,
-          carbs: calorieEntry.carbs,
-          fat: calorieEntry.fat,
-          fiber: calorieEntry.fiber,
-          sugar: calorieEntry.sugar,
-          sodium: calorieEntry.sodium,
-          date: calorieEntry.date,
-          time: calorieEntry.time,
-          mealType: getMealType(),
-          source: 'calculator'
-        }),
-        credentials: 'include',
+      // Store in localStorage instead of requiring authentication
+      const weeklyMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
+      const mealEntry = {
+        name: calorieEntry.name,
+        calories: calorieEntry.calories,
+        protein: calorieEntry.protein,
+        carbs: calorieEntry.carbs,
+        fat: calorieEntry.fat,
+        date: calorieEntry.date,
+        time: calorieEntry.time.replace(/:\d\d$/, ''), // Remove seconds for display
+        category: getMealType(),
+        timestamp: new Date().toISOString(),
+        source: 'calculator',
+        mealType: getMealType()
+      };
+      
+      weeklyMeals.push(mealEntry);
+      localStorage.setItem('weeklyMeals', JSON.stringify(weeklyMeals));
+      
+      console.log('Calories logged from calculator:', mealEntry);
+      console.log('Successfully logged to weekly ' + getMealType() + ':', {
+        name: mealEntry.name,
+        calories: mealEntry.calories,
+        protein: mealEntry.protein,
+        carbs: mealEntry.carbs,
+        fat: mealEntry.fat,
+        date: mealEntry.date,
+        time: mealEntry.time,
+        category: mealEntry.category
       });
       
-      if (!response.ok) {
-        throw new Error('Failed to log calories');
-      }
-      
-      return response.json();
+      return mealEntry;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/meals/logged'] });
+      // No need to invalidate API queries since we're using localStorage
+      queryClient.invalidateQueries({ queryKey: ['weeklyMeals'] });
     },
   });
 

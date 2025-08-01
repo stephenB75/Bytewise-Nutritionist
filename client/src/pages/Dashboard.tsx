@@ -63,7 +63,7 @@ function Dashboard({ onNavigate }: DashboardProps) {
     waterGoal: 8
   });
 
-  // Update stats when data changes
+  // Update stats when data changes - memoized to prevent infinite loops
   useEffect(() => {
     // Real-time data integration: Combine calories from calculator and logged meals
     const calculatorCalories = dailyStats.calories || 0;
@@ -82,20 +82,35 @@ function Dashboard({ onNavigate }: DashboardProps) {
     const mealFat = Array.isArray(mealStats) ? mealStats.reduce((total: number, meal: any) => 
       total + (parseFloat(meal.fat) || 0), 0) : 0;
 
-    setUserStats(prev => ({
-      ...prev,
-      name: (user as any)?.firstName || prev.name,
+    const newStats = {
+      name: (user as any)?.firstName || "User",
+      currentStreak: 0,
       caloriesConsumed: Math.round(calculatorCalories + mealCalories),
       proteinConsumed: Math.round(calculatorProtein + mealProtein),
       carbsConsumed: Math.round(calculatorCarbs + mealCarbs),
       fatConsumed: Math.round(calculatorFat + mealFat),
-      caloriesGoal: (user as any)?.dailyCalorieGoal || prev.caloriesGoal,
-      proteinGoal: (user as any)?.dailyProteinGoal || prev.proteinGoal,
-      carbsGoal: (user as any)?.dailyCarbGoal || prev.carbsGoal,
-      fatGoal: (user as any)?.dailyFatGoal || prev.fatGoal,
-      waterGoal: (user as any)?.dailyWaterGoal || prev.waterGoal
-    }));
-  }, [dailyStats, mealStats, user]);
+      caloriesGoal: (user as any)?.dailyCalorieGoal || 2200,
+      proteinGoal: (user as any)?.dailyProteinGoal || 120,
+      carbsGoal: (user as any)?.dailyCarbGoal || 300,
+      fatGoal: (user as any)?.dailyFatGoal || 70,
+      waterConsumed: 0,
+      waterGoal: (user as any)?.dailyWaterGoal || 8
+    };
+
+    setUserStats(newStats);
+  }, [
+    dailyStats.calories, 
+    dailyStats.protein, 
+    dailyStats.carbs, 
+    dailyStats.fat,
+    mealStats, 
+    (user as any)?.firstName,
+    (user as any)?.dailyCalorieGoal,
+    (user as any)?.dailyProteinGoal,
+    (user as any)?.dailyCarbGoal,
+    (user as any)?.dailyFatGoal,
+    (user as any)?.dailyWaterGoal
+  ]);
 
   // Get today's meals from multiple sources
   const todaysMealsFromLogger = Array.isArray(mealStats) ? mealStats.filter((meal: any) => {
