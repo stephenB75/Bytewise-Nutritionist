@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useState } from 'react';
-import { Loader2, Mail, Lock, User, Github, Apple, Facebook, Chrome } from 'lucide-react';
+import { Loader2, Mail, Lock, User, Github, Apple, Facebook, Chrome, XCircle, Eye, EyeOff } from 'lucide-react';
 
 interface SupabaseAuthWrapperProps {
   children: React.ReactNode;
@@ -35,6 +35,22 @@ export function SupabaseAuthWrapper({ children, onNavigate }: SupabaseAuthWrappe
         <div className="text-center">
           <Loader2 className="animate-spin h-8 w-8 text-blue-600 mx-auto mb-4" />
           <p className="text-gray-600">Loading your nutrition tracker...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state if authentication fails to initialize
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-red-50 to-pink-100 flex items-center justify-center">
+        <div className="text-center p-6">
+          <XCircle className="h-12 w-12 text-red-600 mx-auto mb-4" />
+          <h2 className="text-xl font-bold text-red-900 mb-2">Authentication Error</h2>
+          <p className="text-red-700 mb-4">{error}</p>
+          <Button onClick={() => window.location.reload()} variant="outline">
+            Retry
+          </Button>
         </div>
       </div>
     );

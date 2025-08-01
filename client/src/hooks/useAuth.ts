@@ -37,7 +37,7 @@ export function useAuth() {
     if (!isConfigured) {
       console.warn('Supabase not configured. URL:', !!supabaseUrl, 'Key:', !!supabaseKey);
       setLoading(false);
-      setError('Authentication service not configured. Please check credentials.');
+      setError('Authentication service not configured. Please check Supabase credentials in secrets.');
       return;
     }
 

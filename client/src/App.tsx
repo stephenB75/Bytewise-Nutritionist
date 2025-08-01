@@ -22,6 +22,7 @@ import CalorieCalculatorValidation from './test/CalorieCalculatorValidation';
 import CalorieCalculatorDemo from './components/CalorieCalculatorDemo';
 import CalculatorValidationTest from './components/CalculatorValidationTest';
 import { AuthDebugInfo } from './components/AuthDebugInfo';
+import { SimpleAuthTest } from './components/SimpleAuthTest';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('dashboard');
@@ -109,6 +110,8 @@ export default function App() {
         return <CalculatorValidationTest />;
       case 'auth-debug':
         return <AuthDebugInfo />;
+      case 'auth-test':
+        return <SimpleAuthTest />;
       default:
         return <Dashboard onNavigate={handleNavigate} />;
     }

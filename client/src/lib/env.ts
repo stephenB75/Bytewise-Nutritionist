@@ -3,17 +3,14 @@
  * Provides safe access to environment variables with TypeScript support
  */
 
-declare global {
-  interface ImportMeta {
-    env: {
-      VITE_SUPABASE_URL?: string;
-      VITE_SUPABASE_ANON_KEY?: string;
-      VITE_USDA_API_KEY?: string;
-      VITE_DEVELOPMENT_MODE?: string;
-      DEV?: boolean;
-      PROD?: boolean;
-    };
-  }
+// Environment type extensions
+interface ImportMetaEnv {
+  readonly VITE_SUPABASE_URL?: string;
+  readonly VITE_SUPABASE_ANON_KEY?: string;
+  readonly VITE_USDA_API_KEY?: string;
+  readonly VITE_DEVELOPMENT_MODE?: string;
+  readonly DEV?: boolean;
+  readonly PROD?: boolean;
 }
 
 export const env = {
