@@ -56,8 +56,8 @@
   <!-- Viewport for PWA -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   
-  <!-- Content Security Policy for development -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://fonts.googleapis.com https://replit.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' ws: wss:;">
+  <!-- Content Security Policy for production -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' ws: wss: https:;">
   
   <!-- Prevent zoom on form inputs -->
   <style>
@@ -100,7 +100,6 @@
     }
   </script>
   
-  <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
-  <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
+
 </body>
 </html>
