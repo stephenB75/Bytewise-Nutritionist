@@ -23,7 +23,7 @@ import EmailConfirmation from './pages/EmailConfirmation';
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [showNotifications, setShowNotifications] = useState(false);
-  const [notificationCount, setNotificationCount] = useState(3); // Example notification count
+  const [notificationCount, setNotificationCount] = useState(0);
   
   // Initialize image rotation system
   useImageRotation();

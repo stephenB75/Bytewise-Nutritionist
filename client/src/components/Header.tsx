@@ -27,32 +27,7 @@ export function Header({
   onLogout
 }: HeaderProps) {
   const [isNotificationDropdownOpen, setIsNotificationDropdownOpen] = useState(false);
-  const [notifications, setNotifications] = useState([
-    {
-      id: '1',
-      type: 'success' as const,
-      title: 'Calorie Goal Achieved',
-      message: 'You have reached your daily calorie target of 2000 calories!',
-      timestamp: new Date(),
-      read: false
-    },
-    {
-      id: '2',
-      type: 'info' as const,
-      title: 'Weekly Summary Ready',
-      message: 'Your weekly nutrition report is now available for download.',
-      timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
-      read: false
-    },
-    {
-      id: '3',
-      type: 'achievement' as const,
-      title: 'Streak Milestone',
-      message: 'Congratulations! You have logged meals for 7 consecutive days.',
-      timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000),
-      read: true
-    }
-  ]);
+  const [notifications, setNotifications] = useState<any[]>([]);
 
   const handleMarkAsRead = (id: string) => {
     setNotifications(prev => prev.map(n => 
@@ -68,18 +43,8 @@ export function Header({
     setNotifications(prev => prev.filter(n => n.id !== id));
   };
   const getPageTitle = () => {
-    switch (currentPage) {
-      case 'dashboard':
-        return 'Dashboard';
-      case 'calculator':
-        return 'Calculator';
-      case 'logger':
-        return 'Weekly Logger';
-      case 'profile':
-        return 'Profile';
-      default:
-        return 'Nutrition App';
-    }
+    // Remove page titles for cleaner header design
+    return '';
   };
 
   return (

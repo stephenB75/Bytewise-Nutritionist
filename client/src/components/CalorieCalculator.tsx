@@ -227,6 +227,7 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
     else mealType = 'snack';
 
     const mealData = {
+      id: `calc-${Date.now()}`,
       name: `${analysis.ingredient} (${analysis.measurement})`,
       calories: analysis.estimatedCalories,
       protein: analysis.nutritionPer100g?.protein || 0,
@@ -242,56 +243,34 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
         hour12: true 
       }),
       mealType,
+      category: mealType,
+      timestamp: now.toISOString(),
       source: 'calculator'
     };
 
-    try {
-      // Direct API call to log meal
-      const response = await fetch('/api/meals/logged', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(mealData),
-        credentials: 'include',
-      });
-
-      if (response.ok) {
-        // Successfully logged meal data
-        
-        // Trigger multiple events for comprehensive UI updates
-        const logEvent = new CustomEvent('calories-logged', {
-          detail: { ...mealData, timestamp: new Date().toISOString() }
-        });
-        window.dispatchEvent(logEvent);
-
-        // Trigger success event for immediate refresh
-        const successEvent = new CustomEvent('meal-logged-success', {
-          detail: { ...mealData, timestamp: new Date().toISOString() }
-        });
-        window.dispatchEvent(successEvent);
-        
-        // Show success toast
-        const toastEvent = new CustomEvent('show-toast', {
-          detail: { 
-            message: `✅ Logged ${analysis.ingredient} to ${mealType}!`,
-            type: 'success'
-          }
-        });
-        window.dispatchEvent(toastEvent);
-      } else {
-        throw new Error('Failed to log meal');
+    // Store in localStorage for weekly logger to access  
+    const weeklyMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
+    weeklyMeals.push(mealData);
+    localStorage.setItem('weeklyMeals', JSON.stringify(weeklyMeals));
+    
+    console.log('✅ Successfully logged to weekly tracker:', mealData);
+    
+    // Dispatch comprehensive events for weekly logger refresh
+    window.dispatchEvent(new CustomEvent('calories-logged', {
+      detail: mealData
+    }));
+    window.dispatchEvent(new CustomEvent('meal-logged-success', {
+      detail: mealData
+    }));
+    window.dispatchEvent(new CustomEvent('refresh-weekly-data'));
+    
+    // Show success toast notification
+    window.dispatchEvent(new CustomEvent('show-toast', {
+      detail: { 
+        message: `✅ Logged ${analysis.ingredient} to ${mealType}!`,
+        type: 'success'
       }
-    } catch (error) {
-      // Handle logging error gracefully
-      
-      // Show error toast
-      const toastEvent = new CustomEvent('show-toast', {
-        detail: { 
-          message: `Failed to log meal. Please try again.`,
-          type: 'error'
-        }
-      });
-      window.dispatchEvent(toastEvent);
-    }
+    }));
 
     // Also call the original callback if it exists
     if (onLogToWeekly) {

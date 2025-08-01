@@ -120,21 +120,37 @@ export default function WeeklyLogger({ onNavigate }: WeeklyLoggerProps) {
   const weekStart = startOfWeek(currentWeek, { weekStartsOn: 1 });
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
 
-  // Fetch logged meals for the week  
-  const { data: loggedMeals = [], isLoading, error, refetch } = useQuery({
-    queryKey: ['/api/meals/logged', format(weekStart, 'yyyy-MM-dd')],
-    staleTime: 1000 * 30, // 30 seconds for more frequent updates
-    refetchInterval: 1000 * 60, // Refetch every minute
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
-    retry: 3,
-  });
+  // Get logged meals from localStorage (since calculator logs there)
+  const [loggedMeals, setLoggedMeals] = useState<LoggedMeal[]>([]);
+  
+  useEffect(() => {
+    const loadMeals = () => {
+      const storedMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
+      setLoggedMeals(storedMeals);
+    };
+    
+    loadMeals();
+    
+    // Listen for new meals from calculator
+    const handleMealUpdate = () => {
+      loadMeals();
+    };
+    
+    window.addEventListener('calories-logged', handleMealUpdate);
+    window.addEventListener('storage', handleMealUpdate);
+    
+    return () => {
+      window.removeEventListener('calories-logged', handleMealUpdate);
+      window.removeEventListener('storage', handleMealUpdate);
+    };
+  }, []);
 
   // Force refresh when meals are logged
   useEffect(() => {
     const handleMealLogged = () => {
       console.log('🔄 Forcing meal data refresh...');
-      refetch();
+      const storedMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
+      setLoggedMeals(storedMeals);
     };
 
     window.addEventListener('meal-logged-success', handleMealLogged);
@@ -142,7 +158,7 @@ export default function WeeklyLogger({ onNavigate }: WeeklyLoggerProps) {
     return () => {
       window.removeEventListener('meal-logged-success', handleMealLogged);
     };
-  }, [refetch]);
+  }, []);
 
   // Calculate daily totals
   const getDayTotals = (date: Date) => {

@@ -83,7 +83,7 @@ export function SupabaseAuthWrapper({ children, onNavigate }: SupabaseAuthWrappe
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md p-6">
+        <Card className="w-full max-w-sm p-6 bg-white/90 backdrop-blur-sm border-white/20 shadow-xl">
           <div className="text-center mb-6">
             <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
               <div className="text-white text-2xl font-bold">B</div>
@@ -131,23 +131,22 @@ export function SupabaseAuthWrapper({ children, onNavigate }: SupabaseAuthWrappe
             <div>
               <Label htmlFor="email">Email</Label>
               <div className="relative mt-1">
-                <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
                   id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="pl-10"
+                  className="pr-10"
                   placeholder="Enter your email"
                 />
+                <Mail className="absolute right-3 top-3 h-4 w-4 text-gray-400" />
               </div>
             </div>
 
             <div>
               <Label htmlFor="password">Password</Label>
               <div className="relative mt-1">
-                <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
                   id="password"
                   type="password"
@@ -155,9 +154,10 @@ export function SupabaseAuthWrapper({ children, onNavigate }: SupabaseAuthWrappe
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   minLength={6}
-                  className="pl-10"
+                  className="pr-10"
                   placeholder="Enter your password"
                 />
+                <Lock className="absolute right-3 top-3 h-4 w-4 text-gray-400" />
               </div>
             </div>
 

@@ -151,13 +151,13 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
     staleTime: 10 * 60 * 1000, // 10 minutes
   });
 
-  // Sample user stats
+  // Real user stats from actual data
   const userStats = {
-    totalMealsLogged: 156,
-    currentStreak: 12,
-    caloriesTracked: 78543,
-    favoriteFood: "Greek Yogurt",
-    joinedDate: "January 2024"
+    totalMealsLogged: 0,
+    currentStreak: 0,
+    caloriesTracked: 0,
+    favoriteFood: "Not set",
+    joinedDate: new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
   };
 
   const profileSections = [
@@ -427,19 +427,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
         
         <Separator className="my-4" />
         
-        <div className="flex justify-center">
-          <Button 
-            variant="outline"
-            className="border-blue-600 text-blue-600 hover:bg-blue-50"
-            onClick={() => {
-              // Navigate to achievements page (no celebration popup)
-              console.log('Navigate to achievements page');
-            }}
-          >
-            <Trophy className="w-4 h-4 mr-2" />
-            View All Achievements
-          </Button>
-        </div>
+        {/* Remove View All Achievements button for cleaner profile */}
       </Card>
     </div>
   );
@@ -510,7 +498,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Button 
                 variant="outline"
-                className="border-blue-600 text-blue-600 hover:bg-blue-50"
+                className="slide-button border-blue-600 text-blue-600 hover:bg-blue-50 transform transition-all duration-300 hover:scale-105 hover:shadow-lg"
               >
                 <Lock className="w-4 h-4 mr-2" />
                 Change Password
@@ -518,7 +506,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
               
               <Button 
                 variant="outline"
-                className="border-blue-600 text-blue-600 hover:bg-blue-50"
+                className="slide-button border-blue-600 text-blue-600 hover:bg-blue-50 transform transition-all duration-300 hover:scale-105 hover:shadow-lg"
               >
                 <Shield className="w-4 h-4 mr-2" />
                 Security Settings
