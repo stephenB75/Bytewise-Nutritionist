@@ -1,6 +1,7 @@
 /**
- * Login Screen Component
- * Supabase authentication with email/password and OAuth
+ * Supabase Login Screen Component
+ * 
+ * Clean authentication interface with Supabase Auth
  * Features email/password and social authentication
  */
 
@@ -144,7 +145,7 @@ function LoginScreen({ onNavigate }: LoginScreenProps) {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Food Background Image */}
+      {/* Food Background Image - Beautiful dish background */}
       <div 
         className="absolute inset-0 z-0"
         style={{
@@ -158,17 +159,19 @@ function LoginScreen({ onNavigate }: LoginScreenProps) {
       
       {/* Overlay for better readability */}
       <div className="absolute inset-0 z-5 bg-black/20" />
+      
+
 
       {/* Login Popup */}
       <div className="relative z-30 min-h-screen flex items-center justify-center p-6">
         <div className="w-full max-w-md">
           
-          {/* Logo */}
+          {/* Logo - Increased size by 45% */}
           <div className="text-center mb-8">
             <NewLogoBrand size="xl" className="drop-shadow-lg" />
           </div>
 
-          {/* Login Card */}
+          {/* Login Card - Simple Popup */}
           <Card className="p-8 bg-white/95 backdrop-blur-md border-0 shadow-2xl">
             <div className="text-center mb-6">
               <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -348,10 +351,12 @@ function LoginScreen({ onNavigate }: LoginScreenProps) {
               )}
             </div>
 
-            <p className="text-xs text-gray-500 text-center mt-6">
-              Secure authentication powered by Supabase
-            </p>
           </Card>
+        </div>
+      </div>
+    </div>
+          </Card>
+
         </div>
       </div>
     </div>
