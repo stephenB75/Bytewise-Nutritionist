@@ -23,6 +23,7 @@ import CalorieCalculatorDemo from './components/CalorieCalculatorDemo';
 import CalculatorValidationTest from './components/CalculatorValidationTest';
 import { AuthDebugInfo } from './components/AuthDebugInfo';
 import { SimpleAuthTest } from './components/SimpleAuthTest';
+import { MinimalAuth } from './components/MinimalAuth';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('dashboard');
@@ -119,7 +120,7 @@ export default function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <SupabaseAuthWrapper onNavigate={handleNavigate}>
+      <MinimalAuth>
         <div className="min-h-screen bg-background">
           {/* Global Notification Dropdown */}
           <NotificationDropdown
@@ -154,7 +155,7 @@ export default function App() {
           <PWAInstallPrompt />
           <IOSInstallInstructions />
         </div>
-      </SupabaseAuthWrapper>
+      </MinimalAuth>
     </QueryClientProvider>
   );
 }
