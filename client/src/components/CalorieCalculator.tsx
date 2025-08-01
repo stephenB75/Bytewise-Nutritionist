@@ -27,7 +27,9 @@ import {
   Scale,
   Calendar,
   Plus,
-  Sparkles
+  Sparkles,
+  ChefHat,
+  BookOpen
 } from 'lucide-react';
 import EnhancedFoodDatabaseService, { ENHANCED_FOOD_DATABASE, type FoodItem } from '@/lib/enhancedFoodDatabase';
 
@@ -596,11 +598,17 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
                       <SelectValue placeholder="Select unit" />
                     </SelectTrigger>
                     <SelectContent>
-                      {selectedFood && EnhancedFoodDatabaseService.getAvailableUnits(selectedFood.key, selectedFood.category).map((unit) => (
-                        <SelectItem key={unit} value={unit}>
-                          {unit} {selectedFood.food.units[unit] && `(≈${selectedFood.food.units[unit]}g)`}
-                        </SelectItem>
-                      ))}
+                      {selectedFood && EnhancedFoodDatabaseService.getAvailableUnits(selectedFood.key, selectedFood.category).map((unit) => {
+                        const gramWeight = selectedFood.food.units[unit];
+                        const volumeConversion = selectedFood.food.volumeConversions?.[unit];
+                        return (
+                          <SelectItem key={unit} value={unit}>
+                            {unit} 
+                            {gramWeight && gramWeight !== 1 && ` (≈${gramWeight}g)`}
+                            {volumeConversion && selectedFood.food.tags.densityType === 'liquid' && ` (${volumeConversion}ml)`}
+                          </SelectItem>
+                        );
+                      })}
                     </SelectContent>
                   </Select>
                 </div>
@@ -669,6 +677,77 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
         )}
       </Card>
 
+      {/* Professional Conversion Helper */}
+      <Card className="p-6 bg-gradient-to-br from-green-50 to-blue-50 border-0 shadow-lg">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 bg-green-100 rounded-lg">
+            <ChefHat className="w-6 h-6 text-green-600" />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-gray-900">Professional Culinary Conversions</h3>
+            <p className="text-sm text-gray-600">Shamrock Foods & KTT conversion standards</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Liquid Measures */}
+          <div className="p-4 bg-white rounded-lg border">
+            <h4 className="font-medium text-gray-900 mb-2 flex items-center gap-2">
+              <Droplets className="w-4 h-4 text-blue-500" />
+              Liquid Measures
+            </h4>
+            <div className="text-sm text-gray-700 space-y-1">
+              <div>1 cup = 8 fl oz = 237ml</div>
+              <div>1/2 cup = 4 fl oz = 118ml</div>
+              <div>1/4 cup = 2 fl oz = 59ml</div>
+              <div>1 tbsp = 1/2 fl oz = 15ml</div>
+              <div>1 tsp = 1/6 fl oz = 5ml</div>
+            </div>
+          </div>
+
+          {/* Butter to Oil Conversions */}
+          <div className="p-4 bg-white rounded-lg border">
+            <h4 className="font-medium text-gray-900 mb-2 flex items-center gap-2">
+              <Scale className="w-4 h-4 text-yellow-500" />
+              Butter → Olive Oil (Baking)
+            </h4>
+            <div className="text-sm text-gray-700 space-y-1">
+              <div>1 cup butter → 3/4 cup oil</div>
+              <div>1/2 cup butter → 1/4 cup + 2 tbsp oil</div>
+              <div>1/4 cup butter → 3 tbsp oil</div>
+              <div>1 tbsp butter → 2 1/4 tsp oil</div>
+            </div>
+          </div>
+
+          {/* Temperature Conversions */}
+          <div className="p-4 bg-white rounded-lg border">
+            <h4 className="font-medium text-gray-900 mb-2 flex items-center gap-2">
+              <Flame className="w-4 h-4 text-red-500" />
+              Oven Temperatures
+            </h4>
+            <div className="text-sm text-gray-700 space-y-1">
+              <div>350°F = 180°C (moderate)</div>
+              <div>375°F = 190°C (moderately hot)</div>
+              <div>400°F = 200°C (fairly hot)</div>
+              <div>425°F = 220°C (hot)</div>
+            </div>
+          </div>
+
+          {/* Common Substitutions */}
+          <div className="p-4 bg-white rounded-lg border">
+            <h4 className="font-medium text-gray-900 mb-2 flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-purple-500" />
+              Common Substitutions
+            </h4>
+            <div className="text-sm text-gray-700 space-y-1">
+              <div>1 cup milk → 1/2 cup evap + 1/2 cup water</div>
+              <div>1 egg → 2 egg yolks</div>
+              <div>1 tsp baking powder → 1/4 tsp baking soda + 1/2 cup buttermilk</div>
+            </div>
+          </div>
+        </div>
+      </Card>
+
       {/* Results */}
       {recentAnalyses.length > 0 && (
         <Card className="p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg">
@@ -735,6 +814,40 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
                     <div className="flex items-start gap-2">
                       <Info className="w-4 h-4 text-blue-600 mt-0.5" />
                       <p className="text-sm text-blue-700">{analysis.note}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Professional Conversion Information */}
+                {analysis.isEnhanced && analysis.foodKey && analysis.category && (
+                  <div className="mb-3 space-y-2">
+                    {/* Butter to Olive Oil Conversion for Butter */}
+                    {analysis.foodKey === 'butter' && (
+                      <div className="p-2 bg-green-50 border border-green-200 rounded text-xs">
+                        <div className="font-medium text-green-800">🧄 Baking Substitution</div>
+                        <div className="text-green-700">
+                          For healthier baking: Use ¾ the amount of olive oil
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Drain Weight for Canned Goods */}
+                    {EnhancedFoodDatabaseService.getDrainWeight(analysis.foodKey, analysis.category) && (
+                      <div className="p-2 bg-amber-50 border border-amber-200 rounded text-xs">
+                        <div className="font-medium text-amber-800">📦 Canned Food Info</div>
+                        <div className="text-amber-700">
+                          Drain weight: {EnhancedFoodDatabaseService.getDrainWeight(analysis.foodKey, analysis.category)?.drainWeight}oz 
+                          (#{EnhancedFoodDatabaseService.getDrainWeight(analysis.foodKey, analysis.category)?.canSize} can)
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Available Units Display */}
+                    <div className="p-2 bg-blue-50 border border-blue-200 rounded text-xs">
+                      <div className="font-medium text-blue-800">📏 Available Units</div>
+                      <div className="text-blue-700">
+                        {EnhancedFoodDatabaseService.getAvailableUnits(analysis.foodKey, analysis.category).join(', ')}
+                      </div>
                     </div>
                   </div>
                 )}

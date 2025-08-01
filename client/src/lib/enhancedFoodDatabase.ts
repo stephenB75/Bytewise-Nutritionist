@@ -1,6 +1,7 @@
 /**
- * Enhanced Food Database with Categories and Unit Conversions
- * Integrates structured food data with USDA API for comprehensive nutrition tracking
+ * Enhanced Food Database with Professional Culinary Conversions
+ * Integrates Shamrock Foods conversion charts with USDA API
+ * Provides restaurant-quality accuracy for nutrition tracking
  */
 
 export interface FoodItem {
@@ -8,11 +9,14 @@ export interface FoodItem {
   aliases: string[];
   usdaQuery: string;
   units: Record<string, number>; // unit -> grams conversion
+  volumeConversions?: Record<string, number>; // ml conversions for liquids
   tags: {
     isCommon: boolean;
     densityType: 'dry' | 'liquid' | 'solid';
     dietType: string[];
     categoryColor: string;
+    canSize?: string; // For canned goods
+    drainWeight?: number; // Drained weight in oz for #10 can
   };
 }
 
@@ -29,14 +33,15 @@ export const ENHANCED_FOOD_DATABASE: FoodDatabase = {
     "Flours": {
       "all_purpose_flour": {
         "displayName": "All-Purpose Flour",
-        "aliases": ["AP flour", "plain flour", "all purpose"],
+        "aliases": ["AP flour", "plain flour", "all purpose", "white flour"],
         "usdaQuery": "all purpose flour",
         "units": {
           "cup": 120,
           "tbsp": 7.5,
           "tsp": 2.5,
-          "oz": 28,
-          "g": 120
+          "oz": 28.35,
+          "g": 1,
+          "lb": 453.6
         },
         "tags": {
           "isCommon": true,
@@ -102,19 +107,30 @@ export const ENHANCED_FOOD_DATABASE: FoodDatabase = {
     "Oils": {
       "olive_oil": {
         "displayName": "Olive Oil",
-        "aliases": ["extra virgin olive oil", "EVOO"],
+        "aliases": ["extra virgin olive oil", "EVOO", "virgin olive oil"],
         "usdaQuery": "olive oil",
         "units": {
           "cup": 216,
-          "tbsp": 14,
+          "tbsp": 13.5,
+          "tsp": 4.5,
+          "fl_oz": 27,
+          "oz": 28.35,
+          "ml": 1,
+          "liter": 1000,
+          "gal": 3785,
+          "qt": 946,
+          "pt": 473
+        },
+        "volumeConversions": {
+          "cup": 237,
+          "tbsp": 15,
           "tsp": 5,
-          "oz": 28,
-          "ml": 216
+          "fl_oz": 30
         },
         "tags": {
           "isCommon": true,
           "densityType": "liquid",
-          "dietType": ["vegetarian", "vegan", "keto"],
+          "dietType": ["vegetarian", "vegan", "keto", "mediterranean"],
           "categoryColor": "#FFD580"
         }
       },
@@ -192,14 +208,16 @@ export const ENHANCED_FOOD_DATABASE: FoodDatabase = {
       },
       "butter": {
         "displayName": "Butter",
-        "aliases": ["unsalted butter", "salted butter"],
+        "aliases": ["unsalted butter", "salted butter", "sweet butter"],
         "usdaQuery": "butter",
         "units": {
           "cup": 227,
-          "tbsp": 14,
-          "tsp": 5,
-          "oz": 28,
-          "stick": 113
+          "tbsp": 14.2,
+          "tsp": 4.7,
+          "oz": 28.35,
+          "stick": 113.4,
+          "lb": 453.6,
+          "g": 1
         },
         "tags": {
           "isCommon": true,
@@ -409,6 +427,252 @@ export const ENHANCED_FOOD_DATABASE: FoodDatabase = {
           "categoryColor": "#FFF3E0"
         }
       }
+    },
+    "Canned Goods": {
+      "canned_tomatoes": {
+        "displayName": "Canned Tomatoes (Diced)",
+        "aliases": ["diced tomatoes", "canned diced tomatoes", "stewed tomatoes"],
+        "usdaQuery": "canned tomatoes",
+        "units": {
+          "can_14oz": 411,
+          "can_28oz": 794,
+          "cup": 245,
+          "tbsp": 15,
+          "tsp": 5,
+          "oz": 28.35,
+          "g": 1
+        },
+        "tags": {
+          "isCommon": true,
+          "densityType": "liquid",
+          "dietType": ["vegetarian", "vegan"],
+          "categoryColor": "#FFCDD2",
+          "canSize": "#10",
+          "drainWeight": 68
+        }
+      },
+      "canned_corn": {
+        "displayName": "Canned Corn (Whole Kernel)",
+        "aliases": ["sweet corn", "kernel corn", "whole kernel corn"],
+        "usdaQuery": "canned corn",
+        "units": {
+          "can_15oz": 425,
+          "cup": 165,
+          "tbsp": 10,
+          "tsp": 3.3,
+          "oz": 28.35,
+          "g": 1
+        },
+        "tags": {
+          "isCommon": true,
+          "densityType": "solid",
+          "dietType": ["vegetarian", "vegan"],
+          "categoryColor": "#FFCDD2",
+          "canSize": "#10",
+          "drainWeight": 71
+        }
+      },
+      "canned_beans_black": {
+        "displayName": "Black Beans (Canned)",
+        "aliases": ["canned black beans", "black turtle beans"],
+        "usdaQuery": "canned black beans",
+        "units": {
+          "can_15oz": 425,
+          "cup": 172,
+          "tbsp": 11,
+          "tsp": 3.6,
+          "oz": 28.35,
+          "g": 1
+        },
+        "tags": {
+          "isCommon": true,
+          "densityType": "solid",
+          "dietType": ["vegetarian", "vegan", "high-protein"],
+          "categoryColor": "#FFCDD2",
+          "canSize": "#10",
+          "drainWeight": 68
+        }
+      }
+    },
+    "Baking Essentials": {
+      "baking_powder": {
+        "displayName": "Baking Powder (Double Acting)",
+        "aliases": ["double acting baking powder", "baking powder"],
+        "usdaQuery": "baking powder",
+        "units": {
+          "tsp": 4,
+          "tbsp": 12,
+          "cup": 192,
+          "oz": 28.35,
+          "g": 1
+        },
+        "tags": {
+          "isCommon": true,
+          "densityType": "dry",
+          "dietType": ["vegetarian", "vegan"],
+          "categoryColor": "#E8F5E8"
+        }
+      },
+      "baking_soda": {
+        "displayName": "Baking Soda",
+        "aliases": ["sodium bicarbonate", "bicarbonate of soda"],
+        "usdaQuery": "baking soda",
+        "units": {
+          "tsp": 4,
+          "tbsp": 12,
+          "cup": 192,
+          "oz": 28.35,
+          "g": 1
+        },
+        "tags": {
+          "isCommon": true,
+          "densityType": "dry",
+          "dietType": ["vegetarian", "vegan"],
+          "categoryColor": "#E8F5E8"
+        }
+      },
+      "vanilla_extract": {
+        "displayName": "Vanilla Extract",
+        "aliases": ["pure vanilla extract", "vanilla flavoring"],
+        "usdaQuery": "vanilla extract",
+        "units": {
+          "tsp": 4,
+          "tbsp": 12,
+          "cup": 208,
+          "fl_oz": 30,
+          "ml": 1,
+          "oz": 28.35,
+          "g": 1
+        },
+        "volumeConversions": {
+          "tsp": 5,
+          "tbsp": 15,
+          "fl_oz": 30,
+          "cup": 237
+        },
+        "tags": {
+          "isCommon": true,
+          "densityType": "liquid",
+          "dietType": ["vegetarian", "vegan"],
+          "categoryColor": "#E8F5E8"
+        }
+      }
+    },
+    "Dairy Alternatives": {
+      "almond_milk": {
+        "displayName": "Almond Milk (Unsweetened)",
+        "aliases": ["unsweetened almond milk", "almond beverage"],
+        "usdaQuery": "almond milk unsweetened",
+        "units": {
+          "cup": 240,
+          "tbsp": 15,
+          "tsp": 5,
+          "fl_oz": 30,
+          "ml": 1,
+          "liter": 1000,
+          "qt": 946,
+          "pt": 473,
+          "gal": 3785,
+          "oz": 28.35,
+          "g": 1
+        },
+        "volumeConversions": {
+          "cup": 237,
+          "tbsp": 15,
+          "tsp": 5,
+          "fl_oz": 30
+        },
+        "tags": {
+          "isCommon": true,
+          "densityType": "liquid",
+          "dietType": ["vegan", "dairy-free", "low-calorie"],
+          "categoryColor": "#FFF8E1"
+        }
+      },
+      "coconut_milk_canned": {
+        "displayName": "Coconut Milk (Canned, Full Fat)",
+        "aliases": ["canned coconut milk", "thick coconut milk"],
+        "usdaQuery": "coconut milk canned",
+        "units": {
+          "can_14oz": 400,
+          "cup": 240,
+          "tbsp": 15,
+          "tsp": 5,
+          "fl_oz": 30,
+          "ml": 1,
+          "oz": 28.35,
+          "g": 1
+        },
+        "volumeConversions": {
+          "cup": 237,
+          "tbsp": 15,
+          "tsp": 5,
+          "fl_oz": 30
+        },
+        "tags": {
+          "isCommon": true,
+          "densityType": "liquid",
+          "dietType": ["vegan", "dairy-free", "keto", "paleo"],
+          "categoryColor": "#FFF8E1"
+        }
+      }
+    },
+    "Spices & Seasonings": {
+      "salt_kosher": {
+        "displayName": "Kosher Salt",
+        "aliases": ["coarse salt", "kosher salt", "cooking salt"],
+        "usdaQuery": "salt",
+        "units": {
+          "tsp": 5,
+          "tbsp": 15,
+          "cup": 240,
+          "oz": 28.35,
+          "g": 1,
+          "lb": 453.6
+        },
+        "tags": {
+          "isCommon": true,
+          "densityType": "dry",
+          "dietType": ["vegetarian", "vegan"],
+          "categoryColor": "#F5F5F5"
+        }
+      },
+      "black_pepper": {
+        "displayName": "Black Pepper (Ground)",
+        "aliases": ["ground black pepper", "pepper", "black pepper powder"],
+        "usdaQuery": "black pepper",
+        "units": {
+          "tsp": 2.3,
+          "tbsp": 6.9,
+          "cup": 110,
+          "oz": 28.35,
+          "g": 1
+        },
+        "tags": {
+          "isCommon": true,
+          "densityType": "dry",
+          "dietType": ["vegetarian", "vegan"],
+          "categoryColor": "#F5F5F5"
+        }
+      },
+      "paprika": {
+        "displayName": "Paprika (Ground)",
+        "aliases": ["sweet paprika", "ground paprika", "paprika powder"],
+        "usdaQuery": "paprika",
+        "units": {
+          "tsp": 2.3,
+          "tbsp": 6.8,
+          "cup": 109,
+          "oz": 28.35,
+          "g": 1
+        },
+        "tags": {
+          "isCommon": true,
+          "densityType": "dry",
+          "dietType": ["vegetarian", "vegan"],
+          "categoryColor": "#F5F5F5"
+        }
+      }
     }
   }
 };
@@ -490,7 +754,7 @@ export class EnhancedFoodDatabaseService {
   }
   
   /**
-   * Convert between units using the food's unit conversion table
+   * Convert between units using professional culinary conversion tables
    */
   static convertUnits(
     foodKey: string, 
@@ -504,11 +768,62 @@ export class EnhancedFoodDatabaseService {
       return null;
     }
     
+    // For liquids, use volume conversions when available
+    if (food.tags.densityType === 'liquid' && food.volumeConversions) {
+      const fromVol = food.volumeConversions[fromUnit];
+      const toVol = food.volumeConversions[toUnit];
+      if (fromVol && toVol) {
+        return Math.round((amount * fromVol / toVol) * 100) / 100;
+      }
+    }
+    
     // Convert to grams first, then to target unit
     const gramsFromSource = (amount * food.units[fromUnit]);
     const targetAmount = gramsFromSource / food.units[toUnit];
     
     return Math.round(targetAmount * 100) / 100; // Round to 2 decimal places
+  }
+
+  /**
+   * Get professional butter to olive oil conversion for baking
+   */
+  static convertButterToOliveOil(butterAmount: number, butterUnit: string): {
+    amount: number;
+    unit: string;
+    note: string;
+  } | null {
+    const conversions: Record<string, { amount: number; unit: string }> = {
+      'tsp': { amount: 0.75, unit: 'tsp' },
+      'tbsp': { amount: 2.25, unit: 'tsp' },
+      'cup': { amount: 0.75, unit: 'cup' }
+    };
+    
+    const conversion = conversions[butterUnit];
+    if (!conversion) return null;
+    
+    return {
+      amount: Math.round((butterAmount * conversion.amount) * 100) / 100,
+      unit: conversion.unit,
+      note: 'Professional baking conversion from Shamrock Foods'
+    };
+  }
+
+  /**
+   * Get drain weight for canned goods (#10 can standard)
+   */
+  static getDrainWeight(foodKey: string, categoryName: string): {
+    drainWeight: number;
+    unit: string;
+    canSize: string;
+  } | null {
+    const food = ENHANCED_FOOD_DATABASE.categories[categoryName]?.[foodKey];
+    if (!food?.tags.drainWeight || !food.tags.canSize) return null;
+    
+    return {
+      drainWeight: food.tags.drainWeight,
+      unit: 'oz',
+      canSize: food.tags.canSize
+    };
   }
   
   /**
