@@ -26,11 +26,13 @@ function LoginScreen({ onNavigate }: LoginScreenProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
+    setSuccessMessage(null);
 
     try {
       if (mode === 'login') {
@@ -40,16 +42,30 @@ function LoginScreen({ onNavigate }: LoginScreenProps) {
         });
         if (error) throw error;
       } else {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: window.location.origin,
+            emailRedirectTo: `${window.location.origin}/auth/callback`,
+            data: {
+              first_name: email.split('@')[0], // Use email prefix as initial name
+            }
           },
         });
+        
         if (error) throw error;
-        // Show success message for signup
-        setError('Please check your email for the confirmation link!');
+        
+        // Check if email confirmation is required
+        if (data.user && !data.session) {
+          // Store email for potential resend functionality
+          localStorage.setItem('pending_confirmation_email', email);
+          setSuccessMessage(
+            `Confirmation email sent to ${email}! Please check your inbox and click the confirmation link to complete your account setup.`
+          );
+        } else if (data.session) {
+          // User is immediately signed in (email confirmation disabled)
+          setSuccessMessage('Account created successfully! Welcome to Bytewise!');
+        }
       }
     } catch (error: any) {
       setError(error.message);
@@ -121,6 +137,17 @@ function LoginScreen({ onNavigate }: LoginScreenProps) {
             {error && (
               <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
                 <p className="text-red-600 text-sm">{error}</p>
+              </div>
+            )}
+
+            {successMessage && (
+              <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-start">
+                  <svg className="w-5 h-5 text-green-500 mt-0.5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <p className="text-green-700 text-sm">{successMessage}</p>
+                </div>
               </div>
             )}
 

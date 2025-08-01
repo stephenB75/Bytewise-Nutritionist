@@ -18,6 +18,7 @@ import Dashboard from './pages/Dashboard';
 import CalorieCalculatorWrapper from './components/CalorieCalculatorWrapper';
 import WeeklyLogger from './pages/WeeklyLogger';
 import ProfileEnhanced from './pages/ProfileEnhanced';
+import EmailConfirmation from './pages/EmailConfirmation';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('dashboard');
@@ -86,8 +87,24 @@ export default function App() {
     };
   }, []);
 
+  // Check for special routes first
+  const checkSpecialRoutes = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const type = urlParams.get('type');
+    
+    if (type === 'signup' || window.location.pathname.includes('confirm')) {
+      return <EmailConfirmation onNavigate={handleNavigate} />;
+    }
+    
+    return null;
+  };
+
   // Render current page component
   const renderCurrentPage = () => {
+    // Check for special routes first
+    const specialRoute = checkSpecialRoutes();
+    if (specialRoute) return specialRoute;
+
     switch (activeTab) {
       case 'dashboard':
         return <Dashboard onNavigate={handleNavigate} />;
