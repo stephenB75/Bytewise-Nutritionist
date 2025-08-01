@@ -1,10 +1,17 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import path from "path";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { usdaService } from "./services/usdaService";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Emergency static route for when React fails to load
+  app.get('/emergency', (req, res) => {
+    const emergencyPath = path.resolve(import.meta.dirname, '..', 'client', 'emergency.html');
+    res.sendFile(emergencyPath);
+  });
+
   // Auth middleware
   await setupAuth(app);
 
