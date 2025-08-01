@@ -4,7 +4,6 @@ const config: CapacitorConfig = {
   appId: 'com.bytewise.nutritionist',
   appName: 'ByteWise Nutritionist',
   webDir: 'dist',
-  bundledWebRuntime: false,
   backgroundColor: '#fef7cd',
   
   plugins: {
