@@ -24,6 +24,7 @@ import CalculatorValidationTest from './components/CalculatorValidationTest';
 import { AuthDebugInfo } from './components/AuthDebugInfo';
 import { SimpleAuthTest } from './components/SimpleAuthTest';
 import { MinimalAuth } from './components/MinimalAuth';
+import { DirectRender } from './components/DirectRender';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('dashboard');
@@ -117,6 +118,11 @@ export default function App() {
         return <Dashboard onNavigate={handleNavigate} />;
     }
   };
+
+  // Emergency fallback - direct render test
+  if (activeTab === 'direct-test') {
+    return <DirectRender />;
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
