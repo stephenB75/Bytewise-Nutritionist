@@ -103,10 +103,12 @@ class ErrorBoundary extends Component<
   }
 }
 
+import MinimalApp from './MinimalApp';
+
 try {
   createRoot(document.getElementById("root")!).render(
     <ErrorBoundary>
-      <App />
+      <MinimalApp />
     </ErrorBoundary>
   );
 } catch (error) {
