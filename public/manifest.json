@@ -19,61 +19,61 @@
   "related_applications": [],
   "icons": [
     {
-      "src": "/icons/icon-72x72.png",
+      "src": "/Bytewise-Nutritionist/icons/icon-72x72.png",
       "sizes": "72x72",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/icon-96x96.png",
+      "src": "/Bytewise-Nutritionist/icons/icon-96x96.png",
       "sizes": "96x96",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/icon-128x128.png",
+      "src": "/Bytewise-Nutritionist/icons/icon-128x128.png",
       "sizes": "128x128",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/icon-144x144.png",
+      "src": "/Bytewise-Nutritionist/icons/icon-144x144.png",
       "sizes": "144x144",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/icon-152x152.png",
+      "src": "/Bytewise-Nutritionist/icons/icon-152x152.png",
       "sizes": "152x152",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/icon-192x192.png",
+      "src": "/Bytewise-Nutritionist/icons/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/icon-384x384.png",
+      "src": "/Bytewise-Nutritionist/icons/icon-384x384.png",
       "sizes": "384x384",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/icon-512x512.png",
+      "src": "/Bytewise-Nutritionist/icons/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/icon-192x192.png",
+      "src": "/Bytewise-Nutritionist/icons/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/icons/icon-512x512.png",
+      "src": "/Bytewise-Nutritionist/icons/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
@@ -87,7 +87,7 @@
       "url": "/Bytewise-Nutritionist/calculator",
       "icons": [
         {
-          "src": "/icons/shortcut-meal.png",
+          "src": "/Bytewise-Nutritionist/icons/shortcut-meal.png",
           "sizes": "96x96"
         }
       ]
@@ -99,7 +99,7 @@
       "url": "/Bytewise-Nutritionist/dashboard",
       "icons": [
         {
-          "src": "/icons/shortcut-dashboard.png",
+          "src": "/Bytewise-Nutritionist/icons/shortcut-dashboard.png",
           "sizes": "96x96"
         }
       ]
@@ -111,7 +111,7 @@
       "url": "/Bytewise-Nutritionist/weekly",
       "icons": [
         {
-          "src": "/icons/shortcut-progress.png",
+          "src": "/Bytewise-Nutritionist/icons/shortcut-progress.png",
           "sizes": "96x96"
         }
       ]
@@ -156,6 +156,12 @@
     {
       "protocol": "web+bytewise",
       "url": "/Bytewise-Nutritionist/app?action=%s"
+    }
+  ],
+  "iarc_rating_id": "e58c174a-81d2-5c3c-32cc-34b8de4a52e9",
+  "scope_extensions": [
+    {
+      "origin": "https://api.nal.usda.gov"
     }
   ]
 }
