@@ -66,7 +66,8 @@ export default function WeeklyLogger({ onNavigate }: WeeklyLoggerProps) {
 
   // Constants for calculations
   const dailyCalorieGoal = 2000;
-  const calculatedCaloriesTotal = getTodaysCalories();
+  const todaysCalculatedEntries = getTodaysCalories();
+  const calculatedCaloriesTotal = todaysCalculatedEntries.reduce((sum, entry) => sum + entry.calories, 0);
   const calculatedItemsCount = calculatedCalories.length;
 
   // Navigation functions
