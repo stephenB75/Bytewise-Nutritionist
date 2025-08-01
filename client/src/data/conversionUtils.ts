@@ -3,50 +3,54 @@
  * Based on industry-standard measurement charts from Kitchen to Table and Shamrock Foods
  */
 
-// Standard liquid conversions (in milliliters)
+// Standard liquid conversions (in milliliters) - Based on professional conversion charts
 export const LIQUID_CONVERSIONS = {
   // Teaspoon and tablespoon
   tsp: 5,
   tbsp: 15,
   
-  // Cup measurements
-  cup: 237,
-  "3/4_cup": 177,
-  "2/3_cup": 158,
-  "1/2_cup": 118,
-  "1/3_cup": 79,
-  "1/4_cup": 59,
-  "1/8_cup": 30,
+  // Cup measurements (professional standards)
+  cup: 240,           // 1 cup = 240ml (16 tbsp = 48 tsp)
+  "3/4_cup": 180,     // 3/4 cup = 180ml (12 tbsp = 36 tsp)
+  "2/3_cup": 160,     // 2/3 cup = 160ml (11 tbsp = 32 tsp)
+  "1/2_cup": 120,     // 1/2 cup = 120ml (8 tbsp = 24 tsp)
+  "1/3_cup": 80,      // 1/3 cup = 80ml (5 tbsp = 16 tsp)
+  "1/4_cup": 60,      // 1/4 cup = 60ml (4 tbsp = 12 tsp)
+  "1/8_cup": 30,      // 1/8 cup = 30ml (2 tbsp = 6 tsp)
+  "1/16_cup": 15,     // 1/16 cup = 15ml (1 tbsp = 3 tsp)
   
-  // Fluid ounces
-  fl_oz: 30,
-  "1/2_fl_oz": 15,
+  // Fluid ounces (precise conversions)
+  fl_oz: 30,          // 1 fl oz = 30ml (2 tbsp = 6 tsp)
+  "1/2_fl_oz": 15,    // 1/2 fl oz = 15ml (1 tbsp = 3 tsp)
   
   // Larger measurements
-  pt: 473,    // pint
-  qt: 946,    // quart
-  gal: 3785,  // gallon
+  pt: 473,    // pint = 2 cups
+  qt: 946,    // quart = 4 cups
+  gal: 3785,  // gallon = 16 cups
   
   // Metric
   ml: 1,
   l: 1000
 };
 
-// Standard dry ingredient densities (grams per cup)
+// Professional dry ingredient densities (grams per cup) - Based on King Arthur and industry standards
 export const DRY_INGREDIENT_DENSITIES = {
-  // Flours
-  "all_purpose_flour": 125,
-  "bread_flour": 127,
-  "cake_flour": 114,
-  "whole_wheat_flour": 113,
-  "almond_flour": 96,
+  // Flours (scoop-and-sweep method)
+  "all_purpose_flour": 120,        // Standard AP flour
+  "bread_flour": 120,              // High-protein flour
+  "cake_flour": 120,               // Low-protein flour
+  "whole_wheat_flour": 113,        // Graham flour
+  "pastry_flour": 106,             // Medium-protein flour
+  "almond_flour": 100,             // Blanched almond flour
+  "00_pizza_flour": 116,           // Italian-style flour
+  "coconut_flour": 128,            // High-absorption flour
   
-  // Sugars
-  "granulated_sugar": 200,
-  "brown_sugar_packed": 213,
-  "brown_sugar_loose": 145,
-  "powdered_sugar": 120,
-  "confectioners_sugar": 120,
+  // Sugars (precise measurements)
+  "granulated_sugar": 198,         // White sugar
+  "brown_sugar_packed": 213,       // Light/dark brown (packed)
+  "brown_sugar_loose": 145,        // Unpacked brown sugar
+  "powdered_sugar": 160,           // Confectioners' sugar (unsifted)
+  "confectioners_sugar": 160,      // Same as powdered
   
   // Grains and cereals
   "white_rice_dry": 185,

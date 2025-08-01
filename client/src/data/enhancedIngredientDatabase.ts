@@ -42,16 +42,16 @@ export const enhancedIngredientDatabase: IngredientDatabase = {
         aliases: ["AP flour", "plain flour", "all purpose"],
         usdaQuery: "all purpose flour",
         units: {
-          cup: 125,
-          "3/4_cup": 94,
-          "2/3_cup": 83,
-          "1/2_cup": 63,
-          "1/3_cup": 42,
-          "1/4_cup": 31,
-          "1/8_cup": 16,
-          tbsp: 8,
-          tsp: 2.7,
-          oz: 28,
+          cup: 120,
+          "3/4_cup": 105,
+          "2/3_cup": 93,
+          "1/2_cup": 70,
+          "1/3_cup": 47,
+          "1/4_cup": 35,
+          "1/8_cup": 18,
+          tbsp: 9,
+          tsp: 3,
+          oz: 28.35,
           lb: 454,
           g: 1
         },
@@ -308,7 +308,7 @@ export const enhancedIngredientDatabase: IngredientDatabase = {
         aliases: ["white sugar", "table sugar", "refined sugar"],
         usdaQuery: "sugar granulated",
         units: {
-          cup: 200,
+          cup: 198,
           "3/4_cup": 150,
           "2/3_cup": 133,
           "1/2_cup": 100,
@@ -317,7 +317,7 @@ export const enhancedIngredientDatabase: IngredientDatabase = {
           "1/8_cup": 25,
           tbsp: 13,
           tsp: 4,
-          oz: 28,
+          oz: 28.35,
           lb: 454,
           g: 1
         },
@@ -334,13 +334,14 @@ export const enhancedIngredientDatabase: IngredientDatabase = {
         usdaQuery: "brown sugar",
         units: {
           cup_packed: 213,
-          "3/4_cup_packed": 160,
-          "1/2_cup_packed": 107,
-          "1/3_cup_packed": 71,
-          "1/4_cup_packed": 53,
-          tbsp: 14,
+          "3/4_cup_packed": 165,
+          "2/3_cup_packed": 145,
+          "1/2_cup_packed": 110,
+          "1/3_cup_packed": 75,
+          "1/4_cup_packed": 55,
+          tbsp: 15,
           tsp: 5,
-          oz: 28,
+          oz: 28.35,
           lb: 454,
           g: 1
         },
@@ -356,14 +357,15 @@ export const enhancedIngredientDatabase: IngredientDatabase = {
         aliases: ["pure honey", "raw honey"],
         usdaQuery: "honey",
         units: {
-          cup: 340,
-          "3/4_cup": 255,
-          "1/2_cup": 170,
-          "1/3_cup": 113,
-          "1/4_cup": 85,
-          tbsp: 21,
+          cup: 320,
+          "3/4_cup": 240,
+          "2/3_cup": 213,
+          "1/2_cup": 160,
+          "1/3_cup": 107,
+          "1/4_cup": 80,
+          tbsp: 20,
           tsp: 7,
-          oz: 28,
+          oz: 28.35,
           lb: 454,
           g: 1
         },
@@ -379,20 +381,45 @@ export const enhancedIngredientDatabase: IngredientDatabase = {
         aliases: ["confectioners sugar", "icing sugar"],
         usdaQuery: "powdered sugar",
         units: {
-          cup: 120,
-          "3/4_cup": 90,
-          "1/2_cup": 60,
-          "1/3_cup": 40,
-          "1/4_cup": 30,
-          tbsp: 8,
-          tsp: 2.5,
-          oz: 28,
+          cup: 160,
+          "3/4_cup": 120,
+          "2/3_cup": 107,
+          "1/2_cup": 80,
+          "1/3_cup": 53,
+          "1/4_cup": 40,
+          tbsp: 10,
+          tsp: 3.3,
+          oz: 28.35,
           lb: 454,
           g: 1
         },
         tags: {
           isCommon: true,
           densityType: "dry",
+          dietType: ["vegetarian", "vegan"],
+          categoryColor: "#F8E8FF"
+        }
+      },
+      "maple_syrup": {
+        displayName: "Maple Syrup",
+        aliases: ["pure maple syrup", "real maple syrup"],
+        usdaQuery: "maple syrup",
+        units: {
+          cup: 312,
+          "3/4_cup": 234,
+          "2/3_cup": 208,
+          "1/2_cup": 156,
+          "1/3_cup": 104,
+          "1/4_cup": 78,
+          tbsp: 20,
+          tsp: 7,
+          oz: 28.35,
+          lb: 454,
+          g: 1
+        },
+        tags: {
+          isCommon: true,
+          densityType: "liquid",
           dietType: ["vegetarian", "vegan"],
           categoryColor: "#F8E8FF"
         }
@@ -473,13 +500,15 @@ export const enhancedIngredientDatabase: IngredientDatabase = {
         aliases: ["raw almonds", "whole almonds"],
         usdaQuery: "almonds raw",
         units: {
-          cup_whole: 143,
-          cup_sliced: 92,
+          cup_whole: 142,
+          cup_sliced: 100,
           cup_slivered: 108,
-          "1/2_cup_whole": 72,
+          "1/2_cup_whole": 71,
           "1/4_cup_whole": 36,
-          oz: 28,
+          tbsp: 9,
+          oz: 28.35,
           "23_almonds": 28,
+          handful: 28,
           lb: 454,
           g: 1
         },
@@ -495,11 +524,15 @@ export const enhancedIngredientDatabase: IngredientDatabase = {
         aliases: ["english walnuts", "walnut halves"],
         usdaQuery: "walnuts english",
         units: {
-          cup_halves: 117,
-          cup_chopped: 120,
-          "1/2_cup_halves": 59,
-          "1/4_cup_halves": 29,
-          oz: 28,
+          cup_halves: 90,
+          cup_chopped: 113,
+          "3/4_cup_halves": 68,
+          "2/3_cup_halves": 60,
+          "1/2_cup_halves": 45,
+          "1/3_cup_halves": 30,
+          "1/4_cup_halves": 23,
+          tbsp: 7,
+          oz: 28.35,
           lb: 454,
           g: 1
         },
@@ -508,6 +541,165 @@ export const enhancedIngredientDatabase: IngredientDatabase = {
           densityType: "solid",
           dietType: ["vegetarian", "vegan", "keto", "gluten-free"],
           categoryColor: "#D4A574"
+        }
+      },
+      "peanut_butter": {
+        displayName: "Peanut Butter",
+        aliases: ["smooth peanut butter", "creamy peanut butter"],
+        usdaQuery: "peanut butter",
+        units: {
+          cup: 270,
+          "3/4_cup": 203,
+          "1/2_cup": 135,
+          "1/3_cup": 90,
+          "1/4_cup": 68,
+          tbsp: 17,
+          tsp: 6,
+          oz: 28.35,
+          lb: 454,
+          g: 1
+        },
+        tags: {
+          isCommon: true,
+          densityType: "solid",
+          dietType: ["vegetarian", "vegan"],
+          categoryColor: "#D4A574"
+        }
+      },
+      "sesame_seeds": {
+        displayName: "Sesame Seeds",
+        aliases: ["white sesame seeds", "hulled sesame seeds"],
+        usdaQuery: "sesame seeds",
+        units: {
+          cup: 144,
+          "1/2_cup": 71,
+          "1/4_cup": 36,
+          tbsp: 9,
+          tsp: 3,
+          oz: 28.35,
+          lb: 454,
+          g: 1
+        },
+        tags: {
+          isCommon: true,
+          densityType: "solid",
+          dietType: ["vegetarian", "vegan", "keto"],
+          categoryColor: "#D4A574"
+        }
+      }
+    },
+    "Baking Ingredients": {
+      "cocoa_powder": {
+        displayName: "Cocoa Powder (Unsweetened)",
+        aliases: ["unsweetened cocoa", "cocoa powder"],
+        usdaQuery: "cocoa powder unsweetened",
+        units: {
+          cup: 100,
+          "3/4_cup": 75,
+          "2/3_cup": 67,
+          "1/2_cup": 50,
+          "1/3_cup": 33,
+          "1/4_cup": 25,
+          tbsp: 6,
+          tsp: 2,
+          oz: 28.35,
+          lb: 454,
+          g: 1
+        },
+        tags: {
+          isCommon: true,
+          densityType: "dry",
+          dietType: ["vegetarian", "vegan"],
+          categoryColor: "#8B4513"
+        }
+      },
+      "baking_powder": {
+        displayName: "Baking Powder",
+        aliases: ["double acting baking powder"],
+        usdaQuery: "baking powder",
+        units: {
+          tbsp: 12,
+          "2.5_tsp": 10,
+          "2_tsp": 8,
+          "1.75_tsp": 7,
+          "1.5_tsp": 6,
+          "1.25_tsp": 5,
+          tsp: 4,
+          "0.75_tsp": 3,
+          "0.5_tsp": 2,
+          "0.25_tsp": 1,
+          oz: 28.35,
+          g: 1
+        },
+        tags: {
+          isCommon: true,
+          densityType: "dry",
+          dietType: ["vegetarian", "vegan"],
+          categoryColor: "#FFF8DC"
+        }
+      },
+      "baking_soda": {
+        displayName: "Baking Soda",
+        aliases: ["sodium bicarbonate"],
+        usdaQuery: "baking soda",
+        units: {
+          tbsp: 20,
+          "2_tsp": 14,
+          "1.75_tsp": 12,
+          "1.5_tsp": 10,
+          "1.25_tsp": 9,
+          tsp: 7,
+          "0.75_tsp": 5,
+          "0.5_tsp": 3,
+          "0.25_tsp": 2,
+          oz: 28.35,
+          g: 1
+        },
+        tags: {
+          isCommon: true,
+          densityType: "dry",
+          dietType: ["vegetarian", "vegan"],
+          categoryColor: "#FFF8DC"
+        }
+      },
+      "vanilla_extract": {
+        displayName: "Vanilla Extract",
+        aliases: ["pure vanilla extract"],
+        usdaQuery: "vanilla extract",
+        units: {
+          tbsp: 14,
+          tsp: 5,
+          "0.5_tsp": 2.5,
+          fl_oz: 30,
+          ml: 1,
+          oz: 28.35,
+          g: 1
+        },
+        tags: {
+          isCommon: true,
+          densityType: "liquid",
+          dietType: ["vegetarian", "vegan"],
+          categoryColor: "#8B4513"
+        }
+      },
+      "salt": {
+        displayName: "Salt (Table Salt)",
+        aliases: ["fine salt", "table salt", "iodized salt"],
+        usdaQuery: "salt table",
+        units: {
+          tbsp: 18,
+          tsp: 6,
+          "0.5_tsp": 3,
+          "0.25_tsp": 1.5,
+          oz: 28.35,
+          lb: 454,
+          g: 1
+        },
+        tags: {
+          isCommon: true,
+          densityType: "dry",
+          dietType: ["vegetarian", "vegan"],
+          categoryColor: "#FFFFFF"
         }
       }
     },
