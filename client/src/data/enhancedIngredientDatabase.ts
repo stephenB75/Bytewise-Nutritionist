@@ -1,8 +1,8 @@
 /**
- * Comprehensive Ingredient Database
+ * Enhanced Ingredient Database
  * 
- * Hierarchical food database with categories, units, aliases, and USDA queries
- * Supports precise unit conversions and nutritional calculations
+ * Professional cooking measurements based on Kitchen to Table and Shamrock Foods conversion charts
+ * Includes precise weight conversions, fractional measurements, and industry-standard ratios
  */
 
 export interface IngredientUnit {
@@ -34,7 +34,7 @@ export interface IngredientDatabase {
   };
 }
 
-export const ingredientDatabase: IngredientDatabase = {
+export const enhancedIngredientDatabase: IngredientDatabase = {
   categories: {
     "Flours": {
       "all_purpose_flour": {
@@ -48,6 +48,7 @@ export const ingredientDatabase: IngredientDatabase = {
           "1/2_cup": 63,
           "1/3_cup": 42,
           "1/4_cup": 31,
+          "1/8_cup": 16,
           tbsp: 8,
           tsp: 2.7,
           oz: 28,
@@ -66,10 +67,38 @@ export const ingredientDatabase: IngredientDatabase = {
         aliases: ["high protein flour", "strong flour"],
         usdaQuery: "bread flour",
         units: {
-          cup: 125,
+          cup: 127,
+          "3/4_cup": 95,
+          "1/2_cup": 64,
+          "1/3_cup": 42,
+          "1/4_cup": 32,
           tbsp: 8,
-          tsp: 2.6,
+          tsp: 2.7,
           oz: 28,
+          lb: 454,
+          g: 1
+        },
+        tags: {
+          isCommon: true,
+          densityType: "dry",
+          dietType: ["vegetarian", "vegan"],
+          categoryColor: "#F4E1A1"
+        }
+      },
+      "cake_flour": {
+        displayName: "Cake Flour",
+        aliases: ["pastry flour", "soft flour"],
+        usdaQuery: "cake flour",
+        units: {
+          cup: 114,
+          "3/4_cup": 86,
+          "1/2_cup": 57,
+          "1/3_cup": 38,
+          "1/4_cup": 29,
+          tbsp: 7,
+          tsp: 2.4,
+          oz: 28,
+          lb: 454,
           g: 1
         },
         tags: {
@@ -85,107 +114,46 @@ export const ingredientDatabase: IngredientDatabase = {
         usdaQuery: "whole wheat flour",
         units: {
           cup: 113,
+          "3/4_cup": 85,
+          "1/2_cup": 57,
+          "1/3_cup": 38,
+          "1/4_cup": 28,
           tbsp: 7,
           tsp: 2.3,
           oz: 28,
+          lb: 454,
           g: 1
         },
         tags: {
           isCommon: true,
           densityType: "dry",
           dietType: ["vegetarian", "vegan"],
-          categoryColor: "#F4E1A1"
-        }
-      },
-      "pizza_flour_00": {
-        displayName: "00 Pizza Flour",
-        aliases: ["pizza flour", "type 00 flour"],
-        usdaQuery: "pizza flour",
-        units: {
-          cup: 116,
-          tbsp: 7.25,
-          oz: 28,
-          g: 1
-        },
-        tags: {
-          isCommon: false,
-          densityType: "dry",
-          dietType: ["vegetarian", "vegan"],
-          categoryColor: "#F4E1A1"
-        }
-      },
-      "almond_flour": {
-        displayName: "Almond Flour",
-        aliases: ["almond meal", "ground almonds"],
-        usdaQuery: "almond flour",
-        units: {
-          cup: 96,
-          tbsp: 6,
-          tsp: 2,
-          oz: 28,
-          g: 1
-        },
-        tags: {
-          isCommon: true,
-          densityType: "dry",
-          dietType: ["vegetarian", "vegan", "keto", "gluten-free"],
           categoryColor: "#F4E1A1"
         }
       }
     },
-    "Oils": {
+    "Oils & Fats": {
       "olive_oil": {
         displayName: "Olive Oil",
         aliases: ["extra virgin olive oil", "EVOO"],
         usdaQuery: "olive oil",
         units: {
           cup: 216,
+          "3/4_cup": 162,
+          "2/3_cup": 144,
+          "1/2_cup": 108,
+          "1/3_cup": 72,
+          "1/4_cup": 54,
           tbsp: 14,
           tsp: 5,
-          oz: 30,
+          fl_oz: 30,
           ml: 0.92,
+          l: 920,
           g: 1
         },
         tags: {
           isCommon: true,
           densityType: "liquid",
-          dietType: ["vegetarian", "vegan", "keto"],
-          categoryColor: "#FFD580"
-        }
-      },
-      "vegetable_oil": {
-        displayName: "Vegetable Oil",
-        aliases: ["canola oil", "cooking oil"],
-        usdaQuery: "vegetable oil",
-        units: {
-          cup: 218,
-          tbsp: 14,
-          tsp: 5,
-          oz: 30,
-          ml: 0.92,
-          g: 1
-        },
-        tags: {
-          isCommon: true,
-          densityType: "liquid",
-          dietType: ["vegetarian", "vegan"],
-          categoryColor: "#FFD580"
-        }
-      },
-      "coconut_oil": {
-        displayName: "Coconut Oil",
-        aliases: ["virgin coconut oil"],
-        usdaQuery: "coconut oil",
-        units: {
-          cup: 218,
-          tbsp: 14,
-          tsp: 5,
-          oz: 28,
-          g: 1
-        },
-        tags: {
-          isCommon: true,
-          densityType: "solid",
           dietType: ["vegetarian", "vegan", "keto"],
           categoryColor: "#FFD580"
         }
@@ -214,6 +182,29 @@ export const ingredientDatabase: IngredientDatabase = {
           dietType: ["vegetarian"],
           categoryColor: "#FFD580"
         }
+      },
+      "coconut_oil": {
+        displayName: "Coconut Oil",
+        aliases: ["virgin coconut oil", "refined coconut oil"],
+        usdaQuery: "coconut oil",
+        units: {
+          cup: 218,
+          "3/4_cup": 164,
+          "1/2_cup": 109,
+          "1/3_cup": 73,
+          "1/4_cup": 55,
+          tbsp: 14,
+          tsp: 5,
+          oz: 28,
+          lb: 454,
+          g: 1
+        },
+        tags: {
+          isCommon: true,
+          densityType: "solid",
+          dietType: ["vegetarian", "vegan", "keto"],
+          categoryColor: "#FFD580"
+        }
       }
     },
     "Dairy & Eggs": {
@@ -224,8 +215,11 @@ export const ingredientDatabase: IngredientDatabase = {
         units: {
           piece: 55,
           cup: 275,
-          yolk_tbsp: 20,
-          white_tbsp: 35,
+          "1/2_cup": 138,
+          "1/4_cup": 69,
+          yolk: 20,
+          white: 35,
+          dozen: 660,
           g: 1
         },
         tags: {
@@ -246,6 +240,7 @@ export const ingredientDatabase: IngredientDatabase = {
           "1/2_cup": 122,
           "1/3_cup": 81,
           "1/4_cup": 61,
+          "1/8_cup": 30,
           tbsp: 15,
           tsp: 5,
           fl_oz: 30,
@@ -269,9 +264,13 @@ export const ingredientDatabase: IngredientDatabase = {
         usdaQuery: "heavy cream",
         units: {
           cup: 240,
+          "3/4_cup": 180,
+          "1/2_cup": 120,
+          "1/3_cup": 80,
+          "1/4_cup": 60,
           tbsp: 15,
           tsp: 5,
-          oz: 30,
+          fl_oz: 30,
           ml: 0.98,
           g: 1
         },
@@ -288,8 +287,11 @@ export const ingredientDatabase: IngredientDatabase = {
         usdaQuery: "cheddar cheese",
         units: {
           cup_shredded: 113,
+          "1/2_cup_shredded": 57,
+          "1/4_cup_shredded": 28,
           oz: 28,
           slice: 28,
+          lb: 454,
           g: 1
         },
         tags: {
@@ -297,270 +299,6 @@ export const ingredientDatabase: IngredientDatabase = {
           densityType: "solid",
           dietType: ["vegetarian"],
           categoryColor: "#FDD692"
-        }
-      },
-      "greek_yogurt": {
-        displayName: "Greek Yogurt",
-        aliases: ["strained yogurt", "greek style yogurt"],
-        usdaQuery: "greek yogurt",
-        units: {
-          cup: 227,
-          tbsp: 15,
-          container_small: 150,
-          oz: 30,
-          g: 1
-        },
-        tags: {
-          isCommon: true,
-          densityType: "solid",
-          dietType: ["vegetarian"],
-          categoryColor: "#FDD692"
-        }
-      }
-    },
-    "Proteins": {
-      "chicken_breast": {
-        displayName: "Chicken Breast",
-        aliases: ["boneless skinless chicken breast"],
-        usdaQuery: "chicken breast",
-        units: {
-          breast: 174,
-          oz: 28,
-          lb: 454,
-          g: 1
-        },
-        tags: {
-          isCommon: true,
-          densityType: "solid",
-          dietType: [],
-          categoryColor: "#FFB3BA"
-        }
-      },
-      "ground_beef": {
-        displayName: "Ground Beef (80/20)",
-        aliases: ["ground chuck", "hamburger meat"],
-        usdaQuery: "ground beef 80/20",
-        units: {
-          lb: 454,
-          oz: 28,
-          patty: 113,
-          g: 1
-        },
-        tags: {
-          isCommon: true,
-          densityType: "solid",
-          dietType: [],
-          categoryColor: "#FFB3BA"
-        }
-      },
-      "salmon": {
-        displayName: "Salmon Fillet",
-        aliases: ["atlantic salmon", "cooked salmon"],
-        usdaQuery: "salmon fillet",
-        units: {
-          fillet: 150,
-          oz: 28,
-          lb: 454,
-          g: 1
-        },
-        tags: {
-          isCommon: true,
-          densityType: "solid",
-          dietType: [],
-          categoryColor: "#FFB3BA"
-        }
-      }
-    },
-    "Vegetables": {
-      "broccoli": {
-        displayName: "Broccoli",
-        aliases: ["fresh broccoli", "broccoli florets"],
-        usdaQuery: "broccoli fresh",
-        units: {
-          cup_chopped: 91,
-          head: 608,
-          spear: 31,
-          oz: 28,
-          g: 1
-        },
-        tags: {
-          isCommon: true,
-          densityType: "solid",
-          dietType: ["vegetarian", "vegan"],
-          categoryColor: "#B5EAD7"
-        }
-      },
-      "spinach": {
-        displayName: "Spinach",
-        aliases: ["fresh spinach", "baby spinach"],
-        usdaQuery: "spinach fresh",
-        units: {
-          cup: 30,
-          bunch: 340,
-          bag: 142,
-          oz: 28,
-          g: 1
-        },
-        tags: {
-          isCommon: true,
-          densityType: "solid",
-          dietType: ["vegetarian", "vegan"],
-          categoryColor: "#B5EAD7"
-        }
-      },
-      "onion": {
-        displayName: "Onion",
-        aliases: ["yellow onion", "white onion"],
-        usdaQuery: "onion raw",
-        units: {
-          medium: 110,
-          large: 150,
-          cup_chopped: 160,
-          oz: 28,
-          g: 1
-        },
-        tags: {
-          isCommon: true,
-          densityType: "solid",
-          dietType: ["vegetarian", "vegan"],
-          categoryColor: "#B5EAD7"
-        }
-      }
-    },
-    "Fruits": {
-      "apple": {
-        displayName: "Apple",
-        aliases: ["red apple", "green apple", "gala apple"],
-        usdaQuery: "apple fresh",
-        units: {
-          medium: 182,
-          large: 223,
-          cup_sliced: 109,
-          oz: 28,
-          g: 1
-        },
-        tags: {
-          isCommon: true,
-          densityType: "solid",
-          dietType: ["vegetarian", "vegan"],
-          categoryColor: "#FFB3E6"
-        }
-      },
-      "banana": {
-        displayName: "Banana",
-        aliases: ["fresh banana", "ripe banana"],
-        usdaQuery: "banana fresh",
-        units: {
-          medium: 118,
-          large: 136,
-          cup_sliced: 150,
-          oz: 28,
-          g: 1
-        },
-        tags: {
-          isCommon: true,
-          densityType: "solid",
-          dietType: ["vegetarian", "vegan"],
-          categoryColor: "#FFB3E6"
-        }
-      },
-      "blueberries": {
-        displayName: "Blueberries",
-        aliases: ["fresh blueberries", "wild blueberries"],
-        usdaQuery: "blueberries fresh",
-        units: {
-          cup: 148,
-          pint: 290,
-          oz: 28,
-          g: 1
-        },
-        tags: {
-          isCommon: true,
-          densityType: "solid",
-          dietType: ["vegetarian", "vegan"],
-          categoryColor: "#FFB3E6"
-        }
-      }
-    },
-    "Grains": {
-      "white_rice": {
-        displayName: "White Rice",
-        aliases: ["long grain rice", "jasmine rice"],
-        usdaQuery: "white rice cooked",
-        units: {
-          cup_cooked: 158,
-          cup_dry: 185,
-          "3/4_cup_cooked": 119,
-          "1/2_cup_cooked": 79,
-          "1/3_cup_cooked": 53,
-          "1/4_cup_cooked": 40,
-          tbsp: 10,
-          oz: 28,
-          lb: 454,
-          g: 1
-        },
-        tags: {
-          isCommon: true,
-          densityType: "solid",
-          dietType: ["vegetarian", "vegan"],
-          categoryColor: "#F4E4BC"
-        }
-      },
-      "quinoa": {
-        displayName: "Quinoa",
-        aliases: ["cooked quinoa", "quinoa grain"],
-        usdaQuery: "quinoa cooked",
-        units: {
-          cup_cooked: 185,
-          cup_dry: 170,
-          oz: 28,
-          g: 1
-        },
-        tags: {
-          isCommon: true,
-          densityType: "solid",
-          dietType: ["vegetarian", "vegan", "gluten-free"],
-          categoryColor: "#F4E4BC"
-        }
-      },
-      "pasta": {
-        displayName: "Pasta",
-        aliases: ["spaghetti", "penne", "macaroni"],
-        usdaQuery: "pasta cooked",
-        units: {
-          cup_cooked: 124,
-          oz_dry: 28,
-          serving_dry: 56,
-          g: 1
-        },
-        tags: {
-          isCommon: true,
-          densityType: "solid",
-          dietType: ["vegetarian", "vegan"],
-          categoryColor: "#F4E4BC"
-        }
-      },
-      "oats": {
-        displayName: "Rolled Oats",
-        aliases: ["old fashioned oats", "oatmeal", "quick oats"],
-        usdaQuery: "oats rolled dry",
-        units: {
-          cup: 81,
-          "3/4_cup": 61,
-          "1/2_cup": 41,
-          "1/3_cup": 27,
-          "1/4_cup": 20,
-          tbsp: 5,
-          tsp: 1.7,
-          oz: 28,
-          lb: 454,
-          g: 1
-        },
-        tags: {
-          isCommon: true,
-          densityType: "dry",
-          dietType: ["vegetarian", "vegan", "gluten-free"],
-          categoryColor: "#F4E4BC"
         }
       }
     },
@@ -576,6 +314,7 @@ export const ingredientDatabase: IngredientDatabase = {
           "1/2_cup": 100,
           "1/3_cup": 67,
           "1/4_cup": 50,
+          "1/8_cup": 25,
           tbsp: 13,
           tsp: 4,
           oz: 28,
@@ -633,6 +372,98 @@ export const ingredientDatabase: IngredientDatabase = {
           densityType: "liquid",
           dietType: ["vegetarian"],
           categoryColor: "#F8E8FF"
+        }
+      },
+      "powdered_sugar": {
+        displayName: "Powdered Sugar",
+        aliases: ["confectioners sugar", "icing sugar"],
+        usdaQuery: "powdered sugar",
+        units: {
+          cup: 120,
+          "3/4_cup": 90,
+          "1/2_cup": 60,
+          "1/3_cup": 40,
+          "1/4_cup": 30,
+          tbsp: 8,
+          tsp: 2.5,
+          oz: 28,
+          lb: 454,
+          g: 1
+        },
+        tags: {
+          isCommon: true,
+          densityType: "dry",
+          dietType: ["vegetarian", "vegan"],
+          categoryColor: "#F8E8FF"
+        }
+      }
+    },
+    "Grains": {
+      "white_rice": {
+        displayName: "White Rice",
+        aliases: ["long grain rice", "jasmine rice"],
+        usdaQuery: "white rice cooked",
+        units: {
+          cup_cooked: 158,
+          cup_dry: 185,
+          "3/4_cup_cooked": 119,
+          "1/2_cup_cooked": 79,
+          "1/3_cup_cooked": 53,
+          "1/4_cup_cooked": 40,
+          tbsp: 10,
+          oz: 28,
+          lb: 454,
+          g: 1
+        },
+        tags: {
+          isCommon: true,
+          densityType: "solid",
+          dietType: ["vegetarian", "vegan"],
+          categoryColor: "#F4E4BC"
+        }
+      },
+      "quinoa": {
+        displayName: "Quinoa",
+        aliases: ["cooked quinoa", "quinoa grain"],
+        usdaQuery: "quinoa cooked",
+        units: {
+          cup_cooked: 185,
+          cup_dry: 170,
+          "1/2_cup_cooked": 93,
+          "1/3_cup_cooked": 62,
+          "1/4_cup_cooked": 46,
+          oz: 28,
+          lb: 454,
+          g: 1
+        },
+        tags: {
+          isCommon: true,
+          densityType: "solid",
+          dietType: ["vegetarian", "vegan", "gluten-free"],
+          categoryColor: "#F4E4BC"
+        }
+      },
+      "oats": {
+        displayName: "Rolled Oats",
+        aliases: ["old fashioned oats", "oatmeal", "quick oats"],
+        usdaQuery: "oats rolled dry",
+        units: {
+          cup: 81,
+          "3/4_cup": 61,
+          "1/2_cup": 41,
+          "1/3_cup": 27,
+          "1/4_cup": 20,
+          tbsp: 5,
+          tsp: 1.7,
+          oz: 28,
+          lb: 454,
+          g: 1
+        },
+        tags: {
+          isCommon: true,
+          densityType: "dry",
+          dietType: ["vegetarian", "vegan", "gluten-free"],
+          categoryColor: "#F4E4BC"
         }
       }
     },
@@ -726,8 +557,8 @@ export const ingredientDatabase: IngredientDatabase = {
   }
 };
 
-// Utility functions for working with the ingredient database
-export class IngredientDatabaseManager {
+// Enhanced database manager with professional conversion utilities
+export class EnhancedIngredientDatabaseManager {
   
   /**
    * Search for ingredients across all categories
@@ -740,7 +571,7 @@ export class IngredientDatabaseManager {
     const results: Array<{category: string; key: string; data: IngredientData}> = [];
     const searchTerm = query.toLowerCase();
     
-    Object.entries(ingredientDatabase.categories).forEach(([categoryName, category]) => {
+    Object.entries(enhancedIngredientDatabase.categories).forEach(([categoryName, category]) => {
       Object.entries(category).forEach(([ingredientKey, ingredientData]) => {
         // Search in display name
         if (ingredientData.displayName.toLowerCase().includes(searchTerm)) {
@@ -756,18 +587,25 @@ export class IngredientDatabaseManager {
       });
     });
     
-    return results;
+    return results.sort((a, b) => {
+      // Prioritize common ingredients
+      if (a.data.tags.isCommon && !b.data.tags.isCommon) return -1;
+      if (!a.data.tags.isCommon && b.data.tags.isCommon) return 1;
+      
+      // Then by display name
+      return a.data.displayName.localeCompare(b.data.displayName);
+    });
   }
   
   /**
    * Get ingredient by category and key
    */
   static getIngredient(category: string, key: string): IngredientData | null {
-    return ingredientDatabase.categories[category]?.[key] || null;
+    return enhancedIngredientDatabase.categories[category]?.[key] || null;
   }
   
   /**
-   * Convert between units for an ingredient
+   * Convert between units for an ingredient using professional ratios
    */
   static convertUnits(
     category: string, 
@@ -775,7 +613,7 @@ export class IngredientDatabaseManager {
     fromAmount: number, 
     fromUnit: string, 
     toUnit: string
-  ): number | null {
+  ): { amount: number; precision: 'exact' | 'approximate' } | null {
     const ingredient = this.getIngredient(category, key);
     if (!ingredient) return null;
     
@@ -786,7 +624,32 @@ export class IngredientDatabaseManager {
     
     // Convert to grams first, then to target unit
     const gramsAmount = fromAmount * fromGrams;
-    return gramsAmount / toGrams;
+    const result = gramsAmount / toGrams;
+    
+    // Determine precision based on measurement type
+    const precision = this.isPreciseMeasurement(fromUnit, toUnit) ? 'exact' : 'approximate';
+    
+    return { amount: result, precision };
+  }
+  
+  /**
+   * Check if conversion between units is considered precise
+   */
+  private static isPreciseMeasurement(fromUnit: string, toUnit: string): boolean {
+    const preciseUnits = ['g', 'oz', 'lb', 'ml', 'l'];
+    const volumeUnits = ['cup', 'tbsp', 'tsp'];
+    
+    // Gram/ounce conversions are precise
+    if (preciseUnits.includes(fromUnit) && preciseUnits.includes(toUnit)) {
+      return true;
+    }
+    
+    // Volume to volume within same system is precise
+    if (volumeUnits.some(u => fromUnit.includes(u)) && volumeUnits.some(u => toUnit.includes(u))) {
+      return true;
+    }
+    
+    return false;
   }
   
   /**
@@ -794,25 +657,55 @@ export class IngredientDatabaseManager {
    */
   static getAvailableUnits(category: string, key: string): string[] {
     const ingredient = this.getIngredient(category, key);
-    return ingredient ? Object.keys(ingredient.units) : [];
+    return ingredient ? Object.keys(ingredient.units).sort() : [];
   }
   
   /**
    * Get all categories
    */
   static getCategories(): string[] {
-    return Object.keys(ingredientDatabase.categories);
+    return Object.keys(enhancedIngredientDatabase.categories);
   }
   
   /**
    * Get all ingredients in a category
    */
   static getCategoryIngredients(category: string): {key: string; data: IngredientData}[] {
-    const categoryData = ingredientDatabase.categories[category];
+    const categoryData = enhancedIngredientDatabase.categories[category];
     if (!categoryData) return [];
     
-    return Object.entries(categoryData).map(([key, data]) => ({ key, data }));
+    return Object.entries(categoryData).map(([key, data]) => ({ key, data }))
+      .sort((a, b) => {
+        // Common ingredients first
+        if (a.data.tags.isCommon && !b.data.tags.isCommon) return -1;
+        if (!a.data.tags.isCommon && b.data.tags.isCommon) return 1;
+        return a.data.displayName.localeCompare(b.data.displayName);
+      });
+  }
+  
+  /**
+   * Get conversion suggestions for better measurements
+   */
+  static getConversionSuggestions(category: string, key: string, unit: string): string[] {
+    const ingredient = this.getIngredient(category, key);
+    if (!ingredient) return [];
+    
+    const suggestions: string[] = [];
+    const densityType = ingredient.tags.densityType;
+    
+    // Suggest common alternatives based on density type
+    if (densityType === 'dry') {
+      if (unit !== 'cup') suggestions.push('cup');
+      if (unit !== 'g') suggestions.push('g');
+      if (unit !== 'oz') suggestions.push('oz');
+    } else if (densityType === 'liquid') {
+      if (unit !== 'cup') suggestions.push('cup');
+      if (unit !== 'ml') suggestions.push('ml');
+      if (unit !== 'fl_oz') suggestions.push('fl_oz');
+    }
+    
+    return suggestions.filter(s => ingredient.units[s]);
   }
 }
 
-export default ingredientDatabase;
+export default enhancedIngredientDatabase;

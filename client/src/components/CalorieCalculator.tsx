@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { IngredientDatabaseManager, type IngredientData } from '@/data/ingredientDatabase';
+import { EnhancedIngredientDatabaseManager, type IngredientData } from '@/data/enhancedIngredientDatabase';
 import { 
   Search, 
   Calculator, 
@@ -75,7 +75,7 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
   // Search ingredients as user types
   useEffect(() => {
     if (ingredient.length >= 2) {
-      const suggestions = IngredientDatabaseManager.searchIngredients(ingredient);
+      const suggestions = EnhancedIngredientDatabaseManager.searchIngredients(ingredient);
       setIngredientSuggestions(suggestions.slice(0, 8)); // Limit to 8 suggestions
     } else {
       setIngredientSuggestions([]);
@@ -85,7 +85,7 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
   // Update available units when ingredient is selected
   useEffect(() => {
     if (selectedIngredient) {
-      const units = IngredientDatabaseManager.getAvailableUnits(
+      const units = EnhancedIngredientDatabaseManager.getAvailableUnits(
         selectedIngredient.category, 
         selectedIngredient.key
       );
@@ -466,7 +466,7 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
               )}
               
               <p className="text-xs text-gray-500 mt-1">
-                Database includes {Object.keys(IngredientDatabaseManager.getCategories()).length} categories with precise unit conversions
+                Enhanced database with {Object.keys(EnhancedIngredientDatabaseManager.getCategories()).length} categories and professional measurement conversions
               </p>
             </div>
             
