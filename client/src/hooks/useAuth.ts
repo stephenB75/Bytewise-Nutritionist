@@ -19,22 +19,25 @@ export function useAuth() {
   const [error, setError] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
-  // Check if Supabase is properly configured
-  const isConfigured = config.supabase.isConfigured;
+  // Check if Supabase credentials exist
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+  const isConfigured = !!(supabaseUrl && supabaseKey && supabaseUrl.includes('supabase.co'));
 
   // Get user profile data
   const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: ['user-profile', user?.id],
     queryFn: () => userApi.getCurrentUser(),
-    enabled: !!user,
+    enabled: !!user && isConfigured,
     retry: false,
   });
 
   useEffect(() => {
     // Skip auth setup if not configured
     if (!isConfigured) {
+      console.warn('Supabase not configured. URL:', !!supabaseUrl, 'Key:', !!supabaseKey);
       setLoading(false);
-      setError('Supabase not configured');
+      setError('Authentication service not configured. Please check credentials.');
       return;
     }
 

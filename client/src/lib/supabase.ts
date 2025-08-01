@@ -7,12 +7,22 @@ import { createClient } from '@supabase/supabase-js';
 import type { Database } from '../types/database';
 import { config } from './config';
 
-// Use configuration with safe fallbacks
-const finalUrl = config.supabase.isConfigured ? config.supabase.url : config.fallback.supabaseUrl;
-const finalKey = config.supabase.isConfigured ? config.supabase.anonKey : config.fallback.supabaseKey;
+// Direct environment variable access (more reliable than config layer)
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-// Create Supabase client
-export const supabase = createClient<Database>(finalUrl, finalKey, {
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error('Missing Supabase credentials:', { 
+    hasUrl: !!supabaseUrl, 
+    hasKey: !!supabaseAnonKey 
+  });
+}
+
+// Create Supabase client with direct credentials
+export const supabase = createClient<Database>(
+  supabaseUrl || 'https://placeholder.supabase.co',
+  supabaseAnonKey || 'placeholder-key',
+  {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
