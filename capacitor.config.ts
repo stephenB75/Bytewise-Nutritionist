@@ -3,7 +3,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 const config: CapacitorConfig = {
   appId: 'com.bytewise.nutritionist',
   appName: 'ByteWise Nutritionist',
-  webDir: 'dist/public',
+  webDir: 'dist',
   bundledWebRuntime: false,
   backgroundColor: '#fef7cd',
   
