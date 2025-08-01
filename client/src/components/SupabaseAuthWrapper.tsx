@@ -137,7 +137,7 @@ export function SupabaseAuthWrapper({ children, onNavigate }: SupabaseAuthWrappe
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="pr-10 pl-8"
+                  className="pr-10 pl-2"
                   placeholder="Enter your email"
                 />
                 <Mail className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -154,7 +154,7 @@ export function SupabaseAuthWrapper({ children, onNavigate }: SupabaseAuthWrappe
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   minLength={6}
-                  className="pr-10 pl-8"
+                  className="pr-10 pl-2"
                   placeholder="Enter your password"
                 />
                 <Lock className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
