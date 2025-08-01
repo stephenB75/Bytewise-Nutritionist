@@ -2,7 +2,7 @@
  * Simple Login Screen Component
  * 
  * Clean authentication interface with food background image
- * Features simple sign-in popup with Replit OIDC integration
+ * Features simple sign-in popup with Supabase authentication
  */
 
 import { useState } from 'react';
@@ -87,7 +87,7 @@ function LoginScreen({ onNavigate }: LoginScreenProps) {
 
             {/* Simple footer */}
             <p className="text-xs text-gray-500 text-center mt-6">
-              Secure authentication powered by Replit
+              Secure authentication powered by Supabase
             </p>
           </Card>
 

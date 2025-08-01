@@ -110,17 +110,17 @@ export default function Landing({ onNavigateToForgotPassword }: LandingProps) {
             </div>
             
             <Button 
-              onClick={() => window.location.href = '/api/login'}
+              onClick={() => window.location.href = '/working'}
               className="w-full h-14 text-lg font-semibold touch-target btn-animate group bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-black shadow-lg hover:shadow-xl"
               size="lg"
               style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "1.125rem", fontWeight: 600 }}
             >
-              Sign In with Replit
+              Sign In to Bytewise
               <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Button>
             
             <p className="text-gray-500 text-xs text-center mt-4">
-              Secure authentication powered by Replit
+              Secure authentication powered by Supabase
             </p>
           </div>
         </div>
