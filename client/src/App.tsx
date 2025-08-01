@@ -5,10 +5,10 @@
  * Features brand-compliant design and seamless navigation
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from '@/lib/queryClient';
-import { SupabaseAuthWrapper } from './components/SupabaseAuthWrapper';
+import { AuthWrapper } from './components/AuthWrapper';
 import { Header } from './components/Header';
 import { Navigation } from './components/Navigation';
 import { NotificationDropdown } from './components/NotificationDropdown';
@@ -44,8 +44,8 @@ export default function App() {
   };
 
   const handleLogout = () => {
-    // Logout will be handled by the Header component directly via useAuth hook
-    console.log('Logout triggered from App component');
+    // Redirect to logout endpoint
+    window.location.href = '/api/logout';
   };
 
   // Add global notification event listeners
@@ -104,7 +104,7 @@ export default function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <SupabaseAuthWrapper onNavigate={handleNavigate}>
+      <AuthWrapper onNavigate={handleNavigate}>
         <div className="min-h-screen bg-background">
           {/* Global Notification Dropdown */}
           <NotificationDropdown
@@ -122,6 +122,7 @@ export default function App() {
             onNavigate={handleNavigate}
             showNotifications={true}
             notificationCount={notificationCount}
+            onLogout={handleLogout}
           />
 
           {/* Main Content Area with top/bottom padding for fixed elements */}
@@ -139,7 +140,7 @@ export default function App() {
           <PWAInstallPrompt />
           <IOSInstallInstructions />
         </div>
-      </SupabaseAuthWrapper>
+      </AuthWrapper>
     </QueryClientProvider>
   );
 }

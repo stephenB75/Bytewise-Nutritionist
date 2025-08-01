@@ -10,13 +10,13 @@ import { NewLogoBrand } from './NewLogoBrand';
 import { Bell, Settings, Search, LogOut } from 'lucide-react';
 import { Button } from './ui/button';
 import { NotificationDropdown } from './NotificationDropdown';
-import { useAuth } from '@/hooks/useAuth';
 
 interface HeaderProps {
   currentPage: string;
   onNavigate: (page: string, section?: string) => void;
   showNotifications?: boolean;
   notificationCount?: number;
+  onLogout?: () => void;
 }
 
 export function Header({ 
@@ -26,7 +26,6 @@ export function Header({
   notificationCount = 0,
   onLogout
 }: HeaderProps) {
-  const { signOut } = useAuth();
   const [isNotificationDropdownOpen, setIsNotificationDropdownOpen] = useState(false);
   const [notifications, setNotifications] = useState([
     {
@@ -149,15 +148,17 @@ export function Header({
               <Settings size={20} className="text-gray-700" />
             </Button>
             
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-16 w-16 p-0 touch-target hover:bg-accent/80 transition-all duration-200"
-              onClick={() => signOut()}
-              title="Sign Out"
-            >
-              <LogOut size={20} className="text-gray-700" />
-            </Button>
+            {onLogout && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-16 w-16 p-0 touch-target hover:bg-accent/80 transition-all duration-200"
+                onClick={onLogout}
+                title="Sign Out"
+              >
+                <LogOut size={20} className="text-gray-700" />
+              </Button>
+            )}
           </div>
         </div>
       </div>

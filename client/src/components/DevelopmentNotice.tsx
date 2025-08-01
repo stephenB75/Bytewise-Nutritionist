@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ExternalLink, Database, Key, CheckCircle } from 'lucide-react';
 import { config } from '@/lib/config';
-import { SetupProgress } from './SetupProgress';
 
 export function DevelopmentNotice() {
   const hasSupabaseUrl = !!config.supabase.url;
@@ -115,10 +114,6 @@ export function DevelopmentNotice() {
           </p>
         </div>
       </Card>
-
-      <div className="mt-6">
-        <SetupProgress />
-      </div>
     </div>
   );
 }

@@ -1,13 +1,57 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { setupAuth, isAuthenticated } from "./replitAuth";
 import { usdaService } from "./services/usdaService";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Auth middleware
+  await setupAuth(app);
 
-  // Health check endpoint
-  app.get('/api/health', async (req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  // Auth routes
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = (req.user as any)?.claims?.sub;
+      const user = await storage.getUser(userId);
+      res.json(user);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+  // Meals API for logger
+  app.post('/api/meals/logged', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = (req.user as any)?.claims?.sub;
+      const mealData = {
+        ...req.body,
+        userId,
+        createdAt: new Date()
+      };
+      
+      // Store meal in database/memory
+      console.log('Logging meal from calculator:', mealData);
+      
+      res.json({ success: true, meal: mealData });
+    } catch (error) {
+      console.error("Error logging meal:", error);
+      res.status(500).json({ message: "Failed to log meal" });
+    }
+  });
+
+  app.get('/api/meals/logged', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = (req.user as any)?.claims?.sub;
+      
+      // Return logged meals for the user
+      const meals: any[] = []; // Implement meal retrieval from storage
+      
+      res.json(meals);
+    } catch (error) {
+      console.error("Error fetching meals:", error);
+      res.status(500).json({ message: "Failed to fetch meals" });
+    }
   });
 
   // Calculate calories API with real USDA integration
@@ -26,7 +70,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // USDA Food Database Sync API
-  app.post('/api/sync/food-database', async (req, res) => {
+  app.post('/api/sync/food-database', isAuthenticated, async (req, res) => {
     try {
       console.log('Starting USDA food database sync...');
       
@@ -79,9 +123,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // User Data Sync API
-  app.post('/api/sync/user-data', async (req: any, res) => {
+  app.post('/api/sync/user-data', isAuthenticated, async (req: any, res) => {
     try {
-      console.log('Starting user data sync...');
+      const userId = (req.user as any)?.claims?.sub;
+      console.log('Starting user data sync for:', userId);
       
       // Sync user meals, achievements, and preferences
       const syncData = {

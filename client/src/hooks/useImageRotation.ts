@@ -5,7 +5,7 @@
  * Detects when the app is opened or closed and triggers image rotation
  */
 
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { resetImageRotation, isImageRotationEnabled } from '@/utils/foodImageRotation';
 
 export function useImageRotation() {
