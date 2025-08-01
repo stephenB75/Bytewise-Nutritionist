@@ -169,20 +169,12 @@ function LoginScreen({ onNavigate }: LoginScreenProps) {
       <div className="relative z-30 min-h-screen flex items-center justify-center p-6">
         <div className="w-full max-w-md">
           
-          {/* Logo */}
-          <div className="text-center mb-8">
-            <NewLogoBrand size="xl" className="drop-shadow-lg" />
-          </div>
-
           {/* Login Card */}
           <Card className="p-8 bg-white/95 backdrop-blur-md border-0 shadow-2xl">
             <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <LogIn className="w-8 h-8 text-white" />
+              <div className="mb-4">
+                <NewLogoBrand size="lg" />
               </div>
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                {getTitle()}
-              </h1>
               <p className="text-gray-600">
                 {getSubtitle()}
               </p>

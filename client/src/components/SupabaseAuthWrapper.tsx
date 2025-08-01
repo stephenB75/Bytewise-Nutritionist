@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useState } from 'react';
 import { Loader2, Mail, Lock, User, Github } from 'lucide-react';
+import { NewLogoBrand } from '@/components/NewLogoBrand';
 
 interface SupabaseAuthWrapperProps {
   children: React.ReactNode;
@@ -85,10 +86,9 @@ export function SupabaseAuthWrapper({ children, onNavigate }: SupabaseAuthWrappe
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
         <Card className="w-full max-w-sm p-6 bg-white/90 backdrop-blur-sm border-white/20 shadow-xl">
           <div className="text-center mb-6">
-            <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <div className="text-white text-2xl font-bold">B</div>
+            <div className="mb-4">
+              <NewLogoBrand size="lg" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">Bytewise</h1>
             <p className="text-gray-600 mt-1">
               {isSignUp ? 'Create your nutrition tracking account' : 'Sign in to your nutrition tracker'}
             </p>
