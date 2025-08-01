@@ -10,7 +10,11 @@ export const config = {
   supabase: {
     url: env.VITE_SUPABASE_URL || '',
     anonKey: env.VITE_SUPABASE_ANON_KEY || '',
-    isConfigured: !!(env.VITE_SUPABASE_URL && env.VITE_SUPABASE_ANON_KEY),
+    // For demo purposes, require both URL and key to be properly configured
+    // This enables demo mode when not fully set up
+    isConfigured: !!(env.VITE_SUPABASE_URL && env.VITE_SUPABASE_ANON_KEY && 
+                    env.VITE_SUPABASE_URL.includes('supabase.co') && 
+                    env.VITE_SUPABASE_ANON_KEY.length > 100),
   },
   
   // USDA API configuration

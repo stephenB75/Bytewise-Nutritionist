@@ -3,18 +3,7 @@
  * Provides safe access to environment variables with TypeScript support
  */
 
-declare global {
-  interface ImportMeta {
-    env: {
-      VITE_SUPABASE_URL?: string;
-      VITE_SUPABASE_ANON_KEY?: string;
-      VITE_USDA_API_KEY?: string;
-      VITE_DEVELOPMENT_MODE?: string;
-      DEV?: boolean;
-      PROD?: boolean;
-    };
-  }
-}
+// Environment variables are handled by Vite automatically
 
 export const env = {
   VITE_SUPABASE_URL: typeof import.meta !== 'undefined' ? import.meta.env?.VITE_SUPABASE_URL : undefined,

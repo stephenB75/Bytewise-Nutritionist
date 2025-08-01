@@ -18,9 +18,11 @@ interface AuthWrapperProps {
 export function AuthWrapper({ children, onNavigate }: AuthWrapperProps) {
   const { isAuthenticated, loading, isConfigured, error } = useAuth();
 
-  // Show setup notice if Supabase is not configured
-  if (!isConfigured && !loading) {
-    return <DevelopmentNotice />;
+  // For demo purposes, bypass authentication if Supabase is not configured
+  // This allows users to experience the full Bytewise app
+  if (!isConfigured) {
+    console.log('🚀 Running Bytewise in demo mode - full app access enabled');
+    return <>{children}</>;
   }
 
   // Loading screen
@@ -36,7 +38,7 @@ export function AuthWrapper({ children, onNavigate }: AuthWrapperProps) {
     );
   }
 
-  // Show login screen if not authenticated
+  // Show login screen if not authenticated (when Supabase is configured)
   if (!isAuthenticated) {
     return <LoginScreen onNavigate={onNavigate} />;
   }
