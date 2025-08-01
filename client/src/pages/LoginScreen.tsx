@@ -9,10 +9,11 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
 import { LogIn, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { NewLogoBrand } from '@/components/NewLogoBrand';
 import { supabase } from '@/lib/supabase';
-import dishImage from '@assets/food-3262796_1920_1753859530086.jpg';
+import { useRotatingBackground } from '@/hooks/useRotatingBackground';
 
 interface LoginScreenProps {
   onNavigate: (page: string) => void;
@@ -26,6 +27,9 @@ function LoginScreen({ onNavigate }: LoginScreenProps) {
   const [mode, setMode] = useState<'login' | 'signup' | 'forgot'>('login');
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  
+  // Rotating background system
+  const { currentImage, currentTheme, currentAlt, isLoading: imageLoading } = useRotatingBackground();
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -139,17 +143,24 @@ function LoginScreen({ onNavigate }: LoginScreenProps) {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Food Background Image */}
+      {/* Rotating Food Background Image */}
       <div 
-        className="absolute inset-0 z-0"
+        className={`absolute inset-0 z-0 transition-opacity duration-500 ${imageLoading ? 'opacity-0' : 'opacity-100'}`}
         style={{
-          backgroundImage: `url(${dishImage})`,
+          backgroundImage: `url(${currentImage})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
           filter: 'blur(2px) brightness(0.6)'
         }}
+        role="img"
+        aria-label={currentAlt}
       />
+      
+      {/* Loading state for background */}
+      {imageLoading && (
+        <div className="absolute inset-0 z-0 bg-gradient-to-br from-emerald-500 to-blue-600" />
+      )}
       
       {/* Overlay for better readability */}
       <div className="absolute inset-0 z-5 bg-black/20" />
@@ -347,6 +358,13 @@ function LoginScreen({ onNavigate }: LoginScreenProps) {
             <p className="text-xs text-gray-500 text-center mt-6">
               Secure authentication powered by Supabase
             </p>
+            
+            {/* Background theme indicator */}
+            <div className="text-center mt-2">
+              <Badge variant="outline" className="text-xs bg-white/80">
+                {currentTheme.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())} Theme
+              </Badge>
+            </div>
           </Card>
         </div>
       </div>
