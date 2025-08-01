@@ -28,30 +28,33 @@ export function DataManagementPanel() {
   const handleExportData = async () => {
     setIsExporting(true);
     try {
-      // Generate PDF report using jsPDF
-      const response = await fetch('/api/export/pdf', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ format: 'pdf', includeImages: true }),
-        credentials: 'include'
-      });
+      // Import and use the PDF export utility
+      const { generateProgressReportPDF } = await import('@/utils/pdfExport');
+      const success = await generateProgressReportPDF();
       
-      if (response.ok) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `bytewise-nutrition-report-${new Date().toISOString().split('T')[0]}.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
+      if (success) {
+        // Show success toast
+        const toastEvent = new CustomEvent('show-toast', {
+          detail: { 
+            message: 'Progress report downloaded successfully!',
+            type: 'success' 
+          }
+        });
+        window.dispatchEvent(toastEvent);
       } else {
-        throw new Error('Export failed');
+        throw new Error('PDF generation failed');
       }
     } catch (error) {
       console.error('Export failed:', error);
-      alert('Export failed. Please try again.');
+      
+      // Show error toast
+      const toastEvent = new CustomEvent('show-toast', {
+        detail: { 
+          message: 'Export failed. Please try again.',
+          type: 'error' 
+        }
+      });
+      window.dispatchEvent(toastEvent);
     } finally {
       setIsExporting(false);
     }

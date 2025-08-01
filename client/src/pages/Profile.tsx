@@ -196,9 +196,9 @@ export default function Profile({ onNavigate, onLogout }: ProfileProps) {
                 setIsEditingProfile(!isEditingProfile);
                 setTempProfile(userProfile);
               }}
-              className="border-blue-600 text-blue-600 hover:bg-blue-50"
+              className="slide-button border-blue-600 text-blue-600 hover:bg-blue-50"
             >
-              <Edit size={16} className="mr-1" />
+              <Edit size={16} className="mr-2" />
               {isEditingProfile ? 'Cancel Edit' : 'Edit Profile'}
             </Button>
           </div>
@@ -243,16 +243,16 @@ export default function Profile({ onNavigate, onLogout }: ProfileProps) {
                 <Button 
                   size="sm" 
                   onClick={saveProfile}
-                  className="text-brand-button"
+                  className="slide-button text-brand-button"
                 >
-                  <Save size={16} className="mr-1" />
+                  <Save size={16} className="mr-2" />
                   Save
                 </Button>
                 <Button 
                   variant="outline" 
                   size="sm"
                   onClick={() => setIsEditingProfile(false)}
-                  className="text-brand-button"
+                  className="slide-button text-brand-button"
                 >
                   Cancel
                 </Button>
@@ -483,9 +483,9 @@ export default function Profile({ onNavigate, onLogout }: ProfileProps) {
                 console.log('Showing all achievements');
                 setShowAllAchievements(true);
               }}
-              className="border-yellow-600 text-yellow-600 hover:bg-yellow-50"
+              className="slide-button border-yellow-600 text-yellow-600 hover:bg-yellow-50"
             >
-              <Trophy className="w-4 h-4 mr-1" />
+              <Trophy className="w-4 h-4 mr-2" />
               View All Achievements ({achievements.length})
             </Button>
           </div>
@@ -512,8 +512,8 @@ export default function Profile({ onNavigate, onLogout }: ProfileProps) {
                   <p className="font-medium text-brand-subheading">Dark Mode</p>
                   <p className="text-sm text-muted-foreground text-brand-body">Switch to dark theme</p>
                 </div>
-                <Button variant="outline" size="sm" className="text-brand-button">
-                  <Palette size={16} className="mr-1" />
+                <Button variant="outline" size="sm" className="slide-button text-brand-button">
+                  <Palette size={16} className="mr-2" />
                   Theme
                 </Button>
               </div>
@@ -586,19 +586,19 @@ export default function Profile({ onNavigate, onLogout }: ProfileProps) {
           <div className="space-y-3">
             <Button 
               variant="outline" 
-              className="w-full justify-start text-brand-button"
+              className="slide-button w-full justify-start text-brand-button"
               onClick={() => onNavigate('dashboard')}
             >
-              <TrendingUp className="mr-2" size={16} />
+              <TrendingUp className="mr-3" size={16} />
               View Dashboard
             </Button>
             
             <Button 
               variant="outline" 
-              className="w-full justify-start text-brand-button"
+              className="slide-button w-full justify-start text-brand-button"
               onClick={() => onNavigate('planner')}
             >
-              <Calendar className="mr-2" size={16} />
+              <Calendar className="mr-3" size={16} />
               Meal Planner
             </Button>
             
@@ -607,10 +607,10 @@ export default function Profile({ onNavigate, onLogout }: ProfileProps) {
             {onLogout && (
               <Button 
                 variant="destructive" 
-                className="w-full justify-start"
+                className="slide-button w-full justify-start"
                 onClick={onLogout}
               >
-                <LogOut className="mr-2" size={16} />
+                <LogOut className="mr-3" size={16} />
                 Sign Out
               </Button>
             )}

@@ -60,9 +60,9 @@ export function HeroSection({
       <div className="max-w-md mx-auto">
         {/* Header */}
         <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold mb-2">{title}</h1>
+          <h1 className="text-3xl font-bold mb-3">{title}</h1>
           {subtitle && (
-            <p className="text-blue-100 text-sm">{subtitle}</p>
+            <p className="text-blue-100 text-base font-semibold opacity-95">{subtitle}</p>
           )}
         </div>
 
@@ -96,8 +96,8 @@ export function HeroSection({
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <div className="text-center">
-                    <p className="text-2xl font-bold">{Math.round(progressPercentage)}%</p>
-                    <p className="text-xs text-blue-100">Daily Goal</p>
+                    <p className="text-3xl font-bold">{Math.round(progressPercentage)}%</p>
+                    <p className="text-sm text-blue-100 font-medium">Daily Goal</p>
                   </div>
                 </div>
               </div>
@@ -105,22 +105,22 @@ export function HeroSection({
 
             {/* Stats Cards */}
             <div className="grid grid-cols-3 gap-3">
-              <Card className="p-3 bg-white/10 backdrop-blur-sm border-0 text-center">
-                <Flame className="w-5 h-5 mx-auto text-orange-300 mb-1" />
-                <p className="text-lg font-bold">{caloriesConsumed}</p>
-                <p className="text-xs text-blue-100">Consumed</p>
+              <Card className="p-4 bg-white/10 backdrop-blur-sm border-0 text-center">
+                <Flame className="w-6 h-6 mx-auto text-orange-300 mb-2" />
+                <p className="text-xl font-bold">{caloriesConsumed}</p>
+                <p className="text-sm text-blue-100 font-medium">Consumed</p>
               </Card>
               
-              <Card className="p-3 bg-white/10 backdrop-blur-sm border-0 text-center">
-                <Target className="w-5 h-5 mx-auto text-green-300 mb-1" />
-                <p className="text-lg font-bold">{caloriesGoal}</p>
-                <p className="text-xs text-blue-100">Goal</p>
+              <Card className="p-4 bg-white/10 backdrop-blur-sm border-0 text-center">
+                <Target className="w-6 h-6 mx-auto text-green-300 mb-2" />
+                <p className="text-xl font-bold">{caloriesGoal}</p>
+                <p className="text-sm text-blue-100 font-medium">Goal</p>
               </Card>
               
-              <Card className="p-3 bg-white/10 backdrop-blur-sm border-0 text-center">
-                <TrendingUp className="w-5 h-5 mx-auto text-yellow-300 mb-1" />
-                <p className="text-lg font-bold">{currentStreak}</p>
-                <p className="text-xs text-blue-100">Day Streak</p>
+              <Card className="p-4 bg-white/10 backdrop-blur-sm border-0 text-center">
+                <TrendingUp className="w-6 h-6 mx-auto text-yellow-300 mb-2" />
+                <p className="text-xl font-bold">{currentStreak}</p>
+                <p className="text-sm text-blue-100 font-medium">Day Streak</p>
               </Card>
             </div>
           </>
@@ -133,11 +133,11 @@ export function HeroSection({
               const IconComponent = stat.icon;
               return (
                 <div key={index} className="text-center">
-                  <div className={`p-2 ${stat.bgColor} rounded-lg mb-2 mx-auto w-fit`}>
-                    <IconComponent className={`w-5 h-5 ${stat.color}`} />
+                  <div className={`p-3 ${stat.bgColor} rounded-lg mb-3 mx-auto w-fit`}>
+                    <IconComponent className={`w-6 h-6 ${stat.color}`} />
                   </div>
-                  <div className="text-lg font-bold">{stat.value}</div>
-                  <div className="text-xs text-blue-100">{stat.label}</div>
+                  <div className="text-xl font-bold">{stat.value}</div>
+                  <div className="text-sm text-blue-100 font-medium">{stat.label}</div>
                 </div>
               );
             })}

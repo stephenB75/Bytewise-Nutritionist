@@ -18,7 +18,7 @@ interface UserProgressData {
   }>;
 }
 
-export async function generateProgressReportPDF(): Promise<void> {
+export async function generateProgressReportPDF(): Promise<boolean> {
   // Gather user progress data
   const progressData: UserProgressData = {
     totalMealsLogged: 156,
@@ -113,14 +113,22 @@ export async function generateProgressReportPDF(): Promise<void> {
 </body>
 </html>`;
 
-  // Create and download the HTML file (as PDF alternative)
-  const blob = new Blob([pdfContent], { type: 'text/html' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `bytewise-progress-report-${new Date().toISOString().split('T')[0]}.html`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+  try {
+    // Create and download the HTML file (as PDF alternative)
+    const blob = new Blob([pdfContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `bytewise-progress-report-${new Date().toISOString().split('T')[0]}.html`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    console.log('✅ PDF report generated and downloaded successfully');
+    return true;
+  } catch (error) {
+    console.error('❌ Failed to generate PDF report:', error);
+    return false;
+  }
 }

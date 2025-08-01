@@ -4,6 +4,59 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Enhanced Accessibility - Increased text sizes throughout the app */
+html {
+  font-size: 17px; /* Increased from 16px for better readability */
+}
+
+/* Global text size improvements for accessibility */
+.text-xs {
+  font-size: 0.8rem !important; /* Increased from 0.75rem */
+}
+
+.text-sm {
+  font-size: 0.9rem !important; /* Increased from 0.875rem */
+}
+
+.text-base {
+  font-size: 1.1rem !important; /* Increased from 1rem */
+}
+
+.text-lg {
+  font-size: 1.2rem !important; /* Increased from 1.125rem */
+}
+
+.text-xl {
+  font-size: 1.35rem !important; /* Increased from 1.25rem */
+}
+
+/* Profile page slide button animations */
+.slide-button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.slide-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.6s ease;
+}
+
+.slide-button:hover::before {
+  left: 100%;
+}
+
+.slide-button:hover {
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
 /* Input field text visibility fixes */
 .input-with-icon {
   @apply relative;
