@@ -76,7 +76,7 @@ function LoginScreen({ onNavigate }: LoginScreenProps) {
         setTimeout(() => setMode('login'), 3000);
       }
     } catch (error: any) {
-      console.error('Email authentication error:', error);
+      // Handle authentication errors gracefully
       
       // Provide more helpful error messages
       let errorMessage = error.message;
@@ -107,7 +107,7 @@ function LoginScreen({ onNavigate }: LoginScreenProps) {
       });
       if (error) throw error;
     } catch (error: any) {
-      console.error('Google authentication error:', error);
+      // Handle OAuth errors gracefully
       
       let errorMessage = error.message;
       if (error.message.includes('fetch')) {
@@ -119,12 +119,7 @@ function LoginScreen({ onNavigate }: LoginScreenProps) {
     }
   };
 
-  const handleDemoLogin = () => {
-    setEmail('demo@bytewise.com');
-    setPassword('demo123');
-    setMode('login');
-    setSuccessMessage('Demo credentials loaded! Click "Sign In" to continue with the demo account.');
-  };
+  // Production mode - demo login removed for live app
 
   const getTitle = () => {
     switch (mode) {
@@ -302,14 +297,7 @@ function LoginScreen({ onNavigate }: LoginScreenProps) {
                     </div>
                   </div>
 
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleDemoLogin}
-                    className="w-full mb-2"
-                  >
-                    <span className="text-emerald-600 font-medium">Try Demo Account</span>
-                  </Button>
+
 
                   <Button
                     type="button"

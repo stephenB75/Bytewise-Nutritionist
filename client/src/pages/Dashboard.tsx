@@ -50,7 +50,7 @@ function Dashboard({ onNavigate }: DashboardProps) {
   // Combined stats from calculator and logged meals
   const [userStats, setUserStats] = useState({
     name: "User",
-    currentStreak: 7,
+    currentStreak: 0,
     caloriesConsumed: 0,
     caloriesGoal: 2200,
     proteinConsumed: 0,
@@ -59,7 +59,7 @@ function Dashboard({ onNavigate }: DashboardProps) {
     carbsGoal: 300,
     fatConsumed: 0,
     fatGoal: 70,
-    waterConsumed: 6,
+    waterConsumed: 0,
     waterGoal: 8
   });
 

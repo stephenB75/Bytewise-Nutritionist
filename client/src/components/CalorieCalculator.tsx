@@ -221,7 +221,7 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
       });
 
       if (response.ok) {
-        console.log(`✅ Successfully logged to ${mealType}: ${analysis.ingredient} - ${analysis.estimatedCalories} cal`);
+        // Successfully logged meal data
         
         // Trigger multiple events for comprehensive UI updates
         const logEvent = new CustomEvent('calories-logged', {
@@ -247,7 +247,7 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
         throw new Error('Failed to log meal');
       }
     } catch (error) {
-      console.error('❌ Failed to log to weekly:', error);
+      // Handle logging error gracefully
       
       // Show error toast
       const toastEvent = new CustomEvent('show-toast', {
@@ -358,7 +358,7 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
                   <Button
                     size="sm"
                     onClick={() => {
-                      console.log('Log to Weekly button clicked for:', analysis);
+                      // Logging meal data
                       handleLogToWeekly(analysis);
                     }}
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white"

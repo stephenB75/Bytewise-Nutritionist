@@ -30,11 +30,9 @@ export function PWAStatus() {
         try {
           const registration = await navigator.serviceWorker.getRegistration();
           setSWRegistered(!!registration);
-          if (registration) {
-            console.log('Service Worker active:', registration.active?.state);
-          }
+          // Service Worker registered successfully
         } catch (error) {
-          console.error('Service Worker check failed:', error);
+          // Service Worker check failed
         }
       }
     };

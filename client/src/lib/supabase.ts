@@ -11,13 +11,7 @@ import { config } from './config';
 const finalUrl = config.supabase.url || config.fallback.supabaseUrl;
 const finalKey = config.supabase.anonKey || config.fallback.supabaseKey;
 
-// Log configuration for debugging
-console.log('🔧 Supabase Config:', {
-  isConfigured: config.supabase.isConfigured,
-  hasUrl: !!config.supabase.url,
-  hasKey: !!config.supabase.anonKey,
-  urlType: config.supabase.url ? 'real' : 'fallback'
-});
+// Production-ready configuration - debug logs removed
 
 // Create Supabase client
 export const supabase = createClient<Database>(finalUrl, finalKey, {
