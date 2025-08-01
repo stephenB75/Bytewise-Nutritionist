@@ -23,8 +23,7 @@ import CalorieCalculatorDemo from './components/CalorieCalculatorDemo';
 import CalculatorValidationTest from './components/CalculatorValidationTest';
 import { AuthDebugInfo } from './components/AuthDebugInfo';
 import { SimpleAuthTest } from './components/SimpleAuthTest';
-import { MinimalAuth } from './components/MinimalAuth';
-import { DirectRender } from './components/DirectRender';
+import { WorkingAuth } from './components/WorkingAuth';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('dashboard');
@@ -119,14 +118,9 @@ export default function App() {
     }
   };
 
-  // Emergency fallback - direct render test
-  if (activeTab === 'direct-test') {
-    return <DirectRender />;
-  }
-
   return (
     <QueryClientProvider client={queryClient}>
-      <MinimalAuth>
+      <WorkingAuth>
         <div className="min-h-screen bg-background">
           {/* Global Notification Dropdown */}
           <NotificationDropdown
@@ -161,7 +155,7 @@ export default function App() {
           <PWAInstallPrompt />
           <IOSInstallInstructions />
         </div>
-      </MinimalAuth>
+      </WorkingAuth>
     </QueryClientProvider>
   );
 }
