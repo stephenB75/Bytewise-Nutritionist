@@ -118,11 +118,15 @@ export function useAuth() {
   };
 
   // Sign in with OAuth provider
-  const signInWithProvider = async (provider: 'google' | 'github' | 'discord') => {
+  const signInWithProvider = async (provider: 'google' | 'github' | 'discord' | 'apple' | 'facebook') => {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
       },
     });
     if (error) throw error;

@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useState } from 'react';
-import { Loader2, Mail, Lock, User, Github } from 'lucide-react';
+import { Loader2, Mail, Lock, User, Github, Apple, Facebook, Chrome } from 'lucide-react';
 
 interface SupabaseAuthWrapperProps {
   children: React.ReactNode;
@@ -17,14 +17,16 @@ interface SupabaseAuthWrapperProps {
 }
 
 export function SupabaseAuthWrapper({ children, onNavigate }: SupabaseAuthWrapperProps) {
-  const { user, loading, signInWithEmail, signUpWithEmail, signInWithProvider } = useAuth();
+  const { user, loading, signInWithEmail, signUpWithEmail, signInWithProvider, resetPassword } = useAuth();
   const [isSignUp, setIsSignUp] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   // Show loading spinner while checking auth
   if (loading) {
@@ -81,6 +83,132 @@ export function SupabaseAuthWrapper({ children, onNavigate }: SupabaseAuthWrappe
       }
     };
 
+    const handleAppleSignIn = async () => {
+      setIsLoading(true);
+      try {
+        await signInWithProvider('apple');
+      } catch (err: any) {
+        setError(err.message || 'Apple sign in failed');
+        setIsLoading(false);
+      }
+    };
+
+    const handleFacebookSignIn = async () => {
+      setIsLoading(true);
+      try {
+        await signInWithProvider('facebook');
+      } catch (err: any) {
+        setError(err.message || 'Facebook sign in failed');
+        setIsLoading(false);
+      }
+    };
+
+    const handleDiscordSignIn = async () => {
+      setIsLoading(true);
+      try {
+        await signInWithProvider('discord');
+      } catch (err: any) {
+        setError(err.message || 'Discord sign in failed');
+        setIsLoading(false);
+      }
+    };
+
+    const handleForgotPassword = async (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!email) {
+        setError('Please enter your email address');
+        return;
+      }
+
+      setIsLoading(true);
+      setError('');
+      try {
+        await resetPassword(email);
+        setSuccessMessage('Password reset email sent! Check your inbox.');
+        setShowForgotPassword(false);
+      } catch (err: any) {
+        setError(err.message || 'Failed to send password reset email');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    // Show forgot password form
+    if (showForgotPassword) {
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+          <Card className="w-full max-w-md p-6">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="text-white text-2xl font-bold">B</div>
+              </div>
+              <h1 className="text-2xl font-bold text-gray-900">Reset Password</h1>
+              <p className="text-gray-600 mt-1">
+                Enter your email to receive a password reset link
+              </p>
+            </div>
+
+            {error && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg">
+                {error}
+              </div>
+            )}
+
+            {successMessage && (
+              <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 text-sm rounded-lg">
+                {successMessage}
+              </div>
+            )}
+
+            <form onSubmit={handleForgotPassword} className="space-y-4">
+              <div>
+                <Label htmlFor="reset-email">Email</Label>
+                <div className="relative mt-1">
+                  <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Input
+                    id="reset-email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="pl-10"
+                    placeholder="Enter your email"
+                  />
+                </div>
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full bg-blue-600 hover:bg-blue-700"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <Loader2 className="animate-spin h-4 w-4 mr-2" />
+                ) : (
+                  <Mail className="h-4 w-4 mr-2" />
+                )}
+                Send Reset Email
+              </Button>
+            </form>
+
+            <div className="mt-6 text-center">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowForgotPassword(false);
+                  setError('');
+                  setSuccessMessage('');
+                }}
+                className="text-sm text-blue-600 hover:text-blue-700"
+              >
+                Back to sign in
+              </button>
+            </div>
+          </Card>
+        </div>
+      );
+    }
+
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
         <Card className="w-full max-w-md p-6">
@@ -97,6 +225,12 @@ export function SupabaseAuthWrapper({ children, onNavigate }: SupabaseAuthWrappe
           {error && (
             <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg">
               {error}
+            </div>
+          )}
+
+          {successMessage && (
+            <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 text-sm rounded-lg">
+              {successMessage}
             </div>
           )}
 
@@ -210,7 +344,54 @@ export function SupabaseAuthWrapper({ children, onNavigate }: SupabaseAuthWrappe
                 GitHub
               </Button>
             </div>
+            
+            <div className="grid grid-cols-2 gap-3 mt-2">
+              <Button
+                variant="outline"
+                onClick={handleAppleSignIn}
+                disabled={isLoading}
+                className="w-full"
+              >
+                <Apple className="w-4 h-4 mr-2" />
+                Apple
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleFacebookSignIn}
+                disabled={isLoading}
+                className="w-full"
+              >
+                <Facebook className="w-4 h-4 mr-2" />
+                Facebook
+              </Button>
+            </div>
+            
+            <div className="mt-2">
+              <Button
+                variant="outline"
+                onClick={handleDiscordSignIn}
+                disabled={isLoading}
+                className="w-full"
+              >
+                <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.19.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+                </svg>
+                Discord
+              </Button>
+            </div>
           </div>
+
+          {!isSignUp && (
+            <div className="mt-4 text-center">
+              <button
+                type="button"
+                onClick={() => setShowForgotPassword(true)}
+                className="text-sm text-blue-600 hover:text-blue-700"
+              >
+                Forgot your password?
+              </button>
+            </div>
+          )}
 
           <div className="mt-6 text-center">
             <button
