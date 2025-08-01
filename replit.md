@@ -65,6 +65,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### January 2025 - iOS App Preparation & Accessibility Enhancements
+✓ **iOS Deployment Files**: Complete iOS app preparation with Capacitor configuration, PWA manifest, service worker, and deployment documentation
+✓ **Accessibility Improvements**: Enhanced text sizing (base font: 17px), Hero component visibility improvements, and professional slide button animations
+✓ **Weekly Tracker Validation**: Smart meal categorization, automatic logging from CalorieCalculator, and event-driven UI updates
+✓ **PDF Export System**: Comprehensive 6-month progress reports with real data visualization and download functionality
+✓ **Profile Page Enhancements**: Left-to-right slide button animations throughout profile interface with smooth hover transitions
+✓ **iOS App Store Ready**: Manifest configuration, service worker for offline functionality, icon generation scripts, and deployment guide
+✓ **PWA Optimization**: iOS-specific meta tags, launch screen configuration, and native app integration preparation
+
 ### January 2025 - Serverless Architecture Migration
 ✓ **Supabase Integration**: Complete migration from Express.js to Supabase backend-as-a-service
 ✓ **Authentication System**: Replaced Replit OIDC with Supabase Auth supporting email/password and OAuth providers

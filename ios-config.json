@@ -1,0 +1,103 @@
+{
+  "app": {
+    "name": "ByteWise Nutritionist",
+    "bundleId": "com.bytewise.nutritionist",
+    "version": "1.2.0",
+    "buildNumber": "120",
+    "minimumOSVersion": "14.0",
+    "category": "MedicalApps",
+    "description": "Professional nutrition tracking with USDA database integration"
+  },
+  "capacitor": {
+    "webDir": "dist",
+    "bundledWebRuntime": false,
+    "backgroundColor": "#fef7cd",
+    "plugins": {
+      "SplashScreen": {
+        "launchShowDuration": 2000,
+        "launchAutoHide": true,
+        "backgroundColor": "#fef7cd",
+        "androidSplashResourceName": "splash",
+        "androidScaleType": "CENTER_CROP",
+        "showSpinner": true,
+        "androidSpinnerStyle": "large",
+        "iosSpinnerStyle": "small",
+        "spinnerColor": "#a8dadc",
+        "splashFullScreen": true,
+        "splashImmersive": true,
+        "layoutName": "launch_screen",
+        "useDialog": true
+      },
+      "StatusBar": {
+        "style": "light",
+        "backgroundColor": "#a8dadc"
+      },
+      "Keyboard": {
+        "resize": "body",
+        "style": "dark",
+        "resizeOnFullScreen": true
+      },
+      "LocalNotifications": {
+        "smallIcon": "ic_stat_icon_config_sample",
+        "iconColor": "#a8dadc",
+        "sound": "beep.wav"
+      },
+      "PushNotifications": {
+        "presentationOptions": ["badge", "sound", "alert"]
+      },
+      "Haptics": {},
+      "Device": {},
+      "Storage": {},
+      "Filesystem": {},
+      "Network": {},
+      "App": {
+        "launchUrl": "/"
+      }
+    },
+    "cordova": {},
+    "server": {
+      "androidScheme": "https"
+    }
+  },
+  "plist": {
+    "NSCameraUsageDescription": "This app uses the camera to scan food barcodes for nutrition tracking",
+    "NSPhotoLibraryUsageDescription": "This app accesses photos to attach meal images to your nutrition log",
+    "NSLocationWhenInUseUsageDescription": "This app uses location to find nearby restaurants and suggest local nutrition options",
+    "NSUserNotificationsUsageDescription": "This app sends notifications to remind you about meal logging and nutrition goals",
+    "CFBundleURLTypes": [
+      {
+        "CFBundleURLName": "com.bytewise.nutritionist",
+        "CFBundleURLSchemes": ["bytewise"]
+      }
+    ],
+    "UILaunchStoryboardName": "LaunchScreen",
+    "UIMainStoryboardFile": "Main",
+    "UIStatusBarHidden": false,
+    "UIViewControllerBasedStatusBarAppearance": true,
+    "UISupportedInterfaceOrientations": [
+      "UIInterfaceOrientationPortrait",
+      "UIInterfaceOrientationPortraitUpsideDown"
+    ],
+    "UISupportedInterfaceOrientations~ipad": [
+      "UIInterfaceOrientationPortrait",
+      "UIInterfaceOrientationPortraitUpsideDown",
+      "UIInterfaceOrientationLandscapeLeft",
+      "UIInterfaceOrientationLandscapeRight"
+    ],
+    "UIRequiredDeviceCapabilities": ["armv7"],
+    "LSRequiresIPhoneOS": true,
+    "UIDeviceFamily": [1, 2],
+    "CFBundleVersion": "120",
+    "CFBundleShortVersionString": "1.2.0"
+  },
+  "buildSettings": {
+    "SWIFT_VERSION": "5.0",
+    "IPHONEOS_DEPLOYMENT_TARGET": "14.0",
+    "TARGETED_DEVICE_FAMILY": "1,2",
+    "CODE_SIGN_STYLE": "Automatic",
+    "DEVELOPMENT_TEAM": "",
+    "PRODUCT_BUNDLE_IDENTIFIER": "com.bytewise.nutritionist",
+    "MARKETING_VERSION": "1.2.0",
+    "CURRENT_PROJECT_VERSION": "120"
+  }
+}
