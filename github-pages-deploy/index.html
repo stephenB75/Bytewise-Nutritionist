@@ -31,7 +31,7 @@
   <meta name="twitter:description" content="Mobile nutrition tracking and meal planning made simple." />
   
   <!-- PWA Manifest -->
-  <link rel="manifest" href="/manifest.json" />
+  <link rel="manifest" href="./manifest.json" />
   
   <!-- GitHub Pages SPA Router Script -->
   <script type="text/javascript">
@@ -46,21 +46,21 @@
   </script>
   
   <!-- Favicon and Icons -->
-  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png" />
-  <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="./icons/favicon-16x16.png" />
   
   <!-- Apple Touch Icons for iOS -->
-  <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon-180x180.png" />
-  <link rel="apple-touch-icon" sizes="152x152" href="/icons/apple-touch-icon-152x152.png" />
-  <link rel="apple-touch-icon" sizes="120x120" href="/icons/apple-touch-icon-120x120.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon-180x180.png" />
+  <link rel="apple-touch-icon" sizes="152x152" href="./icons/apple-touch-icon-152x152.png" />
+  <link rel="apple-touch-icon" sizes="120x120" href="./icons/apple-touch-icon-120x120.png" />
   
   <!-- Android Chrome Icons -->
-  <link rel="icon" type="image/png" sizes="192x192" href="/icons/android-chrome-192x192.png" />
-  <link rel="icon" type="image/png" sizes="512x512" href="/icons/android-chrome-512x512.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/android-chrome-192x192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="./icons/android-chrome-512x512.png" />
   
   <!-- iOS Launch Screens -->
-  <link rel="apple-touch-startup-image" href="/icons/apple-launch-1125x2436.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)" />
-  <link rel="apple-touch-startup-image" href="/icons/apple-launch-1242x2208.png" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)" />
+  <link rel="apple-touch-startup-image" href="./icons/apple-launch-1125x2436.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)" />
+  <link rel="apple-touch-startup-image" href="./icons/apple-launch-1242x2208.png" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)" />
   
   <!-- Preload critical fonts -->
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" />
@@ -92,8 +92,8 @@
       font-size: 16px !important;
     }
   </style>
-  <script type="module" crossorigin src="/assets/index-CR1WmwXw.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-CtyhaWzA.css">
+  <script type="module" crossorigin src="./assets/index-CR1WmwXw.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-CtyhaWzA.css">
 </head>
 <body>
   <div id="root"></div>
@@ -102,7 +102,7 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
+        navigator.serviceWorker.register('./sw.js')
           .then((registration) => {
             console.log('🍎 Service Worker registered successfully:', registration);
           })
