@@ -187,6 +187,18 @@
             background: #dc2626;
         }
         
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .user-email {
+            color: #6b7280;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
         .main-content {
             max-width: 1200px;
             margin: 0 auto;
@@ -352,7 +364,7 @@
             </form>
             
             <div class="demo-note">
-                <strong>Demo Mode:</strong> Enter any email and password to access the nutrition tracker
+                <strong>Supabase Auth:</strong> Enter a valid email and password to sign in, or create a new account automatically
             </div>
         </div>
     </div>
@@ -365,7 +377,10 @@
                     <div class="header-logo-icon">B</div>
                     <h1 class="header-title">Bytewise</h1>
                 </div>
-                <button id="logoutBtn" class="logout-btn">Sign Out</button>
+                <div class="user-info">
+                    <span class="user-email"></span>
+                    <button id="logoutBtn" class="logout-btn">Sign Out</button>
+                </div>
             </div>
         </header>
 
@@ -449,37 +464,153 @@
         </main>
     </div>
 
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <script>
-        // Simple authentication and navigation
+        // Supabase configuration from environment variables
+        const SUPABASE_URL = 'https://xkzqwmqpjhsbjqhexnew.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhrenF3bXFwamhzYmpxaGV4bmV3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU2NDQ2NDQsImV4cCI6MjA1MTIyMDY0NH0.hTI2LKMNXKXbZNy5l7R-hggM7aUFD0xOwJqG1b4HArU';
+        
+        // Initialize Supabase client
+        const { createClient } = supabase;
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // DOM elements
         const loginScreen = document.getElementById('loginScreen');
         const dashboard = document.getElementById('dashboard');
         const loginForm = document.getElementById('loginForm');
         const logoutBtn = document.getElementById('logoutBtn');
+        const loginBtn = document.querySelector('.login-btn');
+        
+        let currentUser = null;
 
         // Check if user is already logged in
-        if (localStorage.getItem('bytewise-auth') === 'true') {
-            showDashboard();
+        checkAuthState();
+
+        async function checkAuthState() {
+            try {
+                const { data: { session }, error } = await supabaseClient.auth.getSession();
+                
+                if (error) {
+                    console.error('Auth state check error:', error);
+                    showLogin();
+                    return;
+                }
+
+                if (session && session.user) {
+                    currentUser = session.user;
+                    showDashboard();
+                } else {
+                    showLogin();
+                }
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                showLogin();
+            }
         }
 
-        loginForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+        // Listen for auth state changes
+        supabaseClient.auth.onAuthStateChange((event, session) => {
+            console.log('Auth state changed:', event, session);
             
-            if (email && password) {
-                localStorage.setItem('bytewise-auth', 'true');
+            if (event === 'SIGNED_IN' && session) {
+                currentUser = session.user;
                 showDashboard();
+            } else if (event === 'SIGNED_OUT') {
+                currentUser = null;
+                showLogin();
             }
         });
 
-        logoutBtn.addEventListener('click', function() {
-            localStorage.removeItem('bytewise-auth');
-            showLogin();
+        // Handle login form submission
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            if (!email || !password) {
+                showError('Please enter both email and password');
+                return;
+            }
+
+            try {
+                // Show loading state
+                loginBtn.textContent = 'Signing in...';
+                loginBtn.disabled = true;
+
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email: email,
+                    password: password,
+                });
+
+                if (error) {
+                    if (error.message.includes('Invalid login credentials')) {
+                        // Try to sign up if login fails
+                        const { data: signUpData, error: signUpError } = await supabaseClient.auth.signUp({
+                            email: email,
+                            password: password,
+                        });
+
+                        if (signUpError) {
+                            throw signUpError;
+                        }
+
+                        if (signUpData.user) {
+                            showSuccess('Account created! Please check your email to verify your account.');
+                            // Auto-login for demo purposes (in production, wait for email verification)
+                            currentUser = signUpData.user;
+                            showDashboard();
+                        }
+                    } else {
+                        throw error;
+                    }
+                } else {
+                    currentUser = data.user;
+                    showSuccess('Welcome back!');
+                    showDashboard();
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showError(error.message || 'Login failed. Please try again.');
+            } finally {
+                // Reset button state
+                loginBtn.textContent = 'Sign In to Dashboard';
+                loginBtn.disabled = false;
+            }
+        });
+
+        // Handle logout
+        logoutBtn.addEventListener('click', async function() {
+            try {
+                const { error } = await supabaseClient.auth.signOut();
+                
+                if (error) {
+                    console.error('Logout error:', error);
+                    showError('Logout failed. Please try again.');
+                } else {
+                    showSuccess('Successfully logged out!');
+                    currentUser = null;
+                    showLogin();
+                }
+            } catch (error) {
+                console.error('Logout error:', error);
+                showError('Logout failed. Please try again.');
+            }
         });
 
         function showDashboard() {
             loginScreen.style.display = 'none';
             dashboard.classList.add('active');
+            
+            // Update dashboard with user info if available
+            if (currentUser && currentUser.email) {
+                const userElement = document.querySelector('.user-email');
+                if (userElement) {
+                    userElement.textContent = currentUser.email;
+                }
+            }
         }
 
         function showLogin() {
@@ -489,12 +620,72 @@
             document.getElementById('password').value = '';
         }
 
+        function showError(message) {
+            // Create or update error message
+            let errorDiv = document.querySelector('.auth-error');
+            if (!errorDiv) {
+                errorDiv = document.createElement('div');
+                errorDiv.className = 'auth-error';
+                errorDiv.style.cssText = `
+                    background: #fee2e2;
+                    color: #dc2626;
+                    padding: 12px;
+                    border-radius: 8px;
+                    margin-bottom: 16px;
+                    font-size: 14px;
+                    border: 1px solid #fecaca;
+                `;
+                loginForm.insertBefore(errorDiv, loginForm.firstChild);
+            }
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            
+            // Hide after 5 seconds
+            setTimeout(() => {
+                if (errorDiv) {
+                    errorDiv.style.display = 'none';
+                }
+            }, 5000);
+        }
+
+        function showSuccess(message) {
+            // Create or update success message
+            let successDiv = document.querySelector('.auth-success');
+            if (!successDiv) {
+                successDiv = document.createElement('div');
+                successDiv.className = 'auth-success';
+                successDiv.style.cssText = `
+                    background: #d1fae5;
+                    color: #059669;
+                    padding: 12px;
+                    border-radius: 8px;
+                    margin-bottom: 16px;
+                    font-size: 14px;
+                    border: 1px solid #a7f3d0;
+                `;
+                loginForm.insertBefore(successDiv, loginForm.firstChild);
+            }
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            
+            // Hide after 3 seconds
+            setTimeout(() => {
+                if (successDiv) {
+                    successDiv.style.display = 'none';
+                }
+            }, 3000);
+        }
+
         // Add meal functionality
         document.querySelector('.add-meal-btn').addEventListener('click', function() {
-            alert('Add Meal feature would open a meal logging interface in the full app!');
+            if (currentUser) {
+                alert(`Add Meal feature for ${currentUser.email} - This would open a meal logging interface in the full app!`);
+            } else {
+                alert('Please log in to add meals');
+            }
         });
 
-        console.log('🥗 Bytewise Nutrition Tracker loaded successfully!');
+        console.log('🥗 Bytewise Nutrition Tracker with Supabase Auth loaded successfully!');
     </script>
 </body>
 </html>
