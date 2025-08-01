@@ -3,7 +3,7 @@
   "name": "ByteWise Nutritionist",
   "short_name": "ByteWise",
   "description": "Professional nutrition tracking app with USDA database integration, meal planning, and progress analytics",
-  "start_url": "/",
+  "start_url": "/Bytewise-Nutritionist/",
   "display": "standalone",
   "orientation": "portrait-primary",
   "theme_color": "#7dd3fc",
@@ -11,7 +11,7 @@
   "categories": ["health", "lifestyle", "food"],
   "lang": "en-US",
   "dir": "ltr",
-  "scope": "/",
+  "scope": "/Bytewise-Nutritionist/",
   "launch_handler": {
     "client_mode": "navigate-existing"
   },
@@ -84,7 +84,7 @@
       "name": "Log Meal",
       "short_name": "Log Meal",
       "description": "Quick meal logging",
-      "url": "/calculator",
+      "url": "/Bytewise-Nutritionist/calculator",
       "icons": [
         {
           "src": "/icons/shortcut-meal.png",
@@ -96,7 +96,7 @@
       "name": "View Dashboard",
       "short_name": "Dashboard",
       "description": "View nutrition dashboard",
-      "url": "/dashboard",
+      "url": "/Bytewise-Nutritionist/dashboard",
       "icons": [
         {
           "src": "/icons/shortcut-dashboard.png",
@@ -108,7 +108,7 @@
       "name": "Weekly Progress",
       "short_name": "Progress",
       "description": "Check weekly progress",
-      "url": "/weekly",
+      "url": "/Bytewise-Nutritionist/weekly",
       "icons": [
         {
           "src": "/icons/shortcut-progress.png",
@@ -145,7 +145,7 @@
   },
   "file_handlers": [
     {
-      "action": "/import-data",
+      "action": "/Bytewise-Nutritionist/import-data",
       "accept": {
         "application/json": [".json"],
         "text/csv": [".csv"]
@@ -155,7 +155,7 @@
   "protocol_handlers": [
     {
       "protocol": "web+bytewise",
-      "url": "/app?action=%s"
+      "url": "/Bytewise-Nutritionist/app?action=%s"
     }
   ]
 }

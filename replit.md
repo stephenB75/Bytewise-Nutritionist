@@ -67,15 +67,17 @@ Preferred communication style: Simple, everyday language.
 
 ### August 2025 - GitHub Pages Migration & Project Cleanup Complete
 ✓ **GitHub Pages Deployment**: Complete migration from Replit to GitHub Pages hosting
-✓ **Domain Change**: App now hosted at https://stephtonybro.github.io/Bytewise-Nutritionist/  
-✓ **Path Configuration**: All absolute paths converted to relative for GitHub Pages compatibility
+✓ **Domain Change**: App configured for https://stephtonybro.github.io/Bytewise-Nutritionist/  
+✓ **Path Configuration**: All absolute paths updated for GitHub Pages `/Bytewise-Nutritionist/` base path
 ✓ **SPA Routing**: Implemented GitHub Pages SPA routing with 404.html redirect system
-✓ **PWA Optimization**: Updated manifest.json and service worker paths for new domain
+✓ **PWA Optimization**: Updated manifest.json and service worker paths for GitHub Pages domain
+✓ **USDA Database Integration**: Enhanced calorie calculator with authentic USDA food portions and nutrition data
 ✓ **Authentication UI**: Enhanced text field positioning with icons on right side and improved spacing
 ✓ **Deployment Package**: Complete production-ready deployment in github-pages-deploy/ directory
 ✓ **Build Process**: Optimized build pipeline for GitHub Pages with proper asset handling
 ✓ **Project Cleanup**: Removed 180+ obsolete files, legacy components, and redundant documentation
 ✓ **Code Organization**: Streamlined folder structure with only essential files and active components
+✓ **Domain Verification**: All PWA manifest and service worker paths updated for GitHub Pages hosting
 
 ### August 2025 - IPA Creation Ready & PWA Standards Complete
 ✓ **PWA Manifest**: Complete IPA-ready manifest with all required, recommended, and optional fields

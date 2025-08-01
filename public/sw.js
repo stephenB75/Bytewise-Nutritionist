@@ -12,11 +12,11 @@ const API_CACHE = 'bytewise-api-v1.2.0';
 
 // Files to cache for offline use
 const STATIC_FILES = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png',
+  '/Bytewise-Nutritionist/',
+  '/Bytewise-Nutritionist/index.html',
+  '/Bytewise-Nutritionist/manifest.json',
+  '/Bytewise-Nutritionist/icons/icon-192x192.png',
+  '/Bytewise-Nutritionist/icons/icon-512x512.png',
   // Add critical CSS and JS files here when available
 ];
 
