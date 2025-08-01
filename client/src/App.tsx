@@ -18,12 +18,6 @@ import Dashboard from './pages/Dashboard';
 import CalorieCalculatorWrapper from './components/CalorieCalculatorWrapper';
 import WeeklyLogger from './pages/WeeklyLogger';
 import ProfileEnhanced from './pages/ProfileEnhanced';
-import CalorieCalculatorValidation from './test/CalorieCalculatorValidation';
-import CalorieCalculatorDemo from './components/CalorieCalculatorDemo';
-import CalculatorValidationTest from './components/CalculatorValidationTest';
-import { AuthDebugInfo } from './components/AuthDebugInfo';
-import { SimpleAuthTest } from './components/SimpleAuthTest';
-import { WorkingAuth } from './components/WorkingAuth';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('dashboard');
@@ -103,16 +97,6 @@ export default function App() {
         return <WeeklyLogger onNavigate={handleNavigate} />;
       case 'profile':
         return <ProfileEnhanced onNavigate={handleNavigate} />;
-      case 'validation':
-        return <CalorieCalculatorValidation />;
-      case 'demo':
-        return <CalorieCalculatorDemo />;
-      case 'test':
-        return <CalculatorValidationTest />;
-      case 'auth-debug':
-        return <AuthDebugInfo />;
-      case 'auth-test':
-        return <SimpleAuthTest />;
       default:
         return <Dashboard onNavigate={handleNavigate} />;
     }
@@ -120,7 +104,7 @@ export default function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <WorkingAuth>
+      <SupabaseAuthWrapper onNavigate={handleNavigate}>
         <div className="min-h-screen bg-background">
           {/* Global Notification Dropdown */}
           <NotificationDropdown
@@ -155,7 +139,7 @@ export default function App() {
           <PWAInstallPrompt />
           <IOSInstallInstructions />
         </div>
-      </WorkingAuth>
+      </SupabaseAuthWrapper>
     </QueryClientProvider>
   );
 }

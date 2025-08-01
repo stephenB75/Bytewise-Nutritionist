@@ -1,18 +1,17 @@
 /**
  * Enhanced Calorie Calculator Component
  * 
- * USDA-powered ingredient analysis with structured food database
- * Provides detailed nutrition breakdown and smart unit conversions
+ * USDA-powered ingredient analysis with offline capabilities
+ * Provides detailed nutrition breakdown and measurement conversions
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   Search, 
   Calculator, 
@@ -26,12 +25,8 @@ import {
   Apple,
   Scale,
   Calendar,
-  Plus,
-  Sparkles,
-  ChefHat,
-  BookOpen
+  Plus
 } from 'lucide-react';
-import EnhancedFoodDatabaseService, { ENHANCED_FOOD_DATABASE, type FoodItem } from '@/lib/enhancedFoodDatabase';
 
 interface IngredientAnalysis {
   ingredient: string;
@@ -45,16 +40,6 @@ interface IngredientAnalysis {
     carbs: number;
     fat: number;
   };
-  foodKey?: string;
-  category?: string;
-  isEnhanced?: boolean;
-}
-
-interface FoodSuggestion {
-  key: string;
-  category: string;
-  food: FoodItem;
-  matchType: 'exact' | 'alias' | 'partial';
 }
 
 interface CalorieCalculatorProps {
@@ -77,84 +62,12 @@ interface CalorieCalculatorProps {
 function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLogToWeekly, isCompact = false }: CalorieCalculatorProps) {
   const [ingredient, setIngredient] = useState('');
   const [measurement, setMeasurement] = useState('');
-  const [selectedAmount, setSelectedAmount] = useState('1');
-  const [selectedUnit, setSelectedUnit] = useState('');
   const [recentAnalyses, setRecentAnalyses] = useState<IngredientAnalysis[]>([]);
-  const [foodSuggestions, setFoodSuggestions] = useState<FoodSuggestion[]>([]);
-  const [selectedFood, setSelectedFood] = useState<FoodSuggestion | null>(null);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [validationMessage, setValidationMessage] = useState('');
   const queryClient = useQueryClient();
 
-  // Search for food suggestions as user types
-  useEffect(() => {
-    if (ingredient.length > 2) {
-      const suggestions = EnhancedFoodDatabaseService.searchFoods(ingredient);
-      setFoodSuggestions(suggestions.slice(0, 10)); // Limit to top 10 matches
-      setShowSuggestions(suggestions.length > 0);
-    } else {
-      setFoodSuggestions([]);
-      setShowSuggestions(false);
-    }
-  }, [ingredient]);
-
-  // Update available units when food is selected
-  useEffect(() => {
-    if (selectedFood) {
-      const availableUnits = EnhancedFoodDatabaseService.getAvailableUnits(
-        selectedFood.key, 
-        selectedFood.category
-      );
-      if (availableUnits.length > 0 && !selectedUnit) {
-        setSelectedUnit(availableUnits[0]);
-      }
-    }
-  }, [selectedFood, selectedUnit]);
-
-  // Enhanced calorie calculation with structured food database support
+  // Calculate calories mutation
   const calculateCalories = useMutation({
-    mutationFn: async ({ ingredient, measurement, foodKey, category }: { 
-      ingredient: string; 
-      measurement: string;
-      foodKey?: string;
-      category?: string;
-    }) => {
-      // If we have enhanced food data, use it for accurate calculations
-      if (foodKey && category) {
-        const food = ENHANCED_FOOD_DATABASE.categories[category]?.[foodKey];
-        const parsedMeasurement = EnhancedFoodDatabaseService.parseMeasurement(
-          measurement, foodKey, category
-        );
-        
-        if (food && parsedMeasurement.isValid && parsedMeasurement.amount && parsedMeasurement.unit) {
-          // Use enhanced database for calculation
-          const gramsEquivalent = food.units[parsedMeasurement.unit] * parsedMeasurement.amount;
-          
-          // Still call USDA API for nutrition data but use our accurate measurement
-          const response = await fetch('/api/calculate-calories', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-              ingredient: food.usdaQuery, 
-              measurement: `${gramsEquivalent}g`
-            }),
-          });
-          
-          if (response.ok) {
-            const data = await response.json();
-            return {
-              ...data,
-              ingredient: food.displayName,
-              measurement: `${parsedMeasurement.amount} ${parsedMeasurement.unit} (~${Math.round(gramsEquivalent)}g)`,
-              isEnhanced: true,
-              foodKey,
-              category
-            };
-          }
-        }
-      }
-      
-      // Fallback to standard USDA API call
+    mutationFn: async ({ ingredient, measurement }: { ingredient: string; measurement: string }) => {
       const response = await fetch('/api/calculate-calories', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -171,10 +84,6 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
       setRecentAnalyses(prev => [data, ...prev.slice(0, 4)]);
       setIngredient('');
       setMeasurement('');
-      setSelectedAmount('1');
-      setSelectedUnit('');
-      setSelectedFood(null);
-      setValidationMessage('');
       
       // Send calculated calories to tracking hook
       if (onCaloriesCalculated) {
@@ -191,73 +100,35 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
         });
       }
     },
-    onError: () => {
-      setValidationMessage('Calculation failed. Please try again.');
-    }
   });
 
   const handleCalculate = (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Enhanced measurement validation
     const cleanIngredient = ingredient.trim();
-    
-    if (!cleanIngredient) {
-      setValidationMessage('Please enter a food item');
-      return;
-    }
-    
-    // If using enhanced database with selected food and units
-    if (selectedFood && selectedAmount && selectedUnit) {
-      const measurementStr = `${selectedAmount} ${selectedUnit}`;
-      const parsedMeasurement = EnhancedFoodDatabaseService.parseMeasurement(
-        measurementStr, selectedFood.key, selectedFood.category
-      );
-      
-      if (!parsedMeasurement.isValid) {
-        setValidationMessage(parsedMeasurement.suggestions?.join('. ') || 'Invalid measurement');
-        return;
-      }
-      
-      calculateCalories.mutate({
-        ingredient: selectedFood.food.displayName,
-        measurement: measurementStr,
-        foodKey: selectedFood.key,
-        category: selectedFood.category
-      });
-      return;
-    }
-    
-    // Fallback to manual measurement input
     const cleanMeasurement = measurement.trim();
-    if (!cleanMeasurement) {
-      setValidationMessage('Please enter an amount (e.g., "1 cup", "100g")');
+    
+    if (!cleanIngredient || !cleanMeasurement) {
       return;
     }
     
-    // Validate measurement format for manual input
+    // Validate measurement format
     const measurementValidation = validateMeasurement(cleanMeasurement);
     if (!measurementValidation.isValid) {
-      setValidationMessage(measurementValidation.suggestion || 'Please use format like "1 cup", "100g", "2 tbsp"');
+      // Show validation error notification
+      const event = new CustomEvent('show-notification', {
+        detail: {
+          type: 'warning',
+          title: 'Invalid Measurement',
+          message: measurementValidation.suggestion || 'Please use format like "1 cup", "100g", "2 tbsp", "1 medium"'
+        }
+      });
+      window.dispatchEvent(event);
       return;
     }
     
     calculateCalories.mutate({ ingredient: cleanIngredient, measurement: cleanMeasurement });
-  };
-
-  const handleFoodSelect = (suggestion: FoodSuggestion) => {
-    setSelectedFood(suggestion);
-    setIngredient(suggestion.food.displayName);
-    setShowSuggestions(false);
-    
-    // Set default unit and clear any previous unit selection
-    const availableUnits = EnhancedFoodDatabaseService.getAvailableUnits(
-      suggestion.key, 
-      suggestion.category
-    );
-    if (availableUnits.length > 0) {
-      setSelectedUnit(availableUnits[0]);
-    }
-    setValidationMessage('');
   };
 
   // Measurement validation function
@@ -519,144 +390,52 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
         </div>
 
         <form onSubmit={handleCalculate} className="space-y-4">
-          <div className="space-y-4">
-            <div className="relative">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Ingredient Name
               </label>
               <Input
-                type="text"
-                placeholder="e.g., chicken breast, apple, olive oil"
+                placeholder="e.g., chicken breast, Greek yogurt, banana"
                 value={ingredient}
                 onChange={(e) => setIngredient(e.target.value)}
                 className="text-base"
               />
-              
-              {/* Enhanced Food Suggestions */}
-              {showSuggestions && foodSuggestions.length > 0 && (
-                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
-                  {foodSuggestions.map((suggestion, index) => (
-                    <button
-                      key={`${suggestion.category}-${suggestion.key}`}
-                      type="button"
-                      className="w-full px-4 py-3 text-left hover:bg-gray-50 border-b last:border-b-0 focus:outline-none focus:bg-blue-50"
-                      onClick={() => handleFoodSelect(suggestion)}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="font-medium text-gray-900">{suggestion.food.displayName}</div>
-                          <div className="text-sm text-gray-500 flex items-center gap-2">
-                            <Badge 
-                              variant="secondary" 
-                              className="text-xs"
-                              style={{ backgroundColor: suggestion.food.tags.categoryColor + '40' }}
-                            >
-                              {suggestion.category}
-                            </Badge>
-                            <span>•</span>
-                            <span>{suggestion.food.tags.dietType.join(', ')}</span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          {suggestion.matchType === 'exact' && (
-                            <CheckCircle className="w-4 h-4 text-green-500" />
-                          )}
-                          {suggestion.food.tags.isCommon && (
-                            <Sparkles className="w-4 h-4 text-blue-500" />
-                          )}
-                        </div>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
+              <p className="text-xs text-gray-500 mt-1">
+                Use simple, common ingredient names for best results
+              </p>
             </div>
-
-            {/* Enhanced Measurement Section */}
-            {selectedFood ? (
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Amount
-                  </label>
-                  <Input
-                    type="number"
-                    step="0.1"
-                    min="0.1"
-                    placeholder="1"
-                    value={selectedAmount}
-                    onChange={(e) => setSelectedAmount(e.target.value)}
-                    className="text-base"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Unit
-                  </label>
-                  <Select value={selectedUnit} onValueChange={setSelectedUnit}>
-                    <SelectTrigger className="text-base">
-                      <SelectValue placeholder="Select unit" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {selectedFood && EnhancedFoodDatabaseService.getAvailableUnits(selectedFood.key, selectedFood.category).map((unit) => {
-                        const gramWeight = selectedFood.food.units[unit];
-                        const volumeConversion = selectedFood.food.volumeConversions?.[unit];
-                        return (
-                          <SelectItem key={unit} value={unit}>
-                            {unit} 
-                            {gramWeight && gramWeight !== 1 && ` (≈${gramWeight}g)`}
-                            {volumeConversion && selectedFood.food.tags.densityType === 'liquid' && ` (${volumeConversion}ml)`}
-                          </SelectItem>
-                        );
-                      })}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            ) : (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Measurement
-                </label>
-                <Input
-                  type="text"
-                  placeholder="e.g., 1 cup, 100g, 2 tbsp, 1 medium"
-                  value={measurement}
-                  onChange={(e) => setMeasurement(e.target.value)}
-                  className="text-base"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Or select a food above for precise measurements
-                </p>
-              </div>
-            )}
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Measurement
+              </label>
+              <Input
+                placeholder="e.g., 1 cup, 100g, 1 medium, 2 tablespoons"
+                value={measurement}
+                onChange={(e) => setMeasurement(e.target.value)}
+                className="text-base"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Supports cups, grams, ounces, pieces, and more
+              </p>
+            </div>
           </div>
-
-          {/* Validation Message */}
-          {validationMessage && (
-            <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
-              <div className="flex items-center gap-2">
-                <Info className="w-4 h-4 text-amber-600" />
-                <span className="text-sm text-amber-700">{validationMessage}</span>
-              </div>
-            </div>
-          )}
 
           <Button 
             type="submit" 
-            disabled={calculateCalories.isPending || !ingredient.trim() || 
-              (selectedFood ? (!selectedAmount || !selectedUnit) : !measurement.trim())}
+            disabled={calculateCalories.isPending || !ingredient.trim() || !measurement.trim()}
             className="w-full bg-blue-600 hover:bg-blue-700 text-lg py-6"
           >
             {calculateCalories.isPending ? (
               <>
                 <Search className="w-5 h-5 mr-2 animate-spin" />
-                {selectedFood ? 'Enhanced Analysis...' : 'Analyzing with USDA Database...'}
+                Analyzing with USDA Database...
               </>
             ) : (
               <>
                 <Calculator className="w-5 h-5 mr-2" />
-                {selectedFood ? 'Calculate with Enhanced Data' : 'Calculate Calories'}
+                Calculate Calories
               </>
             )}
           </Button>
@@ -677,81 +456,6 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
         )}
       </Card>
 
-      {/* Professional Conversion Helper */}
-      <Card className="p-6 bg-gradient-to-br from-green-50 to-blue-50 border-0 shadow-lg">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-green-100 rounded-lg">
-            <ChefHat className="w-6 h-6 text-green-600" />
-          </div>
-          <div>
-            <h3 className="text-lg font-bold text-gray-900">Professional Culinary Conversions</h3>
-            <p className="text-sm text-gray-600">Shamrock Foods & KTT conversion standards</p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Liquid Measures */}
-          <div className="p-4 bg-white rounded-lg border">
-            <h4 className="font-medium text-gray-900 mb-2 flex items-center gap-2">
-              <Droplets className="w-4 h-4 text-blue-500" />
-              Liquid Measures
-            </h4>
-            <div className="text-sm text-gray-700 space-y-1">
-              <div>1 cup = 8 fl oz = 237ml</div>
-              <div>1/2 cup = 4 fl oz = 118ml</div>
-              <div>1/4 cup = 2 fl oz = 59ml</div>
-              <div>1 tbsp = 1/2 fl oz = 15ml</div>
-              <div>1 tsp = 1/6 fl oz = 5ml</div>
-            </div>
-          </div>
-
-          {/* Butter to Oil Conversions */}
-          <div className="p-4 bg-white rounded-lg border">
-            <h4 className="font-medium text-gray-900 mb-2 flex items-center gap-2">
-              <Scale className="w-4 h-4 text-yellow-500" />
-              Butter → Olive Oil (Baking)
-            </h4>
-            <div className="text-sm text-gray-700 space-y-1">
-              <div>1 cup butter → 3/4 cup oil</div>
-              <div>1/2 cup butter → 1/4 cup + 2 tbsp oil</div>
-              <div>1/4 cup butter → 3 tbsp oil</div>
-              <div>1 tbsp butter → 2 1/4 tsp oil</div>
-            </div>
-          </div>
-
-          {/* Temperature Conversions */}
-          <div className="p-4 bg-white rounded-lg border">
-            <h4 className="font-medium text-gray-900 mb-2 flex items-center gap-2">
-              <Flame className="w-4 h-4 text-red-500" />
-              Oven Temperatures
-            </h4>
-            <div className="text-sm text-gray-700 space-y-1">
-              <div>250°F = 120°C = Gas Mark 1/2</div>
-              <div>350°F = 175°C = Gas Mark 4</div>
-              <div>375°F = 190°C = Gas Mark 5</div>
-              <div>400°F = 200°C = Gas Mark 6</div>
-              <div>425°F = 220°C = Gas Mark 7</div>
-              <div>450°F = 230°C = Gas Mark 8</div>
-            </div>
-          </div>
-
-          {/* Common Substitutions */}
-          <div className="p-4 bg-white rounded-lg border">
-            <h4 className="font-medium text-gray-900 mb-2 flex items-center gap-2">
-              <BookOpen className="w-4 h-4 text-purple-500" />
-              Common Substitutions
-            </h4>
-            <div className="text-sm text-gray-700 space-y-1">
-              <div>1 cup milk → 1/2 cup evap milk + 1/2 cup water</div>
-              <div>1 egg → 2 egg yolks (for richness)</div>
-              <div>1 tsp baking powder → 1/4 tsp baking soda + 1/2 tsp cream of tartar</div>
-              <div>1 cup butter → 3/4 cup olive oil (healthier)</div>
-              <div>1 cup all-purpose flour → 1 cup + 2 tbsp cake flour</div>
-            </div>
-          </div>
-        </div>
-      </Card>
-
       {/* Results */}
       {recentAnalyses.length > 0 && (
         <Card className="p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg">
@@ -761,16 +465,8 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
             {recentAnalyses.map((analysis, index) => (
               <div key={index} className="p-4 border border-gray-200 rounded-lg">
                 <div className="flex justify-between items-start mb-3">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <h4 className="font-bold text-gray-900 text-lg">{analysis.ingredient}</h4>
-                      {analysis.isEnhanced && (
-                        <Badge variant="secondary" className="bg-green-100 text-green-800 text-xs">
-                          <Sparkles className="w-3 h-3 mr-1" />
-                          Enhanced
-                        </Badge>
-                      )}
-                    </div>
+                  <div>
+                    <h4 className="font-bold text-gray-900 text-lg">{analysis.ingredient}</h4>
                     <p className="text-gray-600">{analysis.measurement}</p>
                   </div>
                   <Badge variant="default" className="bg-orange-500 text-white text-lg px-3 py-1">
@@ -818,40 +514,6 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
                     <div className="flex items-start gap-2">
                       <Info className="w-4 h-4 text-blue-600 mt-0.5" />
                       <p className="text-sm text-blue-700">{analysis.note}</p>
-                    </div>
-                  </div>
-                )}
-
-                {/* Professional Conversion Information */}
-                {analysis.isEnhanced && analysis.foodKey && analysis.category && (
-                  <div className="mb-3 space-y-2">
-                    {/* Butter to Olive Oil Conversion for Butter */}
-                    {analysis.foodKey === 'butter' && (
-                      <div className="p-2 bg-green-50 border border-green-200 rounded text-xs">
-                        <div className="font-medium text-green-800">🧄 Baking Substitution</div>
-                        <div className="text-green-700">
-                          For healthier baking: Use ¾ the amount of olive oil
-                        </div>
-                      </div>
-                    )}
-                    
-                    {/* Drain Weight for Canned Goods */}
-                    {EnhancedFoodDatabaseService.getDrainWeight(analysis.foodKey, analysis.category) && (
-                      <div className="p-2 bg-amber-50 border border-amber-200 rounded text-xs">
-                        <div className="font-medium text-amber-800">📦 Canned Food Info</div>
-                        <div className="text-amber-700">
-                          Drain weight: {EnhancedFoodDatabaseService.getDrainWeight(analysis.foodKey, analysis.category)?.drainWeight}oz 
-                          (#{EnhancedFoodDatabaseService.getDrainWeight(analysis.foodKey, analysis.category)?.canSize} can)
-                        </div>
-                      </div>
-                    )}
-                    
-                    {/* Available Units Display */}
-                    <div className="p-2 bg-blue-50 border border-blue-200 rounded text-xs">
-                      <div className="font-medium text-blue-800">📏 Available Units</div>
-                      <div className="text-blue-700">
-                        {EnhancedFoodDatabaseService.getAvailableUnits(analysis.foodKey, analysis.category).join(', ')}
-                      </div>
                     </div>
                   </div>
                 )}

@@ -19,25 +19,22 @@ export function useAuth() {
   const [error, setError] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
-  // Check if Supabase credentials exist
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-  const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-  const isConfigured = !!(supabaseUrl && supabaseKey && supabaseUrl.includes('supabase.co'));
+  // Check if Supabase is properly configured
+  const isConfigured = config.supabase.isConfigured;
 
   // Get user profile data
   const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: ['user-profile', user?.id],
     queryFn: () => userApi.getCurrentUser(),
-    enabled: !!user && isConfigured,
+    enabled: !!user,
     retry: false,
   });
 
   useEffect(() => {
     // Skip auth setup if not configured
     if (!isConfigured) {
-      console.warn('Supabase not configured. URL:', !!supabaseUrl, 'Key:', !!supabaseKey);
       setLoading(false);
-      setError('Authentication service not configured. Please check Supabase credentials in secrets.');
+      setError('Supabase not configured');
       return;
     }
 
@@ -121,15 +118,11 @@ export function useAuth() {
   };
 
   // Sign in with OAuth provider
-  const signInWithProvider = async (provider: 'google' | 'github' | 'discord' | 'apple' | 'facebook') => {
+  const signInWithProvider = async (provider: 'google' | 'github' | 'discord') => {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
-        queryParams: {
-          access_type: 'offline',
-          prompt: 'consent',
-        },
       },
     });
     if (error) throw error;

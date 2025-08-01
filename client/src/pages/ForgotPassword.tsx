@@ -11,10 +11,10 @@ interface ForgotPasswordProps {
 
 export default function ForgotPassword({ onNavigateToLogin, showToast }: ForgotPasswordProps) {
   const handleResetRequest = () => {
-    // Since we use Supabase Auth, redirect to working app for password reset
-    showToast('Redirecting to password reset...', 'default');
+    // Since we use Replit OIDC, redirect to Replit's password reset
+    showToast('Redirecting to Replit password reset...', 'default');
     setTimeout(() => {
-      window.location.href = '/working';
+      window.open('https://replit.com/forgot-password', '_blank');
     }, 1000);
   };
 
@@ -85,7 +85,7 @@ export default function ForgotPassword({ onNavigateToLogin, showToast }: ForgotP
                 className="w-full touch-target"
                 style={{ fontFamily: "'Work Sans', sans-serif", fontSize: "1rem", fontWeight: 500 }}
               >
-                Reset Password via Supabase
+                Reset Password via Replit
               </Button>
             </form>
             
@@ -105,7 +105,7 @@ export default function ForgotPassword({ onNavigateToLogin, showToast }: ForgotP
         
         <div className="text-center text-sm text-muted-foreground">
           <p style={{ fontFamily: "'Quicksand', sans-serif", fontSize: "0.75rem", fontWeight: 400 }}>
-            Since ByteWise uses Supabase authentication, password reset is handled through your Supabase account.
+            Since ByteWise uses Replit authentication, password reset is handled through your Replit account.
           </p>
         </div>
       </div>
