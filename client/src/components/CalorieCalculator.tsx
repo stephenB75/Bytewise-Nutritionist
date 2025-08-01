@@ -5,13 +5,15 @@
  * Provides detailed nutrition breakdown and measurement conversions
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { IngredientDatabaseManager, type IngredientData } from '@/data/ingredientDatabase';
 import { 
   Search, 
   Calculator, 
@@ -62,8 +64,44 @@ interface CalorieCalculatorProps {
 function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLogToWeekly, isCompact = false }: CalorieCalculatorProps) {
   const [ingredient, setIngredient] = useState('');
   const [measurement, setMeasurement] = useState('');
+  const [selectedUnit, setSelectedUnit] = useState('');
+  const [amount, setAmount] = useState('');
   const [recentAnalyses, setRecentAnalyses] = useState<IngredientAnalysis[]>([]);
+  const [ingredientSuggestions, setIngredientSuggestions] = useState<Array<{category: string; key: string; data: IngredientData}>>([]);
+  const [selectedIngredient, setSelectedIngredient] = useState<{category: string; key: string; data: IngredientData} | null>(null);
+  const [availableUnits, setAvailableUnits] = useState<string[]>([]);
   const queryClient = useQueryClient();
+
+  // Search ingredients as user types
+  useEffect(() => {
+    if (ingredient.length >= 2) {
+      const suggestions = IngredientDatabaseManager.searchIngredients(ingredient);
+      setIngredientSuggestions(suggestions.slice(0, 8)); // Limit to 8 suggestions
+    } else {
+      setIngredientSuggestions([]);
+    }
+  }, [ingredient]);
+
+  // Update available units when ingredient is selected
+  useEffect(() => {
+    if (selectedIngredient) {
+      const units = IngredientDatabaseManager.getAvailableUnits(
+        selectedIngredient.category, 
+        selectedIngredient.key
+      );
+      setAvailableUnits(units);
+      if (units.length > 0 && !selectedUnit) {
+        setSelectedUnit(units[0]); // Set first unit as default
+      }
+    }
+  }, [selectedIngredient]);
+
+  // Select ingredient from suggestions
+  const handleSelectIngredient = (suggestion: {category: string; key: string; data: IngredientData}) => {
+    setSelectedIngredient(suggestion);
+    setIngredient(suggestion.data.displayName);
+    setIngredientSuggestions([]);
+  };
 
   // Calculate calories mutation
   const calculateCalories = useMutation({
@@ -84,6 +122,9 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
       setRecentAnalyses(prev => [data, ...prev.slice(0, 4)]);
       setIngredient('');
       setMeasurement('');
+      setAmount('');
+      setSelectedUnit('');
+      setSelectedIngredient(null);
       
       // Send calculated calories to tracking hook
       if (onCaloriesCalculated) {
@@ -105,30 +146,23 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
   const handleCalculate = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Enhanced measurement validation
-    const cleanIngredient = ingredient.trim();
-    const cleanMeasurement = measurement.trim();
-    
-    if (!cleanIngredient || !cleanMeasurement) {
+    if (!ingredient.trim()) {
       return;
     }
-    
-    // Validate measurement format
-    const measurementValidation = validateMeasurement(cleanMeasurement);
-    if (!measurementValidation.isValid) {
-      // Show validation error notification
-      const event = new CustomEvent('show-notification', {
-        detail: {
-          type: 'warning',
-          title: 'Invalid Measurement',
-          message: measurementValidation.suggestion || 'Please use format like "1 cup", "100g", "2 tbsp", "1 medium"'
-        }
+
+    // Enhanced calculation with ingredient database
+    if (selectedIngredient && amount && selectedUnit) {
+      const measurementText = `${amount} ${selectedUnit}`;
+      
+      // Use USDA query for enhanced accuracy
+      calculateCalories.mutate({ 
+        ingredient: selectedIngredient.data.usdaQuery, 
+        measurement: measurementText 
       });
-      window.dispatchEvent(event);
-      return;
+    } else if (measurement.trim()) {
+      // Fallback to original method
+      calculateCalories.mutate({ ingredient: ingredient.trim(), measurement: measurement.trim() });
     }
-    
-    calculateCalories.mutate({ ingredient: cleanIngredient, measurement: cleanMeasurement });
   };
 
   // Measurement validation function
@@ -390,8 +424,9 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
         </div>
 
         <form onSubmit={handleCalculate} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
+          <div className="grid grid-cols-1 gap-4">
+            {/* Enhanced Ingredient Input with Suggestions */}
+            <div className="relative">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Ingredient Name
               </label>
@@ -401,30 +436,97 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
                 onChange={(e) => setIngredient(e.target.value)}
                 className="text-base"
               />
+              
+              {/* Ingredient Suggestions Dropdown */}
+              {ingredientSuggestions.length > 0 && (
+                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                  {ingredientSuggestions.map((suggestion, index) => (
+                    <button
+                      key={`${suggestion.category}-${suggestion.key}`}
+                      type="button"
+                      onClick={() => handleSelectIngredient(suggestion)}
+                      className="w-full px-4 py-2 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium text-gray-900">{suggestion.data.displayName}</p>
+                          <p className="text-xs text-gray-500">{suggestion.category}</p>
+                        </div>
+                        <Badge 
+                          variant="outline" 
+                          style={{ backgroundColor: suggestion.data.tags.categoryColor + '40', color: '#374151' }}
+                          className="text-xs"
+                        >
+                          {suggestion.data.tags.dietType[0] || 'food'}
+                        </Badge>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+              
               <p className="text-xs text-gray-500 mt-1">
-                Use simple, common ingredient names for best results
+                Database includes {Object.keys(IngredientDatabaseManager.getCategories()).length} categories with precise unit conversions
               </p>
             </div>
             
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Measurement
-              </label>
-              <Input
-                placeholder="e.g., 1 cup, 100g, 1 medium, 2 tablespoons"
-                value={measurement}
-                onChange={(e) => setMeasurement(e.target.value)}
-                className="text-base"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                Supports cups, grams, ounces, pieces, and more
-              </p>
-            </div>
+            {/* Enhanced Measurement Input */}
+            {selectedIngredient ? (
+              // Enhanced mode with unit selection
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Amount
+                  </label>
+                  <Input
+                    type="number"
+                    step="0.25"
+                    placeholder="1"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    className="text-base"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Unit
+                  </label>
+                  <Select value={selectedUnit} onValueChange={setSelectedUnit}>
+                    <SelectTrigger className="text-base">
+                      <SelectValue placeholder="Select unit" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableUnits.map((unit) => (
+                        <SelectItem key={unit} value={unit}>
+                          {unit.replace('_', ' ')}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            ) : (
+              // Fallback mode
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Measurement
+                </label>
+                <Input
+                  placeholder="e.g., 1 cup, 100g, 1 medium, 2 tablespoons"
+                  value={measurement}
+                  onChange={(e) => setMeasurement(e.target.value)}
+                  className="text-base"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Supports cups, grams, ounces, pieces, and more
+                </p>
+              </div>
+            )}
           </div>
 
           <Button 
             type="submit" 
-            disabled={calculateCalories.isPending || !ingredient.trim() || !measurement.trim()}
+            disabled={calculateCalories.isPending || !ingredient.trim() || (!measurement.trim() && !(selectedIngredient && amount && selectedUnit))}
             className="w-full bg-blue-600 hover:bg-blue-700 text-lg py-6"
           >
             {calculateCalories.isPending ? (
