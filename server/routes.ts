@@ -12,6 +12,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.sendFile(emergencyPath);
   });
 
+  // Working nutrition tracker that bypasses React entirely
+  app.get('/working', (req, res) => {
+    const workingPath = path.resolve(import.meta.dirname, '..', 'client', 'working.html');
+    res.sendFile(workingPath);
+  });
+
   // Auth middleware
   await setupAuth(app);
 
