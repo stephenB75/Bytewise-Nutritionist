@@ -8,6 +8,7 @@
 import { useAuth } from '@/hooks/useAuth';
 import LoginScreen from '@/pages/LoginScreen';
 import { NewLogoBrand } from '@/components/NewLogoBrand';
+import { DevelopmentNotice } from '@/components/DevelopmentNotice';
 
 interface AuthWrapperProps {
   children: React.ReactNode;
@@ -15,10 +16,15 @@ interface AuthWrapperProps {
 }
 
 export function AuthWrapper({ children, onNavigate }: AuthWrapperProps) {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, loading, isConfigured, error } = useAuth();
+
+  // Show setup notice if Supabase is not configured
+  if (!isConfigured && !loading) {
+    return <DevelopmentNotice />;
+  }
 
   // Loading screen
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-100 flex items-center justify-center">
         <div className="text-center">

@@ -17,12 +17,12 @@ Preferred communication style: Simple, everyday language.
 
 ### Technical Implementations
 - **Frontend Framework**: React 18 with TypeScript.
-- **Backend Runtime**: Node.js with Express.js (TypeScript with ES modules).
+- **Backend Architecture**: Serverless with Supabase backend-as-a-service.
 - **State Management**: TanStack Query for server state, React hooks for local state.
-- **Database**: PostgreSQL with Drizzle ORM, connected via Neon Database serverless.
-- **Authentication**: Replit OIDC authentication, Express sessions with PostgreSQL store, HTTP-only cookies, CSRF protection.
-- **API**: RESTful endpoints.
-- **Data Models**: Users, Foods (with USDA data), Recipes, Meals, Water Intake.
+- **Database**: PostgreSQL with Supabase, Row Level Security (RLS) policies, real-time subscriptions.
+- **Authentication**: Supabase Auth with email/password and OAuth providers (Google, GitHub), JWT-based sessions.
+- **API**: Supabase client-side API with TypeScript types, USDA FoodData Central integration.
+- **Data Models**: Users, Foods (with USDA data), Recipes, Meals, Water Intake, Achievements, Calorie Calculations.
 
 ### Feature Specifications
 - **PWA Capabilities**: Offline functionality, installable, service worker for caching and push notifications.
@@ -62,3 +62,14 @@ Preferred communication style: Simple, everyday language.
 - `vite`: Frontend build tool and development server.
 - `typescript`: Language for type safety.
 - `tsx`: TypeScript execution for Node.js.
+
+## Recent Changes
+
+### January 2025 - Serverless Architecture Migration
+✓ **Supabase Integration**: Complete migration from Express.js to Supabase backend-as-a-service
+✓ **Authentication System**: Replaced Replit OIDC with Supabase Auth supporting email/password and OAuth providers
+✓ **Database Migration**: PostgreSQL with Row Level Security policies, real-time subscriptions, and automatic scaling
+✓ **TypeScript API Layer**: Type-safe client-side API with generated database types and error handling
+✓ **Serverless Functions**: USDA API integration moved to client-side with proper environment variable handling
+✓ **Security Enhancement**: JWT-based authentication, RLS policies, and secure environment variable management
+✓ **Development Workflow**: Simplified deployment with zero server maintenance and automatic scaling
