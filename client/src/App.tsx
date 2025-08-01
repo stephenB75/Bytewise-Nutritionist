@@ -19,6 +19,8 @@ import CalorieCalculatorWrapper from './components/CalorieCalculatorWrapper';
 import WeeklyLogger from './pages/WeeklyLogger';
 import ProfileEnhanced from './pages/ProfileEnhanced';
 import CalorieCalculatorValidation from './test/CalorieCalculatorValidation';
+import CalorieCalculatorDemo from './components/CalorieCalculatorDemo';
+import CalculatorValidationTest from './components/CalculatorValidationTest';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('dashboard');
@@ -100,6 +102,10 @@ export default function App() {
         return <ProfileEnhanced onNavigate={handleNavigate} />;
       case 'validation':
         return <CalorieCalculatorValidation />;
+      case 'demo':
+        return <CalorieCalculatorDemo />;
+      case 'test':
+        return <CalculatorValidationTest />;
       default:
         return <Dashboard onNavigate={handleNavigate} />;
     }
