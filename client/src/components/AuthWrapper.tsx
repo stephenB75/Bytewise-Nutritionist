@@ -45,6 +45,7 @@ export function AuthWrapper({ children, onNavigate }: AuthWrapperProps) {
 
   // Show login screen if not authenticated (when Supabase is configured)
   if (!isAuthenticated) {
+    console.log('🔐 Showing LoginScreen - user not authenticated');
     return <LoginScreen onNavigate={onNavigate} />;
   }
 

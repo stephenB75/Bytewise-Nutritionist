@@ -89,6 +89,13 @@ export function resetImageRotation(): void {
 }
 
 /**
+ * Set image rotation preference (no-op for this implementation)
+ */
+export function setImageRotation(enabled: boolean): void {
+  // No state to set in this simplified implementation
+}
+
+/**
  * Get a food image for a specific component
  */
 export function getComponentFoodImage(componentName: string): string {
@@ -101,6 +108,13 @@ export function getComponentFoodImage(componentName: string): string {
   const images = getAllFoodImages();
   const index = Math.abs(hash) % images.length;
   return images[index];
+}
+
+/**
+ * Get the total count of available food images
+ */
+export function getFoodImageCount(): number {
+  return getAllFoodImages().length;
 }
 
 /**
