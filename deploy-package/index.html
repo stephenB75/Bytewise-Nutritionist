@@ -31,7 +31,7 @@
   <meta name="twitter:description" content="Mobile nutrition tracking and meal planning made simple." />
   
   <!-- PWA Manifest -->
-  <link rel="manifest" href="./manifest.json" />
+  <link rel="manifest" href="/manifest.json" />
   
   <!-- Favicon and Icons -->
   <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png" />
@@ -82,11 +82,8 @@
       font-size: 16px !important;
     }
   </style>
-  <script type="module" crossorigin src="./assets/index-DrR5NbRy.js"></script>
-  <link rel="modulepreload" crossorigin href="./assets/vendor-BgNOLPkv.js">
-  <link rel="modulepreload" crossorigin href="./assets/ui-BIkWkz57.js">
-  <link rel="modulepreload" crossorigin href="./assets/utils-J9WKoK_r.js">
-  <link rel="stylesheet" crossorigin href="./assets/index-CmtxucEg.css">
+  <script type="module" crossorigin src="/assets/index-DLUnb2Cu.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-CmtxucEg.css">
 </head>
 <body>
   <div id="root"></div>
@@ -95,7 +92,7 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
+        navigator.serviceWorker.register('/sw.js')
           .then((registration) => {
             console.log('🍎 Service Worker registered successfully:', registration);
           })

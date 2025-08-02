@@ -52,6 +52,9 @@ export const config = {
 // Production logging
 if (isProd) {
   console.log('📱 ByteWise Production Mode');
+  console.log('🔧 Supabase configured:', config.supabase.isConfigured);
+  console.log('🔗 Supabase URL:', config.supabase.url ? 'present' : 'missing');
+  console.log('🔑 Supabase Key:', config.supabase.anonKey ? 'present' : 'missing');
 }
 
 export default config;
