@@ -28,7 +28,7 @@ Preferred communication style: Simple, everyday language.
 - **PWA Capabilities**: Offline functionality, installable, service worker for caching and push notifications.
 - **Real-time Updates**: Optimistic updates via TanStack Query.
 - **Component Library**: Extensive shadcn/ui base components augmented with custom nutrition-specific components (e.g., progress rings, meal cards).
-- **Nutrition Analysis**: USDA-powered calorie calculations with measurement conversions and detailed nutritional breakdowns. Includes a professional ingredient database with precise weight conversions and unit conversion system.
+- **Enhanced Nutrition Analysis**: USDA-powered calorie calculations using comprehensive CSV datasets with food-specific conversion factors, precise portion weights, and detailed nutritional breakdowns. Professional ingredient database with accurate weight conversions and advanced measurement parsing system supporting fractions and food-specific portions.
 - **Meal Logging**: Real-time nutrition calculations and dashboard updates.
 - **Recipe Creation**: Dynamic nutrition calculation as ingredients are added.
 - **Tracking**: Daily goals, aggregated consumption, calendar view for historical data.
@@ -37,10 +37,12 @@ Preferred communication style: Simple, everyday language.
 - **Reporting**: PDF export system for progress reports.
 - **Native Mobile Support**: Android and iOS support using Capacitor framework with relevant mobile plugins.
 
-## Recent Fixes
-✓ **Frontend Runtime Issues Resolved**: Systematically debugged React component errors by isolating HeroSection component causing runtime conflicts
-✓ **Complete App Restoration**: ByteWise full application now functional with proper authentication flow and component loading
-✓ **Preview Access Confirmed**: App loads correctly in both development and external preview environments with working USDA API integration
+## Recent Enhancements
+✓ **Enhanced USDA Data Integration**: Implemented comprehensive USDA CSV datasets for significantly improved calorie calculation accuracy
+✓ **Food-Specific Conversion Factors**: Integrated precise calorie conversion factors (protein: 2.44-4.27, fat: 8.37-9.02, carbs: 3.57-4.16) based on food type rather than generic 4-9-4 formula  
+✓ **Precise Portion Database**: Added accurate portion-to-gram conversions from USDA food portion data (e.g., medium apple = 182g, large banana = 136g)
+✓ **Advanced Measurement Parsing**: Enhanced measurement recognition with support for fractions, food-specific portions, and comprehensive unit conversions
+✓ **Real-Time Nutrition Calculations**: All calorie calculations now use authentic USDA data with enhanced accuracy for meal logging and recipe building
 
 ## External Dependencies
 

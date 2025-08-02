@@ -8,6 +8,8 @@
 import { db } from '../db';
 import { usdaFoodCache } from '@shared/schema';
 import { eq, like, desc, asc, sql } from 'drizzle-orm';
+import { getPortionWeight, parseMeasurement } from '../data/portionData.js';
+import { getCalorieFactors, calculateCaloriesFromMacros } from '../data/calorieFactors.js';
 
 interface USDANutrient {
   id: number;
@@ -201,15 +203,32 @@ export class USDAService {
       // Parse measurement and convert to grams
       const { quantity, unit, gramsEquivalent } = this.parseMeasurement(measurement, food);
       
-      // Calculate calories based on grams
-      const caloriesPer100g = nutrients.calories || 0;
-      const estimatedCalories = Math.round((caloriesPer100g * gramsEquivalent) / 100);
+      // Calculate calories based on grams using enhanced conversion factors
+      let estimatedCalories: number;
+      
+      if (nutrients.calories > 0) {
+        // Use direct calorie data if available
+        estimatedCalories = Math.round((nutrients.calories * gramsEquivalent) / 100);
+      } else if (nutrients.protein > 0 || nutrients.carbs > 0 || nutrients.fat > 0) {
+        // Calculate using food-specific USDA conversion factors
+        estimatedCalories = calculateCaloriesFromMacros(
+          food.description,
+          (nutrients.protein * gramsEquivalent) / 100,
+          (nutrients.fat * gramsEquivalent) / 100,
+          (nutrients.carbs * gramsEquivalent) / 100
+        );
+        console.log(`🧮 Enhanced calorie calculation for "${food.description}": ${estimatedCalories} cal (${gramsEquivalent}g)`);
+      } else {
+        // Fallback to zero if no nutritional data
+        estimatedCalories = 0;
+      }
       
       // Generate equivalent measurement
+      const caloriesPer100g = nutrients.calories || Math.round((estimatedCalories * 100) / gramsEquivalent);
       const equivalentMeasurement = this.generateEquivalentMeasurement(
         gramsEquivalent,
         unit,
-        nutrients.calories
+        caloriesPer100g
       );
       
       // Generate size variation note
@@ -624,9 +643,13 @@ export class USDAService {
   }
 
   /**
-   * Fallback calorie estimation when USDA data unavailable
+   * Enhanced calorie estimation using USDA portion data and conversion factors
    */
   private getEnhancedFallbackEstimate(ingredientName: string, measurement: string) {
+    // First try to get precise portion weight from USDA data
+    const { quantity, unit } = parseMeasurement(measurement);
+    const portionWeight = getPortionWeight(ingredientName, unit);
+    
     // Comprehensive fallback estimates per 100g based on USDA averages
     const fallbackData: { [key: string]: { calories: number; protein: number; carbs: number; fat: number } } = {
       // Fruits
@@ -634,6 +657,7 @@ export class USDAService {
       'banana': { calories: 89, protein: 1.1, carbs: 23, fat: 0.3 },
       'orange': { calories: 47, protein: 0.9, carbs: 12, fat: 0.1 },
       'grape': { calories: 62, protein: 0.6, carbs: 16, fat: 0.2 },
+      'cherry': { calories: 63, protein: 1.1, carbs: 16, fat: 0.2 },
       
       // Proteins  
       'chicken': { calories: 165, protein: 31, carbs: 0, fat: 3.6 },
@@ -662,33 +686,55 @@ export class USDAService {
       }
     }
 
-    // Parse measurement for gram equivalent
-    const { gramsEquivalent } = this.parseFallbackMeasurement(measurement);
-    const estimatedCalories = Math.round((nutritionData.calories * gramsEquivalent) / 100);
+    // Calculate gram equivalent - use USDA portion data if available, fallback otherwise
+    let gramsEquivalent: number;
+    if (portionWeight) {
+      gramsEquivalent = portionWeight * quantity;
+    } else {
+      const fallbackResult = this.parseFallbackMeasurement(measurement);
+      gramsEquivalent = fallbackResult.gramsEquivalent;
+    }
+
+    // Use food-specific calorie conversion factors for more accuracy
+    const enhancedCalories = calculateCaloriesFromMacros(
+      ingredientName,
+      (nutritionData.protein * gramsEquivalent) / 100,
+      (nutritionData.fat * gramsEquivalent) / 100,
+      (nutritionData.carbs * gramsEquivalent) / 100
+    );
 
     return {
       ingredient: ingredientName.toUpperCase(),
       measurement: `${measurement} (~${Math.round(gramsEquivalent)}g)`,
-      estimatedCalories,
+      estimatedCalories: enhancedCalories,
       equivalentMeasurement: `100g ≈ ${nutritionData.calories} kcal`,
-      note: 'Estimate based on USDA nutrition averages (fallback data)',
+      note: portionWeight ? 
+        'Enhanced estimate using USDA portion database and food-specific conversion factors' :
+        'Estimate based on USDA nutrition averages with enhanced conversion factors',
       nutritionPer100g: nutritionData,
+      usdaPortionUsed: !!portionWeight,
     };
   }
 
   private parseFallbackMeasurement(measurement: string): { gramsEquivalent: number } {
-    const normalized = measurement.toLowerCase();
-    const match = normalized.match(/^(\d+(?:\.\d+)?)\s*(.+)$/);
-    const quantity = match ? parseFloat(match[1]) : 1;
-    const unit = match ? match[2].trim() : normalized;
+    const { quantity, unit } = parseMeasurement(measurement);
 
+    // Enhanced conversions based on USDA portion data averages
     const conversions: { [key: string]: number } = {
       'g': 1, 'gram': 1, 'grams': 1,
+      'kg': 1000, 'kilogram': 1000,
       'cup': 240, 'cups': 240,
       'tablespoon': 15, 'tbsp': 15,
       'teaspoon': 5, 'tsp': 5,
       'medium': 150, 'large': 200, 'small': 100,
-      'slice': 30, 'piece': 50, 'whole': 200,
+      'slice': 28, 'piece': 50, 'whole': 200,
+      'serving': 85, 'portion': 85,
+      'breast': 172, 'thigh': 85, 'drumstick': 44,
+      'fillet': 150, 'steak': 150,
+      'ounce': 28.35, 'oz': 28.35,
+      'pound': 453.6, 'lb': 453.6,
+      'pint': 473, 'quart': 946, 'gallon': 3785,
+      'liter': 1000, 'ml': 1, 'milliliter': 1,
     };
 
     let gramsEquivalent = quantity * 100; // default 100g per unit
