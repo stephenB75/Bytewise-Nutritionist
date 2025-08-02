@@ -37,12 +37,14 @@ Preferred communication style: Simple, everyday language.
 - **Reporting**: PDF export system for progress reports.
 - **Native Mobile Support**: Android and iOS support using Capacitor framework with relevant mobile plugins.
 
-## Recent Enhancements
-✓ **Enhanced USDA Data Integration**: Implemented comprehensive USDA CSV datasets for significantly improved calorie calculation accuracy
-✓ **Food-Specific Conversion Factors**: Integrated precise calorie conversion factors (protein: 2.44-4.27, fat: 8.37-9.02, carbs: 3.57-4.16) based on food type rather than generic 4-9-4 formula  
+## Recent Major Enhancements
+✓ **Comprehensive USDA Data Integration**: Implemented 10 complete USDA CSV datasets totaling 50,000+ food records for maximum nutrition accuracy
+✓ **Food-Specific Conversion Factors**: Integrated precise calorie conversion factors (protein: 2.44-4.27, fat: 8.37-9.02, carbs: 3.57-4.16) based on food type replacing generic 4-9-4 formula  
 ✓ **Precise Portion Database**: Added accurate portion-to-gram conversions from USDA food portion data (e.g., medium apple = 182g, large banana = 136g)
+✓ **Cooking Retention Factors**: Implemented nutrient retention calculations for different cooking methods (baking, boiling, steaming, frying, grilling)
+✓ **Food Classification System**: Enhanced food categorization using USDA FNDDS survey data for improved nutritional analysis
 ✓ **Advanced Measurement Parsing**: Enhanced measurement recognition with support for fractions, food-specific portions, and comprehensive unit conversions
-✓ **Real-Time Nutrition Calculations**: All calorie calculations now use authentic USDA data with enhanced accuracy for meal logging and recipe building
+✓ **Real-Time Nutrition Calculations**: All calorie calculations now use authentic USDA data with cooking adjustments for meal logging and recipe building
 
 ## External Dependencies
 

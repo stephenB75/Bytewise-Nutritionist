@@ -10,6 +10,8 @@ import { usdaFoodCache } from '@shared/schema';
 import { eq, like, desc, asc, sql } from 'drizzle-orm';
 import { getPortionWeight, parseMeasurement } from '../data/portionData.js';
 import { getCalorieFactors, calculateCaloriesFromMacros } from '../data/calorieFactors.js';
+import { getRetentionFactors, applyRetentionFactors, detectCookingMethod } from '../data/retentionFactors.js';
+import { classifyFood, getNutritionalPriorities } from '../data/foodCategories.js';
 
 interface USDANutrient {
   id: number;
@@ -198,7 +200,16 @@ export class USDAService {
       console.log(`📊 Food has ${food.foodNutrients?.length || 0} nutrients`);
       
       // Extract key nutrients
-      const nutrients = this.extractNutrients(food.foodNutrients);
+      let nutrients = this.extractNutrients(food.foodNutrients);
+      
+      // Apply cooking retention factors if food is prepared
+      const cookingMethod = detectCookingMethod(food.description);
+      const foodGroup = classifyFood(food.description);
+      
+      if (cookingMethod !== 'raw') {
+        nutrients = applyRetentionFactors(nutrients, cookingMethod, foodGroup);
+        console.log(`🔥 Applied ${cookingMethod} retention factors for ${foodGroup}: ${JSON.stringify(nutrients)}`);
+      }
       
       // Parse measurement and convert to grams
       const { quantity, unit, gramsEquivalent } = this.parseMeasurement(measurement, food);
@@ -650,6 +661,10 @@ export class USDAService {
     const { quantity, unit } = parseMeasurement(measurement);
     const portionWeight = getPortionWeight(ingredientName, unit);
     
+    // Detect if food is cooked and apply retention factors
+    const cookingMethod = detectCookingMethod(ingredientName);
+    const foodGroup = classifyFood(ingredientName);
+    
     // Comprehensive fallback estimates per 100g based on USDA averages
     const fallbackData: { [key: string]: { calories: number; protein: number; carbs: number; fat: number } } = {
       // Fruits
@@ -695,12 +710,26 @@ export class USDAService {
       gramsEquivalent = fallbackResult.gramsEquivalent;
     }
 
+    // Apply cooking retention factors if needed
+    let adjustedNutrition = { ...nutritionData };
+    if (cookingMethod !== 'raw') {
+      adjustedNutrition = applyRetentionFactors(
+        { 
+          protein: nutritionData.protein, 
+          fat: nutritionData.fat, 
+          carbs: nutritionData.carbs 
+        },
+        cookingMethod,
+        foodGroup
+      );
+    }
+    
     // Use food-specific calorie conversion factors for more accuracy
     const enhancedCalories = calculateCaloriesFromMacros(
       ingredientName,
-      (nutritionData.protein * gramsEquivalent) / 100,
-      (nutritionData.fat * gramsEquivalent) / 100,
-      (nutritionData.carbs * gramsEquivalent) / 100
+      (adjustedNutrition.protein * gramsEquivalent) / 100,
+      (adjustedNutrition.fat * gramsEquivalent) / 100,
+      (adjustedNutrition.carbs * gramsEquivalent) / 100
     );
 
     return {
