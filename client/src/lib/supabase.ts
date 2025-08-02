@@ -8,8 +8,8 @@ import type { Database } from '../types/database';
 import { config } from './config';
 
 // Use configuration with safe fallbacks
-const finalUrl = config.supabase.url || config.fallback.supabaseUrl;
-const finalKey = config.supabase.anonKey || config.fallback.supabaseKey;
+const finalUrl = config.supabase.url;
+const finalKey = config.supabase.anonKey;
 
 // Production-ready configuration - debug logs removed
 
