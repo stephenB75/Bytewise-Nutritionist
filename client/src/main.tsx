@@ -2,10 +2,11 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import TestApp from "./TestApp";
+import MinimalTest from "./MinimalTest";
 import "./index.css";
 
-// Debug mode - use TestApp to isolate issues
-const useTestApp = false;
+// Debug mode - use minimal test to isolate issues
+const useMinimalTest = true;
 
 // Suppress development warnings and errors
 if (import.meta.env.DEV) {
@@ -33,5 +34,31 @@ if (import.meta.env.DEV) {
 }
 
 console.log('🚀 Starting ByteWise app render...');
-const AppComponent = useTestApp ? TestApp : App;
-createRoot(document.getElementById("root")!).render(<AppComponent />);
+
+// Add error boundary to catch render errors
+const rootElement = document.getElementById("root");
+if (!rootElement) {
+  console.error('❌ Root element not found');
+  document.body.innerHTML = `
+    <div style="background: red; color: white; padding: 20px;">
+      ERROR: Root element not found in DOM
+    </div>
+  `;
+} else {
+  console.log('✅ Root element found, attempting render...');
+  
+  try {
+    const AppComponent = useMinimalTest ? MinimalTest : App;
+    const root = createRoot(rootElement);
+    root.render(<AppComponent />);
+    console.log('✅ React render initiated successfully');
+  } catch (error) {
+    console.error('❌ React render failed:', error);
+    rootElement.innerHTML = `
+      <div style="background: red; color: white; padding: 20px; font-family: Arial;">
+        <h1>RENDER ERROR</h1>
+        <p>React failed to render: ${error}</p>
+      </div>
+    `;
+  }
+}
