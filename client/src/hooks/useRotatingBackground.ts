@@ -5,12 +5,12 @@
 
 import { useState, useEffect } from 'react';
 
-// Import available food images
-import appleImage from '@assets/apple-3313209_1920_1753859530078.jpg';
-import blueberriesImage from '@assets/blueberries-9450130_1920_1753859477806.jpg';
-import bowlImage from '@assets/bowl-1842294_1920_1753859477806.jpg';
-import burgersImage from '@assets/burgers-5590503_1920_1753859530083.jpg';
-import dishImage from '@assets/food-3262796_1920_1753859530086.jpg';
+// Use static paths for reliable image loading
+const appleImage = '/assets/apple-3313209_1920_1753859530078-BJW4vFlt.jpg';
+const blueberriesImage = '/assets/blueberries-9450130_1920_1753859477806-DQeN0M4j.jpg';
+const bowlImage = '/assets/bowl-1842294_1920_1753859477806-bRUsOvIC.jpg';
+const burgersImage = '/assets/burgers-5590503_1920_1753859530083-I99DUxaH.jpg';
+const dishImage = '/assets/food-3262796_1920_1753859530086-BeFn5V1r.jpg';
 
 const BACKGROUND_IMAGES = [
   {

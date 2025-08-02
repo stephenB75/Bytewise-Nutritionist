@@ -1,6 +1,6 @@
-# ByteWise Nutritionist 🥗
+# 🥗 ByteWise Nutrition Tracker
 
-> Professional nutrition tracking Progressive Web App with USDA database integration
+> **Professional cross-platform nutrition tracking app with USDA database integration, real-time meal logging, and native mobile support**
 
 [![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)](https://github.com/bytewise-team/bytewise-nutritionist)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
@@ -17,32 +17,33 @@
 - **Recipe Builder** - Create and save custom recipes with nutrition calculations
 - **Goal Management** - Personalized nutrition targets and achievement tracking
 
-### Technical Excellence
-- **Progressive Web App** - Installable, offline-capable, native-like experience
-- **iOS App Store Ready** - Complete deployment files and build automation
-- **Enhanced Accessibility** - 17px base font, improved contrast, WCAG compliant
-- **Professional UI/UX** - Slide animations, responsive design, touch-optimized
-- **Real-time Updates** - Event-driven architecture with optimistic UI updates
-- **Offline Support** - Service worker with intelligent caching and background sync
+### Technical Excellence  
+- **Cross-Platform Native Apps** - Single React codebase → iOS App Store + Google Play Store
+- **Progressive Web App** - Installable, offline-capable, native-like web experience
+- **Capacitor Framework** - 100% native performance with web technologies
+- **Serverless Architecture** - Supabase backend with auto-scaling and real-time sync
+- **Enhanced Mobile UI** - Touch-optimized, 44px touch targets, haptic feedback
+- **Professional Design** - shadcn/ui components with Tailwind CSS mobile-first approach
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 - Node.js 18+ and npm
 - Modern web browser with PWA support
-- For iOS deployment: macOS with Xcode 15+
+- For mobile deployment: iOS (macOS + Xcode) or Android (Android Studio)
 
-### Installation
+### Installation & Development
 ```bash
-# Clone the repository
-git clone https://github.com/bytewise-team/bytewise-nutritionist.git
-cd bytewise-nutritionist
-
 # Install dependencies
 npm install
 
 # Start development server
 npm run dev
+
+# Mobile development
+./mobile-build.sh              # Build for mobile
+npx cap run ios --livereload    # iOS with live reload
+npx cap run android --livereload # Android with live reload
 ```
 
 ### Build for Production
