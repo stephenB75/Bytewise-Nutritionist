@@ -1,0 +1,7 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" fill="#10b981" rx="60"/>
+  <circle cx="256" cy="256" r="160" fill="white"/>
+  <path d="M256 160 L256 352 M186 226 L326 226 M206 286 L306 286" stroke="#10b981" stroke-width="12" stroke-linecap="round"/>
+  <circle cx="256" cy="200" r="20" fill="#10b981"/>
+  <text x="256" y="420" text-anchor="middle" fill="white" font-family="system-ui" font-size="42" font-weight="bold">ByteWise</text>
+</svg>
