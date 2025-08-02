@@ -1,10 +1,10 @@
 // ByteWise PWA Service Worker
 const CACHE_NAME = 'bytewise-v1';
 const urlsToCache = [
-  './',
-  './index.html',
-  './manifest.json',
-  './offline.html'
+  '/Bytewise-Nutritionist/',
+  '/Bytewise-Nutritionist/index.html',
+  '/Bytewise-Nutritionist/manifest.json',
+  '/Bytewise-Nutritionist/offline.html'
 ];
 
 self.addEventListener('install', (event) => {
@@ -22,7 +22,7 @@ self.addEventListener('fetch', (event) => {
         return response || fetch(event.request).catch(() => {
           // If both cache and network fail, show offline page
           if (event.request.destination === 'document') {
-            return caches.match('./offline.html');
+            return caches.match('/Bytewise-Nutritionist/offline.html');
           }
         });
       })
