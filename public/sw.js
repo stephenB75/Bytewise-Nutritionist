@@ -1,79 +1,77 @@
-/**
- * ByteWise Service Worker
- * 
- * Handles offline functionality, caching, and background sync
- * Optimized for iOS PWA installation
- */
+// Bytewise Nutrition Tracker - Service Worker
+// Provides offline functionality and caching for PWA experience
 
 const CACHE_NAME = 'bytewise-v1.2.0';
-const STATIC_CACHE = 'bytewise-static-v1.2.0';
-const DYNAMIC_CACHE = 'bytewise-dynamic-v1.2.0';
-const API_CACHE = 'bytewise-api-v1.2.0';
+const STATIC_CACHE = 'bytewise-static-v1';
+const DYNAMIC_CACHE = 'bytewise-dynamic-v1';
+const API_CACHE = 'bytewise-api-v1';
 
-// Files to cache for offline use
-const STATIC_FILES = [
-  '/Bytewise-Nutritionist/',
-  '/Bytewise-Nutritionist/index.html',
-  '/Bytewise-Nutritionist/manifest.json',
-  '/Bytewise-Nutritionist/icons/icon-192x192.png',
-  '/Bytewise-Nutritionist/icons/icon-512x512.png',
-  // Add critical CSS and JS files here when available
+// Critical resources to cache immediately
+const STATIC_ASSETS = [
+  '/',
+  '/index.html',
+  '/manifest.json',
+  '/icon-192.svg',
+  '/icon-512.svg'
 ];
 
-// API endpoints to cache
+// API endpoints to cache for offline functionality
 const API_ENDPOINTS = [
-  '/api/user/profile',
-  '/api/meals/recent',
-  '/api/nutrition/usda'
+  '/api/auth/user',
+  '/api/version',
+  '/api/foods',
+  '/api/usda/search'
 ];
 
-// Install event - cache static files
-self.addEventListener('install', (event) => {
-  console.log('[SW] Installing ByteWise Service Worker v1.2.0');
+// Install event - cache static assets
+self.addEventListener('install', event => {
+  console.log('🔧 Service Worker installing...');
   
   event.waitUntil(
-    Promise.all([
-      caches.open(STATIC_CACHE).then((cache) => {
-        console.log('[SW] Caching static files');
-        return cache.addAll(STATIC_FILES);
-      }),
-      caches.open(API_CACHE).then((cache) => {
-        console.log('[SW] Preparing API cache');
-        return Promise.resolve();
+    caches.open(STATIC_CACHE)
+      .then(cache => {
+        console.log('📦 Caching static assets');
+        return cache.addAll(STATIC_ASSETS);
       })
-    ])
+      .then(() => {
+        console.log('✅ Static assets cached successfully');
+        return self.skipWaiting();
+      })
+      .catch(err => {
+        console.error('❌ Failed to cache static assets:', err);
+      })
   );
-  
-  // Force activation of new service worker
-  self.skipWaiting();
 });
 
-// Activate event - cleanup old caches
-self.addEventListener('activate', (event) => {
-  console.log('[SW] Activating ByteWise Service Worker v1.2.0');
+// Activate event - clean up old caches
+self.addEventListener('activate', event => {
+  console.log('🚀 Service Worker activating...');
   
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== STATIC_CACHE && 
-              cacheName !== DYNAMIC_CACHE && 
-              cacheName !== API_CACHE &&
-              cacheName.startsWith('bytewise-')) {
-            console.log('[SW] Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
+    caches.keys()
+      .then(cacheNames => {
+        return Promise.all(
+          cacheNames
+            .filter(cacheName => {
+              return cacheName !== STATIC_CACHE && 
+                     cacheName !== DYNAMIC_CACHE && 
+                     cacheName !== API_CACHE;
+            })
+            .map(cacheName => {
+              console.log('🗑️ Deleting old cache:', cacheName);
+              return caches.delete(cacheName);
+            })
+        );
+      })
+      .then(() => {
+        console.log('✅ Service Worker activated');
+        return self.clients.claim();
+      })
   );
-  
-  // Take control of all clients
-  return self.clients.claim();
 });
 
-// Fetch event - handle requests with caching strategy
-self.addEventListener('fetch', (event) => {
+// Fetch event - implement caching strategies
+self.addEventListener('fetch', event => {
   const { request } = event;
   const url = new URL(request.url);
   
@@ -82,228 +80,174 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
-  // Skip chrome-extension and other non-http requests
-  if (!url.protocol.startsWith('http')) {
+  // Handle API requests
+  if (url.pathname.startsWith('/api/')) {
+    event.respondWith(handleApiRequest(request));
     return;
   }
   
-  event.respondWith(handleFetch(request));
+  // Handle static assets
+  if (STATIC_ASSETS.some(asset => url.pathname === asset || url.pathname.endsWith(asset))) {
+    event.respondWith(handleStaticRequest(request));
+    return;
+  }
+  
+  // Handle other requests (CSS, JS, images)
+  event.respondWith(handleDynamicRequest(request));
 });
 
-async function handleFetch(request) {
-  const url = new URL(request.url);
-  
+// Cache-first strategy for static assets
+async function handleStaticRequest(request) {
   try {
-    // Strategy 1: Static files - Cache First
-    if (STATIC_FILES.some(file => url.pathname === file || url.pathname.endsWith(file))) {
-      return await cacheFirst(request, STATIC_CACHE);
+    const cachedResponse = await caches.match(request);
+    if (cachedResponse) {
+      return cachedResponse;
     }
     
-    // Strategy 2: API requests - Network First with fallback
-    if (url.pathname.startsWith('/api/')) {
-      return await networkFirstWithFallback(request, API_CACHE);
-    }
+    const networkResponse = await fetch(request);
+    const cache = await caches.open(STATIC_CACHE);
+    cache.put(request, networkResponse.clone());
     
-    // Strategy 3: Images and assets - Cache First
-    if (request.destination === 'image' || 
-        url.pathname.includes('/icons/') ||
-        url.pathname.includes('/screenshots/') ||
-        url.pathname.match(/\.(png|jpg|jpeg|gif|svg|webp)$/)) {
-      return await cacheFirst(request, DYNAMIC_CACHE);
-    }
-    
-    // Strategy 4: Other requests - Network First
-    return await networkFirst(request, DYNAMIC_CACHE);
-    
+    return networkResponse;
   } catch (error) {
-    console.error('[SW] Fetch error:', error);
+    console.error('Static request failed:', error);
     
-    // Return offline fallback for navigation requests
-    if (request.mode === 'navigate') {
-      const cache = await caches.open(STATIC_CACHE);
-      return await cache.match('/') || new Response('Offline', { status: 503 });
-    }
-    
-    return new Response('Network Error', { 
-      status: 503,
-      statusText: 'Service Unavailable'
-    });
-  }
-}
-
-// Cache First strategy
-async function cacheFirst(request, cacheName) {
-  const cache = await caches.open(cacheName);
-  const cached = await cache.match(request);
-  
-  if (cached) {
-    console.log('[SW] Cache hit:', request.url);
-    return cached;
-  }
-  
-  console.log('[SW] Cache miss, fetching:', request.url);
-  const response = await fetch(request);
-  
-  if (response.ok) {
-    cache.put(request, response.clone());
-  }
-  
-  return response;
-}
-
-// Network First strategy
-async function networkFirst(request, cacheName) {
-  try {
-    const response = await fetch(request);
-    
-    if (response.ok) {
-      const cache = await caches.open(cacheName);
-      cache.put(request, response.clone());
-    }
-    
-    return response;
-  } catch (error) {
-    console.log('[SW] Network failed, trying cache:', request.url);
-    const cache = await caches.open(cacheName);
-    const cached = await cache.match(request);
-    
-    if (cached) {
-      return cached;
+    // Return offline fallback for HTML requests
+    if (request.headers.get('accept').includes('text/html')) {
+      return new Response(
+        `<!DOCTYPE html>
+        <html>
+        <head>
+          <title>Bytewise - Offline</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <style>
+            body { font-family: system-ui, sans-serif; text-align: center; padding: 2rem; color: #334155; }
+            .offline { max-width: 400px; margin: 2rem auto; }
+            .icon { font-size: 4rem; margin-bottom: 1rem; }
+            .title { font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem; }
+            .message { margin-bottom: 2rem; color: #64748b; }
+            .retry { background: #7dd3fc; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 0.5rem; cursor: pointer; }
+          </style>
+        </head>
+        <body>
+          <div class="offline">
+            <div class="icon">🍎</div>
+            <div class="title">Bytewise</div>
+            <div class="message">You're offline. Please check your connection and try again.</div>
+            <button class="retry" onclick="location.reload()">Retry</button>
+          </div>
+        </body>
+        </html>`,
+        { headers: { 'Content-Type': 'text/html' } }
+      );
     }
     
     throw error;
   }
 }
 
-// Network First with intelligent fallback for API requests
-async function networkFirstWithFallback(request, cacheName) {
+// Network-first strategy for API requests with fallback
+async function handleApiRequest(request) {
   try {
-    const response = await fetch(request);
+    const networkResponse = await fetch(request);
     
-    if (response.ok) {
-      const cache = await caches.open(cacheName);
-      cache.put(request, response.clone());
-      return response;
+    // Cache successful API responses
+    if (networkResponse.ok) {
+      const cache = await caches.open(API_CACHE);
+      cache.put(request, networkResponse.clone());
     }
     
-    // If network response is not ok, try cache
-    throw new Error(`HTTP ${response.status}`);
-    
+    return networkResponse;
   } catch (error) {
-    console.log('[SW] API network failed, trying cache:', request.url);
-    const cache = await caches.open(cacheName);
-    const cached = await cache.match(request);
+    console.log('Network failed, trying cache for:', request.url);
     
-    if (cached) {
-      console.log('[SW] Returning cached API response');
-      return cached;
+    // Try to return cached version
+    const cachedResponse = await caches.match(request);
+    if (cachedResponse) {
+      return cachedResponse;
     }
     
-    // Return meaningful offline response for API requests
-    return new Response(JSON.stringify({
-      error: 'offline',
-      message: 'Data not available offline',
-      cached: false
-    }), {
-      status: 503,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    // Return offline indicator for critical API calls
+    if (request.url.includes('/api/auth/user')) {
+      return new Response(JSON.stringify({ offline: true }), {
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    
+    throw error;
   }
 }
 
-// Background sync for meal logging
-self.addEventListener('sync', (event) => {
+// Stale-while-revalidate strategy for dynamic content
+async function handleDynamicRequest(request) {
+  const cache = await caches.open(DYNAMIC_CACHE);
+  const cachedResponse = await cache.match(request);
+  
+  const fetchPromise = fetch(request).then(networkResponse => {
+    cache.put(request, networkResponse.clone());
+    return networkResponse;
+  }).catch(() => cachedResponse);
+  
+  return cachedResponse || fetchPromise;
+}
+
+// Handle background sync for offline actions
+self.addEventListener('sync', event => {
+  console.log('🔄 Background sync triggered:', event.tag);
+  
   if (event.tag === 'meal-sync') {
-    console.log('[SW] Background sync: meal-sync');
-    event.waitUntil(syncMealData());
+    event.waitUntil(syncOfflineMeals());
   }
 });
 
-async function syncMealData() {
+// Sync offline meal logs when connection is restored
+async function syncOfflineMeals() {
   try {
-    // Get pending meal data from IndexedDB or localStorage
-    const pendingMeals = await getPendingMeals();
-    
-    for (const meal of pendingMeals) {
-      try {
-        const response = await fetch('/api/meals', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(meal)
-        });
-        
-        if (response.ok) {
-          await removePendingMeal(meal.id);
-          console.log('[SW] Synced meal:', meal.id);
-        }
-      } catch (error) {
-        console.error('[SW] Failed to sync meal:', meal.id, error);
-      }
-    }
+    // Get offline meal data from IndexedDB if implemented
+    console.log('📤 Syncing offline meal data...');
+    // Implementation would depend on offline storage strategy
   } catch (error) {
-    console.error('[SW] Background sync failed:', error);
+    console.error('Failed to sync offline meals:', error);
   }
 }
 
-// Helper functions for background sync
-async function getPendingMeals() {
-  // This would integrate with your actual storage solution
-  return [];
-}
-
-async function removePendingMeal(mealId) {
-  // This would remove the meal from your storage
-  console.log('[SW] Removing synced meal:', mealId);
-}
-
-// Push notifications
-self.addEventListener('push', (event) => {
-  console.log('[SW] Push message received');
+// Handle push notifications (future enhancement)
+self.addEventListener('push', event => {
+  if (!event.data) return;
   
+  const data = event.data.json();
   const options = {
-    body: event.data ? event.data.text() : 'Time to log your meal!',
-    icon: '/icons/icon-192x192.png',
-    badge: '/icons/badge-72x72.png',
-    tag: 'meal-reminder',
-    renotify: true,
+    body: data.body || 'New nutrition insight available!',
+    icon: '/icon-192.svg',
+    badge: '/icon-192.svg',
+    tag: 'bytewise-notification',
+    requireInteraction: false,
     actions: [
       {
-        action: 'log',
-        title: 'Log Meal',
-        icon: '/icons/action-log.png'
+        action: 'open',
+        title: 'Open App'
       },
       {
         action: 'dismiss',
-        title: 'Dismiss',
-        icon: '/icons/action-dismiss.png'
+        title: 'Dismiss'
       }
     ]
   };
   
   event.waitUntil(
-    self.registration.showNotification('ByteWise Reminder', options)
+    self.registration.showNotification(data.title || 'Bytewise', options)
   );
 });
 
 // Handle notification clicks
-self.addEventListener('notificationclick', (event) => {
-  console.log('[SW] Notification clicked:', event.action);
-  
+self.addEventListener('notificationclick', event => {
   event.notification.close();
   
-  if (event.action === 'log') {
-    event.waitUntil(
-      clients.openWindow('/calculator')
-    );
-  } else if (event.action === 'dismiss') {
-    // Just close the notification
-    return;
-  } else {
-    // Default action - open the app
+  if (event.action === 'open' || !event.action) {
     event.waitUntil(
       clients.openWindow('/')
     );
   }
 });
 
-console.log('[SW] ByteWise Service Worker loaded successfully');
+console.log('🍎 Bytewise Service Worker loaded successfully');
