@@ -1,25 +1,85 @@
 {
+  "id": "com.bytewise.nutritionist",
   "name": "ByteWise Nutritionist",
   "short_name": "ByteWise",
   "description": "Professional nutrition tracking with USDA database integration",
-  "start_url": "/Bytewise-Nutritionist/",
+  "start_url": "https://stephenb75.github.io/Bytewise-Nutritionist/",
+  "scope": "https://stephenb75.github.io/Bytewise-Nutritionist/",
   "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone"],
   "background_color": "#ffffff",
   "theme_color": "#10b981",
   "orientation": "portrait",
   "categories": ["health", "lifestyle", "food"],
+  "lang": "en-US",
+  "dir": "ltr",
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "iarc_rating_id": "e84b072d-71de-3dae-a794-abd6ca80b126",
+  "edge_side_panel": {
+    "preferred_width": 412
+  },
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
+  "file_handlers": [
+    {
+      "action": "/",
+      "accept": {
+        "text/csv": [".csv"],
+        "application/json": [".json"],
+        "text/plain": [".txt"]
+      },
+      "launch_type": "single-client"
+    }
+  ],
+  "handle_links": "preferred",
+  "protocol_handlers": [
+    {
+      "protocol": "web+bytewise",
+      "url": "/?protocol=%s"
+    }
+  ],
   "icons": [
     {
-      "src": "/Bytewise-Nutritionist/icon-192.svg",
+      "src": "https://stephenb75.github.io/Bytewise-Nutritionist/icon-192.svg",
       "sizes": "192x192",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "/Bytewise-Nutritionist/icon-512.svg", 
+      "src": "https://stephenb75.github.io/Bytewise-Nutritionist/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    },
+    {
+      "src": "https://stephenb75.github.io/Bytewise-Nutritionist/icon-512.svg", 
       "sizes": "512x512",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "https://stephenb75.github.io/Bytewise-Nutritionist/icon-512.svg", 
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "https://stephenb75.github.io/Bytewise-Nutritionist/assets/screenshot-mobile.svg",
+      "sizes": "390x844",
+      "type": "image/svg+xml",
+      "form_factor": "narrow",
+      "label": "ByteWise mobile nutrition tracking interface"
+    },
+    {
+      "src": "https://stephenb75.github.io/Bytewise-Nutritionist/assets/screenshot-desktop.svg",
+      "sizes": "1280x720",
+      "type": "image/svg+xml",
+      "form_factor": "wide",
+      "label": "ByteWise desktop dashboard with meal planning"
     }
   ]
 }
