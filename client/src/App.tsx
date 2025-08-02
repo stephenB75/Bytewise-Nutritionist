@@ -28,7 +28,7 @@ export default function App() {
   const [notificationCount, setNotificationCount] = useState(0);
   
   // Initialize image rotation system
-  // useImageRotation(); // Temporarily disabled for debugging
+  useImageRotation();
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
