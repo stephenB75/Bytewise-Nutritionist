@@ -3,13 +3,26 @@ import type { CapacitorConfig } from '@capacitor/cli';
 const config: CapacitorConfig = {
   appId: 'com.bytewise.nutritionist',
   appName: 'ByteWise Nutritionist',
-  webDir: 'dist/public',
+  webDir: 'dist',
   backgroundColor: '#fef7cd',
   
   // iOS-specific configuration
   ios: {
     scheme: 'ByteWise Nutritionist',
     path: 'ios'
+  },
+  
+  // Android-specific configuration
+  android: {
+    path: 'android',
+    allowMixedContent: true,
+    captureInput: true
+  },
+  
+  // Server configuration for development
+  server: {
+    url: 'http://localhost:5000',
+    cleartext: true
   },
   
   plugins: {
@@ -48,6 +61,21 @@ const config: CapacitorConfig = {
     
     PushNotifications: {
       presentationOptions: ['badge', 'sound', 'alert']
+    },
+    
+    Haptics: {},
+    
+    Camera: {
+      permissions: {
+        camera: 'This app uses the camera to take photos of meals for nutrition tracking.',
+        photos: 'This app accesses photos to select meal images for logging.'
+      }
+    },
+    
+    Filesystem: {
+      permissions: {
+        publicStorage: 'This app uses storage to save meal photos and export reports.'
+      }
     }
   }
 };
