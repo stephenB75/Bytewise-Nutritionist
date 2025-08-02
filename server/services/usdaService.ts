@@ -174,6 +174,8 @@ export class USDAService {
         throw new Error(`No nutrition data found for "${ingredientName}"`);
       }
 
+      console.log(`🔍 Found ${foods.length} foods for "${ingredientName}"`);
+
       // Filter and prioritize results
       const filteredFoods = this.filterAndPrioritizeFoods(foods, ingredientName);
       if (filteredFoods.length === 0) {
@@ -182,6 +184,9 @@ export class USDAService {
       
       // Use the most relevant result (first one after filtering)
       const food = filteredFoods[0];
+      
+      console.log(`📱 Selected food: ${food.description} (ID: ${food.fdcId})`);
+      console.log(`📊 Food has ${food.foodNutrients?.length || 0} nutrients`);
       
       // Extract key nutrients
       const nutrients = this.extractNutrients(food.foodNutrients);
@@ -287,6 +292,13 @@ export class USDAService {
       sodium: 0,
     };
 
+    console.log(`📊 Extracting nutrients from ${foodNutrients?.length || 0} items`);
+
+    if (!foodNutrients || !Array.isArray(foodNutrients)) {
+      console.log('❌ No valid foodNutrients array');
+      return nutrients;
+    }
+
     for (const nutrient of foodNutrients) {
       // Handle USDA API format with proper type checking
       if (!nutrient || !nutrient.nutrient || !nutrient.nutrient.name) {
@@ -296,24 +308,29 @@ export class USDAService {
       const name = nutrient.nutrient.name.toLowerCase();
       const amount = nutrient.amount || 0;
 
-      // More comprehensive nutrient matching
-      if (name.includes('energy') || name.includes('calorie') || name.includes('kcal')) {
+      // Log all nutrients for debugging
+      console.log(`🔍 Nutrient: "${nutrient.nutrient.name}" = ${amount} ${nutrient.nutrient.unitName || ''}`);
+
+      // More comprehensive nutrient matching with exact USDA names
+      if (name === 'energy' || name.includes('energy') || name.includes('calorie') || name.includes('kcal')) {
         nutrients.calories = amount;
+        console.log(`🔥 Found calories: ${amount}`);
       } else if (name.includes('protein')) {
         nutrients.protein = amount;
-      } else if (name.includes('carbohydrate') || name.includes('carbs')) {
+      } else if (name.includes('carbohydrate') || name.includes('carbs') || name === 'carbohydrate, by difference') {
         nutrients.carbs = amount;
-      } else if (name.includes('total lipid') || name.includes('fat, total') || name.includes('total fat')) {
+      } else if (name.includes('total lipid') || name.includes('fat, total') || name.includes('total fat') || name === 'total lipid (fat)') {
         nutrients.fat = amount;
-      } else if (name.includes('fiber')) {
+      } else if (name.includes('fiber') || name === 'fiber, total dietary') {
         nutrients.fiber = amount;
-      } else if (name.includes('sugar') && !name.includes('added')) {
+      } else if ((name.includes('sugar') && !name.includes('added')) || name === 'sugars, total including nlea') {
         nutrients.sugar = amount;
-      } else if (name.includes('sodium')) {
+      } else if (name.includes('sodium') || name === 'sodium, na') {
         nutrients.sodium = amount > 100 ? amount / 1000 : amount; // Convert mg to g if needed
       }
     }
 
+    console.log(`✅ Final nutrients:`, nutrients);
     return nutrients;
   }
 
