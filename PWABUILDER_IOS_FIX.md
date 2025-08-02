@@ -32,11 +32,24 @@ PWABuilder's iOS image generator service only accepts PNG format icons for iOS a
 }
 ```
 
+## Additional Fix - React Native Configuration:
+PWABuilder iOS service also requires React Native app configuration files.
+
+### Files Added:
+- **app.json**: Expo/React Native configuration with proper app metadata
+- **package.json**: React Native package configuration for PWABuilder
+
+### Configuration Details:
+- Bundle ID: `com.bytewise.nutritionist`
+- App name: ByteWise Nutritionist
+- Icons and splash screen configured
+- iOS and Android platform settings
+
 ## Next Steps:
-1. Create actual PNG versions of your ByteWise icons
-2. Upload both SVG and PNG icons to GitHub Pages
+1. Create actual PNG versions of your ByteWise icons (192x192, 512x512)
+2. Upload complete deployment package to GitHub Pages
 3. Retry PWABuilder iOS package generation
-4. PNG icons will resolve the "Unsupported Media Type" error
+4. Both PNG icons and React Native config will resolve PWABuilder errors
 
 ## Icon Creation Options:
 - Use online SVG to PNG converters
