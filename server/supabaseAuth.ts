@@ -14,7 +14,7 @@ const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.en
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
 // Enhanced request type with user info
-interface AuthenticatedRequest extends Request {
+export interface AuthenticatedRequest extends Request {
   user?: {
     id: string;
     email?: string;
@@ -24,7 +24,7 @@ interface AuthenticatedRequest extends Request {
 
 // Middleware to verify Supabase JWT tokens
 export async function isAuthenticated(
-  req: AuthenticatedRequest,
+  req: any,
   res: Response,
   next: NextFunction
 ) {
@@ -61,7 +61,7 @@ export async function isAuthenticated(
 
 // Optional authentication - continues even if not authenticated
 export async function optionalAuth(
-  req: AuthenticatedRequest,
+  req: any,
   res: Response,
   next: NextFunction
 ) {

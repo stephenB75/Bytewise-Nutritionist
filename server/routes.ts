@@ -1,24 +1,15 @@
-import type { Express, Request } from "express";
+import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated, optionalAuth } from "./supabaseAuth";
+import { setupAuth, isAuthenticated, optionalAuth, type AuthenticatedRequest } from "./supabaseAuth";
 import { usdaService } from "./services/usdaService";
-
-// Enhanced request type with user info
-interface AuthenticatedRequest extends Request {
-  user?: {
-    id: string;
-    email?: string;
-    claims?: any;
-  };
-}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
 
   // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+  app.get('/api/auth/user', isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.user?.id;
       if (!userId) {
@@ -33,7 +24,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Meals API for logger
-  app.post('/api/meals/logged', isAuthenticated, async (req: any, res) => {
+  app.post('/api/meals/logged', isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.user?.id;
       if (!userId) {
@@ -55,7 +46,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/meals/logged', isAuthenticated, async (req: any, res) => {
+  app.get('/api/meals/logged', isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.user?.id;
       if (!userId) {
@@ -73,7 +64,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Calculate calories API with real USDA integration (no auth required)
-  app.post('/api/calculate-calories', optionalAuth, async (req: any, res) => {
+  app.post('/api/calculate-calories', optionalAuth, async (req: AuthenticatedRequest, res) => {
     try {
       const { ingredient, measurement } = req.body;
       
@@ -88,7 +79,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // USDA Food Database Sync API
-  app.post('/api/sync/food-database', isAuthenticated, async (req: any, res) => {
+  app.post('/api/sync/food-database', isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
       console.log('Starting USDA food database sync...');
       
@@ -141,7 +132,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // User Data Sync API
-  app.post('/api/sync/user-data', isAuthenticated, async (req: any, res) => {
+  app.post('/api/sync/user-data', isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.user?.id;
       if (!userId) {
