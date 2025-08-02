@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ByteWise Debug Test</title>
+  <style>
+    body { 
+      background: #fef7cd; 
+      color: #1d1d1b; 
+      padding: 20px; 
+      font-family: Arial; 
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>DIRECT HTML TEST</h1>
+  <p>If you see this, the server is working but there's a JavaScript/React issue.</p>
+  <p>Server time: <span id="time"></span></p>
+  
+  <script>
+    document.getElementById('time').textContent = new Date().toLocaleString();
+    console.log('Direct HTML test loaded successfully');
+  </script>
+</body>
+</html>
