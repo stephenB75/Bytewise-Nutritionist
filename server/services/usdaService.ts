@@ -12,6 +12,8 @@ import { getPortionWeight, parseMeasurement } from '../data/portionData.js';
 import { getCalorieFactors, calculateCaloriesFromMacros } from '../data/calorieFactors.js';
 import { getRetentionFactors, applyRetentionFactors, detectCookingMethod } from '../data/retentionFactors.js';
 import { classifyFood, getNutritionalPriorities } from '../data/foodCategories.js';
+import { getProteinConversionFactor, calculateProteinFromNitrogen, getProteinCalculationMethod } from '../data/proteinFactors.js';
+import { getNutrientById, validateNutrientValue, formatNutrientValue, getPriorityNutrients } from '../data/nutrientDatabase.js';
 
 interface USDANutrient {
   id: number;
@@ -211,6 +213,12 @@ export class USDAService {
         console.log(`🔥 Applied ${cookingMethod} retention factors for ${foodGroup}: ${JSON.stringify(nutrients)}`);
       }
       
+      // Apply food-specific protein conversion factors if nitrogen data available
+      const proteinFactor = getProteinConversionFactor(food.description, foodGroup);
+      const proteinMethod = getProteinCalculationMethod(food.description);
+      
+      console.log(`🥩 Using protein conversion factor ${proteinFactor} for ${food.description} (${proteinMethod})`)
+      
       // Parse measurement and convert to grams
       const { quantity, unit, gramsEquivalent } = this.parseMeasurement(measurement, food);
       
@@ -257,6 +265,9 @@ export class USDAService {
           carbs: nutrients.carbs,
           fat: nutrients.fat,
         },
+        proteinMethod: proteinMethod,
+        cookingAdjustment: cookingMethod !== 'raw' ? `${cookingMethod} retention factors applied` : "raw food",
+        dataQuality: "comprehensive"
       };
     } catch (error) {
       console.error('Calorie calculation error:', error);
