@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated, optionalAuth, type AuthenticatedRequest } from "./supabaseAuth";
+import { setupAuth, isAuthenticated, optionalAuth, createAuthenticatedHandler, type AuthenticatedRequest } from "./supabaseAuth";
 import { usdaService } from "./services/usdaService";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -9,7 +9,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   await setupAuth(app);
 
   // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: AuthenticatedRequest, res) => {
+  app.get('/api/auth/user', isAuthenticated, createAuthenticatedHandler(async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.user?.id;
       if (!userId) {
@@ -21,10 +21,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
     }
-  });
+  }));
 
   // Meals API for logger
-  app.post('/api/meals/logged', isAuthenticated, async (req: AuthenticatedRequest, res) => {
+  app.post('/api/meals/logged', isAuthenticated, createAuthenticatedHandler(async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.user?.id;
       if (!userId) {
@@ -44,9 +44,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Error logging meal:", error);
       res.status(500).json({ message: "Failed to log meal" });
     }
-  });
+  }));
 
-  app.get('/api/meals/logged', isAuthenticated, async (req: AuthenticatedRequest, res) => {
+  app.get('/api/meals/logged', isAuthenticated, createAuthenticatedHandler(async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.user?.id;
       if (!userId) {
@@ -61,10 +61,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Error fetching meals:", error);
       res.status(500).json({ message: "Failed to fetch meals" });
     }
-  });
+  }));
 
   // Calculate calories API with real USDA integration (no auth required)
-  app.post('/api/calculate-calories', optionalAuth, async (req: AuthenticatedRequest, res) => {
+  app.post('/api/calculate-calories', optionalAuth, createAuthenticatedHandler(async (req: AuthenticatedRequest, res) => {
     try {
       const { ingredient, measurement } = req.body;
       
@@ -76,10 +76,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Error calculating calories:", error);
       res.status(500).json({ message: "Failed to calculate calories" });
     }
-  });
+  }));
 
   // USDA Food Database Sync API
-  app.post('/api/sync/food-database', isAuthenticated, async (req: AuthenticatedRequest, res) => {
+  app.post('/api/sync/food-database', isAuthenticated, createAuthenticatedHandler(async (req: AuthenticatedRequest, res) => {
     try {
       console.log('Starting USDA food database sync...');
       
@@ -129,10 +129,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         error: (error as Error).message
       });
     }
-  });
+  }));
 
   // User Data Sync API
-  app.post('/api/sync/user-data', isAuthenticated, async (req: AuthenticatedRequest, res) => {
+  app.post('/api/sync/user-data', isAuthenticated, createAuthenticatedHandler(async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.user?.id;
       if (!userId) {
@@ -162,7 +162,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         error: error.message
       });
     }
-  });
+  }));
 
   // Search USDA Foods API
   app.get('/api/foods/search', async (req, res) => {

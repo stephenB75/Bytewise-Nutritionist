@@ -22,9 +22,18 @@ export interface AuthenticatedRequest extends Request {
   };
 }
 
+// Type-safe middleware wrapper
+export function createAuthenticatedHandler(
+  handler: (req: AuthenticatedRequest, res: Response, next?: NextFunction) => Promise<void> | void
+) {
+  return (req: any, res: Response, next?: NextFunction) => {
+    return handler(req as AuthenticatedRequest, res, next);
+  };
+}
+
 // Middleware to verify Supabase JWT tokens
 export async function isAuthenticated(
-  req: any,
+  req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
 ) {
@@ -61,7 +70,7 @@ export async function isAuthenticated(
 
 // Optional authentication - continues even if not authenticated
 export async function optionalAuth(
-  req: any,
+  req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
 ) {
