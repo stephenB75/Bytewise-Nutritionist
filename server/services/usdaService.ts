@@ -85,10 +85,10 @@ export class USDAService {
         },
         body: JSON.stringify({
           query,
-          dataType: ['Foundation', 'Branded', 'Survey'],
+          dataType: ['Foundation', 'Survey', 'Branded'], // Prioritize Foundation foods
           pageSize,
           pageNumber: 1,
-          sortBy: 'lowercaseDescription.keyword',
+          sortBy: 'dataType.keyword',
           sortOrder: 'asc'
         }),
       });
@@ -174,8 +174,14 @@ export class USDAService {
         throw new Error(`No nutrition data found for "${ingredientName}"`);
       }
 
-      // Use the most relevant result (first one)
-      const food = foods[0];
+      // Filter and prioritize results
+      const filteredFoods = this.filterAndPrioritizeFoods(foods, ingredientName);
+      if (filteredFoods.length === 0) {
+        throw new Error('No suitable foods found');
+      }
+      
+      // Use the most relevant result (first one after filtering)
+      const food = filteredFoods[0];
       
       // Extract key nutrients
       const nutrients = this.extractNutrients(food.foodNutrients);
@@ -282,29 +288,29 @@ export class USDAService {
     };
 
     for (const nutrient of foodNutrients) {
-      // Safely access nutrient properties with null checks
+      // Handle USDA API format with proper type checking
       if (!nutrient || !nutrient.nutrient || !nutrient.nutrient.name) {
-        console.warn('Invalid nutrient data:', nutrient);
         continue;
       }
       
       const name = nutrient.nutrient.name.toLowerCase();
       const amount = nutrient.amount || 0;
 
-      if (name.includes('energy') || name.includes('calorie')) {
+      // More comprehensive nutrient matching
+      if (name.includes('energy') || name.includes('calorie') || name.includes('kcal')) {
         nutrients.calories = amount;
       } else if (name.includes('protein')) {
         nutrients.protein = amount;
-      } else if (name.includes('carbohydrate')) {
+      } else if (name.includes('carbohydrate') || name.includes('carbs')) {
         nutrients.carbs = amount;
-      } else if (name.includes('total lipid') || name.includes('fat')) {
+      } else if (name.includes('total lipid') || name.includes('fat, total') || name.includes('total fat')) {
         nutrients.fat = amount;
       } else if (name.includes('fiber')) {
         nutrients.fiber = amount;
-      } else if (name.includes('sugar')) {
+      } else if (name.includes('sugar') && !name.includes('added')) {
         nutrients.sugar = amount;
       } else if (name.includes('sodium')) {
-        nutrients.sodium = amount;
+        nutrients.sodium = amount > 100 ? amount / 1000 : amount; // Convert mg to g if needed
       }
     }
 
@@ -403,6 +409,44 @@ export class USDAService {
     }
 
     return { quantity, unit, gramsEquivalent };
+  }
+
+  /**
+   * Filter and prioritize food results for better matching
+   */
+  private filterAndPrioritizeFoods(foods: USDAFood[], searchTerm: string): USDAFood[] {
+    const searchLower = searchTerm.toLowerCase();
+    
+    // Score foods based on relevance
+    const scoredFoods = foods.map(food => {
+      let score = 0;
+      const description = food.description.toLowerCase();
+      
+      // Higher score for exact matches
+      if (description.includes(searchLower)) score += 10;
+      
+      // Prefer Foundation and Survey data over Branded
+      if (food.dataType === 'Foundation') score += 20;
+      else if (food.dataType === 'Survey') score += 15;
+      else if (food.dataType === 'Branded') score += 5;
+      
+      // Penalize overly processed foods
+      if (description.includes('sauce') || description.includes('seasoning') || 
+          description.includes('mix') || description.includes('prepared')) {
+        score -= 5;
+      }
+      
+      // Prefer raw/basic ingredients
+      if (description.includes('raw') || description.includes('fresh')) score += 5;
+      
+      return { food, score };
+    });
+    
+    // Sort by score and return top results
+    return scoredFoods
+      .filter(item => item.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .map(item => item.food);
   }
 
   /**
