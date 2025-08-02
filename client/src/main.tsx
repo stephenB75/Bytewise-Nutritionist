@@ -33,35 +33,32 @@ if (import.meta.env.DEV) {
   };
 }
 
-// Immediate DOM test - no React needed
-document.body.style.backgroundColor = '#ff0000';
-document.body.innerHTML = `
-  <div style="background: #fef7cd; color: #1d1d1b; padding: 20px; font-family: Arial; min-height: 100vh;">
-    <h1>JAVASCRIPT IS EXECUTING</h1>
-    <p>If you see this, JavaScript is working but React may not be.</p>
-    <p>Time: ${new Date().toLocaleString()}</p>
-    <p>URL: ${window.location.href}</p>
-    <p>Console should show debug messages...</p>
-  </div>
-`;
+console.log('🚀 Starting ByteWise app render...');
 
-console.log('🔍 MAIN.TSX EXECUTED - Check browser console');
-console.log('🌐 URL:', window.location.href);
-console.log('📁 Root element exists:', !!document.getElementById("root"));
-
-// Now try React render
-try {
-  console.log('🚀 Starting React render...');
-  const rootElement = document.getElementById("root");
-  if (rootElement) {
-    const AppComponent = useMinimalTest ? MinimalTest : App;
+const rootElement = document.getElementById("root");
+if (!rootElement) {
+  console.error('❌ Root element not found');
+  document.body.innerHTML = `
+    <div style="background: red; color: white; padding: 20px;">
+      ERROR: Root element not found in DOM
+    </div>
+  `;
+} else {
+  console.log('✅ Root element found, attempting render...');
+  
+  try {
+    // Use the full App now that we know JS works
+    const AppComponent = App;
     const root = createRoot(rootElement);
     root.render(<AppComponent />);
-    console.log('✅ React render completed');
-  } else {
-    console.error('❌ Root element missing');
+    console.log('✅ React render initiated successfully');
+  } catch (error) {
+    console.error('❌ React render failed:', error);
+    rootElement.innerHTML = `
+      <div style="background: red; color: white; padding: 20px; font-family: Arial;">
+        <h1>RENDER ERROR</h1>
+        <p>React failed to render: ${error}</p>
+      </div>
+    `;
   }
-} catch (error) {
-  console.error('❌ React render error:', error);
-  document.body.innerHTML += `<div style="background: red; color: white; padding: 20px;"><h2>REACT ERROR: ${error}</h2></div>`;
 }
