@@ -207,7 +207,7 @@ function Dashboard({ onNavigate }: DashboardProps) {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-full bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Hero Section */}
       <HeroSection
         title={`Good morning, ${userStats.name}!`}
@@ -219,7 +219,7 @@ function Dashboard({ onNavigate }: DashboardProps) {
       />
 
       {/* Main Content */}
-      <div className="flex-1 max-w-md mx-auto w-full px-3 py-6 space-y-6">
+      <div className="max-w-md mx-auto w-full px-3 py-6 space-y-6">
         {/* Daily Nutrition Metrics */}
         <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
           <div className="flex items-center justify-between mb-4">

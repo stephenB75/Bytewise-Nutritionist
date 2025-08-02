@@ -43,7 +43,7 @@ export default function CalorieCalculatorWrapper({ onNavigate }: CalorieCalculat
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#a8dadc]/10 to-[#fef7cd]/10">
+    <div className="min-h-full bg-gradient-to-b from-[#a8dadc]/10 to-[#fef7cd]/10">
       {/* Hero Section */}
       <HeroSection
         title="Calorie Calculator"
@@ -55,7 +55,7 @@ export default function CalorieCalculatorWrapper({ onNavigate }: CalorieCalculat
       />
 
       {/* Calculator Content */}
-      <div className="max-w-md mx-auto w-full px-3">
+      <div className="max-w-md mx-auto w-full px-3 pb-6">
         <CalorieCalculator 
           onNavigate={onNavigate} 
           onCaloriesCalculated={addCalculatedCalories}

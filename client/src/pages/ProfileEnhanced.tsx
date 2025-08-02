@@ -1064,7 +1064,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100">
+    <div className="min-h-full bg-gradient-to-br from-purple-50 to-indigo-100">
       {/* Notification Dropdown */}
       <NotificationDropdown
         isOpen={showNotifications}
@@ -1113,7 +1113,7 @@ function ProfileEnhanced({ onNavigate }: ProfileProps) {
       </div>
 
       {/* Content */}
-      <div className="flex-1 max-w-md mx-auto w-full px-3 pb-20">
+      <div className="max-w-md mx-auto w-full px-3 pb-6">
         {renderSection()}
       </div>
 

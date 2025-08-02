@@ -96,36 +96,46 @@ export function setImageRotation(enabled: boolean): void {
 }
 
 /**
- * Get a food image for a specific component
+ * Enhanced component-specific food image rotation
  */
-export function getComponentFoodImage(componentName: string): string {
-  // Simple hash function to get consistent image for component
-  const hash = componentName.split('').reduce((a, b) => {
-    a = ((a << 5) - a) + b.charCodeAt(0);
-    return a & a;
-  }, 0);
+export function getComponentFoodImage(component: string): string {
+  const componentImageMap: Record<string, string[]> = {
+    dashboard: [FOOD_IMAGES.apple, FOOD_IMAGES.salad, FOOD_IMAGES.mango],
+    calculator: [FOOD_IMAGES.pizza, FOOD_IMAGES.burgers, FOOD_IMAGES.blueberries],
+    logger: [FOOD_IMAGES.salad, FOOD_IMAGES.apple, FOOD_IMAGES.mango],
+    profile: [FOOD_IMAGES.mango, FOOD_IMAGES.pizza, FOOD_IMAGES.salad],
+    login: [FOOD_IMAGES.burgers, FOOD_IMAGES.blueberries, FOOD_IMAGES.apple],
+    meals: [FOOD_IMAGES.blueberries, FOOD_IMAGES.pizza, FOOD_IMAGES.burgers],
+    recipes: [FOOD_IMAGES.pizza, FOOD_IMAGES.salad, FOOD_IMAGES.mango],
+    planning: [FOOD_IMAGES.salad, FOOD_IMAGES.apple, FOOD_IMAGES.blueberries]
+  };
   
-  const images = getAllFoodImages();
-  const index = Math.abs(hash) % images.length;
-  return images[index];
+  const images = componentImageMap[component] || [FOOD_IMAGES.apple];
+  
+  // Rotate image every 4 hours based on current time
+  const currentHour = new Date().getHours();
+  const rotationIndex = Math.floor(currentHour / 4) % images.length;
+  
+  return images[rotationIndex];
+}
+
+/**
+ * Create enhanced background style with better visual quality
+ */
+export function createFoodBackgroundStyle(imageSrc: string, opacity: number = 0.15): any {
+  return {
+    backgroundImage: `linear-gradient(135deg, rgba(168, 218, 220, ${1-opacity}) 0%, rgba(69, 123, 157, ${1-opacity}) 100%), url(${imageSrc})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+    backgroundBlendMode: 'overlay'
+  };
 }
 
 /**
  * Get the total count of available food images
  */
 export function getFoodImageCount(): number {
-  return getAllFoodImages().length;
+  return Object.keys(FOOD_IMAGES).length;
 }
 
-/**
- * Create a background style object for food images
- */
-export function createFoodBackgroundStyle(imageUrl: string, opacity: number = 1): React.CSSProperties {
-  return {
-    backgroundImage: `url(${imageUrl})`,
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    backgroundRepeat: 'no-repeat',
-    opacity: opacity
-  };
-}

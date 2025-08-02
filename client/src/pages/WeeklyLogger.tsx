@@ -262,7 +262,7 @@ export default function WeeklyLogger({ onNavigate }: WeeklyLoggerProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#a8dadc]/10 to-[#fef7cd]/10">
+    <div className="min-h-full bg-gradient-to-b from-[#a8dadc]/10 to-[#fef7cd]/10">
       {/* Hero Section */}
       <HeroSection
         title="Weekly Logger"
@@ -273,7 +273,7 @@ export default function WeeklyLogger({ onNavigate }: WeeklyLoggerProps) {
         className="pb-6"
       />
 
-      <div className="max-w-md mx-auto w-full px-3 space-y-6">
+      <div className="max-w-md mx-auto w-full px-3 pb-6 space-y-6">
         {/* Navigation Tabs */}
         <Tabs defaultValue="overview" className="w-full">
           <TabsList className="grid w-full grid-cols-3 bg-white/80 backdrop-blur-sm h-12">

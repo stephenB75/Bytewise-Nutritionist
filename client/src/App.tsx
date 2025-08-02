@@ -144,9 +144,15 @@ export default function App() {
             onLogout={handleLogout}
           />
 
-          {/* Main Content Area with top/bottom padding for fixed elements */}
-          <main className="pt-16 pb-20">
-            {renderCurrentPage()}
+          {/* Main Content Area with proper spacing for fixed header/footer */}
+          <main className="min-h-screen flex flex-col">
+            {/* Fixed header spacer */}
+            <div className="h-16 flex-shrink-0"></div>
+            
+            {/* Main content with proper flex grow */}
+            <div className="flex-1 pb-20">
+              {renderCurrentPage()}
+            </div>
           </main>
 
           {/* Fixed Bottom Navigation */}
