@@ -14,7 +14,7 @@ import { Navigation } from './components/Navigation';
 import { NotificationDropdown } from './components/NotificationDropdown';
 import { PWAInstallPrompt, IOSInstallInstructions } from './components/PWAInstallPrompt';
 import { LiveAppButton } from './components/LiveAppButton';
-import { useImageRotation } from './hooks/useImageRotation';
+// import { useImageRotation } from './hooks/useImageRotation';
 import Dashboard from './pages/Dashboard';
 import CalorieCalculatorWrapper from './components/CalorieCalculatorWrapper';
 import WeeklyLogger from './pages/WeeklyLogger';

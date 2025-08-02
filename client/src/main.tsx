@@ -1,5 +1,5 @@
 import { createRoot } from "react-dom/client";
-import App from "./App";
+import AppVeryBasic from "./AppVeryBasic";
 import "./index.css";
 
 // Suppress development warnings and errors
@@ -27,4 +27,4 @@ if (import.meta.env.DEV) {
   };
 }
 
-createRoot(document.getElementById("root")!).render(<App />);
+createRoot(document.getElementById("root")!).render(<AppVeryBasic />);
