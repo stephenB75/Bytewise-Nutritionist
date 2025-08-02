@@ -130,7 +130,10 @@ export function HeroSection({
             {statCard ? (
               <div className="flex justify-center">
                 <Card className="p-6 bg-white/10 backdrop-blur-sm border-0 text-center">
-                  <statCard.icon className={`w-8 h-8 mx-auto text-${statCard.iconColor} mb-3`} />
+                  {(() => {
+                    const IconComponent = statCard.icon;
+                    return <IconComponent className="w-8 h-8 mx-auto text-yellow-400 mb-3" />;
+                  })()}
                   <p className="text-2xl font-bold">{statCard.value}</p>
                   <p className="text-sm text-blue-100 font-medium">{statCard.label}</p>
                 </Card>
