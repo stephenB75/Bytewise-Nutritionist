@@ -1,200 +1,53 @@
-# ByteWise Nutritionist 🥗
+# ByteWise Nutritionist - GitHub Pages Deployment
 
-> Professional nutrition tracking Progressive Web App with USDA database integration
+🌐 **Live App**: [https://stephtonybro.github.io/Bytewise-Nutritionist/](https://stephtonybro.github.io/Bytewise-Nutritionist/)
 
-[![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)](https://github.com/bytewise-team/bytewise-nutritionist)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![PWA](https://img.shields.io/badge/PWA-ready-orange.svg)](public/manifest.json)
-[![iOS](https://img.shields.io/badge/iOS-App%20Store%20Ready-black.svg)](ios-deployment.md)
+## About ByteWise
 
-## 🌟 Features
+ByteWise is a comprehensive Progressive Web App (PWA) for nutrition tracking and meal planning. Built with modern web technologies, it offers professional-grade nutrition analysis powered by the USDA Food Database.
 
-### Core Functionality
-- **USDA Database Integration** - Access to comprehensive nutrition data
-- **Smart Meal Logging** - Automatic categorization based on time of day
-- **Professional Conversion Charts** - Kitchen to Table and Shamrock Foods standards
-- **Weekly Progress Tracking** - Comprehensive analytics and PDF export
-- **Recipe Builder** - Create and save custom recipes with nutrition calculations
-- **Goal Management** - Personalized nutrition targets and achievement tracking
+### Key Features
 
-### Technical Excellence
-- **Progressive Web App** - Installable, offline-capable, native-like experience
-- **iOS App Store Ready** - Complete deployment files and build automation
-- **Enhanced Accessibility** - 17px base font, improved contrast, WCAG compliant
-- **Professional UI/UX** - Slide animations, responsive design, touch-optimized
-- **Real-time Updates** - Event-driven architecture with optimistic UI updates
-- **Offline Support** - Service worker with intelligent caching and background sync
+- **USDA Database Integration**: Access to comprehensive food nutrition data
+- **Smart Meal Logging**: Time-based automatic meal categorization
+- **Enhanced Ingredient Database**: 40+ professional ingredients with precise conversions
+- **Weekly Progress Tracking**: Visual analytics and PDF export capabilities
+- **PWA Functionality**: Install as native app on any device
+- **Offline Support**: Service worker for offline functionality
+- **Professional UI**: Enhanced accessibility with smooth animations
 
-## 🚀 Quick Start
+### Technical Stack
 
-### Prerequisites
-- Node.js 18+ and npm
-- Modern web browser with PWA support
-- For iOS deployment: macOS with Xcode 15+
+- **Frontend**: React 18 with TypeScript
+- **Styling**: Tailwind CSS with shadcn/ui components
+- **State Management**: TanStack Query for server state
+- **Authentication**: Supabase Auth with email/password and OAuth
+- **Database**: PostgreSQL with Supabase backend
+- **PWA**: Complete manifest with service worker
+- **Mobile**: Touch-optimized with iOS-specific enhancements
 
 ### Installation
-```bash
-# Clone the repository
-git clone https://github.com/bytewise-team/bytewise-nutritionist.git
-cd bytewise-nutritionist
 
-# Install dependencies
-npm install
+**Mobile Devices:**
+- **iOS**: Open in Safari → Share → Add to Home Screen
+- **Android**: Open in Chrome → Menu → Install App
 
-# Start development server
-npm run dev
-```
+**Desktop:**
+- Click the install icon in your browser's address bar
 
-### Build for Production
-```bash
-# Build web app
-npm run build
+### Development
 
-# For iOS deployment
-./build-ios.sh
-```
+This app was built using modern web development practices with a focus on performance, accessibility, and user experience. The GitHub Pages deployment includes:
 
-## 📱 iOS App Deployment
+- SPA routing support for seamless navigation
+- PWA manifest for native app installation
+- Service worker for offline functionality
+- Optimized asset loading and caching
 
-ByteWise is fully prepared for iOS App Store deployment:
+### Support
 
-```bash
-# Generate app icons (place 1024x1024 icon as icon-base-1024.png)
-cd public/icons
-./generate-icons.sh
-
-# Build iOS app
-./build-ios.sh
-
-# Open in Xcode
-npx cap open ios
-```
-
-See [iOS Deployment Guide](ios-deployment.md) for detailed instructions.
-
-## 🏗️ Architecture
-
-### Tech Stack
-- **Frontend**: React 18 + TypeScript + Vite
-- **Styling**: Tailwind CSS + shadcn/ui components
-- **State Management**: TanStack Query + React hooks
-- **Database**: PostgreSQL with Drizzle ORM
-- **Authentication**: Supabase Auth with JWT
-- **PWA**: Service Worker + Web App Manifest
-- **iOS**: Capacitor for native app deployment
-
-### Project Structure
-```
-bytewise-nutritionist/
-├── client/                 # Frontend React application
-│   ├── src/
-│   │   ├── components/    # Reusable UI components
-│   │   ├── pages/         # Application pages/screens
-│   │   ├── hooks/         # Custom React hooks
-│   │   ├── utils/         # Utility functions
-│   │   └── data/          # Enhanced ingredient database
-│   └── public/            # Static assets and PWA files
-├── server/                # Backend API (if applicable)
-├── shared/                # Shared types and schemas
-├── public/                # PWA assets and service worker
-├── ios-*.md              # iOS deployment documentation
-└── build-ios.sh          # iOS build automation
-```
-
-## 🎨 Enhanced Ingredient Database
-
-Professional-grade ingredient database featuring:
-
-- **40+ Ingredients** across 8 categories (Proteins, Grains, Vegetables, etc.)
-- **Industry Standards** - Kitchen to Table, Shamrock Foods, King Arthur Flour
-- **Precise Conversions** - Fractional cups, metric/imperial, weight-to-volume
-- **Professional Use Cases** - Restaurant portions, commercial cooking standards
-- **Diet Classifications** - Vegetarian, vegan, gluten-free, keto indicators
-
-## 📊 Features Showcase
-
-### Smart Meal Logging
-- Time-based meal categorization (breakfast: 5-11am, lunch: 11-4pm, etc.)
-- USDA nutrition data integration
-- Automatic progress tracking
-- Weekly analytics with PDF export
-
-### Professional UI/UX
-- Slide button animations throughout the interface
-- Enhanced accessibility (17px base font, improved contrast)
-- Touch-optimized interactions (44px minimum touch targets)
-- Responsive design with mobile-first approach
-
-### PWA Capabilities
-- Offline functionality with intelligent caching
-- Background sync for meal data
-- Push notifications for meal reminders
-- Installable on iOS/Android home screens
-- Service worker with cache strategies
-
-## 🔧 Development
-
-### Scripts
-```bash
-npm run dev          # Start development server
-npm run build        # Build for production
-npm run preview      # Preview production build
-npm run type-check   # TypeScript type checking
-npm run lint         # ESLint code linting
-```
-
-### iOS Development
-```bash
-npm run ios:build    # Build and sync iOS app
-npm run ios:open     # Open in Xcode
-npm run ios:run      # Run on iOS simulator
-```
-
-## 📈 Performance & Quality
-
-- **Lighthouse Score**: 95+ (Performance, Accessibility, Best Practices, SEO)
-- **Bundle Size**: Optimized with code splitting and tree shaking
-- **Accessibility**: WCAG 2.1 AA compliant
-- **Type Safety**: 100% TypeScript coverage
-- **Testing**: Comprehensive component and integration tests
-
-## 🌍 Browser Support
-
-- **iOS Safari**: 14.0+
-- **Chrome**: 88+
-- **Firefox**: 78+
-- **Edge**: 88+
-- **Samsung Internet**: 15.0+
-
-## 📄 License
-
-MIT License - see [LICENSE](LICENSE) file for details.
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📞 Support
-
-- **Documentation**: [iOS Deployment Guide](ios-deployment.md)
-- **Issues**: [GitHub Issues](https://github.com/bytewise-team/bytewise-nutritionist/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/bytewise-team/bytewise-nutritionist/discussions)
-
-## 🎯 Roadmap
-
-- [ ] Apple Watch companion app
-- [ ] Barcode scanning for packaged foods
-- [ ] Social features and meal sharing
-- [ ] AI-powered nutrition recommendations
-- [ ] Integration with fitness trackers
-- [ ] Multi-language support
+For issues or questions about ByteWise, please visit the [main repository](https://github.com/stephtonybro/Bytewise-Nutritionist) or open an issue.
 
 ---
 
-**ByteWise Nutritionist** - Professional nutrition tracking that scales with your needs.
-
-Built with ❤️ by the ByteWise Team
+**Built with ❤️ by the ByteWise Team**
