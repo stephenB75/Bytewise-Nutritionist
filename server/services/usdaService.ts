@@ -18,15 +18,21 @@ interface USDANutrient {
 }
 
 interface USDAFoodNutrient {
-  type: string;
-  id: number;
-  nutrient: USDANutrient;
+  type?: string;
+  id?: number;
+  nutrient?: USDANutrient;
   foodNutrientDerivation?: {
     code: string;
     description: string;
   };
   median?: number;
-  amount: number;
+  amount?: number;
+  // Actual USDA API format
+  nutrientId: number;
+  nutrientName: string;
+  nutrientNumber: string;
+  unitName: string;
+  value: number;
 }
 
 interface USDAFood {
@@ -78,6 +84,7 @@ export class USDAService {
       }
 
       // Search USDA API
+      console.log('🔑 API Key length:', this.apiKey?.length || 0);
       const response = await fetch(`${this.baseUrl}/foods/search?api_key=${this.apiKey}`, {
         method: 'POST',
         headers: {
@@ -85,7 +92,7 @@ export class USDAService {
         },
         body: JSON.stringify({
           query,
-          dataType: ['Foundation', 'Survey', 'Branded'], // Prioritize Foundation foods
+          dataType: ['Foundation', 'Survey (FNDDS)'], // Exclude branded foods that often have zero values
           pageSize,
           pageNumber: 1,
           sortBy: 'dataType.keyword',
@@ -224,8 +231,8 @@ export class USDAService {
     } catch (error) {
       console.error('Calorie calculation error:', error);
       
-      // Fallback to basic estimation
-      return this.getFallbackCalorieEstimate(ingredientName, measurement);
+      // Fallback to enhanced estimation with proper nutrition data
+      return this.getEnhancedFallbackEstimate(ingredientName, measurement);
     }
   }
 
@@ -299,35 +306,45 @@ export class USDAService {
       return nutrients;
     }
 
+    // Log first nutrient to understand structure
+    if (foodNutrients.length > 0) {
+      console.log('🔍 Sample nutrient structure:', JSON.stringify(foodNutrients[0], null, 2));
+    }
+
     for (const nutrient of foodNutrients) {
-      // Handle USDA API format with proper type checking
-      if (!nutrient || !nutrient.nutrient || !nutrient.nutrient.name) {
+      // Handle actual USDA API format
+      if (!nutrient || (!nutrient.nutrientName && !nutrient.nutrient?.name)) {
         continue;
       }
       
-      const name = nutrient.nutrient.name.toLowerCase();
-      const amount = nutrient.amount || 0;
+      // Extract data from actual API response format
+      const name = (nutrient.nutrientName || nutrient.nutrient?.name || '').toLowerCase();
+      const amount = nutrient.value || nutrient.amount || 0;
+      const nutrientId = nutrient.nutrientId || nutrient.nutrient?.id;
 
-      // Log first few nutrients for debugging
-      if (nutrients.calories === 0 && foodNutrients.indexOf(nutrient) < 5) {
-        console.log(`🔍 Nutrient: "${nutrient.nutrient.name}" = ${amount} ${nutrient.nutrient.unitName || ''}`);
+      // Log nutrients being processed
+      if (foodNutrients.indexOf(nutrient) < 3) {
+        console.log(`🔍 Processing: "${nutrient.nutrientName || nutrient.nutrient?.name}" (ID: ${nutrientId}) = ${amount}`);
       }
 
-      // More comprehensive nutrient matching with exact USDA names
-      if (name === 'energy' || name.includes('energy') || name.includes('calorie') || name.includes('kcal')) {
+      // Map using exact USDA nutrient IDs and names
+      if (name.includes('energy') || name.includes('calorie') || nutrientId === 1008) {
         nutrients.calories = amount;
-        console.log(`🔥 Found calories: ${amount}`);
-      } else if (name.includes('protein')) {
+        console.log(`🔥 Found calories: ${amount} from "${name}"`);
+      } else if (name.includes('protein') || nutrientId === 1003) {
         nutrients.protein = amount;
-      } else if (name.includes('carbohydrate') || name.includes('carbs') || name === 'carbohydrate, by difference') {
+        console.log(`🥩 Found protein: ${amount}g from "${name}"`);
+      } else if ((name.includes('carbohydrate') && !name.includes('fiber')) || nutrientId === 1005) {
         nutrients.carbs = amount;
-      } else if (name.includes('total lipid') || name.includes('fat, total') || name.includes('total fat') || name === 'total lipid (fat)') {
+        console.log(`🍞 Found carbs: ${amount}g from "${name}"`);
+      } else if (name.includes('total lipid') || name.includes('fat') || nutrientId === 1004) {
         nutrients.fat = amount;
-      } else if (name.includes('fiber') || name === 'fiber, total dietary') {
+        console.log(`🧈 Found fat: ${amount}g from "${name}"`);
+      } else if (name.includes('fiber') || nutrientId === 1079) {
         nutrients.fiber = amount;
-      } else if ((name.includes('sugar') && !name.includes('added')) || name === 'sugars, total including nlea') {
+      } else if (name.includes('sugar') || nutrientId === 2000) {
         nutrients.sugar = amount;
-      } else if (name.includes('sodium') || name === 'sodium, na') {
+      } else if (name.includes('sodium') || nutrientId === 1093) {
         nutrients.sodium = amount > 100 ? amount / 1000 : amount; // Convert mg to g if needed
       }
     }
@@ -436,27 +453,39 @@ export class USDAService {
   private filterAndPrioritizeFoods(foods: USDAFood[], searchTerm: string): USDAFood[] {
     const searchLower = searchTerm.toLowerCase();
     
-    // Score foods based on relevance
-    const scoredFoods = foods.map(food => {
+    // First filter out foods with insufficient nutrition data
+    const validFoods = foods.filter(food => {
+      const hasEnergy = food.foodNutrients.some(n => 
+        (n.nutrientId === 1008 || (n.nutrientName && n.nutrientName.toLowerCase().includes('energy'))) && 
+        (n.value || 0) > 0
+      );
+      return hasEnergy || food.dataType === 'Foundation'; // Always include Foundation foods
+    });
+    
+    console.log(`🔍 Filtered from ${foods.length} to ${validFoods.length} foods with valid nutrition data`);
+    
+    // Score foods based on relevance and data quality
+    const scoredFoods = validFoods.map(food => {
       let score = 0;
       const description = food.description.toLowerCase();
       
       // Higher score for exact matches
-      if (description.includes(searchLower)) score += 10;
+      if (description.includes(searchLower)) score += 100;
+      if (description === searchLower) score += 200;
       
-      // Prefer Foundation and Survey data over Branded
-      if (food.dataType === 'Foundation') score += 20;
-      else if (food.dataType === 'Survey') score += 15;
-      else if (food.dataType === 'Branded') score += 5;
+      // Strongly prefer Foundation and Survey data over Branded
+      if (food.dataType === 'Foundation') score += 150;
+      else if (food.dataType === 'Survey (FNDDS)') score += 120;
+      else if (food.dataType === 'Branded') score += 30;
       
-      // Penalize overly processed foods
-      if (description.includes('sauce') || description.includes('seasoning') || 
-          description.includes('mix') || description.includes('prepared')) {
-        score -= 5;
-      }
+      // Check for actual energy data
+      const hasEnergy = food.foodNutrients.some(n => 
+        (n.nutrientId === 1008) && (n.value || 0) > 0);
+      if (hasEnergy) score += 100;
       
       // Prefer raw/basic ingredients
-      if (description.includes('raw') || description.includes('fresh')) score += 5;
+      if (description.includes('raw') || description.includes('fresh')) score += 50;
+      if (!description.includes('prepared') && !description.includes('seasoned')) score += 30;
       
       return { food, score };
     });
@@ -581,6 +610,12 @@ export class USDAService {
             rank: 1,
             unitName: nutrient.unitName,
           },
+          // Add required fields for actual API format
+          nutrientId: nutrient.id,
+          nutrientName: nutrient.name,
+          nutrientNumber: nutrient.id.toString(),
+          unitName: nutrient.unitName,
+          value: nutrients[key],
         });
       }
     }
@@ -591,34 +626,80 @@ export class USDAService {
   /**
    * Fallback calorie estimation when USDA data unavailable
    */
-  private getFallbackCalorieEstimate(ingredientName: string, measurement: string) {
-    // Basic fallback estimates for common ingredients
-    const fallbacks: { [key: string]: number } = {
-      'egg': 70,
-      'grape': 3,
-      'chicken': 200,
-      'rice': 130,
-      'bread': 80,
-      'milk': 150,
-      'cheese': 100,
+  private getEnhancedFallbackEstimate(ingredientName: string, measurement: string) {
+    // Comprehensive fallback estimates per 100g based on USDA averages
+    const fallbackData: { [key: string]: { calories: number; protein: number; carbs: number; fat: number } } = {
+      // Fruits
+      'apple': { calories: 52, protein: 0.3, carbs: 14, fat: 0.2 },
+      'banana': { calories: 89, protein: 1.1, carbs: 23, fat: 0.3 },
+      'orange': { calories: 47, protein: 0.9, carbs: 12, fat: 0.1 },
+      'grape': { calories: 62, protein: 0.6, carbs: 16, fat: 0.2 },
+      
+      // Proteins  
+      'chicken': { calories: 165, protein: 31, carbs: 0, fat: 3.6 },
+      'beef': { calories: 250, protein: 26, carbs: 0, fat: 15 },
+      'salmon': { calories: 208, protein: 20, carbs: 0, fat: 12 },
+      'egg': { calories: 155, protein: 13, carbs: 1.1, fat: 11 },
+      
+      // Grains
+      'rice': { calories: 130, protein: 2.7, carbs: 28, fat: 0.3 },
+      'bread': { calories: 265, protein: 9, carbs: 49, fat: 3.2 },
+      'pasta': { calories: 131, protein: 5, carbs: 25, fat: 1.1 },
+      
+      // Vegetables
+      'broccoli': { calories: 34, protein: 2.8, carbs: 7, fat: 0.4 },
+      'carrot': { calories: 41, protein: 0.9, carbs: 10, fat: 0.2 },
+      'spinach': { calories: 23, protein: 2.9, carbs: 3.6, fat: 0.4 },
     };
 
     const ingredient = ingredientName.toLowerCase();
-    let baseCalories = 100; // default
+    let nutritionData = { calories: 100, protein: 2, carbs: 15, fat: 1 }; // default
 
-    for (const [key, calories] of Object.entries(fallbacks)) {
+    for (const [key, data] of Object.entries(fallbackData)) {
       if (ingredient.includes(key)) {
-        baseCalories = calories;
+        nutritionData = data;
         break;
       }
     }
 
+    // Parse measurement for gram equivalent
+    const { gramsEquivalent } = this.parseFallbackMeasurement(measurement);
+    const estimatedCalories = Math.round((nutritionData.calories * gramsEquivalent) / 100);
+
     return {
-      ingredient: ingredientName,
-      measurement,
-      estimatedCalories: baseCalories,
-      note: 'Estimate based on common nutrition data (USDA database temporarily unavailable)',
+      ingredient: ingredientName.toUpperCase(),
+      measurement: `${measurement} (~${Math.round(gramsEquivalent)}g)`,
+      estimatedCalories,
+      equivalentMeasurement: `100g ≈ ${nutritionData.calories} kcal`,
+      note: 'Estimate based on USDA nutrition averages (fallback data)',
+      nutritionPer100g: nutritionData,
     };
+  }
+
+  private parseFallbackMeasurement(measurement: string): { gramsEquivalent: number } {
+    const normalized = measurement.toLowerCase();
+    const match = normalized.match(/^(\d+(?:\.\d+)?)\s*(.+)$/);
+    const quantity = match ? parseFloat(match[1]) : 1;
+    const unit = match ? match[2].trim() : normalized;
+
+    const conversions: { [key: string]: number } = {
+      'g': 1, 'gram': 1, 'grams': 1,
+      'cup': 240, 'cups': 240,
+      'tablespoon': 15, 'tbsp': 15,
+      'teaspoon': 5, 'tsp': 5,
+      'medium': 150, 'large': 200, 'small': 100,
+      'slice': 30, 'piece': 50, 'whole': 200,
+    };
+
+    let gramsEquivalent = quantity * 100; // default 100g per unit
+    for (const [unitPattern, grams] of Object.entries(conversions)) {
+      if (unit.includes(unitPattern)) {
+        gramsEquivalent = quantity * grams;
+        break;
+      }
+    }
+
+    return { gramsEquivalent };
   }
 }
 
