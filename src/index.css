@@ -1,0 +1,3682 @@
+@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@100;200;300;400;500;600;700;800;900&family=Quicksand:wght@300;400;500;600;700&family=Work+Sans:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Enhanced Accessibility - Increased text sizes throughout the app */
+html {
+  font-size: 17px; /* Increased from 16px for better readability */
+}
+
+/* Global text size improvements for accessibility */
+.text-xs {
+  font-size: 0.8rem !important; /* Increased from 0.75rem */
+}
+
+.text-sm {
+  font-size: 0.9rem !important; /* Increased from 0.875rem */
+}
+
+.text-base {
+  font-size: 1.1rem !important; /* Increased from 1rem */
+}
+
+.text-lg {
+  font-size: 1.2rem !important; /* Increased from 1.125rem */
+}
+
+.text-xl {
+  font-size: 1.35rem !important; /* Increased from 1.25rem */
+}
+
+/* Profile page slide button animations */
+.slide-button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.slide-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.6s ease;
+}
+
+.slide-button:hover::before {
+  left: 100%;
+}
+
+.slide-button:hover {
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Input field text visibility fixes */
+.input-with-icon {
+  @apply relative;
+}
+
+.input-with-icon input {
+  position: relative;
+  z-index: 1;
+  background-color: white !important;
+  color: #1f2937 !important;
+  font-weight: 400;
+}
+
+.input-with-icon input::placeholder {
+  color: #9ca3af !important;
+  opacity: 1;
+}
+
+.input-with-icon input:focus {
+  color: #1f2937 !important;
+  background-color: white !important;
+}
+
+.input-icon {
+  position: absolute;
+  z-index: 10;
+  pointer-events: none;
+  color: #9ca3af;
+}
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --font-size: 14px;
+  --pastel-yellow: #fef7cd;
+  --pastel-blue: #a8dadc;
+  --pastel-blue-dark: #89c4c7;
+  --background: var(--pastel-yellow);
+  --foreground: #1d1d1b;
+  --card: #ffffff;
+  --card-foreground: #1d1d1b;
+  --popover: #ffffff;
+  --popover-foreground: #1d1d1b;
+  --primary: var(--pastel-blue);
+  --primary-foreground: #1d1d1b;
+  --secondary: #f8f9fa;
+  --secondary-foreground: #1d1d1b;
+  --muted: #e9ecef;
+  --muted-foreground: #6c757d;
+  --accent: var(--pastel-blue);
+  --accent-foreground: #1d1d1b;
+  --destructive: #dc3545;
+  --destructive-foreground: #ffffff;
+  --border: rgba(0, 0, 0, 0.1);
+  --input: transparent;
+  --input-background: #ffffff;
+  --switch-background: #cbced4;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --ring: var(--pastel-blue);
+  --chart-1: #ff6b6b;
+  --chart-2: #4ecdc4;
+  --chart-3: #45b7d1;
+  --chart-4: #f9ca24;
+  --chart-5: #f0932b;
+  --radius: 1rem;
+  --sidebar: var(--pastel-yellow);
+  --sidebar-foreground: #1d1d1b;
+  --sidebar-primary: var(--pastel-blue);
+  --sidebar-primary-foreground: #1d1d1b;
+  --sidebar-accent: #ffffff;
+  --sidebar-accent-foreground: #1d1d1b;
+  --sidebar-border: rgba(0, 0, 0, 0.1);
+  --sidebar-ring: var(--pastel-blue);
+}
+
+.dark {
+  --background: #1d1d1b;
+  --foreground: #f8f9fa;
+  --card: #2d2d2b;
+  --card-foreground: #f8f9fa;
+  --popover: #2d2d2b;
+  --popover-foreground: #f8f9fa;
+  --primary: var(--pastel-blue);
+  --primary-foreground: #1d1d1b;
+  --secondary: #3d3d3b;
+  --secondary-foreground: #f8f9fa;
+  --muted: #4d4d4b;
+  --muted-foreground: #adb5bd;
+  --accent: var(--pastel-blue);
+  --accent-foreground: #1d1d1b;
+  --destructive: #dc3545;
+  --destructive-foreground: #ffffff;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.1);
+  --ring: var(--pastel-blue);
+  --sidebar: #2d2d2b;
+  --sidebar-foreground: #f8f9fa;
+  --sidebar-primary: var(--pastel-blue);
+  --sidebar-primary-foreground: #1d1d1b;
+  --sidebar-accent: #3d3d3b;
+  --sidebar-accent-foreground: #f8f9fa;
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-ring: var(--pastel-blue);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-switch-background: var(--switch-background);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.6;
+  }
+}
+
+/**
+ * Bytewise Typography System - Brand Guidelines Compliant
+ * Primary: League Spartan (headings, brand elements)
+ * Secondary: Work Sans (subheadings, labels, buttons)
+ * Body: Quicksand (body text, inputs)
+ * MOBILE: All inputs minimum 16px to prevent auto-zoom
+ * MOBILE-OPTIMIZED: Responsive sizing for better horizontal fit
+ */
+@layer base {
+  :where(:not(:has([class*=" text-"]), :not(:has([class^="text-"])))) {
+    h1 {
+      font-size: 1.75rem; /* Reduced from 2rem for mobile fit */
+      font-weight: 700;
+      line-height: 1.1; /* Tighter line height */
+      letter-spacing: -0.025em; /* Slight compression */
+      font-family: 'League Spartan', sans-serif;
+    }
+
+    h2 {
+      font-size: 1.375rem; /* Reduced from 1.5rem */
+      font-weight: 600;
+      line-height: 1.2; /* Tighter line height */
+      letter-spacing: -0.015em;
+      font-family: 'League Spartan', sans-serif;
+    }
+
+    h3 {
+      font-size: 1.125rem; /* Reduced from 1.25rem */
+      font-weight: 600;
+      line-height: 1.3; /* Tighter line height */
+      letter-spacing: -0.01em;
+      font-family: 'Work Sans', sans-serif;
+    }
+
+    h4 {
+      font-size: 1rem; /* Reduced from 1.125rem */
+      font-weight: 500;
+      line-height: 1.4;
+      letter-spacing: -0.005em;
+      font-family: 'Work Sans', sans-serif;
+    }
+
+    h5 {
+      font-size: 0.875rem; /* Reduced from 1rem */
+      font-weight: 500;
+      line-height: 1.4;
+      font-family: 'Work Sans', sans-serif;
+    }
+
+    h6 {
+      font-size: 0.75rem; /* Reduced from 0.875rem */
+      font-weight: 500;
+      line-height: 1.4;
+      font-family: 'Work Sans', sans-serif;
+    }
+
+    p {
+      font-size: 0.875rem; /* Reduced from 1rem for mobile */
+      font-weight: 400;
+      line-height: 1.5; /* Slightly tighter */
+      font-family: 'Quicksand', sans-serif;
+    }
+
+    label {
+      font-size: 0.75rem; /* Reduced from 0.875rem */
+      font-weight: 500;
+      line-height: 1.4;
+      font-family: 'Work Sans', sans-serif;
+    }
+
+    button {
+      font-size: max(16px, 0.875rem); /* Minimum 16px for mobile, but smaller default */
+      font-weight: 500;
+      line-height: 1.4; /* Tighter line height */
+      letter-spacing: 0.01em; /* Slight spacing for readability */
+      font-family: 'Work Sans', sans-serif;
+    }
+
+    input {
+      font-size: max(16px, 1rem) !important; /* Critical: Minimum 16px prevents mobile zoom */
+      font-weight: 400;
+      line-height: 1.4; /* Slightly tighter */
+      font-family: 'Quicksand', sans-serif;
+    }
+
+    textarea {
+      font-size: max(16px, 1rem) !important; /* Critical: Minimum 16px prevents mobile zoom */
+      font-weight: 400;
+      line-height: 1.4; /* Slightly tighter */
+      font-family: 'Quicksand', sans-serif;
+    }
+
+    select {
+      font-size: max(16px, 1rem) !important; /* Critical: Minimum 16px prevents mobile zoom */
+      font-weight: 400;
+      line-height: 1.4; /* Slightly tighter */
+      font-family: 'Quicksand', sans-serif;
+    }
+
+    /* Brand Logo Typography */
+    .brand-logo {
+      font-family: 'League Spartan', sans-serif;
+      font-weight: 700;
+      color: var(--pastel-blue);
+    }
+
+    .brand-tagline {
+      font-family: 'League Spartan', sans-serif;
+      font-weight: 400;
+      color: var(--foreground);
+    }
+  }
+  
+  /* Mobile-specific typography adjustments */
+  @media screen and (max-width: 640px) {
+    :where(:not(:has([class*=" text-"]), :not(:has([class^="text-"])))) {
+      h1 {
+        font-size: 1.5rem; /* Even smaller on mobile */
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+      }
+      
+      h2 {
+        font-size: 1.25rem;
+        line-height: 1.2;
+        letter-spacing: -0.015em;
+      }
+      
+      h3 {
+        font-size: 1rem;
+        line-height: 1.3;
+        letter-spacing: -0.01em;
+      }
+      
+      p {
+        font-size: 0.8125rem; /* 13px for very tight mobile layouts */
+        line-height: 1.5;
+      }
+      
+      label {
+        font-size: 0.6875rem; /* 11px for compact labels */
+        line-height: 1.4;
+      }
+    }
+  }
+}
+
+html {
+  font-size: var(--font-size);
+  /* Prevent zoom on iOS Safari and other mobile browsers */
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* MOBILE VIEWPORT CONTROLS - PREVENT AUTO-ZOOM ON INPUT FOCUS */
+/* Critical: All input fields must be 16px or larger to prevent mobile zoom */
+
+/* Base input styling to prevent zoom */
+input, 
+textarea, 
+select,
+button {
+  /* Minimum 16px font-size prevents mobile browsers from zooming */
+  font-size: max(16px, 1rem) !important;
+  /* Prevent zoom on focus in iOS Safari */
+  -webkit-text-size-adjust: 100%;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Specific input types that commonly trigger zoom */
+input[type="text"],
+input[type="email"], 
+input[type="password"],
+input[type="tel"],
+input[type="url"],
+input[type="search"],
+input[type="number"],
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+textarea,
+select {
+  font-size: 16px !important; /* Critical for preventing zoom */
+  line-height: 1.5 !important;
+  /* Additional mobile optimizations */
+  -webkit-appearance: none;
+}
+
+/**
+ * Bytewise Logo Brand System - CSS Implementation
+ * Character-based alignment for precise positioning
+ */
+.bytewise-logo {
+  display: inline-block;
+  text-align: left;
+}
+
+.bytewise-logo-main {
+  font-family: 'League Spartan', sans-serif;
+  font-weight: 700;
+  color: var(--pastel-blue);
+  text-transform: lowercase;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.bytewise-logo-tagline {
+  font-family: 'League Spartan', sans-serif;
+  font-weight: 400;
+  color: var(--foreground);
+  letter-spacing: 0.15em;
+  line-height: 1;
+}
+
+/* Small (Header/Navigation) */
+.bytewise-logo-sm .bytewise-logo-main {
+  font-size: 1.5rem; /* 24px */
+}
+
+.bytewise-logo-sm .bytewise-logo-tagline {
+  font-size: 0.75rem; /* 12px */
+  margin-top: 0.125rem; /* 2px */
+  text-indent: 1.8ch; /* Character-based alignment */
+}
+
+/* Medium (Standard) */
+.bytewise-logo-md .bytewise-logo-main {
+  font-size: 2.25rem; /* 36px */
+}
+
+.bytewise-logo-md .bytewise-logo-tagline {
+  font-size: 1rem; /* 16px */
+  margin-top: 0.25rem; /* 4px */
+  text-indent: 2.0ch; /* Character-based alignment */
+}
+
+/* Large (Landing/Authentication) */
+.bytewise-logo-lg .bytewise-logo-main {
+  font-size: 3rem; /* 48px */
+}
+
+.bytewise-logo-lg .bytewise-logo-tagline {
+  font-size: 1.25rem; /* 20px */
+  margin-top: 0.375rem; /* 6px */
+  text-indent: 2.2ch; /* Character-based alignment */
+}
+
+/* Dark theme support */
+.dark .bytewise-logo-tagline {
+  color: #f8f9fa;
+}
+
+/* Interactive states */
+.bytewise-logo:hover {
+  transform: scale(1.02);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bytewise-logo:hover {
+    transform: none;
+  }
+}
+
+/**
+ * Mobile-First PWA Optimizations
+ */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+  touch-action: manipulation;
+}
+
+.safe-area-inset {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+.safe-area-inset-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-area-inset-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/**
+ * Enhanced Mobile Interactions
+ */
+@media (max-width: 640px) {
+  .mobile-optimized {
+    /* Enhanced touch targets */
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+  }
+  
+  .mobile-card {
+    /* Better card spacing on mobile */
+    margin: 0.5rem;
+    border-radius: 1rem;
+  }
+}
+
+/**
+ * Smooth Animations & Transitions
+ */
+.smooth-transition {
+  transition: all 0.2s ease-in-out;
+}
+
+.hero-gradient {
+  background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 50%, transparent 100%);
+}
+
+/**
+ * Brand Color Utilities
+ */
+.text-brand-heading {
+  font-family: 'League Spartan', sans-serif !important;
+  font-weight: 700 !important;
+}
+
+.text-brand-subheading {
+  font-family: 'Work Sans', sans-serif !important;
+  font-weight: 600 !important;
+}
+
+.text-brand-label {
+  font-family: 'Work Sans', sans-serif !important;
+  font-weight: 500 !important;
+}
+
+.text-brand-body {
+  font-family: 'Quicksand', sans-serif !important;
+  font-weight: 400 !important;
+}
+
+.text-brand-button {
+  font-family: 'Work Sans', sans-serif !important;
+  font-weight: 500 !important;
+}
+
+.bg-brand-primary {
+  background-color: var(--pastel-blue);
+}
+
+.bg-brand-background {
+  background-color: var(--pastel-yellow);
+}
+
+.text-brand-primary {
+  color: var(--pastel-blue);
+}
+
+/**
+ * PWA Specific Styles
+ */
+@media (display-mode: standalone) {
+  body {
+    /* Hide scrollbars in PWA mode for native app feel */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  body::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Input appearance normalization for mobile */
+input, 
+textarea, 
+select {
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 0; /* Prevents iOS from adding default styling */
+}
+
+/* Ensure form elements maintain minimum size on mobile while being more compact */
+@media screen and (max-width: 768px) {
+  input, 
+  textarea, 
+  select,
+  button {
+    min-height: 44px; /* iOS minimum touch target */
+    font-size: 16px !important;
+  }
+  
+  /* Compact button variants for mobile */
+  .btn-mobile-compact {
+    min-height: 40px !important;
+    padding: 8px 12px !important;
+    font-size: 16px !important;
+  }
+  
+  .btn-mobile-small {
+    min-height: 36px !important;
+    padding: 6px 10px !important;
+    font-size: 14px !important;
+  }
+  
+  /* Override any component library font sizes that might be smaller */
+  .text-sm input,
+  .text-xs input,
+  input.text-sm,
+  input.text-xs {
+    font-size: 16px !important;
+  }
+  
+  /* Search inputs often have smaller default font sizes */
+  input[type="search"] {
+    font-size: 16px !important;
+    -webkit-appearance: none;
+    padding: 8px 12px !important; /* More compact for search */
+  }
+  
+  /* Compact form layouts */
+  .form-mobile-compact label {
+    font-size: 12px !important;
+    margin-bottom: 4px !important;
+  }
+  
+  .form-mobile-compact input,
+  .form-mobile-compact select,
+  .form-mobile-compact textarea {
+    padding: 8px 12px !important;
+    margin-bottom: 12px !important;
+  }
+  
+  /* Mobile-optimized select elements */
+  select {
+    padding: 8px 32px 8px 12px !important; /* Space for dropdown arrow */
+  }
+}
+
+/* Square footer buttons when clicked/active - Full height when clicked */
+.navigation-button:active,
+.navigation-button.active {
+  border-radius: 0.125rem; /* 2px - much more square than default rounded */
+  transform: scale(0.95);
+  transition: all 0.1s ease-out;
+  height: 100% !important; /* Full height of footer when clicked */
+  min-height: 64px !important;
+}
+
+/* Navigation button base styling */
+.navigation-button {
+  border-radius: 0.5rem; /* Default rounded */
+  transition: all 0.2s ease-in-out;
+}
+  
+  /* Override any component library font sizes that might be smaller */
+  .text-sm input,
+  .text-xs input,
+  input.text-sm,
+  input.text-xs {
+    font-size: 16px !important;
+  }
+  
+  /* Search inputs often have smaller default font sizes */
+  input[type="search"] {
+    font-size: 16px !important;
+    -webkit-appearance: none;
+    padding: 8px 12px !important; /* More compact for search */
+  }
+  
+  /* Compact form layouts */
+  .form-mobile-compact label {
+    font-size: 12px !important;
+    margin-bottom: 4px !important;
+  }
+  
+  .form-mobile-compact input,
+  .form-mobile-compact select,
+  .form-mobile-compact textarea {
+    padding: 8px 12px !important;
+    margin-bottom: 12px !important;
+  }
+  
+  /* Mobile-optimized select elements */
+  select {
+    padding: 8px 32px 8px 12px !important; /* Space for dropdown arrow */
+  }
+
+/* Prevent zoom on specific UI component inputs */
+[role="searchbox"],
+[role="textbox"],
+[role="combobox"] {
+  font-size: 16px !important;
+}
+
+/* Override ShadCN UI component font sizes for mobile - Compact variants */
+@media screen and (max-width: 768px) {
+  .ui-input,
+  .ui-textarea,
+  .ui-select,
+  [data-radix-select-trigger],
+  [data-radix-combobox-input] {
+    font-size: 16px !important;
+    min-height: 44px !important;
+    padding: 10px 12px !important; /* More compact padding */
+  }
+  
+  /* Compact UI components */
+  .ui-compact .ui-input,
+  .ui-compact .ui-textarea,
+  .ui-compact .ui-select {
+    min-height: 40px !important;
+    padding: 8px 12px !important;
+    font-size: 16px !important;
+  }
+  
+  /* Ultra-compact UI components */
+  .ui-ultra-compact .ui-input,
+  .ui-ultra-compact .ui-textarea,
+  .ui-ultra-compact .ui-select {
+    min-height: 36px !important;
+    padding: 6px 10px !important;
+    font-size: 16px !important;
+  }
+  
+  /* ShadCN Button overrides for mobile */
+  .ui-button,
+  [data-radix-dialog-trigger],
+  [data-radix-popover-trigger] {
+    font-size: 14px !important;
+    padding: 8px 16px !important;
+    min-height: 40px !important;
+  }
+  
+  .ui-button-sm {
+    font-size: 13px !important;
+    padding: 6px 12px !important;
+    min-height: 36px !important;
+  }
+  
+  .ui-button-xs {
+    font-size: 12px !important;
+    padding: 4px 8px !important;
+    min-height: 32px !important;
+  }
+  
+  /* ShadCN Card components - more compact */
+  .ui-card,
+  [data-radix-card] {
+    padding: 12px !important; /* Reduced from default */
+  }
+  
+  .ui-card-compact {
+    padding: 8px !important;
+  }
+  
+  .ui-card-header {
+    padding-bottom: 8px !important;
+    margin-bottom: 8px !important;
+  }
+  
+  .ui-card-content {
+    padding: 0 !important;
+  }
+  
+  .ui-card-footer {
+    padding-top: 8px !important;
+    margin-top: 8px !important;
+  }
+}
+
+/* Ensure search bars and filter inputs don't zoom */
+.search-input,
+.filter-input,
+.food-search,
+.ingredients-search {
+  font-size: 16px !important;
+}
+
+/* Mobile viewport meta controls for React apps */
+/* These should be added via Next.js Head or index.html:
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+*/
+
+/* Additional mobile optimizations */
+@supports (-webkit-touch-callout: none) {
+  /* iOS Safari specific optimizations */
+  input, textarea, select {
+    font-size: 16px !important;
+    transform: scale(1); /* Prevents iOS zoom behavior */
+  }
+}
+
+/* Prevent zoom on focus for all form elements */
+@media screen and (max-width: 768px) {
+  input:focus,
+  textarea:focus,
+  select:focus {
+    font-size: 16px !important;
+    /* Additional focus state optimizations */
+    outline: none;
+    transform: none;
+    zoom: 1;
+  }
+}
+
+/* Bytewise Brand Spacing System - Mobile-First Ultra-Tight Layout */
+:root {
+  --spacing-micro: 0.0625rem; /* 1px - Ultra tight */
+  --spacing-xs: 0.125rem;     /* 2px - Extra tight */
+  --spacing-sm: 0.25rem;      /* 4px - Tight */
+  --spacing-md: 0.375rem;     /* 6px - Compact (reduced from 8px) */
+  --spacing-lg: 0.5rem;       /* 8px - Small (reduced from 12px) */
+  --spacing-xl: 0.75rem;      /* 12px - Medium (reduced from 16px) */
+  --spacing-2xl: 1rem;        /* 16px - Large (reduced from 20px) */
+  --spacing-3xl: 1.25rem;     /* 20px - Extra large (reduced from 24px) */
+  --spacing-4xl: 1.5rem;      /* 24px - Maximum (reduced from 32px) */
+  
+  /* Mobile-specific spacing overrides */
+  --mobile-spacing-xs: 0.125rem;  /* 2px */
+  --mobile-spacing-sm: 0.25rem;   /* 4px */
+  --mobile-spacing-md: 0.375rem;  /* 6px */
+  --mobile-spacing-lg: 0.5rem;    /* 8px */
+  --mobile-spacing-xl: 0.75rem;   /* 12px */
+  
+  /* Component-specific spacing */
+  --button-padding-x: 0.75rem;    /* 12px horizontal */
+  --button-padding-y: 0.5rem;     /* 8px vertical */
+  --card-padding: 0.75rem;        /* 12px card padding */
+  --input-padding: 0.5rem;        /* 8px input padding */
+}
+
+/* Mobile spacing override utilities */
+@media screen and (max-width: 640px) {
+  :root {
+    --spacing-md: var(--mobile-spacing-md);
+    --spacing-lg: var(--mobile-spacing-lg);
+    --spacing-xl: var(--mobile-spacing-xl);
+    --button-padding-x: 0.625rem; /* 10px */
+    --button-padding-y: 0.375rem; /* 6px */
+    --card-padding: 0.5rem;       /* 8px */
+  }
+}
+
+/* Bytewise Brand Animations */
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes heroSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Enhanced Notification System Animations */
+@keyframes notificationSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(50px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes notificationSlideOut {
+  from {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(300px) scale(0.95);
+  }
+}
+
+@keyframes notificationBounceIn {
+  0% {
+    opacity: 0;
+    transform: translateY(50px) scale(0.8);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-5px) scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes notificationPulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes progressSlide {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+@keyframes notificationGlow {
+  0%, 100% {
+    box-shadow: 0 4px 12px rgba(168, 218, 220, 0.2);
+  }
+  50% {
+    box-shadow: 0 8px 24px rgba(168, 218, 220, 0.4);
+  }
+}
+
+@keyframes floatingAccent {
+  0%, 100% {
+    transform: translateY(0);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-2px);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s ease-out;
+}
+
+.animate-hero-slide-up {
+  animation: heroSlideUp 0.6s ease-out;
+}
+
+.animate-notification-slide-in {
+  animation: notificationSlideIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.animate-notification-slide-out {
+  animation: notificationSlideOut 0.3s cubic-bezier(0.55, 0.06, 0.68, 0.19);
+}
+
+.animate-notification-bounce-in {
+  animation: notificationBounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.animate-notification-pulse {
+  animation: notificationPulse 2s infinite;
+}
+
+.animate-progress-slide {
+  animation: progressSlide linear;
+}
+
+.animate-notification-glow {
+  animation: notificationGlow 3s ease-in-out infinite;
+}
+
+.animate-floating-accent {
+  animation: floatingAccent 3s ease-in-out infinite;
+}
+
+/* Brand Component Spacing Utilities - Mobile-Optimized */
+.brand-spacing-micro { gap: var(--spacing-micro); }
+.brand-spacing-xs { gap: var(--spacing-xs); }
+.brand-spacing-sm { gap: var(--spacing-sm); }
+.brand-spacing-md { gap: var(--spacing-md); }
+.brand-spacing-lg { gap: var(--spacing-lg); }
+.brand-spacing-xl { gap: var(--spacing-xl); }
+.brand-spacing-2xl { gap: var(--spacing-2xl); }
+.brand-spacing-3xl { gap: var(--spacing-3xl); }
+
+.brand-padding-micro { padding: var(--spacing-micro); }
+.brand-padding-xs { padding: var(--spacing-xs); }
+.brand-padding-sm { padding: var(--spacing-sm); }
+.brand-padding-md { padding: var(--spacing-md); }
+.brand-padding-lg { padding: var(--spacing-lg); }
+.brand-padding-xl { padding: var(--spacing-xl); }
+.brand-padding-2xl { padding: var(--spacing-2xl); }
+.brand-padding-3xl { padding: var(--spacing-3xl); }
+
+.brand-margin-micro { margin: var(--spacing-micro); }
+.brand-margin-xs { margin: var(--spacing-xs); }
+.brand-margin-sm { margin: var(--spacing-sm); }
+.brand-margin-md { margin: var(--spacing-md); }
+.brand-margin-lg { margin: var(--spacing-lg); }
+.brand-margin-xl { margin: var(--spacing-xl); }
+.brand-margin-2xl { margin: var(--spacing-2xl); }
+.brand-margin-3xl { margin: var(--spacing-3xl); }
+
+/* Directional spacing utilities for precise control */
+.px-mobile-tight { padding-left: var(--mobile-spacing-sm); padding-right: var(--mobile-spacing-sm); }
+.py-mobile-tight { padding-top: var(--mobile-spacing-sm); padding-bottom: var(--mobile-spacing-sm); }
+.mx-mobile-tight { margin-left: var(--mobile-spacing-sm); margin-right: var(--mobile-spacing-sm); }
+.my-mobile-tight { margin-top: var(--mobile-spacing-sm); margin-bottom: var(--mobile-spacing-sm); }
+
+.px-mobile-ultra { padding-left: var(--mobile-spacing-xs); padding-right: var(--mobile-spacing-xs); }
+.py-mobile-ultra { padding-top: var(--mobile-spacing-xs); padding-bottom: var(--mobile-spacing-xs); }
+.mx-mobile-ultra { margin-left: var(--mobile-spacing-xs); margin-right: var(--mobile-spacing-xs); }
+.my-mobile-ultra { margin-top: var(--mobile-spacing-xs); margin-bottom: var(--mobile-spacing-xs); }
+
+/* Bytewise Button Animations */
+.btn-animate {
+  transition: all 0.2s ease;
+  transform: translateY(0);
+}
+
+.btn-animate:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(168, 218, 220, 0.3);
+}
+
+.btn-animate:active {
+  transform: translateY(0);
+  transition: transform 0.1s ease;
+}
+
+.btn-animate:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 0 0 2px var(--ring);
+}
+
+/* Bytewise Card Gradients */
+.card-gradient {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+}
+
+.hero-card-gradient {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(248, 249, 250, 0.1) 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Enhanced Notification Card Gradients */
+.notification-gradient-success {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(22, 163, 74, 0.05) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.notification-gradient-error {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.05) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.notification-gradient-warning {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.05) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.notification-gradient-info {
+  background: linear-gradient(135deg, rgba(168, 218, 220, 0.2) 0%, rgba(168, 218, 220, 0.1) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.notification-gradient-meal {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.05) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.notification-gradient-achievement {
+  background: linear-gradient(135deg, rgba(147, 51, 234, 0.1) 0%, rgba(126, 34, 206, 0.05) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.notification-gradient-goal {
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.1) 0%, rgba(234, 88, 12, 0.05) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* Brand-Consistent Card Spacing */
+.brand-card {
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: var(--card);
+  transition: all 0.2s ease;
+}
+
+.brand-card:hover {
+  box-shadow: 0 4px 12px rgba(168, 218, 220, 0.15);
+  transform: translateY(-1px);
+}
+
+.brand-card-compact {
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--card);
+}
+
+.brand-card-header {
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid var(--border);
+}
+
+.brand-card-content {
+  margin-bottom: var(--spacing-md);
+}
+
+.brand-card-footer {
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid var(--border);
+}
+
+/* Enhanced Notification Card Styling */
+.notification-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  border: 2px solid transparent;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.notification-card:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.notification-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.notification-progress-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.notification-progress-fill {
+  height: 100%;
+  transition: width 0.1s linear;
+  background: linear-gradient(90deg, currentColor 0%, rgba(255, 255, 255, 0.8) 100%);
+}
+
+.notification-icon-container {
+  position: relative;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
+
+.notification-icon-container::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, currentColor, transparent);
+  z-index: -1;
+  opacity: 0.3;
+}
+
+.notification-accent-dot {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.4;
+  animation: floatingAccent 3s ease-in-out infinite;
+}
+
+.notification-metadata {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.notification-metadata-item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: currentColor;
+  opacity: 0.8;
+}
+
+/* Bytewise Layout Utilities */
+.tight-spacing > * + * {
+  margin-top: var(--spacing-sm);
+}
+
+.ultra-tight-spacing > * + * {
+  margin-top: var(--spacing-xs);
+}
+
+.seamless-layout {
+  gap: var(--spacing-xs);
+}
+
+.compact-layout {
+  gap: var(--spacing-sm);
+}
+
+/* BYTEWISE SEAMLESS HEADER-HERO INTEGRATION */
+/* Core seamless integration classes */
+.seamless-header-hero {
+  padding-top: 0;
+  margin-top: 0;
+}
+
+.header-overlay-effect {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-under-header {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.content-seamless-start {
+  padding-top: 0;
+}
+
+/* Enhanced Header Styling for Seamless Integration */
+.enhanced-header {
+  min-height: 4rem;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+}
+
+.enhanced-header-seamless {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background: rgba(254, 247, 205, 0.95);
+  transition: all 0.3s ease;
+}
+
+.content-under-seamless-header {
+  padding-top: 0;
+  margin-top: 0;
+}
+
+/* BYTEWISE HERO COMPONENT BRAND STANDARDS */
+/* Comprehensive hero component styling utilities following Dashboard hero pattern */
+
+/* Hero Container Base Structure */
+.hero-container {
+  position: relative;
+  margin-left: -0.75rem; /* -mx-3 for standard components */
+  margin-right: -0.75rem;
+  margin-bottom: 1.5rem; /* mb-6 */
+  margin-top: 0; /* Seamless integration - no top margin */
+  padding-top: 0; /* Seamless integration - no top padding */
+}
+
+.hero-container-dashboard {
+  margin-left: -1rem; /* -mx-4 for dashboard variant */
+  margin-right: -1rem;
+}
+
+/* Hero Background and Image Structure */
+.hero-background {
+  height: 16rem; /* h-64 - standardized height */
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-gradient-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.4) 50%, transparent 100%);
+}
+
+/* Hero Content Layout - Three-Column Standard */
+.hero-content {
+  position: absolute;
+  left: 1rem; /* inset-x-4 */
+  right: 1rem;
+  bottom: 1.5rem; /* bottom-6 */
+  top: 4rem; /* top-16 - space for header */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  color: white;
+}
+
+.hero-layout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+/* Hero Typography - Brand Compliant */
+.hero-title-section h1 {
+  font-family: 'League Spartan', sans-serif !important;
+  font-size: 1.875rem !important; /* 30px */
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  color: white !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.hero-title-section .hero-subtitle {
+  font-family: 'Quicksand', sans-serif !important;
+  font-size: 0.875rem !important; /* 14px */
+  font-weight: 400 !important;
+  opacity: 0.9;
+  margin-bottom: 0.25rem !important;
+  color: white !important;
+}
+
+.hero-title-section .hero-description {
+  font-family: 'Quicksand', sans-serif !important;
+  font-size: 0.875rem !important; /* 14px */
+  font-weight: 400 !important;
+  opacity: 0.9;
+  margin-top: 0.25rem !important;
+  color: white !important;
+}
+
+/* Hero Statistics Card - Dashboard Standard */
+.hero-stats-card {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 1rem; /* rounded-2xl */
+  padding: 0.75rem 1rem; /* px-4 py-3 */
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
+}
+
+.hero-stats-card .hero-stats-icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem; /* space-x-2 */
+  margin-bottom: 0.25rem; /* mb-1 */
+}
+
+.hero-stats-card .hero-stats-number {
+  font-family: 'League Spartan', sans-serif !important;
+  font-size: 1.5rem !important; /* 24px */
+  font-weight: 700 !important;
+  color: white !important;
+  margin: 0 !important;
+  line-height: 1 !important;
+}
+
+.hero-stats-card .hero-stats-label {
+  font-family: 'Quicksand', sans-serif !important;
+  font-size: 0.75rem !important; /* 12px */
+  font-weight: 400 !important;
+  opacity: 0.9;
+  color: white !important;
+  margin: 0 !important;
+  line-height: 1 !important;
+}
+
+/* Hero Progress Ring - Dashboard Standard */
+.hero-progress-ring {
+  position: relative;
+  width: 5rem; /* w-20 */
+  height: 5rem; /* h-20 */
+  flex-shrink: 0;
+}
+
+.hero-progress-ring svg {
+  width: 5rem;
+  height: 5rem;
+  transform: rotate(-90deg);
+}
+
+.hero-progress-ring .hero-progress-bg {
+  cx: 50;
+  cy: 50;
+  r: 35;
+  stroke: rgba(255, 255, 255, 0.3);
+  stroke-width: 6;
+  fill: transparent;
+}
+
+.hero-progress-ring .hero-progress-fill {
+  cx: 50;
+  cy: 50;
+  r: 35;
+  stroke: var(--pastel-blue); /* Brand color */
+  stroke-width: 6;
+  fill: transparent;
+  stroke-linecap: round;
+  transition: all 0.5s ease;
+}
+
+.hero-progress-ring .hero-progress-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-progress-ring .hero-progress-percentage {
+  font-family: 'League Spartan', sans-serif !important;
+  font-size: 1.125rem !important; /* 18px */
+  font-weight: 700 !important;
+  color: white !important;
+  text-align: center;
+  line-height: 1 !important;
+}
+
+.hero-progress-ring .hero-progress-label {
+  font-family: 'Quicksand', sans-serif !important;
+  font-size: 0.75rem !important; /* 12px */
+  font-weight: 400 !important;
+  opacity: 0.75;
+  color: white !important;
+  text-align: center;
+  line-height: 1 !important;
+}
+
+/* Hero Bottom Row - Dashboard Standard */
+.hero-bottom-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem; /* gap-3 */
+  margin-top: 1rem;
+}
+
+.hero-bottom-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem; /* space-x-3 */
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 1rem; /* rounded-2xl */
+  padding: 0.625rem 0.75rem; /* px-3 py-2.5 */
+  flex: 1 1 0%;
+  min-width: 0;
+}
+
+.hero-bottom-info .hero-info-section {
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.hero-bottom-info .hero-info-number {
+  font-family: 'League Spartan', sans-serif !important;
+  font-size: 1.125rem !important; /* 18px */
+  font-weight: 700 !important;
+  color: white !important;
+  margin: 0 !important;
+  line-height: 1 !important;
+}
+
+.hero-bottom-info .hero-info-label {
+  font-family: 'Quicksand', sans-serif !important;
+  font-size: 0.75rem !important; /* 12px */
+  font-weight: 400 !important;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0 !important;
+  line-height: 1 !important;
+}
+
+.hero-bottom-info .hero-info-divider {
+  width: 1px;
+  height: 2rem; /* h-8 */
+  background: rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+}
+
+/* Hero Input Elements (Date pickers, etc.) */
+.hero-input {
+  background: transparent !important;
+  border: 0 !important;
+  color: white !important;
+  text-align: center;
+  font-family: 'Work Sans', sans-serif !important;
+  font-size: 0.875rem !important; /* 14px */
+  font-weight: 500 !important;
+  width: auto;
+  outline: none !important;
+  min-height: auto !important;
+  padding: 0 !important;
+}
+
+.hero-input:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-radius: 0.25rem !important;
+  padding: 0.25rem 0.5rem !important;
+}
+
+/* Mobile Responsive Adjustments */
+@media screen and (max-width: 640px) {
+  .hero-title-section h1 {
+    font-size: 1.5rem !important; /* 24px on mobile */
+  }
+  
+  .hero-title-section .hero-subtitle,
+  .hero-title-section .hero-description {
+    font-size: 0.75rem !important; /* 12px on mobile */
+  }
+  
+  .hero-stats-card .hero-stats-number {
+    font-size: 1.25rem !important; /* 20px on mobile */
+  }
+  
+  .hero-stats-card .hero-stats-label {
+    font-size: 0.6875rem !important; /* 11px on mobile */
+  }
+  
+  .hero-progress-ring .hero-progress-percentage {
+    font-size: 1rem !important; /* 16px on mobile */
+  }
+  
+  .hero-progress-ring .hero-progress-label {
+    font-size: 0.6875rem !important; /* 11px on mobile */
+  }
+  
+  .hero-bottom-info .hero-info-number {
+    font-size: 1rem !important; /* 16px on mobile */
+  }
+  
+  .hero-bottom-info .hero-info-label {
+    font-size: 0.6875rem !important; /* 11px on mobile */
+  }
+  
+  .hero-layout {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  
+  .hero-stats-card {
+    align-self: center;
+  }
+  
+  .hero-bottom-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+}
+
+/* Hero Animation and Transitions */
+.hero-content {
+  animation: heroSlideUp 0.6s ease-out;
+}
+
+.hero-stats-card {
+  transition: all 0.2s ease;
+}
+
+.hero-stats-card:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+}
+
+.hero-progress-ring .hero-progress-fill {
+  transition: stroke-dashoffset 0.5s ease;
+}
+
+.hero-bottom-info {
+  transition: all 0.2s ease;
+}
+
+.hero-bottom-info:hover {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+/* Hero Brand Color Variants */
+.hero-accent-orange .hero-stats-icon-container svg {
+  color: #ff6b35 !important; /* Orange accent */
+}
+
+.hero-accent-green .hero-stats-icon-container svg {
+  color: #4ade80 !important; /* Green accent */
+}
+
+.hero-accent-blue .hero-stats-icon-container svg {
+  color: var(--pastel-blue) !important; /* Brand blue accent */
+}
+
+.hero-accent-yellow .hero-stats-icon-container svg {
+  color: #fbbf24 !important; /* Yellow accent */
+}
+
+.hero-accent-purple .hero-stats-icon-container svg {
+  color: #a855f7 !important; /* Purple accent */
+}
+
+/* Hero Layout Utilities */
+.hero-layout-standard {
+  /* Default three-column layout */
+}
+
+.hero-layout-centered {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1rem;
+}
+
+.hero-layout-compact {
+  margin-bottom: 0.75rem;
+}
+
+.hero-layout-compact .hero-progress-ring {
+  width: 4rem;
+  height: 4rem;
+}
+
+.hero-layout-compact .hero-progress-ring svg {
+  width: 4rem;
+  height: 4rem;
+}
+
+/* Hero Context-Specific Variants */
+.hero-dashboard {
+  /* Dashboard-specific styling (default) */
+}
+
+.hero-recipe-builder .hero-accent-yellow {
+  /* Recipe Builder specific */
+}
+
+.hero-meal-planner .hero-accent-green {
+  /* Meal Planner specific */
+}
+
+.hero-calendar .hero-accent-blue {
+  /* Calendar specific */
+}
+
+.hero-profile .hero-accent-purple {
+  /* Profile specific */
+}
+
+/* Hero Accessibility Enhancements */
+.hero-content {
+  /* Ensure proper contrast ratios */
+  color: white !important;
+}
+
+.hero-title-section h1,
+.hero-stats-card .hero-stats-number,
+.hero-progress-ring .hero-progress-percentage {
+  /* High contrast for important text */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-content {
+    animation: none;
+  }
+  
+  .hero-stats-card:hover,
+  .hero-bottom-info:hover {
+    transform: none;
+  }
+  
+  .hero-progress-ring .hero-progress-fill {
+    transition: none;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .hero-gradient-overlay {
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.6) 50%, rgba(0, 0, 0, 0.3) 100%);
+  }
+  
+  .hero-stats-card {
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    background: rgba(0, 0, 0, 0.6);
+  }
+  
+  .hero-bottom-info {
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    background: rgba(0, 0, 0, 0.7);
+  }
+}
+
+/* Print Styles for Hero Components */
+@media print {
+  .hero-container {
+    display: none;
+  }
+}
+
+/* Hero Component Override Utilities */
+.hero-override-spacing {
+  /* Use when component needs custom spacing */
+  margin-left: calc(-0.75rem + var(--hero-spacing-override, 0)) !important;
+  margin-right: calc(-0.75rem + var(--hero-spacing-override, 0)) !important;
+}
+
+.hero-override-height {
+  /* Use when component needs custom height */
+  height: var(--hero-height-override, 16rem) !important;
+}
+
+.hero-force-brand-typography {
+  /* Force brand typography on all child elements */
+}
+
+.hero-force-brand-typography h1,
+.hero-force-brand-typography .hero-title {
+  font-family: 'League Spartan', sans-serif !important;
+  font-weight: 700 !important;
+  color: white !important;
+}
+
+.hero-force-brand-typography p,
+.hero-force-brand-typography .hero-subtitle,
+.hero-force-brand-typography .hero-description {
+  font-family: 'Quicksand', sans-serif !important;
+  font-weight: 400 !important;
+  color: white !important;
+}
+
+.hero-force-brand-typography .hero-stats-number,
+.hero-force-brand-typography .hero-progress-percentage {
+  font-family: 'League Spartan', sans-serif !important;
+  font-weight: 700 !important;
+  color: white !important;
+}
+
+.hero-force-brand-typography .hero-stats-label,
+.hero-force-brand-typography .hero-progress-label,
+.hero-force-brand-typography .hero-info-label {
+  font-family: 'Quicksand', sans-serif !important;
+  font-weight: 400 !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Footer-Content Integration */
+.content-footer-tight {
+  padding-bottom: var(--spacing-2xl);
+}
+
+.content-footer-seamless {
+  padding-bottom: var(--spacing-xl);
+}
+
+.above-footer {
+  margin-bottom: calc(-1 * var(--spacing-sm));
+}
+
+/* Bytewise Food Image Styles */
+.food-image {
+  transition: transform 0.3s ease;
+  background-color: var(--muted);
+  object-fit: cover;
+  border-radius: var(--radius-md);
+}
+
+.food-image:hover {
+  transform: scale(1.05);
+}
+
+/* Image Loading States */
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+img[src=""] {
+  display: none;
+}
+
+.image-container {
+  background-color: var(--muted);
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+}
+
+.image-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--pastel-yellow) 0%, var(--pastel-blue) 100%);
+  opacity: 0.1;
+  z-index: -1;
+}
+
+/* Recipe Builder Enhanced Scroll Styles */
+[data-recipe-builder] .hover-scroll-area {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) transparent;
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+  transition: all 0.2s ease;
+}
+
+.hover-scroll-area::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.hover-scroll-area::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 3px;
+}
+
+.hover-scroll-area::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 3px;
+  opacity: 0.4;
+  transition: opacity 0.2s ease;
+}
+
+.hover-scroll-area::-webkit-scrollbar-thumb:hover {
+  opacity: 0.8;
+  background: var(--pastel-blue-dark);
+}
+
+.hover-scroll-area::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+.hover-scroll-container:hover .hover-scroll-area::-webkit-scrollbar-thumb,
+.hover-scroll-area:focus-within::-webkit-scrollbar-thumb {
+  opacity: 0.6;
+}
+
+.hover-scroll-item {
+  scroll-margin: 8px;
+  scroll-snap-align: start;
+  transition: all 0.2s ease;
+  min-height: 44px;
+  position: relative;
+}
+
+.hover-scroll-item * {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+/* Recipe Builder Drag States */
+.scroll-disabled {
+  overflow: hidden !important;
+  scroll-behavior: auto !important;
+}
+
+.scroll-disabled::-webkit-scrollbar-thumb {
+  opacity: 0.2 !important;
+}
+
+.recipe-builder-dragging [data-recipe-builder] .ingredients-scroll-area {
+  user-select: none;
+  -webkit-user-select: none;
+  pointer-events: auto;
+}
+
+.recipe-builder-dragging [data-recipe-builder] .ingredients-scroll-area * {
+  pointer-events: none;
+}
+
+.recipe-builder-dragging [data-recipe-builder] .ingredients-scroll-area .dragging-item {
+  pointer-events: auto;
+}
+
+.recipe-builder-dragging [data-meal-category] {
+  pointer-events: auto;
+}
+
+.recipe-builder-dragging [data-meal-category] * {
+  pointer-events: none;
+}
+
+.recipe-builder-dragging [data-meal-category] .dragging-item {
+  pointer-events: auto;
+}
+
+.dragging-item {
+  position: relative;
+  z-index: 1000 !important;
+  box-shadow: 0 10px 25px rgba(168, 218, 220, 0.4) !important;
+  transform: rotate(2deg) scale(1.05) !important;
+  transition: none !important;
+  pointer-events: auto !important;
+}
+
+[data-recipe-builder] .group.cursor-grab {
+  cursor: grab;
+  -webkit-user-drag: element;
+}
+
+[data-recipe-builder] .group.cursor-grab:active {
+  cursor: grabbing;
+}
+
+.recipe-builder-dragging [data-recipe-builder].drag-enabled {
+  overflow: visible !important;
+}
+
+.recipe-builder-dragging [data-recipe-builder].drag-enabled * {
+  pointer-events: none;
+}
+
+.recipe-builder-dragging [data-recipe-builder].drag-enabled .dragging-item {
+  pointer-events: auto !important;
+}
+
+.recipe-builder-dragging [data-recipe-builder].drag-enabled .group {
+  pointer-events: auto;
+}
+
+.drag-feedback-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  pointer-events: none;
+  background: rgba(168, 218, 220, 0.05);
+  backdrop-filter: blur(1px);
+  transition: all 0.2s ease;
+}
+
+/* Mobile Scroll Snap */
+@media (max-width: 768px) {
+  .hover-scroll-area {
+    scroll-snap-type: y proximity;
+  }
+}
+
+/* Recipe Builder Ingredients Library Enhancements */
+[data-recipe-builder] .ingredients-scroll-area {
+  position: relative;
+  isolation: isolate;
+}
+
+[data-recipe-builder] .ingredients-scroll-area::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background: linear-gradient(to bottom, var(--background) 60%, transparent);
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+[data-recipe-builder] .ingredients-scroll-area::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background: linear-gradient(to top, var(--background) 60%, transparent);
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+[data-recipe-builder] .ingredients-scroll-area:hover::before,
+[data-recipe-builder] .ingredients-scroll-area:hover::after,
+[data-recipe-builder] .ingredients-scroll-area.scrolling::before,
+[data-recipe-builder] .ingredients-scroll-area.scrolling::after {
+  opacity: 1;
+}
+
+.recipe-builder-dragging [data-recipe-builder] .ingredients-scroll-area::before,
+.recipe-builder-dragging [data-recipe-builder] .ingredients-scroll-area::after {
+  opacity: 0 !important;
+}
+
+/* Scroll Indicator Animation */
+@keyframes scrollPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+.scroll-indicator {
+  animation: scrollPulse 2s infinite;
+}
+
+/* Text Truncation Utilities */
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Food Database Enhanced Styling */
+.food-database-list {
+  scroll-behavior: smooth;
+}
+
+.food-database-item {
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+  border-radius: var(--radius-md);
+}
+
+.food-database-item:hover {
+  border-left-color: var(--primary);
+  background: linear-gradient(90deg, var(--primary)/5 0%, transparent 100%);
+  transform: translateX(2px);
+}
+
+/* Bytewise Brand Typography Override Utilities */
+.text-brand-heading {
+  font-family: 'League Spartan', sans-serif !important;
+  font-weight: 700 !important;
+}
+
+.text-brand-subheading {
+  font-family: 'Work Sans', sans-serif !important;
+  font-weight: 600 !important;
+}
+
+.text-brand-label {
+  font-family: 'Work Sans', sans-serif !important;
+  font-weight: 500 !important;
+}
+
+.text-brand-body {
+  font-family: 'Quicksand', sans-serif !important;
+  font-weight: 400 !important;
+}
+
+.text-brand-button {
+  font-family: 'Work Sans', sans-serif !important;
+  font-weight: 500 !important;
+}
+
+/* MOBILE-OPTIMIZED COMPACT TEXT UTILITIES */
+/* Responsive text sizing for better horizontal fit */
+
+.text-compact-xs {
+  font-size: 0.625rem !important; /* 10px */
+  line-height: 1.2 !important;
+  letter-spacing: 0.025em !important;
+}
+
+.text-compact-sm {
+  font-size: 0.75rem !important; /* 12px */
+  line-height: 1.3 !important;
+  letter-spacing: 0.015em !important;
+}
+
+.text-compact-base {
+  font-size: 0.875rem !important; /* 14px */
+  line-height: 1.4 !important;
+  letter-spacing: 0.01em !important;
+}
+
+.text-compact-lg {
+  font-size: 1rem !important; /* 16px */
+  line-height: 1.4 !important;
+  letter-spacing: 0.005em !important;
+}
+
+.text-compact-xl {
+  font-size: 1.125rem !important; /* 18px */
+  line-height: 1.3 !important;
+  letter-spacing: -0.005em !important;
+}
+
+.text-compact-2xl {
+  font-size: 1.25rem !important; /* 20px */
+  line-height: 1.2 !important;
+  letter-spacing: -0.01em !important;
+}
+
+.text-compact-3xl {
+  font-size: 1.5rem !important; /* 24px */
+  line-height: 1.1 !important;
+  letter-spacing: -0.02em !important;
+}
+
+/* Mobile-first heading hierarchy - compact but readable */
+.heading-mobile-sm {
+  font-family: 'League Spartan', sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 1.25rem !important; /* 20px */
+  line-height: 1.2 !important;
+  letter-spacing: -0.015em !important;
+}
+
+.heading-mobile-md {
+  font-family: 'League Spartan', sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 1.5rem !important; /* 24px */
+  line-height: 1.1 !important;
+  letter-spacing: -0.02em !important;
+}
+
+.heading-mobile-lg {
+  font-family: 'League Spartan', sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 1.75rem !important; /* 28px */
+  line-height: 1.1 !important;
+  letter-spacing: -0.025em !important;
+}
+
+.subheading-mobile {
+  font-family: 'Work Sans', sans-serif !important;
+  font-weight: 600 !important;
+  font-size: 1rem !important; /* 16px */
+  line-height: 1.3 !important;
+  letter-spacing: -0.005em !important;
+}
+
+.label-mobile {
+  font-family: 'Work Sans', sans-serif !important;
+  font-weight: 500 !important;
+  font-size: 0.875rem !important; /* 14px */
+  line-height: 1.4 !important;
+  letter-spacing: 0.01em !important;
+}
+
+.body-mobile {
+  font-family: 'Quicksand', sans-serif !important;
+  font-weight: 400 !important;
+  font-size: 0.875rem !important; /* 14px */
+  line-height: 1.5 !important;
+  letter-spacing: 0.005em !important;
+}
+
+/* COMPACT BUTTON UTILITIES */
+/* Mobile-optimized button sizing while maintaining accessibility */
+
+.btn-compact-xs {
+  padding: 0.375rem 0.75rem !important; /* 6px 12px */
+  font-size: 0.75rem !important; /* 12px */
+  min-height: 32px !important; /* Smaller but still accessible */
+  font-family: 'Work Sans', sans-serif !important;
+  font-weight: 500 !important;
+  line-height: 1.2 !important;
+  letter-spacing: 0.025em !important;
+}
+
+.btn-compact-sm {
+  padding: 0.5rem 1rem !important; /* 8px 16px */
+  font-size: 0.875rem !important; /* 14px */
+  min-height: 36px !important;
+  font-family: 'Work Sans', sans-serif !important;
+  font-weight: 500 !important;
+  line-height: 1.3 !important;
+  letter-spacing: 0.015em !important;
+}
+
+.btn-compact-base {
+  padding: 0.625rem 1.25rem !important; /* 10px 20px */
+  font-size: 0.875rem !important; /* 14px */
+  min-height: 40px !important;
+  font-family: 'Work Sans', sans-serif !important;
+  font-weight: 500 !important;
+  line-height: 1.4 !important;
+  letter-spacing: 0.01em !important;
+}
+
+.btn-mobile-safe {
+  padding: 0.75rem 1rem !important; /* 12px 16px */
+  font-size: 16px !important; /* Prevents zoom on mobile */
+  min-height: 44px !important; /* iOS minimum touch target */
+  font-family: 'Work Sans', sans-serif !important;
+  font-weight: 500 !important;
+  line-height: 1.4 !important;
+  letter-spacing: 0.005em !important;
+}
+
+/* Icon + text button compact variants */
+.btn-icon-compact {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.375rem !important; /* 6px */
+  padding: 0.5rem 0.875rem !important; /* 8px 14px */
+  font-size: 0.75rem !important; /* 12px */
+  min-height: 36px !important;
+}
+
+.btn-icon-compact svg {
+  width: 14px !important;
+  height: 14px !important;
+  flex-shrink: 0 !important;
+}
+
+.btn-icon-mobile {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important; /* 8px */
+  padding: 0.625rem 1rem !important; /* 10px 16px */
+  font-size: 0.875rem !important; /* 14px */
+  min-height: 40px !important;
+}
+
+.btn-icon-mobile svg {
+  width: 16px !important;
+  height: 16px !important;
+  flex-shrink: 0 !important;
+}
+
+/* RESPONSIVE SPACING UTILITIES */
+/* Tighter spacing for mobile layouts */
+
+.space-x-tight > * + * {
+  margin-left: 0.375rem !important; /* 6px */
+}
+
+.space-y-tight > * + * {
+  margin-top: 0.375rem !important; /* 6px */
+}
+
+.space-x-ultra-tight > * + * {
+  margin-left: 0.25rem !important; /* 4px */
+}
+
+.space-y-ultra-tight > * + * {
+  margin-top: 0.25rem !important; /* 4px */
+}
+
+.gap-tight {
+  gap: 0.375rem !important; /* 6px */
+}
+
+.gap-ultra-tight {
+  gap: 0.25rem !important; /* 4px */
+}
+
+.gap-micro {
+  gap: 0.125rem !important; /* 2px */
+}
+
+/* MOBILE LAYOUT UTILITIES */
+/* Optimized for horizontal space constraints */
+
+.flex-mobile-fit {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  overflow: hidden !important;
+}
+
+.flex-mobile-fit > * {
+  flex-shrink: 1 !important;
+  min-width: 0 !important;
+}
+
+.grid-mobile-fit {
+  display: grid !important;
+  grid-template-columns: 1fr auto !important;
+  gap: 0.5rem !important;
+  align-items: center !important;
+}
+
+.grid-mobile-3col {
+  display: grid !important;
+  grid-template-columns: 1fr auto auto !important;
+  gap: 0.375rem !important;
+  align-items: center !important;
+}
+
+.truncate-mobile {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  max-width: 100% !important;
+}
+
+.truncate-mobile-flex {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  flex: 1 1 0% !important;
+  min-width: 0 !important;
+}
+
+/* CARD COMPACT VARIANTS */
+/* Tighter card layouts for mobile */
+
+.card-compact {
+  padding: 0.75rem !important; /* 12px */
+  border-radius: 0.75rem !important; /* 12px */
+  margin-bottom: 0.5rem !important; /* 8px */
+}
+
+.card-ultra-compact {
+  padding: 0.5rem !important; /* 8px */
+  border-radius: 0.5rem !important; /* 8px */
+  margin-bottom: 0.375rem !important; /* 6px */
+}
+
+.card-mobile {
+  padding: 1rem 0.75rem !important; /* 16px 12px */
+  border-radius: 1rem !important; /* 16px */
+  margin-bottom: 0.75rem !important; /* 12px */
+}
+
+/* NAVIGATION COMPACT UTILITIES */
+/* For tabs, breadcrumbs, and navigation elements */
+
+.nav-compact {
+  font-size: 0.75rem !important; /* 12px */
+  padding: 0.375rem 0.625rem !important; /* 6px 10px */
+  min-height: 32px !important;
+  font-family: 'Work Sans', sans-serif !important;
+  font-weight: 500 !important;
+}
+
+.nav-mobile {
+  font-size: 0.875rem !important; /* 14px */
+  padding: 0.5rem 0.75rem !important; /* 8px 12px */
+  min-height: 36px !important;
+  font-family: 'Work Sans', sans-serif !important;
+  font-weight: 500 !important;
+}
+
+.tab-compact {
+  font-size: 0.75rem !important; /* 12px */
+  padding: 0.5rem 0.75rem !important; /* 8px 12px */
+  min-height: 36px !important;
+  font-family: 'Work Sans', sans-serif !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.025em !important;
+}
+
+/* FORM ELEMENT COMPACT UTILITIES */
+/* Maintains 16px minimum for inputs to prevent zoom */
+
+.input-compact {
+  padding: 0.5rem 0.75rem !important; /* 8px 12px */
+  font-size: 16px !important; /* Prevents mobile zoom */
+  min-height: 40px !important;
+  font-family: 'Quicksand', sans-serif !important;
+  line-height: 1.4 !important;
+}
+
+.label-compact {
+  font-size: 0.75rem !important; /* 12px */
+  font-family: 'Work Sans', sans-serif !important;
+  font-weight: 500 !important;
+  line-height: 1.3 !important;
+  margin-bottom: 0.25rem !important; /* 4px */
+}
+
+.select-compact {
+  padding: 0.5rem 0.75rem !important; /* 8px 12px */
+  font-size: 16px !important; /* Prevents mobile zoom */
+  min-height: 40px !important;
+  font-family: 'Quicksand', sans-serif !important;
+  line-height: 1.4 !important;
+}
+
+/* MOBILE BREAKPOINT OVERRIDES */
+/* Responsive adjustments for better horizontal fit */
+
+@media screen and (max-width: 640px) {
+  .mobile\:text-xs {
+    font-size: 0.75rem !important;
+    line-height: 1.3 !important;
+  }
+  
+  .mobile\:text-sm {
+    font-size: 0.875rem !important;
+    line-height: 1.4 !important;
+  }
+  
+  .mobile\:btn-compact {
+    padding: 0.5rem 0.875rem !important;
+    font-size: 0.875rem !important;
+    min-height: 40px !important;
+  }
+  
+  .mobile\:btn-ultra-compact {
+    padding: 0.375rem 0.625rem !important;
+    font-size: 0.75rem !important;
+    min-height: 36px !important;
+  }
+  
+  .mobile\:gap-tight {
+    gap: 0.375rem !important;
+  }
+  
+  .mobile\:gap-ultra-tight {
+    gap: 0.25rem !important;
+  }
+  
+  .mobile\:p-tight {
+    padding: 0.5rem !important;
+  }
+  
+  .mobile\:px-tight {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+  
+  .mobile\:py-tight {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+  }
+  
+  /* Force compact layouts on mobile */
+  .mobile\:truncate {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+  
+  .mobile\:flex-shrink {
+    flex-shrink: 1 !important;
+    min-width: 0 !important;
+  }
+  
+  .mobile\:max-w-fit {
+    max-width: fit-content !important;
+  }
+}
+
+/* Mobile-Safe Input Typography Utilities */
+.mobile-safe-input {
+  font-size: 16px !important;
+  min-height: 44px !important;
+  padding: 12px 16px !important;
+}
+
+.mobile-safe-text {
+  font-size: max(16px, 1rem) !important;
+}
+
+/* COMPREHENSIVE INPUT FIELD WITH ICON SPACING UTILITIES */
+/* Fixes overlapping issues between icons and text in input fields */
+
+/* Input with left icon only */
+.input-with-left-icon {
+  padding-left: 2.75rem !important; /* 44px - space for icon + padding */
+  padding-right: 1rem !important; /* 16px normal right padding */
+  font-size: 16px !important; /* Prevents mobile zoom */
+  min-height: 44px !important; /* Minimum touch target */
+}
+
+/* Input with right icon only */
+.input-with-right-icon {
+  padding-left: 1rem !important; /* 16px normal left padding */
+  padding-right: 2.75rem !important; /* 44px - space for icon + padding */
+  font-size: 16px !important;
+  min-height: 44px !important;
+}
+
+/* Input with both left and right icons */
+.input-with-both-icons {
+  padding-left: 2.75rem !important; /* 44px for left icon */
+  padding-right: 2.75rem !important; /* 44px for right icon */
+  font-size: 16px !important;
+  min-height: 44px !important;
+}
+
+/* Compact variants for tighter layouts */
+.input-with-left-icon-compact {
+  padding-left: 2.25rem !important; /* 36px - smaller icon space */
+  padding-right: 0.75rem !important; /* 12px right padding */
+  font-size: 16px !important;
+  min-height: 40px !important;
+}
+
+.input-with-right-icon-compact {
+  padding-left: 0.75rem !important; /* 12px left padding */
+  padding-right: 2.25rem !important; /* 36px for right icon */
+  font-size: 16px !important;
+  min-height: 40px !important;
+}
+
+.input-with-both-icons-compact {
+  padding-left: 2.25rem !important; /* 36px for left icon */
+  padding-right: 2.25rem !important; /* 36px for right icon */
+  font-size: 16px !important;
+  min-height: 40px !important;
+}
+
+/* Icon positioning utilities */
+.input-icon-left {
+  position: absolute !important;
+  left: 0.75rem !important; /* 12px from left edge */
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 10 !important;
+  pointer-events: none !important;
+  color: rgb(156 163 175) !important; /* Gray-400 */
+}
+
+.input-icon-right {
+  position: absolute !important;
+  right: 0.75rem !important; /* 12px from right edge */
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 10 !important;
+  pointer-events: none !important;
+  color: rgb(156 163 175) !important; /* Gray-400 */
+}
+
+/* Compact icon positioning */
+.input-icon-left-compact {
+  position: absolute !important;
+  left: 0.625rem !important; /* 10px from left edge */
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 10 !important;
+  pointer-events: none !important;
+  color: rgb(156 163 175) !important;
+}
+
+.input-icon-right-compact {
+  position: absolute !important;
+  right: 0.625rem !important; /* 10px from right edge */
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 10 !important;
+  pointer-events: none !important;
+  color: rgb(156 163 175) !important;
+}
+
+/* Interactive icons (clickable) */
+.input-icon-interactive {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  transition: color 0.2s ease !important;
+}
+
+.input-icon-interactive:hover {
+  color: rgb(107 114 128) !important; /* Gray-500 */
+}
+
+/* Input container utilities */
+.input-container {
+  position: relative !important;
+  width: 100% !important;
+}
+
+.input-container-fixed-width {
+  position: relative !important;
+  width: auto !important;
+  min-width: 200px !important; /* Minimum width to prevent text cramping */
+}
+
+/* Search input specific utilities */
+.search-input-container {
+  position: relative !important;
+  width: 100% !important;
+  max-width: 400px !important; /* Prevent search bars from getting too wide */
+}
+
+.search-input {
+  padding-left: 2.5rem !important; /* 40px for search icon */
+  padding-right: 2.5rem !important; /* 40px for loading/clear icon */
+  font-size: 16px !important;
+  min-height: 44px !important;
+  width: 100% !important;
+}
+
+.search-input-compact {
+  padding-left: 2.25rem !important; /* 36px for search icon */
+  padding-right: 2.25rem !important; /* 36px for loading/clear icon */
+  font-size: 16px !important;
+  min-height: 40px !important;
+  width: 100% !important;
+}
+
+/* Form field group utilities - prevents overlapping in form layouts */
+.form-field-group {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.75rem !important; /* 12px gap between elements */
+  width: 100% !important;
+}
+
+.form-field-group-compact {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important; /* 8px gap between elements */
+  width: 100% !important;
+}
+
+.form-field-group-tight {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.375rem !important; /* 6px gap between elements */
+  width: 100% !important;
+}
+
+/* Prevent text overflow in form fields */
+.form-field-text {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  flex: 1 1 0% !important;
+  min-width: 0 !important;
+}
+
+/* Input field width utilities for preventing cramping */
+.input-min-width {
+  min-width: 120px !important;
+}
+
+.input-comfortable-width {
+  min-width: 160px !important;
+}
+
+.input-wide-width {
+  min-width: 200px !important;
+}
+
+/* Container width adjustments for better spacing */
+.container-input-spacing {
+  padding-left: 0.5rem !important;
+  padding-right: 0.5rem !important;
+}
+
+.container-input-spacing-comfortable {
+  padding-left: 0.75rem !important;
+  padding-right: 0.75rem !important;
+}
+
+.container-input-spacing-wide {
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+
+/* Specific mobile adjustments for input icon spacing */
+@media screen and (max-width: 640px) {
+  .input-with-left-icon {
+    padding-left: 2.5rem !important; /* Slightly reduced on mobile */
+  }
+  
+  .input-with-right-icon {
+    padding-right: 2.5rem !important;
+  }
+  
+  .input-with-both-icons {
+    padding-left: 2.5rem !important;
+    padding-right: 2.5rem !important;
+  }
+  
+  .input-icon-left {
+    left: 0.625rem !important; /* 10px on mobile */
+  }
+  
+  .input-icon-right {
+    right: 0.625rem !important; /* 10px on mobile */
+  }
+  
+  .search-input-container {
+    max-width: none !important; /* Full width on mobile */
+  }
+  
+  .form-field-group {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.5rem !important;
+  }
+  
+  .form-field-group-compact {
+    gap: 0.375rem !important;
+  }
+  
+  .mobile\:stack-form-fields {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  
+  .mobile\:stack-form-fields > * {
+    width: 100% !important;
+  }
+}
+
+/* Override ShadCN UI input components to prevent icon overlap */
+.ui-input-with-icon {
+  font-size: 16px !important;
+  min-height: 44px !important;
+}
+
+.ui-input-with-icon[data-icon-left="true"] {
+  padding-left: 2.75rem !important;
+}
+
+.ui-input-with-icon[data-icon-right="true"] {
+  padding-right: 2.75rem !important;
+}
+
+/* Select dropdown with icon spacing */
+.select-with-left-icon {
+  padding-left: 2.75rem !important;
+  padding-right: 2rem !important; /* Space for dropdown arrow */
+  font-size: 16px !important;
+  min-height: 44px !important;
+}
+
+.select-with-left-icon-compact {
+  padding-left: 2.25rem !important;
+  padding-right: 1.75rem !important;
+  font-size: 16px !important;
+  min-height: 40px !important;
+}
+
+/* Textarea with icon spacing (for forms with icon labels) */
+.textarea-with-icon {
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+  padding-top: 0.75rem !important;
+  padding-bottom: 0.75rem !important;
+  font-size: 16px !important;
+  min-height: 88px !important; /* 2 lines minimum */
+}
+
+/* Button with icon spacing utilities */
+.btn-with-left-icon {
+  padding-left: 2.5rem !important;
+  position: relative !important;
+}
+
+.btn-with-right-icon {
+  padding-right: 2.5rem !important;
+  position: relative !important;
+}
+
+.btn-icon-left {
+  position: absolute !important;
+  left: 0.75rem !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+}
+
+.btn-icon-right {
+  position: absolute !important;
+  right: 0.75rem !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+}
+
+/* Quantity selector specific utilities (for Recipe Builder) */
+.quantity-selector-container {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  min-width: 0 !important;
+}
+
+.quantity-input {
+  min-width: 80px !important; /* Adequate space for multi-digit numbers */
+  max-width: 100px !important;
+  text-align: center !important;
+  font-size: 16px !important;
+  padding: 0.5rem 0.25rem !important;
+}
+
+.unit-select {
+  min-width: 120px !important; /* Adequate space for unit text */
+  font-size: 16px !important;
+}
+
+.quantity-selector-compact {
+  gap: 0.375rem !important;
+}
+
+.quantity-selector-compact .quantity-input {
+  min-width: 70px !important;
+  max-width: 90px !important;
+}
+
+.quantity-selector-compact .unit-select {
+  min-width: 100px !important;
+}
+
+/* Override component library small text inputs for mobile */
+.input-sm,
+.text-sm input,
+input.text-sm {
+  font-size: 16px !important;
+}
+
+.input-xs,
+.text-xs input,
+input.text-xs {
+  font-size: 16px !important;
+}
+
+/* Hero-specific typography overrides */
+.hero-content h1 {
+  font-family: 'League Spartan', sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 1.875rem !important;
+  line-height: 1.2 !important;
+}
+
+.hero-content p {
+  font-family: 'Quicksand', sans-serif !important;
+  font-weight: 400 !important;
+  font-size: 0.875rem !important;
+  line-height: 1.5 !important;
+}
+
+.hero-stats-card span {
+  font-family: 'League Spartan', sans-serif !important;
+  font-weight: 700 !important;
+}
+
+.hero-stats-card p {
+  font-family: 'Quicksand', sans-serif !important;
+  font-weight: 400 !important;
+  font-size: 0.75rem !important;
+}
+
+/* Brand Color Utilities */
+.bg-brand-yellow {
+  background-color: var(--pastel-yellow) !important;
+}
+
+.bg-brand-blue {
+  background-color: var(--pastel-blue) !important;
+}
+
+.bg-brand-blue-dark {
+  background-color: var(--pastel-blue-dark) !important;
+}
+
+.text-brand-yellow {
+  color: var(--pastel-yellow) !important;
+}
+
+.text-brand-blue {
+  color: var(--pastel-blue) !important;
+}
+
+.text-brand-blue-dark {
+  color: var(--pastel-blue-dark) !important;
+}
+
+.border-brand-yellow {
+  border-color: var(--pastel-yellow) !important;
+}
+
+.border-brand-blue {
+  border-color: var(--pastel-blue) !important;
+}
+
+.border-brand-blue-dark {
+  border-color: var(--pastel-blue-dark) !important;
+}
+
+/* Focus and interaction states with brand colors */
+.focus\:ring-brand-blue:focus {
+  --ring-color: var(--pastel-blue);
+}
+
+.hover\:bg-brand-blue:hover {
+  background-color: var(--pastel-blue);
+}
+
+.hover\:bg-brand-blue-dark:hover {
+  background-color: var(--pastel-blue-dark);
+}
+
+/* BYTEWISE BRAND LOGO STYLING */
+/* CSS Logo Component Utilities */
+.bytewise-logo {
+  display: inline-block;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: all 0.2s ease;
+}
+
+.bytewise-logo:hover {
+  transform: scale(1.02);
+}
+
+.bytewise-logo-main {
+  font-family: 'League Spartan', sans-serif !important;
+  font-weight: 700 !important;
+  color: var(--pastel-blue) !important;
+  line-height: 1 !important;
+  letter-spacing: -0.02em !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.bytewise-logo-tagline {
+  font-family: 'League Spartan', sans-serif !important;
+  font-weight: 400 !important;
+  color: #1d1d1b !important;
+  line-height: 1 !important;
+  letter-spacing: 0.15em !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Mobile-optimized logo sizing for better horizontal fit */
+.bytewise-logo-xs .bytewise-logo-main {
+  font-size: 1.125rem !important; /* 18px - Extra small for tight spaces */
+}
+
+.bytewise-logo-xs .bytewise-logo-tagline {
+  font-size: 0.625rem !important; /* 10px */
+  margin-top: 0.0625rem !important; /* 1px */
+  text-indent: 1.6ch !important;
+}
+
+.bytewise-logo-sm .bytewise-logo-main {
+  font-size: 1.375rem !important; /* 22px - Reduced from 24px */
+}
+
+.bytewise-logo-sm .bytewise-logo-tagline {
+  font-size: 0.6875rem !important; /* 11px - Reduced from 12px */
+  margin-top: 0.0625rem !important; /* 1px - Reduced spacing */
+  text-indent: 1.7ch !important;
+}
+
+.bytewise-logo-md .bytewise-logo-main {
+  font-size: 2rem !important; /* 32px - Reduced from 36px */
+}
+
+.bytewise-logo-md .bytewise-logo-tagline {
+  font-size: 0.875rem !important; /* 14px - Reduced from 16px */
+  margin-top: 0.125rem !important; /* 2px - Reduced spacing */
+  text-indent: 1.9ch !important;
+}
+
+.bytewise-logo-lg .bytewise-logo-main {
+  font-size: 2.5rem !important; /* 40px - Reduced from 48px */
+}
+
+.bytewise-logo-lg .bytewise-logo-tagline {
+  font-size: 1rem !important; /* 16px - Reduced from 20px */
+  margin-top: 0.1875rem !important; /* 3px - Reduced spacing */
+  text-indent: 2.1ch !important;
+}
+
+/* Mobile-specific logo adjustments */
+@media screen and (max-width: 640px) {
+  .bytewise-logo-sm .bytewise-logo-main {
+    font-size: 1.25rem !important; /* 20px on mobile */
+  }
+  
+  .bytewise-logo-sm .bytewise-logo-tagline {
+    font-size: 0.625rem !important; /* 10px on mobile */
+    text-indent: 1.6ch !important;
+  }
+  
+  .bytewise-logo-md .bytewise-logo-main {
+    font-size: 1.75rem !important; /* 28px on mobile */
+  }
+  
+  .bytewise-logo-md .bytewise-logo-tagline {
+    font-size: 0.75rem !important; /* 12px on mobile */
+    text-indent: 1.8ch !important;
+  }
+  
+  .bytewise-logo-lg .bytewise-logo-main {
+    font-size: 2.25rem !important; /* 36px on mobile */
+  }
+  
+  .bytewise-logo-lg .bytewise-logo-tagline {
+    font-size: 0.875rem !important; /* 14px on mobile */
+    text-indent: 2.0ch !important;
+  }
+}
+
+/* Dark theme support for logo */
+.dark .bytewise-logo-main {
+  color: var(--pastel-blue) !important;
+}
+
+.dark .bytewise-logo-tagline {
+  color: #f8f9fa !important;
+}
+
+/* Logo animation for loading states */
+@keyframes logoFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.bytewise-logo-animated {
+  animation: logoFadeIn 0.6s ease-out;
+}
+
+/* High contrast accessibility support */
+@media (prefers-contrast: high) {
+  .bytewise-logo-main {
+    color: #0066cc !important;
+    font-weight: 800 !important;
+  }
+  
+  .bytewise-logo-tagline {
+    color: #000000 !important;
+    font-weight: 500 !important;
+  }
+}
+
+/* Reduced motion accessibility support */
+@media (prefers-reduced-motion: reduce) {
+  .bytewise-logo:hover {
+    transform: none;
+  }
+  
+  .bytewise-logo-animated {
+    animation: none;
+  }
+  
+  .animate-notification-slide-in,
+  .animate-notification-slide-out,
+  .animate-notification-bounce-in,
+  .animate-notification-pulse,
+  .animate-notification-glow,
+  .animate-floating-accent {
+    animation: none;
+  }
+}
+
+/* Logo spacing utilities */
+.logo-spacing-tight {
+  margin-bottom: 0.5rem;
+}
+
+.logo-spacing-normal {
+  margin-bottom: 1rem;
+}
+
+.logo-spacing-relaxed {
+  margin-bottom: 1.5rem;
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .animate-slide-in,
+  .animate-fade-in,
+  .animate-scale-in,
+  .animate-hero-slide-up,
+  .btn-animate {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --border: rgba(0, 0, 0, 0.3);
+    --muted-foreground: #333333;
+  }
+  
+  .dark {
+    --border: rgba(255, 255, 255, 0.3);
+    --muted-foreground: #cccccc;
+  }
+  
+  .notification-card {
+    border: 2px solid currentColor;
+  }
+}
+
+/* Print styles */
+@media print {
+  .hero-container,
+  .enhanced-header,
+  .drag-feedback-overlay,
+  .notification-card {
+    display: none;
+  }
+  
+  body {
+    background: white;
+    color: black;
+  }
+  
+  .bytewise-logo-main {
+    color: #0066cc !important;
+  }
+  
+  .bytewise-logo-tagline {
+    color: #000000 !important;
+  }
+}
+
+/* Enhanced Notification System Utilities */
+.notification-container {
+  position: fixed;
+  z-index: 60;
+  pointer-events: none;
+}
+
+.notification-container > * {
+  pointer-events: auto;
+}
+
+.notification-stacking {
+  transform-origin: center bottom;
+}
+
+.notification-hover-lift:hover {
+  transform: translateY(-4px) scale(1.02);
+  z-index: 100;
+}
+
+.notification-dismiss-button {
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+.notification-dismiss-button:hover {
+  opacity: 1;
+}
+
+/* Mobile-specific notification adjustments */
+@media (max-width: 640px) {
+  .notification-card {
+    margin-left: 1rem;
+    margin-right: 1rem;
+    max-width: calc(100vw - 2rem);
+  }
+  
+  .notification-container {
+    left: 0;
+    right: 0;
+    transform: none;
+  }
+}
+
+/* Notification overflow indicator */
+.notification-overflow-indicator {
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 9999px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: white;
+  text-align: center;
+  margin-top: 0.5rem;
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* COMPONENT-SPECIFIC INPUT FIELD FIXES */
+/* Addresses specific overlapping issues in app components */
+
+/* Recipe Builder search bar fixes */
+.recipe-builder-search {
+  position: relative !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.recipe-builder-search .search-icon {
+  position: absolute !important;
+  left: 0.75rem !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 10 !important;
+  color: rgb(156 163 175) !important;
+  pointer-events: none !important;
+}
+
+.recipe-builder-search .loading-icon {
+  position: absolute !important;
+  right: 0.75rem !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 10 !important;
+  color: rgb(156 163 175) !important;
+  pointer-events: none !important;
+}
+
+.recipe-builder-search input {
+  padding-left: 2.5rem !important;
+  padding-right: 2.5rem !important;
+  font-size: 16px !important;
+  min-height: 44px !important;
+  width: 100% !important;
+  border: 1px solid rgb(209 213 219) !important;
+  border-radius: 0.5rem !important;
+}
+
+/* Dashboard search and filter inputs */
+.dashboard-input-container {
+  position: relative !important;
+  width: 100% !important;
+}
+
+.dashboard-input-container input {
+  padding-left: 2.75rem !important;
+  padding-right: 1rem !important;
+  font-size: 16px !important;
+  min-height: 44px !important;
+}
+
+/* Profile form input fixes */
+.profile-form-field {
+  position: relative !important;
+  margin-bottom: 1rem !important;
+}
+
+.profile-form-field label {
+  display: block !important;
+  margin-bottom: 0.5rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  color: rgb(75 85 99) !important;
+}
+
+.profile-form-field input,
+.profile-form-field select,
+.profile-form-field textarea {
+  width: 100% !important;
+  padding: 0.75rem 1rem !important;
+  font-size: 16px !important;
+  min-height: 44px !important;
+  border: 1px solid rgb(209 213 219) !important;
+  border-radius: 0.5rem !important;
+}
+
+.profile-form-field input:focus,
+.profile-form-field select:focus,
+.profile-form-field textarea:focus {
+  outline: none !important;
+  border-color: var(--pastel-blue) !important;
+  box-shadow: 0 0 0 1px var(--pastel-blue) !important;
+}
+
+/* Authentication form fixes */
+.auth-form-field {
+  position: relative !important;
+  margin-bottom: 1.25rem !important;
+}
+
+.auth-form-field label {
+  display: block !important;
+  margin-bottom: 0.5rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  font-family: 'Work Sans', sans-serif !important;
+}
+
+.auth-form-field input {
+  width: 100% !important;
+  padding: 0.875rem 1rem !important;
+  font-size: 16px !important;
+  min-height: 48px !important;
+  border: 2px solid rgb(229 231 235) !important;
+  border-radius: 0.75rem !important;
+  font-family: 'Quicksand', sans-serif !important;
+  transition: border-color 0.2s ease !important;
+}
+
+.auth-form-field input:focus {
+  outline: none !important;
+  border-color: var(--pastel-blue) !important;
+  box-shadow: 0 0 0 2px rgba(168, 218, 220, 0.2) !important;
+}
+
+/* Calendar screen input fixes */
+.calendar-input-container {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+  margin-bottom: 1rem !important;
+}
+
+.calendar-input-container input,
+.calendar-input-container select {
+  flex: 1 !important;
+  min-width: 0 !important;
+  padding: 0.625rem 0.875rem !important;
+  font-size: 16px !important;
+  min-height: 40px !important;
+}
+
+/* Meal planner form fixes */
+.meal-planner-form {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 1rem !important;
+}
+
+.meal-planner-form .form-row {
+  display: flex !important;
+  gap: 0.75rem !important;
+  align-items: end !important;
+}
+
+.meal-planner-form .form-field {
+  flex: 1 !important;
+  min-width: 0 !important;
+}
+
+.meal-planner-form input,
+.meal-planner-form select {
+  width: 100% !important;
+  padding: 0.625rem 0.875rem !important;
+  font-size: 16px !important;
+  min-height: 42px !important;
+}
+
+/* Button spacing in form contexts */
+.form-button-group {
+  display: flex !important;
+  gap: 0.75rem !important;
+  margin-top: 1.5rem !important;
+  justify-content: flex-end !important;
+}
+
+.form-button-group button {
+  padding: 0.75rem 1.5rem !important;
+  font-size: 0.875rem !important;
+  min-height: 44px !important;
+  font-family: 'Work Sans', sans-serif !important;
+  font-weight: 500 !important;
+}
+
+/* Responsive adjustments for component inputs */
+@media screen and (max-width: 640px) {
+  .recipe-builder-search input {
+    padding-left: 2.25rem !important;
+    padding-right: 2.25rem !important;
+  }
+  
+  .recipe-builder-search .search-icon {
+    left: 0.625rem !important;
+  }
+  
+  .recipe-builder-search .loading-icon {
+    right: 0.625rem !important;
+  }
+  
+  .calendar-input-container {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  
+  .meal-planner-form .form-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  
+  .form-button-group {
+    flex-direction: column !important;
+  }
+  
+  .form-button-group button {
+    width: 100% !important;
+  }
+}
+
+/* Input container max-width utilities to prevent excessive stretching */
+.input-container-sm {
+  max-width: 200px !important;
+}
+
+.input-container-md {
+  max-width: 300px !important;
+}
+
+.input-container-lg {
+  max-width: 400px !important;
+}
+
+.input-container-xl {
+  max-width: 500px !important;
+}
+
+/* Prevent input field text from being too close to borders */
+.input-comfortable-padding {
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+  padding-top: 0.75rem !important;
+  padding-bottom: 0.75rem !important;
+}
+
+.input-generous-padding {
+  padding-left: 1.25rem !important;
+  padding-right: 1.25rem !important;
+  padding-top: 0.875rem !important;
+  padding-bottom: 0.875rem !important;
+}
+
+/* Text alignment utilities for form inputs */
+.input-text-left {
+  text-align: left !important;
+}
+
+.input-text-center {
+  text-align: center !important;
+}
+
+.input-text-right {
+  text-align: right !important;
+}
+
+/* Number input specific utilities */
+.number-input {
+  text-align: center !important;
+  font-variant-numeric: tabular-nums !important;
+  letter-spacing: 0.025em !important;
+}
+
+.number-input-left {
+  text-align: left !important;
+  font-variant-numeric: tabular-nums !important;
+}
+
+/* Override any component library inputs that might have conflicting styles */
+.override-component-input {
+  font-size: 16px !important;
+  min-height: 44px !important;
+  padding: 0.75rem 1rem !important;
+  border: 1px solid rgb(209 213 219) !important;
+  border-radius: 0.5rem !important;
+  font-family: 'Quicksand', sans-serif !important;
+}
+
+.override-component-input:focus {
+  outline: none !important;
+  border-color: var(--pastel-blue) !important;
+  box-shadow: 0 0 0 1px var(--pastel-blue) !important;
+}
+
+/* STRONGER OVERRIDE FOR SPECIFIC COMPONENT INPUTS */
+/* Force the input spacing utilities to override component library styles */
+
+.input-with-left-icon,
+input.input-with-left-icon,
+.ui-input.input-with-left-icon {
+  padding-left: 2.75rem !important;
+  padding-right: 1rem !important;
+  font-size: 16px !important;
+  min-height: 44px !important;
+}
+
+.input-with-right-icon,
+input.input-with-right-icon,
+.ui-input.input-with-right-icon {
+  padding-left: 1rem !important;
+  padding-right: 2.75rem !important;
+  font-size: 16px !important;
+  min-height: 44px !important;
+}
+
+.input-with-both-icons,
+input.input-with-both-icons,
+.ui-input.input-with-both-icons {
+  padding-left: 2.75rem !important;
+  padding-right: 2.75rem !important;
+  font-size: 16px !important;
+  min-height: 44px !important;
+}
+
+/* Force icon positioning for all input containers */
+.input-container .input-icon-left,
+.search-input-container .input-icon-left {
+  position: absolute !important;
+  left: 0.75rem !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 20 !important;
+  pointer-events: none !important;
+  color: rgb(156 163 175) !important;
+}
+
+.input-container .input-icon-right,
+.search-input-container .input-icon-right {
+  position: absolute !important;
+  right: 0.75rem !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 20 !important;
+  pointer-events: none !important;
+  color: rgb(156 163 175) !important;
+}
+
+.input-container .input-icon-interactive,
+.search-input-container .input-icon-interactive {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  transition: color 0.2s ease !important;
+}
+
+.input-container .input-icon-interactive:hover,
+.search-input-container .input-icon-interactive:hover {
+  color: rgb(107 114 128) !important;
+}
+
+/* Ensure input containers have proper positioning */
+.input-container,
+.search-input-container {
+  position: relative !important;
+  width: 100% !important;
+}
+
+/* Override ShadCN and other component library padding */
+.input-container input,
+.search-input-container input {
+  position: relative !important;
+  z-index: 10 !important;
+}
+
+/* Specific overrides for common conflicting classes */
+input[class*="pl-"],
+input[class*="pr-"] {
+  padding-left: inherit !important;
+  padding-right: inherit !important;
+}
+
+/* Mobile-specific stronger overrides */
+@media screen and (max-width: 640px) {
+  .input-with-left-icon,
+  input.input-with-left-icon,
+  .ui-input.input-with-left-icon {
+    padding-left: 2.5rem !important;
+  }
+  
+  .input-with-right-icon,
+  input.input-with-right-icon,
+  .ui-input.input-with-right-icon {
+    padding-right: 2.5rem !important;
+  }
+  
+  .input-with-both-icons,
+  input.input-with-both-icons,
+  .ui-input.input-with-both-icons {
+    padding-left: 2.5rem !important;
+    padding-right: 2.5rem !important;
+  }
+  
+  .input-container .input-icon-left,
+  .search-input-container .input-icon-left {
+    left: 0.625rem !important;
+  }
+  
+  .input-container .input-icon-right,
+  .search-input-container .input-icon-right {
+    right: 0.625rem !important;
+  }
+}
