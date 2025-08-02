@@ -1,6 +1,7 @@
-<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="512" height="512" rx="64" fill="#7dd3fc"/>
-  <path d="M128 256c0-70.692 57.308-128 128-128s128 57.308 128 128-57.308 128-128 128-128-57.308-128-128z" fill="white"/>
-  <path d="M192 256c0-35.346 28.654-64 64-64s64 28.654 64 64-28.654 64-64 64-64-28.654-64-64z" fill="#0369a1"/>
-  <text x="256" y="290" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-weight="bold" font-size="48">BW</text>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" fill="#10b981" rx="60"/>
+  <circle cx="256" cy="256" r="160" fill="white"/>
+  <path d="M256 160 L256 352 M186 226 L326 226 M206 286 L306 286" stroke="#10b981" stroke-width="12" stroke-linecap="round"/>
+  <circle cx="256" cy="200" r="20" fill="#10b981"/>
+  <text x="256" y="420" text-anchor="middle" fill="white" font-family="system-ui" font-size="42" font-weight="bold">ByteWise</text>
 </svg>

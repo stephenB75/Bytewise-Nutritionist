@@ -7,19 +7,17 @@
 
 ```
 deploy-package/
-├── index.html          ← Main app entry point
-├── manifest.json       ← PWA manifest
-├── sw.js              ← Service worker
-├── offline.html       ← Offline fallback
-├── icon-192.svg       ← PWA icon (192x192)
-├── icon-512.svg       ← PWA icon (512x512)
-├── README.md          ← Deployment instructions
-└── assets/            ← Optimized bundles
-    ├── index-DrR5NbRy.js      (361KB main app)
-    ├── vendor-BgNOLPkv.js     (142KB React/libs)
-    ├── ui-BIkWkz57.js         (79KB UI components)
-    ├── utils-J9WKoK_r.js      (41KB utilities)
-    └── index-CmtxucEg.css     (155KB styles)
+├── index.html          ← Main app entry point  
+├── manifest.json       ← PWA manifest with vector icons
+├── sw.js              ← Service worker for offline support
+├── offline.html       ← Offline fallback page
+├── icon-192.svg       ← Vector PWA icon (192x192)
+├── icon-512.svg       ← Vector PWA icon (512x512)
+└── assets/            ← Optimized bundles + food images
+    ├── index-Ci5OFQ8W.js      (622KB main app bundle)
+    ├── pdfExport-BqIJ0Be_.js  (4KB PDF export feature)
+    ├── index-CmtxucEg.css     (155KB optimized styles)
+    └── [34 food images]       (15MB high-quality nutrition images)
 ```
 
 ### **What's Included:**
