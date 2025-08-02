@@ -14,9 +14,13 @@ import type { Database } from '../types/database';
 type UserProfile = Database['public']['Tables']['users']['Row'];
 
 export function useAuth() {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  // Debug: Check if React.useState is available
+  console.log('React available:', !!React);
+  console.log('useState available:', !!React?.useState);
+  
+  const [user, setUser] = React.useState<User | null>(null);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
   const queryClient = useQueryClient();
 
   // Check if Supabase is properly configured
@@ -30,7 +34,7 @@ export function useAuth() {
     retry: false,
   });
 
-  useEffect(() => {
+  React.useEffect(() => {
     // Skip auth setup if not configured
     if (!isConfigured) {
       setLoading(false);
