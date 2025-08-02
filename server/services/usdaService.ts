@@ -308,8 +308,10 @@ export class USDAService {
       const name = nutrient.nutrient.name.toLowerCase();
       const amount = nutrient.amount || 0;
 
-      // Log all nutrients for debugging
-      console.log(`🔍 Nutrient: "${nutrient.nutrient.name}" = ${amount} ${nutrient.nutrient.unitName || ''}`);
+      // Log first few nutrients for debugging
+      if (nutrients.calories === 0 && foodNutrients.indexOf(nutrient) < 5) {
+        console.log(`🔍 Nutrient: "${nutrient.nutrient.name}" = ${amount} ${nutrient.nutrient.unitName || ''}`);
+      }
 
       // More comprehensive nutrient matching with exact USDA names
       if (name === 'energy' || name.includes('energy') || name.includes('calorie') || name.includes('kcal')) {
