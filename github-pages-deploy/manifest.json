@@ -3,7 +3,7 @@
   "name": "ByteWise Nutritionist",
   "short_name": "ByteWise",
   "description": "Professional nutrition tracking app with USDA database integration, meal planning, and progress analytics",
-  "start_url": "/",
+  "start_url": "/Bytewise-Nutritionist/",
   "display": "standalone",
   "orientation": "portrait-primary",
   "theme_color": "#7dd3fc",
@@ -11,7 +11,7 @@
   "categories": ["health", "lifestyle", "food"],
   "lang": "en-US",
   "dir": "ltr",
-  "scope": "/",
+  "scope": "/Bytewise-Nutritionist/",
   "launch_handler": {
     "client_mode": "navigate-existing"
   },
@@ -53,21 +53,21 @@
       "name": "Calculate Calories",
       "short_name": "Calculator",
       "description": "Quick access to USDA-powered calorie calculator",
-      "url": "/?tab=calculator",
+      "url": "/Bytewise-Nutritionist/?tab=calculator",
       "icons": [{ "src": "/icon-192.svg", "sizes": "192x192" }]
     },
     {
       "name": "Log Meal",
       "short_name": "Logger",
       "description": "Track your weekly nutrition progress",
-      "url": "/?tab=logger",
+      "url": "/Bytewise-Nutritionist/?tab=logger",
       "icons": [{ "src": "/icon-192.svg", "sizes": "192x192" }]
     },
     {
       "name": "View Profile",
       "short_name": "Profile",
       "description": "Manage goals and achievements",
-      "url": "/?tab=profile",
+      "url": "/Bytewise-Nutritionist/?tab=profile",
       "icons": [{ "src": "/icon-192.svg", "sizes": "192x192" }]
     }
   ],

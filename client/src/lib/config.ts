@@ -5,6 +5,9 @@
 
 // Environment detection
 const isDev = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+const isGitHubPages = typeof window !== 'undefined' && 
+  (window.location.hostname.includes('github.io') || 
+   window.location.hostname.includes('bytewise-nutritionist'));
 const isProd = !isDev;
 
 // Fallback configuration for production
@@ -33,6 +36,9 @@ function getEnvVar(key: string): string | undefined {
 export const config = {
   isDev,
   isProd,
+  isGitHubPages,
+  apiMode: isGitHubPages ? 'direct' : 'proxy', // Direct API calls for GitHub Pages
+  baseUrl: isGitHubPages ? '/Bytewise-Nutritionist' : '',
   supabase: {
     url: getEnvVar('VITE_SUPABASE_URL') || FALLBACK_CONFIG.supabaseUrl,
     anonKey: getEnvVar('VITE_SUPABASE_ANON_KEY') || FALLBACK_CONFIG.supabaseKey,
@@ -51,7 +57,12 @@ export const config = {
 
 // Production logging
 if (isProd) {
-  console.log('📱 ByteWise Production Mode');
+  if (isGitHubPages) {
+    console.log('📱 ByteWise GitHub Pages Mode');
+    console.log('🌐 Direct API mode enabled');
+  } else {
+    console.log('📱 ByteWise Production Mode');
+  }
   console.log('🔧 Supabase configured:', config.supabase.isConfigured);
   console.log('🔗 Supabase URL:', config.supabase.url ? 'present' : 'missing');
   console.log('🔑 Supabase Key:', config.supabase.anonKey ? 'present' : 'missing');
