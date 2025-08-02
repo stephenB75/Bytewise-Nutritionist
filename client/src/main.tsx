@@ -5,7 +5,7 @@ import TestApp from "./TestApp";
 import "./index.css";
 
 // Debug mode - use TestApp to isolate issues
-const useTestApp = true;
+const useTestApp = false;
 
 // Suppress development warnings and errors
 if (import.meta.env.DEV) {

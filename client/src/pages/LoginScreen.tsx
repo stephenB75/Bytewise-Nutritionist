@@ -28,8 +28,12 @@ function LoginScreen({ onNavigate }: LoginScreenProps) {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   
-  // Rotating background system
-  const { currentImage, currentTheme, currentAlt, isLoading: imageLoading } = useRotatingBackground();
+  // Rotating background system - temporarily disabled to fix white screen
+  // const { currentImage, currentTheme, currentAlt, isLoading: imageLoading } = useRotatingBackground();
+  const currentImage = '';
+  const currentTheme = 'light';
+  const currentAlt = '';
+  const imageLoading = false;
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();

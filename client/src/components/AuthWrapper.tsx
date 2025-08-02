@@ -28,6 +28,10 @@ export function AuthWrapper({ children, onNavigate }: AuthWrapperProps) {
     return <>{children}</>;
   }
 
+  // TEMPORARY: Bypass authentication entirely for debugging
+  console.log('🚧 Bypassing authentication for white screen debugging');
+  return <>{children}</>;
+
   // Loading screen
   if (loading) {
     console.log('⏳ Auth loading...');
