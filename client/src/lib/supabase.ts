@@ -11,24 +11,32 @@ import { config } from './config';
 const finalUrl = config.supabase.url;
 const finalKey = config.supabase.anonKey;
 
-// Production-ready configuration - debug logs removed
+// Singleton pattern to prevent multiple client instances
+let supabaseInstance: ReturnType<typeof createClient<Database>> | null = null;
 
-// Create Supabase client
-export const supabase = createClient<Database>(finalUrl, finalKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true,
-  },
-  db: {
-    schema: 'public',
-  },
-  global: {
-    headers: {
-      'X-Client-Info': 'bytewise-nutrition-tracker',
-    },
-  },
-});
+// Create Supabase client with singleton pattern
+export const supabase = (() => {
+  if (!supabaseInstance) {
+    supabaseInstance = createClient<Database>(finalUrl, finalKey, {
+      auth: {
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: true,
+        storageKey: 'bytewise-auth',
+        storage: window.localStorage,
+      },
+      db: {
+        schema: 'public',
+      },
+      global: {
+        headers: {
+          'X-Client-Info': 'bytewise-nutrition-tracker',
+        },
+      },
+    });
+  }
+  return supabaseInstance;
+})();
 
 // Auth helpers
 export const auth = supabase.auth;

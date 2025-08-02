@@ -1,8 +1,17 @@
-import type { Express } from "express";
+import type { Express, Request } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { setupAuth, isAuthenticated, optionalAuth } from "./supabaseAuth";
 import { usdaService } from "./services/usdaService";
+
+// Enhanced request type with user info
+interface AuthenticatedRequest extends Request {
+  user?: {
+    id: string;
+    email?: string;
+    claims?: any;
+  };
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
@@ -11,7 +20,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth routes
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = (req.user as any)?.claims?.sub;
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "User not found" });
+      }
       const user = await storage.getUser(userId);
       res.json(user);
     } catch (error) {
@@ -23,7 +35,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Meals API for logger
   app.post('/api/meals/logged', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = (req.user as any)?.claims?.sub;
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "User not found" });
+      }
       const mealData = {
         ...req.body,
         userId,
@@ -42,7 +57,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/meals/logged', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = (req.user as any)?.claims?.sub;
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "User not found" });
+      }
       
       // Return logged meals for the user
       const meals: any[] = []; // Implement meal retrieval from storage
@@ -54,8 +72,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Calculate calories API with real USDA integration
-  app.post('/api/calculate-calories', async (req, res) => {
+  // Calculate calories API with real USDA integration (no auth required)
+  app.post('/api/calculate-calories', optionalAuth, async (req: any, res) => {
     try {
       const { ingredient, measurement } = req.body;
       
@@ -70,7 +88,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // USDA Food Database Sync API
-  app.post('/api/sync/food-database', isAuthenticated, async (req, res) => {
+  app.post('/api/sync/food-database', isAuthenticated, async (req: any, res) => {
     try {
       console.log('Starting USDA food database sync...');
       
@@ -125,7 +143,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // User Data Sync API
   app.post('/api/sync/user-data', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = (req.user as any)?.claims?.sub;
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "User not found" });
+      }
       console.log('Starting user data sync for:', userId);
       
       // Sync user meals, achievements, and preferences
