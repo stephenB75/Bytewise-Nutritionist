@@ -8,31 +8,55 @@ import memoize from "memoizee";
 import connectPg from "connect-pg-simple";
 import { storage } from "./storage";
 
+// Fallback for development environment
 if (!process.env.REPLIT_DOMAINS) {
-  throw new Error("Environment variable REPLIT_DOMAINS not provided");
+  console.warn("REPLIT_DOMAINS not set, using development fallback");
+  process.env.REPLIT_DOMAINS = "localhost";
 }
 
 const getOidcConfig = memoize(
   async () => {
-    return await client.discovery(
-      new URL(process.env.ISSUER_URL ?? "https://replit.com/oidc"),
-      process.env.REPL_ID!
-    );
+    try {
+      return await client.discovery(
+        new URL(process.env.ISSUER_URL ?? "https://replit.com/oidc"),
+        process.env.REPL_ID || 'dev-repl-id'
+      );
+    } catch (error) {
+      console.warn("OIDC discovery failed, using fallback config:", error);
+      // Return minimal config for development
+      return {
+        issuer: "https://replit.com/oidc",
+        authorization_endpoint: "https://replit.com/oidc/authorize",
+        token_endpoint: "https://replit.com/oidc/token",
+        userinfo_endpoint: "https://replit.com/oidc/userinfo",
+        metadata: {},
+        [client.custom.http_options]: () => ({ timeout: 10000 })
+      } as any;
+    }
   },
   { maxAge: 3600 * 1000 }
 );
 
 export function getSession() {
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
-  const pgStore = connectPg(session);
-  const sessionStore = new pgStore({
-    conString: process.env.DATABASE_URL,
-    createTableIfMissing: false,
-    ttl: sessionTtl,
-    tableName: "sessions",
-  });
+  
+  // Use memory store for development if DATABASE_URL not available
+  let sessionStore;
+  if (process.env.DATABASE_URL) {
+    const pgStore = connectPg(session);
+    sessionStore = new pgStore({
+      conString: process.env.DATABASE_URL,
+      createTableIfMissing: false,
+      ttl: sessionTtl,
+      tableName: "sessions",
+    });
+  } else {
+    console.warn("DATABASE_URL not set, using memory store for sessions");
+    sessionStore = undefined; // Use default memory store
+  }
+  
   return session({
-    secret: process.env.SESSION_SECRET!,
+    secret: process.env.SESSION_SECRET || 'dev-secret-key-change-in-production',
     store: sessionStore,
     resave: false,
     saveUninitialized: false,
@@ -90,7 +114,7 @@ export async function setupAuth(app: Express) {
     const strategy = new Strategy(
       {
         name: `replitauth:${domain}`,
-        config,
+        config: config as any,
         scope: "openid email profile offline_access",
         callbackURL: `https://${domain}/api/callback`,
       },
