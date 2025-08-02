@@ -4,11 +4,14 @@
  */
 
 // Environment detection
-const isDev = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+const isDev = typeof window !== 'undefined' && 
+  (window.location.hostname === 'localhost' || 
+   window.location.hostname.includes('replit.dev') ||
+   window.location.hostname.includes('replit.app'));
 const isGitHubPages = typeof window !== 'undefined' && 
   (window.location.hostname.includes('github.io') || 
    window.location.hostname.includes('bytewise-nutritionist'));
-const isProd = !isDev;
+const isProd = !isDev && !isGitHubPages;
 
 // Fallback configuration for production
 const FALLBACK_CONFIG = {
