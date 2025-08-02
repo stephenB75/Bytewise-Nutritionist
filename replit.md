@@ -74,8 +74,8 @@ Preferred communication style: Simple, everyday language.
 ✓ **External Network Access**: Successfully configured server for external access on 0.0.0.0:5000
 ✓ **Runtime Exports Fixed**: Added all missing foodImageRotation utility exports
 ✓ **React Import Issues**: Fixed duplicate useEffect imports causing runtime errors in useImageRotation hook
-✓ **External Access Verified**: App confirmed working at https://workspace.stephtonybro.repl.co with full authentication and UI functionality
-✓ **Alternative URL Available**: https://fad43cfb-8f6f-430e-8487-3dbe63d5ada8.id.replit.dev for backup access
+✓ **External Access Updated**: App accessible at https://fad43cfb-8f6f-430e-8487-3dbe63d5ada8-00-2nde95asc8gzx.janeway.replit.dev
+✓ **Network Configuration**: Server running on 0.0.0.0:5000 with proper external access configuration
 
 ### August 2025 - Project Structure Cleanup & Native Mobile Platform Support
 ✓ **Folder Organization**: Cleaned project structure with proper documentation and archive organization
