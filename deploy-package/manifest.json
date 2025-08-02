@@ -1,13 +1,21 @@
 {
+  "id": "com.bytewise.nutritionist",
   "name": "ByteWise Nutritionist",
   "short_name": "ByteWise",
   "description": "Professional nutrition tracking with USDA database integration",
   "start_url": "https://stephenb75.github.io/Bytewise-Nutritionist/",
   "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone"],
   "background_color": "#ffffff",
   "theme_color": "#10b981",
   "orientation": "portrait",
   "categories": ["health", "lifestyle", "food"],
+  "edge_side_panel": {
+    "preferred_width": 412
+  },
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
   "icons": [
     {
       "src": "https://stephenb75.github.io/Bytewise-Nutritionist/icon-192.svg",
@@ -32,6 +40,22 @@
       "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "https://stephenb75.github.io/Bytewise-Nutritionist/assets/screenshot-mobile.svg",
+      "sizes": "390x844",
+      "type": "image/svg+xml",
+      "form_factor": "narrow",
+      "label": "ByteWise mobile nutrition tracking interface"
+    },
+    {
+      "src": "https://stephenb75.github.io/Bytewise-Nutritionist/assets/screenshot-desktop.svg",
+      "sizes": "1280x720",
+      "type": "image/svg+xml",
+      "form_factor": "wide",
+      "label": "ByteWise desktop dashboard with meal planning"
     }
   ]
 }
