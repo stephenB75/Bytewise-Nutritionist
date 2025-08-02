@@ -30,7 +30,8 @@ const getOidcConfig = memoize(
         token_endpoint: "https://replit.com/oidc/token",
         userinfo_endpoint: "https://replit.com/oidc/userinfo",
         metadata: {},
-        [client.custom.http_options]: () => ({ timeout: 10000 })
+        // Custom timeout configuration
+        httpOptions: { timeout: 10000 }
       } as any;
     }
   },
