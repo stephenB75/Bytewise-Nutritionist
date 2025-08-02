@@ -1,7 +1,11 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
+import TestApp from "./TestApp";
 import "./index.css";
+
+// Debug mode - use TestApp to isolate issues
+const useTestApp = true;
 
 // Suppress development warnings and errors
 if (import.meta.env.DEV) {
@@ -28,4 +32,6 @@ if (import.meta.env.DEV) {
   };
 }
 
-createRoot(document.getElementById("root")!).render(<App />);
+console.log('🚀 Starting ByteWise app render...');
+const AppComponent = useTestApp ? TestApp : App;
+createRoot(document.getElementById("root")!).render(<AppComponent />);
