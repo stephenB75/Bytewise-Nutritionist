@@ -18,6 +18,7 @@ import { getComponentFoodImage, createFoodBackgroundStyle } from '@/utils/foodIm
 interface HeroSectionProps {
   title: string;
   subtitle?: string;
+  description?: string;
   caloriesConsumed?: number;
   caloriesGoal?: number;
   currentStreak?: number;
@@ -31,20 +32,37 @@ interface HeroSectionProps {
     color: string;
     bgColor: string;
   }>;
+  statCard?: {
+    icon: any;
+    value: number;
+    label: string;
+    iconColor: string;
+  };
+  progressRing?: {
+    percentage: number;
+    color: string;
+    label: string;
+  };
 }
 
 export function HeroSection({ 
   title, 
-  subtitle, 
+  subtitle,
+  description,
   caloriesConsumed = 0, 
   caloriesGoal = 2000, 
   currentStreak = 0,
   showProgress = true,
   className = '',
   component = 'dashboard',
-  stats = []
+  stats = [],
+  statCard,
+  progressRing
 }: HeroSectionProps) {
-  const progressPercentage = Math.min((caloriesConsumed / caloriesGoal) * 100, 100);
+  // Use progressRing percentage if provided, otherwise calculate from calories
+  const progressPercentage = progressRing 
+    ? Math.min(progressRing.percentage, 100)
+    : Math.min((caloriesConsumed / caloriesGoal) * 100, 100);
   
   // Get food background image for this component
   const foodImage = getComponentFoodImage(component);
@@ -63,6 +81,9 @@ export function HeroSection({
           <h1 className="text-3xl font-bold mb-3">{title}</h1>
           {subtitle && (
             <p className="text-blue-100 text-base font-semibold opacity-95">{subtitle}</p>
+          )}
+          {description && !subtitle && (
+            <p className="text-blue-100 text-base font-semibold opacity-95">{description}</p>
           )}
         </div>
 
@@ -97,32 +118,45 @@ export function HeroSection({
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <div className="text-center">
                     <p className="text-3xl font-bold">{Math.round(progressPercentage)}%</p>
-                    <p className="text-sm text-blue-100 font-medium">Daily Goal</p>
+                    <p className="text-sm text-blue-100 font-medium">
+                      {progressRing ? progressRing.label : "Daily Goal"}
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Stats Cards */}
-            <div className="grid grid-cols-3 gap-3">
-              <Card className="p-4 bg-white/10 backdrop-blur-sm border-0 text-center">
-                <Flame className="w-6 h-6 mx-auto text-orange-300 mb-2" />
-                <p className="text-xl font-bold">{caloriesConsumed}</p>
-                <p className="text-sm text-blue-100 font-medium">Consumed</p>
-              </Card>
-              
-              <Card className="p-4 bg-white/10 backdrop-blur-sm border-0 text-center">
-                <Target className="w-6 h-6 mx-auto text-green-300 mb-2" />
-                <p className="text-xl font-bold">{caloriesGoal}</p>
-                <p className="text-sm text-blue-100 font-medium">Goal</p>
-              </Card>
-              
-              <Card className="p-4 bg-white/10 backdrop-blur-sm border-0 text-center">
-                <TrendingUp className="w-6 h-6 mx-auto text-yellow-300 mb-2" />
-                <p className="text-xl font-bold">{currentStreak}</p>
-                <p className="text-sm text-blue-100 font-medium">Day Streak</p>
-              </Card>
-            </div>
+            {/* Stats Cards - Profile version with statCard */}
+            {statCard ? (
+              <div className="flex justify-center">
+                <Card className="p-6 bg-white/10 backdrop-blur-sm border-0 text-center">
+                  <statCard.icon className={`w-8 h-8 mx-auto text-${statCard.iconColor} mb-3`} />
+                  <p className="text-2xl font-bold">{statCard.value}</p>
+                  <p className="text-sm text-blue-100 font-medium">{statCard.label}</p>
+                </Card>
+              </div>
+            ) : (
+              /* Default Stats Cards */
+              <div className="grid grid-cols-3 gap-3">
+                <Card className="p-4 bg-white/10 backdrop-blur-sm border-0 text-center">
+                  <Flame className="w-6 h-6 mx-auto text-orange-300 mb-2" />
+                  <p className="text-xl font-bold">{caloriesConsumed}</p>
+                  <p className="text-sm text-blue-100 font-medium">Consumed</p>
+                </Card>
+                
+                <Card className="p-4 bg-white/10 backdrop-blur-sm border-0 text-center">
+                  <Target className="w-6 h-6 mx-auto text-green-300 mb-2" />
+                  <p className="text-xl font-bold">{caloriesGoal}</p>
+                  <p className="text-sm text-blue-100 font-medium">Goal</p>
+                </Card>
+                
+                <Card className="p-4 bg-white/10 backdrop-blur-sm border-0 text-center">
+                  <TrendingUp className="w-6 h-6 mx-auto text-yellow-300 mb-2" />
+                  <p className="text-xl font-bold">{currentStreak}</p>
+                  <p className="text-sm text-blue-100 font-medium">Day Streak</p>
+                </Card>
+              </div>
+            )}
           </>
         )}
 
