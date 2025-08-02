@@ -73,3 +73,45 @@ export function getRandomFoodImage(): string {
   const images = getAllFoodImages();
   return images[Math.floor(Math.random() * images.length)];
 }
+
+/**
+ * Check if image rotation is enabled (always true for this implementation)
+ */
+export function isImageRotationEnabled(): boolean {
+  return true;
+}
+
+/**
+ * Reset image rotation state (no-op for this implementation)
+ */
+export function resetImageRotation(): void {
+  // No state to reset in this simplified implementation
+}
+
+/**
+ * Get a food image for a specific component
+ */
+export function getComponentFoodImage(componentName: string): string {
+  // Simple hash function to get consistent image for component
+  const hash = componentName.split('').reduce((a, b) => {
+    a = ((a << 5) - a) + b.charCodeAt(0);
+    return a & a;
+  }, 0);
+  
+  const images = getAllFoodImages();
+  const index = Math.abs(hash) % images.length;
+  return images[index];
+}
+
+/**
+ * Create a background style object for food images
+ */
+export function createFoodBackgroundStyle(imageUrl: string, opacity: number = 1): React.CSSProperties {
+  return {
+    backgroundImage: `url(${imageUrl})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+    opacity: opacity
+  };
+}

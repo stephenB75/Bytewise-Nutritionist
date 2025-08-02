@@ -20,7 +20,7 @@ import CalorieCalculatorWrapper from './components/CalorieCalculatorWrapper';
 import WeeklyLogger from './pages/WeeklyLogger';
 import ProfileEnhanced from './pages/ProfileEnhanced';
 import EmailConfirmation from './pages/EmailConfirmation';
-import './utils/testCalorieIntegration';
+// import './utils/testCalorieIntegration';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('dashboard');
