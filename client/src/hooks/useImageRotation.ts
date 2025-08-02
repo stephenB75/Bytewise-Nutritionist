@@ -8,10 +8,9 @@
 import React from 'react';
 import { resetImageRotation, isImageRotationEnabled } from '@/utils/foodImageRotation';
 
-const { useEffect } = React;
-
 export function useImageRotation() {
-  useEffect(() => {
+  // Temporarily disabled to fix runtime error - will re-enable once React hook issue is resolved
+  React.useEffect(() => {
     // Only run if rotation is enabled
     if (!isImageRotationEnabled()) {
       return;

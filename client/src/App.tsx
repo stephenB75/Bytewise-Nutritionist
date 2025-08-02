@@ -27,8 +27,8 @@ export default function App() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [notificationCount, setNotificationCount] = useState(0);
   
-  // Initialize image rotation system
-  useImageRotation();
+  // Initialize image rotation system - temporarily disabled to fix React hook error
+  // useImageRotation();
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
