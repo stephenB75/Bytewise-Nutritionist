@@ -159,18 +159,10 @@ export default function Profile({ onNavigate, onLogout }: ProfileProps) {
         component="profile"
         title={`${userProfile.name}'s Profile`}
         subtitle="Your nutrition journey"
-        description="Track progress and manage your account"
-        statCard={{
-          icon: Trophy,
-          value: achievements.filter(a => a.earned).length,
-          label: "achievements",
-          iconColor: "yellow-400"
-        }}
-        progressRing={{
-          percentage: getProfileCompletion(),
-          color: "#a8dadc",
-          label: "complete"
-        }}
+        caloriesConsumed={getProfileCompletion()}
+        caloriesGoal={100}
+        currentStreak={userProfile.stats.currentStreak}
+        showProgress={true}
       />
 
       {/* Main Content */}
