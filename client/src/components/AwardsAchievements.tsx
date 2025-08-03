@@ -8,6 +8,8 @@ import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Progress } from './ui/progress';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 import { 
   Trophy, 
   Star, 
@@ -44,8 +46,11 @@ interface AwardsAchievementsProps {
 }
 
 export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
+  const { user } = useAuth();
+  const { toast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [achievements, setAchievements] = useState<Achievement[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const [userStats, setUserStats] = useState({
     totalPoints: 0,
@@ -70,6 +75,98 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
     silver: 'bg-gray-400/20 border-gray-300/30 text-gray-300',
     gold: 'bg-[#faed39]/20 border-[#faed39]/30 text-[#faed39]',
     platinum: 'bg-purple-500/20 border-purple-400/30 text-purple-400'
+  };
+
+  // Load achievements data
+  useEffect(() => {
+    loadAchievements();
+  }, [user]);
+
+  const loadAchievements = async () => {
+    try {
+      setLoading(true);
+      // Generate starter achievements for the user
+      const starterAchievements: Achievement[] = [
+        {
+          id: '1',
+          title: 'First Steps',
+          description: 'Log your first meal',
+          icon: '🥗',
+          category: 'daily',
+          difficulty: 'bronze',
+          progress: 0,
+          target: 1,
+          completed: false,
+          points: 10
+        },
+        {
+          id: '2',
+          title: 'Daily Tracker',
+          description: 'Track meals for 7 consecutive days',
+          icon: '📅',
+          category: 'weekly',
+          difficulty: 'silver',
+          progress: 0,
+          target: 7,
+          completed: false,
+          points: 50
+        },
+        {
+          id: '3',
+          title: 'Calorie Goal',
+          description: 'Meet your daily calorie goal',
+          icon: '🎯',
+          category: 'daily',
+          difficulty: 'bronze',
+          progress: 0,
+          target: 1,
+          completed: false,
+          points: 15
+        },
+        {
+          id: '4',
+          title: 'Protein Power',
+          description: 'Meet protein goal 5 times',
+          icon: '💪',
+          category: 'weekly',
+          difficulty: 'silver',
+          progress: 0,
+          target: 5,
+          completed: false,
+          points: 40
+        },
+        {
+          id: '5',
+          title: 'Recipe Creator',
+          description: 'Create your first custom recipe',
+          icon: '👨‍🍳',
+          category: 'milestone',
+          difficulty: 'gold',
+          progress: 0,
+          target: 1,
+          completed: false,
+          points: 75
+        }
+      ];
+      
+      setAchievements(starterAchievements);
+      setUserStats({
+        totalPoints: 0,
+        achievementsCompleted: 0,
+        currentStreak: 0,
+        longestStreak: 0,
+        level: 1,
+        nextLevelPoints: 100
+      });
+    } catch (error) {
+      toast({
+        title: "Error loading achievements",
+        description: "Could not load your achievements. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const filteredAchievements = selectedCategory === 'all' 

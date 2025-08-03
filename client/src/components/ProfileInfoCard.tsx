@@ -12,6 +12,8 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 import { 
   User, 
   Mail, 
@@ -34,48 +36,51 @@ import {
 } from 'lucide-react';
 
 interface ProfileInfoCardProps {
-  user?: {
-    firstName?: string;
-    lastName?: string;
-    email?: string;
-    profileImageUrl?: string;
-    emailVerified?: boolean;
-    personalInfo?: {
-      age?: number;
-      location?: string;
-      phone?: string;
-      bio?: string;
-    };
-  };
   className?: string;
 }
 
-export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) {
+export function ProfileInfoCard({ className = '' }: ProfileInfoCardProps) {
+  const { user } = useAuth();
+  const { toast } = useToast();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [editedData, setEditedData] = useState({
-    firstName: user?.firstName || '',
-    lastName: user?.lastName || '',
-    age: user?.personalInfo?.age || '',
-    location: user?.personalInfo?.location || '',
-    phone: user?.personalInfo?.phone || '',
-    bio: user?.personalInfo?.bio || ''
+    firstName: (user as any)?.firstName || '',
+    lastName: (user as any)?.lastName || '',
+    age: (user as any)?.personalInfo?.age || '',
+    location: (user as any)?.personalInfo?.location || '',
+    phone: (user as any)?.personalInfo?.phone || '',
+    bio: (user as any)?.personalInfo?.bio || ''
   });
 
-  const handleSave = () => {
-    // Save logic here
-    // Saving profile data
-    setIsEditing(false);
-    
-    // Show success message
-    const event = new CustomEvent('show-toast', {
-      detail: { 
-        message: 'Profile updated successfully!',
-        type: 'success'
+  const handleSave = async () => {
+    try {
+      // Save logic here - send to backend
+      const response = await fetch('/api/auth/user/update', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(editedData),
+      });
+
+      if (response.ok) {
+        setIsEditing(false);
+        toast({
+          title: "Profile updated",
+          description: "Your profile information has been saved successfully.",
+        });
+      } else {
+        throw new Error('Failed to update profile');
       }
-    });
-    window.dispatchEvent(event);
+    } catch (error) {
+      toast({
+        title: "Update failed",
+        description: "There was an error updating your profile. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleCancel = () => {

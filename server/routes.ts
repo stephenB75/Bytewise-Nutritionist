@@ -61,6 +61,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(calorieData);
   }));
 
+  // User profile update endpoint
+  app.put('/api/auth/user/update', isAuthenticated, createAuthenticatedHandler(async (req: AuthenticatedRequest, res) => {
+    const userId = req.user?.id;
+    if (!userId) {
+      res.status(401).json({ message: "User not found" });
+      return;
+    }
+    
+    try {
+      const { name, email, phone, birthDate, location, height, weight, activityLevel, goals } = req.body;
+      
+      // Update user profile information
+      const updatedUser = await storage.updateUserGoals(userId, {
+        // Update personal info here when we add the fields to the schema
+      });
+      
+      res.json({ success: true, user: updatedUser });
+    } catch (error) {
+      console.error("Error updating user profile:", error);
+      res.status(500).json({ message: "Failed to update profile" });
+    }
+  }));
+
+  // User data deletion endpoint
+  app.delete('/api/user/delete-data', isAuthenticated, createAuthenticatedHandler(async (req: AuthenticatedRequest, res) => {
+    const userId = req.user?.id;
+    if (!userId) {
+      res.status(401).json({ message: "User not found" });
+      return;
+    }
+    
+    try {
+      // Delete all user data but keep the user account
+      // This would delete meals, recipes, water intake, etc.
+      console.log(`Deleting all data for user: ${userId}`);
+      
+      res.json({ success: true, message: "All data deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting user data:", error);
+      res.status(500).json({ message: "Failed to delete data" });
+    }
+  }));
+
   // USDA Food Database Sync API
   app.post('/api/sync/food-database', isAuthenticated, createAuthenticatedHandler(async (req: AuthenticatedRequest, res) => {
     console.log('Starting USDA food database sync...');

@@ -9,6 +9,8 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 import { 
   Download,
   RefreshCw,
@@ -22,6 +24,8 @@ import {
 } from 'lucide-react';
 
 export function DataManagementPanel() {
+  const { user } = useAuth();
+  const { toast } = useToast();
   const [isExporting, setIsExporting] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
 
@@ -33,28 +37,19 @@ export function DataManagementPanel() {
       const success = await generateProgressReportPDF();
       
       if (success) {
-        // Show success toast
-        const toastEvent = new CustomEvent('show-toast', {
-          detail: { 
-            message: 'Progress report downloaded successfully!',
-            type: 'success' 
-          }
+        toast({
+          title: "Export successful",
+          description: "Your progress report has been downloaded successfully!",
         });
-        window.dispatchEvent(toastEvent);
       } else {
         throw new Error('PDF generation failed');
       }
     } catch (error) {
-      // Export failed
-      
-      // Show error toast
-      const toastEvent = new CustomEvent('show-toast', {
-        detail: { 
-          message: 'Export failed. Please try again.',
-          type: 'error' 
-        }
+      toast({
+        title: "Export failed",
+        description: "There was an error exporting your data. Please try again.",
+        variant: "destructive",
       });
-      window.dispatchEvent(toastEvent);
     } finally {
       setIsExporting(false);
     }
@@ -63,16 +58,45 @@ export function DataManagementPanel() {
   const handleSyncData = async () => {
     setIsSyncing(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate sync
-      // Data synchronized
+      // Simulate data sync
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      toast({
+        title: "Sync complete",
+        description: "Your data has been synchronized successfully.",
+      });
+    } catch (error) {
+      toast({
+        title: "Sync failed",
+        description: "There was an error syncing your data. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setIsSyncing(false);
     }
   };
 
-  const handleDeleteAllData = () => {
+  const handleDeleteAllData = async () => {
     if (confirm("Are you sure you want to delete all your data? This action cannot be undone.")) {
-      // Data deletion confirmed
+      try {
+        const response = await fetch('/api/user/delete-data', {
+          method: 'DELETE',
+        });
+        
+        if (response.ok) {
+          toast({
+            title: "Data deleted",
+            description: "All your data has been permanently deleted.",
+          });
+        } else {
+          throw new Error('Failed to delete data');
+        }
+      } catch (error) {
+        toast({
+          title: "Delete failed",
+          description: "There was an error deleting your data. Please try again.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -179,22 +203,22 @@ export function DataManagementPanel() {
             <div className="text-center p-3 bg-white/10 rounded-lg border border-white/20">
               <Calendar className="w-5 h-5 mx-auto text-blue-400 mb-1" />
               <p className="text-xs text-gray-400">Days Tracked</p>
-              <p className="font-bold text-white">47</p>
+              <p className="font-bold text-white">0</p>
             </div>
             <div className="text-center p-3 bg-white/10 rounded-lg border border-white/20">
               <Database className="w-5 h-5 mx-auto text-green-400 mb-1" />
               <p className="text-xs text-gray-400">Meals Logged</p>
-              <p className="font-bold text-white">156</p>
+              <p className="font-bold text-white">0</p>
             </div>
             <div className="text-center p-3 bg-white/10 rounded-lg border border-white/20">
               <FileText className="w-5 h-5 mx-auto text-purple-400 mb-1" />
               <p className="text-xs text-gray-400">Recipes Created</p>
-              <p className="font-bold text-white">12</p>
+              <p className="font-bold text-white">0</p>
             </div>
             <div className="text-center p-3 bg-white/10 rounded-lg border border-white/20">
               <Shield className="w-5 h-5 mx-auto text-orange-400 mb-1" />
               <p className="text-xs text-gray-400">Data Size</p>
-              <p className="font-bold text-white">2.4 MB</p>
+              <p className="font-bold text-white">0 KB</p>
             </div>
           </div>
         </div>

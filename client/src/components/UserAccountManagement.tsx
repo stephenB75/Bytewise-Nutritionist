@@ -8,6 +8,8 @@ import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Badge } from './ui/badge';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 import { 
   User, 
   Settings, 
@@ -32,19 +34,21 @@ interface UserAccountManagementProps {
 }
 
 export function UserAccountManagement({ onClose }: UserAccountManagementProps) {
+  const { user } = useAuth();
+  const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [userInfo, setUserInfo] = useState({
-    name: 'Alex Thompson',
-    email: 'alex.thompson@email.com',
-    phone: '+1 (555) 123-4567',
-    birthDate: '1990-05-15',
-    location: 'San Francisco, CA',
-    height: '5\'10"',
-    weight: '165 lbs',
-    activityLevel: 'Moderately Active',
-    goals: ['Weight Maintenance', 'Muscle Gain', 'Better Nutrition'],
-    joinDate: '2024-01-15'
+    name: user ? `${(user as any).firstName || ''} ${(user as any).lastName || ''}`.trim() : '',
+    email: (user as any)?.email || '',
+    phone: (user as any)?.personalInfo?.phone || '',
+    birthDate: (user as any)?.personalInfo?.birthDate || '',
+    location: (user as any)?.personalInfo?.location || '',
+    height: (user as any)?.personalInfo?.height || '',
+    weight: (user as any)?.personalInfo?.weight || '',
+    activityLevel: (user as any)?.personalInfo?.activityLevel || 'Moderately Active',
+    goals: (user as any)?.personalInfo?.goals || [],
+    joinDate: (user as any)?.createdAt ? new Date((user as any).createdAt).toISOString().split('T')[0] : ''
   });
 
   const [preferences, setPreferences] = useState({
@@ -62,10 +66,46 @@ export function UserAccountManagement({ onClose }: UserAccountManagementProps) {
     }
   });
 
-  const handleSave = () => {
-    setIsEditing(false);
-    // Here you would typically save to backend
-    console.log('Saving user info:', userInfo);
+  const handleSave = async () => {
+    try {
+      // Save user info to backend
+      const response = await fetch('/api/auth/user/update', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userInfo),
+      });
+
+      if (response.ok) {
+        setIsEditing(false);
+        toast({
+          title: "Profile updated",
+          description: "Your account information has been saved successfully.",
+        });
+      } else {
+        throw new Error('Failed to update profile');
+      }
+    } catch (error) {
+      toast({
+        title: "Update failed",
+        description: "There was an error updating your profile. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      window.location.reload();
+    } catch (error) {
+      toast({
+        title: "Sign out failed",
+        description: "There was an error signing out. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -358,6 +398,20 @@ export function UserAccountManagement({ onClose }: UserAccountManagementProps) {
             </div>
             <Button variant="destructive" size="sm">
               Delete Account
+            </Button>
+          </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-white">Sign Out</p>
+              <p className="text-sm text-gray-400">Sign out of your account</p>
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={handleSignOut}
+              className="border-gray-600 text-gray-300 hover:bg-gray-700"
+            >
+              Sign Out
             </Button>
           </div>
         </div>
