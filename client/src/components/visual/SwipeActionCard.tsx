@@ -125,7 +125,7 @@ export function SwipeActionCard({
       >
         <Card className={`${className} ${isSwipeActive ? 'shadow-xl' : 'shadow-md'} transition-shadow duration-200`}>
           {getActionIndicator()}
-          {children}
+          <div>{children}</div>
         </Card>
       </motion.div>
     </div>

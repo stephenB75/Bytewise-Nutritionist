@@ -63,7 +63,7 @@ export function VisualCalorieCalculator({
       proteinPer100g: 31,
       carbsPer100g: 0,
       fatPer100g: 3.6,
-      image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEwIDEwSDU0VjU0SDEwVjEwWiIgZmlsbD0iI0Y5QzJCQSIvPgo8cGF0aCBkPSJNMTYgMTZINDhWNDhIMTZWMTZaIiBmaWxsPSIjRkRCN0EzIi8+CjwvYGc+',
+      image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEwIDEwSDU0VjU0SDEwVjEwWiIgZmlsbD0iI0Y5QzJCQSIvPgo8cGF0aCBkPSJNMTYgMTZINDhWNDhIMTZWMTZaIiBmaWxsPSIjRkRCN0EzIi8+Cjwvc3ZnPg==',
       units: ['g', 'oz', 'piece']
     },
     {
