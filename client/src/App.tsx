@@ -28,7 +28,7 @@ import EmailConfirmation from './pages/EmailConfirmation';
 // import './utils/testCalorieIntegration';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<string>('redesigned');
+  const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [showNotifications, setShowNotifications] = useState(false);
   const [notificationCount, setNotificationCount] = useState(0);
   
