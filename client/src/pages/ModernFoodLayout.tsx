@@ -445,12 +445,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <p className="text-gray-400">Find and log nutrition information</p>
           </div>
           <div className="relative">
-            <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-400 w-6 h-6" />
+            <Search className="absolute left-8 top-1/2 transform -translate-y-1/2 text-gray-400 w-6 h-6" />
             <Input
               placeholder="Search foods to log..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-16 pr-12 h-16 bg-white/10 border-white/20 text-white placeholder-gray-400 backdrop-blur-md rounded-2xl text-xl font-medium"
+              className="pl-20 pr-16 h-16 bg-white/10 border-white/20 text-white placeholder-gray-400 backdrop-blur-md rounded-2xl text-xl font-medium"
             />
             {searchQuery && (
               <Button
