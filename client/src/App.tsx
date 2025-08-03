@@ -12,7 +12,7 @@ import { queryClient } from '@/lib/queryClient';
 
 // import { useImageRotation } from './hooks/useImageRotation';
 
-import TestApp from './TestApp';
+import ModernFoodLayout from './pages/ModernFoodLayout';
 
 // import './utils/testCalorieIntegration';
 
@@ -88,9 +88,9 @@ export default function App() {
     return null;
   };
 
-  // Render test app
+  // Render ModernFoodLayout
   const renderCurrentPage = () => {
-    return <TestApp />;
+    return <ModernFoodLayout onNavigate={handleNavigate} />;
   };
 
   return (
