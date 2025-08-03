@@ -94,49 +94,44 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
     <Card className={`overflow-hidden bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-blue-200 ${className}`}>
       {/* Header - Always Visible */}
       <div className="p-6">
-        <div className="flex items-center gap-4">
-          {/* Profile Image */}
-          <div className="relative">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold border-4 border-white shadow-lg">
-              {user?.profileImageUrl ? (
-                <img
-                  src={user.profileImageUrl}
-                  alt="Profile"
-                  className="w-full h-full rounded-full object-cover"
-                />
-              ) : (
-                <span>{(user?.firstName?.[0] || 'U').toUpperCase()}</span>
-              )}
-            </div>
-            {user?.emailVerified && (
-              <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center border-2 border-white">
-                <Verified className="w-3 h-3 text-white" />
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-lg font-bold border-3 border-white shadow-md">
+                {user?.profileImageUrl ? (
+                  <img
+                    src={user.profileImageUrl}
+                    alt="Profile"
+                    className="w-full h-full rounded-full object-cover"
+                  />
+                ) : (
+                  <span>{(user?.firstName?.[0] || 'U').toUpperCase()}</span>
+                )}
               </div>
-            )}
-          </div>
-
-          {/* Basic Info */}
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-1">
-              <h3 className="text-xl font-bold text-gray-900" style={{ fontFamily: "'League Spartan', sans-serif" }}>
-                {user?.firstName || 'User'} {user?.lastName || ''}
-              </h3>
               {user?.emailVerified && (
-                <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">
-                  Verified
-                </Badge>
+                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center border-2 border-white">
+                  <Verified className="w-2 h-2 text-white" />
+                </div>
               )}
             </div>
-            <div className="flex items-center gap-2 text-gray-600">
-              <Mail className="w-4 h-4" />
-              <span className="text-sm" style={{ fontFamily: "'Quicksand', sans-serif" }}>
-                {user?.email || 'No email'}
-              </span>
+
+            <div>
+              <div className="flex items-center gap-2">
+                <h4 className="text-lg font-bold text-gray-900" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                  Profile Details
+                </h4>
+                {user?.emailVerified && (
+                  <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">
+                    Verified
+                  </Badge>
+                )}
+              </div>
+              <p className="text-sm text-gray-600">Manage your personal information</p>
             </div>
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             {!isEditing && (
               <Button
                 variant="ghost"
@@ -171,34 +166,34 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
 
           {/* Profile Dropdown Menu */}
           {showDropdown && (
-            <div className="absolute top-16 right-0 z-50 w-56 bg-gray-800/95 backdrop-blur-md rounded-xl shadow-2xl border border-gray-600 overflow-hidden">
-              <div className="p-3 border-b border-gray-600/50 bg-gradient-to-r from-gray-700 to-gray-800">
-                <h3 className="font-semibold text-white text-sm">Profile Settings</h3>
+            <div className="absolute top-16 right-0 z-50 w-56 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden">
+              <div className="p-3 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
+                <h3 className="font-semibold text-gray-900 text-sm">Profile Settings</h3>
               </div>
               
               <div className="py-1">
                 <button 
-                  className="w-full px-3 py-2.5 text-left text-sm hover:bg-blue-600/20 flex items-center gap-3 text-gray-200 transition-all duration-200 group"
+                  className="w-full px-3 py-2.5 text-left text-sm hover:bg-blue-50 flex items-center gap-3 text-gray-700 transition-all duration-200 group"
                   onClick={() => {
                     setIsEditing(true);
                     setShowDropdown(false);
                   }}
                 >
-                  <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center group-hover:bg-blue-500/30">
-                    <Edit3 className="w-4 h-4 text-blue-400" />
+                  <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center group-hover:bg-blue-200">
+                    <Edit3 className="w-4 h-4 text-blue-600" />
                   </div>
                   <span className="font-medium">Edit Profile</span>
                 </button>
                 
                 <button 
-                  className="w-full px-3 py-2.5 text-left text-sm hover:bg-purple-600/20 flex items-center gap-3 text-gray-200 transition-all duration-200 group"
+                  className="w-full px-3 py-2.5 text-left text-sm hover:bg-purple-50 flex items-center gap-3 text-gray-700 transition-all duration-200 group"
                   onClick={() => {
                     // Change profile photo
                     setShowDropdown(false);
                   }}
                 >
-                  <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center group-hover:bg-purple-500/30">
-                    <Camera className="w-4 h-4 text-purple-400" />
+                  <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center group-hover:bg-purple-200">
+                    <Camera className="w-4 h-4 text-purple-600" />
                   </div>
                   <span className="font-medium">Change Photo</span>
                 </button>
@@ -206,7 +201,7 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
                 <div className="h-px bg-gray-600/50 mx-3 my-2" />
                 
                 <button 
-                  className="w-full px-3 py-2.5 text-left text-sm hover:bg-green-600/20 flex items-center gap-3 text-gray-200 transition-all duration-200 group"
+                  className="w-full px-3 py-2.5 text-left text-sm hover:bg-green-50 flex items-center gap-3 text-gray-700 transition-all duration-200 group"
                   onClick={() => {
                     const event = new CustomEvent('navigate-to-section', {
                       detail: { section: 'privacy' }
@@ -215,14 +210,14 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
                     setShowDropdown(false);
                   }}
                 >
-                  <div className="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center group-hover:bg-green-500/30">
-                    <Shield className="w-4 h-4 text-green-400" />
+                  <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center group-hover:bg-green-200">
+                    <Shield className="w-4 h-4 text-green-600" />
                   </div>
                   <span className="font-medium">Privacy Settings</span>
                 </button>
                 
                 <button 
-                  className="w-full px-3 py-2.5 text-left text-sm hover:bg-orange-600/20 flex items-center gap-3 text-gray-200 transition-all duration-200 group"
+                  className="w-full px-3 py-2.5 text-left text-sm hover:bg-orange-50 flex items-center gap-3 text-gray-700 transition-all duration-200 group"
                   onClick={() => {
                     const event = new CustomEvent('navigate-to-section', {
                       detail: { section: 'notifications' }
@@ -231,22 +226,22 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
                     setShowDropdown(false);
                   }}
                 >
-                  <div className="w-8 h-8 rounded-lg bg-orange-500/20 flex items-center justify-center group-hover:bg-orange-500/30">
-                    <Bell className="w-4 h-4 text-orange-400" />
+                  <div className="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center group-hover:bg-orange-200">
+                    <Bell className="w-4 h-4 text-orange-600" />
                   </div>
                   <span className="font-medium">Notifications</span>
                 </button>
                 
-                <div className="h-px bg-gray-600/50 mx-3 my-2" />
+                <div className="h-px bg-gray-200 mx-3 my-2" />
                 
                 <button 
-                  className="w-full px-3 py-2.5 text-left text-sm hover:bg-red-600/20 flex items-center gap-3 text-red-400 transition-all duration-200 group"
+                  className="w-full px-3 py-2.5 text-left text-sm hover:bg-red-50 flex items-center gap-3 text-red-600 transition-all duration-200 group"
                   onClick={() => {
                     window.location.href = '/api/logout';
                   }}
                 >
-                  <div className="w-8 h-8 rounded-lg bg-red-500/20 flex items-center justify-center group-hover:bg-red-500/30">
-                    <LogOut className="w-4 h-4 text-red-400" />
+                  <div className="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center group-hover:bg-red-200">
+                    <LogOut className="w-4 h-4 text-red-600" />
                   </div>
                   <span className="font-medium">Sign Out</span>
                 </button>
@@ -262,30 +257,30 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
           isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
         }`}
       >
-        <div className="px-6 pb-6 border-t border-white/20">
+        <div className="px-6 pb-6 border-t border-gray-200">
           <div className="pt-4 space-y-4">
             {isEditing ? (
               /* Edit Mode */
               <div className="space-y-4">
-                <div className="grid grid-cols-1 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-medium text-gray-300 mb-1 block">
+                    <label className="text-sm font-medium text-gray-700 mb-1 block">
                       First Name
                     </label>
                     <Input
                       value={editedData.firstName}
                       onChange={(e) => setEditedData({ ...editedData, firstName: e.target.value })}
-                      className="text-sm bg-white/10 border-white/20 text-white"
+                      className="text-sm"
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-300 mb-1 block">
+                    <label className="text-sm font-medium text-gray-700 mb-1 block">
                       Last Name
                     </label>
                     <Input
                       value={editedData.lastName}
                       onChange={(e) => setEditedData({ ...editedData, lastName: e.target.value })}
-                      className="text-sm bg-white/10 border-white/20 text-white"
+                      className="text-sm"
                     />
                   </div>
                 </div>

@@ -49,17 +49,17 @@ export function UserProfile({ showDetails = false, size = 'md' }: UserProfilePro
   return (
     <div className="bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-blue-200 rounded-xl overflow-hidden">
       <div className="p-6">
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col items-center text-center space-y-4">
           {/* Profile Image */}
           <div className="relative">
             {user.user_metadata?.profileImageUrl ? (
               <img 
                 src={user.user_metadata.profileImageUrl} 
                 alt={displayName}
-                className="w-16 h-16 rounded-full object-cover border-4 border-white shadow-lg"
+                className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-lg"
               />
             ) : (
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xl font-bold border-4 border-white shadow-lg">
+              <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-2xl font-bold border-4 border-white shadow-lg">
                 <span>{displayName.charAt(0).toUpperCase()}</span>
               </div>
             )}
@@ -71,9 +71,9 @@ export function UserProfile({ showDetails = false, size = 'md' }: UserProfilePro
           </div>
           
           {/* User Details */}
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-1">
-              <h3 className="text-xl font-bold text-gray-900" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+          <div className="space-y-2">
+            <div className="flex items-center justify-center gap-2">
+              <h3 className="text-2xl font-bold text-gray-900" style={{ fontFamily: "'League Spartan', sans-serif" }}>
                 {displayName}
               </h3>
               <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">
@@ -82,7 +82,7 @@ export function UserProfile({ showDetails = false, size = 'md' }: UserProfilePro
             </div>
             
             {user.email && (
-              <div className="flex items-center gap-2 text-gray-600">
+              <div className="flex items-center justify-center gap-2 text-gray-600">
                 <Mail className="w-4 h-4" />
                 <span className="text-sm" style={{ fontFamily: "'Quicksand', sans-serif" }}>
                   {user.email}
@@ -90,10 +90,12 @@ export function UserProfile({ showDetails = false, size = 'md' }: UserProfilePro
               </div>
             )}
             
-            <Badge variant="secondary" className="text-xs mt-2">
-              <Calendar className="w-3 h-3 mr-1" />
-              Member since {new Date(user.created_at).toLocaleDateString()}
-            </Badge>
+            <div className="flex justify-center">
+              <Badge variant="secondary" className="text-xs">
+                <Calendar className="w-3 h-3 mr-1" />
+                Member since {new Date(user.created_at).toLocaleDateString()}
+              </Badge>
+            </div>
           </div>
         </div>
       </div>
