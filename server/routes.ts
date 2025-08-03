@@ -24,7 +24,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { email, password } = req.body;
       
-      console.log('Sign in attempt for email:', email);
+
       
       const { data, error } = await serverSupabase.auth.signInWithPassword({
         email,
@@ -45,7 +45,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             firstName: data.user.user_metadata?.first_name,
             lastName: data.user.user_metadata?.last_name,
           });
-          console.log('User upserted successfully:', data.user.id);
+
         } catch (dbError) {
           console.error('Database upsert error during signin:', dbError);
           // Continue anyway since Supabase auth succeeded
@@ -68,7 +68,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { email, password } = req.body;
       
-      console.log('Sign up attempt for email:', email);
+
       
       const { data, error } = await serverSupabase.auth.signUp({
         email,
@@ -89,7 +89,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             firstName: data.user.user_metadata?.first_name,
             lastName: data.user.user_metadata?.last_name,
           });
-          console.log('User created and stored:', data.user.id);
+
         } catch (dbError) {
           console.error('Database upsert error during signup:', dbError);
           // Continue anyway since Supabase auth succeeded
@@ -126,7 +126,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Email is required" });
       }
       
-      console.log('Confirming email for:', email);
+
       
       // Use service role client to update user email confirmation
       const { data: users, error: listError } = await serverSupabase.auth.admin.listUsers();
@@ -237,7 +237,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Delete all user data but keep the user account
       // This would delete meals, recipes, water intake, etc.
-      console.log(`Deleting all data for user: ${userId}`);
+
       
       res.json({ success: true, message: "All data deleted successfully" });
     } catch (error) {
@@ -248,7 +248,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // USDA Food Database Sync API
   app.post('/api/sync/food-database', isAuthenticated, async (req: any, res: Response) => {
-    console.log('Starting USDA food database sync...');
+
       
       // Sync popular foods for offline access
       const popularFoods = [
@@ -297,7 +297,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!userId) {
         return res.status(401).json({ message: "User not found" });
       }
-      console.log('Starting user data sync for:', userId);
+
       
       // Sync user meals, achievements, and preferences
       const syncData = {

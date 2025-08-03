@@ -106,7 +106,7 @@ export class DatabaseStorage implements IStorage {
     } catch (error: any) {
       // If there's an email conflict, try to update by email
       if (error.code === '23505' && error.constraint === 'users_email_unique') {
-        console.log('Email conflict detected, attempting to update existing user');
+
         const [existingUser] = await db
           .update(users)
           .set({

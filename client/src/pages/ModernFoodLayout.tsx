@@ -3,13 +3,12 @@
  * Features: Hero sections, food cards, nutrition breakdown, and modern navigation
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import CalorieCalculator from '@/components/CalorieCalculator';
-import { LogoBrand } from '@/components/LogoBrand';
 import { UserProfile } from '@/components/UserProfile';
 import { ProfileInfoCard } from '@/components/ProfileInfoCard';
 import { SignOnModule } from '@/components/SignOnModule';
@@ -23,21 +22,16 @@ import { useGoalAchievements } from '@/hooks/useGoalAchievements';
 import { useRotatingBackground } from '@/hooks/useRotatingBackground';
 import { 
   Search, 
-  Heart, 
-  User, 
+  User,
   Plus,
   ChevronRight,
   Flame,
   Target,
-  Activity,
-  Zap,
   Settings,
   Trophy,
   Calendar,
   Download,
   Bell,
-  Shield,
-  RefreshCw,
   X
 } from 'lucide-react';
 import { NotificationDropdown } from '@/components/NotificationDropdown';
