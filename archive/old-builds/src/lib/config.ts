@@ -1,0 +1,56 @@
+/**
+ * Production-Ready Configuration
+ * Handles both development and production environments
+ */
+
+// Environment detection
+const isDev = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+const isProd = !isDev;
+
+// Fallback configuration for production
+const FALLBACK_CONFIG = {
+  supabaseUrl: 'https://ykgqcftrfvjblmqzbqvr.supabase.co',
+  supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrZ3FjZnRyZnZqYmxtcXpicXZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU3ODcxNjQsImV4cCI6MjA1MTM2MzE2NH0.x7kMQbFJevYhYe4LvBTIb3VjcL6H6M7AQwvR8IbgAY4',
+  usdaApiKey: 'z4YPCZm0HAL1SLXe9sRhXXRG8meDjQDBkGqE7hqY'
+};
+
+// Safe environment variable access
+function getEnvVar(key: string): string | undefined {
+  try {
+    if (typeof import.meta !== 'undefined' && import.meta.env) {
+      return import.meta.env[key];
+    }
+    if (typeof process !== 'undefined' && process.env) {
+      return process.env[key];
+    }
+  } catch (e) {
+    // Ignore errors
+  }
+  return undefined;
+}
+
+// Configuration object
+export const config = {
+  isDev,
+  isProd,
+  supabase: {
+    url: getEnvVar('VITE_SUPABASE_URL') || FALLBACK_CONFIG.supabaseUrl,
+    anonKey: getEnvVar('VITE_SUPABASE_ANON_KEY') || FALLBACK_CONFIG.supabaseKey
+  },
+  usda: {
+    apiKey: getEnvVar('VITE_USDA_API_KEY') || FALLBACK_CONFIG.usdaApiKey,
+    baseUrl: 'https://api.nal.usda.gov/fdc/v1'
+  },
+  fallback: {
+    supabaseUrl: FALLBACK_CONFIG.supabaseUrl,
+    supabaseKey: FALLBACK_CONFIG.supabaseKey,
+    usdaApiKey: FALLBACK_CONFIG.usdaApiKey
+  }
+};
+
+// Production logging
+if (isProd) {
+  console.log('📱 ByteWise Production Mode');
+}
+
+export default config;

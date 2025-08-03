@@ -31,19 +31,19 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   {
-    id: 'home',
-    label: 'Home',
+    id: 'dashboard',
+    label: 'Dashboard',
     icon: Home,
     activeIcon: HomeIcon
   },
   {
-    id: 'nutrition',
-    label: 'Nutrition',
+    id: 'calculator',
+    label: 'Calculator',
     icon: ChefHat
   },
   {
-    id: 'daily',
-    label: 'Daily',
+    id: 'logger',
+    label: 'Logger',
     icon: Calendar,
     activeIcon: CalendarIcon
   },

@@ -37,6 +37,7 @@ import {
   X
 } from 'lucide-react';
 import { NotificationDropdown } from '@/components/NotificationDropdown';
+import { Navigation } from '@/components/Navigation';
 
 interface ModernFoodLayoutProps {
   onNavigate?: (page: string) => void;
@@ -1098,10 +1099,62 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   const renderContent = () => {
     switch (activeTab) {
-      case 'calculator':
-        return renderCalculator();
       case 'home':
         return renderHome();
+      case 'nutrition':
+        return renderCalculator();
+      case 'daily':
+        return renderDailyWeekly();
+      case 'profile':
+        return (
+          <div className="space-y-0">
+            {/* Full-Screen Hero Section */}
+            <div className="relative h-screen overflow-hidden">
+              <div 
+                className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out"
+                style={{
+                  backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`
+                }}
+              />
+              
+              {/* Hero Content - ONLY TEXT OVERLAY */}
+              <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
+                <div className="space-y-6 max-w-2xl">
+                  <div className="space-y-2">
+                    <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
+                      Data
+                    </h1>
+                    <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
+                      <span className="bg-gradient-to-r from-blue-400 to-cyan-500 bg-clip-text text-transparent">
+                        Management
+                      </span>
+                    </h1>
+                  </div>
+                  
+                  <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto">
+                    Export, sync, and manage your nutrition tracking data
+                  </p>
+                </div>
+              </div>
+              
+              {/* Scroll indicator */}
+              <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60">
+                <div className="animate-bounce">
+                  <ChevronRight className="w-6 h-6 rotate-90" />
+                </div>
+              </div>
+            </div>
+
+            {/* Content Section - Completely Separate and Underneath */}
+            <div className="px-6 py-8 bg-black min-h-screen">
+              <div className="bg-gray-900/80 backdrop-blur-md rounded-3xl border border-gray-700">
+                <DataManagementPanel />
+              </div>
+            </div>
+          </div>
+        );
+      case 'calculator':
+        return renderCalculator();
       case 'tracking':
         return renderTracking();
       case 'signin':
@@ -1156,474 +1209,25 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             </div>
           </div>
         );
-      case 'profile':
-        return (
-          <div className="space-y-0">
-            {/* Full-Screen Hero Section */}
-            <div className="relative h-screen overflow-hidden">
-              <div 
-                className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out"
-                style={{
-                  backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`
-                }}
-              />
-              
-              {/* Hero Content - ONLY TEXT OVERLAY */}
-              <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
-                <div className="space-y-6 max-w-2xl">
-                  <div className="space-y-2">
-                    <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
-                      Your
-                    </h1>
-                    <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
-                      <span className="bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
-                        Profile
-                      </span>
-                    </h1>
-                  </div>
-                  
-                  <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto">
-                    Manage your account, settings, and nutrition data
-                  </p>
-                </div>
-              </div>
-              
-              {/* Scroll indicator */}
-              <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60">
-                <div className="animate-bounce">
-                  <ChevronRight className="w-6 h-6 rotate-90" />
-                </div>
-              </div>
-            </div>
-
-            {/* Content Section - Completely Separate and Underneath */}
-            <div className="px-6 py-8 bg-black">
-              {/* User Info Card */}
-              <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6 mb-6">
-                <div className="flex items-center space-x-4 mb-6">
-                  <div className="relative">
-                    {user?.user_metadata?.avatar_url ? (
-                      <img 
-                        src={user.user_metadata.avatar_url} 
-                        alt="Profile"
-                        className="w-16 h-16 rounded-full object-cover border-3 border-orange-500"
-                      />
-                    ) : (
-                      <div className="w-16 h-16 bg-gradient-to-r from-orange-400 to-red-400 rounded-full flex items-center justify-center border-3 border-orange-500">
-                        <User className="w-8 h-8 text-white" />
-                      </div>
-                    )}
-                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-gray-900" />
-                  </div>
-                  <div className="flex-1">
-                    <h2 className="text-xl font-bold text-white mb-1">
-                      {user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Nutrition Tracker'}
-                    </h2>
-                    <p className="text-gray-400 text-sm">{user?.email || 'member@nutrition.app'}</p>
-                    <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30 mt-2">
-                      <Trophy className="w-3 h-3 mr-1" />
-                      Pro Member
-                    </Badge>
-                  </div>
-                  <Button 
-                    variant="ghost" 
-                    className="text-gray-400 hover:text-white"
-                    onClick={() => {
-                      console.log('App Settings clicked - functionality activated');
-                      const appInfo = `
-ByteWise Nutrition Tracker
-Version: 2.1.0
-Build: 2025.02.03
-Framework: React + TypeScript
-Database: USDA FoodData Central
-Features: 275,000+ foods, Real-time tracking
-                      `;
-                      alert(appInfo);
-                    }}
-                  >
-                    <Settings className="w-5 h-5" />
-                  </Button>
-                </div>
-                
-                {/* Stats */}
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="text-center p-3 bg-blue-500/20 rounded-xl border border-blue-500/30">
-                    <div className="text-2xl font-bold text-blue-400 mb-1">{goalCalories}</div>
-                    <div className="text-xs text-blue-300">Daily Goal</div>
-                  </div>
-                  <div className="text-center p-3 bg-green-500/20 rounded-xl border border-green-500/30">
-                    <div className="text-2xl font-bold text-green-400 mb-1">{achievements?.length || 0}</div>
-                    <div className="text-xs text-green-300">Achievements</div>
-                  </div>
-                  <div className="text-center p-3 bg-purple-500/20 rounded-xl border border-purple-500/30">
-                    <div className="text-2xl font-bold text-purple-400 mb-1">{loggedMeals.length > 0 ? Math.max(47, loggedMeals.length * 7) : 47}</div>
-                    <div className="text-xs text-purple-300">Days Tracked</div>
-                  </div>
-                </div>
-              </Card>
-
-              {/* Account Settings */}
-              <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6 mb-6">
-                <h3 className="text-xl font-bold text-white mb-4">Account Settings</h3>
-                <div className="space-y-3">
-                  <Button
-                    variant="ghost"
-                    className="w-full flex items-center justify-between p-3 bg-gray-800/50 rounded-xl hover:bg-gray-800/70 text-left h-auto"
-                    onClick={() => {
-                      console.log('Push Notifications clicked - functionality activated');
-                      if ('Notification' in window) {
-                        Notification.requestPermission().then(permission => {
-                          const toast = document.createElement('div');
-                          toast.className = 'fixed top-4 right-4 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg z-50';
-                          toast.textContent = permission === 'granted' ? 'Notifications enabled!' : 'Permission required for notifications';
-                          document.body.appendChild(toast);
-                          setTimeout(() => document.body.removeChild(toast), 3000);
-                        });
-                      }
-                    }}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <Bell className="w-5 h-5 text-blue-400" />
-                      <span className="text-white">Push Notifications</span>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-gray-400" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    className="w-full flex items-center justify-between p-3 bg-gray-800/50 rounded-xl hover:bg-gray-800/70 text-left h-auto"
-                    onClick={() => {
-                      console.log('Privacy Settings clicked - functionality activated');
-                      const toast = document.createElement('div');
-                      toast.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50';
-                      toast.textContent = 'Privacy: Data stored locally, never shared';
-                      document.body.appendChild(toast);
-                      setTimeout(() => document.body.removeChild(toast), 3000);
-                    }}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <Shield className="w-5 h-5 text-green-400" />
-                      <span className="text-white">Privacy Settings</span>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-gray-400" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    className="w-full flex items-center justify-between p-3 bg-gray-800/50 rounded-xl hover:bg-gray-800/70 text-left h-auto"
-                    onClick={() => {
-                      console.log('Nutrition Goals clicked - functionality activated');
-                      const newGoal = prompt(`Current: ${goalCalories} cal/day\nEnter new daily goal:`, goalCalories.toString());
-                      if (newGoal && !isNaN(Number(newGoal))) {
-                        setGoalCalories(Number(newGoal));
-                        setWeeklyGoal(Number(newGoal) * 7);
-                        localStorage.setItem('dailyGoal', newGoal);
-                        const toast = document.createElement('div');
-                        toast.className = 'fixed top-4 right-4 bg-orange-500 text-white px-4 py-2 rounded-lg shadow-lg z-50';
-                        toast.textContent = `Goal updated to ${newGoal} calories!`;
-                        document.body.appendChild(toast);
-                        setTimeout(() => document.body.removeChild(toast), 3000);
-                      }
-                    }}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <Target className="w-5 h-5 text-orange-400" />
-                      <span className="text-white">Nutrition Goals</span>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-gray-400" />
-                  </Button>
-                </div>
-              </Card>
-
-              {/* Earned Achievements */}
-              {achievements && achievements.length > 0 && (
-                <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6 mb-6">
-                  <h3 className="text-xl font-bold text-white mb-4">Your Achievements</h3>
-                  <div className="space-y-3">
-                    {achievements.map((achievement, index) => (
-                      <div key={index} className="flex items-center space-x-4 p-3 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-xl border border-yellow-500/30">
-                        <div className="w-10 h-10 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
-                          <Trophy className="w-5 h-5 text-white" />
-                        </div>
-                        <div className="flex-1">
-                          <h4 className="text-white font-semibold text-sm">{achievement.title}</h4>
-                          <p className="text-gray-400 text-xs">{achievement.description}</p>
-                        </div>
-                        <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200 text-xs">
-                          {new Date(achievement.earnedAt).toLocaleDateString()}
-                        </Badge>
-                      </div>
-                    ))}
-                  </div>
-                </Card>
-              )}
-
-              {/* Achievements Module */}
-              <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6 mb-6">
-                <h3 className="text-xl font-bold text-white mb-4 flex items-center">
-                  <Trophy className="w-5 h-5 mr-2 text-yellow-400" />
-                  Achievements & Awards
-                </h3>
-                
-                {/* Achievement Stats */}
-                <div className="grid grid-cols-3 gap-4 mb-6">
-                  <div className="text-center p-3 bg-gradient-to-br from-yellow-500/20 to-orange-500/20 rounded-xl border border-yellow-500/30">
-                    <div className="text-2xl font-bold text-yellow-400">{achievements ? achievements.length : 3}</div>
-                    <div className="text-xs text-gray-300">Earned</div>
-                  </div>
-                  <div className="text-center p-3 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-xl border border-blue-500/30">
-                    <div className="text-2xl font-bold text-blue-400">15</div>
-                    <div className="text-xs text-gray-300">Available</div>
-                  </div>
-                  <div className="text-center p-3 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-xl border border-green-500/30">
-                    <div className="text-2xl font-bold text-green-400">{Math.round(((achievements ? achievements.length : 3) / 15) * 100)}%</div>
-                    <div className="text-xs text-gray-300">Complete</div>
-                  </div>
-                </div>
-
-                {/* Recent Achievements */}
-                <div className="space-y-3">
-                  {(achievements && achievements.length > 0 ? achievements : [
-                    { title: "First Day Complete", description: "Logged your first day of meals", earnedAt: new Date().toISOString() },
-                    { title: "Goal Achiever", description: "Met your daily calorie goal", earnedAt: new Date(Date.now() - 86400000).toISOString() },
-                    { title: "Streak Starter", description: "3 days of consistent logging", earnedAt: new Date(Date.now() - 172800000).toISOString() }
-                  ]).slice(0, 3).map((achievement, index) => (
-                    <div key={index} className="flex items-center space-x-4 p-3 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-xl border border-yellow-500/30">
-                      <div className="w-10 h-10 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center flex-shrink-0">
-                        <Trophy className="w-5 h-5 text-white" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="text-white font-semibold text-sm truncate">{achievement.title}</h4>
-                        <p className="text-gray-400 text-xs truncate">{achievement.description}</p>
-                      </div>
-                      <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200 text-xs flex-shrink-0">
-                        {new Date(achievement.earnedAt).toLocaleDateString()}
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-
-                {/* View All Button */}
-                <Button 
-                  variant="outline" 
-                  className="w-full mt-4 border-yellow-500/50 text-yellow-400 bg-yellow-500/10 hover:bg-yellow-500/20"
-                  onClick={() => {
-                    console.log('View All Achievements clicked - functionality activated');
-                    setShowAchievement(true);
-                    setCurrentAchievement({
-                      title: "Achievement Explorer",
-                      description: "Viewing all your earned achievements"
-                    });
-                  }}
-                >
-                  View All Achievements
-                </Button>
-              </Card>
-
-              {/* Data Management */}
-              <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6 mb-6">
-                <h3 className="text-xl font-bold text-white mb-4">Data Management</h3>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <Button 
-                      variant="outline" 
-                      className="h-12 bg-green-600 border-green-500 text-white hover:bg-green-700"
-                      onClick={() => {
-                        console.log('Export to PDF clicked - generating PDF report');
-                        // Generate PDF content
-                        const pdfContent = `
-BYTEWISE NUTRITION TRACKER REPORT
-Generated: ${new Date().toLocaleDateString()}
-
-DAILY SUMMARY
-=============
-Daily Goal: ${goalCalories} calories
-Current Progress: ${Math.round(dailyCalories)} calories (${Math.round((dailyCalories/goalCalories)*100)}%)
-Meals Logged: ${loggedMeals.length}
-
-WEEKLY SUMMARY  
-==============
-Weekly Goal: ${weeklyGoal} calories
-Current Progress: ${Math.round(weeklyCalories)} calories (${Math.round((weeklyCalories/weeklyGoal)*100)}%)
-Average per Day: ${Math.round(weeklyCalories/7)} calories
-
-ACHIEVEMENTS
-============
-Total Earned: ${achievements ? achievements.length : 3}
-Recent: ${achievements && achievements.length > 0 ? achievements[0].title : 'First Day Complete'}
-
-MEAL HISTORY
-============
-${loggedMeals.map(meal => `${meal.name} - ${Math.round(meal.calories || 0)} cal (${meal.time})`).join('\n')}
-
-DATA EXPORT
-===========
-Export Date: ${new Date().toISOString()}
-User Progress: ${Math.round((dailyCalories/goalCalories)*100)}% of daily goal
-                        `;
-                        
-                        // Create PDF-style content and download
-                        const blob = new Blob([pdfContent], { type: 'text/plain' });
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = `ByteWise-Nutrition-Report-${new Date().toISOString().split('T')[0]}.txt`;
-                        a.click();
-                        URL.revokeObjectURL(url);
-                      }}
-                    >
-                      <Download className="w-4 h-4 mr-2" />
-                      Export to PDF
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      className="h-12 bg-blue-600 border-blue-500 text-white hover:bg-blue-700"
-                      onClick={() => {
-                        console.log('Sync Data clicked - functionality activated');
-                        // Simulate data sync
-                        const syncButton = document.querySelector('[data-sync-button]');
-                        if (syncButton) {
-                          syncButton.textContent = 'Syncing...';
-                          setTimeout(() => {
-                            syncButton.textContent = 'Synced ✓';
-                            setTimeout(() => {
-                              syncButton.textContent = 'Sync Data';
-                            }, 2000);
-                          }, 1500);
-                        }
-                      }}
-                    >
-                      <RefreshCw className="w-4 h-4 mr-2" />
-                      <span data-sync-button="true">Sync Data</span>
-                    </Button>
-                  </div>
-                  
-                  {/* Data Overview */}
-                  <div className="grid grid-cols-2 gap-4 mt-4">
-                    <div className="text-center p-3 bg-gray-800/50 rounded-xl">
-                      <div className="text-lg font-bold text-white">{loggedMeals.length}</div>
-                      <div className="text-xs text-gray-400">Meals Today</div>
-                    </div>
-                    <div className="text-center p-3 bg-gray-800/50 rounded-xl">
-                      <div className="text-lg font-bold text-white">{Math.round(dailyCalories)}</div>
-                      <div className="text-xs text-gray-400">Calories Logged</div>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-
-
-            </div>
-          </div>
-        );
       default:
         return renderHome();
     }
   };
 
   return (
-    <div className="min-h-screen bg-black overflow-x-hidden overflow-y-auto">
-
-
-      {/* Minimal Dark Header */}
-      <div className="absolute top-0 left-0 right-0 z-50 bg-black/70 backdrop-blur-xl border-b border-gray-800/50 px-4 py-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            {/* Header simplified - logo moved to home hero */}
-          </div>
-          <div className="flex items-center space-x-2">
-            {/* Notifications */}
-            <div className="relative">
-              <Button 
-                size="sm" 
-                variant="ghost" 
-                className="relative text-white hover:bg-white/10 rounded-full p-2"
-                onClick={() => {
-                  setShowNotificationDropdown(!showNotificationDropdown);
-                  console.log('Notification dropdown toggled:', !showNotificationDropdown);
-                }}
-              >
-                <Bell className="w-5 h-5" />
-                <div className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 rounded-full flex items-center justify-center border border-white">
-                  <span className="text-xs font-bold text-white">{notifications.filter(n => !n.read).length || 3}</span>
-                </div>
-              </Button>
-              
-              {showNotificationDropdown && (
-                <NotificationDropdown
-                  isOpen={showNotificationDropdown}
-                  onClose={() => setShowNotificationDropdown(false)}
-                  notifications={notifications}
-                  onMarkAsRead={handleMarkAsRead}
-                  onMarkAllAsRead={handleMarkAllAsRead}
-                  onDeleteNotification={handleDeleteNotification}
-                  onNavigate={(page, section) => {
-                    setActiveTab(page);
-                    setShowNotificationDropdown(false);
-                  }}
-                />
-              )}
-            </div>
-            
-            {/* User Profile */}
-            {user && (
-              <div className="flex items-center space-x-2 ml-2">
-                <UserProfile size="sm" />
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Full-Screen Content with Vertical Scroll */}
-      <div className="bg-black min-h-screen pt-16 pb-20 overflow-y-auto">
-        {renderContent()}
-      </div>
-
-      {/* Dark Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-black/95 backdrop-blur-md border-t border-gray-800 px-4 py-2">
-        <div className="flex justify-around">
-          {[
-            { id: 'home', label: 'Home', icon: Search },
-            { id: 'calculator', label: 'Nutrition', icon: Zap },
-            { id: 'tracking', label: 'Tracking', icon: Calendar },
-            { id: 'achievements', label: 'Goals', icon: Trophy },
-            { id: 'profile', label: 'Profile', icon: User },
-          ].map((item) => (
-            <Button
-              key={item.id}
-              variant="ghost"
-              size="sm"
-              className={`flex-col h-16 space-y-1 relative ${
-                activeTab === item.id 
-                  ? 'text-orange-500 bg-orange-500/20' 
-                  : 'text-gray-400 hover:text-white hover:bg-gray-800'
-              }`}
-              onClick={() => setActiveTab(item.id)}
-            >
-              <item.icon className="w-5 h-5" />
-              <span className="text-xs font-medium">{item.label}</span>
-              
-              {/* Achievement badge */}
-              {item.id === 'profile' && achievements && achievements.length > 0 && (
-                <div className="absolute -top-1 -right-1 h-4 w-4 bg-orange-500 rounded-full flex items-center justify-center">
-                  <span className="text-xs font-bold text-white">{achievements.length}</span>
-                </div>
-              )}
-            </Button>
-          ))}
-        </div>
-      </div>
-
-      {/* Achievement Celebration Modal */}
-      {(showAchievement || showCelebration) && (
+    <div className="min-h-screen bg-black">
+      {/* Content rendered based on active tab */}
+      {renderContent()}
+      
+      {/* Bottom Navigation */}
+      <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
+      
+      {/* Achievement Celebration Overlay */}
+      {showAchievement && currentAchievement && (
         <AchievementCelebration
-          isOpen={showAchievement || showCelebration}
-          onClose={() => {
-            setShowAchievement(false);
-            if (showCelebration) {
-              closeCelebration();
-            }
-          }}
-          achievement={currentAchievement || celebrationAchievement}
+          achievement={currentAchievement}
+          isOpen={showAchievement}
+          onClose={() => setShowAchievement(false)}
         />
       )}
     </div>
