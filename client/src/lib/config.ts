@@ -61,10 +61,10 @@ export const config = {
 // Production logging
 if (isProd) {
   if (isGitHubPages) {
-    console.log('📱 ByteWise GitHub Pages Mode');
+    console.log('📱 bytewise GitHub Pages Mode');
     console.log('🌐 Direct API mode enabled');
   } else {
-    console.log('📱 ByteWise Production Mode');
+    console.log('📱 bytewise Production Mode');
   }
   console.log('🔧 Supabase configured:', config.supabase.isConfigured);
   console.log('🔗 Supabase URL:', config.supabase.url ? 'present' : 'missing');

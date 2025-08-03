@@ -61,8 +61,11 @@ if (!rootElement) {
           <div style="width: 80px; height: 80px; background: rgba(255,255,255,0.2); border-radius: 24px; display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem;">
             <div style="font-size: 2rem;">🍎</div>
           </div>
-          <h1 style="font-size: 3rem; margin-bottom: 1rem; font-weight: 900;">ByteWise</h1>
-          <p style="font-size: 1.2rem; opacity: 0.9;">Loading modern food app design...</p>
+          <div style="font-family: 'League Spartan', sans-serif; margin-bottom: 1rem;">
+            <h1 style="font-size: 3.5rem; font-weight: 900; margin: 0; line-height: 0.9;">bytewise</h1>
+            <p style="font-size: 1rem; font-weight: 300; margin: 0; opacity: 0.8; letter-spacing: 0.1em;">nutritionist</p>
+          </div>
+          <p style="font-size: 1.2rem; opacity: 0.9;">loading bytewise nutritionist...</p>
           <div style="margin-top: 2rem;">
             <div style="width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid white; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
           </div>
