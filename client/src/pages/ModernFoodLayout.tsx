@@ -528,8 +528,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               </div>
             </Card>
           </div>
-
-
         </div>
       </div>
     </div>

@@ -136,14 +136,14 @@ textarea {
 
 /* Global scroll behavior fixes - prevent content from being hidden at bottom */
 body {
-  padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+  padding-bottom: 0 !important;
   margin: 0 !important;
   overflow-x: hidden !important;
 }
 
 /* Main content containers need bottom padding to clear navigation */
 .main-content {
-  padding-bottom: 60px !important; /* Minimal space for bottom navigation */
+  padding-bottom: 20px !important; /* Minimal space for bottom navigation */
   margin-bottom: 0 !important;
   min-height: auto !important;
   height: 100% !important;
@@ -160,7 +160,7 @@ body {
 /* Fix for content sections to not be cut off */
 .content-section {
   margin-bottom: 0 !important;
-  padding-bottom: 65px !important;
+  padding-bottom: 20px !important;
   min-height: auto !important;
   position: relative !important;
 }
@@ -171,9 +171,9 @@ html, body {
   scroll-behavior: smooth;
 }
 
-/* Ensure cards and components have proper bottom spacing */
+/* Ensure cards and components have minimal bottom spacing */
 .card-container, .component-container {
-  margin-bottom: 2rem !important;
+  margin-bottom: 0 !important;
 }
 
 /* Specific spacing for macro cards grid to clear navigation */
@@ -188,18 +188,29 @@ html, body {
   padding-bottom: 0 !important;
 }
 
-/* Fix for mobile safe areas */
+/* Aggressive spacing reduction for mobile */
+.content-section > div:last-child {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.macros-grid {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* Disable mobile safe areas that add excessive padding */
 @supports (padding: max(0px)) {
   body {
-    padding-bottom: max(100px, env(safe-area-inset-bottom)) !important;
+    padding-bottom: 0 !important;
   }
   
   .main-content {
-    padding-bottom: max(100px, calc(100px + env(safe-area-inset-bottom))) !important;
+    padding-bottom: 20px !important;
   }
   
   .page-container {
-    padding-bottom: max(120px, calc(120px + env(safe-area-inset-bottom))) !important;
+    padding-bottom: 0 !important;
   }
 }
 
