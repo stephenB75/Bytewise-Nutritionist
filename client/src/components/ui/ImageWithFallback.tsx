@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 
 // Simple CSS gradient fallbacks - no external dependencies
 const GRADIENT_PLACEHOLDERS = [

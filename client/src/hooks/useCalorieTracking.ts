@@ -3,7 +3,7 @@
  * Manages daily calorie tracking and communication between calculator and logger
  */
 
-import { useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface CalculatedCalories {

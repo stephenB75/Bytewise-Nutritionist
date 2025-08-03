@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Food } from '@shared/schema';
 import { useDragDrop } from './DragDropProvider';
 import { Card } from './ui/card';
