@@ -31,6 +31,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [confirmingEmail, setConfirmingEmail] = useState(false);
   const { toast } = useToast();
 
   const handleEmailAuth = async (e: React.FormEvent) => {
@@ -50,18 +51,82 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
       const data = await response.json();
 
       if (response.ok) {
+        if (isSignUp) {
+          toast({
+            title: "Account created!",
+            description: "Please check your email to verify your account before signing in.",
+          });
+          // Switch to sign-in mode after successful signup
+          setIsSignUp(false);
+          setPassword(''); // Clear password for security
+        } else {
+          toast({
+            title: "Welcome back!",
+            description: "You've been signed in successfully.",
+          });
+          
+          // Force a page reload to update authentication state
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        }
+      } else {
+        if (data.message === "Email not confirmed") {
+          toast({
+            title: "Email not confirmed",
+            description: "Please check your email and click the confirmation link, or use the 'Confirm Email' button below for testing.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Authentication failed",
+            description: data.message || "Please try again.",
+            variant: "destructive",
+          });
+        }
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleConfirmEmail = async () => {
+    if (!email) {
+      toast({
+        title: "Email required",
+        description: "Please enter your email address first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setConfirmingEmail(true);
+    
+    try {
+      const response = await fetch('/api/auth/confirm-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
         toast({
-          title: isSignUp ? "Account created!" : "Welcome back!",
-          description: data.message || (isSignUp ? "Please check your email to verify your account." : "You've been signed in successfully."),
+          title: "Email confirmed!",
+          description: "You can now sign in with your credentials.",
         });
-        
-        // Force a page reload to update authentication state
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
       } else {
         toast({
-          title: "Authentication failed",
+          title: "Confirmation failed",
           description: data.message || "Please try again.",
           variant: "destructive",
         });
@@ -73,7 +138,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
         variant: "destructive",
       });
     } finally {
-      setLoading(false);
+      setConfirmingEmail(false);
     }
   };
 
@@ -195,6 +260,32 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
             )}
           </Button>
         </form>
+
+        {/* Email Confirmation Helper */}
+        <div className="text-center">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleConfirmEmail}
+            disabled={confirmingEmail || !email}
+            className="text-sm py-2 px-4 border-[#1f4aa6] text-[#1f4aa6] hover:bg-[#1f4aa6] hover:text-white"
+          >
+            {confirmingEmail ? (
+              <div className="flex items-center">
+                <div className="w-4 h-4 border-2 border-[#1f4aa6]/30 border-t-[#1f4aa6] rounded-full animate-spin mr-2" />
+                Confirming Email...
+              </div>
+            ) : (
+              <>
+                <Mail className="w-4 h-4 mr-2" />
+                Confirm Email (Dev Testing)
+              </>
+            )}
+          </Button>
+          <p className="text-xs text-gray-500 mt-2">
+            Use this button to confirm your email for testing purposes
+          </p>
+        </div>
 
         {/* OAuth Providers */}
         <div className="space-y-3">

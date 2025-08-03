@@ -9,7 +9,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   await setupAuth(app);
 
   // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: AuthenticatedRequest, res: Response) => {
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res: Response) => {
     const userId = req.user?.id;
     if (!userId) {
       res.status(401).json({ message: "User not found" });
@@ -107,8 +107,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Development helper: Auto-confirm user email for testing
+  app.post('/api/auth/confirm-email', async (req: Request, res: Response) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+      
+      console.log('Confirming email for:', email);
+      
+      // Use service role client to update user email confirmation
+      const { data: users, error: listError } = await serverSupabase.auth.admin.listUsers();
+      
+      if (listError) {
+        console.error('Error listing users:', listError);
+        return res.status(500).json({ message: "Failed to find user" });
+      }
+      
+      const user = users.users.find(u => u.email === email);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Update user to confirm email
+      const { error: updateError } = await serverSupabase.auth.admin.updateUserById(
+        user.id,
+        { email_confirm: true }
+      );
+      
+      if (updateError) {
+        console.error('Error confirming email:', updateError);
+        return res.status(500).json({ message: "Failed to confirm email" });
+      }
+      
+      console.log('Email confirmed successfully for:', email);
+      res.json({ message: "Email confirmed successfully" });
+      
+    } catch (error) {
+      console.error('Email confirmation error:', error);
+      res.status(500).json({ message: "Email confirmation failed" });
+    }
+  });
+
   // Meals API for logger
-  app.post('/api/meals/logged', isAuthenticated, async (req: AuthenticatedRequest, res: Response) => {
+  app.post('/api/meals/logged', isAuthenticated, async (req: any, res: Response) => {
     const userId = req.user?.id;
     if (!userId) {
       res.status(401).json({ message: "User not found" });
@@ -126,7 +170,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ success: true, meal: mealData });
   });
 
-  app.get('/api/meals/logged', isAuthenticated, async (req: AuthenticatedRequest, res: Response) => {
+  app.get('/api/meals/logged', isAuthenticated, async (req: any, res: Response) => {
     const userId = req.user?.id;
     if (!userId) {
       res.status(401).json({ message: "User not found" });
@@ -140,7 +184,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Calculate calories API with real USDA integration (no auth required)
-  app.post('/api/calculate-calories', optionalAuth, async (req: AuthenticatedRequest, res: Response) => {
+  app.post('/api/calculate-calories', optionalAuth, async (req: any, res: Response) => {
     const { ingredient, measurement } = req.body;
     
     // Use real USDA service for calorie calculation
@@ -150,7 +194,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // User profile update endpoint
-  app.put('/api/auth/user/update', isAuthenticated, async (req: AuthenticatedRequest, res: Response) => {
+  app.put('/api/auth/user/update', isAuthenticated, async (req: any, res: Response) => {
     const userId = req.user?.id;
     if (!userId) {
       res.status(401).json({ message: "User not found" });
@@ -173,7 +217,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // User data deletion endpoint
-  app.delete('/api/user/delete-data', isAuthenticated, async (req: AuthenticatedRequest, res: Response) => {
+  app.delete('/api/user/delete-data', isAuthenticated, async (req: any, res: Response) => {
     const userId = req.user?.id;
     if (!userId) {
       res.status(401).json({ message: "User not found" });
@@ -193,7 +237,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // USDA Food Database Sync API
-  app.post('/api/sync/food-database', isAuthenticated, async (req: AuthenticatedRequest, res: Response) => {
+  app.post('/api/sync/food-database', isAuthenticated, async (req: any, res: Response) => {
     console.log('Starting USDA food database sync...');
       
       // Sync popular foods for offline access
@@ -237,7 +281,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // User Data Sync API
-  app.post('/api/sync/user-data', isAuthenticated, async (req: AuthenticatedRequest, res: Response) => {
+  app.post('/api/sync/user-data', isAuthenticated, async (req: any, res: Response) => {
     try {
       const userId = req.user?.id;
       if (!userId) {
