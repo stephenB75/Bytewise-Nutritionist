@@ -458,6 +458,21 @@ export class USDAService {
       'l': 1000,
       'liter': 1000,
       'liters': 1000,
+      // Common user phrases
+      'scoop': 30, // protein powder scoop ≈ 30g
+      'pinch': 0.5, // pinch of salt/spice ≈ 0.5g
+      'dash': 0.6, // dash of liquid/spice ≈ 0.6ml
+      'splash': 5, // splash of liquid ≈ 5ml
+      'dollop': 15, // dollop ≈ 1 tablespoon
+      'handful': 40, // handful of nuts/berries ≈ 40g
+      'slice': 25, // average slice of bread/fruit ≈ 25g
+      'piece': 50, // piece of fruit/food ≈ 50g
+      'wedge': 15, // wedge of lemon/lime ≈ 15g
+      'sprig': 1, // sprig of herbs ≈ 1g
+      'leaf': 0.5, // single leaf ≈ 0.5g
+      'clove': 3, // garlic clove ≈ 3g
+      'stick': 113, // butter stick ≈ 113g
+      'pat': 5, // pat of butter ≈ 5g
     };
 
     // Item-specific conversions
