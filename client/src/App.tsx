@@ -110,7 +110,7 @@ export default function App() {
 
     switch (activeTab) {
       case 'redesigned':
-        return <ModernFoodLayout onNavigate={handleNavigate} />;
+        return <ModernFoodApp onNavigate={handleNavigate} />;
       case 'dashboard':
         return <ModernFoodApp onNavigate={handleNavigate} />;
       case 'fresh':
@@ -122,7 +122,7 @@ export default function App() {
       case 'profile':
         return <ProfileEnhanced onNavigate={handleNavigate} />;
       default:
-        return <ModernFoodLayout onNavigate={handleNavigate} />;
+        return <ModernFoodApp onNavigate={handleNavigate} />;
     }
   };
 
