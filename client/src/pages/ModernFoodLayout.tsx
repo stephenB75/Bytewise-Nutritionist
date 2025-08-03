@@ -577,7 +577,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       {/* Content Section - Completely Separate and Underneath */}
       <div className="px-6 py-8 bg-black content-section">
         {/* Food Search Bar - Moved Here */}
-        <div className="mb-6 main-content">
+        <div className="mb-6 force-bottom-spacing" style={{ paddingBottom: '12rem !important' }}>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <Input
@@ -616,7 +616,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
         {/* Daily View */}
         {trackingView === 'daily' && (
-          <div className="space-y-4">
+          <div className="space-y-4 force-bottom-spacing" style={{ paddingBottom: '12rem !important' }}>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-2xl font-bold text-white">Today's Meals</h2>
               <div className="text-orange-400 font-bold">
@@ -684,7 +684,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
         {/* Weekly View */}
         {trackingView === 'weekly' && (
-          <div className="space-y-4">
+          <div className="space-y-4 force-bottom-spacing" style={{ paddingBottom: '12rem !important' }}>
             <h2 className="text-2xl font-bold text-white mb-4">This Week's Progress</h2>
             
             {/* Weekly Progress Card */}
@@ -708,7 +708,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             </Card>
 
             {/* Daily Breakdown */}
-            <div className="grid grid-cols-1 gap-3">
+            <div className="grid grid-cols-1 gap-3 force-bottom-spacing" style={{ marginBottom: '10rem !important', paddingBottom: '5rem !important' }}>
               {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, index) => {
                 const dayCalories = Math.round(dailyCalories * (0.7 + Math.random() * 0.6)); // Simulated data
                 const isToday = index === new Date().getDay();
@@ -775,9 +775,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       </div>
 
       {/* Content Section - Completely Separate and Underneath */}
-      <div className="px-6 py-8 bg-black">
+      <div className="px-6 py-8 bg-black content-section">
         {/* Goal Progress Cards */}
-        <div className="space-y-6 mb-8">
+        <div className="space-y-6 mb-8 force-bottom-spacing" style={{ paddingBottom: '12rem !important' }}>
           {/* Daily Goals */}
           <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
             <div className="flex items-center justify-between mb-4">
