@@ -16,6 +16,7 @@ import { DataManagementPanel } from '@/components/DataManagementPanel';
 import { AchievementCelebration } from '@/components/AchievementCelebration';
 import { useAuth } from '@/hooks/useAuth';
 import { useGoalAchievements } from '@/hooks/useGoalAchievements';
+import { useRotatingBackground } from '@/hooks/useRotatingBackground';
 import { 
   Search, 
   Heart, 
@@ -44,10 +45,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const [searchQuery, setSearchQuery] = useState('');
   const [showAchievement, setShowAchievement] = useState(false);
   const [currentAchievement, setCurrentAchievement] = useState<any>(null);
+  const [dailyCalories, setDailyCalories] = useState(1850);
+  const [weeklyCalories, setWeeklyCalories] = useState(12950);
+  const [goalCalories] = useState(2100);
+  const [weeklyGoal] = useState(14700);
   
   // Auth and achievement hooks
   const { user, loading } = useAuth();
   const { achievements, celebrationAchievement, showCelebration, closeCelebration } = useGoalAchievements();
+  const { backgroundImage } = useRotatingBackground(activeTab);
 
   // Handle new achievements
   useEffect(() => {
@@ -117,9 +123,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       {/* Full-Screen Hero Section */}
       <div className="relative h-screen overflow-hidden">
         <div 
-          className="absolute inset-0 bg-cover bg-center"
+          className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out"
           style={{
-            backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=1600&h=1200&fit=crop')`
+            backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`
           }}
         />
         
@@ -163,53 +169,177 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
       {/* Content Section - Completely Separate and Underneath */}
       <div className="px-6 py-8 bg-black">
-        {/* Daily Progress Metrics Cards on Macro and Micro Nutrients */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-white mb-4">Today's Progress</h2>
-          <div className="grid grid-cols-2 gap-4">
-            {/* Macro Nutrients */}
-            <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4 hover:bg-white/20 transition-all">
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center mb-3">
-                <span className="text-2xl">💪</span>
-              </div>
-              <h3 className="text-white font-semibold text-lg">Macros</h3>
-              <p className="text-gray-300 text-sm">45g/150g protein</p>
-              <p className="text-gray-300 text-sm">180g/250g carbs</p>
-              <p className="text-gray-300 text-sm">65g/85g fat</p>
-            </Card>
+        {/* Enhanced Daily Progress Metrics with Graphs */}
+        <div className="space-y-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-black text-white">Today's Progress</h2>
+            <Button 
+              variant="ghost" 
+              className="text-orange-400 hover:text-orange-300"
+              onClick={() => {
+                // Check calorie calculator functionality
+                setActiveTab('calculator');
+                console.log('Navigating to calculator for nutrition tracking');
+              }}
+            >
+              Track Food
+            </Button>
+          </div>
 
-            <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4 hover:bg-white/20 transition-all">
-              <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mb-3">
-                <span className="text-2xl">🌟</span>
+          {/* Daily Calorie Progress Card with Graph */}
+          <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-orange-500/20 rounded-xl">
+                  <Flame className="w-5 h-5 text-orange-400" />
+                </div>
+                <div>
+                  <h3 className="text-white font-semibold">Daily Calories</h3>
+                  <p className="text-gray-400 text-sm">{dailyCalories}/{goalCalories} kcal</p>
+                </div>
               </div>
-              <h3 className="text-white font-semibold text-lg">Micros</h3>
-              <p className="text-gray-300 text-sm">65mg/90mg Vitamin C</p>
-              <p className="text-gray-300 text-sm">2.8mg/3.2mg Iron</p>
-              <p className="text-gray-300 text-sm">850mg/1000mg Calcium</p>
-            </Card>
+              <div className="text-right">
+                <div className="text-2xl font-bold text-orange-400">{Math.round((dailyCalories/goalCalories)*100)}%</div>
+                <div className="text-xs text-gray-400">of goal</div>
+              </div>
+            </div>
+            {/* Progress Bar Graph */}
+            <div className="relative h-3 bg-gray-800 rounded-full overflow-hidden mb-4">
+              <div 
+                className="absolute left-0 top-0 h-full bg-gradient-to-r from-orange-400 to-red-500 rounded-full transition-all duration-1000"
+                style={{ width: `${Math.min((dailyCalories/goalCalories)*100, 100)}%` }}
+              />
+              {dailyCalories >= goalCalories && (
+                <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full animate-pulse" />
+              )}
+            </div>
+            {/* Mini Graph Line */}
+            <div className="flex items-end space-x-1 h-8">
+              {[0.2, 0.4, 0.6, 0.8, 0.9, 0.7, 0.88].map((height, i) => (
+                <div 
+                  key={i}
+                  className="flex-1 bg-orange-400/30 rounded-t"
+                  style={{ height: `${height * 100}%` }}
+                />
+              ))}
+            </div>
+          </Card>
 
-            <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4 hover:bg-white/20 transition-all">
-              <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex items-center justify-center mb-3">
-                <span className="text-2xl">🔥</span>
+          {/* Weekly Progress Card with Trend Line */}
+          <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-blue-500/20 rounded-xl">
+                  <Calendar className="w-5 h-5 text-blue-400" />
+                </div>
+                <div>
+                  <h3 className="text-white font-semibold">Weekly Progress</h3>
+                  <p className="text-gray-400 text-sm">{weeklyCalories}/{weeklyGoal} kcal</p>
+                </div>
               </div>
-              <h3 className="text-white font-semibold text-lg">Calories</h3>
-              <p className="text-gray-300 text-sm">1,234/2,100 kcal</p>
-              <div className="w-full bg-gray-700 rounded-full h-2 mt-2">
-                <div className="bg-orange-500 h-2 rounded-full" style={{width: '59%'}}></div>
+              <div className="text-right">
+                <div className="text-2xl font-bold text-blue-400">{Math.round((weeklyCalories/weeklyGoal)*100)}%</div>
+                <div className="text-xs text-gray-400">completed</div>
+              </div>
+            </div>
+            {/* Weekly Progress Bar */}
+            <div className="relative h-3 bg-gray-800 rounded-full overflow-hidden mb-4">
+              <div 
+                className="absolute left-0 top-0 h-full bg-gradient-to-r from-blue-400 to-cyan-500 rounded-full transition-all duration-1000"
+                style={{ width: `${Math.min((weeklyCalories/weeklyGoal)*100, 100)}%` }}
+              />
+            </div>
+            {/* Weekly Trend Graph */}
+            <div className="flex items-end space-x-1 h-12">
+              {[0.3, 0.5, 0.7, 0.6, 0.8, 0.9, 0.88].map((height, i) => (
+                <div key={i} className="flex-1 flex flex-col justify-end">
+                  <div 
+                    className="bg-blue-400/40 rounded-t mb-1"
+                    style={{ height: `${height * 70}%` }}
+                  />
+                  <div className="text-xs text-gray-500 text-center">
+                    {['M', 'T', 'W', 'T', 'F', 'S', 'S'][i]}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {/* Macros Breakdown with Mini Graphs */}
+          <div className="grid grid-cols-3 gap-4">
+            <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4">
+              <div className="text-center">
+                <div className="text-sm text-gray-400 mb-1">Protein</div>
+                <div className="text-xl font-bold text-green-400 mb-2">140g</div>
+                <div className="flex items-end space-x-px h-6">
+                  {[0.4, 0.6, 0.8, 0.7, 0.9].map((height, i) => (
+                    <div 
+                      key={i}
+                      className="flex-1 bg-green-400/30 rounded-t"
+                      style={{ height: `${height * 100}%` }}
+                    />
+                  ))}
+                </div>
               </div>
             </Card>
-
-            <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4 hover:bg-white/20 transition-all">
-              <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center mb-3">
-                <span className="text-2xl">💧</span>
+            <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4">
+              <div className="text-center">
+                <div className="text-sm text-gray-400 mb-1">Carbs</div>
+                <div className="text-xl font-bold text-yellow-400 mb-2">180g</div>
+                <div className="flex items-end space-x-px h-6">
+                  {[0.5, 0.7, 0.6, 0.8, 0.85].map((height, i) => (
+                    <div 
+                      key={i}
+                      className="flex-1 bg-yellow-400/30 rounded-t"
+                      style={{ height: `${height * 100}%` }}
+                    />
+                  ))}
+                </div>
               </div>
-              <h3 className="text-white font-semibold text-lg">Hydration</h3>
-              <p className="text-gray-300 text-sm">6/8 glasses water</p>
-              <div className="w-full bg-gray-700 rounded-full h-2 mt-2">
-                <div className="bg-blue-500 h-2 rounded-full" style={{width: '75%'}}></div>
+            </Card>
+            <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4">
+              <div className="text-center">
+                <div className="text-sm text-gray-400 mb-1">Fat</div>
+                <div className="text-xl font-bold text-purple-400 mb-2">65g</div>
+                <div className="flex items-end space-x-px h-6">
+                  {[0.6, 0.4, 0.7, 0.9, 0.8].map((height, i) => (
+                    <div 
+                      key={i}
+                      className="flex-1 bg-purple-400/30 rounded-t"
+                      style={{ height: `${height * 100}%` }}
+                    />
+                  ))}
+                </div>
               </div>
             </Card>
           </div>
+
+          {/* Goal Achievement Check */}
+          {dailyCalories >= goalCalories && (
+            <Card className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 border-green-500/30 p-6">
+              <div className="flex items-center space-x-4">
+                <div className="p-3 bg-green-500 rounded-full">
+                  <Trophy className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-white font-bold text-lg">Daily Goal Achieved!</h3>
+                  <p className="text-green-200">You've reached your calorie target for today. Keep it up!</p>
+                </div>
+                <Button 
+                  onClick={() => {
+                    setShowAchievement(true);
+                    setCurrentAchievement({
+                      title: "Daily Goal Achieved!",
+                      description: "You've hit your calorie target for today"
+                    });
+                  }}
+                  className="bg-green-500 hover:bg-green-600 text-white"
+                >
+                  Celebrate
+                </Button>
+              </div>
+            </Card>
+          )}
         </div>
       </div>
     </div>
@@ -220,9 +350,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       {/* Full-Screen Hero Section */}
       <div className="relative h-screen overflow-hidden">
         <div 
-          className="absolute inset-0 bg-cover bg-center"
+          className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out"
           style={{
-            backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=1600&h=1200&fit=crop')`
+            backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`
           }}
         />
         
@@ -378,9 +508,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       {/* Full-Screen Hero Section */}
       <div className="relative h-screen overflow-hidden">
         <div 
-          className="absolute inset-0 bg-cover bg-center"
+          className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out"
           style={{
-            backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1482049016688-2d3e1b311543?w=1600&h=1200&fit=crop')`
+            backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`
           }}
         />
         
@@ -798,16 +928,44 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   };
 
   return (
-    <div className="min-h-screen bg-black overflow-x-hidden">
+    <div className="min-h-screen bg-black overflow-x-hidden overflow-y-auto">
+
+
       {/* Minimal Dark Header */}
       <div className="absolute top-0 left-0 right-0 z-50 bg-black/70 backdrop-blur-xl border-b border-gray-800/50 px-4 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <LogoBrand />
+            <LogoBrand 
+              size="sm" 
+              clickable 
+              onClick={() => setActiveTab('home')}
+            />
           </div>
           <div className="flex items-center space-x-2">
             {/* Notifications */}
-            <Button size="sm" variant="ghost" className="relative text-white hover:bg-white/10 rounded-full p-2">
+            <Button 
+              size="sm" 
+              variant="ghost" 
+              className="relative text-white hover:bg-white/10 rounded-full p-2"
+              onClick={() => {
+                console.log('Notification clicked - checking functionality');
+                if ('Notification' in window && Notification.permission === 'granted') {
+                  new Notification('ByteWise Nutrition', {
+                    body: 'Daily goal reminder: Stay on track with your nutrition!',
+                    icon: '/icon-192.svg'
+                  });
+                } else if ('Notification' in window) {
+                  Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                      new Notification('ByteWise Nutrition', {
+                        body: 'Notifications enabled! You\'ll get goal reminders.',
+                        icon: '/icon-192.svg'
+                      });
+                    }
+                  });
+                }
+              }}
+            >
               <Bell className="w-5 h-5" />
               {achievements && achievements.length > 0 && (
                 <div className="absolute -top-1 -right-1 h-4 w-4 bg-orange-500 rounded-full flex items-center justify-center">
@@ -826,8 +984,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         </div>
       </div>
 
-      {/* Full-Screen Content */}
-      <div className="bg-black min-h-screen pt-16">
+      {/* Full-Screen Content with Vertical Scroll */}
+      <div className="bg-black min-h-screen pt-16 overflow-y-auto">
         {renderContent()}
       </div>
 
@@ -867,11 +1025,18 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       </div>
 
       {/* Achievement Celebration Modal */}
-      <AchievementCelebration
-        isOpen={showAchievement}
-        onClose={() => setShowAchievement(false)}
-        achievement={currentAchievement}
-      />
+      {(showAchievement || showCelebration) && (
+        <AchievementCelebration
+          isOpen={showAchievement || showCelebration}
+          onClose={() => {
+            setShowAchievement(false);
+            if (showCelebration) {
+              closeCelebration();
+            }
+          }}
+          achievement={currentAchievement || celebrationAchievement}
+        />
+      )}
     </div>
   );
 }
