@@ -316,15 +316,15 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
             <div className="text-2xl font-bold text-green-700">{userStats.achievementsCompleted}</div>
             <div className="text-sm text-green-600">Completed</div>
           </Card>
-        <Card className="bg-orange-500/20 backdrop-blur-md border-orange-500/30 p-4 text-center">
-          <div className="text-2xl font-bold text-orange-400">{userStats.currentStreak}</div>
-          <div className="text-sm text-gray-300">Current Streak</div>
-        </Card>
-        <Card className="bg-purple-500/20 backdrop-blur-md border-purple-500/30 p-4 text-center">
-          <div className="text-2xl font-bold text-purple-400">Level {userStats.level}</div>
-          <div className="text-sm text-gray-300">{userStats.nextLevelPoints} to next</div>
-        </Card>
-      </div>
+          <Card className="bg-orange-500/20 backdrop-blur-md border-orange-500/30 p-4 text-center">
+            <div className="text-2xl font-bold text-orange-400">{userStats.currentStreak}</div>
+            <div className="text-sm text-gray-300">Current Streak</div>
+          </Card>
+          <Card className="bg-purple-500/20 backdrop-blur-md border-purple-500/30 p-4 text-center">
+            <div className="text-2xl font-bold text-purple-400">Level {userStats.level}</div>
+            <div className="text-sm text-gray-300">{userStats.nextLevelPoints} to next</div>
+          </Card>
+        </div>
 
       {/* Category Filter */}
       <div className="flex space-x-2 overflow-x-auto pb-2">
@@ -425,6 +425,7 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
           </div>
         </div>
       </Card>
+      </div>
     </div>
   );
 }

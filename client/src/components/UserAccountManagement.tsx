@@ -362,6 +362,7 @@ export function UserAccountManagement({ onClose }: UserAccountManagementProps) {
           </div>
         </div>
       </Card>
+      </div>
     </div>
   );
 }

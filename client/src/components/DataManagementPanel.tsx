@@ -123,11 +123,9 @@ export function DataManagementPanel() {
               )}
             </Button>
           </div>
-        </div>
+        </Card>
 
         <Separator />
-
-        </Card>
 
         {/* Sync & Backup Section */}
         <Card className="bg-white border-gray-200 p-6">
@@ -170,7 +168,7 @@ export function DataManagementPanel() {
               Backup Settings
             </Button>
           </div>
-        </div>
+        </Card>
 
         <Separator />
 
