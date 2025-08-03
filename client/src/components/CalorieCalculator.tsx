@@ -33,7 +33,9 @@ import {
   Apple,
   Scale,
   Calendar,
-  Plus
+  Plus,
+  Trophy,
+  Sparkles
 } from 'lucide-react';
 
 interface IngredientAnalysis {
@@ -73,6 +75,8 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
   const [selectedUnit, setSelectedUnit] = useState('');
   const [amount, setAmount] = useState('');
   const [recentAnalyses, setRecentAnalyses] = useState<IngredientAnalysis[]>([]);
+  const [showLoggedAnimation, setShowLoggedAnimation] = useState(false);
+  const [loggedData, setLoggedData] = useState<any>(null);
   const [ingredientSuggestions, setIngredientSuggestions] = useState<Array<{category: string; key: string; data: IngredientData}>>([]);
   const [selectedIngredient, setSelectedIngredient] = useState<{category: string; key: string; data: IngredientData} | null>(null);
   const [usdaFoodSuggestions, setUsdaFoodSuggestions] = useState<EnhancedFoodItem[]>([]);
@@ -336,6 +340,23 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
     }));
     window.dispatchEvent(new CustomEvent('refresh-weekly-data'));
     
+    // Store logged data and show animation
+    setLoggedData({
+      name: mealData.name,
+      calories: mealData.calories,
+      mealType,
+      protein: mealData.protein,
+      carbs: mealData.carbs,
+      fat: mealData.fat
+    });
+    setShowLoggedAnimation(true);
+    
+    // Auto-hide animation after 3 seconds
+    setTimeout(() => {
+      setShowLoggedAnimation(false);
+      setLoggedData(null);
+    }, 3000);
+    
     // Show success toast notification
     window.dispatchEvent(new CustomEvent('show-toast', {
       detail: { 
@@ -461,7 +482,52 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
+      {/* Animated Success Dialog */}
+      {showLoggedAnimation && loggedData && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl p-8 mx-4 max-w-sm w-full shadow-2xl animate-in zoom-in-95 duration-500">
+            <div className="text-center space-y-4">
+              <div className="relative">
+                <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto animate-pulse">
+                  <Trophy className="w-10 h-10 text-white" />
+                </div>
+                <div className="absolute -top-2 -right-2">
+                  <Sparkles className="w-6 h-6 text-yellow-400 animate-spin" />
+                </div>
+              </div>
+              
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Successfully Logged!</h3>
+                <p className="text-gray-600 font-medium">{loggedData.name}</p>
+                <p className="text-2xl font-bold text-green-600 mt-2">{loggedData.calories} calories</p>
+              </div>
+              
+              <div className="flex justify-around text-sm">
+                <div className="text-center">
+                  <div className="text-green-600 font-bold">{loggedData.protein?.toFixed(1)}g</div>
+                  <div className="text-gray-500">Protein</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-yellow-600 font-bold">{loggedData.carbs?.toFixed(1)}g</div>
+                  <div className="text-gray-500">Carbs</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-purple-600 font-bold">{loggedData.fat?.toFixed(1)}g</div>
+                  <div className="text-gray-500">Fat</div>
+                </div>
+              </div>
+              
+              <div className="pt-2">
+                <Badge className="bg-green-100 text-green-700 border-green-200">
+                  Added to {loggedData.mealType}
+                </Badge>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Main Calculator */}
       <Card className="p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg">
         <div className="flex items-center gap-3 mb-6">

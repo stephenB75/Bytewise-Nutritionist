@@ -393,7 +393,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             placeholder="Search foods to log..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-12 h-14 bg-white/10 border-white/20 text-white placeholder-gray-400 backdrop-blur-md rounded-2xl text-lg"
+            className="pl-12 pr-4 h-14 bg-white/10 border-white/20 text-white placeholder-gray-400 backdrop-blur-md rounded-2xl text-lg"
           />
         </div>
         {/* Daily/Weekly Tabs */}
@@ -402,7 +402,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <Calendar className="w-4 h-4 mr-2" />
             Today
           </Button>
-          <Button variant="outline" className="border-white/20 text-white hover:bg-white/10 font-semibold px-6 py-3 rounded-xl">
+          <Button variant="outline" className="border-green-500/50 text-green-400 bg-green-500/10 hover:bg-green-500/20 font-semibold px-6 py-3 rounded-xl">
             This Week
           </Button>
         </div>
@@ -411,18 +411,23 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         <div className="space-y-4">
           <h3 className="text-xl font-bold text-white">Logged Today</h3>
           {[
-            { name: 'Breakfast: Oatmeal with Berries', calories: 320, time: '8:30 AM' },
-            { name: 'Lunch: Grilled Chicken Salad', calories: 450, time: '1:15 PM' },
-            { name: 'Snack: Greek Yogurt', calories: 150, time: '3:45 PM' },
+            { name: 'Ham, sliced (2 oz)', calories: 117, time: '8:30 AM', protein: '19.04g', carbs: '0.94g', fat: '3.87g' },
+            { name: 'Carrots, raw (100g)', calories: 44, time: '12:15 PM', protein: '0.87g', carbs: '9.68g', fat: '0.24g' },
+            { name: 'Greek Yogurt (150g)', calories: 150, time: '3:45 PM', protein: '12g', carbs: '8g', fat: '6g' },
           ].map((meal, index) => (
             <Card key={index} className="bg-white/10 backdrop-blur-md border-white/20 p-4">
               <div className="flex items-center justify-between">
-                <div>
+                <div className="flex-1">
                   <h4 className="text-white font-semibold">{meal.name}</h4>
                   <p className="text-gray-400 text-sm">{meal.time}</p>
+                  <div className="flex space-x-4 mt-1">
+                    <span className="text-xs text-green-400">P: {meal.protein}</span>
+                    <span className="text-xs text-yellow-400">C: {meal.carbs}</span>
+                    <span className="text-xs text-purple-400">F: {meal.fat}</span>
+                  </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-orange-400 font-bold">{meal.calories} cal</p>
+                  <p className="text-orange-400 font-bold text-lg">{meal.calories} cal</p>
                   <Button size="sm" variant="ghost" className="text-gray-400 hover:text-white">
                     Edit
                   </Button>
@@ -440,9 +445,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       {/* Full-Screen Hero Section */}
       <div className="relative h-screen overflow-hidden">
         <div 
-          className="absolute inset-0 bg-cover bg-center"
+          className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out"
           style={{
-            backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=1600&h=1200&fit=crop')`
+            backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`
           }}
         />
         
@@ -568,9 +573,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             {/* Full-Screen Hero Section */}
             <div className="relative h-screen overflow-hidden">
               <div 
-                className="absolute inset-0 bg-cover bg-center"
+                className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out"
                 style={{
-                  backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=1600&h=1200&fit=crop')`
+                  backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`
                 }}
               />
               
@@ -718,9 +723,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             {/* Full-Screen Hero Section */}
             <div className="relative h-screen overflow-hidden">
               <div 
-                className="absolute inset-0 bg-cover bg-center"
+                className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out"
                 style={{
-                  backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1600&h=1200&fit=crop')`
+                  backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`
                 }}
               />
               
@@ -766,9 +771,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             {/* Full-Screen Hero Section */}
             <div className="relative h-screen overflow-hidden">
               <div 
-                className="absolute inset-0 bg-cover bg-center"
+                className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out"
                 style={{
-                  backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=1600&h=1200&fit=crop')`
+                  backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`
                 }}
               />
               
