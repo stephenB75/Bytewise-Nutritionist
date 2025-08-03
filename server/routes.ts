@@ -97,20 +97,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      res.json({
-        success: true,
-        message: `Successfully synced ${syncedCount} foods from USDA database`,
-        syncResults,
-        timestamp: new Date().toISOString()
-      });
-    } catch (error) {
-      console.error("Error syncing food database:", error);
-      res.status(500).json({ 
-        success: false,
-        message: "Failed to sync food database",
-        error: (error as Error).message
-      });
-    }
+    res.json({
+      success: true,
+      message: `Successfully synced ${syncedCount} foods from USDA database`,
+      syncResults,
+      timestamp: new Date().toISOString()
+    });
   }));
 
   // User Data Sync API

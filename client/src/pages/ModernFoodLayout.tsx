@@ -3,8 +3,7 @@
  * Features: Hero sections, food cards, nutrition breakdown, and modern navigation
  */
 
-import * as React from 'react';
-const { useState, useEffect } = React;
+import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
