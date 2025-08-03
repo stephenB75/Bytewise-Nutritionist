@@ -43,7 +43,10 @@ interface ModernFoodLayoutProps {
 }
 
 export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) {
-  const { user, isLoading: authLoading } = useAuth();
+  // Temporarily disable auth hook to test
+  const user = null;
+  const authLoading = false;
+  // const { user, isLoading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState('home');
   const [searchQuery, setSearchQuery] = useState('');
   const [showAchievement, setShowAchievement] = useState(false);
