@@ -1,10 +1,7 @@
-import * as React from "react";
+import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import SimpleApp from "./SimpleApp";
-
-// Ensure React is globally available
-(window as any).React = React;
 
 import "./index.css";
 

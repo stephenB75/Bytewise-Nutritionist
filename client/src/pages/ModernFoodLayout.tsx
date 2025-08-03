@@ -3,7 +3,7 @@
  * Features: Hero sections, food cards, nutrition breakdown, and modern navigation
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -43,10 +43,7 @@ interface ModernFoodLayoutProps {
 }
 
 export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) {
-  // Temporarily disable auth hook to test
-  const user = null;
-  const authLoading = false;
-  // const { user, isLoading: authLoading } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState('home');
   const [searchQuery, setSearchQuery] = useState('');
   const [showAchievement, setShowAchievement] = useState(false);

@@ -8,6 +8,7 @@
 import React, { useState, useEffect } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from '@/lib/queryClient';
+import ModernFoodLayout from './pages/ModernFoodLayout';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('redesigned');
@@ -76,15 +77,9 @@ export default function App() {
     return null;
   };
 
-  // Import and render the clean layout
-  const CleanFoodLayout = React.lazy(() => import('./pages/CleanFoodLayout'));
-  
+  // Render ModernFoodLayout
   const renderCurrentPage = () => {
-    return (
-      <React.Suspense fallback={<div className="text-white p-8 bg-black min-h-screen flex items-center justify-center">Loading ByteWise...</div>}>
-        <CleanFoodLayout onNavigate={handleNavigate} />
-      </React.Suspense>
-    );
+    return <ModernFoodLayout onNavigate={handleNavigate} />;
   };
 
   return (
