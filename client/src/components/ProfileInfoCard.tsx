@@ -100,7 +100,7 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="relative">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-600 to-blue-600 flex items-center justify-center text-white text-xl font-bold shadow-2xl border-2 border-white/50 backdrop-blur-sm">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#1f4aa6] via-[#45c73e] to-[#faed39] flex items-center justify-center text-white text-xl font-bold shadow-2xl border-2 border-white/50 backdrop-blur-sm">
                 {user?.profileImageUrl ? (
                   <img
                     src={user.profileImageUrl}
@@ -112,7 +112,7 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
                 )}
               </div>
               {user?.emailVerified && (
-                <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full flex items-center justify-center border-2 border-white shadow-lg">
+                <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-[#45c73e] rounded-full flex items-center justify-center border-2 border-white shadow-lg">
                   <Verified className="w-2.5 h-2.5 text-white" />
                 </div>
               )}
@@ -124,7 +124,7 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
                   Profile Details
                 </h4>
                 {user?.emailVerified && (
-                  <Badge className="text-xs bg-gradient-to-r from-emerald-500 to-green-600 text-white border-0 shadow-md">
+                  <Badge className="text-xs bg-[#45c73e] text-white border-0 shadow-md">
                     <Verified className="w-3 h-3 mr-1" />
                     Verified
                   </Badge>
@@ -143,7 +143,7 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
                 className="h-10 w-10 p-0 bg-white/60 backdrop-blur-sm border border-white/60 shadow-sm hover:bg-white/80 hover:shadow-md transition-all duration-200 rounded-xl"
                 onClick={() => setIsEditing(true)}
               >
-                <Edit3 className="w-4 h-4 text-indigo-600" />
+                <Edit3 className="w-4 h-4 text-[#1f4aa6]" />
               </Button>
             )}
             <Button
@@ -152,7 +152,7 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
               className="h-10 w-10 p-0 bg-white/60 backdrop-blur-sm border border-white/60 shadow-sm hover:bg-white/80 hover:shadow-md transition-all duration-200 rounded-xl relative"
               onClick={() => setShowDropdown(!showDropdown)}
             >
-              <Settings className="w-4 h-4 text-purple-600" />
+              <Settings className="w-4 h-4 text-[#faed39]" />
             </Button>
             <Button
               variant="ghost"
@@ -161,9 +161,9 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
               onClick={() => setIsExpanded(!isExpanded)}
             >
               {isExpanded ? (
-                <ChevronUp className="w-5 h-5 text-blue-600" />
+                <ChevronUp className="w-5 h-5 text-[#45c73e]" />
               ) : (
-                <ChevronDown className="w-5 h-5 text-blue-600" />
+                <ChevronDown className="w-5 h-5 text-[#45c73e]" />
               )}
             </Button>
           </div>
@@ -184,7 +184,7 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
                     setShowDropdown(false);
                   }}
                 >
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center group-hover:shadow-lg group-hover:scale-105 transition-all duration-200">
+                  <div className="w-10 h-10 rounded-xl bg-[#1f4aa6] flex items-center justify-center group-hover:shadow-lg group-hover:scale-105 transition-all duration-200">
                     <Edit3 className="w-4 h-4 text-white" />
                   </div>
                   <div>
@@ -200,7 +200,7 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
                     setShowDropdown(false);
                   }}
                 >
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center group-hover:shadow-lg group-hover:scale-105 transition-all duration-200">
+                  <div className="w-10 h-10 rounded-xl bg-[#faed39] flex items-center justify-center group-hover:shadow-lg group-hover:scale-105 transition-all duration-200">
                     <Camera className="w-4 h-4 text-white" />
                   </div>
                   <div>
@@ -221,7 +221,7 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
                     setShowDropdown(false);
                   }}
                 >
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center group-hover:shadow-lg group-hover:scale-105 transition-all duration-200">
+                  <div className="w-10 h-10 rounded-xl bg-[#45c73e] flex items-center justify-center group-hover:shadow-lg group-hover:scale-105 transition-all duration-200">
                     <Shield className="w-4 h-4 text-white" />
                   </div>
                   <div>
@@ -240,7 +240,7 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
                     setShowDropdown(false);
                   }}
                 >
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center group-hover:shadow-lg group-hover:scale-105 transition-all duration-200">
+                  <div className="w-10 h-10 rounded-xl bg-[#faed39] flex items-center justify-center group-hover:shadow-lg group-hover:scale-105 transition-all duration-200">
                     <Bell className="w-4 h-4 text-white" />
                   </div>
                   <div>
@@ -257,7 +257,7 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
                     window.location.href = '/api/logout';
                   }}
                 >
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-rose-600 flex items-center justify-center group-hover:shadow-lg group-hover:scale-105 transition-all duration-200">
+                  <div className="w-10 h-10 rounded-xl bg-red-500 flex items-center justify-center group-hover:shadow-lg group-hover:scale-105 transition-all duration-200">
                     <LogOut className="w-4 h-4 text-white" />
                   </div>
                   <div>
@@ -358,7 +358,7 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
                   <Button
                     onClick={handleSave}
                     size="sm"
-                    className="bg-green-600 hover:bg-green-700 text-white"
+                    className="bg-[#45c73e] hover:bg-[#45c73e]/80 text-white"
                   >
                     <Check className="w-4 h-4 mr-1" />
                     Save
@@ -378,7 +378,7 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
               <div className="space-y-3">
                 {user?.personalInfo?.age && (
                   <div className="flex items-center gap-3">
-                    <Calendar className="w-4 h-4 text-blue-600" />
+                    <Calendar className="w-4 h-4 text-[#1f4aa6]" />
                     <span className="text-sm text-gray-700">
                       {user.personalInfo.age} years old
                     </span>
@@ -387,7 +387,7 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
                 
                 {user?.personalInfo?.location && (
                   <div className="flex items-center gap-3">
-                    <MapPin className="w-4 h-4 text-blue-600" />
+                    <MapPin className="w-4 h-4 text-[#45c73e]" />
                     <span className="text-sm text-gray-700">
                       {user.personalInfo.location}
                     </span>
@@ -396,7 +396,7 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
                 
                 {user?.personalInfo?.phone && (
                   <div className="flex items-center gap-3">
-                    <Phone className="w-4 h-4 text-blue-600" />
+                    <Phone className="w-4 h-4 text-[#faed39]" />
                     <span className="text-sm text-gray-700">
                       {user.personalInfo.phone}
                     </span>
@@ -405,7 +405,7 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
                 
                 {user?.personalInfo?.bio && (
                   <div className="flex items-start gap-3">
-                    <User className="w-4 h-4 text-blue-600 mt-0.5" />
+                    <User className="w-4 h-4 text-[#1f4aa6] mt-0.5" />
                     <p className="text-sm text-gray-700 leading-relaxed">
                       {user.personalInfo.bio}
                     </p>
