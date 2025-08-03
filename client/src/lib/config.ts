@@ -3,11 +3,13 @@
  * Handles both development and production environments
  */
 
-// Environment detection - updated for better URL handling
+// Environment detection - fully dynamic URL handling
 const isDev = typeof window !== 'undefined' && 
   (window.location.hostname === 'localhost' || 
    window.location.hostname.includes('replit.dev') ||
-   window.location.hostname.includes('replit.app'));
+   window.location.hostname.includes('replit.app') ||
+   window.location.hostname.includes('127.0.0.1') ||
+   window.location.port === '5000');
 const isGitHubPages = typeof window !== 'undefined' && 
   (window.location.hostname.includes('github.io') || 
    window.location.hostname.includes('bytewise-nutritionist'));
@@ -16,7 +18,10 @@ const isProd = !isDev && !isGitHubPages;
 // Dynamic API base URL based on current environment
 const getApiBaseUrl = () => {
   if (typeof window === 'undefined') return '/api';
-  return `${window.location.protocol}//${window.location.host}/api`;
+  
+  // Use current origin for all environments
+  const { protocol, host } = window.location;
+  return `${protocol}//${host}/api`;
 };
 
 // Fallback configuration for production

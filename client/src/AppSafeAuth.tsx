@@ -70,7 +70,7 @@ export default function AppSafeAuth() {
           {/* External URL */}
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-500">
-              External URL: https://fad43cfb-8f6f-430e-8487-3dbe63d5ada8-00-2nde95asc8gzx.janeway.replit.dev
+              External URL: {window.location.origin}
             </p>
           </div>
         </div>

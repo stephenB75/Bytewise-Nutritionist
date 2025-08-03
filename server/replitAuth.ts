@@ -11,7 +11,9 @@ import { storage } from "./storage";
 // Fallback for development environment
 if (!process.env.REPLIT_DOMAINS) {
   console.warn("REPLIT_DOMAINS not set, using development fallback");
-  process.env.REPLIT_DOMAINS = "localhost";
+  if (!process.env.REPLIT_DOMAINS) {
+    process.env.REPLIT_DOMAINS = process.env.REPLIT_DEV_DOMAIN || "localhost";
+  }
 }
 
 const getOidcConfig = memoize(
