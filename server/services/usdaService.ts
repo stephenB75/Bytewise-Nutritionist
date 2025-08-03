@@ -401,33 +401,46 @@ export class USDAService {
     gramsEquivalent: number;
   } {
     // Remove extra whitespace and normalize
-    const normalized = measurement.toLowerCase().trim();
+    let normalized = measurement.toLowerCase().trim();
     
-    // Extract quantity and unit with fraction support
+    // Enhanced text-to-number conversion
+    normalized = this.convertTextToNumbers(normalized);
+    
+    // Extract quantity and unit with comprehensive parsing
     let quantity = 1;
     let unit = normalized;
     
-    // Handle fractions like "1/2", "3/4"
-    const fractionMatch = normalized.match(/^(\d+)\s*\/\s*(\d+)\s+(.+)$/);
-    if (fractionMatch) {
-      const numerator = parseFloat(fractionMatch[1]);
-      const denominator = parseFloat(fractionMatch[2]);
-      quantity = numerator / denominator;
-      unit = fractionMatch[3].trim();
+    // Handle Unicode fractions (½, ¼, ¾, ⅓, ⅔)
+    const unicodeFractionMatch = normalized.match(/^([½¼¾⅓⅔])\s+(.+)$/);
+    if (unicodeFractionMatch) {
+      const fractionMap: { [key: string]: number } = {
+        '½': 0.5, '¼': 0.25, '¾': 0.75, '⅓': 0.333, '⅔': 0.666
+      };
+      quantity = fractionMap[unicodeFractionMatch[1]];
+      unit = unicodeFractionMatch[2].trim();
     } else {
-      // Handle mixed numbers like "1 1/2"
-      const mixedMatch = normalized.match(/^(\d+)\s+(\d+)\s*\/\s*(\d+)\s*(.+)$/);
-      if (mixedMatch) {
-        const whole = parseFloat(mixedMatch[1]);
-        const numerator = parseFloat(mixedMatch[2]);
-        const denominator = parseFloat(mixedMatch[3]);
-        quantity = whole + (numerator / denominator);
-        unit = mixedMatch[4].trim();
+      // Handle fractions like "1/2", "3/4"
+      const fractionMatch = normalized.match(/^(\d+)\s*\/\s*(\d+)\s+(.+)$/);
+      if (fractionMatch) {
+        const numerator = parseFloat(fractionMatch[1]);
+        const denominator = parseFloat(fractionMatch[2]);
+        quantity = numerator / denominator;
+        unit = fractionMatch[3].trim();
       } else {
-        // Handle regular decimal numbers
-        const match = normalized.match(/^(\d+(?:\.\d+)?)\s*(.+)$/);
-        quantity = match ? parseFloat(match[1]) : 1;
-        unit = match ? match[2].trim() : normalized;
+        // Handle mixed numbers like "1 1/2"
+        const mixedMatch = normalized.match(/^(\d+)\s+(\d+)\s*\/\s*(\d+)\s*(.+)$/);
+        if (mixedMatch) {
+          const whole = parseFloat(mixedMatch[1]);
+          const numerator = parseFloat(mixedMatch[2]);
+          const denominator = parseFloat(mixedMatch[3]);
+          quantity = whole + (numerator / denominator);
+          unit = mixedMatch[4].trim();
+        } else {
+          // Handle regular decimal numbers
+          const match = normalized.match(/^(\d+(?:\.\d+)?)\s*(.+)$/);
+          quantity = match ? parseFloat(match[1]) : 1;
+          unit = match ? match[2].trim() : normalized;
+        }
       }
     }
 
@@ -537,6 +550,40 @@ export class USDAService {
     }
 
     return { quantity, unit, gramsEquivalent };
+  }
+
+  /**
+   * Convert text-based numbers and fractions to numeric equivalents
+   */
+  private convertTextToNumbers(text: string): string {
+    const wordNumbers: { [key: string]: string } = {
+      'one': '1', 'two': '2', 'three': '3', 'four': '4', 'five': '5',
+      'six': '6', 'seven': '7', 'eight': '8', 'nine': '9', 'ten': '10'
+    };
+    
+    const fractionWords: { [key: string]: string } = {
+      'half': '1/2', 'quarter': '1/4', 'third': '1/3',
+      'three quarters': '3/4', 'two thirds': '2/3',
+      'one half': '1/2', 'one quarter': '1/4', 'one third': '1/3',
+      'a half': '1/2', 'a quarter': '1/4', 'a third': '1/3'
+    };
+    
+    let converted = text;
+    
+    // Convert fraction words first (longer phrases first to avoid conflicts)
+    const sortedFractionWords = Object.entries(fractionWords).sort((a, b) => b[0].length - a[0].length);
+    for (const [phrase, fraction] of sortedFractionWords) {
+      const regex = new RegExp(`\\b${phrase}\\b`, 'gi');
+      converted = converted.replace(regex, fraction);
+    }
+    
+    // Convert word numbers
+    for (const [word, number] of Object.entries(wordNumbers)) {
+      const regex = new RegExp(`\\b${word}\\b`, 'gi');
+      converted = converted.replace(regex, number);
+    }
+    
+    return converted;
   }
 
   /**
