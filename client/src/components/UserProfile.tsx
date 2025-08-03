@@ -47,43 +47,50 @@ export function UserProfile({ showDetails = false, size = 'md' }: UserProfilePro
     : user.email?.split('@')[0] || 'User';
 
   return (
-    <div className="w-full">
-      <div className="flex flex-col items-center text-center space-y-3">
-        {/* Profile Image */}
-        <div className="relative">
-          {user.user_metadata?.profileImageUrl ? (
-            <img 
-              src={user.user_metadata.profileImageUrl} 
-              alt={displayName}
-              className="w-16 h-16 rounded-full object-cover border-3 border-white/20"
-            />
-          ) : (
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center border-3 border-white/20">
-              <User className="w-8 h-8 text-white" />
+    <div className="bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-blue-200 rounded-xl overflow-hidden">
+      <div className="p-6">
+        <div className="flex items-center gap-4">
+          {/* Profile Image */}
+          <div className="relative">
+            {user.user_metadata?.profileImageUrl ? (
+              <img 
+                src={user.user_metadata.profileImageUrl} 
+                alt={displayName}
+                className="w-16 h-16 rounded-full object-cover border-4 border-white shadow-lg"
+              />
+            ) : (
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xl font-bold border-4 border-white shadow-lg">
+                <span>{displayName.charAt(0).toUpperCase()}</span>
+              </div>
+            )}
+            
+            {/* Online status */}
+            <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+              <div className="w-2 h-2 bg-white rounded-full" />
             </div>
-          )}
-          
-          {/* Online status */}
-          <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-gray-900 flex items-center justify-center">
-            <div className="w-1.5 h-1.5 bg-white rounded-full" />
           </div>
-        </div>
-        
-        {/* User Details */}
-        <div className="space-y-2 w-full">
-          <h2 className="text-xl font-bold text-white">
-            {displayName}
-          </h2>
           
-          {user.email && (
-            <p className="text-gray-400 flex items-center justify-center gap-2 text-sm">
-              <Mail className="w-3 h-3" />
-              {user.email}
-            </p>
-          )}
-          
-          <div className="flex justify-center">
-            <Badge variant="secondary" className="text-xs px-2 py-1">
+          {/* User Details */}
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className="text-xl font-bold text-gray-900" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                {displayName}
+              </h3>
+              <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">
+                Active
+              </Badge>
+            </div>
+            
+            {user.email && (
+              <div className="flex items-center gap-2 text-gray-600">
+                <Mail className="w-4 h-4" />
+                <span className="text-sm" style={{ fontFamily: "'Quicksand', sans-serif" }}>
+                  {user.email}
+                </span>
+              </div>
+            )}
+            
+            <Badge variant="secondary" className="text-xs mt-2">
               <Calendar className="w-3 h-3 mr-1" />
               Member since {new Date(user.created_at).toLocaleDateString()}
             </Badge>

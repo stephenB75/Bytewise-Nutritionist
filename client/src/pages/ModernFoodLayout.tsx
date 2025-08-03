@@ -1175,65 +1175,57 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       </div>
 
       {/* Content Section - Completely Separate and Underneath */}
-      <div className="px-6 py-8 bg-black min-h-screen">
-        {/* Profile Navigation */}
-        <div className="flex space-x-2 mb-6 overflow-x-auto pb-2">
-          {[
-            { id: 'overview', name: 'Overview', icon: User },
-            { id: 'account', name: 'Account', icon: Settings },
-            { id: 'achievements', name: 'Awards', icon: Trophy },
-            { id: 'data', name: 'Data', icon: Download }
-          ].map((section) => {
-            const IconComponent = section.icon;
-            return (
-              <Button
-                key={section.id}
-                variant={profileSection === section.id ? "default" : "outline"}
-                size="sm"
-                className={`flex items-center space-x-2 whitespace-nowrap ${
-                  profileSection === section.id 
-                    ? 'bg-purple-600 hover:bg-purple-700' 
-                    : 'bg-white/10 hover:bg-white/20'
-                }`}
-                onClick={() => setProfileSection(section.id)}
-              >
-                <IconComponent className="w-4 h-4" />
-                <span>{section.name}</span>
-              </Button>
-            );
-          })}
-        </div>
+      <div className="bg-white">
+        <div className="max-w-4xl mx-auto px-6 py-8">
+          {/* Profile Navigation */}
+          <div className="flex space-x-2 mb-8 overflow-x-auto pb-2">
+            {[
+              { id: 'overview', name: 'Overview', icon: User },
+              { id: 'account', name: 'Account', icon: Settings },
+              { id: 'achievements', name: 'Awards', icon: Trophy },
+              { id: 'data', name: 'Data', icon: Download }
+            ].map((section) => {
+              const IconComponent = section.icon;
+              return (
+                <Button
+                  key={section.id}
+                  variant={profileSection === section.id ? "default" : "outline"}
+                  size="sm"
+                  className={`flex items-center space-x-2 whitespace-nowrap ${
+                    profileSection === section.id 
+                      ? 'bg-purple-600 hover:bg-purple-700 text-white' 
+                      : 'bg-white hover:bg-gray-50 text-gray-700 border-gray-300'
+                  }`}
+                  onClick={() => setProfileSection(section.id)}
+                >
+                  <IconComponent className="w-4 h-4" />
+                  <span>{section.name}</span>
+                </Button>
+              );
+            })}
+          </div>
 
-        {/* Profile Content - Single Column Stack */}
-        <div className="flex flex-col space-y-6 w-full max-w-md mx-auto">
-          {profileSection === 'overview' && (
-            <>
-              <div className="bg-gray-900/80 backdrop-blur-md rounded-2xl border border-gray-700 p-6">
+          {/* Profile Content - Single Column Stack */}
+          <div className="space-y-6">
+            {profileSection === 'overview' && (
+              <>
                 <UserProfile showDetails={true} size="lg" />
-              </div>
-              <div className="bg-gray-900/80 backdrop-blur-md rounded-2xl border border-gray-700 p-6">
                 <ProfileInfoCard />
-              </div>
-            </>
-          )}
-          
-          {profileSection === 'account' && (
-            <div className="bg-gray-900/80 backdrop-blur-md rounded-2xl border border-gray-700 p-6">
+              </>
+            )}
+            
+            {profileSection === 'account' && (
               <UserAccountManagement onClose={() => setProfileSection('overview')} />
-            </div>
-          )}
-          
-          {profileSection === 'achievements' && (
-            <div className="bg-gray-900/80 backdrop-blur-md rounded-2xl border border-gray-700 p-6">
+            )}
+            
+            {profileSection === 'achievements' && (
               <AwardsAchievements onClose={() => setProfileSection('overview')} />
-            </div>
-          )}
-          
-          {profileSection === 'data' && (
-            <div className="bg-gray-900/80 backdrop-blur-md rounded-2xl border border-gray-700 p-6">
+            )}
+            
+            {profileSection === 'data' && (
               <DataManagementPanel />
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </div>
