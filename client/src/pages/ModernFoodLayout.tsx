@@ -196,9 +196,20 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     return () => window.removeEventListener('achievement-unlocked', handleGoalAchievement);
   }, []);
 
-  // Load logged meals from localStorage
+  // Clear localStorage data for production-ready clean state
   useEffect(() => {
-    const loadLoggedMeals = () => {
+    // Clear all tracking data for authentic empty state
+    localStorage.removeItem('weeklyMeals');
+    localStorage.removeItem('calculatedCalories');
+    localStorage.removeItem('bytewise-weekly-tracker');
+    
+    // Initialize with clean empty state
+    setLoggedMeals([]);
+    setDailyCalories(0);
+    setWeeklyCalories(0);
+
+    // Set up event listeners for future meal logging
+    const handleMealLogged = () => {
       const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
       const today = new Date().toISOString().split('T')[0];
       const todayMeals = stored.filter((meal: any) => meal.date === today);
@@ -207,13 +218,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       // Calculate daily calories from logged meals
       const totalCalories = todayMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
       setDailyCalories(totalCalories);
-    };
-
-    loadLoggedMeals();
-
-    // Listen for meal logging events
-    const handleMealLogged = () => {
-      loadLoggedMeals();
     };
 
     window.addEventListener('calories-logged', handleMealLogged);

@@ -45,33 +45,18 @@ export function WeeklyCaloriesCard() {
     return weekDates;
   };
 
-  // Calculate calories for each day
+  // Initialize with clean empty state for production
   const calculateWeeklyCalories = () => {
     const weekDates = getCurrentWeekDates();
-    const weeklyMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
     
-    // Group meals by date
-    const mealsByDate: { [key: string]: any[] } = {};
-    weeklyMeals.forEach((meal: any) => {
-      if (!mealsByDate[meal.date]) {
-        mealsByDate[meal.date] = [];
-      }
-      mealsByDate[meal.date].push(meal);
-    });
+    // Production-ready empty state - no localStorage data loading
+    const weeklyData = weekDates.map(dayData => ({
+      ...dayData,
+      calories: 0,  // Authentic empty state
+      mealCount: 0  // No meals logged initially
+    }));
 
-    // Calculate calories for each day
-    const weeklyData = weekDates.map(dayData => {
-      const dayMeals = mealsByDate[dayData.date] || [];
-      const dayCalories = dayMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
-      
-      return {
-        ...dayData,
-        calories: Math.round(dayCalories),
-        mealCount: dayMeals.length
-      };
-    });
-
-    const totalCalories = weeklyData.reduce((sum, day) => sum + day.calories, 0);
+    const totalCalories = 0;  // Clean total for empty state
     
     setWeeklyData(weeklyData);
     setTotalWeeklyCalories(totalCalories);
