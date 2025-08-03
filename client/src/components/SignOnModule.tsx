@@ -21,6 +21,7 @@ import {
   UserPlus
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 
 interface SignOnModuleProps {
   onClose?: () => void;
@@ -33,6 +34,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
   const [loading, setLoading] = useState(false);
   const [confirmingEmail, setConfirmingEmail] = useState(false);
   const { toast } = useToast();
+  const { supabase, refetch } = useAuth();
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,15 +62,41 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
           setIsSignUp(false);
           setPassword(''); // Clear password for security
         } else {
+          // Set the Supabase session with the returned data
+          if (data.session) {
+            console.log('Setting session:', data.session);
+            try {
+              const { error: sessionError } = await supabase.auth.setSession({
+                access_token: data.session.access_token,
+                refresh_token: data.session.refresh_token,
+              });
+              
+              if (sessionError) {
+                console.error('Session set error:', sessionError);
+              } else {
+                console.log('Session set successfully');
+                // Refetch auth state immediately
+                await refetch();
+              }
+            } catch (err) {
+              console.error('Error setting session:', err);
+            }
+          }
+          
           toast({
             title: "Welcome back!",
             description: "You've been signed in successfully.",
           });
           
-          // Force a page reload to update authentication state
-          setTimeout(() => {
-            window.location.reload();
-          }, 1000);
+          // Close the sign-in module or refresh
+          if (onClose) {
+            onClose();
+          } else {
+            // Force a page reload as fallback
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
+          }
         }
       } else {
         if (data.message === "Email not confirmed") {
