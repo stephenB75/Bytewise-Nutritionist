@@ -289,7 +289,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   // Render functions for each page
   const renderHome = () => (
-    <div className="space-y-0">
+    <div className="space-y-0 page-container">
       {/* Full-Screen Hero Section */}
       <div className="relative h-screen overflow-hidden">
         <div 
@@ -377,9 +377,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       </div>
 
       {/* Content Section - Completely Separate and Underneath */}
-      <div className="px-6 py-8 bg-black">
+      <div className="px-6 py-8 bg-black content-section">
         {/* Enhanced Daily Progress Metrics with Graphs */}
-        <div className="space-y-6">
+        <div className="space-y-6 main-content">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-black text-white">Today's Progress</h2>
             <Button 
@@ -536,7 +536,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   );
 
   const renderTracking = () => (
-    <div className="space-y-0">
+    <div className="space-y-0 page-container">
       {/* Full-Screen Hero Section */}
       <div className="relative h-screen overflow-hidden">
         <div 
@@ -575,9 +575,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       </div>
 
       {/* Content Section - Completely Separate and Underneath */}
-      <div className="px-6 py-8 bg-black">
+      <div className="px-6 py-8 bg-black content-section">
         {/* Food Search Bar - Moved Here */}
-        <div className="mb-6">
+        <div className="mb-6 main-content">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <Input
@@ -1105,7 +1105,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
 
   const renderCalculator = () => (
-    <div className="space-y-0">
+    <div className="space-y-0 page-container">
       {/* Full-Screen Hero Section */}
       <div className="relative h-screen overflow-hidden">
         <div 
@@ -1144,17 +1144,19 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       </div>
       
       {/* Content Section - Completely Separate and Underneath */}
-      <div className="bg-white">
-        <CalorieCalculator 
-          onNavigate={onNavigate}
-          isCompact={false}
-        />
+      <div className="bg-white content-section">
+        <div className="main-content">
+          <CalorieCalculator 
+            onNavigate={onNavigate}
+            isCompact={false}
+          />
+        </div>
       </div>
     </div>
   );
 
   const renderProfile = () => (
-    <div className="space-y-0">
+    <div className="space-y-0 page-container">
       {/* Full-Screen Hero Section */}
       <div className="relative h-screen overflow-hidden">
         <div 
@@ -1193,8 +1195,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       </div>
 
       {/* Content Section - Completely Separate and Underneath */}
-      <div className="bg-white">
-        <div className="max-w-4xl mx-auto px-6 py-8">
+      <div className="bg-white content-section">
+        <div className="max-w-4xl mx-auto px-6 py-8 main-content">
           {/* Profile Navigation */}
           <div className="grid grid-cols-2 md:flex md:space-x-2 gap-2 md:gap-0 mb-8">
             {[
