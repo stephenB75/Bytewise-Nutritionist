@@ -1205,32 +1205,32 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         </div>
 
         {/* Profile Content - Stacked Vertically */}
-        <div className="space-y-6">
+        <div className="w-full max-w-4xl mx-auto space-y-6">
           {profileSection === 'overview' && (
-            <>
-              <div className="bg-gray-900/80 backdrop-blur-md rounded-3xl border border-gray-700 p-6">
-                <UserProfile />
+            <div className="w-full space-y-6">
+              <div className="w-full bg-gray-900/80 backdrop-blur-md rounded-3xl border border-gray-700 p-6">
+                <UserProfile showDetails={true} size="lg" />
               </div>
-              <div className="bg-gray-900/80 backdrop-blur-md rounded-3xl border border-gray-700 p-6">
+              <div className="w-full bg-gray-900/80 backdrop-blur-md rounded-3xl border border-gray-700 p-6">
                 <ProfileInfoCard />
               </div>
-            </>
+            </div>
           )}
           
           {profileSection === 'account' && (
-            <div className="bg-gray-900/80 backdrop-blur-md rounded-3xl border border-gray-700 p-6">
+            <div className="w-full bg-gray-900/80 backdrop-blur-md rounded-3xl border border-gray-700 p-6">
               <UserAccountManagement onClose={() => setProfileSection('overview')} />
             </div>
           )}
           
           {profileSection === 'achievements' && (
-            <div className="bg-gray-900/80 backdrop-blur-md rounded-3xl border border-gray-700 p-6">
+            <div className="w-full bg-gray-900/80 backdrop-blur-md rounded-3xl border border-gray-700 p-6">
               <AwardsAchievements onClose={() => setProfileSection('overview')} />
             </div>
           )}
           
           {profileSection === 'data' && (
-            <div className="bg-gray-900/80 backdrop-blur-md rounded-3xl border border-gray-700 p-6">
+            <div className="w-full bg-gray-900/80 backdrop-blur-md rounded-3xl border border-gray-700 p-6">
               <DataManagementPanel />
             </div>
           )}

@@ -47,36 +47,49 @@ export function UserProfile({ showDetails = false, size = 'md' }: UserProfilePro
     : user.email?.split('@')[0] || 'User';
 
   return (
-    <div className="flex items-center gap-2 w-full">
-      {user.user_metadata?.profileImageUrl ? (
-        <img 
-          src={user.user_metadata.profileImageUrl} 
-          alt={displayName}
-          className={`${avatarSize} rounded-full object-cover`}
-        />
-      ) : (
-        <div className={`${avatarSize} bg-blue-600 rounded-full flex items-center justify-center`}>
-          <User className="w-4 h-4 text-white" />
+    <div className="w-full">
+      <div className="flex flex-col items-center text-center space-y-4">
+        {/* Profile Image */}
+        <div className="relative">
+          {user.user_metadata?.profileImageUrl ? (
+            <img 
+              src={user.user_metadata.profileImageUrl} 
+              alt={displayName}
+              className="w-20 h-20 rounded-full object-cover border-4 border-white/20"
+            />
+          ) : (
+            <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center border-4 border-white/20">
+              <User className="w-10 h-10 text-white" />
+            </div>
+          )}
+          
+          {/* Online status */}
+          <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-gray-900 flex items-center justify-center">
+            <div className="w-2 h-2 bg-white rounded-full" />
+          </div>
         </div>
-      )}
-      
-      {showDetails && (
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-white truncate">
+        
+        {/* User Details */}
+        <div className="space-y-2 w-full">
+          <h2 className="text-2xl font-bold text-white">
             {displayName}
-          </p>
+          </h2>
+          
           {user.email && (
-            <p className="text-xs text-gray-400 truncate flex items-center gap-1">
-              <Mail className="w-3 h-3" />
+            <p className="text-gray-400 flex items-center justify-center gap-2">
+              <Mail className="w-4 h-4" />
               {user.email}
             </p>
           )}
-          <Badge variant="secondary" className="text-xs mt-1">
-            <Calendar className="w-3 h-3 mr-1" />
-            Member since {new Date(user.created_at).toLocaleDateString()}
-          </Badge>
+          
+          <div className="flex justify-center">
+            <Badge variant="secondary" className="text-sm">
+              <Calendar className="w-4 h-4 mr-2" />
+              Member since {new Date(user.created_at).toLocaleDateString()}
+            </Badge>
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
