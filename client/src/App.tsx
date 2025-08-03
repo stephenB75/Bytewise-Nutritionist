@@ -77,16 +77,23 @@ export default function App() {
     return null;
   };
 
-  // Render ModernFoodLayout or Test Component
+  // Direct render without lazy loading to fix React hooks
   const renderCurrentPage = () => {
-    // Temporarily use test component to debug React hooks
-    const TestComponent = React.lazy(() => import('./TestComponent'));
     return (
-      <React.Suspense fallback={<div className="text-white p-8">Loading...</div>}>
-        <TestComponent />
-      </React.Suspense>
+      <div className="p-8 text-white bg-black min-h-screen">
+        <h1 className="text-2xl mb-4">ByteWise Nutrition Tracker</h1>
+        <p className="mb-4">Testing React hooks functionality...</p>
+        <div className="mb-4">
+          <button 
+            onClick={() => setActiveTab('test')}
+            className="bg-blue-500 px-4 py-2 rounded mr-2"
+          >
+            Test Button (activeTab: {activeTab})
+          </button>
+        </div>
+        <p className="text-sm">If this button works, React hooks are functioning properly.</p>
+      </div>
     );
-    // return <ModernFoodLayout onNavigate={handleNavigate} />;
   };
 
   return (
