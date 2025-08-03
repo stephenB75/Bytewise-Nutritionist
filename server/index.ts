@@ -101,9 +101,7 @@ app.use((req, res, next) => {
     reusePort: true,
   }, () => {
     log(`serving on port ${port}`);
-    const currentHost = process.env.REPLIT_DEV_DOMAIN || `localhost:${port}`;
-    const protocol = process.env.REPLIT_DEV_DOMAIN ? 'https' : 'http';
-    log(`🌐 External preview: ${protocol}://${currentHost}`);
+    log(`🌐 External preview: https://${process.env.REPLIT_DEV_DOMAIN || 'localhost'}`);
     log(`🔧 Local dev: http://localhost:${port}`);
     log(`✅ Both external and development previews are accessible`);
   });
