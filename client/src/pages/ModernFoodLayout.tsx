@@ -243,71 +243,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           }}
         />
         
-        {/* Notification Header */}
-        <div className="absolute top-6 right-6 z-20">
-          <div className="relative">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="bg-black/20 backdrop-blur-md border border-white/20 text-white hover:bg-white/10 rounded-full p-3"
-              onClick={() => setShowNotificationDropdown(!showNotificationDropdown)}
-            >
-              <Bell className="w-5 h-5" />
-              {notifications.filter(n => !n.read).length > 0 && (
-                <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
-                  <span className="text-xs text-white font-bold">
-                    {notifications.filter(n => !n.read).length}
-                  </span>
-                </div>
-              )}
-            </Button>
-            
-            {/* Notification Dropdown */}
-            {showNotificationDropdown && (
-              <div className="absolute top-full right-0 mt-2 w-80 bg-black/90 backdrop-blur-md border border-white/20 rounded-2xl shadow-2xl overflow-hidden z-30">
-                <div className="p-4 border-b border-white/10">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-white font-semibold">Notifications</h3>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-gray-400 hover:text-white"
-                      onClick={handleMarkAllAsRead}
-                    >
-                      Mark all read
-                    </Button>
-                  </div>
-                </div>
-                <div className="max-h-80 overflow-y-auto">
-                  {notifications.map((notification) => (
-                    <div
-                      key={notification.id}
-                      className={`p-4 border-b border-white/5 ${!notification.read ? 'bg-blue-500/10' : ''}`}
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <h4 className="text-white font-medium text-sm">{notification.title}</h4>
-                          <p className="text-gray-400 text-xs mt-1">{notification.message}</p>
-                          <p className="text-gray-500 text-xs mt-2">
-                            {notification.timestamp.toLocaleDateString()}
-                          </p>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-gray-400 hover:text-white p-1"
-                          onClick={() => handleDeleteNotification(notification.id)}
-                        >
-                          <X className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+
 
         {/* Hero Content - ONLY TEXT OVERLAY */}
         <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
@@ -324,7 +260,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               >
                 <div 
                   style={{
-                    fontSize: '3.825rem',
+                    fontSize: '4.5rem',
                     fontWeight: '900', 
                     lineHeight: '0.9',
                     color: '#7dd3fc',
@@ -337,7 +273,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 </div>
                 <div 
                   style={{
-                    fontSize: '1.0625rem',
+                    fontSize: '1.25rem',
                     fontWeight: '300',
                     color: 'rgba(255,255,255,0.8)',
                     letterSpacing: '0.15em',
@@ -1268,25 +1204,33 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           })}
         </div>
 
-        {/* Profile Content */}
-        <div className="bg-gray-900/80 backdrop-blur-md rounded-3xl border border-gray-700 p-6">
+        {/* Profile Content - Stacked Vertically */}
+        <div className="space-y-6">
           {profileSection === 'overview' && (
-            <div className="space-y-6">
-              <UserProfile />
-              <ProfileInfoCard />
-            </div>
+            <>
+              <div className="bg-gray-900/80 backdrop-blur-md rounded-3xl border border-gray-700 p-6">
+                <UserProfile />
+              </div>
+              <div className="bg-gray-900/80 backdrop-blur-md rounded-3xl border border-gray-700 p-6">
+                <ProfileInfoCard />
+              </div>
+            </>
           )}
           
           {profileSection === 'account' && (
-            <UserAccountManagement onClose={() => setProfileSection('overview')} />
+            <div className="bg-gray-900/80 backdrop-blur-md rounded-3xl border border-gray-700 p-6">
+              <UserAccountManagement onClose={() => setProfileSection('overview')} />
+            </div>
           )}
           
           {profileSection === 'achievements' && (
-            <AwardsAchievements onClose={() => setProfileSection('overview')} />
+            <div className="bg-gray-900/80 backdrop-blur-md rounded-3xl border border-gray-700 p-6">
+              <AwardsAchievements onClose={() => setProfileSection('overview')} />
+            </div>
           )}
           
           {profileSection === 'data' && (
-            <div className="space-y-6">
+            <div className="bg-gray-900/80 backdrop-blur-md rounded-3xl border border-gray-700 p-6">
               <DataManagementPanel />
             </div>
           )}
@@ -1368,6 +1312,72 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   return (
     <div className="min-h-screen bg-black">
+      {/* Fixed Notification Header on all pages */}
+      <div className="fixed top-6 right-6 z-50">
+        <div className="relative">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="bg-black/40 backdrop-blur-md text-white hover:bg-black/60 rounded-full p-3 border-0"
+            onClick={() => setShowNotificationDropdown(!showNotificationDropdown)}
+          >
+            <Bell className="w-5 h-5" />
+            {notifications.filter(n => !n.read).length > 0 && (
+              <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
+                <span className="text-xs text-white font-bold">
+                  {notifications.filter(n => !n.read).length}
+                </span>
+              </div>
+            )}
+          </Button>
+          
+          {/* Notification Dropdown */}
+          {showNotificationDropdown && (
+            <div className="absolute top-full right-0 mt-2 w-80 bg-black/90 backdrop-blur-md border border-white/20 rounded-2xl shadow-2xl overflow-hidden z-40">
+              <div className="p-4 border-b border-white/10">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-white font-semibold">Notifications</h3>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-gray-400 hover:text-white"
+                    onClick={handleMarkAllAsRead}
+                  >
+                    Mark all read
+                  </Button>
+                </div>
+              </div>
+              <div className="max-h-80 overflow-y-auto">
+                {notifications.map((notification) => (
+                  <div
+                    key={notification.id}
+                    className={`p-4 border-b border-white/5 ${!notification.read ? 'bg-blue-500/10' : ''}`}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <h4 className="text-white font-medium text-sm">{notification.title}</h4>
+                        <p className="text-gray-400 text-xs mt-1">{notification.message}</p>
+                        <p className="text-gray-500 text-xs mt-2">
+                          {notification.timestamp.toLocaleDateString()}
+                        </p>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-gray-400 hover:text-white p-1"
+                        onClick={() => handleDeleteNotification(notification.id)}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Content rendered based on active tab */}
       {renderContent()}
       
