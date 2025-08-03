@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated, optionalAuth, createAuthenticatedHandler, type AuthenticatedRequest } from "./supabaseAuth";
+import { setupAuth, isAuthenticated } from "./replitAuth";
 import { usdaService } from "./services/usdaService";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -9,23 +9,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   await setupAuth(app);
 
   // Auth routes
-  app.get('/api/auth/user', isAuthenticated, createAuthenticatedHandler(async (req: AuthenticatedRequest, res) => {
-    const userId = req.user?.id;
-    if (!userId) {
-      res.status(401).json({ message: "User not found" });
-      return;
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      res.json(user);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
     }
-    const user = await storage.getUser(userId);
-    res.json(user);
-  }));
+  });
 
   // Meals API for logger
-  app.post('/api/meals/logged', isAuthenticated, createAuthenticatedHandler(async (req: AuthenticatedRequest, res) => {
-    const userId = req.user?.id;
-    if (!userId) {
-      res.status(401).json({ message: "User not found" });
-      return;
-    }
+  app.post('/api/meals/logged', isAuthenticated, async (req: any, res) => {
+    const userId = req.user.claims.sub;
     const mealData = {
       ...req.body,
       userId,
@@ -36,20 +33,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.log('Logging meal from calculator:', mealData);
     
     res.json({ success: true, meal: mealData });
-  }));
+  });
 
-  app.get('/api/meals/logged', isAuthenticated, createAuthenticatedHandler(async (req: AuthenticatedRequest, res) => {
-    const userId = req.user?.id;
-    if (!userId) {
-      res.status(401).json({ message: "User not found" });
-      return;
-    }
+  app.get('/api/meals/logged', isAuthenticated, async (req: any, res) => {
+    const userId = req.user.claims.sub;
     
     // Return logged meals for the user
     const meals: any[] = []; // Implement meal retrieval from storage
     
     res.json(meals);
-  }));
+  });
 
   // Calculate calories API with real USDA integration (no auth required)
   app.post('/api/calculate-calories', optionalAuth, createAuthenticatedHandler(async (req: AuthenticatedRequest, res) => {

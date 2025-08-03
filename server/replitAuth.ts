@@ -8,64 +8,38 @@ import memoize from "memoizee";
 import connectPg from "connect-pg-simple";
 import { storage } from "./storage";
 
-// Fallback for development environment
 if (!process.env.REPLIT_DOMAINS) {
-  console.warn("REPLIT_DOMAINS not set, using development fallback");
-  process.env.REPLIT_DOMAINS = "localhost";
+  throw new Error("Environment variable REPLIT_DOMAINS not provided");
 }
 
 const getOidcConfig = memoize(
   async () => {
-    try {
-      return await client.discovery(
-        new URL(process.env.ISSUER_URL ?? "https://replit.com/oidc"),
-        process.env.REPL_ID || 'dev-repl-id'
-      );
-    } catch (error) {
-      console.warn("OIDC discovery failed, using fallback config:", error);
-      // Return minimal config for development
-      return {
-        issuer: "https://replit.com/oidc",
-        authorization_endpoint: "https://replit.com/oidc/authorize",
-        token_endpoint: "https://replit.com/oidc/token",
-        userinfo_endpoint: "https://replit.com/oidc/userinfo",
-        metadata: {},
-        // Custom timeout configuration
-        httpOptions: { timeout: 10000 }
-      } as any;
-    }
+    return await client.discovery(
+      new URL(process.env.ISSUER_URL ?? "https://replit.com/oidc"),
+      process.env.REPL_ID!
+    );
   },
   { maxAge: 3600 * 1000 }
 );
 
 export function getSession() {
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
-  
-  // Use memory store for development if DATABASE_URL not available
-  let sessionStore;
-  if (process.env.DATABASE_URL) {
-    const pgStore = connectPg(session);
-    sessionStore = new pgStore({
-      conString: process.env.DATABASE_URL,
-      createTableIfMissing: false,
-      ttl: sessionTtl,
-      tableName: "sessions",
-    });
-  } else {
-    console.warn("DATABASE_URL not set, using memory store for sessions");
-    sessionStore = undefined; // Use default memory store
-  }
-  
+  const pgStore = connectPg(session);
+  const sessionStore = new pgStore({
+    conString: process.env.DATABASE_URL,
+    createTableIfMissing: false,
+    ttl: sessionTtl,
+    tableName: "sessions",
+  });
   return session({
-    secret: process.env.SESSION_SECRET || 'dev-secret-key-change-in-production',
+    secret: process.env.SESSION_SECRET!,
     store: sessionStore,
     resave: false,
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: true,
       maxAge: sessionTtl,
-      sameSite: 'lax',
     },
   });
 }
@@ -115,7 +89,7 @@ export async function setupAuth(app: Express) {
     const strategy = new Strategy(
       {
         name: `replitauth:${domain}`,
-        config: config as any,
+        config,
         scope: "openid email profile offline_access",
         callbackURL: `https://${domain}/api/callback`,
       },
@@ -128,22 +102,14 @@ export async function setupAuth(app: Express) {
   passport.deserializeUser((user: Express.User, cb) => cb(null, user));
 
   app.get("/api/login", (req, res, next) => {
-    // Use the correct domain from REPLIT_DOMAINS for authentication
-    const domains = process.env.REPLIT_DOMAINS!.split(",");
-    const domain = domains.find(d => d.includes(req.hostname)) || domains[0];
-    
-    passport.authenticate(`replitauth:${domain}`, {
+    passport.authenticate(`replitauth:${req.hostname}`, {
       prompt: "login consent",
       scope: ["openid", "email", "profile", "offline_access"],
     })(req, res, next);
   });
 
   app.get("/api/callback", (req, res, next) => {
-    // Use the correct domain from REPLIT_DOMAINS for authentication
-    const domains = process.env.REPLIT_DOMAINS!.split(",");
-    const domain = domains.find(d => d.includes(req.hostname)) || domains[0];
-    
-    passport.authenticate(`replitauth:${domain}`, {
+    passport.authenticate(`replitauth:${req.hostname}`, {
       successReturnToOrRedirect: "/",
       failureRedirect: "/api/login",
     })(req, res, next);
@@ -164,7 +130,7 @@ export async function setupAuth(app: Express) {
 export const isAuthenticated: RequestHandler = async (req, res, next) => {
   const user = req.user as any;
 
-  if (!req.isAuthenticated() || !user?.expires_at) {
+  if (!req.isAuthenticated() || !user.expires_at) {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
@@ -175,7 +141,8 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
 
   const refreshToken = user.refresh_token;
   if (!refreshToken) {
-    return res.status(401).json({ message: "Unauthorized" });
+    res.status(401).json({ message: "Unauthorized" });
+    return;
   }
 
   try {
@@ -184,7 +151,7 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
     updateUserSession(user, tokenResponse);
     return next();
   } catch (error) {
-    console.error("Token refresh failed:", error);
-    return res.status(401).json({ message: "Unauthorized" });
+    res.status(401).json({ message: "Unauthorized" });
+    return;
   }
 };

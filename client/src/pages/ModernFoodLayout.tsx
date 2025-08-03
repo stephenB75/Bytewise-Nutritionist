@@ -17,6 +17,7 @@ import { AchievementCelebration } from '@/components/AchievementCelebration';
 import { UserAccountManagement } from '@/components/UserAccountManagement';
 import { AwardsAchievements } from '@/components/AwardsAchievements';
 import { ConfettiCelebration } from '@/components/ConfettiCelebration';
+import { SignOnModule } from '@/components/SignOnModule';
 import { useAuth } from '@/hooks/useAuth';
 import { useGoalAchievements } from '@/hooks/useGoalAchievements';
 import { useRotatingBackground } from '@/hooks/useRotatingBackground';
@@ -1217,21 +1218,39 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <div className="space-y-6 pr-2">
               {profileSection === 'overview' && (
                 <div className="space-y-6">
-                  <UserProfile showDetails={true} size="lg" />
-                  <ProfileInfoCard />
+                  {user ? (
+                    <>
+                      <UserProfile showDetails={true} size="lg" />
+                      <ProfileInfoCard />
+                    </>
+                  ) : (
+                    <SignOnModule />
+                  )}
                 </div>
               )}
               
               {profileSection === 'account' && (
-                <UserAccountManagement onClose={() => setProfileSection('overview')} />
+                user ? (
+                  <UserAccountManagement onClose={() => setProfileSection('overview')} />
+                ) : (
+                  <SignOnModule />
+                )
               )}
               
               {profileSection === 'achievements' && (
-                <AwardsAchievements onClose={() => setProfileSection('overview')} />
+                user ? (
+                  <AwardsAchievements onClose={() => setProfileSection('overview')} />
+                ) : (
+                  <SignOnModule />
+                )
               )}
               
               {profileSection === 'data' && (
-                <DataManagementPanel />
+                user ? (
+                  <DataManagementPanel />
+                ) : (
+                  <SignOnModule />
+                )
               )}
             </div>
           </div>
