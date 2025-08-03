@@ -1313,12 +1313,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   return (
     <div className="min-h-screen bg-black">
       {/* Fixed Notification Header on all pages */}
-      <div className="fixed top-6 right-6 z-50">
+      <div className="fixed top-4 right-4 z-50">
         <div className="relative">
           <Button
             variant="ghost"
             size="sm"
-            className="bg-black/40 backdrop-blur-md text-white hover:bg-black/60 rounded-full p-3 border-0"
+            className="bg-black/50 backdrop-blur-md text-white hover:bg-black/70 rounded-full p-3 border-0 shadow-lg"
             onClick={() => setShowNotificationDropdown(!showNotificationDropdown)}
           >
             <Bell className="w-5 h-5" />
