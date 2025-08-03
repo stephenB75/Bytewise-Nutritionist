@@ -25,7 +25,7 @@ import EmailConfirmation from './pages/EmailConfirmation';
 // import './utils/testCalorieIntegration';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<string>('dashboard');
+  const [activeTab, setActiveTab] = useState<string>('fresh');
   const [showNotifications, setShowNotifications] = useState(false);
   const [notificationCount, setNotificationCount] = useState(0);
   
@@ -115,6 +115,8 @@ export default function App() {
     switch (activeTab) {
       case 'dashboard':
         return <FreshRedesign onNavigate={handleNavigate} />;
+      case 'fresh':
+        return <FreshRedesign onNavigate={handleNavigate} />;
       case 'calculator':
         return <CalorieCalculatorWrapper onNavigate={handleNavigate} />;
       case 'logger':
@@ -122,7 +124,7 @@ export default function App() {
       case 'profile':
         return <ProfileEnhanced onNavigate={handleNavigate} />;
       default:
-        return <Dashboard onNavigate={handleNavigate} />;
+        return <FreshRedesign onNavigate={handleNavigate} />;
     }
   };
 
