@@ -221,7 +221,7 @@ function Dashboard({ onNavigate }: DashboardProps) {
 
   return (
     <div className="min-h-full relative overflow-hidden">
-      {/* Rotating Food Background */}
+      {/* Rotating Food Background - VISUAL REDESIGN ACTIVE */}
       <div 
         className={`absolute inset-0 z-0 transition-opacity duration-500 ${imageLoading ? 'opacity-0' : 'opacity-100'}`}
         style={{
@@ -242,6 +242,11 @@ function Dashboard({ onNavigate }: DashboardProps) {
       
       {/* Overlay for better readability */}
       <div className="absolute inset-0 z-5 bg-black/30" />
+      
+      {/* Visual Redesign Debug Indicator */}
+      <div className="absolute top-4 right-4 z-50 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold">
+        VISUAL REDESIGN ACTIVE
+      </div>
       
       {/* Main Content Container */}
       <div className="relative z-10">
