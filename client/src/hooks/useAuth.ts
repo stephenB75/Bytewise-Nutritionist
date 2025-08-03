@@ -9,9 +9,15 @@ import { supabase } from '../lib/supabase';
 import { userApi } from '../lib/api';
 import { config } from '../lib/config';
 import type { User } from '@supabase/supabase-js';
-import type { Database } from '../types/database';
 
-type UserProfile = Database['public']['Tables']['users']['Row'];
+// Simple user profile type without complex database types
+interface UserProfile {
+  id: string;
+  email: string;
+  first_name?: string;
+  last_name?: string;
+  profile_image_url?: string;
+}
 
 export function useAuth() {
   // Debug: Auth hook initializing
