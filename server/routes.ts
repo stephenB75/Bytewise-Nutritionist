@@ -24,12 +24,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { email, password } = req.body;
       
+      console.log('Sign in attempt for email:', email);
+      
       const { data, error } = await serverSupabase.auth.signInWithPassword({
         email,
         password,
       });
       
       if (error) {
+        console.error('Supabase sign in error:', error);
         return res.status(400).json({ message: error.message });
       }
       
@@ -41,6 +44,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           firstName: data.user.user_metadata?.first_name,
           lastName: data.user.user_metadata?.last_name,
         });
+        console.log('User upserted successfully:', data.user.id);
       }
       
       res.json({ 
@@ -49,6 +53,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: "Signed in successfully" 
       });
     } catch (error) {
+      console.error('Sign in endpoint error:', error);
       res.status(500).json({ message: "Sign in failed" });
     }
   });
@@ -58,13 +63,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { email, password } = req.body;
       
+      console.log('Sign up attempt for email:', email);
+      
       const { data, error } = await serverSupabase.auth.signUp({
         email,
         password,
       });
       
       if (error) {
+        console.error('Supabase sign up error:', error);
         return res.status(400).json({ message: error.message });
+      }
+      
+      // Store user in our database immediately after signup
+      if (data.user) {
+        await storage.upsertUser({
+          id: data.user.id,
+          email: data.user.email,
+          firstName: data.user.user_metadata?.first_name,
+          lastName: data.user.user_metadata?.last_name,
+        });
+        console.log('User created and stored:', data.user.id);
       }
       
       res.json({ 
@@ -73,6 +92,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: "Account created successfully" 
       });
     } catch (error) {
+      console.error('Sign up endpoint error:', error);
       res.status(500).json({ message: "Sign up failed" });
     }
   });
