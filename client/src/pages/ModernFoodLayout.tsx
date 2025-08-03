@@ -870,7 +870,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           </div>
         );
       default:
-        return renderDiscover();
+        return renderHome();
     }
   };
 
