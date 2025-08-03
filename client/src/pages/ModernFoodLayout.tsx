@@ -52,8 +52,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const [confettiAchievement, setConfettiAchievement] = useState<any>(null);
   const [dailyCalories, setDailyCalories] = useState(0);
   const [weeklyCalories, setWeeklyCalories] = useState(0);
-  const [goalCalories, setGoalCalories] = useState(2100);
-  const [weeklyGoal, setWeeklyGoal] = useState(14700);
+  const [goalCalories, setGoalCalories] = useState(2000);
+  const [weeklyGoal, setWeeklyGoal] = useState(14000);
   const [loggedMeals, setLoggedMeals] = useState<any[]>([]);
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
   const [trackingView, setTrackingView] = useState('daily'); // 'daily' or 'weekly'
@@ -433,7 +433,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 <div className="text-xs text-gray-400">Meals</div>
               </div>
               <div className="text-center p-2 bg-gray-800/50 rounded-lg">
-                <div className="text-sm font-bold text-orange-400">{Math.round(dailyCalories - goalCalories)}</div>
+                <div className="text-sm font-bold text-orange-400">{Math.round(goalCalories - dailyCalories)}</div>
                 <div className="text-xs text-gray-400">Remaining</div>
               </div>
               <div className="text-center p-2 bg-gray-800/50 rounded-lg">
@@ -493,13 +493,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4">
               <div className="text-center">
                 <div className="text-sm text-gray-400 mb-1">Protein</div>
-                <div className="text-xl font-bold text-green-400 mb-2">140g</div>
+                <div className="text-xl font-bold text-green-400 mb-2">0g</div>
                 <div className="flex items-end space-x-px h-6">
-                  {[0.4, 0.6, 0.8, 0.7, 0.9].map((height, i) => (
+                  {[0, 0, 0, 0, 0].map((height, i) => (
                     <div 
                       key={i}
-                      className="flex-1 bg-green-400/30 rounded-t"
-                      style={{ height: `${height * 100}%` }}
+                      className="flex-1 bg-green-400/10 rounded-t"
+                      style={{ height: `${Math.max(height * 100, 10)}%` }}
                     />
                   ))}
                 </div>
@@ -508,13 +508,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4">
               <div className="text-center">
                 <div className="text-sm text-gray-400 mb-1">Carbs</div>
-                <div className="text-xl font-bold text-yellow-400 mb-2">180g</div>
+                <div className="text-xl font-bold text-yellow-400 mb-2">0g</div>
                 <div className="flex items-end space-x-px h-6">
-                  {[0.5, 0.7, 0.6, 0.8, 0.85].map((height, i) => (
+                  {[0, 0, 0, 0, 0].map((height, i) => (
                     <div 
                       key={i}
-                      className="flex-1 bg-yellow-400/30 rounded-t"
-                      style={{ height: `${height * 100}%` }}
+                      className="flex-1 bg-yellow-400/10 rounded-t"
+                      style={{ height: `${Math.max(height * 100, 10)}%` }}
                     />
                   ))}
                 </div>
@@ -523,13 +523,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4">
               <div className="text-center">
                 <div className="text-sm text-gray-400 mb-1">Fat</div>
-                <div className="text-xl font-bold text-purple-400 mb-2">65g</div>
+                <div className="text-xl font-bold text-purple-400 mb-2">0g</div>
                 <div className="flex items-end space-x-px h-6">
-                  {[0.6, 0.4, 0.7, 0.9, 0.8].map((height, i) => (
+                  {[0, 0, 0, 0, 0].map((height, i) => (
                     <div 
                       key={i}
-                      className="flex-1 bg-purple-400/30 rounded-t"
-                      style={{ height: `${height * 100}%` }}
+                      className="flex-1 bg-purple-400/10 rounded-t"
+                      style={{ height: `${Math.max(height * 100, 10)}%` }}
                     />
                   ))}
                 </div>
