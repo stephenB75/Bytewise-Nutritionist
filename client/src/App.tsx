@@ -16,6 +16,7 @@ import { PWAInstallPrompt, IOSInstallInstructions } from './components/PWAInstal
 import { LiveAppButton } from './components/LiveAppButton';
 // import { useImageRotation } from './hooks/useImageRotation';
 import Dashboard from './pages/Dashboard';
+import DashboardRedesigned from './pages/DashboardRedesigned';
 import CalorieCalculatorWrapper from './components/CalorieCalculatorWrapper';
 import WeeklyLogger from './pages/WeeklyLogger';
 import ProfileEnhanced from './pages/ProfileEnhanced';
@@ -112,7 +113,7 @@ export default function App() {
 
     switch (activeTab) {
       case 'dashboard':
-        return <Dashboard onNavigate={handleNavigate} />;
+        return <DashboardRedesigned onNavigate={handleNavigate} />;
       case 'calculator':
         return <CalorieCalculatorWrapper onNavigate={handleNavigate} />;
       case 'logger':
