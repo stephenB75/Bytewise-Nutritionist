@@ -11,8 +11,8 @@
 
 /* Force content to scroll properly and meet footer */
 .force-bottom-spacing {
-  margin-bottom: 10rem !important;
-  padding-bottom: 5rem !important;
+  margin-bottom: 6rem !important;
+  padding-bottom: 2rem !important;
 }
 
 /* Enhanced Accessibility - Increased text sizes throughout the app */
@@ -143,7 +143,7 @@ body {
 
 /* Main content containers need bottom padding to clear navigation */
 .main-content {
-  padding-bottom: 160px !important; /* Increased space for bottom navigation */
+  padding-bottom: 120px !important; /* Reduced space for bottom navigation */
   margin-bottom: 0 !important;
   min-height: auto !important;
 }
@@ -174,8 +174,8 @@ html, body {
 
 /* Specific spacing for macro cards grid to clear navigation */
 .macros-grid {
-  margin-bottom: 8rem !important;
-  padding-bottom: 3rem !important;
+  margin-bottom: 6rem !important;
+  padding-bottom: 2rem !important;
 }
 
 /* Force bottom spacing on home page content */
