@@ -5,7 +5,7 @@
  * Features achievements, settings, privacy controls, and app information
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { UserProfile } from '@/components/UserProfile';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';

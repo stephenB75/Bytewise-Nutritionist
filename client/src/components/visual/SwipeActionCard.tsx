@@ -3,7 +3,7 @@
  * ADHD-friendly card with swipe gestures for quick actions
  */
 
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, PanInfo, useMotionValue, useTransform } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 import { Check, X, Edit, Trash2 } from 'lucide-react';

@@ -4,7 +4,7 @@
  * Consolidated data export, sync, and management functionality
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';

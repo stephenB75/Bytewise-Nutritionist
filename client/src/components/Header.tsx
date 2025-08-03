@@ -5,7 +5,7 @@
  * Features LogoBrand component and page navigation
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { NewLogoBrand } from './NewLogoBrand';
 import { Bell, Settings, Search, LogOut } from 'lucide-react';
 import { Button } from './ui/button';

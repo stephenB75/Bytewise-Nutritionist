@@ -5,7 +5,7 @@
  * Features comprehensive notification display with proper sizing
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -57,10 +57,6 @@ export function NotificationDropdown({
 }: NotificationDropdownProps) {
   // Disable notifications for visual redesign testing
   return null;
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   if (!mounted || !isOpen) return null;
 
