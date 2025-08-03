@@ -12,13 +12,13 @@ import CalorieCalculator from '@/components/CalorieCalculator';
 import { LogoBrand } from '@/components/LogoBrand';
 import { UserProfile } from '@/components/UserProfile';
 import { ProfileInfoCard } from '@/components/ProfileInfoCard';
+import { SignOnModule } from '@/components/SignOnModule';
+import { useAuth } from '@/hooks/useAuth';
 import { DataManagementPanel } from '@/components/DataManagementPanel';
 import { AchievementCelebration } from '@/components/AchievementCelebration';
 import { UserAccountManagement } from '@/components/UserAccountManagement';
 import { AwardsAchievements } from '@/components/AwardsAchievements';
 import { ConfettiCelebration } from '@/components/ConfettiCelebration';
-import { SignOnModule } from '@/components/SignOnModule';
-import { useAuth } from '@/hooks/useAuth';
 import { useGoalAchievements } from '@/hooks/useGoalAchievements';
 import { useRotatingBackground } from '@/hooks/useRotatingBackground';
 import { 
@@ -49,6 +49,7 @@ interface ModernFoodLayoutProps {
 }
 
 export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) {
+  const { user, isLoading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState('home');
   const [searchQuery, setSearchQuery] = useState('');
   const [showAchievement, setShowAchievement] = useState(false);
@@ -91,7 +92,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   const handleProfileSectionChange = (sectionId: string) => {
     // Prevent navigation while loading
-    if (isLoading) {
+    if (authLoading) {
       return;
     }
     
@@ -167,8 +168,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     setNotifications(prev => prev.filter(n => n.id !== id));
   };
   
-  // Auth and achievement hooks
-  const { user, isLoading } = useAuth();
+  // Achievement hooks  
   const { achievements, celebrationAchievement, showCelebration, closeCelebration } = useGoalAchievements();
   const { backgroundImage } = useRotatingBackground(activeTab);
 
@@ -1209,12 +1209,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   key={section.id}
                   variant={profileSection === section.id ? "default" : "outline"}
                   size="sm"
-                  disabled={isLoading}
+                  disabled={authLoading}
                   className={`flex items-center justify-center space-x-2 w-full md:w-auto transition-all duration-200 ${
                     profileSection === section.id 
                       ? 'bg-purple-600 hover:bg-purple-700 text-white shadow-lg' 
                       : 'bg-white hover:bg-gray-50 text-gray-700 border-gray-300 hover:border-purple-300'
-                  } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  } ${authLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                   onClick={() => handleProfileSectionChange(section.id)}
                 >
                   <IconComponent className="w-4 h-4" />

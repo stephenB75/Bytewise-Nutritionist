@@ -16,7 +16,7 @@ interface UserProfileProps {
 }
 
 export function UserProfile({ showDetails = false, size = 'md' }: UserProfileProps) {
-  const { user, loading: isLoading } = useAuth();
+  const { user, isLoading, supabase } = useAuth();
 
   if (isLoading) {
     return (

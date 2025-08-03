@@ -47,17 +47,22 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
         body: JSON.stringify({ email, password }),
       });
 
+      const data = await response.json();
+
       if (response.ok) {
         toast({
           title: isSignUp ? "Account created!" : "Welcome back!",
-          description: isSignUp ? "Please check your email to verify your account." : "You've been signed in successfully.",
+          description: data.message || (isSignUp ? "Please check your email to verify your account." : "You've been signed in successfully."),
         });
-        window.location.reload(); // Refresh to update auth state
+        
+        // Force a page reload to update authentication state
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       } else {
-        const error = await response.json();
         toast({
           title: "Authentication failed",
-          description: error.message || "Please try again.",
+          description: data.message || "Please try again.",
           variant: "destructive",
         });
       }

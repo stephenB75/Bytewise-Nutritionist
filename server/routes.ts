@@ -1,7 +1,7 @@
-import type { Express } from "express";
+import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated, optionalAuth, createAuthenticatedHandler, type AuthenticatedRequest } from "./supabaseAuth";
+import { setupAuth, isAuthenticated, optionalAuth, serverSupabase, type AuthenticatedRequest } from "./supabaseAuth";
 import { usdaService } from "./services/usdaService";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -9,7 +9,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   await setupAuth(app);
 
   // Auth routes
-  app.get('/api/auth/user', isAuthenticated, createAuthenticatedHandler(async (req: AuthenticatedRequest, res) => {
+  app.get('/api/auth/user', isAuthenticated, async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.user?.id;
     if (!userId) {
       res.status(401).json({ message: "User not found" });
@@ -17,10 +17,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     const user = await storage.getUser(userId);
     res.json(user);
-  }));
+  });
+
+  // Sign in endpoint
+  app.post('/api/auth/signin', async (req: Request, res: Response) => {
+    try {
+      const { email, password } = req.body;
+      
+      const { data, error } = await serverSupabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      if (error) {
+        return res.status(400).json({ message: error.message });
+      }
+      
+      // Store user in our database if they don't exist
+      if (data.user) {
+        await storage.upsertUser({
+          id: data.user.id,
+          email: data.user.email,
+          firstName: data.user.user_metadata?.first_name,
+          lastName: data.user.user_metadata?.last_name,
+        });
+      }
+      
+      res.json({ 
+        user: data.user, 
+        session: data.session,
+        message: "Signed in successfully" 
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Sign in failed" });
+    }
+  });
+
+  // Sign up endpoint
+  app.post('/api/auth/signup', async (req: Request, res: Response) => {
+    try {
+      const { email, password } = req.body;
+      
+      const { data, error } = await serverSupabase.auth.signUp({
+        email,
+        password,
+      });
+      
+      if (error) {
+        return res.status(400).json({ message: error.message });
+      }
+      
+      res.json({ 
+        user: data.user, 
+        session: data.session,
+        message: "Account created successfully" 
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Sign up failed" });
+    }
+  });
+
+  // Sign out endpoint
+  app.post('/api/auth/signout', async (req: Request, res: Response) => {
+    try {
+      await serverSupabase.auth.signOut();
+      res.json({ message: "Signed out successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Sign out failed" });
+    }
+  });
 
   // Meals API for logger
-  app.post('/api/meals/logged', isAuthenticated, createAuthenticatedHandler(async (req: AuthenticatedRequest, res) => {
+  app.post('/api/meals/logged', isAuthenticated, async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.user?.id;
     if (!userId) {
       res.status(401).json({ message: "User not found" });
@@ -36,9 +104,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.log('Logging meal from calculator:', mealData);
     
     res.json({ success: true, meal: mealData });
-  }));
+  });
 
-  app.get('/api/meals/logged', isAuthenticated, createAuthenticatedHandler(async (req: AuthenticatedRequest, res) => {
+  app.get('/api/meals/logged', isAuthenticated, async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.user?.id;
     if (!userId) {
       res.status(401).json({ message: "User not found" });
@@ -49,20 +117,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const meals: any[] = []; // Implement meal retrieval from storage
     
     res.json(meals);
-  }));
+  });
 
   // Calculate calories API with real USDA integration (no auth required)
-  app.post('/api/calculate-calories', optionalAuth, createAuthenticatedHandler(async (req: AuthenticatedRequest, res) => {
+  app.post('/api/calculate-calories', optionalAuth, async (req: AuthenticatedRequest, res: Response) => {
     const { ingredient, measurement } = req.body;
     
     // Use real USDA service for calorie calculation
     const calorieData = await usdaService.calculateIngredientCalories(ingredient, measurement);
     
     res.json(calorieData);
-  }));
+  });
 
   // User profile update endpoint
-  app.put('/api/auth/user/update', isAuthenticated, createAuthenticatedHandler(async (req: AuthenticatedRequest, res) => {
+  app.put('/api/auth/user/update', isAuthenticated, async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.user?.id;
     if (!userId) {
       res.status(401).json({ message: "User not found" });
@@ -82,10 +150,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Error updating user profile:", error);
       res.status(500).json({ message: "Failed to update profile" });
     }
-  }));
+  });
 
   // User data deletion endpoint
-  app.delete('/api/user/delete-data', isAuthenticated, createAuthenticatedHandler(async (req: AuthenticatedRequest, res) => {
+  app.delete('/api/user/delete-data', isAuthenticated, async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.user?.id;
     if (!userId) {
       res.status(401).json({ message: "User not found" });
@@ -102,10 +170,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Error deleting user data:", error);
       res.status(500).json({ message: "Failed to delete data" });
     }
-  }));
+  });
 
   // USDA Food Database Sync API
-  app.post('/api/sync/food-database', isAuthenticated, createAuthenticatedHandler(async (req: AuthenticatedRequest, res) => {
+  app.post('/api/sync/food-database', isAuthenticated, async (req: AuthenticatedRequest, res: Response) => {
     console.log('Starting USDA food database sync...');
       
       // Sync popular foods for offline access
@@ -146,10 +214,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       syncResults,
       timestamp: new Date().toISOString()
     });
-  }));
+  });
 
   // User Data Sync API
-  app.post('/api/sync/user-data', isAuthenticated, createAuthenticatedHandler(async (req: AuthenticatedRequest, res) => {
+  app.post('/api/sync/user-data', isAuthenticated, async (req: AuthenticatedRequest, res: Response) => {
     try {
       const userId = req.user?.id;
       if (!userId) {
@@ -179,7 +247,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         error: error.message
       });
     }
-  }));
+  });
 
   // Search USDA Foods API
   app.get('/api/foods/search', async (req, res) => {
