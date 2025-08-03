@@ -52,17 +52,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }));
 
   // Calculate calories API with real USDA integration (no auth required)
-  app.post('/api/calculate-calories', async (req, res) => {
+  app.post('/api/calculate-calories', optionalAuth, createAuthenticatedHandler(async (req: AuthenticatedRequest, res) => {
     const { ingredient, measurement } = req.body;
     
     // Use real USDA service for calorie calculation
     const calorieData = await usdaService.calculateIngredientCalories(ingredient, measurement);
     
     res.json(calorieData);
-  });
+  }));
 
   // USDA Food Database Sync API
-  app.post('/api/sync/food-database', async (req, res) => {
+  app.post('/api/sync/food-database', isAuthenticated, createAuthenticatedHandler(async (req: AuthenticatedRequest, res) => {
     console.log('Starting USDA food database sync...');
       
       // Sync popular foods for offline access
@@ -103,12 +103,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       syncResults,
       timestamp: new Date().toISOString()
     });
-  });
+  }));
 
   // User Data Sync API
-  app.post('/api/sync/user-data', async (req, res) => {
+  app.post('/api/sync/user-data', isAuthenticated, createAuthenticatedHandler(async (req: AuthenticatedRequest, res) => {
     try {
-      console.log('Starting user data sync');
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "User not found" });
+      }
+      console.log('Starting user data sync for:', userId);
       
       // Sync user meals, achievements, and preferences
       const syncData = {
@@ -132,7 +136,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         error: error.message
       });
     }
-  });
+  }));
 
   // Search USDA Foods API
   app.get('/api/foods/search', async (req, res) => {
