@@ -90,136 +90,160 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   const renderDiscover = () => (
     <div className="space-y-0">
-      {/* Massive Full-Screen Hero Section */}
-      <div className="relative h-96 overflow-hidden rounded-none -mx-4 -mt-6">
+      {/* Full-Screen Hero Section */}
+      <div className="relative h-screen overflow-hidden">
         <div 
-          className="absolute inset-0 bg-cover bg-center scale-110"
+          className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.6), rgba(30,30,30,0.8)), url('https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=1200&h=800&fit=crop')`
+            backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=1600&h=1200&fit=crop')`
           }}
         />
-        <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white p-8">
-          <div className="space-y-4 max-w-lg">
-            <h1 className="text-5xl font-black mb-2 tracking-tighter leading-tight">Every Bite a</h1>
-            <h1 className="text-5xl font-black mb-6 text-orange-400 tracking-tighter">Better Choice!</h1>
-            <p className="text-xl text-gray-200 mb-8 font-medium leading-relaxed">Track nutrition with scientific precision using our comprehensive USDA database</p>
-            <Button 
-              onClick={() => setActiveTab('calculator')}
-              className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-black px-12 py-4 rounded-full text-xl shadow-2xl transform hover:scale-105 transition-all duration-300"
-            >
-              Start Tracking →
-            </Button>
+        
+        {/* Hero Content */}
+        <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
+          <div className="space-y-6 max-w-2xl">
+            <div className="space-y-2">
+              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
+                Every Bite a
+              </h1>
+              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
+                <span className="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">
+                  Better Choice!
+                </span>
+              </h1>
+            </div>
+            
+            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto">
+              Track nutrition with scientific precision using our comprehensive USDA database
+            </p>
+            
+            <div className="pt-8">
+              <Button 
+                onClick={() => setActiveTab('calculator')}
+                size="lg"
+                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-black px-16 py-6 rounded-full text-2xl shadow-2xl transform hover:scale-105 transition-all duration-500 border-2 border-orange-400/30"
+              >
+                Start Tracking
+              </Button>
+            </div>
           </div>
         </div>
         
-        {/* Floating elements for visual appeal */}
-        <div className="absolute top-20 right-8 opacity-30">
-          <Apple className="w-16 h-16 text-orange-300" />
-        </div>
-        <div className="absolute bottom-20 left-8 opacity-20">
-          <Flame className="w-12 h-12 text-red-300" />
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60">
+          <div className="animate-bounce">
+            <ChevronRight className="w-6 h-6 rotate-90" />
+          </div>
         </div>
       </div>
 
-      {/* Search Bar - Dark theme */}
-      <div className="relative px-4 py-4 -mx-4">
-        <Search className="absolute left-8 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-        <Input
-          placeholder="Search foods, meals, ingredients..."
-          className="pl-12 pr-12 h-14 rounded-2xl border-gray-700 bg-gray-800 text-white placeholder-gray-400 text-lg"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-        <Button size="sm" className="absolute right-6 top-1/2 transform -translate-y-1/2 rounded-xl bg-orange-500 hover:bg-orange-600">
-          <Filter className="w-4 h-4" />
-        </Button>
+      {/* Search Section */}
+      <div className="px-6 py-8 bg-black/50">
+        <div className="relative">
+          <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-400 w-6 h-6" />
+          <Input
+            placeholder="Search foods, meals, ingredients..."
+            className="pl-16 pr-16 h-16 rounded-3xl border-gray-600 bg-gray-900/80 backdrop-blur-md text-white placeholder-gray-400 text-xl font-medium"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <Button size="lg" className="absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full bg-orange-500 hover:bg-orange-600 p-4">
+            <Filter className="w-5 h-5" />
+          </Button>
+        </div>
       </div>
 
-      {/* Massive Visual Categories */}
-      <div className="space-y-6 px-4">
-        <h2 className="text-2xl font-black text-white">Browse by Category</h2>
-        <div className="grid grid-cols-2 gap-4">
+      {/* Categories Section */}
+      <div className="px-6 py-8 bg-gray-900/50">
+        <h2 className="text-3xl font-black text-white mb-8 tracking-tight">Browse Categories</h2>
+        <div className="grid grid-cols-2 gap-6">
           {categories.map((category) => (
             <div
               key={category.id}
-              className={`relative overflow-hidden rounded-3xl h-32 ${category.color} hover:scale-105 transition-all duration-500 cursor-pointer shadow-2xl`}
+              className={`relative overflow-hidden rounded-3xl h-40 ${category.color} hover:scale-105 transition-all duration-700 cursor-pointer shadow-2xl group`}
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-black/10 to-black/40" />
-              <div className="absolute inset-0 flex items-center justify-center text-white">
-                <div className="text-center space-y-2">
-                  <div className="text-4xl drop-shadow-lg">{category.emoji}</div>
-                  <div className="font-black text-lg tracking-wide drop-shadow-md">{category.name}</div>
+              <div className="absolute inset-0 bg-gradient-to-br from-black/20 to-black/60" />
+              <div className="absolute inset-0 flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-500">
+                <div className="text-center space-y-3">
+                  <div className="text-5xl drop-shadow-2xl">{category.emoji}</div>
+                  <div className="font-black text-xl tracking-wide drop-shadow-lg">{category.name}</div>
                 </div>
               </div>
               
-              {/* Subtle gradient overlay for depth */}
-              <div className="absolute inset-0 bg-gradient-to-t from-transparent via-transparent to-white/5" />
+              {/* Hover effects */}
+              <div className="absolute inset-0 bg-gradient-to-t from-transparent via-transparent to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             </div>
           ))}
         </div>
       </div>
 
-      {/* Featured Foods */}
-      <div className="space-y-4 px-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold text-white">Popular This Week</h2>
-          <Button variant="ghost" size="sm" className="text-orange-400 hover:text-orange-300">
-            See all <ChevronRight className="w-4 h-4 ml-1" />
+      {/* Featured Foods Section */}
+      <div className="px-6 py-8 bg-black">
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="text-3xl font-black text-white tracking-tight">Popular This Week</h2>
+          <Button variant="ghost" className="text-orange-400 hover:text-orange-300 font-semibold">
+            See all <ChevronRight className="w-5 h-5 ml-2" />
           </Button>
         </div>
         
-        <div className="space-y-4">
+        <div className="space-y-8">
           {featuredFoods.map((food) => (
-            <div key={food.id} className="relative overflow-hidden rounded-3xl h-64 hover:scale-[1.02] transition-transform duration-500 shadow-2xl">
+            <div key={food.id} className="relative overflow-hidden rounded-3xl h-80 hover:scale-[1.02] transition-all duration-700 shadow-2xl group">
               <div 
-                className="absolute inset-0 bg-cover bg-center scale-110"
+                className="absolute inset-0 bg-cover bg-center group-hover:scale-110 transition-transform duration-700"
                 style={{
-                  backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${food.image}')`
+                  backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.3), rgba(0,0,0,0.8)), url('${food.image}')`
                 }}
               />
+              
+              {/* Content Overlay */}
               <div className="absolute inset-0 p-8 flex flex-col justify-between text-white">
+                {/* Top Row */}
                 <div className="flex justify-between items-start">
-                  <div className="flex space-x-2">
+                  <div className="flex space-x-3">
                     {food.tags.slice(0, 2).map((tag) => (
-                      <Badge key={tag} className="bg-orange-500 text-white text-sm font-semibold border-0 px-3 py-1 rounded-full">
+                      <Badge key={tag} className="bg-orange-500/90 backdrop-blur-sm text-white text-sm font-bold border-0 px-4 py-2 rounded-full">
                         {tag}
                       </Badge>
                     ))}
                   </div>
-                  <Button size="lg" variant="ghost" className="text-white hover:text-red-400 hover:bg-white/20 rounded-full p-3">
-                    <Heart className="w-6 h-6" />
+                  <Button size="lg" variant="ghost" className="text-white hover:text-red-400 hover:bg-white/20 rounded-full p-4 group-hover:scale-110 transition-transform duration-300">
+                    <Heart className="w-7 h-7" />
                   </Button>
                 </div>
                 
-                <div className="space-y-4">
+                {/* Bottom Content */}
+                <div className="space-y-6">
                   <div>
-                    <h3 className="text-3xl font-black mb-2 tracking-tight">{food.name}</h3>
-                    <p className="text-lg text-gray-200 font-medium">{food.description}</p>
+                    <h3 className="text-4xl font-black mb-3 tracking-tight leading-tight">{food.name}</h3>
+                    <p className="text-xl text-gray-200 font-medium leading-relaxed">{food.description}</p>
                   </div>
                   
+                  {/* Stats Row */}
                   <div className="flex items-center space-x-6">
-                    <div className="flex items-center space-x-2 bg-black/30 px-3 py-2 rounded-full">
-                      <Star className="w-5 h-5 text-yellow-400 fill-current" />
-                      <span className="text-lg font-bold">{food.rating}</span>
+                    <div className="flex items-center space-x-3 bg-black/40 backdrop-blur-sm px-4 py-3 rounded-full">
+                      <Star className="w-6 h-6 text-yellow-400 fill-current" />
+                      <span className="text-xl font-black">{food.rating}</span>
                     </div>
-                    <div className="flex items-center space-x-2 bg-black/30 px-3 py-2 rounded-full">
-                      <Clock className="w-5 h-5" />
-                      <span className="text-lg font-semibold">{food.time}</span>
+                    <div className="flex items-center space-x-3 bg-black/40 backdrop-blur-sm px-4 py-3 rounded-full">
+                      <Clock className="w-6 h-6" />
+                      <span className="text-xl font-bold">{food.time}</span>
                     </div>
-                    <div className="flex items-center space-x-2 bg-orange-500/80 px-4 py-2 rounded-full">
-                      <Flame className="w-5 h-5" />
-                      <span className="text-lg font-bold">{food.calories} cal</span>
+                    <div className="flex items-center space-x-3 bg-orange-500/90 backdrop-blur-sm px-5 py-3 rounded-full">
+                      <Flame className="w-6 h-6" />
+                      <span className="text-xl font-black">{food.calories} cal</span>
                     </div>
                   </div>
                   
+                  {/* Bottom Row */}
                   <div className="flex justify-between items-end">
-                    <div className="space-y-1">
-                      <div className="text-lg text-orange-300 font-bold">Nutrition Breakdown</div>
-                      <div className="text-base text-white font-semibold">
+                    <div className="space-y-2">
+                      <div className="text-xl text-orange-300 font-black">Nutrition Breakdown</div>
+                      <div className="text-lg text-white font-bold">
                         Protein {food.protein}g • Carbs {food.carbs}g • Fat {food.fat}g
                       </div>
                     </div>
-                    <Button size="lg" className="bg-orange-500 hover:bg-orange-600 text-white font-black px-8 py-3 rounded-full text-lg shadow-xl">
+                    <Button size="lg" className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-black px-10 py-4 rounded-full text-xl shadow-2xl group-hover:scale-110 transition-transform duration-300">
                       Add ${((food.calories / 100) * 2.5).toFixed(2)}
                     </Button>
                   </div>
@@ -310,30 +334,25 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   };
 
   return (
-    <div className="min-h-screen bg-black">
-      {/* Dark Header with minimal design */}
-      <div className="bg-black/90 backdrop-blur-md border-b border-gray-800 px-4 py-4 relative z-20">
+    <div className="min-h-screen bg-black overflow-x-hidden">
+      {/* Minimal Dark Header */}
+      <div className="absolute top-0 left-0 right-0 z-50 bg-black/70 backdrop-blur-xl border-b border-gray-800/50 px-4 py-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2">
             <LogoBrand />
-            <div className="text-white">
-              <div className="flex items-center space-x-1 text-sm text-gray-300">
-                <MapPin className="w-4 h-4" />
-                <span>Nutrition Hub</span>
-              </div>
-            </div>
+            <div className="text-white text-sm font-medium">Nutrition</div>
           </div>
-          <Button size="sm" variant="ghost" className="relative text-white hover:bg-gray-800">
+          <Button size="sm" variant="ghost" className="relative text-white hover:bg-white/10 rounded-full p-2">
             <ShoppingBag className="w-5 h-5" />
-            <Badge className="absolute -top-2 -right-2 h-5 w-5 text-xs bg-orange-500 text-white">
-              3
-            </Badge>
+            <div className="absolute -top-1 -right-1 h-4 w-4 bg-orange-500 rounded-full flex items-center justify-center">
+              <span className="text-xs font-bold text-white">3</span>
+            </div>
           </Button>
         </div>
       </div>
 
-      {/* Main Content with dark theme */}
-      <div className="bg-gray-900 min-h-screen px-4 py-6 pb-20">
+      {/* Full-Screen Content */}
+      <div className="bg-black min-h-screen pt-16">
         {renderContent()}
       </div>
 
