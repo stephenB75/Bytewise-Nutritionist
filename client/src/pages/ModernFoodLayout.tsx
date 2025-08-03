@@ -62,6 +62,100 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
   const [trackingView, setTrackingView] = useState('daily'); // 'daily' or 'weekly'
   const [profileSection, setProfileSection] = useState('overview'); // 'overview', 'account', 'achievements', 'data'
+  
+  // Validation functions for profile sections
+  const validateProfileSection = (sectionId: string): boolean => {
+    const validSections = ['overview', 'account', 'achievements', 'data'];
+    if (!validSections.includes(sectionId)) {
+      console.error(`Invalid profile section: ${sectionId}`);
+      return false;
+    }
+    
+    // Check if user is authenticated for account/data sections
+    if ((sectionId === 'account' || sectionId === 'data') && !user) {
+      console.warn(`User must be authenticated to access ${sectionId} section`);
+      // Show notification about requiring authentication
+      setNotifications(prev => [{
+        id: Date.now().toString(),
+        type: 'info' as const,
+        title: 'Authentication Required',
+        message: `Please sign in to access the ${sectionId} section`,
+        timestamp: new Date(),
+        read: false
+      }, ...prev]);
+      return false;
+    }
+    
+    return true;
+  };
+
+  const handleProfileSectionChange = (sectionId: string) => {
+    // Prevent navigation while loading
+    if (isLoading) {
+      console.log('Profile section navigation blocked: User data is loading');
+      return;
+    }
+    
+    // Validate the section before changing
+    if (!validateProfileSection(sectionId)) {
+      return; // Don't change section if validation fails
+    }
+    
+    // Log the section change for analytics/debugging
+    console.log(`✅ Profile section validated and changed to: ${sectionId}`);
+    
+    // Check for data consistency before section change
+    if (sectionId === 'account' && user) {
+      console.log(`👤 Loading account management for user: ${(user as any)?.email || 'Unknown'}`);
+    } else if (sectionId === 'achievements' && user) {
+      console.log(`🏆 Loading achievements for authenticated user`);
+    } else if (sectionId === 'data' && user) {
+      console.log(`📊 Loading data management for authenticated user`);
+    }
+    
+    // Update the section
+    setProfileSection(sectionId);
+    
+    // Add contextual notifications for specific sections
+    if (sectionId === 'achievements') {
+      setNotifications(prev => [{
+        id: Date.now().toString(),
+        type: 'success' as const,
+        title: 'Awards & Achievements',
+        message: 'Track your progress and unlock new achievements',
+        timestamp: new Date(),
+        read: false
+      }, ...prev]);
+    } else if (sectionId === 'data') {
+      setNotifications(prev => [{
+        id: Date.now().toString(),
+        type: 'info' as const,
+        title: 'Data Management',
+        message: 'Export, sync, and manage your nutrition data securely',
+        timestamp: new Date(),
+        read: false
+      }, ...prev]);
+    } else if (sectionId === 'account') {
+      setNotifications(prev => [{
+        id: Date.now().toString(),
+        type: 'info' as const,
+        title: 'Account Settings',
+        message: 'Update your profile and manage account preferences',
+        timestamp: new Date(),
+        read: false
+      }, ...prev]);
+    } else if (sectionId === 'overview') {
+      setNotifications(prev => [{
+        id: Date.now().toString(),
+        type: 'success' as const,
+        title: 'Profile Overview',
+        message: 'Welcome to your nutrition tracking dashboard',
+        timestamp: new Date(),
+        read: false
+      }, ...prev]);
+    }
+  };
+  
   const [notifications, setNotifications] = useState<Array<{
     id: string;
     type: 'achievement' | 'info' | 'success';
@@ -87,7 +181,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   };
   
   // Auth and achievement hooks
-  const { user, loading } = useAuth();
+  const { user, isLoading } = useAuth();
   const { achievements, celebrationAchievement, showCelebration, closeCelebration } = useGoalAchievements();
   const { backgroundImage } = useRotatingBackground(activeTab);
 
@@ -1199,12 +1293,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   key={section.id}
                   variant={profileSection === section.id ? "default" : "outline"}
                   size="sm"
-                  className={`flex items-center justify-center space-x-2 w-full md:w-auto ${
+                  disabled={isLoading}
+                  className={`flex items-center justify-center space-x-2 w-full md:w-auto transition-all duration-200 ${
                     profileSection === section.id 
-                      ? 'bg-purple-600 hover:bg-purple-700 text-white' 
-                      : 'bg-white hover:bg-gray-50 text-gray-700 border-gray-300'
-                  }`}
-                  onClick={() => setProfileSection(section.id)}
+                      ? 'bg-purple-600 hover:bg-purple-700 text-white shadow-lg' 
+                      : 'bg-white hover:bg-gray-50 text-gray-700 border-gray-300 hover:border-purple-300'
+                  } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  onClick={() => handleProfileSectionChange(section.id)}
                 >
                   <IconComponent className="w-4 h-4" />
                   <span className="text-sm">{section.name}</span>
