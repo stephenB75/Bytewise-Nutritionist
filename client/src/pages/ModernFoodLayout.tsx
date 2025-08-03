@@ -1486,7 +1486,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           <Button
             variant="ghost"
             size="lg"
-            className="bg-gradient-to-br from-blue-600/90 via-purple-600/90 to-cyan-600/90 backdrop-blur-md text-white hover:from-blue-700/95 hover:via-purple-700/95 hover:to-cyan-700/95 rounded-2xl p-4 border-2 border-white/20 shadow-2xl transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(59,130,246,0.5)]"
+            className="bg-transparent text-white hover:bg-white/10 rounded-2xl p-4 transition-all duration-300 hover:scale-105"
             onClick={() => setShowNotificationDropdown(!showNotificationDropdown)}
           >
             <Bell className="w-8 h-8 drop-shadow-lg" />
