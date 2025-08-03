@@ -23,6 +23,7 @@ import RedesignedApp from './pages/RedesignedApp';
 import ModernFoodLayout from './pages/ModernFoodLayout';
 import { TestComponent } from './components/TestComponent';
 import SimpleModernLayout from './pages/SimpleModernLayout';
+import ModernFoodLayoutFixed from './pages/ModernFoodLayoutFixed';
 import CalorieCalculatorWrapper from './components/CalorieCalculatorWrapper';
 import WeeklyLogger from './pages/WeeklyLogger';
 import ProfileEnhanced from './pages/ProfileEnhanced';
@@ -118,7 +119,7 @@ export default function App() {
 
     switch (activeTab) {
       case 'redesigned':
-        return <SimpleModernLayout onNavigate={handleNavigate} />;
+        return <ModernFoodLayoutFixed onNavigate={handleNavigate} />;
       case 'dashboard':
         return <ModernFoodApp onNavigate={handleNavigate} />;
       case 'fresh':
