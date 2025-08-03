@@ -56,7 +56,7 @@ const navItems: NavItem[] = [
 
 export function Navigation({ activeTab, onTabChange }: NavigationProps) {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-sm border-t border-border safe-area-inset-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-sm border-t border-border safe-area-inset-bottom" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
       <div className="w-full max-w-lg mx-auto px-4 py-3">
         <div className="grid grid-cols-4 gap-1">
           {navItems.map((item) => {

@@ -168,6 +168,14 @@ html, body {
   body {
     padding-bottom: max(100px, env(safe-area-inset-bottom)) !important;
   }
+  
+  .main-content {
+    padding-bottom: max(100px, calc(100px + env(safe-area-inset-bottom))) !important;
+  }
+  
+  .page-container {
+    padding-bottom: max(120px, calc(120px + env(safe-area-inset-bottom))) !important;
+  }
 }
 
 /* Additional bottom spacing for specific content areas */
@@ -188,6 +196,31 @@ html, body {
 .signin-module {
   padding-bottom: 3rem !important;
   margin-bottom: 2rem !important;
+}
+
+/* Mobile-specific adjustments */
+@media (max-width: 768px) {
+  .main-content {
+    padding-bottom: 120px !important; /* Increased for mobile touch targets */
+  }
+  
+  .page-container {
+    padding-bottom: 140px !important; /* Extra space for mobile navigation */
+  }
+  
+  .macros-grid {
+    margin-bottom: 5rem !important; /* More space on mobile */
+    padding-bottom: 2rem !important;
+  }
+  
+  .profile-content {
+    padding-bottom: 3rem !important; /* Extra spacing for mobile */
+  }
+  
+  .signin-module {
+    padding-bottom: 4rem !important; /* Prevent mobile keyboard overlap */
+    margin-bottom: 2rem !important;
+  }
 }
 
 input[type="text"]::placeholder, 
