@@ -1178,7 +1178,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       <div className="bg-white">
         <div className="max-w-4xl mx-auto px-6 py-8">
           {/* Profile Navigation */}
-          <div className="flex space-x-2 mb-8 overflow-x-auto pb-2">
+          <div className="grid grid-cols-2 md:flex md:space-x-2 gap-2 md:gap-0 mb-8">
             {[
               { id: 'overview', name: 'Overview', icon: User },
               { id: 'account', name: 'Account', icon: Settings },
@@ -1191,7 +1191,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   key={section.id}
                   variant={profileSection === section.id ? "default" : "outline"}
                   size="sm"
-                  className={`flex items-center space-x-2 whitespace-nowrap ${
+                  className={`flex items-center justify-center space-x-2 w-full md:w-auto ${
                     profileSection === section.id 
                       ? 'bg-purple-600 hover:bg-purple-700 text-white' 
                       : 'bg-white hover:bg-gray-50 text-gray-700 border-gray-300'
@@ -1199,7 +1199,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   onClick={() => setProfileSection(section.id)}
                 >
                   <IconComponent className="w-4 h-4" />
-                  <span>{section.name}</span>
+                  <span className="text-sm">{section.name}</span>
                 </Button>
               );
             })}
