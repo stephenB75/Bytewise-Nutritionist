@@ -297,9 +297,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/70 to-black/90" />
       </div>
 
-      {/* Content Overlay */}
+      {/* Hero Text Overlay - ONLY TEXT */}
       <div className="relative z-10 px-6 pt-24 pb-32">
-        {/* Hero Text */}
         <div className="mb-12">
           <h1 className="text-5xl font-black text-white mb-4 tracking-tight leading-none">
             Track Your
@@ -312,9 +311,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             Discover amazing foods and track your daily nutrition with our powerful calorie calculator
           </p>
         </div>
+      </div>
 
-
-
+      {/* Content Underneath Hero */}
+      <div className="bg-black px-6 py-8">
         {/* Daily Progress Metrics Cards instead of Categories */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-white mb-4">Today's Progress</h2>
