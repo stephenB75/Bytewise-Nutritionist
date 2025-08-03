@@ -96,15 +96,9 @@ export default function App() {
     };
   }, []);
 
-  // Check for special routes first
+  // Removed special authentication routes - restored to modernlayout state
   const checkSpecialRoutes = () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const type = urlParams.get('type');
-    
-    if (type === 'signup' || window.location.pathname.includes('confirm')) {
-      return <EmailConfirmation onNavigate={handleNavigate} />;
-    }
-    
+    // Direct access to modern layout - no authentication checks
     return null;
   };
 
@@ -128,7 +122,7 @@ export default function App() {
       case 'profile':
         return <ProfileEnhanced onNavigate={handleNavigate} />;
       default:
-        return <RedesignedApp onNavigate={handleNavigate} />;
+        return <ModernFoodLayout onNavigate={handleNavigate} />;
     }
   };
 

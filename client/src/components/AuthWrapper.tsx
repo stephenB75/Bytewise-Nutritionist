@@ -1,7 +1,8 @@
 /**
  * Authentication Wrapper Component
  * 
- * Simplified for visual redesign testing - bypasses auth
+ * Simplified for modernlayout - bypasses all authentication
+ * Restores to pre-sign-on module state
  */
 
 interface AuthWrapperProps {
@@ -10,9 +11,8 @@ interface AuthWrapperProps {
 }
 
 export function AuthWrapper({ children, onNavigate }: AuthWrapperProps) {
-  // Bypass authentication completely for visual redesign testing
-  // AuthWrapper: Bypassing authentication for visual testing
+  // Restored to modernlayout state - no authentication required
+  // Direct access to app without sign-on module
   
-  // Skip all auth logic and directly show children
   return <>{children}</>;
 }
