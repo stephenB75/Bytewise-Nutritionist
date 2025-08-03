@@ -42,6 +42,7 @@ import {
 } from 'lucide-react';
 import { NotificationDropdown } from '@/components/NotificationDropdown';
 import { Navigation } from '@/components/Navigation';
+import { WeeklyCaloriesCard } from '@/components/WeeklyCaloriesCard';
 
 interface ModernFoodLayoutProps {
   onNavigate?: (page: string) => void;
@@ -1093,28 +1094,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             )}
           </div>
         </div>
-        {/* Daily/Weekly Tabs */}
+        {/* Daily Header */}
         <div className="flex space-x-4 mb-6">
           <Button className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-3 rounded-xl">
             <Calendar className="w-4 h-4 mr-2" />
             Today
-          </Button>
-          <Button 
-            variant="outline" 
-            className="border-green-500/50 text-green-400 bg-green-500/10 hover:bg-green-500/20 font-semibold px-6 py-3 rounded-xl"
-            onClick={() => {
-              console.log('This Week clicked - functionality activated');
-              // Show weekly data
-              const weeklyMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-              const totalWeeklyCalories = weeklyMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
-              const toast = document.createElement('div');
-              toast.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50';
-              toast.textContent = `This week: ${Math.round(totalWeeklyCalories)} calories logged`;
-              document.body.appendChild(toast);
-              setTimeout(() => document.body.removeChild(toast), 3000);
-            }}
-          >
-            This Week
           </Button>
         </div>
 
@@ -1182,6 +1166,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               </div>
             </Card>
           )))}
+        </div>
+
+        {/* Weekly Calories Summary */}
+        <div className="space-y-4 mt-8">
+          <div className="flex justify-between items-center">
+            <h3 className="text-xl font-bold text-white">This Week</h3>
+            <Badge className="bg-blue-600 text-white">Weekly Summary</Badge>
+          </div>
+          <WeeklyCaloriesCard />
         </div>
       </div>
     </div>
