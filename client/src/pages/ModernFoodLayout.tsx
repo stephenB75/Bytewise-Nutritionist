@@ -312,80 +312,79 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             Discover amazing foods and track your daily nutrition with our powerful calorie calculator
           </p>
         </div>
-      </div>
 
-      {/* Content Underneath Hero */}
-      <div className="bg-black px-6 py-8">
-        {/* Daily Progress Metrics Cards */}
+
+
+        {/* Daily Progress Metrics Cards instead of Categories */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-white mb-4">Today's Progress</h2>
-          <div className="grid grid-cols-2 gap-4 mb-6">
+          <div className="grid grid-cols-2 gap-4">
             {/* Macro Nutrients */}
-            <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4">
-              <h3 className="text-white font-semibold text-lg mb-3">Macros</h3>
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-blue-400">Protein</span>
-                  <span className="text-white font-bold">45g / 150g</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-green-400">Carbs</span>
-                  <span className="text-white font-bold">120g / 200g</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-orange-400">Fats</span>
-                  <span className="text-white font-bold">35g / 70g</span>
-                </div>
+            <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4 hover:bg-white/20 transition-all">
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center mb-3">
+                <span className="text-2xl">💪</span>
               </div>
+              <h3 className="text-white font-semibold text-lg">Macros</h3>
+              <p className="text-gray-300 text-sm">45g/150g protein</p>
             </Card>
 
-            {/* Micro Nutrients */}
-            <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4">
-              <h3 className="text-white font-semibold text-lg mb-3">Micros</h3>
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-yellow-400">Vitamin C</span>
-                  <span className="text-white font-bold">65mg / 90mg</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-purple-400">Iron</span>
-                  <span className="text-white font-bold">8mg / 18mg</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-pink-400">Calcium</span>
-                  <span className="text-white font-bold">600mg / 1000mg</span>
-                </div>
+            <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4 hover:bg-white/20 transition-all">
+              <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mb-3">
+                <span className="text-2xl">🌟</span>
               </div>
+              <h3 className="text-white font-semibold text-lg">Micros</h3>
+              <p className="text-gray-300 text-sm">65mg/90mg Vitamin C</p>
+            </Card>
+
+            <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4 hover:bg-white/20 transition-all">
+              <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex items-center justify-center mb-3">
+                <span className="text-2xl">🔥</span>
+              </div>
+              <h3 className="text-white font-semibold text-lg">Calories</h3>
+              <p className="text-gray-300 text-sm">1,234/2,100 kcal</p>
+            </Card>
+
+            <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4 hover:bg-white/20 transition-all">
+              <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center mb-3">
+                <span className="text-2xl">💧</span>
+              </div>
+              <h3 className="text-white font-semibold text-lg">Hydration</h3>
+              <p className="text-gray-300 text-sm">6/8 glasses water</p>
             </Card>
           </div>
-
-          {/* Calorie Progress */}
-          <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-white font-semibold text-xl">Daily Calories</h3>
-              <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30">
-                <Flame className="w-3 h-3 mr-1" />
-                1,234 / 2,100 kcal
-              </Badge>
-            </div>
-            <div className="w-full bg-gray-700 rounded-full h-3">
-              <div 
-                className="bg-gradient-to-r from-orange-400 to-red-500 h-3 rounded-full transition-all duration-300"
-                style={{ width: '59%' }}
-              />
-            </div>
-            <p className="text-gray-300 text-sm mt-2">866 calories remaining</p>
-          </Card>
         </div>
 
-        {/* Quick Action Button */}
-        <Button 
-          onClick={() => setActiveTab('calculator')}
-          className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold h-14 rounded-2xl text-lg"
-        >
-          <Zap className="w-5 h-5 mr-2" />
-          Calculate Nutrition
-        </Button>
+        {/* Daily Progress instead of Popular This Week */}
+        <div>
+          <h2 className="text-2xl font-bold text-white mb-4">Today's Meals</h2>
+          <div className="space-y-4">
+            {[
+              { name: 'Breakfast: Oatmeal & Berries', calories: '320 cal', macros: '12g protein, 8g fiber', image: 'https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=400&h=300&fit=crop' },
+              { name: 'Lunch: Chicken Caesar Salad', calories: '450 cal', macros: '35g protein, 15g carbs', image: 'https://images.unsplash.com/photo-1541519227354-08fa5d50c44d?w=400&h=300&fit=crop' },
+              { name: 'Snack: Greek Yogurt Bowl', calories: '150 cal', macros: '20g protein, 3g fat', image: 'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=400&h=300&fit=crop' },
+            ].map((meal) => (
+              <Card key={meal.name} className="bg-white/10 backdrop-blur-md border-white/20 p-4 hover:bg-white/20 transition-all">
+                <div className="flex items-center space-x-4">
+                  <img 
+                    src={meal.image} 
+                    alt={meal.name}
+                    className="w-16 h-16 rounded-xl object-cover"
+                  />
+                  <div className="flex-1">
+                    <h3 className="text-white font-semibold text-lg">{meal.name}</h3>
+                    <div className="flex items-center space-x-4 mt-1">
+                      <span className="text-orange-400 font-medium">{meal.calories}</span>
+                      <span className="text-gray-300">{meal.macros}</span>
+                    </div>
+                  </div>
+                  <Button size="sm" className="bg-orange-500 hover:bg-orange-600 text-white rounded-full">
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
