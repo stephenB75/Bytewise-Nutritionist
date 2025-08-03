@@ -81,7 +81,7 @@ body {
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
-/* Input field text visibility fixes */
+/* Enhanced Input field text visibility fixes */
 .input-with-icon {
   @apply relative;
 }
@@ -109,6 +109,61 @@ body {
   z-index: 10;
   pointer-events: none;
   color: #9ca3af;
+}
+
+/* Global input text visibility improvements */
+input[type="text"], 
+input[type="email"], 
+input[type="password"], 
+input[type="number"], 
+input[type="search"],
+textarea {
+  color: #1f2937 !important;
+  font-weight: 400 !important;
+}
+
+input[type="text"]::placeholder, 
+input[type="email"]::placeholder, 
+input[type="password"]::placeholder, 
+input[type="number"]::placeholder, 
+input[type="search"]::placeholder,
+textarea::placeholder {
+  color: #6b7280 !important;
+  opacity: 0.8 !important;
+}
+
+/* Focus states for better visibility */
+input[type="text"]:focus, 
+input[type="email"]:focus, 
+input[type="password"]:focus, 
+input[type="number"]:focus, 
+input[type="search"]:focus,
+textarea:focus {
+  color: #111827 !important;
+  font-weight: 500 !important;
+  background-color: #ffffff !important;
+}
+
+/* Dark background input overrides */
+.bg-white\/10 input,
+.bg-white\/5 input,
+.bg-gray-800 input,
+.bg-black input {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  color: #1f2937 !important;
+}
+
+/* Ensure good contrast on all input backgrounds */
+input {
+  background-color: #ffffff !important;
+  color: #1f2937 !important;
+  border: 1px solid #d1d5db;
+}
+
+input:focus {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+  border-color: #3b82f6;
 }
 
 @custom-variant dark (&:is(.dark *));

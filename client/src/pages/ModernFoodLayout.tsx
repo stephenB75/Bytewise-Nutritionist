@@ -1005,12 +1005,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           <div className="space-y-4">
             <Input
               placeholder="Email"
-              className="h-12 bg-white/10 border-white/20 text-white placeholder-gray-400"
+              className="h-12 bg-white/95 border-white/20 text-gray-900 placeholder-gray-500"
             />
             <Input
               type="password"
               placeholder="Password"
-              className="h-12 bg-white/10 border-white/20 text-white placeholder-gray-400"
+              className="h-12 bg-white/95 border-white/20 text-gray-900 placeholder-gray-500"
             />
             <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold h-12 rounded-xl">
               Sign In
@@ -1079,7 +1079,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               placeholder="Search foods to log..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-28 pr-16 h-16 bg-white/10 border-white/20 text-white placeholder-gray-400 backdrop-blur-md rounded-2xl text-xl font-medium"
+              className="pl-28 pr-16 h-16 bg-white/95 border-white/20 text-gray-900 placeholder-gray-500 backdrop-blur-md rounded-2xl text-xl font-medium"
             />
             {searchQuery && (
               <Button
