@@ -291,7 +291,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const renderHome = () => (
     <div className="space-y-0 page-container">
       {/* Full-Screen Hero Section */}
-      <div className="relative h-[60vh] overflow-hidden">
+      <div className="relative h-screen overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out"
           style={{
@@ -538,7 +538,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const renderTracking = () => (
     <div className="space-y-0 page-container">
       {/* Full-Screen Hero Section */}
-      <div className="relative h-[60vh] overflow-hidden">
+      <div className="relative h-screen overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out"
           style={{
@@ -738,7 +738,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const renderAchievements = () => (
     <div className="space-y-0">
       {/* Full-Screen Hero Section */}
-      <div className="relative h-[60vh] overflow-hidden">
+      <div className="relative h-screen overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out"
           style={{
@@ -1107,7 +1107,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const renderCalculator = () => (
     <div className="space-y-0 page-container">
       {/* Full-Screen Hero Section */}
-      <div className="relative h-[60vh] overflow-hidden">
+      <div className="relative h-screen overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out"
           style={{
@@ -1158,7 +1158,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const renderProfile = () => (
     <div className="space-y-0 page-container">
       {/* Full-Screen Hero Section */}
-      <div className="relative h-[60vh] overflow-hidden">
+      <div className="relative h-screen overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out"
           style={{
