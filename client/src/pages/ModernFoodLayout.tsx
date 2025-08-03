@@ -1352,7 +1352,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             className="bg-gradient-to-br from-blue-600/90 via-purple-600/90 to-cyan-600/90 backdrop-blur-md text-white hover:from-blue-700/95 hover:via-purple-700/95 hover:to-cyan-700/95 rounded-2xl p-4 border-2 border-white/20 shadow-2xl transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(59,130,246,0.5)]"
             onClick={() => setShowNotificationDropdown(!showNotificationDropdown)}
           >
-            <Bell className="w-6 h-6 drop-shadow-lg" />
+            <Bell className="w-8 h-8 drop-shadow-lg" />
             {notifications.filter(n => !n.read).length > 0 && (
               <div className="absolute -top-2 -right-2 w-7 h-7 bg-gradient-to-br from-red-500 to-pink-600 rounded-full flex items-center justify-center border-2 border-white shadow-lg animate-pulse">
                 <span className="text-sm text-white font-bold drop-shadow-md">
