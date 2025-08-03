@@ -94,7 +94,7 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
     <Card className={`overflow-hidden bg-white/10 backdrop-blur-md border-white/20 w-full ${className}`}>
       {/* Header - Always Visible */}
       <div className="p-6">
-        <div className="flex flex-col items-center gap-6 text-center">
+        <div className="flex flex-col space-y-4">
           {/* Profile Image */}
           <div className="relative">
             <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold border-4 border-white shadow-lg">
@@ -116,20 +116,18 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
           </div>
 
           {/* Basic Info */}
-          <div className="w-full space-y-4">
-            <div className="space-y-2">
-              <h3 className="text-xl font-bold text-white" style={{ fontFamily: "'League Spartan', sans-serif" }}>
-                {user?.firstName || 'User'} {user?.lastName || ''}
-              </h3>
-              <div className="flex items-center justify-center gap-2 text-gray-300">
-                <Mail className="w-4 h-4" />
-                <span className="text-sm" style={{ fontFamily: "'Quicksand', sans-serif" }}>
-                  {user?.email || 'No email'}
-                </span>
-              </div>
+          <div className="space-y-3">
+            <h3 className="text-lg font-bold text-white" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+              {user?.firstName || 'User'} {user?.lastName || ''}
+            </h3>
+            <div className="flex items-center gap-2 text-gray-300">
+              <Mail className="w-4 h-4" />
+              <span className="text-sm" style={{ fontFamily: "'Quicksand', sans-serif" }}>
+                {user?.email || 'No email'}
+              </span>
             </div>
             
-            <div className="flex justify-center gap-2">
+            <div className="flex gap-2">
               {user?.emailVerified && (
                 <Badge variant="secondary" className="text-xs bg-green-500/20 text-green-400 border-green-500/30">
                   Verified
@@ -142,7 +140,7 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
           </div>
 
           {/* Actions */}
-          <div className="flex justify-center gap-2 mt-4">
+          <div className="flex gap-2 mt-4">
             {!isEditing && (
               <Button
                 variant="ghost"

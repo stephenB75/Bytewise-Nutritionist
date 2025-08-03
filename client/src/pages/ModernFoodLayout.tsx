@@ -1204,33 +1204,33 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           })}
         </div>
 
-        {/* Profile Content - Stacked Vertically */}
-        <div className="w-full max-w-2xl mx-auto space-y-4">
+        {/* Profile Content - Single Column Stack */}
+        <div className="flex flex-col space-y-6 w-full max-w-md mx-auto">
           {profileSection === 'overview' && (
-            <div className="w-full space-y-4">
-              <div className="w-full bg-gray-900/80 backdrop-blur-md rounded-2xl border border-gray-700 p-4">
+            <>
+              <div className="bg-gray-900/80 backdrop-blur-md rounded-2xl border border-gray-700 p-6">
                 <UserProfile showDetails={true} size="lg" />
               </div>
-              <div className="w-full bg-gray-900/80 backdrop-blur-md rounded-2xl border border-gray-700 p-4">
+              <div className="bg-gray-900/80 backdrop-blur-md rounded-2xl border border-gray-700 p-6">
                 <ProfileInfoCard />
               </div>
-            </div>
+            </>
           )}
           
           {profileSection === 'account' && (
-            <div className="w-full bg-gray-900/80 backdrop-blur-md rounded-2xl border border-gray-700 p-4">
+            <div className="bg-gray-900/80 backdrop-blur-md rounded-2xl border border-gray-700 p-6">
               <UserAccountManagement onClose={() => setProfileSection('overview')} />
             </div>
           )}
           
           {profileSection === 'achievements' && (
-            <div className="w-full bg-gray-900/80 backdrop-blur-md rounded-2xl border border-gray-700 p-4">
+            <div className="bg-gray-900/80 backdrop-blur-md rounded-2xl border border-gray-700 p-6">
               <AwardsAchievements onClose={() => setProfileSection('overview')} />
             </div>
           )}
           
           {profileSection === 'data' && (
-            <div className="w-full bg-gray-900/80 backdrop-blur-md rounded-2xl border border-gray-700 p-4">
+            <div className="bg-gray-900/80 backdrop-blur-md rounded-2xl border border-gray-700 p-6">
               <DataManagementPanel />
             </div>
           )}
