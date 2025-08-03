@@ -25,6 +25,10 @@ import { PWAStatus } from '@/components/PWAStatus';
 import { useCalorieTracking } from '@/hooks/useCalorieTracking';
 import { useQuery } from '@tanstack/react-query';
 import { useRotatingBackground } from '@/hooks/useRotatingBackground';
+import { WorkflowNavigation } from '@/components/visual/WorkflowNavigation';
+import { InteractiveProgressRing } from '@/components/visual/InteractiveProgressRing';
+import { MinimalistMealCard } from '@/components/visual/MinimalistMealCard';
+import { ADHDFriendlyToggle } from '@/components/visual/ADHDFriendlyToggle';
 
 interface DashboardProps {
   onNavigate: (page: string) => void;
@@ -38,6 +42,11 @@ function Dashboard({ onNavigate }: DashboardProps) {
   
   // Add rotating background to main dashboard
   const { currentImage, currentAlt, isLoading: imageLoading } = useRotatingBackground();
+  
+  // Workflow state
+  const [currentWorkflowStep, setCurrentWorkflowStep] = useState('track');
+  const [completedSteps, setCompletedSteps] = useState(['calculate', 'log']);
+  const [showProgressDetails, setShowProgressDetails] = useState(false);
 
   // Fetch user data from API
   const { data: user } = useQuery({
@@ -238,308 +247,165 @@ function Dashboard({ onNavigate }: DashboardProps) {
       <div className="relative z-10">
         {/* Hero Section */}
         <HeroSection
-        title={`Good morning, ${userStats.name}!`}
-        subtitle="Keep up your amazing progress"
-        component="dashboard"
-        caloriesConsumed={userStats.caloriesConsumed}
-        caloriesGoal={userStats.caloriesGoal}
-        currentStreak={userStats.currentStreak}
-      />
+          title={`Good morning, ${userStats.name}!`}
+          subtitle="Keep up your amazing progress"
+          component="dashboard"
+          caloriesConsumed={userStats.caloriesConsumed}
+          caloriesGoal={userStats.caloriesGoal}
+          currentStreak={userStats.currentStreak}
+        />
 
-      {/* Main Content */}
-      <div className="max-w-md mx-auto w-full px-3 py-6 space-y-6">
-        {/* Daily Nutrition Metrics */}
-        <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-gray-900">Daily Nutrition Overview</h3>
-            <Badge variant="outline" className="text-xs">
-              📊 Calculator: {dataSource.calculatorEntries} • Logger: {dataSource.mealEntries}
-            </Badge>
-          </div>
-          
-          {/* Data Source Status */}
-          <div className="bg-blue-50 p-3 rounded-lg mb-4">
-            <div className="flex items-center gap-2">
-              <Flame className="w-4 h-4 text-blue-600" />
-              <span className="text-sm font-medium text-blue-900">Live Data Sources</span>
-            </div>
-            <div className="text-xs text-blue-700 mt-1">
-              Calculator: {Math.round(dataSource.calculatorCalories)} cal • Last update: {dataSource.lastUpdate}
-            </div>
-          </div>
-          
-          {/* Macro Nutrients - 4 Column Layout with Vertical Bars */}
-          <div className="grid grid-cols-4 gap-3 mb-6">
-            <div className="text-center p-3 bg-red-50 rounded-lg">
-              <div className="p-2 bg-red-100 rounded-lg w-fit mx-auto mb-2">
-                <Beef className="w-4 h-4 text-red-600" />
-              </div>
-              <div className="text-xl font-bold text-red-600">{userStats.proteinConsumed}g</div>
-              <div className="text-xs text-gray-600 mb-2">Protein</div>
-              
-              {/* Vertical Bar */}
-              <div className="h-16 w-3 bg-gray-200 rounded-full mx-auto mb-2 relative">
-                <div 
-                  className="bg-red-500 w-full rounded-full absolute bottom-0 transition-all duration-500" 
-                  style={{ height: `${Math.min(proteinProgress, 100)}%` }}
-                ></div>
-              </div>
-              <div className="text-xs text-gray-500">{userStats.proteinGoal}g</div>
-            </div>
+        {/* Main Content */}
+        <div className="max-w-md mx-auto w-full px-3 py-6 space-y-6">
+          {/* Workflow Navigation */}
+          <WorkflowNavigation
+            currentStep={currentWorkflowStep}
+            completedSteps={completedSteps}
+            onStepClick={(step) => {
+              setCurrentWorkflowStep(step);
+              if (step === 'calculate') onNavigate('calculator');
+              if (step === 'log') onNavigate('logger');
+              if (step === 'view') onNavigate('profile');
+            }}
+          />
 
-            <div className="text-center p-3 bg-yellow-50 rounded-lg">
-              <div className="p-2 bg-yellow-100 rounded-lg w-fit mx-auto mb-2">
-                <Calendar className="w-4 h-4 text-yellow-600" />
-              </div>
-              <div className="text-xl font-bold text-yellow-600">{userStats.carbsConsumed}g</div>
-              <div className="text-xs text-gray-600 mb-2">Carbs</div>
-              
-              {/* Vertical Bar */}
-              <div className="h-16 w-3 bg-gray-200 rounded-full mx-auto mb-2 relative">
-                <div 
-                  className="bg-yellow-500 w-full rounded-full absolute bottom-0 transition-all duration-500" 
-                  style={{ height: `${Math.min(carbsProgress, 100)}%` }}
-                ></div>
-              </div>
-              <div className="text-xs text-gray-500">{userStats.carbsGoal}g</div>
-            </div>
-
-            <div className="text-center p-3 bg-green-50 rounded-lg">
-              <div className="p-2 bg-green-100 rounded-lg w-fit mx-auto mb-2">
-                <Droplets className="w-4 h-4 text-green-600" />
-              </div>
-              <div className="text-xl font-bold text-green-600">{userStats.fatConsumed}g</div>
-              <div className="text-xs text-gray-600 mb-2">Fat</div>
-              
-              {/* Vertical Bar */}
-              <div className="h-16 w-3 bg-gray-200 rounded-full mx-auto mb-2 relative">
-                <div 
-                  className="bg-green-500 w-full rounded-full absolute bottom-0 transition-all duration-500" 
-                  style={{ height: `${Math.min(fatProgress, 100)}%` }}
-                ></div>
-              </div>
-              <div className="text-xs text-gray-500">{userStats.fatGoal}g</div>
-            </div>
-
-            <div className="text-center p-3 bg-blue-50 rounded-lg">
-              <div className="p-2 bg-blue-100 rounded-lg w-fit mx-auto mb-2">
-                <Droplets className="w-4 h-4 text-blue-600" />
-              </div>
-              <div className="text-xl font-bold text-blue-600">{userStats.waterConsumed}</div>
-              <div className="text-xs text-gray-600 mb-2">Water</div>
-              
-              {/* Vertical Bar */}
-              <div className="h-16 w-3 bg-gray-200 rounded-full mx-auto mb-2 relative">
-                <div 
-                  className="bg-blue-500 w-full rounded-full absolute bottom-0 transition-all duration-500" 
-                  style={{ height: `${Math.min(waterProgress, 100)}%` }}
-                ></div>
-              </div>
-              <div className="text-xs text-gray-500">{userStats.waterGoal} cups</div>
-            </div>
-          </div>
-
-          {/* Micro Nutrients */}
-          <div className="border-t pt-4">
-            <h4 className="font-semibold text-gray-900 mb-3">Key Micronutrients</h4>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                <div>
-                  <div className="font-medium text-gray-900">Fiber</div>
-                  <div className="text-sm text-gray-600">28g / 35g</div>
-                </div>
-                <div className="text-green-600 font-bold">80%</div>
-              </div>
-              
-              <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                <div>
-                  <div className="font-medium text-gray-900">Sodium</div>
-                  <div className="text-sm text-gray-600">1,890mg / 2,300mg</div>
-                </div>
-                <div className="text-blue-600 font-bold">82%</div>
-              </div>
-
-              <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
-                <div>
-                  <div className="font-medium text-gray-900">Vitamin C</div>
-                  <div className="text-sm text-gray-600">67mg / 90mg</div>
-                </div>
-                <div className="text-orange-600 font-bold">74%</div>
-              </div>
-
-              <div className="flex items-center justify-between p-3 bg-indigo-50 rounded-lg">
-                <div>
-                  <div className="font-medium text-gray-900">Iron</div>
-                  <div className="text-sm text-gray-600">12mg / 18mg</div>
-                </div>
-                <div className="text-indigo-600 font-bold">67%</div>
-              </div>
-            </div>
-          </div>
-        </Card>
-
-        {/* Today's Meals */}
-        <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-gray-900">Today's Meals</h3>
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className="text-xs">
-                📊 {todayMeals.length} entries
-              </Badge>
-              <Button 
-                variant="ghost" 
+          {/* Visual Progress Overview */}
+          <Card className="p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-gray-900">Today's Progress</h3>
+              <ADHDFriendlyToggle
+                checked={showProgressDetails}
+                onChange={setShowProgressDetails}
+                label=""
                 size="sm"
-                onClick={() => onNavigate('calculator')}
-                className="text-blue-600 hover:text-blue-700"
-              >
-                <Plus className="w-4 h-4 mr-1" />
-                Add Meal
-              </Button>
+                variant="success"
+              />
             </div>
-          </div>
+            
+            <div className="grid grid-cols-4 gap-4 mb-4">
+              <InteractiveProgressRing
+                value={userStats.caloriesConsumed}
+                max={userStats.caloriesGoal}
+                size={80}
+                strokeWidth={6}
+                label="Calories"
+                unit=""
+                showValue={true}
+                color="#10b981"
+              />
+              <InteractiveProgressRing
+                value={userStats.proteinConsumed}
+                max={userStats.proteinGoal}
+                size={80}
+                strokeWidth={6}
+                label="Protein"
+                unit="g"
+                showValue={true}
+                color="#ef4444"
+              />
+              <InteractiveProgressRing
+                value={userStats.carbsConsumed}
+                max={userStats.carbsGoal}
+                size={80}
+                strokeWidth={6}
+                label="Carbs"
+                unit="g"
+                showValue={true}
+                color="#f59e0b"
+              />
+              <InteractiveProgressRing
+                value={userStats.fatConsumed}
+                max={userStats.fatGoal}
+                size={80}
+                strokeWidth={6}
+                label="Fat"
+                unit="g"
+                showValue={true}
+                color="#3b82f6"
+              />
+            </div>
 
-          {/* Data Source Status */}
-          <div className="bg-green-50 p-3 rounded-lg mb-4">
-            <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-green-600" />
-              <span className="text-sm font-medium text-green-900">Live Data Connection</span>
-            </div>
-            <div className="text-xs text-green-700 mt-1">
-              Calculator: {todaysMealsFromCalculator.length} • Logger: {todaysMealsFromLogger.length} • Last sync: {dataSource.lastUpdate}
-            </div>
-          </div>
-          
-          <div className="space-y-3">
-            {todayMeals.length > 0 ? (
-              todayMeals.map((meal, index) => (
-                <div key={index} className={`flex items-center justify-between p-3 bg-gradient-to-r ${meal.color} rounded-lg border`}>
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-white rounded-lg shadow-sm">
-                      {meal.source === 'calculator' ? (
-                        <Target className="w-4 h-4 text-blue-600" />
-                      ) : (
-                        <Utensils className="w-4 h-4 text-green-600" />
-                      )}
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-900">{meal.name}</p>
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <span>{meal.time}</span>
-                        <Badge variant="outline" className="text-xs">
-                          {meal.source === 'calculator' ? '🧮 Calc' : '📝 Logger'}
-                        </Badge>
-                      </div>
-                    </div>
-                  </div>
-                  <Badge variant="secondary" className="bg-white">
-                    {meal.calories} cal
-                  </Badge>
+            {showProgressDetails && (
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span>Calories:</span>
+                  <span>{userStats.caloriesConsumed} / {userStats.caloriesGoal}</span>
                 </div>
-              ))
-            ) : (
-              <div className="text-center py-8">
-                <Utensils className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-500 mb-2">No meals logged today</p>
-                <p className="text-sm text-gray-400">Use the calculator or logger to add entries</p>
+                <div className="flex justify-between">
+                  <span>Protein:</span>
+                  <span>{userStats.proteinConsumed}g / {userStats.proteinGoal}g</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Carbs:</span>
+                  <span>{userStats.carbsConsumed}g / {userStats.carbsGoal}g</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Fat:</span>
+                  <span>{userStats.fatConsumed}g / {userStats.fatGoal}g</span>
+                </div>
               </div>
             )}
-          </div>
-        </Card>
+          </Card>
 
-        {/* Recent Achievements */}
-        <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-gray-900">Recent Achievements</h3>
-            <Badge variant="outline" className="text-xs">
-              🏆 {achievements.length} earned today
-            </Badge>
-          </div>
-
-          {/* Achievement Status */}
-          <div className="bg-yellow-50 p-3 rounded-lg mb-4">
-            <div className="flex items-center gap-2">
-              <Award className="w-4 h-4 text-yellow-600" />
-              <span className="text-sm font-medium text-yellow-900">Achievement System Active</span>
+          {/* Today's Meals */}
+          <Card className="p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-gray-900">Today's Meals</h3>
+              <Badge variant="outline" className="text-xs">
+                {todayMeals.length} meals logged
+              </Badge>
             </div>
-            <div className="text-xs text-yellow-700 mt-1">
-              Tracking daily & weekly nutrition goals • Next reward at {Math.max(100 - calorieProgress, 0)}% progress
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-3 gap-4">
-            {achievements.length > 0 ? (
-              achievements.map((achievement) => {
-                const IconComponent = achievement.icon;
-                return (
-                  <div key={achievement.id} className="text-center">
-                    <div className="p-3 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-lg mb-2 mx-auto w-fit border border-yellow-200">
-                      <IconComponent className={`w-6 h-6 ${achievement.color}`} />
-                    </div>
-                    <p className="text-xs font-medium text-gray-700">{achievement.title}</p>
-                    <div className="w-2 h-2 bg-green-500 rounded-full mx-auto mt-1"></div>
+            
+            <div className="space-y-3">
+              {todayMeals.length > 0 ? (
+                todayMeals.slice(0, 3).map((meal, index) => (
+                  <MinimalistMealCard
+                    key={index}
+                    name={meal.name}
+                    time={meal.time}
+                    calories={meal.calories}
+                    mealType={meal.type as any}
+                    onClick={() => onNavigate('logger')}
+                  />
+                ))
+              ) : (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Utensils className="w-8 h-8 text-gray-400" />
                   </div>
-                );
-              })
-            ) : (
-              <div className="col-span-3 text-center py-4">
-                <Award className="w-12 h-12 text-gray-300 mx-auto mb-2" />
-                <p className="text-gray-500 text-sm">Complete nutrition goals to earn achievements</p>
-                <p className="text-xs text-gray-400 mt-1">Track calories & meet daily targets</p>
-              </div>
-            )}
-          </div>
-
-          {/* Achievement Progress */}
-          <div className="mt-4 pt-4 border-t border-gray-200">
-            <div className="text-xs text-gray-600 mb-2">Today's Progress</div>
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <div className="flex justify-between">
-                <span>Calories:</span>
-                <span className={calorieProgress >= 100 ? "text-green-600 font-medium" : "text-gray-600"}>
-                  {calorieProgress}%
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span>Protein:</span>
-                <span className={proteinProgress >= 100 ? "text-green-600 font-medium" : "text-gray-600"}>
-                  {proteinProgress}%
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span>Meals logged:</span>
-                <span className={todayMeals.length >= 3 ? "text-green-600 font-medium" : "text-gray-600"}>
-                  {todayMeals.length}/3
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span>Streak:</span>
-                <span className={userStats.currentStreak >= 7 ? "text-green-600 font-medium" : "text-gray-600"}>
-                  {userStats.currentStreak} days
-                </span>
-              </div>
+                  <p className="text-gray-600 mb-2">No meals logged today</p>
+                  <Button
+                    onClick={() => onNavigate('calculator')}
+                    size="sm"
+                    className="bg-green-500 hover:bg-green-600"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Your First Meal
+                  </Button>
+                </div>
+              )}
             </div>
-          </div>
-        </Card>
+          </Card>
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-2 gap-4">
-          <Button 
-            onClick={() => onNavigate('calculator')} 
-            className="h-16 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white border-0 shadow-lg"
-          >
-            <Plus className="w-5 h-5 mr-2" />
-            Calculate Calories
-          </Button>
-          <Button 
-            onClick={() => onNavigate('logger')} 
-            variant="outline"
-            className="h-16 bg-white/80 backdrop-blur-sm border-gray-200 shadow-lg hover:bg-white"
-          >
-            <Calendar className="w-5 h-5 mr-2" />
-            Weekly Logger
-          </Button>
+          {/* Quick Actions */}
+          <div className="grid grid-cols-2 gap-4">
+            <Button 
+              onClick={() => onNavigate('calculator')} 
+              className="h-16 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white border-0 shadow-lg"
+            >
+              <Plus className="w-5 h-5 mr-2" />
+              Calculate Calories
+            </Button>
+            <Button 
+              onClick={() => onNavigate('logger')} 
+              variant="outline"
+              className="h-16 bg-white/80 backdrop-blur-sm border-gray-200 shadow-lg hover:bg-white"
+            >
+              <Calendar className="w-5 h-5 mr-2" />
+              Weekly Logger
+            </Button>
+          </div>
         </div>
-      </div>
       </div>
     </div>
   );
