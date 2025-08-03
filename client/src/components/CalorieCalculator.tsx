@@ -13,6 +13,8 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { EnhancedIngredientDatabaseManager, type IngredientData } from '@/data/enhancedIngredientDatabase';
 import { 
   enhancedFoodDatabase, 
@@ -36,6 +38,15 @@ import {
   Droplets,
   Calendar
 } from 'lucide-react';
+
+interface USDAFoodResult {
+  fdcId: number;
+  description: string;
+  dataType: string;
+  foodCategory?: string;
+  brandOwner?: string;
+  brandName?: string;
+}
 
 interface IngredientAnalysis {
   ingredient: string;
@@ -81,7 +92,16 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
   const [usdaFoodSuggestions, setUsdaFoodSuggestions] = useState<EnhancedFoodItem[]>([]);
   const [selectedUSDAFood, setSelectedUSDAFood] = useState<EnhancedFoodItem | null>(null);
   const [availableUnits, setAvailableUnits] = useState<string[]>([]);
+  const [showFoodSearch, setShowFoodSearch] = useState(false);
+  const [selectedVerifiedFood, setSelectedVerifiedFood] = useState<USDAFoodResult | null>(null);
   const queryClient = useQueryClient();
+
+  // Search USDA foods query
+  const { data: usdaSearchResults, isLoading: isSearchingUSDA } = useQuery({
+    queryKey: ['/api/search-foods', ingredient],
+    enabled: ingredient.length >= 2,
+    retry: false,
+  }) as { data: { foods: USDAFoodResult[] } | undefined; isLoading: boolean };
 
   // Search ingredients as user types - both custom and USDA
   useEffect(() => {
@@ -184,59 +204,18 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
       return;
     }
 
-    // Enhanced calculation with USDA database
-    if (selectedUSDAFood && amount && selectedUnit) {
-      const quantity = parseFloat(amount) || 1;
-      const nutrition = calculateNutritionForPortion(selectedUSDAFood, selectedUnit, quantity);
-      
-      if (nutrition) {
-        const analysis: IngredientAnalysis = {
-          ingredient: selectedUSDAFood.name,
-          measurement: `${amount} ${selectedUnit}`,
-          estimatedCalories: nutrition.calories,
-          equivalentMeasurement: `${nutrition.totalGrams}g`,
-          note: `USDA verified (${selectedUSDAFood.data_reliability} reliability)`,
-          nutritionPer100g: {
-            calories: selectedUSDAFood.calories_per_100g,
-            protein: selectedUSDAFood.protein_per_100g,
-            carbs: selectedUSDAFood.carbs_per_100g,
-            fat: selectedUSDAFood.fat_per_100g
-          }
-        };
-        
-        setRecentAnalyses(prev => [analysis, ...prev.slice(0, 4)]);
-        setIngredient('');
-        setMeasurement('');
-        setAmount('');
-        setSelectedUnit('');
-        setSelectedUSDAFood(null);
-        
-        // Send calculated calories to tracking hook
-        if (onCaloriesCalculated) {
-          onCaloriesCalculated({
-            name: `${analysis.ingredient} (${analysis.measurement})`,
-            calories: analysis.estimatedCalories,
-            protein: nutrition.protein,
-            carbs: nutrition.carbs,
-            fat: nutrition.fat,
-            fiber: nutrition.fiber,
-            sugar: nutrition.sugar,
-            sodium: nutrition.sodium,
-            ingredients: [analysis.ingredient]
-          });
-        }
-      }
-    } else if (selectedIngredient && amount && selectedUnit) {
-      const measurementText = `${amount} ${selectedUnit}`;
-      
-      // Use USDA query for enhanced accuracy
+    // Use the USDA API to calculate calories for the selected verified food
+    if (selectedVerifiedFood && measurement.trim()) {
       calculateCalories.mutate({ 
-        ingredient: selectedIngredient.data.usdaQuery, 
-        measurement: measurementText 
+        ingredient: selectedVerifiedFood.description, 
+        measurement: measurement.trim() 
       });
     } else if (measurement.trim()) {
-      // Fallback to original method
-      calculateCalories.mutate({ ingredient: ingredient.trim(), measurement: measurement.trim() });
+      // Fallback to regular ingredient search
+      calculateCalories.mutate({ 
+        ingredient: ingredient.trim(), 
+        measurement: measurement.trim() 
+      });
     }
   };
 
@@ -541,161 +520,138 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
 
         <form onSubmit={handleCalculate} className="space-y-4">
           <div className="grid grid-cols-1 gap-4">
-            {/* Enhanced Ingredient Input with Suggestions */}
+            {/* USDA Food Search with Dropdown */}
             <div className="relative">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Ingredient Name
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-600" />
+                  Search USDA Verified Foods
+                </div>
               </label>
-              <Input
-                placeholder="e.g., chicken breast, Greek yogurt, banana"
-                value={ingredient}
-                onChange={(e) => setIngredient(e.target.value)}
-                className="text-base"
-              />
               
-              {/* Ingredient Suggestions Dropdown */}
-              {(ingredientSuggestions.length > 0 || usdaFoodSuggestions.length > 0) && (
-                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-64 overflow-y-auto">
-                  {/* USDA Food Suggestions */}
-                  {usdaFoodSuggestions.length > 0 && (
-                    <>
-                      <div className="px-4 py-2 bg-green-50 border-b border-green-200">
-                        <p className="text-xs font-semibold text-green-800 uppercase tracking-wide">
-                          ✓ USDA Verified Foods
-                        </p>
+              <Popover open={showFoodSearch} onOpenChange={setShowFoodSearch}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={showFoodSearch}
+                    className="w-full justify-between text-left font-normal"
+                    data-testid="food-search-trigger"
+                  >
+                    {selectedVerifiedFood ? (
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-green-600" />
+                        <span className="truncate">{selectedVerifiedFood.description}</span>
                       </div>
-                      {usdaFoodSuggestions.map((food, index) => (
-                        <button
-                          key={`usda-${food.id}`}
-                          type="button"
-                          onClick={() => handleSelectUSDAFood(food)}
-                          className="w-full px-4 py-3 text-left hover:bg-green-50 border-b border-gray-100"
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="flex-1">
-                              <p className="font-medium text-gray-900">{food.name}</p>
-                              <p className="text-xs text-gray-500">{food.category}</p>
-                              <div className="flex items-center gap-2 mt-1">
-                                <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
-                                  USDA {food.data_reliability}
-                                </Badge>
-                                {food.usda_fdc_id && (
-                                  <Badge variant="outline" className="text-xs">
-                                    FDC #{food.usda_fdc_id}
+                    ) : (
+                      <div className="flex items-center gap-2 text-gray-500">
+                        <Search className="w-4 h-4" />
+                        <span>Search for verified foods...</span>
+                      </div>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[400px] p-0" align="start">
+                  <Command>
+                    <CommandInput 
+                      placeholder="Search USDA foods..." 
+                      value={ingredient}
+                      onValueChange={setIngredient}
+                      data-testid="food-search-input"
+                    />
+                    <CommandList>
+                      <CommandEmpty>
+                        {isSearchingUSDA ? (
+                          <div className="flex items-center justify-center py-6">
+                            <Search className="w-4 h-4 mr-2 animate-spin" />
+                            Searching USDA database...
+                          </div>
+                        ) : ingredient.length < 2 ? (
+                          "Type at least 2 characters to search"
+                        ) : (
+                          "No verified foods found. Try a different search term."
+                        )}
+                      </CommandEmpty>
+                      
+                      {usdaSearchResults?.foods && usdaSearchResults.foods.length > 0 && (
+                        <CommandGroup heading="✓ USDA Verified Foods">
+                          {usdaSearchResults.foods.map((food: USDAFoodResult) => (
+                            <CommandItem
+                              key={food.fdcId}
+                              onSelect={() => {
+                                setSelectedVerifiedFood(food);
+                                setIngredient(food.description);
+                                setShowFoodSearch(false);
+                              }}
+                              className="flex items-start gap-3 p-3"
+                              data-testid={`food-option-${food.fdcId}`}
+                            >
+                              <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                              <div className="flex-1 min-w-0">
+                                <p className="font-medium text-gray-900 truncate">
+                                  {food.description}
+                                </p>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+                                    {food.dataType}
                                   </Badge>
+                                  {food.foodCategory && (
+                                    <span className="text-xs text-gray-500 truncate">
+                                      {food.foodCategory}
+                                    </span>
+                                  )}
+                                </div>
+                                {food.brandOwner && (
+                                  <span className="text-xs text-gray-400 truncate block">
+                                    {food.brandOwner}
+                                  </span>
                                 )}
                               </div>
-                            </div>
-                            <div className="text-right text-xs text-gray-500">
-                              <p>{food.calories_per_100g} cal/100g</p>
-                              <p>{food.portions.length} portions</p>
-                            </div>
-                          </div>
-                        </button>
-                      ))}
-                    </>
-                  )}
-                  
-                  {/* Custom Ingredient Suggestions */}
-                  {ingredientSuggestions.length > 0 && (
-                    <>
-                      {usdaFoodSuggestions.length > 0 && (
-                        <div className="px-4 py-2 bg-blue-50 border-b border-blue-200">
-                          <p className="text-xs font-semibold text-blue-800 uppercase tracking-wide">
-                            Custom Database
-                          </p>
-                        </div>
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
                       )}
-                      {ingredientSuggestions.map((suggestion, index) => (
-                        <button
-                          key={`${suggestion.category}-${suggestion.key}`}
-                          type="button"
-                          onClick={() => handleSelectIngredient(suggestion)}
-                          className="w-full px-4 py-2 text-left hover:bg-blue-50 border-b border-gray-100 last:border-b-0"
-                        >
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <p className="font-medium text-gray-900">{suggestion.data.displayName}</p>
-                              <p className="text-xs text-gray-500">{suggestion.category}</p>
-                            </div>
-                            <Badge 
-                              variant="outline" 
-                              style={{ backgroundColor: suggestion.data.tags.categoryColor + '40', color: '#374151' }}
-                              className="text-xs"
-                            >
-                              {suggestion.data.tags.dietType[0] || 'food'}
-                            </Badge>
-                          </div>
-                        </button>
-                      ))}
-                    </>
-                  )}
-                </div>
-              )}
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+              
+
               
               <p className="text-xs text-gray-500 mt-1">
-                Enhanced with USDA verified foods + {Object.keys(EnhancedIngredientDatabaseManager.getCategories()).length} custom categories
+                Select from thousands of USDA verified foods with accurate nutritional data
               </p>
             </div>
             
-            {/* Enhanced Measurement Input */}
-            {(selectedIngredient || selectedUSDAFood) ? (
-              // Enhanced mode with unit selection
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Amount
-                  </label>
-                  <Input
-                    type="number"
-                    step="0.25"
-                    placeholder="1"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    className="text-base"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Unit
-                  </label>
-                  <Select value={selectedUnit} onValueChange={setSelectedUnit}>
-                    <SelectTrigger className="text-base">
-                      <SelectValue placeholder="Select unit" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {availableUnits.map((unit) => (
-                        <SelectItem key={unit} value={unit}>
-                          {unit.replace('_', ' ')}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            ) : (
-              // Fallback mode
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+            {/* Measurement Input */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <div className="flex items-center gap-2">
+                  <Scale className="w-4 h-4 text-blue-600" />
                   Measurement
-                </label>
-                <Input
-                  placeholder="e.g., 1 cup, 100g, 1 medium, 2 tablespoons"
-                  value={measurement}
-                  onChange={(e) => setMeasurement(e.target.value)}
-                  className="text-base"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Supports cups, grams, ounces, pieces, and more
-                </p>
-              </div>
-            )}
+                </div>
+              </label>
+              <Input
+                placeholder="e.g., 1 cup, 100g, 1 medium, 2 tablespoons"
+                value={measurement}
+                onChange={(e) => setMeasurement(e.target.value)}
+                className="text-base"
+                data-testid="measurement-input"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                {selectedVerifiedFood 
+                  ? `Enter amount for: ${selectedVerifiedFood.description}`
+                  : "Supports fractions, decimals, cups, grams, ounces, pieces, and more"
+                }
+              </p>
+            </div>
           </div>
 
           <Button 
             type="submit" 
-            disabled={calculateCalories.isPending || !ingredient.trim() || (!measurement.trim() && !((selectedIngredient || selectedUSDAFood) && amount && selectedUnit))}
+            disabled={calculateCalories.isPending || !ingredient.trim() || !measurement.trim()}
             className="w-full bg-blue-600 hover:bg-blue-700 text-lg py-6"
+            data-testid="calculate-button"
           >
             {calculateCalories.isPending ? (
               <>

@@ -193,6 +193,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(meals);
   });
 
+  // Search USDA foods endpoint (no auth required)
+  app.get('/api/search-foods', async (req: Request, res: Response) => {
+    try {
+      const query = req.query.q as string;
+      
+      if (!query || query.length < 2) {
+        return res.json({ foods: [] });
+      }
+
+      const foods = await usdaService.searchFoods(query);
+      res.json({ foods: foods.slice(0, 10) }); // Limit to 10 results
+    } catch (error) {
+      console.error('Error searching foods:', error);
+      res.status(500).json({ 
+        message: 'Failed to search foods',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
   // Calculate calories API with real USDA integration (no auth required)
   app.post('/api/calculate-calories', optionalAuth, async (req: any, res: Response) => {
     const { ingredient, measurement } = req.body;
