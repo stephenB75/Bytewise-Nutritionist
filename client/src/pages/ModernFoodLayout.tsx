@@ -377,7 +377,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       </div>
 
       {/* Content Section - Completely Separate and Underneath */}
-      <div className="px-6 py-4 bg-black content-section">
+      <div className="px-6 py-4 bg-black content-section" style={{ maxHeight: 'calc(100vh - 120px)', overflowY: 'auto' }}>
         {/* Enhanced Daily Progress Metrics with Graphs */}
         <div className="space-y-3 force-bottom-spacing" style={{ paddingBottom: '1.5rem !important' }}>
           <div className="flex items-center justify-between mb-4">
@@ -575,7 +575,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       </div>
 
       {/* Content Section - Completely Separate and Underneath */}
-      <div className="px-6 py-4 bg-black content-section">
+      <div className="px-6 py-4 bg-black content-section" style={{ maxHeight: 'calc(100vh - 120px)', overflowY: 'auto' }}>
         {/* Food Search Bar - Moved Here */}
         <div className="mb-6 force-bottom-spacing" style={{ paddingBottom: '3rem !important' }}>
           <div className="relative">
@@ -775,7 +775,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       </div>
 
       {/* Content Section - Completely Separate and Underneath */}
-      <div className="px-6 py-4 bg-black content-section">
+      <div className="px-6 py-4 bg-black content-section" style={{ maxHeight: 'calc(100vh - 120px)', overflowY: 'auto' }}>
         {/* Goal Progress Cards */}
         <div className="space-y-6 mb-8 force-bottom-spacing" style={{ paddingBottom: '3rem !important' }}>
           {/* Daily Goals */}
@@ -1144,7 +1144,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       </div>
       
       {/* Content Section - Completely Separate and Underneath */}
-      <div className="bg-white content-section">
+      <div className="bg-white content-section" style={{ maxHeight: 'calc(100vh - 120px)', overflowY: 'auto' }}>
         <div className="main-content">
           <CalorieCalculator 
             onNavigate={onNavigate}
@@ -1195,7 +1195,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       </div>
 
       {/* Content Section - Completely Separate and Underneath */}
-      <div className="bg-white content-section">
+      <div className="bg-white content-section" style={{ maxHeight: 'calc(100vh - 120px)', overflowY: 'auto' }}>
         <div className="max-w-4xl mx-auto px-6 py-4 main-content profile-content">
           {/* Profile Navigation */}
           <div className="grid grid-cols-2 md:flex md:space-x-2 gap-2 md:gap-0 mb-8">
