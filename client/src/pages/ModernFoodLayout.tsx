@@ -379,7 +379,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       {/* Content Section - Completely Separate and Underneath */}
       <div className="px-6 py-4 bg-black content-section">
         {/* Enhanced Daily Progress Metrics with Graphs */}
-        <div className="space-y-4 force-bottom-spacing" style={{ paddingBottom: '3rem !important' }}>
+        <div className="space-y-4">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-black text-white">Today's Progress</h2>
             <Button 
@@ -481,7 +481,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           </Card>
 
           {/* Macros Breakdown with Mini Graphs */}
-          <div className="grid grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-3 gap-4 mb-4 macros-grid">
             <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4">
               <div className="text-center">
                 <div className="text-sm text-gray-400 mb-1">Protein</div>
@@ -616,7 +616,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
         {/* Daily View */}
         {trackingView === 'daily' && (
-          <div className="space-y-4 force-bottom-spacing" style={{ paddingBottom: '3rem !important' }}>
+          <div className="space-y-4">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-2xl font-bold text-white">Today's Meals</h2>
               <div className="text-orange-400 font-bold">
@@ -684,7 +684,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
         {/* Weekly View */}
         {trackingView === 'weekly' && (
-          <div className="space-y-4 force-bottom-spacing" style={{ paddingBottom: '3rem !important' }}>
+          <div className="space-y-4">
             <h2 className="text-2xl font-bold text-white mb-4">This Week's Progress</h2>
             
             {/* Weekly Progress Card */}
@@ -708,7 +708,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             </Card>
 
             {/* Daily Breakdown */}
-            <div className="grid grid-cols-1 gap-3 force-bottom-spacing" style={{ paddingBottom: '3rem !important' }}>
+            <div className="grid grid-cols-1 gap-3">
               {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, index) => {
                 const dayCalories = Math.round(dailyCalories * (0.7 + Math.random() * 0.6)); // Simulated data
                 const isToday = index === new Date().getDay();
@@ -777,7 +777,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       {/* Content Section - Completely Separate and Underneath */}
       <div className="px-6 py-4 bg-black content-section">
         {/* Goal Progress Cards */}
-        <div className="space-y-4 force-bottom-spacing" style={{ paddingBottom: '3rem !important' }}>
+        <div className="space-y-4">
           {/* Daily Goals */}
           <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
             <div className="flex items-center justify-between mb-4">
@@ -1196,7 +1196,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
       {/* Content Section - Completely Separate and Underneath */}
       <div className="bg-white content-section">
-        <div className="max-w-4xl mx-auto px-6 py-4 main-content profile-content h-full flex flex-col force-bottom-spacing" style={{ paddingBottom: '3rem !important' }}>
+        <div className="max-w-4xl mx-auto px-6 py-4 main-content profile-content h-full flex flex-col">
           {/* Profile Navigation */}
           <div className="grid grid-cols-2 md:flex md:space-x-2 gap-2 md:gap-0 mb-6">
             {[
@@ -1228,7 +1228,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
           {/* Profile Content - Scrollable Container */}
           <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-            <div className="space-y-4 pr-2 force-bottom-spacing" style={{ paddingBottom: '3rem !important' }}>
+            <div className="space-y-4 pr-2">
               {profileSection === 'overview' && (
                 <div className="space-y-4">
                   {user ? (
