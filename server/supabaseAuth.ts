@@ -26,8 +26,15 @@ export interface AuthenticatedRequest extends Request {
 export function createAuthenticatedHandler(
   handler: (req: AuthenticatedRequest, res: Response, next?: NextFunction) => Promise<void> | void
 ) {
-  return (req: any, res: Response, next?: NextFunction) => {
-    return handler(req as AuthenticatedRequest, res, next);
+  return async (req: any, res: Response, next?: NextFunction) => {
+    try {
+      await handler(req as AuthenticatedRequest, res, next);
+    } catch (error) {
+      console.error('Handler error:', error);
+      if (!res.headersSent) {
+        res.status(500).json({ message: 'Internal server error' });
+      }
+    }
   };
 }
 

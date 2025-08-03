@@ -10,78 +10,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Auth routes
   app.get('/api/auth/user', isAuthenticated, createAuthenticatedHandler(async (req: AuthenticatedRequest, res) => {
-    try {
-      const userId = req.user?.id;
-      if (!userId) {
-        return res.status(401).json({ message: "User not found" });
-      }
-      const user = await storage.getUser(userId);
-      res.json(user);
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      res.status(500).json({ message: "Failed to fetch user" });
+    const userId = req.user?.id;
+    if (!userId) {
+      res.status(401).json({ message: "User not found" });
+      return;
     }
+    const user = await storage.getUser(userId);
+    res.json(user);
   }));
 
   // Meals API for logger
   app.post('/api/meals/logged', isAuthenticated, createAuthenticatedHandler(async (req: AuthenticatedRequest, res) => {
-    try {
-      const userId = req.user?.id;
-      if (!userId) {
-        return res.status(401).json({ message: "User not found" });
-      }
-      const mealData = {
-        ...req.body,
-        userId,
-        createdAt: new Date()
-      };
-      
-      // Store meal in database/memory
-      console.log('Logging meal from calculator:', mealData);
-      
-      res.json({ success: true, meal: mealData });
-    } catch (error) {
-      console.error("Error logging meal:", error);
-      res.status(500).json({ message: "Failed to log meal" });
+    const userId = req.user?.id;
+    if (!userId) {
+      res.status(401).json({ message: "User not found" });
+      return;
     }
+    const mealData = {
+      ...req.body,
+      userId,
+      createdAt: new Date()
+    };
+    
+    // Store meal in database/memory
+    console.log('Logging meal from calculator:', mealData);
+    
+    res.json({ success: true, meal: mealData });
   }));
 
   app.get('/api/meals/logged', isAuthenticated, createAuthenticatedHandler(async (req: AuthenticatedRequest, res) => {
-    try {
-      const userId = req.user?.id;
-      if (!userId) {
-        return res.status(401).json({ message: "User not found" });
-      }
-      
-      // Return logged meals for the user
-      const meals: any[] = []; // Implement meal retrieval from storage
-      
-      res.json(meals);
-    } catch (error) {
-      console.error("Error fetching meals:", error);
-      res.status(500).json({ message: "Failed to fetch meals" });
+    const userId = req.user?.id;
+    if (!userId) {
+      res.status(401).json({ message: "User not found" });
+      return;
     }
+    
+    // Return logged meals for the user
+    const meals: any[] = []; // Implement meal retrieval from storage
+    
+    res.json(meals);
   }));
 
   // Calculate calories API with real USDA integration (no auth required)
   app.post('/api/calculate-calories', optionalAuth, createAuthenticatedHandler(async (req: AuthenticatedRequest, res) => {
-    try {
-      const { ingredient, measurement } = req.body;
-      
-      // Use real USDA service for calorie calculation
-      const calorieData = await usdaService.calculateIngredientCalories(ingredient, measurement);
-      
-      res.json(calorieData);
-    } catch (error: any) {
-      console.error("Error calculating calories:", error);
-      res.status(500).json({ message: "Failed to calculate calories" });
-    }
+    const { ingredient, measurement } = req.body;
+    
+    // Use real USDA service for calorie calculation
+    const calorieData = await usdaService.calculateIngredientCalories(ingredient, measurement);
+    
+    res.json(calorieData);
   }));
 
   // USDA Food Database Sync API
   app.post('/api/sync/food-database', isAuthenticated, createAuthenticatedHandler(async (req: AuthenticatedRequest, res) => {
-    try {
-      console.log('Starting USDA food database sync...');
+    console.log('Starting USDA food database sync...');
       
       // Sync popular foods for offline access
       const popularFoods = [
