@@ -1,6 +1,6 @@
 /**
- * ByteWise - Complete Fresh Redesign from Scratch
- * Only keeping the calorie calculator function as requested
+ * ByteWise - Fresh Redesign Inspired by Modern Food Apps
+ * Clean, modern interface keeping only the calorie calculator
  */
 
 import { useState, useEffect } from 'react';
@@ -11,10 +11,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { 
   Calculator, 
-  Sparkles, 
-  Zap,
+  ArrowRight,
   Target,
-  ChevronRight
+  Activity,
+  User,
+  Scale,
+  Ruler,
+  Zap
 } from 'lucide-react';
 
 interface FreshRedesignProps {
@@ -22,61 +25,25 @@ interface FreshRedesignProps {
 }
 
 export default function FreshRedesign({ onNavigate }: FreshRedesignProps) {
-  // Rotating background themes
-  const [currentTheme, setCurrentTheme] = useState(0);
   const [showCalculator, setShowCalculator] = useState(false);
   
-  // Calculator state - keeping original functionality
+  // Calculator state - preserving original functionality
   const [age, setAge] = useState('');
   const [gender, setGender] = useState('');
   const [weight, setWeight] = useState('');
   const [height, setHeight] = useState('');
   const [activityLevel, setActivityLevel] = useState('');
   const [calculatedCalories, setCalculatedCalories] = useState<number | null>(null);
+  const [currentStep, setCurrentStep] = useState(0);
 
-  // Auto-rotating themes every 4 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTheme(prev => (prev + 1) % themes.length);
-    }, 4000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Fresh visual themes
-  const themes = [
-    {
-      name: 'Sunrise Energy',
-      gradient: 'from-orange-400 via-pink-400 to-purple-500',
-      accent: 'text-orange-600',
-      bg: 'bg-orange-50'
-    },
-    {
-      name: 'Ocean Breeze',
-      gradient: 'from-blue-400 via-cyan-400 to-teal-500', 
-      accent: 'text-blue-600',
-      bg: 'bg-blue-50'
-    },
-    {
-      name: 'Forest Fresh',
-      gradient: 'from-green-400 via-emerald-400 to-cyan-500',
-      accent: 'text-green-600', 
-      bg: 'bg-green-50'
-    },
-    {
-      name: 'Cosmic Purple',
-      gradient: 'from-purple-400 via-violet-400 to-indigo-500',
-      accent: 'text-purple-600',
-      bg: 'bg-purple-50'
-    },
-    {
-      name: 'Golden Hour',
-      gradient: 'from-yellow-400 via-orange-400 to-red-500',
-      accent: 'text-yellow-600',
-      bg: 'bg-yellow-50'
-    }
+  // Form steps for better UX
+  const formSteps = [
+    { field: 'age', label: 'Age', icon: User, placeholder: 'Enter your age', type: 'number' },
+    { field: 'gender', label: 'Gender', icon: User, placeholder: 'Select gender', type: 'select' },
+    { field: 'weight', label: 'Weight (kg)', icon: Scale, placeholder: 'Enter weight', type: 'number' },
+    { field: 'height', label: 'Height (cm)', icon: Ruler, placeholder: 'Enter height', type: 'number' },
+    { field: 'activityLevel', label: 'Activity Level', icon: Activity, placeholder: 'Select activity', type: 'select' }
   ];
-
-  const currentThemeData = themes[currentTheme];
 
   // Calculate calories function - preserved original logic
   const calculateCalories = () => {
@@ -120,106 +87,131 @@ export default function FreshRedesign({ onNavigate }: FreshRedesignProps) {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Dynamic Background */}
-      <div 
-        className={`absolute inset-0 bg-gradient-to-br ${currentThemeData.gradient} transition-all duration-1000 ease-in-out`}
-      >
-        {/* Animated pattern overlay */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-10 left-10 w-32 h-32 bg-white rounded-full animate-pulse"></div>
-          <div className="absolute top-1/3 right-20 w-24 h-24 bg-white rounded-full animate-bounce"></div>
-          <div className="absolute bottom-20 left-1/4 w-40 h-40 bg-white rounded-full animate-pulse"></div>
-        </div>
-      </div>
-
-      {/* Theme indicator */}
-      <div className="fixed top-4 left-4 z-50 bg-white/90 backdrop-blur-sm rounded-2xl p-3 shadow-lg">
-        <div className="flex items-center gap-2">
-          <Sparkles className={`w-5 h-5 ${currentThemeData.accent}`} />
-          <span className="text-sm font-semibold">{currentThemeData.name}</span>
-          <Badge variant="secondary" className="text-xs">
-            {currentTheme + 1}/5
-          </Badge>
-        </div>
-      </div>
-
-      <div className="relative z-10 pt-20 px-6">
-        <div className="max-w-md mx-auto space-y-8">
-          
-          {/* Hero Section */}
-          <div className="text-center mb-8">
-            <div className="bg-white/95 backdrop-blur-lg rounded-3xl p-8 shadow-2xl">
-              <h1 className="text-4xl font-black text-gray-800 mb-2">
-                ByteWise
-              </h1>
-              <p className="text-lg text-gray-600 mb-6">
-                Smart Nutrition Calculator
-              </p>
-              <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
-                <Zap className="w-4 h-4" />
-                <span>Redesigned from scratch</span>
-              </div>
-            </div>
+    <div className="min-h-screen bg-gray-50">
+      {/* Status Bar */}
+      <div className="bg-white border-b border-gray-100 px-4 py-3">
+        <div className="flex items-center justify-between">
+          <div className="text-sm font-medium text-gray-900">9:41</div>
+          <div className="flex items-center gap-1">
+            <div className="w-4 h-2 bg-green-500 rounded-sm"></div>
+            <div className="text-xs text-gray-600">100%</div>
           </div>
+        </div>
+      </div>
 
-          {/* Main Action */}
-          {!showCalculator ? (
-            <Card className="bg-white/95 backdrop-blur-lg border-0 shadow-2xl rounded-3xl p-8">
-              <div className="text-center">
-                <div className={`w-20 h-20 ${currentThemeData.bg} rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg`}>
-                  <Calculator className={`w-10 h-10 ${currentThemeData.accent}`} />
+      <div className="px-4 pt-6">
+        {/* Hero Section with Food Image Background */}
+        {!showCalculator ? (
+          <>
+            {/* Hero Card */}
+            <div 
+              className="relative h-80 rounded-3xl overflow-hidden mb-6 shadow-xl"
+              style={{
+                backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.2)), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 600'%3E%3Cdefs%3E%3ClinearGradient id='food' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23ff6b6b'/%3E%3Cstop offset='50%25' stop-color='%23feca57'/%3E%3Cstop offset='100%25' stop-color='%2348dbfb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='1000' height='600' fill='url(%23food)'/%3E%3Ccircle cx='200' cy='150' r='80' fill='%23fff' opacity='0.1'/%3E%3Ccircle cx='800' cy='400' r='60' fill='%23fff' opacity='0.1'/%3E%3Ccircle cx='500' cy='300' r='100' fill='%23fff' opacity='0.05'/%3E%3C/svg%3E")`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center'
+              }}
+            >
+              <div className="absolute inset-0 flex flex-col justify-center items-center text-center p-8">
+                <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-4">
+                  <Calculator className="w-8 h-8 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-4">
-                  Calculate Your Daily Calories
-                </h2>
-                <p className="text-gray-600 mb-8">
-                  Get personalized calorie recommendations based on your body metrics and activity level
+                <h1 className="text-3xl font-black text-white mb-2">
+                  ByteWise
+                </h1>
+                <p className="text-white/90 text-lg mb-6">
+                  Calculate your daily calorie needs
                 </p>
                 <Button
                   onClick={() => setShowCalculator(true)}
-                  className={`w-full h-16 bg-gradient-to-r ${currentThemeData.gradient} hover:scale-105 transform transition-all duration-300 text-white font-bold text-lg rounded-2xl shadow-lg border-0`}
+                  className="bg-white text-gray-900 hover:bg-gray-100 font-bold px-8 py-4 rounded-2xl shadow-lg"
                 >
-                  <Target className="w-6 h-6 mr-3" />
-                  Start Calculation
-                  <ChevronRight className="w-6 h-6 ml-3" />
+                  Get Started
+                  <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
               </div>
+            </div>
+
+            {/* Features Cards */}
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <Card className="bg-white border-0 shadow-lg rounded-2xl p-6">
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-3">
+                  <Target className="w-6 h-6 text-blue-600" />
+                </div>
+                <h3 className="font-bold text-gray-900 mb-1">Accurate</h3>
+                <p className="text-sm text-gray-600">Precise BMR calculation</p>
+              </Card>
+              <Card className="bg-white border-0 shadow-lg rounded-2xl p-6">
+                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-3">
+                  <Zap className="w-6 h-6 text-green-600" />
+                </div>
+                <h3 className="font-bold text-gray-900 mb-1">Fast</h3>
+                <p className="text-sm text-gray-600">Quick results</p>
+              </Card>
+            </div>
+          </>
+        ) : (
+          /* Calculator Interface with Step-by-Step Design */
+          <div className="space-y-6">
+            {/* Progress Header */}
+            <Card className="bg-white border-0 shadow-lg rounded-2xl p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-gray-900">Calorie Calculator</h2>
+                <Badge variant="secondary" className="bg-blue-100 text-blue-700">
+                  Step {currentStep + 1} of {formSteps.length}
+                </Badge>
+              </div>
+              <div className="flex gap-2">
+                {formSteps.map((_, index) => (
+                  <div
+                    key={index}
+                    className={`flex-1 h-2 rounded-full ${
+                      index <= currentStep ? 'bg-blue-500' : 'bg-gray-200'
+                    }`}
+                  />
+                ))}
+              </div>
             </Card>
-          ) : (
-            /* Calculator Interface */
-            <Card className="bg-white/95 backdrop-blur-lg border-0 shadow-2xl rounded-3xl p-8">
-              <div className="text-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-800 mb-2">
-                  Calorie Calculator
-                </h2>
-                <p className="text-gray-600">
-                  Fill in your details for accurate results
-                </p>
+
+            {/* Current Step Card */}
+            <Card className="bg-white border-0 shadow-lg rounded-2xl p-8">
+              <div className="text-center mb-8">
+                <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  {(() => {
+                    const IconComponent = formSteps[currentStep].icon;
+                    return <IconComponent className="w-8 h-8 text-blue-600" />;
+                  })()}
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                  {formSteps[currentStep].label}
+                </h3>
               </div>
 
               <div className="space-y-6">
-                {/* Age Input */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Age (years)
-                  </label>
+                {/* Dynamic Input Based on Current Step */}
+                {formSteps[currentStep].type === 'number' && (
                   <Input
                     type="number"
-                    placeholder="Enter your age"
-                    value={age}
-                    onChange={(e) => setAge(e.target.value)}
-                    className="h-12 rounded-xl border-2 border-gray-200 focus:border-current text-lg"
+                    placeholder={formSteps[currentStep].placeholder}
+                    value={
+                      formSteps[currentStep].field === 'age' ? age :
+                      formSteps[currentStep].field === 'weight' ? weight :
+                      formSteps[currentStep].field === 'height' ? height : ''
+                    }
+                    onChange={(e) => {
+                      switch(formSteps[currentStep].field) {
+                        case 'age': setAge(e.target.value); break;
+                        case 'weight': setWeight(e.target.value); break;
+                        case 'height': setHeight(e.target.value); break;
+                      }
+                    }}
+                    className="h-14 text-lg rounded-2xl border-2 border-gray-200 focus:border-blue-500"
                   />
-                </div>
+                )}
 
-                {/* Gender Select */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Gender
-                  </label>
+                {formSteps[currentStep].type === 'select' && formSteps[currentStep].field === 'gender' && (
                   <Select value={gender} onValueChange={setGender}>
-                    <SelectTrigger className="h-12 rounded-xl border-2 border-gray-200 text-lg">
+                    <SelectTrigger className="h-14 text-lg rounded-2xl border-2 border-gray-200">
                       <SelectValue placeholder="Select gender" />
                     </SelectTrigger>
                     <SelectContent>
@@ -227,111 +219,154 @@ export default function FreshRedesign({ onNavigate }: FreshRedesignProps) {
                       <SelectItem value="female">Female</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
+                )}
 
-                {/* Weight Input */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Weight (kg)
-                  </label>
-                  <Input
-                    type="number"
-                    placeholder="Enter your weight"
-                    value={weight}
-                    onChange={(e) => setWeight(e.target.value)}
-                    className="h-12 rounded-xl border-2 border-gray-200 focus:border-current text-lg"
-                  />
-                </div>
-
-                {/* Height Input */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Height (cm)
-                  </label>
-                  <Input
-                    type="number"
-                    placeholder="Enter your height"
-                    value={height}
-                    onChange={(e) => setHeight(e.target.value)}
-                    className="h-12 rounded-xl border-2 border-gray-200 focus:border-current text-lg"
-                  />
-                </div>
-
-                {/* Activity Level Select */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Activity Level
-                  </label>
+                {formSteps[currentStep].type === 'select' && formSteps[currentStep].field === 'activityLevel' && (
                   <Select value={activityLevel} onValueChange={setActivityLevel}>
-                    <SelectTrigger className="h-12 rounded-xl border-2 border-gray-200 text-lg">
+                    <SelectTrigger className="h-14 text-lg rounded-2xl border-2 border-gray-200">
                       <SelectValue placeholder="Select activity level" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="sedentary">Sedentary (little/no exercise)</SelectItem>
-                      <SelectItem value="light">Light (light exercise 1-3 days/week)</SelectItem>
-                      <SelectItem value="moderate">Moderate (moderate exercise 3-5 days/week)</SelectItem>
-                      <SelectItem value="active">Active (hard exercise 6-7 days/week)</SelectItem>
-                      <SelectItem value="extra">Extra Active (very hard exercise, physical job)</SelectItem>
+                      <SelectItem value="sedentary">
+                        <div className="py-2">
+                          <div className="font-medium">Sedentary</div>
+                          <div className="text-sm text-gray-500">Little/no exercise</div>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="light">
+                        <div className="py-2">
+                          <div className="font-medium">Light</div>
+                          <div className="text-sm text-gray-500">Light exercise 1-3 days/week</div>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="moderate">
+                        <div className="py-2">
+                          <div className="font-medium">Moderate</div>
+                          <div className="text-sm text-gray-500">Moderate exercise 3-5 days/week</div>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="active">
+                        <div className="py-2">
+                          <div className="font-medium">Active</div>
+                          <div className="text-sm text-gray-500">Hard exercise 6-7 days/week</div>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="extra">
+                        <div className="py-2">
+                          <div className="font-medium">Extra Active</div>
+                          <div className="text-sm text-gray-500">Very hard exercise, physical job</div>
+                        </div>
+                      </SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
+                )}
 
-                {/* Action Buttons */}
-                <div className="space-y-4 pt-4">
-                  <Button
-                    onClick={calculateCalories}
-                    className={`w-full h-16 bg-gradient-to-r ${currentThemeData.gradient} hover:scale-105 transform transition-all duration-300 text-white font-bold text-lg rounded-2xl shadow-lg border-0`}
-                  >
-                    <Calculator className="w-6 h-6 mr-3" />
-                    Calculate Calories
-                  </Button>
-                  
-                  <div className="flex gap-3">
+                {/* Navigation Buttons */}
+                <div className="flex gap-4 pt-4">
+                  {currentStep > 0 && (
                     <Button
-                      onClick={resetCalculator}
+                      onClick={() => setCurrentStep(prev => prev - 1)}
                       variant="outline"
-                      className="flex-1 h-12 rounded-xl border-2 font-semibold"
-                    >
-                      Reset
-                    </Button>
-                    <Button
-                      onClick={() => setShowCalculator(false)}
-                      variant="outline" 
-                      className="flex-1 h-12 rounded-xl border-2 font-semibold"
+                      className="flex-1 h-14 rounded-2xl border-2 font-semibold"
                     >
                       Back
                     </Button>
-                  </div>
+                  )}
+                  
+                  <Button
+                    onClick={() => {
+                      const currentValue = 
+                        formSteps[currentStep].field === 'age' ? age :
+                        formSteps[currentStep].field === 'gender' ? gender :
+                        formSteps[currentStep].field === 'weight' ? weight :
+                        formSteps[currentStep].field === 'height' ? height :
+                        formSteps[currentStep].field === 'activityLevel' ? activityLevel : '';
+                      
+                      if (!currentValue) {
+                        alert(`Please fill in ${formSteps[currentStep].label.toLowerCase()}`);
+                        return;
+                      }
+                      
+                      if (currentStep < formSteps.length - 1) {
+                        setCurrentStep(prev => prev + 1);
+                      } else {
+                        calculateCalories();
+                      }
+                    }}
+                    className="flex-1 h-14 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl"
+                  >
+                    {currentStep < formSteps.length - 1 ? 'Continue' : 'Calculate'}
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </Button>
+                </div>
+
+                {/* Quick Actions */}
+                <div className="flex justify-center pt-4">
+                  <button
+                    onClick={() => setShowCalculator(false)}
+                    className="text-gray-500 text-sm hover:text-gray-700"
+                  >
+                    ← Back to home
+                  </button>
                 </div>
               </div>
             </Card>
-          )}
+          </div>
+        )}
 
-          {/* Results Display */}
-          {calculatedCalories && (
-            <Card className={`${currentThemeData.bg} border-0 shadow-2xl rounded-3xl p-8`}>
-              <div className="text-center">
-                <div className={`w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg`}>
-                  <span className={`text-3xl font-black ${currentThemeData.accent}`}>
-                    {calculatedCalories}
-                  </span>
-                </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-2">
-                  Daily Calorie Needs
-                </h3>
-                <p className="text-gray-600 mb-6">
-                  Based on your personal metrics and activity level
-                </p>
-                <div className="bg-white/50 rounded-2xl p-4">
-                  <div className="text-sm text-gray-600">
-                    This calculation uses the Mifflin-St Jeor equation for accurate results
+        {/* Results Display */}
+        {calculatedCalories && (
+          <Card className="bg-white border-0 shadow-lg rounded-2xl p-8 mt-6">
+            <div className="text-center">
+              <div className="w-20 h-20 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span className="text-2xl font-black text-white">
+                  {calculatedCalories}
+                </span>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                Daily Calories
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Your personalized daily calorie needs
+              </p>
+              
+              {/* Breakdown Card */}
+              <div className="bg-gray-50 rounded-2xl p-6 mb-6">
+                <h4 className="font-semibold text-gray-900 mb-4">Breakdown</h4>
+                <div className="grid grid-cols-3 gap-4 text-center">
+                  <div>
+                    <div className="text-lg font-bold text-blue-600">{Math.round(calculatedCalories * 0.5)}</div>
+                    <div className="text-xs text-gray-600">Carbs (50%)</div>
+                  </div>
+                  <div>
+                    <div className="text-lg font-bold text-green-600">{Math.round(calculatedCalories * 0.3 / 4)}</div>
+                    <div className="text-xs text-gray-600">Protein (30%)</div>
+                  </div>
+                  <div>
+                    <div className="text-lg font-bold text-orange-600">{Math.round(calculatedCalories * 0.2 / 9)}</div>
+                    <div className="text-xs text-gray-600">Fat (20%)</div>
                   </div>
                 </div>
               </div>
-            </Card>
-          )}
 
-        </div>
+              <div className="flex gap-3">
+                <Button
+                  onClick={resetCalculator}
+                  variant="outline"
+                  className="flex-1 h-12 rounded-2xl border-2 font-semibold"
+                >
+                  Calculate Again
+                </Button>
+                <Button
+                  onClick={() => setShowCalculator(false)}
+                  className="flex-1 h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl"
+                >
+                  Done
+                </Button>
+              </div>
+            </div>
+          </Card>
+        )}
       </div>
     </div>
   );
