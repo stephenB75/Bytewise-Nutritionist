@@ -33,7 +33,8 @@ import {
   Download,
   Bell,
   Shield,
-  RefreshCw
+  RefreshCw,
+  X
 } from 'lucide-react';
 
 interface ModernFoodLayoutProps {
@@ -47,8 +48,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const [currentAchievement, setCurrentAchievement] = useState<any>(null);
   const [dailyCalories, setDailyCalories] = useState(1850);
   const [weeklyCalories, setWeeklyCalories] = useState(12950);
-  const [goalCalories] = useState(2100);
-  const [weeklyGoal] = useState(14700);
+  const [goalCalories, setGoalCalories] = useState(2100);
+  const [weeklyGoal, setWeeklyGoal] = useState(14700);
   const [loggedMeals, setLoggedMeals] = useState<any[]>([]);
   
   // Auth and achievement hooks
@@ -476,7 +477,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               console.log('This Week clicked - functionality activated');
               // Show weekly data
               const weeklyMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-              const totalWeeklyCalories = weeklyMeals.reduce((sum, meal) => sum + (meal.calories || 0), 0);
+              const totalWeeklyCalories = weeklyMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
               const toast = document.createElement('div');
               toast.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50';
               toast.textContent = `This week: ${Math.round(totalWeeklyCalories)} calories logged`;
