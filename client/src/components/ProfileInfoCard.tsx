@@ -177,38 +177,38 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
 
           {/* Profile Dropdown Menu */}
           {showDropdown && (
-            <div className="absolute top-20 right-4 z-50 w-64 bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden">
-              <div className="p-3 border-b border-gray-100 bg-blue-50">
-                <h3 className="font-semibold text-gray-900 text-sm">Profile Settings</h3>
+            <div className="absolute top-20 right-4 z-50 w-64 bg-gray-800 rounded-lg shadow-xl border border-gray-600 overflow-hidden">
+              <div className="p-3 border-b border-gray-600 bg-gray-700">
+                <h3 className="font-semibold text-white text-sm">Profile Settings</h3>
               </div>
               
               <div className="py-2">
                 <button 
-                  className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
+                  className="w-full px-4 py-2 text-left text-sm hover:bg-gray-700 flex items-center gap-2 text-gray-300"
                   onClick={() => {
                     setIsEditing(true);
                     setShowDropdown(false);
                   }}
                 >
-                  <Edit3 className="w-4 h-4 text-gray-500" />
+                  <Edit3 className="w-4 h-4 text-gray-400" />
                   Edit Profile
                 </button>
                 
                 <button 
-                  className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
+                  className="w-full px-4 py-2 text-left text-sm hover:bg-gray-700 flex items-center gap-2 text-gray-300"
                   onClick={() => {
                     // Change profile photo
                     setShowDropdown(false);
                   }}
                 >
-                  <Camera className="w-4 h-4 text-gray-500" />
+                  <Camera className="w-4 h-4 text-gray-400" />
                   Change Photo
                 </button>
                 
                 <Separator className="my-2" />
                 
                 <button 
-                  className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
+                  className="w-full px-4 py-2 text-left text-sm hover:bg-gray-700 flex items-center gap-2 text-gray-300"
                   onClick={() => {
                     const event = new CustomEvent('navigate-to-section', {
                       detail: { section: 'privacy' }
@@ -217,12 +217,12 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
                     setShowDropdown(false);
                   }}
                 >
-                  <Shield className="w-4 h-4 text-gray-500" />
+                  <Shield className="w-4 h-4 text-gray-400" />
                   Privacy Settings
                 </button>
                 
                 <button 
-                  className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
+                  className="w-full px-4 py-2 text-left text-sm hover:bg-gray-700 flex items-center gap-2 text-gray-300"
                   onClick={() => {
                     const event = new CustomEvent('navigate-to-section', {
                       detail: { section: 'notifications' }
@@ -231,14 +231,14 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
                     setShowDropdown(false);
                   }}
                 >
-                  <Bell className="w-4 h-4 text-gray-500" />
+                  <Bell className="w-4 h-4 text-gray-400" />
                   Notifications
                 </button>
                 
                 <Separator className="my-2" />
                 
                 <button 
-                  className="w-full px-4 py-2 text-left text-sm hover:bg-red-50 text-red-600 flex items-center gap-2"
+                  className="w-full px-4 py-2 text-left text-sm hover:bg-red-900/20 text-red-400 flex items-center gap-2"
                   onClick={() => {
                     window.location.href = '/api/logout';
                   }}
@@ -258,30 +258,30 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
           isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
         }`}
       >
-        <div className="px-6 pb-6 border-t border-blue-200/50">
+        <div className="px-6 pb-6 border-t border-white/20">
           <div className="pt-4 space-y-4">
             {isEditing ? (
               /* Edit Mode */
               <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                   <div>
-                    <label className="text-sm font-medium text-gray-700 mb-1 block">
+                    <label className="text-sm font-medium text-gray-300 mb-1 block">
                       First Name
                     </label>
                     <Input
                       value={editedData.firstName}
                       onChange={(e) => setEditedData({ ...editedData, firstName: e.target.value })}
-                      className="text-sm"
+                      className="text-sm bg-white/10 border-white/20 text-white"
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-700 mb-1 block">
+                    <label className="text-sm font-medium text-gray-300 mb-1 block">
                       Last Name
                     </label>
                     <Input
                       value={editedData.lastName}
                       onChange={(e) => setEditedData({ ...editedData, lastName: e.target.value })}
-                      className="text-sm"
+                      className="text-sm bg-white/10 border-white/20 text-white"
                     />
                   </div>
                 </div>
