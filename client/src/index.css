@@ -120,6 +120,7 @@ input[type="search"],
 textarea {
   color: #1f2937 !important;
   font-weight: 400 !important;
+  text-align: center !important;
 }
 
 input[type="text"]::placeholder, 

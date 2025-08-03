@@ -1080,7 +1080,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               placeholder="Search foods to log..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-28 pr-16 h-16 bg-white/95 border-white/20 text-gray-900 placeholder-gray-500 backdrop-blur-md rounded-2xl text-xl font-medium"
+              className="pl-28 pr-16 h-16 bg-white/95 border-white/20 text-gray-900 placeholder-gray-500 backdrop-blur-md rounded-2xl text-xl font-medium text-center"
             />
             {searchQuery && (
               <Button
