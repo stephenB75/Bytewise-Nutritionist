@@ -145,73 +145,87 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
       {/* Content Section - Completely Separate and Underneath */}
       <div className="bg-black px-6 py-8 min-h-screen">
-        {/* Daily Progress Metrics Cards instead of Categories */}
+        {/* Food Categories - Like Deliveroo/Chipotle */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-white mb-4">Today's Progress</h2>
-          <div className="grid grid-cols-2 gap-4">
-            {/* Macro Nutrients */}
-            <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4 hover:bg-white/20 transition-all">
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center mb-3">
-                <span className="text-2xl">💪</span>
+          <h2 className="text-3xl font-black text-white mb-6 tracking-tight">Browse Categories</h2>
+          <div className="grid grid-cols-2 gap-6">
+            {categories.map((category) => (
+              <div
+                key={category.id}
+                className={`relative overflow-hidden rounded-3xl h-40 ${category.color} hover:scale-105 transition-all duration-700 cursor-pointer shadow-2xl group`}
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-black/20 to-black/60" />
+                <div className="absolute inset-0 flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-500">
+                  <div className="text-center space-y-3">
+                    <div className="text-5xl drop-shadow-2xl">{category.emoji}</div>
+                    <div className="font-black text-xl tracking-wide drop-shadow-lg">{category.name}</div>
+                  </div>
+                </div>
+                
+                {/* Hover effects */}
+                <div className="absolute inset-0 bg-gradient-to-t from-transparent via-transparent to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </div>
-              <h3 className="text-white font-semibold text-lg">Macros</h3>
-              <p className="text-gray-300 text-sm">45g/150g protein</p>
-            </Card>
-
-            <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4 hover:bg-white/20 transition-all">
-              <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mb-3">
-                <span className="text-2xl">🌟</span>
-              </div>
-              <h3 className="text-white font-semibold text-lg">Micros</h3>
-              <p className="text-gray-300 text-sm">65mg/90mg Vitamin C</p>
-            </Card>
-
-            <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4 hover:bg-white/20 transition-all">
-              <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex items-center justify-center mb-3">
-                <span className="text-2xl">🔥</span>
-              </div>
-              <h3 className="text-white font-semibold text-lg">Calories</h3>
-              <p className="text-gray-300 text-sm">1,234/2,100 kcal</p>
-            </Card>
-
-            <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4 hover:bg-white/20 transition-all">
-              <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center mb-3">
-                <span className="text-2xl">💧</span>
-              </div>
-              <h3 className="text-white font-semibold text-lg">Hydration</h3>
-              <p className="text-gray-300 text-sm">6/8 glasses water</p>
-            </Card>
+            ))}
           </div>
         </div>
 
-        {/* Daily Progress instead of Popular This Week */}
+        {/* Featured Foods - Like premium burger apps */}
         <div>
-          <h2 className="text-2xl font-bold text-white mb-4">Today's Meals</h2>
-          <div className="space-y-4">
-            {[
-              { name: 'Breakfast: Oatmeal & Berries', calories: '320 cal', macros: '12g protein, 8g fiber', image: 'https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=400&h=300&fit=crop' },
-              { name: 'Lunch: Chicken Caesar Salad', calories: '450 cal', macros: '35g protein, 15g carbs', image: 'https://images.unsplash.com/photo-1541519227354-08fa5d50c44d?w=400&h=300&fit=crop' },
-              { name: 'Snack: Greek Yogurt Bowl', calories: '150 cal', macros: '20g protein, 3g fat', image: 'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=400&h=300&fit=crop' },
-            ].map((meal) => (
-              <Card key={meal.name} className="bg-white/10 backdrop-blur-md border-white/20 p-4 hover:bg-white/20 transition-all">
-                <div className="flex items-center space-x-4">
-                  <img 
-                    src={meal.image} 
-                    alt={meal.name}
-                    className="w-16 h-16 rounded-xl object-cover"
-                  />
-                  <div className="flex-1">
-                    <h3 className="text-white font-semibold text-lg">{meal.name}</h3>
-                    <div className="flex items-center space-x-4 mt-1">
-                      <span className="text-orange-400 font-medium">{meal.calories}</span>
-                      <span className="text-gray-300">{meal.macros}</span>
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-3xl font-black text-white tracking-tight">Popular This Week</h2>
+            <Button variant="ghost" className="text-orange-400 hover:text-orange-300 font-semibold">
+              See all <ChevronRight className="w-5 h-5 ml-2" />
+            </Button>
+          </div>
+          
+          <div className="space-y-8">
+            {featuredFoods.map((food) => (
+              <div key={food.id} className="relative overflow-hidden rounded-3xl h-80 hover:scale-[1.02] transition-all duration-700 shadow-2xl group">
+                <div 
+                  className="absolute inset-0 bg-cover bg-center group-hover:scale-110 transition-transform duration-700"
+                  style={{
+                    backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.3), rgba(0,0,0,0.8)), url('${food.image}')`
+                  }}
+                />
+                
+                {/* Content Overlay */}
+                <div className="absolute inset-0 p-8 flex flex-col justify-between text-white">
+                  {/* Top Row */}
+                  <div className="flex justify-between items-start">
+                    <div className="flex space-x-3">
+                      {food.tags.slice(0, 2).map((tag) => (
+                        <Badge key={tag} className="bg-orange-500/90 backdrop-blur-sm text-white text-sm font-bold border-0 px-4 py-2 rounded-full">
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                    <Button size="lg" variant="ghost" className="text-white hover:text-red-400 hover:bg-white/20 rounded-full p-4 group-hover:scale-110 transition-transform duration-300">
+                      <Heart className="w-7 h-7" />
+                    </Button>
+                  </div>
+                  
+                  {/* Bottom Content */}
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className="text-4xl font-black mb-3 tracking-tight leading-tight">{food.name}</h3>
+                      <p className="text-xl text-gray-200 font-medium leading-relaxed">{food.description}</p>
+                    </div>
+                    
+                    {/* Bottom Row */}
+                    <div className="flex justify-between items-end">
+                      <div className="space-y-2">
+                        <div className="text-xl text-orange-300 font-black">Nutrition Breakdown</div>
+                        <div className="text-lg text-white font-bold">
+                          Protein {food.protein}g • Carbs {food.carbs}g • Fat {food.fat}g
+                        </div>
+                      </div>
+                      <Button size="lg" className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-black px-10 py-4 rounded-full text-xl shadow-2xl group-hover:scale-110 transition-transform duration-300">
+                        Add ${((food.calories / 100) * 2.5).toFixed(2)}
+                      </Button>
                     </div>
                   </div>
-                  <Button size="sm" className="bg-orange-500 hover:bg-orange-600 text-white rounded-full">
-                    <Plus className="w-4 h-4" />
-                  </Button>
                 </div>
-              </Card>
+              </div>
             ))}
           </div>
         </div>
