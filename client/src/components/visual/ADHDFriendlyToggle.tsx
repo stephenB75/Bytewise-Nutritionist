@@ -39,17 +39,17 @@ const sizeClasses = {
 
 const variantColors = {
   default: {
-    on: 'bg-blue-500',
+    on: 'bg-[#1f4aa6]',
     off: 'bg-gray-300',
     thumb: 'bg-white'
   },
   success: {
-    on: 'bg-green-500',
+    on: 'bg-[#45c73e]',
     off: 'bg-gray-300',
     thumb: 'bg-white'
   },
   warning: {
-    on: 'bg-yellow-500',
+    on: 'bg-[#faed39]',
     off: 'bg-gray-300',
     thumb: 'bg-white'
   },

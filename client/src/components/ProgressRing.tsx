@@ -29,9 +29,9 @@ export function ProgressRing({
   };
 
   const colorMap = {
-    blue: { stroke: '#3b82f6', bg: 'bg-blue-500', shadow: 'rgba(59, 130, 246, 0.4)' },
-    green: { stroke: '#10b981', bg: 'bg-green-500', shadow: 'rgba(16, 185, 129, 0.4)' },
-    orange: { stroke: '#f59e0b', bg: 'bg-orange-500', shadow: 'rgba(245, 158, 11, 0.4)' },
+    blue: { stroke: '#1f4aa6', bg: 'bg-[#1f4aa6]', shadow: 'rgba(31, 74, 166, 0.4)' },
+    green: { stroke: '#45c73e', bg: 'bg-[#45c73e]', shadow: 'rgba(69, 199, 62, 0.4)' },
+    orange: { stroke: '#faed39', bg: 'bg-[#faed39]', shadow: 'rgba(250, 237, 57, 0.4)' },
     purple: { stroke: '#8b5cf6', bg: 'bg-purple-500', shadow: 'rgba(139, 92, 246, 0.4)' }
   };
 

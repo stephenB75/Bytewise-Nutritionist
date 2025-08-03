@@ -137,7 +137,7 @@ export function WeekProgress({
               <div
                 key={i}
                 className={`flex-1 h-2 rounded-full ${
-                  i < Math.ceil((weeklyTotals.meals / 21) * 7) ? 'bg-green-400' : 'bg-green-100'
+                  i < Math.ceil((weeklyTotals.meals / 21) * 7) ? 'bg-[#45c73e]' : 'bg-[#45c73e]/20'
                 }`}
               />
             ))}
@@ -157,9 +157,9 @@ export function WeekProgress({
             </div>
           </div>
           <div className="flex items-center gap-1">
-            <div className={`w-2 h-2 rounded-full ${isGoalReached ? 'bg-green-400' : 'bg-gray-200'}`} />
-            <div className={`w-2 h-2 rounded-full ${isOnTrack ? 'bg-blue-400' : 'bg-gray-200'}`} />
-            <div className={`w-2 h-2 rounded-full ${weekProgress > 30 ? 'bg-yellow-400' : 'bg-gray-200'}`} />
+            <div className={`w-2 h-2 rounded-full ${isGoalReached ? 'bg-[#45c73e]' : 'bg-gray-200'}`} />
+            <div className={`w-2 h-2 rounded-full ${isOnTrack ? 'bg-[#1f4aa6]' : 'bg-gray-200'}`} />
+            <div className={`w-2 h-2 rounded-full ${weekProgress > 30 ? 'bg-[#faed39]' : 'bg-gray-200'}`} />
             <div className={`w-2 h-2 rounded-full ${weekProgress > 0 ? 'bg-purple-400' : 'bg-gray-200'}`} />
           </div>
         </div>

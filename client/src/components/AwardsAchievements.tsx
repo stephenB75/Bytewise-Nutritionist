@@ -171,7 +171,7 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
   const difficultyColors = {
     bronze: 'bg-amber-600/20 border-amber-500/30 text-amber-400',
     silver: 'bg-gray-400/20 border-gray-300/30 text-gray-300',
-    gold: 'bg-yellow-500/20 border-yellow-400/30 text-yellow-400',
+    gold: 'bg-[#faed39]/20 border-[#faed39]/30 text-[#faed39]',
     platinum: 'bg-purple-500/20 border-purple-400/30 text-purple-400'
   };
 

@@ -71,9 +71,9 @@ export function DailyProgress({
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'complete': return 'text-green-600 bg-green-50 border-green-200';
-      case 'good': return 'text-blue-600 bg-blue-50 border-blue-200';
-      case 'started': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
+      case 'complete': return 'text-[#45c73e] bg-[#45c73e]/10 border-[#45c73e]/20';
+      case 'good': return 'text-[#1f4aa6] bg-[#1f4aa6]/10 border-[#1f4aa6]/20';
+      case 'started': return 'text-[#faed39] bg-[#faed39]/10 border-[#faed39]/20';
       case 'future': return 'text-gray-400 bg-gray-50 border-gray-200';
       default: return 'text-gray-600 bg-gray-50 border-gray-200';
     }

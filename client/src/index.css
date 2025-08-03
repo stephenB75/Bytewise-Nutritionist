@@ -9,10 +9,10 @@ html {
   font-size: 17px; /* Increased from 16px for better readability */
 }
 
-/* Apply ByteWise theme to body and root */
+/* Apply ByteWise brand colors to body and root */
 body {
-  background-color: var(--pastel-yellow) !important;
-  color: var(--foreground) !important;
+  background-color: #0a0a00 !important;
+  color: #ffffff !important;
   margin: 0;
   padding: 0;
   min-height: 100vh;
@@ -20,7 +20,7 @@ body {
 }
 
 #root {
-  background-color: var(--pastel-yellow) !important;
+  background-color: #0a0a00 !important;
   min-height: 100vh;
 }
 
@@ -115,76 +115,78 @@ body {
 
 :root {
   --font-size: 14px;
-  --pastel-yellow: #fef7cd;
-  --pastel-blue: #a8dadc;
-  --pastel-blue-dark: #89c4c7;
-  --background: var(--pastel-yellow);
-  --foreground: #1d1d1b;
-  --card: #ffffff;
-  --card-foreground: #1d1d1b;
-  --popover: #ffffff;
-  --popover-foreground: #1d1d1b;
-  --primary: var(--pastel-blue);
-  --primary-foreground: #1d1d1b;
-  --secondary: #f8f9fa;
-  --secondary-foreground: #1d1d1b;
-  --muted: #e9ecef;
-  --muted-foreground: #6c757d;
-  --accent: var(--pastel-blue);
-  --accent-foreground: #1d1d1b;
-  --destructive: #dc3545;
-  --destructive-foreground: #ffffff;
-  --border: rgba(0, 0, 0, 0.1);
-  --input: transparent;
-  --input-background: #ffffff;
-  --switch-background: #cbced4;
-  --font-weight-medium: 500;
-  --font-weight-normal: 400;
-  --ring: var(--pastel-blue);
-  --chart-1: #ff6b6b;
-  --chart-2: #4ecdc4;
-  --chart-3: #45b7d1;
-  --chart-4: #f9ca24;
-  --chart-5: #f0932b;
-  --radius: 1rem;
-  --sidebar: var(--pastel-yellow);
-  --sidebar-foreground: #1d1d1b;
-  --sidebar-primary: var(--pastel-blue);
-  --sidebar-primary-foreground: #1d1d1b;
-  --sidebar-accent: #ffffff;
-  --sidebar-accent-foreground: #1d1d1b;
-  --sidebar-border: rgba(0, 0, 0, 0.1);
-  --sidebar-ring: var(--pastel-blue);
-}
-
-.dark {
-  --background: #1d1d1b;
-  --foreground: #f8f9fa;
-  --card: #2d2d2b;
-  --card-foreground: #f8f9fa;
-  --popover: #2d2d2b;
-  --popover-foreground: #f8f9fa;
-  --primary: var(--pastel-blue);
-  --primary-foreground: #1d1d1b;
-  --secondary: #3d3d3b;
-  --secondary-foreground: #f8f9fa;
-  --muted: #4d4d4b;
-  --muted-foreground: #adb5bd;
-  --accent: var(--pastel-blue);
-  --accent-foreground: #1d1d1b;
+  /* ByteWise Brand Colors */
+  --brand-yellow: #faed39;
+  --brand-blue: #1f4aa6;
+  --brand-green: #45c73e;
+  --brand-background: #0a0a00;
+  --background: var(--brand-background);
+  --foreground: #ffffff;
+  --card: rgba(255, 255, 255, 0.05);
+  --card-foreground: #ffffff;
+  --popover: rgba(255, 255, 255, 0.1);
+  --popover-foreground: #ffffff;
+  --primary: var(--brand-yellow);
+  --primary-foreground: #000000;
+  --secondary: rgba(255, 255, 255, 0.1);
+  --secondary-foreground: #ffffff;
+  --muted: rgba(255, 255, 255, 0.1);
+  --muted-foreground: rgba(255, 255, 255, 0.7);
+  --accent: var(--brand-blue);
+  --accent-foreground: #ffffff;
   --destructive: #dc3545;
   --destructive-foreground: #ffffff;
   --border: rgba(255, 255, 255, 0.1);
   --input: rgba(255, 255, 255, 0.1);
-  --ring: var(--pastel-blue);
-  --sidebar: #2d2d2b;
-  --sidebar-foreground: #f8f9fa;
-  --sidebar-primary: var(--pastel-blue);
-  --sidebar-primary-foreground: #1d1d1b;
-  --sidebar-accent: #3d3d3b;
-  --sidebar-accent-foreground: #f8f9fa;
+  --input-background: rgba(255, 255, 255, 0.05);
+  --switch-background: rgba(255, 255, 255, 0.2);
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --ring: var(--brand-yellow);
+  --chart-1: var(--brand-green);
+  --chart-2: var(--brand-blue);
+  --chart-3: var(--brand-yellow);
+  --chart-4: #f59e0b;
+  --chart-5: #ef4444;
+  --radius: 1rem;
+  --sidebar: var(--brand-background);
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: var(--brand-yellow);
+  --sidebar-primary-foreground: #000000;
+  --sidebar-accent: rgba(255, 255, 255, 0.1);
+  --sidebar-accent-foreground: #ffffff;
   --sidebar-border: rgba(255, 255, 255, 0.1);
-  --sidebar-ring: var(--pastel-blue);
+  --sidebar-ring: var(--brand-yellow);
+}
+
+.dark {
+  --background: var(--brand-background);
+  --foreground: #ffffff;
+  --card: rgba(255, 255, 255, 0.05);
+  --card-foreground: #ffffff;
+  --popover: rgba(255, 255, 255, 0.1);
+  --popover-foreground: #ffffff;
+  --primary: var(--brand-yellow);
+  --primary-foreground: #000000;
+  --secondary: rgba(255, 255, 255, 0.1);
+  --secondary-foreground: #ffffff;
+  --muted: rgba(255, 255, 255, 0.1);
+  --muted-foreground: rgba(255, 255, 255, 0.7);
+  --accent: var(--brand-blue);
+  --accent-foreground: #ffffff;
+  --destructive: #dc3545;
+  --destructive-foreground: #ffffff;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.1);
+  --ring: var(--brand-yellow);
+  --sidebar: var(--brand-background);
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: var(--brand-yellow);
+  --sidebar-primary-foreground: #000000;
+  --sidebar-accent: rgba(255, 255, 255, 0.1);
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-ring: var(--brand-yellow);
 }
 
 @theme inline {
@@ -444,7 +446,7 @@ select {
 .bytewise-logo-main {
   font-family: 'League Spartan', sans-serif;
   font-weight: 700;
-  color: var(--pastel-blue);
+  color: var(--brand-yellow);
   text-transform: lowercase;
   letter-spacing: -0.02em;
   line-height: 1;
