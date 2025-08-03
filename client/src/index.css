@@ -3123,11 +3123,20 @@ input.text-xs {
 
 /* Dark theme support for logo */
 .dark .bytewise-logo-main {
-  color: var(--pastel-blue) !important;
+  color: #f97316 !important; /* Orange for ByteWise brand */
 }
 
 .dark .bytewise-logo-tagline {
   color: #f8f9fa !important;
+}
+
+/* Force dark colors for header usage */
+.bytewise-logo-main {
+  color: #f97316 !important; /* Orange for visibility on dark backgrounds */
+}
+
+.bytewise-logo-tagline {
+  color: #e5e7eb !important; /* Light gray for visibility on dark backgrounds */
 }
 
 /* Logo animation for loading states */

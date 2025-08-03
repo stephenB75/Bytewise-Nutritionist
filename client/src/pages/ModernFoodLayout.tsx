@@ -1118,13 +1118,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       <div className="absolute top-0 left-0 right-0 z-50 bg-black/70 backdrop-blur-xl border-b border-gray-800/50 px-4 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <div className="transform scale-75 origin-left">
-              <LogoBrand 
-                size="sm" 
-                clickable 
-                onClick={() => setActiveTab('home')}
-              />
-            </div>
+            <LogoBrand 
+              size="sm" 
+              clickable 
+              onClick={() => setActiveTab('home')}
+            />
           </div>
           <div className="flex items-center space-x-2">
             {/* Notifications */}
