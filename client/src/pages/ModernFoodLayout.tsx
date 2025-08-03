@@ -145,7 +145,24 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     message: string;
     timestamp: Date;
     read: boolean;
-  }>>([]);
+  }>>([
+    {
+      id: '1',
+      type: 'achievement',
+      title: 'Daily Goal Achieved!',
+      message: 'You reached your calorie goal today',
+      timestamp: new Date(),
+      read: false
+    },
+    {
+      id: '2',
+      type: 'info',
+      title: 'Weekly Report Ready',
+      message: 'Your nutrition summary is available',
+      timestamp: new Date(Date.now() - 3600000),
+      read: false
+    }
+  ]);
 
   // Notification handler functions
   const handleMarkAsRead = (id: string) => {
@@ -1474,8 +1491,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           >
             <Bell className="w-8 h-8 drop-shadow-lg" />
             {notifications.filter(n => !n.read).length > 0 && (
-              <div className="absolute -top-2 -right-2 w-7 h-7 bg-gradient-to-br from-red-500 to-pink-600 rounded-full flex items-center justify-center border-2 border-white shadow-lg animate-pulse">
-                <span className="text-sm text-white font-bold drop-shadow-md">
+              <div className="absolute -top-2 -right-2 w-8 h-8 bg-red-600 rounded-full flex items-center justify-center border-3 border-white shadow-xl animate-pulse ring-2 ring-red-400/50">
+                <span className="text-sm text-white font-bold drop-shadow-lg">
                   {notifications.filter(n => !n.read).length}
                 </span>
               </div>
