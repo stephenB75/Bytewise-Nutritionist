@@ -86,61 +86,64 @@ export function UserAccountManagement({ onClose }: UserAccountManagementProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-blue-200 rounded-xl overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <div className="p-3 bg-blue-500/20 rounded-xl">
-            <User className="w-6 h-6 text-blue-400" />
+      <div className="p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="p-3 bg-blue-100 rounded-xl">
+              <User className="w-6 h-6 text-blue-600" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900" style={{ fontFamily: "'League Spartan', sans-serif" }}>Account Management</h2>
+              <p className="text-gray-600">Manage your profile and account settings</p>
+            </div>
           </div>
-          <div>
-            <h2 className="text-2xl font-bold text-white">Account Management</h2>
-            <p className="text-gray-400">Manage your profile and account settings</p>
-          </div>
+          {onClose && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-gray-600 hover:text-gray-900"
+              onClick={onClose}
+            >
+              <X className="w-5 h-5" />
+            </Button>
+          )}
         </div>
-        {onClose && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-gray-400 hover:text-white"
-            onClick={onClose}
-          >
-            <X className="w-5 h-5" />
-          </Button>
-        )}
       </div>
 
-      {/* Profile Information */}
-      <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-semibold text-white flex items-center">
-            <User className="w-5 h-5 mr-2 text-blue-400" />
-            Profile Information
-          </h3>
-          <Button
-            variant={isEditing ? "default" : "outline"}
-            size="sm"
-            onClick={isEditing ? handleSave : () => setIsEditing(true)}
-            className={isEditing ? "bg-green-600 hover:bg-green-700" : ""}
-          >
-            {isEditing ? <Save className="w-4 h-4 mr-2" /> : <Edit3 className="w-4 h-4 mr-2" />}
-            {isEditing ? 'Save' : 'Edit'}
-          </Button>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4">
-          <div>
-            <label className="text-sm text-gray-400 mb-2 block">Full Name</label>
-            {isEditing ? (
-              <Input
-                value={userInfo.name}
-                onChange={(e) => handleInputChange('name', e.target.value)}
-                className="bg-white/10 border-white/20 text-white"
-              />
-            ) : (
-              <p className="text-white">{userInfo.name}</p>
-            )}
+      <div className="p-6 space-y-6">
+        {/* Profile Information */}
+        <Card className="bg-white border-gray-200 p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-semibold text-gray-900 flex items-center" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+              <User className="w-5 h-5 mr-2 text-blue-600" />
+              Profile Information
+            </h3>
+            <Button
+              variant={isEditing ? "default" : "outline"}
+              size="sm"
+              onClick={isEditing ? handleSave : () => setIsEditing(true)}
+              className={isEditing ? "bg-green-600 hover:bg-green-700" : "border-gray-300"}
+            >
+              {isEditing ? <Save className="w-4 h-4 mr-2" /> : <Edit3 className="w-4 h-4 mr-2" />}
+              {isEditing ? 'Save' : 'Edit'}
+            </Button>
           </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="text-sm text-gray-700 mb-2 block font-medium">Full Name</label>
+              {isEditing ? (
+                <Input
+                  value={userInfo.name}
+                  onChange={(e) => handleInputChange('name', e.target.value)}
+                  className="border-gray-300"
+                />
+              ) : (
+                <p className="text-gray-900 bg-gray-50 p-2 rounded border">{userInfo.name}</p>
+              )}
+            </div>
 
           <div>
             <label className="text-sm text-gray-400 mb-2 block">Email</label>

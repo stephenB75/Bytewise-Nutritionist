@@ -292,17 +292,30 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
   );
 
   return (
-    <div className="space-y-6">
-      {/* Header Stats */}
-      <div className="grid grid-cols-1 gap-4">
-        <Card className="bg-blue-500/20 backdrop-blur-md border-blue-500/30 p-4 text-center">
-          <div className="text-2xl font-bold text-blue-400">{userStats.totalPoints}</div>
-          <div className="text-sm text-gray-300">Total Points</div>
-        </Card>
-        <Card className="bg-green-500/20 backdrop-blur-md border-green-500/30 p-4 text-center">
-          <div className="text-2xl font-bold text-green-400">{userStats.achievementsCompleted}</div>
-          <div className="text-sm text-gray-300">Completed</div>
-        </Card>
+    <div className="bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-blue-200 rounded-xl overflow-hidden">
+      <div className="p-6 border-b border-gray-200">
+        <div className="flex items-center space-x-3">
+          <div className="p-3 bg-yellow-100 rounded-xl">
+            <Trophy className="w-6 h-6 text-yellow-600" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900" style={{ fontFamily: "'League Spartan', sans-serif" }}>Awards & Achievements</h2>
+            <p className="text-gray-600">Track your progress and unlock rewards</p>
+          </div>
+        </div>
+      </div>
+      
+      <div className="p-6 space-y-6">
+        {/* Header Stats */}
+        <div className="grid grid-cols-2 gap-4">
+          <Card className="bg-blue-100 border-blue-200 p-4 text-center">
+            <div className="text-2xl font-bold text-blue-700">{userStats.totalPoints}</div>
+            <div className="text-sm text-blue-600">Total Points</div>
+          </Card>
+          <Card className="bg-green-100 border-green-200 p-4 text-center">
+            <div className="text-2xl font-bold text-green-700">{userStats.achievementsCompleted}</div>
+            <div className="text-sm text-green-600">Completed</div>
+          </Card>
         <Card className="bg-orange-500/20 backdrop-blur-md border-orange-500/30 p-4 text-center">
           <div className="text-2xl font-bold text-orange-400">{userStats.currentStreak}</div>
           <div className="text-sm text-gray-300">Current Streak</div>

@@ -77,18 +77,28 @@ export function DataManagementPanel() {
   };
 
   return (
-    <div className="p-6 w-full">
-      <h3 className="text-2xl font-bold text-white mb-6">Data Management</h3>
+    <div className="bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-blue-200 rounded-xl overflow-hidden">
+      <div className="p-6 border-b border-gray-200">
+        <div className="flex items-center space-x-3">
+          <div className="p-3 bg-purple-100 rounded-xl">
+            <Database className="w-6 h-6 text-purple-600" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900" style={{ fontFamily: "'League Spartan', sans-serif" }}>Data Management</h2>
+            <p className="text-gray-600">Export, sync, and manage your nutrition data</p>
+          </div>
+        </div>
+      </div>
       
-      <div className="space-y-6">
+      <div className="p-6 space-y-6">
         {/* Export Section */}
-        <div>
+        <Card className="bg-white border-gray-200 p-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h4 className="font-semibold text-white text-lg">Export Your Data</h4>
-              <p className="text-gray-400">Download comprehensive nutrition reports</p>
+              <h4 className="font-semibold text-gray-900 text-lg" style={{ fontFamily: "'League Spartan', sans-serif" }}>Export Your Data</h4>
+              <p className="text-gray-600">Download comprehensive nutrition reports</p>
             </div>
-            <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+            <Badge className="bg-green-100 text-green-700 border-green-200">
               <FileText className="w-3 h-3 mr-1" />
               PDF Ready
             </Badge>
@@ -117,14 +127,16 @@ export function DataManagementPanel() {
 
         <Separator />
 
+        </Card>
+
         {/* Sync & Backup Section */}
-        <div>
+        <Card className="bg-white border-gray-200 p-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h4 className="font-semibold text-white text-lg">Sync & Backup</h4>
-              <p className="text-gray-400">Keep your data safe and synchronized</p>
+              <h4 className="font-semibold text-gray-900 text-lg" style={{ fontFamily: "'League Spartan', sans-serif" }}>Sync & Backup</h4>
+              <p className="text-gray-600">Keep your data safe and synchronized</p>
             </div>
-            <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
+            <Badge className="bg-blue-100 text-blue-700 border-blue-200">
               <CheckCircle className="w-3 h-3 mr-1" />
               Auto-sync On
             </Badge>
