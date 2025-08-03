@@ -1205,26 +1205,28 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             })}
           </div>
 
-          {/* Profile Content - Single Column Stack */}
-          <div className="space-y-6">
-            {profileSection === 'overview' && (
-              <>
-                <UserProfile showDetails={true} size="lg" />
-                <ProfileInfoCard />
-              </>
-            )}
-            
-            {profileSection === 'account' && (
-              <UserAccountManagement onClose={() => setProfileSection('overview')} />
-            )}
-            
-            {profileSection === 'achievements' && (
-              <AwardsAchievements onClose={() => setProfileSection('overview')} />
-            )}
-            
-            {profileSection === 'data' && (
-              <DataManagementPanel />
-            )}
+          {/* Profile Content - Scrollable Container */}
+          <div className="h-[calc(100vh-24rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+            <div className="space-y-6 pr-2">
+              {profileSection === 'overview' && (
+                <div className="space-y-6">
+                  <UserProfile showDetails={true} size="lg" />
+                  <ProfileInfoCard />
+                </div>
+              )}
+              
+              {profileSection === 'account' && (
+                <UserAccountManagement onClose={() => setProfileSection('overview')} />
+              )}
+              
+              {profileSection === 'achievements' && (
+                <AwardsAchievements onClose={() => setProfileSection('overview')} />
+              )}
+              
+              {profileSection === 'data' && (
+                <DataManagementPanel />
+              )}
+            </div>
           </div>
         </div>
       </div>
