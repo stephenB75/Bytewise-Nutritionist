@@ -27,7 +27,14 @@ import {
   Info, 
   CheckCircle,
   Plus,
-  Sparkles
+  Sparkles,
+  Scale,
+  AlertCircle,
+  Trophy,
+  Beef,
+  Wheat,
+  Droplets,
+  Calendar
 } from 'lucide-react';
 
 interface IngredientAnalysis {
