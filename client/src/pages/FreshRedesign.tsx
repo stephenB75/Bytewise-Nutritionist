@@ -27,6 +27,14 @@ interface FreshRedesignProps {
 export default function FreshRedesign({ onNavigate }: FreshRedesignProps) {
   const [showCalculator, setShowCalculator] = useState(false);
   
+  // Force immediate visual feedback
+  console.log('🎨 FRESH REDESIGN LOADING - New UI Active!');
+  
+  // Add immediate cache-busting
+  useEffect(() => {
+    console.log('✅ FreshRedesign component mounted successfully');
+  }, []);
+  
   // Calculator state - preserving original functionality
   const [age, setAge] = useState('');
   const [gender, setGender] = useState('');

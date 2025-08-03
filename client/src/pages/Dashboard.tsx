@@ -246,10 +246,7 @@ function Dashboard({ onNavigate }: DashboardProps) {
       className="min-h-full relative overflow-hidden transition-all duration-1000 ease-in-out"
       style={{ background: backgrounds[currentBg] }}
     >
-      {/* ULTRA-VISIBLE VISUAL REDESIGN INDICATOR */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-green-500 text-white p-4 text-center font-bold text-lg shadow-lg animate-pulse">
-        🎨 BYTEWISE VISUAL REDESIGN ACTIVE! Background {currentBg + 1}/5 Auto-Rotating! 🎨
-      </div>
+
       
       {/* Rotating Food Background - VISUAL REDESIGN ACTIVE */}
       <div 
