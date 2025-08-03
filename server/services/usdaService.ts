@@ -419,13 +419,21 @@ export class USDAService {
       quantity = fractionMap[unicodeFractionMatch[1]];
       unit = unicodeFractionMatch[2].trim();
     } else {
-      // Handle fractions like "1/2", "3/4"
-      const fractionMatch = normalized.match(/^(\d+)\s*\/\s*(\d+)\s+(.+)$/);
-      if (fractionMatch) {
-        const numerator = parseFloat(fractionMatch[1]);
-        const denominator = parseFloat(fractionMatch[2]);
+      // Handle fractions like "1/2", "3/4" (both with and without units)
+      const fractionWithUnitMatch = normalized.match(/^(\d+)\s*\/\s*(\d+)\s+(.+)$/);
+      const fractionOnlyMatch = normalized.match(/^(\d+)\s*\/\s*(\d+)$/);
+      
+      if (fractionWithUnitMatch) {
+        const numerator = parseFloat(fractionWithUnitMatch[1]);
+        const denominator = parseFloat(fractionWithUnitMatch[2]);
         quantity = numerator / denominator;
-        unit = fractionMatch[3].trim();
+        unit = fractionWithUnitMatch[3].trim();
+      } else if (fractionOnlyMatch) {
+        // Fraction without unit - default to medium/piece
+        const numerator = parseFloat(fractionOnlyMatch[1]);
+        const denominator = parseFloat(fractionOnlyMatch[2]);
+        quantity = numerator / denominator;
+        unit = 'medium';
       } else {
         // Handle mixed numbers like "1 1/2"
         const mixedMatch = normalized.match(/^(\d+)\s+(\d+)\s*\/\s*(\d+)\s*(.+)$/);
