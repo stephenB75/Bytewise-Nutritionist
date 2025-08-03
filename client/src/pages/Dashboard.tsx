@@ -35,6 +35,9 @@ interface DashboardProps {
 }
 
 function Dashboard({ onNavigate }: DashboardProps) {
+  // Debug log
+  console.log('📊 Dashboard Component Loading - Visual Redesign');
+  
   // Get real-time data from calorie tracking hook
   const { getDailyStats, getTodaysCalories } = useCalorieTracking();
   const dailyStats = getDailyStats();
@@ -220,7 +223,12 @@ function Dashboard({ onNavigate }: DashboardProps) {
   };
 
   return (
-    <div className="min-h-full relative overflow-hidden">
+    <div className="min-h-full relative overflow-hidden bg-gradient-to-br from-purple-500 to-pink-500">
+      {/* ULTRA-VISIBLE VISUAL REDESIGN INDICATOR */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-green-500 text-white p-4 text-center font-bold text-lg shadow-lg">
+        🎨 BYTEWISE VISUAL REDESIGN IS ACTIVE! 🎨
+      </div>
+      
       {/* Rotating Food Background - VISUAL REDESIGN ACTIVE */}
       <div 
         className={`absolute inset-0 z-0 transition-opacity duration-500 ${imageLoading ? 'opacity-0' : 'opacity-100'}`}
@@ -243,13 +251,8 @@ function Dashboard({ onNavigate }: DashboardProps) {
       {/* Overlay for better readability */}
       <div className="absolute inset-0 z-5 bg-black/30" />
       
-      {/* Visual Redesign Debug Indicator */}
-      <div className="absolute top-4 right-4 z-50 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-        VISUAL REDESIGN ACTIVE
-      </div>
-      
       {/* Main Content Container */}
-      <div className="relative z-10">
+      <div className="relative z-10 pt-16">
         {/* Hero Section */}
         <HeroSection
           title={`Good morning, ${userStats.name}!`}

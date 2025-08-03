@@ -27,6 +27,9 @@ export default function App() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [notificationCount, setNotificationCount] = useState(0);
   
+  // Debug log to ensure app is loading
+  console.log('🚀 ByteWise App Loading - Visual Redesign Active');
+  
   // Initialize image rotation system - temporarily disabled to fix React hook error
   // useImageRotation();
 
