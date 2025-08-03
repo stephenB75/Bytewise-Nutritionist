@@ -358,11 +358,19 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             
             <div className="pt-8">
               <Button 
-                onClick={() => setActiveTab('calculator')}
+                onClick={() => {
+                  if (user) {
+                    // Authenticated user - go to calorie calculator
+                    setActiveTab('calculator');
+                  } else {
+                    // Unauthenticated user - go to profile page with sign-up
+                    setActiveTab('profile');
+                  }
+                }}
                 size="lg"
                 className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-black px-16 py-6 rounded-full text-2xl shadow-2xl transform hover:scale-105 transition-all duration-500 border-2 border-orange-400/30"
               >
-                Start Tracking
+                {user ? 'Start Tracking' : 'Sign Up to Track'}
               </Button>
             </div>
           </div>
@@ -385,9 +393,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <Button 
               variant="ghost" 
               className="text-orange-400 hover:text-orange-300"
-              onClick={() => setActiveTab('calculator')}
+              onClick={() => {
+                if (user) {
+                  setActiveTab('calculator');
+                } else {
+                  setActiveTab('profile');
+                }
+              }}
             >
-              Track Food
+              {user ? 'Track Food' : 'Sign Up to Track'}
             </Button>
           </div>
 
@@ -586,11 +600,17 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             />
           </div>
           <Button 
-            onClick={() => setActiveTab('calculator')}
+            onClick={() => {
+              if (user) {
+                setActiveTab('calculator');
+              } else {
+                setActiveTab('profile');
+              }
+            }}
             className="w-full mt-3 bg-orange-600 hover:bg-orange-700 text-white font-bold h-12 rounded-xl"
           >
             <Plus className="w-4 h-4 mr-2" />
-            Log Food with Calculator
+            {user ? 'Log Food with Calculator' : 'Sign Up to Log Food'}
           </Button>
         </div>
 
