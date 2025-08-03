@@ -1,11 +1,11 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
-import SimpleTest from "./SimpleTest";
+import MinimalApp from "./MinimalApp";
 import "./index.css";
 
-// Debug mode - use simple test to isolate issues
-const useSimpleTest = false;
+// Use minimal app with guaranteed visual redesign
+const useMinimalApp = true;
 
 // Suppress development warnings and errors
 if (import.meta.env.DEV) {
@@ -49,8 +49,8 @@ if (!rootElement) {
   console.log('✅ Root element found, attempting render...');
   
   try {
-    // Force simple visual test first
-    const AppComponent = useSimpleTest ? SimpleTest : App;
+    // Use minimal app with guaranteed visual redesign
+    const AppComponent = useMinimalApp ? MinimalApp : App;
     const root = createRoot(rootElement);
     
     // Add immediate visual feedback
