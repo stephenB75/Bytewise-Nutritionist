@@ -8,23 +8,12 @@
 import React, { useState, useEffect } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from '@/lib/queryClient';
-// Simplified imports
-
-// import { useImageRotation } from './hooks/useImageRotation';
-
 import ModernFoodLayout from './pages/ModernFoodLayout';
-
-// import './utils/testCalorieIntegration';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('redesigned');
   const [showNotifications, setShowNotifications] = useState(false);
   const [notificationCount, setNotificationCount] = useState(0);
-  
-  // App loading with visual redesign
-  
-  // Initialize image rotation system - temporarily disabled to fix React hook error
-  // useImageRotation();
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
