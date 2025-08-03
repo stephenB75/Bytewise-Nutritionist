@@ -55,7 +55,8 @@ export function NotificationDropdown({
   onDeleteNotification,
   onNavigate
 }: NotificationDropdownProps) {
-  const [mounted, setMounted] = useState(false);
+  // Disable notifications for visual redesign testing
+  return null;
 
   useEffect(() => {
     setMounted(true);

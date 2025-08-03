@@ -128,15 +128,7 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <AuthWrapper onNavigate={handleNavigate}>
         <div className="min-h-screen bg-background">
-          {/* Global Notification Dropdown */}
-          <NotificationDropdown
-            isOpen={showNotifications}
-            onClose={() => setShowNotifications(false)}
-            notifications={[]}
-            onMarkAsRead={() => {}}
-            onMarkAllAsRead={() => {}}
-            onDeleteNotification={() => {}}
-          />
+          {/* Global Notification Dropdown - Disabled for visual testing */}
 
           {/* Fixed Header */}
           <Header 
