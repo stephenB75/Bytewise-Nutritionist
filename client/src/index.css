@@ -4,6 +4,17 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Critical: Override any conflicting styles */
+* {
+  box-sizing: border-box;
+}
+
+/* Force content to scroll properly and meet footer */
+.force-bottom-spacing {
+  margin-bottom: 10rem !important;
+  padding-bottom: 5rem !important;
+}
+
 /* Enhanced Accessibility - Increased text sizes throughout the app */
 html {
   font-size: 17px; /* Increased from 16px for better readability */
@@ -126,18 +137,22 @@ textarea {
 /* Global scroll behavior fixes - prevent content from being hidden at bottom */
 body {
   padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+  margin: 0 !important;
+  overflow-x: hidden !important;
 }
 
 /* Main content containers need bottom padding to clear navigation */
 .main-content {
-  padding-bottom: 100px !important; /* Optimized space for bottom navigation */
+  padding-bottom: 160px !important; /* Increased space for bottom navigation */
   margin-bottom: 0 !important;
+  min-height: auto !important;
 }
 
 /* Ensure all page containers have proper bottom spacing */
 .page-container {
   min-height: 100vh;
-  padding-bottom: 120px !important; /* Optimized for navigation + safe area */
+  padding-bottom: 180px !important; /* Increased for navigation + safe area */
+  margin-bottom: 0 !important;
 }
 
 /* Fix for content sections to not be cut off */
@@ -207,25 +222,26 @@ html, body {
 /* Mobile-specific adjustments */
 @media (max-width: 768px) {
   .main-content {
-    padding-bottom: 120px !important; /* Increased for mobile touch targets */
+    padding-bottom: 200px !important; /* Much more space for mobile touch targets */
   }
   
   .page-container {
-    padding-bottom: 140px !important; /* Extra space for mobile navigation */
+    padding-bottom: 220px !important; /* Extra space for mobile navigation */
   }
   
-  .macros-grid {
-    margin-bottom: 5rem !important; /* More space on mobile */
-    padding-bottom: 2rem !important;
+  .macros-grid,
+  .force-bottom-spacing {
+    margin-bottom: 12rem !important; /* Much more space on mobile */
+    padding-bottom: 6rem !important;
   }
   
   .profile-content {
-    padding-bottom: 3rem !important; /* Extra spacing for mobile */
+    padding-bottom: 8rem !important; /* Extra spacing for mobile */
   }
   
   .signin-module {
-    padding-bottom: 4rem !important; /* Prevent mobile keyboard overlap */
-    margin-bottom: 2rem !important;
+    padding-bottom: 8rem !important; /* Prevent mobile keyboard overlap */
+    margin-bottom: 4rem !important;
   }
 }
 
