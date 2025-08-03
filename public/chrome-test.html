@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chrome Preview Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .test-card {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+        }
+        .success { color: #00ff88; }
+        .error { color: #ff6b6b; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Chrome Preview Test</h1>
+    
+    <div class="test-card">
+        <h2>Basic Functionality</h2>
+        <p id="basic-test" class="success">✅ HTML/CSS Loading: Working</p>
+        <p id="js-test">⏳ JavaScript: Testing...</p>
+    </div>
+
+    <div class="test-card">
+        <h2>External Resources</h2>
+        <p id="image-test">⏳ External Images: Testing...</p>
+        <img id="test-image" src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200&h=150&fit=crop" 
+             style="width: 200px; height: 150px; border-radius: 8px; margin: 10px 0;" 
+             onload="document.getElementById('image-test').innerHTML = '✅ External Images: Working'; document.getElementById('image-test').className = 'success';"
+             onerror="document.getElementById('image-test').innerHTML = '❌ External Images: Failed'; document.getElementById('image-test').className = 'error';">
+    </div>
+
+    <div class="test-card">
+        <h2>Console Info</h2>
+        <p>Check browser console for any errors</p>
+        <button onclick="testConsole()" style="padding: 10px 20px; border: none; border-radius: 5px; background: #4CAF50; color: white; cursor: pointer;">Test Console</button>
+    </div>
+
+    <script>
+        // Test JavaScript functionality
+        document.getElementById('js-test').innerHTML = '✅ JavaScript: Working';
+        document.getElementById('js-test').className = 'success';
+
+        function testConsole() {
+            console.log('🧪 Chrome Preview Test: Console is working');
+            console.log('🌐 Current URL:', window.location.href);
+            console.log('🖥️ User Agent:', navigator.userAgent);
+            console.log('📱 Viewport:', window.innerWidth + 'x' + window.innerHeight);
+            alert('Check browser console for test results!');
+        }
+
+        // Log startup info
+        console.log('🚀 Chrome Preview Test Page Loaded');
+        console.log('📍 Location:', window.location.href);
+        
+        // Test for common issues
+        try {
+            localStorage.setItem('test', 'value');
+            console.log('💾 LocalStorage: Working');
+        } catch (e) {
+            console.error('❌ LocalStorage:', e.message);
+        }
+    </script>
+</body>
+</html>

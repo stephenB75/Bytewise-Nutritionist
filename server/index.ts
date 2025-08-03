@@ -6,11 +6,29 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Add CORS headers for external preview access
+// Enhanced headers for Chrome preview compatibility
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  
+  // Additional security headers for Chrome compatibility
+  res.header('X-Content-Type-Options', 'nosniff');
+  res.header('X-Frame-Options', 'SAMEORIGIN');
+  res.header('Referrer-Policy', 'strict-origin-when-cross-origin');
+  
+  // Content Security Policy to allow external images
+  res.header('Content-Security-Policy', 
+    "default-src 'self'; " +
+    "img-src 'self' https: data: blob:; " +
+    "style-src 'self' 'unsafe-inline' https:; " +
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+    "connect-src 'self' https: wss:; " +
+    "font-src 'self' https: data:; " +
+    "media-src 'self' https: data:; " +
+    "object-src 'none'; " +
+    "base-uri 'self';"
+  );
   
   // Handle preflight requests
   if (req.method === 'OPTIONS') {

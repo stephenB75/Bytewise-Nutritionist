@@ -56,9 +56,7 @@
   <!-- Viewport for PWA -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   
-  <!-- Security Headers for HTTPS Production -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://fonts.googleapis.com https://api.nal.usda.gov; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' wss: https: https://api.nal.usda.gov; upgrade-insecure-requests;">
-  <meta http-equiv="Strict-Transport-Security" content="max-age=31536000; includeSubDomains">
+  <!-- Simplified security headers - CSP managed by server -->
   <meta name="referrer" content="strict-origin-when-cross-origin">
   
   <!-- Prevent zoom on form inputs -->
