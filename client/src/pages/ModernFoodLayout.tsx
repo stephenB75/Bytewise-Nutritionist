@@ -14,6 +14,9 @@ import { UserProfile } from '@/components/UserProfile';
 import { ProfileInfoCard } from '@/components/ProfileInfoCard';
 import { DataManagementPanel } from '@/components/DataManagementPanel';
 import { AchievementCelebration } from '@/components/AchievementCelebration';
+import { UserAccountManagement } from '@/components/UserAccountManagement';
+import { AwardsAchievements } from '@/components/AwardsAchievements';
+import { ConfettiCelebration } from '@/components/ConfettiCelebration';
 import { useAuth } from '@/hooks/useAuth';
 import { useGoalAchievements } from '@/hooks/useGoalAchievements';
 import { useRotatingBackground } from '@/hooks/useRotatingBackground';
@@ -48,6 +51,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const [searchQuery, setSearchQuery] = useState('');
   const [showAchievement, setShowAchievement] = useState(false);
   const [currentAchievement, setCurrentAchievement] = useState<any>(null);
+  const [showConfettiCelebration, setShowConfettiCelebration] = useState(false);
+  const [confettiAchievement, setConfettiAchievement] = useState<any>(null);
   const [dailyCalories, setDailyCalories] = useState(1850);
   const [weeklyCalories, setWeeklyCalories] = useState(12950);
   const [goalCalories, setGoalCalories] = useState(2100);
@@ -55,11 +60,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const [loggedMeals, setLoggedMeals] = useState<any[]>([]);
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
   const [trackingView, setTrackingView] = useState('daily'); // 'daily' or 'weekly'
+  const [profileSection, setProfileSection] = useState('overview'); // 'overview', 'account', 'achievements', 'data'
   const [notifications, setNotifications] = useState([
     {
       id: '1',
       type: 'achievement' as const,
-      title: 'Daily Goal Reached!',
+      title: 'Daily Goal Reached! 🏆',
       message: 'Congratulations! You\'ve reached your daily calorie goal.',
       timestamp: new Date(),
       read: false
@@ -70,6 +76,14 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       title: 'Weekly Summary Ready',
       message: 'Your weekly nutrition report is available for download.',
       timestamp: new Date(Date.now() - 3600000),
+      read: false
+    },
+    {
+      id: '3',
+      type: 'achievement' as const,
+      title: 'Weekly Goal Achievement! 🎉',
+      message: 'Amazing! You\'ve completed your weekly nutrition goal.',
+      timestamp: new Date(Date.now() - 86400000),
       read: false
     },
     {
@@ -109,6 +123,28 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       setShowAchievement(true);
     }
   }, [celebrationAchievement]);
+
+  // Listen for goal achievements and trigger confetti
+  useEffect(() => {
+    const handleGoalAchievement = (event: any) => {
+      const achievement = event.detail;
+      setConfettiAchievement(achievement);
+      setShowConfettiCelebration(true);
+      
+      // Add notification
+      setNotifications(prev => [{
+        id: Date.now().toString(),
+        type: 'achievement' as const,
+        title: achievement.title,
+        message: achievement.message,
+        timestamp: new Date(),
+        read: false
+      }, ...prev]);
+    };
+
+    window.addEventListener('achievement-unlocked', handleGoalAchievement);
+    return () => window.removeEventListener('achievement-unlocked', handleGoalAchievement);
+  }, []);
 
   // Load logged meals from localStorage
   useEffect(() => {
@@ -207,6 +243,72 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           }}
         />
         
+        {/* Notification Header */}
+        <div className="absolute top-6 right-6 z-20">
+          <div className="relative">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="bg-black/20 backdrop-blur-md border border-white/20 text-white hover:bg-white/10 rounded-full p-3"
+              onClick={() => setShowNotificationDropdown(!showNotificationDropdown)}
+            >
+              <Bell className="w-5 h-5" />
+              {notifications.filter(n => !n.read).length > 0 && (
+                <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
+                  <span className="text-xs text-white font-bold">
+                    {notifications.filter(n => !n.read).length}
+                  </span>
+                </div>
+              )}
+            </Button>
+            
+            {/* Notification Dropdown */}
+            {showNotificationDropdown && (
+              <div className="absolute top-full right-0 mt-2 w-80 bg-black/90 backdrop-blur-md border border-white/20 rounded-2xl shadow-2xl overflow-hidden z-30">
+                <div className="p-4 border-b border-white/10">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-white font-semibold">Notifications</h3>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-gray-400 hover:text-white"
+                      onClick={handleMarkAllAsRead}
+                    >
+                      Mark all read
+                    </Button>
+                  </div>
+                </div>
+                <div className="max-h-80 overflow-y-auto">
+                  {notifications.map((notification) => (
+                    <div
+                      key={notification.id}
+                      className={`p-4 border-b border-white/5 ${!notification.read ? 'bg-blue-500/10' : ''}`}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h4 className="text-white font-medium text-sm">{notification.title}</h4>
+                          <p className="text-gray-400 text-xs mt-1">{notification.message}</p>
+                          <p className="text-gray-500 text-xs mt-2">
+                            {notification.timestamp.toLocaleDateString()}
+                          </p>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-gray-400 hover:text-white p-1"
+                          onClick={() => handleDeleteNotification(notification.id)}
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Hero Content - ONLY TEXT OVERLAY */}
         <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
           <div className="space-y-8 max-w-2xl">
@@ -1097,6 +1199,102 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     </div>
   );
 
+  const renderProfile = () => (
+    <div className="space-y-0">
+      {/* Full-Screen Hero Section */}
+      <div className="relative h-screen overflow-hidden">
+        <div 
+          className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out"
+          style={{
+            backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`
+          }}
+        />
+        
+        {/* Hero Content - ONLY TEXT OVERLAY */}
+        <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
+          <div className="space-y-6 max-w-2xl">
+            <div className="space-y-2">
+              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
+                Your
+              </h1>
+              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
+                <span className="bg-gradient-to-r from-purple-400 to-blue-500 bg-clip-text text-transparent">
+                  Profile
+                </span>
+              </h1>
+            </div>
+            
+            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto">
+              Manage your account, view achievements, and track your progress
+            </p>
+          </div>
+        </div>
+        
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60">
+          <div className="animate-bounce">
+            <ChevronRight className="w-6 h-6 rotate-90" />
+          </div>
+        </div>
+      </div>
+
+      {/* Content Section - Completely Separate and Underneath */}
+      <div className="px-6 py-8 bg-black min-h-screen">
+        {/* Profile Navigation */}
+        <div className="flex space-x-2 mb-6 overflow-x-auto pb-2">
+          {[
+            { id: 'overview', name: 'Overview', icon: User },
+            { id: 'account', name: 'Account', icon: Settings },
+            { id: 'achievements', name: 'Awards', icon: Trophy },
+            { id: 'data', name: 'Data', icon: Download }
+          ].map((section) => {
+            const IconComponent = section.icon;
+            return (
+              <Button
+                key={section.id}
+                variant={profileSection === section.id ? "default" : "outline"}
+                size="sm"
+                className={`flex items-center space-x-2 whitespace-nowrap ${
+                  profileSection === section.id 
+                    ? 'bg-purple-600 hover:bg-purple-700' 
+                    : 'bg-white/10 hover:bg-white/20'
+                }`}
+                onClick={() => setProfileSection(section.id)}
+              >
+                <IconComponent className="w-4 h-4" />
+                <span>{section.name}</span>
+              </Button>
+            );
+          })}
+        </div>
+
+        {/* Profile Content */}
+        <div className="bg-gray-900/80 backdrop-blur-md rounded-3xl border border-gray-700 p-6">
+          {profileSection === 'overview' && (
+            <div className="space-y-6">
+              <UserProfile />
+              <ProfileInfoCard />
+            </div>
+          )}
+          
+          {profileSection === 'account' && (
+            <UserAccountManagement onClose={() => setProfileSection('overview')} />
+          )}
+          
+          {profileSection === 'achievements' && (
+            <AwardsAchievements onClose={() => setProfileSection('overview')} />
+          )}
+          
+          {profileSection === 'data' && (
+            <div className="space-y-6">
+              <DataManagementPanel />
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
   const renderContent = () => {
     switch (activeTab) {
       case 'home':
@@ -1106,53 +1304,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       case 'daily':
         return renderDailyWeekly();
       case 'profile':
-        return (
-          <div className="space-y-0">
-            {/* Full-Screen Hero Section */}
-            <div className="relative h-screen overflow-hidden">
-              <div 
-                className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out"
-                style={{
-                  backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`
-                }}
-              />
-              
-              {/* Hero Content - ONLY TEXT OVERLAY */}
-              <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
-                <div className="space-y-6 max-w-2xl">
-                  <div className="space-y-2">
-                    <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
-                      Data
-                    </h1>
-                    <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
-                      <span className="bg-gradient-to-r from-blue-400 to-cyan-500 bg-clip-text text-transparent">
-                        Management
-                      </span>
-                    </h1>
-                  </div>
-                  
-                  <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto">
-                    Export, sync, and manage your nutrition tracking data
-                  </p>
-                </div>
-              </div>
-              
-              {/* Scroll indicator */}
-              <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60">
-                <div className="animate-bounce">
-                  <ChevronRight className="w-6 h-6 rotate-90" />
-                </div>
-              </div>
-            </div>
-
-            {/* Content Section - Completely Separate and Underneath */}
-            <div className="px-6 py-8 bg-black min-h-screen">
-              <div className="bg-gray-900/80 backdrop-blur-md rounded-3xl border border-gray-700">
-                <DataManagementPanel />
-              </div>
-            </div>
-          </div>
-        );
+        return renderProfile();
       case 'calculator':
         return renderCalculator();
       case 'tracking':
@@ -1228,6 +1380,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           achievement={currentAchievement}
           isOpen={showAchievement}
           onClose={() => setShowAchievement(false)}
+        />
+      )}
+      
+      {/* Confetti Celebration for Goals */}
+      {showConfettiCelebration && confettiAchievement && (
+        <ConfettiCelebration
+          achievement={confettiAchievement}
+          isOpen={showConfettiCelebration}
+          onClose={() => setShowConfettiCelebration(false)}
         />
       )}
     </div>

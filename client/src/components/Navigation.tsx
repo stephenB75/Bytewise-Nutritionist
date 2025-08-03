@@ -7,11 +7,10 @@
 
 import React from 'react';
 import { 
-  Home, 
+  LayoutDashboard, 
   ChefHat, 
   Calendar, 
   User,
-  HomeIcon,
   CalendarIcon,
   UserIcon
 } from 'lucide-react';
@@ -32,9 +31,9 @@ interface NavItem {
 const navItems: NavItem[] = [
   {
     id: 'home',
-    label: 'Home',
-    icon: Home,
-    activeIcon: HomeIcon
+    label: 'Dashboard',
+    icon: LayoutDashboard,
+    activeIcon: LayoutDashboard
   },
   {
     id: 'nutrition',
