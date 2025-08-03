@@ -308,10 +308,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             </span>
           </h1>
           <p className="text-xl text-gray-300 max-w-md leading-relaxed">
-            Monitor your daily nutrition with powerful macro and micro nutrient tracking
+            Discover amazing foods and track your daily nutrition with our powerful calorie calculator
           </p>
         </div>
+      </div>
 
+      {/* Content Underneath Hero */}
+      <div className="bg-black px-6 py-8">
         {/* Daily Progress Metrics Cards */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-white mb-4">Today's Progress</h2>
@@ -398,7 +401,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/70 to-black/90" />
       </div>
 
-      {/* Content */}
+      {/* Hero Text Overlay */}
       <div className="relative z-10 px-6 pt-24 pb-32">
         <div className="mb-12">
           <h1 className="text-5xl font-black text-white mb-4 tracking-tight leading-none">
@@ -423,7 +426,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             className="pl-12 h-14 bg-white/10 border-white/20 text-white placeholder-gray-400 backdrop-blur-md rounded-2xl text-lg"
           />
         </div>
+      </div>
 
+      {/* Content Underneath Hero */}
+      <div className="bg-black px-6 py-8">
         {/* Daily/Weekly Tabs */}
         <div className="flex space-x-4 mb-6">
           <Button className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-3 rounded-xl">
@@ -475,7 +481,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/70 to-black/90" />
       </div>
 
-      {/* Content */}
+      {/* Hero Text Overlay */}
       <div className="relative z-10 px-6 pt-24 pb-32">
         <div className="mb-12">
           <h1 className="text-5xl font-black text-white mb-4 tracking-tight leading-none">
@@ -489,7 +495,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             Sign in to start tracking your nutrition journey
           </p>
         </div>
+      </div>
 
+      {/* Content Underneath Hero */}
+      <div className="bg-black px-6 py-8">
         {/* Sign In Component */}
         <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
           <h3 className="text-2xl font-bold text-white mb-6 text-center">Sign In</h3>
@@ -568,7 +577,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/70 to-black/90" />
             </div>
 
-            {/* Content */}
+            {/* Hero Text Overlay */}
             <div className="relative z-10 px-6 pt-24 pb-32">
               <div className="mb-12">
                 <h1 className="text-5xl font-black text-white mb-4 tracking-tight leading-none">
@@ -582,7 +591,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   Track daily and weekly nutrition goals to unlock achievements
                 </p>
               </div>
+            </div>
 
+            {/* Content Underneath Hero */}
+            <div className="bg-black px-6 py-8">
               {/* Goal Progress Cards */}
               <div className="space-y-6 mb-8">
                 {/* Daily Goals */}
@@ -719,7 +731,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/70 to-black/90" />
             </div>
 
-            {/* Content */}
+            {/* Hero Text Overlay */}
             <div className="relative z-10 px-6 pt-24 pb-32">
               <div className="mb-12">
                 <h1 className="text-5xl font-black text-white mb-4 tracking-tight leading-none">
@@ -733,7 +745,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   Manage your account, settings, and nutrition data
                 </p>
               </div>
+            </div>
 
+            {/* Content Underneath Hero */}
+            <div className="bg-black px-6 py-8">
               {/* User Info Card */}
               <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6 mb-6">
                 <div className="flex items-center space-x-4 mb-6">
