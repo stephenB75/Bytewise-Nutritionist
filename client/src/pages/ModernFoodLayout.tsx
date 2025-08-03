@@ -379,7 +379,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       {/* Content Section - Completely Separate and Underneath */}
       <div className="px-6 py-8 bg-black content-section">
         {/* Enhanced Daily Progress Metrics with Graphs */}
-        <div className="space-y-6 main-content daily-progress-container">
+        <div className="space-y-6" style={{ paddingBottom: '10rem' }}>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-black text-white">Today's Progress</h2>
             <Button 
@@ -481,7 +481,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           </Card>
 
           {/* Macros Breakdown with Mini Graphs */}
-          <div className="grid grid-cols-3 gap-4 macros-grid">
+          <div className="grid grid-cols-3 gap-4" style={{ marginBottom: '8rem', paddingBottom: '3rem' }}>
             <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4">
               <div className="text-center">
                 <div className="text-sm text-gray-400 mb-1">Protein</div>

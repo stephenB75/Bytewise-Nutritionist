@@ -159,8 +159,14 @@ html, body {
 
 /* Specific spacing for macro cards grid to clear navigation */
 .macros-grid {
-  margin-bottom: 4rem !important;
-  padding-bottom: 1.5rem !important;
+  margin-bottom: 8rem !important;
+  padding-bottom: 3rem !important;
+}
+
+/* Force bottom spacing on home page content */
+.home-content-bottom {
+  margin-bottom: 10rem !important;
+  padding-bottom: 5rem !important;
 }
 
 /* Fix for mobile safe areas */
