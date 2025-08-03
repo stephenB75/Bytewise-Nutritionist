@@ -4,8 +4,9 @@ import App from "./App";
 import MinimalApp from "./MinimalApp";
 import "./index.css";
 
-// Use full app now that React issues are fixed
+// Force modern design loading
 const useMinimalApp = false;
+const forceModernDesign = true;
 
 // Suppress development warnings and errors
 if (import.meta.env.DEV) {
@@ -53,14 +54,17 @@ if (!rootElement) {
     const AppComponent = useMinimalApp ? MinimalApp : App;
     const root = createRoot(rootElement);
     
-    // Add immediate visual feedback
+    // Modern food app loading screen
     rootElement.innerHTML = `
-      <div style="background: linear-gradient(45deg, #10b981, #3b82f6); color: white; padding: 40px; min-height: 100vh; display: flex; align-items: center; justify-content: center; font-family: Arial; text-align: center;">
+      <div style="background: linear-gradient(135deg, #ff6b35, #f7931e); color: white; padding: 40px; min-height: 100vh; display: flex; align-items: center; justify-content: center; font-family: Arial; text-align: center;">
         <div>
-          <h1 style="font-size: 3rem; margin-bottom: 1rem;">🎨 BYTEWISE LOADING...</h1>
-          <p style="font-size: 1.5rem;">React is initializing the visual redesign</p>
+          <div style="width: 80px; height: 80px; background: rgba(255,255,255,0.2); border-radius: 24px; display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem;">
+            <div style="font-size: 2rem;">🍎</div>
+          </div>
+          <h1 style="font-size: 3rem; margin-bottom: 1rem; font-weight: 900;">ByteWise</h1>
+          <p style="font-size: 1.2rem; opacity: 0.9;">Loading modern food app design...</p>
           <div style="margin-top: 2rem;">
-            <div style="width: 50px; height: 50px; border: 5px solid white; border-top: 5px solid transparent; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+            <div style="width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid white; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
           </div>
         </div>
       </div>
@@ -72,11 +76,15 @@ if (!rootElement) {
       </style>
     `;
     
-    // Delay React render to show loading state
+    // Force immediate render with cache busting
     setTimeout(() => {
+      // Clear any cached components
+      if (typeof window !== 'undefined') {
+        window.location.hash = '#force-refresh-' + Date.now();
+      }
       root.render(<AppComponent />);
-      console.log('✅ React render initiated successfully');
-    }, 1000);
+      console.log('✅ Modern Food App rendered successfully');
+    }, 500);
     
   } catch (error) {
     console.error('❌ React render failed:', error);

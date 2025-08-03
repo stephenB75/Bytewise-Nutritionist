@@ -135,31 +135,10 @@ export default function App() {
         <div className="min-h-screen bg-background">
           {/* Global Notification Dropdown - Disabled for visual testing */}
 
-          {/* Fixed Header */}
-          <Header 
-            currentPage={activeTab}
-            onNavigate={handleNavigate}
-            showNotifications={true}
-            notificationCount={notificationCount}
-            onLogout={handleLogout}
-          />
-
-          {/* Main Content Area with proper spacing for fixed header/footer */}
-          <main className="min-h-screen flex flex-col">
-            {/* Fixed header spacer */}
-            <div className="h-16 flex-shrink-0"></div>
-            
-            {/* Main content with proper flex grow */}
-            <div className="flex-1 pb-20">
-              {renderCurrentPage()}
-            </div>
+          {/* Main Content - Full Screen Modern Design */}
+          <main className="min-h-screen">
+            {renderCurrentPage()}
           </main>
-
-          {/* Fixed Bottom Navigation */}
-          <Navigation 
-            activeTab={activeTab}
-            onTabChange={handleTabChange}
-          />
           
           {/* PWA Install Prompts */}
           <PWAInstallPrompt />

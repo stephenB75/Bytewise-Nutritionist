@@ -32,11 +32,18 @@ export default function ModernFoodApp({ onNavigate }: ModernFoodAppProps) {
   const [showCalculator, setShowCalculator] = useState(false);
   
   // Force immediate visual feedback
-  console.log('🎨 MODERN FOOD APP REDESIGN LOADING!');
+  console.log('🎨 MODERN FOOD APP REDESIGN LOADING! Cache:', Date.now());
   
-  // Add immediate cache-busting
+  // Add immediate cache-busting and force browser refresh
   useEffect(() => {
     console.log('✅ ModernFoodApp component mounted successfully');
+    // Add body class to force style refresh
+    document.body.className = 'modern-food-app-' + Date.now();
+    // Force meta viewport for mobile
+    const viewport = document.querySelector('meta[name="viewport"]');
+    if (viewport) {
+      viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+    }
   }, []);
   
   // Calculator state - preserving original functionality
