@@ -294,7 +294,7 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
   return (
     <div className="space-y-6">
       {/* Header Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 gap-4">
         <Card className="bg-blue-500/20 backdrop-blur-md border-blue-500/30 p-4 text-center">
           <div className="text-2xl font-bold text-blue-400">{userStats.totalPoints}</div>
           <div className="text-sm text-gray-300">Total Points</div>
@@ -342,7 +342,7 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
           <TrendingUp className="w-5 h-5 mr-2 text-green-400" />
           Achievement Progress
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6">
           <div>
             <h4 className="text-lg font-medium text-white mb-2">Completed ({completedAchievements.length})</h4>
             <div className="space-y-2">
@@ -384,7 +384,7 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
       </Card>
 
       {/* Achievement Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4">
         {filteredAchievements.map(renderAchievementCard)}
       </div>
 
@@ -394,7 +394,7 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
           <Gift className="w-5 h-5 mr-2 text-purple-400" />
           Upcoming Rewards
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4">
           <div className="text-center p-4 bg-white/10 rounded-lg">
             <div className="text-2xl mb-2">🎯</div>
             <h4 className="text-white font-medium">Daily Streak</h4>

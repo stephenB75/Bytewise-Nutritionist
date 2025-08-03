@@ -128,7 +128,7 @@ export function UserAccountManagement({ onClose }: UserAccountManagementProps) {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4">
           <div>
             <label className="text-sm text-gray-400 mb-2 block">Full Name</label>
             {isEditing ? (
@@ -211,7 +211,7 @@ export function UserAccountManagement({ onClose }: UserAccountManagementProps) {
         {/* Account Stats */}
         <div className="mt-6 pt-6 border-t border-white/10">
           <h4 className="text-lg font-semibold text-white mb-4">Account Statistics</h4>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             <div className="text-center">
               <div className="text-2xl font-bold text-blue-400">47</div>
               <div className="text-sm text-gray-400">Days Active</div>
