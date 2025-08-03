@@ -38,6 +38,25 @@ function Dashboard({ onNavigate }: DashboardProps) {
   // Debug log
   console.log('📊 Dashboard Component Loading - Visual Redesign');
   
+  // Force visual redesign activation with rotating backgrounds
+  const [currentBg, setCurrentBg] = useState(0);
+  
+  // Rotate backgrounds every 4 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentBg(prev => (prev + 1) % 5);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const backgrounds = [
+    'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+    'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+    'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+    'linear-gradient(135deg, #fa709a 0%, #fee140 100%)'
+  ];
+  
   // Get real-time data from calorie tracking hook
   const { getDailyStats, getTodaysCalories } = useCalorieTracking();
   const dailyStats = getDailyStats();
@@ -223,10 +242,13 @@ function Dashboard({ onNavigate }: DashboardProps) {
   };
 
   return (
-    <div className="min-h-full relative overflow-hidden bg-gradient-to-br from-purple-500 to-pink-500">
+    <div 
+      className="min-h-full relative overflow-hidden transition-all duration-1000 ease-in-out"
+      style={{ background: backgrounds[currentBg] }}
+    >
       {/* ULTRA-VISIBLE VISUAL REDESIGN INDICATOR */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-green-500 text-white p-4 text-center font-bold text-lg shadow-lg">
-        🎨 BYTEWISE VISUAL REDESIGN IS ACTIVE! 🎨
+      <div className="fixed top-0 left-0 right-0 z-50 bg-green-500 text-white p-4 text-center font-bold text-lg shadow-lg animate-pulse">
+        🎨 BYTEWISE VISUAL REDESIGN ACTIVE! Background {currentBg + 1}/5 Auto-Rotating! 🎨
       </div>
       
       {/* Rotating Food Background - VISUAL REDESIGN ACTIVE */}
