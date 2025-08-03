@@ -379,7 +379,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       {/* Content Section - Completely Separate and Underneath */}
       <div className="px-6 py-8 bg-black content-section">
         {/* Enhanced Daily Progress Metrics with Graphs */}
-        <div className="space-y-6 force-bottom-spacing" style={{ paddingBottom: '8rem !important' }}>
+        <div className="space-y-6 force-bottom-spacing" style={{ paddingBottom: '3rem !important' }}>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-black text-white">Today's Progress</h2>
             <Button 
@@ -481,7 +481,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           </Card>
 
           {/* Macros Breakdown with Mini Graphs */}
-          <div className="grid grid-cols-3 gap-4 force-bottom-spacing" style={{ marginBottom: '6rem !important', paddingBottom: '2rem !important' }}>
+          <div className="grid grid-cols-3 gap-4 force-bottom-spacing" style={{ marginBottom: '2rem !important', paddingBottom: '1rem !important' }}>
             <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4">
               <div className="text-center">
                 <div className="text-sm text-gray-400 mb-1">Protein</div>
@@ -577,7 +577,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       {/* Content Section - Completely Separate and Underneath */}
       <div className="px-6 py-8 bg-black content-section">
         {/* Food Search Bar - Moved Here */}
-        <div className="mb-6 force-bottom-spacing" style={{ paddingBottom: '8rem !important' }}>
+        <div className="mb-6 force-bottom-spacing" style={{ paddingBottom: '3rem !important' }}>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <Input
@@ -616,7 +616,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
         {/* Daily View */}
         {trackingView === 'daily' && (
-          <div className="space-y-4 force-bottom-spacing" style={{ paddingBottom: '8rem !important' }}>
+          <div className="space-y-4 force-bottom-spacing" style={{ paddingBottom: '3rem !important' }}>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-2xl font-bold text-white">Today's Meals</h2>
               <div className="text-orange-400 font-bold">
@@ -684,7 +684,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
         {/* Weekly View */}
         {trackingView === 'weekly' && (
-          <div className="space-y-4 force-bottom-spacing" style={{ paddingBottom: '8rem !important' }}>
+          <div className="space-y-4 force-bottom-spacing" style={{ paddingBottom: '3rem !important' }}>
             <h2 className="text-2xl font-bold text-white mb-4">This Week's Progress</h2>
             
             {/* Weekly Progress Card */}
@@ -708,7 +708,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             </Card>
 
             {/* Daily Breakdown */}
-            <div className="grid grid-cols-1 gap-3 force-bottom-spacing" style={{ marginBottom: '6rem !important', paddingBottom: '2rem !important' }}>
+            <div className="grid grid-cols-1 gap-3 force-bottom-spacing" style={{ marginBottom: '2rem !important', paddingBottom: '1rem !important' }}>
               {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, index) => {
                 const dayCalories = Math.round(dailyCalories * (0.7 + Math.random() * 0.6)); // Simulated data
                 const isToday = index === new Date().getDay();
@@ -777,7 +777,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       {/* Content Section - Completely Separate and Underneath */}
       <div className="px-6 py-8 bg-black content-section">
         {/* Goal Progress Cards */}
-        <div className="space-y-6 mb-8 force-bottom-spacing" style={{ paddingBottom: '8rem !important' }}>
+        <div className="space-y-6 mb-8 force-bottom-spacing" style={{ paddingBottom: '3rem !important' }}>
           {/* Daily Goals */}
           <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
             <div className="flex items-center justify-between mb-4">
