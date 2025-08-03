@@ -143,10 +143,10 @@ body {
 
 /* Main content containers need bottom padding to clear navigation */
 .main-content {
-  padding-bottom: 80px !important; /* Minimal space for bottom navigation */
+  padding-bottom: 70px !important; /* Minimal space for bottom navigation */
   margin-bottom: 0 !important;
   min-height: auto !important;
-  max-height: calc(100vh - 120px) !important;
+  height: 100% !important;
   overflow-y: auto !important;
 }
 
@@ -160,10 +160,11 @@ body {
 /* Fix for content sections to not be cut off */
 .content-section {
   margin-bottom: 0 !important;
-  padding-bottom: 80px !important;
-  min-height: calc(100vh - 100px) !important;
-  max-height: calc(100vh - 100px) !important;
+  padding-bottom: 70px !important;
+  height: calc(100vh - 90px) !important;
   overflow-y: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
 }
 
 /* Prevent overflow issues while maintaining scroll */
