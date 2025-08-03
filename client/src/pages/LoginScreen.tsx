@@ -28,12 +28,8 @@ function LoginScreen({ onNavigate }: LoginScreenProps) {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   
-  // Rotating background system - temporarily disabled to fix white screen
-  // const { currentImage, currentTheme, currentAlt, isLoading: imageLoading } = useRotatingBackground();
-  const currentImage = '';
-  const currentTheme = 'light';
-  const currentAlt = '';
-  const imageLoading = false;
+  // Rotating background system with food images
+  const { currentImage, currentTheme, currentAlt, isLoading: imageLoading, rotateImage } = useRotatingBackground();
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,6 +44,9 @@ function LoginScreen({ onNavigate }: LoginScreenProps) {
           password,
         });
         if (error) throw error;
+        
+        // Rotate background image on successful login
+        rotateImage();
       } else if (mode === 'signup') {
         const { data, error } = await supabase.auth.signUp({
           email,
@@ -72,6 +71,8 @@ function LoginScreen({ onNavigate }: LoginScreenProps) {
         } else if (data.session) {
           // User is immediately signed in (email confirmation disabled)
           setSuccessMessage('Account created successfully! Welcome to Bytewise!');
+          // Rotate background image on successful signup
+          rotateImage();
         }
       } else if (mode === 'forgot') {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -114,6 +115,8 @@ function LoginScreen({ onNavigate }: LoginScreenProps) {
         },
       });
       if (error) throw error;
+      // Rotate background image on successful Google auth
+      rotateImage();
     } catch (error: any) {
       // Handle OAuth errors gracefully
       
