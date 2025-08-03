@@ -212,7 +212,7 @@ function LoginScreen({ onNavigate }: LoginScreenProps) {
                     id="email"
                     type="email"
                     placeholder="Enter your email"
-                    className="pl-5 pr-11 h-12 text-gray-900 bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500 focus:ring-1 leading-normal"
+                    className="pl-8 pr-11 h-12 text-gray-900 bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500 focus:ring-1 leading-normal"
                     style={{ 
                       backgroundColor: 'white !important',
                       color: '#1f2937 !important'
@@ -233,7 +233,7 @@ function LoginScreen({ onNavigate }: LoginScreenProps) {
                       id="password"
                       type={showPassword ? "text" : "password"}
                       placeholder="Enter your password"
-                      className="pl-5 pr-20 h-12 text-gray-900 bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500 focus:ring-1 leading-normal"
+                      className="pl-8 pr-20 h-12 text-gray-900 bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500 focus:ring-1 leading-normal"
                       style={{ 
                         backgroundColor: 'white !important',
                         color: '#1f2937 !important'
