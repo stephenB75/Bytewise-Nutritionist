@@ -41,29 +41,32 @@ export async function generateProgressReportPDF(): Promise<boolean> {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>ByteWise - 6 Month Progress Report</title>
+    <title>bytewise nutritionist - 6 Month Progress Report</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; color: #333; }
-        .header { text-align: center; border-bottom: 2px solid #a8dadc; padding-bottom: 20px; margin-bottom: 30px; }
-        .logo { font-size: 28px; font-weight: bold; color: #a8dadc; margin-bottom: 10px; }
-        .subtitle { color: #666; font-size: 14px; }
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin: 30px 0; }
-        .stat-card { text-align: center; padding: 20px; background: #f8fffe; border-radius: 8px; border: 1px solid #e0e7e7; }
-        .stat-value { font-size: 32px; font-weight: bold; color: #a8dadc; margin-bottom: 5px; }
-        .stat-label { font-size: 14px; color: #666; }
-        .monthly-chart { margin: 30px 0; }
-        .month-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; }
-        .month-name { font-weight: bold; width: 100px; }
-        .month-bar { height: 20px; background: linear-gradient(90deg, #a8dadc, #fef7cd); border-radius: 10px; margin: 0 10px; }
-        .month-value { font-size: 12px; color: #666; min-width: 80px; text-align: right; }
-        .footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; color: #666; }
+        @import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@300;400;700;800;900&display=swap');
+        body { font-family: 'League Spartan', Arial, sans-serif; margin: 20px; color: #333; line-height: 1.6; }
+        .header { text-align: center; border-bottom: 2px solid #7dd3fc; padding-bottom: 30px; margin-bottom: 40px; background: linear-gradient(135deg, #f8fafc, #e2e8f0); padding: 40px 20px; border-radius: 12px; }
+        .css-logo-container { margin-bottom: 20px; }
+        .css-logo-main { font-family: 'League Spartan', sans-serif; font-size: 48px; font-weight: 900; color: #7dd3fc; line-height: 0.9; margin-bottom: 8px; text-transform: lowercase; letter-spacing: -0.02em; }
+        .css-logo-tagline { font-family: 'League Spartan', sans-serif; font-size: 16px; font-weight: 300; color: #64748b; letter-spacing: 0.15em; text-transform: uppercase; }
+        .subtitle { color: #64748b; font-size: 14px; margin-top: 15px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin: 40px 0; }
+        .stat-card { text-align: center; padding: 24px; background: linear-gradient(135deg, #ffffff, #f8fafc); border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .stat-value { font-size: 36px; font-weight: 800; color: #7dd3fc; margin-bottom: 8px; font-family: 'League Spartan', sans-serif; }
+        .stat-label { font-size: 14px; color: #64748b; font-weight: 400; }
+        .monthly-chart { margin: 40px 0; background: #f8fafc; padding: 30px; border-radius: 12px; border: 1px solid #e2e8f0; }
+        .month-row { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #e2e8f0; }
+        .month-name { font-weight: 700; width: 100px; color: #374151; font-family: 'League Spartan', sans-serif; }
+        .month-bar { height: 24px; background: linear-gradient(90deg, #7dd3fc, #fbbf24); border-radius: 12px; margin: 0 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .month-value { font-size: 13px; color: #64748b; min-width: 80px; text-align: right; font-weight: 500; }
+        .footer { text-align: center; margin-top: 50px; padding: 30px 20px; border-top: 2px solid #7dd3fc; color: #64748b; background: linear-gradient(135deg, #f8fafc, #e2e8f0); border-radius: 12px; }
     </style>
 </head>
 <body>
     <div class="header">
-        <div class="logo">
-            <div style="font-size: 28px; font-weight: bold; color: #a8dadc;">bytewise</div>
-            <div style="font-size: 14px; color: #666; margin-left: 2.2ch;">Nutritionist</div>
+        <div class="css-logo-container">
+            <div class="css-logo-main">bytewise</div>
+            <div class="css-logo-tagline">nutritionist</div>
         </div>
         <div class="subtitle">6-Month Progress Report • Generated ${new Date().toLocaleDateString()}</div>
     </div>
@@ -107,8 +110,12 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     </div>
 
     <div class="footer">
-        <p><strong>ByteWise Nutritionist</strong> • Your Personal Nutrition Companion</p>
-        <p>Keep up the great work on your nutrition journey!</p>
+        <div style="margin-bottom: 15px;">
+            <div style="font-size: 24px; font-weight: 800; color: #7dd3fc; font-family: 'League Spartan', sans-serif; text-transform: lowercase; letter-spacing: -0.02em;">bytewise</div>
+            <div style="font-size: 12px; font-weight: 300; color: #64748b; letter-spacing: 0.15em; text-transform: uppercase; margin-top: 4px;">nutritionist</div>
+        </div>
+        <p style="font-weight: 600; color: #374151; margin-bottom: 8px;">Your Personal Nutrition Companion</p>
+        <p style="color: #64748b; font-size: 14px;">Keep up the great work on your nutrition journey!</p>
     </div>
 </body>
 </html>`;
