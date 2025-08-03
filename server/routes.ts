@@ -38,13 +38,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Store user in our database if they don't exist
       if (data.user) {
-        await storage.upsertUser({
-          id: data.user.id,
-          email: data.user.email,
-          firstName: data.user.user_metadata?.first_name,
-          lastName: data.user.user_metadata?.last_name,
-        });
-        console.log('User upserted successfully:', data.user.id);
+        try {
+          await storage.upsertUser({
+            id: data.user.id,
+            email: data.user.email,
+            firstName: data.user.user_metadata?.first_name,
+            lastName: data.user.user_metadata?.last_name,
+          });
+          console.log('User upserted successfully:', data.user.id);
+        } catch (dbError) {
+          console.error('Database upsert error during signin:', dbError);
+          // Continue anyway since Supabase auth succeeded
+        }
       }
       
       res.json({ 
@@ -77,13 +82,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Store user in our database immediately after signup
       if (data.user) {
-        await storage.upsertUser({
-          id: data.user.id,
-          email: data.user.email,
-          firstName: data.user.user_metadata?.first_name,
-          lastName: data.user.user_metadata?.last_name,
-        });
-        console.log('User created and stored:', data.user.id);
+        try {
+          await storage.upsertUser({
+            id: data.user.id,
+            email: data.user.email,
+            firstName: data.user.user_metadata?.first_name,
+            lastName: data.user.user_metadata?.last_name,
+          });
+          console.log('User created and stored:', data.user.id);
+        } catch (dbError) {
+          console.error('Database upsert error during signup:', dbError);
+          // Continue anyway since Supabase auth succeeded
+        }
       }
       
       res.json({ 
