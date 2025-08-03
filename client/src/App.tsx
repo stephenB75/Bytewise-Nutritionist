@@ -17,6 +17,7 @@ import { LiveAppButton } from './components/LiveAppButton';
 // import { useImageRotation } from './hooks/useImageRotation';
 import Dashboard from './pages/Dashboard';
 import DashboardRedesigned from './pages/DashboardRedesigned';
+import FreshRedesign from './pages/FreshRedesign';
 import CalorieCalculatorWrapper from './components/CalorieCalculatorWrapper';
 import WeeklyLogger from './pages/WeeklyLogger';
 import ProfileEnhanced from './pages/ProfileEnhanced';
@@ -113,7 +114,7 @@ export default function App() {
 
     switch (activeTab) {
       case 'dashboard':
-        return <DashboardRedesigned onNavigate={handleNavigate} />;
+        return <FreshRedesign onNavigate={handleNavigate} />;
       case 'calculator':
         return <CalorieCalculatorWrapper onNavigate={handleNavigate} />;
       case 'logger':
