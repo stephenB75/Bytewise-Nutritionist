@@ -113,38 +113,56 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   // Render functions for each page
   const renderHome = () => (
-    <div className="bg-black">
-      {/* Hero Section - Fixed Height */}
-      <div className="relative h-96 overflow-hidden">
-        {/* Hero Background with Food Image */}
+    <div className="space-y-0">
+      {/* Full-Screen Hero Section */}
+      <div className="relative h-screen overflow-hidden">
         <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=800&h=600&fit=crop&crop=faces,edges')`,
+            backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=1600&h=1200&fit=crop')`
           }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/70 to-black/90" />
-        </div>
-
-        {/* Hero Text Overlay - ONLY TEXT */}
-        <div className="relative z-10 px-6 pt-24 pb-8 h-full flex flex-col justify-center">
-          <div>
-            <h1 className="text-5xl font-black text-white mb-4 tracking-tight leading-none">
-              Track Your
-              <br />
-              <span className="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">
-                Nutrition
-              </span>
-            </h1>
-            <p className="text-xl text-gray-300 max-w-md leading-relaxed">
-              Discover amazing foods and track your daily nutrition with our powerful calorie calculator
+        />
+        
+        {/* Hero Content */}
+        <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
+          <div className="space-y-6 max-w-2xl">
+            <div className="space-y-2">
+              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
+                Track Your
+              </h1>
+              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
+                <span className="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">
+                  Nutrition
+                </span>
+              </h1>
+            </div>
+            
+            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto">
+              Track nutrition with scientific precision using our comprehensive USDA database
             </p>
+            
+            <div className="pt-8">
+              <Button 
+                onClick={() => setActiveTab('calculator')}
+                size="lg"
+                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-black px-16 py-6 rounded-full text-2xl shadow-2xl transform hover:scale-105 transition-all duration-500 border-2 border-orange-400/30"
+              >
+                Start Tracking
+              </Button>
+            </div>
+          </div>
+        </div>
+        
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60">
+          <div className="animate-bounce">
+            <ChevronRight className="w-6 h-6 rotate-90" />
           </div>
         </div>
       </div>
 
-      {/* Content Section - Completely Separate and Underneath */}
-      <div className="bg-black px-6 py-8 min-h-screen">
+      {/* Daily Progress Metrics Cards Section */}
+      <div className="px-6 py-8 bg-black">
         {/* Daily Progress Metrics Cards on Macro and Micro Nutrients */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-white mb-4">Today's Progress</h2>
@@ -198,38 +216,46 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   );
 
   const renderDailyWeekly = () => (
-    <div className="bg-black">
-      {/* Hero Section - Fixed Height */}
-      <div className="relative h-96 overflow-hidden">
-        {/* Hero Background */}
+    <div className="space-y-0">
+      {/* Full-Screen Hero Section */}
+      <div className="relative h-screen overflow-hidden">
         <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&h=600&fit=crop')`,
+            backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=1600&h=1200&fit=crop')`
           }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/70 to-black/90" />
-        </div>
-
-        {/* Hero Text Overlay - ONLY TEXT */}
-        <div className="relative z-10 px-6 pt-24 pb-8 h-full flex flex-col justify-center">
-          <div>
-            <h1 className="text-5xl font-black text-white mb-4 tracking-tight leading-none">
-              Daily &
-              <br />
-              <span className="bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
-                Weekly
-              </span>
-            </h1>
-            <p className="text-xl text-gray-300 max-w-md leading-relaxed">
+        />
+        
+        {/* Hero Content */}
+        <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
+          <div className="space-y-6 max-w-2xl">
+            <div className="space-y-2">
+              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
+                Daily &
+              </h1>
+              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
+                <span className="bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
+                  Weekly
+                </span>
+              </h1>
+            </div>
+            
+            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto">
               Track your calorie intake and search for foods to log
             </p>
           </div>
         </div>
+        
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60">
+          <div className="animate-bounce">
+            <ChevronRight className="w-6 h-6 rotate-90" />
+          </div>
+        </div>
       </div>
 
-      {/* Content Section - Completely Separate and Underneath */}
-      <div className="bg-black px-6 py-8 min-h-screen">
+      {/* Food Search and Logged Foods Section */}
+      <div className="px-6 py-8 bg-black">
         {/* Food Search Bar - Moved here from home page */}
         <div className="relative mb-8">
           <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -280,35 +306,46 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   );
 
   const renderSignIn = () => (
-    <div className="relative min-h-screen bg-black">
-      {/* Hero Background */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: `url('https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=800&h=600&fit=crop')`,
-        }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/70 to-black/90" />
-      </div>
-
-      {/* Hero Text Overlay */}
-      <div className="relative z-10 px-6 pt-24 pb-32">
-        <div className="mb-12">
-          <h1 className="text-5xl font-black text-white mb-4 tracking-tight leading-none">
-            Welcome to
-            <br />
-            <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-              Nutrition
-            </span>
-          </h1>
-          <p className="text-xl text-gray-300 max-w-md leading-relaxed">
-            Sign in to start tracking your nutrition journey
-          </p>
+    <div className="space-y-0">
+      {/* Full-Screen Hero Section */}
+      <div className="relative h-screen overflow-hidden">
+        <div 
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=1600&h=1200&fit=crop')`
+          }}
+        />
+        
+        {/* Hero Content */}
+        <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
+          <div className="space-y-6 max-w-2xl">
+            <div className="space-y-2">
+              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
+                Welcome to
+              </h1>
+              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
+                <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                  Nutrition
+                </span>
+              </h1>
+            </div>
+            
+            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto">
+              Sign in to start tracking your nutrition journey
+            </p>
+          </div>
+        </div>
+        
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60">
+          <div className="animate-bounce">
+            <ChevronRight className="w-6 h-6 rotate-90" />
+          </div>
         </div>
       </div>
 
-      {/* Content Underneath Hero */}
-      <div className="bg-black px-6 py-8">
+      {/* Sign In Form Section */}
+      <div className="px-6 py-8 bg-black">
         {/* Sign In Component */}
         <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
           <h3 className="text-2xl font-bold text-white mb-6 text-center">Sign In</h3>
