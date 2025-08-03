@@ -130,20 +130,20 @@ body {
 
 /* Main content containers need bottom padding to clear navigation */
 .main-content {
-  padding-bottom: 100px !important; /* Extra space for bottom navigation */
+  padding-bottom: 140px !important; /* Increased space for bottom navigation */
   margin-bottom: 0 !important;
 }
 
 /* Ensure all page containers have proper bottom spacing */
 .page-container {
   min-height: 100vh;
-  padding-bottom: 120px !important; /* Account for navigation + safe area */
+  padding-bottom: 160px !important; /* Increased for navigation + safe area */
 }
 
 /* Fix for content sections to not be cut off */
 .content-section {
-  margin-bottom: 2rem !important;
-  padding-bottom: 2rem !important;
+  margin-bottom: 3rem !important;
+  padding-bottom: 3rem !important;
 }
 
 /* Prevent overflow issues while maintaining scroll */
@@ -154,14 +154,28 @@ html, body {
 
 /* Ensure cards and components have proper bottom spacing */
 .card-container, .component-container {
-  margin-bottom: 1.5rem !important;
+  margin-bottom: 2rem !important;
+}
+
+/* Specific spacing for macro cards grid to clear navigation */
+.macros-grid {
+  margin-bottom: 6rem !important;
+  padding-bottom: 2rem !important;
 }
 
 /* Fix for mobile safe areas */
 @supports (padding: max(0px)) {
   body {
-    padding-bottom: max(100px, env(safe-area-inset-bottom)) !important;
+    padding-bottom: max(140px, env(safe-area-inset-bottom)) !important;
   }
+}
+
+/* Additional bottom spacing for specific content areas */
+.weekly-progress-container,
+.daily-progress-container,
+.macro-breakdown-container {
+  padding-bottom: 4rem !important;
+  margin-bottom: 2rem !important;
 }
 
 input[type="text"]::placeholder, 
