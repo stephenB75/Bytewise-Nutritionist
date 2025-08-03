@@ -96,9 +96,15 @@ export default function App() {
     };
   }, []);
 
-  // Removed special authentication routes - restored to modernlayout state
+  // Check for special routes first
   const checkSpecialRoutes = () => {
-    // Direct access to modern layout - no authentication checks
+    const urlParams = new URLSearchParams(window.location.search);
+    const type = urlParams.get('type');
+    
+    if (type === 'signup' || window.location.pathname.includes('confirm')) {
+      return <EmailConfirmation onNavigate={handleNavigate} />;
+    }
+    
     return null;
   };
 
@@ -110,7 +116,7 @@ export default function App() {
 
     switch (activeTab) {
       case 'redesigned':
-        return <ModernFoodApp onNavigate={handleNavigate} />;
+        return <ModernFoodLayout onNavigate={handleNavigate} />;
       case 'dashboard':
         return <ModernFoodApp onNavigate={handleNavigate} />;
       case 'fresh':
@@ -122,7 +128,7 @@ export default function App() {
       case 'profile':
         return <ProfileEnhanced onNavigate={handleNavigate} />;
       default:
-        return <ModernFoodApp onNavigate={handleNavigate} />;
+        return <ModernFoodLayout onNavigate={handleNavigate} />;
     }
   };
 
