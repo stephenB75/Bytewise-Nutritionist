@@ -286,35 +286,38 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   // Render functions for each page
   const renderHome = () => (
-    <div className="relative min-h-screen bg-black">
-      {/* Hero Background with Food Image */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: `url('https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=800&h=600&fit=crop&crop=faces,edges')`,
-        }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/70 to-black/90" />
-      </div>
+    <div className="bg-black">
+      {/* Hero Section - Fixed Height */}
+      <div className="relative h-96 overflow-hidden">
+        {/* Hero Background with Food Image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url('https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=800&h=600&fit=crop&crop=faces,edges')`,
+          }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/70 to-black/90" />
+        </div>
 
-      {/* Hero Text Overlay - ONLY TEXT */}
-      <div className="relative z-10 px-6 pt-24 pb-32">
-        <div className="mb-12">
-          <h1 className="text-5xl font-black text-white mb-4 tracking-tight leading-none">
-            Track Your
-            <br />
-            <span className="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">
-              Nutrition
-            </span>
-          </h1>
-          <p className="text-xl text-gray-300 max-w-md leading-relaxed">
-            Discover amazing foods and track your daily nutrition with our powerful calorie calculator
-          </p>
+        {/* Hero Text Overlay - ONLY TEXT */}
+        <div className="relative z-10 px-6 pt-24 pb-8 h-full flex flex-col justify-center">
+          <div>
+            <h1 className="text-5xl font-black text-white mb-4 tracking-tight leading-none">
+              Track Your
+              <br />
+              <span className="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">
+                Nutrition
+              </span>
+            </h1>
+            <p className="text-xl text-gray-300 max-w-md leading-relaxed">
+              Discover amazing foods and track your daily nutrition with our powerful calorie calculator
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Content Underneath Hero */}
-      <div className="bg-black px-6 py-8">
+      {/* Content Section - Completely Separate and Underneath */}
+      <div className="bg-black px-6 py-8 min-h-screen">
         {/* Daily Progress Metrics Cards instead of Categories */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-white mb-4">Today's Progress</h2>
@@ -390,32 +393,38 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   );
 
   const renderDailyWeekly = () => (
-    <div className="relative min-h-screen bg-black">
-      {/* Hero Background */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: `url('https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&h=600&fit=crop')`,
-        }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/70 to-black/90" />
-      </div>
-
-      {/* Hero Text Overlay */}
-      <div className="relative z-10 px-6 pt-24 pb-32">
-        <div className="mb-12">
-          <h1 className="text-5xl font-black text-white mb-4 tracking-tight leading-none">
-            Daily &
-            <br />
-            <span className="bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
-              Weekly
-            </span>
-          </h1>
-          <p className="text-xl text-gray-300 max-w-md leading-relaxed">
-            Track your calorie intake and search for foods to log
-          </p>
+    <div className="bg-black">
+      {/* Hero Section - Fixed Height */}
+      <div className="relative h-96 overflow-hidden">
+        {/* Hero Background */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url('https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&h=600&fit=crop')`,
+          }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/70 to-black/90" />
         </div>
 
+        {/* Hero Text Overlay - ONLY TEXT */}
+        <div className="relative z-10 px-6 pt-24 pb-8 h-full flex flex-col justify-center">
+          <div>
+            <h1 className="text-5xl font-black text-white mb-4 tracking-tight leading-none">
+              Daily &
+              <br />
+              <span className="bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
+                Weekly
+              </span>
+            </h1>
+            <p className="text-xl text-gray-300 max-w-md leading-relaxed">
+              Track your calorie intake and search for foods to log
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Content Section - Completely Separate and Underneath */}
+      <div className="bg-black px-6 py-8 min-h-screen">
         {/* Search Bar */}
         <div className="relative mb-8">
           <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -426,10 +435,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             className="pl-12 h-14 bg-white/10 border-white/20 text-white placeholder-gray-400 backdrop-blur-md rounded-2xl text-lg"
           />
         </div>
-      </div>
-
-      {/* Content Underneath Hero */}
-      <div className="bg-black px-6 py-8">
         {/* Daily/Weekly Tabs */}
         <div className="flex space-x-4 mb-6">
           <Button className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-3 rounded-xl">
