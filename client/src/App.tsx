@@ -118,7 +118,7 @@ export default function App() {
 
     switch (activeTab) {
       case 'redesigned':
-        return <SimpleModernLayout onNavigate={handleNavigate} />;
+        return <ModernFoodLayout onNavigate={handleNavigate} />;
       case 'dashboard':
         return <ModernFoodApp onNavigate={handleNavigate} />;
       case 'fresh':
