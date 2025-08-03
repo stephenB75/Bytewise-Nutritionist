@@ -477,17 +477,40 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             </Card>
           </div>
 
-          {/* Goal Achievement Check */}
-          {dailyCalories >= goalCalories && (
-            <Card className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 border-green-500/30 p-6">
-              <div className="flex items-center space-x-4">
-                <div className="p-3 bg-green-500 rounded-full">
-                  <Trophy className="w-6 h-6 text-white" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-white font-bold text-lg">Daily Goal Achieved!</h3>
-                  <p className="text-green-200">You've reached your calorie target for today. Keep it up!</p>
-                </div>
+          {/* Enhanced Goal Achievement Card - Always Visible */}
+          <Card className={`transition-all duration-500 p-6 ${
+            dailyCalories >= goalCalories 
+              ? 'bg-gradient-to-r from-[#45c73e]/30 to-[#45c73e]/20 border-[#45c73e]/40 shadow-lg shadow-[#45c73e]/20' 
+              : 'bg-gradient-to-r from-[#1f4aa6]/20 to-[#faed39]/10 border-[#1f4aa6]/30 opacity-80'
+          }`}>
+            <div className="flex items-center space-x-4">
+              <div className={`p-3 rounded-full transition-all duration-300 ${
+                dailyCalories >= goalCalories 
+                  ? 'bg-[#45c73e] shadow-lg' 
+                  : 'bg-[#1f4aa6]/60'
+              }`}>
+                <Trophy className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className={`font-bold text-lg transition-colors duration-300 ${
+                  dailyCalories >= goalCalories 
+                    ? 'text-white' 
+                    : 'text-gray-300'
+                }`}>
+                  {dailyCalories >= goalCalories ? 'Daily Goal Achieved!' : 'Daily Goal Progress'}
+                </h3>
+                <p className={`transition-colors duration-300 ${
+                  dailyCalories >= goalCalories 
+                    ? 'text-[#45c73e]/80' 
+                    : 'text-gray-400'
+                }`}>
+                  {dailyCalories >= goalCalories 
+                    ? "You've reached your calorie target for today. Keep it up!" 
+                    : `${Math.round((dailyCalories / goalCalories) * 100)}% of daily goal completed`
+                  }
+                </p>
+              </div>
+              {dailyCalories >= goalCalories && (
                 <Button 
                   onClick={() => {
                     setShowAchievement(true);
@@ -496,13 +519,23 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                       description: "You've hit your calorie target for today"
                     });
                   }}
-                  className="bg-green-500 hover:bg-green-600 text-white"
+                  className="bg-[#45c73e] hover:bg-[#45c73e]/80 text-white shadow-lg"
                 >
                   Celebrate
                 </Button>
-              </div>
-            </Card>
-          )}
+              )}
+              {dailyCalories < goalCalories && (
+                <div className="text-right">
+                  <div className="text-[#faed39] font-bold text-sm">
+                    {goalCalories - dailyCalories} cal
+                  </div>
+                  <div className="text-gray-400 text-xs">
+                    remaining
+                  </div>
+                </div>
+              )}
+            </div>
+          </Card>
         </div>
       </div>
     </div>
