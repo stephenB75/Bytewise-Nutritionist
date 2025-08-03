@@ -482,7 +482,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 <div className="text-xs text-gray-400">Remain</div>
               </div>
               <div className="text-center p-2 bg-gray-800/50 rounded-lg">
-                <div className="text-sm font-bold text-blue-400">{loggedMeals.length * 7}</div>
+                <div className="text-sm font-bold text-blue-400">{loggedMeals.length}</div>
                 <div className="text-xs text-gray-400">Total</div>
               </div>
             </div>
@@ -824,7 +824,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             {/* Daily Breakdown */}
             <div className="grid grid-cols-1 gap-3">
               {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, index) => {
-                const dayCalories = Math.round(dailyCalories * (0.7 + Math.random() * 0.6)); // Simulated data
+                const dayCalories = 0; // Authentic empty state
                 const isToday = index === new Date().getDay();
                 return (
                   <Card key={day} className={`bg-white/10 backdrop-blur-md border-white/20 p-4 ${isToday ? 'border-orange-500/50' : ''}`}>
