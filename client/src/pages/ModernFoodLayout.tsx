@@ -123,7 +123,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           }}
         />
         
-        {/* Hero Content */}
+        {/* Hero Content - ONLY TEXT OVERLAY */}
         <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
           <div className="space-y-6 max-w-2xl">
             <div className="space-y-2">
@@ -161,7 +161,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         </div>
       </div>
 
-      {/* Daily Progress Metrics Cards Section */}
+      {/* Content Section - Completely Separate and Underneath */}
       <div className="px-6 py-8 bg-black">
         {/* Daily Progress Metrics Cards on Macro and Micro Nutrients */}
         <div className="mb-8">
@@ -226,7 +226,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           }}
         />
         
-        {/* Hero Content */}
+        {/* Hero Content - ONLY TEXT OVERLAY */}
         <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
           <div className="space-y-6 max-w-2xl">
             <div className="space-y-2">
@@ -254,7 +254,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         </div>
       </div>
 
-      {/* Food Search and Logged Foods Section */}
+      {/* Content Section - Completely Separate and Underneath */}
       <div className="px-6 py-8 bg-black">
         {/* Food Search Bar - Moved here from home page */}
         <div className="relative mb-8">
@@ -316,7 +316,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           }}
         />
         
-        {/* Hero Content */}
+        {/* Hero Content - ONLY TEXT OVERLAY */}
         <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
           <div className="space-y-6 max-w-2xl">
             <div className="space-y-2">
@@ -344,7 +344,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         </div>
       </div>
 
-      {/* Sign In Form Section */}
+      {/* Content Section - Completely Separate and Underneath */}
       <div className="px-6 py-8 bg-black">
         {/* Sign In Component */}
         <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
