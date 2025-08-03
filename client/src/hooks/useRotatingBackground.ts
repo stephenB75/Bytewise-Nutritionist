@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 interface FoodImage {
   url: string;
@@ -37,38 +37,53 @@ const FOOD_IMAGES: FoodImage[] = [
 ];
 
 export function useRotatingBackground() {
-  const [currentIndex, setCurrentIndex] = React.useState(0);
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Rotate background every 5 seconds
-  React.useEffect(() => {
+  useEffect(() => {
+    console.log('🖼️ Setting up rotating background interval');
     const interval = setInterval(() => {
+      console.log('🔄 Auto-rotating background image');
       setIsLoading(true);
       
       // Small delay to create smooth transition effect
       setTimeout(() => {
-        setCurrentIndex((prevIndex) => 
-          (prevIndex + 1) % FOOD_IMAGES.length
-        );
+        setCurrentIndex((prevIndex) => {
+          const newIndex = (prevIndex + 1) % FOOD_IMAGES.length;
+          console.log(`📸 Background changed to image ${newIndex + 1}/${FOOD_IMAGES.length}`);
+          return newIndex;
+        });
         setIsLoading(false);
       }, 300);
     }, 5000);
 
-    return () => clearInterval(interval);
+    return () => {
+      console.log('🧹 Cleaning up background rotation interval');
+      clearInterval(interval);
+    };
   }, []);
 
   // Change image when user signs in or page changes
-  const rotateImage = React.useCallback(() => {
+  const rotateImage = useCallback(() => {
+    console.log('⚡ Manual background rotation triggered');
     setIsLoading(true);
     setTimeout(() => {
-      setCurrentIndex((prevIndex) => 
-        (prevIndex + 1) % FOOD_IMAGES.length
-      );
+      setCurrentIndex((prevIndex) => {
+        const newIndex = (prevIndex + 1) % FOOD_IMAGES.length;
+        console.log(`📸 Background manually changed to image ${newIndex + 1}/${FOOD_IMAGES.length}`);
+        return newIndex;
+      });
       setIsLoading(false);
     }, 300);
   }, []);
 
   const currentImage = FOOD_IMAGES[currentIndex];
+  
+  // Debug logging
+  useEffect(() => {
+    console.log(`🎨 Current background: ${currentImage.alt} (${currentIndex + 1}/${FOOD_IMAGES.length})`);
+  }, [currentIndex, currentImage.alt]);
 
   return {
     currentImage: currentImage.url,
