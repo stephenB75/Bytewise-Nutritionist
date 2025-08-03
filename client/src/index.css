@@ -3133,10 +3133,12 @@ input.text-xs {
 /* Force dark colors for header usage */
 .bytewise-logo-main {
   color: #f97316 !important; /* Orange for visibility on dark backgrounds */
+  text-transform: lowercase !important;
 }
 
 .bytewise-logo-tagline {
   color: #e5e7eb !important; /* Light gray for visibility on dark backgrounds */
+  text-transform: lowercase !important;
 }
 
 /* Logo animation for loading states */

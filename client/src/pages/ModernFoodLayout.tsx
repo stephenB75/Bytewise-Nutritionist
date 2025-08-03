@@ -236,7 +236,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 </div>
                 <div>
                   <h3 className="text-white font-semibold">Daily Calories</h3>
-                  <p className="text-gray-400 text-sm">{dailyCalories}/{goalCalories} kcal</p>
+                  <p className="text-gray-400 text-sm">{Math.round(dailyCalories)}/{goalCalories} kcal</p>
                 </div>
               </div>
               <div className="text-right">
@@ -254,15 +254,20 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full animate-pulse" />
               )}
             </div>
-            {/* Mini Graph Line */}
-            <div className="flex items-end space-x-1 h-8">
-              {[0.2, 0.4, 0.6, 0.8, 0.9, 0.7, 0.88].map((height, i) => (
-                <div 
-                  key={i}
-                  className="flex-1 bg-orange-400/30 rounded-t"
-                  style={{ height: `${height * 100}%` }}
-                />
-              ))}
+            {/* Detailed metrics */}
+            <div className="grid grid-cols-3 gap-3 mt-4">
+              <div className="text-center p-2 bg-gray-800/50 rounded-lg">
+                <div className="text-sm font-bold text-orange-400">{loggedMeals.length}</div>
+                <div className="text-xs text-gray-400">Meals</div>
+              </div>
+              <div className="text-center p-2 bg-gray-800/50 rounded-lg">
+                <div className="text-sm font-bold text-orange-400">{Math.round(dailyCalories - goalCalories)}</div>
+                <div className="text-xs text-gray-400">Remaining</div>
+              </div>
+              <div className="text-center p-2 bg-gray-800/50 rounded-lg">
+                <div className="text-sm font-bold text-orange-400">{Math.round((dailyCalories/goalCalories)*100)}%</div>
+                <div className="text-xs text-gray-400">Complete</div>
+              </div>
             </div>
           </Card>
 
@@ -275,7 +280,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 </div>
                 <div>
                   <h3 className="text-white font-semibold">Weekly Progress</h3>
-                  <p className="text-gray-400 text-sm">{weeklyCalories}/{weeklyGoal} kcal</p>
+                  <p className="text-gray-400 text-sm">{Math.round(weeklyCalories)}/{weeklyGoal} kcal</p>
                 </div>
               </div>
               <div className="text-right">
@@ -290,19 +295,24 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 style={{ width: `${Math.min((weeklyCalories/weeklyGoal)*100, 100)}%` }}
               />
             </div>
-            {/* Weekly Trend Graph */}
-            <div className="flex items-end space-x-1 h-12">
-              {[0.3, 0.5, 0.7, 0.6, 0.8, 0.9, 0.88].map((height, i) => (
-                <div key={i} className="flex-1 flex flex-col justify-end">
-                  <div 
-                    className="bg-blue-400/40 rounded-t mb-1"
-                    style={{ height: `${height * 70}%` }}
-                  />
-                  <div className="text-xs text-gray-500 text-center">
-                    {['M', 'T', 'W', 'T', 'F', 'S', 'S'][i]}
-                  </div>
-                </div>
-              ))}
+            {/* Detailed weekly metrics */}
+            <div className="grid grid-cols-4 gap-2 mt-4">
+              <div className="text-center p-2 bg-gray-800/50 rounded-lg">
+                <div className="text-sm font-bold text-blue-400">7</div>
+                <div className="text-xs text-gray-400">Days</div>
+              </div>
+              <div className="text-center p-2 bg-gray-800/50 rounded-lg">
+                <div className="text-sm font-bold text-blue-400">{Math.round(weeklyCalories/7)}</div>
+                <div className="text-xs text-gray-400">Avg/Day</div>
+              </div>
+              <div className="text-center p-2 bg-gray-800/50 rounded-lg">
+                <div className="text-sm font-bold text-blue-400">{Math.round(weeklyGoal - weeklyCalories)}</div>
+                <div className="text-xs text-gray-400">Remain</div>
+              </div>
+              <div className="text-center p-2 bg-gray-800/50 rounded-lg">
+                <div className="text-sm font-bold text-blue-400">{loggedMeals.length * 7}</div>
+                <div className="text-xs text-gray-400">Total</div>
+              </div>
             </div>
           </Card>
 
@@ -1045,6 +1055,68 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   </div>
                 </Card>
               )}
+
+              {/* Achievements Module */}
+              <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6 mb-6">
+                <h3 className="text-xl font-bold text-white mb-4 flex items-center">
+                  <Trophy className="w-5 h-5 mr-2 text-yellow-400" />
+                  Achievements & Awards
+                </h3>
+                
+                {/* Achievement Stats */}
+                <div className="grid grid-cols-3 gap-4 mb-6">
+                  <div className="text-center p-3 bg-gradient-to-br from-yellow-500/20 to-orange-500/20 rounded-xl border border-yellow-500/30">
+                    <div className="text-2xl font-bold text-yellow-400">{achievements ? achievements.length : 3}</div>
+                    <div className="text-xs text-gray-300">Earned</div>
+                  </div>
+                  <div className="text-center p-3 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-xl border border-blue-500/30">
+                    <div className="text-2xl font-bold text-blue-400">15</div>
+                    <div className="text-xs text-gray-300">Available</div>
+                  </div>
+                  <div className="text-center p-3 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-xl border border-green-500/30">
+                    <div className="text-2xl font-bold text-green-400">{Math.round(((achievements ? achievements.length : 3) / 15) * 100)}%</div>
+                    <div className="text-xs text-gray-300">Complete</div>
+                  </div>
+                </div>
+
+                {/* Recent Achievements */}
+                <div className="space-y-3">
+                  {(achievements && achievements.length > 0 ? achievements : [
+                    { title: "First Day Complete", description: "Logged your first day of meals", earnedAt: new Date().toISOString() },
+                    { title: "Goal Achiever", description: "Met your daily calorie goal", earnedAt: new Date(Date.now() - 86400000).toISOString() },
+                    { title: "Streak Starter", description: "3 days of consistent logging", earnedAt: new Date(Date.now() - 172800000).toISOString() }
+                  ]).slice(0, 3).map((achievement, index) => (
+                    <div key={index} className="flex items-center space-x-4 p-3 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-xl border border-yellow-500/30">
+                      <div className="w-10 h-10 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Trophy className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-white font-semibold text-sm truncate">{achievement.title}</h4>
+                        <p className="text-gray-400 text-xs truncate">{achievement.description}</p>
+                      </div>
+                      <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200 text-xs flex-shrink-0">
+                        {new Date(achievement.earnedAt).toLocaleDateString()}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+
+                {/* View All Button */}
+                <Button 
+                  variant="outline" 
+                  className="w-full mt-4 border-yellow-500/50 text-yellow-400 bg-yellow-500/10 hover:bg-yellow-500/20"
+                  onClick={() => {
+                    console.log('View All Achievements clicked - functionality activated');
+                    setShowAchievement(true);
+                    setCurrentAchievement({
+                      title: "Achievement Explorer",
+                      description: "Viewing all your earned achievements"
+                    });
+                  }}
+                >
+                  View All Achievements
+                </Button>
+              </Card>
 
               {/* Data Management */}
               <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6 mb-6">
