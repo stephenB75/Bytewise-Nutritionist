@@ -189,8 +189,8 @@ export class USDAService {
 
       console.log(`🔍 Found ${foods.length} foods for "${ingredientName}"`);
 
-      // Filter and prioritize results
-      const filteredFoods = this.filterAndPrioritizeFoods(foods, ingredientName);
+      // Filter and prioritize results with measurement context
+      const filteredFoods = this.filterAndPrioritizeFoodsWithMeasurement(foods, ingredientName, measurement);
       if (filteredFoods.length === 0) {
         throw new Error('No suitable foods found');
       }
@@ -502,9 +502,18 @@ export class USDAService {
   }
 
   /**
+   * Filter and prioritize food results with measurement context
+   */
+  private filterAndPrioritizeFoodsWithMeasurement(foods: USDAFood[], searchTerm: string, measurement: string = ''): USDAFood[] {
+    const measurementLower = measurement.toLowerCase();
+    
+    return this.filterAndPrioritizeFoods(foods, searchTerm, measurementLower);
+  }
+
+  /**
    * Filter and prioritize food results for better matching
    */
-  private filterAndPrioritizeFoods(foods: USDAFood[], searchTerm: string): USDAFood[] {
+  private filterAndPrioritizeFoods(foods: USDAFood[], searchTerm: string, measurementContext: string = ''): USDAFood[] {
     const searchLower = searchTerm.toLowerCase();
     
     // First filter out foods with insufficient nutrition data
@@ -536,6 +545,24 @@ export class USDAService {
       const hasEnergy = food.foodNutrients.some(n => 
         (n.nutrientId === 1008) && (n.value || 0) > 0);
       if (hasEnergy) score += 100;
+      
+      // Smart food selection based on ingredient and measurement context
+      if (searchLower.includes('banana')) {
+        // Strongly prefer fresh raw bananas over overripe
+        if (description.includes('raw') && !description.includes('overripe')) score += 300;
+        if (description.includes('overripe')) score -= 300; // Heavily penalize overripe
+      }
+      
+      if (searchLower.includes('rice')) {
+        // Prefer cooked rice for volume measurements (cup), raw for weight (grams)
+        if (measurementContext.includes('cup')) {
+          if (description.includes('cooked') || description.includes('steamed')) score += 200;
+          if (description.includes('flour') || description.includes('dry') || description.includes('raw')) score -= 200;
+        } else if (measurementContext.includes('g')) {
+          if (description.includes('raw') && !description.includes('flour')) score += 100;
+          if (description.includes('flour')) score -= 100;
+        }
+      }
       
       // Prefer raw/basic ingredients
       if (description.includes('raw') || description.includes('fresh')) score += 50;
