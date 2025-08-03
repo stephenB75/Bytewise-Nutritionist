@@ -16,7 +16,7 @@ interface UserProfileProps {
 }
 
 export function UserProfile({ showDetails = false, size = 'md' }: UserProfileProps) {
-  const { user, isLoading } = useAuth();
+  const { user, loading: isLoading } = useAuth();
 
   if (isLoading) {
     return (
@@ -42,15 +42,15 @@ export function UserProfile({ showDetails = false, size = 'md' }: UserProfilePro
   }
 
   const avatarSize = size === 'sm' ? 'w-6 h-6' : size === 'md' ? 'w-8 h-8' : 'w-12 h-12';
-  const displayName = user.firstName || user.lastName 
-    ? `${user.firstName || ''} ${user.lastName || ''}`.trim()
+  const displayName = user.user_metadata?.firstName || user.user_metadata?.lastName 
+    ? `${user.user_metadata?.firstName || ''} ${user.user_metadata?.lastName || ''}`.trim()
     : user.email?.split('@')[0] || 'User';
 
   return (
-    <div className="flex items-center gap-2">
-      {user.profileImageUrl ? (
+    <div className="flex items-center gap-2 w-full">
+      {user.user_metadata?.profileImageUrl ? (
         <img 
-          src={user.profileImageUrl} 
+          src={user.user_metadata.profileImageUrl} 
           alt={displayName}
           className={`${avatarSize} rounded-full object-cover`}
         />
@@ -62,18 +62,18 @@ export function UserProfile({ showDetails = false, size = 'md' }: UserProfilePro
       
       {showDetails && (
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-gray-900 truncate">
+          <p className="text-sm font-medium text-white truncate">
             {displayName}
           </p>
           {user.email && (
-            <p className="text-xs text-gray-500 truncate flex items-center gap-1">
+            <p className="text-xs text-gray-400 truncate flex items-center gap-1">
               <Mail className="w-3 h-3" />
               {user.email}
             </p>
           )}
           <Badge variant="secondary" className="text-xs mt-1">
             <Calendar className="w-3 h-3 mr-1" />
-            Member since {new Date(user.createdAt).toLocaleDateString()}
+            Member since {new Date(user.created_at).toLocaleDateString()}
           </Badge>
         </div>
       )}

@@ -91,7 +91,7 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
   };
 
   return (
-    <Card className={`overflow-hidden bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-blue-200 ${className}`}>
+    <Card className={`overflow-hidden bg-white/10 backdrop-blur-md border-white/20 w-full ${className}`}>
       {/* Header - Always Visible */}
       <div className="p-6">
         <div className="flex items-center gap-4">

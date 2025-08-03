@@ -77,7 +77,7 @@ export function DataManagementPanel() {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-6 w-full">
       <h3 className="text-2xl font-bold text-white mb-6">Data Management</h3>
       
       <div className="space-y-6">
@@ -130,7 +130,7 @@ export function DataManagementPanel() {
             </Badge>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3">
             <Button 
               onClick={handleSyncData}
               disabled={isSyncing}
@@ -165,7 +165,7 @@ export function DataManagementPanel() {
         {/* Data Stats */}
         <div>
           <h4 className="font-medium text-gray-900 mb-3">Your Data Summary</h4>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 gap-3">
             <div className="text-center p-3 bg-gray-50 rounded-lg">
               <Calendar className="w-5 h-5 mx-auto text-blue-600 mb-1" />
               <p className="text-xs text-gray-600">Days Tracked</p>
