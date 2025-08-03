@@ -11,8 +11,8 @@
 
 /* Force content to scroll properly and meet footer */
 .force-bottom-spacing {
-  margin-bottom: 1rem !important;
-  padding-bottom: 1rem !important;
+  margin-bottom: 0.5rem !important;
+  padding-bottom: 0.5rem !important;
 }
 
 /* Enhanced Accessibility - Increased text sizes throughout the app */
@@ -160,8 +160,9 @@ body {
 /* Fix for content sections to not be cut off */
 .content-section {
   margin-bottom: 0 !important;
-  padding-bottom: 2rem !important;
-  height: calc(100vh - 120px) !important;
+  padding-bottom: 80px !important;
+  min-height: calc(100vh - 100px) !important;
+  max-height: calc(100vh - 100px) !important;
   overflow-y: auto !important;
 }
 
