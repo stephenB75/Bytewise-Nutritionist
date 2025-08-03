@@ -36,6 +36,7 @@ import {
   RefreshCw,
   X
 } from 'lucide-react';
+import { NotificationDropdown } from '@/components/NotificationDropdown';
 
 interface ModernFoodLayoutProps {
   onNavigate?: (page: string) => void;
@@ -51,6 +52,48 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const [goalCalories, setGoalCalories] = useState(2100);
   const [weeklyGoal, setWeeklyGoal] = useState(14700);
   const [loggedMeals, setLoggedMeals] = useState<any[]>([]);
+  const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
+  const [notifications, setNotifications] = useState([
+    {
+      id: '1',
+      type: 'achievement' as const,
+      title: 'Daily Goal Reached!',
+      message: 'Congratulations! You\'ve reached your daily calorie goal.',
+      timestamp: new Date(),
+      read: false
+    },
+    {
+      id: '2', 
+      type: 'info' as const,
+      title: 'Weekly Summary Ready',
+      message: 'Your weekly nutrition report is available for download.',
+      timestamp: new Date(Date.now() - 3600000),
+      read: false
+    },
+    {
+      id: '3',
+      type: 'success' as const,
+      title: 'Meal Logged Successfully',
+      message: 'Your lunch has been added to today\'s nutrition tracking.',
+      timestamp: new Date(Date.now() - 7200000),
+      read: true
+    }
+  ]);
+
+  // Notification handler functions
+  const handleMarkAsRead = (id: string) => {
+    setNotifications(prev => prev.map(n => 
+      n.id === id ? { ...n, read: true } : n
+    ));
+  };
+
+  const handleMarkAllAsRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+  };
+
+  const handleDeleteNotification = (id: string) => {
+    setNotifications(prev => prev.filter(n => n.id !== id));
+  };
   
   // Auth and achievement hooks
   const { user, loading } = useAuth();
@@ -1304,34 +1347,37 @@ User Progress: ${Math.round((dailyCalories/goalCalories)*100)}% of daily goal
           </div>
           <div className="flex items-center space-x-2">
             {/* Notifications */}
-            <Button 
-              size="sm" 
-              variant="ghost" 
-              className="relative text-white hover:bg-white/10 rounded-full p-2"
-              onClick={() => {
-                console.log('Notification clicked - checking functionality');
-                if ('Notification' in window && Notification.permission === 'granted') {
-                  new Notification('ByteWise Nutrition', {
-                    body: 'Daily goal reminder: Stay on track with your nutrition!',
-                    icon: '/icon-192.svg'
-                  });
-                } else if ('Notification' in window) {
-                  Notification.requestPermission().then(permission => {
-                    if (permission === 'granted') {
-                      new Notification('ByteWise Nutrition', {
-                        body: 'Notifications enabled! You\'ll get goal reminders.',
-                        icon: '/icon-192.svg'
-                      });
-                    }
-                  });
-                }
-              }}
-            >
-              <Bell className="w-5 h-5" />
-              <div className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 rounded-full flex items-center justify-center border border-white">
-                <span className="text-xs font-bold text-white">{achievements ? achievements.length : 3}</span>
-              </div>
-            </Button>
+            <div className="relative">
+              <Button 
+                size="sm" 
+                variant="ghost" 
+                className="relative text-white hover:bg-white/10 rounded-full p-2"
+                onClick={() => {
+                  setShowNotificationDropdown(!showNotificationDropdown);
+                  console.log('Notification dropdown toggled:', !showNotificationDropdown);
+                }}
+              >
+                <Bell className="w-5 h-5" />
+                <div className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 rounded-full flex items-center justify-center border border-white">
+                  <span className="text-xs font-bold text-white">{notifications.filter(n => !n.read).length || 3}</span>
+                </div>
+              </Button>
+              
+              {showNotificationDropdown && (
+                <NotificationDropdown
+                  isOpen={showNotificationDropdown}
+                  onClose={() => setShowNotificationDropdown(false)}
+                  notifications={notifications}
+                  onMarkAsRead={handleMarkAsRead}
+                  onMarkAllAsRead={handleMarkAllAsRead}
+                  onDeleteNotification={handleDeleteNotification}
+                  onNavigate={(page, section) => {
+                    setActiveTab(page);
+                    setShowNotificationDropdown(false);
+                  }}
+                />
+              )}
+            </div>
             
             {/* User Profile */}
             {user && (
