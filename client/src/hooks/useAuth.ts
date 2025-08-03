@@ -3,7 +3,7 @@
  * Manages user authentication state with Supabase Auth
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import { userApi } from '../lib/api';
@@ -14,13 +14,12 @@ import type { Database } from '../types/database';
 type UserProfile = Database['public']['Tables']['users']['Row'];
 
 export function useAuth() {
-  // Debug: Check if React.useState is available
-  console.log('React available:', !!React);
-  console.log('useState available:', !!React?.useState);
+  // Debug: Auth hook initializing
+  console.log('🔐 useAuth hook initializing');
   
-  const [user, setUser] = React.useState<User | null>(null);
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
   // Check if Supabase is properly configured
@@ -34,7 +33,7 @@ export function useAuth() {
     retry: false,
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     // Skip auth setup if not configured
     if (!isConfigured) {
       setLoading(false);
