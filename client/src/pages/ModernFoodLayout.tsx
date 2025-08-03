@@ -208,13 +208,41 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         {/* Hero Content - ONLY TEXT OVERLAY */}
         <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
           <div className="space-y-8 max-w-2xl">
-            {/* CSS Logo - Large Size */}
+            {/* CSS Logo - Hero Size */}
             <div className="mb-8">
-              <LogoBrand 
-                size="lg" 
-                clickable 
+              <div 
+                className="cursor-pointer hover:scale-105 transition-transform duration-200"
                 onClick={() => setActiveTab('home')}
-              />
+                style={{
+                  fontFamily: "'League Spartan', sans-serif",
+                  textAlign: 'center'
+                }}
+              >
+                <div 
+                  style={{
+                    fontSize: '4.5rem',
+                    fontWeight: '900', 
+                    lineHeight: '0.9',
+                    color: '#7dd3fc',
+                    marginBottom: '0.5rem',
+                    textTransform: 'lowercase',
+                    letterSpacing: '-0.02em'
+                  }}
+                >
+                  bytewise
+                </div>
+                <div 
+                  style={{
+                    fontSize: '1.25rem',
+                    fontWeight: '300',
+                    color: 'rgba(255,255,255,0.8)',
+                    letterSpacing: '0.15em',
+                    textTransform: 'uppercase'
+                  }}
+                >
+                  nutritionist
+                </div>
+              </div>
             </div>
             
             <div className="space-y-2">
