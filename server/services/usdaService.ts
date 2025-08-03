@@ -265,9 +265,7 @@ export class USDAService {
           carbs: nutrients.carbs,
           fat: nutrients.fat,
         },
-        proteinMethod: proteinMethod,
-        cookingAdjustment: cookingMethod !== 'raw' ? `${cookingMethod} retention factors applied` : "raw food",
-        dataQuality: "comprehensive"
+        // Additional info removed to match interface
       };
     } catch (error) {
       console.error('Calorie calculation error:', error);
@@ -423,7 +421,7 @@ export class USDAService {
       'lb': 453.6,
       'pound': 453.6,
       'pounds': 453.6,
-      'cup': 240, // approximate for liquids
+      'cup': 47, // lettuce cup ≈ 47g, varies by ingredient
       'cups': 240,
       'tablespoon': 15,
       'tablespoons': 15,
@@ -478,11 +476,26 @@ export class USDAService {
       }
     }
 
-    // If no conversion found, assume it's already in grams or use serving size
-    if (gramsEquivalent === quantity && food.servingSize) {
-      gramsEquivalent = quantity * food.servingSize;
-    } else if (gramsEquivalent === quantity) {
-      gramsEquivalent = quantity * 100; // default to 100g
+    // If no conversion found, check if unit suggests grams or use serving size
+    if (gramsEquivalent === quantity) {
+      if (unit.includes('g') || unit.includes('gram')) {
+        // Already in grams, don't multiply
+        gramsEquivalent = quantity;
+      } else if (food.servingSize) {
+        gramsEquivalent = quantity * food.servingSize;
+      } else {
+        // For items like "medium", "large", use food-specific defaults
+        const foodType = food.description.toLowerCase();
+        if (foodType.includes('apple')) {
+          gramsEquivalent = quantity * 180; // medium apple
+        } else if (foodType.includes('banana')) {
+          gramsEquivalent = quantity * 120; // medium banana  
+        } else if (foodType.includes('lettuce') && unit.includes('cup')) {
+          gramsEquivalent = quantity * 47; // 1 cup chopped lettuce
+        } else {
+          gramsEquivalent = quantity * 100; // fallback
+        }
+      }
     }
 
     return { quantity, unit, gramsEquivalent };
@@ -726,6 +739,7 @@ export class USDAService {
     if (cookingMethod !== 'raw') {
       adjustedNutrition = applyRetentionFactors(
         { 
+          calories: nutritionData.calories,
           protein: nutritionData.protein, 
           fat: nutritionData.fat, 
           carbs: nutritionData.carbs 

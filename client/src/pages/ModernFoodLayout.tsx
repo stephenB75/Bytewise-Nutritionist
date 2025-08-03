@@ -145,24 +145,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     message: string;
     timestamp: Date;
     read: boolean;
-  }>>([
-    {
-      id: '1',
-      type: 'achievement',
-      title: 'Daily Goal Achieved!',
-      message: 'You reached your calorie goal today',
-      timestamp: new Date(),
-      read: false
-    },
-    {
-      id: '2',
-      type: 'info',
-      title: 'Weekly Report Ready',
-      message: 'Your nutrition summary is available',
-      timestamp: new Date(Date.now() - 3600000),
-      read: false
-    }
-  ]);
+  }>>([]);
 
   // Notification handler functions
   const handleMarkAsRead = (id: string) => {
