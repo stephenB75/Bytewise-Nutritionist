@@ -10,6 +10,12 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import CalorieCalculator from '@/components/CalorieCalculator';
 import { LogoBrand } from '@/components/LogoBrand';
+import { UserProfile } from '@/components/UserProfile';
+import { ProfileInfoCard } from '@/components/ProfileInfoCard';
+import { DataManagementPanel } from '@/components/DataManagementPanel';
+import { AchievementCelebration } from '@/components/AchievementCelebration';
+import { useAuth } from '@/hooks/useAuth';
+import { useGoalAchievements } from '@/hooks/useGoalAchievements';
 import { 
   Search, 
   Heart, 
@@ -25,7 +31,14 @@ import {
   Target,
   Activity,
   Apple,
-  Zap
+  Zap,
+  Settings,
+  Trophy,
+  Calendar,
+  Download,
+  Bell,
+  Shield,
+  ChevronDown
 } from 'lucide-react';
 
 interface ModernFoodLayoutProps {
@@ -35,6 +48,20 @@ interface ModernFoodLayoutProps {
 export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) {
   const [activeTab, setActiveTab] = useState('discover');
   const [searchQuery, setSearchQuery] = useState('');
+  const [showAchievement, setShowAchievement] = useState(false);
+  const [currentAchievement, setCurrentAchievement] = useState<any>(null);
+  
+  // Auth and achievement hooks
+  const { user, loading } = useAuth();
+  const { achievements, newAchievement } = useGoalAchievements();
+
+  // Handle new achievements
+  useEffect(() => {
+    if (newAchievement) {
+      setCurrentAchievement(newAchievement);
+      setShowAchievement(true);
+    }
+  }, [newAchievement]);
 
   // Food categories inspired by Deliveroo
   const categories = [
@@ -290,42 +317,200 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         return renderCalculator();
       case 'favorites':
         return (
-          <div className="space-y-6 px-4">
-            <h1 className="text-2xl font-bold text-white">Your Favorites</h1>
-            <div className="text-center py-12">
-              <Heart className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-              <p className="text-gray-400">Start adding foods to your favorites</p>
+          <div className="space-y-6 px-6 py-8 bg-black min-h-screen">
+            <div className="flex items-center justify-between mb-8">
+              <h1 className="text-3xl font-black text-white tracking-tight">Your Favorites</h1>
+              <Button variant="ghost" className="text-orange-400 hover:text-orange-300">
+                <Plus className="w-5 h-5 mr-2" />
+                Add New
+              </Button>
+            </div>
+            
+            <div className="text-center py-16">
+              <div className="w-24 h-24 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Heart className="w-12 h-12 text-gray-600" />
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-3">No favorites yet</h3>
+              <p className="text-gray-400 text-lg mb-8 max-w-md mx-auto">
+                Start adding foods to your favorites by tapping the heart icon on any food card
+              </p>
+              <Button 
+                onClick={() => setActiveTab('discover')}
+                className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-8 py-3 rounded-full"
+              >
+                Discover Foods
+              </Button>
+            </div>
+          </div>
+        );
+      case 'achievements':
+        return (
+          <div className="space-y-6 px-6 py-8 bg-black min-h-screen">
+            <div className="flex items-center justify-between mb-8">
+              <h1 className="text-3xl font-black text-white tracking-tight">Achievements</h1>
+              <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30">
+                {achievements?.length || 0} Earned
+              </Badge>
+            </div>
+            
+            {achievements && achievements.length > 0 ? (
+              <div className="space-y-4">
+                {achievements.map((achievement, index) => (
+                  <Card key={index} className="p-6 bg-gray-900/80 backdrop-blur-md border-gray-700">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-16 h-16 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
+                        <Trophy className="w-8 h-8 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-xl font-bold text-white mb-1">{achievement.title}</h3>
+                        <p className="text-gray-400 mb-2">{achievement.description}</p>
+                        <Badge variant="secondary" className="text-xs">
+                          <Calendar className="w-3 h-3 mr-1" />
+                          {new Date(achievement.earnedAt).toLocaleDateString()}
+                        </Badge>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-16">
+                <div className="w-24 h-24 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Trophy className="w-12 h-12 text-gray-600" />
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-3">No achievements yet</h3>
+                <p className="text-gray-400 text-lg mb-8 max-w-md mx-auto">
+                  Start tracking your nutrition to unlock achievements and celebrate your progress
+                </p>
+                <Button 
+                  onClick={() => setActiveTab('calculator')}
+                  className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-8 py-3 rounded-full"
+                >
+                  Start Tracking
+                </Button>
+              </div>
+            )}
+          </div>
+        );
+      case 'data':
+        return (
+          <div className="space-y-6 px-6 py-8 bg-black min-h-screen">
+            <div className="flex items-center justify-between mb-8">
+              <h1 className="text-3xl font-black text-white tracking-tight">Data Management</h1>
+              <Button variant="ghost" className="text-gray-400 hover:text-white">
+                <Shield className="w-5 h-5" />
+              </Button>
+            </div>
+            
+            <div className="bg-gray-900/80 backdrop-blur-md rounded-3xl border border-gray-700">
+              <DataManagementPanel />
             </div>
           </div>
         );
       case 'profile':
         return (
-          <div className="space-y-6 px-4">
-            <h1 className="text-2xl font-bold text-white">Your Profile</h1>
-            <Card className="p-6 bg-gray-800 border-gray-700">
-              <div className="flex items-center space-x-4 mb-6">
-                <div className="w-16 h-16 bg-gradient-to-r from-orange-400 to-red-400 rounded-full flex items-center justify-center">
-                  <User className="w-8 h-8 text-white" />
+          <div className="space-y-6 px-6 py-8 bg-black min-h-screen">
+            <div className="flex items-center justify-between mb-8">
+              <h1 className="text-3xl font-black text-white tracking-tight">Your Profile</h1>
+              <Button variant="ghost" className="text-gray-400 hover:text-white">
+                <Settings className="w-5 h-5" />
+              </Button>
+            </div>
+
+            {/* User Profile Card */}
+            <div className="bg-gray-900/80 backdrop-blur-md rounded-3xl p-8 border border-gray-700">
+              <div className="flex items-center space-x-6 mb-8">
+                <div className="relative">
+                  {user?.profileImageUrl ? (
+                    <img 
+                      src={user.profileImageUrl} 
+                      alt="Profile"
+                      className="w-20 h-20 rounded-full object-cover border-4 border-orange-500"
+                    />
+                  ) : (
+                    <div className="w-20 h-20 bg-gradient-to-r from-orange-400 to-red-400 rounded-full flex items-center justify-center border-4 border-orange-500">
+                      <User className="w-10 h-10 text-white" />
+                    </div>
+                  )}
+                  <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-gray-900" />
                 </div>
-                <div>
-                  <h2 className="text-xl font-semibold text-white">Nutrition Tracker</h2>
-                  <p className="text-gray-400">ByteWise Member</p>
+                <div className="flex-1">
+                  <h2 className="text-2xl font-bold text-white mb-1">
+                    {user?.firstName || user?.lastName 
+                      ? `${user.firstName || ''} ${user.lastName || ''}`.trim()
+                      : 'Nutrition Tracker'}
+                  </h2>
+                  <p className="text-gray-400 mb-2">{user?.email || 'member@bytewise.com'}</p>
+                  <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30">
+                    <Trophy className="w-3 h-3 mr-1" />
+                    Pro Member
+                  </Badge>
                 </div>
               </div>
               
-              <div className="grid grid-cols-2 gap-4">
-                <div className="text-center p-4 bg-gray-700 rounded-xl">
-                  <Target className="w-6 h-6 text-blue-400 mx-auto mb-2" />
-                  <div className="text-2xl font-bold text-white">2,100</div>
-                  <div className="text-sm text-gray-400">Daily Goal</div>
+              {/* Stats Grid */}
+              <div className="grid grid-cols-2 gap-6 mb-8">
+                <div className="text-center p-6 bg-gray-800/60 rounded-2xl border border-gray-700">
+                  <Target className="w-8 h-8 text-blue-400 mx-auto mb-3" />
+                  <div className="text-3xl font-black text-white mb-1">
+                    {user?.dailyCalorieGoal || 2100}
+                  </div>
+                  <div className="text-sm text-gray-400">Daily Goal (kcal)</div>
                 </div>
-                <div className="text-center p-4 bg-gray-700 rounded-xl">
-                  <Activity className="w-6 h-6 text-green-400 mx-auto mb-2" />
-                  <div className="text-2xl font-bold text-white">1,234</div>
-                  <div className="text-sm text-gray-400">Today</div>
+                <div className="text-center p-6 bg-gray-800/60 rounded-2xl border border-gray-700">
+                  <Activity className="w-8 h-8 text-green-400 mx-auto mb-3" />
+                  <div className="text-3xl font-black text-white mb-1">
+                    {achievements?.length || 0}
+                  </div>
+                  <div className="text-sm text-gray-400">Achievements</div>
                 </div>
               </div>
-            </Card>
+
+              {/* Nutrition Goals */}
+              <div className="space-y-4 mb-8">
+                <h3 className="text-xl font-bold text-white mb-4">Nutrition Goals</h3>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="text-center p-4 bg-blue-500/20 rounded-xl border border-blue-500/30">
+                    <div className="text-2xl font-bold text-blue-400 mb-1">
+                      {user?.dailyProteinGoal || 150}g
+                    </div>
+                    <div className="text-xs text-blue-300">Protein</div>
+                  </div>
+                  <div className="text-center p-4 bg-green-500/20 rounded-xl border border-green-500/30">
+                    <div className="text-2xl font-bold text-green-400 mb-1">
+                      {user?.dailyCarbGoal || 200}g
+                    </div>
+                    <div className="text-xs text-green-300">Carbs</div>
+                  </div>
+                  <div className="text-center p-4 bg-orange-500/20 rounded-xl border border-orange-500/30">
+                    <div className="text-2xl font-bold text-orange-400 mb-1">
+                      {user?.dailyFatGoal || 70}g
+                    </div>
+                    <div className="text-xs text-orange-300">Fats</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Quick Actions */}
+              <div className="grid grid-cols-2 gap-4">
+                <Button 
+                  variant="outline" 
+                  className="h-14 bg-gray-800 border-gray-600 text-white hover:bg-gray-700"
+                  onClick={() => setActiveTab('achievements')}
+                >
+                  <Trophy className="w-5 h-5 mr-2" />
+                  View Achievements
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="h-14 bg-gray-800 border-gray-600 text-white hover:bg-gray-700"
+                  onClick={() => setActiveTab('data')}
+                >
+                  <Download className="w-5 h-5 mr-2" />
+                  Export Data
+                </Button>
+              </div>
+            </div>
           </div>
         );
       default:
@@ -340,14 +525,26 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <LogoBrand />
-            <div className="text-white text-sm font-medium">Nutrition</div>
+            <div className="text-white text-sm font-medium">ByteWise</div>
           </div>
-          <Button size="sm" variant="ghost" className="relative text-white hover:bg-white/10 rounded-full p-2">
-            <ShoppingBag className="w-5 h-5" />
-            <div className="absolute -top-1 -right-1 h-4 w-4 bg-orange-500 rounded-full flex items-center justify-center">
-              <span className="text-xs font-bold text-white">3</span>
-            </div>
-          </Button>
+          <div className="flex items-center space-x-2">
+            {/* Notifications */}
+            <Button size="sm" variant="ghost" className="relative text-white hover:bg-white/10 rounded-full p-2">
+              <Bell className="w-5 h-5" />
+              {achievements && achievements.length > 0 && (
+                <div className="absolute -top-1 -right-1 h-4 w-4 bg-orange-500 rounded-full flex items-center justify-center">
+                  <span className="text-xs font-bold text-white">{achievements.length}</span>
+                </div>
+              )}
+            </Button>
+            
+            {/* User Profile */}
+            {user && (
+              <div className="flex items-center space-x-2 ml-2">
+                <UserProfile size="sm" />
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -363,13 +560,14 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             { id: 'discover', label: 'Discover', icon: Search },
             { id: 'calculator', label: 'Nutrition', icon: Zap },
             { id: 'favorites', label: 'Favorites', icon: Heart },
+            { id: 'achievements', label: 'Achievements', icon: Trophy },
             { id: 'profile', label: 'Profile', icon: User },
           ].map((item) => (
             <Button
               key={item.id}
               variant="ghost"
               size="sm"
-              className={`flex-col h-16 space-y-1 ${
+              className={`flex-col h-16 space-y-1 relative ${
                 activeTab === item.id 
                   ? 'text-orange-500 bg-orange-500/20' 
                   : 'text-gray-400 hover:text-white hover:bg-gray-800'
@@ -378,10 +576,24 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             >
               <item.icon className="w-5 h-5" />
               <span className="text-xs font-medium">{item.label}</span>
+              
+              {/* Achievement badge */}
+              {item.id === 'achievements' && achievements && achievements.length > 0 && (
+                <div className="absolute -top-1 -right-1 h-4 w-4 bg-orange-500 rounded-full flex items-center justify-center">
+                  <span className="text-xs font-bold text-white">{achievements.length}</span>
+                </div>
+              )}
             </Button>
           ))}
         </div>
       </div>
+
+      {/* Achievement Celebration Modal */}
+      <AchievementCelebration
+        isOpen={showAchievement}
+        onClose={() => setShowAchievement(false)}
+        achievement={currentAchievement}
+      />
     </div>
   );
 }

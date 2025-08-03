@@ -77,18 +77,18 @@ export function DataManagementPanel() {
   };
 
   return (
-    <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-      <h3 className="text-lg font-bold text-gray-900 mb-4">Data Management</h3>
+    <div className="p-6">
+      <h3 className="text-2xl font-bold text-white mb-6">Data Management</h3>
       
       <div className="space-y-6">
         {/* Export Section */}
         <div>
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between mb-4">
             <div>
-              <h4 className="font-medium text-gray-900">Export Your Data</h4>
-              <p className="text-sm text-gray-600">Download comprehensive nutrition reports</p>
+              <h4 className="font-semibold text-white text-lg">Export Your Data</h4>
+              <p className="text-gray-400">Download comprehensive nutrition reports</p>
             </div>
-            <Badge variant="outline" className="text-green-600 border-green-600">
+            <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
               <FileText className="w-3 h-3 mr-1" />
               PDF Ready
             </Badge>
@@ -119,12 +119,12 @@ export function DataManagementPanel() {
 
         {/* Sync & Backup Section */}
         <div>
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between mb-4">
             <div>
-              <h4 className="font-medium text-gray-900">Sync & Backup</h4>
-              <p className="text-sm text-gray-600">Keep your data safe and synchronized</p>
+              <h4 className="font-semibold text-white text-lg">Sync & Backup</h4>
+              <p className="text-gray-400">Keep your data safe and synchronized</p>
             </div>
-            <Badge variant="outline" className="text-blue-600 border-blue-600">
+            <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
               <CheckCircle className="w-3 h-3 mr-1" />
               Auto-sync On
             </Badge>
@@ -210,6 +210,6 @@ export function DataManagementPanel() {
           </div>
         </div>
       </div>
-    </Card>
+    </div>
   );
 }
