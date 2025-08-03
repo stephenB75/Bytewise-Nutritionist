@@ -46,22 +46,22 @@ interface ModernFoodLayoutProps {
 }
 
 export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) {
-  const [activeTab, setActiveTab] = useState('discover');
+  const [activeTab, setActiveTab] = useState('home');
   const [searchQuery, setSearchQuery] = useState('');
   const [showAchievement, setShowAchievement] = useState(false);
   const [currentAchievement, setCurrentAchievement] = useState<any>(null);
   
   // Auth and achievement hooks
   const { user, loading } = useAuth();
-  const { achievements, newAchievement } = useGoalAchievements();
+  const { achievements, celebrationAchievement, showCelebration, closeCelebration } = useGoalAchievements();
 
   // Handle new achievements
   useEffect(() => {
-    if (newAchievement) {
-      setCurrentAchievement(newAchievement);
+    if (celebrationAchievement) {
+      setCurrentAchievement(celebrationAchievement);
       setShowAchievement(true);
     }
-  }, [newAchievement]);
+  }, [celebrationAchievement]);
 
   // Food categories inspired by Deliveroo
   const categories = [
@@ -283,6 +283,240 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     </div>
   );
 
+  // Render functions for each page
+  const renderHome = () => (
+    <div className="relative min-h-screen bg-black">
+      {/* Hero Background with Food Image */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: `url('https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=800&h=600&fit=crop&crop=faces,edges')`,
+        }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/70 to-black/90" />
+      </div>
+
+      {/* Content Overlay */}
+      <div className="relative z-10 px-6 pt-24 pb-32">
+        {/* Hero Text */}
+        <div className="mb-12">
+          <h1 className="text-5xl font-black text-white mb-4 tracking-tight leading-none">
+            Track Your
+            <br />
+            <span className="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">
+              Nutrition
+            </span>
+          </h1>
+          <p className="text-xl text-gray-300 max-w-md leading-relaxed">
+            Monitor your daily nutrition with powerful macro and micro nutrient tracking
+          </p>
+        </div>
+
+        {/* Daily Progress Metrics Cards */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-white mb-4">Today's Progress</h2>
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            {/* Macro Nutrients */}
+            <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4">
+              <h3 className="text-white font-semibold text-lg mb-3">Macros</h3>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-blue-400">Protein</span>
+                  <span className="text-white font-bold">45g / 150g</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-green-400">Carbs</span>
+                  <span className="text-white font-bold">120g / 200g</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-orange-400">Fats</span>
+                  <span className="text-white font-bold">35g / 70g</span>
+                </div>
+              </div>
+            </Card>
+
+            {/* Micro Nutrients */}
+            <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4">
+              <h3 className="text-white font-semibold text-lg mb-3">Micros</h3>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-yellow-400">Vitamin C</span>
+                  <span className="text-white font-bold">65mg / 90mg</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-purple-400">Iron</span>
+                  <span className="text-white font-bold">8mg / 18mg</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-pink-400">Calcium</span>
+                  <span className="text-white font-bold">600mg / 1000mg</span>
+                </div>
+              </div>
+            </Card>
+          </div>
+
+          {/* Calorie Progress */}
+          <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-white font-semibold text-xl">Daily Calories</h3>
+              <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30">
+                <Flame className="w-3 h-3 mr-1" />
+                1,234 / 2,100 kcal
+              </Badge>
+            </div>
+            <div className="w-full bg-gray-700 rounded-full h-3">
+              <div 
+                className="bg-gradient-to-r from-orange-400 to-red-500 h-3 rounded-full transition-all duration-300"
+                style={{ width: '59%' }}
+              />
+            </div>
+            <p className="text-gray-300 text-sm mt-2">866 calories remaining</p>
+          </Card>
+        </div>
+
+        {/* Quick Action Button */}
+        <Button 
+          onClick={() => setActiveTab('calculator')}
+          className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold h-14 rounded-2xl text-lg"
+        >
+          <Zap className="w-5 h-5 mr-2" />
+          Calculate Nutrition
+        </Button>
+      </div>
+    </div>
+  );
+
+  const renderDailyWeekly = () => (
+    <div className="relative min-h-screen bg-black">
+      {/* Hero Background */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: `url('https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&h=600&fit=crop')`,
+        }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/70 to-black/90" />
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10 px-6 pt-24 pb-32">
+        <div className="mb-12">
+          <h1 className="text-5xl font-black text-white mb-4 tracking-tight leading-none">
+            Daily &
+            <br />
+            <span className="bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
+              Weekly
+            </span>
+          </h1>
+          <p className="text-xl text-gray-300 max-w-md leading-relaxed">
+            Track your calorie intake and search for foods to log
+          </p>
+        </div>
+
+        {/* Search Bar */}
+        <div className="relative mb-8">
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <Input
+            placeholder="Search foods to log..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-12 h-14 bg-white/10 border-white/20 text-white placeholder-gray-400 backdrop-blur-md rounded-2xl text-lg"
+          />
+        </div>
+
+        {/* Daily/Weekly Tabs */}
+        <div className="flex space-x-4 mb-6">
+          <Button className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-3 rounded-xl">
+            <Calendar className="w-4 h-4 mr-2" />
+            Today
+          </Button>
+          <Button variant="outline" className="border-white/20 text-white hover:bg-white/10 font-semibold px-6 py-3 rounded-xl">
+            This Week
+          </Button>
+        </div>
+
+        {/* Logged Foods */}
+        <div className="space-y-4">
+          <h3 className="text-xl font-bold text-white">Logged Today</h3>
+          {[
+            { name: 'Breakfast: Oatmeal with Berries', calories: 320, time: '8:30 AM' },
+            { name: 'Lunch: Grilled Chicken Salad', calories: 450, time: '1:15 PM' },
+            { name: 'Snack: Greek Yogurt', calories: 150, time: '3:45 PM' },
+          ].map((meal, index) => (
+            <Card key={index} className="bg-white/10 backdrop-blur-md border-white/20 p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-white font-semibold">{meal.name}</h4>
+                  <p className="text-gray-400 text-sm">{meal.time}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-orange-400 font-bold">{meal.calories} cal</p>
+                  <Button size="sm" variant="ghost" className="text-gray-400 hover:text-white">
+                    Edit
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderSignIn = () => (
+    <div className="relative min-h-screen bg-black">
+      {/* Hero Background */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: `url('https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=800&h=600&fit=crop')`,
+        }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/70 to-black/90" />
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10 px-6 pt-24 pb-32">
+        <div className="mb-12">
+          <h1 className="text-5xl font-black text-white mb-4 tracking-tight leading-none">
+            Welcome to
+            <br />
+            <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+              Nutrition
+            </span>
+          </h1>
+          <p className="text-xl text-gray-300 max-w-md leading-relaxed">
+            Sign in to start tracking your nutrition journey
+          </p>
+        </div>
+
+        {/* Sign In Component */}
+        <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
+          <h3 className="text-2xl font-bold text-white mb-6 text-center">Sign In</h3>
+          <div className="space-y-4">
+            <Input
+              placeholder="Email"
+              className="h-12 bg-white/10 border-white/20 text-white placeholder-gray-400"
+            />
+            <Input
+              type="password"
+              placeholder="Password"
+              className="h-12 bg-white/10 border-white/20 text-white placeholder-gray-400"
+            />
+            <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold h-12 rounded-xl">
+              Sign In
+            </Button>
+            <div className="text-center">
+              <Button variant="link" className="text-gray-300 hover:text-white">
+                Don't have an account? Sign up
+              </Button>
+            </div>
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+
   const renderCalculator = () => (
     <div className="space-y-0 -mx-4 -mt-6">
       {/* Full-screen nutrition hero */}
@@ -315,81 +549,146 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     switch (activeTab) {
       case 'calculator':
         return renderCalculator();
-      case 'favorites':
-        return (
-          <div className="space-y-6 px-6 py-8 bg-black min-h-screen">
-            <div className="flex items-center justify-between mb-8">
-              <h1 className="text-3xl font-black text-white tracking-tight">Your Favorites</h1>
-              <Button variant="ghost" className="text-orange-400 hover:text-orange-300">
-                <Plus className="w-5 h-5 mr-2" />
-                Add New
-              </Button>
-            </div>
-            
-            <div className="text-center py-16">
-              <div className="w-24 h-24 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Heart className="w-12 h-12 text-gray-600" />
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-3">No favorites yet</h3>
-              <p className="text-gray-400 text-lg mb-8 max-w-md mx-auto">
-                Start adding foods to your favorites by tapping the heart icon on any food card
-              </p>
-              <Button 
-                onClick={() => setActiveTab('discover')}
-                className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-8 py-3 rounded-full"
-              >
-                Discover Foods
-              </Button>
-            </div>
-          </div>
-        );
+      case 'home':
+        return renderHome();
+      case 'daily':
+        return renderDailyWeekly();
+      case 'signin':
+        return renderSignIn();
       case 'achievements':
         return (
-          <div className="space-y-6 px-6 py-8 bg-black min-h-screen">
-            <div className="flex items-center justify-between mb-8">
-              <h1 className="text-3xl font-black text-white tracking-tight">Achievements</h1>
-              <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30">
-                {achievements?.length || 0} Earned
-              </Badge>
+          <div className="relative min-h-screen bg-black">
+            {/* Hero Background */}
+            <div 
+              className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+              style={{
+                backgroundImage: `url('https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=800&h=600&fit=crop')`,
+              }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/70 to-black/90" />
             </div>
-            
-            {achievements && achievements.length > 0 ? (
-              <div className="space-y-4">
-                {achievements.map((achievement, index) => (
-                  <Card key={index} className="p-6 bg-gray-900/80 backdrop-blur-md border-gray-700">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-16 h-16 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
-                        <Trophy className="w-8 h-8 text-white" />
+
+            {/* Content */}
+            <div className="relative z-10 px-6 pt-24 pb-32">
+              <div className="mb-12">
+                <h1 className="text-5xl font-black text-white mb-4 tracking-tight leading-none">
+                  Your
+                  <br />
+                  <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                    Achievements
+                  </span>
+                </h1>
+                <p className="text-xl text-gray-300 max-w-md leading-relaxed">
+                  Track daily and weekly nutrition goals to unlock achievements
+                </p>
+              </div>
+
+              {/* Goal Progress Cards */}
+              <div className="space-y-6 mb-8">
+                {/* Daily Goals */}
+                <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-white font-semibold text-xl">Daily Goals</h3>
+                    <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+                      <Target className="w-3 h-3 mr-1" />
+                      3/5 Complete
+                    </Badge>
+                  </div>
+                  <div className="grid grid-cols-1 gap-3">
+                    <div className="flex items-center justify-between p-3 bg-green-500/20 rounded-xl border border-green-500/30">
+                      <span className="text-white">Hit calorie target</span>
+                      <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                        <span className="text-white text-xs">✓</span>
                       </div>
-                      <div className="flex-1">
-                        <h3 className="text-xl font-bold text-white mb-1">{achievement.title}</h3>
-                        <p className="text-gray-400 mb-2">{achievement.description}</p>
+                    </div>
+                    <div className="flex items-center justify-between p-3 bg-green-500/20 rounded-xl border border-green-500/30">
+                      <span className="text-white">Meet protein goal</span>
+                      <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between p-3 bg-green-500/20 rounded-xl border border-green-500/30">
+                      <span className="text-white">Log 3 meals</span>
+                      <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between p-3 bg-gray-700/50 rounded-xl border border-gray-600">
+                      <span className="text-gray-400">Track micronutrients</span>
+                      <div className="w-6 h-6 bg-gray-600 rounded-full flex items-center justify-center">
+                        <span className="text-gray-400 text-xs">○</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between p-3 bg-gray-700/50 rounded-xl border border-gray-600">
+                      <span className="text-gray-400">Stay within carb limit</span>
+                      <div className="w-6 h-6 bg-gray-600 rounded-full flex items-center justify-center">
+                        <span className="text-gray-400 text-xs">○</span>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+
+                {/* Weekly Goals */}
+                <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-white font-semibold text-xl">Weekly Goals</h3>
+                    <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
+                      <Calendar className="w-3 h-3 mr-1" />
+                      2/4 Complete
+                    </Badge>
+                  </div>
+                  <div className="grid grid-cols-1 gap-3">
+                    <div className="flex items-center justify-between p-3 bg-blue-500/20 rounded-xl border border-blue-500/30">
+                      <span className="text-white">Track 5+ days</span>
+                      <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between p-3 bg-blue-500/20 rounded-xl border border-blue-500/30">
+                      <span className="text-white">Average 2000+ cal/day</span>
+                      <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between p-3 bg-gray-700/50 rounded-xl border border-gray-600">
+                      <span className="text-gray-400">Hit protein goal 5 days</span>
+                      <div className="w-6 h-6 bg-gray-600 rounded-full flex items-center justify-center">
+                        <span className="text-gray-400 text-xs">3/5</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between p-3 bg-gray-700/50 rounded-xl border border-gray-600">
+                      <span className="text-gray-400">Try 3 new foods</span>
+                      <div className="w-6 h-6 bg-gray-600 rounded-full flex items-center justify-center">
+                        <span className="text-gray-400 text-xs">1/3</span>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+
+              {/* Earned Achievements */}
+              {achievements && achievements.length > 0 && (
+                <div className="space-y-4">
+                  <h3 className="text-2xl font-bold text-white">Earned Achievements</h3>
+                  {achievements.map((achievement, index) => (
+                    <Card key={index} className="bg-white/10 backdrop-blur-md border-white/20 p-4">
+                      <div className="flex items-center space-x-4">
+                        <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
+                          <Trophy className="w-6 h-6 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="text-white font-semibold">{achievement.title}</h4>
+                          <p className="text-gray-400 text-sm">{achievement.description}</p>
+                        </div>
                         <Badge variant="secondary" className="text-xs">
-                          <Calendar className="w-3 h-3 mr-1" />
                           {new Date(achievement.earnedAt).toLocaleDateString()}
                         </Badge>
                       </div>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-16">
-                <div className="w-24 h-24 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Trophy className="w-12 h-12 text-gray-600" />
+                    </Card>
+                  ))}
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-3">No achievements yet</h3>
-                <p className="text-gray-400 text-lg mb-8 max-w-md mx-auto">
-                  Start tracking your nutrition to unlock achievements and celebrate your progress
-                </p>
-                <Button 
-                  onClick={() => setActiveTab('calculator')}
-                  className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-8 py-3 rounded-full"
-                >
-                  Start Tracking
-                </Button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         );
       case 'data':
@@ -409,107 +708,149 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         );
       case 'profile':
         return (
-          <div className="space-y-6 px-6 py-8 bg-black min-h-screen">
-            <div className="flex items-center justify-between mb-8">
-              <h1 className="text-3xl font-black text-white tracking-tight">Your Profile</h1>
-              <Button variant="ghost" className="text-gray-400 hover:text-white">
-                <Settings className="w-5 h-5" />
-              </Button>
+          <div className="relative min-h-screen bg-black">
+            {/* Hero Background */}
+            <div 
+              className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+              style={{
+                backgroundImage: `url('https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=800&h=600&fit=crop')`,
+              }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/70 to-black/90" />
             </div>
 
-            {/* User Profile Card */}
-            <div className="bg-gray-900/80 backdrop-blur-md rounded-3xl p-8 border border-gray-700">
-              <div className="flex items-center space-x-6 mb-8">
-                <div className="relative">
-                  {user?.profileImageUrl ? (
-                    <img 
-                      src={user.profileImageUrl} 
-                      alt="Profile"
-                      className="w-20 h-20 rounded-full object-cover border-4 border-orange-500"
-                    />
-                  ) : (
-                    <div className="w-20 h-20 bg-gradient-to-r from-orange-400 to-red-400 rounded-full flex items-center justify-center border-4 border-orange-500">
-                      <User className="w-10 h-10 text-white" />
-                    </div>
-                  )}
-                  <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-gray-900" />
-                </div>
-                <div className="flex-1">
-                  <h2 className="text-2xl font-bold text-white mb-1">
-                    {user?.firstName || user?.lastName 
-                      ? `${user.firstName || ''} ${user.lastName || ''}`.trim()
-                      : 'Nutrition Tracker'}
-                  </h2>
-                  <p className="text-gray-400 mb-2">{user?.email || 'member@bytewise.com'}</p>
-                  <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30">
-                    <Trophy className="w-3 h-3 mr-1" />
-                    Pro Member
-                  </Badge>
-                </div>
-              </div>
-              
-              {/* Stats Grid */}
-              <div className="grid grid-cols-2 gap-6 mb-8">
-                <div className="text-center p-6 bg-gray-800/60 rounded-2xl border border-gray-700">
-                  <Target className="w-8 h-8 text-blue-400 mx-auto mb-3" />
-                  <div className="text-3xl font-black text-white mb-1">
-                    {user?.dailyCalorieGoal || 2100}
-                  </div>
-                  <div className="text-sm text-gray-400">Daily Goal (kcal)</div>
-                </div>
-                <div className="text-center p-6 bg-gray-800/60 rounded-2xl border border-gray-700">
-                  <Activity className="w-8 h-8 text-green-400 mx-auto mb-3" />
-                  <div className="text-3xl font-black text-white mb-1">
-                    {achievements?.length || 0}
-                  </div>
-                  <div className="text-sm text-gray-400">Achievements</div>
-                </div>
+            {/* Content */}
+            <div className="relative z-10 px-6 pt-24 pb-32">
+              <div className="mb-12">
+                <h1 className="text-5xl font-black text-white mb-4 tracking-tight leading-none">
+                  Your
+                  <br />
+                  <span className="bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
+                    Profile
+                  </span>
+                </h1>
+                <p className="text-xl text-gray-300 max-w-md leading-relaxed">
+                  Manage your account, settings, and nutrition data
+                </p>
               </div>
 
-              {/* Nutrition Goals */}
-              <div className="space-y-4 mb-8">
-                <h3 className="text-xl font-bold text-white mb-4">Nutrition Goals</h3>
+              {/* User Info Card */}
+              <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6 mb-6">
+                <div className="flex items-center space-x-4 mb-6">
+                  <div className="relative">
+                    {user?.user_metadata?.avatar_url ? (
+                      <img 
+                        src={user.user_metadata.avatar_url} 
+                        alt="Profile"
+                        className="w-16 h-16 rounded-full object-cover border-3 border-orange-500"
+                      />
+                    ) : (
+                      <div className="w-16 h-16 bg-gradient-to-r from-orange-400 to-red-400 rounded-full flex items-center justify-center border-3 border-orange-500">
+                        <User className="w-8 h-8 text-white" />
+                      </div>
+                    )}
+                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-gray-900" />
+                  </div>
+                  <div className="flex-1">
+                    <h2 className="text-xl font-bold text-white mb-1">
+                      {user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Nutrition Tracker'}
+                    </h2>
+                    <p className="text-gray-400 text-sm">{user?.email || 'member@nutrition.app'}</p>
+                    <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30 mt-2">
+                      <Trophy className="w-3 h-3 mr-1" />
+                      Pro Member
+                    </Badge>
+                  </div>
+                  <Button variant="ghost" className="text-gray-400 hover:text-white">
+                    <Settings className="w-5 h-5" />
+                  </Button>
+                </div>
+                
+                {/* Stats */}
                 <div className="grid grid-cols-3 gap-4">
-                  <div className="text-center p-4 bg-blue-500/20 rounded-xl border border-blue-500/30">
-                    <div className="text-2xl font-bold text-blue-400 mb-1">
-                      {user?.dailyProteinGoal || 150}g
-                    </div>
-                    <div className="text-xs text-blue-300">Protein</div>
+                  <div className="text-center p-3 bg-blue-500/20 rounded-xl border border-blue-500/30">
+                    <div className="text-2xl font-bold text-blue-400 mb-1">2100</div>
+                    <div className="text-xs text-blue-300">Daily Goal</div>
                   </div>
-                  <div className="text-center p-4 bg-green-500/20 rounded-xl border border-green-500/30">
-                    <div className="text-2xl font-bold text-green-400 mb-1">
-                      {user?.dailyCarbGoal || 200}g
-                    </div>
-                    <div className="text-xs text-green-300">Carbs</div>
+                  <div className="text-center p-3 bg-green-500/20 rounded-xl border border-green-500/30">
+                    <div className="text-2xl font-bold text-green-400 mb-1">{achievements?.length || 0}</div>
+                    <div className="text-xs text-green-300">Achievements</div>
                   </div>
-                  <div className="text-center p-4 bg-orange-500/20 rounded-xl border border-orange-500/30">
-                    <div className="text-2xl font-bold text-orange-400 mb-1">
-                      {user?.dailyFatGoal || 70}g
-                    </div>
-                    <div className="text-xs text-orange-300">Fats</div>
+                  <div className="text-center p-3 bg-purple-500/20 rounded-xl border border-purple-500/30">
+                    <div className="text-2xl font-bold text-purple-400 mb-1">47</div>
+                    <div className="text-xs text-purple-300">Days Tracked</div>
                   </div>
                 </div>
-              </div>
+              </Card>
 
-              {/* Quick Actions */}
-              <div className="grid grid-cols-2 gap-4">
-                <Button 
-                  variant="outline" 
-                  className="h-14 bg-gray-800 border-gray-600 text-white hover:bg-gray-700"
-                  onClick={() => setActiveTab('achievements')}
-                >
-                  <Trophy className="w-5 h-5 mr-2" />
-                  View Achievements
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="h-14 bg-gray-800 border-gray-600 text-white hover:bg-gray-700"
-                  onClick={() => setActiveTab('data')}
-                >
-                  <Download className="w-5 h-5 mr-2" />
-                  Export Data
-                </Button>
-              </div>
+              {/* Account Settings */}
+              <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6 mb-6">
+                <h3 className="text-xl font-bold text-white mb-4">Account Settings</h3>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 bg-gray-800/50 rounded-xl">
+                    <div className="flex items-center space-x-3">
+                      <Bell className="w-5 h-5 text-blue-400" />
+                      <span className="text-white">Push Notifications</span>
+                    </div>
+                    <Button variant="ghost" className="text-gray-400 hover:text-white">
+                      <ChevronRight className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-gray-800/50 rounded-xl">
+                    <div className="flex items-center space-x-3">
+                      <Shield className="w-5 h-5 text-green-400" />
+                      <span className="text-white">Privacy Settings</span>
+                    </div>
+                    <Button variant="ghost" className="text-gray-400 hover:text-white">
+                      <ChevronRight className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-gray-800/50 rounded-xl">
+                    <div className="flex items-center space-x-3">
+                      <Target className="w-5 h-5 text-orange-400" />
+                      <span className="text-white">Nutrition Goals</span>
+                    </div>
+                    <Button variant="ghost" className="text-gray-400 hover:text-white">
+                      <ChevronRight className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+
+              {/* Data Management */}
+              <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
+                <h3 className="text-xl font-bold text-white mb-4">Data Management</h3>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <Button 
+                      variant="outline" 
+                      className="h-12 bg-green-600 border-green-500 text-white hover:bg-green-700"
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Export Data
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="h-12 bg-blue-600 border-blue-500 text-white hover:bg-blue-700"
+                    >
+                      <RefreshCw className="w-4 h-4 mr-2" />
+                      Sync Data
+                    </Button>
+                  </div>
+                  
+                  {/* Data Overview */}
+                  <div className="grid grid-cols-2 gap-4 mt-4">
+                    <div className="text-center p-3 bg-gray-800/50 rounded-xl">
+                      <div className="text-lg font-bold text-white">156</div>
+                      <div className="text-xs text-gray-400">Meals Logged</div>
+                    </div>
+                    <div className="text-center p-3 bg-gray-800/50 rounded-xl">
+                      <div className="text-lg font-bold text-white">2.4 MB</div>
+                      <div className="text-xs text-gray-400">Data Size</div>
+                    </div>
+                  </div>
+                </div>
+              </Card>
             </div>
           </div>
         );
@@ -525,7 +866,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <LogoBrand />
-            <div className="text-white text-sm font-medium">ByteWise</div>
           </div>
           <div className="flex items-center space-x-2">
             {/* Notifications */}
@@ -557,9 +897,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       <div className="fixed bottom-0 left-0 right-0 bg-black/95 backdrop-blur-md border-t border-gray-800 px-4 py-2">
         <div className="flex justify-around">
           {[
-            { id: 'discover', label: 'Discover', icon: Search },
+            { id: 'home', label: 'Home', icon: Search },
             { id: 'calculator', label: 'Nutrition', icon: Zap },
-            { id: 'favorites', label: 'Favorites', icon: Heart },
+            { id: 'daily', label: 'Daily', icon: Calendar },
             { id: 'achievements', label: 'Achievements', icon: Trophy },
             { id: 'profile', label: 'Profile', icon: User },
           ].map((item) => (
