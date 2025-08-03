@@ -45,7 +45,7 @@ export function DataManagementPanel() {
         throw new Error('PDF generation failed');
       }
     } catch (error) {
-      console.error('Export failed:', error);
+      // Export failed
       
       // Show error toast
       const toastEvent = new CustomEvent('show-toast', {
@@ -64,7 +64,7 @@ export function DataManagementPanel() {
     setIsSyncing(true);
     try {
       await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate sync
-      console.log('Data synchronized');
+      // Data synchronized
     } finally {
       setIsSyncing(false);
     }
@@ -72,7 +72,7 @@ export function DataManagementPanel() {
 
   const handleDeleteAllData = () => {
     if (confirm("Are you sure you want to delete all your data? This action cannot be undone.")) {
-      console.log('Data deletion confirmed');
+      // Data deletion confirmed
     }
   };
 

@@ -29,16 +29,12 @@ const API_ENDPOINTS = [
 
 // Install event - cache static files
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing ByteWise Service Worker v1.2.0');
-  
   event.waitUntil(
     Promise.all([
       caches.open(STATIC_CACHE).then((cache) => {
-        console.log('[SW] Caching static files');
         return cache.addAll(STATIC_FILES);
       }),
       caches.open(API_CACHE).then((cache) => {
-        console.log('[SW] Preparing API cache');
         return Promise.resolve();
       })
     ])
@@ -50,8 +46,6 @@ self.addEventListener('install', (event) => {
 
 // Activate event - cleanup old caches
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activating ByteWise Service Worker v1.2.0');
-  
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
@@ -60,7 +54,6 @@ self.addEventListener('activate', (event) => {
               cacheName !== DYNAMIC_CACHE && 
               cacheName !== API_CACHE &&
               cacheName.startsWith('bytewise-')) {
-            console.log('[SW] Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })

@@ -35,7 +35,7 @@ if (import.meta.env.DEV) {
 
 const rootElement = document.getElementById("root");
 if (!rootElement) {
-  console.error('❌ Root element not found');
+  // Root element not found
   document.body.innerHTML = `
     <div style="background: linear-gradient(45deg, #ff6b6b, #4ecdc4); color: white; padding: 40px; min-height: 100vh; display: flex; align-items: center; justify-content: center; font-family: Arial; text-align: center;">
       <div>

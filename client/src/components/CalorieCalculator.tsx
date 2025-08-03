@@ -329,7 +329,7 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
     weeklyMeals.push(mealData);
     localStorage.setItem('weeklyMeals', JSON.stringify(weeklyMeals));
     
-    console.log('✅ Successfully logged to weekly tracker:', mealData);
+    // Successfully logged to weekly tracker
     
     // Dispatch comprehensive events for weekly logger refresh
     window.dispatchEvent(new CustomEvent('calories-logged', {
