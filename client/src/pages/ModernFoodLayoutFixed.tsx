@@ -13,8 +13,6 @@ import { LogoBrand } from '@/components/LogoBrand';
 import { UserProfile } from '@/components/UserProfile';
 import { ProfileInfoCard } from '@/components/ProfileInfoCard';
 import { DataManagementPanel } from '@/components/DataManagementPanel';
-import PDFExportButton from '@/components/PDFExportButton';
-import PushNotifications from '@/components/PushNotifications';
 import SignOnModule from '@/components/SignOnModule';
 import { useAuth } from '@/hooks/useAuth';
 import { 
@@ -55,7 +53,6 @@ class ModernFoodLayoutFixed extends React.Component<ModernFoodLayoutFixedProps> 
     weeklyGoal: 14700,
     loggedMeals: [],
     showNotificationDropdown: false,
-    showNotificationSettings: false,
     showSignOn: false,
     trackingView: 'daily',
     notifications: [
@@ -153,6 +150,7 @@ class ModernFoodLayoutFixed extends React.Component<ModernFoodLayoutFixedProps> 
               onClick={() => this.setState({ showSignOn: !this.state.showSignOn })}
             >
               <User className="w-5 h-5" />
+              <span className="ml-1 text-sm">Sign In</span>
             </Button>
           </div>
         </header>
@@ -400,92 +398,39 @@ class ModernFoodLayoutFixed extends React.Component<ModernFoodLayoutFixedProps> 
             <h2 className="text-4xl font-bold text-center mb-12 text-gray-900">
               Quick Actions
             </h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer"
+            <div className="grid md:grid-cols-2 gap-8">
+              <Card className="p-8 hover:shadow-lg transition-shadow cursor-pointer"
                     onClick={() => this.props.onNavigate?.('calculator')}>
-                <div className="flex flex-col items-center text-center gap-4">
+                <div className="flex items-center gap-4 mb-4">
                   <div className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center">
                     <Plus className="w-8 h-8 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-gray-900">Log Meal</h3>
-                    <p className="text-gray-600 text-sm">Add calories with USDA data</p>
+                    <h3 className="text-2xl font-semibold text-gray-900">Log Meal</h3>
+                    <p className="text-gray-600">Add calories with USDA data</p>
                   </div>
-                  <Button className="w-full" size="sm">
-                    Start Logging
-                  </Button>
                 </div>
+                <Button className="w-full">
+                  Start Logging <ChevronRight className="w-4 h-4 ml-2" />
+                </Button>
               </Card>
 
-              <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer"
+              <Card className="p-8 hover:shadow-lg transition-shadow cursor-pointer"
                     onClick={() => this.props.onNavigate?.('logger')}>
-                <div className="flex flex-col items-center text-center gap-4">
+                <div className="flex items-center gap-4 mb-4">
                   <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center">
                     <Calendar className="w-8 h-8 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-gray-900">View Progress</h3>
-                    <p className="text-gray-600 text-sm">Weekly insights and trends</p>
+                    <h3 className="text-2xl font-semibold text-gray-900">View Progress</h3>
+                    <p className="text-gray-600">Weekly insights and trends</p>
                   </div>
-                  <Button variant="outline" className="w-full" size="sm">
-                    View Analytics
-                  </Button>
                 </div>
-              </Card>
-
-              <Card className="p-6 hover:shadow-lg transition-shadow">
-                <div className="flex flex-col items-center text-center gap-4">
-                  <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center">
-                    <Download className="w-8 h-8 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-semibold text-gray-900">Export PDF</h3>
-                    <p className="text-gray-600 text-sm">Download nutrition report</p>
-                  </div>
-                  <PDFExportButton 
-                    nutritionData={{
-                      dailyCalories: this.state.dailyCalories,
-                      goalCalories: this.state.goalCalories,
-                      protein: 128,
-                      carbs: 184,
-                      fat: 58
-                    }}
-                    className="w-full"
-                  />
-                </div>
-              </Card>
-
-              <Card className="p-6 hover:shadow-lg transition-shadow">
-                <div className="flex flex-col items-center text-center gap-4">
-                  <div className="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center">
-                    <Bell className="w-8 h-8 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-semibold text-gray-900">Notifications</h3>
-                    <p className="text-gray-600 text-sm">Enable meal reminders</p>
-                  </div>
-                  <Button 
-                    variant="outline" 
-                    className="w-full" 
-                    size="sm"
-                    onClick={() => this.setState({ showNotificationSettings: !this.state.showNotificationSettings })}
-                  >
-                    Setup
-                  </Button>
-                </div>
+                <Button variant="outline" className="w-full">
+                  View Analytics <ChevronRight className="w-4 h-4 ml-2" />
+                </Button>
               </Card>
             </div>
-            
-            {/* Push Notifications Panel */}
-            {this.state.showNotificationSettings && (
-              <div className="mt-8">
-                <PushNotifications 
-                  onPermissionChange={(permission) => {
-                    console.log('Notification permission:', permission);
-                  }}
-                />
-              </div>
-            )}
           </div>
         </div>
 
