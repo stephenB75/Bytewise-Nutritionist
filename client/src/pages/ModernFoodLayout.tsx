@@ -43,7 +43,7 @@ interface ModernFoodLayoutProps {
 }
 
 export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) {
-  const [activeTab, setActiveTab] = useState('home');
+  const [activeTab, setActiveTab] = useState('calculator');
   const [searchQuery, setSearchQuery] = useState('');
   const [showAchievement, setShowAchievement] = useState(false);
   const [currentAchievement, setCurrentAchievement] = useState<any>(null);
