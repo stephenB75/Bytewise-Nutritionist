@@ -1,7 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
-import MinimalApp from "./MinimalApp";
+
 import "./index.css";
 
 // Force modern design loading
@@ -50,8 +50,8 @@ if (!rootElement) {
   // Root element found
   
   try {
-    // Use minimal app with guaranteed visual redesign
-    const AppComponent = useMinimalApp ? MinimalApp : App;
+    // Use main app component
+    const AppComponent = App;
     const root = createRoot(rootElement);
     
     // Modern food app loading screen

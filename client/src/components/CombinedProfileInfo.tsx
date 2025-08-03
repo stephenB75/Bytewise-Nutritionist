@@ -48,7 +48,7 @@ export function CombinedProfileInfo({ user }: CombinedProfileInfoProps) {
   });
 
   const handleSave = () => {
-    console.log('Saving profile data:', formData);
+    // Saving profile data
     setIsEditing(false);
   };
 

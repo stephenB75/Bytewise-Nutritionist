@@ -85,7 +85,7 @@ export default function CalorieCalculatorWrapper({ onNavigate }: CalorieCalculat
             window.dispatchEvent(logEvent);
             
             // Show success feedback with category
-            console.log(`Successfully logged to weekly ${logData.category}:`, logData);
+            // Successfully logged to weekly
             
             // Show toast notification
             const toastEvent = new CustomEvent('show-toast', {

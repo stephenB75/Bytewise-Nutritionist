@@ -15,16 +15,9 @@ import { NotificationDropdown } from './components/NotificationDropdown';
 import { PWAInstallPrompt, IOSInstallInstructions } from './components/PWAInstallPrompt';
 
 // import { useImageRotation } from './hooks/useImageRotation';
-import Dashboard from './pages/Dashboard';
-import DashboardRedesigned from './pages/DashboardRedesigned';
-import FreshRedesign from './pages/FreshRedesign';
-import ModernFoodApp from './pages/ModernFoodApp';
-import RedesignedApp from './pages/RedesignedApp';
+
 import ModernFoodLayout from './pages/ModernFoodLayout';
-import CalorieCalculatorWrapper from './components/CalorieCalculatorWrapper';
-import WeeklyLogger from './pages/WeeklyLogger';
-import ProfileEnhanced from './pages/ProfileEnhanced';
-import EmailConfirmation from './pages/EmailConfirmation';
+
 // import './utils/testCalorieIntegration';
 
 export default function App() {
@@ -69,12 +62,10 @@ export default function App() {
     };
 
     const handleToast = (event: CustomEvent) => {
-      console.log('Toast:', event.detail.message);
       // Handle toast notifications here if needed
     };
 
     const handleCaloriesLogged = (event: CustomEvent) => {
-      console.log('Calories logged from calculator:', event.detail);
       // Handle weekly logger communication
       // Refresh weekly logger data if it's the active tab
       if (activeTab === 'logger') {
@@ -111,15 +102,15 @@ export default function App() {
       case 'redesigned':
         return <ModernFoodLayout onNavigate={handleNavigate} />;
       case 'dashboard':
-        return <ModernFoodApp onNavigate={handleNavigate} />;
+        return <ModernFoodLayout onNavigate={handleNavigate} />;
       case 'fresh':
-        return <ModernFoodApp onNavigate={handleNavigate} />;
+        return <ModernFoodLayout onNavigate={handleNavigate} />;
       case 'calculator':
-        return <CalorieCalculatorWrapper onNavigate={handleNavigate} />;
+        return <ModernFoodLayout onNavigate={handleNavigate} />;
       case 'logger':
-        return <WeeklyLogger onNavigate={handleNavigate} />;
+        return <ModernFoodLayout onNavigate={handleNavigate} />;
       case 'profile':
-        return <ProfileEnhanced onNavigate={handleNavigate} />;
+        return <ModernFoodLayout onNavigate={handleNavigate} />;
       default:
         return <ModernFoodLayout onNavigate={handleNavigate} />;
     }

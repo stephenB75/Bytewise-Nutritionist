@@ -49,17 +49,7 @@ export function useCalorieTracking() {
       weeklyMeals.push(mealEntry);
       localStorage.setItem('weeklyMeals', JSON.stringify(weeklyMeals));
       
-      console.log('Calories logged from calculator:', mealEntry);
-      console.log('Successfully logged to weekly ' + getMealType() + ':', {
-        name: mealEntry.name,
-        calories: mealEntry.calories,
-        protein: mealEntry.protein,
-        carbs: mealEntry.carbs,
-        fat: mealEntry.fat,
-        date: mealEntry.date,
-        time: mealEntry.time,
-        category: mealEntry.category
-      });
+      // Calories logged successfully
       
       return mealEntry;
     },

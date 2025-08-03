@@ -65,7 +65,7 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
 
   const handleSave = () => {
     // Save logic here
-    console.log('Saving profile data:', editedData);
+    // Saving profile data
     setIsEditing(false);
     
     // Show success message
@@ -191,7 +191,7 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
                 <button 
                   className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
                   onClick={() => {
-                    console.log('Change profile photo');
+                    // Change profile photo
                     setShowDropdown(false);
                   }}
                 >

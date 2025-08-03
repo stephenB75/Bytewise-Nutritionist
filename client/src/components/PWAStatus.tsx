@@ -80,10 +80,10 @@ export function PWAStatus() {
       try {
         await installPrompt.prompt();
         const result = await installPrompt.userChoice;
-        console.log('Install result:', result.outcome);
+        // Install result logged
         setInstallPrompt(null);
       } catch (error) {
-        console.error('Install failed:', error);
+        // Install failed
       }
     }
   };

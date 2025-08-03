@@ -50,7 +50,7 @@ export function useWeeklyTracker() {
         const data = JSON.parse(stored);
         setWeeklyData(data);
       } catch (error) {
-        console.error('Failed to parse weekly tracker data:', error);
+        // Failed to parse weekly tracker data
       }
     }
 

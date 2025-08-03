@@ -20,8 +20,7 @@ interface UserProfile {
 }
 
 export function useAuth() {
-  // Debug: Auth hook initializing
-  console.log('🔐 useAuth hook initializing');
+  // Auth hook initializing
   
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -50,13 +49,11 @@ export function useAuth() {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session }, error }) => {
       if (error) {
-        console.error('Auth session error:', error);
         setError(error.message);
       }
       setUser(session?.user ?? null);
       setLoading(false);
     }).catch((err) => {
-      console.error('Auth setup error:', err);
       setError('Authentication setup failed');
       setLoading(false);
     });
@@ -65,7 +62,6 @@ export function useAuth() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state changed:', event, session?.user?.email);
       
       setUser(session?.user ?? null);
       setLoading(false);
