@@ -4,8 +4,8 @@ import App from "./App";
 import MinimalApp from "./MinimalApp";
 import "./index.css";
 
-// Use minimal app with guaranteed visual redesign
-const useMinimalApp = true;
+// Use full app now that React issues are fixed
+const useMinimalApp = false;
 
 // Suppress development warnings and errors
 if (import.meta.env.DEV) {
