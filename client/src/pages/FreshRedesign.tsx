@@ -1,6 +1,6 @@
 /**
- * ByteWise - Fresh Redesign Inspired by Modern Food Apps
- * Clean, modern interface keeping only the calorie calculator
+ * ByteWise - Complete Modern Food App Redesign
+ * Inspired by Deliveroo, Chipotle, and modern food delivery apps
  */
 
 import { useState, useEffect } from 'react';
@@ -17,7 +17,10 @@ import {
   User,
   Scale,
   Ruler,
-  Zap
+  Zap,
+  ChefHat,
+  Utensils,
+  Apple
 } from 'lucide-react';
 
 interface FreshRedesignProps {

@@ -18,6 +18,7 @@ import { LiveAppButton } from './components/LiveAppButton';
 import Dashboard from './pages/Dashboard';
 import DashboardRedesigned from './pages/DashboardRedesigned';
 import FreshRedesign from './pages/FreshRedesign';
+import ModernFoodApp from './pages/ModernFoodApp';
 import CalorieCalculatorWrapper from './components/CalorieCalculatorWrapper';
 import WeeklyLogger from './pages/WeeklyLogger';
 import ProfileEnhanced from './pages/ProfileEnhanced';
@@ -114,9 +115,9 @@ export default function App() {
 
     switch (activeTab) {
       case 'dashboard':
-        return <FreshRedesign onNavigate={handleNavigate} />;
+        return <ModernFoodApp onNavigate={handleNavigate} />;
       case 'fresh':
-        return <FreshRedesign onNavigate={handleNavigate} />;
+        return <ModernFoodApp onNavigate={handleNavigate} />;
       case 'calculator':
         return <CalorieCalculatorWrapper onNavigate={handleNavigate} />;
       case 'logger':
@@ -124,7 +125,7 @@ export default function App() {
       case 'profile':
         return <ProfileEnhanced onNavigate={handleNavigate} />;
       default:
-        return <FreshRedesign onNavigate={handleNavigate} />;
+        return <ModernFoodApp onNavigate={handleNavigate} />;
     }
   };
 
