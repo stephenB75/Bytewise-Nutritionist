@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = 'https://ykgqcftrfvjblmqzbqvr.supabase.co';
@@ -7,31 +7,85 @@ const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export function useAuth() {
-  const { data: user, isLoading, refetch } = useQuery({
-    queryKey: ["/api/auth/user"],
-    queryFn: async () => {
-      // Get current session from Supabase
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session?.access_token) {
-        return null;
+  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        // Get current session from Supabase
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session?.access_token) {
+          setUser(null);
+          setIsLoading(false);
+          return;
+        }
+        
+        // Use the session token to get user data from our backend
+        const response = await fetch('/api/auth/user', {
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+        });
+        
+        if (response.ok) {
+          const userData = await response.json();
+          setUser(userData);
+        } else {
+          setUser(null);
+        }
+      } catch (error) {
+        setUser(null);
+      } finally {
+        setIsLoading(false);
       }
-      
-      // Use the session token to get user data from our backend
+    };
+
+    checkAuth();
+
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+          checkAuth();
+        }
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const refetch = async () => {
+    setIsLoading(true);
+    // Re-run the auth check
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session?.access_token) {
+      setUser(null);
+      setIsLoading(false);
+      return;
+    }
+    
+    try {
       const response = await fetch('/api/auth/user', {
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
         },
       });
       
-      if (!response.ok) {
-        throw new Error('Failed to fetch user');
+      if (response.ok) {
+        const userData = await response.json();
+        setUser(userData);
+      } else {
+        setUser(null);
       }
-      
-      return response.json();
-    },
-    retry: false,
-  });
+    } catch (error) {
+      setUser(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return {
     user,
