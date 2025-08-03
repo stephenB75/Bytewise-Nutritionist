@@ -91,117 +91,128 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
   };
 
   return (
-    <Card className={`overflow-hidden bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-blue-200 ${className}`}>
+    <Card className={`overflow-hidden bg-white shadow-xl border-0 rounded-2xl backdrop-blur-md ${className}`}>
+      {/* Gradient Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-blue-25 to-indigo-50 opacity-80" />
+      
       {/* Header - Always Visible */}
-      <div className="p-6">
+      <div className="relative p-6">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             <div className="relative">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-lg font-bold border-3 border-white shadow-md">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-600 to-blue-600 flex items-center justify-center text-white text-xl font-bold shadow-2xl border-2 border-white/50 backdrop-blur-sm">
                 {user?.profileImageUrl ? (
                   <img
                     src={user.profileImageUrl}
                     alt="Profile"
-                    className="w-full h-full rounded-full object-cover"
+                    className="w-full h-full rounded-2xl object-cover"
                   />
                 ) : (
-                  <span>{(user?.firstName?.[0] || 'U').toUpperCase()}</span>
+                  <span className="drop-shadow-lg">{(user?.firstName?.[0] || 'U').toUpperCase()}</span>
                 )}
               </div>
               {user?.emailVerified && (
-                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center border-2 border-white">
-                  <Verified className="w-2 h-2 text-white" />
+                <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full flex items-center justify-center border-2 border-white shadow-lg">
+                  <Verified className="w-2.5 h-2.5 text-white" />
                 </div>
               )}
             </div>
 
             <div>
-              <div className="flex items-center gap-2">
-                <h4 className="text-lg font-bold text-gray-900" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+              <div className="flex items-center gap-3">
+                <h4 className="text-xl font-black text-gray-800 tracking-tight" style={{ fontFamily: "'League Spartan', sans-serif" }}>
                   Profile Details
                 </h4>
                 {user?.emailVerified && (
-                  <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">
+                  <Badge className="text-xs bg-gradient-to-r from-emerald-500 to-green-600 text-white border-0 shadow-md">
+                    <Verified className="w-3 h-3 mr-1" />
                     Verified
                   </Badge>
                 )}
               </div>
-              <p className="text-sm text-gray-600">Manage your personal information</p>
+              <p className="text-sm text-gray-600 font-medium">Manage your personal information</p>
             </div>
           </div>
 
-          {/* Actions */}
-          <div className="flex items-center gap-1">
+          {/* Enhanced Actions */}
+          <div className="flex items-center gap-2">
             {!isEditing && (
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-8 w-8 p-0"
+                className="h-10 w-10 p-0 bg-white/60 backdrop-blur-sm border border-white/60 shadow-sm hover:bg-white/80 hover:shadow-md transition-all duration-200 rounded-xl"
                 onClick={() => setIsEditing(true)}
               >
-                <Edit3 className="w-4 h-4" />
+                <Edit3 className="w-4 h-4 text-indigo-600" />
               </Button>
             )}
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 w-8 p-0 relative"
+              className="h-10 w-10 p-0 bg-white/60 backdrop-blur-sm border border-white/60 shadow-sm hover:bg-white/80 hover:shadow-md transition-all duration-200 rounded-xl relative"
               onClick={() => setShowDropdown(!showDropdown)}
             >
-              <Settings className="w-4 h-4" />
+              <Settings className="w-4 h-4 text-purple-600" />
             </Button>
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 w-8 p-0"
+              className="h-10 w-10 p-0 bg-white/60 backdrop-blur-sm border border-white/60 shadow-sm hover:bg-white/80 hover:shadow-md transition-all duration-200 rounded-xl"
               onClick={() => setIsExpanded(!isExpanded)}
             >
               {isExpanded ? (
-                <ChevronUp className="w-5 h-5" />
+                <ChevronUp className="w-5 h-5 text-blue-600" />
               ) : (
-                <ChevronDown className="w-5 h-5" />
+                <ChevronDown className="w-5 h-5 text-blue-600" />
               )}
             </Button>
           </div>
 
-          {/* Profile Dropdown Menu */}
+          {/* Enhanced Profile Dropdown Menu */}
           {showDropdown && (
-            <div className="absolute top-16 right-0 z-50 w-56 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden">
-              <div className="p-3 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
-                <h3 className="font-semibold text-gray-900 text-sm">Profile Settings</h3>
+            <div className="absolute top-20 right-0 z-50 w-64 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
+              <div className="p-4 border-b border-gray-100 bg-gradient-to-r from-indigo-50 via-purple-25 to-blue-50">
+                <h3 className="font-black text-gray-800 text-base tracking-tight" style={{ fontFamily: "'League Spartan', sans-serif" }}>Profile Settings</h3>
+                <p className="text-xs text-gray-600 mt-0.5">Manage your account preferences</p>
               </div>
               
-              <div className="py-1">
+              <div className="py-2">
                 <button 
-                  className="w-full px-3 py-2.5 text-left text-sm hover:bg-blue-50 flex items-center gap-3 text-gray-700 transition-all duration-200 group"
+                  className="w-full px-4 py-3 text-left text-sm hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 flex items-center gap-4 text-gray-700 transition-all duration-300 group"
                   onClick={() => {
                     setIsEditing(true);
                     setShowDropdown(false);
                   }}
                 >
-                  <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center group-hover:bg-blue-200">
-                    <Edit3 className="w-4 h-4 text-blue-600" />
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center group-hover:shadow-lg group-hover:scale-105 transition-all duration-200">
+                    <Edit3 className="w-4 h-4 text-white" />
                   </div>
-                  <span className="font-medium">Edit Profile</span>
+                  <div>
+                    <span className="font-semibold text-gray-800">Edit Profile</span>
+                    <p className="text-xs text-gray-500">Update your information</p>
+                  </div>
                 </button>
                 
                 <button 
-                  className="w-full px-3 py-2.5 text-left text-sm hover:bg-purple-50 flex items-center gap-3 text-gray-700 transition-all duration-200 group"
+                  className="w-full px-4 py-3 text-left text-sm hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 flex items-center gap-4 text-gray-700 transition-all duration-300 group"
                   onClick={() => {
                     // Change profile photo
                     setShowDropdown(false);
                   }}
                 >
-                  <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center group-hover:bg-purple-200">
-                    <Camera className="w-4 h-4 text-purple-600" />
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center group-hover:shadow-lg group-hover:scale-105 transition-all duration-200">
+                    <Camera className="w-4 h-4 text-white" />
                   </div>
-                  <span className="font-medium">Change Photo</span>
+                  <div>
+                    <span className="font-semibold text-gray-800">Change Photo</span>
+                    <p className="text-xs text-gray-500">Upload new avatar</p>
+                  </div>
                 </button>
                 
-                <div className="h-px bg-gray-600/50 mx-3 my-2" />
+                <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent mx-4 my-2" />
                 
                 <button 
-                  className="w-full px-3 py-2.5 text-left text-sm hover:bg-green-50 flex items-center gap-3 text-gray-700 transition-all duration-200 group"
+                  className="w-full px-4 py-3 text-left text-sm hover:bg-gradient-to-r hover:from-emerald-50 hover:to-green-50 flex items-center gap-4 text-gray-700 transition-all duration-300 group"
                   onClick={() => {
                     const event = new CustomEvent('navigate-to-section', {
                       detail: { section: 'privacy' }
@@ -210,14 +221,17 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
                     setShowDropdown(false);
                   }}
                 >
-                  <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center group-hover:bg-green-200">
-                    <Shield className="w-4 h-4 text-green-600" />
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center group-hover:shadow-lg group-hover:scale-105 transition-all duration-200">
+                    <Shield className="w-4 h-4 text-white" />
                   </div>
-                  <span className="font-medium">Privacy Settings</span>
+                  <div>
+                    <span className="font-semibold text-gray-800">Privacy Settings</span>
+                    <p className="text-xs text-gray-500">Security preferences</p>
+                  </div>
                 </button>
                 
                 <button 
-                  className="w-full px-3 py-2.5 text-left text-sm hover:bg-orange-50 flex items-center gap-3 text-gray-700 transition-all duration-200 group"
+                  className="w-full px-4 py-3 text-left text-sm hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 flex items-center gap-4 text-gray-700 transition-all duration-300 group"
                   onClick={() => {
                     const event = new CustomEvent('navigate-to-section', {
                       detail: { section: 'notifications' }
@@ -226,24 +240,30 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
                     setShowDropdown(false);
                   }}
                 >
-                  <div className="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center group-hover:bg-orange-200">
-                    <Bell className="w-4 h-4 text-orange-600" />
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center group-hover:shadow-lg group-hover:scale-105 transition-all duration-200">
+                    <Bell className="w-4 h-4 text-white" />
                   </div>
-                  <span className="font-medium">Notifications</span>
+                  <div>
+                    <span className="font-semibold text-gray-800">Notifications</span>
+                    <p className="text-xs text-gray-500">Alert preferences</p>
+                  </div>
                 </button>
                 
-                <div className="h-px bg-gray-200 mx-3 my-2" />
+                <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent mx-4 my-2" />
                 
                 <button 
-                  className="w-full px-3 py-2.5 text-left text-sm hover:bg-red-50 flex items-center gap-3 text-red-600 transition-all duration-200 group"
+                  className="w-full px-4 py-3 text-left text-sm hover:bg-gradient-to-r hover:from-red-50 hover:to-rose-50 flex items-center gap-4 text-red-600 transition-all duration-300 group"
                   onClick={() => {
                     window.location.href = '/api/logout';
                   }}
                 >
-                  <div className="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center group-hover:bg-red-200">
-                    <LogOut className="w-4 h-4 text-red-600" />
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-rose-600 flex items-center justify-center group-hover:shadow-lg group-hover:scale-105 transition-all duration-200">
+                    <LogOut className="w-4 h-4 text-white" />
                   </div>
-                  <span className="font-medium">Sign Out</span>
+                  <div>
+                    <span className="font-semibold text-red-700">Sign Out</span>
+                    <p className="text-xs text-red-500">End your session</p>
+                  </div>
                 </button>
               </div>
             </div>
