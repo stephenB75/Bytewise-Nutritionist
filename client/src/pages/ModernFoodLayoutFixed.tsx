@@ -13,6 +13,9 @@ import { LogoBrand } from '@/components/LogoBrand';
 import { UserProfile } from '@/components/UserProfile';
 import { ProfileInfoCard } from '@/components/ProfileInfoCard';
 import { DataManagementPanel } from '@/components/DataManagementPanel';
+import PDFExportButton from '@/components/PDFExportButton';
+import PushNotifications from '@/components/PushNotifications';
+import SignOnModule from '@/components/SignOnModule';
 import { useAuth } from '@/hooks/useAuth';
 import { 
   Search, 
@@ -33,7 +36,7 @@ import {
   RefreshCw,
   X
 } from 'lucide-react';
-import { NotificationDropdown } from '@/components/NotificationDropdown';
+
 
 interface ModernFoodLayoutFixedProps {
   onNavigate?: (page: string) => void;
@@ -52,6 +55,8 @@ class ModernFoodLayoutFixed extends React.Component<ModernFoodLayoutFixedProps> 
     weeklyGoal: 14700,
     loggedMeals: [],
     showNotificationDropdown: false,
+    showNotificationSettings: false,
+    showSignOn: false,
     trackingView: 'daily',
     notifications: [
       {
@@ -72,6 +77,10 @@ class ModernFoodLayoutFixed extends React.Component<ModernFoodLayoutFixedProps> 
       }
     ]
   };
+
+  backgroundImages: string[] = [];
+  currentImageIndex: number = 0;
+  backgroundInterval: NodeJS.Timeout | null = null;
 
   componentDidMount() {
     // Set up background rotation without hooks
@@ -95,9 +104,7 @@ class ModernFoodLayoutFixed extends React.Component<ModernFoodLayoutFixedProps> 
     }
   }
 
-  backgroundImages = [];
-  currentImageIndex = 0;
-  backgroundInterval = null;
+
 
   handleTabChange = (tab: string) => {
     this.setState({ activeTab: tab });
@@ -139,7 +146,12 @@ class ModernFoodLayoutFixed extends React.Component<ModernFoodLayoutFixedProps> 
                 <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
               )}
             </Button>
-            <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-white hover:bg-white/20"
+              onClick={() => this.setState({ showSignOn: !this.state.showSignOn })}
+            >
               <User className="w-5 h-5" />
             </Button>
           </div>
@@ -305,8 +317,8 @@ class ModernFoodLayoutFixed extends React.Component<ModernFoodLayoutFixedProps> 
               this.props.onNavigate?.('redesigned');
             }}
           >
-            <span className="text-lg">🏠</span>
-            <span className="text-xs">Home</span>
+            <Activity className="w-4 h-4" />
+            <span className="text-xs">Dashboard</span>
           </Button>
           <Button 
             variant={this.state.activeTab === 'track' ? 'default' : 'ghost'}
@@ -352,18 +364,28 @@ class ModernFoodLayoutFixed extends React.Component<ModernFoodLayoutFixedProps> 
   render() {
     return (
       <div className="min-h-screen bg-gray-50">
-        {/* Notification Dropdown */}
+        {/* Simple Notification Panel - temporarily removed complex component */}
         {this.state.showNotificationDropdown && (
-          <NotificationDropdown
-            notifications={this.state.notifications}
-            onClose={() => this.setState({ showNotificationDropdown: false })}
-            onMarkAsRead={(id) => {
-              const updatedNotifications = this.state.notifications.map(n =>
-                n.id === id ? { ...n, read: true } : n
-              );
-              this.setState({ notifications: updatedNotifications });
-            }}
-          />
+          <div className="fixed top-16 right-6 bg-white rounded-lg shadow-lg border p-4 z-50 w-80">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-semibold">Notifications</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => this.setState({ showNotificationDropdown: false })}
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+            <div className="space-y-2">
+              {this.state.notifications.map((notification) => (
+                <div key={notification.id} className="p-3 bg-gray-50 rounded border-l-4 border-orange-500">
+                  <div className="font-medium text-sm">{notification.title}</div>
+                  <div className="text-xs text-gray-600">{notification.message}</div>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
 
         {/* Hero Section */}
@@ -378,41 +400,107 @@ class ModernFoodLayoutFixed extends React.Component<ModernFoodLayoutFixedProps> 
             <h2 className="text-4xl font-bold text-center mb-12 text-gray-900">
               Quick Actions
             </h2>
-            <div className="grid md:grid-cols-2 gap-8">
-              <Card className="p-8 hover:shadow-lg transition-shadow cursor-pointer"
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer"
                     onClick={() => this.props.onNavigate?.('calculator')}>
-                <div className="flex items-center gap-4 mb-4">
+                <div className="flex flex-col items-center text-center gap-4">
                   <div className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center">
                     <Plus className="w-8 h-8 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-semibold text-gray-900">Log Meal</h3>
-                    <p className="text-gray-600">Add calories with USDA data</p>
+                    <h3 className="text-xl font-semibold text-gray-900">Log Meal</h3>
+                    <p className="text-gray-600 text-sm">Add calories with USDA data</p>
                   </div>
+                  <Button className="w-full" size="sm">
+                    Start Logging
+                  </Button>
                 </div>
-                <Button className="w-full">
-                  Start Logging <ChevronRight className="w-4 h-4 ml-2" />
-                </Button>
               </Card>
 
-              <Card className="p-8 hover:shadow-lg transition-shadow cursor-pointer"
+              <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer"
                     onClick={() => this.props.onNavigate?.('logger')}>
-                <div className="flex items-center gap-4 mb-4">
+                <div className="flex flex-col items-center text-center gap-4">
                   <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center">
                     <Calendar className="w-8 h-8 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-semibold text-gray-900">View Progress</h3>
-                    <p className="text-gray-600">Weekly insights and trends</p>
+                    <h3 className="text-xl font-semibold text-gray-900">View Progress</h3>
+                    <p className="text-gray-600 text-sm">Weekly insights and trends</p>
                   </div>
+                  <Button variant="outline" className="w-full" size="sm">
+                    View Analytics
+                  </Button>
                 </div>
-                <Button variant="outline" className="w-full">
-                  View Analytics <ChevronRight className="w-4 h-4 ml-2" />
-                </Button>
+              </Card>
+
+              <Card className="p-6 hover:shadow-lg transition-shadow">
+                <div className="flex flex-col items-center text-center gap-4">
+                  <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center">
+                    <Download className="w-8 h-8 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-gray-900">Export PDF</h3>
+                    <p className="text-gray-600 text-sm">Download nutrition report</p>
+                  </div>
+                  <PDFExportButton 
+                    nutritionData={{
+                      dailyCalories: this.state.dailyCalories,
+                      goalCalories: this.state.goalCalories,
+                      protein: 128,
+                      carbs: 184,
+                      fat: 58
+                    }}
+                    className="w-full"
+                  />
+                </div>
+              </Card>
+
+              <Card className="p-6 hover:shadow-lg transition-shadow">
+                <div className="flex flex-col items-center text-center gap-4">
+                  <div className="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center">
+                    <Bell className="w-8 h-8 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-gray-900">Notifications</h3>
+                    <p className="text-gray-600 text-sm">Enable meal reminders</p>
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    className="w-full" 
+                    size="sm"
+                    onClick={() => this.setState({ showNotificationSettings: !this.state.showNotificationSettings })}
+                  >
+                    Setup
+                  </Button>
+                </div>
               </Card>
             </div>
+            
+            {/* Push Notifications Panel */}
+            {this.state.showNotificationSettings && (
+              <div className="mt-8">
+                <PushNotifications 
+                  onPermissionChange={(permission) => {
+                    console.log('Notification permission:', permission);
+                  }}
+                />
+              </div>
+            )}
           </div>
         </div>
+
+        {/* Sign On Modal */}
+        {this.state.showSignOn && (
+          <div className="fixed inset-0 z-50">
+            <SignOnModule
+              onSignIn={(userData) => {
+                console.log('User signed in:', userData);
+                this.setState({ showSignOn: false });
+              }}
+              onCancel={() => this.setState({ showSignOn: false })}
+            />
+          </div>
+        )}
 
         {/* Bottom Navigation */}
         {this.renderBottomNavigation()}
