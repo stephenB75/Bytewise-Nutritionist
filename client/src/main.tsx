@@ -33,7 +33,7 @@ if (import.meta.env.DEV) {
   };
 }
 
-console.log('🚀 Starting ByteWise app render...');
+// ByteWise app starting
 
 const rootElement = document.getElementById("root");
 if (!rootElement) {
@@ -47,7 +47,7 @@ if (!rootElement) {
     </div>
   `;
 } else {
-  console.log('✅ Root element found, attempting render...');
+  // Root element found
   
   try {
     // Use minimal app with guaranteed visual redesign
@@ -83,7 +83,7 @@ if (!rootElement) {
         window.location.hash = '#force-refresh-' + Date.now();
       }
       root.render(<AppComponent />);
-      console.log('✅ Modern Food App rendered successfully');
+      // App rendered successfully
     }, 500);
     
   } catch (error) {

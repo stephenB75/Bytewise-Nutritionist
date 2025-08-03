@@ -11,7 +11,7 @@ interface AuthWrapperProps {
 
 export function AuthWrapper({ children, onNavigate }: AuthWrapperProps) {
   // Bypass authentication completely for visual redesign testing
-  console.log('🚧 AuthWrapper: Bypassing authentication for visual testing');
+  // AuthWrapper: Bypassing authentication for visual testing
   
   // Skip all auth logic and directly show children
   return <>{children}</>;

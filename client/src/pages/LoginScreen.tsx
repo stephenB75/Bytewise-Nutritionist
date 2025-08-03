@@ -29,7 +29,13 @@ function LoginScreen({ onNavigate }: LoginScreenProps) {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   
   // Rotating background system with food images
-  const { currentImage, currentTheme, currentAlt, isLoading: imageLoading, rotateImage } = useRotatingBackground();
+  const { backgroundImage } = useRotatingBackground('login');
+  const [imageLoading, setImageLoading] = useState(false);
+  
+  const rotateImage = () => {
+    setImageLoading(true);
+    setTimeout(() => setImageLoading(false), 500);
+  };
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -154,14 +160,14 @@ function LoginScreen({ onNavigate }: LoginScreenProps) {
       <div 
         className={`absolute inset-0 z-0 transition-opacity duration-500 ${imageLoading ? 'opacity-0' : 'opacity-100'}`}
         style={{
-          backgroundImage: `url(${currentImage})`,
+          backgroundImage: `url(${backgroundImage})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
           filter: 'blur(2px) brightness(0.6)'
         }}
         role="img"
-        aria-label={currentAlt}
+        aria-label="Login background"
       />
       
       {/* Loading state for background */}
@@ -363,7 +369,7 @@ function LoginScreen({ onNavigate }: LoginScreenProps) {
             {/* Background theme indicator */}
             <div className="text-center mt-2">
               <Badge variant="outline" className="text-xs bg-white/80">
-                {currentTheme.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())} Theme
+                Food Background Theme
               </Badge>
             </div>
           </Card>
