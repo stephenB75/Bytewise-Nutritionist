@@ -1,7 +1,7 @@
 {
   "id": "com.bytewise.nutritionist",
-  "name": "ByteWise Nutritionist",
-  "short_name": "ByteWise",
+  "name": "bytewise nutritionist",
+  "short_name": "bytewise",
   "description": "Professional nutrition tracking app with USDA database integration, meal planning, and progress analytics",
   "start_url": "/",
   "display": "standalone",
