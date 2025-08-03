@@ -489,7 +489,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           </Card>
 
           {/* Macros Breakdown with Mini Graphs */}
-          <div className="grid grid-cols-3 gap-4 mb-2 macros-grid">
+          <div className="grid grid-cols-3 gap-4 mb-4 macros-grid">
             <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4">
               <div className="text-center">
                 <div className="text-sm text-gray-400 mb-1">Protein</div>
@@ -535,6 +535,108 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 </div>
               </div>
             </Card>
+          </div>
+
+          {/* Micronutrients Section */}
+          <div className="mb-4">
+            <h3 className="text-lg font-bold text-white mb-3 flex items-center">
+              <span className="w-2 h-2 bg-cyan-400 rounded-full mr-2"></span>
+              Essential Micronutrients
+            </h3>
+            
+            {/* Vitamins Grid */}
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              <Card className="bg-white/10 backdrop-blur-md border-white/20 p-3">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-sm font-semibold text-cyan-400">Vitamin C</div>
+                  <div className="text-xs text-gray-400">0/90mg</div>
+                </div>
+                <div className="relative h-2 bg-gray-800 rounded-full overflow-hidden">
+                  <div className="absolute left-0 top-0 h-full bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full transition-all duration-1000" style={{ width: '0%' }} />
+                </div>
+                <div className="text-xs text-gray-500 mt-1">0% DV</div>
+              </Card>
+              
+              <Card className="bg-white/10 backdrop-blur-md border-white/20 p-3">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-sm font-semibold text-orange-400">Vitamin D</div>
+                  <div className="text-xs text-gray-400">0/20μg</div>
+                </div>
+                <div className="relative h-2 bg-gray-800 rounded-full overflow-hidden">
+                  <div className="absolute left-0 top-0 h-full bg-gradient-to-r from-orange-400 to-yellow-500 rounded-full transition-all duration-1000" style={{ width: '0%' }} />
+                </div>
+                <div className="text-xs text-gray-500 mt-1">0% DV</div>
+              </Card>
+              
+              <Card className="bg-white/10 backdrop-blur-md border-white/20 p-3">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-sm font-semibold text-red-400">Vitamin B12</div>
+                  <div className="text-xs text-gray-400">0/2.4μg</div>
+                </div>
+                <div className="relative h-2 bg-gray-800 rounded-full overflow-hidden">
+                  <div className="absolute left-0 top-0 h-full bg-gradient-to-r from-red-400 to-pink-500 rounded-full transition-all duration-1000" style={{ width: '0%' }} />
+                </div>
+                <div className="text-xs text-gray-500 mt-1">0% DV</div>
+              </Card>
+              
+              <Card className="bg-white/10 backdrop-blur-md border-white/20 p-3">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-sm font-semibold text-green-400">Folate</div>
+                  <div className="text-xs text-gray-400">0/400μg</div>
+                </div>
+                <div className="relative h-2 bg-gray-800 rounded-full overflow-hidden">
+                  <div className="absolute left-0 top-0 h-full bg-gradient-to-r from-green-400 to-emerald-500 rounded-full transition-all duration-1000" style={{ width: '0%' }} />
+                </div>
+                <div className="text-xs text-gray-500 mt-1">0% DV</div>
+              </Card>
+            </div>
+            
+            {/* Minerals Grid */}
+            <div className="grid grid-cols-2 gap-3">
+              <Card className="bg-white/10 backdrop-blur-md border-white/20 p-3">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-sm font-semibold text-slate-400">Iron</div>
+                  <div className="text-xs text-gray-400">0/18mg</div>
+                </div>
+                <div className="relative h-2 bg-gray-800 rounded-full overflow-hidden">
+                  <div className="absolute left-0 top-0 h-full bg-gradient-to-r from-slate-400 to-gray-500 rounded-full transition-all duration-1000" style={{ width: '0%' }} />
+                </div>
+                <div className="text-xs text-gray-500 mt-1">0% DV</div>
+              </Card>
+              
+              <Card className="bg-white/10 backdrop-blur-md border-white/20 p-3">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-sm font-semibold text-white">Calcium</div>
+                  <div className="text-xs text-gray-400">0/1000mg</div>
+                </div>
+                <div className="relative h-2 bg-gray-800 rounded-full overflow-hidden">
+                  <div className="absolute left-0 top-0 h-full bg-gradient-to-r from-white to-gray-300 rounded-full transition-all duration-1000" style={{ width: '0%' }} />
+                </div>
+                <div className="text-xs text-gray-500 mt-1">0% DV</div>
+              </Card>
+              
+              <Card className="bg-white/10 backdrop-blur-md border-white/20 p-3">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-sm font-semibold text-amber-400">Zinc</div>
+                  <div className="text-xs text-gray-400">0/11mg</div>
+                </div>
+                <div className="relative h-2 bg-gray-800 rounded-full overflow-hidden">
+                  <div className="absolute left-0 top-0 h-full bg-gradient-to-r from-amber-400 to-yellow-600 rounded-full transition-all duration-1000" style={{ width: '0%' }} />
+                </div>
+                <div className="text-xs text-gray-500 mt-1">0% DV</div>
+              </Card>
+              
+              <Card className="bg-white/10 backdrop-blur-md border-white/20 p-3">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-sm font-semibold text-rose-400">Magnesium</div>
+                  <div className="text-xs text-gray-400">0/400mg</div>
+                </div>
+                <div className="relative h-2 bg-gray-800 rounded-full overflow-hidden">
+                  <div className="absolute left-0 top-0 h-full bg-gradient-to-r from-rose-400 to-pink-500 rounded-full transition-all duration-1000" style={{ width: '0%' }} />
+                </div>
+                <div className="text-xs text-gray-500 mt-1">0% DV</div>
+              </Card>
+            </div>
           </div>
         </div>
       </div>
