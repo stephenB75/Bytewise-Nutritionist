@@ -163,7 +163,16 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         
         {/* Hero Content - ONLY TEXT OVERLAY */}
         <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
-          <div className="space-y-6 max-w-2xl">
+          <div className="space-y-8 max-w-2xl">
+            {/* CSS Logo - Large Size */}
+            <div className="mb-8">
+              <LogoBrand 
+                size="lg" 
+                clickable 
+                onClick={() => setActiveTab('home')}
+              />
+            </div>
+            
             <div className="space-y-2">
               <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
                 Track Your
@@ -1038,7 +1047,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               )}
 
               {/* Data Management */}
-              <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
+              <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6 mb-6">
                 <h3 className="text-xl font-bold text-white mb-4">Data Management</h3>
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
@@ -1092,16 +1101,18 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   {/* Data Overview */}
                   <div className="grid grid-cols-2 gap-4 mt-4">
                     <div className="text-center p-3 bg-gray-800/50 rounded-xl">
-                      <div className="text-lg font-bold text-white">156</div>
-                      <div className="text-xs text-gray-400">Meals Logged</div>
+                      <div className="text-lg font-bold text-white">{loggedMeals.length}</div>
+                      <div className="text-xs text-gray-400">Meals Today</div>
                     </div>
                     <div className="text-center p-3 bg-gray-800/50 rounded-xl">
-                      <div className="text-lg font-bold text-white">2.4 MB</div>
-                      <div className="text-xs text-gray-400">Data Size</div>
+                      <div className="text-lg font-bold text-white">{Math.round(dailyCalories)}</div>
+                      <div className="text-xs text-gray-400">Calories Logged</div>
                     </div>
                   </div>
                 </div>
               </Card>
+
+
             </div>
           </div>
         );
@@ -1118,11 +1129,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       <div className="absolute top-0 left-0 right-0 z-50 bg-black/70 backdrop-blur-xl border-b border-gray-800/50 px-4 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <LogoBrand 
-              size="sm" 
-              clickable 
-              onClick={() => setActiveTab('home')}
-            />
+            {/* Header simplified - logo moved to home hero */}
           </div>
           <div className="flex items-center space-x-2">
             {/* Notifications */}
@@ -1180,7 +1187,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             { id: 'calculator', label: 'Nutrition', icon: Zap },
             { id: 'daily', label: 'Daily', icon: Calendar },
             { id: 'profile', label: 'Profile', icon: User },
-            { id: 'data', label: 'Data', icon: Settings },
           ].map((item) => (
             <Button
               key={item.id}
