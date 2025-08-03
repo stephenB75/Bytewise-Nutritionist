@@ -19,6 +19,7 @@ import Dashboard from './pages/Dashboard';
 import DashboardRedesigned from './pages/DashboardRedesigned';
 import FreshRedesign from './pages/FreshRedesign';
 import ModernFoodApp from './pages/ModernFoodApp';
+import RedesignedApp from './pages/RedesignedApp';
 import CalorieCalculatorWrapper from './components/CalorieCalculatorWrapper';
 import WeeklyLogger from './pages/WeeklyLogger';
 import ProfileEnhanced from './pages/ProfileEnhanced';
@@ -26,7 +27,7 @@ import EmailConfirmation from './pages/EmailConfirmation';
 // import './utils/testCalorieIntegration';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<string>('fresh');
+  const [activeTab, setActiveTab] = useState<string>('redesigned');
   const [showNotifications, setShowNotifications] = useState(false);
   const [notificationCount, setNotificationCount] = useState(0);
   
@@ -114,6 +115,8 @@ export default function App() {
     if (specialRoute) return specialRoute;
 
     switch (activeTab) {
+      case 'redesigned':
+        return <RedesignedApp onNavigate={handleNavigate} />;
       case 'dashboard':
         return <ModernFoodApp onNavigate={handleNavigate} />;
       case 'fresh':
@@ -125,7 +128,7 @@ export default function App() {
       case 'profile':
         return <ProfileEnhanced onNavigate={handleNavigate} />;
       default:
-        return <ModernFoodApp onNavigate={handleNavigate} />;
+        return <RedesignedApp onNavigate={handleNavigate} />;
     }
   };
 
