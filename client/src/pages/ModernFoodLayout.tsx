@@ -377,10 +377,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       </div>
 
       {/* Content Section - Completely Separate and Underneath */}
-      <div className="px-6 py-4 bg-black content-section">
+      <div className="px-6 py-3 bg-black content-section">
         {/* Enhanced Daily Progress Metrics with Graphs */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between mb-4">
+        <div className="space-y-3">
+          <div className="flex items-center justify-between mb-3">
             <h2 className="text-xl font-black text-white">Today's Progress</h2>
             <Button 
               variant="ghost" 
@@ -481,7 +481,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           </Card>
 
           {/* Macros Breakdown with Mini Graphs */}
-          <div className="grid grid-cols-3 gap-4 mb-4 macros-grid">
+          <div className="grid grid-cols-3 gap-4 mb-2 macros-grid">
             <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4">
               <div className="text-center">
                 <div className="text-sm text-gray-400 mb-1">Protein</div>
@@ -575,9 +575,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       </div>
 
       {/* Content Section - Completely Separate and Underneath */}
-      <div className="px-6 py-4 bg-black content-section">
+      <div className="px-6 py-3 bg-black content-section">
         {/* Food Search Bar - Moved Here */}
-        <div className="mb-6 pb-4">
+        <div className="mb-4 pb-2">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <Input
@@ -775,7 +775,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       </div>
 
       {/* Content Section - Completely Separate and Underneath */}
-      <div className="px-6 py-4 bg-black content-section">
+      <div className="px-6 py-3 bg-black content-section">
         {/* Goal Progress Cards */}
         <div className="space-y-4">
           {/* Daily Goals */}
@@ -1196,9 +1196,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
       {/* Content Section - Completely Separate and Underneath */}
       <div className="bg-white content-section">
-        <div className="max-w-4xl mx-auto px-6 py-4 main-content profile-content h-full flex flex-col">
+        <div className="max-w-4xl mx-auto px-6 py-3 main-content profile-content h-full flex flex-col">
           {/* Profile Navigation */}
-          <div className="grid grid-cols-2 md:flex md:space-x-2 gap-2 md:gap-0 mb-6">
+          <div className="grid grid-cols-2 md:flex md:space-x-2 gap-2 md:gap-0 mb-4">
             {[
               { id: 'overview', name: 'Overview', icon: User },
               { id: 'account', name: 'Account', icon: Settings },

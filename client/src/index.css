@@ -143,7 +143,7 @@ body {
 
 /* Main content containers need bottom padding to clear navigation */
 .main-content {
-  padding-bottom: 70px !important; /* Minimal space for bottom navigation */
+  padding-bottom: 60px !important; /* Minimal space for bottom navigation */
   margin-bottom: 0 !important;
   min-height: auto !important;
   height: 100% !important;
@@ -160,7 +160,7 @@ body {
 /* Fix for content sections to not be cut off */
 .content-section {
   margin-bottom: 0 !important;
-  padding-bottom: 80px !important;
+  padding-bottom: 65px !important;
   min-height: auto !important;
   position: relative !important;
 }
