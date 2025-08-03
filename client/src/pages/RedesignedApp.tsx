@@ -11,6 +11,8 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import CalorieCalculator from '@/components/CalorieCalculator';
+import { LogoBrand } from '@/components/LogoBrand';
+import { useRotatingBackground } from '@/hooks/useRotatingBackground';
 import { 
   Home,
   Calculator, 
@@ -40,6 +42,9 @@ export default function RedesignedApp({ onNavigate }: RedesignedAppProps) {
   const [activeTab, setActiveTab] = useState('home');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [greeting, setGreeting] = useState('');
+  
+  // Use rotating background hook
+  const { backgroundImage } = useRotatingBackground(activeTab);
 
   // Set greeting based on time
   useEffect(() => {
@@ -274,15 +279,23 @@ export default function RedesignedApp({ onNavigate }: RedesignedAppProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div 
+      className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 relative transition-all duration-1000 ease-in-out"
+      style={{
+        backgroundImage: `linear-gradient(135deg, rgba(248, 250, 252, 0.92), rgba(239, 246, 255, 0.88), rgba(238, 242, 255, 0.85)), url(${backgroundImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
       {/* Header */}
       <div className="bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-50 shadow-sm">
         <div className="flex items-center justify-between p-4">
-          <div>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              ByteWise
-            </h1>
-            <p className="text-sm text-gray-600">{greeting}!</p>
+          <div className="flex items-center space-x-3">
+            <LogoBrand size="sm" className="scale-90" />
+            <div>
+              <p className="text-sm text-gray-600 font-medium">{greeting}!</p>
+            </div>
           </div>
           <div className="flex items-center space-x-3">
             <Button variant="ghost" size="sm" className="relative hover:bg-blue-50 transition-colors">

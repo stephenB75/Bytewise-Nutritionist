@@ -13,7 +13,7 @@ import { Header } from './components/Header';
 import { Navigation } from './components/Navigation';
 import { NotificationDropdown } from './components/NotificationDropdown';
 import { PWAInstallPrompt, IOSInstallInstructions } from './components/PWAInstallPrompt';
-import { LiveAppButton } from './components/LiveAppButton';
+
 // import { useImageRotation } from './hooks/useImageRotation';
 import Dashboard from './pages/Dashboard';
 import DashboardRedesigned from './pages/DashboardRedesigned';
@@ -147,8 +147,7 @@ export default function App() {
           <PWAInstallPrompt />
           <IOSInstallInstructions />
           
-          {/* Live App Access Button */}
-          <LiveAppButton />
+
         </div>
       </AuthWrapper>
     </QueryClientProvider>
