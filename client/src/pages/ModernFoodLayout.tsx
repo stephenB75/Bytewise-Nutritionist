@@ -68,13 +68,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const validateProfileSection = (sectionId: string): boolean => {
     const validSections = ['overview', 'account', 'achievements', 'data'];
     if (!validSections.includes(sectionId)) {
-      console.error(`Invalid profile section: ${sectionId}`);
+      // Invalid profile section
       return false;
     }
     
     // Check if user is authenticated for account/data sections
     if ((sectionId === 'account' || sectionId === 'data') && !user) {
-      console.warn(`User must be authenticated to access ${sectionId} section`);
       // Show notification about requiring authentication
       setNotifications(prev => [{
         id: Date.now().toString(),
@@ -93,25 +92,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const handleProfileSectionChange = (sectionId: string) => {
     // Prevent navigation while loading
     if (isLoading) {
-      console.log('Profile section navigation blocked: User data is loading');
       return;
     }
     
     // Validate the section before changing
     if (!validateProfileSection(sectionId)) {
-      return; // Don't change section if validation fails
-    }
-    
-    // Log the section change for analytics/debugging
-    console.log(`✅ Profile section validated and changed to: ${sectionId}`);
-    
-    // Check for data consistency before section change
-    if (sectionId === 'account' && user) {
-      console.log(`👤 Loading account management for user: ${(user as any)?.email || 'Unknown'}`);
-    } else if (sectionId === 'achievements' && user) {
-      console.log(`🏆 Loading achievements for authenticated user`);
-    } else if (sectionId === 'data' && user) {
-      console.log(`📊 Loading data management for authenticated user`);
+      return;
     }
     
     // Update the section
@@ -399,11 +385,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <Button 
               variant="ghost" 
               className="text-orange-400 hover:text-orange-300"
-              onClick={() => {
-                // Check calorie calculator functionality
-                setActiveTab('calculator');
-                console.log('Navigating to calculator for nutrition tracking');
-              }}
+              onClick={() => setActiveTab('calculator')}
             >
               Track Food
             </Button>
@@ -672,7 +654,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                       variant="ghost" 
                       className="text-gray-400 hover:text-white"
                       onClick={() => {
-                        console.log('Delete meal clicked:', meal);
+                        // Delete meal action
                         // Remove meal from storage
                         const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
                         const updated = stored.filter((m: any) => m.id !== meal.id);
@@ -1083,7 +1065,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     variant="ghost" 
                     className="text-gray-400 hover:text-white"
                     onClick={() => {
-                      console.log('Edit meal clicked:', meal);
                       // Remove meal from storage
                       const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
                       const updated = stored.filter((m: any) => m.id !== meal.id);
