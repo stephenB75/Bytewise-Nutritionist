@@ -3082,13 +3082,13 @@ input.text-xs {
 }
 
 .bytewise-logo-lg .bytewise-logo-main {
-  font-size: 2.5rem !important; /* 40px - Reduced from 48px */
+  font-size: 4.375rem !important; /* 70px - Increased by 75% from 40px */
 }
 
 .bytewise-logo-lg .bytewise-logo-tagline {
-  font-size: 1rem !important; /* 16px - Reduced from 20px */
-  margin-top: 0.1875rem !important; /* 3px - Reduced spacing */
-  text-indent: 2.1ch !important;
+  font-size: 1.75rem !important; /* 28px - Increased by 75% from 16px */
+  margin-top: 0.325rem !important; /* 5.25px - Increased spacing */
+  text-indent: 2.4ch !important;
 }
 
 /* Mobile-specific logo adjustments */
