@@ -54,7 +54,7 @@ Preferred communication style: Simple, everyday language.
 ✓ **Production-Ready Clean Release**: Eliminated all console errors, fixed TypeScript diagnostics, suppressed browser extension interference, and cleaned debug messages for pristine professional experience (August 2025)
 ✓ **Brand Standard Hero Layout**: Applied consistent full-screen hero layout pattern to all pages with centered text overlays, high-quality background images, scroll indicators, and content sections completely separated underneath (August 2025)
 ✓ **Hero Logo Scale Enhancement**: Optimized CSS logo size to 3.825rem (61px) main text and 1.0625rem (17px) tagline for balanced visual hierarchy with hero headings, reduced by 15% for better proportion (August 2025)
-✓ **PDF Export CSS Branding**: Enhanced PDF export with League Spartan font CSS logo branding, professional styling, gradients, and brand-consistent design elements matching app aesthetics (August 2025)
+✓ **PDF Export CSS Branding**: Enhanced PDF export with League Spartan font CSS logo branding, professional styling, gradients, brand-consistent design elements, and consistent "bytewise-nutrition-report" filename (August 2025)
 
 ## External Dependencies
 
