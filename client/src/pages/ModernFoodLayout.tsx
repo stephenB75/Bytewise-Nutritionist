@@ -1205,32 +1205,32 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         </div>
 
         {/* Profile Content - Stacked Vertically */}
-        <div className="w-full max-w-4xl mx-auto space-y-6">
+        <div className="w-full max-w-2xl mx-auto space-y-4">
           {profileSection === 'overview' && (
-            <div className="w-full space-y-6">
-              <div className="w-full bg-gray-900/80 backdrop-blur-md rounded-3xl border border-gray-700 p-6">
+            <div className="w-full space-y-4">
+              <div className="w-full bg-gray-900/80 backdrop-blur-md rounded-2xl border border-gray-700 p-4">
                 <UserProfile showDetails={true} size="lg" />
               </div>
-              <div className="w-full bg-gray-900/80 backdrop-blur-md rounded-3xl border border-gray-700 p-6">
+              <div className="w-full bg-gray-900/80 backdrop-blur-md rounded-2xl border border-gray-700 p-4">
                 <ProfileInfoCard />
               </div>
             </div>
           )}
           
           {profileSection === 'account' && (
-            <div className="w-full bg-gray-900/80 backdrop-blur-md rounded-3xl border border-gray-700 p-6">
+            <div className="w-full bg-gray-900/80 backdrop-blur-md rounded-2xl border border-gray-700 p-4">
               <UserAccountManagement onClose={() => setProfileSection('overview')} />
             </div>
           )}
           
           {profileSection === 'achievements' && (
-            <div className="w-full bg-gray-900/80 backdrop-blur-md rounded-3xl border border-gray-700 p-6">
+            <div className="w-full bg-gray-900/80 backdrop-blur-md rounded-2xl border border-gray-700 p-4">
               <AwardsAchievements onClose={() => setProfileSection('overview')} />
             </div>
           )}
           
           {profileSection === 'data' && (
-            <div className="w-full bg-gray-900/80 backdrop-blur-md rounded-3xl border border-gray-700 p-6">
+            <div className="w-full bg-gray-900/80 backdrop-blur-md rounded-2xl border border-gray-700 p-4">
               <DataManagementPanel />
             </div>
           )}

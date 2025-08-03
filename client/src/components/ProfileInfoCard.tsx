@@ -177,38 +177,42 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
 
           {/* Profile Dropdown Menu */}
           {showDropdown && (
-            <div className="absolute top-20 right-4 z-50 w-64 bg-gray-800 rounded-lg shadow-xl border border-gray-600 overflow-hidden">
-              <div className="p-3 border-b border-gray-600 bg-gray-700">
+            <div className="absolute top-16 right-0 z-50 w-56 bg-gray-800/95 backdrop-blur-md rounded-xl shadow-2xl border border-gray-600 overflow-hidden">
+              <div className="p-3 border-b border-gray-600/50 bg-gradient-to-r from-gray-700 to-gray-800">
                 <h3 className="font-semibold text-white text-sm">Profile Settings</h3>
               </div>
               
-              <div className="py-2">
+              <div className="py-1">
                 <button 
-                  className="w-full px-4 py-2 text-left text-sm hover:bg-gray-700 flex items-center gap-2 text-gray-300"
+                  className="w-full px-3 py-2.5 text-left text-sm hover:bg-blue-600/20 flex items-center gap-3 text-gray-200 transition-all duration-200 group"
                   onClick={() => {
                     setIsEditing(true);
                     setShowDropdown(false);
                   }}
                 >
-                  <Edit3 className="w-4 h-4 text-gray-400" />
-                  Edit Profile
+                  <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center group-hover:bg-blue-500/30">
+                    <Edit3 className="w-4 h-4 text-blue-400" />
+                  </div>
+                  <span className="font-medium">Edit Profile</span>
                 </button>
                 
                 <button 
-                  className="w-full px-4 py-2 text-left text-sm hover:bg-gray-700 flex items-center gap-2 text-gray-300"
+                  className="w-full px-3 py-2.5 text-left text-sm hover:bg-purple-600/20 flex items-center gap-3 text-gray-200 transition-all duration-200 group"
                   onClick={() => {
                     // Change profile photo
                     setShowDropdown(false);
                   }}
                 >
-                  <Camera className="w-4 h-4 text-gray-400" />
-                  Change Photo
+                  <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center group-hover:bg-purple-500/30">
+                    <Camera className="w-4 h-4 text-purple-400" />
+                  </div>
+                  <span className="font-medium">Change Photo</span>
                 </button>
                 
-                <Separator className="my-2" />
+                <div className="h-px bg-gray-600/50 mx-3 my-2" />
                 
                 <button 
-                  className="w-full px-4 py-2 text-left text-sm hover:bg-gray-700 flex items-center gap-2 text-gray-300"
+                  className="w-full px-3 py-2.5 text-left text-sm hover:bg-green-600/20 flex items-center gap-3 text-gray-200 transition-all duration-200 group"
                   onClick={() => {
                     const event = new CustomEvent('navigate-to-section', {
                       detail: { section: 'privacy' }
@@ -217,12 +221,14 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
                     setShowDropdown(false);
                   }}
                 >
-                  <Shield className="w-4 h-4 text-gray-400" />
-                  Privacy Settings
+                  <div className="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center group-hover:bg-green-500/30">
+                    <Shield className="w-4 h-4 text-green-400" />
+                  </div>
+                  <span className="font-medium">Privacy Settings</span>
                 </button>
                 
                 <button 
-                  className="w-full px-4 py-2 text-left text-sm hover:bg-gray-700 flex items-center gap-2 text-gray-300"
+                  className="w-full px-3 py-2.5 text-left text-sm hover:bg-orange-600/20 flex items-center gap-3 text-gray-200 transition-all duration-200 group"
                   onClick={() => {
                     const event = new CustomEvent('navigate-to-section', {
                       detail: { section: 'notifications' }
@@ -231,20 +237,24 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
                     setShowDropdown(false);
                   }}
                 >
-                  <Bell className="w-4 h-4 text-gray-400" />
-                  Notifications
+                  <div className="w-8 h-8 rounded-lg bg-orange-500/20 flex items-center justify-center group-hover:bg-orange-500/30">
+                    <Bell className="w-4 h-4 text-orange-400" />
+                  </div>
+                  <span className="font-medium">Notifications</span>
                 </button>
                 
-                <Separator className="my-2" />
+                <div className="h-px bg-gray-600/50 mx-3 my-2" />
                 
                 <button 
-                  className="w-full px-4 py-2 text-left text-sm hover:bg-red-900/20 text-red-400 flex items-center gap-2"
+                  className="w-full px-3 py-2.5 text-left text-sm hover:bg-red-600/20 flex items-center gap-3 text-red-400 transition-all duration-200 group"
                   onClick={() => {
                     window.location.href = '/api/logout';
                   }}
                 >
-                  <LogOut className="w-4 h-4" />
-                  Sign Out
+                  <div className="w-8 h-8 rounded-lg bg-red-500/20 flex items-center justify-center group-hover:bg-red-500/30">
+                    <LogOut className="w-4 h-4 text-red-400" />
+                  </div>
+                  <span className="font-medium">Sign Out</span>
                 </button>
               </div>
             </div>
