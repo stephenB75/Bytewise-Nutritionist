@@ -444,27 +444,33 @@ export class USDAService {
       }
     }
 
-    // Standard conversions (approximate)
+    // Enhanced unit recognition with comprehensive variations
+    const unitVariations: { [key: string]: string[] } = {
+      'cup': ['cup', 'cups', 'c'],
+      'tablespoon': ['tablespoon', 'tablespoons', 'tbsp', 'tbs'],
+      'teaspoon': ['teaspoon', 'teaspoons', 'tsp', 'ts'],
+      'gram': ['gram', 'grams', 'g'],
+      'kilogram': ['kilogram', 'kilograms', 'kg'],
+      'ounce': ['ounce', 'ounces', 'oz'],
+      'pound': ['pound', 'pounds', 'lb', 'lbs'],
+      'piece': ['piece', 'pieces', 'unit', 'units', 'item', 'items'],
+      'slice': ['slice', 'slices'],
+      'bowl': ['bowl', 'bowls'],
+      'plate': ['plate', 'plates'],
+      'pinch': ['pinch', 'pinches', 'dash', 'sprinkle'],
+      'handful': ['handful', 'handfuls']
+    };
+
+    // Standard conversions with base unit names
     const conversions: { [key: string]: number } = {
-      'g': 1,
       'gram': 1,
-      'grams': 1,
-      'kg': 1000,
       'kilogram': 1000,
-      'oz': 28.35,
       'ounce': 28.35,
-      'ounces': 28.35,
-      'lb': 453.6,
       'pound': 453.6,
-      'pounds': 453.6,
-      'cup': 47, // lettuce cup ≈ 47g, varies by ingredient
-      'cups': 240,
+      'cup': 47, // lettuce cup ≈ 47g, varies by ingredient when single
+      'cups': 240, // plural cups for multiple servings
       'tablespoon': 15,
-      'tablespoons': 15,
-      'tbsp': 15,
       'teaspoon': 5,
-      'teaspoons': 5,
-      'tsp': 5,
       'ml': 1, // for liquids, approximate to grams
       'milliliter': 1,
       'milliliters': 1,
@@ -474,12 +480,13 @@ export class USDAService {
       // Common user phrases
       'scoop': 30, // protein powder scoop ≈ 30g
       'pinch': 0.5, // pinch of salt/spice ≈ 0.5g
-      'dash': 0.6, // dash of liquid/spice ≈ 0.6ml
       'splash': 5, // splash of liquid ≈ 5ml
       'dollop': 15, // dollop ≈ 1 tablespoon
       'handful': 40, // handful of nuts/berries ≈ 40g
       'slice': 25, // average slice of bread/fruit ≈ 25g
       'piece': 50, // piece of fruit/food ≈ 50g
+      'bowl': 200, // average bowl serving ≈ 200g
+      'plate': 300, // average plate serving ≈ 300g
       'wedge': 15, // wedge of lemon/lime ≈ 15g
       'sprig': 1, // sprig of herbs ≈ 1g
       'leaf': 0.5, // single leaf ≈ 0.5g
@@ -519,11 +526,31 @@ export class USDAService {
       }
     }
 
-    // Standard unit conversions
-    for (const [unitPattern, grams] of Object.entries(conversions)) {
-      if (unit.includes(unitPattern)) {
-        gramsEquivalent = quantity * grams;
-        break;
+    // Enhanced unit matching with variations
+    let unitMatched = false;
+    
+    // First, try to match using unit variations
+    for (const [baseUnit, variations] of Object.entries(unitVariations)) {
+      for (const variation of variations) {
+        if (unit.includes(variation)) {
+          const conversionFactor = conversions[baseUnit];
+          if (conversionFactor) {
+            gramsEquivalent = quantity * conversionFactor;
+            unitMatched = true;
+            break;
+          }
+        }
+      }
+      if (unitMatched) break;
+    }
+    
+    // If no variation matched, try direct conversion lookup
+    if (!unitMatched) {
+      for (const [unitPattern, grams] of Object.entries(conversions)) {
+        if (unit.includes(unitPattern)) {
+          gramsEquivalent = quantity * grams;
+          break;
+        }
       }
     }
 
