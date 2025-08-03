@@ -921,7 +921,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       </div>
 
       {/* Content Section - Completely Separate and Underneath */}
-      <div className="px-6 py-8 bg-black">
+      <div className="px-6 py-3 bg-black content-section">
         {/* Sign In Component */}
         <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
           <h3 className="text-2xl font-bold text-white mb-6 text-center">Sign In</h3>
@@ -989,7 +989,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       </div>
 
       {/* Content Section - Completely Separate and Underneath */}
-      <div className="px-6 py-8 bg-black">
+      <div className="px-6 py-3 bg-black content-section">
         {/* Food Search Bar - Enhanced with filtering */}
         <div className="space-y-4 mb-8">
           <div className="text-center">

@@ -157,12 +157,20 @@ body {
   margin-bottom: 0 !important;
 }
 
-/* Fix for content sections to not be cut off */
+/* CRITICAL: Force minimal padding on content sections */
 .content-section {
   margin-bottom: 0 !important;
   padding-bottom: 20px !important;
   min-height: auto !important;
   position: relative !important;
+}
+
+/* Override all possible content section padding */
+div.content-section,
+.bg-black.content-section,
+.bg-white.content-section {
+  padding-bottom: 20px !important;
+  margin-bottom: 0 !important;
 }
 
 /* Prevent overflow issues while maintaining scroll */
@@ -199,6 +207,19 @@ html, body {
   padding-bottom: 0 !important;
 }
 
+/* Force override for all possible content containers */
+.px-6.py-3.bg-black.content-section,
+.px-6.py-4.bg-black.content-section {
+  padding-top: 12px !important;
+  padding-bottom: 20px !important;
+}
+
+.max-w-4xl.mx-auto.px-6.py-3.main-content,
+.max-w-4xl.mx-auto.px-6.py-4.main-content {
+  padding-top: 12px !important;
+  padding-bottom: 20px !important;
+}
+
 /* Disable mobile safe areas that add excessive padding */
 @supports (padding: max(0px)) {
   body {
@@ -218,45 +239,49 @@ html, body {
 .weekly-progress-container,
 .daily-progress-container,
 .macro-breakdown-container {
-  padding-bottom: 2rem !important;
-  margin-bottom: 1.5rem !important;
+  padding-bottom: 0 !important;
+  margin-bottom: 0 !important;
 }
 
 /* Profile page specific spacing adjustments */
 .profile-content {
-  padding-bottom: 2rem !important;
-  margin-bottom: 1rem !important;
+  padding-bottom: 20px !important;
+  margin-bottom: 0 !important;
 }
 
 /* Sign-in module spacing */
 .signin-module {
-  padding-bottom: 3rem !important;
-  margin-bottom: 2rem !important;
+  padding-bottom: 20px !important;
+  margin-bottom: 0 !important;
 }
 
-/* Mobile-specific adjustments */
+/* Mobile-specific adjustments - OVERRIDE EXCESSIVE PADDING */
 @media (max-width: 768px) {
   .main-content {
-    padding-bottom: 200px !important; /* Much more space for mobile touch targets */
+    padding-bottom: 20px !important;
   }
   
   .page-container {
-    padding-bottom: 220px !important; /* Extra space for mobile navigation */
+    padding-bottom: 0 !important;
   }
   
   .macros-grid,
   .force-bottom-spacing {
-    margin-bottom: 12rem !important; /* Much more space on mobile */
-    padding-bottom: 6rem !important;
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
   }
   
   .profile-content {
-    padding-bottom: 8rem !important; /* Extra spacing for mobile */
+    padding-bottom: 20px !important;
   }
   
   .signin-module {
-    padding-bottom: 8rem !important; /* Prevent mobile keyboard overlap */
-    margin-bottom: 4rem !important;
+    padding-bottom: 20px !important;
+    margin-bottom: 0 !important;
+  }
+  
+  .content-section {
+    padding-bottom: 20px !important;
   }
 }
 
