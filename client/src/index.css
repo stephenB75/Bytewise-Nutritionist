@@ -160,11 +160,8 @@ body {
 /* Fix for content sections to not be cut off */
 .content-section {
   margin-bottom: 0 !important;
-  padding-bottom: 70px !important;
-  height: calc(100vh - 90px) !important;
-  overflow-y: auto !important;
-  display: flex !important;
-  flex-direction: column !important;
+  padding-bottom: 90px !important;
+  min-height: 50vh !important;
 }
 
 /* Prevent overflow issues while maintaining scroll */
