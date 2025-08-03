@@ -220,7 +220,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               >
                 <div 
                   style={{
-                    fontSize: '4.5rem',
+                    fontSize: '3.825rem',
                     fontWeight: '900', 
                     lineHeight: '0.9',
                     color: '#7dd3fc',
@@ -233,7 +233,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 </div>
                 <div 
                   style={{
-                    fontSize: '1.25rem',
+                    fontSize: '1.0625rem',
                     fontWeight: '300',
                     color: 'rgba(255,255,255,0.8)',
                     letterSpacing: '0.15em',
