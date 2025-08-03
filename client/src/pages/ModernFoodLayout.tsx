@@ -817,74 +817,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     </div>
   );
 
-  const renderSignIn = () => (
-    <div className="space-y-0">
-      {/* Full-Screen Hero Section */}
-      <div className="relative h-screen overflow-hidden">
-        <div 
-          className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out"
-          style={{
-            backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`
-          }}
-        />
-        
-        {/* Hero Content - ONLY TEXT OVERLAY */}
-        <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
-          <div className="space-y-6 max-w-2xl">
-            <div className="space-y-2">
-              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
-                Welcome to
-              </h1>
-              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
-                <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-                  Nutrition
-                </span>
-              </h1>
-            </div>
-            
-            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto">
-              Sign in to start tracking your nutrition journey
-            </p>
-          </div>
-        </div>
-        
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60">
-          <div className="animate-bounce">
-            <ChevronRight className="w-6 h-6 rotate-90" />
-          </div>
-        </div>
-      </div>
-
-      {/* Content Section - Completely Separate and Underneath */}
-      <div className="px-6 py-8 bg-black">
-        {/* Sign In Component */}
-        <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
-          <h3 className="text-2xl font-bold text-white mb-6 text-center">Sign In</h3>
-          <div className="space-y-4">
-            <Input
-              placeholder="Email"
-              className="h-12 bg-white/10 border-white/20 text-white placeholder-gray-400"
-            />
-            <Input
-              type="password"
-              placeholder="Password"
-              className="h-12 bg-white/10 border-white/20 text-white placeholder-gray-400"
-            />
-            <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold h-12 rounded-xl">
-              Sign In
-            </Button>
-            <div className="text-center">
-              <Button variant="link" className="text-gray-300 hover:text-white">
-                Don't have an account? Sign up
-              </Button>
-            </div>
-          </div>
-        </Card>
-      </div>
-    </div>
-  );
-
   const renderDailyWeekly = () => (
     <div className="space-y-0">
       {/* Full-Screen Hero Section */}
@@ -1104,8 +1036,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         return renderHome();
       case 'tracking':
         return renderTracking();
-      case 'signin':
-        return renderSignIn();
+
       case 'achievements':
         return renderAchievements();
       case 'data':

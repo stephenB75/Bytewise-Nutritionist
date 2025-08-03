@@ -21,8 +21,6 @@ import FreshRedesign from './pages/FreshRedesign';
 import ModernFoodApp from './pages/ModernFoodApp';
 import RedesignedApp from './pages/RedesignedApp';
 import ModernFoodLayout from './pages/ModernFoodLayout';
-import { TestComponent } from './components/TestComponent';
-import SimpleModernLayout from './pages/SimpleModernLayout';
 import CalorieCalculatorWrapper from './components/CalorieCalculatorWrapper';
 import WeeklyLogger from './pages/WeeklyLogger';
 import ProfileEnhanced from './pages/ProfileEnhanced';
