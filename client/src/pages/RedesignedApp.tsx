@@ -39,7 +39,7 @@ interface RedesignedAppProps {
 }
 
 export default function RedesignedApp({ onNavigate }: RedesignedAppProps) {
-  const [activeTab, setActiveTab] = useState('home');
+  const [activeTab, setActiveTab] = useState('calculator'); // Start with calculator as main focus
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [greeting, setGreeting] = useState('');
   
@@ -55,8 +55,8 @@ export default function RedesignedApp({ onNavigate }: RedesignedAppProps) {
   }, []);
 
   const menuItems = [
-    { id: 'home', label: 'Home', icon: Home },
     { id: 'calculator', label: 'Calculator', icon: Calculator },
+    { id: 'home', label: 'Home', icon: Home },
     { id: 'progress', label: 'Progress', icon: TrendingUp },
     { id: 'profile', label: 'Profile', icon: User },
   ];
@@ -78,19 +78,18 @@ export default function RedesignedApp({ onNavigate }: RedesignedAppProps) {
     switch (activeTab) {
       case 'calculator':
         return (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900">Calorie Calculator</h2>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-bold text-gray-900">Nutrition Calculator</h2>
               <Badge variant="secondary" className="bg-gradient-to-r from-green-500 to-green-600 text-white shadow-sm">
                 USDA Database
               </Badge>
             </div>
-            <div className="bg-white/70 backdrop-blur-sm rounded-lg border-0 shadow-lg">
-              <CalorieCalculator 
-                onNavigate={onNavigate}
-                isCompact={false}
-              />
-            </div>
+            {/* Direct calculator integration without extra wrapper */}
+            <CalorieCalculator 
+              onNavigate={onNavigate}
+              isCompact={false}
+            />
           </div>
         );
 
@@ -197,18 +196,29 @@ export default function RedesignedApp({ onNavigate }: RedesignedAppProps) {
           </div>
         );
 
-      default: // home
+      case 'home':
         return (
           <div className="space-y-6">
-            {/* Quick Stats Grid */}
+            {/* Welcome message and quick access to calculator */}
+            <Card className="p-6 bg-white/70 backdrop-blur-sm border-0 shadow-lg">
+              <h3 className="text-lg font-semibold mb-3 text-gray-900">Welcome to ByteWise</h3>
+              <p className="text-gray-600 mb-4">Your comprehensive nutrition tracking companion with USDA database integration.</p>
+              <Button 
+                onClick={() => setActiveTab('calculator')}
+                className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg"
+              >
+                <Calculator className="w-5 h-5 mr-2" />
+                Start Calculating Nutrition
+              </Button>
+            </Card>
+
+            {/* Quick Stats */}
             <div className="grid grid-cols-2 gap-4">
               {quickStats.map((stat, index) => (
-                <Card key={index} className="p-4 bg-white/70 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                <Card key={index} className="p-4 bg-white/70 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300">
                   <div className="flex items-center justify-between mb-2">
-                    <div className={`p-2 rounded-full ${stat.color}/20`}>
-                      <stat.icon className={`w-5 h-5 ${stat.color.replace('bg-', 'text-')}`} />
-                    </div>
-                    <Badge variant="secondary" className={`${stat.color} text-white text-xs shadow-sm`}>
+                    <stat.icon className="w-5 h-5 text-gray-600" />
+                    <Badge variant="secondary" className="text-xs">
                       {stat.unit}
                     </Badge>
                   </div>
@@ -217,62 +227,23 @@ export default function RedesignedApp({ onNavigate }: RedesignedAppProps) {
                 </Card>
               ))}
             </div>
+          </div>
+        );
 
-            {/* Quick Actions */}
-            <Card className="p-6 bg-white/70 backdrop-blur-sm border-0 shadow-lg">
-              <h3 className="text-lg font-semibold mb-4 text-gray-900">Quick Actions</h3>
-              <div className="grid grid-cols-2 gap-3">
-                <Button 
-                  variant="outline" 
-                  className="h-12 flex-col space-y-1 border-blue-200 hover:bg-blue-50 hover:border-blue-300 transition-all duration-200 hover:shadow-md"
-                  onClick={() => setActiveTab('calculator')}
-                >
-                  <Calculator className="w-5 h-5 text-blue-600" />
-                  <span className="text-xs font-medium">Calculate</span>
-                </Button>
-                <Button variant="outline" className="h-12 flex-col space-y-1 border-green-200 hover:bg-green-50 hover:border-green-300 transition-all duration-200 hover:shadow-md">
-                  <Plus className="w-5 h-5 text-green-600" />
-                  <span className="text-xs font-medium">Add Meal</span>
-                </Button>
-                <Button variant="outline" className="h-12 flex-col space-y-1 border-purple-200 hover:bg-purple-50 hover:border-purple-300 transition-all duration-200 hover:shadow-md">
-                  <Search className="w-5 h-5 text-purple-600" />
-                  <span className="text-xs font-medium">Search Food</span>
-                </Button>
-                <Button variant="outline" className="h-12 flex-col space-y-1 border-orange-200 hover:bg-orange-50 hover:border-orange-300 transition-all duration-200 hover:shadow-md">
-                  <ChefHat className="w-5 h-5 text-orange-600" />
-                  <span className="text-xs font-medium">Recipes</span>
-                </Button>
-              </div>
-            </Card>
-
-            {/* Recent Meals */}
-            <Card className="p-6 bg-white/70 backdrop-blur-sm border-0 shadow-lg">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">Recent Meals</h3>
-                <Button variant="ghost" size="sm" className="text-blue-600 hover:bg-blue-50">View All</Button>
-              </div>
-              <div className="space-y-3">
-                {recentMeals.map((meal, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-gradient-to-r from-white to-gray-50 rounded-lg border border-gray-100 hover:shadow-md transition-all duration-200">
-                    <div className="flex items-center space-x-3">
-                      <div className={`w-4 h-4 rounded-full shadow-sm ${
-                        meal.type === 'breakfast' ? 'bg-gradient-to-r from-yellow-400 to-yellow-500' :
-                        meal.type === 'lunch' ? 'bg-gradient-to-r from-green-400 to-green-500' :
-                        meal.type === 'snack' ? 'bg-gradient-to-r from-blue-400 to-blue-500' : 'bg-gradient-to-r from-purple-400 to-purple-500'
-                      }`}></div>
-                      <div>
-                        <div className="font-medium text-gray-900">{meal.name}</div>
-                        <div className="text-sm text-gray-600">{meal.time}</div>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="font-bold text-gray-900">{meal.calories}</div>
-                      <div className="text-xs text-gray-500 font-medium">cal</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </Card>
+      default:
+        // Default to calculator as main feature
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-bold text-gray-900">Nutrition Calculator</h2>
+              <Badge variant="secondary" className="bg-gradient-to-r from-green-500 to-green-600 text-white shadow-sm">
+                USDA Database
+              </Badge>
+            </div>
+            <CalorieCalculator 
+              onNavigate={onNavigate}
+              isCompact={false}
+            />
           </div>
         );
     }
