@@ -36,8 +36,8 @@ export function LogoBrand({
       aria-label={clickable ? "Go to Dashboard" : undefined}
       type={clickable ? "button" : undefined}
     >
-      <div className="bytewise-logo-main">bytewise</div>
-      <div className="bytewise-logo-tagline">Nutritionist</div>
+      <div className="bytewise-logo-main"></div>
+      <div className="bytewise-logo-tagline"></div>
     </Component>
   );
 }
