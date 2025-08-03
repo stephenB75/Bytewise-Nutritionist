@@ -403,10 +403,33 @@ export class USDAService {
     // Remove extra whitespace and normalize
     const normalized = measurement.toLowerCase().trim();
     
-    // Extract quantity and unit
-    const match = normalized.match(/^(\d+(?:\.\d+)?)\s*(.+)$/);
-    const quantity = match ? parseFloat(match[1]) : 1;
-    const unit = match ? match[2].trim() : normalized;
+    // Extract quantity and unit with fraction support
+    let quantity = 1;
+    let unit = normalized;
+    
+    // Handle fractions like "1/2", "3/4"
+    const fractionMatch = normalized.match(/^(\d+)\s*\/\s*(\d+)\s+(.+)$/);
+    if (fractionMatch) {
+      const numerator = parseFloat(fractionMatch[1]);
+      const denominator = parseFloat(fractionMatch[2]);
+      quantity = numerator / denominator;
+      unit = fractionMatch[3].trim();
+    } else {
+      // Handle mixed numbers like "1 1/2"
+      const mixedMatch = normalized.match(/^(\d+)\s+(\d+)\s*\/\s*(\d+)\s*(.+)$/);
+      if (mixedMatch) {
+        const whole = parseFloat(mixedMatch[1]);
+        const numerator = parseFloat(mixedMatch[2]);
+        const denominator = parseFloat(mixedMatch[3]);
+        quantity = whole + (numerator / denominator);
+        unit = mixedMatch[4].trim();
+      } else {
+        // Handle regular decimal numbers
+        const match = normalized.match(/^(\d+(?:\.\d+)?)\s*(.+)$/);
+        quantity = match ? parseFloat(match[1]) : 1;
+        unit = match ? match[2].trim() : normalized;
+      }
+    }
 
     // Standard conversions (approximate)
     const conversions: { [key: string]: number } = {
