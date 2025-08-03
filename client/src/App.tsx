@@ -77,9 +77,16 @@ export default function App() {
     return null;
   };
 
-  // Render ModernFoodLayout
+  // Render ModernFoodLayout or Test Component
   const renderCurrentPage = () => {
-    return <ModernFoodLayout onNavigate={handleNavigate} />;
+    // Temporarily use test component to debug React hooks
+    const TestComponent = React.lazy(() => import('./TestComponent'));
+    return (
+      <React.Suspense fallback={<div className="text-white p-8">Loading...</div>}>
+        <TestComponent />
+      </React.Suspense>
+    );
+    // return <ModernFoodLayout onNavigate={handleNavigate} />;
   };
 
   return (
