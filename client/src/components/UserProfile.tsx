@@ -42,8 +42,8 @@ export function UserProfile({ showDetails = false, size = 'md' }: UserProfilePro
   }
 
   const avatarSize = size === 'sm' ? 'w-6 h-6' : size === 'md' ? 'w-8 h-8' : 'w-12 h-12';
-  const displayName = user.user_metadata?.firstName || user.user_metadata?.lastName 
-    ? `${user.user_metadata?.firstName || ''} ${user.user_metadata?.lastName || ''}`.trim()
+  const displayName = user.firstName || user.lastName 
+    ? `${user.firstName || ''} ${user.lastName || ''}`.trim()
     : user.email?.split('@')[0] || 'User';
 
   return (
@@ -55,9 +55,9 @@ export function UserProfile({ showDetails = false, size = 'md' }: UserProfilePro
         <div className="flex flex-col items-center text-center space-y-6">
           {/* Profile Image with Glass Effect */}
           <div className="relative">
-            {user.user_metadata?.profileImageUrl ? (
+            {user.profileImageUrl ? (
               <img 
-                src={user.user_metadata.profileImageUrl} 
+                src={user.profileImageUrl} 
                 alt={displayName}
                 className="w-24 h-24 rounded-full object-cover border-4 border-white/70 shadow-2xl backdrop-blur-sm"
               />

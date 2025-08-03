@@ -3,27 +3,81 @@
  * Authentication component for the profile page
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { 
   LogIn, 
   User, 
   Shield, 
   Github, 
   Chrome,
-  Zap
+  Zap,
+  Mail,
+  Lock,
+  UserPlus
 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface SignOnModuleProps {
   onClose?: () => void;
 }
 
 export function SignOnModule({ onClose }: SignOnModuleProps) {
-  const handleSignIn = () => {
-    // Redirect to Replit Auth login endpoint
-    window.location.href = '/api/login';
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
+
+  const handleEmailAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    
+    try {
+      const endpoint = isSignUp ? '/api/auth/signup' : '/api/auth/signin';
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (response.ok) {
+        toast({
+          title: isSignUp ? "Account created!" : "Welcome back!",
+          description: isSignUp ? "Please check your email to verify your account." : "You've been signed in successfully.",
+        });
+        window.location.reload(); // Refresh to update auth state
+      } else {
+        const error = await response.json();
+        toast({
+          title: "Authentication failed",
+          description: error.message || "Please try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = () => {
+    window.location.href = '/api/auth/google';
+  };
+
+  const handleGitHubSignIn = () => {
+    window.location.href = '/api/auth/github';
   };
 
   return (
@@ -36,10 +90,10 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
           </div>
         </div>
         <h2 className="text-2xl font-bold text-center mb-2" style={{ fontFamily: "'League Spartan', sans-serif" }}>
-          Sign In to ByteWise
+          {isSignUp ? 'Join ByteWise' : 'Sign In to ByteWise'}
         </h2>
         <p className="text-center text-white/90 text-sm">
-          Access your nutrition tracking, recipes, and progress
+          {isSignUp ? 'Start your nutrition tracking journey' : 'Access your nutrition tracking, recipes, and progress'}
         </p>
       </div>
 
@@ -82,22 +136,104 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
           </div>
         </div>
 
-        {/* Sign In Button */}
-        <div className="space-y-4">
+        {/* Email Authentication Form */}
+        <form onSubmit={handleEmailAuth} className="space-y-4">
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email</Label>
+              <div className="relative mt-1">
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  className="pl-10 bg-white border-gray-300 focus:border-[#1f4aa6] focus:ring-[#1f4aa6]"
+                  required
+                />
+              </div>
+            </div>
+            
+            <div>
+              <Label htmlFor="password" className="text-sm font-medium text-gray-700">Password</Label>
+              <div className="relative mt-1">
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  className="pl-10 bg-white border-gray-300 focus:border-[#1f4aa6] focus:ring-[#1f4aa6]"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+
           <Button
-            onClick={handleSignIn}
+            type="submit"
+            disabled={loading}
             className="w-full bg-gradient-to-r from-[#1f4aa6] to-[#45c73e] hover:from-[#1f4aa6]/80 hover:to-[#45c73e]/80 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] py-3 text-base font-semibold"
           >
-            <LogIn className="w-5 h-5 mr-2" />
-            Sign In with Replit
+            {loading ? (
+              <div className="flex items-center justify-center">
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                {isSignUp ? 'Creating Account...' : 'Signing In...'}
+              </div>
+            ) : (
+              <>
+                {isSignUp ? <UserPlus className="w-5 h-5 mr-2" /> : <LogIn className="w-5 h-5 mr-2" />}
+                {isSignUp ? 'Create Account' : 'Sign In'}
+              </>
+            )}
           </Button>
-          
-          <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
-            <Github className="w-4 h-4" />
-            <span>•</span>
-            <Chrome className="w-4 h-4" />
-            <span>Supports GitHub, Google, and more</span>
+        </form>
+
+        {/* OAuth Providers */}
+        <div className="space-y-3">
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-200" />
+            </div>
+            <div className="relative flex justify-center text-xs">
+              <span className="px-2 bg-white text-gray-500">Or continue with</span>
+            </div>
           </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleGoogleSignIn}
+              className="flex items-center justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+            >
+              <Chrome className="w-4 h-4 mr-2" />
+              Google
+            </Button>
+            
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleGitHubSignIn}
+              className="flex items-center justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+            >
+              <Github className="w-4 h-4 mr-2" />
+              GitHub
+            </Button>
+          </div>
+        </div>
+
+        {/* Toggle Sign In / Sign Up */}
+        <div className="text-center">
+          <button
+            type="button"
+            onClick={() => setIsSignUp(!isSignUp)}
+            className="text-sm text-[#1f4aa6] hover:text-[#1f4aa6]/80 font-medium"
+          >
+            {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
+          </button>
         </div>
 
         {/* Privacy Notice */}
