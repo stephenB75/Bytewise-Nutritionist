@@ -1,0 +1,36 @@
+Uncaught (in promise) Error: Could not establish connection. Receiving end does not exist.Understand this error
+sw.js:253 🍎 Bytewise Service Worker loaded successfully
+3sw.js:187 Uncaught (in promise) TypeError: Failed to execute 'put' on 'Cache': Request scheme 'chrome-extension' is unsupported
+    at sw.js:187:11Understand this error
+content.js:2 Uncaught (in promise) TypeError: Cannot read properties of undefined (reading 'checkoutUrls')
+    at content.js:2:210850
+    at async e (content.js:2:210762)
+    at async t (content.js:2:211679)Understand this error
+chunk-276SZO74.js?v=672d3e0e:21551 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+main.tsx:36 🚀 Starting ByteWise app render...
+main.tsx:47 ✅ Root element found, attempting render...
+main.tsx:54 ✅ React render initiated successfully
+useAuth.ts:18 React available: true
+useAuth.ts:19 useState available: true
+AuthWrapper.tsx:22 🔍 AuthWrapper state: Object
+AuthWrapper.tsx:32 🚧 Bypassing authentication for white screen debugging
+useAuth.ts:63 Auth state changed: SIGNED_IN stephen75@me.com
+useAuth.ts:18 React available: true
+useAuth.ts:19 useState available: true
+AuthWrapper.tsx:22 🔍 AuthWrapper state: Object
+AuthWrapper.tsx:32 🚧 Bypassing authentication for white screen debugging
+3sw.js:187 Uncaught (in promise) TypeError: Failed to execute 'put' on 'Cache': Request scheme 'chrome-extension' is unsupported
+    at sw.js:187:11Understand this error
+feature_extension-platform-merchant-homepage-plugin-view.js:1 Uncaught (in promise) TypeError: Cannot read properties of undefined (reading 'map')
+    at feature_extension-platform-merchant-homepage-plugin-view.js:1:5171Understand this error
+logout:221 🍎 Service Worker registered successfully: ServiceWorkerRegistration
+feature_extension-platform-merchant-homepage-plugin-view.js:1 Uncaught (in promise) TypeError: Cannot read properties of undefined (reading 'checkoutUrls')
+    at background.js:2:1118846Understand this error
+contentScript.bundle.js:1 Uncaught (in promise) Error: No resume URL
+    at t (contentScript.bundle.js:1:845908)
+    at async contentScript.bundle.js:1:846458Understand this error
+logout:1 Banner not shown: beforeinstallpromptevent.preventDefault() called. The page must call beforeinstallpromptevent.prompt() to show the banner.
+logout:1 Refused to load the stylesheet 'https://cdn.jsdelivr.net/npm/antd/dist/antd.min.css' because it violates the following Content Security Policy directive: "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com". Note that 'style-src-elem' was not explicitly set, so 'style-src' is used as a fallback.
+Understand this error
+2sw.js:187 Uncaught (in promise) TypeError: Failed to execute 'put' on 'Cache': Request scheme 'chrome-extension' is unsupported
+    at sw.js:187:11

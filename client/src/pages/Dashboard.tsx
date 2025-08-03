@@ -24,6 +24,7 @@ import { HeroSection } from '@/components/HeroSection';
 import { PWAStatus } from '@/components/PWAStatus';
 import { useCalorieTracking } from '@/hooks/useCalorieTracking';
 import { useQuery } from '@tanstack/react-query';
+import { useRotatingBackground } from '@/hooks/useRotatingBackground';
 
 interface DashboardProps {
   onNavigate: (page: string) => void;
@@ -34,6 +35,9 @@ function Dashboard({ onNavigate }: DashboardProps) {
   const { getDailyStats, getTodaysCalories } = useCalorieTracking();
   const dailyStats = getDailyStats();
   const todaysCalculations = getTodaysCalories();
+  
+  // Add rotating background to main dashboard
+  const { currentImage, currentAlt, isLoading: imageLoading } = useRotatingBackground();
 
   // Fetch user data from API
   const { data: user } = useQuery({
@@ -207,9 +211,33 @@ function Dashboard({ onNavigate }: DashboardProps) {
   };
 
   return (
-    <div className="min-h-full bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Hero Section */}
-      <HeroSection
+    <div className="min-h-full relative overflow-hidden">
+      {/* Rotating Food Background */}
+      <div 
+        className={`absolute inset-0 z-0 transition-opacity duration-500 ${imageLoading ? 'opacity-0' : 'opacity-100'}`}
+        style={{
+          backgroundImage: `url(${currentImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          filter: 'blur(3px) brightness(0.4)'
+        }}
+        role="img"
+        aria-label={currentAlt}
+      />
+      
+      {/* Loading state for background */}
+      {imageLoading && (
+        <div className="absolute inset-0 z-0 bg-gradient-to-br from-emerald-500 to-blue-600" />
+      )}
+      
+      {/* Overlay for better readability */}
+      <div className="absolute inset-0 z-5 bg-black/30" />
+      
+      {/* Main Content Container */}
+      <div className="relative z-10">
+        {/* Hero Section */}
+        <HeroSection
         title={`Good morning, ${userStats.name}!`}
         subtitle="Keep up your amazing progress"
         component="dashboard"
@@ -511,6 +539,7 @@ function Dashboard({ onNavigate }: DashboardProps) {
             Weekly Logger
           </Button>
         </div>
+      </div>
       </div>
     </div>
   );
