@@ -291,7 +291,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const renderHome = () => (
     <div className="space-y-0 page-container">
       {/* Full-Screen Hero Section */}
-      <div className="relative h-screen overflow-hidden">
+      <div className="relative h-[60vh] overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out"
           style={{
@@ -379,7 +379,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       {/* Content Section - Completely Separate and Underneath */}
       <div className="px-6 py-4 bg-black content-section">
         {/* Enhanced Daily Progress Metrics with Graphs */}
-        <div className="space-y-3 pb-8">
+        <div className="space-y-3 pb-4">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-black text-white">Today's Progress</h2>
             <Button 
@@ -538,7 +538,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const renderTracking = () => (
     <div className="space-y-0 page-container">
       {/* Full-Screen Hero Section */}
-      <div className="relative h-screen overflow-hidden">
+      <div className="relative h-[60vh] overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out"
           style={{
@@ -577,7 +577,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       {/* Content Section - Completely Separate and Underneath */}
       <div className="px-6 py-4 bg-black content-section">
         {/* Food Search Bar - Moved Here */}
-        <div className="mb-6 pb-8">
+        <div className="mb-6 pb-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <Input
@@ -738,7 +738,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const renderAchievements = () => (
     <div className="space-y-0">
       {/* Full-Screen Hero Section */}
-      <div className="relative h-screen overflow-hidden">
+      <div className="relative h-[60vh] overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out"
           style={{
@@ -777,7 +777,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       {/* Content Section - Completely Separate and Underneath */}
       <div className="px-6 py-4 bg-black content-section">
         {/* Goal Progress Cards */}
-        <div className="space-y-6 mb-8 pb-8">
+        <div className="space-y-6 mb-8 pb-4">
           {/* Daily Goals */}
           <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
             <div className="flex items-center justify-between mb-4">
@@ -1107,7 +1107,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const renderCalculator = () => (
     <div className="space-y-0 page-container">
       {/* Full-Screen Hero Section */}
-      <div className="relative h-screen overflow-hidden">
+      <div className="relative h-[60vh] overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out"
           style={{
@@ -1158,7 +1158,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const renderProfile = () => (
     <div className="space-y-0 page-container">
       {/* Full-Screen Hero Section */}
-      <div className="relative h-screen overflow-hidden">
+      <div className="relative h-[60vh] overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out"
           style={{
