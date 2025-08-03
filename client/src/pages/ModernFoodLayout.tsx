@@ -38,7 +38,8 @@ import {
   Download,
   Bell,
   Shield,
-  ChevronDown
+  ChevronDown,
+  RefreshCw
 } from 'lucide-react';
 
 interface ModernFoodLayoutProps {
