@@ -12,7 +12,7 @@ import { config } from '@/lib/config';
 export function DevelopmentNotice() {
   const hasSupabaseUrl = !!config.supabase.url;
   const hasSupabaseKey = !!config.supabase.anonKey;
-  const hasUsdaKey = config.usda.isConfigured;
+  const hasUsdaKey = !!config.usda.apiKey;
 
   const isFullyConfigured = hasSupabaseUrl && hasSupabaseKey && hasUsdaKey;
 

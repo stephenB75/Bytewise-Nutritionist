@@ -45,118 +45,15 @@ interface AwardsAchievementsProps {
 
 export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [achievements, setAchievements] = useState<Achievement[]>([
-    {
-      id: '1',
-      title: 'First Day Complete',
-      description: 'Log your first full day of nutrition',
-      icon: '🎯',
-      category: 'daily',
-      difficulty: 'bronze',
-      progress: 1,
-      target: 1,
-      completed: true,
-      completedDate: new Date('2024-08-01'),
-      points: 100,
-      reward: 'Beginner Badge'
-    },
-    {
-      id: '2',
-      title: 'Week Warrior',
-      description: 'Complete 7 consecutive days of tracking',
-      icon: '🔥',
-      category: 'weekly',
-      difficulty: 'silver',
-      progress: 7,
-      target: 7,
-      completed: true,
-      completedDate: new Date('2024-08-02'),
-      points: 500,
-      reward: 'Streak Master Title'
-    },
-    {
-      id: '3',
-      title: 'Calorie Champion',
-      description: 'Meet your daily calorie goal 10 times',
-      icon: '🏆',
-      category: 'milestone',
-      difficulty: 'gold',
-      progress: 8,
-      target: 10,
-      completed: false,
-      points: 1000
-    },
-    {
-      id: '4',
-      title: 'Protein Power',
-      description: 'Hit your protein goal 5 days in a row',
-      icon: '💪',
-      category: 'weekly',
-      difficulty: 'silver',
-      progress: 3,
-      target: 5,
-      completed: false,
-      points: 750
-    },
-    {
-      id: '5',
-      title: 'Early Bird',
-      description: 'Log breakfast before 9 AM for 5 days',
-      icon: '🌅',
-      category: 'daily',
-      difficulty: 'bronze',
-      progress: 2,
-      target: 5,
-      completed: false,
-      points: 300
-    },
-    {
-      id: '6',
-      title: 'Nutrition Scholar',
-      description: 'Try 20 different foods',
-      icon: '🧠',
-      category: 'milestone',
-      difficulty: 'gold',
-      progress: 12,
-      target: 20,
-      completed: false,
-      points: 1500
-    },
-    {
-      id: '7',
-      title: 'Perfect Month',
-      description: 'Complete every day of a month',
-      icon: '⭐',
-      category: 'monthly',
-      difficulty: 'platinum',
-      progress: 15,
-      target: 30,
-      completed: false,
-      points: 5000,
-      reward: 'Platinum Status'
-    },
-    {
-      id: '8',
-      title: 'Hydration Hero',
-      description: 'Track water intake for 14 days',
-      icon: '💧',
-      category: 'weekly',
-      difficulty: 'silver',
-      progress: 14,
-      target: 14,
-      completed: true,
-      completedDate: new Date('2024-07-28'),
-      points: 600
-    }
-  ]);
+  const [achievements, setAchievements] = useState<Achievement[]>([]);
 
   const [userStats, setUserStats] = useState({
-    totalPoints: 1200,
-    achievementsCompleted: 3,
-    currentStreak: 7,
-    longestStreak: 12,
-    level: 5,
-    nextLevelPoints: 300
+    totalPoints: 0,
+    achievementsCompleted: 0,
+    currentStreak: 0,
+    longestStreak: 0,
+    level: 1,
+    nextLevelPoints: 100
   });
 
   const categories = [
@@ -182,48 +79,22 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
   const completedAchievements = achievements.filter(a => a.completed);
   const inProgressAchievements = achievements.filter(a => !a.completed);
 
-  // Check for daily/weekly goal achievements
+  // TODO: Connect to real data source for achievement tracking
   useEffect(() => {
-    const checkGoalAchievements = () => {
-      // Check daily calorie goal
-      const dailyCalories = 1850; // This would come from actual tracking
-      const goalCalories = 2100;
-      
-      if (dailyCalories >= goalCalories) {
-        // Trigger daily goal achievement celebration
-        window.dispatchEvent(new CustomEvent('achievement-unlocked', {
-          detail: {
-            type: 'daily-goal',
-            title: 'Daily Goal Reached! 🏆',
-            message: 'Congratulations! You\'ve reached your daily calorie goal.',
-            confetti: true
-          }
-        }));
-      }
-
-      // Check weekly goal
-      const weeklyCalories = 12950; // This would come from actual tracking
-      const weeklyGoal = 14700;
-      
-      if (weeklyCalories >= weeklyGoal) {
-        // Trigger weekly goal achievement celebration
-        window.dispatchEvent(new CustomEvent('achievement-unlocked', {
-          detail: {
-            type: 'weekly-goal',
-            title: 'Weekly Goal Achievement! 🎉',
-            message: 'Amazing! You\'ve completed your weekly nutrition goal.',
-            confetti: true,
-            trophy: true
-          }
-        }));
+    // Load user achievements and stats from database
+    const loadAchievements = async () => {
+      try {
+        // Future: Fetch from API/database
+        // const response = await fetch('/api/achievements');
+        // const data = await response.json();
+        // setAchievements(data.achievements);
+        // setUserStats(data.userStats);
+      } catch (error) {
+        console.error('Failed to load achievements:', error);
       }
     };
 
-    // Check achievements on component mount and periodically
-    checkGoalAchievements();
-    const interval = setInterval(checkGoalAchievements, 60000); // Check every minute
-
-    return () => clearInterval(interval);
+    loadAchievements();
   }, []);
 
   const renderAchievementCard = (achievement: Achievement) => (

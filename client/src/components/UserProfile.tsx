@@ -109,15 +109,15 @@ export function UserProfile({ showDetails = false, size = 'md' }: UserProfilePro
           {/* Stats Cards */}
           <div className="grid grid-cols-3 gap-4 w-full mt-6">
             <div className="text-center p-3 bg-white/60 backdrop-blur-sm rounded-xl border border-white/60 shadow-sm">
-              <div className="text-lg font-bold text-[#1f4aa6]">156</div>
+              <div className="text-lg font-bold text-[#1f4aa6]">0</div>
               <div className="text-xs text-gray-600">Meals</div>
             </div>
             <div className="text-center p-3 bg-white/60 backdrop-blur-sm rounded-xl border border-white/60 shadow-sm">
-              <div className="text-lg font-bold text-[#45c73e]">12</div>
+              <div className="text-lg font-bold text-[#45c73e]">0</div>
               <div className="text-xs text-gray-600">Recipes</div>
             </div>
             <div className="text-center p-3 bg-white/60 backdrop-blur-sm rounded-xl border border-white/60 shadow-sm">
-              <div className="text-lg font-bold text-[#faed39]">47</div>
+              <div className="text-lg font-bold text-[#faed39]">0</div>
               <div className="text-xs text-gray-600">Days</div>
             </div>
           </div>

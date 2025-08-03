@@ -53,48 +53,22 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const [currentAchievement, setCurrentAchievement] = useState<any>(null);
   const [showConfettiCelebration, setShowConfettiCelebration] = useState(false);
   const [confettiAchievement, setConfettiAchievement] = useState<any>(null);
-  const [dailyCalories, setDailyCalories] = useState(1850);
-  const [weeklyCalories, setWeeklyCalories] = useState(12950);
+  const [dailyCalories, setDailyCalories] = useState(0);
+  const [weeklyCalories, setWeeklyCalories] = useState(0);
   const [goalCalories, setGoalCalories] = useState(2100);
   const [weeklyGoal, setWeeklyGoal] = useState(14700);
   const [loggedMeals, setLoggedMeals] = useState<any[]>([]);
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
   const [trackingView, setTrackingView] = useState('daily'); // 'daily' or 'weekly'
   const [profileSection, setProfileSection] = useState('overview'); // 'overview', 'account', 'achievements', 'data'
-  const [notifications, setNotifications] = useState([
-    {
-      id: '1',
-      type: 'achievement' as const,
-      title: 'Daily Goal Reached! 🏆',
-      message: 'Congratulations! You\'ve reached your daily calorie goal.',
-      timestamp: new Date(),
-      read: false
-    },
-    {
-      id: '2', 
-      type: 'info' as const,
-      title: 'Weekly Summary Ready',
-      message: 'Your weekly nutrition report is available for download.',
-      timestamp: new Date(Date.now() - 3600000),
-      read: false
-    },
-    {
-      id: '3',
-      type: 'achievement' as const,
-      title: 'Weekly Goal Achievement! 🎉',
-      message: 'Amazing! You\'ve completed your weekly nutrition goal.',
-      timestamp: new Date(Date.now() - 86400000),
-      read: false
-    },
-    {
-      id: '3',
-      type: 'success' as const,
-      title: 'Meal Logged Successfully',
-      message: 'Your lunch has been added to today\'s nutrition tracking.',
-      timestamp: new Date(Date.now() - 7200000),
-      read: true
-    }
-  ]);
+  const [notifications, setNotifications] = useState<Array<{
+    id: string;
+    type: 'achievement' | 'info' | 'success';
+    title: string;
+    message: string;
+    timestamp: Date;
+    read: boolean;
+  }>>([]);
 
   // Notification handler functions
   const handleMarkAsRead = (id: string) => {

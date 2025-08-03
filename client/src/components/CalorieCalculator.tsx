@@ -813,30 +813,18 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
         </Card>
       )}
 
-      {/* Examples Card */}
+      {/* User Guide Card */}
       <Card className="p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">Example Calculations</h3>
+        <h3 className="text-lg font-bold text-gray-900 mb-4">How to Use</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-3">
-            <h4 className="font-medium text-gray-700">Common Ingredients</h4>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-600">1 large egg</span>
-                <span className="font-medium">~70 kcal</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">1 cup cooked rice</span>
-                <span className="font-medium">~205 kcal</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">1 medium banana</span>
-                <span className="font-medium">~105 kcal</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">1 tablespoon olive oil</span>
-                <span className="font-medium">~120 kcal</span>
-              </div>
+            <h4 className="font-medium text-gray-700">Ingredient Entry</h4>
+            <div className="space-y-2 text-sm text-gray-600">
+              <p>• Type any food name to search</p>
+              <p>• Use USDA database for accuracy</p>
+              <p>• Select from custom ingredients</p>
+              <p>• Get detailed nutrition breakdowns</p>
             </div>
           </div>
           
