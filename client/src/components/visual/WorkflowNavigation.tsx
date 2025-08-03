@@ -138,7 +138,7 @@ export function WorkflowNavigation({
                 {/* Completion Check */}
                 {state === 'completed' && (
                   <motion.div
-                    className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center"
+                    className="absolute -top-1 -right-1 w-4 h-4 bg-[#45c73e] rounded-full flex items-center justify-center"
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ type: "spring", delay: 0.2 }}
@@ -185,9 +185,9 @@ export function WorkflowNavigation({
         key={currentStep}
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mt-3 p-2 bg-blue-50 rounded-lg"
+        className="mt-3 p-2 bg-[#1f4aa6]/10 rounded-lg"
       >
-        <p className="text-xs text-blue-800">
+        <p className="text-xs text-[#1f4aa6]">
           {workflowSteps.find(step => step.id === currentStep)?.description}
         </p>
       </motion.div>

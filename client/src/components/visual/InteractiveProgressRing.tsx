@@ -183,7 +183,7 @@ export function InteractiveProgressRing({
             exit={{ scale: 0, opacity: 0 }}
           >
             <motion.div
-              className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center"
+              className="w-8 h-8 bg-[#45c73e] rounded-full flex items-center justify-center"
               animate={{ 
                 scale: [1, 1.2, 1],
                 rotate: [0, 360]

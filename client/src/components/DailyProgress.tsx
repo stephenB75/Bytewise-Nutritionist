@@ -149,7 +149,7 @@ export function DailyProgress({
                   </div>
                   {status === 'complete' && (
                     <div className="mt-1">
-                      <Star className="w-4 h-4 text-yellow-500 mx-auto" />
+                      <Star className="w-4 h-4 text-[#faed39] mx-auto" />
                     </div>
                   )}
                 </div>
@@ -171,9 +171,9 @@ export function DailyProgress({
                   <Progress 
                     value={progress} 
                     className={`h-3 mb-3 transition-all duration-700 ${
-                      status === 'complete' ? '[&>div]:bg-gradient-to-r [&>div]:from-green-500 [&>div]:to-emerald-600' :
-                      status === 'good' ? '[&>div]:bg-gradient-to-r [&>div]:from-blue-500 [&>div]:to-indigo-600' :
-                      status === 'started' ? '[&>div]:bg-gradient-to-r [&>div]:from-yellow-500 [&>div]:to-orange-500' :
+                      status === 'complete' ? '[&>div]:bg-gradient-to-r [&>div]:from-[#45c73e] [&>div]:to-[#45c73e]' :
+                      status === 'good' ? '[&>div]:bg-gradient-to-r [&>div]:from-[#1f4aa6] [&>div]:to-[#1f4aa6]' :
+                      status === 'started' ? '[&>div]:bg-gradient-to-r [&>div]:from-[#faed39] [&>div]:to-[#faed39]' :
                       '[&>div]:bg-gray-300'
                     }`}
                   />
@@ -204,9 +204,9 @@ export function DailyProgress({
               {progress > 0 && (
                 <div className="absolute bottom-2 right-2">
                   <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                    status === 'complete' ? 'bg-green-100 text-green-700' :
-                    status === 'good' ? 'bg-blue-100 text-blue-700' :
-                    status === 'started' ? 'bg-yellow-100 text-yellow-700' :
+                    status === 'complete' ? 'bg-[#45c73e]/10 text-[#45c73e]' :
+                    status === 'good' ? 'bg-[#1f4aa6]/10 text-[#1f4aa6]' :
+                    status === 'started' ? 'bg-[#faed39]/10 text-[#faed39]' :
                     'bg-gray-100 text-gray-700'
                   }`}>
                     <Zap className="w-3 h-3" />
@@ -227,11 +227,11 @@ export function DailyProgress({
           <span className="text-gray-600">Week Summary</span>
           <div className="flex items-center gap-4 text-gray-700">
             <div className="flex items-center gap-1">
-              <CheckCircle className="w-4 h-4 text-green-600" />
+              <CheckCircle className="w-4 h-4 text-[#45c73e]" />
               <span>{weekDays.filter(day => getDayTotals(day).calories >= dailyCalorieGoal).length} goal days</span>
             </div>
             <div className="flex items-center gap-1">
-              <TrendingUp className="w-4 h-4 text-blue-600" />
+              <TrendingUp className="w-4 h-4 text-[#1f4aa6]" />
               <span>{weekDays.filter(day => getDayTotals(day).calories > 0).length} active days</span>
             </div>
           </div>

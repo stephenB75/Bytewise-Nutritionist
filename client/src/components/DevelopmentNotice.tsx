@@ -80,7 +80,7 @@ export function DevelopmentNotice() {
           </div>
         </div>
 
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <div className="bg-[#1f4aa6]/10 border border-[#1f4aa6]/20 rounded-lg p-4 mb-6">
           <h3 className="font-semibold text-blue-900 mb-2">Setup Instructions</h3>
           <ol className="text-sm text-blue-800 space-y-1">
             <li>1. Check the <code className="bg-blue-100 px-1 rounded">SUPABASE_SETUP.md</code> file for detailed instructions</li>

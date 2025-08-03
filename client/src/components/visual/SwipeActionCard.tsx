@@ -3,7 +3,7 @@
  * ADHD-friendly card with swipe gestures for quick actions
  */
 
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, PanInfo, useMotionValue, useTransform } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 import { Check, X, Edit, Trash2 } from 'lucide-react';
@@ -106,7 +106,7 @@ export function SwipeActionCard({
         </div>
       )}
       {rightActions.length > 0 && (
-        <div className="absolute right-0 top-0 bottom-0 w-20 bg-green-500 flex items-center justify-center">
+        <div className="absolute right-0 top-0 bottom-0 w-20 bg-[#45c73e] flex items-center justify-center">
           {React.createElement(rightActions[0].icon, { className: "w-6 h-6 text-white" })}
         </div>
       )}
