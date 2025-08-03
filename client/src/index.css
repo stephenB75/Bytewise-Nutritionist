@@ -11,8 +11,8 @@
 
 /* Force content to scroll properly and meet footer */
 .force-bottom-spacing {
-  margin-bottom: 2rem !important;
-  padding-bottom: 1rem !important;
+  margin-bottom: 1.5rem !important;
+  padding-bottom: 0.5rem !important;
 }
 
 /* Enhanced Accessibility - Increased text sizes throughout the app */

@@ -377,11 +377,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       </div>
 
       {/* Content Section - Completely Separate and Underneath */}
-      <div className="px-6 py-8 bg-black content-section">
+      <div className="px-6 py-4 bg-black content-section">
         {/* Enhanced Daily Progress Metrics with Graphs */}
-        <div className="space-y-6 force-bottom-spacing" style={{ paddingBottom: '3rem !important' }}>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-black text-white">Today's Progress</h2>
+        <div className="space-y-3 force-bottom-spacing" style={{ paddingBottom: '1.5rem !important' }}>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-black text-white">Today's Progress</h2>
             <Button 
               variant="ghost" 
               className="text-orange-400 hover:text-orange-300"
@@ -392,7 +392,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           </div>
 
           {/* Daily Calorie Progress Card with Graph */}
-          <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
+          <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-3">
                 <div className="p-2 bg-orange-500/20 rounded-xl">
@@ -436,7 +436,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           </Card>
 
           {/* Weekly Progress Card with Trend Line */}
-          <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6 weekly-progress-container">
+          <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4 weekly-progress-container">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-3">
                 <div className="p-2 bg-blue-500/20 rounded-xl">
@@ -481,7 +481,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           </Card>
 
           {/* Macros Breakdown with Mini Graphs */}
-          <div className="grid grid-cols-3 gap-4 force-bottom-spacing" style={{ marginBottom: '2rem !important', paddingBottom: '1rem !important' }}>
+          <div className="grid grid-cols-3 gap-4 force-bottom-spacing" style={{ marginBottom: '1.5rem !important', paddingBottom: '0.5rem !important' }}>
             <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4">
               <div className="text-center">
                 <div className="text-sm text-gray-400 mb-1">Protein</div>
@@ -575,7 +575,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       </div>
 
       {/* Content Section - Completely Separate and Underneath */}
-      <div className="px-6 py-8 bg-black content-section">
+      <div className="px-6 py-4 bg-black content-section">
         {/* Food Search Bar - Moved Here */}
         <div className="mb-6 force-bottom-spacing" style={{ paddingBottom: '3rem !important' }}>
           <div className="relative">
@@ -688,7 +688,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <h2 className="text-2xl font-bold text-white mb-4">This Week's Progress</h2>
             
             {/* Weekly Progress Card */}
-            <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
+            <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4">
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h3 className="text-white font-semibold">Weekly Total</h3>
@@ -775,7 +775,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       </div>
 
       {/* Content Section - Completely Separate and Underneath */}
-      <div className="px-6 py-8 bg-black content-section">
+      <div className="px-6 py-4 bg-black content-section">
         {/* Goal Progress Cards */}
         <div className="space-y-6 mb-8 force-bottom-spacing" style={{ paddingBottom: '3rem !important' }}>
           {/* Daily Goals */}
@@ -1196,7 +1196,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
       {/* Content Section - Completely Separate and Underneath */}
       <div className="bg-white content-section">
-        <div className="max-w-4xl mx-auto px-6 py-8 main-content profile-content">
+        <div className="max-w-4xl mx-auto px-6 py-4 main-content profile-content">
           {/* Profile Navigation */}
           <div className="grid grid-cols-2 md:flex md:space-x-2 gap-2 md:gap-0 mb-8">
             {[
@@ -1227,7 +1227,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           </div>
 
           {/* Profile Content - Scrollable Container */}
-          <div className="h-[calc(100vh-20rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+          <div className="h-[calc(100vh-16rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
             <div className="space-y-6 pr-2">
               {profileSection === 'overview' && (
                 <div className="space-y-6">
