@@ -5,7 +5,7 @@ import SimpleTest from "./SimpleTest";
 import "./index.css";
 
 // Debug mode - use simple test to isolate issues
-const useSimpleTest = true;
+const useSimpleTest = false;
 
 // Suppress development warnings and errors
 if (import.meta.env.DEV) {
@@ -38,25 +38,54 @@ const rootElement = document.getElementById("root");
 if (!rootElement) {
   console.error('❌ Root element not found');
   document.body.innerHTML = `
-    <div style="background: red; color: white; padding: 20px;">
-      ERROR: Root element not found in DOM
+    <div style="background: linear-gradient(45deg, #ff6b6b, #4ecdc4); color: white; padding: 40px; min-height: 100vh; display: flex; align-items: center; justify-content: center; font-family: Arial; text-align: center;">
+      <div>
+        <h1 style="font-size: 3rem; margin-bottom: 1rem;">🚨 ROOT ELEMENT ERROR</h1>
+        <p style="font-size: 1.5rem;">Root element not found in DOM</p>
+      </div>
     </div>
   `;
 } else {
   console.log('✅ Root element found, attempting render...');
   
   try {
-    // Use simple test first to verify React works
+    // Force simple visual test first
     const AppComponent = useSimpleTest ? SimpleTest : App;
     const root = createRoot(rootElement);
-    root.render(<AppComponent />);
-    console.log('✅ React render initiated successfully');
+    
+    // Add immediate visual feedback
+    rootElement.innerHTML = `
+      <div style="background: linear-gradient(45deg, #10b981, #3b82f6); color: white; padding: 40px; min-height: 100vh; display: flex; align-items: center; justify-content: center; font-family: Arial; text-align: center;">
+        <div>
+          <h1 style="font-size: 3rem; margin-bottom: 1rem;">🎨 BYTEWISE LOADING...</h1>
+          <p style="font-size: 1.5rem;">React is initializing the visual redesign</p>
+          <div style="margin-top: 2rem;">
+            <div style="width: 50px; height: 50px; border: 5px solid white; border-top: 5px solid transparent; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+          </div>
+        </div>
+      </div>
+      <style>
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      </style>
+    `;
+    
+    // Delay React render to show loading state
+    setTimeout(() => {
+      root.render(<AppComponent />);
+      console.log('✅ React render initiated successfully');
+    }, 1000);
+    
   } catch (error) {
     console.error('❌ React render failed:', error);
     rootElement.innerHTML = `
-      <div style="background: red; color: white; padding: 20px; font-family: Arial;">
-        <h1>RENDER ERROR</h1>
-        <p>React failed to render: ${error}</p>
+      <div style="background: linear-gradient(45deg, #ef4444, #f97316); color: white; padding: 40px; min-height: 100vh; display: flex; align-items: center; justify-content: center; font-family: Arial; text-align: center;">
+        <div>
+          <h1 style="font-size: 3rem; margin-bottom: 1rem;">🚨 REACT ERROR</h1>
+          <p style="font-size: 1.5rem;">React failed to render: ${error}</p>
+        </div>
       </div>
     `;
   }
