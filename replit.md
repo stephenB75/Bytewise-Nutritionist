@@ -56,7 +56,7 @@ Preferred communication style: Simple, everyday language.
 ✓ **Hero Logo Scale Enhancement**: Optimized CSS logo size to 3.825rem (61px) main text and 1.0625rem (17px) tagline for balanced visual hierarchy with hero headings, reduced by 15% for better proportion (August 2025)
 ✓ **PDF Export Enhancement**: Fixed PDF generation to create actual .pdf files using jsPDF library with CSS logo branding, professional A4 formatting, multi-page support, and high-resolution rendering (August 2025)
 ✓ **Comprehensive App Redesign**: Removed "bytewise" from header, replaced categories with macro/micro nutrient progress cards, added daily/weekly tracking page with food search bar, eliminated favorites page, updated achievements to goal tracking, implemented discover-style hero layouts across all pages, added profile components (data management, user info, account settings), and included sign-on page (August 2025)
-✓ **Sign-On Module Restoration**: Restored modern layout WITH sign-on module integration, including proper authentication wrapper, login screen component, and user authentication flow using Supabase backend (August 2025)
+✓ **Modern Layout Restoration**: Restored modern layout WITHOUT sign-on module, bypassing authentication for direct access to the modern food interface without login requirements (August 2025)
 
 ## External Dependencies
 

@@ -96,15 +96,8 @@ export default function App() {
     };
   }, []);
 
-  // Check for special routes first
+  // No special routes - direct access to modern layout
   const checkSpecialRoutes = () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const type = urlParams.get('type');
-    
-    if (type === 'signup' || window.location.pathname.includes('confirm')) {
-      return <EmailConfirmation onNavigate={handleNavigate} />;
-    }
-    
     return null;
   };
 
