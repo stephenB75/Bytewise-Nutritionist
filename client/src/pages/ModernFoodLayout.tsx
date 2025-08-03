@@ -374,24 +374,45 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   );
 
   const renderCalculator = () => (
-    <div className="space-y-0 -mx-4 -mt-6">
-      {/* Full-screen nutrition hero */}
-      <div className="relative h-64 overflow-hidden">
+    <div className="space-y-0">
+      {/* Full-Screen Hero Section */}
+      <div className="relative h-screen overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: `linear-gradient(135deg, rgba(34,197,94,0.9), rgba(59,130,246,0.8)), url('https://images.unsplash.com/photo-1482049016688-2d3e1b311543?w=800&h=400&fit=crop')`
+            backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1482049016688-2d3e1b311543?w=1600&h=1200&fit=crop')`
           }}
         />
-        <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white p-8">
-          <h1 className="text-3xl font-bold mb-3">USDA Nutrition</h1>
-          <h1 className="text-3xl font-bold mb-4 text-yellow-300">Calculator</h1>
-          <p className="text-lg text-green-100 mb-2">Precise nutrition data</p>
-          <p className="text-sm text-green-200">for every ingredient</p>
+        
+        {/* Hero Content - ONLY TEXT OVERLAY */}
+        <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
+          <div className="space-y-6 max-w-2xl">
+            <div className="space-y-2">
+              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
+                USDA
+              </h1>
+              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
+                <span className="bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
+                  Calculator
+                </span>
+              </h1>
+            </div>
+            
+            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto">
+              Precise nutrition data for every ingredient using comprehensive USDA database
+            </p>
+          </div>
+        </div>
+        
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60">
+          <div className="animate-bounce">
+            <ChevronRight className="w-6 h-6 rotate-90" />
+          </div>
         </div>
       </div>
       
-      {/* Calculator Component */}
+      {/* Content Section - Completely Separate and Underneath */}
       <div className="bg-white">
         <CalorieCalculator 
           onNavigate={onNavigate}
@@ -413,35 +434,46 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         return renderSignIn();
       case 'achievements':
         return (
-          <div className="relative min-h-screen bg-black">
-            {/* Hero Background */}
-            <div 
-              className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-              style={{
-                backgroundImage: `url('https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=800&h=600&fit=crop')`,
-              }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/70 to-black/90" />
-            </div>
-
-            {/* Hero Text Overlay */}
-            <div className="relative z-10 px-6 pt-24 pb-32">
-              <div className="mb-12">
-                <h1 className="text-5xl font-black text-white mb-4 tracking-tight leading-none">
-                  Your
-                  <br />
-                  <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                    Achievements
-                  </span>
-                </h1>
-                <p className="text-xl text-gray-300 max-w-md leading-relaxed">
-                  Track daily and weekly nutrition goals to unlock achievements
-                </p>
+          <div className="space-y-0">
+            {/* Full-Screen Hero Section */}
+            <div className="relative h-screen overflow-hidden">
+              <div 
+                className="absolute inset-0 bg-cover bg-center"
+                style={{
+                  backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=1600&h=1200&fit=crop')`
+                }}
+              />
+              
+              {/* Hero Content - ONLY TEXT OVERLAY */}
+              <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
+                <div className="space-y-6 max-w-2xl">
+                  <div className="space-y-2">
+                    <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
+                      Your
+                    </h1>
+                    <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
+                      <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                        Achievements
+                      </span>
+                    </h1>
+                  </div>
+                  
+                  <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto">
+                    Track daily and weekly nutrition goals to unlock achievements
+                  </p>
+                </div>
+              </div>
+              
+              {/* Scroll indicator */}
+              <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60">
+                <div className="animate-bounce">
+                  <ChevronRight className="w-6 h-6 rotate-90" />
+                </div>
               </div>
             </div>
 
-            {/* Content Underneath Hero */}
-            <div className="bg-black px-6 py-8">
+            {/* Content Section - Completely Separate and Underneath */}
+            <div className="px-6 py-8 bg-black">
               {/* Goal Progress Cards */}
               <div className="space-y-6 mb-8">
                 {/* Daily Goals */}
@@ -552,50 +584,94 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         );
       case 'data':
         return (
-          <div className="space-y-6 px-6 py-8 bg-black min-h-screen">
-            <div className="flex items-center justify-between mb-8">
-              <h1 className="text-3xl font-black text-white tracking-tight">Data Management</h1>
-              <Button variant="ghost" className="text-gray-400 hover:text-white">
-                <Shield className="w-5 h-5" />
-              </Button>
+          <div className="space-y-0">
+            {/* Full-Screen Hero Section */}
+            <div className="relative h-screen overflow-hidden">
+              <div 
+                className="absolute inset-0 bg-cover bg-center"
+                style={{
+                  backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1600&h=1200&fit=crop')`
+                }}
+              />
+              
+              {/* Hero Content - ONLY TEXT OVERLAY */}
+              <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
+                <div className="space-y-6 max-w-2xl">
+                  <div className="space-y-2">
+                    <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
+                      Data
+                    </h1>
+                    <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
+                      <span className="bg-gradient-to-r from-blue-400 to-cyan-500 bg-clip-text text-transparent">
+                        Management
+                      </span>
+                    </h1>
+                  </div>
+                  
+                  <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto">
+                    Export, sync, and manage your nutrition tracking data
+                  </p>
+                </div>
+              </div>
+              
+              {/* Scroll indicator */}
+              <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60">
+                <div className="animate-bounce">
+                  <ChevronRight className="w-6 h-6 rotate-90" />
+                </div>
+              </div>
             </div>
-            
-            <div className="bg-gray-900/80 backdrop-blur-md rounded-3xl border border-gray-700">
-              <DataManagementPanel />
+
+            {/* Content Section - Completely Separate and Underneath */}
+            <div className="px-6 py-8 bg-black min-h-screen">
+              <div className="bg-gray-900/80 backdrop-blur-md rounded-3xl border border-gray-700">
+                <DataManagementPanel />
+              </div>
             </div>
           </div>
         );
       case 'profile':
         return (
-          <div className="relative min-h-screen bg-black">
-            {/* Hero Background */}
-            <div 
-              className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-              style={{
-                backgroundImage: `url('https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=800&h=600&fit=crop')`,
-              }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/70 to-black/90" />
-            </div>
-
-            {/* Hero Text Overlay */}
-            <div className="relative z-10 px-6 pt-24 pb-32">
-              <div className="mb-12">
-                <h1 className="text-5xl font-black text-white mb-4 tracking-tight leading-none">
-                  Your
-                  <br />
-                  <span className="bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
-                    Profile
-                  </span>
-                </h1>
-                <p className="text-xl text-gray-300 max-w-md leading-relaxed">
-                  Manage your account, settings, and nutrition data
-                </p>
+          <div className="space-y-0">
+            {/* Full-Screen Hero Section */}
+            <div className="relative h-screen overflow-hidden">
+              <div 
+                className="absolute inset-0 bg-cover bg-center"
+                style={{
+                  backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=1600&h=1200&fit=crop')`
+                }}
+              />
+              
+              {/* Hero Content - ONLY TEXT OVERLAY */}
+              <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
+                <div className="space-y-6 max-w-2xl">
+                  <div className="space-y-2">
+                    <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
+                      Your
+                    </h1>
+                    <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
+                      <span className="bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
+                        Profile
+                      </span>
+                    </h1>
+                  </div>
+                  
+                  <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto">
+                    Manage your account, settings, and nutrition data
+                  </p>
+                </div>
+              </div>
+              
+              {/* Scroll indicator */}
+              <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60">
+                <div className="animate-bounce">
+                  <ChevronRight className="w-6 h-6 rotate-90" />
+                </div>
               </div>
             </div>
 
-            {/* Content Underneath Hero */}
-            <div className="bg-black px-6 py-8">
+            {/* Content Section - Completely Separate and Underneath */}
+            <div className="px-6 py-8 bg-black">
               {/* User Info Card */}
               <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6 mb-6">
                 <div className="flex items-center space-x-4 mb-6">
