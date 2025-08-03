@@ -111,14 +111,14 @@ export function MinimalistMealCard({
               
               {carbs !== undefined && (
                 <div className="flex items-center text-sm text-gray-700">
-                  <Wheat className="w-4 h-4 mr-1 text-yellow-500" />
+                  <Wheat className="w-4 h-4 mr-1 text-[#faed39]" />
                   <span>{Math.round(carbs)}g</span>
                 </div>
               )}
               
               {fat !== undefined && (
                 <div className="flex items-center text-sm text-gray-700">
-                  <Droplets className="w-4 h-4 mr-1 text-blue-500" />
+                  <Droplets className="w-4 h-4 mr-1 text-[#1f4aa6]" />
                   <span>{Math.round(fat)}g</span>
                 </div>
               )}

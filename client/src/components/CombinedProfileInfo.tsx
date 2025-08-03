@@ -83,7 +83,7 @@ export function CombinedProfileInfo({ user }: CombinedProfileInfoProps) {
               <Mail className="w-4 h-4 text-gray-500" />
               <span className="text-gray-600">{user?.email}</span>
               {user?.emailVerified && (
-                <CheckCircle className="w-4 h-4 text-green-500" />
+                <CheckCircle className="w-4 h-4 text-[#45c73e]" />
               )}
             </div>
           </div>

@@ -161,8 +161,8 @@ export function PWAStatus() {
       </div>
 
       {!isOnline && (
-        <div className="mt-3 p-3 bg-yellow-50 rounded-lg border-l-4 border-yellow-400">
-          <p className="text-sm text-yellow-800">
+        <div className="mt-3 p-3 bg-[#faed39]/10 rounded-lg border-l-4 border-[#faed39]">
+          <p className="text-sm text-[#faed39]">
             You're offline, but the app will continue to work with cached data.
           </p>
         </div>

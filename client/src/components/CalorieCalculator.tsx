@@ -768,12 +768,12 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
                       <p className="font-bold text-gray-900">{Math.round(analysis.nutritionPer100g.protein)}g</p>
                     </div>
                     <div className="text-center p-2 bg-gray-50 rounded">
-                      <Wheat className="w-4 h-4 mx-auto text-yellow-500 mb-1" />
+                      <Wheat className="w-4 h-4 mx-auto text-[#faed39] mb-1" />
                       <p className="text-xs text-gray-600">Carbs</p>
                       <p className="font-bold text-gray-900">{Math.round(analysis.nutritionPer100g.carbs)}g</p>
                     </div>
                     <div className="text-center p-2 bg-gray-50 rounded">
-                      <Droplets className="w-4 h-4 mx-auto text-blue-500 mb-1" />
+                      <Droplets className="w-4 h-4 mx-auto text-[#1f4aa6] mb-1" />
                       <p className="text-xs text-gray-600">Fat</p>
                       <p className="font-bold text-gray-900">{Math.round(analysis.nutritionPer100g.fat)}g</p>
                     </div>

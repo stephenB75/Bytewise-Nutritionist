@@ -375,7 +375,7 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
             <h4 className="text-lg font-medium text-white mb-2">In Progress ({inProgressAchievements.length})</h4>
             <div className="space-y-2">
               {inProgressAchievements.slice(0, 3).map(achievement => (
-                <div key={achievement.id} className="flex items-center space-x-3 p-2 bg-yellow-500/10 rounded-lg">
+                <div key={achievement.id} className="flex items-center space-x-3 p-2 bg-[#faed39]/10 rounded-lg">
                   <span className="text-xl">{achievement.icon}</span>
                   <div className="flex-1">
                     <p className="text-white font-medium text-sm">{achievement.title}</p>

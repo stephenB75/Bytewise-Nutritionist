@@ -81,10 +81,10 @@ export function MealTimeline({
         accent: 'bg-orange-500'
       };
       case 'lunch': return {
-        bg: 'bg-gradient-to-br from-yellow-50 to-orange-50',
-        border: 'border-yellow-200',
-        text: 'text-yellow-700',
-        accent: 'bg-yellow-500'
+        bg: 'bg-gradient-to-br from-[#faed39]/10 to-orange-50',
+        border: 'border-[#faed39]/20',
+        text: 'text-[#faed39]',
+        accent: 'bg-[#faed39]'
       };
       case 'dinner': return {
         bg: 'bg-gradient-to-br from-indigo-50 to-blue-50',
@@ -304,7 +304,7 @@ export function MealTimeline({
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <Activity className="w-4 h-4 text-green-500" />
+                <Activity className="w-4 h-4 text-[#45c73e]" />
                 <span className="text-gray-600">
                   P: {dailyTotals.protein}g • C: {dailyTotals.carbs}g • F: {dailyTotals.fat}g
                 </span>
@@ -315,7 +315,7 @@ export function MealTimeline({
               className={`
                 ${dailyProgress >= 100 ? 'bg-green-100 text-green-800 border-green-200' : 
                   dailyProgress >= 70 ? 'bg-blue-100 text-blue-800 border-blue-200' : 
-                  'bg-yellow-100 text-yellow-800 border-yellow-200'}
+                  'bg-[#faed39]/10 text-[#faed39] border-[#faed39]/20'}
               `}
             >
               {dailyProgress >= 100 ? 'Goal Reached!' : 
