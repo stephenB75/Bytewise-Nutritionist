@@ -1,8 +1,11 @@
 /**
  * PDF Export Utility
  * 
- * Creates actual PDF reports for user progress data over 6 months
+ * Creates actual PDF reports for user progress data over 6 months using jsPDF
  */
+
+import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
 
 interface UserProgressData {
   totalMealsLogged: number;
@@ -121,16 +124,58 @@ export async function generateProgressReportPDF(): Promise<boolean> {
 </html>`;
 
   try {
-    // Create and download the HTML file (as PDF alternative)
-    const blob = new Blob([pdfContent], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `bytewise-nutrition-report-${new Date().toISOString().split('T')[0]}.html`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    // Create a temporary container for the HTML content
+    const tempContainer = document.createElement('div');
+    tempContainer.innerHTML = pdfContent;
+    tempContainer.style.position = 'absolute';
+    tempContainer.style.top = '-9999px';
+    tempContainer.style.width = '800px';
+    tempContainer.style.backgroundColor = 'white';
+    document.body.appendChild(tempContainer);
+
+    // Get the body content from the HTML
+    const bodyContent = tempContainer.querySelector('body');
+    if (!bodyContent) {
+      throw new Error('Could not find body content');
+    }
+
+    // Convert HTML to canvas
+    const canvas = await html2canvas(bodyContent, {
+      width: 800,
+      height: 1200,
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#ffffff'
+    });
+
+    // Create PDF
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const imgWidth = 210; // A4 width in mm
+    const pageHeight = 297; // A4 height in mm
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    let heightLeft = imgHeight;
+
+    const imgData = canvas.toDataURL('image/png');
+    let position = 0;
+
+    // Add first page
+    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+
+    // Add additional pages if content is too long
+    while (heightLeft >= 0) {
+      position = heightLeft - imgHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+    }
+
+    // Clean up temporary container
+    document.body.removeChild(tempContainer);
+
+    // Download the PDF
+    const filename = `bytewise-nutrition-report-${new Date().toISOString().split('T')[0]}.pdf`;
+    pdf.save(filename);
     
     console.log('✅ PDF report generated and downloaded successfully');
     return true;
