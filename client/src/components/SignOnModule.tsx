@@ -81,7 +81,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
   };
 
   return (
-    <Card className="w-full bg-white/90 backdrop-blur-md border-0 shadow-xl overflow-hidden">
+    <Card className="w-full bg-white/90 backdrop-blur-md border-0 shadow-xl overflow-hidden signin-module">
       {/* Header */}
       <div className="p-6 bg-gradient-to-r from-[#1f4aa6] to-[#45c73e] text-white">
         <div className="flex items-center justify-center mb-4">

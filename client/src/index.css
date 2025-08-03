@@ -130,20 +130,20 @@ body {
 
 /* Main content containers need bottom padding to clear navigation */
 .main-content {
-  padding-bottom: 140px !important; /* Increased space for bottom navigation */
+  padding-bottom: 100px !important; /* Optimized space for bottom navigation */
   margin-bottom: 0 !important;
 }
 
 /* Ensure all page containers have proper bottom spacing */
 .page-container {
   min-height: 100vh;
-  padding-bottom: 160px !important; /* Increased for navigation + safe area */
+  padding-bottom: 120px !important; /* Optimized for navigation + safe area */
 }
 
 /* Fix for content sections to not be cut off */
 .content-section {
-  margin-bottom: 3rem !important;
-  padding-bottom: 3rem !important;
+  margin-bottom: 2rem !important;
+  padding-bottom: 2rem !important;
 }
 
 /* Prevent overflow issues while maintaining scroll */
@@ -159,14 +159,14 @@ html, body {
 
 /* Specific spacing for macro cards grid to clear navigation */
 .macros-grid {
-  margin-bottom: 6rem !important;
-  padding-bottom: 2rem !important;
+  margin-bottom: 4rem !important;
+  padding-bottom: 1.5rem !important;
 }
 
 /* Fix for mobile safe areas */
 @supports (padding: max(0px)) {
   body {
-    padding-bottom: max(140px, env(safe-area-inset-bottom)) !important;
+    padding-bottom: max(100px, env(safe-area-inset-bottom)) !important;
   }
 }
 
@@ -174,7 +174,19 @@ html, body {
 .weekly-progress-container,
 .daily-progress-container,
 .macro-breakdown-container {
-  padding-bottom: 4rem !important;
+  padding-bottom: 2rem !important;
+  margin-bottom: 1.5rem !important;
+}
+
+/* Profile page specific spacing adjustments */
+.profile-content {
+  padding-bottom: 2rem !important;
+  margin-bottom: 1rem !important;
+}
+
+/* Sign-in module spacing */
+.signin-module {
+  padding-bottom: 3rem !important;
   margin-bottom: 2rem !important;
 }
 

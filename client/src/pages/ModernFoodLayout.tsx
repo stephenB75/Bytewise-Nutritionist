@@ -1196,7 +1196,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
       {/* Content Section - Completely Separate and Underneath */}
       <div className="bg-white content-section">
-        <div className="max-w-4xl mx-auto px-6 py-8 main-content">
+        <div className="max-w-4xl mx-auto px-6 py-8 main-content profile-content">
           {/* Profile Navigation */}
           <div className="grid grid-cols-2 md:flex md:space-x-2 gap-2 md:gap-0 mb-8">
             {[
@@ -1227,7 +1227,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           </div>
 
           {/* Profile Content - Scrollable Container */}
-          <div className="h-[calc(100vh-24rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+          <div className="h-[calc(100vh-20rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
             <div className="space-y-6 pr-2">
               {profileSection === 'overview' && (
                 <div className="space-y-6">
