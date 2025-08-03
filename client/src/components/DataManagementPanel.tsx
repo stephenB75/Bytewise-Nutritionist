@@ -135,7 +135,7 @@ export function DataManagementPanel() {
               onClick={handleSyncData}
               disabled={isSyncing}
               variant="outline"
-              className="border-blue-600 text-blue-600 hover:bg-blue-50"
+              className="border-blue-400 text-blue-400 hover:bg-blue-900/20"
             >
               {isSyncing ? (
                 <>
@@ -152,7 +152,7 @@ export function DataManagementPanel() {
             
             <Button 
               variant="outline"
-              className="border-emerald-600 text-emerald-600 hover:bg-emerald-50"
+              className="border-emerald-400 text-emerald-400 hover:bg-emerald-900/20"
             >
               <Shield className="w-4 h-4 mr-2" />
               Backup Settings
@@ -164,27 +164,27 @@ export function DataManagementPanel() {
 
         {/* Data Stats */}
         <div>
-          <h4 className="font-medium text-gray-900 mb-3">Your Data Summary</h4>
-          <div className="grid grid-cols-1 gap-3">
-            <div className="text-center p-3 bg-gray-50 rounded-lg">
-              <Calendar className="w-5 h-5 mx-auto text-blue-600 mb-1" />
-              <p className="text-xs text-gray-600">Days Tracked</p>
-              <p className="font-bold text-gray-900">47</p>
+          <h4 className="font-medium text-white mb-3">Your Data Summary</h4>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="text-center p-3 bg-white/10 rounded-lg border border-white/20">
+              <Calendar className="w-5 h-5 mx-auto text-blue-400 mb-1" />
+              <p className="text-xs text-gray-400">Days Tracked</p>
+              <p className="font-bold text-white">47</p>
             </div>
-            <div className="text-center p-3 bg-gray-50 rounded-lg">
-              <Database className="w-5 h-5 mx-auto text-green-600 mb-1" />
-              <p className="text-xs text-gray-600">Meals Logged</p>
-              <p className="font-bold text-gray-900">156</p>
+            <div className="text-center p-3 bg-white/10 rounded-lg border border-white/20">
+              <Database className="w-5 h-5 mx-auto text-green-400 mb-1" />
+              <p className="text-xs text-gray-400">Meals Logged</p>
+              <p className="font-bold text-white">156</p>
             </div>
-            <div className="text-center p-3 bg-gray-50 rounded-lg">
-              <FileText className="w-5 h-5 mx-auto text-purple-600 mb-1" />
-              <p className="text-xs text-gray-600">Recipes Created</p>
-              <p className="font-bold text-gray-900">12</p>
+            <div className="text-center p-3 bg-white/10 rounded-lg border border-white/20">
+              <FileText className="w-5 h-5 mx-auto text-purple-400 mb-1" />
+              <p className="text-xs text-gray-400">Recipes Created</p>
+              <p className="font-bold text-white">12</p>
             </div>
-            <div className="text-center p-3 bg-gray-50 rounded-lg">
-              <Shield className="w-5 h-5 mx-auto text-orange-600 mb-1" />
-              <p className="text-xs text-gray-600">Data Size</p>
-              <p className="font-bold text-gray-900">2.4 MB</p>
+            <div className="text-center p-3 bg-white/10 rounded-lg border border-white/20">
+              <Shield className="w-5 h-5 mx-auto text-orange-400 mb-1" />
+              <p className="text-xs text-gray-400">Data Size</p>
+              <p className="font-bold text-white">2.4 MB</p>
             </div>
           </div>
         </div>
@@ -193,15 +193,15 @@ export function DataManagementPanel() {
 
         {/* Danger Zone */}
         <div>
-          <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+          <div className="p-4 bg-red-900/20 border border-red-500/30 rounded-lg">
             <div className="flex items-center gap-2 mb-2">
-              <AlertCircle className="w-5 h-5 text-red-600" />
-              <h4 className="font-medium text-red-700">Danger Zone</h4>
+              <AlertCircle className="w-5 h-5 text-red-400" />
+              <h4 className="font-medium text-red-300">Danger Zone</h4>
             </div>
-            <p className="text-sm text-red-600 mb-3">Permanently delete all your nutrition data</p>
+            <p className="text-sm text-red-400 mb-3">Permanently delete all your nutrition data</p>
             <Button 
               variant="destructive" 
-              className="w-full justify-center hover:bg-red-600 transition-all duration-200"
+              className="w-full justify-center bg-red-600 hover:bg-red-700 text-white transition-all duration-200"
               onClick={handleDeleteAllData}
             >
               <Trash2 className="w-4 h-4 mr-2" />

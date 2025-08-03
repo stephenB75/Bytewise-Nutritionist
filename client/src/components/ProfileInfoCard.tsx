@@ -142,12 +142,12 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex justify-center gap-2 mt-4">
             {!isEditing && (
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-8 w-8 p-0"
+                className="h-8 w-8 p-0 text-gray-400 hover:text-white"
                 onClick={() => setIsEditing(true)}
               >
                 <Edit3 className="w-4 h-4" />
@@ -156,7 +156,7 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 w-8 p-0 relative"
+              className="h-8 w-8 p-0 relative text-gray-400 hover:text-white"
               onClick={() => setShowDropdown(!showDropdown)}
             >
               <Settings className="w-4 h-4" />
@@ -164,7 +164,7 @@ export function ProfileInfoCard({ user, className = '' }: ProfileInfoCardProps) 
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 w-8 p-0"
+              className="h-8 w-8 p-0 text-gray-400 hover:text-white"
               onClick={() => setIsExpanded(!isExpanded)}
             >
               {isExpanded ? (
