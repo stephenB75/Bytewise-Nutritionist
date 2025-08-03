@@ -4,9 +4,7 @@ import App from "./App";
 
 import "./index.css";
 
-// Force modern design loading
-const useMinimalApp = false;
-const forceModernDesign = true;
+// App ready for rendering
 
 // Suppress development warnings and errors
 if (import.meta.env.DEV) {
@@ -47,55 +45,16 @@ if (!rootElement) {
     </div>
   `;
 } else {
-  // Root element found
-  
+  // Root element found - render app directly
   try {
-    // Use main app component
-    const AppComponent = App;
     const root = createRoot(rootElement);
-    
-    // Modern food app loading screen
-    rootElement.innerHTML = `
-      <div style="background: linear-gradient(135deg, #ff6b35, #f7931e); color: white; padding: 40px; min-height: 100vh; display: flex; align-items: center; justify-content: center; font-family: Arial; text-align: center;">
-        <div>
-          <div style="width: 80px; height: 80px; background: rgba(255,255,255,0.2); border-radius: 24px; display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem;">
-            <div style="font-size: 2rem;">🍎</div>
-          </div>
-          <div style="font-family: 'League Spartan', sans-serif; margin-bottom: 1rem;">
-            <h1 style="font-size: 3.5rem; font-weight: 900; margin: 0; line-height: 0.9;">bytewise</h1>
-            <p style="font-size: 1rem; font-weight: 300; margin: 0; opacity: 0.8; letter-spacing: 0.1em;">nutritionist</p>
-          </div>
-          <p style="font-size: 1.2rem; opacity: 0.9;">loading bytewise nutritionist...</p>
-          <div style="margin-top: 2rem;">
-            <div style="width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid white; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
-          </div>
-        </div>
-      </div>
-      <style>
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      </style>
-    `;
-    
-    // Force immediate render with cache busting
-    setTimeout(() => {
-      // Clear any cached components
-      if (typeof window !== 'undefined') {
-        window.location.hash = '#force-refresh-' + Date.now();
-      }
-      root.render(<AppComponent />);
-      // App rendered successfully
-    }, 500);
-    
+    root.render(<App />);
   } catch (error) {
-    console.error('❌ React render failed:', error);
     rootElement.innerHTML = `
-      <div style="background: linear-gradient(45deg, #ef4444, #f97316); color: white; padding: 40px; min-height: 100vh; display: flex; align-items: center; justify-content: center; font-family: Arial; text-align: center;">
+      <div style="background: #ef4444; color: white; padding: 40px; min-height: 100vh; display: flex; align-items: center; justify-content: center; font-family: Arial; text-align: center;">
         <div>
-          <h1 style="font-size: 3rem; margin-bottom: 1rem;">🚨 REACT ERROR</h1>
-          <p style="font-size: 1.5rem;">React failed to render: ${error}</p>
+          <h1>React Error</h1>
+          <p>Failed to render: ${error}</p>
         </div>
       </div>
     `;

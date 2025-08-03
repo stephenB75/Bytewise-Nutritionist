@@ -8,11 +8,7 @@
 import React, { useState, useEffect } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from '@/lib/queryClient';
-import { AuthWrapper } from './components/AuthWrapper';
-import { Header } from './components/Header';
-import { Navigation } from './components/Navigation';
-import { NotificationDropdown } from './components/NotificationDropdown';
-import { PWAInstallPrompt, IOSInstallInstructions } from './components/PWAInstallPrompt';
+// Simplified imports
 
 // import { useImageRotation } from './hooks/useImageRotation';
 
@@ -92,48 +88,18 @@ export default function App() {
     return null;
   };
 
-  // Render current page component
+  // Always render ModernFoodLayout
   const renderCurrentPage = () => {
-    // Check for special routes first
-    const specialRoute = checkSpecialRoutes();
-    if (specialRoute) return specialRoute;
-
-    switch (activeTab) {
-      case 'redesigned':
-        return <ModernFoodLayout onNavigate={handleNavigate} />;
-      case 'dashboard':
-        return <ModernFoodLayout onNavigate={handleNavigate} />;
-      case 'fresh':
-        return <ModernFoodLayout onNavigate={handleNavigate} />;
-      case 'calculator':
-        return <ModernFoodLayout onNavigate={handleNavigate} />;
-      case 'logger':
-        return <ModernFoodLayout onNavigate={handleNavigate} />;
-      case 'profile':
-        return <ModernFoodLayout onNavigate={handleNavigate} />;
-      default:
-        return <ModernFoodLayout onNavigate={handleNavigate} />;
-    }
+    return <ModernFoodLayout onNavigate={handleNavigate} />;
   };
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthWrapper onNavigate={handleNavigate}>
-        <div className="min-h-screen bg-background">
-          {/* Global Notification Dropdown - Disabled for visual testing */}
-
-          {/* Main Content - Full Screen Modern Design */}
-          <main className="min-h-screen">
-            {renderCurrentPage()}
-          </main>
-          
-          {/* PWA Install Prompts */}
-          <PWAInstallPrompt />
-          <IOSInstallInstructions />
-          
-
-        </div>
-      </AuthWrapper>
+      <div className="min-h-screen bg-black">
+        <main className="min-h-screen">
+          {renderCurrentPage()}
+        </main>
+      </div>
     </QueryClientProvider>
   );
 }
