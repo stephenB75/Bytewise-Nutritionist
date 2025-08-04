@@ -100,7 +100,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
         if (data.message === "Email not confirmed") {
           toast({
             title: "Email not confirmed",
-            description: "Please check your email and click the confirmation link, or use the 'Confirm Email' button below for testing.",
+            description: "Please check your email and click the confirmation link, or use the 'Verify Email Address' button below.",
             variant: "destructive",
           });
         } else {
@@ -299,17 +299,17 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
             {confirmingEmail ? (
               <div className="flex items-center">
                 <div className="w-4 h-4 border-2 border-[#1f4aa6]/30 border-t-[#1f4aa6] rounded-full animate-spin mr-2" />
-                Confirming Email...
+                Verifying Email...
               </div>
             ) : (
               <>
                 <Mail className="w-4 h-4 mr-2" />
-                Confirm Email (Dev Testing)
+                Verify Email Address
               </>
             )}
           </Button>
           <p className="text-xs text-gray-500 mt-2">
-            Use this button to confirm your email for testing purposes
+            Click to verify your email address and activate your account
           </p>
         </div>
 
