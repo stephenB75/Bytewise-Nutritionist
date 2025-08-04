@@ -43,7 +43,7 @@ interface UserSettingsManagerProps {
 }
 
 export function UserSettingsManager({ onClose, initialSection = 'profile' }: UserSettingsManagerProps) {
-  const { user } = useAuth();
+  const { user, supabase } = useAuth();
   const { toast } = useToast();
   
   // Profile editing states
@@ -103,10 +103,24 @@ export function UserSettingsManager({ onClose, initialSection = 'profile' }: Use
         return;
       }
 
+      // Get the current session for authentication
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.access_token) {
+        toast({
+          title: "Authentication Error",
+          description: "Please sign in to save your profile",
+          variant: "destructive",
+        });
+        setIsSaving(false);
+        return;
+      }
+
       const response = await fetch('/api/auth/user/update', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
         },
         body: JSON.stringify(userInfo),
       });
