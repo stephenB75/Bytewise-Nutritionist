@@ -33,8 +33,8 @@ import {
   Bell,
   X
 } from 'lucide-react';
-import { NotificationDropdown } from '@/components/NotificationDropdown';
-import { WeeklyCaloriesCard } from '@/components/WeeklyCaloriesCard';
+// import { NotificationDropdown } from '@/components/NotificationDropdown';
+// import { WeeklyCaloriesCard } from '@/components/WeeklyCaloriesCard';
 
 interface ModernFoodLayoutProps {
   onNavigate?: (page: string) => void;
@@ -1220,7 +1220,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <h3 className="text-xl font-bold text-white">This Week</h3>
             <Badge className="bg-blue-600 text-white">Weekly Summary</Badge>
           </div>
-          <WeeklyCaloriesCard />
+          {/* <WeeklyCaloriesCard /> */}
+          <div className="p-4 text-center text-sm text-gray-500">
+            Weekly calories data temporarily disabled
+          </div>
         </div>
       </div>
     </div>
