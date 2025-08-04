@@ -3,7 +3,7 @@
  * Cycles through food images when user changes pages/tabs
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 const foodImages = [
   // Use the existing food image assets - check the actual asset directory

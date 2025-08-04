@@ -77,9 +77,19 @@ export default function App() {
     return null;
   };
 
-  // Render ModernFoodLayout
+  // Render basic test to debug React
   const renderCurrentPage = () => {
-    return <ModernFoodLayout onNavigate={handleNavigate} />;
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold mb-4">ByteWise Loading...</h1>
+          <p>React is working - Basic test</p>
+          <div className="mt-4 p-4 bg-gray-800 rounded">
+            <p>If you see this, React rendering works!</p>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (

@@ -4,7 +4,7 @@
  * Manages weekly nutrition tracking functionality with local storage persistence
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 interface MealEntry {
   id: string;

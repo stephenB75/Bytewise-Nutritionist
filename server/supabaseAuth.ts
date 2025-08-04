@@ -24,11 +24,11 @@ export interface AuthenticatedRequest extends Request {
 
 // Type-safe middleware wrapper
 export function createAuthenticatedHandler(
-  handler: (req: AuthenticatedRequest, res: Response, next?: NextFunction) => Promise<void> | void
+  handler: (req: AuthenticatedRequest, res: Response, next?: NextFunction) => Promise<any> | any
 ) {
-  return async (req: any, res: Response, next?: NextFunction) => {
+  return async (req: Request, res: Response, next?: NextFunction) => {
     try {
-      await handler(req as AuthenticatedRequest, res, next);
+      return await handler(req as AuthenticatedRequest, res, next);
     } catch (error) {
       console.error('Handler error:', error);
       if (!res.headersSent) {

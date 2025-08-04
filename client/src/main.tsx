@@ -97,8 +97,8 @@ if (!rootElement) {
       </style>
     `;
     
-    // Render full app
-    root.render(<App />);
+    // Render simple app for testing
+    root.render(<SimpleApp />);
     
   } catch (error) {
     rootElement.innerHTML = `

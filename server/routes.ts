@@ -1,7 +1,7 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated, optionalAuth, serverSupabase, type AuthenticatedRequest } from "./supabaseAuth";
+import { setupAuth, isAuthenticated, optionalAuth, serverSupabase, createAuthenticatedHandler, type AuthenticatedRequest } from "./supabaseAuth";
 import { usdaService } from "./services/usdaService";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -162,7 +162,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Meals API for logger
-  app.post('/api/meals/logged', isAuthenticated, async (req: any, res: Response) => {
+  app.post('/api/meals/logged', isAuthenticated, createAuthenticatedHandler(async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.user?.id;
     if (!userId) {
       res.status(401).json({ message: "User not found" });
@@ -178,9 +178,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.log('Logging meal from calculator:', mealData);
     
     res.json({ success: true, meal: mealData });
-  });
+  }));
 
-  app.get('/api/meals/logged', isAuthenticated, async (req: any, res: Response) => {
+  app.get('/api/meals/logged', isAuthenticated, createAuthenticatedHandler(async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.user?.id;
     if (!userId) {
       res.status(401).json({ message: "User not found" });
@@ -191,7 +191,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const meals: any[] = []; // Implement meal retrieval from storage
     
     res.json(meals);
-  });
+  }));
 
   // Calculate calories API with real USDA integration (no auth required)
   app.post('/api/calculate-calories', optionalAuth, async (req: any, res: Response) => {
@@ -204,7 +204,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // User profile update endpoint
-  app.put('/api/auth/user/update', isAuthenticated, async (req: any, res: Response) => {
+  app.put('/api/auth/user/update', isAuthenticated, createAuthenticatedHandler(async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.user?.id;
     if (!userId) {
       res.status(401).json({ message: "User not found" });
@@ -224,10 +224,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Error updating user profile:", error);
       res.status(500).json({ message: "Failed to update profile" });
     }
-  });
+  }));
 
   // User data deletion endpoint
-  app.delete('/api/user/delete-data', isAuthenticated, async (req: any, res: Response) => {
+  app.delete('/api/user/delete-data', isAuthenticated, createAuthenticatedHandler(async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.user?.id;
     if (!userId) {
       res.status(401).json({ message: "User not found" });
@@ -244,10 +244,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Error deleting user data:", error);
       res.status(500).json({ message: "Failed to delete data" });
     }
-  });
+  }));
 
   // USDA Food Database Sync API
-  app.post('/api/sync/food-database', isAuthenticated, async (req: any, res: Response) => {
+  app.post('/api/sync/food-database', isAuthenticated, createAuthenticatedHandler(async (req: AuthenticatedRequest, res: Response) => {
 
       
       // Sync popular foods for offline access
@@ -288,10 +288,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       syncResults,
       timestamp: new Date().toISOString()
     });
-  });
+  }));
 
   // User Data Sync API
-  app.post('/api/sync/user-data', isAuthenticated, async (req: any, res: Response) => {
+  app.post('/api/sync/user-data', isAuthenticated, createAuthenticatedHandler(async (req: AuthenticatedRequest, res: Response) => {
     try {
       const userId = req.user?.id;
       if (!userId) {
@@ -321,7 +321,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         error: error.message
       });
     }
-  });
+  }));
 
   // Search USDA Foods API
   app.get('/api/foods/search', async (req, res) => {
