@@ -1309,29 +1309,39 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       {/* Content Section - Completely Separate and Underneath */}
       <div className="bg-white content-section">
         <div className="max-w-4xl mx-auto px-6 py-3 main-content profile-content h-full flex flex-col">
-          {/* Profile Navigation */}
-          <div className="grid grid-cols-1 md:flex md:space-x-2 gap-2 md:gap-0 mb-4">
+          {/* Profile Navigation - Improved Mobile Layout */}
+          <div className="flex flex-col sm:flex-row gap-2 mb-6">
             {[
-              { id: 'profile', name: 'Profile & Account', icon: User },
-              { id: 'achievements', name: 'Awards', icon: Trophy },
-              { id: 'data', name: 'Data', icon: Download }
+              { id: 'profile', name: 'Profile & Account', shortName: 'Profile', icon: User },
+              { id: 'achievements', name: 'Awards & Goals', shortName: 'Awards', icon: Trophy },
+              { id: 'data', name: 'Data Management', shortName: 'Data', icon: Download }
             ].map((section) => {
               const IconComponent = section.icon;
               return (
                 <Button
                   key={section.id}
                   variant={profileSection === section.id ? "default" : "outline"}
-                  size="sm"
+                  size="lg"
                   disabled={authLoading}
-                  className={`flex items-center justify-center space-x-2 w-full md:w-auto transition-all duration-200 ${
+                  className={`flex-1 flex items-center justify-center space-x-3 py-4 px-3 transition-all duration-300 ${
                     profileSection === section.id 
-                      ? 'bg-purple-600 hover:bg-purple-700 text-white shadow-lg' 
-                      : 'bg-white hover:bg-gray-50 text-gray-700 border-gray-300 hover:border-purple-300'
-                  } ${authLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      ? 'bg-gradient-to-r from-[#1f4aa6] to-[#45c73e] hover:from-[#1850a0] hover:to-[#3ab82e] text-white shadow-xl border-0' 
+                      : 'bg-white/90 hover:bg-white text-gray-700 border-2 border-gray-200 hover:border-[#1f4aa6] hover:shadow-lg'
+                  } ${authLoading ? 'opacity-50 cursor-not-allowed' : ''} rounded-xl`}
                   onClick={() => handleProfileSectionChange(section.id)}
                 >
-                  <IconComponent className="w-4 h-4" />
-                  <span className="text-sm">{section.name}</span>
+                  <IconComponent 
+                    className={`w-5 h-5 ${profileSection === section.id ? 'text-white' : 'text-[#1f4aa6]'}`}
+                    strokeWidth={2.5}
+                  />
+                  <div className="flex flex-col text-left">
+                    <span className={`text-sm font-bold ${profileSection === section.id ? 'text-white' : 'text-gray-900'}`}>
+                      {window.innerWidth < 640 ? section.shortName : section.name}
+                    </span>
+                    {profileSection === section.id && (
+                      <span className="text-xs text-white/80 font-medium">Active</span>
+                    )}
+                  </div>
                 </Button>
               );
             })}

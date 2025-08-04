@@ -264,41 +264,44 @@ export function UserSettingsManager({ onClose, initialSection = 'profile' }: Use
               </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex items-center gap-2">
+            {/* Action Buttons - Improved Mobile Layout */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
               <Button
                 variant={isEditing ? "default" : "outline"}
-                size="sm"
+                size="lg"
                 disabled={isSaving}
                 onClick={isEditing ? handleSave : () => setIsEditing(true)}
-                className={isEditing ? "bg-[#45c73e] hover:bg-[#3ab82e] text-white disabled:opacity-50" : "border-[#1f4aa6] text-[#1f4aa6] hover:bg-[#1f4aa6] hover:text-white"}
+                className={`flex-1 sm:flex-none px-6 py-3 ${isEditing 
+                  ? "bg-gradient-to-r from-[#45c73e] to-[#3ab82e] hover:from-[#3ab82e] hover:to-[#2d8f26] text-white shadow-lg disabled:opacity-50 border-0" 
+                  : "border-2 border-[#1f4aa6] text-[#1f4aa6] hover:bg-[#1f4aa6] hover:text-white bg-white/90 hover:shadow-lg"
+                } rounded-xl transition-all duration-300`}
               >
                 {isSaving ? (
                   <>
-                    <div className="w-4 h-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                    Saving...
+                    <div className="w-5 h-5 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    <span className="font-semibold">Saving...</span>
                   </>
                 ) : isEditing ? (
                   <>
-                    <Save className="w-4 h-4 mr-2" />
-                    Save
+                    <Save className="w-5 h-5 mr-2" strokeWidth={2.5} />
+                    <span className="font-semibold">Save Changes</span>
                   </>
                 ) : (
                   <>
-                    <Edit3 className="w-4 h-4 mr-2" />
-                    Edit
+                    <Edit3 className="w-5 h-5 mr-2" strokeWidth={2.5} />
+                    <span className="font-semibold">Edit Profile</span>
                   </>
                 )}
               </Button>
               {isEditing && (
                 <Button
                   variant="outline"
-                  size="sm"
+                  size="lg"
                   onClick={handleCancel}
-                  className="border-gray-400 text-gray-300 hover:bg-gray-600 hover:text-white"
+                  className="flex-1 sm:flex-none px-6 py-3 border-2 border-gray-400 text-gray-300 hover:bg-gray-600 hover:text-white bg-white/90 hover:shadow-lg rounded-xl transition-all duration-300"
                 >
-                  <X className="w-4 h-4 mr-2" />
-                  Cancel
+                  <X className="w-5 h-5 mr-2" strokeWidth={2.5} />
+                  <span className="font-semibold">Cancel</span>
                 </Button>
               )}
             </div>

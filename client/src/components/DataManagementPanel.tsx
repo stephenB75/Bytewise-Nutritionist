@@ -197,47 +197,49 @@ export function DataManagementPanel() {
         </div>
 
         <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-white/10 rounded-lg border border-white/20">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 bg-white/10 rounded-lg border border-white/20 space-y-3 sm:space-y-0">
             <div className="flex items-center space-x-3">
-              <FileText className="w-5 h-5 text-[#1f4aa6]" />
+              <FileText className="w-6 h-6 text-[#1f4aa6]" strokeWidth={2.5} />
               <div>
-                <p className="font-medium text-white" style={{ fontFamily: "'Work Sans', sans-serif" }}>Progress Report (PDF)</p>
+                <p className="font-semibold text-white text-lg" style={{ fontFamily: "'Work Sans', sans-serif" }}>Progress Report (PDF)</p>
                 <p className="text-sm text-gray-300" style={{ fontFamily: "'Quicksand', sans-serif" }}>Complete nutrition tracking report with charts and insights</p>
               </div>
             </div>
             <Button
               onClick={handleExportData}
               disabled={isExporting}
-              className="bg-[#1f4aa6] hover:bg-[#1850a0] text-white"
+              size="lg"
+              className="w-full sm:w-auto bg-gradient-to-r from-[#1f4aa6] to-[#1850a0] hover:from-[#1850a0] hover:to-[#164291] text-white shadow-lg rounded-xl px-6 py-3 transition-all duration-300"
             >
               {isExporting ? (
                 <>
-                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                  Generating...
+                  <RefreshCw className="w-5 h-5 mr-2 animate-spin" strokeWidth={2.5} />
+                  <span className="font-semibold">Generating PDF...</span>
                 </>
               ) : (
                 <>
-                  <Download className="w-4 h-4 mr-2" />
-                  Export PDF
+                  <Download className="w-5 h-5 mr-2" strokeWidth={2.5} />
+                  <span className="font-semibold">Export PDF</span>
                 </>
               )}
             </Button>
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-white/10 rounded-lg border border-white/20">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 bg-white/10 rounded-lg border border-white/20 space-y-3 sm:space-y-0">
             <div className="flex items-center space-x-3">
-              <Archive className="w-5 h-5 text-[#1f4aa6]" />
+              <Archive className="w-6 h-6 text-[#1f4aa6]" strokeWidth={2.5} />
               <div>
-                <p className="font-medium text-white" style={{ fontFamily: "'Work Sans', sans-serif" }}>Raw Data Export</p>
+                <p className="font-semibold text-white text-lg" style={{ fontFamily: "'Work Sans', sans-serif" }}>Raw Data Export</p>
                 <p className="text-sm text-gray-300" style={{ fontFamily: "'Quicksand', sans-serif" }}>Export all data in JSON format for backup or analysis</p>
               </div>
             </div>
             <Button
               variant="outline"
-              className="border-[#1f4aa6] text-[#1f4aa6] hover:bg-[#1f4aa6] hover:text-white"
+              size="lg"
+              className="w-full sm:w-auto border-2 border-[#1f4aa6] text-[#1f4aa6] hover:bg-[#1f4aa6] hover:text-white bg-white/90 hover:shadow-lg rounded-xl px-6 py-3 transition-all duration-300"
             >
-              <Download className="w-4 h-4 mr-2" />
-              Export JSON
+              <Download className="w-5 h-5 mr-2" strokeWidth={2.5} />
+              <span className="font-semibold">Export JSON</span>
             </Button>
           </div>
         </div>
@@ -254,38 +256,39 @@ export function DataManagementPanel() {
           </div>
 
         <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-white/10 rounded-lg border border-white/20">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 bg-white/10 rounded-lg border border-white/20 space-y-3 sm:space-y-0">
             <div className="flex items-center space-x-3">
-              <Cloud className="w-5 h-5 text-[#1f4aa6]" />
+              <Cloud className="w-6 h-6 text-[#1f4aa6]" strokeWidth={2.5} />
               <div>
-                <p className="font-medium text-white" style={{ fontFamily: "'Work Sans', sans-serif" }}>Sync Data</p>
+                <p className="font-semibold text-white text-lg" style={{ fontFamily: "'Work Sans', sans-serif" }}>Sync Data</p>
                 <p className="text-sm text-gray-300" style={{ fontFamily: "'Quicksand', sans-serif" }}>Synchronize your data across all devices</p>
               </div>
             </div>
             <Button
               onClick={handleSyncData}
               disabled={isSyncing}
-              className="bg-[#45c73e] hover:bg-[#3ab82e] text-white"
+              size="lg"
+              className="w-full sm:w-auto bg-gradient-to-r from-[#45c73e] to-[#3ab82e] hover:from-[#3ab82e] hover:to-[#2d8f26] text-white shadow-lg rounded-xl px-6 py-3 transition-all duration-300"
             >
               {isSyncing ? (
                 <>
-                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                  Syncing...
+                  <RefreshCw className="w-5 h-5 mr-2 animate-spin" strokeWidth={2.5} />
+                  <span className="font-semibold">Syncing...</span>
                 </>
               ) : (
                 <>
-                  <RefreshCw className="w-4 h-4 mr-2" />
-                  Sync Now
+                  <RefreshCw className="w-5 h-5 mr-2" strokeWidth={2.5} />
+                  <span className="font-semibold">Sync Now</span>
                 </>
               )}
             </Button>
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-white/10 rounded-lg border border-white/20">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 bg-white/10 rounded-lg border border-white/20 space-y-3 sm:space-y-0">
             <div className="flex items-center space-x-3">
-              <HardDrive className="w-5 h-5 text-[#1f4aa6]" />
+              <HardDrive className="w-6 h-6 text-[#1f4aa6]" strokeWidth={2.5} />
               <div>
-                <p className="font-medium text-white" style={{ fontFamily: "'Work Sans', sans-serif" }}>Clear Cache</p>
+                <p className="font-semibold text-white text-lg" style={{ fontFamily: "'Work Sans', sans-serif" }}>Clear Cache</p>
                 <p className="text-sm text-gray-300" style={{ fontFamily: "'Quicksand', sans-serif" }}>Clear app cache to free up storage space</p>
               </div>
             </div>
@@ -293,17 +296,18 @@ export function DataManagementPanel() {
               onClick={handleClearCache}
               disabled={isClearing}
               variant="outline"
-              className="border-white/30 text-white hover:bg-white/20"
+              size="lg"
+              className="w-full sm:w-auto border-2 border-white/30 text-white hover:bg-white/20 bg-white/90 hover:shadow-lg rounded-xl px-6 py-3 transition-all duration-300"
             >
               {isClearing ? (
                 <>
-                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                  Clearing...
+                  <RefreshCw className="w-5 h-5 mr-2 animate-spin" strokeWidth={2.5} />
+                  <span className="font-semibold">Clearing...</span>
                 </>
               ) : (
                 <>
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Clear Cache
+                  <Trash2 className="w-5 h-5 mr-2" strokeWidth={2.5} />
+                  <span className="font-semibold">Clear Cache</span>
                 </>
               )}
             </Button>

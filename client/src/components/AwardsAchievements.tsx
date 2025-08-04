@@ -237,23 +237,31 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
 
       {/* Category Filter */}
       <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4">
-        <div className="flex flex-wrap gap-2">
+        <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
           {categories.map((category) => {
             const IconComponent = category.icon;
             return (
               <Button
                 key={category.id}
                 variant={selectedCategory === category.id ? "default" : "outline"}
-                size="sm"
+                size="lg"
                 onClick={() => setSelectedCategory(category.id)}
-                className={`flex items-center space-x-2 ${
+                className={`flex items-center justify-center space-x-2 py-3 px-4 transition-all duration-300 ${
                   selectedCategory === category.id 
-                    ? 'bg-[#1f4aa6] hover:bg-[#1850a0] text-white' 
-                    : 'border-white/30 text-white hover:bg-white/20'
-                }`}
+                    ? 'bg-gradient-to-r from-[#1f4aa6] to-[#45c73e] hover:from-[#1850a0] hover:to-[#3ab82e] text-white shadow-lg border-0' 
+                    : 'border-2 border-white/30 text-white hover:bg-white/20 bg-white/90 hover:shadow-lg hover:border-[#1f4aa6]'
+                } rounded-xl`}
               >
-                <IconComponent className="w-4 h-4" />
-                <span style={{ fontFamily: "'Work Sans', sans-serif" }}>{category.name}</span>
+                <IconComponent 
+                  className={`w-5 h-5 ${selectedCategory === category.id ? 'text-white' : 'text-[#1f4aa6]'}`}
+                  strokeWidth={2.5}
+                />
+                <span 
+                  className="font-semibold text-sm" 
+                  style={{ fontFamily: "'Work Sans', sans-serif" }}
+                >
+                  {category.name}
+                </span>
               </Button>
             );
           })}
