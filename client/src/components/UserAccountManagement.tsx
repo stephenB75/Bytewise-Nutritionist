@@ -97,7 +97,7 @@ export function UserAccountManagement({ onClose }: UserAccountManagementProps) {
 
   const handleSignOut = async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
+      await fetch('/api/auth/signout', { method: 'POST' });
       window.location.reload();
     } catch (error) {
       toast({

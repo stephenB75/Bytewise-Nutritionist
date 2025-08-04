@@ -31,6 +31,13 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
   updateUserGoals(userId: string, goals: Partial<Pick<User, 'dailyCalorieGoal' | 'dailyProteinGoal' | 'dailyCarbGoal' | 'dailyFatGoal' | 'dailyWaterGoal'>>): Promise<User>;
+  updateUserProfile(userId: string, profileData: {
+    firstName?: string;
+    lastName?: string;
+    personalInfo?: any;
+    notificationSettings?: any;
+    privacySettings?: any;
+  }): Promise<User>;
 
   // Food operations
   searchFoods(query: string, limit?: number): Promise<Food[]>;
@@ -130,6 +137,24 @@ export class DatabaseStorage implements IStorage {
     const [user] = await db
       .update(users)
       .set({ ...goals, updatedAt: new Date() })
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
+  }
+
+  async updateUserProfile(userId: string, profileData: {
+    firstName?: string;
+    lastName?: string;
+    personalInfo?: any;
+    notificationSettings?: any;
+    privacySettings?: any;
+  }): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({
+        ...profileData,
+        updatedAt: new Date(),
+      })
       .where(eq(users.id, userId))
       .returning();
     return user;

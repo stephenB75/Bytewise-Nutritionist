@@ -203,13 +203,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { name, email, phone, birthDate, location, height, weight, activityLevel, goals } = req.body;
       
+      // Parse the name field into firstName and lastName
+      const [firstName = '', lastName = ''] = (name || '').split(' ');
+      
+      // Create personal info object
+      const personalInfo = {
+        phone,
+        birthDate,
+        location,
+        height,
+        weight,
+        activityLevel,
+        goals
+      };
+      
       // Update user profile information
-      const updatedUser = await storage.updateUserGoals(userId, {
-        // Update personal info here when we add the fields to the schema
+      const updatedUser = await storage.updateUserProfile(userId, {
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        personalInfo
       });
       
       res.json({ success: true, user: updatedUser });
     } catch (error) {
+      console.error('Profile update error:', error);
       res.status(500).json({ message: "Failed to update profile" });
     }
   });
