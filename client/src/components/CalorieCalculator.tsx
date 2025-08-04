@@ -15,12 +15,6 @@ import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { EnhancedIngredientDatabaseManager, type IngredientData } from '@/data/enhancedIngredientDatabase';
 import { 
-  enhancedFoodDatabase, 
-  searchEnhancedFoods, 
-  calculateNutritionForPortion,
-  type EnhancedFoodItem 
-} from '@/data/enhancedFoodDatabase';
-import { 
   Search, 
   Calculator, 
   Flame, 
@@ -78,8 +72,8 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
   const [loggedData, setLoggedData] = useState<any>(null);
   const [ingredientSuggestions, setIngredientSuggestions] = useState<Array<{category: string; key: string; data: IngredientData}>>([]);
   const [selectedIngredient, setSelectedIngredient] = useState<{category: string; key: string; data: IngredientData} | null>(null);
-  const [usdaFoodSuggestions, setUsdaFoodSuggestions] = useState<EnhancedFoodItem[]>([]);
-  const [selectedUSDAFood, setSelectedUSDAFood] = useState<EnhancedFoodItem | null>(null);
+  const [usdaFoodSuggestions, setUsdaFoodSuggestions] = useState<any[]>([]);
+  const [selectedUSDAFood, setSelectedUSDAFood] = useState<any>(null);
   const [availableUnits, setAvailableUnits] = useState<string[]>([]);
   const queryClient = useQueryClient();
 
@@ -89,9 +83,8 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
       const customSuggestions = EnhancedIngredientDatabaseManager.searchIngredients(ingredient);
       setIngredientSuggestions(customSuggestions.slice(0, 6)); // Limit to 6 custom suggestions
       
-      // Search USDA database
-      const usdaSuggestions = searchEnhancedFoods(ingredient);
-      setUsdaFoodSuggestions(usdaSuggestions.slice(0, 8)); // Limit to 8 USDA suggestions
+      // USDA database search removed for cleanup
+      setUsdaFoodSuggestions([]);
     } else {
       setIngredientSuggestions([]);
       setUsdaFoodSuggestions([]);
@@ -122,7 +115,7 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
   };
 
   // Select USDA food from suggestions
-  const handleSelectUSDAFood = (food: EnhancedFoodItem) => {
+  const handleSelectUSDAFood = (food: any) => {
     setSelectedUSDAFood(food);
     setSelectedIngredient(null); // Clear custom ingredient selection
     setIngredient(food.name);
@@ -184,49 +177,8 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
       return;
     }
 
-    // Enhanced calculation with USDA database
-    if (selectedUSDAFood && amount && selectedUnit) {
-      const quantity = parseFloat(amount) || 1;
-      const nutrition = calculateNutritionForPortion(selectedUSDAFood, selectedUnit, quantity);
-      
-      if (nutrition) {
-        const analysis: IngredientAnalysis = {
-          ingredient: selectedUSDAFood.name,
-          measurement: `${amount} ${selectedUnit}`,
-          estimatedCalories: nutrition.calories,
-          equivalentMeasurement: `${nutrition.totalGrams}g`,
-          note: `USDA verified (${selectedUSDAFood.data_reliability} reliability)`,
-          nutritionPer100g: {
-            calories: selectedUSDAFood.calories_per_100g,
-            protein: selectedUSDAFood.protein_per_100g,
-            carbs: selectedUSDAFood.carbs_per_100g,
-            fat: selectedUSDAFood.fat_per_100g
-          }
-        };
-        
-        setRecentAnalyses(prev => [analysis, ...prev.slice(0, 4)]);
-        setIngredient('');
-        setMeasurement('');
-        setAmount('');
-        setSelectedUnit('');
-        setSelectedUSDAFood(null);
-        
-        // Send calculated calories to tracking hook
-        if (onCaloriesCalculated) {
-          onCaloriesCalculated({
-            name: `${analysis.ingredient} (${analysis.measurement})`,
-            calories: analysis.estimatedCalories,
-            protein: nutrition.protein,
-            carbs: nutrition.carbs,
-            fat: nutrition.fat,
-            fiber: nutrition.fiber,
-            sugar: nutrition.sugar,
-            sodium: nutrition.sodium,
-            ingredients: [analysis.ingredient]
-          });
-        }
-      }
-    } else if (selectedIngredient && amount && selectedUnit) {
+    // Use enhanced ingredient calculation
+    if (selectedIngredient && amount && selectedUnit) {
       const measurementText = `${amount} ${selectedUnit}`;
       
       // Use USDA query for enhanced accuracy

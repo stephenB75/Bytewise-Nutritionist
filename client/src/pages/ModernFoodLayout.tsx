@@ -34,7 +34,6 @@ import {
   X
 } from 'lucide-react';
 import { NotificationDropdown } from '@/components/NotificationDropdown';
-import { Navigation } from '@/components/Navigation';
 import { WeeklyCaloriesCard } from '@/components/WeeklyCaloriesCard';
 
 interface ModernFoodLayoutProps {
@@ -1523,8 +1522,30 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       {/* Content rendered based on active tab */}
       {renderContent()}
       
-      {/* Bottom Navigation */}
-      <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
+      {/* Bottom Navigation - Inline Implementation */}
+      <div className="fixed bottom-0 left-0 right-0 bg-gray-900/95 backdrop-blur-md border-t border-gray-700 safe-area-pb z-50">
+        <div className="flex items-center justify-around py-2 px-4 max-w-md mx-auto">
+          {[
+            { id: 'home', label: 'Dashboard', icon: '🏠' },
+            { id: 'nutrition', label: 'Nutrition', icon: '🥗' },
+            { id: 'daily', label: 'Daily', icon: '📊' },
+            { id: 'profile', label: 'Profile', icon: '👤' }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 ${
+                activeTab === tab.id
+                  ? 'bg-yellow-400/20 text-yellow-400'
+                  : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+              }`}
+            >
+              <span className="text-lg mb-1">{tab.icon}</span>
+              <span className="text-xs font-medium">{tab.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
       
       {/* Achievement Celebration Overlay */}
       {showAchievement && currentAchievement && (

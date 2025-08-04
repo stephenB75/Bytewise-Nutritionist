@@ -1,43 +1,13 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
-import SimpleApp from "./SimpleApp";
 
 import "./index.css";
 
-// App ready for rendering
-
-// Suppress development warnings and errors
-if (import.meta.env.DEV) {
-  const originalError = console.error;
-  console.error = (...args) => {
-    const message = String(args[0] || '');
-    if (message.includes('WebSocket') || 
-        message.includes('Invalid hook call') ||
-        message.includes('Cannot read properties of null') ||
-        message.includes('chrome-extension') ||
-        message.includes('content.js')) {
-      return; // Suppress development environment errors
-    }
-    originalError.apply(console, args);
-  };
-
-  const originalWarn = console.warn;
-  console.warn = (...args) => {
-    const message = String(args[0] || '');
-    if (message.includes('Invalid hook call') || 
-        message.includes('WebSocket')) {
-      return; // Suppress React and WebSocket warnings
-    }
-    originalWarn.apply(console, args);
-  };
-}
-
-// ByteWise app starting
+// Production ready ByteWise Nutrition Tracker
 
 const rootElement = document.getElementById("root");
 if (!rootElement) {
-  // Root element not found
   document.body.innerHTML = `
     <div style="background: linear-gradient(45deg, #ff6b6b, #4ecdc4); color: white; padding: 40px; min-height: 100vh; display: flex; align-items: center; justify-content: center; font-family: Arial; text-align: center;">
       <div>
@@ -47,7 +17,6 @@ if (!rootElement) {
     </div>
   `;
 } else {
-  // Root element found
   try {
     const root = createRoot(rootElement);
     
