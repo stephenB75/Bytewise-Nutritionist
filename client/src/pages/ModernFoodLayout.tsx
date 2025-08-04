@@ -69,6 +69,7 @@ type TrackingView = 'daily' | 'weekly';
 export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) {
   const { user, isLoading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState('home');
+  const [previousTab, setPreviousTab] = useState('home');
   const { backgroundImage } = useRotatingBackground(activeTab);
   const [searchQuery, setSearchQuery] = useState('');
   const [showAchievement, setShowAchievement] = useState(false);
@@ -276,9 +277,29 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     }
   ];
 
-  // Render functions for each page with animations
+  // Get animation direction based on tab transition
+  const getAnimationDirection = (currentTab: string, prevTab: string) => {
+    const tabOrder = ['home', 'nutrition', 'daily', 'profile', 'search', 'tracking', 'achievements', 'data'];
+    const currentIndex = tabOrder.indexOf(currentTab);
+    const prevIndex = tabOrder.indexOf(prevTab);
+    
+    if (currentIndex > prevIndex) {
+      return 'slide-in-from-right-4';
+    } else if (currentIndex < prevIndex) {
+      return 'slide-in-from-left-4';
+    }
+    return 'slide-in-from-bottom-4';
+  };
+
+  // Enhanced tab change handler with animation direction
+  const handleTabChange = (newTab: string) => {
+    setPreviousTab(activeTab);
+    setActiveTab(newTab);
+  };
+
+  // Render functions for each page with enhanced animations
   const renderHome = () => (
-    <div className="space-y-0 page-container animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className={`space-y-0 page-container animate-in fade-in ${getAnimationDirection('home', previousTab)} duration-700 ease-out`}>
       {/* Full-Screen Hero Section */}
       <div className="relative h-screen overflow-hidden">
         <div 
@@ -637,7 +658,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   );
 
   const renderTracking = () => (
-    <div className="space-y-0 page-container animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className={`space-y-0 page-container animate-in fade-in ${getAnimationDirection('tracking', previousTab)} duration-700 ease-out`}>
       {/* Full-Screen Hero Section */}
       <div className="relative h-screen overflow-hidden">
         <div 
@@ -843,7 +864,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   );
 
   const renderAchievements = () => (
-    <div className="space-y-0 animate-in fade-in slide-in-from-left-4 duration-500">
+    <div className={`space-y-0 animate-in fade-in ${getAnimationDirection('achievements', previousTab)} duration-700 ease-out`}>
       {/* Full-Screen Hero Section */}
       <div className="relative h-screen overflow-hidden">
         <div 
@@ -1059,7 +1080,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   );
 
   const renderDailyWeekly = () => (
-    <div className="space-y-0 animate-in fade-in slide-in-from-right-4 duration-500">
+    <div className={`space-y-0 animate-in fade-in ${getAnimationDirection('search', previousTab)} duration-700 ease-out`}>
       {/* Full-Screen Hero Section */}
       <div className="relative h-screen overflow-hidden">
         <div 
@@ -1263,7 +1284,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   );
 
   const renderProfile = () => (
-    <div className="space-y-0 page-container animate-in fade-in slide-in-from-left-4 duration-500">
+    <div className={`space-y-0 page-container animate-in fade-in ${getAnimationDirection('profile', previousTab)} duration-700 ease-out`}>
       {/* Full-Screen Hero Section */}
       <div className="relative h-screen overflow-hidden">
         <div 
@@ -1422,9 +1443,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         return renderSignIn();
       case 'achievements':
         return renderAchievements();
+      case 'search':
+        return renderDailyWeekly();
       case 'data':
         return (
-          <div className="space-y-0">
+          <div className={`space-y-0 animate-in fade-in ${getAnimationDirection('data', previousTab)} duration-700 ease-out`}>
             {/* Full-Screen Hero Section */}
             <div className="relative h-screen overflow-hidden">
               <div 
@@ -1559,7 +1582,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => handleTabChange(tab.id)}
                 className={`flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 ${
                   activeTab === tab.id
                     ? 'bg-yellow-400/20 text-yellow-400'
