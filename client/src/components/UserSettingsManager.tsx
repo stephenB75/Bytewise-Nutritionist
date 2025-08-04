@@ -288,7 +288,7 @@ export function UserSettingsManager({ onClose, initialSection = 'profile' }: Use
                       size="lg"
                       disabled={isSaving}
                       onClick={() => setIsEditing(true)}
-                      className="px-10 py-5 border-3 border-[#1f4aa6] text-[#1f4aa6] hover:bg-[#1f4aa6] hover:text-white bg-white/95 hover:shadow-2xl rounded-2xl transition-all duration-300 font-bold text-lg backdrop-blur-sm hover:scale-105"
+                      className="px-10 py-5 border-3 border-[#1f4aa6] text-[#1f4aa6] hover:bg-[#1f4aa6] hover:text-white bg-white/95 hover:shadow-2xl rounded-2xl transition-all duration-300 font-bold text-lg backdrop-blur-sm"
                     >
                       <Edit3 className="w-6 h-6 mr-4" strokeWidth={2.5} />
                       Edit Profile Information
@@ -303,7 +303,7 @@ export function UserSettingsManager({ onClose, initialSection = 'profile' }: Use
                         size="lg"
                         disabled={isSaving}
                         onClick={handleSave}
-                        className="w-full px-8 py-5 bg-gradient-to-r from-[#45c73e] to-[#3ab82e] hover:from-[#3ab82e] hover:to-[#2d8f26] text-white shadow-2xl disabled:opacity-50 border-0 rounded-2xl transition-all duration-300 font-bold text-lg hover:scale-105"
+                        className="w-full px-8 py-5 bg-gradient-to-r from-[#45c73e] to-[#3ab82e] hover:from-[#3ab82e] hover:to-[#2d8f26] text-white shadow-2xl disabled:opacity-50 border-0 rounded-2xl transition-all duration-300 font-bold text-lg"
                       >
                         {isSaving ? (
                           <>
@@ -323,7 +323,7 @@ export function UserSettingsManager({ onClose, initialSection = 'profile' }: Use
                         variant="outline"
                         size="lg"
                         onClick={handleCancel}
-                        className="w-full px-8 py-5 border-3 border-gray-400 text-gray-300 hover:bg-gray-600 hover:text-white bg-white/95 hover:shadow-2xl rounded-2xl transition-all duration-300 font-bold text-lg hover:scale-105"
+                        className="w-full px-8 py-5 border-3 border-gray-400 text-gray-300 hover:bg-gray-600 hover:text-white bg-white/95 hover:shadow-2xl rounded-2xl transition-all duration-300 font-bold text-lg"
                       >
                         <X className="w-6 h-6 mr-4" strokeWidth={2.5} />
                         Cancel
