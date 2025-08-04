@@ -341,7 +341,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         </div>
       </div>
       
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60">
+      <div 
+        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60 cursor-pointer hover:text-white transition-colors duration-300"
+        onClick={() => {
+          const contentSection = document.querySelector('.content-section, .main-content, .bg-white');
+          if (contentSection) {
+            contentSection.scrollIntoView({ behavior: 'smooth' });
+          }
+        }}
+      >
         <div className="animate-bounce">
           <ChevronRight className="w-6 h-6 rotate-90" />
         </div>
