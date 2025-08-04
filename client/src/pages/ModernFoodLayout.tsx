@@ -584,19 +584,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             searchInput.focus();
           }
         }}
-      >
-        <div className="mb-8 animate-in fade-in zoom-in-50 duration-800 delay-500">
-          <div className="flex items-center justify-center space-x-4">
-            <div className="w-16 h-16 bg-blue-500/20 rounded-xl flex items-center justify-center">
-              <Calendar className="w-8 h-8 text-blue-400" />
-            </div>
-            <div className="text-left">
-              <div className="text-sm font-semibold text-blue-400">Progress Tracking</div>
-              <div className="text-xs text-gray-300">Daily & Weekly</div>
-            </div>
-          </div>
-        </div>
-      </HeroSection>
+      />
 
       {/* Content Section - Completely Separate and Underneath */}
       <div className="px-6 py-3 bg-black content-section">
@@ -778,19 +766,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             goalsSection.scrollIntoView({ behavior: 'smooth' });
           }
         }}
-      >
-        <div className="mb-8 animate-in fade-in zoom-in-50 duration-800 delay-500">
-          <div className="flex items-center justify-center space-x-4">
-            <div className="w-16 h-16 bg-yellow-500/20 rounded-xl flex items-center justify-center">
-              <Trophy className="w-8 h-8 text-yellow-400" />
-            </div>
-            <div className="text-left">
-              <div className="text-sm font-semibold text-yellow-400">Achievement System</div>
-              <div className="text-xs text-gray-300">Goals & Progress</div>
-            </div>
-          </div>
-        </div>
-      </HeroSection>
+      />
 
       {/* Content Section - Completely Separate and Underneath */}
       <div className="px-6 py-3 bg-black content-section">
@@ -914,19 +890,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             signInCard.scrollIntoView({ behavior: 'smooth' });
           }
         }}
-      >
-        <div className="mb-8 animate-in fade-in zoom-in-50 duration-800 delay-500">
-          <div className="flex items-center justify-center space-x-4">
-            <div className="w-16 h-16 bg-blue-500/20 rounded-xl flex items-center justify-center">
-              <User className="w-8 h-8 text-blue-400" />
-            </div>
-            <div className="text-left">
-              <div className="text-sm font-semibold text-blue-400">Account Access</div>
-              <div className="text-xs text-gray-300">Sign In Required</div>
-            </div>
-          </div>
-        </div>
-      </HeroSection>
+      />
 
       {/* Content Section - Completely Separate and Underneath */}
       <div className="px-6 py-3 bg-black content-section">
@@ -970,19 +934,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             searchInput.focus();
           }
         }}
-      >
-        <div className="mb-8 animate-in fade-in zoom-in-50 duration-800 delay-500">
-          <div className="flex items-center justify-center space-x-4">
-            <div className="w-16 h-16 bg-green-500/20 rounded-xl flex items-center justify-center">
-              <Calendar className="w-8 h-8 text-green-400" />
-            </div>
-            <div className="text-left">
-              <div className="text-sm font-semibold text-green-400">Food Logging</div>
-              <div className="text-xs text-gray-300">Daily & Weekly</div>
-            </div>
-          </div>
-        </div>
-      </HeroSection>
+      />
 
       {/* Content Section - Completely Separate and Underneath */}
       <div className="px-6 py-3 bg-black content-section">
@@ -1111,19 +1063,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             calculatorElement.scrollIntoView({ behavior: 'smooth' });
           }
         }}
-      >
-        <div className="mb-8 animate-in fade-in zoom-in-50 duration-800 delay-500">
-          <div className="flex items-center justify-center space-x-4">
-            <div className="w-16 h-16 bg-green-500/20 rounded-xl flex items-center justify-center">
-              <span className="text-2xl font-black text-green-400">🔬</span>
-            </div>
-            <div className="text-left">
-              <div className="text-sm font-semibold text-green-400">USDA Database</div>
-              <div className="text-xs text-gray-300">Scientific Precision</div>
-            </div>
-          </div>
-        </div>
-      </HeroSection>
+      />
       
       {/* Content Section - Completely Separate and Underneath */}
       <div className="bg-white content-section">
@@ -1154,19 +1094,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             setProfileSection('profile');
           }
         }}
-      >
-        <div className="mb-8 animate-in fade-in zoom-in-50 duration-800 delay-500">
-          <div className="flex items-center justify-center space-x-4">
-            <div className="w-16 h-16 bg-purple-500/20 rounded-xl flex items-center justify-center">
-              <User className="w-8 h-8 text-purple-400" />
-            </div>
-            <div className="text-left">
-              <div className="text-sm font-semibold text-purple-400">Account Management</div>
-              <div className="text-xs text-gray-300">Profile & Settings</div>
-            </div>
-          </div>
-        </div>
-      </HeroSection>
+      />
 
       {/* Content Section - Completely Separate and Underneath */}
       <div className="bg-white content-section">
@@ -1305,19 +1233,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   dataPanel.scrollIntoView({ behavior: 'smooth' });
                 }
               }}
-            >
-              <div className="mb-8 animate-in fade-in zoom-in-50 duration-800 delay-500">
-                <div className="flex items-center justify-center space-x-4">
-                  <div className="w-16 h-16 bg-cyan-500/20 rounded-xl flex items-center justify-center">
-                    <Download className="w-8 h-8 text-cyan-400" />
-                  </div>
-                  <div className="text-left">
-                    <div className="text-sm font-semibold text-cyan-400">Data Export</div>
-                    <div className="text-xs text-gray-300">Sync & Management</div>
-                  </div>
-                </div>
-              </div>
-            </HeroSection>
+            />
 
             {/* Content Section - Completely Separate and Underneath */}
             <div className="px-6 py-8 bg-black min-h-screen">
