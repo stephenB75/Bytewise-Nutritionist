@@ -1,10 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = 'https://ykgqcftrfvjblmqzbqvr.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrZ3FjZnRyZnZqYmxtcXpicXZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU3ODcxNjQsImV4cCI6MjA1MTM2MzE2NH0.x7kMQbFJevYhYe4LvBTIb3VjcL6H6M7AQwvR8IbgAY4';
-
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+import { supabase } from '@/lib/supabase';
 
 export function useAuth() {
   const { data: user, isLoading, refetch } = useQuery({
