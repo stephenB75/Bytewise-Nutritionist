@@ -298,7 +298,14 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   };
 
   // Helper components for cleaner code
-  const HeroSection = ({ title, subtitle, description, buttonText, onButtonClick, children }) => (
+  const HeroSection = ({ title, subtitle, description, buttonText, onButtonClick, children }: {
+    title: string;
+    subtitle: string;
+    description: string;
+    buttonText: string;
+    onButtonClick: () => void;
+    children?: React.ReactNode;
+  }) => (
     <div className="hero-container">
       <div 
         className={`absolute inset-0 hero-background ${isTransitioning ? 'transitioning' : ''}`}
@@ -368,7 +375,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     </div>
   );
 
-  const ProgressCard = ({ title, icon: Icon, value, goal, percentage, color, children }) => (
+  const ProgressCard = ({ title, icon: Icon, value, goal, percentage, color, children }: {
+    title: string;
+    icon: React.ComponentType<{ className?: string }>;
+    value: string;
+    goal: string;
+    percentage: number;
+    color: string;
+    children?: React.ReactNode;
+  }) => (
     <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-3">
@@ -398,7 +413,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     </Card>
   );
 
-  const MacroCard = ({ name, value, color, data = [0, 0, 0, 0, 0] }) => (
+  const MacroCard = ({ name, value, color, data = [0, 0, 0, 0, 0] }: {
+    name: string;
+    value: number;
+    color: string;
+    data?: number[];
+  }) => (
     <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4">
       <div className="text-center">
         <div className="text-sm text-gray-400 mb-1">{name}</div>
@@ -416,7 +436,14 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     </Card>
   );
 
-  const MicronutrientCard = ({ name, value, goal, unit, color, percentage = 0 }) => (
+  const MicronutrientCard = ({ name, value, goal, unit, color, percentage = 0 }: {
+    name: string;
+    value: number;
+    goal: number;
+    unit: string;
+    color: string;
+    percentage?: number;
+  }) => (
     <Card className="bg-white/10 backdrop-blur-md border-white/20 p-3">
       <div className="flex items-center justify-between mb-2">
         <div className={`text-sm font-semibold text-${color}-400`}>{name}</div>
@@ -1139,42 +1166,31 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   const renderCalculator = () => (
     <div className={`space-y-0 page-container animate-in fade-in ${getAnimationDirection('nutrition', previousTab)} duration-700 ease-out`}>
-      {/* Full-Screen Hero Section */}
-      <div className="relative h-screen overflow-hidden">
-        <div 
-          className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out"
-          style={{
-            backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`
-          }}
-        />
-        
-        {/* Hero Content - ONLY TEXT OVERLAY */}
-        <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
-          <div className="space-y-6 max-w-2xl animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-300">
-            <div className="space-y-2 animate-in fade-in slide-in-from-bottom-4 duration-800 delay-600">
-              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
-                USDA
-              </h1>
-              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
-                <span className="bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
-                  Calculator
-                </span>
-              </h1>
+      <HeroSection
+        title="USDA"
+        subtitle="Calculator"
+        description="Precise nutrition data for every ingredient using comprehensive USDA database"
+        buttonText="Start Calculating"
+        onButtonClick={() => {
+          // Focus on the calculator input or scroll to calculator
+          const calculatorElement = document.querySelector('.main-content');
+          if (calculatorElement) {
+            calculatorElement.scrollIntoView({ behavior: 'smooth' });
+          }
+        }}
+      >
+        <div className="mb-8 animate-in fade-in zoom-in-50 duration-800 delay-500">
+          <div className="flex items-center justify-center space-x-4">
+            <div className="w-16 h-16 bg-green-500/20 rounded-xl flex items-center justify-center">
+              <span className="text-2xl font-black text-green-400">🔬</span>
             </div>
-            
-            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-800 delay-800">
-              Precise nutrition data for every ingredient using comprehensive USDA database
-            </p>
+            <div className="text-left">
+              <div className="text-sm font-semibold text-green-400">USDA Database</div>
+              <div className="text-xs text-gray-300">Scientific Precision</div>
+            </div>
           </div>
         </div>
-        
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60">
-          <div className="animate-bounce">
-            <ChevronRight className="w-6 h-6 rotate-90" />
-          </div>
-        </div>
-      </div>
+      </HeroSection>
       
       {/* Content Section - Completely Separate and Underneath */}
       <div className="bg-white content-section">
