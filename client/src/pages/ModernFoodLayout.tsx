@@ -70,7 +70,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const { user, isLoading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState('home');
   const [previousTab, setPreviousTab] = useState('home');
-  const { backgroundImage } = useRotatingBackground(activeTab);
+  const { backgroundImage, isTransitioning } = useRotatingBackground(activeTab);
   const [searchQuery, setSearchQuery] = useState('');
   const [showAchievement, setShowAchievement] = useState(false);
   const [currentAchievement, setCurrentAchievement] = useState<Achievement | null>(null);
@@ -303,7 +303,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       {/* Full-Screen Hero Section */}
       <div className="relative h-screen overflow-hidden">
         <div 
-          className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out"
+          className={`absolute inset-0 bg-cover bg-center hero-background ${
+            isTransitioning ? 'transitioning' : ''
+          }`}
           style={{
             backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`
           }}
