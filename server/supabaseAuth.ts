@@ -13,7 +13,7 @@ const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.en
 // Create Supabase client for server-side operations
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
-// Enhanced request type with user info
+// Enhanced request type with user info  
 export interface AuthenticatedRequest extends Request {
   user?: {
     id: string;
@@ -21,6 +21,9 @@ export interface AuthenticatedRequest extends Request {
     claims?: any;
   };
 }
+
+// Middleware handler type that works with Express
+export type AuthMiddleware = (req: any, res: Response, next: NextFunction) => Promise<void | Response>;
 
 // Type-safe middleware wrapper
 export function createAuthenticatedHandler(
@@ -38,11 +41,11 @@ export function createAuthenticatedHandler(
 }
 
 // Middleware to verify Supabase JWT tokens
-export async function isAuthenticated(
-  req: AuthenticatedRequest,
+export const isAuthenticated: AuthMiddleware = async (
+  req: any,
   res: Response,
   next: NextFunction
-) {
+) => {
   try {
     // Get token from Authorization header
     const authHeader = req.headers.authorization;
@@ -70,14 +73,14 @@ export async function isAuthenticated(
   } catch (error) {
     res.status(401).json({ message: 'Unauthorized' });
   }
-}
+};
 
 // Optional authentication - continues even if not authenticated
-export async function optionalAuth(
-  req: AuthenticatedRequest,
+export const optionalAuth: AuthMiddleware = async (
+  req: any,
   res: Response,
   next: NextFunction
-) {
+) => {
   try {
     const authHeader = req.headers.authorization;
     if (authHeader && authHeader.startsWith('Bearer ')) {
@@ -97,7 +100,7 @@ export async function optionalAuth(
   }
   
   next();
-}
+};
 
 // Setup function (replaces Replit auth setup)
 export async function setupAuth(app: any) {
