@@ -1324,9 +1324,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
       {/* Content Section - Completely Separate and Underneath */}
       <div className="bg-white content-section">
-        <div className="max-w-5xl mx-auto px-4 py-4 main-content profile-content h-full flex flex-col">
-          {/* Profile Navigation - Optimized Layout */}
-          <div className="flex flex-col sm:flex-row gap-3 mb-6 justify-center items-stretch">
+        <div className="max-w-6xl mx-auto px-6 py-8 main-content profile-content h-full flex flex-col">
+          {/* Profile Navigation - Modern Layout */}
+          <div className="flex flex-col sm:flex-row gap-4 mb-8 justify-center items-stretch">
             {[
               { 
                 id: 'profile', 
@@ -1358,24 +1358,24 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   variant="outline"
                   size="lg"
                   disabled={authLoading}
-                  className={`flex-1 sm:flex-none sm:w-48 h-28 p-4 flex flex-col items-center justify-center space-y-2 transition-all duration-300 ${
+                  className={`flex-1 sm:flex-none sm:w-56 h-32 p-5 flex flex-col items-center justify-center space-y-3 transition-all duration-300 ${
                     isActive
                       ? 'bg-gradient-to-br from-[#1f4aa6] via-[#45c73e] to-[#faed39] text-white shadow-2xl border-2 border-transparent transform scale-105 z-10' 
                       : 'bg-white/95 hover:bg-white text-gray-700 border-2 border-gray-200 hover:border-[#1f4aa6] hover:shadow-xl hover:scale-102'
                   } ${authLoading ? 'opacity-50 cursor-not-allowed' : ''} rounded-2xl backdrop-blur-sm relative`}
                   onClick={() => handleProfileSectionChange(section.id)}
                 >
-                  <div className={`w-12 h-12 p-3 rounded-xl flex items-center justify-center ${isActive ? 'bg-white/20' : 'bg-[#1f4aa6]/10'}`}>
+                  <div className={`w-14 h-14 p-3.5 rounded-xl flex items-center justify-center ${isActive ? 'bg-white/20' : 'bg-[#1f4aa6]/10'}`}>
                     <IconComponent 
-                      className={`w-6 h-6 ${isActive ? 'text-white' : 'text-[#1f4aa6]'}`}
+                      className={`w-7 h-7 ${isActive ? 'text-white' : 'text-[#1f4aa6]'}`}
                       strokeWidth={2.5}
                     />
                   </div>
                   <div className="text-center">
-                    <div className={`text-sm font-bold ${isActive ? 'text-white' : 'text-gray-900'}`}>
-                      {section.name}
+                    <div className={`text-sm font-bold ${isActive ? 'text-white' : 'text-gray-900'}`} style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                      {section.shortName}
                     </div>
-                    <div className={`text-xs mt-1 ${isActive ? 'text-white/90' : 'text-gray-500'}`}>
+                    <div className={`text-xs mt-1 ${isActive ? 'text-white/90' : 'text-gray-500'}`} style={{ fontFamily: "'Work Sans', sans-serif" }}>
                       {section.description}
                     </div>
                   </div>
@@ -1387,9 +1387,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             })}
           </div>
 
-          {/* Profile Content - Scrollable Container */}
+          {/* Profile Content - Improved Container */}
           <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 min-h-0">
-            <div className="space-y-3 pr-2 pb-6">
+            <div className="space-y-6 pr-2 pb-8">
               {profileSection === 'profile' && (
                 <div className="space-y-4">
                   {user ? (

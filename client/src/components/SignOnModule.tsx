@@ -177,24 +177,24 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto bg-white/90 backdrop-blur-md border-0 shadow-xl overflow-hidden signin-module">
-      {/* Header - Compact */}
-      <div className="p-4 bg-gradient-to-r from-[#1f4aa6] to-[#45c73e] text-white">
-        <div className="flex items-center justify-center mb-3">
-          <div className="p-2 bg-white/20 rounded-full">
-            <User className="w-6 h-6" />
+    <Card className="w-full max-w-3xl mx-auto bg-white/95 backdrop-blur-md border-0 shadow-xl overflow-hidden signin-module">
+      {/* Header - Enhanced */}
+      <div className="p-6 bg-gradient-to-r from-[#1f4aa6] to-[#45c73e] text-white">
+        <div className="flex items-center justify-center mb-4">
+          <div className="p-3 bg-white/20 rounded-xl">
+            <User className="w-7 h-7" />
           </div>
         </div>
-        <h2 className="text-xl font-bold text-center mb-1" style={{ fontFamily: "'League Spartan', sans-serif" }}>
-          {isSignUp ? 'Join ByteWise' : 'Sign In to ByteWise'}
+        <h2 className="text-2xl font-bold text-center mb-2" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+          {isSignUp ? 'Join ByteWise' : 'Welcome Back to ByteWise'}
         </h2>
-        <p className="text-center text-white/90 text-xs">
-          {isSignUp ? 'Start your nutrition tracking journey' : 'Access your nutrition tracking, recipes, and progress'}
+        <p className="text-center text-white/90 text-sm" style={{ fontFamily: "'Work Sans', sans-serif" }}>
+          {isSignUp ? 'Start your nutrition tracking journey today' : 'Access your nutrition tracking, recipes, and progress'}
         </p>
       </div>
 
-      {/* Content - Compact */}
-      <div className="p-4 space-y-4">
+      {/* Content - Enhanced */}
+      <div className="p-6 space-y-6">
         {/* Benefits - Compact */}
         <div className="space-y-3">
           <div className="text-center space-y-1 mb-4">
