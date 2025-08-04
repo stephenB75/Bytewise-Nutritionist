@@ -1342,10 +1342,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   variant="outline"
                   size="lg"
                   disabled={authLoading}
-                  className={`h-24 w-full p-4 flex flex-col items-center justify-center space-y-2 transition-all duration-300 ${
+                  className={`h-24 w-full min-w-[180px] max-w-[180px] p-4 flex flex-col items-center justify-center space-y-2 transition-all duration-300 ${
                     isActive
-                      ? 'bg-gradient-to-br from-[#1f4aa6] via-[#45c73e] to-[#faed39] text-white shadow-2xl border-2 border-transparent' 
-                      : 'bg-white/95 hover:bg-white text-gray-700 border-2 border-gray-200 hover:border-[#1f4aa6] hover:shadow-xl'
+                      ? 'bg-gradient-to-br from-[#1f4aa6] via-[#45c73e] to-[#faed39] text-white shadow-2xl border-2 border-transparent transform scale-105' 
+                      : 'bg-white/95 hover:bg-white text-gray-700 border-2 border-gray-200 hover:border-[#1f4aa6] hover:shadow-xl hover:scale-102'
                   } ${authLoading ? 'opacity-50 cursor-not-allowed' : ''} rounded-2xl backdrop-blur-sm`}
                   onClick={() => handleProfileSectionChange(section.id)}
                 >

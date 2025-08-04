@@ -247,10 +247,10 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
                 variant="outline"
                 size="lg"
                 onClick={() => setSelectedCategory(category.id)}
-                className={`h-24 w-full p-4 flex flex-col items-center justify-center space-y-2 transition-all duration-300 ${
+                className={`h-24 w-full min-w-[140px] max-w-[140px] p-4 flex flex-col items-center justify-center space-y-2 transition-all duration-300 ${
                   isActive
-                    ? 'bg-gradient-to-br from-[#1f4aa6] via-[#45c73e] to-[#faed39] text-white shadow-2xl border-2 border-transparent' 
-                    : 'bg-white/95 hover:bg-white text-gray-700 border-2 border-white/30 hover:border-[#1f4aa6] hover:shadow-xl'
+                    ? 'bg-gradient-to-br from-[#1f4aa6] via-[#45c73e] to-[#faed39] text-white shadow-2xl border-2 border-transparent transform scale-105' 
+                    : 'bg-white/95 hover:bg-white text-gray-700 border-2 border-white/30 hover:border-[#1f4aa6] hover:shadow-xl hover:scale-102'
                 } rounded-2xl backdrop-blur-sm relative`}
               >
                 <div className={`p-3 rounded-xl ${isActive ? 'bg-white/20' : 'bg-[#1f4aa6]/10'}`}>
