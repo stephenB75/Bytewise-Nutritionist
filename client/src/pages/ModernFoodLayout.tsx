@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import CalorieCalculator from '@/components/CalorieCalculator';
-import { UserProfile } from '@/components/UserProfile';
 import { UserSettingsManager } from '@/components/UserSettingsManager';
 import { SignOnModule } from '@/components/SignOnModule';
 import { useAuth } from '@/hooks/useAuth';
@@ -26,7 +25,6 @@ import {
   ChevronRight,
   Flame,
   Target,
-  Settings,
   Trophy,
   Calendar,
   Download,
@@ -40,9 +38,32 @@ import {
 import { NotificationDropdown } from '@/components/NotificationDropdown';
 import { WeeklyCaloriesCard } from '@/components/WeeklyCaloriesCard';
 
+// Types
 interface ModernFoodLayoutProps {
   onNavigate?: (page: string) => void;
 }
+
+interface Notification {
+  id: string;
+  type: 'achievement' | 'info' | 'success';
+  title: string;
+  message: string;
+  timestamp: Date;
+  read: boolean;
+}
+
+interface Achievement {
+  type?: string;
+  title: string;
+  message: string;
+  description?: string;
+  confetti?: boolean;
+  trophy?: boolean;
+  points?: number;
+}
+
+type ProfileSection = 'profile' | 'achievements' | 'data';
+type TrackingView = 'daily' | 'weekly';
 
 export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) {
   const { user, isLoading: authLoading } = useAuth();
@@ -50,96 +71,62 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const { backgroundImage } = useRotatingBackground(activeTab);
   const [searchQuery, setSearchQuery] = useState('');
   const [showAchievement, setShowAchievement] = useState(false);
-  const [currentAchievement, setCurrentAchievement] = useState<any>(null);
+  const [currentAchievement, setCurrentAchievement] = useState<Achievement | null>(null);
   const [showConfettiCelebration, setShowConfettiCelebration] = useState(false);
-  const [confettiAchievement, setConfettiAchievement] = useState<any>(null);
+  const [confettiAchievement, setConfettiAchievement] = useState<Achievement | null>(null);
   const [dailyCalories, setDailyCalories] = useState(0);
   const [weeklyCalories, setWeeklyCalories] = useState(0);
   const [goalCalories, setGoalCalories] = useState(2000);
   const [weeklyGoal, setWeeklyGoal] = useState(14000);
   const [loggedMeals, setLoggedMeals] = useState<any[]>([]);
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
-  const [trackingView, setTrackingView] = useState('daily'); // 'daily' or 'weekly'
-  const [profileSection, setProfileSection] = useState('profile'); // 'profile', 'achievements', 'data' - defaults to profile
+  const [trackingView, setTrackingView] = useState<TrackingView>('daily');
+  const [profileSection, setProfileSection] = useState<ProfileSection>('profile');
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   
   // Validation functions for profile sections
   const validateProfileSection = (sectionId: string): boolean => {
-    const validSections = ['profile', 'achievements', 'data'];
-    if (!validSections.includes(sectionId)) {
-      // Invalid profile section
+    const validSections: ProfileSection[] = ['profile', 'achievements', 'data'];
+    if (!validSections.includes(sectionId as ProfileSection)) {
       return false;
     }
     
-    // Check if user is authenticated for profile/data sections
     if ((sectionId === 'profile' || sectionId === 'data') && !user) {
-      // Show notification about requiring authentication
-      setNotifications(prev => [{
-        id: Date.now().toString(),
-        type: 'info' as const,
-        title: 'Authentication Required',
-        message: `Please sign in to access the ${sectionId} section`,
-        timestamp: new Date(),
-        read: false
-      }, ...prev]);
+      addNotification('info', 'Authentication Required', `Please sign in to access the ${sectionId} section`);
       return false;
     }
     
     return true;
   };
 
+  // Utility function to add notifications
+  const addNotification = (type: Notification['type'], title: string, message: string) => {
+    setNotifications(prev => [{
+      id: Date.now().toString(),
+      type,
+      title,
+      message,
+      timestamp: new Date(),
+      read: false
+    }, ...prev]);
+  };
+
   const handleProfileSectionChange = (sectionId: string) => {
-    // Prevent navigation while loading
-    if (authLoading) {
-      return;
-    }
+    if (authLoading || !validateProfileSection(sectionId)) return;
     
-    // Validate the section before changing
-    if (!validateProfileSection(sectionId)) {
-      return;
-    }
+    setProfileSection(sectionId as ProfileSection);
     
-    // Update the section
-    setProfileSection(sectionId);
+    const notificationMessages = {
+      achievements: { type: 'success' as const, title: 'Awards & Achievements', message: 'Track your progress and unlock new achievements' },
+      data: { type: 'info' as const, title: 'Data Management', message: 'Export, sync, and manage your nutrition data securely' },
+      profile: { type: 'success' as const, title: 'Profile & Account', message: 'Manage your personal information and account settings' }
+    };
     
-    // Add contextual notifications for specific sections
-    if (sectionId === 'achievements') {
-      setNotifications(prev => [{
-        id: Date.now().toString(),
-        type: 'success' as const,
-        title: 'Awards & Achievements',
-        message: 'Track your progress and unlock new achievements',
-        timestamp: new Date(),
-        read: false
-      }, ...prev]);
-    } else if (sectionId === 'data') {
-      setNotifications(prev => [{
-        id: Date.now().toString(),
-        type: 'info' as const,
-        title: 'Data Management',
-        message: 'Export, sync, and manage your nutrition data securely',
-        timestamp: new Date(),
-        read: false
-      }, ...prev]);
-    } else if (sectionId === 'profile') {
-      setNotifications(prev => [{
-        id: Date.now().toString(),
-        type: 'success' as const,
-        title: 'Profile & Account',
-        message: 'Manage your personal information and account settings',
-        timestamp: new Date(),
-        read: false
-      }, ...prev]);
+    const notification = notificationMessages[sectionId as ProfileSection];
+    if (notification) {
+      addNotification(notification.type, notification.title, notification.message);
     }
   };
-  
-  const [notifications, setNotifications] = useState<Array<{
-    id: string;
-    type: 'achievement' | 'info' | 'success';
-    title: string;
-    message: string;
-    timestamp: Date;
-    read: boolean;
-  }>>([]);
 
   // Notification handler functions
   const handleMarkAsRead = (id: string) => {
@@ -174,15 +161,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       setConfettiAchievement(achievement);
       setShowConfettiCelebration(true);
       
-      // Add notification
-      setNotifications(prev => [{
-        id: Date.now().toString(),
-        type: 'achievement' as const,
-        title: achievement.title,
-        message: achievement.message,
-        timestamp: new Date(),
-        read: false
-      }, ...prev]);
+      addNotification('achievement', achievement.title, achievement.message);
     };
 
     window.addEventListener('achievement-unlocked', handleGoalAchievement);
@@ -276,8 +255,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     }
   ];
 
-
-
   // Render functions for each page with animations
   const renderHome = () => (
     <div className="space-y-0 page-container animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -290,8 +267,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           }}
         />
         
-
-
         {/* Hero Content - ONLY TEXT OVERLAY */}
         <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
           <div className="space-y-8 max-w-2xl">

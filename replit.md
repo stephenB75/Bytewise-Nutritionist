@@ -6,6 +6,11 @@ ByteWise is a comprehensive Progressive Web App (PWA) for nutrition tracking, me
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes (August 2025)
+- **Code Cleanup & Optimization**: Comprehensive code cleanup completed with proper TypeScript interfaces, consolidated notification system, removed unused imports (Flame, Calendar, Settings icons restored where needed), optimized state management with typed interfaces (Achievement, Notification, ProfileSection, TrackingView), and unified notification handling with addNotification utility function.
+- **Enhanced Type Safety**: Added proper TypeScript interfaces for all data structures, replacing `any` types with specific typed interfaces for better code maintainability and development experience.
+- **Rotating Background & Animations**: Fully restored rotating background image functionality that changes on tab selection and auto-rotates every 30 seconds, plus smooth page transition animations with directional slides (500ms duration) for enhanced user experience.
+
 ## System Architecture
 
 ### UI/UX Decisions
