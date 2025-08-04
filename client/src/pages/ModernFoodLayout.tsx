@@ -306,18 +306,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     onButtonClick: () => void;
     children?: React.ReactNode;
   }) => (
-    <div className="hero-container">
+    <div className="relative h-screen overflow-hidden">
       <div 
-        className={`absolute inset-0 hero-background ${isTransitioning ? 'transitioning' : ''}`}
+        className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out"
         style={{
-          backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
+          backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`
         }}
       />
       
-      <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6 z-10">
+      <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
         <div className="space-y-8 max-w-2xl animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-300">
           {children}
           
