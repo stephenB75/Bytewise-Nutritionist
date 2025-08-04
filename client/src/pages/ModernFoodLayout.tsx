@@ -665,16 +665,21 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const renderTracking = () => (
     <div className={`space-y-0 page-container animate-in fade-in ${getAnimationDirection('tracking', previousTab)} duration-700 ease-out`}>
       {/* Full-Screen Hero Section */}
-      <div className="relative h-screen overflow-hidden">
+      <div className="hero-container">
         <div 
-          className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out"
+          className={`absolute inset-0 hero-background ${
+            isTransitioning ? 'transitioning' : ''
+          }`}
           style={{
-            backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`
+            backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
           }}
         />
         
         {/* Hero Content - ONLY TEXT OVERLAY */}
-        <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
+        <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6 z-10">
           <div className="space-y-6 max-w-2xl animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-300">
             <div className="space-y-2 animate-in fade-in slide-in-from-bottom-4 duration-800 delay-600">
               <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
@@ -871,16 +876,21 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const renderAchievements = () => (
     <div className={`space-y-0 animate-in fade-in ${getAnimationDirection('achievements', previousTab)} duration-700 ease-out`}>
       {/* Full-Screen Hero Section */}
-      <div className="relative h-screen overflow-hidden">
+      <div className="hero-container">
         <div 
-          className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out"
+          className={`absolute inset-0 hero-background ${
+            isTransitioning ? 'transitioning' : ''
+          }`}
           style={{
-            backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`
+            backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
           }}
         />
         
         {/* Hero Content - ONLY TEXT OVERLAY */}
-        <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
+        <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6 z-10">
           <div className="space-y-6 max-w-2xl">
             <div className="space-y-2">
               <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
@@ -1019,11 +1029,16 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const renderSignIn = () => (
     <div className="space-y-0 animate-in fade-in slide-in-from-top-4 duration-500">
       {/* Full-Screen Hero Section */}
-      <div className="relative h-screen overflow-hidden">
+      <div className="hero-container">
         <div 
-          className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out"
+          className={`absolute inset-0 hero-background ${
+            isTransitioning ? 'transitioning' : ''
+          }`}
           style={{
-            backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`
+            backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
           }}
         />
         
@@ -1454,11 +1469,16 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         return (
           <div className={`space-y-0 animate-in fade-in ${getAnimationDirection('data', previousTab)} duration-700 ease-out`}>
             {/* Full-Screen Hero Section */}
-            <div className="relative h-screen overflow-hidden">
+            <div className="hero-container">
               <div 
-                className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out"
+                className={`absolute inset-0 hero-background ${
+                  isTransitioning ? 'transitioning' : ''
+                }`}
                 style={{
-                  backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`
+                  backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat'
                 }}
               />
               
