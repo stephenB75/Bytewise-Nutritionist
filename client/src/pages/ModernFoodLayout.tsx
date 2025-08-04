@@ -301,18 +301,21 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const renderHome = () => (
     <div className={`space-y-0 page-container animate-in fade-in ${getAnimationDirection('home', previousTab)} duration-700 ease-out`}>
       {/* Full-Screen Hero Section */}
-      <div className="relative h-screen overflow-hidden">
+      <div className="hero-container">
         <div 
-          className={`absolute inset-0 bg-cover bg-center hero-background ${
+          className={`absolute inset-0 hero-background ${
             isTransitioning ? 'transitioning' : ''
           }`}
           style={{
-            backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`
+            backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
           }}
         />
         
         {/* Hero Content - ONLY TEXT OVERLAY */}
-        <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
+        <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6 z-10">
           <div className="space-y-8 max-w-2xl animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-300">
             {/* CSS Logo - Hero Size */}
             <div className="mb-8 animate-in fade-in zoom-in-50 duration-800 delay-500">

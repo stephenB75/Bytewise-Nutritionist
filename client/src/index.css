@@ -354,12 +354,39 @@ input {
 .hero-background {
   transition: all 800ms cubic-bezier(0.4, 0, 0.2, 1);
   will-change: transform, opacity, filter;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  height: 100vh !important;
+  width: 100vw !important;
 }
 
 .hero-background.transitioning {
   opacity: 0.7;
   transform: scale(1.03);
   filter: blur(1px);
+}
+
+/* Ensure full screen hero sections */
+.hero-container {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  overflow: hidden !important;
+  z-index: 0 !important;
+}
+
+/* Ensure navigation stays on top */
+.bottom-navigation {
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 50 !important;
+  background: rgba(0, 0, 0, 0.9) !important;
+  backdrop-filter: blur(10px) !important;
 }
 
 input:focus {
