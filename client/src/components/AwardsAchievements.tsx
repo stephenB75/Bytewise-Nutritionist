@@ -253,7 +253,7 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
                     : 'bg-white/95 hover:bg-white text-gray-700 border-2 border-white/30 hover:border-[#1f4aa6] hover:shadow-xl hover:scale-102'
                 } rounded-2xl backdrop-blur-sm relative`}
               >
-                <div className={`p-3 rounded-xl ${isActive ? 'bg-white/20' : 'bg-[#1f4aa6]/10'}`}>
+                <div className={`w-12 h-12 p-3 rounded-xl flex items-center justify-center ${isActive ? 'bg-white/20' : 'bg-[#1f4aa6]/10'}`}>
                   <IconComponent 
                     className={`w-6 h-6 ${isActive ? 'text-white' : 'text-[#1f4aa6]'}`}
                     strokeWidth={2.5}

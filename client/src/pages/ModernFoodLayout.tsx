@@ -1349,7 +1349,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   } ${authLoading ? 'opacity-50 cursor-not-allowed' : ''} rounded-2xl backdrop-blur-sm relative`}
                   onClick={() => handleProfileSectionChange(section.id)}
                 >
-                  <div className={`p-3 rounded-xl ${isActive ? 'bg-white/20' : 'bg-[#1f4aa6]/10'}`}>
+                  <div className={`w-12 h-12 p-3 rounded-xl flex items-center justify-center ${isActive ? 'bg-white/20' : 'bg-[#1f4aa6]/10'}`}>
                     <IconComponent 
                       className={`w-6 h-6 ${isActive ? 'text-white' : 'text-[#1f4aa6]'}`}
                       strokeWidth={2.5}
