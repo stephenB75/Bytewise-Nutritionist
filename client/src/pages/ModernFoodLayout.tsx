@@ -59,7 +59,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const [loggedMeals, setLoggedMeals] = useState<any[]>([]);
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
   const [trackingView, setTrackingView] = useState('daily'); // 'daily' or 'weekly'
-  const [profileSection, setProfileSection] = useState('profile'); // 'profile', 'achievements', 'data'
+  const [profileSection, setProfileSection] = useState('profile'); // 'profile', 'achievements', 'data' - defaults to profile
   
   // Validation functions for profile sections
   const validateProfileSection = (sectionId: string): boolean => {
