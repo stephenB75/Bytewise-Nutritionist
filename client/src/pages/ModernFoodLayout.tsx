@@ -1361,11 +1361,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               )}
               
               {profileSection === 'account' && (
-                user ? (
-                  <UserAccountManagement onClose={() => setProfileSection('overview')} />
-                ) : (
-                  <SignOnModule />
-                )
+                <div>
+                  {user ? (
+                    <UserAccountManagement onClose={() => setProfileSection('overview')} />
+                  ) : (
+                    <SignOnModule />
+                  )}
+                </div>
               )}
               
               {profileSection === 'achievements' && (
