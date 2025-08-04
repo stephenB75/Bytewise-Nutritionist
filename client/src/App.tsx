@@ -8,8 +8,7 @@
 import React, { useState, useEffect } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from '@/lib/queryClient';
-// import ModernFoodLayout from './pages/ModernFoodLayout';
-import SimpleTestLayout from './pages/SimpleTestLayout';
+import ModernFoodLayout from './pages/ModernFoodLayout';
 
 function AppContent() {
   const [activeTab, setActiveTab] = useState<string>('redesigned');
@@ -78,9 +77,9 @@ function AppContent() {
     return null;
   };
 
-  // Render SimpleTestLayout temporarily
+  // Render ModernFoodLayout
   const renderCurrentPage = () => {
-    return <SimpleTestLayout />;
+    return <ModernFoodLayout onNavigate={handleNavigate} />;
   };
 
   return (

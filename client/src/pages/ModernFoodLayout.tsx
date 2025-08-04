@@ -12,12 +12,12 @@ import CalorieCalculator from '@/components/CalorieCalculator';
 import { UserProfile } from '@/components/UserProfile';
 import { UserSettingsManager } from '@/components/UserSettingsManager';
 import { SignOnModule } from '@/components/SignOnModule';
-// import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/hooks/useAuth';
 import { DataManagementPanel } from '@/components/DataManagementPanel';
 import { AchievementCelebration } from '@/components/AchievementCelebration';
 import { AwardsAchievements } from '@/components/AwardsAchievements';
 import { ConfettiCelebration } from '@/components/ConfettiCelebration';
-// import { useGoalAchievements } from '@/hooks/useGoalAchievements';
+import { useGoalAchievements } from '@/hooks/useGoalAchievements';
 // import { useRotatingBackground } from '@/hooks/useRotatingBackground';
 import { 
   Search, 
@@ -33,17 +33,15 @@ import {
   Bell,
   X
 } from 'lucide-react';
-// import { NotificationDropdown } from '@/components/NotificationDropdown';
-// import { WeeklyCaloriesCard } from '@/components/WeeklyCaloriesCard';
+import { NotificationDropdown } from '@/components/NotificationDropdown';
+import { WeeklyCaloriesCard } from '@/components/WeeklyCaloriesCard';
 
 interface ModernFoodLayoutProps {
   onNavigate?: (page: string) => void;
 }
 
 export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) {
-  // const { user, isLoading: authLoading } = useAuth();
-  const user = null; // Temporarily disabled
-  const authLoading = false;
+  const { user, isLoading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState('home');
   const [searchQuery, setSearchQuery] = useState('');
   const [showAchievement, setShowAchievement] = useState(false);
@@ -162,12 +160,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     setNotifications(prev => prev.filter(n => n.id !== id));
   };
   
-  // Achievement hooks - temporarily disabled
-  // const { achievements, celebrationAchievement, showCelebration, closeCelebration } = useGoalAchievements();
-  const achievements: any[] = [];
-  const celebrationAchievement = null;
-  const showCelebration = false;
-  const closeCelebration = () => {};
+  // Achievement hooks  
+  const { achievements, celebrationAchievement, showCelebration, closeCelebration } = useGoalAchievements();
   // Temporary static background image until hook is fixed
   const backgroundImage = 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80';
 
@@ -1220,10 +1214,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <h3 className="text-xl font-bold text-white">This Week</h3>
             <Badge className="bg-blue-600 text-white">Weekly Summary</Badge>
           </div>
-          {/* <WeeklyCaloriesCard /> */}
-          <div className="p-4 text-center text-sm text-gray-500">
-            Weekly calories data temporarily disabled
-          </div>
+          <WeeklyCaloriesCard />
         </div>
       </div>
     </div>
