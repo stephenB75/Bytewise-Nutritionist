@@ -197,36 +197,43 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
       <div className="p-6 space-y-6">
         {/* Benefits */}
         <div className="space-y-4">
-          <h3 className="font-semibold text-gray-900 text-center">Your Nutrition Journey Awaits</h3>
+          <div className="text-center space-y-2">
+            <h3 className="text-3xl font-black tracking-tight">
+              Your <span className="bg-gradient-to-r from-[#1f4aa6] to-[#45c73e] bg-clip-text text-transparent">Nutrition</span>
+            </h3>
+            <h3 className="text-3xl font-black tracking-tight text-gray-900">
+              Journey Awaits
+            </h3>
+          </div>
           
           <div className="grid grid-cols-1 gap-3">
-            <div className="flex items-center gap-3 p-3 bg-[#faed39]/10 rounded-lg">
-              <div className="p-2 bg-[#faed39]/20 rounded-full">
-                <Zap className="w-4 h-4 text-[#faed39]" />
+            <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-[#faed39]/20 to-[#faed39]/10 rounded-xl border border-[#faed39]/30 backdrop-blur-sm">
+              <div className="p-3 bg-[#faed39]/30 rounded-full shadow-lg">
+                <Zap className="w-5 h-5 text-[#faed39]" />
               </div>
               <div>
-                <div className="font-medium text-sm">Track Your Progress</div>
-                <div className="text-xs text-gray-600">Monitor daily goals and achievements</div>
+                <div className="font-bold text-base text-gray-900">Track Your Progress</div>
+                <div className="text-sm text-gray-700">Monitor daily goals and achievements</div>
               </div>
             </div>
             
-            <div className="flex items-center gap-3 p-3 bg-[#1f4aa6]/10 rounded-lg">
-              <div className="p-2 bg-[#1f4aa6]/20 rounded-full">
-                <Shield className="w-4 h-4 text-[#1f4aa6]" />
+            <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-[#1f4aa6]/20 to-[#1f4aa6]/10 rounded-xl border border-[#1f4aa6]/30 backdrop-blur-sm">
+              <div className="p-3 bg-[#1f4aa6]/30 rounded-full shadow-lg">
+                <Shield className="w-5 h-5 text-[#1f4aa6]" />
               </div>
               <div>
-                <div className="font-medium text-sm">Secure Data Sync</div>
-                <div className="text-xs text-gray-600">Your data stays safe across devices</div>
+                <div className="font-bold text-base text-gray-900">Secure Data Sync</div>
+                <div className="text-sm text-gray-700">Your data stays safe across devices</div>
               </div>
             </div>
             
-            <div className="flex items-center gap-3 p-3 bg-[#45c73e]/10 rounded-lg">
-              <div className="p-2 bg-[#45c73e]/20 rounded-full">
-                <User className="w-4 h-4 text-[#45c73e]" />
+            <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-[#45c73e]/20 to-[#45c73e]/10 rounded-xl border border-[#45c73e]/30 backdrop-blur-sm">
+              <div className="p-3 bg-[#45c73e]/30 rounded-full shadow-lg">
+                <User className="w-5 h-5 text-[#45c73e]" />
               </div>
               <div>
-                <div className="font-medium text-sm">Personal Profile</div>
-                <div className="text-xs text-gray-600">Customize goals and preferences</div>
+                <div className="font-bold text-base text-gray-900">Personal Profile</div>
+                <div className="text-sm text-gray-700">Customize goals and preferences</div>
               </div>
             </div>
           </div>
