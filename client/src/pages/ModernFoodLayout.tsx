@@ -18,7 +18,7 @@ import { AchievementCelebration } from '@/components/AchievementCelebration';
 import { AwardsAchievements } from '@/components/AwardsAchievements';
 import { ConfettiCelebration } from '@/components/ConfettiCelebration';
 import { useGoalAchievements } from '@/hooks/useGoalAchievements';
-import { useRotatingBackground } from '@/hooks/useRotatingBackground';
+// import { useRotatingBackground } from '@/hooks/useRotatingBackground';
 import { 
   Search, 
   User,
@@ -162,7 +162,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   
   // Achievement hooks  
   const { achievements, celebrationAchievement, showCelebration, closeCelebration } = useGoalAchievements();
-  const { backgroundImage } = useRotatingBackground(activeTab);
+  // Temporary static background image until hook is fixed
+  const backgroundImage = 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80';
 
   // Handle new achievements
   useEffect(() => {
