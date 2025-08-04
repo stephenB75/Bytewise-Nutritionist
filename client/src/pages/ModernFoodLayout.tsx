@@ -18,7 +18,7 @@ import { AchievementCelebration } from '@/components/AchievementCelebration';
 import { AwardsAchievements } from '@/components/AwardsAchievements';
 import { ConfettiCelebration } from '@/components/ConfettiCelebration';
 import { useGoalAchievements } from '@/hooks/useGoalAchievements';
-// import { useRotatingBackground } from '@/hooks/useRotatingBackground';
+import { useRotatingBackground } from '@/hooks/useRotatingBackground';
 import { 
   Search, 
   User,
@@ -47,6 +47,7 @@ interface ModernFoodLayoutProps {
 export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) {
   const { user, isLoading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState('home');
+  const { backgroundImage } = useRotatingBackground(activeTab);
   const [searchQuery, setSearchQuery] = useState('');
   const [showAchievement, setShowAchievement] = useState(false);
   const [currentAchievement, setCurrentAchievement] = useState<any>(null);
@@ -157,8 +158,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   
   // Achievement hooks  
   const { achievements, celebrationAchievement, showCelebration, closeCelebration } = useGoalAchievements();
-  // Temporary static background image until hook is fixed
-  const backgroundImage = 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80';
 
   // Handle new achievements
   useEffect(() => {
@@ -279,9 +278,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
 
 
-  // Render functions for each page
+  // Render functions for each page with animations
   const renderHome = () => (
-    <div className="space-y-0 page-container">
+    <div className="space-y-0 page-container animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Full-Screen Hero Section */}
       <div className="relative h-screen overflow-hidden">
         <div 
@@ -642,7 +641,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   );
 
   const renderTracking = () => (
-    <div className="space-y-0 page-container">
+    <div className="space-y-0 page-container animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Full-Screen Hero Section */}
       <div className="relative h-screen overflow-hidden">
         <div 
@@ -848,7 +847,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   );
 
   const renderAchievements = () => (
-    <div className="space-y-0">
+    <div className="space-y-0 animate-in fade-in slide-in-from-left-4 duration-500">
       {/* Full-Screen Hero Section */}
       <div className="relative h-screen overflow-hidden">
         <div 
@@ -996,7 +995,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   );
 
   const renderSignIn = () => (
-    <div className="space-y-0">
+    <div className="space-y-0 animate-in fade-in slide-in-from-top-4 duration-500">
       {/* Full-Screen Hero Section */}
       <div className="relative h-screen overflow-hidden">
         <div 
@@ -1064,7 +1063,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   );
 
   const renderDailyWeekly = () => (
-    <div className="space-y-0">
+    <div className="space-y-0 animate-in fade-in slide-in-from-right-4 duration-500">
       {/* Full-Screen Hero Section */}
       <div className="relative h-screen overflow-hidden">
         <div 
@@ -1217,7 +1216,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
 
   const renderCalculator = () => (
-    <div className="space-y-0 page-container">
+    <div className="space-y-0 page-container animate-in fade-in slide-in-from-right-4 duration-500">
       {/* Full-Screen Hero Section */}
       <div className="relative h-screen overflow-hidden">
         <div 
@@ -1268,7 +1267,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   );
 
   const renderProfile = () => (
-    <div className="space-y-0 page-container">
+    <div className="space-y-0 page-container animate-in fade-in slide-in-from-left-4 duration-500">
       {/* Full-Screen Hero Section */}
       <div className="relative h-screen overflow-hidden">
         <div 
