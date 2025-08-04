@@ -197,11 +197,11 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
       <div className="p-6 space-y-6">
         {/* Benefits */}
         <div className="space-y-4">
-          <div className="text-center space-y-2">
-            <h3 className="text-3xl font-black tracking-tight">
+          <div className="text-center space-y-1 mb-6">
+            <h3 className="text-3xl font-black tracking-tight text-center">
               Your <span className="bg-gradient-to-r from-[#1f4aa6] to-[#45c73e] bg-clip-text text-transparent">Nutrition</span>
             </h3>
-            <h3 className="text-3xl font-black tracking-tight text-gray-900">
+            <h3 className="text-3xl font-black tracking-tight text-gray-900 text-center">
               Journey Awaits
             </h3>
           </div>
