@@ -31,7 +31,11 @@ import {
   Calendar,
   Download,
   Bell,
-  X
+  X,
+  Home,
+  BarChart3,
+  UserCircle,
+  Utensils
 } from 'lucide-react';
 import { NotificationDropdown } from '@/components/NotificationDropdown';
 import { WeeklyCaloriesCard } from '@/components/WeeklyCaloriesCard';
@@ -1453,7 +1457,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             className="bg-transparent text-white hover:bg-white/10 rounded-2xl p-4 transition-all duration-300 hover:scale-105"
             onClick={() => setShowNotificationDropdown(!showNotificationDropdown)}
           >
-            <Bell className="w-8 h-8 drop-shadow-lg" />
+            <Bell className="w-8 h-8 drop-shadow-lg" strokeWidth={2.5} />
             {notifications.filter(n => !n.read).length > 0 && (
               <div className="absolute -top-2 -right-2 w-8 h-8 bg-red-600 rounded-full flex items-center justify-center border-3 border-white shadow-xl animate-pulse ring-2 ring-red-400/50">
                 <span className="text-sm text-white font-bold drop-shadow-lg">
@@ -1513,28 +1517,35 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       {/* Content rendered based on active tab */}
       {renderContent()}
       
-      {/* Bottom Navigation - Inline Implementation */}
+      {/* Bottom Navigation - High Resolution Icons */}
       <div className="fixed bottom-0 left-0 right-0 bg-gray-900/95 backdrop-blur-md border-t border-gray-700 safe-area-pb z-50">
         <div className="flex items-center justify-around py-2 px-4 max-w-md mx-auto">
           {[
-            { id: 'home', label: 'Dashboard', icon: '🏠' },
-            { id: 'nutrition', label: 'Nutrition', icon: '🥗' },
-            { id: 'daily', label: 'Daily', icon: '📊' },
-            { id: 'profile', label: 'Profile', icon: '👤' }
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 ${
-                activeTab === tab.id
-                  ? 'bg-yellow-400/20 text-yellow-400'
-                  : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
-              }`}
-            >
-              <span className="text-lg mb-1">{tab.icon}</span>
-              <span className="text-xs font-medium">{tab.label}</span>
-            </button>
-          ))}
+            { id: 'home', label: 'Dashboard', icon: Home },
+            { id: 'nutrition', label: 'Nutrition', icon: Utensils },
+            { id: 'daily', label: 'Daily', icon: BarChart3 },
+            { id: 'profile', label: 'Profile', icon: UserCircle }
+          ].map((tab) => {
+            const IconComponent = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 ${
+                  activeTab === tab.id
+                    ? 'bg-yellow-400/20 text-yellow-400'
+                    : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+                }`}
+              >
+                <IconComponent 
+                  size={22} 
+                  className={`mb-1 ${activeTab === tab.id ? 'drop-shadow-lg' : ''}`}
+                  strokeWidth={activeTab === tab.id ? 2.5 : 2}
+                />
+                <span className="text-xs font-medium">{tab.label}</span>
+              </button>
+            )
+          })}
         </div>
       </div>
       
