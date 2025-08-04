@@ -573,47 +573,30 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   const renderTracking = () => (
     <div className={`space-y-0 page-container animate-in fade-in ${getAnimationDirection('tracking', previousTab)} duration-700 ease-out`}>
-      {/* Full-Screen Hero Section */}
-      <div className="hero-container">
-        <div 
-          className={`absolute inset-0 hero-background ${
-            isTransitioning ? 'transitioning' : ''
-          }`}
-          style={{
-            backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat'
-          }}
-        />
-        
-        {/* Hero Content - ONLY TEXT OVERLAY */}
-        <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6 z-10">
-          <div className="space-y-6 max-w-2xl animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-300">
-            <div className="space-y-2 animate-in fade-in slide-in-from-bottom-4 duration-800 delay-600">
-              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
-                Daily &
-              </h1>
-              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
-                <span className="bg-gradient-to-r from-blue-400 to-cyan-500 bg-clip-text text-transparent">
-                  Weekly
-                </span>
-              </h1>
+      <HeroSection
+        title="Daily &"
+        subtitle="Weekly"
+        description="Track your nutrition progress and log meals"
+        buttonText="Start Tracking"
+        onButtonClick={() => {
+          const searchInput = document.querySelector('input[placeholder="Search foods to log..."]') as HTMLInputElement;
+          if (searchInput) {
+            searchInput.focus();
+          }
+        }}
+      >
+        <div className="mb-8 animate-in fade-in zoom-in-50 duration-800 delay-500">
+          <div className="flex items-center justify-center space-x-4">
+            <div className="w-16 h-16 bg-blue-500/20 rounded-xl flex items-center justify-center">
+              <Calendar className="w-8 h-8 text-blue-400" />
             </div>
-            
-            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-800 delay-800">
-              Track your nutrition progress and log meals
-            </p>
+            <div className="text-left">
+              <div className="text-sm font-semibold text-blue-400">Progress Tracking</div>
+              <div className="text-xs text-gray-300">Daily & Weekly</div>
+            </div>
           </div>
         </div>
-        
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60">
-          <div className="animate-bounce">
-            <ChevronRight className="w-6 h-6 rotate-90" />
-          </div>
-        </div>
-      </div>
+      </HeroSection>
 
       {/* Content Section - Completely Separate and Underneath */}
       <div className="px-6 py-3 bg-black content-section">
@@ -784,47 +767,30 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   const renderAchievements = () => (
     <div className={`space-y-0 animate-in fade-in ${getAnimationDirection('achievements', previousTab)} duration-700 ease-out`}>
-      {/* Full-Screen Hero Section */}
-      <div className="hero-container">
-        <div 
-          className={`absolute inset-0 hero-background ${
-            isTransitioning ? 'transitioning' : ''
-          }`}
-          style={{
-            backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat'
-          }}
-        />
-        
-        {/* Hero Content - ONLY TEXT OVERLAY */}
-        <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6 z-10">
-          <div className="space-y-6 max-w-2xl">
-            <div className="space-y-2">
-              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
-                Your
-              </h1>
-              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
-                <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                  Goals
-                </span>
-              </h1>
+      <HeroSection
+        title="Your"
+        subtitle="Goals"
+        description="Track daily and weekly nutrition goals to unlock achievements"
+        buttonText="View Goals"
+        onButtonClick={() => {
+          const goalsSection = document.querySelector('.space-y-4');
+          if (goalsSection) {
+            goalsSection.scrollIntoView({ behavior: 'smooth' });
+          }
+        }}
+      >
+        <div className="mb-8 animate-in fade-in zoom-in-50 duration-800 delay-500">
+          <div className="flex items-center justify-center space-x-4">
+            <div className="w-16 h-16 bg-yellow-500/20 rounded-xl flex items-center justify-center">
+              <Trophy className="w-8 h-8 text-yellow-400" />
             </div>
-            
-            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto">
-              Track daily and weekly nutrition goals to unlock achievements
-            </p>
+            <div className="text-left">
+              <div className="text-sm font-semibold text-yellow-400">Achievement System</div>
+              <div className="text-xs text-gray-300">Goals & Progress</div>
+            </div>
           </div>
         </div>
-        
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60">
-          <div className="animate-bounce">
-            <ChevronRight className="w-6 h-6 rotate-90" />
-          </div>
-        </div>
-      </div>
+      </HeroSection>
 
       {/* Content Section - Completely Separate and Underneath */}
       <div className="px-6 py-3 bg-black content-section">
@@ -937,47 +903,30 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   const renderSignIn = () => (
     <div className="space-y-0 animate-in fade-in slide-in-from-top-4 duration-500">
-      {/* Full-Screen Hero Section */}
-      <div className="hero-container">
-        <div 
-          className={`absolute inset-0 hero-background ${
-            isTransitioning ? 'transitioning' : ''
-          }`}
-          style={{
-            backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat'
-          }}
-        />
-        
-        {/* Hero Content - ONLY TEXT OVERLAY */}
-        <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
-          <div className="space-y-6 max-w-2xl">
-            <div className="space-y-2">
-              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
-                Welcome to
-              </h1>
-              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
-                <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-                  Nutrition
-                </span>
-              </h1>
+      <HeroSection
+        title="Welcome to"
+        subtitle="Nutrition"
+        description="Sign in to start tracking your nutrition journey"
+        buttonText="Get Started"
+        onButtonClick={() => {
+          const signInCard = document.querySelector('.bg-white\\/10');
+          if (signInCard) {
+            signInCard.scrollIntoView({ behavior: 'smooth' });
+          }
+        }}
+      >
+        <div className="mb-8 animate-in fade-in zoom-in-50 duration-800 delay-500">
+          <div className="flex items-center justify-center space-x-4">
+            <div className="w-16 h-16 bg-blue-500/20 rounded-xl flex items-center justify-center">
+              <User className="w-8 h-8 text-blue-400" />
             </div>
-            
-            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto">
-              Sign in to start tracking your nutrition journey
-            </p>
+            <div className="text-left">
+              <div className="text-sm font-semibold text-blue-400">Account Access</div>
+              <div className="text-xs text-gray-300">Sign In Required</div>
+            </div>
           </div>
         </div>
-        
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60">
-          <div className="animate-bounce">
-            <ChevronRight className="w-6 h-6 rotate-90" />
-          </div>
-        </div>
-      </div>
+      </HeroSection>
 
       {/* Content Section - Completely Separate and Underneath */}
       <div className="px-6 py-3 bg-black content-section">
@@ -1214,42 +1163,34 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   const renderProfile = () => (
     <div className={`space-y-0 page-container animate-in fade-in ${getAnimationDirection('profile', previousTab)} duration-700 ease-out`}>
-      {/* Full-Screen Hero Section */}
-      <div className="relative h-screen overflow-hidden">
-        <div 
-          className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out"
-          style={{
-            backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`
-          }}
-        />
-        
-        {/* Hero Content - ONLY TEXT OVERLAY */}
-        <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
-          <div className="space-y-6 max-w-2xl">
-            <div className="space-y-2">
-              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
-                Your
-              </h1>
-              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
-                <span className="bg-gradient-to-r from-purple-400 to-blue-500 bg-clip-text text-transparent">
-                  Profile
-                </span>
-              </h1>
+      <HeroSection
+        title="Your"
+        subtitle="Profile"
+        description="Manage your account, view achievements, and track your progress"
+        buttonText={user ? "Manage Profile" : "Sign Up"}
+        onButtonClick={() => {
+          if (user) {
+            const profileNav = document.querySelector('.flex.flex-col.sm\\:flex-row');
+            if (profileNav) {
+              profileNav.scrollIntoView({ behavior: 'smooth' });
+            }
+          } else {
+            setProfileSection('profile');
+          }
+        }}
+      >
+        <div className="mb-8 animate-in fade-in zoom-in-50 duration-800 delay-500">
+          <div className="flex items-center justify-center space-x-4">
+            <div className="w-16 h-16 bg-purple-500/20 rounded-xl flex items-center justify-center">
+              <User className="w-8 h-8 text-purple-400" />
             </div>
-            
-            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto">
-              Manage your account, view achievements, and track your progress
-            </p>
+            <div className="text-left">
+              <div className="text-sm font-semibold text-purple-400">Account Management</div>
+              <div className="text-xs text-gray-300">Profile & Settings</div>
+            </div>
           </div>
         </div>
-        
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60">
-          <div className="animate-bounce">
-            <ChevronRight className="w-6 h-6 rotate-90" />
-          </div>
-        </div>
-      </div>
+      </HeroSection>
 
       {/* Content Section - Completely Separate and Underneath */}
       <div className="bg-white content-section">
@@ -1377,47 +1318,30 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       case 'data':
         return (
           <div className={`space-y-0 animate-in fade-in ${getAnimationDirection('data', previousTab)} duration-700 ease-out`}>
-            {/* Full-Screen Hero Section */}
-            <div className="hero-container">
-              <div 
-                className={`absolute inset-0 hero-background ${
-                  isTransitioning ? 'transitioning' : ''
-                }`}
-                style={{
-                  backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  backgroundRepeat: 'no-repeat'
-                }}
-              />
-              
-              {/* Hero Content - ONLY TEXT OVERLAY */}
-              <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
-                <div className="space-y-6 max-w-2xl">
-                  <div className="space-y-2">
-                    <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
-                      Data
-                    </h1>
-                    <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
-                      <span className="bg-gradient-to-r from-blue-400 to-cyan-500 bg-clip-text text-transparent">
-                        Management
-                      </span>
-                    </h1>
+            <HeroSection
+              title="Data"
+              subtitle="Management"
+              description="Export, sync, and manage your nutrition tracking data"
+              buttonText="Manage Data"
+              onButtonClick={() => {
+                const dataPanel = document.querySelector('.bg-gray-900\\/80');
+                if (dataPanel) {
+                  dataPanel.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
+            >
+              <div className="mb-8 animate-in fade-in zoom-in-50 duration-800 delay-500">
+                <div className="flex items-center justify-center space-x-4">
+                  <div className="w-16 h-16 bg-cyan-500/20 rounded-xl flex items-center justify-center">
+                    <Download className="w-8 h-8 text-cyan-400" />
                   </div>
-                  
-                  <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto">
-                    Export, sync, and manage your nutrition tracking data
-                  </p>
+                  <div className="text-left">
+                    <div className="text-sm font-semibold text-cyan-400">Data Export</div>
+                    <div className="text-xs text-gray-300">Sync & Management</div>
+                  </div>
                 </div>
               </div>
-              
-              {/* Scroll indicator */}
-              <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60">
-                <div className="animate-bounce">
-                  <ChevronRight className="w-6 h-6 rotate-90" />
-                </div>
-              </div>
-            </div>
+            </HeroSection>
 
             {/* Content Section - Completely Separate and Underneath */}
             <div className="px-6 py-8 bg-black min-h-screen">
