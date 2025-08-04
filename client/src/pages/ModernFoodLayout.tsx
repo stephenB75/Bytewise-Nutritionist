@@ -1080,7 +1080,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   );
 
   const renderDailyWeekly = () => (
-    <div className={`space-y-0 animate-in fade-in ${getAnimationDirection('search', previousTab)} duration-700 ease-out`}>
+    <div className={`space-y-0 animate-in fade-in ${getAnimationDirection('daily', previousTab)} duration-700 ease-out`}>
       {/* Full-Screen Hero Section */}
       <div className="relative h-screen overflow-hidden">
         <div 
@@ -1092,8 +1092,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         
         {/* Hero Content - ONLY TEXT OVERLAY */}
         <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
-          <div className="space-y-6 max-w-2xl">
-            <div className="space-y-2">
+          <div className="space-y-6 max-w-2xl animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-300">
+            <div className="space-y-2 animate-in fade-in slide-in-from-bottom-4 duration-800 delay-600">
               <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
                 Daily &
               </h1>
@@ -1104,7 +1104,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               </h1>
             </div>
             
-            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto">
+            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-800 delay-800">
               Track your calorie intake and search for foods to log
             </p>
           </div>
