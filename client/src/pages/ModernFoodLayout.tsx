@@ -10,12 +10,11 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import CalorieCalculator from '@/components/CalorieCalculator';
 import { UserProfile } from '@/components/UserProfile';
-import { ProfileInfoCard } from '@/components/ProfileInfoCard';
+import { UserSettingsManager } from '@/components/UserSettingsManager';
 import { SignOnModule } from '@/components/SignOnModule';
 import { useAuth } from '@/hooks/useAuth';
 import { DataManagementPanel } from '@/components/DataManagementPanel';
 import { AchievementCelebration } from '@/components/AchievementCelebration';
-import { UserAccountManagement } from '@/components/UserAccountManagement';
 import { AwardsAchievements } from '@/components/AwardsAchievements';
 import { ConfettiCelebration } from '@/components/ConfettiCelebration';
 import { useGoalAchievements } from '@/hooks/useGoalAchievements';
@@ -1347,23 +1346,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           {/* Profile Content - Scrollable Container */}
           <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
             <div className="space-y-4 pr-2">
-              {profileSection === 'overview' && (
+              {(profileSection === 'overview' || profileSection === 'account') && (
                 <div className="space-y-4">
                   {user ? (
-                    <>
-                      <UserProfile showDetails={true} size="lg" />
-                      <ProfileInfoCard />
-                    </>
-                  ) : (
-                    <SignOnModule />
-                  )}
-                </div>
-              )}
-              
-              {profileSection === 'account' && (
-                <div>
-                  {user ? (
-                    <UserAccountManagement onClose={() => setProfileSection('overview')} />
+                    <UserSettingsManager 
+                      onClose={() => setProfileSection('overview')} 
+                      initialSection={profileSection === 'account' ? 'account' : 'profile'}
+                    />
                   ) : (
                     <SignOnModule />
                   )}
