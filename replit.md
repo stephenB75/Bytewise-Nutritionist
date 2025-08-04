@@ -11,6 +11,7 @@ Preferred communication style: Simple, everyday language.
 - **Enhanced Type Safety**: Added proper TypeScript interfaces for all data structures, replacing `any` types with specific typed interfaces for better code maintainability and development experience.
 - **Advanced Page Animation System**: Implemented comprehensive directional slide animations for all page transitions with intelligent direction detection based on tab order (700ms duration with ease-out timing), enhanced tab change handling with previousTab state tracking, and smooth fade-in effects combined with contextual slide directions (left/right/bottom) for premium user experience.
 - **Full-Height Background System (August 4, 2025)**: Successfully implemented consistent full-height background images across all pages using hero-container and hero-background CSS classes with proper viewport dimensions (100vh/100vw), smooth transition effects (800ms duration), and reliable CDN food images. Fixed critical positioning issue by changing hero-container from fixed to relative positioning, ensuring proper layout without conflicts.
+- **Vertical Scroll Restoration (August 4, 2025)**: Fixed vertical scrolling functionality by removing overflow-hidden from main container div. Hero sections now properly allow natural page scrolling to content sections while maintaining all visual styling and background systems.
 
 ## System Architecture
 
