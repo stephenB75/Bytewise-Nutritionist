@@ -30,7 +30,6 @@ export function createAuthenticatedHandler(
     try {
       await handler(req as AuthenticatedRequest, res, next);
     } catch (error) {
-      console.error('Handler error:', error);
       if (!res.headersSent) {
         res.status(500).json({ message: 'Internal server error' });
       }
@@ -57,7 +56,6 @@ export async function isAuthenticated(
     const { data: { user }, error } = await supabase.auth.getUser(token);
     
     if (error || !user) {
-      console.error('Auth verification failed:', error?.message);
       return res.status(401).json({ message: 'Unauthorized' });
     }
 
@@ -70,7 +68,6 @@ export async function isAuthenticated(
 
     next();
   } catch (error) {
-    console.error('Authentication middleware error:', error);
     res.status(401).json({ message: 'Unauthorized' });
   }
 }
@@ -97,7 +94,6 @@ export async function optionalAuth(
     }
   } catch (error) {
     // Silently fail for optional auth
-    console.log('Optional auth failed:', error);
   }
   
   next();
@@ -105,14 +101,11 @@ export async function optionalAuth(
 
 // Setup function (replaces Replit auth setup)
 export async function setupAuth(app: any) {
-  console.log('🔐 Setting up Supabase authentication middleware');
   
   // Test Supabase connection
   try {
     const { data, error } = await supabase.auth.getSession();
-    console.log('✅ Supabase auth service connected');
   } catch (error) {
-    console.error('❌ Supabase auth connection failed:', error);
   }
 }
 

@@ -158,7 +158,6 @@ export function ConfettiCelebration({ isOpen, onClose, achievement }: ConfettiCe
             <Button
               onClick={() => {
                 // Share achievement functionality
-                console.log('Sharing achievement:', achievement);
                 onClose();
               }}
               variant="outline"

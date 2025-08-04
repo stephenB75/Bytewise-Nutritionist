@@ -77,7 +77,6 @@ export function useCalorieTracking() {
     const existing = stored ? JSON.parse(stored) : [];
     localStorage.setItem('calculatedCalories', JSON.stringify([...existing, newEntry]));
     
-    console.log('Added calculated calories:', newEntry);
     
     return newEntry;
   }, [logCaloriesMutation]);

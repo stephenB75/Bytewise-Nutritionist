@@ -141,7 +141,6 @@ export function useWeeklyTracker() {
     });
     window.dispatchEvent(toastEvent);
 
-    console.log(`✅ Meal logged to weekly tracker:`, entry);
   }, [currentWeek]);
 
   const getCurrentWeekData = useCallback(() => {

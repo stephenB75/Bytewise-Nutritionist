@@ -28,7 +28,6 @@ export function shouldTriggerAchievement(type: AchievementTriggerType): boolean 
 
 export function triggerAchievement(achievement: AchievementData): void {
   if (!shouldTriggerAchievement(achievement.type)) {
-    console.log(`Achievement blocked: ${achievement.title} (type: ${achievement.type})`);
     return;
   }
 

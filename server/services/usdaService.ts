@@ -85,12 +85,10 @@ export class USDAService {
       // First check local cache
       const cachedResults = await this.searchCachedFoods(query, pageSize);
       if (cachedResults.length > 0) {
-        console.log(`Found ${cachedResults.length} cached results for "${query}"`);
         return this.formatCachedAsUSDAFood(cachedResults);
       }
 
       // Search USDA API
-      console.log('🔑 API Key length:', this.apiKey?.length || 0);
       const response = await fetch(`${this.baseUrl}/foods/search?api_key=${this.apiKey}`, {
         method: 'POST',
         headers: {
@@ -117,7 +115,6 @@ export class USDAService {
       
       return data.foods;
     } catch (error) {
-      console.error('USDA search error:', error);
       
       // Fallback to cached results only
       const cachedResults = await this.searchCachedFoods(query, pageSize);
@@ -155,7 +152,6 @@ export class USDAService {
       
       return food;
     } catch (error) {
-      console.error('USDA food details error:', error);
       return null;
     }
   }
@@ -187,8 +183,6 @@ export class USDAService {
         throw new Error(`No nutrition data found for "${ingredientName}"`);
       }
 
-      console.log(`🔍 Found ${foods.length} foods for "${ingredientName}"`);
-
       // Filter and prioritize results with measurement context
       const filteredFoods = this.filterAndPrioritizeFoodsWithMeasurement(foods, ingredientName, measurement);
       if (filteredFoods.length === 0) {
@@ -198,8 +192,7 @@ export class USDAService {
       // Use the most relevant result (first one after filtering)
       const food = filteredFoods[0];
       
-      console.log(`📱 Selected food: ${food.description} (ID: ${food.fdcId})`);
-      console.log(`📊 Food has ${food.foodNutrients?.length || 0} nutrients`);
+
       
       // Extract key nutrients
       let nutrients = this.extractNutrients(food.foodNutrients);
@@ -210,14 +203,13 @@ export class USDAService {
       
       if (cookingMethod !== 'raw') {
         nutrients = applyRetentionFactors(nutrients, cookingMethod, foodGroup);
-        console.log(`🔥 Applied ${cookingMethod} retention factors for ${foodGroup}: ${JSON.stringify(nutrients)}`);
       }
       
       // Apply food-specific protein conversion factors if nitrogen data available
       const proteinFactor = getProteinConversionFactor(food.description, foodGroup);
       const proteinMethod = getProteinCalculationMethod(food.description);
       
-      console.log(`🥩 Using protein conversion factor ${proteinFactor} for ${food.description} (${proteinMethod})`)
+
       
       // Parse measurement and convert to grams
       const { quantity, unit, gramsEquivalent } = this.parseMeasurement(measurement, food);
@@ -236,7 +228,7 @@ export class USDAService {
           (nutrients.fat * gramsEquivalent) / 100,
           (nutrients.carbs * gramsEquivalent) / 100
         );
-        console.log(`🧮 Enhanced calorie calculation for "${food.description}": ${estimatedCalories} cal (${gramsEquivalent}g)`);
+
       } else {
         // Fallback to zero if no nutritional data
         estimatedCalories = 0;
@@ -268,7 +260,6 @@ export class USDAService {
         // Additional info removed to match interface
       };
     } catch (error) {
-      console.error('Calorie calculation error:', error);
       
       // Fallback to enhanced estimation with proper nutrition data
       return this.getEnhancedFallbackEstimate(ingredientName, measurement);
@@ -319,7 +310,6 @@ export class USDAService {
             },
           });
       } catch (error) {
-        console.error('Cache insert error:', error);
       }
     }
   }
@@ -338,16 +328,8 @@ export class USDAService {
       sodium: 0,
     };
 
-    console.log(`📊 Extracting nutrients from ${foodNutrients?.length || 0} items`);
-
     if (!foodNutrients || !Array.isArray(foodNutrients)) {
-      console.log('❌ No valid foodNutrients array');
       return nutrients;
-    }
-
-    // Log first nutrient to understand structure
-    if (foodNutrients.length > 0) {
-      console.log('🔍 Sample nutrient structure:', JSON.stringify(foodNutrients[0], null, 2));
     }
 
     for (const nutrient of foodNutrients) {
@@ -361,24 +343,17 @@ export class USDAService {
       const amount = nutrient.value || nutrient.amount || 0;
       const nutrientId = nutrient.nutrientId || nutrient.nutrient?.id;
 
-      // Log nutrients being processed
-      if (foodNutrients.indexOf(nutrient) < 3) {
-        console.log(`🔍 Processing: "${nutrient.nutrientName || nutrient.nutrient?.name}" (ID: ${nutrientId}) = ${amount}`);
-      }
+
 
       // Map using exact USDA nutrient IDs and names
       if (name.includes('energy') || name.includes('calorie') || nutrientId === 1008) {
         nutrients.calories = amount;
-        console.log(`🔥 Found calories: ${amount} from "${name}"`);
       } else if (name.includes('protein') || nutrientId === 1003) {
         nutrients.protein = amount;
-        console.log(`🥩 Found protein: ${amount}g from "${name}"`);
       } else if ((name.includes('carbohydrate') && !name.includes('fiber')) || nutrientId === 1005) {
         nutrients.carbs = amount;
-        console.log(`🍞 Found carbs: ${amount}g from "${name}"`);
       } else if (name.includes('total lipid') || name.includes('fat') || nutrientId === 1004) {
         nutrients.fat = amount;
-        console.log(`🧈 Found fat: ${amount}g from "${name}"`);
       } else if (name.includes('fiber') || nutrientId === 1079) {
         nutrients.fiber = amount;
       } else if (name.includes('sugar') || nutrientId === 2000) {
@@ -388,7 +363,6 @@ export class USDAService {
       }
     }
 
-    console.log(`✅ Final nutrients:`, nutrients);
     return nutrients;
   }
 
@@ -645,7 +619,7 @@ export class USDAService {
       return hasEnergy || food.dataType === 'Foundation'; // Always include Foundation foods
     });
     
-    console.log(`🔍 Filtered from ${foods.length} to ${validFoods.length} foods with valid nutrition data`);
+
     
     // Score foods based on relevance and data quality
     const scoredFoods = validFoods.map(food => {
@@ -884,16 +858,25 @@ export class USDAService {
     // Apply cooking retention factors if needed
     let adjustedNutrition = { ...nutritionData };
     if (cookingMethod !== 'raw') {
-      adjustedNutrition = applyRetentionFactors(
+      const fullNutrients = applyRetentionFactors(
         { 
           calories: nutritionData.calories,
           protein: nutritionData.protein, 
           fat: nutritionData.fat, 
-          carbs: nutritionData.carbs 
+          carbs: nutritionData.carbs,
+          fiber: 0,
+          sugar: 0,
+          sodium: 0
         },
         cookingMethod,
         foodGroup
       );
+      adjustedNutrition = {
+        calories: fullNutrients.calories,
+        protein: fullNutrients.protein,
+        carbs: fullNutrients.carbs,
+        fat: fullNutrients.fat
+      };
     }
     
     // Use food-specific calorie conversion factors for more accuracy

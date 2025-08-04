@@ -177,7 +177,6 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     const filename = `bytewise-nutrition-report-${new Date().toISOString().split('T')[0]}.pdf`;
     pdf.save(filename);
     
-    console.log('✅ PDF report generated and downloaded successfully');
     return true;
   } catch (error) {
     console.error('❌ Failed to generate PDF report:', error);

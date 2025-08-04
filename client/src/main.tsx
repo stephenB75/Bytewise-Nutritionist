@@ -10,7 +10,6 @@ import "./index.css";
 // Suppress development warnings and errors
 if (import.meta.env.DEV) {
   const originalError = console.error;
-  const originalWarn = console.warn;
   console.error = (...args) => {
     const message = String(args[0] || '');
     if (message.includes('WebSocket') || 
@@ -22,6 +21,8 @@ if (import.meta.env.DEV) {
     }
     originalError.apply(console, args);
   };
+
+  const originalWarn = console.warn;
   console.warn = (...args) => {
     const message = String(args[0] || '');
     if (message.includes('Invalid hook call') || 

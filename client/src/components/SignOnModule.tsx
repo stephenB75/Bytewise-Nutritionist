@@ -64,7 +64,6 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
         } else {
           // Set the Supabase session with the returned data
           if (data.session) {
-            console.log('Setting session:', data.session);
             try {
               const { error: sessionError } = await supabase.auth.setSession({
                 access_token: data.session.access_token,
@@ -74,7 +73,6 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
               if (sessionError) {
                 console.error('Session set error:', sessionError);
               } else {
-                console.log('Session set successfully');
                 // Refetch auth state immediately
                 await refetch();
               }

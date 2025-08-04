@@ -32,7 +32,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       if (error) {
-        console.error('Supabase sign in error:', error);
         return res.status(400).json({ message: error.message });
       }
       
@@ -47,7 +46,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
 
         } catch (dbError) {
-          console.error('Database upsert error during signin:', dbError);
           // Continue anyway since Supabase auth succeeded
         }
       }
@@ -58,7 +56,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: "Signed in successfully" 
       });
     } catch (error) {
-      console.error('Sign in endpoint error:', error);
       res.status(500).json({ message: "Sign in failed" });
     }
   });
@@ -76,7 +73,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       if (error) {
-        console.error('Supabase sign up error:', error);
         return res.status(400).json({ message: error.message });
       }
       
@@ -91,7 +87,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
 
         } catch (dbError) {
-          console.error('Database upsert error during signup:', dbError);
           // Continue anyway since Supabase auth succeeded
         }
       }
@@ -102,7 +97,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: "Account created successfully" 
       });
     } catch (error) {
-      console.error('Sign up endpoint error:', error);
       res.status(500).json({ message: "Sign up failed" });
     }
   });
@@ -132,7 +126,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { data: users, error: listError } = await serverSupabase.auth.admin.listUsers();
       
       if (listError) {
-        console.error('Error listing users:', listError);
         return res.status(500).json({ message: "Failed to find user" });
       }
       
@@ -148,15 +141,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       );
       
       if (updateError) {
-        console.error('Error confirming email:', updateError);
         return res.status(500).json({ message: "Failed to confirm email" });
       }
       
-      console.log('Email confirmed successfully for:', email);
       res.json({ message: "Email confirmed successfully" });
       
     } catch (error) {
-      console.error('Email confirmation error:', error);
       res.status(500).json({ message: "Email confirmation failed" });
     }
   });
@@ -175,7 +165,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     };
     
     // Store meal in database/memory
-    console.log('Logging meal from calculator:', mealData);
     
     res.json({ success: true, meal: mealData });
   });
@@ -221,7 +210,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json({ success: true, user: updatedUser });
     } catch (error) {
-      console.error("Error updating user profile:", error);
       res.status(500).json({ message: "Failed to update profile" });
     }
   });
@@ -241,7 +229,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json({ success: true, message: "All data deleted successfully" });
     } catch (error) {
-      console.error("Error deleting user data:", error);
       res.status(500).json({ message: "Failed to delete data" });
     }
   });
@@ -273,7 +260,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }))
           });
         } catch (error) {
-          console.error(`Error syncing ${food}:`, error);
           syncResults.push({
             query: food,
             found: 0,
@@ -314,7 +300,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         timestamp: new Date().toISOString()
       });
     } catch (error: any) {
-      console.error("Error syncing user data:", error);
       res.status(500).json({ 
         success: false,
         message: "Failed to sync user data",
@@ -347,7 +332,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }))
       });
     } catch (error) {
-      console.error("Error searching foods:", error);
       res.status(500).json({ message: "Failed to search foods" });
     }
   });

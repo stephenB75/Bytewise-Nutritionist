@@ -43,7 +43,6 @@ export const checkForUpdates = async (): Promise<AppVersion | null> => {
       }
     }
   } catch (error) {
-    console.log('Update check failed:', error);
   }
   
   return null;
