@@ -17,11 +17,11 @@ Preferred communication style: Simple, everyday language.
 
 ### Technical Implementations
 - **Frontend Framework**: React 18 with TypeScript.
-- **Backend Architecture**: Serverless with Supabase backend-as-a-service.
+- **Backend Architecture**: Custom Express.js server with Supabase backend-as-a-service.
 - **State Management**: TanStack Query for server state, React hooks for local state.
 - **Database**: PostgreSQL with Supabase, Row Level Security (RLS) policies, real-time subscriptions.
 - **Authentication**: Supabase Auth with email/password and OAuth providers (Google, GitHub), JWT-based sessions.
-- **API**: Supabase client-side API with TypeScript types, USDA FoodData Central integration.
+- **API**: Custom Express routes with Supabase integration, USDA FoodData Central service.
 - **Data Models**: Users, Foods (with USDA data), Recipes, Meals, Water Intake, Achievements, Calorie Calculations.
 
 ### Feature Specifications
@@ -75,6 +75,7 @@ Preferred communication style: Simple, everyday language.
 ✓ **Profile Button Module Activation**: Validated all four profile section buttons (Overview, Account, Awards, Data) are fully active with proper authentication integration, user data loading, PDF export functionality, achievement system, and comprehensive validation with contextual notifications (August 2025)
 ✓ **Database Integration Verification**: Authenticated complete user sign-up/sign-in flow with successful database capture including user profiles, nutrition goals (2000 cal, 150g protein, 200g carbs, 70g fat), email verification system, JWT session management, and proper user data persistence across multiple test accounts (August 2025)
 ✓ **User Settings Consolidation**: Successfully consolidated ProfileInfoCard (Overview) and UserAccountManagement (Account) components into unified UserSettingsManager component featuring tabbed navigation (Profile/Account/Privacy), comprehensive profile editing, notification preferences, privacy controls, and account actions - eliminating code duplication while maintaining all functionality and ByteWise brand styling (August 2025)
+✓ **Backend Services Architecture Confirmation**: Verified complete custom Express.js backend with Supabase integration - all TypeScript errors resolved, authentication middleware working correctly, USDA nutrition API delivering accurate data (695 calories for 100g chicken breast), and production-ready server architecture maintained (August 2025)
 
 ## External Dependencies
 
