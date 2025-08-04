@@ -47,10 +47,7 @@ export function UserProfile({ showDetails = false, size = 'md' }: UserProfilePro
     : user.email?.split('@')[0] || 'User';
 
   return (
-    <div className="relative bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden backdrop-blur-md">
-      {/* Background Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 via-purple-25 to-pink-50 opacity-60" />
-      
+    <div className="relative bg-white/10 backdrop-blur-md border-white/20 rounded-2xl overflow-hidden">
       <div className="relative p-8">
         <div className="flex flex-col items-center text-center space-y-6">
           {/* Profile Image with Glass Effect */}
@@ -76,7 +73,7 @@ export function UserProfile({ showDetails = false, size = 'md' }: UserProfilePro
           {/* Enhanced User Details */}
           <div className="space-y-4">
             <div className="flex items-center justify-center gap-3">
-              <h3 className="text-3xl font-black text-gray-800 tracking-tight" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+              <h3 className="text-3xl font-black text-white tracking-tight" style={{ fontFamily: "'League Spartan', sans-serif" }}>
                 {displayName}
               </h3>
               <Badge className="text-xs bg-[#45c73e] text-white border-0 shadow-md">
@@ -86,7 +83,7 @@ export function UserProfile({ showDetails = false, size = 'md' }: UserProfilePro
             </div>
             
             {user.email && (
-              <div className="flex items-center justify-center gap-3 text-gray-600 bg-white/50 backdrop-blur-sm rounded-full px-4 py-2 border border-white/60">
+              <div className="flex items-center justify-center gap-3 text-gray-300 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 border border-white/20">
                 <div className="p-1 bg-[#1f4aa6]/20 rounded-full">
                   <Mail className="w-4 h-4 text-[#1f4aa6]" />
                 </div>
@@ -97,7 +94,7 @@ export function UserProfile({ showDetails = false, size = 'md' }: UserProfilePro
             )}
             
             <div className="flex justify-center">
-              <Badge variant="outline" className="text-xs bg-white/50 backdrop-blur-sm border-gray-200 shadow-sm">
+              <Badge variant="outline" className="text-xs bg-white/10 backdrop-blur-sm border-white/20 text-gray-300 shadow-sm">
                 <div className="p-0.5 bg-[#faed39]/20 rounded-full mr-2">
                   <Calendar className="w-3 h-3 text-[#faed39]" />
                 </div>
@@ -108,17 +105,17 @@ export function UserProfile({ showDetails = false, size = 'md' }: UserProfilePro
           
           {/* Stats Cards */}
           <div className="grid grid-cols-3 gap-4 w-full mt-6">
-            <div className="text-center p-3 bg-white/60 backdrop-blur-sm rounded-xl border border-white/60 shadow-sm">
+            <div className="text-center p-3 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 shadow-sm">
               <div className="text-lg font-bold text-[#1f4aa6]">0</div>
-              <div className="text-xs text-gray-600">Meals</div>
+              <div className="text-xs text-gray-300">Meals</div>
             </div>
-            <div className="text-center p-3 bg-white/60 backdrop-blur-sm rounded-xl border border-white/60 shadow-sm">
+            <div className="text-center p-3 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 shadow-sm">
               <div className="text-lg font-bold text-[#45c73e]">0</div>
-              <div className="text-xs text-gray-600">Recipes</div>
+              <div className="text-xs text-gray-300">Recipes</div>
             </div>
-            <div className="text-center p-3 bg-white/60 backdrop-blur-sm rounded-xl border border-white/60 shadow-sm">
+            <div className="text-center p-3 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 shadow-sm">
               <div className="text-lg font-bold text-[#faed39]">0</div>
-              <div className="text-xs text-gray-600">Days</div>
+              <div className="text-xs text-gray-300">Days</div>
             </div>
           </div>
         </div>

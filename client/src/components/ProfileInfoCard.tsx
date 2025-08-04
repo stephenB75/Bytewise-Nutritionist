@@ -96,10 +96,7 @@ export function ProfileInfoCard({ className = '' }: ProfileInfoCardProps) {
   };
 
   return (
-    <Card className={`overflow-hidden bg-white shadow-xl border-0 rounded-2xl backdrop-blur-md ${className}`}>
-      {/* Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-blue-25 to-indigo-50 opacity-80" />
-      
+    <Card className={`overflow-hidden bg-white/10 backdrop-blur-md border-white/20 rounded-2xl ${className}`}>
       {/* Header - Always Visible */}
       <div className="relative p-6">
         <div className="flex items-center justify-between">
@@ -125,7 +122,7 @@ export function ProfileInfoCard({ className = '' }: ProfileInfoCardProps) {
 
             <div>
               <div className="flex items-center gap-3">
-                <h4 className="text-xl font-black text-gray-800 tracking-tight" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                <h4 className="text-xl font-black text-white tracking-tight" style={{ fontFamily: "'League Spartan', sans-serif" }}>
                   Profile Details
                 </h4>
                 {user?.emailVerified && (
@@ -135,7 +132,7 @@ export function ProfileInfoCard({ className = '' }: ProfileInfoCardProps) {
                   </Badge>
                 )}
               </div>
-              <p className="text-sm text-gray-600 font-medium">Manage your personal information</p>
+              <p className="text-sm text-gray-300 font-medium">Manage your personal information</p>
             </div>
           </div>
 
@@ -145,7 +142,7 @@ export function ProfileInfoCard({ className = '' }: ProfileInfoCardProps) {
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-10 w-10 p-0 bg-white/60 backdrop-blur-sm border border-white/60 shadow-sm hover:bg-white/80 hover:shadow-md transition-all duration-200 rounded-xl"
+                className="h-10 w-10 p-0 bg-white/10 backdrop-blur-sm border border-white/20 shadow-sm hover:bg-white/20 hover:shadow-md transition-all duration-200 rounded-xl"
                 onClick={() => setIsEditing(true)}
               >
                 <Edit3 className="w-4 h-4 text-[#1f4aa6]" />
@@ -154,7 +151,7 @@ export function ProfileInfoCard({ className = '' }: ProfileInfoCardProps) {
             <Button
               variant="ghost"
               size="sm"
-              className="h-10 w-10 p-0 bg-white/60 backdrop-blur-sm border border-white/60 shadow-sm hover:bg-white/80 hover:shadow-md transition-all duration-200 rounded-xl relative"
+              className="h-10 w-10 p-0 bg-white/10 backdrop-blur-sm border border-white/20 shadow-sm hover:bg-white/20 hover:shadow-md transition-all duration-200 rounded-xl relative"
               onClick={() => setShowDropdown(!showDropdown)}
             >
               <Settings className="w-4 h-4 text-[#faed39]" />
@@ -162,7 +159,7 @@ export function ProfileInfoCard({ className = '' }: ProfileInfoCardProps) {
             <Button
               variant="ghost"
               size="sm"
-              className="h-10 w-10 p-0 bg-white/60 backdrop-blur-sm border border-white/60 shadow-sm hover:bg-white/80 hover:shadow-md transition-all duration-200 rounded-xl"
+              className="h-10 w-10 p-0 bg-white/10 backdrop-blur-sm border border-white/20 shadow-sm hover:bg-white/20 hover:shadow-md transition-all duration-200 rounded-xl"
               onClick={() => setIsExpanded(!isExpanded)}
             >
               {isExpanded ? (
@@ -175,15 +172,15 @@ export function ProfileInfoCard({ className = '' }: ProfileInfoCardProps) {
 
           {/* Enhanced Profile Dropdown Menu */}
           {showDropdown && (
-            <div className="absolute top-20 right-0 z-50 w-64 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
-              <div className="p-4 border-b border-gray-100 bg-gradient-to-r from-indigo-50 via-purple-25 to-blue-50">
-                <h3 className="font-black text-gray-800 text-base tracking-tight" style={{ fontFamily: "'League Spartan', sans-serif" }}>Profile Settings</h3>
-                <p className="text-xs text-gray-600 mt-0.5">Manage your account preferences</p>
+            <div className="absolute top-20 right-0 z-50 w-64 bg-white/10 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 overflow-hidden">
+              <div className="p-4 border-b border-white/20 bg-white/10">
+                <h3 className="font-black text-white text-base tracking-tight" style={{ fontFamily: "'League Spartan', sans-serif" }}>Profile Settings</h3>
+                <p className="text-xs text-gray-300 mt-0.5">Manage your account preferences</p>
               </div>
               
               <div className="py-2">
                 <button 
-                  className="w-full px-4 py-3 text-left text-sm hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 flex items-center gap-4 text-gray-700 transition-all duration-300 group"
+                  className="w-full px-4 py-3 text-left text-sm hover:bg-white/20 flex items-center gap-4 text-gray-300 transition-all duration-300 group"
                   onClick={() => {
                     setIsEditing(true);
                     setShowDropdown(false);
@@ -193,13 +190,13 @@ export function ProfileInfoCard({ className = '' }: ProfileInfoCardProps) {
                     <Edit3 className="w-4 h-4 text-white" />
                   </div>
                   <div>
-                    <span className="font-semibold text-gray-800">Edit Profile</span>
-                    <p className="text-xs text-gray-500">Update your information</p>
+                    <span className="font-semibold text-white">Edit Profile</span>
+                    <p className="text-xs text-gray-400">Update your information</p>
                   </div>
                 </button>
                 
                 <button 
-                  className="w-full px-4 py-3 text-left text-sm hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 flex items-center gap-4 text-gray-700 transition-all duration-300 group"
+                  className="w-full px-4 py-3 text-left text-sm hover:bg-white/20 flex items-center gap-4 text-gray-300 transition-all duration-300 group"
                   onClick={() => {
                     // Change profile photo
                     setShowDropdown(false);
@@ -209,8 +206,8 @@ export function ProfileInfoCard({ className = '' }: ProfileInfoCardProps) {
                     <Camera className="w-4 h-4 text-white" />
                   </div>
                   <div>
-                    <span className="font-semibold text-gray-800">Change Photo</span>
-                    <p className="text-xs text-gray-500">Upload new avatar</p>
+                    <span className="font-semibold text-white">Change Photo</span>
+                    <p className="text-xs text-gray-400">Upload new avatar</p>
                   </div>
                 </button>
                 
