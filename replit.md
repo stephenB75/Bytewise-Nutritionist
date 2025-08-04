@@ -1,7 +1,7 @@
 # ByteWise Nutrition Tracker
 
 ## Overview
-ByteWise is a comprehensive Progressive Web App (PWA) designed for nutrition tracking, meal planning, and recipe building. It aims to help users achieve their health goals through an intuitive, mobile-first interface. The application emphasizes professional mobile interactions using a complete shadcn/ui component library and an enhanced CSS system, providing a robust solution for personal health management with a focus on real-time data and user-centric design.
+ByteWise is a comprehensive Progressive Web App (PWA) for nutrition tracking, meal planning, and recipe building. Its purpose is to help users achieve health goals through an intuitive, mobile-first interface, emphasizing professional mobile interactions and a robust CSS system. The application focuses on real-time data and user-centric design for personal health management.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
@@ -10,16 +10,17 @@ Preferred communication style: Simple, everyday language.
 
 ### UI/UX Decisions
 - **Design System**: Bytewise brand identity with League Spartan, Work Sans, and Quicksand fonts.
-- **Styling**: Tailwind CSS with shadcn/ui component library, enhanced CSS system for consistent spacing, touch interactions (44px min touch targets), drag & drop, and smooth animations.
+- **Styling**: Tailwind CSS with shadcn/ui component library, an enhanced CSS system for consistent spacing, touch interactions (44px min touch targets), drag & drop, and smooth animations. Brand colors include #faed39 (yellow), #1f4aa6 (blue), #45c73e (green), #0a0a00 (background).
 - **Mobile-First Design**: PWA with touch-optimized interfaces, seamless header-hero integration, bottom tab navigation, and safe area support.
 - **Theme System**: CSS variables with light/dark mode support.
-- **Visuals**: Faded pattern backgrounds for hero components, high-quality food images.
+- **Visuals**: Faded pattern backgrounds for hero components, high-quality food images, glass-morphism effects, rotating food background images, and a ByteWise CSS logo.
+- **Iconography**: Professional Lucide React icons for navigation.
 
 ### Technical Implementations
 - **Frontend Framework**: React 18 with TypeScript.
 - **Backend Architecture**: Custom Express.js server with Supabase backend-as-a-service.
 - **State Management**: TanStack Query for server state, React hooks for local state.
-- **Database**: PostgreSQL with Supabase, Row Level Security (RLS) policies, real-time subscriptions.
+- **Database**: PostgreSQL with Supabase, Row Level Security (RLS) policies, real-time subscriptions, and Drizzle Kit for schema migrations.
 - **Authentication**: Supabase Auth with email/password and OAuth providers (Google, GitHub), JWT-based sessions.
 - **API**: Custom Express routes with Supabase integration, USDA FoodData Central service.
 - **Data Models**: Users, Foods (with USDA data), Recipes, Meals, Water Intake, Achievements, Calorie Calculations.
@@ -28,57 +29,14 @@ Preferred communication style: Simple, everyday language.
 - **PWA Capabilities**: Offline functionality, installable, service worker for caching and push notifications.
 - **Real-time Updates**: Optimistic updates via TanStack Query.
 - **Component Library**: Extensive shadcn/ui base components augmented with custom nutrition-specific components (e.g., progress rings, meal cards).
-- **Enhanced Nutrition Analysis**: USDA-powered calorie calculations using comprehensive CSV datasets with food-specific conversion factors, precise portion weights, and detailed nutritional breakdowns. Professional ingredient database with accurate weight conversions and advanced measurement parsing system supporting fractions and food-specific portions.
+- **Enhanced Nutrition Analysis**: USDA-powered calorie calculations using comprehensive CSV datasets with food-specific conversion factors (e.g., precise protein conversion factors, food-type-specific calorie conversion factors), precise portion weights, and detailed nutritional breakdowns. Includes a professional ingredient database with accurate weight conversions and advanced measurement parsing system supporting fractions and food-specific portions, comprehensive USDA measure units, microbe data, lab methods, and cooking retention factors.
 - **Meal Logging**: Real-time nutrition calculations and dashboard updates.
 - **Recipe Creation**: Dynamic nutrition calculation as ingredients are added.
-- **Tracking**: Daily goals, aggregated consumption, calendar view for historical data.
-- **User Profile**: Comprehensive profile with personal info, preferences, and achievement system.
-- **Data Management**: Server-side persistence with real-time updates, Drizzle Kit for schema migrations.
-- **Reporting**: PDF export system for progress reports.
+- **Tracking**: Daily goals, aggregated consumption, calendar view for historical data, and weekly calorie breakdown.
+- **User Profile**: Comprehensive profile with personal info, preferences, and an achievement system. Consolidated user settings manager with tabbed navigation (Profile/Account/Privacy).
+- **Data Management**: Server-side persistence with real-time updates and PDF export system for progress reports using jsPDF.
 - **Native Mobile Support**: Android and iOS support using Capacitor framework with relevant mobile plugins.
-
-## Recent Major Enhancements
-✓ **Complete USDA Database Integration**: Implemented 17 comprehensive USDA CSV datasets totaling 275,000+ records including microbe data, lab methods, protein factors, and complete nutrient profiles
-✓ **Food-Specific Protein Conversion**: Integrated precise protein conversion factors (dairy: 6.38, nuts: 5.46, legumes: 5.30, grains: 5.83-5.95) replacing generic 6.25 formula
-✓ **Enhanced Calorie Conversion Factors**: Food-type-specific factors (protein: 2.44-4.27, fat: 8.37-9.02, carbs: 3.57-4.16) for maximum accuracy
-✓ **Comprehensive Measure Units**: Added 124 USDA measure units with intelligent food-specific unit suggestions and validation
-✓ **Probiotic and Microbe Tracking**: Integrated USDA microbe database for probiotic strain identification and health benefit analysis
-✓ **Advanced Lab Method Validation**: 285 analytical methods for data quality assurance and calculation transparency
-✓ **Cooking Retention Factors**: Nutrient retention calculations for different cooking methods with food-group-specific adjustments
-✓ **Complete Nutrient Database**: 479 nutrients with proper categorization, validation ranges, and formatting standards
-✓ **Real-Time Enhanced Calculations**: All nutrition calculations use authentic USDA data with cooking adjustments, protein factors, and comprehensive validation
-✓ **React Import Issues Resolution**: Fixed all "Cannot read properties of null (reading 'useState')" errors across 10+ components by removing problematic React import patterns
-✓ **Visual Redesign Activation**: Successfully deployed complete visual redesign with rotating backgrounds, interactive progress rings, and ADHD-friendly design elements (August 2025)  
-✓ **Fresh Start Redesign**: Created completely new interface from scratch keeping only calorie calculator function, featuring auto-rotating themes, modern card design, and streamlined user experience (August 2025)  
-✓ **Complete Modern Redesign**: Implemented comprehensive UI overhaul with glass-morphism effects, rotating food background images, ByteWise CSS logo integration, bottom tab navigation, and enhanced mobile-first experience while preserving full USDA calorie calculator functionality (August 2025)
-✓ **Production-Ready Clean Release**: Eliminated all console errors, fixed TypeScript diagnostics, suppressed browser extension interference, and cleaned debug messages for pristine professional experience (August 2025)
-✓ **Brand Standard Hero Layout**: Applied consistent full-screen hero layout pattern to all pages with centered text overlays, high-quality background images, scroll indicators, and content sections completely separated underneath (August 2025)
-✓ **Hero Logo Scale Enhancement**: Optimized CSS logo size to 3.825rem (61px) main text and 1.0625rem (17px) tagline for balanced visual hierarchy with hero headings, reduced by 15% for better proportion (August 2025)
-✓ **PDF Export Enhancement**: Fixed PDF generation to create actual .pdf files using jsPDF library with CSS logo branding, professional A4 formatting, multi-page support, and high-resolution rendering (August 2025)
-✓ **Comprehensive App Redesign**: Removed "bytewise" from header, replaced categories with macro/micro nutrient progress cards, added daily/weekly tracking page with food search bar, eliminated favorites page, updated achievements to goal tracking, implemented discover-style hero layouts across all pages, added profile components (data management, user info, account settings), and included sign-on page (August 2025)
-✓ **Standard Layout Implementation**: Established standard layout with "home, nutrition, daily, profile" navigation structure without sign-on module, providing direct access to nutrition tracking interface (August 2025)
-✓ **Codebase Cleanup**: Removed unused files and console logs, cleaned 87 components, eliminated debug files, optimized imports, and established clean professional codebase with zero LSP diagnostics (August 2025)
-✓ **Preview Screen Fix**: Resolved blank preview screen by simplifying main.tsx rendering process and verifying React component structure works correctly (August 2025)
-✓ **Enhanced Feature Implementation**: Added notification bell icon with dropdown functionality, changed home to dashboard navigation, implemented comprehensive user account management, awards/achievements system with progress tracking, confetti celebrations for daily/weekly goals, and improved profile navigation structure (August 2025)
-✓ **UI/UX Improvements**: Moved notification icon to fixed position on right side without outline, updated splash screen with CSS logo instead of apple icon, implemented global header notifications on all pages, and restructured profile components to stack vertically for better mobile experience (August 2025)
-✓ **Final Profile Layout Fix**: Successfully implemented complete vertical stacking for all profile page components including UserProfile, ProfileInfoCard, UserAccountManagement, AwardsAchievements, and DataManagementPanel with single-column layouts and proper mobile-first responsive design (August 2025)
-✓ **Brand Color Integration**: Applied comprehensive ByteWise brand colors throughout application including #faed39 (yellow), #1f4aa6 (blue), #45c73e (green), #0a0a00 (background) in CSS variables, progress components, navigation, achievements, loading screens, and all major UI elements (August 2025)
-✓ **Production Data Cleanup**: Removed all mock achievements, test notifications, sample calorie data, and placeholder statistics from components - app now starts with clean production state (August 2025)
-✓ **User Authentication Integration**: Added comprehensive Supabase authentication system with SignOnModule integrated into profile page, supporting email/password and OAuth (Google, GitHub) login methods while maintaining existing app layout and design (August 2025)
-✓ **Profile Page Functionality**: Fixed all profile page components (Overview, Account, Awards, Data) with proper authentication integration, real user data connections, functional save/export operations, achievements system, and data management capabilities (August 2025)
-✓ **Profile Button Validation**: Added comprehensive validation functions to Overview, Account, Data, and Awards buttons including authentication checks, loading state management, section validation, user feedback notifications, and proper error handling with contextual messages (August 2025)
-✓ **Text Input Enhancements**: Improved all input field visibility with centered text alignment, proper dark text contrast, and enhanced focus states for better user experience across search fields and forms (August 2025)
-✓ **Weekly Calories Display**: Added WeeklyCaloriesCard component showing daily calorie breakdown positioned under "Logged Today" entries with real-time updates and weekly summary calculations (August 2025)
-✓ **Dashboard Streamlining**: Removed "Daily Goal Achieved" card from dashboard for cleaner interface while maintaining daily progress metrics, weekly tracking, and macro breakdown displays (August 2025)
-✓ **Final Code Cleanup**: Removed all remaining console logs, optimized imports, cleaned debug statements, and finalized production-ready codebase with zero LSP diagnostics and clean professional state (August 2025)
-✓ **Complete Authentication System Validation**: Confirmed all sign-in functions performing perfectly including account creation, email verification, JWT token management, user data retrieval, security validation, and session management with production-ready error handling (August 2025)
-✓ **Profile Button Module Activation**: Validated all four profile section buttons (Overview, Account, Awards, Data) are fully active with proper authentication integration, user data loading, PDF export functionality, achievement system, and comprehensive validation with contextual notifications (August 2025)
-✓ **Database Integration Verification**: Authenticated complete user sign-up/sign-in flow with successful database capture including user profiles, nutrition goals (2000 cal, 150g protein, 200g carbs, 70g fat), email verification system, JWT session management, and proper user data persistence across multiple test accounts (August 2025)
-✓ **User Settings Consolidation**: Successfully consolidated ProfileInfoCard (Overview) and UserAccountManagement (Account) components into unified UserSettingsManager component featuring tabbed navigation (Profile/Account/Privacy), comprehensive profile editing, notification preferences, privacy controls, and account actions - eliminating code duplication while maintaining all functionality and ByteWise brand styling (August 2025)
-✓ **Backend Services Architecture Confirmation**: Verified complete custom Express.js backend with Supabase integration - all TypeScript errors resolved, authentication middleware working correctly, USDA nutrition API delivering accurate data (695 calories for 100g chicken breast), and production-ready server architecture maintained (August 2025)
-✓ **Comprehensive Codebase Cleanup**: Removed 15+ unused/redundant components and files, cleaned up duplicate database files (kept only enhancedIngredientDatabase), fixed all TypeScript import errors and LSP diagnostics, removed unused API client libraries and auth wrappers, cleaned up 25+ attached CSV/XLSX files and debug screenshots, removed console logs and debug comments from production code, simplified main.tsx rendering process, fixed Navigation component import error with inline implementation, reduced component count from 87+ to 71 while preserving all core functionality (August 2025)
-✓ **High-Resolution Navigation Icons**: Upgraded bottom navigation from emoji icons to professional Lucide React icons (Home, Utensils, BarChart3, UserCircle) with enhanced stroke weights, shadows, and active states for crisp display across all devices (August 2025)
-✓ **Profile Page Button Layout Optimization**: Redesigned all profile page component button layouts for better mobile experience including responsive navigation tabs with gradient active states, improved UserSettingsManager action buttons with full-width mobile layout, enhanced DataManagementPanel export/sync buttons with column-to-row responsive design, and optimized AwardsAchievements category filters with grid-based mobile layout (August 2025)
+- **User Interaction**: Notification bell icon with dropdown functionality, confetti celebrations for daily/weekly goals.
 
 ## External Dependencies
 
@@ -86,12 +44,14 @@ Preferred communication style: Simple, everyday language.
 - `@neondatabase/serverless`: PostgreSQL connection.
 - `drizzle-orm`: Type-safe database operations.
 - `connect-pg-simple`: PostgreSQL session storage.
+- `supabase-js`: Supabase client library.
 
 ### UI & Styling
 - `@radix-ui/*`: Headless UI primitives.
 - `tailwindcss`: Utility-first CSS framework.
 - `class-variance-authority`: Component variant management.
 - `lucide-react`: Icon system.
+- `jsPDF`: PDF generation library.
 
 ### Data & State Management
 - `@tanstack/react-query`: Server state management.
@@ -107,3 +67,4 @@ Preferred communication style: Simple, everyday language.
 - `vite`: Frontend build tool and development server.
 - `typescript`: Language for type safety.
 - `tsx`: TypeScript execution for Node.js.
+```
