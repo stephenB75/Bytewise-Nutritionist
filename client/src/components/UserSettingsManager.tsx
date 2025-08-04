@@ -47,10 +47,7 @@ export function UserSettingsManager({ onClose, initialSection = 'profile' }: Use
   const { user } = useAuth();
   const { toast } = useToast();
   
-  // Active section management
-  const [activeSection, setActiveSection] = useState(initialSection);
-  
-  // Profile editing states
+  // Profile editing states (remove tab navigation since we're combining everything)
   const [isEditing, setIsEditing] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -194,50 +191,9 @@ export function UserSettingsManager({ onClose, initialSection = 'profile' }: Use
           )}
         </div>
 
-        {/* Section Navigation */}
-        <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4">
-          <div className="flex gap-2">
-            <Button
-              variant={activeSection === 'profile' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setActiveSection('profile')}
-              className={activeSection === 'profile' 
-                ? "bg-[#1f4aa6] hover:bg-[#1a3f95] text-white" 
-                : "text-gray-300 hover:text-white hover:bg-white/20"
-              }
-            >
-              <User className="w-4 h-4 mr-2" />
-              Profile
-            </Button>
-            <Button
-              variant={activeSection === 'account' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setActiveSection('account')}
-              className={activeSection === 'account' 
-                ? "bg-[#1f4aa6] hover:bg-[#1a3f95] text-white" 
-                : "text-gray-300 hover:text-white hover:bg-white/20"
-              }
-            >
-              <Settings className="w-4 h-4 mr-2" />
-              Account
-            </Button>
-            <Button
-              variant={activeSection === 'privacy' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setActiveSection('privacy')}
-              className={activeSection === 'privacy' 
-                ? "bg-[#1f4aa6] hover:bg-[#1a3f95] text-white" 
-                : "text-gray-300 hover:text-white hover:bg-white/20"
-              }
-            >
-              <Shield className="w-4 h-4 mr-2" />
-              Privacy
-            </Button>
-          </div>
-        </Card>
-
-        {/* Profile Section */}
-        {activeSection === 'profile' && (
+        {/* Combined Profile & Account Section */}
+        <div className="space-y-6">
+          {/* Profile Information */}
           <Card className="bg-white/10 backdrop-blur-md border-white/20 overflow-hidden">
             {/* Profile Header */}
             <div className="relative p-6">
@@ -458,11 +414,8 @@ export function UserSettingsManager({ onClose, initialSection = 'profile' }: Use
               )}
             </div>
           </Card>
-        )}
 
-        {/* Account Section */}
-        {activeSection === 'account' && (
-          <div className="space-y-6">
+          {/* Account Settings */}
             {/* Personal Information */}
             <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
               <div className="flex items-center justify-between mb-6">
@@ -586,11 +539,7 @@ export function UserSettingsManager({ onClose, initialSection = 'profile' }: Use
                 </Button>
               </div>
             </Card>
-          </div>
-        )}
-
-        {/* Privacy Section */}
-        {activeSection === 'privacy' && (
+          {/* Privacy & Security Settings */}
           <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
             <h3 className="text-xl font-semibold text-white flex items-center mb-6" style={{ fontFamily: "'League Spartan', sans-serif" }}>
               <Shield className="w-5 h-5 mr-2 text-[#45c73e]" />
@@ -618,7 +567,7 @@ export function UserSettingsManager({ onClose, initialSection = 'profile' }: Use
               ))}
             </div>
           </Card>
-        )}
+        </div>
       </div>
     </div>
   );

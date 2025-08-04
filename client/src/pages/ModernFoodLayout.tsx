@@ -55,18 +55,18 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const [loggedMeals, setLoggedMeals] = useState<any[]>([]);
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
   const [trackingView, setTrackingView] = useState('daily'); // 'daily' or 'weekly'
-  const [profileSection, setProfileSection] = useState('overview'); // 'overview', 'account', 'achievements', 'data'
+  const [profileSection, setProfileSection] = useState('profile'); // 'profile', 'achievements', 'data'
   
   // Validation functions for profile sections
   const validateProfileSection = (sectionId: string): boolean => {
-    const validSections = ['overview', 'account', 'achievements', 'data'];
+    const validSections = ['profile', 'achievements', 'data'];
     if (!validSections.includes(sectionId)) {
       // Invalid profile section
       return false;
     }
     
-    // Check if user is authenticated for account/data sections
-    if ((sectionId === 'account' || sectionId === 'data') && !user) {
+    // Check if user is authenticated for profile/data sections
+    if ((sectionId === 'profile' || sectionId === 'data') && !user) {
       // Show notification about requiring authentication
       setNotifications(prev => [{
         id: Date.now().toString(),
@@ -115,21 +115,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         timestamp: new Date(),
         read: false
       }, ...prev]);
-    } else if (sectionId === 'account') {
-      setNotifications(prev => [{
-        id: Date.now().toString(),
-        type: 'info' as const,
-        title: 'Account Settings',
-        message: 'Update your profile and manage account preferences',
-        timestamp: new Date(),
-        read: false
-      }, ...prev]);
-    } else if (sectionId === 'overview') {
+    } else if (sectionId === 'profile') {
       setNotifications(prev => [{
         id: Date.now().toString(),
         type: 'success' as const,
-        title: 'Profile Overview',
-        message: 'Welcome to your nutrition tracking dashboard',
+        title: 'Profile & Account',
+        message: 'Manage your personal information and account settings',
         timestamp: new Date(),
         read: false
       }, ...prev]);
@@ -1315,10 +1306,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       <div className="bg-white content-section">
         <div className="max-w-4xl mx-auto px-6 py-3 main-content profile-content h-full flex flex-col">
           {/* Profile Navigation */}
-          <div className="grid grid-cols-2 md:flex md:space-x-2 gap-2 md:gap-0 mb-4">
+          <div className="grid grid-cols-1 md:flex md:space-x-2 gap-2 md:gap-0 mb-4">
             {[
-              { id: 'overview', name: 'Overview', icon: User },
-              { id: 'account', name: 'Account', icon: Settings },
+              { id: 'profile', name: 'Profile & Account', icon: User },
               { id: 'achievements', name: 'Awards', icon: Trophy },
               { id: 'data', name: 'Data', icon: Download }
             ].map((section) => {
@@ -1346,12 +1336,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           {/* Profile Content - Scrollable Container */}
           <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
             <div className="space-y-4 pr-2">
-              {(profileSection === 'overview' || profileSection === 'account') && (
+              {profileSection === 'profile' && (
                 <div className="space-y-4">
                   {user ? (
                     <UserSettingsManager 
-                      onClose={() => setProfileSection('overview')} 
-                      initialSection={profileSection === 'account' ? 'account' : 'profile'}
+                      onClose={() => setProfileSection('profile')} 
+                      initialSection="profile"
                     />
                   ) : (
                     <SignOnModule />
@@ -1361,7 +1351,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               
               {profileSection === 'achievements' && (
                 user ? (
-                  <AwardsAchievements onClose={() => setProfileSection('overview')} />
+                  <AwardsAchievements onClose={() => setProfileSection('profile')} />
                 ) : (
                   <SignOnModule />
                 )
