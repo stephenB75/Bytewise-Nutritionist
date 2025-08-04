@@ -311,9 +311,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         
         {/* Hero Content - ONLY TEXT OVERLAY */}
         <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
-          <div className="space-y-8 max-w-2xl">
+          <div className="space-y-8 max-w-2xl animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-300">
             {/* CSS Logo - Hero Size */}
-            <div className="mb-8">
+            <div className="mb-8 animate-in fade-in zoom-in-50 duration-800 delay-500">
               <div 
                 className="cursor-pointer hover:scale-105 transition-transform duration-200"
                 onClick={() => setActiveTab('home')}
@@ -349,7 +349,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               </div>
             </div>
             
-            <div className="space-y-2">
+            <div className="space-y-2 animate-in fade-in slide-in-from-bottom-4 duration-800 delay-700">
               <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
                 Track Your
               </h1>
@@ -360,11 +360,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               </h1>
             </div>
             
-            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto">
+            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-800 delay-900">
               Track nutrition with scientific precision using our comprehensive USDA database
             </p>
             
-            <div className="pt-8">
+            <div className="pt-8 animate-in fade-in slide-in-from-bottom-4 duration-800 delay-1100">
               <Button 
                 onClick={() => {
                   if (user) {
@@ -670,8 +670,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         
         {/* Hero Content - ONLY TEXT OVERLAY */}
         <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
-          <div className="space-y-6 max-w-2xl">
-            <div className="space-y-2">
+          <div className="space-y-6 max-w-2xl animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-300">
+            <div className="space-y-2 animate-in fade-in slide-in-from-bottom-4 duration-800 delay-600">
               <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
                 Daily &
               </h1>
@@ -682,7 +682,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               </h1>
             </div>
             
-            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto">
+            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-800 delay-800">
               Track your nutrition progress and log meals
             </p>
           </div>
@@ -1233,7 +1233,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
 
   const renderCalculator = () => (
-    <div className="space-y-0 page-container animate-in fade-in slide-in-from-right-4 duration-500">
+    <div className={`space-y-0 page-container animate-in fade-in ${getAnimationDirection('nutrition', previousTab)} duration-700 ease-out`}>
       {/* Full-Screen Hero Section */}
       <div className="relative h-screen overflow-hidden">
         <div 
@@ -1245,8 +1245,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         
         {/* Hero Content - ONLY TEXT OVERLAY */}
         <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
-          <div className="space-y-6 max-w-2xl">
-            <div className="space-y-2">
+          <div className="space-y-6 max-w-2xl animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-300">
+            <div className="space-y-2 animate-in fade-in slide-in-from-bottom-4 duration-800 delay-600">
               <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
                 USDA
               </h1>
@@ -1257,7 +1257,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               </h1>
             </div>
             
-            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto">
+            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-800 delay-800">
               Precise nutrition data for every ingredient using comprehensive USDA database
             </p>
           </div>
