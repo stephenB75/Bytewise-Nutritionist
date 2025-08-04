@@ -126,35 +126,36 @@ export function UserAccountManagement({ onClose }: UserAccountManagementProps) {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <div className="p-3 bg-gradient-to-br from-[#faed39] to-[#1f4aa6] rounded-xl">
-            <User className="w-6 h-6 text-white" />
+    <div className="bg-black min-h-screen px-6 py-3">
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="p-3 bg-gradient-to-br from-[#faed39] to-[#1f4aa6] rounded-xl">
+              <User className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-white" style={{ fontFamily: "'League Spartan', sans-serif" }}>Account Management</h2>
+              <p className="text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>Manage your profile and account settings</p>
+            </div>
           </div>
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900" style={{ fontFamily: "'League Spartan', sans-serif" }}>Account Management</h2>
-            <p className="text-gray-600" style={{ fontFamily: "'Work Sans', sans-serif" }}>Manage your profile and account settings</p>
-          </div>
+          {onClose && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-gray-400 hover:text-white"
+              onClick={onClose}
+            >
+              <X className="w-5 h-5" />
+            </Button>
+          )}
         </div>
-        {onClose && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-gray-600 hover:text-gray-900"
-            onClick={onClose}
-          >
-            <X className="w-5 h-5" />
-          </Button>
-        )}
-      </div>
 
-      {/* Profile Information */}
-      <Card className="bg-white/95 backdrop-blur-md border border-gray-200/50 shadow-xl p-6">
+        {/* Profile Information */}
+        <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-semibold text-gray-900 flex items-center" style={{ fontFamily: "'League Spartan', sans-serif" }}>
-            <User className="w-5 h-5 mr-2 text-[#1f4aa6]" />
+          <h3 className="text-xl font-semibold text-white flex items-center" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+            <User className="w-5 h-5 mr-2 text-[#faed39]" />
             Profile Information
           </h3>
           <Button
@@ -170,42 +171,42 @@ export function UserAccountManagement({ onClose }: UserAccountManagementProps) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="text-sm text-gray-700 mb-2 block font-medium" style={{ fontFamily: "'Work Sans', sans-serif" }}>Full Name</label>
+            <label className="text-sm text-gray-300 mb-2 block font-medium" style={{ fontFamily: "'Work Sans', sans-serif" }}>Full Name</label>
             {isEditing ? (
               <Input
                 value={userInfo.name}
                 onChange={(e) => handleInputChange('name', e.target.value)}
-                className="border-gray-300 focus:border-[#1f4aa6] focus:ring-[#1f4aa6] text-center"
+                className="bg-white/20 border-white/30 text-white text-center placeholder-gray-400 focus:border-[#faed39] focus:ring-[#faed39]"
               />
             ) : (
-              <p className="text-gray-900 bg-gray-50 p-3 rounded border text-center" style={{ fontFamily: "'Quicksand', sans-serif" }}>{userInfo.name}</p>
+              <p className="text-white bg-white/10 p-3 rounded border border-white/20 text-center" style={{ fontFamily: "'Quicksand', sans-serif" }}>{userInfo.name}</p>
             )}
           </div>
 
           <div>
-            <label className="text-sm text-gray-700 mb-2 block font-medium" style={{ fontFamily: "'Work Sans', sans-serif" }}>Email</label>
+            <label className="text-sm text-gray-300 mb-2 block font-medium" style={{ fontFamily: "'Work Sans', sans-serif" }}>Email</label>
             {isEditing ? (
               <Input
                 value={userInfo.email}
                 onChange={(e) => handleInputChange('email', e.target.value)}
-                className="border-gray-300 focus:border-[#1f4aa6] focus:ring-[#1f4aa6] text-center"
+                className="bg-white/20 border-white/30 text-white text-center placeholder-gray-400 focus:border-[#faed39] focus:ring-[#faed39]"
               />
             ) : (
-              <p className="text-gray-900 bg-gray-50 p-3 rounded border text-center" style={{ fontFamily: "'Quicksand', sans-serif" }}>{userInfo.email}</p>
+              <p className="text-white bg-white/10 p-3 rounded border border-white/20 text-center" style={{ fontFamily: "'Quicksand', sans-serif" }}>{userInfo.email}</p>
             )}
           </div>
 
           <div>
-            <label className="text-sm text-gray-700 mb-2 block font-medium" style={{ fontFamily: "'Work Sans', sans-serif" }}>Phone</label>
+            <label className="text-sm text-gray-300 mb-2 block font-medium" style={{ fontFamily: "'Work Sans', sans-serif" }}>Phone</label>
             {isEditing ? (
               <Input
                 value={userInfo.phone}
                 onChange={(e) => handleInputChange('phone', e.target.value)}
-                className="border-gray-300 focus:border-[#1f4aa6] focus:ring-[#1f4aa6] text-center"
+                className="bg-white/20 border-white/30 text-white text-center placeholder-gray-400 focus:border-[#faed39] focus:ring-[#faed39]"
                 placeholder="(555) 123-4567"
               />
             ) : (
-              <p className="text-gray-900 bg-gray-50 p-3 rounded border text-center" style={{ fontFamily: "'Quicksand', sans-serif" }}>{userInfo.phone || 'Not provided'}</p>
+              <p className="text-white bg-white/10 p-3 rounded border border-white/20 text-center" style={{ fontFamily: "'Quicksand', sans-serif" }}>{userInfo.phone || 'Not provided'}</p>
             )}
           </div>
 
@@ -224,55 +225,55 @@ export function UserAccountManagement({ onClose }: UserAccountManagementProps) {
           </div>
 
           <div>
-            <label className="text-sm text-gray-700 mb-2 block font-medium" style={{ fontFamily: "'Work Sans', sans-serif" }}>Height</label>
+            <label className="text-sm text-gray-300 mb-2 block font-medium" style={{ fontFamily: "'Work Sans', sans-serif" }}>Height</label>
             {isEditing ? (
               <Input
                 value={userInfo.height}
                 onChange={(e) => handleInputChange('height', e.target.value)}
-                className="border-gray-300 focus:border-[#1f4aa6] focus:ring-[#1f4aa6] text-center"
+                className="bg-white/20 border-white/30 text-white text-center placeholder-gray-400 focus:border-[#faed39] focus:ring-[#faed39]"
                 placeholder="5'10&quot;"
               />
             ) : (
-              <p className="text-gray-900 bg-gray-50 p-3 rounded border text-center" style={{ fontFamily: "'Quicksand', sans-serif" }}>{userInfo.height || 'Not provided'}</p>
+              <p className="text-white bg-white/10 p-3 rounded border border-white/20 text-center" style={{ fontFamily: "'Quicksand', sans-serif" }}>{userInfo.height || 'Not provided'}</p>
             )}
           </div>
 
           <div>
-            <label className="text-sm text-gray-700 mb-2 block font-medium" style={{ fontFamily: "'Work Sans', sans-serif" }}>Weight</label>
+            <label className="text-sm text-gray-300 mb-2 block font-medium" style={{ fontFamily: "'Work Sans', sans-serif" }}>Weight</label>
             {isEditing ? (
               <Input
                 value={userInfo.weight}
                 onChange={(e) => handleInputChange('weight', e.target.value)}
-                className="border-gray-300 focus:border-[#1f4aa6] focus:ring-[#1f4aa6] text-center"
+                className="bg-white/20 border-white/30 text-white text-center placeholder-gray-400 focus:border-[#faed39] focus:ring-[#faed39]"
                 placeholder="170 lbs"
               />
             ) : (
-              <p className="text-gray-900 bg-gray-50 p-3 rounded border text-center" style={{ fontFamily: "'Quicksand', sans-serif" }}>{userInfo.weight || 'Not provided'}</p>
+              <p className="text-white bg-white/10 p-3 rounded border border-white/20 text-center" style={{ fontFamily: "'Quicksand', sans-serif" }}>{userInfo.weight || 'Not provided'}</p>
             )}
           </div>
 
           <div className="md:col-span-2">
-            <label className="text-sm text-gray-700 mb-2 block font-medium" style={{ fontFamily: "'Work Sans', sans-serif" }}>Activity Level</label>
-            <p className="text-gray-900 bg-gray-50 p-3 rounded border text-center" style={{ fontFamily: "'Quicksand', sans-serif" }}>{userInfo.activityLevel}</p>
+            <label className="text-sm text-gray-300 mb-2 block font-medium" style={{ fontFamily: "'Work Sans', sans-serif" }}>Activity Level</label>
+            <p className="text-white bg-white/10 p-3 rounded border border-white/20 text-center" style={{ fontFamily: "'Quicksand', sans-serif" }}>{userInfo.activityLevel}</p>
           </div>
         </div>
       </Card>
 
       {/* Notification Preferences */}
-      <Card className="bg-white/95 backdrop-blur-md border border-gray-200/50 shadow-xl p-6">
-        <h3 className="text-xl font-semibold text-gray-900 flex items-center mb-6" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+      <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
+        <h3 className="text-xl font-semibold text-white flex items-center mb-6" style={{ fontFamily: "'League Spartan', sans-serif" }}>
           <Bell className="w-5 h-5 mr-2 text-[#faed39]" />
           Notification Preferences
         </h3>
 
         <div className="space-y-4">
           {Object.entries(preferences.notifications).map(([key, value]) => (
-            <div key={key} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+            <div key={key} className="flex items-center justify-between p-4 bg-white/10 rounded-lg border border-white/20">
               <div>
-                <p className="text-gray-900 capitalize font-medium" style={{ fontFamily: "'Work Sans', sans-serif" }}>
+                <p className="text-white capitalize font-medium" style={{ fontFamily: "'Work Sans', sans-serif" }}>
                   {key.replace(/([A-Z])/g, ' $1').trim()}
                 </p>
-                <p className="text-sm text-gray-600" style={{ fontFamily: "'Quicksand', sans-serif" }}>
+                <p className="text-sm text-gray-300" style={{ fontFamily: "'Quicksand', sans-serif" }}>
                   {key === 'mealReminders' && 'Get reminders to log your meals'}
                   {key === 'goalAlerts' && 'Notifications when you reach goals'}
                   {key === 'weeklyReports' && 'Weekly nutrition summary reports'}
@@ -283,7 +284,7 @@ export function UserAccountManagement({ onClose }: UserAccountManagementProps) {
                 variant={value ? "default" : "outline"}
                 size="sm"
                 onClick={() => handlePreferenceChange('notifications', key, !value)}
-                className={value ? "bg-[#45c73e] hover:bg-[#3ab82e] text-white" : "border-gray-300 text-gray-700 hover:bg-gray-100"}
+                className={value ? "bg-[#45c73e] hover:bg-[#3ab82e] text-white" : "border-white/30 text-white hover:bg-white/20"}
               >
                 {value ? 'Enabled' : 'Disabled'}
               </Button>
@@ -293,20 +294,20 @@ export function UserAccountManagement({ onClose }: UserAccountManagementProps) {
       </Card>
 
       {/* Privacy Settings */}
-      <Card className="bg-white/95 backdrop-blur-md border border-gray-200/50 shadow-xl p-6">
-        <h3 className="text-xl font-semibold text-gray-900 flex items-center mb-6" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+      <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
+        <h3 className="text-xl font-semibold text-white flex items-center mb-6" style={{ fontFamily: "'League Spartan', sans-serif" }}>
           <Shield className="w-5 h-5 mr-2 text-[#1f4aa6]" />
           Privacy & Security
         </h3>
 
         <div className="space-y-4">
           {Object.entries(preferences.privacy).map(([key, value]) => (
-            <div key={key} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+            <div key={key} className="flex items-center justify-between p-4 bg-white/10 rounded-lg border border-white/20">
               <div>
-                <p className="text-gray-900 capitalize font-medium" style={{ fontFamily: "'Work Sans', sans-serif" }}>
+                <p className="text-white capitalize font-medium" style={{ fontFamily: "'Work Sans', sans-serif" }}>
                   {key.replace(/([A-Z])/g, ' $1').trim()}
                 </p>
-                <p className="text-sm text-gray-600" style={{ fontFamily: "'Quicksand', sans-serif" }}>
+                <p className="text-sm text-gray-300" style={{ fontFamily: "'Quicksand', sans-serif" }}>
                   {key === 'profileVisible' && 'Make your profile visible to other users'}
                   {key === 'shareProgress' && 'Share your progress with friends'}
                   {key === 'dataAnalytics' && 'Help improve the app with anonymous data'}
@@ -316,7 +317,7 @@ export function UserAccountManagement({ onClose }: UserAccountManagementProps) {
                 variant={value ? "default" : "outline"}
                 size="sm"
                 onClick={() => handlePreferenceChange('privacy', key, !value)}
-                className={value ? "bg-[#1f4aa6] hover:bg-[#1850a0] text-white" : "border-gray-300 text-gray-700 hover:bg-gray-100"}
+                className={value ? "bg-[#1f4aa6] hover:bg-[#1850a0] text-white" : "border-white/30 text-white hover:bg-white/20"}
               >
                 {value ? 'Enabled' : 'Disabled'}
               </Button>
@@ -326,25 +327,26 @@ export function UserAccountManagement({ onClose }: UserAccountManagementProps) {
       </Card>
 
       {/* Account Actions */}
-      <Card className="bg-white/95 backdrop-blur-md border border-gray-200/50 shadow-xl p-6">
-        <h3 className="text-xl font-semibold text-gray-900 mb-6" style={{ fontFamily: "'League Spartan', sans-serif" }}>Account Actions</h3>
+      <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
+        <h3 className="text-xl font-semibold text-white mb-6" style={{ fontFamily: "'League Spartan', sans-serif" }}>Account Actions</h3>
         <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-white/10 rounded-lg border border-white/20">
             <div>
-              <p className="text-gray-900 font-medium" style={{ fontFamily: "'Work Sans', sans-serif" }}>Sign Out</p>
-              <p className="text-sm text-gray-600" style={{ fontFamily: "'Quicksand', sans-serif" }}>Sign out of your account</p>
+              <p className="text-white font-medium" style={{ fontFamily: "'Work Sans', sans-serif" }}>Sign Out</p>
+              <p className="text-sm text-gray-300" style={{ fontFamily: "'Quicksand', sans-serif" }}>Sign out of your account</p>
             </div>
             <Button 
               variant="outline" 
               size="sm"
               onClick={handleSignOut}
-              className="border-gray-300 text-gray-700 hover:bg-gray-100"
+              className="border-white/30 text-white hover:bg-white/20"
             >
               Sign Out
             </Button>
           </div>
         </div>
       </Card>
+      </div>
     </div>
   );
 }

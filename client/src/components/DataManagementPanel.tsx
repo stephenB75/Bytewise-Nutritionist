@@ -133,61 +133,62 @@ export function DataManagementPanel() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <div className="p-3 bg-gradient-to-br from-[#faed39] to-[#1f4aa6] rounded-xl">
-            <Database className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900" style={{ fontFamily: "'League Spartan', sans-serif" }}>Data Management</h2>
-            <p className="text-gray-600" style={{ fontFamily: "'Work Sans', sans-serif" }}>Export, sync, and manage your nutrition data</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Data Overview */}
-      <Card className="bg-white/95 backdrop-blur-md border border-gray-200/50 shadow-xl p-6">
-        <h3 className="text-xl font-semibold text-gray-900 mb-6" style={{ fontFamily: "'League Spartan', sans-serif" }}>Data Overview</h3>
-        
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-          <div className="text-center p-4 bg-gradient-to-br from-[#45c73e]/10 to-[#45c73e]/5 rounded-lg border border-[#45c73e]/20">
-            <div className="text-2xl font-bold text-[#1f4aa6]" style={{ fontFamily: "'League Spartan', sans-serif" }}>{dataStats.totalMeals}</div>
-            <div className="text-sm text-gray-600" style={{ fontFamily: "'Work Sans', sans-serif" }}>Meals Logged</div>
-          </div>
-          <div className="text-center p-4 bg-gradient-to-br from-[#1f4aa6]/10 to-[#1f4aa6]/5 rounded-lg border border-[#1f4aa6]/20">
-            <div className="text-2xl font-bold text-[#1f4aa6]" style={{ fontFamily: "'League Spartan', sans-serif" }}>{dataStats.totalDays}</div>
-            <div className="text-sm text-gray-600" style={{ fontFamily: "'Work Sans', sans-serif" }}>Days Tracked</div>
-          </div>
-          <div className="text-center p-4 bg-gradient-to-br from-[#faed39]/10 to-[#faed39]/5 rounded-lg border border-[#faed39]/20">
-            <div className="text-2xl font-bold text-[#1f4aa6]" style={{ fontFamily: "'League Spartan', sans-serif" }}>{dataStats.dataSize}</div>
-            <div className="text-sm text-gray-600" style={{ fontFamily: "'Work Sans', sans-serif" }}>Data Size</div>
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+    <div className="bg-black min-h-screen px-6 py-3">
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <Cloud className="w-5 h-5 text-[#1f4aa6]" />
+            <div className="p-3 bg-gradient-to-br from-[#faed39] to-[#1f4aa6] rounded-xl">
+              <Database className="w-6 h-6 text-white" />
+            </div>
             <div>
-              <p className="font-medium text-gray-900" style={{ fontFamily: "'Work Sans', sans-serif" }}>Backup Status</p>
-              <p className="text-sm text-gray-600" style={{ fontFamily: "'Quicksand', sans-serif" }}>Last sync: {dataStats.lastSync}</p>
+              <h2 className="text-2xl font-bold text-white" style={{ fontFamily: "'League Spartan', sans-serif" }}>Data Management</h2>
+              <p className="text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>Export, sync, and manage your nutrition data</p>
             </div>
           </div>
-          <Badge className="bg-[#45c73e]/10 text-[#45c73e] border-[#45c73e]/20">
-            {dataStats.backupStatus}
-          </Badge>
         </div>
-      </Card>
 
-      {/* Export Section */}
-      <Card className="bg-white/95 backdrop-blur-md border border-gray-200/50 shadow-xl p-6">
+        {/* Data Overview */}
+        <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
+          <h3 className="text-xl font-semibold text-white mb-6" style={{ fontFamily: "'League Spartan', sans-serif" }}>Data Overview</h3>
+        
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+            <div className="text-center p-4 bg-gradient-to-br from-[#45c73e]/10 to-[#45c73e]/5 rounded-lg border border-[#45c73e]/20">
+              <div className="text-2xl font-bold text-[#45c73e]" style={{ fontFamily: "'League Spartan', sans-serif" }}>{dataStats.totalMeals}</div>
+              <div className="text-sm text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>Meals Logged</div>
+            </div>
+            <div className="text-center p-4 bg-gradient-to-br from-[#1f4aa6]/10 to-[#1f4aa6]/5 rounded-lg border border-[#1f4aa6]/20">
+              <div className="text-2xl font-bold text-[#1f4aa6]" style={{ fontFamily: "'League Spartan', sans-serif" }}>{dataStats.totalDays}</div>
+              <div className="text-sm text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>Days Tracked</div>
+            </div>
+            <div className="text-center p-4 bg-gradient-to-br from-[#faed39]/10 to-[#faed39]/5 rounded-lg border border-[#faed39]/20">
+              <div className="text-2xl font-bold text-[#faed39]" style={{ fontFamily: "'League Spartan', sans-serif" }}>{dataStats.dataSize}</div>
+              <div className="text-sm text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>Data Size</div>
+            </div>
+        </div>
+
+          <div className="flex items-center justify-between p-4 bg-white/10 rounded-lg border border-white/20">
+            <div className="flex items-center space-x-3">
+              <Cloud className="w-5 h-5 text-[#1f4aa6]" />
+              <div>
+                <p className="font-medium text-white" style={{ fontFamily: "'Work Sans', sans-serif" }}>Backup Status</p>
+                <p className="text-sm text-gray-300" style={{ fontFamily: "'Quicksand', sans-serif" }}>Last sync: {dataStats.lastSync}</p>
+              </div>
+            </div>
+            <Badge className="bg-[#45c73e]/20 text-[#45c73e] border-[#45c73e]/30">
+              {dataStats.backupStatus}
+            </Badge>
+          </div>
+        </Card>
+
+        {/* Export Section */}
+        <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-3">
             <Download className="w-5 h-5 text-[#1f4aa6]" />
             <div>
-              <h4 className="font-semibold text-gray-900 text-lg" style={{ fontFamily: "'League Spartan', sans-serif" }}>Export Your Data</h4>
-              <p className="text-gray-600" style={{ fontFamily: "'Work Sans', sans-serif" }}>Download comprehensive nutrition reports</p>
+              <h4 className="font-semibold text-white text-lg" style={{ fontFamily: "'League Spartan', sans-serif" }}>Export Your Data</h4>
+              <p className="text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>Download comprehensive nutrition reports</p>
             </div>
           </div>
           <Badge className="bg-[#45c73e]/10 text-[#45c73e] border-[#45c73e]/20">
@@ -196,12 +197,12 @@ export function DataManagementPanel() {
         </div>
 
         <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-white/10 rounded-lg border border-white/20">
             <div className="flex items-center space-x-3">
               <FileText className="w-5 h-5 text-[#1f4aa6]" />
               <div>
-                <p className="font-medium text-gray-900" style={{ fontFamily: "'Work Sans', sans-serif" }}>Progress Report (PDF)</p>
-                <p className="text-sm text-gray-600" style={{ fontFamily: "'Quicksand', sans-serif" }}>Complete nutrition tracking report with charts and insights</p>
+                <p className="font-medium text-white" style={{ fontFamily: "'Work Sans', sans-serif" }}>Progress Report (PDF)</p>
+                <p className="text-sm text-gray-300" style={{ fontFamily: "'Quicksand', sans-serif" }}>Complete nutrition tracking report with charts and insights</p>
               </div>
             </div>
             <Button
@@ -223,12 +224,12 @@ export function DataManagementPanel() {
             </Button>
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-white/10 rounded-lg border border-white/20">
             <div className="flex items-center space-x-3">
               <Archive className="w-5 h-5 text-[#1f4aa6]" />
               <div>
-                <p className="font-medium text-gray-900" style={{ fontFamily: "'Work Sans', sans-serif" }}>Raw Data Export</p>
-                <p className="text-sm text-gray-600" style={{ fontFamily: "'Quicksand', sans-serif" }}>Export all data in JSON format for backup or analysis</p>
+                <p className="font-medium text-white" style={{ fontFamily: "'Work Sans', sans-serif" }}>Raw Data Export</p>
+                <p className="text-sm text-gray-300" style={{ fontFamily: "'Quicksand', sans-serif" }}>Export all data in JSON format for backup or analysis</p>
               </div>
             </div>
             <Button
@@ -240,25 +241,25 @@ export function DataManagementPanel() {
             </Button>
           </div>
         </div>
-      </Card>
+        </Card>
 
-      {/* Sync & Maintenance */}
-      <Card className="bg-white/95 backdrop-blur-md border border-gray-200/50 shadow-xl p-6">
-        <div className="flex items-center space-x-3 mb-6">
-          <RefreshCw className="w-5 h-5 text-[#1f4aa6]" />
-          <div>
-            <h4 className="font-semibold text-gray-900 text-lg" style={{ fontFamily: "'League Spartan', sans-serif" }}>Sync & Maintenance</h4>
-            <p className="text-gray-600" style={{ fontFamily: "'Work Sans', sans-serif" }}>Keep your data synchronized and optimized</p>
+        {/* Sync & Maintenance */}
+        <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
+          <div className="flex items-center space-x-3 mb-6">
+            <RefreshCw className="w-5 h-5 text-[#1f4aa6]" />
+            <div>
+              <h4 className="font-semibold text-white text-lg" style={{ fontFamily: "'League Spartan', sans-serif" }}>Sync & Maintenance</h4>
+              <p className="text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>Keep your data synchronized and optimized</p>
+            </div>
           </div>
-        </div>
 
         <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-white/10 rounded-lg border border-white/20">
             <div className="flex items-center space-x-3">
               <Cloud className="w-5 h-5 text-[#1f4aa6]" />
               <div>
-                <p className="font-medium text-gray-900" style={{ fontFamily: "'Work Sans', sans-serif" }}>Sync Data</p>
-                <p className="text-sm text-gray-600" style={{ fontFamily: "'Quicksand', sans-serif" }}>Synchronize your data across all devices</p>
+                <p className="font-medium text-white" style={{ fontFamily: "'Work Sans', sans-serif" }}>Sync Data</p>
+                <p className="text-sm text-gray-300" style={{ fontFamily: "'Quicksand', sans-serif" }}>Synchronize your data across all devices</p>
               </div>
             </div>
             <Button
@@ -280,19 +281,19 @@ export function DataManagementPanel() {
             </Button>
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-white/10 rounded-lg border border-white/20">
             <div className="flex items-center space-x-3">
               <HardDrive className="w-5 h-5 text-[#1f4aa6]" />
               <div>
-                <p className="font-medium text-gray-900" style={{ fontFamily: "'Work Sans', sans-serif" }}>Clear Cache</p>
-                <p className="text-sm text-gray-600" style={{ fontFamily: "'Quicksand', sans-serif" }}>Clear app cache to free up storage space</p>
+                <p className="font-medium text-white" style={{ fontFamily: "'Work Sans', sans-serif" }}>Clear Cache</p>
+                <p className="text-sm text-gray-300" style={{ fontFamily: "'Quicksand', sans-serif" }}>Clear app cache to free up storage space</p>
               </div>
             </div>
             <Button
               onClick={handleClearCache}
               disabled={isClearing}
               variant="outline"
-              className="border-gray-300 text-gray-700 hover:bg-gray-100"
+              className="border-white/30 text-white hover:bg-white/20"
             >
               {isClearing ? (
                 <>
@@ -308,24 +309,24 @@ export function DataManagementPanel() {
             </Button>
           </div>
         </div>
-      </Card>
+        </Card>
 
-      {/* Danger Zone */}
-      <Card className="bg-red-50/80 backdrop-blur-md border border-red-200/50 shadow-xl p-6">
+        {/* Danger Zone */}
+        <Card className="bg-red-950/30 backdrop-blur-md border border-red-800/30 p-6">
         <div className="flex items-center space-x-3 mb-6">
           <AlertCircle className="w-5 h-5 text-red-600" />
           <div>
-            <h4 className="font-semibold text-red-900 text-lg" style={{ fontFamily: "'League Spartan', sans-serif" }}>Danger Zone</h4>
-            <p className="text-red-700" style={{ fontFamily: "'Work Sans', sans-serif" }}>Irreversible actions - proceed with caution</p>
+            <h4 className="font-semibold text-red-400 text-lg" style={{ fontFamily: "'League Spartan', sans-serif" }}>Danger Zone</h4>
+            <p className="text-red-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>Irreversible actions - proceed with caution</p>
           </div>
         </div>
 
-        <div className="flex items-center justify-between p-4 bg-red-100/50 rounded-lg border border-red-200">
+        <div className="flex items-center justify-between p-4 bg-red-950/40 rounded-lg border border-red-800/40">
           <div className="flex items-center space-x-3">
             <Trash2 className="w-5 h-5 text-red-600" />
             <div>
-              <p className="font-medium text-red-900" style={{ fontFamily: "'Work Sans', sans-serif" }}>Delete All Data</p>
-              <p className="text-sm text-red-700" style={{ fontFamily: "'Quicksand', sans-serif" }}>Permanently delete all your nutrition data and progress</p>
+              <p className="font-medium text-red-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>Delete All Data</p>
+              <p className="text-sm text-red-400" style={{ fontFamily: "'Quicksand', sans-serif" }}>Permanently delete all your nutrition data and progress</p>
             </div>
           </div>
           <Button
@@ -337,7 +338,8 @@ export function DataManagementPanel() {
             Delete All
           </Button>
         </div>
-      </Card>
+        </Card>
+      </div>
     </div>
   );
 }
