@@ -297,155 +297,183 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     setActiveTab(newTab);
   };
 
-  // Render functions for each page with enhanced animations
-  const renderHome = () => (
-    <div className={`space-y-0 page-container animate-in fade-in ${getAnimationDirection('home', previousTab)} duration-700 ease-out`}>
-      {/* Full-Screen Hero Section */}
-      <div className="hero-container">
-        <div 
-          className={`absolute inset-0 hero-background ${
-            isTransitioning ? 'transitioning' : ''
-          }`}
-          style={{
-            backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat'
-          }}
-        />
-        
-        {/* Hero Content - ONLY TEXT OVERLAY */}
-        <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6 z-10">
-          <div className="space-y-8 max-w-2xl animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-300">
-            {/* CSS Logo - Hero Size */}
-            <div className="mb-8 animate-in fade-in zoom-in-50 duration-800 delay-500">
-              <div 
-                className="cursor-pointer hover:scale-105 transition-transform duration-200"
-                onClick={() => setActiveTab('home')}
-                style={{
-                  fontFamily: "'League Spartan', sans-serif",
-                  textAlign: 'center'
-                }}
-              >
-                <div 
-                  style={{
-                    fontSize: '4.5rem',
-                    fontWeight: '900', 
-                    lineHeight: '0.9',
-                    color: '#7dd3fc',
-                    marginBottom: '0.5rem',
-                    textTransform: 'lowercase',
-                    letterSpacing: '-0.02em'
-                  }}
-                >
-                  bytewise
-                </div>
-                <div 
-                  style={{
-                    fontSize: '1.25rem',
-                    fontWeight: '300',
-                    color: 'rgba(255,255,255,0.8)',
-                    letterSpacing: '0.15em',
-                    textTransform: 'uppercase'
-                  }}
-                >
-                  nutritionist
-                </div>
-              </div>
-            </div>
-            
-            <div className="space-y-2 animate-in fade-in slide-in-from-bottom-4 duration-800 delay-700">
-              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
-                Track Your
-              </h1>
-              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
-                <span className="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">
-                  Nutrition
-                </span>
-              </h1>
-            </div>
-            
-            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-800 delay-900">
-              Track nutrition with scientific precision using our comprehensive USDA database
-            </p>
-            
-            <div className="pt-8 animate-in fade-in slide-in-from-bottom-4 duration-800 delay-1100">
-              <Button 
-                onClick={() => {
-                  if (user) {
-                    // Authenticated user - go to calorie calculator
-                    setActiveTab('calculator');
-                  } else {
-                    // Unauthenticated user - go to profile page with sign-up
-                    setActiveTab('profile');
-                  }
-                }}
-                size="lg"
-                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-black px-16 py-6 rounded-full text-2xl shadow-2xl transform hover:scale-105 transition-all duration-500 border-2 border-orange-400/30"
-              >
-                {user ? 'Start Tracking' : 'Sign Up to Track'}
-              </Button>
-            </div>
+  // Helper components for cleaner code
+  const HeroSection = ({ title, subtitle, description, buttonText, onButtonClick, children }) => (
+    <div className="hero-container">
+      <div 
+        className={`absolute inset-0 hero-background ${isTransitioning ? 'transitioning' : ''}`}
+        style={{
+          backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      />
+      
+      <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6 z-10">
+        <div className="space-y-8 max-w-2xl animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-300">
+          {children}
+          
+          <div className="space-y-2 animate-in fade-in slide-in-from-bottom-4 duration-800 delay-700">
+            <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">{title}</h1>
+            <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
+              <span className="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">{subtitle}</span>
+            </h1>
           </div>
-        </div>
-        
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60">
-          <div className="animate-bounce">
-            <ChevronRight className="w-6 h-6 rotate-90" />
+          
+          <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-800 delay-900">
+            {description}
+          </p>
+          
+          <div className="pt-8 animate-in fade-in slide-in-from-bottom-4 duration-800 delay-1100">
+            <Button 
+              onClick={onButtonClick}
+              size="lg"
+              className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-black px-16 py-6 rounded-full text-2xl shadow-2xl transform hover:scale-105 transition-all duration-500 border-2 border-orange-400/30"
+            >
+              {buttonText}
+            </Button>
           </div>
         </div>
       </div>
+      
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60">
+        <div className="animate-bounce">
+          <ChevronRight className="w-6 h-6 rotate-90" />
+        </div>
+      </div>
+    </div>
+  );
+
+  const BytewiseLogo = () => (
+    <div className="mb-8 animate-in fade-in zoom-in-50 duration-800 delay-500">
+      <div 
+        className="cursor-pointer hover:scale-105 transition-transform duration-200"
+        onClick={() => setActiveTab('home')}
+        style={{ fontFamily: "'League Spartan', sans-serif", textAlign: 'center' }}
+      >
+        <div style={{
+          fontSize: '4.5rem', fontWeight: '900', lineHeight: '0.9', color: '#7dd3fc',
+          marginBottom: '0.5rem', textTransform: 'lowercase', letterSpacing: '-0.02em'
+        }}>
+          bytewise
+        </div>
+        <div style={{
+          fontSize: '1.25rem', fontWeight: '300', color: 'rgba(255,255,255,0.8)',
+          letterSpacing: '0.15em', textTransform: 'uppercase'
+        }}>
+          nutritionist
+        </div>
+      </div>
+    </div>
+  );
+
+  const ProgressCard = ({ title, icon: Icon, value, goal, percentage, color, children }) => (
+    <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center space-x-3">
+          <div className={`p-2 bg-${color}-500/20 rounded-xl`}>
+            <Icon className={`w-5 h-5 text-${color}-400`} />
+          </div>
+          <div>
+            <h3 className="text-white font-semibold">{title}</h3>
+            <p className="text-gray-400 text-sm">{value}/{goal}</p>
+          </div>
+        </div>
+        <div className="text-right">
+          <div className={`text-2xl font-bold text-${color}-400`}>{percentage}%</div>
+          <div className="text-xs text-gray-400">of goal</div>
+        </div>
+      </div>
+      <div className="relative h-3 bg-gray-800 rounded-full overflow-hidden mb-4">
+        <div 
+          className={`absolute left-0 top-0 h-full bg-gradient-to-r from-${color}-400 to-${color === 'orange' ? 'red' : 'cyan'}-500 rounded-full transition-all duration-1000`}
+          style={{ width: `${Math.min(percentage, 100)}%` }}
+        />
+        {percentage >= 100 && (
+          <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full animate-pulse" />
+        )}
+      </div>
+      {children}
+    </Card>
+  );
+
+  const MacroCard = ({ name, value, color, data = [0, 0, 0, 0, 0] }) => (
+    <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4">
+      <div className="text-center">
+        <div className="text-sm text-gray-400 mb-1">{name}</div>
+        <div className={`text-xl font-bold text-${color}-400 mb-2`}>{value}g</div>
+        <div className="flex items-end space-x-px h-6">
+          {data.map((height, i) => (
+            <div 
+              key={i}
+              className={`flex-1 bg-${color}-400/10 rounded-t`}
+              style={{ height: `${Math.max(height * 100, 10)}%` }}
+            />
+          ))}
+        </div>
+      </div>
+    </Card>
+  );
+
+  const MicronutrientCard = ({ name, value, goal, unit, color, percentage = 0 }) => (
+    <Card className="bg-white/10 backdrop-blur-md border-white/20 p-3">
+      <div className="flex items-center justify-between mb-2">
+        <div className={`text-sm font-semibold text-${color}-400`}>{name}</div>
+        <div className="text-xs text-gray-400">{value}/{goal}{unit}</div>
+      </div>
+      <div className="relative h-2 bg-gray-800 rounded-full overflow-hidden">
+        <div 
+          className={`absolute left-0 top-0 h-full bg-gradient-to-r from-${color}-400 to-${color === 'cyan' ? 'blue' : color === 'orange' ? 'yellow' : color === 'red' ? 'pink' : 'emerald'}-500 rounded-full transition-all duration-1000`} 
+          style={{ width: `${percentage}%` }} 
+        />
+      </div>
+      <div className="text-xs text-gray-500 mt-1">{percentage}% DV</div>
+    </Card>
+  );
+
+  // Render functions for each page with enhanced animations
+  const renderHome = () => (
+    <div className={`space-y-0 page-container animate-in fade-in ${getAnimationDirection('home', previousTab)} duration-700 ease-out`}>
+      <HeroSection
+        title="Track Your"
+        subtitle="Nutrition"
+        description="Track nutrition with scientific precision using our comprehensive USDA database"
+        buttonText={user ? 'Start Tracking' : 'Sign Up to Track'}
+        onButtonClick={() => {
+          if (user) {
+            setActiveTab('calculator');
+          } else {
+            setActiveTab('profile');
+          }
+        }}
+      >
+        <BytewiseLogo />
+      </HeroSection>
 
       {/* Content Section - Completely Separate and Underneath */}
       <div className="px-6 py-3 bg-black content-section">
-        {/* Enhanced Daily Progress Metrics with Graphs */}
         <div className="space-y-3">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-xl font-black text-white">Today's Progress</h2>
             <Button 
               variant="ghost" 
               className="text-orange-400 hover:text-orange-300"
-              onClick={() => {
-                if (user) {
-                  setActiveTab('calculator');
-                } else {
-                  setActiveTab('profile');
-                }
-              }}
+              onClick={() => setActiveTab(user ? 'calculator' : 'profile')}
             >
               {user ? 'Track Food' : 'Sign Up to Track'}
             </Button>
           </div>
 
-          {/* Daily Calorie Progress Card with Graph */}
-          <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-orange-500/20 rounded-xl">
-                  <Flame className="w-5 h-5 text-orange-400" />
-                </div>
-                <div>
-                  <h3 className="text-white font-semibold">Daily Calories</h3>
-                  <p className="text-gray-400 text-sm">{Math.round(dailyCalories)}/{goalCalories} kcal</p>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="text-2xl font-bold text-orange-400">{Math.round((dailyCalories/goalCalories)*100)}%</div>
-                <div className="text-xs text-gray-400">of goal</div>
-              </div>
-            </div>
-            {/* Progress Bar Graph */}
-            <div className="relative h-3 bg-gray-800 rounded-full overflow-hidden mb-4">
-              <div 
-                className="absolute left-0 top-0 h-full bg-gradient-to-r from-orange-400 to-red-500 rounded-full transition-all duration-1000"
-                style={{ width: `${Math.min((dailyCalories/goalCalories)*100, 100)}%` }}
-              />
-              {dailyCalories >= goalCalories && (
-                <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full animate-pulse" />
-              )}
-            </div>
-            {/* Detailed metrics */}
+          {/* Daily Progress */}
+          <ProgressCard
+            title="Daily Calories"
+            icon={Flame}
+            value={`${Math.round(dailyCalories)} kcal`}
+            goal={`${goalCalories} kcal`}
+            percentage={Math.round((dailyCalories/goalCalories)*100)}
+            color="orange"
+          >
             <div className="grid grid-cols-3 gap-3 mt-4">
               <div className="text-center p-2 bg-gray-800/50 rounded-lg">
                 <div className="text-sm font-bold text-orange-400">{loggedMeals.length}</div>
@@ -460,100 +488,37 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 <div className="text-xs text-gray-400">Complete</div>
               </div>
             </div>
-          </Card>
+          </ProgressCard>
 
-          {/* Weekly Progress Card with Trend Line */}
-          <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4 weekly-progress-container">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-blue-500/20 rounded-xl">
-                  <Calendar className="w-5 h-5 text-blue-400" />
-                </div>
-                <div>
-                  <h3 className="text-white font-semibold">Weekly Progress</h3>
-                  <p className="text-gray-400 text-sm">{Math.round(weeklyCalories)}/{weeklyGoal} kcal</p>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="text-2xl font-bold text-blue-400">{Math.round((weeklyCalories/weeklyGoal)*100)}%</div>
-                <div className="text-xs text-gray-400">completed</div>
-              </div>
-            </div>
-            {/* Weekly Progress Bar */}
-            <div className="relative h-3 bg-gray-800 rounded-full overflow-hidden mb-4">
-              <div 
-                className="absolute left-0 top-0 h-full bg-gradient-to-r from-blue-400 to-cyan-500 rounded-full transition-all duration-1000"
-                style={{ width: `${Math.min((weeklyCalories/weeklyGoal)*100, 100)}%` }}
-              />
-            </div>
-            {/* Detailed weekly metrics */}
+          {/* Weekly Progress */}
+          <ProgressCard
+            title="Weekly Progress"
+            icon={Calendar}
+            value={`${Math.round(weeklyCalories)} kcal`}
+            goal={`${weeklyGoal} kcal`}
+            percentage={Math.round((weeklyCalories/weeklyGoal)*100)}
+            color="blue"
+          >
             <div className="grid grid-cols-4 gap-2 mt-4">
-              <div className="text-center p-2 bg-gray-800/50 rounded-lg">
-                <div className="text-sm font-bold text-blue-400">7</div>
-                <div className="text-xs text-gray-400">Days</div>
-              </div>
-              <div className="text-center p-2 bg-gray-800/50 rounded-lg">
-                <div className="text-sm font-bold text-blue-400">{Math.round(weeklyCalories/7)}</div>
-                <div className="text-xs text-gray-400">Avg/Day</div>
-              </div>
-              <div className="text-center p-2 bg-gray-800/50 rounded-lg">
-                <div className="text-sm font-bold text-blue-400">{Math.round(weeklyGoal - weeklyCalories)}</div>
-                <div className="text-xs text-gray-400">Remain</div>
-              </div>
-              <div className="text-center p-2 bg-gray-800/50 rounded-lg">
-                <div className="text-sm font-bold text-blue-400">{loggedMeals.length}</div>
-                <div className="text-xs text-gray-400">Total</div>
-              </div>
+              {[
+                { label: 'Days', value: '7' },
+                { label: 'Avg/Day', value: Math.round(weeklyCalories/7) },
+                { label: 'Remain', value: Math.round(weeklyGoal - weeklyCalories) },
+                { label: 'Total', value: loggedMeals.length }
+              ].map((item, index) => (
+                <div key={index} className="text-center p-2 bg-gray-800/50 rounded-lg">
+                  <div className="text-sm font-bold text-blue-400">{item.value}</div>
+                  <div className="text-xs text-gray-400">{item.label}</div>
+                </div>
+              ))}
             </div>
-          </Card>
+          </ProgressCard>
 
-          {/* Macros Breakdown with Mini Graphs */}
-          <div className="grid grid-cols-3 gap-4 mb-4 macros-grid">
-            <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4">
-              <div className="text-center">
-                <div className="text-sm text-gray-400 mb-1">Protein</div>
-                <div className="text-xl font-bold text-green-400 mb-2">0g</div>
-                <div className="flex items-end space-x-px h-6">
-                  {[0, 0, 0, 0, 0].map((height, i) => (
-                    <div 
-                      key={i}
-                      className="flex-1 bg-green-400/10 rounded-t"
-                      style={{ height: `${Math.max(height * 100, 10)}%` }}
-                    />
-                  ))}
-                </div>
-              </div>
-            </Card>
-            <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4">
-              <div className="text-center">
-                <div className="text-sm text-gray-400 mb-1">Carbs</div>
-                <div className="text-xl font-bold text-yellow-400 mb-2">0g</div>
-                <div className="flex items-end space-x-px h-6">
-                  {[0, 0, 0, 0, 0].map((height, i) => (
-                    <div 
-                      key={i}
-                      className="flex-1 bg-yellow-400/10 rounded-t"
-                      style={{ height: `${Math.max(height * 100, 10)}%` }}
-                    />
-                  ))}
-                </div>
-              </div>
-            </Card>
-            <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4">
-              <div className="text-center">
-                <div className="text-sm text-gray-400 mb-1">Fat</div>
-                <div className="text-xl font-bold text-purple-400 mb-2">0g</div>
-                <div className="flex items-end space-x-px h-6">
-                  {[0, 0, 0, 0, 0].map((height, i) => (
-                    <div 
-                      key={i}
-                      className="flex-1 bg-purple-400/10 rounded-t"
-                      style={{ height: `${Math.max(height * 100, 10)}%` }}
-                    />
-                  ))}
-                </div>
-              </div>
-            </Card>
+          {/* Macros Breakdown */}
+          <div className="grid grid-cols-3 gap-4 mb-4">
+            <MacroCard name="Protein" value={0} color="green" />
+            <MacroCard name="Carbs" value={0} color="yellow" />
+            <MacroCard name="Fat" value={0} color="purple" />
           </div>
 
           {/* Micronutrients Section */}
@@ -563,98 +528,18 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               Essential Micronutrients
             </h3>
             
-            {/* Vitamins Grid */}
             <div className="grid grid-cols-2 gap-3 mb-4">
-              <Card className="bg-white/10 backdrop-blur-md border-white/20 p-3">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="text-sm font-semibold text-cyan-400">Vitamin C</div>
-                  <div className="text-xs text-gray-400">0/90mg</div>
-                </div>
-                <div className="relative h-2 bg-gray-800 rounded-full overflow-hidden">
-                  <div className="absolute left-0 top-0 h-full bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full transition-all duration-1000" style={{ width: '0%' }} />
-                </div>
-                <div className="text-xs text-gray-500 mt-1">0% DV</div>
-              </Card>
-              
-              <Card className="bg-white/10 backdrop-blur-md border-white/20 p-3">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="text-sm font-semibold text-orange-400">Vitamin D</div>
-                  <div className="text-xs text-gray-400">0/20μg</div>
-                </div>
-                <div className="relative h-2 bg-gray-800 rounded-full overflow-hidden">
-                  <div className="absolute left-0 top-0 h-full bg-gradient-to-r from-orange-400 to-yellow-500 rounded-full transition-all duration-1000" style={{ width: '0%' }} />
-                </div>
-                <div className="text-xs text-gray-500 mt-1">0% DV</div>
-              </Card>
-              
-              <Card className="bg-white/10 backdrop-blur-md border-white/20 p-3">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="text-sm font-semibold text-red-400">Vitamin B12</div>
-                  <div className="text-xs text-gray-400">0/2.4μg</div>
-                </div>
-                <div className="relative h-2 bg-gray-800 rounded-full overflow-hidden">
-                  <div className="absolute left-0 top-0 h-full bg-gradient-to-r from-red-400 to-pink-500 rounded-full transition-all duration-1000" style={{ width: '0%' }} />
-                </div>
-                <div className="text-xs text-gray-500 mt-1">0% DV</div>
-              </Card>
-              
-              <Card className="bg-white/10 backdrop-blur-md border-white/20 p-3">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="text-sm font-semibold text-green-400">Folate</div>
-                  <div className="text-xs text-gray-400">0/400μg</div>
-                </div>
-                <div className="relative h-2 bg-gray-800 rounded-full overflow-hidden">
-                  <div className="absolute left-0 top-0 h-full bg-gradient-to-r from-green-400 to-emerald-500 rounded-full transition-all duration-1000" style={{ width: '0%' }} />
-                </div>
-                <div className="text-xs text-gray-500 mt-1">0% DV</div>
-              </Card>
+              <MicronutrientCard name="Vitamin C" value={0} goal={90} unit="mg" color="cyan" />
+              <MicronutrientCard name="Vitamin D" value={0} goal={20} unit="μg" color="orange" />
+              <MicronutrientCard name="Vitamin B12" value={0} goal={2.4} unit="μg" color="red" />
+              <MicronutrientCard name="Folate" value={0} goal={400} unit="μg" color="green" />
             </div>
             
-            {/* Minerals Grid */}
             <div className="grid grid-cols-2 gap-3">
-              <Card className="bg-white/10 backdrop-blur-md border-white/20 p-3">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="text-sm font-semibold text-slate-400">Iron</div>
-                  <div className="text-xs text-gray-400">0/18mg</div>
-                </div>
-                <div className="relative h-2 bg-gray-800 rounded-full overflow-hidden">
-                  <div className="absolute left-0 top-0 h-full bg-gradient-to-r from-slate-400 to-gray-500 rounded-full transition-all duration-1000" style={{ width: '0%' }} />
-                </div>
-                <div className="text-xs text-gray-500 mt-1">0% DV</div>
-              </Card>
-              
-              <Card className="bg-white/10 backdrop-blur-md border-white/20 p-3">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="text-sm font-semibold text-white">Calcium</div>
-                  <div className="text-xs text-gray-400">0/1000mg</div>
-                </div>
-                <div className="relative h-2 bg-gray-800 rounded-full overflow-hidden">
-                  <div className="absolute left-0 top-0 h-full bg-gradient-to-r from-white to-gray-300 rounded-full transition-all duration-1000" style={{ width: '0%' }} />
-                </div>
-                <div className="text-xs text-gray-500 mt-1">0% DV</div>
-              </Card>
-              
-              <Card className="bg-white/10 backdrop-blur-md border-white/20 p-3">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="text-sm font-semibold text-amber-400">Zinc</div>
-                  <div className="text-xs text-gray-400">0/11mg</div>
-                </div>
-                <div className="relative h-2 bg-gray-800 rounded-full overflow-hidden">
-                  <div className="absolute left-0 top-0 h-full bg-gradient-to-r from-amber-400 to-yellow-600 rounded-full transition-all duration-1000" style={{ width: '0%' }} />
-                </div>
-                <div className="text-xs text-gray-500 mt-1">0% DV</div>
-              </Card>
-              
-              <Card className="bg-white/10 backdrop-blur-md border-white/20 p-3">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="text-sm font-semibold text-rose-400">Magnesium</div>
-                  <div className="text-xs text-gray-400">0/400mg</div>
-                </div>
-                <div className="relative h-2 bg-gray-800 rounded-full overflow-hidden">
-                  <div className="absolute left-0 top-0 h-full bg-gradient-to-r from-rose-400 to-pink-500 rounded-full transition-all duration-1000" style={{ width: '0%' }} />
-                </div>
-                <div className="text-xs text-gray-500 mt-1">0% DV</div>
-              </Card>
+              <MicronutrientCard name="Iron" value={0} goal={18} unit="mg" color="slate" />
+              <MicronutrientCard name="Calcium" value={0} goal={1000} unit="mg" color="white" />
+              <MicronutrientCard name="Zinc" value={0} goal={11} unit="mg" color="amber" />
+              <MicronutrientCard name="Magnesium" value={0} goal={400} unit="mg" color="rose" />
             </div>
           </div>
         </div>
