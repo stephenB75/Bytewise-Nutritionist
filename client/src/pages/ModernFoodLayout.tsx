@@ -1310,7 +1310,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       <div className="bg-white content-section">
         <div className="max-w-4xl mx-auto px-6 py-3 main-content profile-content h-full flex flex-col">
           {/* Profile Navigation - Optimized Layout */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
+          <div className="flex flex-col sm:flex-row gap-4 mb-8 justify-center items-stretch">
             {[
               { 
                 id: 'profile', 
@@ -1342,11 +1342,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   variant="outline"
                   size="lg"
                   disabled={authLoading}
-                  className={`h-24 w-full min-w-[180px] max-w-[180px] p-4 flex flex-col items-center justify-center space-y-2 transition-all duration-300 ${
+                  className={`flex-1 sm:flex-none sm:w-48 h-28 p-4 flex flex-col items-center justify-center space-y-2 transition-all duration-300 ${
                     isActive
-                      ? 'bg-gradient-to-br from-[#1f4aa6] via-[#45c73e] to-[#faed39] text-white shadow-2xl border-2 border-transparent transform scale-105' 
+                      ? 'bg-gradient-to-br from-[#1f4aa6] via-[#45c73e] to-[#faed39] text-white shadow-2xl border-2 border-transparent transform scale-105 z-10' 
                       : 'bg-white/95 hover:bg-white text-gray-700 border-2 border-gray-200 hover:border-[#1f4aa6] hover:shadow-xl hover:scale-102'
-                  } ${authLoading ? 'opacity-50 cursor-not-allowed' : ''} rounded-2xl backdrop-blur-sm`}
+                  } ${authLoading ? 'opacity-50 cursor-not-allowed' : ''} rounded-2xl backdrop-blur-sm relative`}
                   onClick={() => handleProfileSectionChange(section.id)}
                 >
                   <div className={`p-3 rounded-xl ${isActive ? 'bg-white/20' : 'bg-[#1f4aa6]/10'}`}>
