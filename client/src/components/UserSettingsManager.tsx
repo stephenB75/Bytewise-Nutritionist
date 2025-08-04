@@ -86,9 +86,27 @@ export function UserSettingsManager({ onClose, initialSection = 'profile' }: Use
     }
   });
 
+  // Loading state for save operation
+  const [isSaving, setIsSaving] = useState(false);
+
   // Handlers
   const handleSave = async () => {
+    if (isSaving) return; // Prevent double-clicking
+    
+    setIsSaving(true);
+    
     try {
+      // Validate required fields
+      if (!userInfo.name?.trim()) {
+        toast({
+          title: "Validation Error",
+          description: "Name is required",
+          variant: "destructive",
+        });
+        setIsSaving(false);
+        return;
+      }
+
       const response = await fetch('/api/auth/user/update', {
         method: 'PUT',
         headers: {
@@ -98,20 +116,25 @@ export function UserSettingsManager({ onClose, initialSection = 'profile' }: Use
       });
 
       if (response.ok) {
+        const result = await response.json();
         setIsEditing(false);
         toast({
-          title: "Settings updated",
-          description: "Your profile information has been saved successfully.",
+          title: "Profile Updated",
+          description: "Your personal information has been saved successfully.",
         });
       } else {
-        throw new Error('Failed to update profile');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Failed to update profile');
       }
     } catch (error) {
+      console.error('Save error:', error);
       toast({
-        title: "Update failed",
-        description: "There was an error updating your settings. Please try again.",
+        title: "Update Failed",
+        description: error instanceof Error ? error.message : "There was an error updating your profile. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -426,12 +449,38 @@ export function UserSettingsManager({ onClose, initialSection = 'profile' }: Use
                 <Button
                   variant={isEditing ? "default" : "outline"}
                   size="sm"
+                  disabled={isSaving}
                   onClick={isEditing ? handleSave : () => setIsEditing(true)}
-                  className={isEditing ? "bg-[#45c73e] hover:bg-[#3ab82e] text-white" : "border-[#1f4aa6] text-[#1f4aa6] hover:bg-[#1f4aa6] hover:text-white"}
+                  className={isEditing ? "bg-[#45c73e] hover:bg-[#3ab82e] text-white disabled:opacity-50" : "border-[#1f4aa6] text-[#1f4aa6] hover:bg-[#1f4aa6] hover:text-white"}
                 >
-                  {isEditing ? <Save className="w-4 h-4 mr-2" /> : <Edit3 className="w-4 h-4 mr-2" />}
-                  {isEditing ? 'Save' : 'Edit'}
+                  {isSaving ? (
+                    <>
+                      <div className="w-4 h-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      Saving...
+                    </>
+                  ) : isEditing ? (
+                    <>
+                      <Save className="w-4 h-4 mr-2" />
+                      Save
+                    </>
+                  ) : (
+                    <>
+                      <Edit3 className="w-4 h-4 mr-2" />
+                      Edit
+                    </>
+                  )}
                 </Button>
+                {isEditing && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleCancel}
+                    className="border-gray-400 text-gray-300 hover:bg-gray-600 hover:text-white ml-2"
+                  >
+                    <X className="w-4 h-4 mr-2" />
+                    Cancel
+                  </Button>
+                )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
