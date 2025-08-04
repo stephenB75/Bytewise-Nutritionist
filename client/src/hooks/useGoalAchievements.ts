@@ -5,7 +5,7 @@
  * Prevents achievement spam from non-goal activities
  */
 
-import { useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Trophy, Target, Calendar, Flame, Star } from 'lucide-react';
 
 export interface GoalAchievement {

@@ -58,14 +58,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
   const [trackingView, setTrackingView] = useState('daily'); // 'daily' or 'weekly'
   const [profileSection, setProfileSection] = useState('overview'); // 'overview', 'account', 'achievements', 'data'
-  const [notifications, setNotifications] = useState<Array<{
-    id: string;
-    type: 'achievement' | 'info' | 'success';
-    title: string;
-    message: string;
-    timestamp: Date;
-    read: boolean;
-  }>>([]);
   
   // Validation functions for profile sections
   const validateProfileSection = (sectionId: string): boolean => {
@@ -145,6 +137,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       }, ...prev]);
     }
   };
+  
+  const [notifications, setNotifications] = useState<Array<{
+    id: string;
+    type: 'achievement' | 'info' | 'success';
+    title: string;
+    message: string;
+    timestamp: Date;
+    read: boolean;
+  }>>([]);
 
   // Notification handler functions
   const handleMarkAsRead = (id: string) => {

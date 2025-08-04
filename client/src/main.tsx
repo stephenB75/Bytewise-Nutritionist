@@ -2,7 +2,6 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import SimpleApp from "./SimpleApp";
-import TestApp from "./TestApp";
 
 import "./index.css";
 
@@ -97,8 +96,8 @@ if (!rootElement) {
       </style>
     `;
     
-    // Render simple app for testing
-    root.render(<SimpleApp />);
+    // Render full app
+    root.render(<App />);
     
   } catch (error) {
     rootElement.innerHTML = `
