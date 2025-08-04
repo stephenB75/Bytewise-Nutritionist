@@ -10,7 +10,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from '@/lib/queryClient';
 import ModernFoodLayout from './pages/ModernFoodLayout';
 
-export default function App() {
+function AppContent() {
   const [activeTab, setActiveTab] = useState<string>('redesigned');
   const [showNotifications, setShowNotifications] = useState(false);
   const [notificationCount, setNotificationCount] = useState(0);
@@ -83,12 +83,18 @@ export default function App() {
   };
 
   return (
+    <div className="min-h-screen bg-black">
+      <main className="min-h-screen">
+        {renderCurrentPage()}
+      </main>
+    </div>
+  );
+}
+
+export default function App() {
+  return (
     <QueryClientProvider client={queryClient}>
-      <div className="min-h-screen bg-black">
-        <main className="min-h-screen">
-          {renderCurrentPage()}
-        </main>
-      </div>
+      <AppContent />
     </QueryClientProvider>
   );
 }
