@@ -1249,7 +1249,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   };
 
   return (
-    <div className="h-screen w-screen bg-black overflow-hidden">
+    <div className="h-screen w-screen bg-black">
       {/* Fixed Notification Header on all pages - Enhanced visibility */}
       <div className="fixed top-4 right-4 z-50">
         <div className="relative">
