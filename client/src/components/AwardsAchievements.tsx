@@ -247,9 +247,9 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
                 variant="outline"
                 size="lg"
                 onClick={() => setSelectedCategory(category.id)}
-                className={`h-auto p-4 flex flex-col items-center space-y-2 transition-all duration-300 ${
+                className={`h-24 w-full p-4 flex flex-col items-center justify-center space-y-2 transition-all duration-300 ${
                   isActive
-                    ? 'bg-gradient-to-br from-[#1f4aa6] via-[#45c73e] to-[#faed39] text-white shadow-2xl border-0' 
+                    ? 'bg-gradient-to-br from-[#1f4aa6] via-[#45c73e] to-[#faed39] text-white shadow-2xl border-2 border-transparent' 
                     : 'bg-white/95 hover:bg-white text-gray-700 border-2 border-white/30 hover:border-[#1f4aa6] hover:shadow-xl'
                 } rounded-2xl backdrop-blur-sm relative`}
               >
