@@ -1,35 +1,33 @@
 /**
  * Enhanced Rotating Food Background Hook
- * Uses uploaded food images and changes only on page transitions with smooth animations
+ * Uses high-quality food images and changes only on page transitions with smooth animations
  */
 
 import { useState, useEffect } from 'react';
 
-// Uploaded food images from assets directory - using direct paths
+// Food images - using high-quality Unsplash images for consistent loading
 const foodImages = [
-  '/assets/salad-6948004_1920_1753859530085-1zwSa4Vt.jpg',         // Fresh salad
-  '/assets/burgers-5590503_1920_1753859530083-I99DUxaH.jpg',       // Burgers
-  '/assets/pancakes-2291908_1920_1753859477805-FMeaELmV.jpg',      // Pancakes
-  '/assets/pizza-2068272_1920_1753859530080-DhVI5ZGb.jpg',         // Pizza
-  '/assets/chicken-2443901_1920_1753859530084-CTPERNUZ.jpg',       // Chicken
-  '/assets/vegetable-2924245_1920_1753859477807-CZELXr6Z.jpg',     // Fresh vegetables
-  '/assets/strawberry-7224875_1920_1753859477810-CXpGW8lN.jpg',    // Fruits
-  '/assets/bowl-1842294_1920_1753859477806-bRUsOvIC.jpg',          // Healthy bowl
-  '/assets/food-993457_1920_1753859794688-oWnyu60z.jpg',           // Food prep
-  '/assets/spaghetti-1392266_1920_1753859477805-HAisuHs3.jpg',     // Pasta
-  '/assets/steak-6278031_1920_1753859530081-BukNuh5v.jpg',         // Grilled steak
-  '/assets/sandwich-6935938_1920_1753859794687-CXrSzbzE.jpg',      // Sandwich
-  '/assets/variety-5044809_1920_1753859530087-C7xAS9wM.jpg',       // Food variety
-  '/assets/macarons-2179198_1920_1753859477809-B5cbwbKS.jpg',      // Desserts
-  '/assets/oatmeal-1839515_1920_1753859530080-Cf--RV4v.jpg',       // Breakfast
-  '/assets/fried-prawn-1737593_1920_1753859794686-DkxziorZ.jpg',   // Seafood
-  '/assets/chocolate-1927921_1920_1753859477802-D-SPQY8I.jpg',     // Chocolate
-  '/assets/cupcakes-813078_1920_1753859477803-D9uLIWdp.jpg',       // Baked goods
-  '/assets/apple-3313209_1920_1753859530078-BJW4vFlt.jpg',         // Fresh apple
-  '/assets/blueberries-9450130_1920_1753859477806-DQeN0M4j.jpg',   // Berries
+  'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80', // Fresh salad
+  'https://images.unsplash.com/photo-1586190848861-99aa4a171e90?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2080&q=80', // Burgers
+  'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2080&q=80', // Pancakes
+  'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2081&q=80', // Pizza
+  'https://images.unsplash.com/photo-1511690656952-34342bb7c2f2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2064&q=80', // Chicken
+  'https://images.unsplash.com/photo-1490645935967-10de6ba17061?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2053&q=80', // Fresh vegetables
+  'https://images.unsplash.com/photo-1506084868230-bb9d95c24759?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2067&q=80', // Fruits
+  'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2080&q=80', // Healthy bowl
+  'https://images.unsplash.com/photo-1482049016688-2d3e1b311543?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2110&q=80', // Food prep
+  'https://images.unsplash.com/photo-1621996346565-e3dbc353d2e5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2080&q=80', // Pasta
+  'https://images.unsplash.com/photo-1546833999-b9f581a1996d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2080&q=80', // Grilled steak
+  'https://images.unsplash.com/photo-1539906942308-c8f5d84b5f4d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2080&q=80', // Sandwich
+  'https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80', // Food variety
+  'https://images.unsplash.com/photo-1587736756492-dfc9d2b8d473?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2080&q=80', // Desserts
+  'https://images.unsplash.com/photo-1525351326368-efbb5cb6814d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2080&q=80', // Breakfast
+  'https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2078&q=80', // Seafood
+  'https://images.unsplash.com/photo-1606312619070-d48b4c652a52?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2087&q=80', // Chocolate
+  'https://images.unsplash.com/photo-1578985545062-69928b1d9587?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2089&q=80', // Baked goods
+  'https://images.unsplash.com/photo-1568702846914-96b305d2aaeb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80', // Fresh apple
+  'https://images.unsplash.com/photo-1498557850523-fd3d118b962e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2069&q=80', // Berries
 ];
-
-
 
 // Map specific pages to food categories for thematic consistency
 const pageImageMap: Record<string, number[]> = {
