@@ -1324,9 +1324,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
       {/* Content Section - Completely Separate and Underneath */}
       <div className="bg-white content-section">
-        <div className="max-w-4xl mx-auto px-6 py-3 main-content profile-content h-full flex flex-col">
+        <div className="max-w-5xl mx-auto px-4 py-4 main-content profile-content h-full flex flex-col">
           {/* Profile Navigation - Optimized Layout */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-8 justify-center items-stretch">
+          <div className="flex flex-col sm:flex-row gap-3 mb-6 justify-center items-stretch">
             {[
               { 
                 id: 'profile', 
@@ -1388,8 +1388,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           </div>
 
           {/* Profile Content - Scrollable Container */}
-          <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-            <div className="space-y-4 pr-2">
+          <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 min-h-0">
+            <div className="space-y-3 pr-2 pb-6">
               {profileSection === 'profile' && (
                 <div className="space-y-4">
                   {user ? (

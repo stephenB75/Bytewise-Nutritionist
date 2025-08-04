@@ -177,71 +177,71 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
   };
 
   return (
-    <Card className="w-full bg-white/90 backdrop-blur-md border-0 shadow-xl overflow-hidden signin-module">
-      {/* Header */}
-      <div className="p-6 bg-gradient-to-r from-[#1f4aa6] to-[#45c73e] text-white">
-        <div className="flex items-center justify-center mb-4">
-          <div className="p-3 bg-white/20 rounded-full">
-            <User className="w-8 h-8" />
+    <Card className="w-full max-w-2xl mx-auto bg-white/90 backdrop-blur-md border-0 shadow-xl overflow-hidden signin-module">
+      {/* Header - Compact */}
+      <div className="p-4 bg-gradient-to-r from-[#1f4aa6] to-[#45c73e] text-white">
+        <div className="flex items-center justify-center mb-3">
+          <div className="p-2 bg-white/20 rounded-full">
+            <User className="w-6 h-6" />
           </div>
         </div>
-        <h2 className="text-2xl font-bold text-center mb-2" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+        <h2 className="text-xl font-bold text-center mb-1" style={{ fontFamily: "'League Spartan', sans-serif" }}>
           {isSignUp ? 'Join ByteWise' : 'Sign In to ByteWise'}
         </h2>
-        <p className="text-center text-white/90 text-sm">
+        <p className="text-center text-white/90 text-xs">
           {isSignUp ? 'Start your nutrition tracking journey' : 'Access your nutrition tracking, recipes, and progress'}
         </p>
       </div>
 
-      {/* Content */}
-      <div className="p-6 space-y-6">
-        {/* Benefits */}
-        <div className="space-y-4">
-          <div className="text-center space-y-1 mb-6">
-            <h3 className="text-3xl font-black tracking-tight text-center">
+      {/* Content - Compact */}
+      <div className="p-4 space-y-4">
+        {/* Benefits - Compact */}
+        <div className="space-y-3">
+          <div className="text-center space-y-1 mb-4">
+            <h3 className="text-xl font-black tracking-tight text-center">
               Your <span className="bg-gradient-to-r from-[#1f4aa6] to-[#45c73e] bg-clip-text text-transparent">Nutrition</span>
             </h3>
-            <h3 className="text-3xl font-black tracking-tight text-gray-900 text-center">
+            <h3 className="text-xl font-black tracking-tight text-gray-900 text-center">
               Journey Awaits
             </h3>
           </div>
           
-          <div className="grid grid-cols-1 gap-3">
-            <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-[#faed39]/20 to-[#faed39]/10 rounded-xl border border-[#faed39]/30 backdrop-blur-sm">
-              <div className="p-3 bg-[#faed39]/30 rounded-full shadow-lg">
-                <Zap className="w-5 h-5 text-[#faed39]" />
+          <div className="grid grid-cols-1 gap-2">
+            <div className="flex items-center gap-2 p-3 bg-gradient-to-r from-[#faed39]/20 to-[#faed39]/10 rounded-lg border border-[#faed39]/30 backdrop-blur-sm">
+              <div className="p-2 bg-[#faed39]/30 rounded-full shadow-lg">
+                <Zap className="w-4 h-4 text-[#faed39]" />
               </div>
               <div>
-                <div className="font-bold text-base text-gray-900">Track Your Progress</div>
-                <div className="text-sm text-gray-700">Monitor daily goals and achievements</div>
+                <div className="font-bold text-sm text-gray-900">Track Your Progress</div>
+                <div className="text-xs text-gray-700">Monitor daily goals and achievements</div>
               </div>
             </div>
             
-            <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-[#1f4aa6]/20 to-[#1f4aa6]/10 rounded-xl border border-[#1f4aa6]/30 backdrop-blur-sm">
-              <div className="p-3 bg-[#1f4aa6]/30 rounded-full shadow-lg">
-                <Shield className="w-5 h-5 text-[#1f4aa6]" />
+            <div className="flex items-center gap-2 p-3 bg-gradient-to-r from-[#1f4aa6]/20 to-[#1f4aa6]/10 rounded-lg border border-[#1f4aa6]/30 backdrop-blur-sm">
+              <div className="p-2 bg-[#1f4aa6]/30 rounded-full shadow-lg">
+                <Shield className="w-4 h-4 text-[#1f4aa6]" />
               </div>
               <div>
-                <div className="font-bold text-base text-gray-900">Secure Data Sync</div>
-                <div className="text-sm text-gray-700">Your data stays safe across devices</div>
+                <div className="font-bold text-sm text-gray-900">Secure Data Sync</div>
+                <div className="text-xs text-gray-700">Your data stays safe across devices</div>
               </div>
             </div>
             
-            <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-[#45c73e]/20 to-[#45c73e]/10 rounded-xl border border-[#45c73e]/30 backdrop-blur-sm">
-              <div className="p-3 bg-[#45c73e]/30 rounded-full shadow-lg">
-                <User className="w-5 h-5 text-[#45c73e]" />
+            <div className="flex items-center gap-2 p-3 bg-gradient-to-r from-[#45c73e]/20 to-[#45c73e]/10 rounded-lg border border-[#45c73e]/30 backdrop-blur-sm">
+              <div className="p-2 bg-[#45c73e]/30 rounded-full shadow-lg">
+                <User className="w-4 h-4 text-[#45c73e]" />
               </div>
               <div>
-                <div className="font-bold text-base text-gray-900">Personal Profile</div>
-                <div className="text-sm text-gray-700">Customize goals and preferences</div>
+                <div className="font-bold text-sm text-gray-900">Personal Profile</div>
+                <div className="text-xs text-gray-700">Customize goals and preferences</div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Email Authentication Form */}
-        <form onSubmit={handleEmailAuth} className="space-y-4">
-          <div className="space-y-4">
+        <form onSubmit={handleEmailAuth} className="space-y-3">
+          <div className="space-y-3">
             <div>
               <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email</Label>
               <div className="relative mt-1">
@@ -278,7 +278,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
           <Button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-[#1f4aa6] to-[#45c73e] hover:from-[#1f4aa6]/80 hover:to-[#45c73e]/80 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] py-3 text-base font-semibold"
+            className="w-full bg-gradient-to-r from-[#1f4aa6] to-[#45c73e] hover:from-[#1f4aa6]/80 hover:to-[#45c73e]/80 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] py-2 text-sm font-semibold"
           >
             {loading ? (
               <div className="flex items-center justify-center">
@@ -365,20 +365,20 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
           </button>
         </div>
 
-        {/* Privacy Notice */}
-        <div className="p-4 bg-gray-50 rounded-lg">
-          <div className="flex items-start gap-3">
-            <Shield className="w-4 h-4 text-gray-500 mt-0.5" />
+        {/* Privacy Notice - Compact */}
+        <div className="p-3 bg-gray-50 rounded-lg">
+          <div className="flex items-start gap-2">
+            <Shield className="w-3 h-3 text-gray-500 mt-0.5" />
             <div className="text-xs text-gray-600">
-              <div className="font-medium mb-1">Privacy Protected</div>
+              <div className="font-medium mb-0.5">Privacy Protected</div>
               <div>Your nutrition data is encrypted and private. We never share your personal information.</div>
             </div>
           </div>
         </div>
 
-        {/* Guest Mode Option */}
+        {/* Guest Mode Option - Compact */}
         <div className="text-center">
-          <div className="text-xs text-gray-500 mb-2">Want to try without signing in?</div>
+          <div className="text-xs text-gray-500 mb-1">Want to try without signing in?</div>
           <Badge variant="outline" className="text-xs bg-gray-50 text-gray-700 border-gray-300">
             Limited features available in guest mode
           </Badge>
