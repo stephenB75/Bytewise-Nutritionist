@@ -15,7 +15,6 @@ import {
   RefreshCw,
   Trash2,
   Database,
-  Shield,
   Calendar,
   FileText,
   CheckCircle,

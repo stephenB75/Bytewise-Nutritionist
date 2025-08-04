@@ -30,11 +30,11 @@ import {
   EyeOff,
   ChevronDown,
   ChevronUp,
-  Verified,
   Camera,
   LogOut,
   Palette,
-  Globe
+  Globe,
+  CheckCircle
 } from 'lucide-react';
 
 interface UserSettingsManagerProps {
@@ -253,9 +253,9 @@ export function UserSettingsManager({ onClose, initialSection = 'profile' }: Use
                       <span className="drop-shadow-2xl">{(user?.firstName?.[0] || 'U').toUpperCase()}</span>
                     )}
                   </div>
-                  {user?.emailVerified && (
+                  {(user as any)?.emailVerified && (
                     <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-[#45c73e] rounded-full flex items-center justify-center border-4 border-white shadow-2xl">
-                      <Verified className="w-4 h-4 text-white" strokeWidth={3} />
+                      <CheckCircle className="w-4 h-4 text-white" strokeWidth={3} />
                     </div>
                   )}
                   <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[#faed39]/20 to-[#1f4aa6]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -266,9 +266,9 @@ export function UserSettingsManager({ onClose, initialSection = 'profile' }: Use
                     <h3 className="text-3xl lg:text-4xl font-black text-white tracking-tight" style={{ fontFamily: "'League Spartan', sans-serif" }}>
                       {userInfo.name || 'User Profile'}
                     </h3>
-                    {user?.emailVerified && (
+                    {(user as any)?.emailVerified && (
                       <Badge className="text-sm bg-gradient-to-r from-[#45c73e] to-[#3ab82e] text-white border-0 shadow-xl px-3 py-1 rounded-full">
-                        <Verified className="w-4 h-4 mr-2" strokeWidth={2.5} />
+                        <CheckCircle className="w-4 h-4 mr-2" strokeWidth={2.5} />
                         Verified Account
                       </Badge>
                     )}

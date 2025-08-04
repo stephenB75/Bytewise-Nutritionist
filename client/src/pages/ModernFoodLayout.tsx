@@ -53,13 +53,14 @@ interface Notification {
 }
 
 interface Achievement {
-  type?: string;
+  type: 'daily-goal' | 'weekly-goal' | 'milestone' | 'special';
   title: string;
   message: string;
-  description?: string;
+  description: string;
   confetti?: boolean;
   trophy?: boolean;
   points?: number;
+  icon?: any;
 }
 
 type ProfileSection = 'profile' | 'achievements' | 'data';
@@ -99,8 +100,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     return true;
   };
 
-  // Utility function to add notifications
-  const addNotification = (type: Notification['type'], title: string, message: string) => {
+  // Utility function to add notifications - using useCallback for stable reference
+  const addNotification = React.useCallback((type: Notification['type'], title: string, message: string) => {
     setNotifications(prev => [{
       id: Date.now().toString(),
       type,
@@ -109,7 +110,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       timestamp: new Date(),
       read: false
     }, ...prev]);
-  };
+  }, []);
 
   const handleProfileSectionChange = (sectionId: string) => {
     if (authLoading || !validateProfileSection(sectionId)) return;
@@ -149,7 +150,17 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   // Handle new achievements
   useEffect(() => {
     if (celebrationAchievement) {
-      setCurrentAchievement(celebrationAchievement);
+      // Transform the achievement to match our interface
+      const achievement: Achievement = {
+        type: 'milestone',
+        title: celebrationAchievement.title || 'Achievement Unlocked',
+        message: celebrationAchievement.description || celebrationAchievement.title || 'Great job!',
+        description: celebrationAchievement.description || celebrationAchievement.title || 'You unlocked a new achievement!',
+        confetti: true,
+        trophy: true,
+        points: 10
+      };
+      setCurrentAchievement(achievement);
       setShowAchievement(true);
     }
   }, [celebrationAchievement]);
@@ -157,7 +168,17 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   // Listen for goal achievements and trigger confetti
   useEffect(() => {
     const handleGoalAchievement = (event: any) => {
-      const achievement = event.detail;
+      const rawAchievement = event.detail;
+      // Transform the achievement to match our interface
+      const achievement: Achievement = {
+        type: (rawAchievement.type === 'daily-goal' || rawAchievement.type === 'weekly-goal' || rawAchievement.type === 'milestone' || rawAchievement.type === 'special') ? rawAchievement.type : 'milestone',
+        title: rawAchievement.title,
+        message: rawAchievement.message || rawAchievement.title,
+        description: rawAchievement.description || rawAchievement.message || rawAchievement.title,
+        confetti: true,
+        trophy: true,
+        points: rawAchievement.points || 10
+      };
       setConfettiAchievement(achievement);
       setShowConfettiCelebration(true);
       
@@ -166,7 +187,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
     window.addEventListener('achievement-unlocked', handleGoalAchievement);
     return () => window.removeEventListener('achievement-unlocked', handleGoalAchievement);
-  }, []);
+  }, [addNotification]);
 
   // Clear localStorage data for production-ready clean state
   useEffect(() => {
