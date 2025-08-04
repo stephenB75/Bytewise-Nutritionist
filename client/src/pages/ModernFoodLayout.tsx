@@ -1309,39 +1309,63 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       {/* Content Section - Completely Separate and Underneath */}
       <div className="bg-white content-section">
         <div className="max-w-4xl mx-auto px-6 py-3 main-content profile-content h-full flex flex-col">
-          {/* Profile Navigation - Improved Mobile Layout */}
-          <div className="flex flex-col sm:flex-row gap-2 mb-6">
+          {/* Profile Navigation - Optimized Layout */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
             {[
-              { id: 'profile', name: 'Profile & Account', shortName: 'Profile', icon: User },
-              { id: 'achievements', name: 'Awards & Goals', shortName: 'Awards', icon: Trophy },
-              { id: 'data', name: 'Data Management', shortName: 'Data', icon: Download }
+              { 
+                id: 'profile', 
+                name: 'Personal Profile', 
+                shortName: 'Profile', 
+                icon: User,
+                description: 'Edit your personal information'
+              },
+              { 
+                id: 'achievements', 
+                name: 'Awards & Achievements', 
+                shortName: 'Awards', 
+                icon: Trophy,
+                description: 'View your progress and goals'
+              },
+              { 
+                id: 'data', 
+                name: 'Data & Export', 
+                shortName: 'Data', 
+                icon: Download,
+                description: 'Manage your nutrition data'
+              }
             ].map((section) => {
               const IconComponent = section.icon;
+              const isActive = profileSection === section.id;
               return (
                 <Button
                   key={section.id}
-                  variant={profileSection === section.id ? "default" : "outline"}
+                  variant="outline"
                   size="lg"
                   disabled={authLoading}
-                  className={`flex-1 flex items-center justify-center space-x-3 py-4 px-3 transition-all duration-300 ${
-                    profileSection === section.id 
-                      ? 'bg-gradient-to-r from-[#1f4aa6] to-[#45c73e] hover:from-[#1850a0] hover:to-[#3ab82e] text-white shadow-xl border-0' 
-                      : 'bg-white/90 hover:bg-white text-gray-700 border-2 border-gray-200 hover:border-[#1f4aa6] hover:shadow-lg'
-                  } ${authLoading ? 'opacity-50 cursor-not-allowed' : ''} rounded-xl`}
+                  className={`h-auto p-4 flex flex-col items-center space-y-2 transition-all duration-300 ${
+                    isActive
+                      ? 'bg-gradient-to-br from-[#1f4aa6] via-[#45c73e] to-[#faed39] text-white shadow-2xl border-0 transform scale-105' 
+                      : 'bg-white/95 hover:bg-white text-gray-700 border-2 border-gray-200 hover:border-[#1f4aa6] hover:shadow-xl hover:scale-102'
+                  } ${authLoading ? 'opacity-50 cursor-not-allowed' : ''} rounded-2xl backdrop-blur-sm`}
                   onClick={() => handleProfileSectionChange(section.id)}
                 >
-                  <IconComponent 
-                    className={`w-5 h-5 ${profileSection === section.id ? 'text-white' : 'text-[#1f4aa6]'}`}
-                    strokeWidth={2.5}
-                  />
-                  <div className="flex flex-col text-left">
-                    <span className={`text-sm font-bold ${profileSection === section.id ? 'text-white' : 'text-gray-900'}`}>
-                      {window.innerWidth < 640 ? section.shortName : section.name}
-                    </span>
-                    {profileSection === section.id && (
-                      <span className="text-xs text-white/80 font-medium">Active</span>
-                    )}
+                  <div className={`p-3 rounded-xl ${isActive ? 'bg-white/20' : 'bg-[#1f4aa6]/10'}`}>
+                    <IconComponent 
+                      className={`w-6 h-6 ${isActive ? 'text-white' : 'text-[#1f4aa6]'}`}
+                      strokeWidth={2.5}
+                    />
                   </div>
+                  <div className="text-center">
+                    <div className={`text-sm font-bold ${isActive ? 'text-white' : 'text-gray-900'}`}>
+                      {section.name}
+                    </div>
+                    <div className={`text-xs mt-1 ${isActive ? 'text-white/90' : 'text-gray-500'}`}>
+                      {section.description}
+                    </div>
+                  </div>
+                  {isActive && (
+                    <div className="absolute top-2 right-2 w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                  )}
                 </Button>
               );
             })}

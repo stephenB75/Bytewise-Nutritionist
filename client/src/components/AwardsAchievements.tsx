@@ -237,31 +237,36 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
 
       {/* Category Filter */}
       <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4">
-        <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {categories.map((category) => {
             const IconComponent = category.icon;
+            const isActive = selectedCategory === category.id;
             return (
               <Button
                 key={category.id}
-                variant={selectedCategory === category.id ? "default" : "outline"}
+                variant="outline"
                 size="lg"
                 onClick={() => setSelectedCategory(category.id)}
-                className={`flex items-center justify-center space-x-2 py-3 px-4 transition-all duration-300 ${
-                  selectedCategory === category.id 
-                    ? 'bg-gradient-to-r from-[#1f4aa6] to-[#45c73e] hover:from-[#1850a0] hover:to-[#3ab82e] text-white shadow-lg border-0' 
-                    : 'border-2 border-white/30 text-white hover:bg-white/20 bg-white/90 hover:shadow-lg hover:border-[#1f4aa6]'
-                } rounded-xl`}
+                className={`h-auto p-4 flex flex-col items-center space-y-2 transition-all duration-300 ${
+                  isActive
+                    ? 'bg-gradient-to-br from-[#1f4aa6] via-[#45c73e] to-[#faed39] text-white shadow-2xl border-0 transform scale-105' 
+                    : 'bg-white/95 hover:bg-white text-gray-700 border-2 border-white/30 hover:border-[#1f4aa6] hover:shadow-xl hover:scale-102'
+                } rounded-2xl backdrop-blur-sm relative`}
               >
-                <IconComponent 
-                  className={`w-5 h-5 ${selectedCategory === category.id ? 'text-white' : 'text-[#1f4aa6]'}`}
-                  strokeWidth={2.5}
-                />
-                <span 
-                  className="font-semibold text-sm" 
-                  style={{ fontFamily: "'Work Sans', sans-serif" }}
-                >
-                  {category.name}
-                </span>
+                <div className={`p-3 rounded-xl ${isActive ? 'bg-white/20' : 'bg-[#1f4aa6]/10'}`}>
+                  <IconComponent 
+                    className={`w-6 h-6 ${isActive ? 'text-white' : 'text-[#1f4aa6]'}`}
+                    strokeWidth={2.5}
+                  />
+                </div>
+                <div className="text-center">
+                  <div className={`text-sm font-bold ${isActive ? 'text-white' : 'text-gray-900'}`}>
+                    {category.name}
+                  </div>
+                </div>
+                {isActive && (
+                  <div className="absolute top-2 right-2 w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                )}
               </Button>
             );
           })}

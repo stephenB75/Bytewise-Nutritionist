@@ -196,51 +196,69 @@ export function DataManagementPanel() {
           </Badge>
         </div>
 
-        <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 bg-white/10 rounded-lg border border-white/20 space-y-3 sm:space-y-0">
-            <div className="flex items-center space-x-3">
-              <FileText className="w-6 h-6 text-[#1f4aa6]" strokeWidth={2.5} />
-              <div>
-                <p className="font-semibold text-white text-lg" style={{ fontFamily: "'Work Sans', sans-serif" }}>Progress Report (PDF)</p>
-                <p className="text-sm text-gray-300" style={{ fontFamily: "'Quicksand', sans-serif" }}>Complete nutrition tracking report with charts and insights</p>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="p-6 bg-gradient-to-br from-white/15 to-white/5 rounded-2xl border border-white/30 backdrop-blur-md">
+            <div className="flex flex-col items-center text-center space-y-4">
+              <div className="p-4 bg-[#1f4aa6]/20 rounded-2xl">
+                <FileText className="w-8 h-8 text-[#1f4aa6]" strokeWidth={2.5} />
               </div>
+              <div>
+                <h4 className="font-bold text-white text-xl mb-2" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                  Progress Report
+                </h4>
+                <p className="text-sm text-gray-300 mb-4" style={{ fontFamily: "'Quicksand', sans-serif" }}>
+                  Complete nutrition tracking report with charts, insights, and progress analysis
+                </p>
+                <Badge className="bg-[#45c73e]/20 text-[#45c73e] border-[#45c73e]/30 mb-4">
+                  PDF Format
+                </Badge>
+              </div>
+              <Button
+                onClick={handleExportData}
+                disabled={isExporting}
+                size="lg"
+                className="w-full bg-gradient-to-r from-[#1f4aa6] to-[#1850a0] hover:from-[#1850a0] hover:to-[#164291] text-white shadow-xl rounded-2xl px-8 py-4 transition-all duration-300 font-semibold"
+              >
+                {isExporting ? (
+                  <>
+                    <RefreshCw className="w-5 h-5 mr-3 animate-spin" strokeWidth={2.5} />
+                    Generating Report...
+                  </>
+                ) : (
+                  <>
+                    <Download className="w-5 h-5 mr-3" strokeWidth={2.5} />
+                    Download PDF Report
+                  </>
+                )}
+              </Button>
             </div>
-            <Button
-              onClick={handleExportData}
-              disabled={isExporting}
-              size="lg"
-              className="w-full sm:w-auto bg-gradient-to-r from-[#1f4aa6] to-[#1850a0] hover:from-[#1850a0] hover:to-[#164291] text-white shadow-lg rounded-xl px-6 py-3 transition-all duration-300"
-            >
-              {isExporting ? (
-                <>
-                  <RefreshCw className="w-5 h-5 mr-2 animate-spin" strokeWidth={2.5} />
-                  <span className="font-semibold">Generating PDF...</span>
-                </>
-              ) : (
-                <>
-                  <Download className="w-5 h-5 mr-2" strokeWidth={2.5} />
-                  <span className="font-semibold">Export PDF</span>
-                </>
-              )}
-            </Button>
           </div>
 
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 bg-white/10 rounded-lg border border-white/20 space-y-3 sm:space-y-0">
-            <div className="flex items-center space-x-3">
-              <Archive className="w-6 h-6 text-[#1f4aa6]" strokeWidth={2.5} />
-              <div>
-                <p className="font-semibold text-white text-lg" style={{ fontFamily: "'Work Sans', sans-serif" }}>Raw Data Export</p>
-                <p className="text-sm text-gray-300" style={{ fontFamily: "'Quicksand', sans-serif" }}>Export all data in JSON format for backup or analysis</p>
+          <div className="p-6 bg-gradient-to-br from-white/15 to-white/5 rounded-2xl border border-white/30 backdrop-blur-md">
+            <div className="flex flex-col items-center text-center space-y-4">
+              <div className="p-4 bg-[#45c73e]/20 rounded-2xl">
+                <Archive className="w-8 h-8 text-[#45c73e]" strokeWidth={2.5} />
               </div>
+              <div>
+                <h4 className="font-bold text-white text-xl mb-2" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                  Raw Data Export
+                </h4>
+                <p className="text-sm text-gray-300 mb-4" style={{ fontFamily: "'Quicksand', sans-serif" }}>
+                  Export all your nutrition data in JSON format for backup or external analysis
+                </p>
+                <Badge className="bg-[#1f4aa6]/20 text-[#1f4aa6] border-[#1f4aa6]/30 mb-4">
+                  JSON Format
+                </Badge>
+              </div>
+              <Button
+                variant="outline"
+                size="lg"
+                className="w-full border-2 border-[#45c73e] text-[#45c73e] hover:bg-[#45c73e] hover:text-white bg-white/95 hover:shadow-xl rounded-2xl px-8 py-4 transition-all duration-300 font-semibold"
+              >
+                <Download className="w-5 h-5 mr-3" strokeWidth={2.5} />
+                Export JSON Data
+              </Button>
             </div>
-            <Button
-              variant="outline"
-              size="lg"
-              className="w-full sm:w-auto border-2 border-[#1f4aa6] text-[#1f4aa6] hover:bg-[#1f4aa6] hover:text-white bg-white/90 hover:shadow-lg rounded-xl px-6 py-3 transition-all duration-300"
-            >
-              <Download className="w-5 h-5 mr-2" strokeWidth={2.5} />
-              <span className="font-semibold">Export JSON</span>
-            </Button>
           </div>
         </div>
         </Card>
@@ -255,62 +273,80 @@ export function DataManagementPanel() {
             </div>
           </div>
 
-        <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 bg-white/10 rounded-lg border border-white/20 space-y-3 sm:space-y-0">
-            <div className="flex items-center space-x-3">
-              <Cloud className="w-6 h-6 text-[#1f4aa6]" strokeWidth={2.5} />
-              <div>
-                <p className="font-semibold text-white text-lg" style={{ fontFamily: "'Work Sans', sans-serif" }}>Sync Data</p>
-                <p className="text-sm text-gray-300" style={{ fontFamily: "'Quicksand', sans-serif" }}>Synchronize your data across all devices</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="p-6 bg-gradient-to-br from-[#45c73e]/10 to-[#45c73e]/5 rounded-2xl border border-[#45c73e]/20 backdrop-blur-md">
+            <div className="flex flex-col items-center text-center space-y-4">
+              <div className="p-4 bg-[#45c73e]/20 rounded-2xl">
+                <Cloud className="w-8 h-8 text-[#45c73e]" strokeWidth={2.5} />
               </div>
+              <div>
+                <h4 className="font-bold text-white text-xl mb-2" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                  Sync Data
+                </h4>
+                <p className="text-sm text-gray-300 mb-4" style={{ fontFamily: "'Quicksand', sans-serif" }}>
+                  Synchronize your nutrition data across all your devices and platforms
+                </p>
+                <Badge className="bg-[#45c73e]/20 text-[#45c73e] border-[#45c73e]/30 mb-4">
+                  Cloud Sync
+                </Badge>
+              </div>
+              <Button
+                onClick={handleSyncData}
+                disabled={isSyncing}
+                size="lg"
+                className="w-full bg-gradient-to-r from-[#45c73e] to-[#3ab82e] hover:from-[#3ab82e] hover:to-[#2d8f26] text-white shadow-xl rounded-2xl px-8 py-4 transition-all duration-300 font-semibold"
+              >
+                {isSyncing ? (
+                  <>
+                    <RefreshCw className="w-5 h-5 mr-3 animate-spin" strokeWidth={2.5} />
+                    Synchronizing...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="w-5 h-5 mr-3" strokeWidth={2.5} />
+                    Sync All Data
+                  </>
+                )}
+              </Button>
             </div>
-            <Button
-              onClick={handleSyncData}
-              disabled={isSyncing}
-              size="lg"
-              className="w-full sm:w-auto bg-gradient-to-r from-[#45c73e] to-[#3ab82e] hover:from-[#3ab82e] hover:to-[#2d8f26] text-white shadow-lg rounded-xl px-6 py-3 transition-all duration-300"
-            >
-              {isSyncing ? (
-                <>
-                  <RefreshCw className="w-5 h-5 mr-2 animate-spin" strokeWidth={2.5} />
-                  <span className="font-semibold">Syncing...</span>
-                </>
-              ) : (
-                <>
-                  <RefreshCw className="w-5 h-5 mr-2" strokeWidth={2.5} />
-                  <span className="font-semibold">Sync Now</span>
-                </>
-              )}
-            </Button>
           </div>
 
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 bg-white/10 rounded-lg border border-white/20 space-y-3 sm:space-y-0">
-            <div className="flex items-center space-x-3">
-              <HardDrive className="w-6 h-6 text-[#1f4aa6]" strokeWidth={2.5} />
-              <div>
-                <p className="font-semibold text-white text-lg" style={{ fontFamily: "'Work Sans', sans-serif" }}>Clear Cache</p>
-                <p className="text-sm text-gray-300" style={{ fontFamily: "'Quicksand', sans-serif" }}>Clear app cache to free up storage space</p>
+          <div className="p-6 bg-gradient-to-br from-white/15 to-white/5 rounded-2xl border border-white/30 backdrop-blur-md">
+            <div className="flex flex-col items-center text-center space-y-4">
+              <div className="p-4 bg-gray-500/20 rounded-2xl">
+                <HardDrive className="w-8 h-8 text-gray-400" strokeWidth={2.5} />
               </div>
+              <div>
+                <h4 className="font-bold text-white text-xl mb-2" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                  Clear Cache
+                </h4>
+                <p className="text-sm text-gray-300 mb-4" style={{ fontFamily: "'Quicksand', sans-serif" }}>
+                  Clear app cache to free up storage space and improve performance
+                </p>
+                <Badge className="bg-gray-500/20 text-gray-400 border-gray-500/30 mb-4">
+                  Storage
+                </Badge>
+              </div>
+              <Button
+                onClick={handleClearCache}
+                disabled={isClearing}
+                variant="outline"
+                size="lg"
+                className="w-full border-2 border-gray-400 text-gray-300 hover:bg-gray-600 hover:text-white bg-white/95 hover:shadow-xl rounded-2xl px-8 py-4 transition-all duration-300 font-semibold"
+              >
+                {isClearing ? (
+                  <>
+                    <RefreshCw className="w-5 h-5 mr-3 animate-spin" strokeWidth={2.5} />
+                    Clearing Cache...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-5 h-5 mr-3" strokeWidth={2.5} />
+                    Clear All Cache
+                  </>
+                )}
+              </Button>
             </div>
-            <Button
-              onClick={handleClearCache}
-              disabled={isClearing}
-              variant="outline"
-              size="lg"
-              className="w-full sm:w-auto border-2 border-white/30 text-white hover:bg-white/20 bg-white/90 hover:shadow-lg rounded-xl px-6 py-3 transition-all duration-300"
-            >
-              {isClearing ? (
-                <>
-                  <RefreshCw className="w-5 h-5 mr-2 animate-spin" strokeWidth={2.5} />
-                  <span className="font-semibold">Clearing...</span>
-                </>
-              ) : (
-                <>
-                  <Trash2 className="w-5 h-5 mr-2" strokeWidth={2.5} />
-                  <span className="font-semibold">Clear Cache</span>
-                </>
-              )}
-            </Button>
           </div>
         </div>
         </Card>

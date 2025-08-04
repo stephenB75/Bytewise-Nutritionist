@@ -264,45 +264,50 @@ export function UserSettingsManager({ onClose, initialSection = 'profile' }: Use
               </div>
             </div>
 
-            {/* Action Buttons - Improved Mobile Layout */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-              <Button
-                variant={isEditing ? "default" : "outline"}
-                size="lg"
-                disabled={isSaving}
-                onClick={isEditing ? handleSave : () => setIsEditing(true)}
-                className={`flex-1 sm:flex-none px-6 py-3 ${isEditing 
-                  ? "bg-gradient-to-r from-[#45c73e] to-[#3ab82e] hover:from-[#3ab82e] hover:to-[#2d8f26] text-white shadow-lg disabled:opacity-50 border-0" 
-                  : "border-2 border-[#1f4aa6] text-[#1f4aa6] hover:bg-[#1f4aa6] hover:text-white bg-white/90 hover:shadow-lg"
-                } rounded-xl transition-all duration-300`}
-              >
-                {isSaving ? (
-                  <>
-                    <div className="w-5 h-5 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                    <span className="font-semibold">Saving...</span>
-                  </>
-                ) : isEditing ? (
-                  <>
-                    <Save className="w-5 h-5 mr-2" strokeWidth={2.5} />
-                    <span className="font-semibold">Save Changes</span>
-                  </>
-                ) : (
-                  <>
-                    <Edit3 className="w-5 h-5 mr-2" strokeWidth={2.5} />
-                    <span className="font-semibold">Edit Profile</span>
-                  </>
-                )}
-              </Button>
-              {isEditing && (
+            {/* Action Buttons - Streamlined Layout */}
+            <div className="flex flex-col gap-3">
+              {!isEditing ? (
                 <Button
                   variant="outline"
                   size="lg"
-                  onClick={handleCancel}
-                  className="flex-1 sm:flex-none px-6 py-3 border-2 border-gray-400 text-gray-300 hover:bg-gray-600 hover:text-white bg-white/90 hover:shadow-lg rounded-xl transition-all duration-300"
+                  disabled={isSaving}
+                  onClick={() => setIsEditing(true)}
+                  className="w-full sm:w-auto px-8 py-4 border-2 border-[#1f4aa6] text-[#1f4aa6] hover:bg-[#1f4aa6] hover:text-white bg-white/95 hover:shadow-xl rounded-2xl transition-all duration-300 font-semibold"
                 >
-                  <X className="w-5 h-5 mr-2" strokeWidth={2.5} />
-                  <span className="font-semibold">Cancel</span>
+                  <Edit3 className="w-5 h-5 mr-3" strokeWidth={2.5} />
+                  Edit Profile Information
                 </Button>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <Button
+                    variant="default"
+                    size="lg"
+                    disabled={isSaving}
+                    onClick={handleSave}
+                    className="px-8 py-4 bg-gradient-to-r from-[#45c73e] to-[#3ab82e] hover:from-[#3ab82e] hover:to-[#2d8f26] text-white shadow-xl disabled:opacity-50 border-0 rounded-2xl transition-all duration-300 font-semibold"
+                  >
+                    {isSaving ? (
+                      <>
+                        <div className="w-5 h-5 mr-3 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                        Saving Changes...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-5 h-5 mr-3" strokeWidth={2.5} />
+                        Save All Changes
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={handleCancel}
+                    className="px-8 py-4 border-2 border-gray-400 text-gray-300 hover:bg-gray-600 hover:text-white bg-white/95 hover:shadow-xl rounded-2xl transition-all duration-300 font-semibold"
+                  >
+                    <X className="w-5 h-5 mr-3" strokeWidth={2.5} />
+                    Cancel Changes
+                  </Button>
+                </div>
               )}
             </div>
           </div>
