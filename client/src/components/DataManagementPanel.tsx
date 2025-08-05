@@ -59,6 +59,12 @@ export function DataManagementPanel() {
   const handleSyncData = async () => {
     setIsSyncing(true);
     try {
+      // Show initial backup starting message
+      toast({
+        title: "Backup starting",
+        description: "Preparing to backup your nutrition data to the database...",
+      });
+
       // Auto backup user data to database
       const response = await fetch('/api/user/sync-backup', {
         method: 'POST',
@@ -68,23 +74,44 @@ export function DataManagementPanel() {
         body: JSON.stringify({
           userId: user?.id,
           timestamp: new Date().toISOString(),
-          backupType: 'auto_sync'
+          backupType: 'manual_auto_backup',
+          includeProfile: true,
+          includeMeals: true,
+          includeRecipes: true,
+          includeWaterIntake: true
         }),
       });
 
       if (response.ok) {
         const data = await response.json();
+        
+        // Update data stats with backup info
+        dataStats.lastSync = new Date().toLocaleDateString();
+        dataStats.backupStatus = 'Completed';
+        
         toast({
-          title: "Backup complete",
-          description: `Your nutrition data has been automatically backed up to the database. ${data.itemsBackedUp || 0} items synchronized.`,
+          title: "Auto Backup Complete ✅",
+          description: `Successfully backed up ${data.itemsBackedUp || 0} items to the database. Your data is now safely stored and synchronized.`,
         });
+
+        // Optional: Show detailed breakdown
+        if (data.breakdown) {
+          setTimeout(() => {
+            toast({
+              title: "Backup Details",
+              description: `Profile: ${data.breakdown.profile || 0} items, Meals: ${data.breakdown.meals || 0} items, Recipes: ${data.breakdown.recipes || 0} items`,
+            });
+          }, 2000);
+        }
       } else {
-        throw new Error('Backup failed');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Backup failed');
       }
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Auto backup error:', error);
       toast({
-        title: "Backup failed",
-        description: "There was an error backing up your data to the database. Please try again.",
+        title: "Auto Backup Failed",
+        description: error.message || "There was an error backing up your data to the database. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -252,7 +279,7 @@ export function DataManagementPanel() {
                   Auto Backup
                 </h4>
                 <p className="text-sm text-gray-300 mb-4" style={{ fontFamily: "'Quicksand', sans-serif" }}>
-                  Automatically backup your nutrition data to the database for safekeeping
+                  Securely backup your profile, meals, recipes, and tracking data to the database
                 </p>
                 <Badge className="bg-[#45c73e]/20 text-[#45c73e] border-[#45c73e]/30 mb-4">
                   Database Backup
