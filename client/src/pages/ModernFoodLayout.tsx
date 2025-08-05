@@ -317,7 +317,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       
       {/* Content */}
       <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6 z-20">
-        <div className="space-y-8 max-w-2xl animate-fadeInUp z-30">
+        <div className="space-y-8 max-w-2xl z-30">
           <div className="space-y-2">
             <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none text-white drop-shadow-2xl animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
               {title}
@@ -463,7 +463,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         />
         
         <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6 z-20">
-          <div className="space-y-8 max-w-2xl animate-fadeInUp z-30">
+          <div className="space-y-8 max-w-2xl z-30">
             <div className="z-40 animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
               <BytewiseLogo />
             </div>
