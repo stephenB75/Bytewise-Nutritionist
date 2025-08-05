@@ -33,22 +33,34 @@ export function DataManagementPanel() {
   const handleExportData = async () => {
     setIsExporting(true);
     try {
+      // Check browser download capability
+      console.log('Starting PDF export process...');
+      
       // Import and use the PDF export utility
       const { generateProgressReportPDF } = await import('@/utils/pdfExport');
       const success = await generateProgressReportPDF();
       
       if (success) {
         toast({
-          title: "Export successful",
-          description: "Your progress report has been downloaded successfully!",
+          title: "PDF Generated Successfully ✅",
+          description: "Your nutrition report should be downloading now. Check your Downloads folder for 'bytewise-nutrition-report-[date].pdf'",
         });
+        
+        // Additional notification after a delay to confirm download
+        setTimeout(() => {
+          toast({
+            title: "Download Status Check",
+            description: "If the PDF didn't download, please check your browser's download settings or pop-up blocker.",
+          });
+        }, 3000);
       } else {
         throw new Error('PDF generation failed');
       }
-    } catch (error) {
+    } catch (error: any) {
+      console.error('PDF export error:', error);
       toast({
         title: "Export failed",
-        description: "There was an error exporting your data. Please try again.",
+        description: `There was an error exporting your data: ${error.message || 'Unknown error'}. Please try again.`,
         variant: "destructive",
       });
     } finally {

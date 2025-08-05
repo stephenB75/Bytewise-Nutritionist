@@ -129,12 +129,37 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     pdf.text('ByteWise Nutrition Tracker - Your Personal Nutrition Companion', pageWidth / 2, pageHeight - 20, { align: 'center' });
     pdf.text('Keep up the great work on your nutrition journey!', pageWidth / 2, pageHeight - 10, { align: 'center' });
 
-    // Save the PDF
+    // Save the PDF with enhanced download methods
     const filename = `bytewise-nutrition-report-${new Date().toISOString().split('T')[0]}.pdf`;
-    console.log(`Saving PDF as: ${filename}`);
-    pdf.save(filename);
+    console.log(`Attempting to download PDF as: ${filename}`);
     
-    console.log('PDF generated successfully!');
+    // Use blob method for better compatibility
+    const pdfBlob = pdf.output('blob');
+    console.log('PDF blob created, size:', pdfBlob.size, 'bytes');
+    
+    // Create download link and trigger download
+    const blobUrl = URL.createObjectURL(pdfBlob);
+    const downloadLink = document.createElement('a');
+    downloadLink.href = blobUrl;
+    downloadLink.download = filename;
+    downloadLink.style.display = 'none';
+    
+    // Add to DOM, click, and remove
+    document.body.appendChild(downloadLink);
+    console.log('Download link created and added to DOM');
+    
+    // Force click with user interaction
+    downloadLink.click();
+    console.log('Download link clicked');
+    
+    // Clean up
+    setTimeout(() => {
+      document.body.removeChild(downloadLink);
+      URL.revokeObjectURL(blobUrl);
+      console.log('Download link cleaned up');
+    }, 1000);
+    
+    console.log('PDF download process completed successfully!');
     return true;
     
   } catch (error) {
