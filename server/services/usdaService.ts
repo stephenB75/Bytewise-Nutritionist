@@ -506,7 +506,7 @@ export class USDAService {
     let gramsEquivalent = quantity;
 
     // Check for item-specific conversions first
-    const ingredientName = food.description.toLowerCase();
+    const ingredientName = food.description?.toLowerCase() || '';
     for (const [ingredient, conversions] of Object.entries(itemConversions)) {
       if (ingredientName.includes(ingredient)) {
         for (const [unitPattern, grams] of Object.entries(conversions)) {
@@ -937,7 +937,13 @@ export class USDAService {
 
   private parseFallbackMeasurement(measurement: string): { gramsEquivalent: number } {
     // Use our internal, corrected parseMeasurement instead of the external one
-    const result = this.parseMeasurement(measurement, {} as USDAFood);
+    const mockFood: USDAFood = {
+      fdcId: 0,
+      description: 'fallback-food',
+      dataType: 'fallback',
+      foodNutrients: []
+    };
+    const result = this.parseMeasurement(measurement, mockFood);
     return { gramsEquivalent: result.gramsEquivalent };
   }
 }
