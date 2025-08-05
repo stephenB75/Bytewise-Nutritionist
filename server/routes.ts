@@ -209,12 +209,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Calculate calories API with real USDA integration (no auth required)
   app.post('/api/calculate-calories', optionalAuth, async (req: any, res: Response) => {
-    const { ingredient, measurement } = req.body;
-    
-    // Use real USDA service for calorie calculation
-    const calorieData = await usdaService.calculateIngredientCalories(ingredient, measurement);
-    
-    res.json(calorieData);
+    try {
+      const { ingredient, measurement } = req.body;
+      
+      // Validate input
+      if (!ingredient && !measurement) {
+        return res.status(400).json({ 
+          error: 'Missing required fields: ingredient and measurement' 
+        });
+      }
+      
+      // Use real USDA service for calorie calculation
+      const calorieData = await usdaService.calculateIngredientCalories(
+        ingredient || 'unknown', 
+        measurement || '1 serving'
+      );
+      
+      res.json(calorieData);
+    } catch (error: any) {
+      console.error('Error calculating calories:', error);
+      res.status(500).json({ 
+        error: 'Failed to calculate calories',
+        message: error?.message || 'Unknown error occurred'
+      });
+    }
   });
 
   // User profile update endpoint

@@ -307,7 +307,11 @@ export function getPortionWeight(foodName: string, measurement: string): number 
 /**
  * Parse measurement text to extract quantity and unit
  */
-export function parseMeasurement(measurement: string): { quantity: number; unit: string } {
+export function parseMeasurement(measurement: string | undefined): { quantity: number; unit: string } {
+  if (!measurement) {
+    return { quantity: 1, unit: 'serving' };
+  }
+  
   const normalized = measurement.toLowerCase().trim();
   
   // Handle natural language patterns like "half of cantaloupe" or "quarter of watermelon"
