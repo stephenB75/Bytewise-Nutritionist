@@ -102,7 +102,7 @@ export function PWAInstallPrompt() {
           
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-gray-900 text-sm mb-1">
-              Install Bytewise App
+              Install bytewise nutritionist
             </h3>
             <p className="text-xs text-gray-600 mb-3">
               Get the full app experience with offline access and faster loading

@@ -1,7 +1,7 @@
-# ByteWise Nutrition Tracker
+# bytewise nutritionist
 
 ## Overview
-ByteWise is a comprehensive Progressive Web App (PWA) for nutrition tracking, meal planning, and recipe building. Its purpose is to help users achieve health goals through an intuitive, mobile-first interface, emphasizing professional mobile interactions and a robust CSS system. The application focuses on real-time data and user-centric design for personal health management, aiming to provide a professional-grade nutrition tracking experience.
+bytewise nutritionist is a comprehensive Progressive Web App (PWA) for nutrition tracking, meal planning, and recipe building. Its purpose is to help users achieve health goals through an intuitive, mobile-first interface, emphasizing professional mobile interactions and a robust CSS system. The application focuses on real-time data and user-centric design for personal health management, aiming to provide a professional-grade nutrition tracking experience.
 
 ## Recent Changes (January 2025)
 - **Complete Caribbean Food Integration**: Added 25+ Caribbean food synonyms, authentic portion weights for 15+ dishes, enhanced scoring system, and comprehensive fallback nutrition data achieving 78% accuracy for Caribbean cuisine

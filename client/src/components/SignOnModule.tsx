@@ -185,7 +185,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
             <User className="w-8 h-8 text-white" />
           </div>
           <h2 className="text-3xl font-bold text-white mb-2" style={{ fontFamily: "'League Spartan', sans-serif" }}>
-            {isSignUp ? 'Join ByteWise' : 'Welcome Back'}
+            {isSignUp ? 'Join bytewise nutritionist' : 'Welcome Back'}
           </h2>
           <p className="text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>
             {isSignUp ? 'Start your nutrition tracking journey today' : 'Access your nutrition tracking and progress'}
