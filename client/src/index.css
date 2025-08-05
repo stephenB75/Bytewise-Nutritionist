@@ -355,13 +355,16 @@ input {
 
 /* Hero section background enhancements */
 .hero-background {
-  transition: all 800ms cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 400ms cubic-bezier(0.4, 0, 0.2, 1);
   will-change: transform, opacity, filter;
   background-size: cover !important;
   background-position: center !important;
   background-repeat: no-repeat !important;
   height: 100vh !important;
   width: 100vw !important;
+  /* Improve image loading performance */
+  background-attachment: scroll;
+  image-rendering: -webkit-optimize-contrast;
 }
 
 .hero-background.transitioning {

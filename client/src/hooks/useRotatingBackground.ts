@@ -1,6 +1,7 @@
 /**
  * Enhanced Rotating Food Background Hook
- * Uses high-quality food images and changes only on page transitions with smooth animations
+ * Uses high-quality food images with preloading for instant switching
+ * Optimized timing for responsive page transitions
  */
 
 import { useState, useEffect } from 'react';
@@ -47,6 +48,19 @@ export function useRotatingBackground(activeTab: string) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [backgroundImage, setBackgroundImage] = useState(foodImages[0]);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  
+  // Preload images for better performance
+  useEffect(() => {
+    const preloadImages = () => {
+      foodImages.forEach((src, index) => {
+        if (index < 5) { // Preload first 5 images for immediate switching
+          const img = new Image();
+          img.src = src;
+        }
+      });
+    };
+    preloadImages();
+  }, []);
 
   // Change background only when page/tab changes
   useEffect(() => {
@@ -58,12 +72,27 @@ export function useRotatingBackground(activeTab: string) {
     if (randomPageImage !== currentImageIndex) {
       setIsTransitioning(true);
       
-      // Smooth transition with animation
-      setTimeout(() => {
-        setCurrentImageIndex(randomPageImage);
-        setBackgroundImage(foodImages[randomPageImage]);
-        setIsTransitioning(false);
-      }, 300); // 300ms fade transition
+      // Preload the new image for faster display
+      const newImage = new Image();
+      newImage.src = foodImages[randomPageImage];
+      
+      // Smooth transition with preloaded image
+      newImage.onload = () => {
+        setTimeout(() => {
+          setCurrentImageIndex(randomPageImage);
+          setBackgroundImage(foodImages[randomPageImage]);
+          setIsTransitioning(false);
+        }, 150); // Reduced to 150ms for faster response
+      };
+      
+      // Fallback if image fails to load
+      newImage.onerror = () => {
+        setTimeout(() => {
+          setCurrentImageIndex(randomPageImage);
+          setBackgroundImage(foodImages[randomPageImage]);
+          setIsTransitioning(false);
+        }, 150);
+      };
     }
   }, [activeTab]); // Only triggers on tab change
 
