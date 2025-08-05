@@ -62,35 +62,49 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
     
     try {
       // Validate required fields
-      if (!userInfo.name?.trim()) {
+      if (!userInfo.firstName?.trim() && !userInfo.lastName?.trim()) {
         toast({
-          title: "Validation Error",
-          description: "Name is required",
+          title: "Validation Error", 
+          description: "At least first name or last name is required",
           variant: "destructive",
         });
         setIsSaving(false);
         return;
       }
 
-      // Save to database via API endpoint
+      // Get current session for authentication
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.access_token) {
+        toast({
+          title: "Authentication Required",
+          description: "Please sign in to save your profile",
+          variant: "destructive",
+        });
+        setIsSaving(false);
+        return;
+      }
+
+      // Save to database via API endpoint with proper authentication
       const response = await fetch('/api/user/profile', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
-          firstName: userInfo.firstName,
-          lastName: userInfo.lastName,
+          firstName: userInfo.firstName || '',
+          lastName: userInfo.lastName || '',
           personalInfo: {
-            phone: userInfo.phone,
-            birthDate: userInfo.birthDate,
-            location: userInfo.location,
-            height: userInfo.height,
-            weight: userInfo.weight,
-            age: userInfo.age,
-            bio: userInfo.bio,
-            activityLevel: userInfo.activityLevel,
-            goals: userInfo.goals,
+            phone: userInfo.phone || '',
+            birthDate: userInfo.birthDate || '',
+            location: userInfo.location || '',
+            height: userInfo.height || '',
+            weight: userInfo.weight || '',
+            age: userInfo.age || '',
+            bio: userInfo.bio || '',
+            activityLevel: userInfo.activityLevel || 'Moderately Active',
+            goals: userInfo.goals || [],
           }
         }),
       });
@@ -113,13 +127,13 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
       setIsEditing(false);
       toast({
         title: "Profile Saved Successfully",
-        description: `Your profile has been saved to the database. ${savedData.itemsUpdated || 0} items updated.`,
+        description: `Your profile has been saved. ${savedData.itemsUpdated || 0} items updated.`,
       });
     } catch (error: any) {
       console.error('Profile save error:', error);
       toast({
         title: "Save Failed",
-        description: error.message || "Unable to save profile to database. Please try again.",
+        description: error.message || "Unable to save profile. Please try again.",
         variant: "destructive",
       });
     } finally {

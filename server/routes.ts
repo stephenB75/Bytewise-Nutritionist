@@ -235,7 +235,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // User profile update endpoint
+  // User profile update endpoint (legacy)
   app.put('/api/auth/user/update', isAuthenticated, async (req: any, res: Response) => {
     const userId = req.user?.id;
     if (!userId) {
@@ -271,6 +271,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Profile update error:', error);
       res.status(500).json({ message: "Failed to update profile" });
+    }
+  });
+
+  // User profile update endpoint (new format expected by UserSettingsManager)
+  app.put('/api/user/profile', isAuthenticated, async (req: any, res: Response) => {
+    const userId = req.user?.id;
+    if (!userId) {
+      res.status(401).json({ message: "User not found" });
+      return;
+    }
+    
+    try {
+      const { firstName, lastName, personalInfo } = req.body;
+      
+      // Validate required fields
+      if (!firstName?.trim() && !lastName?.trim()) {
+        return res.status(400).json({ 
+          message: "At least first name or last name is required" 
+        });
+      }
+      
+      // Update user profile information
+      const updatedUser = await storage.updateUserProfile(userId, {
+        firstName: firstName?.trim() || '',
+        lastName: lastName?.trim() || '',
+        personalInfo: personalInfo || {}
+      });
+      
+      res.json({ 
+        success: true, 
+        user: updatedUser,
+        itemsUpdated: Object.keys(req.body).length,
+        message: "Profile updated successfully"
+      });
+    } catch (error: any) {
+      console.error('Profile update error:', error);
+      res.status(500).json({ 
+        message: error?.message || "Failed to update profile" 
+      });
     }
   });
 
