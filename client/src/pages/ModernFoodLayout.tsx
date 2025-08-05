@@ -366,7 +366,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   });
 
   const BytewiseLogo = () => (
-    <div className="mb-8 animate-in fade-in zoom-in-50 duration-800 delay-500">
+    <div className="mb-8 animate-in fade-in zoom-in-50 duration-800 delay-500 relative z-40">
       <div 
         className="cursor-pointer hover:scale-105 transition-transform duration-200"
         onClick={() => setActiveTab('home')}
@@ -374,13 +374,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       >
         <div style={{
           fontSize: '4.5rem', fontWeight: '900', lineHeight: '0.9', color: '#7dd3fc',
-          marginBottom: '0.5rem', textTransform: 'lowercase', letterSpacing: '-0.02em'
+          marginBottom: '0.5rem', textTransform: 'lowercase', letterSpacing: '-0.02em',
+          textShadow: '0 8px 32px rgba(0,0,0,0.8)'
         }}>
           bytewise
         </div>
         <div style={{
           fontSize: '1.25rem', fontWeight: '300', color: 'rgba(255,255,255,0.8)',
-          letterSpacing: '0.15em', textTransform: 'uppercase'
+          letterSpacing: '0.15em', textTransform: 'uppercase',
+          textShadow: '0 4px 16px rgba(0,0,0,0.6)'
         }}>
           nutritionist
         </div>
@@ -477,28 +479,30 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     <div className={`space-y-0 page-container animate-in fade-in ${getAnimationDirection('home', previousTab)} duration-700 ease-out`}>
       <div className="relative h-screen overflow-hidden">
         <div 
-          className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out"
+          className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out z-10"
           style={{
             backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`
           }}
         />
         
-        <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
-          <div className="space-y-8 max-w-2xl animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-300">
-            <BytewiseLogo />
+        <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6 z-20">
+          <div className="space-y-8 max-w-2xl animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-300 z-30">
+            <div className="z-40">
+              <BytewiseLogo />
+            </div>
             
             <div className="space-y-2 animate-in fade-in slide-in-from-bottom-4 duration-800 delay-700">
-              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">Track Your</h1>
+              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none text-white drop-shadow-2xl">Track Your</h1>
               <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
-                <span className="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">Nutrition</span>
+                <span className="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent drop-shadow-2xl">Nutrition</span>
               </h1>
             </div>
             
-            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-800 delay-900">
+            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-800 delay-900 drop-shadow-xl">
               Track nutrition with scientific precision using our comprehensive USDA database
             </p>
             
-            <div className="pt-8 animate-in fade-in slide-in-from-bottom-4 duration-800 delay-1100">
+            <div className="pt-8 animate-in fade-in slide-in-from-bottom-4 duration-800 delay-1100 z-40">
               <Button 
                 onClick={() => {
                   if (user) {
@@ -508,7 +512,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   }
                 }}
                 size="lg"
-                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-black px-16 py-6 rounded-full text-2xl shadow-2xl transform hover:scale-105 transition-all duration-500 border-2 border-orange-400/30"
+                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-black px-16 py-6 rounded-full text-2xl shadow-2xl transform hover:scale-105 transition-all duration-500 border-2 border-orange-400/30 relative z-40"
               >
                 {user ? 'Start Tracking' : 'Sign Up to Track'}
               </Button>
@@ -516,9 +520,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           </div>
         </div>
         
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60">
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60 z-30">
           <div className="animate-bounce">
-            <ChevronRight className="w-6 h-6 rotate-90" />
+            <ChevronRight className="w-6 h-6 rotate-90 drop-shadow-lg" />
           </div>
         </div>
       </div>
