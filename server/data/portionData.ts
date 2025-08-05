@@ -137,7 +137,10 @@ export function getPortionWeight(foodName: string, measurement: string): number 
            (normalizedMeasurement.includes('small') && desc === 'small') ||
            (normalizedMeasurement.includes('cup') && desc.includes('cup')) ||
            (normalizedMeasurement.includes('piece') && desc.includes('piece')) ||
-           (normalizedMeasurement.includes('slice') && desc.includes('slice'));
+           (normalizedMeasurement.includes('slice') && desc.includes('slice')) ||
+           (normalizedMeasurement.includes('hot dog') && desc === 'item') ||
+           (normalizedMeasurement.includes('standard') && desc === 'item') ||
+           (normalizedMeasurement.includes('item') && desc === 'item');
   });
   
   if (portion) {
@@ -180,6 +183,15 @@ export function parseMeasurement(measurement: string): { quantity: number; unit:
     return {
       quantity: parseFloat(numberMatch[1]),
       unit: numberMatch[2].trim()
+    };
+  }
+  
+  // Handle cases like "1 hot dog" where number is first
+  const wordNumberMatch = normalized.match(/^(\d+)\s+(.+)$/);
+  if (wordNumberMatch) {
+    return {
+      quantity: parseFloat(wordNumberMatch[1]),
+      unit: wordNumberMatch[2].trim()
     };
   }
   
