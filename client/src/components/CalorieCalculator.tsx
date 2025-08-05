@@ -6,12 +6,11 @@
  */
 
 import { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { EnhancedIngredientDatabaseManager, type IngredientData } from '@/data/enhancedIngredientDatabase';
 import { 
@@ -62,7 +61,29 @@ interface CalorieCalculatorProps {
   isCompact?: boolean;
 }
 
-function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLogToWeekly, isCompact = false }: CalorieCalculatorProps) {
+interface LoggedMealData {
+  id: string;
+  name: string;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  date: string;
+  time: string;
+  mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack';
+  category: 'breakfast' | 'lunch' | 'dinner' | 'snack';
+  timestamp: string;
+  source: string;
+}
+
+function CalorieCalculator({ 
+  onAddToMeal, 
+  onNavigate, 
+  onCaloriesCalculated, 
+  onLogToWeekly, 
+  isCompact = false 
+}: CalorieCalculatorProps) {
+  // State management
   const [ingredient, setIngredient] = useState('');
   const [measurement, setMeasurement] = useState('');
   const [selectedUnit, setSelectedUnit] = useState('');
@@ -73,7 +94,6 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
   const [ingredientSuggestions, setIngredientSuggestions] = useState<Array<{category: string; key: string; data: IngredientData}>>([]);
   const [selectedIngredient, setSelectedIngredient] = useState<{category: string; key: string; data: IngredientData} | null>(null);
   const [availableUnits, setAvailableUnits] = useState<string[]>([]);
-  const queryClient = useQueryClient();
 
   // Search ingredients as user types
   useEffect(() => {
@@ -94,17 +114,10 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
       );
       setAvailableUnits(units);
       if (units.length > 0 && !selectedUnit) {
-        setSelectedUnit(units[0]); // Set first unit as default
+        setSelectedUnit(units[0]);
       }
     }
   }, [selectedIngredient]);
-
-  // Select ingredient from suggestions
-  const handleSelectIngredient = (suggestion: {category: string; key: string; data: IngredientData}) => {
-    setSelectedIngredient(suggestion);
-    setIngredient(suggestion.data.displayName);
-    setIngredientSuggestions([]);
-  };
 
   // Calculate calories mutation
   const calculateCalories = useMutation({
@@ -123,11 +136,7 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
     },
     onSuccess: (data: IngredientAnalysis) => {
       setRecentAnalyses(prev => [data, ...prev.slice(0, 4)]);
-      setIngredient('');
-      setMeasurement('');
-      setAmount('');
-      setSelectedUnit('');
-      setSelectedIngredient(null);
+      resetForm();
       
       // Send calculated calories to tracking hook
       if (onCaloriesCalculated) {
@@ -146,102 +155,59 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
     },
   });
 
+  // Helper functions
+  const resetForm = () => {
+    setIngredient('');
+    setMeasurement('');
+    setAmount('');
+    setSelectedUnit('');
+    setSelectedIngredient(null);
+  };
+
+  const selectIngredient = (suggestion: {category: string; key: string; data: IngredientData}) => {
+    setSelectedIngredient(suggestion);
+    setIngredient(suggestion.data.displayName);
+    setIngredientSuggestions([]);
+  };
+
   const handleCalculate = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!ingredient.trim()) {
-      return;
-    }
+    if (!ingredient.trim()) return;
 
-    // Allow calculation for any food item - no verification required
+    let measurementText = '';
     if (selectedIngredient && amount && selectedUnit) {
-      const measurementText = `${amount} ${selectedUnit}`;
-      
-      // Use ingredient query for calculation
+      measurementText = `${amount} ${selectedUnit}`;
       calculateCalories.mutate({ 
         ingredient: selectedIngredient.data.usdaQuery || ingredient.trim(), 
         measurement: measurementText 
       });
     } else if (measurement.trim()) {
-      // Direct calculation for any food item
       calculateCalories.mutate({ ingredient: ingredient.trim(), measurement: measurement.trim() });
     } else {
-      // Allow calculation even without specific measurement
       calculateCalories.mutate({ ingredient: ingredient.trim(), measurement: '100g' });
     }
   };
 
-  // Measurement validation function
-  const validateMeasurement = (measurement: string): { isValid: boolean; suggestion?: string } => {
-    const measurementLower = measurement.toLowerCase();
-    
-    // Common valid patterns
-    const validPatterns = [
-      /^\d+(\.\d+)?\s*(g|gram|grams)$/,
-      /^\d+(\.\d+)?\s*(oz|ounce|ounces)$/,
-      /^\d+(\.\d+)?\s*(lb|lbs|pound|pounds)$/,
-      /^\d+(\.\d+)?\s*(cup|cups)$/,
-      /^\d+(\.\d+)?\s*(tbsp|tablespoon|tablespoons)$/,
-      /^\d+(\.\d+)?\s*(tsp|teaspoon|teaspoons)$/,
-      /^\d+(\.\d+)?\s*(piece|pieces)$/,
-      /^\d+(\.\d+)?\s*(slice|slices)$/,
-      /^\d+(\.\d+)?\s*(small|medium|large)$/,
-      /^\d+(\.\d+)?\s*(ml|milliliter|milliliters)$/,
-      /^\d+(\.\d+)?\s*(liter|liters|l)$/
-    ];
-    
-    const isValid = validPatterns.some(pattern => pattern.test(measurementLower));
-    
-    if (!isValid) {
-      // Suggest corrections
-      if (/^\d+/.test(measurementLower)) {
-        return { 
-          isValid: false, 
-          suggestion: 'Add a unit like "g", "cup", "tbsp", "medium", etc.' 
-        };
-      } else if (/^(small|medium|large)$/.test(measurementLower)) {
-        return { 
-          isValid: false, 
-          suggestion: 'Add a number like "1 medium", "2 large", etc.' 
-        };
-      } else {
-        return { 
-          isValid: false, 
-          suggestion: 'Use format like "100g", "1 cup", "2 tbsp", "1 medium"' 
-        };
-      }
-    }
-    
-    return { isValid: true };
+  const getMealType = (): 'breakfast' | 'lunch' | 'dinner' | 'snack' => {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 11) return 'breakfast';
+    if (hour >= 11 && hour < 16) return 'lunch';  
+    if (hour >= 16 && hour < 21) return 'dinner';
+    return 'snack';
   };
 
-  const handleAddToMeal = (analysis: IngredientAnalysis) => {
-    if (onAddToMeal) {
-      onAddToMeal(analysis);
-    }
-  };
-
-  const handleLogToWeekly = async (analysis: IngredientAnalysis) => {
+  const logToWeeklyTracker = async (analysis: IngredientAnalysis) => {
     const now = new Date();
-    const hour = now.getHours();
-    let mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack';
-    
-    // Enhanced category assignment logic based on time
-    if (hour >= 5 && hour < 11) mealType = 'breakfast';
-    else if (hour >= 11 && hour < 16) mealType = 'lunch';  
-    else if (hour >= 16 && hour < 21) mealType = 'dinner';
-    else mealType = 'snack';
+    const mealType = getMealType();
 
-    const mealData = {
+    const mealData: LoggedMealData = {
       id: `calc-${Date.now()}`,
       name: `${analysis.ingredient} (${analysis.measurement})`,
       calories: analysis.estimatedCalories,
       protein: analysis.nutritionPer100g?.protein || 0,
       carbs: analysis.nutritionPer100g?.carbs || 0,
       fat: analysis.nutritionPer100g?.fat || 0,
-      fiber: 0,
-      sugar: 0,
-      sodium: 0,
       date: now.toISOString().split('T')[0],
       time: now.toLocaleTimeString('en-US', { 
         hour: '2-digit', 
@@ -259,18 +225,12 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
     weeklyMeals.push(mealData);
     localStorage.setItem('weeklyMeals', JSON.stringify(weeklyMeals));
     
-    // Successfully logged to weekly tracker
-    
-    // Dispatch comprehensive events for weekly logger refresh
-    window.dispatchEvent(new CustomEvent('calories-logged', {
-      detail: mealData
-    }));
-    window.dispatchEvent(new CustomEvent('meal-logged-success', {
-      detail: mealData
-    }));
+    // Dispatch events for weekly logger refresh
+    window.dispatchEvent(new CustomEvent('calories-logged', { detail: mealData }));
+    window.dispatchEvent(new CustomEvent('meal-logged-success', { detail: mealData }));
     window.dispatchEvent(new CustomEvent('refresh-weekly-data'));
     
-    // Store logged data and show animation
+    // Show success animation
     setLoggedData({
       name: mealData.name,
       calories: mealData.calories,
@@ -295,7 +255,7 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
       }
     }));
 
-    // Also call the original callback if it exists
+    // Call the original callback if it exists
     if (onLogToWeekly) {
       onLogToWeekly({
         name: mealData.name,
@@ -310,6 +270,7 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
     }
   };
 
+  // Compact view for smaller spaces
   if (isCompact) {
     return (
       <Card className="p-4 bg-white/90 backdrop-blur-sm border-0 shadow-lg">
@@ -385,7 +346,7 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => handleAddToMeal(analysis)}
+                      onClick={() => onAddToMeal(analysis)}
                       className="w-full"
                     >
                       Add to Meal
@@ -393,10 +354,7 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
                   )}
                   <Button
                     size="sm"
-                    onClick={() => {
-                      // Logging meal data
-                      handleLogToWeekly(analysis);
-                    }}
+                    onClick={() => logToWeeklyTracker(analysis)}
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                   >
                     <Plus className="w-3 h-3 mr-1" />
@@ -411,9 +369,10 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
     );
   }
 
+  // Full view
   return (
     <div className="space-y-6 relative">
-      {/* Animated Success Dialog */}
+      {/* Success Animation Modal */}
       {showLoggedAnimation && loggedData && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
           <div className="bg-white rounded-2xl p-8 mx-4 max-w-sm w-full shadow-2xl animate-in zoom-in-95 duration-500">
@@ -472,7 +431,7 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
 
         <form onSubmit={handleCalculate} className="space-y-4">
           <div className="grid grid-cols-1 gap-4">
-            {/* Enhanced Ingredient Input with Suggestions */}
+            {/* Ingredient Input with Suggestions */}
             <div className="relative">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Ingredient Name
@@ -488,27 +447,27 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
               {ingredientSuggestions.length > 0 && (
                 <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-64 overflow-y-auto">
                   {ingredientSuggestions.map((suggestion, index) => (
-                        <button
-                          key={`${suggestion.category}-${suggestion.key}`}
-                          type="button"
-                          onClick={() => handleSelectIngredient(suggestion)}
-                          className="w-full px-4 py-2 text-left hover:bg-blue-50 border-b border-gray-100 last:border-b-0"
+                    <button
+                      key={`${suggestion.category}-${suggestion.key}`}
+                      type="button"
+                      onClick={() => selectIngredient(suggestion)}
+                      className="w-full px-4 py-2 text-left hover:bg-blue-50 border-b border-gray-100 last:border-b-0"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium text-gray-900">{suggestion.data.displayName}</p>
+                          <p className="text-xs text-gray-500">{suggestion.category}</p>
+                        </div>
+                        <Badge 
+                          variant="outline" 
+                          style={{ backgroundColor: suggestion.data.tags.categoryColor + '40', color: '#374151' }}
+                          className="text-xs"
                         >
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <p className="font-medium text-gray-900">{suggestion.data.displayName}</p>
-                              <p className="text-xs text-gray-500">{suggestion.category}</p>
-                            </div>
-                            <Badge 
-                              variant="outline" 
-                              style={{ backgroundColor: suggestion.data.tags.categoryColor + '40', color: '#374151' }}
-                              className="text-xs"
-                            >
-                              {suggestion.data.tags.dietType[0] || 'food'}
-                            </Badge>
-                          </div>
-                        </button>
-                      ))}
+                          {suggestion.data.tags.dietType[0] || 'food'}
+                        </Badge>
+                      </div>
+                    </button>
+                  ))}
                 </div>
               )}
               
@@ -517,7 +476,7 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
               </p>
             </div>
             
-            {/* Enhanced Measurement Input */}
+            {/* Measurement Input */}
             {selectedIngredient ? (
               // Enhanced mode with unit selection
               <div className="grid grid-cols-2 gap-4">
@@ -553,7 +512,6 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
                 </div>
               </div>
             ) : (
-              // Fallback mode
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Measurement
@@ -674,7 +632,7 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
                 <div className="space-y-2">
                   {onAddToMeal && (
                     <Button
-                      onClick={() => handleAddToMeal(analysis)}
+                      onClick={() => onAddToMeal(analysis)}
                       className="w-full bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
                     >
                       <CheckCircle className="w-4 h-4 mr-2" />
@@ -682,7 +640,7 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
                     </Button>
                   )}
                   <Button
-                    onClick={() => handleLogToWeekly(analysis)}
+                    onClick={() => logToWeeklyTracker(analysis)}
                     className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
                   >
                     <Calendar className="w-5 h-5 mr-2" />
