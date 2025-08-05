@@ -33,7 +33,8 @@ import {
   Home,
   BarChart3,
   UserCircle,
-  Utensils
+  Utensils,
+  CheckCircle2
 } from 'lucide-react';
 import { NotificationDropdown } from '@/components/NotificationDropdown';
 import { WeeklyCaloriesCard } from '@/components/WeeklyCaloriesCard';
@@ -1127,104 +1128,140 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         }}
       />
 
-      {/* Content Section - Completely Separate and Underneath */}
-      <div className="bg-white content-section">
-        <div className="max-w-6xl mx-auto px-6 py-8 main-content profile-content h-full flex flex-col">
-          {/* Profile Navigation - Modern Layout */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-8 justify-center items-stretch">
-            {[
-              { 
-                id: 'profile', 
-                name: 'Personal Profile', 
-                shortName: 'Profile', 
-                icon: User,
-                description: 'Edit your personal information'
-              },
-              { 
-                id: 'achievements', 
-                name: 'Awards & Achievements', 
-                shortName: 'Awards', 
-                icon: Trophy,
-                description: 'View your progress and goals'
-              },
-              { 
-                id: 'data', 
-                name: 'Data & Export', 
-                shortName: 'Data', 
-                icon: Download,
-                description: 'Manage your nutrition data'
-              }
-            ].map((section) => {
-              const IconComponent = section.icon;
-              const isActive = profileSection === section.id;
-              return (
-                <Button
-                  key={section.id}
-                  variant="outline"
-                  size="lg"
-                  disabled={authLoading}
-                  className={`flex-1 sm:flex-none sm:w-56 h-32 p-5 flex flex-col items-center justify-center space-y-3 transition-all duration-300 ${
-                    isActive
-                      ? 'bg-gradient-to-br from-[#1f4aa6] via-[#45c73e] to-[#faed39] text-white shadow-2xl border-2 border-transparent transform scale-105 z-10' 
-                      : 'bg-white/95 hover:bg-white text-gray-700 border-2 border-gray-200 hover:border-[#1f4aa6] hover:shadow-xl hover:scale-102'
-                  } ${authLoading ? 'opacity-50 cursor-not-allowed' : ''} rounded-2xl backdrop-blur-sm relative`}
-                  onClick={() => handleProfileSectionChange(section.id)}
-                >
-                  <div className={`w-14 h-14 p-3.5 rounded-xl flex items-center justify-center ${isActive ? 'bg-white/20' : 'bg-[#1f4aa6]/10'}`}>
-                    <IconComponent 
-                      className={`w-7 h-7 ${isActive ? 'text-white' : 'text-[#1f4aa6]'}`}
-                      strokeWidth={2.5}
-                    />
+      {/* Content Section - Redesigned to match other pages */}
+      <div className="px-6 py-3 bg-black content-section">
+        {user && (
+          <div className="mb-8">
+            {/* User Info Card - Profile Picture and Quick Info */}
+            <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
+              <div className="flex items-center space-x-6">
+                <div className="relative">
+                  <div className="w-20 h-20 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center">
+                    <User className="w-10 h-10 text-white" />
                   </div>
-                  <div className="text-center">
-                    <div className={`text-sm font-bold ${isActive ? 'text-white' : 'text-gray-900'}`} style={{ fontFamily: "'League Spartan', sans-serif" }}>
-                      {section.shortName}
-                    </div>
-                    <div className={`text-xs mt-1 ${isActive ? 'text-white/90' : 'text-gray-500'}`} style={{ fontFamily: "'Work Sans', sans-serif" }}>
-                      {section.description}
-                    </div>
+                  <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-black flex items-center justify-center">
+                    <CheckCircle2 className="w-3 h-3 text-white" />
                   </div>
-                  {isActive && (
-                    <div className="absolute top-2 right-2 w-2 h-2 bg-white rounded-full animate-pulse"></div>
-                  )}
-                </Button>
-              );
-            })}
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-2xl font-bold text-white mb-1" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                    {user?.email?.split('@')[0] || 'ByteWise User'}
+                  </h3>
+                  <p className="text-gray-300 text-sm mb-2">{user?.email}</p>
+                  <div className="flex items-center space-x-4 text-sm text-gray-400">
+                    <span>🏆 Level 1</span>
+                    <span>📊 0 meals logged</span>
+                    <span>🎯 Getting started</span>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-lg font-bold text-orange-400">0</div>
+                  <div className="text-xs text-gray-400">Total Points</div>
+                </div>
+              </div>
+            </Card>
           </div>
+        )}
 
-          {/* Profile Content - Improved Container */}
-          <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 min-h-0">
-            <div className="space-y-6 pr-2 pb-8">
-              {profileSection === 'profile' && (
-                <div className="space-y-4">
-                  {user ? (
-                    <UserSettingsManager 
-                      onClose={() => setProfileSection('profile')} 
-                      initialSection="profile"
-                    />
-                  ) : (
-                    <SignOnModule />
+        {/* Profile Navigation - Redesigned Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          {[
+            { 
+              id: 'profile', 
+              name: 'Personal Profile', 
+              shortName: 'Profile', 
+              icon: User,
+              description: 'Edit your personal information',
+              color: 'from-blue-500 to-cyan-500'
+            },
+            { 
+              id: 'achievements', 
+              name: 'Awards & Achievements', 
+              shortName: 'Awards', 
+              icon: Trophy,
+              description: 'View your progress and goals',
+              color: 'from-yellow-500 to-orange-500'
+            },
+            { 
+              id: 'data', 
+              name: 'Data & Export', 
+              shortName: 'Data', 
+              icon: Download,
+              description: 'Manage your nutrition data',
+              color: 'from-green-500 to-emerald-500'
+            }
+          ].map((section) => {
+            const IconComponent = section.icon;
+            const isActive = profileSection === section.id;
+            return (
+              <Card
+                key={section.id}
+                className={`cursor-pointer transition-all duration-300 hover:scale-105 ${
+                  isActive
+                    ? 'bg-white/20 border-white/40 shadow-2xl ring-2 ring-orange-400/30' 
+                    : 'bg-white/10 border-white/20 hover:bg-white/15'
+                } backdrop-blur-md`}
+                onClick={() => handleProfileSectionChange(section.id)}
+              >
+                <div className="p-6 text-center">
+                  <div className={`w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br ${section.color} flex items-center justify-center shadow-lg`}>
+                    <IconComponent className="w-8 h-8 text-white" strokeWidth={2.5} />
+                  </div>
+                  <h3 className="text-lg font-bold text-white mb-2" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                    {section.shortName}
+                  </h3>
+                  <p className="text-sm text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>
+                    {section.description}
+                  </p>
+                  {isActive && (
+                    <div className="mt-3 flex justify-center">
+                      <div className="w-2 h-2 bg-orange-400 rounded-full animate-pulse"></div>
+                    </div>
                   )}
                 </div>
-              )}
-              
-              {profileSection === 'achievements' && (
-                user ? (
-                  <AwardsAchievements onClose={() => setProfileSection('profile')} />
-                ) : (
+              </Card>
+            );
+          })}
+        </div>
+
+        {/* Profile Content - Redesigned Container */}
+        <div className="min-h-[600px]">
+          {profileSection === 'profile' && (
+            <div className="space-y-4">
+              {user ? (
+                <UserSettingsManager 
+                  onClose={() => setProfileSection('profile')} 
+                  initialSection="profile"
+                />
+              ) : (
+                <Card className="bg-white/10 backdrop-blur-md border-white/20 p-8">
                   <SignOnModule />
-                )
-              )}
-              
-              {profileSection === 'data' && (
-                user ? (
-                  <DataManagementPanel />
-                ) : (
-                  <SignOnModule />
-                )
+                </Card>
               )}
             </div>
-          </div>
+          )}
+          
+          {profileSection === 'achievements' && (
+            user ? (
+              <AwardsAchievements onClose={() => setProfileSection('profile')} />
+            ) : (
+              <Card className="bg-white/10 backdrop-blur-md border-white/20 p-8">
+                <SignOnModule />
+              </Card>
+            )
+          )}
+          
+          {profileSection === 'data' && (
+            user ? (
+              <Card className="bg-white/10 backdrop-blur-md border-white/20">
+                <DataManagementPanel />
+              </Card>
+            ) : (
+              <Card className="bg-white/10 backdrop-blur-md border-white/20 p-8">
+                <SignOnModule />
+              </Card>
+            )
+          )}
         </div>
       </div>
     </div>
