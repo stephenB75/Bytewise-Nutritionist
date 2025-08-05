@@ -298,96 +298,69 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     setActiveTab(newTab);
   };
 
-  // Optimized Hero Section Component with Smooth Animations
+  // Clean Hero Section Component
   const HeroSection = React.memo(({ title, subtitle, description, buttonText, onButtonClick }: {
     title: string;
     subtitle: string;
     description: string;
     buttonText: string;
     onButtonClick: () => void;
-  }) => {
-    const [imageLoaded, setImageLoaded] = React.useState(false);
-    
-    // Preload background image for instant display
-    React.useEffect(() => {
-      const img = new Image();
-      img.src = backgroundImage;
-      img.onload = () => setImageLoaded(true);
-    }, [backgroundImage]);
-
-    return (
-      <div className="relative h-screen overflow-hidden">
-        {/* Smooth background with optimized transitions */}
-        <div 
-          className={`absolute inset-0 bg-cover bg-center transition-all duration-300 ease-in-out z-10 ${
-            isTransitioning ? 'opacity-80' : 'opacity-100'
-          }`}
-          style={{
-            backgroundImage: imageLoaded 
-              ? `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`
-              : 'linear-gradient(135deg, rgba(0,0,0,0.8), rgba(0,0,0,0.9))',
-            transform: 'translate3d(0,0,0)', // GPU acceleration
-            backfaceVisibility: 'hidden'
-          }}
-        />
-        
-        <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6 z-20">
-          <div className="space-y-8 max-w-2xl animate-fadeInUp z-30">
-            <div className="space-y-2">
-              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none text-white drop-shadow-2xl animate-fadeInUp" style={{ animationDelay: '0.2s' }}>{title}</h1>
-              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none animate-fadeInUp" style={{ animationDelay: '0.4s' }}>
-                <span className="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent drop-shadow-2xl">{subtitle}</span>
-              </h1>
-            </div>
-            
-            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl animate-fadeInUp" style={{ animationDelay: '0.6s' }}>
-              {description}
-            </p>
-            
-            <div className="pt-8 z-40 animate-fadeInUp" style={{ animationDelay: '0.8s' }}>
-              <Button 
-                onClick={onButtonClick}
-                size="lg"
-                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-black px-16 py-6 rounded-full text-2xl shadow-2xl transform hover:scale-105 transition-all duration-200 border-2 border-orange-400/30 relative z-40"
-              >
-                {buttonText}
-              </Button>
-            </div>
+  }) => (
+    <div className="relative h-screen overflow-hidden">
+      {/* Background with gradient overlay */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center z-10"
+        style={{
+          backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`
+        }}
+      />
+      
+      {/* Content */}
+      <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6 z-20">
+        <div className="space-y-8 max-w-2xl animate-fadeInUp z-30">
+          <div className="space-y-2">
+            <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none text-white drop-shadow-2xl animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
+              {title}
+            </h1>
+            <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none animate-fadeInUp" style={{ animationDelay: '0.4s' }}>
+              <span className="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent drop-shadow-2xl">
+                {subtitle}
+              </span>
+            </h1>
           </div>
-        </div>
-        
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60 z-30">
-          <div className="animate-bounce">
-            <ChevronRight className="w-6 h-6 rotate-90 drop-shadow-lg" />
+          
+          <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl animate-fadeInUp" style={{ animationDelay: '0.6s' }}>
+            {description}
+          </p>
+          
+          <div className="pt-8 z-40 animate-fadeInUp" style={{ animationDelay: '0.8s' }}>
+            <Button 
+              onClick={onButtonClick}
+              size="lg"
+              className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-black px-16 py-6 rounded-full text-2xl shadow-2xl transform hover:scale-105 transition-all duration-200 border-2 border-orange-400/30 relative z-40"
+            >
+              {buttonText}
+            </Button>
           </div>
         </div>
       </div>
-    );
-  });
+      
+      {/* Scroll indicator */}
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60 z-30">
+        <div className="animate-bounce">
+          <ChevronRight className="w-6 h-6 rotate-90 drop-shadow-lg" />
+        </div>
+      </div>
+    </div>
+  ));
 
   const BytewiseLogo = () => (
-    <div className="mb-8 relative z-50">
-      <div 
-        className="cursor-pointer hover:scale-105 transition-transform duration-200"
-        onClick={() => setActiveTab('home')}
-        style={{ fontFamily: "'League Spartan', sans-serif", textAlign: 'center' }}
-      >
-        <div style={{
-          fontSize: '4.5rem', fontWeight: '900', lineHeight: '0.9', color: '#7dd3fc',
-          marginBottom: '0.5rem', textTransform: 'lowercase', letterSpacing: '-0.02em',
-          textShadow: '0 8px 32px rgba(0,0,0,0.8)',
-          position: 'relative',
-          zIndex: 50
-        }}>
+    <div className="mb-8 relative z-50 cursor-pointer hover:scale-105 transition-transform duration-200" onClick={() => setActiveTab('home')}>
+      <div className="text-center" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+        <div className="text-7xl font-black leading-none text-sky-300 mb-2 lowercase tracking-tight drop-shadow-2xl">
           bytewise
         </div>
-        <div style={{
-          fontSize: '1.25rem', fontWeight: '300', color: 'rgba(255,255,255,0.8)',
-          letterSpacing: '0.15em', textTransform: 'uppercase',
-          textShadow: '0 4px 16px rgba(0,0,0,0.6)',
-          position: 'relative',
-          zIndex: 50
-        }}>
+        <div className="text-xl font-light text-white/80 uppercase tracking-widest drop-shadow-lg">
           nutritionist
         </div>
       </div>
@@ -483,7 +456,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     <div className={`space-y-0 page-container animate-in fade-in ${getAnimationDirection('home', previousTab)} duration-700 ease-out`}>
       <div className="relative h-screen overflow-hidden">
         <div 
-          className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out z-10"
+          className="absolute inset-0 bg-cover bg-center z-10"
           style={{
             backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`
           }}
