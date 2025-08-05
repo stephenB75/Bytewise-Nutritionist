@@ -297,14 +297,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     setActiveTab(newTab);
   };
 
-  // Helper components for cleaner code
-  const HeroSection = ({ title, subtitle, description, buttonText, onButtonClick, children }: {
+  // Optimized Hero Section Component
+  const HeroSection = ({ title, subtitle, description, buttonText, onButtonClick }: {
     title: string;
     subtitle: string;
     description: string;
     buttonText: string;
     onButtonClick: () => void;
-    children?: React.ReactNode;
   }) => (
     <div className="relative h-screen overflow-hidden">
       <div 
@@ -316,8 +315,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       
       <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
         <div className="space-y-8 max-w-2xl animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-300">
-          {children}
-          
           <div className="space-y-2 animate-in fade-in slide-in-from-bottom-4 duration-800 delay-700">
             <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">{title}</h1>
             <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
@@ -372,14 +369,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     </div>
   );
 
-  const ProgressCard = ({ title, icon: Icon, value, goal, percentage, color, children }: {
+  const ProgressCard = ({ title, icon: Icon, value, goal, percentage, color }: {
     title: string;
     icon: React.ComponentType<{ className?: string }>;
     value: string;
     goal: string;
     percentage: number;
     color: string;
-    children?: React.ReactNode;
   }) => (
     <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4">
       <div className="flex items-center justify-between mb-4">
@@ -406,7 +402,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full animate-pulse" />
         )}
       </div>
-      {children}
     </Card>
   );
 
@@ -433,14 +428,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     </Card>
   );
 
-  const MicronutrientCard = ({ name, value, goal, unit, color, percentage = 0 }: {
+  const MicronutrientCard = ({ name, value, goal, unit, color }: {
     name: string;
     value: number;
     goal: number;
     unit: string;
     color: string;
-    percentage?: number;
-  }) => (
+  }) => {
+    const percentage = Math.round((value / goal) * 100);
+    return (
     <Card className="bg-white/10 backdrop-blur-md border-white/20 p-3">
       <div className="flex items-center justify-between mb-2">
         <div className={`text-sm font-semibold text-${color}-400`}>{name}</div>
@@ -454,26 +450,59 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       </div>
       <div className="text-xs text-gray-500 mt-1">{percentage}% DV</div>
     </Card>
-  );
+    );
+  };
 
   // Render functions for each page with enhanced animations
   const renderHome = () => (
     <div className={`space-y-0 page-container animate-in fade-in ${getAnimationDirection('home', previousTab)} duration-700 ease-out`}>
-      <HeroSection
-        title="Track Your"
-        subtitle="Nutrition"
-        description="Track nutrition with scientific precision using our comprehensive USDA database"
-        buttonText={user ? 'Start Tracking' : 'Sign Up to Track'}
-        onButtonClick={() => {
-          if (user) {
-            setActiveTab('calculator');
-          } else {
-            setActiveTab('profile');
-          }
-        }}
-      >
-        <BytewiseLogo />
-      </HeroSection>
+      <div className="relative h-screen overflow-hidden">
+        <div 
+          className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out"
+          style={{
+            backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`
+          }}
+        />
+        
+        <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
+          <div className="space-y-8 max-w-2xl animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-300">
+            <BytewiseLogo />
+            
+            <div className="space-y-2 animate-in fade-in slide-in-from-bottom-4 duration-800 delay-700">
+              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">Track Your</h1>
+              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
+                <span className="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">Nutrition</span>
+              </h1>
+            </div>
+            
+            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-800 delay-900">
+              Track nutrition with scientific precision using our comprehensive USDA database
+            </p>
+            
+            <div className="pt-8 animate-in fade-in slide-in-from-bottom-4 duration-800 delay-1100">
+              <Button 
+                onClick={() => {
+                  if (user) {
+                    setActiveTab('calculator');
+                  } else {
+                    setActiveTab('profile');
+                  }
+                }}
+                size="lg"
+                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-black px-16 py-6 rounded-full text-2xl shadow-2xl transform hover:scale-105 transition-all duration-500 border-2 border-orange-400/30"
+              >
+                {user ? 'Start Tracking' : 'Sign Up to Track'}
+              </Button>
+            </div>
+          </div>
+        </div>
+        
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60">
+          <div className="animate-bounce">
+            <ChevronRight className="w-6 h-6 rotate-90" />
+          </div>
+        </div>
+      </div>
 
       {/* Content Section - Completely Separate and Underneath */}
       <div className="px-6 py-3 bg-black content-section">
@@ -490,14 +519,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           </div>
 
           {/* Daily Progress */}
-          <ProgressCard
-            title="Daily Calories"
-            icon={Flame}
-            value={`${Math.round(dailyCalories)} kcal`}
-            goal={`${goalCalories} kcal`}
-            percentage={Math.round((dailyCalories/goalCalories)*100)}
-            color="orange"
-          >
+          <div className="mb-4">
+            <ProgressCard
+              title="Daily Calories"
+              icon={Flame}
+              value={`${Math.round(dailyCalories)} kcal`}
+              goal={`${goalCalories} kcal`}
+              percentage={Math.round((dailyCalories/goalCalories)*100)}
+              color="orange"
+            />
             <div className="grid grid-cols-3 gap-3 mt-4">
               <div className="text-center p-2 bg-gray-800/50 rounded-lg">
                 <div className="text-sm font-bold text-orange-400">{loggedMeals.length}</div>
@@ -512,17 +542,18 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 <div className="text-xs text-gray-400">Complete</div>
               </div>
             </div>
-          </ProgressCard>
+          </div>
 
           {/* Weekly Progress */}
-          <ProgressCard
-            title="Weekly Progress"
-            icon={Calendar}
-            value={`${Math.round(weeklyCalories)} kcal`}
-            goal={`${weeklyGoal} kcal`}
-            percentage={Math.round((weeklyCalories/weeklyGoal)*100)}
-            color="blue"
-          >
+          <div className="mb-4">
+            <ProgressCard
+              title="Weekly Progress"
+              icon={Calendar}
+              value={`${Math.round(weeklyCalories)} kcal`}
+              goal={`${weeklyGoal} kcal`}
+              percentage={Math.round((weeklyCalories/weeklyGoal)*100)}
+              color="blue"
+            />
             <div className="grid grid-cols-4 gap-2 mt-4">
               {[
                 { label: 'Days', value: '7' },
@@ -536,7 +567,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 </div>
               ))}
             </div>
-          </ProgressCard>
+          </div>
 
           {/* Macros Breakdown */}
           <div className="grid grid-cols-3 gap-4 mb-4">
