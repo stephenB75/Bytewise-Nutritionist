@@ -89,20 +89,21 @@ export function useRotatingBackground(activeTab: string) {
       
       // Smooth transition with preloaded image
       newImage.onload = () => {
-        setTimeout(() => {
+        // Use requestAnimationFrame for optimal timing
+        requestAnimationFrame(() => {
           setCurrentImageIndex(randomPageImage);
           setBackgroundImage(foodImages[randomPageImage]);
-          setIsTransitioning(false);
-        }, 150); // Reduced to 150ms for faster response
+          setTimeout(() => setIsTransitioning(false), 100); // Allow 100ms for transition
+        });
       };
       
       // Fallback if image fails to load
       newImage.onerror = () => {
-        setTimeout(() => {
+        requestAnimationFrame(() => {
           setCurrentImageIndex(randomPageImage);
           setBackgroundImage(foodImages[randomPageImage]);
-          setIsTransitioning(false);
-        }, 150);
+          setTimeout(() => setIsTransitioning(false), 100);
+        });
       };
     }
   }, [activeTab]); // Only triggers on tab change

@@ -298,7 +298,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     setActiveTab(newTab);
   };
 
-  // Optimized Hero Section Component with Performance Enhancements
+  // Optimized Hero Section Component with Smooth Animations
   const HeroSection = React.memo(({ title, subtitle, description, buttonText, onButtonClick }: {
     title: string;
     subtitle: string;
@@ -317,39 +317,38 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
     return (
       <div className="relative h-screen overflow-hidden">
-        {/* Optimized background with faster transitions */}
+        {/* Smooth background with optimized transitions */}
         <div 
-          className={`absolute inset-0 bg-cover bg-center transition-all duration-400 ease-out ${
-            isTransitioning ? 'opacity-70 scale-105' : 'opacity-100 scale-100'
-          } ${imageLoaded ? '' : 'animate-pulse bg-gray-900'}`}
+          className={`absolute inset-0 bg-cover bg-center transition-all duration-300 ease-in-out ${
+            isTransitioning ? 'opacity-80' : 'opacity-100'
+          }`}
           style={{
             backgroundImage: imageLoaded 
               ? `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`
               : 'linear-gradient(135deg, rgba(0,0,0,0.8), rgba(0,0,0,0.9))',
-            willChange: 'transform, opacity',
-            backfaceVisibility: 'hidden',
-            transform: 'translateZ(0)' // GPU acceleration
+            transform: 'translate3d(0,0,0)', // GPU acceleration
+            backfaceVisibility: 'hidden'
           }}
         />
         
         <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
-          <div className="space-y-8 max-w-2xl animate-in fade-in slide-in-from-bottom-4 duration-600 delay-150">
-            <div className="space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-500 delay-300">
-              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none transform-gpu">{title}</h1>
-              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none transform-gpu">
+          <div className="space-y-8 max-w-2xl opacity-0 animate-[fadeInUp_0.8s_ease-out_0.2s_forwards]">
+            <div className="space-y-2">
+              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none opacity-0 animate-[fadeInUp_0.6s_ease-out_0.4s_forwards]">{title}</h1>
+              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none opacity-0 animate-[fadeInUp_0.6s_ease-out_0.6s_forwards]">
                 <span className="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">{subtitle}</span>
               </h1>
             </div>
             
-            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto animate-in fade-in slide-in-from-bottom-2 duration-500 delay-450 transform-gpu">
+            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto opacity-0 animate-[fadeInUp_0.6s_ease-out_0.8s_forwards]">
               {description}
             </p>
             
-            <div className="pt-8 animate-in fade-in slide-in-from-bottom-2 duration-500 delay-600">
+            <div className="pt-8 opacity-0 animate-[fadeInUp_0.6s_ease-out_1s_forwards]">
               <Button 
                 onClick={onButtonClick}
                 size="lg"
-                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-black px-16 py-6 rounded-full text-2xl shadow-2xl transform hover:scale-105 transition-all duration-300 border-2 border-orange-400/30 will-change-transform"
+                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-black px-16 py-6 rounded-full text-2xl shadow-2xl transform hover:scale-105 transition-all duration-200 border-2 border-orange-400/30"
               >
                 {buttonText}
               </Button>
@@ -357,7 +356,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           </div>
         </div>
         
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60">
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60 opacity-0 animate-[fadeIn_0.4s_ease-out_1.2s_forwards]">
           <div className="animate-bounce">
             <ChevronRight className="w-6 h-6 rotate-90" />
           </div>
