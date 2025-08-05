@@ -726,11 +726,10 @@ export class USDAService {
 
     // Check for item-specific conversions first - prioritize ingredient name over food description
     const ingredientName = (food.description?.toLowerCase() || '').replace(/[^\w\s]/g, ' ');
-    const searchIngredient = '';
     
     for (const [ingredient, conversions] of Object.entries(itemConversions)) {
-      // Check both the search term and the food description
-      if (searchIngredient.includes(ingredient) || ingredientName.includes(ingredient)) {
+      // Check the food description for ingredient matches
+      if (ingredientName.includes(ingredient)) {
         for (const [unitPattern, grams] of Object.entries(conversions)) {
           if (unit.includes(unitPattern)) {
             gramsEquivalent = quantity * grams;
