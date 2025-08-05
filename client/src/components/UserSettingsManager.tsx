@@ -113,7 +113,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6 px-4 sm:px-6 lg:px-8">
       {/* Action Buttons when editing */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-white" style={{ fontFamily: "'League Spartan', sans-serif" }}>
@@ -151,14 +151,14 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
       </div>
 
       {/* Profile Card */}
-      <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
+      <Card className="bg-white/10 backdrop-blur-md border-white/20 overflow-hidden">
         {/* Header with Dropdown Toggle */}
         <div 
-          className="flex items-center justify-between cursor-pointer hover:bg-white/5 -m-6 p-6 rounded-lg transition-colors"
+          className="flex items-center justify-between cursor-pointer hover:bg-white/5 p-6 transition-colors"
           onClick={() => setIsExpanded(!isExpanded)}
         >
-          <div className="flex items-center space-x-4">
-            <div className="relative">
+          <div className="flex items-center space-x-4 flex-1 min-w-0">
+            <div className="relative flex-shrink-0">
               <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center">
                 <User className="w-8 h-8 text-white" />
               </div>
@@ -166,7 +166,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                 <CheckCircle className="w-2 h-2 text-white" />
               </div>
             </div>
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 overflow-hidden">
               <h3 className="text-xl font-bold text-white mb-1 truncate" style={{ fontFamily: "'League Spartan', sans-serif" }}>
                 {userInfo.name || user?.email?.split('@')[0] || 'ByteWise User'}
               </h3>
@@ -174,15 +174,16 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
             </div>
           </div>
           
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2 flex-shrink-0">
             {!isEditing && isExpanded && (
               <Button
                 variant="outline"
+                size="sm"
                 onClick={(e) => {
                   e.stopPropagation();
                   setIsEditing(true);
                 }}
-                className="border-white/30 text-gray-300 hover:border-white/50 hover:text-white"
+                className="border-white/30 text-gray-300 hover:border-white/50 hover:text-white hidden sm:flex"
               >
                 <Edit3 className="w-4 h-4 mr-2" />
                 Edit Profile
@@ -204,7 +205,22 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
 
         {/* Collapsible Profile Details */}
         {isExpanded && (
-          <div className="mt-8 space-y-6 animate-in slide-in-from-top-2 duration-300">
+          <div className="px-6 pb-6 space-y-6 animate-in slide-in-from-top-2 duration-300">
+            {/* Mobile Edit Button */}
+            {!isEditing && (
+              <div className="flex justify-center sm:hidden">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsEditing(true)}
+                  className="border-white/30 text-gray-300 hover:border-white/50 hover:text-white"
+                >
+                  <Edit3 className="w-4 h-4 mr-2" />
+                  Edit Profile
+                </Button>
+              </div>
+            )}
+            
             {/* Profile Form */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Personal Information */}
@@ -222,11 +238,11 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                 <Input
                   value={userInfo.name}
                   onChange={(e) => setUserInfo(prev => ({ ...prev, name: e.target.value }))}
-                  className="bg-white/10 border-white/20 text-white placeholder-gray-400"
+                  className="bg-white/10 border-white/20 text-white placeholder-gray-400 w-full"
                   placeholder="Enter your full name"
                 />
               ) : (
-                <p className="text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10">
+                <p className="text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10 break-words">
                   {userInfo.name || 'Not provided'}
                 </p>
               )}
@@ -241,11 +257,11 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                 <Input
                   value={userInfo.phone}
                   onChange={(e) => setUserInfo(prev => ({ ...prev, phone: e.target.value }))}
-                  className="bg-white/10 border-white/20 text-white placeholder-gray-400"
+                  className="bg-white/10 border-white/20 text-white placeholder-gray-400 w-full"
                   placeholder="Enter your phone number"
                 />
               ) : (
-                <p className="text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10">
+                <p className="text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10 break-words">
                   {userInfo.phone || 'Not provided'}
                 </p>
               )}
@@ -260,11 +276,11 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                 <Input
                   value={userInfo.location}
                   onChange={(e) => setUserInfo(prev => ({ ...prev, location: e.target.value }))}
-                  className="bg-white/10 border-white/20 text-white placeholder-gray-400"
+                  className="bg-white/10 border-white/20 text-white placeholder-gray-400 w-full"
                   placeholder="Enter your location"
                 />
               ) : (
-                <p className="text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10">
+                <p className="text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10 break-words">
                   {userInfo.location || 'Not provided'}
                 </p>
               )}
@@ -280,10 +296,10 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                   type="date"
                   value={userInfo.birthDate}
                   onChange={(e) => setUserInfo(prev => ({ ...prev, birthDate: e.target.value }))}
-                  className="bg-white/10 border-white/20 text-white placeholder-gray-400"
+                  className="bg-white/10 border-white/20 text-white placeholder-gray-400 w-full"
                 />
               ) : (
-                <p className="text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10">
+                <p className="text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10 break-words">
                   {userInfo.birthDate || 'Not provided'}
                 </p>
               )}
@@ -305,11 +321,11 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                 <Input
                   value={userInfo.height}
                   onChange={(e) => setUserInfo(prev => ({ ...prev, height: e.target.value }))}
-                  className="bg-white/10 border-white/20 text-white placeholder-gray-400"
+                  className="bg-white/10 border-white/20 text-white placeholder-gray-400 w-full"
                   placeholder="e.g., 5'8&quot; or 5 ft 8 in"
                 />
               ) : (
-                <p className="text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10">
+                <p className="text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10 break-words">
                   {userInfo.height || 'Not provided'}
                 </p>
               )}
@@ -329,11 +345,11 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                     const kg = lbs / 2.20462;
                     setUserInfo(prev => ({ ...prev, weight: kg.toFixed(1) }));
                   }}
-                  className="bg-white/10 border-white/20 text-white placeholder-gray-400"
+                  className="bg-white/10 border-white/20 text-white placeholder-gray-400 w-full"
                   placeholder="Enter your weight in pounds"
                 />
               ) : (
-                <p className="text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10">
+                <p className="text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10 break-words">
                   {userInfo.weight ? `${Math.round(parseFloat(userInfo.weight) * 2.20462)} lbs` : 'Not provided'}
                 </p>
               )}
@@ -357,7 +373,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                   <option value="Extremely Active">Extremely Active</option>
                 </select>
               ) : (
-                <p className="text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10">
+                <p className="text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10 break-words">
                   {userInfo.activityLevel}
                 </p>
               )}
@@ -368,7 +384,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                 <Mail className="w-4 h-4 mr-2 text-blue-400" />
                 Email Address
               </label>
-              <p className="text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10">
+              <p className="text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10 break-all">
                 {userInfo.email || 'Not provided'}
               </p>
             </div>
