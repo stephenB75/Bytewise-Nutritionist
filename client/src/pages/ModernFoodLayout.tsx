@@ -1419,7 +1419,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <button
                 key={tab.id}
                 onClick={() => handleTabChange(tab.id)}
-                className={`flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 ${
+                className={`flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 w-16 ${
                   activeTab === tab.id
                     ? 'bg-yellow-400/20 text-yellow-400'
                     : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
