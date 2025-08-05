@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from 'react';
 
-// Food images - using local assets for optimal performance and reliability
+// Food images - expanded collection using local assets for optimal variety
 import saladImage from '@assets/salad-6948004_1920_1753859530085-1zwSa4Vt.jpg';
 import burgersImage from '@assets/burgers-5590503_1920_1753859530083-I99DUxaH.jpg';
 import pancakesImage from '@assets/pancakes-2291908_1920_1753859477805-FMeaELmV.jpg';
@@ -26,6 +26,20 @@ import chocolateImage from '@assets/chocolate-1927921_1920_1753859477802-D-SPQY8
 import churrosImage from '@assets/churros-2188871_1920_1753859477808-BGqrIj5F.jpg';
 import appleImage from '@assets/apple-3313209_1920_1753859530078-BJW4vFlt.jpg';
 import blueberriesImage from '@assets/blueberries-9450130_1920_1753859477806-DQeN0M4j.jpg';
+// Additional food images for expanded variety
+import chicken2Image from '@assets/chicken-762531_1920_1753859530086-BwBmOm1s.jpg';
+import chickenNuggetsImage from '@assets/chicken-nuggets-1108_1920_1753859530084-DLWOOEId.jpg';
+import food3Image from '@assets/food-3262796_1920_1753859530086-BeFn5V1r.jpg';
+import macaronsImage from '@assets/macarons-2179198_1920_1753859477809-B5cbwbKS.jpg';
+import mangoImage from '@assets/mango-1534061_1920_1753859530079-BEyrLl3D.jpg';
+import newyearsImage from '@assets/new-years-eve-518032_1920_1753859794689-DPPW0W6m.jpg';
+import plumsImage from '@assets/plums-1898196_1920_1753859477809-C44a7c3I.jpg';
+import rawChickenImage from '@assets/raw-chicken-6946604_1920_1753859530081-BqlbPNnB.jpg';
+import spaghetti2Image from '@assets/spaghetti-2931846_1920_1753859477804-BSrB8P7y.jpg';
+import steak2Image from '@assets/steak-7423231_1920_1753859530082-DBBrmAYH.jpg';
+import strawberryImage from '@assets/strawberry-7224875_1920_1753859477810-CXpGW8lN.jpg';
+import swedishImage from '@assets/swedish-6053292_1920_1753859530083-CbbGYA9Y.jpg';
+import tomatoesImage from '@assets/tomatoes-1238255_1920_1753859477803-BBxmQtT1.jpg';
 
 const foodImages = [
   saladImage,        // Fresh salad
@@ -48,20 +62,33 @@ const foodImages = [
   churrosImage,      // Baked goods
   appleImage,        // Fresh apple
   blueberriesImage,  // Berries
+  chicken2Image,     // Chicken variation
+  chickenNuggetsImage, // Chicken nuggets
+  food3Image,        // Mixed food
+  macaronsImage,     // Macarons
+  mangoImage,        // Mango
+  newyearsImage,     // Party food
+  plumsImage,        // Plums
+  rawChickenImage,   // Raw chicken
+  spaghetti2Image,   // Spaghetti variation
+  steak2Image,       // Steak variation
+  strawberryImage,   // Strawberry
+  swedishImage,      // Swedish food
+  tomatoesImage,     // Tomatoes
 ];
 
-// Map specific pages to food categories for thematic consistency
+// Map specific pages to food categories for thematic consistency (expanded)
 const pageImageMap: Record<string, number[]> = {
-  'home': [0, 12, 7],        // Salad, variety, healthy bowl
-  'nutrition': [4, 9, 11],   // Chicken, pasta, sandwich
-  'daily': [1, 3, 10],       // Burgers, pizza, steak
-  'profile': [13, 16, 17],   // Macarons, chocolate, cupcakes
-  'tracking': [14, 15, 8],   // Oatmeal, seafood, food prep
-  'achievements': [18, 19, 6], // Apple, berries, fruits
-  'signin': [2, 5, 12],      // Pancakes, vegetables, variety
-  'calculator': [9, 11, 8],  // Pasta, sandwich, food prep
-  'search': [0, 7, 12],      // Salad, healthy bowl, variety
-  'data': [5, 18, 19]        // Vegetables, apple, berries
+  'home': [0, 12, 7, 22, 24],        // Salad, variety, healthy bowl, mixed food, mango
+  'nutrition': [4, 9, 11, 20, 21],   // Chicken variations, pasta, sandwich, nuggets
+  'daily': [1, 3, 10, 29, 31],       // Burgers, pizza, steaks, swedish food
+  'profile': [13, 16, 17, 23, 30],   // Desserts, chocolate, cupcakes, macarons, strawberry
+  'tracking': [14, 15, 8, 25, 32],   // Oatmeal, seafood, food prep, party food, tomatoes
+  'achievements': [18, 19, 6, 26, 24], // Apple, berries, fruits, plums, mango
+  'signin': [2, 5, 12, 28, 22],      // Pancakes, vegetables, variety, spaghetti, mixed
+  'calculator': [9, 11, 8, 20, 28],  // Pasta variations, sandwich, food prep, chicken
+  'search': [0, 7, 12, 22, 32],      // Salad, healthy bowl, variety, mixed food, tomatoes
+  'data': [5, 18, 19, 26, 30]        // Vegetables, apple, berries, plums, strawberry
 };
 
 export function useRotatingBackground(activeTab: string) {
