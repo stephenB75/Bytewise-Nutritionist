@@ -38,6 +38,7 @@ import {
 } from 'lucide-react';
 import { NotificationDropdown } from '@/components/NotificationDropdown';
 import { WeeklyCaloriesCard } from '@/components/WeeklyCaloriesCard';
+import { Toaster } from '@/components/ui/toaster';
 
 // Types
 interface ModernFoodLayoutProps {
@@ -1429,6 +1430,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           onClose={() => setShowConfettiCelebration(false)}
         />
       )}
+      
+      {/* Toast Notifications */}
+      <Toaster />
     </div>
   );
 }

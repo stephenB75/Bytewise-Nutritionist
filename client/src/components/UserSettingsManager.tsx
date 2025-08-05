@@ -10,6 +10,7 @@ import { Input } from './ui/input';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { toast as sonnerToast } from 'sonner';
 import { 
   User, 
   Mail, 
@@ -58,14 +59,19 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
   const handleSave = async () => {
     if (isSaving) return; // Prevent double-clicking
     
+    console.log('Save button clicked, starting save process...');
     setIsSaving(true);
     
     try {
+      // Split the name field into firstName and lastName for validation
+      const [firstName = '', lastName = ''] = (userInfo.name || '').split(' ');
+      
       // Validate required fields
-      if (!userInfo.firstName?.trim() && !userInfo.lastName?.trim()) {
+      if (!userInfo.name?.trim()) {
+        console.log('Validation failed: Name is required');
         toast({
           title: "Validation Error", 
-          description: "At least first name or last name is required",
+          description: "Name is required",
           variant: "destructive",
         });
         setIsSaving(false);
@@ -73,9 +79,11 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
       }
 
       // Get current session for authentication
+      console.log('Getting authentication session...');
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session?.access_token) {
+        console.log('No authentication session found');
         toast({
           title: "Authentication Required",
           description: "Please sign in to save your profile",
@@ -85,6 +93,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
         return;
       }
 
+      console.log('Sending profile update request...');
       // Save to database via API endpoint with proper authentication
       const response = await fetch('/api/user/profile', {
         method: 'PUT',
@@ -93,8 +102,8 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
           'Authorization': `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
-          firstName: userInfo.firstName || '',
-          lastName: userInfo.lastName || '',
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
           personalInfo: {
             phone: userInfo.phone || '',
             birthDate: userInfo.birthDate || '',
@@ -109,32 +118,56 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
         }),
       });
 
+      console.log('API response status:', response.status);
+
       if (!response.ok) {
         const errorData = await response.json();
+        console.log('API error:', errorData);
         throw new Error(errorData.message || 'Failed to save profile to database');
       }
 
       const savedData = await response.json();
+      console.log('Profile saved successfully:', savedData);
       
       // Also update Supabase auth metadata
       await supabase.auth.updateUser({
         data: {
-          first_name: userInfo.firstName,
-          last_name: userInfo.lastName,
+          first_name: firstName.trim(),
+          last_name: lastName.trim(),
         }
       });
 
       setIsEditing(false);
+      
+      console.log('Showing success toast notification');
+      
+      // Use both toast systems to ensure notification shows
       toast({
         title: "Profile Saved Successfully",
         description: `Your profile has been saved. ${savedData.itemsUpdated || 0} items updated.`,
       });
+      
+      sonnerToast.success("Profile Saved", {
+        description: `Your profile has been saved. ${savedData.itemsUpdated || 0} items updated.`,
+      });
+      
+      // Force a brief delay to ensure toast is visible
+      setTimeout(() => {
+        console.log('Save operation completed successfully');
+      }, 100);
+      
     } catch (error: any) {
       console.error('Profile save error:', error);
+      
+      // Use both toast systems to ensure error notification shows
       toast({
         title: "Save Failed",
         description: error.message || "Unable to save profile. Please try again.",
         variant: "destructive",
+      });
+      
+      sonnerToast.error("Save Failed", {
+        description: error.message || "Unable to save profile. Please try again.",
       });
     } finally {
       setIsSaving(false);
