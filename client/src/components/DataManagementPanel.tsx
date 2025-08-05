@@ -42,17 +42,17 @@ export function DataManagementPanel() {
       
       if (success) {
         toast({
-          title: "PDF Generated Successfully ✅",
-          description: "Your nutrition report should be downloading now. Check your Downloads folder for 'bytewise-nutrition-report-[date].pdf'",
+          title: "PDF Report Generated ✅",
+          description: "Your nutrition report has opened in a new tab. Use the download button on that page to save the PDF file.",
         });
         
-        // Additional notification after a delay to confirm download
+        // Additional helpful information
         setTimeout(() => {
           toast({
-            title: "Download Status Check",
-            description: "If the PDF didn't download automatically, it may have opened in a new tab. Check your browser's download settings or look for a new tab with the PDF.",
+            title: "PDF Available",
+            description: "Look for the new tab with your ByteWise Nutrition Report. You can view it there and download it using the download button.",
           });
-        }, 3000);
+        }, 2000);
       } else {
         throw new Error('PDF generation failed');
       }

@@ -137,99 +137,88 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     const pdfBlob = pdf.output('blob');
     console.log('PDF blob created, size:', pdfBlob.size, 'bytes');
     
-    // Try File System Access API first (modern browsers)
-    if ('showSaveFilePicker' in window) {
-      try {
-        console.log('Trying File System Access API...');
-        const fileHandle = await (window as any).showSaveFilePicker({
-          suggestedName: filename,
-          types: [{
-            description: 'PDF files',
-            accept: { 'application/pdf': ['.pdf'] }
-          }]
-        });
-        
-        const writable = await fileHandle.createWritable();
-        await writable.write(pdfBlob);
-        await writable.close();
-        
-        console.log('PDF saved using File System Access API');
-        return true;
-      } catch (fsError) {
-        console.log('File System Access API failed or was cancelled:', fsError);
-        // Fall back to traditional method
-      }
-    }
+    // For Replit environment, open PDF in new tab directly
+    console.log('Opening PDF in new tab (Replit-compatible method)...');
     
-    // Traditional download method with enhanced user interaction
-    console.log('Using traditional download method...');
+    // Convert PDF to data URI for embedding
+    const pdfDataUri = pdf.output('datauristring');
     
-    // Create blob URL
-    const blobUrl = URL.createObjectURL(pdfBlob);
-    
-    // Method 1: Try direct save first
-    try {
-      pdf.save(filename);
-      console.log('jsPDF save() method executed');
+    // Open PDF in new tab with download instructions
+    const newWindow = window.open('', '_blank');
+    if (newWindow) {
+      newWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>ByteWise Nutrition Report - ${new Date().toLocaleDateString()}</title>
+            <style>
+              body { 
+                margin: 0; 
+                padding: 20px; 
+                font-family: Arial, sans-serif; 
+                background: #f5f5f5;
+              }
+              .header {
+                background: white;
+                padding: 20px;
+                border-radius: 8px;
+                margin-bottom: 20px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                text-align: center;
+              }
+              .pdf-container {
+                background: white;
+                border-radius: 8px;
+                overflow: hidden;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+              }
+              .download-btn {
+                background: #1f4aa6;
+                color: white;
+                padding: 12px 24px;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 16px;
+                margin: 10px;
+                text-decoration: none;
+                display: inline-block;
+              }
+              .download-btn:hover {
+                background: #164291;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <h1>ByteWise Nutrition Report</h1>
+              <p>Generated on ${new Date().toLocaleDateString()}</p>
+              <a href="${pdfDataUri}" download="${filename}" class="download-btn">
+                📥 Download PDF Report
+              </a>
+              <p><small>Click the download button above or right-click the PDF below and select "Save As"</small></p>
+            </div>
+            <div class="pdf-container">
+              <embed src="${pdfDataUri}" type="application/pdf" width="100%" height="800px">
+            </div>
+          </body>
+        </html>
+      `);
+      newWindow.document.close();
+      console.log('PDF opened in new tab with download option');
+    } else {
+      console.error('Unable to open new window - popup blocked');
       
-      // Wait a moment and check if it worked
-      setTimeout(() => {
-        console.log('Fallback download method executing...');
-        const downloadLink = document.createElement('a');
-        downloadLink.href = blobUrl;
-        downloadLink.download = filename;
-        downloadLink.style.position = 'fixed';
-        downloadLink.style.top = '-1000px';
-        downloadLink.style.left = '-1000px';
-        
-        // Add click event listener to ensure it fires
-        downloadLink.addEventListener('click', (e) => {
-          console.log('Download link click event fired');
-        });
-        
-        document.body.appendChild(downloadLink);
-        
-        // Use both click and programmatic trigger
-        const clickEvent = new MouseEvent('click', {
-          view: window,
-          bubbles: true,
-          cancelable: true
-        });
-        
-        downloadLink.dispatchEvent(clickEvent);
-        downloadLink.click();
-        
-        console.log('Download link clicked with both methods');
-        
-        // Clean up after delay
-        setTimeout(() => {
-          if (document.body.contains(downloadLink)) {
-            document.body.removeChild(downloadLink);
-          }
-          URL.revokeObjectURL(blobUrl);
-          console.log('Download resources cleaned up');
-        }, 2000);
-        
-      }, 100);
-      
-    } catch (error) {
-      console.error('All download methods failed:', error);
-      
-      // Last resort: Open in new tab
-      const pdfDataUri = pdf.output('datauristring');
-      const newWindow = window.open();
-      if (newWindow) {
-        newWindow.document.write(`
-          <html>
-            <head><title>ByteWise Nutrition Report</title></head>
-            <body style="margin:0;">
-              <embed src="${pdfDataUri}" type="application/pdf" width="100%" height="100%">
-              <p>Right-click the PDF above and select "Save As" to download it.</p>
-            </body>
-          </html>
-        `);
-        console.log('PDF opened in new tab as fallback');
-      }
+      // Try direct download as fallback
+      const blobUrl = URL.createObjectURL(pdfBlob);
+      const downloadLink = document.createElement('a');
+      downloadLink.href = blobUrl;
+      downloadLink.download = filename;
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+      URL.revokeObjectURL(blobUrl);
+      console.log('Attempted direct download as fallback');
     }
     
     console.log('PDF download process completed successfully!');
