@@ -6,7 +6,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { 
@@ -177,213 +177,202 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
   };
 
   return (
-    <Card className="w-full max-w-3xl mx-auto bg-white/95 backdrop-blur-md border-0 shadow-xl overflow-hidden signin-module">
-      {/* Header - Enhanced */}
-      <div className="p-6 bg-gradient-to-r from-[#1f4aa6] to-[#45c73e] text-white">
-        <div className="flex items-center justify-center mb-4">
-          <div className="p-3 bg-white/20 rounded-xl">
-            <User className="w-7 h-7" />
+    <div className="w-full space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-center mb-8">
+        <div className="text-center">
+          <div className="p-4 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl mb-4 inline-block">
+            <User className="w-8 h-8 text-white" />
           </div>
+          <h2 className="text-3xl font-bold text-white mb-2" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+            {isSignUp ? 'Join ByteWise' : 'Welcome Back'}
+          </h2>
+          <p className="text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>
+            {isSignUp ? 'Start your nutrition tracking journey today' : 'Access your nutrition tracking and progress'}
+          </p>
         </div>
-        <h2 className="text-2xl font-bold text-center mb-2" style={{ fontFamily: "'League Spartan', sans-serif" }}>
-          {isSignUp ? 'Join ByteWise' : 'Welcome Back to ByteWise'}
-        </h2>
-        <p className="text-center text-white/90 text-sm" style={{ fontFamily: "'Work Sans', sans-serif" }}>
-          {isSignUp ? 'Start your nutrition tracking journey today' : 'Access your nutrition tracking, recipes, and progress'}
-        </p>
       </div>
 
-      {/* Content - Enhanced */}
-      <div className="p-6 space-y-6">
-        {/* Benefits - Compact */}
-        <div className="space-y-3">
-          <div className="text-center space-y-1 mb-4">
-            <h3 className="text-xl font-black tracking-tight text-center">
-              Your <span className="bg-gradient-to-r from-[#1f4aa6] to-[#45c73e] bg-clip-text text-transparent">Nutrition</span>
-            </h3>
-            <h3 className="text-xl font-black tracking-tight text-gray-900 text-center">
-              Journey Awaits
+      {/* Main Card */}
+      <Card className="bg-white/10 backdrop-blur-md border-white/20 p-8">
+        <div className="space-y-6">
+          {/* Benefits */}
+          <div className="text-center mb-6">
+            <h3 className="text-xl font-bold text-white mb-2" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+              Your <span className="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">Nutrition</span> Journey Awaits
             </h3>
           </div>
           
-          <div className="grid grid-cols-1 gap-2">
-            <div className="flex items-center gap-2 p-3 bg-gradient-to-r from-[#faed39]/20 to-[#faed39]/10 rounded-lg border border-[#faed39]/30 backdrop-blur-sm">
-              <div className="p-2 bg-[#faed39]/30 rounded-full shadow-lg">
-                <Zap className="w-4 h-4 text-[#faed39]" />
+          <div className="grid grid-cols-1 gap-3 mb-6">
+            <div className="flex items-center gap-3 p-4 bg-white/5 rounded-xl border border-white/10">
+              <div className="p-2 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-lg">
+                <Zap className="w-4 h-4 text-white" />
               </div>
               <div>
-                <div className="font-bold text-sm text-gray-900">Track Your Progress</div>
-                <div className="text-xs text-gray-700">Monitor daily goals and achievements</div>
+                <div className="font-semibold text-white text-sm">Track Your Progress</div>
+                <div className="text-xs text-gray-300">Monitor daily goals and achievements</div>
               </div>
             </div>
             
-            <div className="flex items-center gap-2 p-3 bg-gradient-to-r from-[#1f4aa6]/20 to-[#1f4aa6]/10 rounded-lg border border-[#1f4aa6]/30 backdrop-blur-sm">
-              <div className="p-2 bg-[#1f4aa6]/30 rounded-full shadow-lg">
-                <Shield className="w-4 h-4 text-[#1f4aa6]" />
+            <div className="flex items-center gap-3 p-4 bg-white/5 rounded-xl border border-white/10">
+              <div className="p-2 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg">
+                <Shield className="w-4 h-4 text-white" />
               </div>
               <div>
-                <div className="font-bold text-sm text-gray-900">Secure Data Sync</div>
-                <div className="text-xs text-gray-700">Your data stays safe across devices</div>
+                <div className="font-semibold text-white text-sm">Secure Data Sync</div>
+                <div className="text-xs text-gray-300">Your data stays safe across devices</div>
               </div>
             </div>
             
-            <div className="flex items-center gap-2 p-3 bg-gradient-to-r from-[#45c73e]/20 to-[#45c73e]/10 rounded-lg border border-[#45c73e]/30 backdrop-blur-sm">
-              <div className="p-2 bg-[#45c73e]/30 rounded-full shadow-lg">
-                <User className="w-4 h-4 text-[#45c73e]" />
+            <div className="flex items-center gap-3 p-4 bg-white/5 rounded-xl border border-white/10">
+              <div className="p-2 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg">
+                <User className="w-4 h-4 text-white" />
               </div>
               <div>
-                <div className="font-bold text-sm text-gray-900">Personal Profile</div>
-                <div className="text-xs text-gray-700">Customize goals and preferences</div>
+                <div className="font-semibold text-white text-sm">Personal Profile</div>
+                <div className="text-xs text-gray-300">Customize goals and preferences</div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Email Authentication Form */}
-        <form onSubmit={handleEmailAuth} className="space-y-3">
+          {/* Email Authentication Form */}
+          <form onSubmit={handleEmailAuth} className="space-y-4">
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="email" className="text-sm font-medium text-gray-300">Email</Label>
+                <div className="relative mt-2">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    className="pl-10 bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-blue-400 focus:ring-blue-400"
+                    required
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <Label htmlFor="password" className="text-sm font-medium text-gray-300">Password</Label>
+                <div className="relative mt-2">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter your password"
+                    className="pl-10 bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-blue-400 focus:ring-blue-400"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 py-3 text-sm font-semibold"
+            >
+              {loading ? (
+                <div className="flex items-center justify-center">
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                  {isSignUp ? 'Creating Account...' : 'Signing In...'}
+                </div>
+              ) : (
+                <>
+                  {isSignUp ? <UserPlus className="w-5 h-5 mr-2" /> : <LogIn className="w-5 h-5 mr-2" />}
+                  {isSignUp ? 'Create Account' : 'Sign In'}
+                </>
+              )}
+            </Button>
+          </form>
+
+          {/* Email Confirmation Helper */}
+          <div className="text-center">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleConfirmEmail}
+              disabled={confirmingEmail || !email}
+              className="text-sm py-2 px-4 border-white/30 text-gray-300 hover:border-white/50 hover:text-white"
+            >
+              {confirmingEmail ? (
+                <div className="flex items-center">
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                  Verifying Email...
+                </div>
+              ) : (
+                <>
+                  <Mail className="w-4 h-4 mr-2" />
+                  Verify Email Address
+                </>
+              )}
+            </Button>
+            <p className="text-xs text-gray-400 mt-2">
+              Click to verify your email address and activate your account
+            </p>
+          </div>
+
+          {/* OAuth Providers */}
           <div className="space-y-3">
-            <div>
-              <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email</Label>
-              <div className="relative mt-1">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  className="pl-10 bg-white border-gray-300 focus:border-[#1f4aa6] focus:ring-[#1f4aa6]"
-                  required
-                />
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-white/20" />
+              </div>
+              <div className="relative flex justify-center text-xs">
+                <span className="px-2 bg-white/10 text-gray-300">Or continue with</span>
               </div>
             </div>
-            
-            <div>
-              <Label htmlFor="password" className="text-sm font-medium text-gray-700">Password</Label>
-              <div className="relative mt-1">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
-                  className="pl-10 bg-white border-gray-300 focus:border-[#1f4aa6] focus:ring-[#1f4aa6]"
-                  required
-                />
-              </div>
-            </div>
-          </div>
 
-          <Button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-gradient-to-r from-[#1f4aa6] to-[#45c73e] hover:from-[#1f4aa6]/80 hover:to-[#45c73e]/80 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] py-2 text-sm font-semibold"
-          >
-            {loading ? (
-              <div className="flex items-center justify-center">
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-                {isSignUp ? 'Creating Account...' : 'Signing In...'}
-              </div>
-            ) : (
-              <>
-                {isSignUp ? <UserPlus className="w-5 h-5 mr-2" /> : <LogIn className="w-5 h-5 mr-2" />}
-                {isSignUp ? 'Create Account' : 'Sign In'}
-              </>
-            )}
-          </Button>
-        </form>
-
-        {/* Email Confirmation Helper */}
-        <div className="text-center">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleConfirmEmail}
-            disabled={confirmingEmail || !email}
-            className="text-sm py-2 px-4 border-[#1f4aa6] text-[#1f4aa6] hover:bg-[#1f4aa6] hover:text-white"
-          >
-            {confirmingEmail ? (
-              <div className="flex items-center">
-                <div className="w-4 h-4 border-2 border-[#1f4aa6]/30 border-t-[#1f4aa6] rounded-full animate-spin mr-2" />
-                Verifying Email...
-              </div>
-            ) : (
-              <>
-                <Mail className="w-4 h-4 mr-2" />
-                Verify Email Address
-              </>
-            )}
-          </Button>
-          <p className="text-xs text-gray-500 mt-2">
-            Click to verify your email address and activate your account
-          </p>
-        </div>
-
-        {/* OAuth Providers */}
-        <div className="space-y-3">
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200" />
-            </div>
-            <div className="relative flex justify-center text-xs">
-              <span className="px-2 bg-white text-gray-500">Or continue with</span>
+            <div className="grid grid-cols-2 gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleGoogleSignIn}
+                className="flex items-center justify-center py-2 px-4 border border-white/20 bg-white/5 text-sm font-medium text-gray-300 hover:bg-white/10"
+              >
+                <Chrome className="w-4 h-4 mr-2" />
+                Google
+              </Button>
+              
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleGitHubSignIn}
+                className="flex items-center justify-center py-2 px-4 border border-white/20 bg-white/5 text-sm font-medium text-gray-300 hover:bg-white/10"
+              >
+                <Github className="w-4 h-4 mr-2" />
+                GitHub
+              </Button>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <Button
+          {/* Toggle Sign In / Sign Up */}
+          <div className="text-center">
+            <button
               type="button"
-              variant="outline"
-              onClick={handleGoogleSignIn}
-              className="flex items-center justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+              onClick={() => setIsSignUp(!isSignUp)}
+              className="text-sm text-blue-400 hover:text-blue-300 font-medium"
             >
-              <Chrome className="w-4 h-4 mr-2" />
-              Google
-            </Button>
-            
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleGitHubSignIn}
-              className="flex items-center justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
-            >
-              <Github className="w-4 h-4 mr-2" />
-              GitHub
-            </Button>
+              {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
+            </button>
           </div>
-        </div>
 
-        {/* Toggle Sign In / Sign Up */}
-        <div className="text-center">
-          <button
-            type="button"
-            onClick={() => setIsSignUp(!isSignUp)}
-            className="text-sm text-[#1f4aa6] hover:text-[#1f4aa6]/80 font-medium"
-          >
-            {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
-          </button>
-        </div>
-
-        {/* Privacy Notice - Compact */}
-        <div className="p-3 bg-gray-50 rounded-lg">
-          <div className="flex items-start gap-2">
-            <Shield className="w-3 h-3 text-gray-500 mt-0.5" />
-            <div className="text-xs text-gray-600">
-              <div className="font-medium mb-0.5">Privacy Protected</div>
-              <div>Your nutrition data is encrypted and private. We never share your personal information.</div>
+          {/* Privacy Notice */}
+          <div className="p-4 bg-white/5 rounded-lg border border-white/10">
+            <div className="flex items-start gap-3">
+              <Shield className="w-4 h-4 text-blue-400 mt-0.5" />
+              <div className="text-xs text-gray-300">
+                <div className="font-medium mb-1 text-white">Privacy Protected</div>
+                <div>Your nutrition data is encrypted and private. We never share your personal information.</div>
+              </div>
             </div>
           </div>
         </div>
-
-        {/* Guest Mode Option - Compact */}
-        <div className="text-center">
-          <div className="text-xs text-gray-500 mb-1">Want to try without signing in?</div>
-          <Badge variant="outline" className="text-xs bg-gray-50 text-gray-700 border-gray-300">
-            Limited features available in guest mode
-          </Badge>
-        </div>
-      </div>
-    </Card>
+      </Card>
+    </div>
   );
 }
