@@ -1414,7 +1414,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       
       {/* Bottom Navigation - Compact Design */}
       <div className="fixed bottom-0 left-0 right-0 bg-gray-900/95 backdrop-blur-md border-t border-gray-700 safe-area-pb z-50">
-        <div className="flex items-center justify-around py-1.5 px-1 max-w-sm mx-auto">
+        <div className="flex items-center justify-evenly py-1.5 px-4">
           {[
             { id: 'home', label: 'Dashboard', icon: Home },
             { id: 'nutrition', label: 'Nutrition', icon: Utensils },
@@ -1426,7 +1426,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <button
                 key={tab.id}
                 onClick={() => handleTabChange(tab.id)}
-                className={`flex flex-col items-center py-1.5 px-1.5 rounded-md transition-all duration-200 min-w-[60px] flex-1 ${
+                className={`flex flex-col items-center py-1.5 px-2 rounded-md transition-all duration-200 w-16 ${
                   activeTab === tab.id
                     ? 'bg-yellow-400/20 text-yellow-400'
                     : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
