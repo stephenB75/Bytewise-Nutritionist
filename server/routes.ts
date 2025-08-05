@@ -513,6 +513,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // USDA Bulk Download API endpoints
+  app.post('/api/usda/bulk-download', async (req, res) => {
+    try {
+      const { USDABulkDownloader } = await import('./services/usdaBulkDownloader');
+      const usdaApiKey = process.env.USDA_API_KEY || 'DEMO_KEY';
+      const downloader = new USDABulkDownloader(usdaApiKey);
+      
+      console.log('Starting USDA bulk download...');
+      const progress = await downloader.downloadPopularFoods();
+      
+      res.json({
+        success: true,
+        message: 'Bulk download completed successfully',
+        progress: progress,
+        totalDownloaded: progress.downloadedFoods,
+        errors: progress.errors
+      });
+    } catch (error) {
+      console.error('Bulk download failed:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to start bulk download',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  app.get('/api/usda/cache-stats', async (req, res) => {
+    try {
+      const { USDABulkDownloader } = await import('./services/usdaBulkDownloader');
+      const usdaApiKey = process.env.USDA_API_KEY || 'DEMO_KEY';
+      const downloader = new USDABulkDownloader(usdaApiKey);
+      const stats = await downloader.getCacheStatistics();
+      
+      res.json({
+        success: true,
+        stats: stats
+      });
+    } catch (error) {
+      console.error('Failed to get cache stats:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to get cache statistics',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

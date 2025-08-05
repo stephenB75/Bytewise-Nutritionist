@@ -191,6 +191,7 @@ export const usdaFoodCache = pgTable("usda_food_cache", {
   nutrients: jsonb("nutrients").notNull(), // Complete nutrition data as JSON
   lastUpdated: timestamp("last_updated").defaultNow().notNull(),
   searchCount: integer("search_count").default(0), // Track popularity for caching priority
+  isBulkDownloaded: boolean("is_bulk_downloaded").default(false), // Track if food was bulk downloaded
 }, (table) => ({
   descriptionIdx: index("usda_cache_description_idx").on(table.description),
   categoryIdx: index("usda_cache_category_idx").on(table.foodCategory),
