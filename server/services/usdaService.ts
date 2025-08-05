@@ -289,19 +289,19 @@ export class USDAService {
     'fried plantains': 'plantain fried sweet',
     'sweet plantains': 'plantain sweet fried',
     'green plantains': 'plantain green boiled',
-    'curry goat': 'goat meat curry stewed',
+    'curry goat': 'goat meat stewed caribbean curry',
     'curry chicken': 'chicken curry caribbean',
     'oxtail': 'beef oxtail braised',
     'ackee and saltfish': 'ackee canned saltfish',
     'callaloo': 'callaloo cooked',
-    'roti': 'bread roti whole wheat',
+    'roti': 'tortilla flour wheat caribbean',
     'doubles': 'bread bara chickpea curry',
     'patties': 'pastry meat jamaican',
     'beef patty': 'pastry beef jamaican',
     'chicken patty': 'pastry chicken jamaican',
-    'festival': 'bread fried cornmeal sweet',
-    'johnny cakes': 'bread fried cornmeal',
-    'bammy': 'bread cassava fried',
+    'festival': 'cornbread fried sweet caribbean',
+    'johnny cakes': 'cornbread fried caribbean bread',
+    'bammy': 'cassava bread fried caribbean',
     'cassava': 'cassava root boiled',
     'yuca': 'cassava root boiled',
     'breadfruit': 'breadfruit boiled',
@@ -726,7 +726,7 @@ export class USDAService {
 
     // Check for item-specific conversions first - prioritize ingredient name over food description
     const ingredientName = (food.description?.toLowerCase() || '').replace(/[^\w\s]/g, ' ');
-    const searchIngredient = food.originalSearchTerm?.toLowerCase() || '';
+    const searchIngredient = '';
     
     for (const [ingredient, conversions] of Object.entries(itemConversions)) {
       // Check both the search term and the food description
