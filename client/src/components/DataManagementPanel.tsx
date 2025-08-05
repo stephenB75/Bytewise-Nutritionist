@@ -50,7 +50,7 @@ export function DataManagementPanel() {
         setTimeout(() => {
           toast({
             title: "Download Status Check",
-            description: "If the PDF didn't download, please check your browser's download settings or pop-up blocker.",
+            description: "If the PDF didn't download automatically, it may have opened in a new tab. Check your browser's download settings or look for a new tab with the PDF.",
           });
         }, 3000);
       } else {
@@ -252,6 +252,7 @@ export function DataManagementPanel() {
                 disabled={isExporting}
                 size="lg"
                 className="w-full bg-gradient-to-r from-[#1f4aa6] to-[#1850a0] hover:from-[#1850a0] hover:to-[#164291] text-white shadow-xl rounded-2xl px-8 py-4 transition-all duration-300 font-semibold"
+                data-testid="button-download-pdf"
               >
                 {isExporting ? (
                   <>
