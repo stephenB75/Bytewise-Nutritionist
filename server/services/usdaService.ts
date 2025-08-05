@@ -191,7 +191,7 @@ export class USDAService {
       }
 
       // Advanced filtering with ingredient vs dish classification
-      const filteredFoods = this.filterAndPrioritizeFoodsWithMeasurement(foods, ingredientName, measurement);
+      const filteredFoods = this.filterAndPrioritizeFoods(foods, ingredientName, measurement.toLowerCase());
       if (filteredFoods.length === 0) {
         throw new Error('No suitable foods found');
       }
@@ -242,46 +242,99 @@ export class USDAService {
     }
   }
 
+  // Constants for food preprocessing
+  private static readonly FOOD_SYNONYMS: Record<string, string> = {
+    'corn on the cob': 'corn sweet yellow ear',
+    'corn on cob': 'corn sweet yellow ear',
+    'can of corn': 'corn sweet yellow canned',
+    'frozen corn': 'corn sweet kernel frozen',
+    'fresh corn': 'corn sweet yellow kernel',
+    'corn kernels': 'corn sweet yellow kernel',
+    'grilled chicken breast': 'chicken breast grilled',
+    'fried chicken breast': 'chicken breast fried',
+    'baked chicken breast': 'chicken breast baked',
+    'roasted chicken breast': 'chicken breast roasted',
+    'pasta with marinara': 'pasta cooked marinara sauce',
+    'beef stew': 'beef stew cooked',
+    'baked potato': 'potato baked',
+    'raw potato': 'potato raw',
+    'mashed potatoes': 'potato mashed',
+    'french fries': 'potato french fried',
+    'scrambled eggs': 'egg scrambled',
+    'boiled eggs': 'egg hard boiled',
+    'fried eggs': 'egg fried'
+  };
+
+  private static readonly COOKING_METHODS = ['grilled', 'fried', 'baked', 'roasted', 'boiled', 'steamed', 'raw', 'fresh', 'cooked'];
+  private static readonly PREPARATION_FORMS = ['canned', 'frozen', 'dried', 'fresh', 'pickled', 'smoked'];
+  private static readonly FALLBACK_FOODS = ['apple', 'chicken', 'chicken breast', 'hotdog', 'hot dog', 'egg', 'rice', 'bread', 'pasta', 'corn', 'sweet corn', 'corn on cob', 'corn on the cob', 'potato', 'baked potato'];
+
+  // Comprehensive fallback nutrition data per 100g
+  private static readonly FALLBACK_NUTRITION: Record<string, { calories: number; protein: number; carbs: number; fat: number }> = {
+    // Fruits
+    'apple': { calories: 52, protein: 0.3, carbs: 14, fat: 0.2 },
+    'banana': { calories: 89, protein: 1.1, carbs: 23, fat: 0.3 },
+    'orange': { calories: 47, protein: 0.9, carbs: 12, fat: 0.1 },
+    'grape': { calories: 62, protein: 0.6, carbs: 16, fat: 0.2 },
+    'cherry': { calories: 63, protein: 1.1, carbs: 16, fat: 0.2 },
+    'cantaloupe': { calories: 34, protein: 0.8, carbs: 8, fat: 0.2 },
+    'watermelon': { calories: 30, protein: 0.6, carbs: 8, fat: 0.2 },
+    'honeydew': { calories: 36, protein: 0.5, carbs: 9, fat: 0.1 },
+    
+    // Proteins  
+    'chicken': { calories: 165, protein: 31, carbs: 0, fat: 3.6 },
+    'beef': { calories: 250, protein: 26, carbs: 0, fat: 15 },
+    'salmon': { calories: 208, protein: 20, carbs: 0, fat: 12 },
+    'egg': { calories: 155, protein: 13, carbs: 1.1, fat: 11 },
+    
+    // Grains
+    'rice': { calories: 130, protein: 2.7, carbs: 28, fat: 0.3 },
+    'bread': { calories: 265, protein: 9, carbs: 49, fat: 3.2 },
+    'pasta': { calories: 131, protein: 5, carbs: 25, fat: 1.1 },
+    
+    // Vegetables
+    'broccoli': { calories: 34, protein: 2.8, carbs: 7, fat: 0.4 },
+    'carrot': { calories: 41, protein: 0.9, carbs: 10, fat: 0.2 },
+    'spinach': { calories: 23, protein: 2.9, carbs: 3.6, fat: 0.4 },
+    'corn': { calories: 86, protein: 3.3, carbs: 19, fat: 1.4 },
+    'sweet corn': { calories: 86, protein: 3.3, carbs: 19, fat: 1.4 },
+    'corn on cob': { calories: 86, protein: 3.3, carbs: 19, fat: 1.4 },
+    'corn on the cob': { calories: 86, protein: 3.3, carbs: 19, fat: 1.4 },
+    'potato': { calories: 77, protein: 2, carbs: 17, fat: 0.1 },
+    'baked potato': { calories: 93, protein: 2.5, carbs: 21, fat: 0.1 },
+    
+    // Processed Foods
+    'hotdog': { calories: 290, protein: 10, carbs: 2, fat: 26 },
+    'hot dog': { calories: 290, protein: 10, carbs: 2, fat: 26 },
+    'sausage': { calories: 290, protein: 10, carbs: 2, fat: 26 },
+    'french fries': { calories: 365, protein: 4, carbs: 63, fat: 17 },
+    'fries': { calories: 365, protein: 4, carbs: 63, fat: 17 },
+    'pizza': { calories: 266, protein: 11, carbs: 33, fat: 10 },
+    'hamburger': { calories: 540, protein: 25, carbs: 40, fat: 31 },
+    'cheeseburger': { calories: 540, protein: 25, carbs: 40, fat: 31 },
+    'ice cream': { calories: 207, protein: 3.5, carbs: 24, fat: 11 },
+    'cookie': { calories: 502, protein: 5.9, carbs: 64, fat: 24 },
+    'donut': { calories: 452, protein: 4.9, carbs: 51, fat: 25 }
+  };
+
   /**
    * Preprocess ingredient queries for better matching
    */
   private preprocessIngredientQuery(ingredientName: string): string {
     const query = ingredientName.toLowerCase().trim();
     
-    // Food synonyms and corrections for better matching
-    const synonymMap: { [key: string]: string } = {
-      'corn on the cob': 'corn sweet yellow ear',
-      'corn on cob': 'corn sweet yellow ear',
-      'can of corn': 'corn sweet yellow canned',
-      'frozen corn': 'corn sweet kernel frozen',
-      'fresh corn': 'corn sweet yellow kernel',
-      'corn kernels': 'corn sweet yellow kernel',
-      'grilled chicken breast': 'chicken breast grilled',
-      'fried chicken breast': 'chicken breast fried',
-      'baked chicken breast': 'chicken breast baked',
-      'roasted chicken breast': 'chicken breast roasted',
-      'pasta with marinara': 'pasta cooked marinara sauce',
-      'beef stew': 'beef stew cooked',
-      'baked potato': 'potato baked',
-      'raw potato': 'potato raw',
-      'mashed potatoes': 'potato mashed',
-      'french fries': 'potato french fried',
-      'scrambled eggs': 'egg scrambled',
-      'boiled eggs': 'egg hard boiled',
-      'fried eggs': 'egg fried'
-    };
-
     // Check for direct synonym matches
-    if (synonymMap[query]) {
-      return synonymMap[query];
+    if (USDAService.FOOD_SYNONYMS[query]) {
+      return USDAService.FOOD_SYNONYMS[query];
     }
 
-    // Extract cooking methods and reorder for better matching
-    const cookingMethods = ['grilled', 'fried', 'baked', 'roasted', 'boiled', 'steamed', 'raw', 'fresh', 'cooked'];
+    // Extract cooking methods and preparation forms
     let cookingMethod = '';
+    let preparationForm = '';
     let cleanQuery = query;
 
-    for (const method of cookingMethods) {
+    // Find cooking method
+    for (const method of USDAService.COOKING_METHODS) {
       if (query.includes(method)) {
         cookingMethod = method;
         cleanQuery = query.replace(method, '').trim();
@@ -289,11 +342,8 @@ export class USDAService {
       }
     }
 
-    // Extract preparation forms
-    const preparationForms = ['canned', 'frozen', 'dried', 'fresh', 'pickled', 'smoked'];
-    let preparationForm = '';
-    
-    for (const form of preparationForms) {
+    // Find preparation form
+    for (const form of USDAService.PREPARATION_FORMS) {
       if (cleanQuery.includes(form)) {
         preparationForm = form;
         cleanQuery = cleanQuery.replace(form, '').trim();
@@ -614,33 +664,36 @@ export class USDAService {
     return { quantity, unit, gramsEquivalent };
   }
 
+  // Text conversion constants
+  private static readonly WORD_NUMBERS: Record<string, string> = {
+    'one': '1', 'two': '2', 'three': '3', 'four': '4', 'five': '5',
+    'six': '6', 'seven': '7', 'eight': '8', 'nine': '9', 'ten': '10'
+  };
+  
+  private static readonly FRACTION_WORDS: Record<string, string> = {
+    'three quarters': '3/4', 'two thirds': '2/3', 'one quarter': '1/4',
+    'one third': '1/3', 'one half': '1/2', 'a quarter': '1/4',
+    'a third': '1/3', 'a half': '1/2', 'quarter': '1/4',
+    'third': '1/3', 'half': '1/2'
+  };
+
   /**
    * Convert text-based numbers and fractions to numeric equivalents
    */
   private convertTextToNumbers(text: string): string {
-    const wordNumbers: { [key: string]: string } = {
-      'one': '1', 'two': '2', 'three': '3', 'four': '4', 'five': '5',
-      'six': '6', 'seven': '7', 'eight': '8', 'nine': '9', 'ten': '10'
-    };
-    
-    const fractionWords: { [key: string]: string } = {
-      'half': '1/2', 'quarter': '1/4', 'third': '1/3',
-      'three quarters': '3/4', 'two thirds': '2/3',
-      'one half': '1/2', 'one quarter': '1/4', 'one third': '1/3',
-      'a half': '1/2', 'a quarter': '1/4', 'a third': '1/3'
-    };
-    
     let converted = text;
     
     // Convert fraction words first (longer phrases first to avoid conflicts)
-    const sortedFractionWords = Object.entries(fractionWords).sort((a, b) => b[0].length - a[0].length);
+    const sortedFractionWords = Object.entries(USDAService.FRACTION_WORDS)
+      .sort((a, b) => b[0].length - a[0].length);
+    
     for (const [phrase, fraction] of sortedFractionWords) {
       const regex = new RegExp(`\\b${phrase}\\b`, 'gi');
       converted = converted.replace(regex, fraction);
     }
     
     // Convert word numbers
-    for (const [word, number] of Object.entries(wordNumbers)) {
+    for (const [word, number] of Object.entries(USDAService.WORD_NUMBERS)) {
       const regex = new RegExp(`\\b${word}\\b`, 'gi');
       converted = converted.replace(regex, number);
     }
@@ -648,14 +701,7 @@ export class USDAService {
     return converted;
   }
 
-  /**
-   * Filter and prioritize food results with measurement context
-   */
-  private filterAndPrioritizeFoodsWithMeasurement(foods: USDAFood[], searchTerm: string, measurement: string = ''): USDAFood[] {
-    const measurementLower = measurement.toLowerCase();
-    
-    return this.filterAndPrioritizeFoods(foods, searchTerm, measurementLower);
-  }
+
 
   /**
    * Filter and prioritize food results for better matching
@@ -693,55 +739,12 @@ export class USDAService {
         (n.nutrientId === 1008) && (n.value || 0) > 0);
       if (hasEnergy) score += 100;
       
-      // Smart food selection based on ingredient and measurement context
-      if (searchLower.includes('banana')) {
-        // Strongly prefer fresh raw bananas over overripe
-        if (description.includes('raw') && !description.includes('overripe')) score += 300;
-        if (description.includes('overripe')) score -= 300; // Heavily penalize overripe
-      }
-      
-      if (searchLower.includes('apple')) {
-        // Strongly prefer fresh raw apples over processed varieties
-        if (description.includes('raw') && !description.includes('dried') && !description.includes('chips')) score += 300;
-        if (description.includes('dried') || description.includes('chips') || description.includes('dehydrated')) score -= 500;
-        if (description.includes('fresh') || description.includes('fruit, without')) score += 200;
-      }
-      
-      if (searchLower.includes('chicken')) {
-        // Prefer raw chicken breast data for accurate calculations
-        if (description.includes('raw') && description.includes('breast')) score += 300;
-        if (description.includes('cooked') || description.includes('braised') || description.includes('roasted')) score -= 200;
-        if (description.includes('skinless') && description.includes('boneless')) score += 100;
-      }
-      
-      if (searchLower.includes('rice')) {
-        // Prefer cooked rice for volume measurements (cup), raw for weight (grams)
-        if (measurementContext.includes('cup')) {
-          if (description.includes('cooked') || description.includes('steamed')) score += 200;
-          if (description.includes('flour') || description.includes('dry') || description.includes('raw')) score -= 200;
-        } else if (measurementContext.includes('g')) {
-          if (description.includes('raw') && !description.includes('flour')) score += 100;
-          if (description.includes('flour')) score -= 100;
-        }
-      }
-      
-      if (searchLower.includes('corn')) {
-        // Heavily penalize wrong matches for corn
-        if (description.includes('flour') || description.includes('meal') || description.includes('starch')) score -= 1000;
-        if (description.includes('onion') || description.includes('egg')) score -= 1000;
-        if (description.includes('sweet') && description.includes('corn')) score += 300;
-        if (description.includes('kernel')) score += 200;
-        if (description.includes('ear')) score += 100;
-      }
+      // Apply food-specific scoring logic
+      score += this.calculateFoodSpecificScore(searchLower, description, measurementContext);
       
       // Prefer raw/basic ingredients
       if (description.includes('raw') || description.includes('fresh')) score += 50;
       if (!description.includes('prepared') && !description.includes('seasoned')) score += 30;
-      
-      // Category validation - prevent wrong food categories
-      if (searchLower.includes('corn') && !description.toLowerCase().includes('corn')) score -= 2000;
-      if (searchLower.includes('potato') && !description.toLowerCase().includes('potato')) score -= 2000;
-      if (searchLower.includes('apple') && !description.toLowerCase().includes('apple')) score -= 2000;
       
       return { food, score };
     });
@@ -751,6 +754,60 @@ export class USDAService {
       .filter(item => item.score > 0)
       .sort((a, b) => b.score - a.score)
       .map(item => item.food);
+  }
+
+  /**
+   * Calculate food-specific scoring logic
+   */
+  private calculateFoodSpecificScore(searchTerm: string, description: string, measurementContext: string): number {
+    let score = 0;
+
+    // Banana scoring
+    if (searchTerm.includes('banana')) {
+      if (description.includes('raw') && !description.includes('overripe')) score += 300;
+      if (description.includes('overripe')) score -= 300;
+    }
+    
+    // Apple scoring
+    if (searchTerm.includes('apple')) {
+      if (description.includes('raw') && !description.includes('dried') && !description.includes('chips')) score += 300;
+      if (description.includes('dried') || description.includes('chips') || description.includes('dehydrated')) score -= 500;
+      if (description.includes('fresh') || description.includes('fruit, without')) score += 200;
+    }
+    
+    // Chicken scoring
+    if (searchTerm.includes('chicken')) {
+      if (description.includes('raw') && description.includes('breast')) score += 300;
+      if (description.includes('cooked') || description.includes('braised') || description.includes('roasted')) score -= 200;
+      if (description.includes('skinless') && description.includes('boneless')) score += 100;
+    }
+    
+    // Rice scoring with measurement context
+    if (searchTerm.includes('rice')) {
+      if (measurementContext.includes('cup')) {
+        if (description.includes('cooked') || description.includes('steamed')) score += 200;
+        if (description.includes('flour') || description.includes('dry') || description.includes('raw')) score -= 200;
+      } else if (measurementContext.includes('g')) {
+        if (description.includes('raw') && !description.includes('flour')) score += 100;
+        if (description.includes('flour')) score -= 100;
+      }
+    }
+    
+    // Corn scoring with heavy penalties for wrong matches
+    if (searchTerm.includes('corn')) {
+      if (description.includes('flour') || description.includes('meal') || description.includes('starch')) score -= 1000;
+      if (description.includes('onion') || description.includes('egg')) score -= 1000;
+      if (description.includes('sweet') && description.includes('corn')) score += 300;
+      if (description.includes('kernel')) score += 200;
+      if (description.includes('ear')) score += 100;
+    }
+
+    // Category validation - prevent completely wrong food categories
+    if (searchTerm.includes('corn') && !description.toLowerCase().includes('corn')) score -= 2000;
+    if (searchTerm.includes('potato') && !description.toLowerCase().includes('potato')) score -= 2000;
+    if (searchTerm.includes('apple') && !description.toLowerCase().includes('apple')) score -= 2000;
+
+    return score;
   }
 
   /**
@@ -891,58 +948,10 @@ export class USDAService {
     const cookingMethod = detectCookingMethod(ingredientName);
     const foodGroup = classifyFood(ingredientName);
     
-    // Comprehensive fallback estimates per 100g based on USDA averages
-    const fallbackData: { [key: string]: { calories: number; protein: number; carbs: number; fat: number } } = {
-      // Fruits
-      'apple': { calories: 52, protein: 0.3, carbs: 14, fat: 0.2 },
-      'banana': { calories: 89, protein: 1.1, carbs: 23, fat: 0.3 },
-      'orange': { calories: 47, protein: 0.9, carbs: 12, fat: 0.1 },
-      'grape': { calories: 62, protein: 0.6, carbs: 16, fat: 0.2 },
-      'cherry': { calories: 63, protein: 1.1, carbs: 16, fat: 0.2 },
-      'cantaloupe': { calories: 34, protein: 0.8, carbs: 8, fat: 0.2 },
-      'watermelon': { calories: 30, protein: 0.6, carbs: 8, fat: 0.2 },
-      'honeydew': { calories: 36, protein: 0.5, carbs: 9, fat: 0.1 },
-      
-      // Proteins  
-      'chicken': { calories: 165, protein: 31, carbs: 0, fat: 3.6 },
-      'beef': { calories: 250, protein: 26, carbs: 0, fat: 15 },
-      'salmon': { calories: 208, protein: 20, carbs: 0, fat: 12 },
-      'egg': { calories: 155, protein: 13, carbs: 1.1, fat: 11 },
-      
-      // Grains
-      'rice': { calories: 130, protein: 2.7, carbs: 28, fat: 0.3 },
-      'bread': { calories: 265, protein: 9, carbs: 49, fat: 3.2 },
-      'pasta': { calories: 131, protein: 5, carbs: 25, fat: 1.1 },
-      
-      // Vegetables
-      'broccoli': { calories: 34, protein: 2.8, carbs: 7, fat: 0.4 },
-      'carrot': { calories: 41, protein: 0.9, carbs: 10, fat: 0.2 },
-      'spinach': { calories: 23, protein: 2.9, carbs: 3.6, fat: 0.4 },
-      'corn': { calories: 86, protein: 3.3, carbs: 19, fat: 1.4 },
-      'sweet corn': { calories: 86, protein: 3.3, carbs: 19, fat: 1.4 },
-      'corn on cob': { calories: 86, protein: 3.3, carbs: 19, fat: 1.4 },
-      'corn on the cob': { calories: 86, protein: 3.3, carbs: 19, fat: 1.4 },
-      'potato': { calories: 77, protein: 2, carbs: 17, fat: 0.1 },
-      'baked potato': { calories: 93, protein: 2.5, carbs: 21, fat: 0.1 },
-      
-      // Processed/Fast Foods
-      'hotdog': { calories: 290, protein: 10, carbs: 2, fat: 26 },
-      'hot dog': { calories: 290, protein: 10, carbs: 2, fat: 26 },
-      'sausage': { calories: 290, protein: 10, carbs: 2, fat: 26 },
-      'french fries': { calories: 365, protein: 4, carbs: 63, fat: 17 },
-      'fries': { calories: 365, protein: 4, carbs: 63, fat: 17 },
-      'pizza': { calories: 266, protein: 11, carbs: 33, fat: 10 },
-      'hamburger': { calories: 540, protein: 25, carbs: 40, fat: 31 },
-      'cheeseburger': { calories: 540, protein: 25, carbs: 40, fat: 31 },
-      'ice cream': { calories: 207, protein: 3.5, carbs: 24, fat: 11 },
-      'cookie': { calories: 502, protein: 5.9, carbs: 64, fat: 24 },
-      'donut': { calories: 452, protein: 4.9, carbs: 51, fat: 25 },
-    };
-
     const ingredient = ingredientName.toLowerCase();
     let nutritionData = { calories: 100, protein: 2, carbs: 15, fat: 1 }; // default
 
-    for (const [key, data] of Object.entries(fallbackData)) {
+    for (const [key, data] of Object.entries(USDAService.FALLBACK_NUTRITION)) {
       if (ingredient.includes(key)) {
         nutritionData = data;
         break;
@@ -1030,12 +1039,9 @@ export class USDAService {
   private tryFallbackFirst(ingredientName: string, measurement: string) {
     const ingredient = ingredientName.toLowerCase();
     
-    // List of foods where fallback data is more accurate than potentially wrong USDA results
-    const preferFallbackFor = ['apple', 'chicken', 'chicken breast', 'hotdog', 'hot dog', 'egg', 'rice', 'bread', 'pasta', 'corn', 'sweet corn', 'corn on cob', 'corn on the cob', 'potato', 'baked potato'];
-    
     // Check for exact matches first, then partial matches
-    const exactMatch = preferFallbackFor.find(food => ingredient === food);
-    const partialMatch = preferFallbackFor.find(food => ingredient.includes(food));
+    const exactMatch = USDAService.FALLBACK_FOODS.find(food => ingredient === food);
+    const partialMatch = USDAService.FALLBACK_FOODS.find(food => ingredient.includes(food));
     
     if (exactMatch || partialMatch) {
       return this.getEnhancedFallbackEstimate(ingredientName, measurement);
