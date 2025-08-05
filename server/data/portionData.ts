@@ -35,6 +35,28 @@ export const PORTION_WEIGHTS: Record<string, PortionData[]> = {
     { fdc_id: "2708231", portion_description: "cup", gram_weight: 154, amount: 1 },
     { fdc_id: "2708231", portion_description: "piece", gram_weight: 8, amount: 1 }
   ],
+  "cantaloupe": [
+    { fdc_id: "169105", portion_description: "whole", gram_weight: 552, amount: 1 },
+    { fdc_id: "169105", portion_description: "half", gram_weight: 276, amount: 1 },
+    { fdc_id: "169105", portion_description: "quarter", gram_weight: 138, amount: 1 },
+    { fdc_id: "169105", portion_description: "cup cubed", gram_weight: 160, amount: 1 },
+    { fdc_id: "169105", portion_description: "medium", gram_weight: 552, amount: 1 },
+    { fdc_id: "169105", portion_description: "g", gram_weight: 1, amount: 1 }
+  ],
+  "watermelon": [
+    { fdc_id: "167765", portion_description: "wedge", gram_weight: 286, amount: 1 },
+    { fdc_id: "167765", portion_description: "cup cubed", gram_weight: 152, amount: 1 },
+    { fdc_id: "167765", portion_description: "slice", gram_weight: 286, amount: 1 },
+    { fdc_id: "167765", portion_description: "g", gram_weight: 1, amount: 1 }
+  ],
+  "honeydew": [
+    { fdc_id: "168153", portion_description: "whole", gram_weight: 1280, amount: 1 },
+    { fdc_id: "168153", portion_description: "half", gram_weight: 640, amount: 1 },
+    { fdc_id: "168153", portion_description: "quarter", gram_weight: 320, amount: 1 },
+    { fdc_id: "168153", portion_description: "cup cubed", gram_weight: 170, amount: 1 },
+    { fdc_id: "168153", portion_description: "wedge", gram_weight: 129, amount: 1 },
+    { fdc_id: "168153", portion_description: "g", gram_weight: 1, amount: 1 }
+  ],
   
   // Proteins
   "chicken breast": [
@@ -127,7 +149,7 @@ export function getPortionWeight(foodName: string, measurement: string): number 
     return null;
   }
   
-  // Find best portion match
+  // Find best portion match - enhanced for natural language
   const portion = portions.find(p => {
     const desc = p.portion_description.toLowerCase();
     return desc.includes(normalizedMeasurement) || 
@@ -140,7 +162,12 @@ export function getPortionWeight(foodName: string, measurement: string): number 
            (normalizedMeasurement.includes('slice') && desc.includes('slice')) ||
            (normalizedMeasurement.includes('hot dog') && desc === 'item') ||
            (normalizedMeasurement.includes('standard') && desc === 'item') ||
-           (normalizedMeasurement.includes('item') && desc === 'item');
+           (normalizedMeasurement.includes('item') && desc === 'item') ||
+           // Enhanced natural language matching
+           (normalizedMeasurement.includes('half') && desc === 'half') ||
+           (normalizedMeasurement.includes('quarter') && desc === 'quarter') ||
+           (normalizedMeasurement.includes('whole') && desc === 'whole') ||
+           (normalizedMeasurement.includes('wedge') && desc === 'wedge');
   });
   
   if (portion) {
@@ -157,6 +184,29 @@ export function getPortionWeight(foodName: string, measurement: string): number 
  */
 export function parseMeasurement(measurement: string): { quantity: number; unit: string } {
   const normalized = measurement.toLowerCase().trim();
+  
+  // Handle natural language patterns like "half of cantaloupe" or "quarter of watermelon"
+  const naturalLangMatch = normalized.match(/^(half|quarter|third|1\/2|1\/4|1\/3|2\/3|3\/4)\s*(of\s*)?(.+)$/);
+  if (naturalLangMatch) {
+    const fractionText = naturalLangMatch[1];
+    const remainder = naturalLangMatch[3].trim();
+    
+    const fractionValue = {
+      'half': 0.5,
+      '1/2': 0.5,
+      'quarter': 0.25,
+      '1/4': 0.25,
+      'third': 0.33,
+      '1/3': 0.33,
+      '2/3': 0.67,
+      '3/4': 0.75
+    }[fractionText] || 1;
+    
+    return {
+      quantity: fractionValue,
+      unit: remainder
+    };
+  }
   
   // Handle parenthetical notes like "1 cup (140g)" - prioritize main measurement
   const parentheticalMatch = normalized.match(/^(.+?)\s*\((.+?)\)(.*)$/);

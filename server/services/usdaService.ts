@@ -812,6 +812,9 @@ export class USDAService {
       'orange': { calories: 47, protein: 0.9, carbs: 12, fat: 0.1 },
       'grape': { calories: 62, protein: 0.6, carbs: 16, fat: 0.2 },
       'cherry': { calories: 63, protein: 1.1, carbs: 16, fat: 0.2 },
+      'cantaloupe': { calories: 34, protein: 0.8, carbs: 8, fat: 0.2 },
+      'watermelon': { calories: 30, protein: 0.6, carbs: 8, fat: 0.2 },
+      'honeydew': { calories: 36, protein: 0.5, carbs: 9, fat: 0.1 },
       
       // Proteins  
       'chicken': { calories: 165, protein: 31, carbs: 0, fat: 3.6 },
