@@ -59,7 +59,6 @@ const pageImageMap: Record<string, number[]> = {
 export function useRotatingBackground(activeTab: string) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [backgroundImage, setBackgroundImage] = useState(foodImages[0]);
-  const [isTransitioning, setIsTransitioning] = useState(false);
   const [animationKey, setAnimationKey] = useState(0);
   
   // Change background when page/tab changes
@@ -68,22 +67,14 @@ export function useRotatingBackground(activeTab: string) {
     const randomPageImage = pageImages[Math.floor(Math.random() * pageImages.length)];
     
     if (randomPageImage !== currentImageIndex) {
-      setIsTransitioning(true);
-      
-      requestAnimationFrame(() => {
-        setCurrentImageIndex(randomPageImage);
-        setBackgroundImage(foodImages[randomPageImage]);
-        setAnimationKey(prev => prev + 1);
-        setTimeout(() => setIsTransitioning(false), 50);
-      });
+      setCurrentImageIndex(randomPageImage);
+      setBackgroundImage(foodImages[randomPageImage]);
+      setAnimationKey(prev => prev + 1);
     }
   }, [activeTab, currentImageIndex]);
 
   return {
     backgroundImage,
-    currentImageIndex,
-    totalImages: foodImages.length,
-    isTransitioning,
     animationKey
   };
 }

@@ -71,7 +71,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const { user, isLoading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState('home');
   const [previousTab, setPreviousTab] = useState('home');
-  const { backgroundImage, isTransitioning, animationKey } = useRotatingBackground(activeTab);
+  const { backgroundImage, animationKey } = useRotatingBackground(activeTab);
   const [searchQuery, setSearchQuery] = useState('');
   const [showAchievement, setShowAchievement] = useState(false);
   const [currentAchievement, setCurrentAchievement] = useState<Achievement | null>(null);
@@ -298,17 +298,17 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     setActiveTab(newTab);
   };
 
-  // Hero Section Component
+  // Simplified Hero Section Component
   const HeroSection = React.memo(({ title, subtitle, description, buttonText, onButtonClick }: {
     title: string;
-    subtitle: string;
+    subtitle: string; 
     description: string;
     buttonText: string;
     onButtonClick: () => void;
   }) => (
     <div className="relative h-screen overflow-hidden">
       <div 
-        key={`hero-bg-${animationKey}`}
+        key={animationKey}
         className="absolute inset-0 bg-cover bg-center z-10 hero-bg-animated"
         style={{
           backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`
@@ -318,25 +318,25 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6 z-20">
         <div className="space-y-8 max-w-2xl">
           <div className="space-y-2">
-            <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none text-white drop-shadow-2xl animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
+            <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none text-white drop-shadow-2xl animate-fadeInUp [animation-delay:0.2s]">
               {title}
             </h1>
-            <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none animate-fadeInUp" style={{ animationDelay: '0.4s' }}>
+            <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none animate-fadeInUp [animation-delay:0.4s]">
               <span className="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent drop-shadow-2xl">
                 {subtitle}
               </span>
             </h1>
           </div>
           
-          <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl animate-fadeInUp" style={{ animationDelay: '0.6s' }}>
+          <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl animate-fadeInUp [animation-delay:0.6s]">
             {description}
           </p>
           
-          <div className="pt-8 animate-fadeInUp" style={{ animationDelay: '0.8s' }}>
+          <div className="pt-8 animate-fadeInUp [animation-delay:0.8s]">
             <Button 
               onClick={onButtonClick}
               size="lg"
-              className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-black px-16 py-6 rounded-full text-2xl shadow-2xl transform hover:scale-105 transition-all duration-200 border-2 border-orange-400/30"
+              className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-black px-16 py-6 rounded-full text-2xl shadow-2xl hover:scale-105 transition-all duration-200 border-2 border-orange-400/30"
             >
               {buttonText}
             </Button>
@@ -344,17 +344,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         </div>
       </div>
       
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60 z-30">
-        <div className="animate-bounce">
-          <ChevronRight className="w-6 h-6 rotate-90 drop-shadow-lg" />
-        </div>
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/60 z-30 animate-bounce">
+        <ChevronRight className="w-6 h-6 rotate-90 drop-shadow-lg" />
       </div>
     </div>
   ));
 
   const BytewiseLogo = () => (
     <div className="mb-8 cursor-pointer hover:scale-105 transition-transform duration-200" onClick={() => setActiveTab('home')}>
-      <div className="text-center font-['League_Spartan']">
+      <div className="text-center font-league-spartan">
         <div className="text-7xl font-black leading-none text-sky-300 mb-2 lowercase tracking-tight drop-shadow-2xl">
           bytewise
         </div>
@@ -463,22 +461,22 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         
         <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6 z-20">
           <div className="space-y-8 max-w-2xl">
-            <div className="animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
+            <div className="animate-fadeInUp [animation-delay:0.2s]">
               <BytewiseLogo />
             </div>
             
             <div className="space-y-2">
-              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none text-white drop-shadow-2xl animate-fadeInUp" style={{ animationDelay: '0.4s' }}>Track Your</h1>
-              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none animate-fadeInUp" style={{ animationDelay: '0.6s' }}>
+              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none text-white drop-shadow-2xl animate-fadeInUp [animation-delay:0.4s]">Track Your</h1>
+              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none animate-fadeInUp [animation-delay:0.6s]">
                 <span className="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent drop-shadow-2xl">Nutrition</span>
               </h1>
             </div>
             
-            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl animate-fadeInUp" style={{ animationDelay: '0.8s' }}>
+            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl animate-fadeInUp [animation-delay:0.8s]">
               Track nutrition with scientific precision using our comprehensive USDA database
             </p>
             
-            <div className="pt-8 animate-fadeInUp" style={{ animationDelay: '1.0s' }}>
+            <div className="pt-8 animate-fadeInUp [animation-delay:1.0s]">
               <Button 
                 onClick={() => {
                   if (user) {
@@ -488,7 +486,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   }
                 }}
                 size="lg"
-                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-black px-16 py-6 rounded-full text-2xl shadow-2xl transform hover:scale-105 transition-all duration-500 border-2 border-orange-400/30"
+                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-black px-16 py-6 rounded-full text-2xl shadow-2xl hover:scale-105 transition-all duration-500 border-2 border-orange-400/30"
               >
                 {user ? 'Start Tracking' : 'Sign Up to Track'}
               </Button>
@@ -496,10 +494,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           </div>
         </div>
         
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60 z-30">
-          <div className="animate-bounce">
-            <ChevronRight className="w-6 h-6 rotate-90 drop-shadow-lg" />
-          </div>
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/60 z-30 animate-bounce">
+          <ChevronRight className="w-6 h-6 rotate-90 drop-shadow-lg" />
         </div>
       </div>
 
