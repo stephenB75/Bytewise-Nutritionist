@@ -332,19 +332,19 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         />
         
         <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6 z-20">
-          <div className="space-y-8 max-w-2xl z-30">
+          <div className="space-y-8 max-w-2xl animate-fadeInUp z-30">
             <div className="space-y-2">
-              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none text-white drop-shadow-2xl">{title}</h1>
-              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
+              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none text-white drop-shadow-2xl animate-fadeInUp" style={{ animationDelay: '0.2s' }}>{title}</h1>
+              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none animate-fadeInUp" style={{ animationDelay: '0.4s' }}>
                 <span className="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent drop-shadow-2xl">{subtitle}</span>
               </h1>
             </div>
             
-            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl">
+            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl animate-fadeInUp" style={{ animationDelay: '0.6s' }}>
               {description}
             </p>
             
-            <div className="pt-8 z-40">
+            <div className="pt-8 z-40 animate-fadeInUp" style={{ animationDelay: '0.8s' }}>
               <Button 
                 onClick={onButtonClick}
                 size="lg"
@@ -490,23 +490,23 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         />
         
         <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6 z-20">
-          <div className="space-y-8 max-w-2xl z-30">
-            <div className="z-40">
+          <div className="space-y-8 max-w-2xl animate-fadeInUp z-30">
+            <div className="z-40 animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
               <BytewiseLogo />
             </div>
             
             <div className="space-y-2">
-              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none text-white drop-shadow-2xl">Track Your</h1>
-              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
+              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none text-white drop-shadow-2xl animate-fadeInUp" style={{ animationDelay: '0.4s' }}>Track Your</h1>
+              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none animate-fadeInUp" style={{ animationDelay: '0.6s' }}>
                 <span className="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent drop-shadow-2xl">Nutrition</span>
               </h1>
             </div>
             
-            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl">
+            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl animate-fadeInUp" style={{ animationDelay: '0.8s' }}>
               Track nutrition with scientific precision using our comprehensive USDA database
             </p>
             
-            <div className="pt-8 z-40">
+            <div className="pt-8 z-40 animate-fadeInUp" style={{ animationDelay: '1.0s' }}>
               <Button 
                 onClick={() => {
                   if (user) {
