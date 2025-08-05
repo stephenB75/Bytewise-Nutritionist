@@ -5,9 +5,8 @@
 
 import { useState, useEffect } from 'react';
 
-// Complete food image collection - ALL 106 available images from assets
+// Food-only image collection - using only actual food photographs
 const foodImages = [
-  // Food JPG images
   new URL('@assets/apple-3313209_1920_1753859530078-BJW4vFlt.jpg', import.meta.url).href,
   new URL('@assets/blueberries-9450130_1920_1753859477806-DQeN0M4j.jpg', import.meta.url).href,
   new URL('@assets/bowl-1842294_1920_1753859477806-bRUsOvIC.jpg', import.meta.url).href,
@@ -41,95 +40,20 @@ const foodImages = [
   new URL('@assets/tomatoes-1238255_1920_1753859477803-BBxmQtT1.jpg', import.meta.url).href,
   new URL('@assets/variety-5044809_1920_1753859530087-C7xAS9wM.jpg', import.meta.url).href,
   new URL('@assets/vegetable-2924245_1920_1753859477807-CZELXr6Z.jpg', import.meta.url).href,
-  // App interface PNG images for variety
-  new URL('@assets/image_1754188910321.png', import.meta.url).href,
-  new URL('@assets/image_1754188922168.png', import.meta.url).href,
-  new URL('@assets/image_1754188944072.png', import.meta.url).href,
-  new URL('@assets/image_1754188960456.png', import.meta.url).href,
-  new URL('@assets/image_1754188992812.png', import.meta.url).href,
-  new URL('@assets/image_1754189057791.png', import.meta.url).href,
-  new URL('@assets/image_1754189101718.png', import.meta.url).href,
-  new URL('@assets/image_1754189125471.png', import.meta.url).href,
-  // All available app screenshots for maximum variety (showing food/nutrition interfaces)
-  new URL('@assets/Screenshot 2025-08-02 at 10.05.19 PM_1754186726337.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-02 at 10.07.25 PM_1754186849852.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-02 at 10.08.34 PM_1754186917724.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-02 at 10.11.38 PM_1754187101314.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-02 at 10.13.47 PM_1754187230232.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-02 at 10.36.40 PM_1754188613514.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-02 at 10.36.40 PM_1754189777328.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-02 at 10.52.47 PM_1754189572983.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-02 at 11.28.40 PM_1754191723679.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-02 at 11.38.54 PM_1754192337932.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-03 at 12.52.37 AM_1754196761246.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-03 at 2.03.45 AM_1754201028518.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-03 at 2.15.14 AM_1754201717027.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-03 at 2.15.31 AM_1754201733570.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-03 at 2.17.35 AM_1754201858130.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-03 at 2.18.00 AM_1754201882395.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-03 at 2.45.30 AM_1754203533371.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-03 at 2.46.38 AM_1754203602534.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-03 at 2.47.44 AM_1754203667113.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-03 at 2.49.02 PM_1754246975308.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-03 at 2.50.25 AM_1754203828298.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-03 at 2.56.45 AM_1754204207890.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-03 at 3.05.44 AM_1754204748319.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-03 at 3.11.39 PM_1754248302363.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-03 at 3.14.19 PM_1754248463898.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-03 at 3.23.27 PM_1754249009708.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-03 at 4.01.29 PM_1754251292783.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-03 at 4.05.03 PM_1754251505195.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-03 at 4.07.02 PM_1754251624901.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-03 at 4.07.14 PM_1754251636917.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-03 at 4.07.32 PM_1754251655101.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-03 at 4.20.16 PM_1754252419915.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-03 at 4.29.14 PM_1754252957174.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-03 at 4.52.29 AM_1754211153723.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-03 at 5.04.32 PM_1754255074901.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-03 at 5.19.01 AM_1754212743678.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-03 at 5.20.38 AM_1754212840394.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-03 at 5.41.04 AM_1754214066387.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-03 at 5.46.54 AM_1754214417237.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-03 at 5.52.57 AM_1754214780196.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-03 at 6.15.08 AM_1754216110766.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-03 at 7.22.01 PM_1754263323225.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-03 at 7.26.49 PM_1754263612191.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-04 at 10.26.03 PM_1754360766559.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-04 at 10.40.55 PM_1754361658434.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-04 at 10.56.16 PM_1754362579609.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-04 at 10.56.26 PM_1754362588923.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-04 at 10.56.37 PM_1754362599798.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-04 at 10.57.01 PM_1754362624246.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-04 at 11.05.55 PM_1754363158408.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-04 at 11.06.05 PM_1754363167842.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-04 at 11.06.18 PM_1754363180766.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-04 at 11.06.28 PM_1754363190574.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-04 at 11.21.45 PM_1754364107604.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-04 at 11.26.30 PM_1754364393830.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-04 at 11.30.17 PM_1754364619590.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-04 at 11.35.03 PM_1754364905899.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-04 at 7.14.12 PM_1754349255831.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-04 at 7.17.51 PM_1754349474646.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-04 at 7.21.00 PM_1754349663898.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-04 at 7.23.04 PM_1754349787270.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-04 at 7.24.54 PM_1754349897449.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-04 at 7.26.27 PM_1754349990094.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-04 at 8.25.31 PM_1754353534066.png', import.meta.url).href,
-  new URL('@assets/Screenshot 2025-08-04 at 9.18.24 PM_1754356708097.png', import.meta.url).href,
 ];
 
-// Enhanced page mappings with full image collection access
+// Food-themed page mappings for thematic consistency
 const pageImageMap: Record<string, number[]> = {
-  'home': [0, 2, 10, 22, 33, 42, 50, 63, 75, 88, 95], // Mix of food and interface
-  'nutrition': [3, 4, 5, 6, 11, 23, 35, 45, 60, 72, 89], // Food prep and tracking
-  'daily': [3, 19, 26, 27, 38, 48, 58, 68, 78, 90, 100], // Meals and daily views
-  'profile': [7, 9, 14, 34, 44, 54, 64, 74, 84, 94, 104], // Personal and desserts
-  'tracking': [1, 12, 17, 36, 46, 56, 66, 76, 86, 96], // Progress and data
-  'achievements': [0, 8, 13, 28, 37, 47, 57, 67, 77, 87, 97], // Success and fruits
-  'signin': [18, 25, 39, 49, 59, 69, 79, 89, 99], // Welcome screens
-  'calculator': [11, 20, 24, 40, 50, 60, 70, 80, 90, 101], // Tools and calculations
-  'search': [2, 10, 22, 41, 51, 61, 71, 81, 91, 102], // Discovery and variety
-  'data': [15, 21, 29, 42, 52, 62, 72, 82, 92, 103] // Analytics and exports
+  'home': [0, 2, 10, 22, 31], // Healthy foods (apple, bowl, food, salad, variety)
+  'nutrition': [3, 4, 5, 6, 11, 23], // Proteins and main dishes
+  'daily': [3, 19, 26, 27], // Meals (burgers, pizza, steaks)
+  'profile': [7, 9, 14, 28], // Desserts and treats
+  'tracking': [1, 12, 17, 21], // Breakfast and healthy options
+  'achievements': [0, 8, 13, 15, 20], // Fruits and colorful foods
+  'signin': [18, 25, 31, 32], // Welcoming foods (pancakes, pasta, variety)
+  'calculator': [11, 24, 29], // Cooking ingredients and prep
+  'search': [2, 10, 22, 31], // Variety and discovery
+  'data': [13, 15, 20, 30, 32] // Fresh produce and analytics
 };
 
 export function useRotatingBackground(activeTab: string) {
