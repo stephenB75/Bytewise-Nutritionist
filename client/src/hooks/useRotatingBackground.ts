@@ -69,6 +69,7 @@ export function useRotatingBackground(activeTab: string) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [backgroundImage, setBackgroundImage] = useState(foodImages[0]);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [animationKey, setAnimationKey] = useState(0);
   
   // Local assets are already bundled - no preloading needed
   useEffect(() => {
@@ -85,10 +86,11 @@ export function useRotatingBackground(activeTab: string) {
     if (randomPageImage !== currentImageIndex) {
       setIsTransitioning(true);
       
-      // Immediate update without preloading delay
+      // Immediate update with animation trigger
       requestAnimationFrame(() => {
         setCurrentImageIndex(randomPageImage);
         setBackgroundImage(foodImages[randomPageImage]);
+        setAnimationKey(prev => prev + 1); // Trigger re-animation
         // Reduced transition time for faster response
         setTimeout(() => setIsTransitioning(false), 50);
       });
@@ -99,6 +101,7 @@ export function useRotatingBackground(activeTab: string) {
     backgroundImage,
     currentImageIndex,
     totalImages: foodImages.length,
-    isTransitioning
+    isTransitioning,
+    animationKey
   };
 }

@@ -71,7 +71,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const { user, isLoading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState('home');
   const [previousTab, setPreviousTab] = useState('home');
-  const { backgroundImage, isTransitioning } = useRotatingBackground(activeTab);
+  const { backgroundImage, isTransitioning, animationKey } = useRotatingBackground(activeTab);
   const [searchQuery, setSearchQuery] = useState('');
   const [showAchievement, setShowAchievement] = useState(false);
   const [currentAchievement, setCurrentAchievement] = useState<Achievement | null>(null);
@@ -307,9 +307,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     onButtonClick: () => void;
   }) => (
     <div className="relative h-screen overflow-hidden">
-      {/* Background with gradient overlay */}
+      {/* Background with gradient overlay and animation */}
       <div 
-        className="absolute inset-0 bg-cover bg-center z-10"
+        key={`hero-bg-${animationKey}`}
+        className="absolute inset-0 bg-cover bg-center z-10 hero-bg-animated"
         style={{
           backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`
         }}
@@ -456,7 +457,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     <div className={`space-y-0 page-container animate-in fade-in ${getAnimationDirection('home', previousTab)} duration-700 ease-out`}>
       <div className="relative h-screen overflow-hidden">
         <div 
-          className="absolute inset-0 bg-cover bg-center z-10"
+          key={`home-bg-${animationKey}`}
+          className="absolute inset-0 bg-cover bg-center z-10 hero-bg-slide"
           style={{
             backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`
           }}
