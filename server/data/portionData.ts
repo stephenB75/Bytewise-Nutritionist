@@ -69,6 +69,12 @@ export const PORTION_WEIGHTS: Record<string, PortionData[]> = {
     { fdc_id: "171287", portion_description: "large", gram_weight: 50, amount: 1 },
     { fdc_id: "171287", portion_description: "medium", gram_weight: 44, amount: 1 },
     { fdc_id: "171287", portion_description: "small", gram_weight: 38, amount: 1 },
+    { fdc_id: "171287", portion_description: "eggs", gram_weight: 50, amount: 1 }, // For "2 eggs" calculations
+    { fdc_id: "171287", portion_description: "g", gram_weight: 1, amount: 1 }
+  ],
+  "scrambled eggs": [
+    { fdc_id: "171287", portion_description: "large", gram_weight: 50, amount: 1 },
+    { fdc_id: "171287", portion_description: "eggs", gram_weight: 50, amount: 1 },
     { fdc_id: "171287", portion_description: "g", gram_weight: 1, amount: 1 }
   ],
   
@@ -108,12 +114,39 @@ export const PORTION_WEIGHTS: Record<string, PortionData[]> = {
   ],
   
   // Processed Foods
-  "hotdog": [
-    { fdc_id: "174582", portion_description: "item", gram_weight: 76, amount: 1 },
-    { fdc_id: "174582", portion_description: "piece", gram_weight: 76, amount: 1 },
-    { fdc_id: "174582", portion_description: "link", gram_weight: 76, amount: 1 },
-    { fdc_id: "174582", portion_description: "g", gram_weight: 1, amount: 1 }
+  "hot dog": [
+    { fdc_id: "174608", portion_description: "hotdog", gram_weight: 52, amount: 1 },
+    { fdc_id: "174608", portion_description: "frank", gram_weight: 52, amount: 1 },
+    { fdc_id: "174608", portion_description: "sausage", gram_weight: 52, amount: 1 },
+    { fdc_id: "174608", portion_description: "g", gram_weight: 1, amount: 1 }
   ],
+  "hotdog": [
+    { fdc_id: "174608", portion_description: "hotdog", gram_weight: 52, amount: 1 },
+    { fdc_id: "174608", portion_description: "frank", gram_weight: 52, amount: 1 },
+    { fdc_id: "174608", portion_description: "g", gram_weight: 1, amount: 1 }
+  ],
+  "pizza": [
+    { fdc_id: "175176", portion_description: "slice", gram_weight: 107, amount: 1 },
+    { fdc_id: "175176", portion_description: "piece", gram_weight: 107, amount: 1 },
+    { fdc_id: "175176", portion_description: "g", gram_weight: 1, amount: 1 }
+  ],
+  "french fries": [
+    { fdc_id: "170427", portion_description: "serving", gram_weight: 85, amount: 1 },
+    { fdc_id: "170427", portion_description: "small", gram_weight: 71, amount: 1 },
+    { fdc_id: "170427", portion_description: "medium", gram_weight: 115, amount: 1 },
+    { fdc_id: "170427", portion_description: "large", gram_weight: 154, amount: 1 },
+    { fdc_id: "170427", portion_description: "g", gram_weight: 1, amount: 1 }
+  ],
+  "ice cream": [
+    { fdc_id: "171265", portion_description: "cup", gram_weight: 132, amount: 1 },
+    { fdc_id: "171265", portion_description: "scoop", gram_weight: 66, amount: 1 },
+    { fdc_id: "171265", portion_description: "serving", gram_weight: 66, amount: 1 },
+    { fdc_id: "171265", portion_description: "g", gram_weight: 1, amount: 1 }
+  ]
+};
+
+// Additional portion mappings for processed foods
+export const ADDITIONAL_PORTIONS: Record<string, PortionData[]> = {
   "hot dog": [
     { fdc_id: "174582", portion_description: "item", gram_weight: 76, amount: 1 },
     { fdc_id: "174582", portion_description: "piece", gram_weight: 76, amount: 1 },

@@ -802,10 +802,43 @@ export class USDAService {
       if (description.includes('ear')) score += 100;
     }
 
+    // Broccoli scoring - prefer fresh over fried
+    if (searchTerm.includes('broccoli')) {
+      if (description.includes('raw') || description.includes('fresh')) score += 300;
+      if (description.includes('fried') || description.includes('breaded')) score -= 500;
+      if (description.includes('steamed') || description.includes('boiled')) score += 200;
+    }
+
+    // Pizza scoring - prefer basic pizza over complex dishes
+    if (searchTerm.includes('pizza')) {
+      if (description.includes('pizza') && !description.includes('pepperoni') && !description.includes('meat')) score += 300;
+      if (description.includes('ham') || description.includes('restaurant')) score -= 1000;
+    }
+
+    // Ice cream scoring - prefer plain ice cream
+    if (searchTerm.includes('ice cream')) {
+      if (description.includes('ice cream') && !description.includes('cake')) score += 300;
+      if (description.includes('cake') || description.includes('sandwich')) score -= 500;
+    }
+
+    // French fries scoring - avoid fried rice matches
+    if (searchTerm.includes('french fries') || searchTerm.includes('fries')) {
+      if (description.includes('potato') && description.includes('fried')) score += 300;
+      if (description.includes('rice')) score -= 1000;
+    }
+
+    // Egg scoring - prefer whole eggs over egg whites/yolks
+    if (searchTerm.includes('egg')) {
+      if (description.includes('whole') || (!description.includes('white') && !description.includes('yolk'))) score += 200;
+      if (description.includes('white') || description.includes('yolk')) score -= 100;
+    }
+
     // Category validation - prevent completely wrong food categories
     if (searchTerm.includes('corn') && !description.toLowerCase().includes('corn')) score -= 2000;
     if (searchTerm.includes('potato') && !description.toLowerCase().includes('potato')) score -= 2000;
     if (searchTerm.includes('apple') && !description.toLowerCase().includes('apple')) score -= 2000;
+    if (searchTerm.includes('pizza') && !description.toLowerCase().includes('pizza')) score -= 2000;
+    if (searchTerm.includes('ice cream') && !description.toLowerCase().includes('ice cream')) score -= 1500;
 
     return score;
   }
