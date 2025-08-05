@@ -332,19 +332,19 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         />
         
         <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6 z-20">
-          <div className="space-y-8 max-w-2xl opacity-0 animate-[fadeInUp_0.8s_ease-out_0.2s_forwards] z-30">
+          <div className="space-y-8 max-w-2xl z-30">
             <div className="space-y-2">
-              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none opacity-0 animate-[fadeInUp_0.6s_ease-out_0.4s_forwards] text-white drop-shadow-2xl">{title}</h1>
-              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none opacity-0 animate-[fadeInUp_0.6s_ease-out_0.6s_forwards]">
+              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none text-white drop-shadow-2xl">{title}</h1>
+              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
                 <span className="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent drop-shadow-2xl">{subtitle}</span>
               </h1>
             </div>
             
-            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto opacity-0 animate-[fadeInUp_0.6s_ease-out_0.8s_forwards] drop-shadow-xl">
+            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl">
               {description}
             </p>
             
-            <div className="pt-8 opacity-0 animate-[fadeInUp_0.6s_ease-out_1s_forwards] z-40">
+            <div className="pt-8 z-40">
               <Button 
                 onClick={onButtonClick}
                 size="lg"
@@ -356,7 +356,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           </div>
         </div>
         
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60 opacity-0 animate-[fadeIn_0.4s_ease-out_1.2s_forwards] z-30">
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60 z-30">
           <div className="animate-bounce">
             <ChevronRight className="w-6 h-6 rotate-90 drop-shadow-lg" />
           </div>
