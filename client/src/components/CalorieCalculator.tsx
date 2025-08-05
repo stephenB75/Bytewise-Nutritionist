@@ -77,13 +77,13 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
   const [availableUnits, setAvailableUnits] = useState<string[]>([]);
   const queryClient = useQueryClient();
 
-  // Search ingredients as user types - both custom and USDA
+  // Search ingredients as user types - both custom and any food items
   useEffect(() => {
     if (ingredient.length >= 2) {
       const customSuggestions = EnhancedIngredientDatabaseManager.searchIngredients(ingredient);
       setIngredientSuggestions(customSuggestions.slice(0, 6)); // Limit to 6 custom suggestions
       
-      // USDA database search removed for cleanup
+      // Allow any food search - no USDA verification required
       setUsdaFoodSuggestions([]);
     } else {
       setIngredientSuggestions([]);
@@ -123,7 +123,7 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
     setUsdaFoodSuggestions([]);
     
     // Set available portions as units
-    const portions = food.portions.map(p => p.name);
+    const portions = food.portions.map((p: any) => p.name);
     setAvailableUnits(portions);
     if (portions.length > 0) {
       setSelectedUnit(portions[0]); // Set first portion as default
@@ -177,18 +177,21 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
       return;
     }
 
-    // Use enhanced ingredient calculation
+    // Allow calculation for any food item - no verification required
     if (selectedIngredient && amount && selectedUnit) {
       const measurementText = `${amount} ${selectedUnit}`;
       
-      // Use USDA query for enhanced accuracy
+      // Use ingredient query for calculation
       calculateCalories.mutate({ 
-        ingredient: selectedIngredient.data.usdaQuery, 
+        ingredient: selectedIngredient.data.usdaQuery || ingredient.trim(), 
         measurement: measurementText 
       });
     } else if (measurement.trim()) {
-      // Fallback to original method
+      // Direct calculation for any food item
       calculateCalories.mutate({ ingredient: ingredient.trim(), measurement: measurement.trim() });
+    } else {
+      // Allow calculation even without specific measurement
+      calculateCalories.mutate({ ingredient: ingredient.trim(), measurement: '100g' });
     }
   };
 
@@ -486,8 +489,8 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
             <Calculator className="w-6 h-6 text-blue-600" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-gray-900">USDA Calorie Calculator</h2>
-            <p className="text-sm text-gray-600">Get precise nutrition data with measurement conversions</p>
+            <h2 className="text-xl font-bold text-gray-900">Universal Calorie Calculator</h2>
+            <p className="text-sm text-gray-600">Calculate calories for any food item with smart nutrition estimates</p>
           </div>
         </div>
 
@@ -499,7 +502,7 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
                 Ingredient Name
               </label>
               <Input
-                placeholder="e.g., chicken breast, Greek yogurt, banana"
+                placeholder="e.g., chicken breast, Greek yogurt, banana, pizza, ice cream"
                 value={ingredient}
                 onChange={(e) => setIngredient(e.target.value)}
                 className="text-base"
@@ -586,7 +589,7 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
               )}
               
               <p className="text-xs text-gray-500 mt-1">
-                Enhanced with USDA verified foods + {Object.keys(EnhancedIngredientDatabaseManager.getCategories()).length} custom categories
+                Search any food item - from fresh ingredients to packaged foods and restaurant meals
               </p>
             </div>
             
@@ -632,13 +635,13 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
                   Measurement
                 </label>
                 <Input
-                  placeholder="e.g., 1 cup, 100g, 1 medium, 2 tablespoons"
+                  placeholder="e.g., 1 cup, 100g, 1 medium, 2 tablespoons, 1 slice"
                   value={measurement}
                   onChange={(e) => setMeasurement(e.target.value)}
                   className="text-base"
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  Supports cups, grams, ounces, pieces, and more
+                  Any measurement works - the system will provide the best estimate
                 </p>
               </div>
             )}
