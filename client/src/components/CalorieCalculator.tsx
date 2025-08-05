@@ -22,9 +22,9 @@ import {
   CheckCircle,
   Plus,
   Sparkles,
-  Scale,
   AlertCircle,
   Trophy,
+  Scale,
   Beef,
   Wheat,
   Droplets,
@@ -72,22 +72,16 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
   const [loggedData, setLoggedData] = useState<any>(null);
   const [ingredientSuggestions, setIngredientSuggestions] = useState<Array<{category: string; key: string; data: IngredientData}>>([]);
   const [selectedIngredient, setSelectedIngredient] = useState<{category: string; key: string; data: IngredientData} | null>(null);
-  const [usdaFoodSuggestions, setUsdaFoodSuggestions] = useState<any[]>([]);
-  const [selectedUSDAFood, setSelectedUSDAFood] = useState<any>(null);
   const [availableUnits, setAvailableUnits] = useState<string[]>([]);
   const queryClient = useQueryClient();
 
-  // Search ingredients as user types - both custom and any food items
+  // Search ingredients as user types
   useEffect(() => {
     if (ingredient.length >= 2) {
       const customSuggestions = EnhancedIngredientDatabaseManager.searchIngredients(ingredient);
-      setIngredientSuggestions(customSuggestions.slice(0, 6)); // Limit to 6 custom suggestions
-      
-      // Allow any food search - no USDA verification required
-      setUsdaFoodSuggestions([]);
+      setIngredientSuggestions(customSuggestions.slice(0, 6));
     } else {
       setIngredientSuggestions([]);
-      setUsdaFoodSuggestions([]);
     }
   }, [ingredient]);
 
@@ -108,26 +102,8 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
   // Select ingredient from suggestions
   const handleSelectIngredient = (suggestion: {category: string; key: string; data: IngredientData}) => {
     setSelectedIngredient(suggestion);
-    setSelectedUSDAFood(null); // Clear USDA selection
     setIngredient(suggestion.data.displayName);
     setIngredientSuggestions([]);
-    setUsdaFoodSuggestions([]);
-  };
-
-  // Select USDA food from suggestions
-  const handleSelectUSDAFood = (food: any) => {
-    setSelectedUSDAFood(food);
-    setSelectedIngredient(null); // Clear custom ingredient selection
-    setIngredient(food.name);
-    setIngredientSuggestions([]);
-    setUsdaFoodSuggestions([]);
-    
-    // Set available portions as units
-    const portions = food.portions.map((p: any) => p.name);
-    setAvailableUnits(portions);
-    if (portions.length > 0) {
-      setSelectedUnit(portions[0]); // Set first portion as default
-    }
   };
 
   // Calculate calories mutation
@@ -509,59 +485,9 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
               />
               
               {/* Ingredient Suggestions Dropdown */}
-              {(ingredientSuggestions.length > 0 || usdaFoodSuggestions.length > 0) && (
+              {ingredientSuggestions.length > 0 && (
                 <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-64 overflow-y-auto">
-                  {/* USDA Food Suggestions */}
-                  {usdaFoodSuggestions.length > 0 && (
-                    <>
-                      <div className="px-4 py-2 bg-green-50 border-b border-green-200">
-                        <p className="text-xs font-semibold text-green-800 uppercase tracking-wide">
-                          ✓ USDA Verified Foods
-                        </p>
-                      </div>
-                      {usdaFoodSuggestions.map((food, index) => (
-                        <button
-                          key={`usda-${food.id}`}
-                          type="button"
-                          onClick={() => handleSelectUSDAFood(food)}
-                          className="w-full px-4 py-3 text-left hover:bg-green-50 border-b border-gray-100"
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="flex-1">
-                              <p className="font-medium text-gray-900">{food.name}</p>
-                              <p className="text-xs text-gray-500">{food.category}</p>
-                              <div className="flex items-center gap-2 mt-1">
-                                <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
-                                  USDA {food.data_reliability}
-                                </Badge>
-                                {food.usda_fdc_id && (
-                                  <Badge variant="outline" className="text-xs">
-                                    FDC #{food.usda_fdc_id}
-                                  </Badge>
-                                )}
-                              </div>
-                            </div>
-                            <div className="text-right text-xs text-gray-500">
-                              <p>{food.calories_per_100g} cal/100g</p>
-                              <p>{food.portions.length} portions</p>
-                            </div>
-                          </div>
-                        </button>
-                      ))}
-                    </>
-                  )}
-                  
-                  {/* Custom Ingredient Suggestions */}
-                  {ingredientSuggestions.length > 0 && (
-                    <>
-                      {usdaFoodSuggestions.length > 0 && (
-                        <div className="px-4 py-2 bg-blue-50 border-b border-blue-200">
-                          <p className="text-xs font-semibold text-blue-800 uppercase tracking-wide">
-                            Custom Database
-                          </p>
-                        </div>
-                      )}
-                      {ingredientSuggestions.map((suggestion, index) => (
+                  {ingredientSuggestions.map((suggestion, index) => (
                         <button
                           key={`${suggestion.category}-${suggestion.key}`}
                           type="button"
@@ -583,8 +509,6 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
                           </div>
                         </button>
                       ))}
-                    </>
-                  )}
                 </div>
               )}
               
@@ -594,7 +518,7 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
             </div>
             
             {/* Enhanced Measurement Input */}
-            {(selectedIngredient || selectedUSDAFood) ? (
+            {selectedIngredient ? (
               // Enhanced mode with unit selection
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -649,7 +573,7 @@ function CalorieCalculator({ onAddToMeal, onNavigate, onCaloriesCalculated, onLo
 
           <Button 
             type="submit" 
-            disabled={calculateCalories.isPending || !ingredient.trim() || (!measurement.trim() && !((selectedIngredient || selectedUSDAFood) && amount && selectedUnit))}
+            disabled={calculateCalories.isPending || !ingredient.trim() || (!measurement.trim() && !(selectedIngredient && amount && selectedUnit))}
             className="w-full bg-blue-600 hover:bg-blue-700 text-lg py-6"
           >
             {calculateCalories.isPending ? (

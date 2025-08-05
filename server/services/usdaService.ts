@@ -200,72 +200,35 @@ export class USDAService {
       
 
       
-      // Extract key nutrients
+      // Extract and validate nutrients
       let nutrients = this.extractNutrients(food.foodNutrients);
       
-      // Validate that the calorie count is reasonable for the food type
       if (this.isUnreasonableCalorieCount(ingredientName, nutrients.calories)) {
         throw new Error('Unreasonable calorie data from USDA, using fallback');
       }
       
-      // Apply cooking retention factors if food is prepared
+      // Apply cooking adjustments if needed
       const cookingMethod = detectCookingMethod(food.description);
-      const foodGroup = classifyFood(food.description);
-      
       if (cookingMethod !== 'raw') {
+        const foodGroup = classifyFood(food.description);
         nutrients = applyRetentionFactors(nutrients, cookingMethod, foodGroup);
       }
-      
-      // Apply food-specific protein conversion factors if nitrogen data available
-      const proteinFactor = getProteinConversionFactor(food.description, foodGroup);
-      const proteinMethod = getProteinCalculationMethod(food.description);
-      
-
       
       // Parse measurement and convert to grams
       const { quantity, unit, gramsEquivalent } = this.parseMeasurement(measurement, food);
       
-      // Calculate calories based on grams - prioritize direct calorie data
-      let estimatedCalories: number;
+      // Calculate calories based on grams
+      const estimatedCalories = this.calculateCalories(nutrients, gramsEquivalent);
       
-      if (nutrients.calories > 0) {
-        // Use direct calorie data from USDA - this is the most accurate
-        estimatedCalories = Math.round((nutrients.calories * gramsEquivalent) / 100);
-      } else if (nutrients.protein > 0 || nutrients.carbs > 0 || nutrients.fat > 0) {
-        // Calculate using standard 4-4-9 rule (more reliable than food-specific factors)
-        estimatedCalories = Math.round(
-          ((nutrients.protein * 4) + (nutrients.fat * 9) + (nutrients.carbs * 4)) * gramsEquivalent / 100
-        );
-      } else {
-        // Fallback to zero if no nutritional data
-        estimatedCalories = 0;
-      }
-      
-      // Generate equivalent measurement
-      const caloriesPer100g = nutrients.calories || Math.round((estimatedCalories * 100) / gramsEquivalent);
-      const equivalentMeasurement = this.generateEquivalentMeasurement(
-        gramsEquivalent,
+      return this.formatCalculationResult(
+        food.description,
+        quantity,
         unit,
-        caloriesPer100g
-      );
-      
-      // Generate size variation note
-      const note = this.generateVariationNote(ingredientName, unit);
-
-      return {
-        ingredient: this.formatIngredientName(food.description),
-        measurement: `${quantity} ${unit} (~${Math.round(gramsEquivalent)}g)`,
+        gramsEquivalent,
         estimatedCalories,
-        equivalentMeasurement,
-        note,
-        nutritionPer100g: {
-          calories: nutrients.calories,
-          protein: nutrients.protein,
-          carbs: nutrients.carbs,
-          fat: nutrients.fat,
-        },
-        // Additional info removed to match interface
-      };
+        nutrients,
+        ingredientName
+      );
     } catch (error) {
       
       // Fallback to enhanced estimation with proper nutrition data
@@ -993,6 +956,54 @@ export class USDAService {
     if (ingredient.includes('banana') && caloriesPer100g > 120) return true; // Fresh banana should be ~89 kcal/100g
     
     return false;
+  }
+
+  /**
+   * Calculate calories from nutrients and portion size
+   */
+  private calculateCalories(nutrients: any, gramsEquivalent: number): number {
+    if (nutrients.calories > 0) {
+      // Use direct calorie data from USDA - most accurate
+      return Math.round((nutrients.calories * gramsEquivalent) / 100);
+    } else if (nutrients.protein > 0 || nutrients.carbs > 0 || nutrients.fat > 0) {
+      // Calculate using standard 4-4-9 rule
+      return Math.round(
+        ((nutrients.protein * 4) + (nutrients.fat * 9) + (nutrients.carbs * 4)) * gramsEquivalent / 100
+      );
+    } else {
+      return 0;
+    }
+  }
+
+  /**
+   * Format the final calculation result
+   */
+  private formatCalculationResult(
+    description: string,
+    quantity: number,
+    unit: string,
+    gramsEquivalent: number,
+    estimatedCalories: number,
+    nutrients: any,
+    ingredientName: string
+  ) {
+    const caloriesPer100g = nutrients.calories || Math.round((estimatedCalories * 100) / gramsEquivalent);
+    const equivalentMeasurement = this.generateEquivalentMeasurement(gramsEquivalent, unit, caloriesPer100g);
+    const note = this.generateVariationNote(ingredientName, unit);
+
+    return {
+      ingredient: this.formatIngredientName(description),
+      measurement: `${quantity} ${unit} (~${Math.round(gramsEquivalent)}g)`,
+      estimatedCalories,
+      equivalentMeasurement,
+      note,
+      nutritionPer100g: {
+        calories: nutrients.calories,
+        protein: nutrients.protein,
+        carbs: nutrients.carbs,
+        fat: nutrients.fat,
+      },
+    };
   }
 }
 
