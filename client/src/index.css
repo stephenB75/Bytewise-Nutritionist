@@ -346,20 +346,6 @@ html, body {
 .animate-slideInFromBottom {
   animation: slideInFromBottom 0.7s ease-out forwards;
 }
-  
-  .profile-content {
-    padding-bottom: 20px !important;
-  }
-  
-  .signin-module {
-    padding-bottom: 20px !important;
-    margin-bottom: 0 !important;
-  }
-  
-  .content-section {
-    padding-bottom: 20px !important;
-  }
-}
 
 input[type="text"]::placeholder, 
 input[type="email"]::placeholder, 
