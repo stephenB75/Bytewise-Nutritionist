@@ -244,16 +244,21 @@ export class USDAService {
 
   // Constants for food preprocessing
   private static readonly FOOD_SYNONYMS: Record<string, string> = {
+    // Corn variations
     'corn on the cob': 'corn sweet yellow ear',
     'corn on cob': 'corn sweet yellow ear',
     'can of corn': 'corn sweet yellow canned',
     'frozen corn': 'corn sweet kernel frozen',
     'fresh corn': 'corn sweet yellow kernel',
     'corn kernels': 'corn sweet yellow kernel',
+    
+    // Chicken preparations
     'grilled chicken breast': 'chicken breast grilled',
     'fried chicken breast': 'chicken breast fried',
     'baked chicken breast': 'chicken breast baked',
     'roasted chicken breast': 'chicken breast roasted',
+    
+    // Common dishes
     'pasta with marinara': 'pasta cooked marinara sauce',
     'beef stew': 'beef stew cooked',
     'baked potato': 'potato baked',
@@ -262,7 +267,20 @@ export class USDAService {
     'french fries': 'potato french fried',
     'scrambled eggs': 'egg scrambled',
     'boiled eggs': 'egg hard boiled',
-    'fried eggs': 'egg fried'
+    'fried eggs': 'egg fried',
+    
+    // International cuisine
+    'sushi roll': 'sushi california roll',
+    'pad thai': 'pad thai noodles chicken',
+    'tikka masala': 'chicken tikka masala',
+    'biryani': 'rice pilaf biryani',
+    'ramen noodles': 'soup ramen noodles',
+    'tacos': 'taco beef',
+    'enchiladas': 'enchilada beef',
+    'gyoza': 'dumpling pork gyoza',
+    'pierogi': 'dumpling potato pierogi',
+    'falafel': 'chickpea falafel',
+    'baklava': 'pastry baklava honey'
   };
 
   private static readonly COOKING_METHODS = ['grilled', 'fried', 'baked', 'roasted', 'boiled', 'steamed', 'raw', 'fresh', 'cooked'];
@@ -569,7 +587,7 @@ export class USDAService {
       'dollop': 15, // dollop ≈ 1 tablespoon
       'handful': 40, // handful of nuts/berries ≈ 40g
       'slice': 25, // average slice of bread/fruit ≈ 25g
-      'piece': 50, // piece of fruit/food ≈ 50g
+      'piece': 30, // average piece ≈ 30g (adjusted for dumplings/small items)
       'bowl': 200, // average bowl serving ≈ 200g
       'plate': 300, // average plate serving ≈ 300g
       'wedge': 15, // wedge of lemon/lime ≈ 15g
@@ -594,14 +612,47 @@ export class USDAService {
         'grapes': 5,
         'bunch': 100,
       },
+      'falafel': {
+        'piece': 17,
+        'ball': 17,
+        'pieces': 17,
+      },
+      'pierogi': {
+        'piece': 28,
+        'dumpling': 28,
+        'pieces': 28,
+      },
+      'gyoza': {
+        'piece': 15,
+        'dumpling': 15,
+        'pieces': 15,
+      },
+      'baklava': {
+        'piece': 60,
+        'square': 60,
+        'pieces': 60,
+      },
+      'sushi': {
+        'piece': 30,
+        'roll': 180,
+        'pieces': 30,
+      },
+      'taco': {
+        'piece': 85,
+        'taco': 85,
+        'pieces': 85,
+      },
     };
 
     let gramsEquivalent = quantity;
 
-    // Check for item-specific conversions first
-    const ingredientName = food.description?.toLowerCase() || '';
+    // Check for item-specific conversions first - prioritize ingredient name over food description
+    const ingredientName = (food.description?.toLowerCase() || '').replace(/[^\w\s]/g, ' ');
+    const searchIngredient = food.originalSearchTerm?.toLowerCase() || '';
+    
     for (const [ingredient, conversions] of Object.entries(itemConversions)) {
-      if (ingredientName.includes(ingredient)) {
+      // Check both the search term and the food description
+      if (searchIngredient.includes(ingredient) || ingredientName.includes(ingredient)) {
         for (const [unitPattern, grams] of Object.entries(conversions)) {
           if (unit.includes(unitPattern)) {
             gramsEquivalent = quantity * grams;
@@ -825,6 +876,27 @@ export class USDAService {
     if (searchTerm.includes('french fries') || searchTerm.includes('fries')) {
       if (description.includes('potato') && description.includes('fried')) score += 300;
       if (description.includes('rice')) score -= 1000;
+    }
+
+    // International cuisine scoring
+    if (searchTerm.includes('taco')) {
+      if (description.includes('taco') && !description.includes('sauce')) score += 300;
+      if (description.includes('sauce') && !description.includes('taco')) score -= 1000;
+    }
+
+    if (searchTerm.includes('tikka masala')) {
+      if (description.includes('tikka') || description.includes('masala')) score += 300;
+      if (description.includes('dosa')) score -= 1000;
+    }
+
+    if (searchTerm.includes('sushi')) {
+      if (description.includes('sushi') || description.includes('california')) score += 300;
+      if (description.includes('sauce') || description.includes('dressing')) score -= 500;
+    }
+
+    if (searchTerm.includes('gyoza') || searchTerm.includes('dumpling')) {
+      if (description.includes('dumpling') || description.includes('gyoza')) score += 300;
+      if (description.includes('soup') || description.includes('broth')) score -= 200;
     }
 
     // Egg scoring - prefer whole eggs over egg whites/yolks

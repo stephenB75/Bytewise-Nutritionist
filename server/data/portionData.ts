@@ -142,6 +142,33 @@ export const PORTION_WEIGHTS: Record<string, PortionData[]> = {
     { fdc_id: "171265", portion_description: "scoop", gram_weight: 66, amount: 1 },
     { fdc_id: "171265", portion_description: "serving", gram_weight: 66, amount: 1 },
     { fdc_id: "171265", portion_description: "g", gram_weight: 1, amount: 1 }
+  ],
+  
+  // International foods
+  "falafel": [
+    { fdc_id: "175180", portion_description: "piece", gram_weight: 17, amount: 1 },
+    { fdc_id: "175180", portion_description: "ball", gram_weight: 17, amount: 1 },
+    { fdc_id: "175180", portion_description: "g", gram_weight: 1, amount: 1 }
+  ],
+  "pierogi": [
+    { fdc_id: "175185", portion_description: "piece", gram_weight: 28, amount: 1 },
+    { fdc_id: "175185", portion_description: "dumpling", gram_weight: 28, amount: 1 },
+    { fdc_id: "175185", portion_description: "g", gram_weight: 1, amount: 1 }
+  ],
+  "gyoza": [
+    { fdc_id: "175190", portion_description: "piece", gram_weight: 15, amount: 1 },
+    { fdc_id: "175190", portion_description: "dumpling", gram_weight: 15, amount: 1 },
+    { fdc_id: "175190", portion_description: "g", gram_weight: 1, amount: 1 }
+  ],
+  "baklava": [
+    { fdc_id: "175195", portion_description: "piece", gram_weight: 60, amount: 1 },
+    { fdc_id: "175195", portion_description: "square", gram_weight: 60, amount: 1 },
+    { fdc_id: "175195", portion_description: "g", gram_weight: 1, amount: 1 }
+  ],
+  "sushi": [
+    { fdc_id: "175200", portion_description: "piece", gram_weight: 30, amount: 1 },
+    { fdc_id: "175200", portion_description: "roll", gram_weight: 180, amount: 1 },
+    { fdc_id: "175200", portion_description: "g", gram_weight: 1, amount: 1 }
   ]
 };
 
