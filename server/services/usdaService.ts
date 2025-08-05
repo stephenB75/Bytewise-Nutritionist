@@ -280,7 +280,37 @@ export class USDAService {
     'gyoza': 'dumpling pork gyoza',
     'pierogi': 'dumpling potato pierogi',
     'falafel': 'chickpea falafel',
-    'baklava': 'pastry baklava honey'
+    'baklava': 'pastry baklava honey',
+    
+    // Caribbean cuisine
+    'jerk chicken': 'chicken breast jerk seasoned',
+    'rice and beans': 'rice kidney beans cooked',
+    'plantains': 'plantain cooked',
+    'fried plantains': 'plantain fried sweet',
+    'sweet plantains': 'plantain sweet fried',
+    'green plantains': 'plantain green boiled',
+    'curry goat': 'goat meat curry stewed',
+    'curry chicken': 'chicken curry caribbean',
+    'oxtail': 'beef oxtail braised',
+    'ackee and saltfish': 'ackee canned saltfish',
+    'callaloo': 'callaloo cooked',
+    'roti': 'bread roti whole wheat',
+    'doubles': 'bread bara chickpea curry',
+    'patties': 'pastry meat jamaican',
+    'beef patty': 'pastry beef jamaican',
+    'chicken patty': 'pastry chicken jamaican',
+    'festival': 'bread fried cornmeal sweet',
+    'johnny cakes': 'bread fried cornmeal',
+    'bammy': 'bread cassava fried',
+    'cassava': 'cassava root boiled',
+    'yuca': 'cassava root boiled',
+    'breadfruit': 'breadfruit boiled',
+    'saltfish': 'cod salt dried',
+    'conch': 'conch meat cooked',
+    'escovitch fish': 'fish fried pickled',
+    'brown stew chicken': 'chicken stewed brown sauce',
+    'peas and rice': 'rice pigeon peas coconut',
+    'macaroni pie': 'macaroni cheese baked caribbean'
   };
 
   private static readonly COOKING_METHODS = ['grilled', 'fried', 'baked', 'roasted', 'boiled', 'steamed', 'raw', 'fresh', 'cooked'];
@@ -332,7 +362,25 @@ export class USDAService {
     'cheeseburger': { calories: 540, protein: 25, carbs: 40, fat: 31 },
     'ice cream': { calories: 207, protein: 3.5, carbs: 24, fat: 11 },
     'cookie': { calories: 502, protein: 5.9, carbs: 64, fat: 24 },
-    'donut': { calories: 452, protein: 4.9, carbs: 51, fat: 25 }
+    'donut': { calories: 452, protein: 4.9, carbs: 51, fat: 25 },
+    
+    // Caribbean foods
+    'plantains': { calories: 122, protein: 1.3, carbs: 32, fat: 0.4 },
+    'fried plantains': { calories: 148, protein: 1.1, carbs: 38, fat: 0.1 },
+    'jerk chicken': { calories: 190, protein: 29, carbs: 2, fat: 7 },
+    'rice and beans': { calories: 205, protein: 8, carbs: 38, fat: 3 },
+    'beef patty': { calories: 350, protein: 15, carbs: 30, fat: 20 },
+    'chicken patty': { calories: 320, protein: 16, carbs: 28, fat: 18 },
+    'roti': { calories: 230, protein: 6, carbs: 45, fat: 4 },
+    'festival': { calories: 180, protein: 3, carbs: 35, fat: 4 },
+    'johnny cakes': { calories: 165, protein: 3, carbs: 32, fat: 3 },
+    'cassava': { calories: 160, protein: 1.4, carbs: 38, fat: 0.3 },
+    'breadfruit': { calories: 103, protein: 1.1, carbs: 27, fat: 0.2 },
+    'callaloo': { calories: 22, protein: 2.1, carbs: 3.7, fat: 0.3 },
+    'curry goat': { calories: 250, protein: 22, carbs: 5, fat: 16 },
+    'oxtail': { calories: 330, protein: 19, carbs: 0, fat: 28 },
+    'saltfish': { calories: 290, protein: 62, carbs: 0, fat: 2.4 },
+    'ackee': { calories: 151, protein: 2.9, carbs: 0.8, fat: 15 }
   };
 
   /**
@@ -642,6 +690,36 @@ export class USDAService {
         'taco': 85,
         'pieces': 85,
       },
+      'plantain': {
+        'medium': 179,
+        'large': 218,
+        'small': 148,
+        'piece': 179,
+        'slice': 20,
+      },
+      'patty': {
+        'patty': 142,
+        'piece': 142,
+        'jamaican': 142,
+      },
+      'roti': {
+        'piece': 85,
+        'roti': 85,
+      },
+      'festival': {
+        'piece': 65,
+        'festival': 65,
+      },
+      'cassava': {
+        'medium': 400,
+        'cup': 103,
+        'serving': 150,
+      },
+      'breadfruit': {
+        'medium': 350,
+        'cup': 220,
+        'slice': 60,
+      },
     };
 
     let gramsEquivalent = quantity;
@@ -897,6 +975,33 @@ export class USDAService {
     if (searchTerm.includes('gyoza') || searchTerm.includes('dumpling')) {
       if (description.includes('dumpling') || description.includes('gyoza')) score += 300;
       if (description.includes('soup') || description.includes('broth')) score -= 200;
+    }
+
+    // Caribbean cuisine scoring
+    if (searchTerm.includes('plantain')) {
+      if (description.includes('plantain')) score += 300;
+      if (description.includes('banana') && !description.includes('plantain')) score -= 200;
+    }
+
+    if (searchTerm.includes('jerk chicken')) {
+      if (description.includes('chicken') && description.includes('jerk')) score += 300;
+      if (description.includes('chicken') && !description.includes('jerk')) score += 100;
+      if (description.includes('pork') || description.includes('beef')) score -= 200;
+    }
+
+    if (searchTerm.includes('patty') || searchTerm.includes('jamaican patty')) {
+      if (description.includes('pastry') && (description.includes('beef') || description.includes('chicken'))) score += 300;
+      if (description.includes('hamburger') || description.includes('burger')) score -= 500;
+    }
+
+    if (searchTerm.includes('rice and beans') || searchTerm.includes('peas and rice')) {
+      if (description.includes('rice') && (description.includes('bean') || description.includes('pea'))) score += 300;
+      if (description.includes('rice') && !description.includes('bean') && !description.includes('pea')) score -= 100;
+    }
+
+    if (searchTerm.includes('cassava') || searchTerm.includes('yuca')) {
+      if (description.includes('cassava') || description.includes('yuca')) score += 300;
+      if (description.includes('potato') && !description.includes('cassava')) score -= 200;
     }
 
     // Egg scoring - prefer whole eggs over egg whites/yolks

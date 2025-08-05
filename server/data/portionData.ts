@@ -169,6 +169,71 @@ export const PORTION_WEIGHTS: Record<string, PortionData[]> = {
     { fdc_id: "175200", portion_description: "piece", gram_weight: 30, amount: 1 },
     { fdc_id: "175200", portion_description: "roll", gram_weight: 180, amount: 1 },
     { fdc_id: "175200", portion_description: "g", gram_weight: 1, amount: 1 }
+  ],
+  
+  // Caribbean foods
+  "plantains": [
+    { fdc_id: "169124", portion_description: "medium", gram_weight: 179, amount: 1 },
+    { fdc_id: "169124", portion_description: "large", gram_weight: 218, amount: 1 },
+    { fdc_id: "169124", portion_description: "small", gram_weight: 148, amount: 1 },
+    { fdc_id: "169124", portion_description: "cup sliced", gram_weight: 148, amount: 1 },
+    { fdc_id: "169124", portion_description: "g", gram_weight: 1, amount: 1 }
+  ],
+  "fried plantains": [
+    { fdc_id: "169124", portion_description: "medium", gram_weight: 179, amount: 1 },
+    { fdc_id: "169124", portion_description: "slice", gram_weight: 20, amount: 1 },
+    { fdc_id: "169124", portion_description: "cup", gram_weight: 154, amount: 1 },
+    { fdc_id: "169124", portion_description: "g", gram_weight: 1, amount: 1 }
+  ],
+  "jerk chicken": [
+    { fdc_id: "171477", portion_description: "breast", gram_weight: 172, amount: 1 },
+    { fdc_id: "171477", portion_description: "thigh", gram_weight: 114, amount: 1 },
+    { fdc_id: "171477", portion_description: "drumstick", gram_weight: 85, amount: 1 },
+    { fdc_id: "171477", portion_description: "serving", gram_weight: 150, amount: 1 },
+    { fdc_id: "171477", portion_description: "g", gram_weight: 1, amount: 1 }
+  ],
+  "rice and beans": [
+    { fdc_id: "168878", portion_description: "cup", gram_weight: 200, amount: 1 },
+    { fdc_id: "168878", portion_description: "serving", gram_weight: 200, amount: 1 },
+    { fdc_id: "168878", portion_description: "plate", gram_weight: 300, amount: 1 },
+    { fdc_id: "168878", portion_description: "g", gram_weight: 1, amount: 1 }
+  ],
+  "beef patty": [
+    { fdc_id: "175210", portion_description: "patty", gram_weight: 142, amount: 1 },
+    { fdc_id: "175210", portion_description: "piece", gram_weight: 142, amount: 1 },
+    { fdc_id: "175210", portion_description: "g", gram_weight: 1, amount: 1 }
+  ],
+  "chicken patty": [
+    { fdc_id: "175215", portion_description: "patty", gram_weight: 142, amount: 1 },
+    { fdc_id: "175215", portion_description: "piece", gram_weight: 142, amount: 1 },
+    { fdc_id: "175215", portion_description: "g", gram_weight: 1, amount: 1 }
+  ],
+  "roti": [
+    { fdc_id: "172687", portion_description: "piece", gram_weight: 85, amount: 1 },
+    { fdc_id: "172687", portion_description: "roti", gram_weight: 85, amount: 1 },
+    { fdc_id: "172687", portion_description: "g", gram_weight: 1, amount: 1 }
+  ],
+  "festival": [
+    { fdc_id: "175220", portion_description: "piece", gram_weight: 65, amount: 1 },
+    { fdc_id: "175220", portion_description: "festival", gram_weight: 65, amount: 1 },
+    { fdc_id: "175220", portion_description: "g", gram_weight: 1, amount: 1 }
+  ],
+  "johnny cakes": [
+    { fdc_id: "175225", portion_description: "piece", gram_weight: 55, amount: 1 },
+    { fdc_id: "175225", portion_description: "cake", gram_weight: 55, amount: 1 },
+    { fdc_id: "175225", portion_description: "g", gram_weight: 1, amount: 1 }
+  ],
+  "cassava": [
+    { fdc_id: "169985", portion_description: "cup", gram_weight: 103, amount: 1 },
+    { fdc_id: "169985", portion_description: "medium", gram_weight: 400, amount: 1 },
+    { fdc_id: "169985", portion_description: "serving", gram_weight: 150, amount: 1 },
+    { fdc_id: "169985", portion_description: "g", gram_weight: 1, amount: 1 }
+  ],
+  "breadfruit": [
+    { fdc_id: "169986", portion_description: "cup", gram_weight: 220, amount: 1 },
+    { fdc_id: "169986", portion_description: "medium", gram_weight: 350, amount: 1 },
+    { fdc_id: "169986", portion_description: "slice", gram_weight: 60, amount: 1 },
+    { fdc_id: "169986", portion_description: "g", gram_weight: 1, amount: 1 }
   ]
 };
 
