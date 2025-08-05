@@ -1231,7 +1231,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               {user ? (
                 <UserSettingsManager 
                   onClose={() => setProfileSection('profile')} 
-                  initialSection="profile"
                 />
               ) : (
                 <Card className="bg-white/10 backdrop-blur-md border-white/20 p-8">

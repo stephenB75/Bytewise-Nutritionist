@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
-import { Badge } from './ui/badge';
+
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { 
@@ -26,10 +26,9 @@ import {
 
 interface UserSettingsManagerProps {
   onClose?: () => void;
-  initialSection?: 'profile' | 'account' | 'privacy';
 }
 
-export function UserSettingsManager({ onClose, initialSection = 'profile' }: UserSettingsManagerProps) {
+export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
   const { user, supabase } = useAuth();
   const { toast } = useToast();
   
