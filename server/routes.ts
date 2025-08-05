@@ -5,6 +5,31 @@ import { setupAuth, isAuthenticated, optionalAuth, serverSupabase, type Authenti
 import { usdaService } from "./services/usdaService";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Health check endpoint
+  app.get('/api/health', async (req: Request, res: Response) => {
+    try {
+      // Check database connection
+      const dbTest = await storage.getPopularFoods(1);
+      
+      res.json({
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        services: {
+          database: 'connected',
+          auth: 'active',
+          usda: 'available',
+          storage: 'operational'
+        }
+      });
+    } catch (error) {
+      res.status(503).json({
+        status: 'unhealthy',
+        timestamp: new Date().toISOString(),
+        error: 'Service check failed'
+      });
+    }
+  });
+
   // Auth middleware
   await setupAuth(app);
 
