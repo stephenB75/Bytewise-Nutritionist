@@ -182,14 +182,15 @@ export class USDAService {
         return fallbackResult;
       }
 
-      // Search for the ingredient
-      const foods = await this.searchFoods(ingredientName, 5);
+      // Enhanced search with preprocessing
+      const enhancedQuery = this.preprocessIngredientQuery(ingredientName);
+      const foods = await this.searchFoods(enhancedQuery, 8);
       
       if (foods.length === 0) {
         throw new Error(`No nutrition data found for "${ingredientName}"`);
       }
 
-      // Filter and prioritize results with measurement context
+      // Advanced filtering with ingredient vs dish classification
       const filteredFoods = this.filterAndPrioritizeFoodsWithMeasurement(foods, ingredientName, measurement);
       if (filteredFoods.length === 0) {
         throw new Error('No suitable foods found');
@@ -200,6 +201,11 @@ export class USDAService {
       
 
       
+      // Validate food match quality before proceeding
+      if (this.isIncorrectFoodMatch(ingredientName, food.description)) {
+        throw new Error('Incorrect food match detected, using fallback');
+      }
+
       // Extract and validate nutrients
       let nutrients = this.extractNutrients(food.foodNutrients);
       
@@ -234,6 +240,73 @@ export class USDAService {
       // Fallback to enhanced estimation with proper nutrition data
       return this.getEnhancedFallbackEstimate(ingredientName, measurement);
     }
+  }
+
+  /**
+   * Preprocess ingredient queries for better matching
+   */
+  private preprocessIngredientQuery(ingredientName: string): string {
+    const query = ingredientName.toLowerCase().trim();
+    
+    // Food synonyms and corrections for better matching
+    const synonymMap: { [key: string]: string } = {
+      'corn on the cob': 'corn sweet yellow ear',
+      'corn on cob': 'corn sweet yellow ear',
+      'can of corn': 'corn sweet yellow canned',
+      'frozen corn': 'corn sweet kernel frozen',
+      'fresh corn': 'corn sweet yellow kernel',
+      'corn kernels': 'corn sweet yellow kernel',
+      'grilled chicken breast': 'chicken breast grilled',
+      'fried chicken breast': 'chicken breast fried',
+      'baked chicken breast': 'chicken breast baked',
+      'roasted chicken breast': 'chicken breast roasted',
+      'pasta with marinara': 'pasta cooked marinara sauce',
+      'beef stew': 'beef stew cooked',
+      'baked potato': 'potato baked',
+      'raw potato': 'potato raw',
+      'mashed potatoes': 'potato mashed',
+      'french fries': 'potato french fried',
+      'scrambled eggs': 'egg scrambled',
+      'boiled eggs': 'egg hard boiled',
+      'fried eggs': 'egg fried'
+    };
+
+    // Check for direct synonym matches
+    if (synonymMap[query]) {
+      return synonymMap[query];
+    }
+
+    // Extract cooking methods and reorder for better matching
+    const cookingMethods = ['grilled', 'fried', 'baked', 'roasted', 'boiled', 'steamed', 'raw', 'fresh', 'cooked'];
+    let cookingMethod = '';
+    let cleanQuery = query;
+
+    for (const method of cookingMethods) {
+      if (query.includes(method)) {
+        cookingMethod = method;
+        cleanQuery = query.replace(method, '').trim();
+        break;
+      }
+    }
+
+    // Extract preparation forms
+    const preparationForms = ['canned', 'frozen', 'dried', 'fresh', 'pickled', 'smoked'];
+    let preparationForm = '';
+    
+    for (const form of preparationForms) {
+      if (cleanQuery.includes(form)) {
+        preparationForm = form;
+        cleanQuery = cleanQuery.replace(form, '').trim();
+        break;
+      }
+    }
+
+    // Rebuild query for better USDA matching
+    let enhancedQuery = cleanQuery;
+    if (preparationForm) enhancedQuery += ` ${preparationForm}`;
+    if (cookingMethod && cookingMethod !== 'fresh') enhancedQuery += ` ${cookingMethod}`;
+
+    return enhancedQuery.trim() || query;
   }
 
   /**
@@ -652,9 +725,23 @@ export class USDAService {
         }
       }
       
+      if (searchLower.includes('corn')) {
+        // Heavily penalize wrong matches for corn
+        if (description.includes('flour') || description.includes('meal') || description.includes('starch')) score -= 1000;
+        if (description.includes('onion') || description.includes('egg')) score -= 1000;
+        if (description.includes('sweet') && description.includes('corn')) score += 300;
+        if (description.includes('kernel')) score += 200;
+        if (description.includes('ear')) score += 100;
+      }
+      
       // Prefer raw/basic ingredients
       if (description.includes('raw') || description.includes('fresh')) score += 50;
       if (!description.includes('prepared') && !description.includes('seasoned')) score += 30;
+      
+      // Category validation - prevent wrong food categories
+      if (searchLower.includes('corn') && !description.toLowerCase().includes('corn')) score -= 2000;
+      if (searchLower.includes('potato') && !description.toLowerCase().includes('potato')) score -= 2000;
+      if (searchLower.includes('apple') && !description.toLowerCase().includes('apple')) score -= 2000;
       
       return { food, score };
     });
@@ -831,6 +918,12 @@ export class USDAService {
       'broccoli': { calories: 34, protein: 2.8, carbs: 7, fat: 0.4 },
       'carrot': { calories: 41, protein: 0.9, carbs: 10, fat: 0.2 },
       'spinach': { calories: 23, protein: 2.9, carbs: 3.6, fat: 0.4 },
+      'corn': { calories: 86, protein: 3.3, carbs: 19, fat: 1.4 },
+      'sweet corn': { calories: 86, protein: 3.3, carbs: 19, fat: 1.4 },
+      'corn on cob': { calories: 86, protein: 3.3, carbs: 19, fat: 1.4 },
+      'corn on the cob': { calories: 86, protein: 3.3, carbs: 19, fat: 1.4 },
+      'potato': { calories: 77, protein: 2, carbs: 17, fat: 0.1 },
+      'baked potato': { calories: 93, protein: 2.5, carbs: 21, fat: 0.1 },
       
       // Processed/Fast Foods
       'hotdog': { calories: 290, protein: 10, carbs: 2, fat: 26 },
@@ -938,9 +1031,13 @@ export class USDAService {
     const ingredient = ingredientName.toLowerCase();
     
     // List of foods where fallback data is more accurate than potentially wrong USDA results
-    const preferFallbackFor = ['apple', 'chicken', 'chicken breast', 'hotdog', 'hot dog', 'egg', 'rice', 'bread', 'pasta'];
+    const preferFallbackFor = ['apple', 'chicken', 'chicken breast', 'hotdog', 'hot dog', 'egg', 'rice', 'bread', 'pasta', 'corn', 'sweet corn', 'corn on cob', 'corn on the cob', 'potato', 'baked potato'];
     
-    if (preferFallbackFor.some(food => ingredient.includes(food))) {
+    // Check for exact matches first, then partial matches
+    const exactMatch = preferFallbackFor.find(food => ingredient === food);
+    const partialMatch = preferFallbackFor.find(food => ingredient.includes(food));
+    
+    if (exactMatch || partialMatch) {
       return this.getEnhancedFallbackEstimate(ingredientName, measurement);
     }
     
@@ -957,6 +1054,28 @@ export class USDAService {
     if (ingredient.includes('apple') && caloriesPer100g > 80) return true; // Fresh apple should be ~52 kcal/100g
     if (ingredient.includes('chicken breast') && caloriesPer100g > 200) return true; // Raw chicken breast should be ~165 kcal/100g
     if (ingredient.includes('banana') && caloriesPer100g > 120) return true; // Fresh banana should be ~89 kcal/100g
+    if (ingredient.includes('corn') && caloriesPer100g > 150) return true; // Sweet corn should be ~86 kcal/100g
+    if (ingredient.includes('potato') && caloriesPer100g > 150) return true; // Potato should be ~77-93 kcal/100g
+    
+    return false;
+  }
+
+  /**
+   * Check if USDA food match is completely wrong for the ingredient
+   */
+  private isIncorrectFoodMatch(ingredientName: string, foodDescription: string): boolean {
+    const ingredient = ingredientName.toLowerCase();
+    const description = foodDescription.toLowerCase();
+    
+    // Critical mismatches that should never happen
+    if (ingredient.includes('corn') && !description.includes('corn')) return true;
+    if (ingredient.includes('potato') && !description.includes('potato')) return true;
+    if (ingredient.includes('apple') && !description.includes('apple')) return true;
+    if (ingredient.includes('chicken') && !description.includes('chicken')) return true;
+    if (ingredient.includes('beef') && !description.includes('beef')) return true;
+    
+    // Specific corn mismatch patterns
+    if (ingredient.includes('corn') && (description.includes('flour') || description.includes('meal') || description.includes('onion') || description.includes('egg'))) return true;
     
     return false;
   }
