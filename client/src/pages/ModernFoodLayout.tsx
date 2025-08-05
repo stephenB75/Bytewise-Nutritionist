@@ -1426,18 +1426,18 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <button
                 key={tab.id}
                 onClick={() => handleTabChange(tab.id)}
-                className={`flex flex-col items-center py-1.5 px-2 rounded-md transition-all duration-200 w-16 ${
+                className={`flex flex-col items-center py-1 px-1.5 rounded-md transition-all duration-200 ${
                   activeTab === tab.id
                     ? 'bg-yellow-400/20 text-yellow-400'
                     : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
                 }`}
               >
                 <IconComponent 
-                  size={18} 
+                  size={16} 
                   className={`mb-0.5 ${activeTab === tab.id ? 'drop-shadow-lg' : ''}`}
                   strokeWidth={activeTab === tab.id ? 2.5 : 2}
                 />
-                <span className="text-[9px] font-medium leading-tight text-center">{tab.label}</span>
+                <span className="text-[8px] font-medium leading-tight text-center">{tab.label}</span>
               </button>
             )
           })}
