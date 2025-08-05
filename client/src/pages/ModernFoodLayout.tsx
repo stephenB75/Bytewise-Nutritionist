@@ -298,7 +298,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     setActiveTab(newTab);
   };
 
-  // Clean Hero Section Component
+  // Hero Section Component
   const HeroSection = React.memo(({ title, subtitle, description, buttonText, onButtonClick }: {
     title: string;
     subtitle: string;
@@ -307,7 +307,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     onButtonClick: () => void;
   }) => (
     <div className="relative h-screen overflow-hidden">
-      {/* Background with gradient overlay and animation */}
       <div 
         key={`hero-bg-${animationKey}`}
         className="absolute inset-0 bg-cover bg-center z-10 hero-bg-animated"
@@ -316,9 +315,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         }}
       />
       
-      {/* Content */}
       <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6 z-20">
-        <div className="space-y-8 max-w-2xl z-30">
+        <div className="space-y-8 max-w-2xl">
           <div className="space-y-2">
             <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none text-white drop-shadow-2xl animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
               {title}
@@ -334,11 +332,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             {description}
           </p>
           
-          <div className="pt-8 z-40 animate-fadeInUp" style={{ animationDelay: '0.8s' }}>
+          <div className="pt-8 animate-fadeInUp" style={{ animationDelay: '0.8s' }}>
             <Button 
               onClick={onButtonClick}
               size="lg"
-              className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-black px-16 py-6 rounded-full text-2xl shadow-2xl transform hover:scale-105 transition-all duration-200 border-2 border-orange-400/30 relative z-40"
+              className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-black px-16 py-6 rounded-full text-2xl shadow-2xl transform hover:scale-105 transition-all duration-200 border-2 border-orange-400/30"
             >
               {buttonText}
             </Button>
@@ -346,7 +344,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         </div>
       </div>
       
-      {/* Scroll indicator */}
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60 z-30">
         <div className="animate-bounce">
           <ChevronRight className="w-6 h-6 rotate-90 drop-shadow-lg" />
@@ -356,8 +353,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   ));
 
   const BytewiseLogo = () => (
-    <div className="mb-8 relative z-50 cursor-pointer hover:scale-105 transition-transform duration-200" onClick={() => setActiveTab('home')}>
-      <div className="text-center" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+    <div className="mb-8 cursor-pointer hover:scale-105 transition-transform duration-200" onClick={() => setActiveTab('home')}>
+      <div className="text-center font-['League_Spartan']">
         <div className="text-7xl font-black leading-none text-sky-300 mb-2 lowercase tracking-tight drop-shadow-2xl">
           bytewise
         </div>
@@ -465,8 +462,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         />
         
         <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6 z-20">
-          <div className="space-y-8 max-w-2xl z-30">
-            <div className="z-40 animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
+          <div className="space-y-8 max-w-2xl">
+            <div className="animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
               <BytewiseLogo />
             </div>
             
@@ -481,7 +478,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               Track nutrition with scientific precision using our comprehensive USDA database
             </p>
             
-            <div className="pt-8 z-40 animate-fadeInUp" style={{ animationDelay: '1.0s' }}>
+            <div className="pt-8 animate-fadeInUp" style={{ animationDelay: '1.0s' }}>
               <Button 
                 onClick={() => {
                   if (user) {
@@ -491,7 +488,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   }
                 }}
                 size="lg"
-                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-black px-16 py-6 rounded-full text-2xl shadow-2xl transform hover:scale-105 transition-all duration-500 border-2 border-orange-400/30 relative z-40"
+                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-black px-16 py-6 rounded-full text-2xl shadow-2xl transform hover:scale-105 transition-all duration-500 border-2 border-orange-400/30"
               >
                 {user ? 'Start Tracking' : 'Sign Up to Track'}
               </Button>

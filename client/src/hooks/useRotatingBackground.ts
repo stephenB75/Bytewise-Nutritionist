@@ -1,7 +1,6 @@
 /**
- * Enhanced Rotating Food Background Hook
- * Uses high-quality food images with preloading for instant switching
- * Optimized timing for responsive page transitions
+ * Rotating Food Background Hook
+ * Uses local assets for instant image switching with thematic page mapping
  */
 
 import { useState, useEffect } from 'react';
@@ -71,31 +70,22 @@ export function useRotatingBackground(activeTab: string) {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [animationKey, setAnimationKey] = useState(0);
   
-  // Local assets are already bundled - no preloading needed
+  // Change background when page/tab changes
   useEffect(() => {
-    console.log(`Loaded ${foodImages.length} local food images`);
-  }, []);
-
-  // Change background only when page/tab changes
-  useEffect(() => {
-    // Get page-specific images or use sequential rotation
     const pageImages = pageImageMap[activeTab] || [0, 1, 2];
     const randomPageImage = pageImages[Math.floor(Math.random() * pageImages.length)];
     
-    // Only change if it's different from current
     if (randomPageImage !== currentImageIndex) {
       setIsTransitioning(true);
       
-      // Immediate update with animation trigger
       requestAnimationFrame(() => {
         setCurrentImageIndex(randomPageImage);
         setBackgroundImage(foodImages[randomPageImage]);
-        setAnimationKey(prev => prev + 1); // Trigger re-animation
-        // Reduced transition time for faster response
+        setAnimationKey(prev => prev + 1);
         setTimeout(() => setIsTransitioning(false), 50);
       });
     }
-  }, [activeTab, currentImageIndex]); // Only triggers on tab change
+  }, [activeTab, currentImageIndex]);
 
   return {
     backgroundImage,
