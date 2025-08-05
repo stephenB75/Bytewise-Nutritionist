@@ -72,30 +72,54 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
         return;
       }
 
-      const response = await fetch('/api/profile/update', {
-        method: 'POST',
+      // Save to database via API endpoint
+      const response = await fetch('/api/user/profile', {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(userInfo),
+        body: JSON.stringify({
+          firstName: userInfo.firstName,
+          lastName: userInfo.lastName,
+          personalInfo: {
+            phone: userInfo.phone,
+            birthDate: userInfo.birthDate,
+            location: userInfo.location,
+            height: userInfo.height,
+            weight: userInfo.weight,
+            age: userInfo.age,
+            bio: userInfo.bio,
+            activityLevel: userInfo.activityLevel,
+            goals: userInfo.goals,
+          }
+        }),
       });
 
-      if (response.ok) {
-        const result = await response.json();
-        setIsEditing(false);
-        toast({
-          title: "Profile Updated",
-          description: "Your personal information has been saved successfully.",
-        });
-      } else {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Failed to update profile');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to save profile to database');
       }
-    } catch (error: any) {
-      console.error('Profile update error:', error);
+
+      const savedData = await response.json();
+      
+      // Also update Supabase auth metadata
+      await supabase.auth.updateUser({
+        data: {
+          first_name: userInfo.firstName,
+          last_name: userInfo.lastName,
+        }
+      });
+
+      setIsEditing(false);
       toast({
-        title: "Update Failed",
-        description: error.message || "Unable to update profile. Please try again.",
+        title: "Profile Saved Successfully",
+        description: `Your profile has been saved to the database. ${savedData.itemsUpdated || 0} items updated.`,
+      });
+    } catch (error: any) {
+      console.error('Profile save error:', error);
+      toast({
+        title: "Save Failed",
+        description: error.message || "Unable to save profile to database. Please try again.",
         variant: "destructive",
       });
     } finally {

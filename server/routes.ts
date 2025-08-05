@@ -382,8 +382,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = await storage.getUser(userId);
 
       // Simulate getting meals and recipes data
-      const mockMeals = []; // In real implementation, get from database
-      const mockRecipes = []; // In real implementation, get from database
+      const mockMeals: any[] = []; // In real implementation, get from database
+      const mockRecipes: any[] = []; // In real implementation, get from database
 
       const backupData = {
         user,
@@ -406,6 +406,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Backup error:', error);
       res.status(500).json({ message: "Backup failed" });
+    }
+  });
+
+  // User profile update endpoint
+  app.put('/api/user/profile', isAuthenticated, async (req: any, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const { firstName, lastName, personalInfo } = req.body;
+
+      // Update user profile in database using upsertUser
+      const updatedUser = await storage.upsertUser({
+        id: userId,
+        firstName,
+        lastName,
+        personalInfo
+      });
+
+      console.log(`Profile updated for user ${userId}`);
+
+      res.json({
+        success: true,
+        message: "Profile updated successfully",
+        user: updatedUser,
+        itemsUpdated: Object.keys(personalInfo || {}).length + 2, // personalInfo fields + firstName + lastName
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Profile update error:', error);
+      res.status(500).json({ message: "Failed to update profile" });
     }
   });
 
