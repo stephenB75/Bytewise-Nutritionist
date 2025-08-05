@@ -49,17 +49,28 @@ export function useRotatingBackground(activeTab: string) {
   const [backgroundImage, setBackgroundImage] = useState(foodImages[0]);
   const [isTransitioning, setIsTransitioning] = useState(false);
   
-  // Preload images for better performance
+  // Enhanced preloading for better performance
   useEffect(() => {
     const preloadImages = () => {
+      // Preload first 10 images for immediate switching
       foodImages.forEach((src, index) => {
-        if (index < 5) { // Preload first 5 images for immediate switching
+        if (index < 10) {
           const img = new Image();
           img.src = src;
+          // Add image to cache when loaded
+          img.onload = () => {
+            console.log(`Preloaded image ${index + 1}/10`);
+          };
         }
       });
     };
-    preloadImages();
+    
+    // Use requestIdleCallback for non-blocking preloading
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(preloadImages);
+    } else {
+      setTimeout(preloadImages, 100);
+    }
   }, []);
 
   // Change background only when page/tab changes

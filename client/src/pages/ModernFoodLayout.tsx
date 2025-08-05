@@ -298,54 +298,73 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     setActiveTab(newTab);
   };
 
-  // Optimized Hero Section Component
-  const HeroSection = ({ title, subtitle, description, buttonText, onButtonClick }: {
+  // Optimized Hero Section Component with Performance Enhancements
+  const HeroSection = React.memo(({ title, subtitle, description, buttonText, onButtonClick }: {
     title: string;
     subtitle: string;
     description: string;
     buttonText: string;
     onButtonClick: () => void;
-  }) => (
-    <div className="relative h-screen overflow-hidden">
-      <div 
-        className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out"
-        style={{
-          backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`
-        }}
-      />
-      
-      <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
-        <div className="space-y-8 max-w-2xl animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-300">
-          <div className="space-y-2 animate-in fade-in slide-in-from-bottom-4 duration-800 delay-700">
-            <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">{title}</h1>
-            <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
-              <span className="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">{subtitle}</span>
-            </h1>
+  }) => {
+    const [imageLoaded, setImageLoaded] = React.useState(false);
+    
+    // Preload background image for instant display
+    React.useEffect(() => {
+      const img = new Image();
+      img.src = backgroundImage;
+      img.onload = () => setImageLoaded(true);
+    }, [backgroundImage]);
+
+    return (
+      <div className="relative h-screen overflow-hidden">
+        {/* Optimized background with faster transitions */}
+        <div 
+          className={`absolute inset-0 bg-cover bg-center transition-all duration-400 ease-out ${
+            isTransitioning ? 'opacity-70 scale-105' : 'opacity-100 scale-100'
+          } ${imageLoaded ? '' : 'animate-pulse bg-gray-900'}`}
+          style={{
+            backgroundImage: imageLoaded 
+              ? `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`
+              : 'linear-gradient(135deg, rgba(0,0,0,0.8), rgba(0,0,0,0.9))',
+            willChange: 'transform, opacity',
+            backfaceVisibility: 'hidden',
+            transform: 'translateZ(0)' // GPU acceleration
+          }}
+        />
+        
+        <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6">
+          <div className="space-y-8 max-w-2xl animate-in fade-in slide-in-from-bottom-4 duration-600 delay-150">
+            <div className="space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-500 delay-300">
+              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none transform-gpu">{title}</h1>
+              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none transform-gpu">
+                <span className="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">{subtitle}</span>
+              </h1>
+            </div>
+            
+            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto animate-in fade-in slide-in-from-bottom-2 duration-500 delay-450 transform-gpu">
+              {description}
+            </p>
+            
+            <div className="pt-8 animate-in fade-in slide-in-from-bottom-2 duration-500 delay-600">
+              <Button 
+                onClick={onButtonClick}
+                size="lg"
+                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-black px-16 py-6 rounded-full text-2xl shadow-2xl transform hover:scale-105 transition-all duration-300 border-2 border-orange-400/30 will-change-transform"
+              >
+                {buttonText}
+              </Button>
+            </div>
           </div>
-          
-          <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-800 delay-900">
-            {description}
-          </p>
-          
-          <div className="pt-8 animate-in fade-in slide-in-from-bottom-4 duration-800 delay-1100">
-            <Button 
-              onClick={onButtonClick}
-              size="lg"
-              className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-black px-16 py-6 rounded-full text-2xl shadow-2xl transform hover:scale-105 transition-all duration-500 border-2 border-orange-400/30"
-            >
-              {buttonText}
-            </Button>
+        </div>
+        
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60">
+          <div className="animate-bounce">
+            <ChevronRight className="w-6 h-6 rotate-90" />
           </div>
         </div>
       </div>
-      
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60">
-        <div className="animate-bounce">
-          <ChevronRight className="w-6 h-6 rotate-90" />
-        </div>
-      </div>
-    </div>
-  );
+    );
+  });
 
   const BytewiseLogo = () => (
     <div className="mb-8 animate-in fade-in zoom-in-50 duration-800 delay-500">
