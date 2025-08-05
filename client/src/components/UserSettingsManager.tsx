@@ -212,26 +212,26 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
   };
 
   return (
-    <div className="w-full space-y-6">
+    <div className="w-full max-w-4xl mx-auto space-y-6 px-4 sm:px-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div className="flex items-center space-x-4">
           <div className="p-3 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl">
             <User className="w-6 h-6 text-white" />
           </div>
-          <div>
-            <h2 className="text-2xl font-bold text-white" style={{ fontFamily: "'League Spartan', sans-serif" }}>Personal Profile</h2>
-            <p className="text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>Manage your account and personal information</p>
+          <div className="flex-1 min-w-0">
+            <h2 className="text-xl sm:text-2xl font-bold text-white truncate" style={{ fontFamily: "'League Spartan', sans-serif" }}>Personal Profile</h2>
+            <p className="text-gray-300 text-sm truncate" style={{ fontFamily: "'Work Sans', sans-serif" }}>Manage your account and personal information</p>
           </div>
         </div>
         {isEditing && (
-          <div className="flex space-x-2">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-2 w-full sm:w-auto">
             <Button
               variant="outline"
               size="sm"
               onClick={handleCancel}
               disabled={isSaving}
-              className="border-white/30 text-gray-300 hover:border-white/50 hover:text-white"
+              className="border-white/30 text-gray-300 hover:border-white/50 hover:text-white flex-1 sm:flex-none"
             >
               <X className="w-4 h-4 mr-2" />
               Cancel
@@ -240,7 +240,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
               size="sm"
               onClick={handleSave}
               disabled={isSaving}
-              className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white"
+              className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white flex-1 sm:flex-none"
             >
               {isSaving ? (
                 <>Loading...</>
@@ -257,26 +257,28 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
 
       {/* Profile Card */}
       <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
-        <div className="flex items-center space-x-6 mb-8">
-          <div className="relative">
-            <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center">
-              <User className="w-8 h-8 text-white" />
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 mb-8">
+          <div className="flex items-center space-x-4">
+            <div className="relative">
+              <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center">
+                <User className="w-8 h-8 text-white" />
+              </div>
+              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-black flex items-center justify-center">
+                <CheckCircle className="w-2 h-2 text-white" />
+              </div>
             </div>
-            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-black flex items-center justify-center">
-              <CheckCircle className="w-2 h-2 text-white" />
+            <div className="flex-1 min-w-0">
+              <h3 className="text-xl font-bold text-white mb-1 truncate" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                {userInfo.name || user?.email?.split('@')[0] || 'ByteWise User'}
+              </h3>
+              <p className="text-gray-300 text-sm truncate">{userInfo.email || user?.email}</p>
             </div>
-          </div>
-          <div className="flex-1">
-            <h3 className="text-xl font-bold text-white mb-1" style={{ fontFamily: "'League Spartan', sans-serif" }}>
-              {userInfo.name || user?.email?.split('@')[0] || 'ByteWise User'}
-            </h3>
-            <p className="text-gray-300 text-sm">{userInfo.email || user?.email}</p>
           </div>
           {!isEditing && (
             <Button
               variant="outline"
               onClick={() => setIsEditing(true)}
-              className="border-white/30 text-gray-300 hover:border-white/50 hover:text-white"
+              className="border-white/30 text-gray-300 hover:border-white/50 hover:text-white w-full sm:w-auto"
             >
               <Edit3 className="w-4 h-4 mr-2" />
               Edit Profile
