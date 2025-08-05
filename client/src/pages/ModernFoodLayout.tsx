@@ -366,7 +366,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   });
 
   const BytewiseLogo = () => (
-    <div className="mb-8 animate-in fade-in zoom-in-50 duration-800 delay-500 relative z-40">
+    <div className="mb-8 relative z-50">
       <div 
         className="cursor-pointer hover:scale-105 transition-transform duration-200"
         onClick={() => setActiveTab('home')}
@@ -375,14 +375,18 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         <div style={{
           fontSize: '4.5rem', fontWeight: '900', lineHeight: '0.9', color: '#7dd3fc',
           marginBottom: '0.5rem', textTransform: 'lowercase', letterSpacing: '-0.02em',
-          textShadow: '0 8px 32px rgba(0,0,0,0.8)'
+          textShadow: '0 8px 32px rgba(0,0,0,0.8)',
+          position: 'relative',
+          zIndex: 50
         }}>
           bytewise
         </div>
         <div style={{
           fontSize: '1.25rem', fontWeight: '300', color: 'rgba(255,255,255,0.8)',
           letterSpacing: '0.15em', textTransform: 'uppercase',
-          textShadow: '0 4px 16px rgba(0,0,0,0.6)'
+          textShadow: '0 4px 16px rgba(0,0,0,0.6)',
+          position: 'relative',
+          zIndex: 50
         }}>
           nutritionist
         </div>
@@ -486,23 +490,23 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         />
         
         <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6 z-20">
-          <div className="space-y-8 max-w-2xl animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-300 z-30">
+          <div className="space-y-8 max-w-2xl z-30">
             <div className="z-40">
               <BytewiseLogo />
             </div>
             
-            <div className="space-y-2 animate-in fade-in slide-in-from-bottom-4 duration-800 delay-700">
+            <div className="space-y-2">
               <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none text-white drop-shadow-2xl">Track Your</h1>
               <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none">
                 <span className="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent drop-shadow-2xl">Nutrition</span>
               </h1>
             </div>
             
-            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-800 delay-900 drop-shadow-xl">
+            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl">
               Track nutrition with scientific precision using our comprehensive USDA database
             </p>
             
-            <div className="pt-8 animate-in fade-in slide-in-from-bottom-4 duration-800 delay-1100 z-40">
+            <div className="pt-8 z-40">
               <Button 
                 onClick={() => {
                   if (user) {
