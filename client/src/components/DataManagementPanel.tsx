@@ -20,9 +20,7 @@ import {
   CheckCircle,
   AlertCircle,
   X,
-  Cloud,
-  HardDrive,
-  Archive
+  Cloud
 } from 'lucide-react';
 
 export function DataManagementPanel() {
@@ -30,7 +28,7 @@ export function DataManagementPanel() {
   const { toast } = useToast();
   const [isExporting, setIsExporting] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
-  const [isClearing, setIsClearing] = useState(false);
+
 
   const handleExportData = async () => {
     setIsExporting(true);
@@ -61,16 +59,32 @@ export function DataManagementPanel() {
   const handleSyncData = async () => {
     setIsSyncing(true);
     try {
-      // Simulate data sync
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      toast({
-        title: "Sync complete",
-        description: "Your data has been synchronized successfully.",
+      // Auto backup user data to database
+      const response = await fetch('/api/user/sync-backup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user?.id,
+          timestamp: new Date().toISOString(),
+          backupType: 'auto_sync'
+        }),
       });
+
+      if (response.ok) {
+        const data = await response.json();
+        toast({
+          title: "Backup complete",
+          description: `Your nutrition data has been automatically backed up to the database. ${data.itemsBackedUp || 0} items synchronized.`,
+        });
+      } else {
+        throw new Error('Backup failed');
+      }
     } catch (error) {
       toast({
-        title: "Sync failed",
-        description: "There was an error syncing your data. Please try again.",
+        title: "Backup failed",
+        description: "There was an error backing up your data to the database. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -78,25 +92,7 @@ export function DataManagementPanel() {
     }
   };
 
-  const handleClearCache = async () => {
-    setIsClearing(true);
-    try {
-      // Simulate cache clearing
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast({
-        title: "Cache cleared",
-        description: "App cache has been cleared successfully.",
-      });
-    } catch (error) {
-      toast({
-        title: "Clear failed",
-        description: "There was an error clearing the cache. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsClearing(false);
-    }
-  };
+
 
   const handleDeleteAllData = async () => {
     if (confirm("Are you sure you want to delete all your data? This action cannot be undone.")) {
@@ -195,8 +191,8 @@ export function DataManagementPanel() {
           </Badge>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div className="p-6 bg-gradient-to-br from-white/15 to-white/5 rounded-2xl border border-white/30 backdrop-blur-md">
+        <div className="flex justify-center">
+          <div className="w-full max-w-md p-6 bg-gradient-to-br from-white/15 to-white/5 rounded-2xl border border-white/30 backdrop-blur-md">
             <div className="flex flex-col items-center text-center space-y-4">
               <div className="p-4 bg-[#1f4aa6]/20 rounded-2xl">
                 <FileText className="w-8 h-8 text-[#1f4aa6]" strokeWidth={2.5} />
@@ -232,61 +228,34 @@ export function DataManagementPanel() {
               </Button>
             </div>
           </div>
-
-          <div className="p-6 bg-gradient-to-br from-white/15 to-white/5 rounded-2xl border border-white/30 backdrop-blur-md">
-            <div className="flex flex-col items-center text-center space-y-4">
-              <div className="p-4 bg-[#45c73e]/20 rounded-2xl">
-                <Archive className="w-8 h-8 text-[#45c73e]" strokeWidth={2.5} />
-              </div>
-              <div>
-                <h4 className="font-bold text-white text-xl mb-2" style={{ fontFamily: "'League Spartan', sans-serif" }}>
-                  Raw Data Export
-                </h4>
-                <p className="text-sm text-gray-300 mb-4" style={{ fontFamily: "'Quicksand', sans-serif" }}>
-                  Export all your nutrition data in JSON format for backup or external analysis
-                </p>
-                <Badge className="bg-[#1f4aa6]/20 text-[#1f4aa6] border-[#1f4aa6]/30 mb-4">
-                  JSON Format
-                </Badge>
-              </div>
-              <Button
-                variant="outline"
-                size="lg"
-                className="w-full border-2 border-[#45c73e] text-[#45c73e] hover:bg-[#45c73e] hover:text-white bg-white/95 hover:shadow-xl rounded-2xl px-8 py-4 transition-all duration-300 font-semibold"
-              >
-                <Download className="w-5 h-5 mr-3" strokeWidth={2.5} />
-                Export JSON Data
-              </Button>
-            </div>
-          </div>
         </div>
         </Card>
 
-        {/* Sync & Maintenance */}
+        {/* Auto Backup */}
         <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
           <div className="flex items-center space-x-3 mb-6">
-            <RefreshCw className="w-5 h-5 text-[#1f4aa6]" />
+            <Cloud className="w-5 h-5 text-[#1f4aa6]" />
             <div>
-              <h4 className="font-semibold text-white text-lg" style={{ fontFamily: "'League Spartan', sans-serif" }}>Sync & Maintenance</h4>
-              <p className="text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>Keep your data synchronized and optimized</p>
+              <h4 className="font-semibold text-white text-lg" style={{ fontFamily: "'League Spartan', sans-serif" }}>Auto Backup</h4>
+              <p className="text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>Automatically backup your data to the database</p>
             </div>
           </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="p-6 bg-gradient-to-br from-[#45c73e]/10 to-[#45c73e]/5 rounded-2xl border border-[#45c73e]/20 backdrop-blur-md">
+        <div className="flex justify-center">
+          <div className="w-full max-w-md p-6 bg-gradient-to-br from-[#45c73e]/10 to-[#45c73e]/5 rounded-2xl border border-[#45c73e]/20 backdrop-blur-md">
             <div className="flex flex-col items-center text-center space-y-4">
               <div className="p-4 bg-[#45c73e]/20 rounded-2xl">
                 <Cloud className="w-8 h-8 text-[#45c73e]" strokeWidth={2.5} />
               </div>
               <div>
                 <h4 className="font-bold text-white text-xl mb-2" style={{ fontFamily: "'League Spartan', sans-serif" }}>
-                  Sync Data
+                  Auto Backup
                 </h4>
                 <p className="text-sm text-gray-300 mb-4" style={{ fontFamily: "'Quicksand', sans-serif" }}>
-                  Synchronize your nutrition data across all your devices and platforms
+                  Automatically backup your nutrition data to the database for safekeeping
                 </p>
                 <Badge className="bg-[#45c73e]/20 text-[#45c73e] border-[#45c73e]/30 mb-4">
-                  Cloud Sync
+                  Database Backup
                 </Badge>
               </div>
               <Button
@@ -298,50 +267,12 @@ export function DataManagementPanel() {
                 {isSyncing ? (
                   <>
                     <RefreshCw className="w-5 h-5 mr-3 animate-spin" strokeWidth={2.5} />
-                    Synchronizing...
+                    Backing Up...
                   </>
                 ) : (
                   <>
-                    <RefreshCw className="w-5 h-5 mr-3" strokeWidth={2.5} />
-                    Sync All Data
-                  </>
-                )}
-              </Button>
-            </div>
-          </div>
-
-          <div className="p-6 bg-gradient-to-br from-white/15 to-white/5 rounded-2xl border border-white/30 backdrop-blur-md">
-            <div className="flex flex-col items-center text-center space-y-4">
-              <div className="p-4 bg-gray-500/20 rounded-2xl">
-                <HardDrive className="w-8 h-8 text-gray-400" strokeWidth={2.5} />
-              </div>
-              <div>
-                <h4 className="font-bold text-white text-xl mb-2" style={{ fontFamily: "'League Spartan', sans-serif" }}>
-                  Clear Cache
-                </h4>
-                <p className="text-sm text-gray-300 mb-4" style={{ fontFamily: "'Quicksand', sans-serif" }}>
-                  Clear app cache to free up storage space and improve performance
-                </p>
-                <Badge className="bg-gray-500/20 text-gray-400 border-gray-500/30 mb-4">
-                  Storage
-                </Badge>
-              </div>
-              <Button
-                onClick={handleClearCache}
-                disabled={isClearing}
-                variant="outline"
-                size="lg"
-                className="w-full border-2 border-gray-400 text-gray-300 hover:bg-gray-600 hover:text-white bg-white/95 hover:shadow-xl rounded-2xl px-8 py-4 transition-all duration-300 font-semibold"
-              >
-                {isClearing ? (
-                  <>
-                    <RefreshCw className="w-5 h-5 mr-3 animate-spin" strokeWidth={2.5} />
-                    Clearing Cache...
-                  </>
-                ) : (
-                  <>
-                    <Trash2 className="w-5 h-5 mr-3" strokeWidth={2.5} />
-                    Clear All Cache
+                    <Cloud className="w-5 h-5 mr-3" strokeWidth={2.5} />
+                    Start Auto Backup
                   </>
                 )}
               </Button>

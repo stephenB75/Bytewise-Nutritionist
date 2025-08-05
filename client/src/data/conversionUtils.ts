@@ -3,34 +3,35 @@
  * Based on industry-standard measurement charts from Kitchen to Table and Shamrock Foods
  */
 
-// Standard liquid conversions (in milliliters) - Based on professional conversion charts
+// Imperial liquid conversions (in fluid ounces) - Based on imperial measurement standards
 export const LIQUID_CONVERSIONS = {
+  // Imperial system as default - using fluid ounces as base unit
   // Teaspoon and tablespoon
-  tsp: 5,
-  tbsp: 15,
+  tsp: 0.167,         // 1 tsp = 0.167 fl oz
+  tbsp: 0.5,          // 1 tbsp = 0.5 fl oz
   
-  // Cup measurements (professional standards)
-  cup: 240,           // 1 cup = 240ml (16 tbsp = 48 tsp)
-  "3/4_cup": 180,     // 3/4 cup = 180ml (12 tbsp = 36 tsp)
-  "2/3_cup": 160,     // 2/3 cup = 160ml (11 tbsp = 32 tsp)
-  "1/2_cup": 120,     // 1/2 cup = 120ml (8 tbsp = 24 tsp)
-  "1/3_cup": 80,      // 1/3 cup = 80ml (5 tbsp = 16 tsp)
-  "1/4_cup": 60,      // 1/4 cup = 60ml (4 tbsp = 12 tsp)
-  "1/8_cup": 30,      // 1/8 cup = 30ml (2 tbsp = 6 tsp)
-  "1/16_cup": 15,     // 1/16 cup = 15ml (1 tbsp = 3 tsp)
+  // Cup measurements (imperial standards)
+  cup: 8,             // 1 cup = 8 fl oz
+  "3/4_cup": 6,       // 3/4 cup = 6 fl oz
+  "2/3_cup": 5.33,    // 2/3 cup = 5.33 fl oz
+  "1/2_cup": 4,       // 1/2 cup = 4 fl oz
+  "1/3_cup": 2.67,    // 1/3 cup = 2.67 fl oz
+  "1/4_cup": 2,       // 1/4 cup = 2 fl oz
+  "1/8_cup": 1,       // 1/8 cup = 1 fl oz
+  "1/16_cup": 0.5,    // 1/16 cup = 0.5 fl oz
   
-  // Fluid ounces (precise conversions)
-  fl_oz: 30,          // 1 fl oz = 30ml (2 tbsp = 6 tsp)
-  "1/2_fl_oz": 15,    // 1/2 fl oz = 15ml (1 tbsp = 3 tsp)
+  // Fluid ounces (imperial base unit)
+  fl_oz: 1,           // 1 fl oz = 1 fl oz (base unit)
+  "1/2_fl_oz": 0.5,   // 1/2 fl oz = 0.5 fl oz
   
   // Larger measurements
-  pt: 473,    // pint = 2 cups
-  qt: 946,    // quart = 4 cups
-  gal: 3785,  // gallon = 16 cups
+  pt: 16,     // pint = 16 fl oz
+  qt: 32,     // quart = 32 fl oz
+  gal: 128,   // gallon = 128 fl oz
   
-  // Metric
-  ml: 1,
-  l: 1000
+  // Metric conversions to fl oz (for compatibility)
+  ml: 0.0338,   // 1 ml = 0.0338 fl oz
+  l: 33.8      // 1 l = 33.8 fl oz
 };
 
 // Professional dry ingredient densities (grams per cup) - Based on King Arthur and industry standards
@@ -155,13 +156,13 @@ export class ConversionCalculator {
    * Convert liquid measurements
    */
   static convertLiquid(amount: number, fromUnit: string, toUnit: string): number | null {
-    const fromMl = LIQUID_CONVERSIONS[fromUnit as keyof typeof LIQUID_CONVERSIONS];
-    const toMl = LIQUID_CONVERSIONS[toUnit as keyof typeof LIQUID_CONVERSIONS];
+    const fromFlOz = LIQUID_CONVERSIONS[fromUnit as keyof typeof LIQUID_CONVERSIONS];
+    const toFlOz = LIQUID_CONVERSIONS[toUnit as keyof typeof LIQUID_CONVERSIONS];
     
-    if (!fromMl || !toMl) return null;
+    if (!fromFlOz || !toFlOz) return null;
     
-    const totalMl = amount * fromMl;
-    return totalMl / toMl;
+    const totalFlOz = amount * fromFlOz;
+    return totalFlOz / toFlOz;
   }
   
   /**
@@ -177,36 +178,36 @@ export class ConversionCalculator {
     
     if (!density) return null;
     
-    // Convert everything to grams first
-    let grams: number;
+    // Convert everything to ounces first (imperial system)
+    let ounces: number;
     
-    if (fromUnit === 'g') {
-      grams = amount;
+    if (fromUnit === 'oz') {
+      ounces = amount;
     } else if (fromUnit === 'cup') {
-      grams = amount * density;
-    } else if (fromUnit === 'oz') {
-      grams = amount * 28.35;
+      ounces = (amount * density) / 28.35; // density in grams per cup, convert to oz
     } else if (fromUnit === 'lb') {
-      grams = amount * 453.59;
+      ounces = amount * 16;
+    } else if (fromUnit === 'g') {
+      ounces = amount / 28.35;
     } else {
       // Handle fractional cups
       const cupAmount = this.convertFractionalCup(amount, fromUnit);
       if (cupAmount === null) return null;
-      grams = cupAmount * density;
+      ounces = (cupAmount * density) / 28.35;
     }
     
-    // Convert from grams to target unit
-    if (toUnit === 'g') {
-      return grams;
+    // Convert from ounces to target unit
+    if (toUnit === 'oz') {
+      return ounces;
     } else if (toUnit === 'cup') {
-      return grams / density;
-    } else if (toUnit === 'oz') {
-      return grams / 28.35;
+      return (ounces * 28.35) / density;
     } else if (toUnit === 'lb') {
-      return grams / 453.59;
+      return ounces / 16;
+    } else if (toUnit === 'g') {
+      return ounces * 28.35;
     } else {
       // Handle fractional cups
-      const cupAmount = grams / density;
+      const cupAmount = (ounces * 28.35) / density;
       return this.convertFromCup(cupAmount, toUnit);
     }
   }
@@ -285,10 +286,10 @@ export class ConversionCalculator {
   static convertTemperature(temp: number, fromUnit: 'F' | 'C', toUnit: 'F' | 'C'): number {
     if (fromUnit === toUnit) return temp;
     
-    if (fromUnit === 'F' && toUnit === 'C') {
-      return (temp - 32) * 5 / 9;
-    } else {
+    if (fromUnit === 'C' && toUnit === 'F') {
       return (temp * 9 / 5) + 32;
+    } else {
+      return (temp - 32) * 5 / 9;
     }
   }
 }

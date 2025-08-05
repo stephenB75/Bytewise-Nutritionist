@@ -307,19 +307,36 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
             <div className="space-y-2">
               <label className="text-sm text-gray-300 font-medium flex items-center">
                 <Activity className="w-4 h-4 mr-2 text-blue-400" />
-                Height (cm)
+                Height (ft/in)
               </label>
               {isEditing ? (
-                <Input
-                  type="number"
-                  value={userInfo.height}
-                  onChange={(e) => setUserInfo(prev => ({ ...prev, height: e.target.value }))}
-                  className="bg-white/10 border-white/20 text-white placeholder-gray-400"
-                  placeholder="Enter your height"
-                />
+                <div className="flex gap-2">
+                  <Input
+                    type="number"
+                    value={Math.floor((parseInt(userInfo.height) || 0) / 12)}
+                    onChange={(e) => {
+                      const feet = parseInt(e.target.value) || 0;
+                      const inches = (parseInt(userInfo.height) || 0) % 12;
+                      setUserInfo(prev => ({ ...prev, height: (feet * 12 + inches).toString() }));
+                    }}
+                    className="bg-white/10 border-white/20 text-white placeholder-gray-400 flex-1"
+                    placeholder="Feet"
+                  />
+                  <Input
+                    type="number"
+                    value={(parseInt(userInfo.height) || 0) % 12}
+                    onChange={(e) => {
+                      const inches = parseInt(e.target.value) || 0;
+                      const feet = Math.floor((parseInt(userInfo.height) || 0) / 12);
+                      setUserInfo(prev => ({ ...prev, height: (feet * 12 + inches).toString() }));
+                    }}
+                    className="bg-white/10 border-white/20 text-white placeholder-gray-400 flex-1"
+                    placeholder="Inches"
+                  />
+                </div>
               ) : (
                 <p className="text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10">
-                  {userInfo.height ? `${userInfo.height} cm` : 'Not provided'}
+                  {userInfo.height ? `${Math.floor(parseInt(userInfo.height) / 12)}'${parseInt(userInfo.height) % 12}"` : 'Not provided'}
                 </p>
               )}
             </div>
@@ -327,19 +344,23 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
             <div className="space-y-2">
               <label className="text-sm text-gray-300 font-medium flex items-center">
                 <Activity className="w-4 h-4 mr-2 text-blue-400" />
-                Weight (kg)
+                Weight (lbs)
               </label>
               {isEditing ? (
                 <Input
                   type="number"
-                  value={userInfo.weight}
-                  onChange={(e) => setUserInfo(prev => ({ ...prev, weight: e.target.value }))}
+                  value={userInfo.weight ? Math.round(parseFloat(userInfo.weight) * 2.20462) : ''}
+                  onChange={(e) => {
+                    const lbs = parseFloat(e.target.value) || 0;
+                    const kg = lbs / 2.20462;
+                    setUserInfo(prev => ({ ...prev, weight: kg.toFixed(1) }));
+                  }}
                   className="bg-white/10 border-white/20 text-white placeholder-gray-400"
-                  placeholder="Enter your weight"
+                  placeholder="Enter your weight in pounds"
                 />
               ) : (
                 <p className="text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10">
-                  {userInfo.weight ? `${userInfo.weight} kg` : 'Not provided'}
+                  {userInfo.weight ? `${Math.round(parseFloat(userInfo.weight) * 2.20462)} lbs` : 'Not provided'}
                 </p>
               )}
             </div>
