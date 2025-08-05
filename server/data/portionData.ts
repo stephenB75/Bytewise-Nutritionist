@@ -138,6 +138,25 @@ export function getPortionWeight(foodName: string, measurement: string): number 
 export function parseMeasurement(measurement: string): { quantity: number; unit: string } {
   const normalized = measurement.toLowerCase().trim();
   
+  // Handle parenthetical notes like "1 cup (140g)" - prioritize main measurement
+  const parentheticalMatch = normalized.match(/^(.+?)\s*\((.+?)\)(.*)$/);
+  if (parentheticalMatch) {
+    const beforeParen = parentheticalMatch[1].trim();
+    // Always use the measurement before parentheses as the primary
+    const match = beforeParen.match(/^(\d+(?:\.\d+)?)\s*(.+)$/);
+    if (match) {
+      return {
+        quantity: parseFloat(match[1]),
+        unit: match[2].trim()
+      };
+    }
+    // Fallback if no number before parentheses
+    return {
+      quantity: 1,
+      unit: beforeParen
+    };
+  }
+  
   // Extract numbers from the beginning
   const numberMatch = normalized.match(/^(\d+(?:\.\d+)?)\s*(.*)$/);
   if (numberMatch) {

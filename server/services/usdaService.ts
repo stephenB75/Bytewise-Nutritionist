@@ -418,10 +418,20 @@ export class USDAService {
           quantity = whole + (numerator / denominator);
           unit = mixedMatch[4].trim();
         } else {
-          // Handle regular decimal numbers
-          const match = normalized.match(/^(\d+(?:\.\d+)?)\s*(.+)$/);
-          quantity = match ? parseFloat(match[1]) : 1;
-          unit = match ? match[2].trim() : normalized;
+          // Handle parenthetical notes like "1 cup (140g)" - prioritize main measurement
+          const parentheticalMatch = normalized.match(/^(.+?)\s*\((.+?)\)(.*)$/);
+          if (parentheticalMatch) {
+            const beforeParen = parentheticalMatch[1].trim();
+            // Always use the measurement before parentheses as the primary
+            const match = beforeParen.match(/^(\d+(?:\.\d+)?)\s*(.+)$/);
+            quantity = match ? parseFloat(match[1]) : 1;
+            unit = match ? match[2].trim() : beforeParen;
+          } else {
+            // Handle regular decimal numbers
+            const match = normalized.match(/^(\d+(?:\.\d+)?)\s*(.+)$/);
+            quantity = match ? parseFloat(match[1]) : 1; 
+            unit = match ? match[2].trim() : normalized;
+          }
         }
       }
     }
@@ -449,8 +459,8 @@ export class USDAService {
       'kilogram': 1000,
       'ounce': 28.35,
       'pound': 453.6,
-      'cup': 47, // lettuce cup ≈ 47g, varies by ingredient when single
-      'cups': 240, // plural cups for multiple servings
+      'cup': 240, // standard cup volume ≈ 240ml/g
+      'cups': 240, // same as singular for consistency
       'tablespoon': 15,
       'teaspoon': 5,
       'ml': 1, // for liquids, approximate to grams
@@ -834,6 +844,19 @@ export class USDAService {
       'broccoli': { calories: 34, protein: 2.8, carbs: 7, fat: 0.4 },
       'carrot': { calories: 41, protein: 0.9, carbs: 10, fat: 0.2 },
       'spinach': { calories: 23, protein: 2.9, carbs: 3.6, fat: 0.4 },
+      
+      // Processed/Fast Foods
+      'hotdog': { calories: 290, protein: 10, carbs: 2, fat: 26 },
+      'hot dog': { calories: 290, protein: 10, carbs: 2, fat: 26 },
+      'sausage': { calories: 290, protein: 10, carbs: 2, fat: 26 },
+      'french fries': { calories: 365, protein: 4, carbs: 63, fat: 17 },
+      'fries': { calories: 365, protein: 4, carbs: 63, fat: 17 },
+      'pizza': { calories: 266, protein: 11, carbs: 33, fat: 10 },
+      'hamburger': { calories: 540, protein: 25, carbs: 40, fat: 31 },
+      'cheeseburger': { calories: 540, protein: 25, carbs: 40, fat: 31 },
+      'ice cream': { calories: 207, protein: 3.5, carbs: 24, fat: 11 },
+      'cookie': { calories: 502, protein: 5.9, carbs: 64, fat: 24 },
+      'donut': { calories: 452, protein: 4.9, carbs: 51, fat: 25 },
     };
 
     const ingredient = ingredientName.toLowerCase();
@@ -851,8 +874,20 @@ export class USDAService {
     if (portionWeight) {
       gramsEquivalent = portionWeight * quantity;
     } else {
-      const fallbackResult = this.parseFallbackMeasurement(measurement);
-      gramsEquivalent = fallbackResult.gramsEquivalent;
+      // Use our internal measurement parsing for consistency
+      const { quantity: qty, unit: unt } = parseMeasurement(measurement);
+      
+      // Apply standard cup conversions for consistency
+      if (unt.includes('cup')) {
+        gramsEquivalent = qty * 240; // Standard cup volume
+      } else if (unt.includes('piece') || unt.includes('item')) {
+        gramsEquivalent = qty * 50; // Standard piece weight for hotdog
+      } else if (unt.includes('slice')) {
+        gramsEquivalent = qty * 25; // Standard slice weight
+      } else {
+        const fallbackResult = this.parseFallbackMeasurement(measurement);
+        gramsEquivalent = fallbackResult.gramsEquivalent;
+      }
     }
 
     // Apply cooking retention factors if needed
@@ -890,7 +925,7 @@ export class USDAService {
     return {
       ingredient: ingredientName.toUpperCase(),
       measurement: `${measurement} (~${Math.round(gramsEquivalent)}g)`,
-      estimatedCalories: enhancedCalories,
+      estimatedCalories: Math.round(enhancedCalories),
       equivalentMeasurement: `100g ≈ ${nutritionData.calories} kcal`,
       note: portionWeight ? 
         'Enhanced estimate using USDA portion database and food-specific conversion factors' :
@@ -901,35 +936,9 @@ export class USDAService {
   }
 
   private parseFallbackMeasurement(measurement: string): { gramsEquivalent: number } {
-    const { quantity, unit } = parseMeasurement(measurement);
-
-    // Enhanced conversions based on USDA portion data averages
-    const conversions: { [key: string]: number } = {
-      'g': 1, 'gram': 1, 'grams': 1,
-      'kg': 1000, 'kilogram': 1000,
-      'cup': 240, 'cups': 240,
-      'tablespoon': 15, 'tbsp': 15,
-      'teaspoon': 5, 'tsp': 5,
-      'medium': 150, 'large': 200, 'small': 100,
-      'slice': 28, 'piece': 50, 'whole': 200,
-      'serving': 85, 'portion': 85,
-      'breast': 172, 'thigh': 85, 'drumstick': 44,
-      'fillet': 150, 'steak': 150,
-      'ounce': 28.35, 'oz': 28.35,
-      'pound': 453.6, 'lb': 453.6,
-      'pint': 473, 'quart': 946, 'gallon': 3785,
-      'liter': 1000, 'ml': 1, 'milliliter': 1,
-    };
-
-    let gramsEquivalent = quantity * 100; // default 100g per unit
-    for (const [unitPattern, grams] of Object.entries(conversions)) {
-      if (unit.includes(unitPattern)) {
-        gramsEquivalent = quantity * grams;
-        break;
-      }
-    }
-
-    return { gramsEquivalent };
+    // Use our internal, corrected parseMeasurement instead of the external one
+    const result = this.parseMeasurement(measurement, {} as USDAFood);
+    return { gramsEquivalent: result.gramsEquivalent };
   }
 }
 
