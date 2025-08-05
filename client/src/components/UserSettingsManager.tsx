@@ -22,7 +22,9 @@ import {
   Phone,
   MapPin,
   Calendar,
-  Activity
+  Activity,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 
 interface UserSettingsManagerProps {
@@ -36,6 +38,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
   // Profile editing states
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   // User information state - consolidated from both components
   const [userInfo, setUserInfo] = useState({
@@ -149,7 +152,11 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
 
       {/* Profile Card */}
       <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 mb-8">
+        {/* Header with Dropdown Toggle */}
+        <div 
+          className="flex items-center justify-between cursor-pointer hover:bg-white/5 -m-6 p-6 rounded-lg transition-colors"
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
           <div className="flex items-center space-x-4">
             <div className="relative">
               <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center">
@@ -166,20 +173,40 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
               <p className="text-gray-300 text-sm truncate">{userInfo.email || user?.email}</p>
             </div>
           </div>
-          {!isEditing && (
+          
+          <div className="flex items-center space-x-3">
+            {!isEditing && isExpanded && (
+              <Button
+                variant="outline"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsEditing(true);
+                }}
+                className="border-white/30 text-gray-300 hover:border-white/50 hover:text-white"
+              >
+                <Edit3 className="w-4 h-4 mr-2" />
+                Edit Profile
+              </Button>
+            )}
             <Button
-              variant="outline"
-              onClick={() => setIsEditing(true)}
-              className="border-white/30 text-gray-300 hover:border-white/50 hover:text-white w-full sm:w-auto"
+              variant="ghost"
+              size="sm"
+              className="text-gray-300 hover:text-white hover:bg-white/10"
             >
-              <Edit3 className="w-4 h-4 mr-2" />
-              Edit Profile
+              {isExpanded ? (
+                <ChevronUp className="w-5 h-5" />
+              ) : (
+                <ChevronDown className="w-5 h-5" />
+              )}
             </Button>
-          )}
+          </div>
         </div>
 
-        {/* Profile Form */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Collapsible Profile Details */}
+        {isExpanded && (
+          <div className="mt-8 space-y-6 animate-in slide-in-from-top-2 duration-300">
+            {/* Profile Form */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Personal Information */}
           <div className="space-y-4">
             <h4 className="text-lg font-semibold text-white mb-4" style={{ fontFamily: "'League Spartan', sans-serif" }}>
@@ -348,18 +375,20 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
           </div>
         </div>
 
-        {/* Sign Out Button */}
-        <div className="flex justify-end pt-6 border-t border-white/20 mt-8">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleSignOut}
-            className="border-red-400/50 text-red-400 hover:bg-red-500/10 hover:text-red-300 hover:border-red-400"
-          >
-            <LogOut className="w-4 h-4 mr-2" />
-            Sign Out
-          </Button>
-        </div>
+            {/* Sign Out Button */}
+            <div className="flex justify-end pt-6 border-t border-white/20 mt-8">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleSignOut}
+                className="border-red-400/50 text-red-400 hover:bg-red-500/10 hover:text-red-300 hover:border-red-400"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Sign Out
+              </Button>
+            </div>
+          </div>
+        )}
       </Card>
     </div>
   );
