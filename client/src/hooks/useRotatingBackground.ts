@@ -52,25 +52,19 @@ export function useRotatingBackground(activeTab: string) {
   // Enhanced preloading for better performance
   useEffect(() => {
     const preloadImages = () => {
-      // Preload first 10 images for immediate switching
+      // Preload all images for immediate switching
       foodImages.forEach((src, index) => {
-        if (index < 10) {
-          const img = new Image();
-          img.src = src;
-          // Add image to cache when loaded
-          img.onload = () => {
-            console.log(`Preloaded image ${index + 1}/10`);
-          };
-        }
+        const img = new Image();
+        img.src = src;
+        // Cache images for instant loading
+        img.onload = () => {
+          if (index < 10) console.log(`Preloaded image ${index + 1}/10`);
+        };
       });
     };
     
-    // Use requestIdleCallback for non-blocking preloading
-    if ('requestIdleCallback' in window) {
-      requestIdleCallback(preloadImages);
-    } else {
-      setTimeout(preloadImages, 100);
-    }
+    // Immediate preloading for faster response
+    preloadImages();
   }, []);
 
   // Change background only when page/tab changes
@@ -83,30 +77,15 @@ export function useRotatingBackground(activeTab: string) {
     if (randomPageImage !== currentImageIndex) {
       setIsTransitioning(true);
       
-      // Preload the new image for faster display
-      const newImage = new Image();
-      newImage.src = foodImages[randomPageImage];
-      
-      // Smooth transition with preloaded image
-      newImage.onload = () => {
-        // Use requestAnimationFrame for optimal timing
-        requestAnimationFrame(() => {
-          setCurrentImageIndex(randomPageImage);
-          setBackgroundImage(foodImages[randomPageImage]);
-          setTimeout(() => setIsTransitioning(false), 100); // Allow 100ms for transition
-        });
-      };
-      
-      // Fallback if image fails to load
-      newImage.onerror = () => {
-        requestAnimationFrame(() => {
-          setCurrentImageIndex(randomPageImage);
-          setBackgroundImage(foodImages[randomPageImage]);
-          setTimeout(() => setIsTransitioning(false), 100);
-        });
-      };
+      // Immediate update without preloading delay
+      requestAnimationFrame(() => {
+        setCurrentImageIndex(randomPageImage);
+        setBackgroundImage(foodImages[randomPageImage]);
+        // Reduced transition time for faster response
+        setTimeout(() => setIsTransitioning(false), 50);
+      });
     }
-  }, [activeTab]); // Only triggers on tab change
+  }, [activeTab, currentImageIndex]); // Only triggers on tab change
 
   return {
     backgroundImage,
