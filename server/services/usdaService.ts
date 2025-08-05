@@ -176,6 +176,12 @@ export class USDAService {
     };
   }> {
     try {
+      // First check if we have accurate fallback data for common foods
+      const fallbackResult = this.tryFallbackFirst(ingredientName, measurement);
+      if (fallbackResult) {
+        return fallbackResult;
+      }
+
       // Search for the ingredient
       const foods = await this.searchFoods(ingredientName, 5);
       
@@ -197,6 +203,11 @@ export class USDAService {
       // Extract key nutrients
       let nutrients = this.extractNutrients(food.foodNutrients);
       
+      // Validate that the calorie count is reasonable for the food type
+      if (this.isUnreasonableCalorieCount(ingredientName, nutrients.calories)) {
+        throw new Error('Unreasonable calorie data from USDA, using fallback');
+      }
+      
       // Apply cooking retention factors if food is prepared
       const cookingMethod = detectCookingMethod(food.description);
       const foodGroup = classifyFood(food.description);
@@ -214,21 +225,17 @@ export class USDAService {
       // Parse measurement and convert to grams
       const { quantity, unit, gramsEquivalent } = this.parseMeasurement(measurement, food);
       
-      // Calculate calories based on grams using enhanced conversion factors
+      // Calculate calories based on grams - prioritize direct calorie data
       let estimatedCalories: number;
       
       if (nutrients.calories > 0) {
-        // Use direct calorie data if available
+        // Use direct calorie data from USDA - this is the most accurate
         estimatedCalories = Math.round((nutrients.calories * gramsEquivalent) / 100);
       } else if (nutrients.protein > 0 || nutrients.carbs > 0 || nutrients.fat > 0) {
-        // Calculate using food-specific USDA conversion factors
-        estimatedCalories = calculateCaloriesFromMacros(
-          food.description,
-          (nutrients.protein * gramsEquivalent) / 100,
-          (nutrients.fat * gramsEquivalent) / 100,
-          (nutrients.carbs * gramsEquivalent) / 100
+        // Calculate using standard 4-4-9 rule (more reliable than food-specific factors)
+        estimatedCalories = Math.round(
+          ((nutrients.protein * 4) + (nutrients.fat * 9) + (nutrients.carbs * 4)) * gramsEquivalent / 100
         );
-
       } else {
         // Fallback to zero if no nutritional data
         estimatedCalories = 0;
@@ -548,7 +555,7 @@ export class USDAService {
 
     // If no conversion found, check if unit suggests grams or use serving size
     if (gramsEquivalent === quantity) {
-      if (unit.includes('g') || unit.includes('gram')) {
+      if (unit.match(/^g$|^grams?$|^\d+g$/) || unit.includes('gram')) {
         // Already in grams, don't multiply
         gramsEquivalent = quantity;
       } else if (food.servingSize) {
@@ -655,6 +662,20 @@ export class USDAService {
         // Strongly prefer fresh raw bananas over overripe
         if (description.includes('raw') && !description.includes('overripe')) score += 300;
         if (description.includes('overripe')) score -= 300; // Heavily penalize overripe
+      }
+      
+      if (searchLower.includes('apple')) {
+        // Strongly prefer fresh raw apples over processed varieties
+        if (description.includes('raw') && !description.includes('dried') && !description.includes('chips')) score += 300;
+        if (description.includes('dried') || description.includes('chips') || description.includes('dehydrated')) score -= 500;
+        if (description.includes('fresh') || description.includes('fruit, without')) score += 200;
+      }
+      
+      if (searchLower.includes('chicken')) {
+        // Prefer raw chicken breast data for accurate calculations
+        if (description.includes('raw') && description.includes('breast')) score += 300;
+        if (description.includes('cooked') || description.includes('braised') || description.includes('roasted')) score -= 200;
+        if (description.includes('skinless') && description.includes('boneless')) score += 100;
       }
       
       if (searchLower.includes('rice')) {
@@ -881,7 +902,7 @@ export class USDAService {
       if (unt.includes('cup')) {
         gramsEquivalent = qty * 240; // Standard cup volume
       } else if (unt.includes('piece') || unt.includes('item')) {
-        gramsEquivalent = qty * 50; // Standard piece weight for hotdog
+        gramsEquivalent = qty * 75; // Standard piece weight (updated for accuracy)
       } else if (unt.includes('slice')) {
         gramsEquivalent = qty * 25; // Standard slice weight
       } else {
@@ -914,12 +935,9 @@ export class USDAService {
       };
     }
     
-    // Use food-specific calorie conversion factors for more accuracy
-    const enhancedCalories = calculateCaloriesFromMacros(
-      ingredientName,
-      (adjustedNutrition.protein * gramsEquivalent) / 100,
-      (adjustedNutrition.fat * gramsEquivalent) / 100,
-      (adjustedNutrition.carbs * gramsEquivalent) / 100
+    // Use standard 4-4-9 calorie conversion factors for accuracy and consistency
+    const enhancedCalories = Math.round(
+      ((adjustedNutrition.protein * 4) + (adjustedNutrition.fat * 9) + (adjustedNutrition.carbs * 4)) * gramsEquivalent / 100
     );
 
     return {
@@ -945,6 +963,36 @@ export class USDAService {
     };
     const result = this.parseMeasurement(measurement, mockFood);
     return { gramsEquivalent: result.gramsEquivalent };
+  }
+
+  /**
+   * Check if we have reliable fallback data for common foods and use it first
+   */
+  private tryFallbackFirst(ingredientName: string, measurement: string) {
+    const ingredient = ingredientName.toLowerCase();
+    
+    // List of foods where fallback data is more accurate than potentially wrong USDA results
+    const preferFallbackFor = ['apple', 'chicken', 'chicken breast', 'hotdog', 'hot dog', 'egg', 'rice', 'bread', 'pasta'];
+    
+    if (preferFallbackFor.some(food => ingredient.includes(food))) {
+      return this.getEnhancedFallbackEstimate(ingredientName, measurement);
+    }
+    
+    return null;
+  }
+
+  /**
+   * Validate if calorie count is reasonable for the food type
+   */
+  private isUnreasonableCalorieCount(ingredientName: string, caloriesPer100g: number): boolean {
+    const ingredient = ingredientName.toLowerCase();
+    
+    // Check for obviously wrong calorie counts
+    if (ingredient.includes('apple') && caloriesPer100g > 80) return true; // Fresh apple should be ~52 kcal/100g
+    if (ingredient.includes('chicken breast') && caloriesPer100g > 200) return true; // Raw chicken breast should be ~165 kcal/100g
+    if (ingredient.includes('banana') && caloriesPer100g > 120) return true; // Fresh banana should be ~89 kcal/100g
+    
+    return false;
   }
 }
 

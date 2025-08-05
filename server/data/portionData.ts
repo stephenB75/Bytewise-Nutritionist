@@ -40,18 +40,21 @@ export const PORTION_WEIGHTS: Record<string, PortionData[]> = {
   "chicken breast": [
     { fdc_id: "171477", portion_description: "breast", gram_weight: 172, amount: 1 },
     { fdc_id: "171477", portion_description: "piece", gram_weight: 85, amount: 1 },
-    { fdc_id: "171477", portion_description: "cup diced", gram_weight: 140, amount: 1 }
+    { fdc_id: "171477", portion_description: "cup diced", gram_weight: 140, amount: 1 },
+    { fdc_id: "171477", portion_description: "g", gram_weight: 1, amount: 1 } // 1g = 1g for direct measurements
   ],
   "egg": [
     { fdc_id: "171287", portion_description: "large", gram_weight: 50, amount: 1 },
     { fdc_id: "171287", portion_description: "medium", gram_weight: 44, amount: 1 },
-    { fdc_id: "171287", portion_description: "small", gram_weight: 38, amount: 1 }
+    { fdc_id: "171287", portion_description: "small", gram_weight: 38, amount: 1 },
+    { fdc_id: "171287", portion_description: "g", gram_weight: 1, amount: 1 }
   ],
   
   // Grains & Carbs
   "rice": [
     { fdc_id: "168878", portion_description: "cup cooked", gram_weight: 158, amount: 1 },
-    { fdc_id: "168878", portion_description: "cup uncooked", gram_weight: 185, amount: 1 }
+    { fdc_id: "168878", portion_description: "cup uncooked", gram_weight: 185, amount: 1 },
+    { fdc_id: "168878", portion_description: "g", gram_weight: 1, amount: 1 }
   ],
   "bread": [
     { fdc_id: "172687", portion_description: "slice", gram_weight: 28, amount: 1 },
@@ -80,6 +83,20 @@ export const PORTION_WEIGHTS: Record<string, PortionData[]> = {
   "cheese": [
     { fdc_id: "173441", portion_description: "slice", gram_weight: 28, amount: 1 },
     { fdc_id: "173441", portion_description: "cup shredded", gram_weight: 113, amount: 1 }
+  ],
+  
+  // Processed Foods
+  "hotdog": [
+    { fdc_id: "174582", portion_description: "item", gram_weight: 76, amount: 1 },
+    { fdc_id: "174582", portion_description: "piece", gram_weight: 76, amount: 1 },
+    { fdc_id: "174582", portion_description: "link", gram_weight: 76, amount: 1 },
+    { fdc_id: "174582", portion_description: "g", gram_weight: 1, amount: 1 }
+  ],
+  "hot dog": [
+    { fdc_id: "174582", portion_description: "item", gram_weight: 76, amount: 1 },
+    { fdc_id: "174582", portion_description: "piece", gram_weight: 76, amount: 1 },
+    { fdc_id: "174582", portion_description: "link", gram_weight: 76, amount: 1 },
+    { fdc_id: "174582", portion_description: "g", gram_weight: 1, amount: 1 }
   ]
 };
 
