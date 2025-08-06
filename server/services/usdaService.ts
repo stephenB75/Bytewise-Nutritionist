@@ -427,7 +427,29 @@ export class USDAService {
     'avocado': { calories: 160, protein: 2.0, carbs: 8.5, fat: 14.7 },
     'lime': { calories: 30, protein: 0.7, carbs: 10.5, fat: 0.2 },
     'scotch bonnet pepper': { calories: 40, protein: 1.9, carbs: 8.8, fat: 0.4 },
-    'plantain': { calories: 122, protein: 1.3, carbs: 32, fat: 0.4 }
+    'plantain': { calories: 122, protein: 1.3, carbs: 32, fat: 0.4 },
+    
+    // Caribbean fruit variations and alternative names
+    'plumrose': { calories: 25, protein: 0.6, carbs: 5.7, fat: 0.3 }, // Mountain apple variety
+    'starapple': { calories: 67, protein: 1.5, carbs: 15.3, fat: 0.7 }, // Star apple (one word)
+    'star apple': { calories: 67, protein: 1.5, carbs: 15.3, fat: 0.7 },
+    'timbrine': { calories: 46, protein: 0.9, carbs: 11.2, fat: 0.3 }, // Regional name for june plum
+    'golden plum': { calories: 46, protein: 0.9, carbs: 11.2, fat: 0.3 },
+    'hog plum': { calories: 46, protein: 0.9, carbs: 11.2, fat: 0.3 },
+    'jew plum': { calories: 46, protein: 0.9, carbs: 11.2, fat: 0.3 },
+    'coolie plum': { calories: 46, protein: 0.9, carbs: 11.2, fat: 0.3 },
+    'pommecythere': { calories: 46, protein: 0.9, carbs: 11.2, fat: 0.3 },
+    'rose apple': { calories: 25, protein: 0.6, carbs: 5.7, fat: 0.3 },
+    'wax apple': { calories: 25, protein: 0.6, carbs: 5.7, fat: 0.3 },
+    'water apple': { calories: 25, protein: 0.6, carbs: 5.7, fat: 0.3 },
+    'mammee apple': { calories: 51, protein: 0.5, carbs: 12.5, fat: 0.5 },
+    'mamey': { calories: 124, protein: 1.4, carbs: 32.1, fat: 0.5 },
+    'sapodilla': { calories: 83, protein: 0.4, carbs: 20, fat: 1.1 },
+    'naseberry': { calories: 83, protein: 0.4, carbs: 20, fat: 1.1 },
+    'guinep': { calories: 58, protein: 1.3, carbs: 13.7, fat: 0.1 },
+    'spanish lime': { calories: 58, protein: 1.3, carbs: 13.7, fat: 0.1 },
+    'ackee fruit': { calories: 151, protein: 2.9, carbs: 0.8, fat: 15 },
+    'breadnut': { calories: 191, protein: 7.4, carbs: 38.4, fat: 2.3 }
   };
 
   /**
