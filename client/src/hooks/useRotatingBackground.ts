@@ -49,11 +49,11 @@ const pageImageMap: Record<string, number[]> = {
   'daily': [3, 19, 26, 27], // Meals (burgers, pizza, steaks)
   'profile': [7, 9, 14, 28], // Desserts and treats
   'tracking': [1, 12, 17, 21], // Breakfast and healthy options
-  'achievements': [0, 8, 13, 15, 20], // Fruits and colorful foods
+  'achievements': [0, 8, 13, 15, 16, 20], // Fruits and colorful foods (added mango)
   'signin': [18, 25, 31, 32], // Welcoming foods (pancakes, pasta, variety)
   'calculator': [11, 24, 29], // Cooking ingredients and prep
   'search': [2, 10, 22, 31], // Variety and discovery
-  'data': [13, 15, 20, 30, 32] // Fresh produce and analytics
+  'data': [13, 15, 16, 20, 30, 32] // Fresh produce and analytics (added mango)
 };
 
 export function useRotatingBackground(activeTab: string) {
