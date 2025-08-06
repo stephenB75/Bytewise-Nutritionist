@@ -196,18 +196,28 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   useEffect(() => {
     // Load existing meal data on component mount
     const loadExistingData = () => {
-      const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-      const today = new Date().toISOString().split('T')[0];
-      const todayMeals = stored.filter((meal: any) => meal.date === today);
-      setLoggedMeals(todayMeals);
-      
-      // Calculate daily calories from existing logged meals
-      const dailyTotal = todayMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
-      setDailyCalories(dailyTotal);
-      
-      // Calculate weekly calories from all stored meals
-      const weeklyTotal = stored.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
-      setWeeklyCalories(weeklyTotal);
+      try {
+        const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
+        const today = new Date().toISOString().split('T')[0];
+        const todayMeals = stored.filter((meal: any) => meal.date === today);
+        setLoggedMeals(todayMeals);
+        
+        // Calculate daily calories from existing logged meals
+        const dailyTotal = todayMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
+        setDailyCalories(dailyTotal);
+        
+        // Calculate weekly calories from all stored meals
+        const weeklyTotal = stored.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
+        setWeeklyCalories(weeklyTotal);
+        
+        console.log('📊 ModernFoodLayout: Loaded data - Daily:', dailyTotal, 'Weekly:', weeklyTotal);
+      } catch (error) {
+        console.error('❌ ModernFoodLayout: Error loading existing data:', error);
+        // Reset to safe state on error
+        setLoggedMeals([]);
+        setDailyCalories(0);
+        setWeeklyCalories(0);
+      }
     };
 
     // Load existing data immediately
@@ -215,21 +225,32 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
     // Set up event listeners for future meal logging
     const handleMealLogged = () => {
-      console.log('🔄 ModernFoodLayout: Handling meal logged event');
-      loadExistingData();
-      // Also dispatch event for weekly cards to refresh
-      window.dispatchEvent(new CustomEvent('refresh-weekly-data'));
+      try {
+        console.log('🔄 ModernFoodLayout: Handling meal logged event');
+        loadExistingData();
+        // Don't dispatch circular events - let other components handle their own refresh
+      } catch (error) {
+        console.error('❌ ModernFoodLayout: Error handling meal logged event:', error);
+      }
     };
 
-    window.addEventListener('calories-logged', handleMealLogged);
-    window.addEventListener('meal-logged-success', handleMealLogged);
-    window.addEventListener('refresh-weekly-data', handleMealLogged);
+    // Add event listeners with unique references to avoid conflicts
+    const eventsToAdd = [
+      { type: 'calories-logged', handler: handleMealLogged },
+      { type: 'meal-logged-success', handler: handleMealLogged }
+    ];
+
+    eventsToAdd.forEach(({ type, handler }) => {
+      window.addEventListener(type, handler);
+    });
+
+    // Add storage listener separately
     window.addEventListener('storage', loadExistingData);
 
     return () => {
-      window.removeEventListener('calories-logged', handleMealLogged);
-      window.removeEventListener('meal-logged-success', handleMealLogged);
-      window.removeEventListener('refresh-weekly-data', handleMealLogged);
+      eventsToAdd.forEach(({ type, handler }) => {
+        window.removeEventListener(type, handler);
+      });
       window.removeEventListener('storage', loadExistingData);
     };
   }, []);
