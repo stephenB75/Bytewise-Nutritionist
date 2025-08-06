@@ -64,14 +64,30 @@ export function useRotatingBackground(activeTab: string) {
   // Change background when page/tab changes
   useEffect(() => {
     const pageImages = pageImageMap[activeTab] || [0, 1, 2];
-    const randomPageImage = pageImages[Math.floor(Math.random() * pageImages.length)];
     
-    if (randomPageImage !== currentImageIndex) {
-      setCurrentImageIndex(randomPageImage);
-      setBackgroundImage(foodImages[randomPageImage]);
-      setAnimationKey(prev => prev + 1);
+    // Ensure we get a different image by filtering out current one
+    let availableImages = pageImages;
+    if (pageImages.length > 1) {
+      availableImages = pageImages.filter(index => index !== currentImageIndex);
     }
-  }, [activeTab, currentImageIndex]);
+    
+    // If no different images available, use all page images
+    if (availableImages.length === 0) {
+      availableImages = pageImages;
+    }
+    
+    const randomPageImage = availableImages[Math.floor(Math.random() * availableImages.length)];
+    
+    // Get food name for debugging
+    const imageName = foodImages[randomPageImage].split('/').pop()?.split('_')[0] || 'unknown';
+    console.log(`🎨 Background Rotation: ${activeTab} -> Image ${randomPageImage} (${imageName})`);
+    console.log(`📋 Available images for ${activeTab}:`, pageImages, '| Selected:', randomPageImage);
+    console.log(`🔄 Previous image: ${currentImageIndex} -> New image: ${randomPageImage}`);
+    
+    setCurrentImageIndex(randomPageImage);
+    setBackgroundImage(foodImages[randomPageImage]);
+    setAnimationKey(prev => prev + 1);
+  }, [activeTab]); // Remove currentImageIndex dependency to avoid infinite loops
 
   return {
     backgroundImage,
