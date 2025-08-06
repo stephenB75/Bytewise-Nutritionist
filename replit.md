@@ -13,6 +13,7 @@ bytewise nutritionist is a comprehensive Progressive Web App (PWA) for nutrition
 - **Complete Cereal Database Integration**: Added 25+ breakfast cereals including popular brands (Cheerios, Cornflakes, Lucky Charms), health-focused options (granola, muesli, bran flakes), and hot cereals (oatmeal, grits, cream of wheat) with accurate per-100g nutritional data for precise portion calculations
 - **Comprehensive Sandwich Database**: Added 30+ sandwich varieties including chicken sandwiches, deli meats, Italian subs, burgers, specialty sandwiches (Reuben, Cuban, Monte Cristo), and breakfast sandwiches with complete nutritional profiles resolving "No nutrition data available" errors for composite foods
 - **Complete Bread Database Verification**: Added 30+ bread varieties including whole wheat, white, sourdough, rye, specialty breads (brioche, challah), baked goods (bagels, croissants), and international options (tortillas, naan, pita) with accurate nutritional data resolving bread-specific lookup errors
+- **Comprehensive Pasta Database Integration**: Added 35+ pasta varieties including traditional shapes (spaghetti, penne, rigatoni), specialty options (whole wheat, gluten-free, lentil, quinoa), cooked vs dry states, and Asian noodles (ramen, udon, soba) with complete nutritional profiles for accurate carbohydrate tracking
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.

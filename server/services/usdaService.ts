@@ -1336,6 +1336,51 @@ export class USDAService {
       'lavash': { calories: 275, protein: 9.1, carbs: 55.7, fat: 1.2 },
       'flatbread': { calories: 275, protein: 9.1, carbs: 55.7, fat: 1.2 },
       
+      // Pasta varieties (dry, per 100g)
+      'pasta': { calories: 371, protein: 13.0, carbs: 74.7, fat: 1.5 },
+      'spaghetti': { calories: 371, protein: 13.0, carbs: 74.7, fat: 1.5 },
+      'penne': { calories: 371, protein: 13.0, carbs: 74.7, fat: 1.5 },
+      'rigatoni': { calories: 371, protein: 13.0, carbs: 74.7, fat: 1.5 },
+      'fusilli': { calories: 371, protein: 13.0, carbs: 74.7, fat: 1.5 },
+      'farfalle': { calories: 371, protein: 13.0, carbs: 74.7, fat: 1.5 },
+      'linguine': { calories: 371, protein: 13.0, carbs: 74.7, fat: 1.5 },
+      'fettuccine': { calories: 371, protein: 13.0, carbs: 74.7, fat: 1.5 },
+      'angel hair pasta': { calories: 371, protein: 13.0, carbs: 74.7, fat: 1.5 },
+      'rotini': { calories: 371, protein: 13.0, carbs: 74.7, fat: 1.5 },
+      'shells pasta': { calories: 371, protein: 13.0, carbs: 74.7, fat: 1.5 },
+      'bow tie pasta': { calories: 371, protein: 13.0, carbs: 74.7, fat: 1.5 },
+      'macaroni': { calories: 371, protein: 13.0, carbs: 74.7, fat: 1.5 },
+      'elbows pasta': { calories: 371, protein: 13.0, carbs: 74.7, fat: 1.5 },
+      'orzo': { calories: 371, protein: 13.0, carbs: 74.7, fat: 1.5 },
+      'ziti': { calories: 371, protein: 13.0, carbs: 74.7, fat: 1.5 },
+      'lasagna noodles': { calories: 371, protein: 13.0, carbs: 74.7, fat: 1.5 },
+      
+      // Whole grain pasta
+      'whole wheat pasta': { calories: 348, protein: 14.6, carbs: 71.5, fat: 2.5 },
+      'whole wheat spaghetti': { calories: 348, protein: 14.6, carbs: 71.5, fat: 2.5 },
+      'whole grain pasta': { calories: 348, protein: 14.6, carbs: 71.5, fat: 2.5 },
+      
+      // Specialty pasta
+      'gluten free pasta': { calories: 357, protein: 7.0, carbs: 78.0, fat: 2.0 },
+      'rice pasta': { calories: 364, protein: 7.2, carbs: 80.0, fat: 1.4 },
+      'quinoa pasta': { calories: 357, protein: 14.0, carbs: 71.6, fat: 2.8 },
+      'lentil pasta': { calories: 336, protein: 25.0, carbs: 52.0, fat: 2.0 },
+      'chickpea pasta': { calories: 337, protein: 20.9, carbs: 57.6, fat: 4.2 },
+      
+      // Cooked pasta (per 100g)
+      'cooked pasta': { calories: 131, protein: 5.0, carbs: 25.0, fat: 1.1 },
+      'cooked spaghetti': { calories: 131, protein: 5.0, carbs: 25.0, fat: 1.1 },
+      'cooked penne': { calories: 131, protein: 5.0, carbs: 25.0, fat: 1.1 },
+      'cooked whole wheat pasta': { calories: 124, protein: 5.3, carbs: 23.0, fat: 1.4 },
+      
+      // Asian noodles
+      'ramen noodles': { calories: 436, protein: 9.4, carbs: 58.0, fat: 18.0 },
+      'udon noodles': { calories: 270, protein: 8.0, carbs: 52.0, fat: 2.0 },
+      'soba noodles': { calories: 274, protein: 11.0, carbs: 56.0, fat: 1.9 },
+      'rice noodles': { calories: 364, protein: 5.9, carbs: 83.0, fat: 0.6 },
+      'lo mein noodles': { calories: 384, protein: 14.0, carbs: 71.0, fat: 4.4 },
+      'pad thai noodles': { calories: 192, protein: 4.6, carbs: 42.2, fat: 0.6 },
+      
       // Sodas and carbonated drinks
       'soda': { calories: 41, protein: 0, carbs: 10.6, fat: 0 },
       'cola': { calories: 41, protein: 0, carbs: 10.6, fat: 0 },
