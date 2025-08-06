@@ -399,11 +399,35 @@ export class USDAService {
     'johnny cakes': { calories: 165, protein: 3, carbs: 32, fat: 3 },
     'cassava': { calories: 160, protein: 1.4, carbs: 38, fat: 0.3 },
     'breadfruit': { calories: 103, protein: 1.1, carbs: 27, fat: 0.2 },
+    'breakfruit': { calories: 103, protein: 1.1, carbs: 27, fat: 0.2 }, // Common misspelling
     'callaloo': { calories: 22, protein: 2.1, carbs: 3.7, fat: 0.3 },
     'curry goat': { calories: 250, protein: 22, carbs: 5, fat: 16 },
     'oxtail': { calories: 330, protein: 19, carbs: 0, fat: 28 },
     'saltfish': { calories: 290, protein: 62, carbs: 0, fat: 2.4 },
-    'ackee': { calories: 151, protein: 2.9, carbs: 0.8, fat: 15 }
+    'ackee': { calories: 151, protein: 2.9, carbs: 0.8, fat: 15 },
+    
+    // Additional Caribbean fruits
+    'mango': { calories: 60, protein: 0.8, carbs: 15, fat: 0.4 },
+    'papaya': { calories: 43, protein: 0.5, carbs: 11, fat: 0.3 },
+    'guava': { calories: 68, protein: 2.6, carbs: 14.3, fat: 1.0 },
+    'soursop': { calories: 66, protein: 1.0, carbs: 16.8, fat: 0.3 },
+    'star fruit': { calories: 31, protein: 1.0, carbs: 6.7, fat: 0.3 },
+    'passion fruit': { calories: 97, protein: 2.2, carbs: 23.4, fat: 0.7 },
+    'sugar apple': { calories: 94, protein: 2.1, carbs: 23.6, fat: 0.3 },
+    'sweetsop': { calories: 94, protein: 2.1, carbs: 23.6, fat: 0.3 },
+    'custard apple': { calories: 94, protein: 2.1, carbs: 23.6, fat: 0.3 },
+    'coconut meat': { calories: 354, protein: 3.3, carbs: 15.2, fat: 33.5 },
+    'coconut water': { calories: 19, protein: 0.7, carbs: 3.7, fat: 0.2 },
+    'tamarind': { calories: 239, protein: 2.8, carbs: 62.5, fat: 0.6 },
+    'june plum': { calories: 46, protein: 0.9, carbs: 11.2, fat: 0.3 },
+    'golden apple': { calories: 46, protein: 0.9, carbs: 11.2, fat: 0.3 },
+    'otaheite apple': { calories: 25, protein: 0.6, carbs: 5.7, fat: 0.3 },
+    'mountain apple': { calories: 25, protein: 0.6, carbs: 5.7, fat: 0.3 },
+    'carambola': { calories: 31, protein: 1.0, carbs: 6.7, fat: 0.3 },
+    'avocado': { calories: 160, protein: 2.0, carbs: 8.5, fat: 14.7 },
+    'lime': { calories: 30, protein: 0.7, carbs: 10.5, fat: 0.2 },
+    'scotch bonnet pepper': { calories: 40, protein: 1.9, carbs: 8.8, fat: 0.4 },
+    'plantain': { calories: 122, protein: 1.3, carbs: 32, fat: 0.4 }
   };
 
   /**

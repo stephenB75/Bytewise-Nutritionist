@@ -16,6 +16,7 @@ bytewise nutritionist is a comprehensive Progressive Web App (PWA) for nutrition
 - **Comprehensive Pasta Database Integration**: Added 35+ pasta varieties including traditional shapes (spaghetti, penne, rigatoni), specialty options (whole wheat, gluten-free, lentil, quinoa), cooked vs dry states, and Asian noodles (ramen, udon, soba) with complete nutritional profiles for accurate carbohydrate tracking
 - **Complete Database Optimization**: Fixed all LSP diagnostics (5 → 0), resolved type safety issues, implemented optimized cached food search with intelligent prioritization, and streamlined query performance for improved application stability
 - **Comprehensive Salad Database Integration**: Added 35+ salad varieties including basic mixed greens (15 cal), specialty salads (Caesar, Greek, Cobb), protein salads (chicken, tuna, egg), unique options (Waldorf, Caprese, Niçoise), and common spelling variations ("Cesar Salad") with complete nutritional profiles for accurate meal tracking
+- **Complete Caribbean Fruits Database**: Added 20+ tropical fruits including mango, papaya, guava, soursop, star fruit, passion fruit, coconut (meat/water), tamarind, june plum, avocado, and lime with authentic nutritional data. Fixed "Breakfruit" misspelling (breadfruit) for accurate Caribbean cuisine tracking
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
