@@ -395,7 +395,12 @@ export class USDAService {
     } catch (error) {
       
       // Fallback to enhanced estimation with proper nutrition data
-      return this.getEnhancedFallbackEstimate(ingredientName, measurement);
+      try {
+        return this.getEnhancedFallbackEstimate(ingredientName, measurement);
+      } catch (fallbackError) {
+        // Create a basic estimate for unknown foods
+        return this.getGenericFoodEstimate(ingredientName, measurement);
+      }
     }
   }
 
@@ -482,7 +487,7 @@ export class USDAService {
 
   private static readonly COOKING_METHODS = ['grilled', 'fried', 'baked', 'roasted', 'boiled', 'steamed', 'raw', 'fresh', 'cooked'];
   private static readonly PREPARATION_FORMS = ['canned', 'frozen', 'dried', 'fresh', 'pickled', 'smoked'];
-  private static readonly FALLBACK_FOODS = ['apple', 'chicken', 'chicken breast', 'hotdog', 'hot dog', 'egg', 'rice', 'white rice', 'brown rice', 'bread', 'white bread', 'whole wheat bread', 'pasta', 'spaghetti', 'penne', 'macaroni', 'corn', 'sweet corn', 'corn on cob', 'corn on the cob', 'potato', 'baked potato', 'oats', 'oatmeal', 'quinoa', 'barley', 'bulgur', 'cereal', 'cheerios', 'cornflakes', 'granola', 'peanut punch', 'sorrel', 'ginger beer', 'coconut water', 'rum punch', 'mauby', 'sea moss'];
+  private static readonly FALLBACK_FOODS = ['apple', 'chicken', 'chicken breast', 'hotdog', 'hot dog', 'egg', 'rice', 'white rice', 'brown rice', 'bread', 'white bread', 'whole wheat bread', 'pasta', 'spaghetti', 'penne', 'macaroni', 'corn', 'sweet corn', 'corn on cob', 'corn on the cob', 'potato', 'baked potato', 'oats', 'oatmeal', 'quinoa', 'barley', 'bulgur', 'cereal', 'cheerios', 'cornflakes', 'granola', 'peanut punch', 'sorrel', 'ginger beer', 'coconut water', 'rum punch', 'mauby', 'sea moss', 'nectarine', 'nectarines', 'protein bar', 'nutrition bar', 'energy bar'];
 
   // FDA Standard Liquid Serving Sizes (RACC - Reference Amounts Customarily Consumed)
   private static readonly STANDARD_LIQUID_SERVINGS: Record<string, { 
@@ -2083,6 +2088,24 @@ export class USDAService {
       'mediterranean salad': { calories: 107, protein: 3.8, carbs: 7.2, fat: 7.8 },
       'italian salad': { calories: 107, protein: 3.8, carbs: 7.2, fat: 7.8 },
       'antipasto salad': { calories: 145, protein: 8.6, carbs: 7.4, fat: 9.8 },
+
+      // Stone fruits - Nectarines
+      'nectarine': { calories: 44, protein: 1.1, carbs: 10.6, fat: 0.3 },
+      'nectarines': { calories: 44, protein: 1.1, carbs: 10.6, fat: 0.3 },
+      'fresh nectarine': { calories: 44, protein: 1.1, carbs: 10.6, fat: 0.3 },
+      'raw nectarine': { calories: 44, protein: 1.1, carbs: 10.6, fat: 0.3 },
+
+      // Protein bars and nutrition bars (per 100g)
+      'protein bar': { calories: 413, protein: 25.0, carbs: 45.0, fat: 8.5 },
+      'nutrition bar': { calories: 413, protein: 25.0, carbs: 45.0, fat: 8.5 },
+      'energy bar': { calories: 413, protein: 25.0, carbs: 45.0, fat: 8.5 },
+      'protein energy bar': { calories: 413, protein: 25.0, carbs: 45.0, fat: 8.5 },
+      'whey protein bar': { calories: 413, protein: 25.0, carbs: 45.0, fat: 8.5 },
+      'quest bar': { calories: 400, protein: 21.0, carbs: 22.0, fat: 14.0 },
+      'clif bar': { calories: 421, protein: 10.5, carbs: 68.4, fat: 10.5 },
+      'kind bar': { calories: 500, protein: 16.0, carbs: 32.0, fat: 32.0 },
+      'granola bar': { calories: 471, protein: 10.1, carbs: 64.8, fat: 19.0 },
+      'cereal bar': { calories: 395, protein: 6.0, carbs: 70.0, fat: 10.0 },
     };
 
     const liquidFallback = liquidFallbacks[normalized as keyof typeof liquidFallbacks];
@@ -2146,7 +2169,56 @@ export class USDAService {
       return result;
     }
 
-    throw new Error(`No nutrition data available for "${ingredientName}"`);
+    // Final fallback: create basic estimate
+    return this.getGenericFoodEstimate(ingredientName, measurement);
+  }
+
+  /**
+   * Generate generic estimates for unknown foods based on common food patterns
+   */
+  private getGenericFoodEstimate(ingredientName: string, measurement: string): any {
+    const normalized = ingredientName.toLowerCase().trim();
+    
+    // Generic estimates based on food type patterns
+    let baseCalories = 150; // Default moderate calorie food
+    let protein = 5.0;
+    let carbs = 20.0;
+    let fat = 3.0;
+    
+    // Pattern-based nutrition estimates
+    if (normalized.includes('bar') || normalized.includes('protein')) {
+      baseCalories = 413; protein = 25.0; carbs = 45.0; fat = 8.5;
+    } else if (normalized.includes('fruit') || normalized.match(/\b(apple|banana|orange|peach|pear|plum|nectarine|berry)\b/)) {
+      baseCalories = 44; protein = 1.1; carbs = 10.6; fat = 0.3;
+    } else if (normalized.includes('vegetable') || normalized.match(/\b(broccoli|carrot|spinach|lettuce|tomato)\b/)) {
+      baseCalories = 25; protein = 2.5; carbs = 5.0; fat = 0.2;
+    } else if (normalized.includes('meat') || normalized.match(/\b(chicken|beef|pork|fish|turkey)\b/)) {
+      baseCalories = 250; protein = 25.0; carbs = 0.0; fat = 15.0;
+    } else if (normalized.includes('grain') || normalized.match(/\b(rice|bread|pasta|cereal|oats)\b/)) {
+      baseCalories = 350; protein = 10.0; carbs = 70.0; fat = 2.0;
+    }
+    
+    const nutrition = { calories: baseCalories, protein, carbs, fat };
+    const mockFood: USDAFood = {
+      fdcId: 0,
+      description: normalized,
+      dataType: 'Generic Estimate',
+      foodNutrients: []
+    };
+    
+    const measurementResult = this.parseMeasurement(measurement, mockFood);
+    const { quantity, unit, gramsEquivalent } = measurementResult;
+    const estimatedCalories = Math.round((nutrition.calories * gramsEquivalent) / 100);
+    
+    return {
+      ingredient: ingredientName.toUpperCase(),
+      measurement: `${quantity} ${unit} (~${gramsEquivalent}g)`,
+      estimatedCalories,
+      equivalentMeasurement: `100g ≈ ${nutrition.calories} kcal`,
+      note: 'Generic estimate - consider adding specific nutrition data',
+      nutritionPer100g: nutrition,
+      isGenericEstimate: true
+    };
   }
 
 }
