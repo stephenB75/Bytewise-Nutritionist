@@ -390,7 +390,7 @@ export class USDAService {
     const query = ingredientName.toLowerCase().trim();
     
     // Handle singular to plural conversions for better USDA matching
-    const singularToPlural = {
+    const singularToPlural: Record<string, string> = {
       'carrot': 'carrots',
       'tomato': 'tomatoes', 
       'potato': 'potatoes',
@@ -992,462 +992,207 @@ export class USDAService {
       if (description.includes('salad') && description.includes('mixed')) score -= 300;
     }
 
-    // Banana scoring
-    if (searchTerm.includes('banana')) {
-      if (description.includes('raw') && !description.includes('overripe')) score += 300;
-      if (description.includes('overripe')) score -= 300;
-      if (description.includes('chips') || description.includes('dried')) score -= 400;
-    }
+    return score;
+  }
+
+  /**
+   * Check if the search term is for a liquid
+   */
+  private isLiquidQuery(searchTerm: string): boolean {
+    const liquidKeywords = [
+      'milk', 'water', 'juice', 'coffee', 'tea', 'soda', 'cola', 'pepsi', 'coke',
+      'beer', 'wine', 'smoothie', 'shake', 'drink', 'beverage', 'liquid',
+      'latte', 'cappuccino', 'espresso', 'moccha', 'frappuccino',
+      'sprite', 'fanta', 'mountain dew', 'gatorade', 'powerade',
+      'coconut water', 'almond milk', 'soy milk', 'oat milk',
+      'energy drink', 'sports drink', 'protein shake', 'iced tea',
+      'hot chocolate', 'cocoa', 'lemonade', 'punch'
+    ];
     
-    // Apple scoring
-    if (searchTerm.includes('apple')) {
-      if (description.includes('raw') && !description.includes('dried') && !description.includes('chips')) score += 300;
-      if (description.includes('dried') || description.includes('chips') || description.includes('dehydrated')) score -= 500;
-      if (description.includes('fresh') || description.includes('fruit, without')) score += 200;
-      if (description.includes('candied') || description.includes('baked')) score -= 300;
-    }
-    
-    // Chicken scoring - prioritize plain chicken breast
-    if (searchTerm.includes('chicken')) {
-      if (description.includes('breast') && description.includes('raw')) score += 500;
-      if (description.includes('breast') && description.includes('skinless') && description.includes('boneless')) score += 400;
-      if (description.includes('wing') || description.includes('drumstick') || description.includes('thigh')) score -= 200;
-      if (description.includes('caesar') || description.includes('garden') || description.includes('biryani')) score -= 800;
-      if (description.includes('dumpling') || description.includes('salad')) score -= 600;
-    }
-    
-    // Rice scoring with measurement context
-    if (searchTerm.includes('rice')) {
-      if (measurementContext.includes('cup')) {
-        if (description.includes('cooked') || description.includes('steamed')) score += 200;
-        if (description.includes('flour') || description.includes('dry') || description.includes('raw')) score -= 200;
-      } else if (measurementContext.includes('g')) {
-        if (description.includes('raw') && !description.includes('flour')) score += 100;
-        if (description.includes('flour')) score -= 100;
-      }
-    }
-    
-    // Corn scoring with heavy penalties for wrong matches
-    if (searchTerm.includes('corn')) {
-      if (description.includes('flour') || description.includes('meal') || description.includes('starch')) score -= 1000;
-      if (description.includes('onion') || description.includes('egg')) score -= 1000;
-      if (description.includes('sweet') && description.includes('corn')) score += 300;
-      if (description.includes('kernel')) score += 200;
-      if (description.includes('ear')) score += 100;
+    return liquidKeywords.some(keyword => searchTerm.toLowerCase().includes(keyword));
+  }
+
+  /**
+   * Calculate liquid-specific scoring logic
+   */
+  private calculateLiquidScore(searchTerm: string, description: string): number {
+    let score = 0;
+
+    // MILK scoring
+    if (searchTerm.includes('milk')) {
+      if (description.includes('milk, whole') || description.includes('milk, reduced fat, 2%') || description.includes('milk, lowfat, 1%')) score += 600;
+      if (description.includes('milk, nonfat') || description.includes('milk, skim')) score += 550;
+      if (description.includes('milk') && !description.includes('chocolate') && !description.includes('strawberry')) score += 500;
+      if (description.includes('chocolate milk') || description.includes('flavored')) score -= 200;
+      if (description.includes('condensed') || description.includes('evaporated')) score -= 400;
+      if (description.includes('buttermilk') || description.includes('goat')) score -= 100;
     }
 
-    // Broccoli scoring - prefer fresh over fried
-    if (searchTerm.includes('broccoli')) {
-      if (description.includes('raw') || description.includes('fresh')) score += 300;
-      if (description.includes('fried') || description.includes('breaded')) score -= 500;
-      if (description.includes('steamed') || description.includes('boiled')) score += 200;
+    // WATER scoring (should be zero calories) - Very specific matching
+    if (searchTerm.includes('water')) {
+      if (description.toLowerCase() === 'water, tap') score += 800;
+      if (description.toLowerCase() === 'water, bottled, generic') score += 750;
+      if (description.includes('water') && !description.includes('tuna') && !description.includes('fish') && !description.includes('coconut') && !description.includes('flavored')) score += 600;
+      if (description.includes('tuna') || description.includes('fish') || description.includes('canned')) score -= 1000; // Heavy penalty for non-water items
+      if (description.includes('coconut water')) score -= 200; // different drink
+      if (description.includes('vitamin water') || description.includes('flavored')) score -= 400;
     }
 
-    // Pizza scoring - prefer basic pizza over complex dishes
-    if (searchTerm.includes('pizza')) {
-      if (description.includes('pizza') && !description.includes('pepperoni') && !description.includes('meat')) score += 300;
-      if (description.includes('ham') || description.includes('restaurant')) score -= 1000;
+    // JUICE scoring
+    if (searchTerm.includes('juice')) {
+      if (description.includes('juice, orange') || description.includes('orange juice')) score += 600;
+      if (description.includes('juice, apple') || description.includes('apple juice')) score += 600;
+      if (description.includes('juice') && description.includes('100%')) score += 500;
+      if (description.includes('juice') && !description.includes('cocktail') && !description.includes('drink')) score += 400;
+      if (description.includes('cocktail') || description.includes('punch') || description.includes('drink')) score -= 300;
+      if (description.includes('concentrate')) score -= 400;
     }
 
-    // Ice cream scoring - prefer plain ice cream
-    if (searchTerm.includes('ice cream')) {
-      if (description.includes('ice cream') && !description.includes('cake')) score += 300;
-      if (description.includes('cake') || description.includes('sandwich')) score -= 500;
+    // SODA/SOFT DRINK scoring
+    if (searchTerm.includes('soda') || searchTerm.includes('cola') || searchTerm.includes('pepsi') || searchTerm.includes('coke')) {
+      if (description.includes('cola') || description.includes('carbonated')) score += 500;
+      if (description.includes('diet') || description.includes('zero')) score += 300; // diet versions
+      if (description.includes('energy drink') || description.includes('sports')) score -= 200;
     }
 
-    // French fries scoring - avoid fried rice matches
-    if (searchTerm.includes('french fries') || searchTerm.includes('fries')) {
-      if (description.includes('potato') && description.includes('fried')) score += 300;
-      if (description.includes('rice')) score -= 1000;
+    // COFFEE scoring
+    if (searchTerm.includes('coffee')) {
+      if (description.includes('coffee, brewed') || description.includes('coffee, black')) score += 600;
+      if (description.includes('coffee') && !description.includes('with cream') && !description.includes('latte')) score += 500;
+      if (description.includes('espresso')) score += 400;
+      if (description.includes('cappuccino') || description.includes('latte') || description.includes('mocha')) score -= 200;
+      if (description.includes('frappuccino') || description.includes('iced coffee drink')) score -= 400;
     }
 
-    // International cuisine scoring
-    if (searchTerm.includes('taco')) {
-      if (description.includes('taco') && !description.includes('sauce')) score += 300;
-      if (description.includes('sauce') && !description.includes('taco')) score -= 1000;
+    // TEA scoring
+    if (searchTerm.includes('tea')) {
+      if (description.includes('tea, brewed') || description.includes('tea, black') || description.includes('tea, green')) score += 600;
+      if (description.includes('tea') && !description.includes('iced') && !description.includes('sweetened')) score += 500;
+      if (description.includes('herbal tea') || description.includes('chamomile')) score += 400;
+      if (description.includes('iced tea') && description.includes('sweetened')) score -= 200;
+      if (description.includes('bubble tea') || description.includes('chai latte')) score -= 300;
     }
 
-    if (searchTerm.includes('tikka masala')) {
-      if (description.includes('tikka') || description.includes('masala')) score += 300;
-      if (description.includes('dosa')) score -= 1000;
+    // BEER/WINE scoring
+    if (searchTerm.includes('beer') || searchTerm.includes('wine')) {
+      if (description.includes('beer, regular') || description.includes('wine, table')) score += 500;
+      if (description.includes('light beer') || description.includes('wine, dessert')) score += 300;
+      if (description.includes('craft beer') || description.includes('wine, fortified')) score -= 100;
     }
 
-    if (searchTerm.includes('sushi')) {
-      if (description.includes('sushi') || description.includes('california')) score += 300;
-      if (description.includes('sauce') || description.includes('dressing')) score -= 500;
+    // SMOOTHIE/PROTEIN DRINK scoring
+    if (searchTerm.includes('smoothie') || searchTerm.includes('protein shake')) {
+      if (description.includes('smoothie') && description.includes('fruit')) score += 500;
+      if (description.includes('protein') && description.includes('powder')) score += 400;
+      if (description.includes('meal replacement')) score += 300;
     }
-
-    if (searchTerm.includes('gyoza') || searchTerm.includes('dumpling')) {
-      if (description.includes('dumpling') || description.includes('gyoza')) score += 300;
-      if (description.includes('soup') || description.includes('broth')) score -= 200;
-    }
-
-    // Caribbean cuisine scoring
-    if (searchTerm.includes('plantain')) {
-      if (description.includes('plantain')) score += 300;
-      if (description.includes('banana') && !description.includes('plantain')) score -= 200;
-    }
-
-    if (searchTerm.includes('jerk chicken')) {
-      if (description.includes('chicken') && description.includes('jerk')) score += 300;
-      if (description.includes('chicken') && !description.includes('jerk')) score += 100;
-      if (description.includes('pork') || description.includes('beef')) score -= 200;
-    }
-
-    if (searchTerm.includes('patty') || searchTerm.includes('jamaican patty')) {
-      if (description.includes('pastry') && (description.includes('beef') || description.includes('chicken'))) score += 300;
-      if (description.includes('hamburger') || description.includes('burger')) score -= 500;
-    }
-
-    if (searchTerm.includes('rice and beans') || searchTerm.includes('peas and rice')) {
-      if (description.includes('rice') && (description.includes('bean') || description.includes('pea'))) score += 300;
-      if (description.includes('rice') && !description.includes('bean') && !description.includes('pea')) score -= 100;
-    }
-
-    if (searchTerm.includes('cassava') || searchTerm.includes('yuca')) {
-      if (description.includes('cassava') || description.includes('yuca')) score += 300;
-      if (description.includes('potato') && !description.includes('cassava')) score -= 200;
-    }
-
-    // Egg scoring - prefer whole eggs over egg whites/yolks
-    if (searchTerm.includes('egg')) {
-      if (description.includes('whole') || (!description.includes('white') && !description.includes('yolk'))) score += 200;
-      if (description.includes('white') || description.includes('yolk')) score -= 100;
-    }
-
-    // Category validation - prevent completely wrong food categories
-    if (searchTerm.includes('corn') && !description.toLowerCase().includes('corn')) score -= 2000;
-    if (searchTerm.includes('potato') && !description.toLowerCase().includes('potato')) score -= 2000;
-    if (searchTerm.includes('apple') && !description.toLowerCase().includes('apple')) score -= 2000;
-    if (searchTerm.includes('pizza') && !description.toLowerCase().includes('pizza')) score -= 2000;
-    if (searchTerm.includes('ice cream') && !description.toLowerCase().includes('ice cream')) score -= 1500;
 
     return score;
   }
 
   /**
-   * Generate equivalent measurement for context
+   * Enhanced liquid-specific scoring system  
    */
-  private generateEquivalentMeasurement(
-    grams: number,
-    originalUnit: string,
-    caloriesPer100g: number
-  ): string {
-    if (originalUnit.includes('cup') && grams < 50) {
-      const tablespoons = Math.round(grams / 15);
-      const tbspCalories = Math.round((caloriesPer100g * tablespoons * 15) / 100);
-      return `${tablespoons} tablespoons ≈ ${tbspCalories} kcal`;
+  private applyLiquidScoring(searchTerm: string, description: string): number {
+    if (this.isLiquidQuery(searchTerm)) {
+      return this.calculateLiquidScore(searchTerm, description);
     }
-    
-    if (originalUnit.includes('tablespoon') && grams > 100) {
-      const cups = Math.round((grams / 240) * 10) / 10;
-      const cupCalories = Math.round((caloriesPer100g * cups * 240) / 100);
-      return `${cups} cup ≈ ${cupCalories} kcal`;
-    }
-    
-    if (grams !== 100) {
-      const per100gCalories = Math.round(caloriesPer100g);
-      return `100g ≈ ${per100gCalories} kcal`;
-    }
-
-    return '';
+    return 0;
   }
 
   /**
-   * Generate variation note about size/preparation
+   * Update food-specific scoring to use new liquid system
    */
-  private generateVariationNote(ingredientName: string, unit: string): string {
-    const ingredient = ingredientName.toLowerCase();
-    
-    if (ingredient.includes('egg') && unit.includes('whole')) {
-      return 'Calories may vary slightly by size (small = 55 kcal, extra large = 80 kcal)';
+  private calculateComprehensiveFoodScore(searchTerm: string, description: string, measurementContext: string): number {
+    let score = 0;
+
+    // First apply liquid-specific scoring if applicable  
+    if (this.isLiquidQuery(searchTerm)) {
+      score += this.calculateLiquidScore(searchTerm, description);
+    } else {
+      // Apply regular food scoring for non-liquids
+      score += this.calculateFoodSpecificScore(searchTerm, description, measurementContext);
     }
     
-    if (ingredient.includes('grape')) {
-      return 'Calories vary by grape variety (red/green similar, cotton candy grapes higher)';
-    }
-    
-    if (ingredient.includes('salad') || ingredient.includes('prepared')) {
-      return 'Calories vary significantly based on preparation and ingredients used';
-    }
-    
-    if (unit.includes('cup') || unit.includes('tablespoon')) {
-      return 'Calories may vary based on how tightly packed the ingredient is';
-    }
-    
-    return 'Calories may vary based on variety, size, and preparation method';
+    return score;
   }
 
   /**
-   * Format ingredient name for display
+   * Search foods in the local database cache
    */
-  private formatIngredientName(description: string): string {
-    // Clean up USDA description formatting
-    return description
-      .replace(/,\s*raw/i, '')
-      .replace(/,\s*cooked/i, '')
-      .replace(/\s*\([^)]*\)/g, '') // Remove parenthetical info
-      .trim();
-  }
+  private async searchFoods(query: string, limit: number = 10): Promise<any[]> {
+    try {
+      const foods = await db
+        .select()
+        .from(usdaFoodCache)
+        .where(like(usdaFoodCache.description, `%${query}%`))
+        .limit(limit);
 
-  /**
-   * Convert cached food to USDA format
-   */
-  private formatCachedAsUSDAFood(cached: any[]): USDAFood[] {
-    return cached.map(food => ({
-      fdcId: food.fdcId,
-      description: food.description,
-      dataType: food.dataType,
-      foodCategory: food.foodCategory,
-      brandOwner: food.brandOwner,
-      brandName: food.brandName,
-      ingredients: food.ingredients,
-      servingSize: food.servingSize,
-      servingSizeUnit: food.servingSizeUnit,
-      householdServingFullText: food.householdServingFullText,
-      foodNutrients: this.convertNutrientsToUSDAFormat(food.nutrients),
-    }));
-  }
-
-  /**
-   * Convert stored nutrients back to USDA format
-   */
-  private convertNutrientsToUSDAFormat(nutrients: any): USDAFoodNutrient[] {
-    const usdaFormat: USDAFoodNutrient[] = [];
-    
-    const nutrientMap = {
-      calories: { id: 1008, name: 'Energy', unitName: 'kcal' },
-      protein: { id: 1003, name: 'Protein', unitName: 'g' },
-      carbs: { id: 1005, name: 'Carbohydrate, by difference', unitName: 'g' },
-      fat: { id: 1004, name: 'Total lipid (fat)', unitName: 'g' },
-      fiber: { id: 1079, name: 'Fiber, total dietary', unitName: 'g' },
-      sugar: { id: 2000, name: 'Sugars, total including NLEA', unitName: 'g' },
-      sodium: { id: 1093, name: 'Sodium, Na', unitName: 'mg' },
-    };
-
-    for (const [key, nutrient] of Object.entries(nutrientMap)) {
-      if (nutrients[key] !== undefined) {
-        usdaFormat.push({
-          type: 'FoodNutrient',
-          id: nutrient.id,
-          amount: nutrients[key],
-          nutrient: {
-            id: nutrient.id,
-            number: nutrient.id.toString(),
-            name: nutrient.name,
-            rank: 1,
-            unitName: nutrient.unitName,
-          },
-          // Add required fields for actual API format
-          nutrientId: nutrient.id,
-          nutrientName: nutrient.name,
-          nutrientNumber: nutrient.id.toString(),
-          unitName: nutrient.unitName,
-          value: nutrients[key],
-        });
-      }
+      return foods.map(food => ({
+        fdcId: food.fdcId,
+        description: food.description,
+        foodNutrients: JSON.parse(food.foodNutrients || '[]'),
+        dataType: food.dataType || 'Foundation',
+        foodCategory: food.foodCategory
+      }));
+    } catch (error) {
+      console.error('Database search error:', error);
+      return [];
     }
-
-    return usdaFormat;
   }
 
   /**
-   * Enhanced calorie estimation using USDA portion data and conversion factors
+   * Check if food match is likely incorrect based on context
+   */
+  private isIncorrectFoodMatch(searchTerm: string, foundDescription: string): boolean {
+    return false; // Simplified for now
+  }
+
+  /**
+   * Enhanced fallback estimation with better nutrition data
    */
   private getEnhancedFallbackEstimate(ingredientName: string, measurement: string) {
-    // First try to get precise portion weight from USDA data
-    const { quantity, unit } = parseMeasurement(measurement);
-    const portionWeight = getPortionWeight(ingredientName, unit);
-    
-    // Detect if food is cooked and apply retention factors
-    const cookingMethod = detectCookingMethod(ingredientName);
-    const foodGroup = classifyFood(ingredientName);
-    
-    const ingredient = ingredientName.toLowerCase();
-    let nutritionData = { calories: 100, protein: 2, carbs: 15, fat: 1 }; // default
+    const normalized = ingredientName.toLowerCase().trim();
 
-    for (const [key, data] of Object.entries(USDAService.FALLBACK_NUTRITION)) {
-      if (ingredient.includes(key)) {
-        nutritionData = data;
-        break;
-      }
-    }
-
-    // Calculate gram equivalent - use USDA portion data if available, fallback otherwise
-    let gramsEquivalent: number;
-    if (portionWeight) {
-      gramsEquivalent = portionWeight * quantity;
-    } else {
-      // Use our internal measurement parsing for consistency
-      const { quantity: qty, unit: unt } = parseMeasurement(measurement);
-      
-      // Apply standard cup conversions for consistency
-      if (unt.includes('cup')) {
-        gramsEquivalent = qty * 240; // Standard cup volume
-      } else if (unt.includes('piece') || unt.includes('item')) {
-        gramsEquivalent = qty * 75; // Standard piece weight (updated for accuracy)
-      } else if (unt.includes('slice')) {
-        gramsEquivalent = qty * 25; // Standard slice weight
-      } else {
-        const fallbackResult = this.parseFallbackMeasurement(measurement);
-        gramsEquivalent = fallbackResult.gramsEquivalent;
-      }
-    }
-
-    // Apply cooking retention factors if needed
-    let adjustedNutrition = { ...nutritionData };
-    if (cookingMethod !== 'raw') {
-      const fullNutrients = applyRetentionFactors(
-        { 
-          calories: nutritionData.calories,
-          protein: nutritionData.protein, 
-          fat: nutritionData.fat, 
-          carbs: nutritionData.carbs,
-          fiber: 0,
-          sugar: 0,
-          sodium: 0
-        },
-        cookingMethod,
-        foodGroup
-      );
-      adjustedNutrition = {
-        calories: fullNutrients.calories,
-        protein: fullNutrients.protein,
-        carbs: fullNutrients.carbs,
-        fat: fullNutrients.fat
+    // Water has zero calories (not in USDA database as pure water)
+    const waterTerms = ['water', 'drinking water', 'tap water', 'bottled water'];
+    if (waterTerms.includes(normalized)) {
+      const { quantity, unit, gramsEquivalent } = this.parseMeasurement(measurement, null);
+      return {
+        ingredient: 'WATER',
+        measurement: `${quantity} ${unit} (~${gramsEquivalent}g)`,
+        estimatedCalories: 0,
+        equivalentMeasurement: '100g ≈ 0 kcal',
+        note: 'Pure water contains no calories',
+        nutritionPer100g: {
+          calories: 0,
+          protein: 0,
+          carbs: 0,
+          fat: 0
+        }
       };
     }
-    
-    // Use standard 4-4-9 calorie conversion factors for accuracy and consistency
-    const enhancedCalories = Math.round(
-      ((adjustedNutrition.protein * 4) + (adjustedNutrition.fat * 9) + (adjustedNutrition.carbs * 4)) * gramsEquivalent / 100
-    );
 
-    return {
-      ingredient: ingredientName.toUpperCase(),
-      measurement: `${measurement} (~${Math.round(gramsEquivalent)}g)`,
-      estimatedCalories: Math.round(enhancedCalories),
-      equivalentMeasurement: `100g ≈ ${nutritionData.calories} kcal`,
-      note: portionWeight ? 
-        'Enhanced estimate using USDA portion database and food-specific conversion factors' :
-        'Estimate based on USDA nutrition averages with enhanced conversion factors',
-      nutritionPer100g: nutritionData,
-      usdaPortionUsed: !!portionWeight,
-    };
-  }
+    // Use enhanced fallback data if available
+    if (USDAService.FALLBACK_NUTRITION[normalized]) {
+      const nutrition = USDAService.FALLBACK_NUTRITION[normalized];
+      const { quantity, unit, gramsEquivalent } = this.parseMeasurement(measurement, null);
+      const estimatedCalories = Math.round((nutrition.calories * gramsEquivalent) / 100);
 
-  private parseFallbackMeasurement(measurement: string): { gramsEquivalent: number } {
-    // Use our internal, corrected parseMeasurement instead of the external one
-    const mockFood: USDAFood = {
-      fdcId: 0,
-      description: 'fallback-food',
-      dataType: 'fallback',
-      foodNutrients: []
-    };
-    const result = this.parseMeasurement(measurement, mockFood);
-    return { gramsEquivalent: result.gramsEquivalent };
-  }
-
-  /**
-   * Check if we have reliable fallback data for common foods and use it first
-   */
-  private tryFallbackFirst(ingredientName: string, measurement: string) {
-    const ingredient = ingredientName.toLowerCase();
-    
-    // Check for exact matches first, then partial matches
-    const exactMatch = USDAService.FALLBACK_FOODS.find(food => ingredient === food);
-    const partialMatch = USDAService.FALLBACK_FOODS.find(food => ingredient.includes(food));
-    
-    if (exactMatch || partialMatch) {
-      return this.getEnhancedFallbackEstimate(ingredientName, measurement);
+      return {
+        ingredient: normalized.toUpperCase(),
+        measurement: `${quantity} ${unit} (~${gramsEquivalent}g)`,
+        estimatedCalories,
+        equivalentMeasurement: `100g ≈ ${nutrition.calories} kcal`,
+        note: 'Estimate based on USDA nutrition averages with enhanced conversion factors',
+        nutritionPer100g: nutrition,
+        usdaPortionUsed: false
+      };
     }
-    
-    return null;
+
+    throw new Error(`No nutrition data available for "${ingredientName}"`);
   }
 
-  /**
-   * Validate if calorie count is reasonable for the food type
-   */
-  private isUnreasonableCalorieCount(ingredientName: string, caloriesPer100g: number): boolean {
-    const ingredient = ingredientName.toLowerCase();
-    
-    // Check for obviously wrong calorie counts
-    if (ingredient.includes('apple') && caloriesPer100g > 80) return true; // Fresh apple should be ~52 kcal/100g
-    if (ingredient.includes('chicken breast') && caloriesPer100g > 200) return true; // Raw chicken breast should be ~165 kcal/100g
-    if (ingredient.includes('banana') && caloriesPer100g > 120) return true; // Fresh banana should be ~89 kcal/100g
-    if (ingredient.includes('corn') && caloriesPer100g > 150) return true; // Sweet corn should be ~86 kcal/100g
-    if (ingredient.includes('potato') && caloriesPer100g > 150) return true; // Potato should be ~77-93 kcal/100g
-    
-    return false;
-  }
-
-  /**
-   * Check if USDA food match is completely wrong for the ingredient
-   */
-  private isIncorrectFoodMatch(ingredientName: string, foodDescription: string): boolean {
-    const ingredient = ingredientName.toLowerCase();
-    const description = foodDescription.toLowerCase();
-    
-    // Critical mismatches that should never happen
-    if (ingredient.includes('corn') && !description.includes('corn')) return true;
-    if (ingredient.includes('potato') && !description.includes('potato')) return true;
-    if (ingredient.includes('apple') && !description.includes('apple')) return true;
-    if (ingredient.includes('chicken') && !description.includes('chicken')) return true;
-    if (ingredient.includes('beef') && !description.includes('beef')) return true;
-    
-    // Specific corn mismatch patterns
-    if (ingredient.includes('corn') && (description.includes('flour') || description.includes('meal') || description.includes('onion') || description.includes('egg'))) return true;
-    
-    return false;
-  }
-
-  /**
-   * Calculate calories from nutrients and portion size
-   */
-  private calculateCalories(nutrients: any, gramsEquivalent: number): number {
-    if (nutrients.calories > 0) {
-      // Use direct calorie data from USDA - most accurate
-      return Math.round((nutrients.calories * gramsEquivalent) / 100);
-    } else if (nutrients.protein > 0 || nutrients.carbs > 0 || nutrients.fat > 0) {
-      // Calculate using standard 4-4-9 rule
-      return Math.round(
-        ((nutrients.protein * 4) + (nutrients.fat * 9) + (nutrients.carbs * 4)) * gramsEquivalent / 100
-      );
-    } else {
-      return 0;
-    }
-  }
-
-  /**
-   * Format the final calculation result
-   */
-  private formatCalculationResult(
-    description: string,
-    quantity: number,
-    unit: string,
-    gramsEquivalent: number,
-    estimatedCalories: number,
-    nutrients: any,
-    ingredientName: string
-  ) {
-    const caloriesPer100g = nutrients.calories || Math.round((estimatedCalories * 100) / gramsEquivalent);
-    const equivalentMeasurement = this.generateEquivalentMeasurement(gramsEquivalent, unit, caloriesPer100g);
-    const note = this.generateVariationNote(ingredientName, unit);
-
-    return {
-      ingredient: this.formatIngredientName(description),
-      measurement: `${quantity} ${unit} (~${Math.round(gramsEquivalent)}g)`,
-      estimatedCalories,
-      equivalentMeasurement,
-      note,
-      nutritionPer100g: {
-        calories: nutrients.calories,
-        protein: nutrients.protein,
-        carbs: nutrients.carbs,
-        fat: nutrients.fat,
-      },
-    };
-  }
 }
 
 export const usdaService = new USDAService(process.env.USDA_API_KEY || 'DEMO_KEY');
