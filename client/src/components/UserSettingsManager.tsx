@@ -7,6 +7,12 @@ import { useState, useEffect } from 'react';
 import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from './ui/accordion';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
@@ -39,7 +45,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
   // Profile editing states
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [accordionValue, setAccordionValue] = useState<string>("");
 
   // User information state - consolidated from both components
   const [userInfo, setUserInfo] = useState({
@@ -221,62 +227,57 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
         )}
       </div>
 
-      {/* Profile Card */}
+      {/* Profile Card with Accordion */}
       <Card className="bg-white/10 backdrop-blur-md border-white/20 overflow-hidden">
-        {/* Header with Dropdown Toggle */}
-        <div 
-          className="flex items-center justify-between cursor-pointer hover:bg-white/5 p-6 transition-colors"
-          onClick={() => setIsExpanded(!isExpanded)}
+        <Accordion 
+          type="single" 
+          collapsible 
+          value={accordionValue} 
+          onValueChange={setAccordionValue}
+          className="w-full"
         >
-          <div className="flex items-center space-x-4 flex-1 min-w-0">
-            <div className="relative flex-shrink-0">
-              <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center">
-                <User className="w-8 h-8 text-white" />
+          <AccordionItem value="profile" className="border-none">
+            <AccordionTrigger className="px-6 py-6 hover:bg-white/5 hover:no-underline [&[data-state=open]>div>div:last-child]:rotate-180">
+              <div className="flex items-center space-x-4 flex-1 min-w-0">
+                <div className="relative flex-shrink-0">
+                  <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center">
+                    <User className="w-8 h-8 text-white" />
+                  </div>
+                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-black flex items-center justify-center">
+                    <CheckCircle className="w-2 h-2 text-white" />
+                  </div>
+                </div>
+                <div className="flex-1 min-w-0 overflow-hidden text-left">
+                  <h3 className="text-xl font-bold text-white mb-1 truncate" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                    {userInfo.name || user?.email?.split('@')[0] || 'ByteWise User'}
+                  </h3>
+                  <p className="text-gray-300 text-sm truncate">{userInfo.email || user?.email}</p>
+                </div>
               </div>
-              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-black flex items-center justify-center">
-                <CheckCircle className="w-2 h-2 text-white" />
+              
+              <div className="flex items-center space-x-2 flex-shrink-0">
+                {!isEditing && accordionValue === "profile" && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsEditing(true);
+                    }}
+                    className="border-white/30 text-gray-300 hover:border-white/50 hover:text-white hidden sm:flex"
+                  >
+                    <Edit3 className="w-4 h-4 mr-2" />
+                    Edit Profile
+                  </Button>
+                )}
+                <div className="transition-transform duration-200 text-gray-300">
+                  <ChevronDown className="w-5 h-5" />
+                </div>
               </div>
-            </div>
-            <div className="flex-1 min-w-0 overflow-hidden">
-              <h3 className="text-xl font-bold text-white mb-1 truncate" style={{ fontFamily: "'League Spartan', sans-serif" }}>
-                {userInfo.name || user?.email?.split('@')[0] || 'ByteWise User'}
-              </h3>
-              <p className="text-gray-300 text-sm truncate">{userInfo.email || user?.email}</p>
-            </div>
-          </div>
-          
-          <div className="flex items-center space-x-2 flex-shrink-0">
-            {!isEditing && isExpanded && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsEditing(true);
-                }}
-                className="border-white/30 text-gray-300 hover:border-white/50 hover:text-white hidden sm:flex"
-              >
-                <Edit3 className="w-4 h-4 mr-2" />
-                Edit Profile
-              </Button>
-            )}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-gray-300 hover:text-white hover:bg-white/10"
-            >
-              {isExpanded ? (
-                <ChevronUp className="w-5 h-5" />
-              ) : (
-                <ChevronDown className="w-5 h-5" />
-              )}
-            </Button>
-          </div>
-        </div>
+            </AccordionTrigger>
 
-        {/* Collapsible Profile Details */}
-        {isExpanded && (
-          <div className="px-6 pb-6 space-y-6 animate-in slide-in-from-top-2 duration-300">
+            <AccordionContent className="px-6 pb-6 pt-0">
+              <div className="space-y-6">
             {/* Mobile Edit Button */}
             {!isEditing && (
               <div className="flex justify-center sm:hidden">
@@ -493,20 +494,22 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
           </div>
         </div>
 
-            {/* Sign Out Button */}
-            <div className="flex justify-end pt-6 border-t border-white/20 mt-8">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleSignOut}
-                className="border-red-400/50 text-red-400 hover:bg-red-500/10 hover:text-red-300 hover:border-red-400"
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Sign Out
-              </Button>
-            </div>
-          </div>
-        )}
+                {/* Sign Out Button */}
+                <div className="flex justify-end pt-6 border-t border-white/20 mt-8">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleSignOut}
+                    className="border-red-400/50 text-red-400 hover:bg-red-500/10 hover:text-red-300 hover:border-red-400"
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Sign Out
+                  </Button>
+                </div>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       </Card>
     </div>
   );

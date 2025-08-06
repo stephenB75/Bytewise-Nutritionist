@@ -8,6 +8,12 @@ import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Progress } from './ui/progress';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from './ui/accordion';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { 
@@ -52,6 +58,7 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [loading, setLoading] = useState(true);
+  const [accordionValue, setAccordionValue] = useState<string>("");
 
   const [userStats, setUserStats] = useState({
     totalPoints: 0,
@@ -273,17 +280,38 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
         </div>
       </Card>
 
-      {/* Achievements Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {loading ? (
-          <div className="col-span-full text-center py-8">
-            <div className="text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>Loading achievements...</div>
-          </div>
-        ) : filteredAchievements.length === 0 ? (
-          <div className="col-span-full text-center py-8">
-            <div className="text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>No achievements found for this category.</div>
-          </div>
-        ) : (
+      {/* Achievements Grid with Accordion */}
+      <Card className="bg-white/10 backdrop-blur-md border-white/20 overflow-hidden">
+        <Accordion 
+          type="single" 
+          collapsible 
+          value={accordionValue} 
+          onValueChange={setAccordionValue}
+          className="w-full"
+        >
+          <AccordionItem value="achievements" className="border-none">
+            <AccordionTrigger className="px-6 py-6 hover:bg-white/5 hover:no-underline [&[data-state=open]>div]:text-[#faed39]">
+              <div className="flex items-center justify-between w-full">
+                <h3 className="text-xl font-semibold text-white transition-colors" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                  {selectedCategory === 'all' ? 'All Achievements' : `${categories.find(c => c.id === selectedCategory)?.name} Achievements`}
+                  <Badge variant="secondary" className="ml-2 bg-[#1f4aa6]/20 text-[#1f4aa6]">
+                    {filteredAchievements.length}
+                  </Badge>
+                </h3>
+              </div>
+            </AccordionTrigger>
+            
+            <AccordionContent className="px-6 pb-6 pt-0">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {loading ? (
+                  <div className="col-span-full text-center py-8">
+                    <div className="text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>Loading achievements...</div>
+                  </div>
+                ) : filteredAchievements.length === 0 ? (
+                  <div className="col-span-full text-center py-8">
+                    <div className="text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>No achievements found for this category.</div>
+                  </div>
+                ) : (
           filteredAchievements.map((achievement) => (
             <Card 
               key={achievement.id} 
@@ -347,7 +375,11 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
             </Card>
           ))
         )}
-      </div>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </Card>
       </div>
     </div>
   );
