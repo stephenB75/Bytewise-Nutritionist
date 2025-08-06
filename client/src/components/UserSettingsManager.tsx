@@ -62,10 +62,13 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
     setIsSaving(true);
     
     try {
+      // Ensure firstName and lastName are properly split from name if needed
+      const [firstName = '', lastName = ''] = userInfo.name.split(' ');
+      
       const { error } = await supabase.auth.updateUser({
         data: {
-          firstName: userInfo.firstName,
-          lastName: userInfo.lastName,
+          firstName: userInfo.firstName || firstName.trim(),
+          lastName: userInfo.lastName || lastName.trim(),
           phone: userInfo.phone,
           location: userInfo.location,
           birth_date: userInfo.birthDate,
@@ -86,6 +89,9 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
 
       sonnerToast.success("Profile updated successfully!");
       setIsEditing(false);
+      
+      // Update local state to reflect the saved changes
+      window.location.reload(); // Refresh to show updated data from server
     } catch (error) {
       console.error('Error updating profile:', error);
       toast({
@@ -240,7 +246,16 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
               {isEditing ? (
                 <Input
                   value={userInfo.name}
-                  onChange={(e) => setUserInfo(prev => ({ ...prev, name: e.target.value }))}
+                  onChange={(e) => {
+                    const fullName = e.target.value;
+                    const [firstName = '', lastName = ''] = fullName.split(' ');
+                    setUserInfo(prev => ({ 
+                      ...prev, 
+                      name: fullName,
+                      firstName: firstName.trim(),
+                      lastName: lastName.trim()
+                    }));
+                  }}
                   className="bg-white/10 border-white/20 text-white placeholder-gray-400 w-full"
                   placeholder="Enter your full name"
                 />
