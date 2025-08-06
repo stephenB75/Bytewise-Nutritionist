@@ -30,7 +30,8 @@ import {
   CheckCircle,
   Lock,
   Gift,
-  X
+  X,
+  ChevronDown
 } from 'lucide-react';
 
 interface Achievement {
@@ -281,23 +282,29 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
       </Card>
 
       {/* Achievements Grid with Accordion */}
-      <Card className="bg-white/10 backdrop-blur-md border-white/20 overflow-hidden">
-        <Accordion 
-          type="single" 
-          collapsible 
-          value={accordionValue} 
-          onValueChange={setAccordionValue}
-          className="w-full"
-        >
-          <AccordionItem value="achievements" className="border-none">
-            <AccordionTrigger className="px-6 py-6 hover:bg-white/5 hover:no-underline [&[data-state=open]>div]:text-[#faed39]">
+      <Accordion 
+        type="single" 
+        collapsible 
+        value={accordionValue} 
+        onValueChange={setAccordionValue}
+        className="w-full"
+      >
+        <AccordionItem value="achievements" className="border-none">
+          <Card className="bg-white/10 backdrop-blur-md border-white/20 overflow-hidden">
+            <AccordionTrigger className="px-6 py-6 hover:bg-white/5 hover:no-underline [&[data-state=open]>div]:text-[#faed39] [&[data-state=open]]:bg-white/5">
               <div className="flex items-center justify-between w-full">
-                <h3 className="text-xl font-semibold text-white transition-colors" style={{ fontFamily: "'League Spartan', sans-serif" }}>
-                  {selectedCategory === 'all' ? 'All Achievements' : `${categories.find(c => c.id === selectedCategory)?.name} Achievements`}
-                  <Badge variant="secondary" className="ml-2 bg-[#1f4aa6]/20 text-[#1f4aa6]">
-                    {filteredAchievements.length}
-                  </Badge>
-                </h3>
+                <div className="flex items-center space-x-3">
+                  <Trophy className="w-6 h-6 text-[#faed39]" />
+                  <div>
+                    <h3 className="text-xl font-semibold text-white transition-colors" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                      {selectedCategory === 'all' ? 'All Achievements' : `${categories.find(c => c.id === selectedCategory)?.name} Achievements`}
+                    </h3>
+                    <p className="text-sm text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>
+                      {filteredAchievements.length} achievements available
+                    </p>
+                  </div>
+                </div>
+                <ChevronDown className="w-5 h-5 text-gray-300 transition-transform duration-200" />
               </div>
             </AccordionTrigger>
             
@@ -377,9 +384,9 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
         )}
               </div>
             </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-      </Card>
+          </Card>
+        </AccordionItem>
+      </Accordion>
       </div>
     </div>
   );
