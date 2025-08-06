@@ -8,7 +8,7 @@ const config: CapacitorConfig = {
   
   // iOS-specific configuration
   ios: {
-    scheme: 'bytewise nutritionist',
+    scheme: 'bytewise-nutritionist',
     path: 'ios'
   },
   
@@ -49,8 +49,8 @@ const config: CapacitorConfig = {
     },
     
     Keyboard: {
-      resize: 'body',
-      style: 'dark',
+      resize: 'body' as any,
+      style: 'dark' as any,
       resizeOnFullScreen: true
     },
     
