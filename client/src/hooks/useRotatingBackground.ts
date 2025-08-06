@@ -78,12 +78,6 @@ export function useRotatingBackground(activeTab: string) {
     
     const randomPageImage = availableImages[Math.floor(Math.random() * availableImages.length)];
     
-    // Get food name for debugging
-    const imageName = foodImages[randomPageImage].split('/').pop()?.split('_')[0] || 'unknown';
-    console.log(`🎨 Background Rotation: ${activeTab} -> Image ${randomPageImage} (${imageName})`);
-    console.log(`📋 Available images for ${activeTab}:`, pageImages, '| Selected:', randomPageImage);
-    console.log(`🔄 Previous image: ${currentImageIndex} -> New image: ${randomPageImage}`);
-    
     setCurrentImageIndex(randomPageImage);
     setBackgroundImage(foodImages[randomPageImage]);
     setAnimationKey(prev => prev + 1);

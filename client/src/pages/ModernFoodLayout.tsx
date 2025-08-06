@@ -220,10 +220,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         // Calculate weekly calories from all stored meals
         const weeklyTotal = stored.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
         setWeeklyCalories(weeklyTotal);
-        
-        console.log('📊 ModernFoodLayout: Loaded data - Daily:', dailyTotal, 'Weekly:', weeklyTotal);
       } catch (error) {
-        console.error('❌ ModernFoodLayout: Error loading existing data:', error);
         // Reset to safe state on error
         setLoggedMeals([]);
         setDailyCalories(0);
@@ -237,11 +234,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     // Set up event listeners for future meal logging
     const handleMealLogged = () => {
       try {
-        console.log('🔄 ModernFoodLayout: Handling meal logged event');
         loadExistingData();
         // Don't dispatch circular events - let other components handle their own refresh
       } catch (error) {
-        console.error('❌ ModernFoodLayout: Error handling meal logged event:', error);
+        // Handle errors silently to avoid console spam
       }
     };
 

@@ -61,8 +61,6 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
   // Update local state when user data changes
   useEffect(() => {
     if (user) {
-      console.log('🔄 UserSettingsManager: Loading user data:', user);
-      
       const userData = user as any;
       const firstName = userData?.firstName || '';
       const lastName = userData?.lastName || '';
@@ -72,7 +70,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
       const fullName = firstName && lastName ? `${firstName} ${lastName}`.trim() : 
                        personalInfo?.name || userData?.name || firstName || userData?.email?.split('@')[0] || '';
       
-      const newUserInfo = {
+      setUserInfo({
         firstName,
         lastName, 
         name: fullName,
@@ -86,10 +84,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
         dietaryPreferences: personalInfo?.dietary_preferences || [],
         calorieGoal: userData?.dailyCalorieGoal || 2000,
         joinDate: userData?.createdAt || new Date().toISOString(),
-      };
-      
-      console.log('📋 UserSettingsManager: Mapped user info:', newUserInfo);
-      setUserInfo(newUserInfo);
+      });
     }
   }, [user]);
 
@@ -128,7 +123,6 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
       // Refetch user data to show updated information
       await refetch();
     } catch (error) {
-      console.error('Error updating profile:', error);
       toast({
         title: "Update Failed", 
         description: "There was an error updating your profile. Please try again.",
@@ -147,7 +141,6 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
       sonnerToast.success("Signed out successfully!");
       if (onClose) onClose();
     } catch (error) {
-      console.error('Error signing out:', error);
       toast({
         title: "Sign Out Failed",
         description: "There was an error signing you out. Please try again.",

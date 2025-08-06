@@ -56,16 +56,11 @@ export function WeeklyCaloriesCard() {
       
       // Load meals from localStorage where the daily page stores them
       const storedMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-      console.log('📊 WeeklyCaloriesCard: Loaded meals from localStorage:', storedMeals.length);
       
       // Calculate calories for each day of the week
       const weeklyData = weekDates.map(dayData => {
         const dayMeals = storedMeals.filter((meal: any) => meal.date === dayData.date);
         const dayCalories = dayMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
-        
-        if (dayMeals.length > 0) {
-          console.log(`📅 WeeklyCaloriesCard: ${dayData.day} (${dayData.date}): ${dayMeals.length} meals, ${dayCalories} calories`);
-        }
         
         return {
           ...dayData,
@@ -75,12 +70,10 @@ export function WeeklyCaloriesCard() {
       });
 
       const totalCalories = weeklyData.reduce((sum, day) => sum + day.calories, 0);
-      console.log('🔢 WeeklyCaloriesCard: Total weekly calories:', totalCalories);
       
       setWeeklyData(weeklyData);
       setTotalWeeklyCalories(totalCalories);
     } catch (error) {
-      console.error('❌ WeeklyCaloriesCard: Error calculating weekly calories:', error);
       // Set empty state on error
       const weekDates = getCurrentWeekDates();
       setWeeklyData(weekDates.map(day => ({ ...day, calories: 0, mealCount: 0 })));
@@ -93,7 +86,6 @@ export function WeeklyCaloriesCard() {
     calculateWeeklyCalories();
 
     const handleMealLogged = () => {
-      console.log('🔄 WeeklyCaloriesCard: Refreshing data after meal logged');
       calculateWeeklyCalories();
       
       // Check for achievements after weekly data updates
@@ -103,7 +95,6 @@ export function WeeklyCaloriesCard() {
     // Listen for localStorage storage events
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'weeklyMeals') {
-        console.log('📦 WeeklyCaloriesCard: localStorage weeklyMeals updated');
         calculateWeeklyCalories();
       }
     };

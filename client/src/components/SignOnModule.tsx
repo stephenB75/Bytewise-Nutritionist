@@ -70,14 +70,12 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
                 refresh_token: data.session.refresh_token,
               });
               
-              if (sessionError) {
-                console.error('Session set error:', sessionError);
-              } else {
+              if (!sessionError) {
                 // Refetch auth state immediately
                 await refetch();
               }
             } catch (err) {
-              console.error('Error setting session:', err);
+              // Handle session errors silently
             }
           }
           
