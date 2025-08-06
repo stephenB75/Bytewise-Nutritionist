@@ -281,15 +281,15 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
       </Card>
 
       {/* Achievements Grid with Accordion */}
-      <Card className="bg-white/10 backdrop-blur-md border-white/20 overflow-hidden">
-        <Accordion 
-          type="single" 
-          collapsible 
-          value={accordionValue} 
-          onValueChange={setAccordionValue}
-          className="w-full"
-        >
-          <AccordionItem value="achievements" className="border-none">
+      <Accordion 
+        type="single" 
+        collapsible 
+        value={accordionValue} 
+        onValueChange={setAccordionValue}
+        className="w-full"
+      >
+        <AccordionItem value="achievements" className="border-none">
+          <Card className="bg-white/10 backdrop-blur-md border-white/20 overflow-hidden">
             <AccordionTrigger className="px-6 py-6 hover:bg-white/5 hover:no-underline [&[data-state=open]>div]:text-[#faed39]">
               <div className="flex items-center justify-between w-full">
                 <h3 className="text-xl font-semibold text-white transition-colors" style={{ fontFamily: "'League Spartan', sans-serif" }}>
@@ -377,9 +377,9 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
         )}
               </div>
             </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-      </Card>
+          </Card>
+        </AccordionItem>
+      </Accordion>
       </div>
     </div>
   );

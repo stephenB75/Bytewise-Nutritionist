@@ -228,15 +228,15 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
       </div>
 
       {/* Profile Card with Accordion */}
-      <Card className="bg-white/10 backdrop-blur-md border-white/20 overflow-hidden">
-        <Accordion 
-          type="single" 
-          collapsible 
-          value={accordionValue} 
-          onValueChange={setAccordionValue}
-          className="w-full"
-        >
-          <AccordionItem value="profile" className="border-none">
+      <Accordion 
+        type="single" 
+        collapsible 
+        value={accordionValue} 
+        onValueChange={setAccordionValue}
+        className="w-full"
+      >
+        <AccordionItem value="profile" className="border-none">
+          <Card className="bg-white/10 backdrop-blur-md border-white/20 overflow-hidden">
             <AccordionTrigger className="px-6 py-6 hover:bg-white/5 hover:no-underline [&[data-state=open]>div>div:last-child]:rotate-180">
               <div className="flex items-center space-x-4 flex-1 min-w-0">
                 <div className="relative flex-shrink-0">
@@ -257,18 +257,25 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
               
               <div className="flex items-center space-x-2 flex-shrink-0">
                 {!isEditing && accordionValue === "profile" && (
-                  <Button
-                    variant="outline"
-                    size="sm"
+                  <div
                     onClick={(e) => {
                       e.stopPropagation();
                       setIsEditing(true);
                     }}
-                    className="border-white/30 text-gray-300 hover:border-white/50 hover:text-white hidden sm:flex"
+                    className="border border-white/30 text-gray-300 hover:border-white/50 hover:text-white hidden sm:flex px-3 py-1 rounded text-sm items-center cursor-pointer transition-colors"
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setIsEditing(true);
+                      }
+                    }}
                   >
                     <Edit3 className="w-4 h-4 mr-2" />
                     Edit Profile
-                  </Button>
+                  </div>
                 )}
                 <div className="transition-transform duration-200 text-gray-300">
                   <ChevronDown className="w-5 h-5" />
@@ -508,9 +515,9 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                 </div>
               </div>
             </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-      </Card>
+          </Card>
+        </AccordionItem>
+      </Accordion>
     </div>
   );
 }
