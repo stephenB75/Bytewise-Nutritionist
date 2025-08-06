@@ -6,6 +6,7 @@ import {
   meals,
   mealFoods,
   waterIntake,
+  achievements,
   type User,
   type UpsertUser,
   type Food,
@@ -20,6 +21,8 @@ import {
   type InsertMealFood,
   type WaterIntake,
   type InsertWaterIntake,
+  type Achievement,
+  type InsertAchievement,
   type RecipeWithIngredients,
   type MealWithFoods,
 } from "@shared/schema";
@@ -75,6 +78,11 @@ export interface IStorage {
   // Water intake operations
   getUserWaterIntake(userId: string, date: Date): Promise<WaterIntake | undefined>;
   upsertWaterIntake(waterIntake: InsertWaterIntake): Promise<WaterIntake>;
+
+  // Achievement operations
+  getUserAchievements(userId: string): Promise<Achievement[]>;
+  createAchievement(achievement: InsertAchievement): Promise<Achievement>;
+  checkAndCreateAchievements(userId: string): Promise<Achievement[]>;
 
   // Analytics
   getUserDailyStats(userId: string, date: Date): Promise<{
@@ -439,6 +447,132 @@ export class DatabaseStorage implements IStorage {
       const [newIntake] = await db.insert(waterIntake).values(intake).returning();
       return newIntake;
     }
+  }
+
+  // Achievement operations
+  async getUserAchievements(userId: string): Promise<Achievement[]> {
+    return await db
+      .select()
+      .from(achievements)
+      .where(eq(achievements.userId, userId))
+      .orderBy(desc(achievements.earnedAt));
+  }
+
+  async createAchievement(achievement: InsertAchievement): Promise<Achievement> {
+    const [newAchievement] = await db.insert(achievements).values(achievement).returning();
+    return newAchievement;
+  }
+
+  async checkAndCreateAchievements(userId: string): Promise<Achievement[]> {
+    const newAchievements: Achievement[] = [];
+    const today = new Date();
+    const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    
+    // Get user's daily stats
+    const dailyStats = await this.getUserDailyStats(userId, today);
+    const user = await this.getUser(userId);
+    
+    if (!user) return newAchievements;
+
+    // Get existing achievements to avoid duplicates
+    const existingAchievements = await this.getUserAchievements(userId);
+    const achievementTypes = existingAchievements.map(a => a.achievementType);
+
+    // Check First Day Achievement
+    if (!achievementTypes.includes('first_day_complete') && dailyStats.totalCalories >= 500) {
+      const achievement = await this.createAchievement({
+        userId,
+        achievementType: 'first_day_complete',
+        title: 'First Day Complete',
+        description: 'Successfully logged your first day of nutrition tracking',
+        iconName: 'target',
+        colorClass: 'bg-green-500/20 border-green-500/30'
+      });
+      newAchievements.push(achievement);
+    }
+
+    // Check Calorie Goal Achievement
+    if (!achievementTypes.includes('calorie_goal_met') && 
+        dailyStats.totalCalories >= (user.dailyCalorieGoal || 2000) * 0.9 &&
+        dailyStats.totalCalories <= (user.dailyCalorieGoal || 2000) * 1.1) {
+      const achievement = await this.createAchievement({
+        userId,
+        achievementType: 'calorie_goal_met',
+        title: 'Calorie Goal Achieved',
+        description: 'Hit your daily calorie target within 10%',
+        iconName: 'flame',
+        colorClass: 'bg-orange-500/20 border-orange-500/30'
+      });
+      newAchievements.push(achievement);
+    }
+
+    // Check Protein Goal Achievement
+    if (!achievementTypes.includes('protein_goal_met') && 
+        dailyStats.totalProtein >= (user.dailyProteinGoal || 150) * 0.9) {
+      const achievement = await this.createAchievement({
+        userId,
+        achievementType: 'protein_goal_met',
+        title: 'Protein Champion',
+        description: 'Met your daily protein goal',
+        iconName: 'zap',
+        colorClass: 'bg-purple-500/20 border-purple-500/30'
+      });
+      newAchievements.push(achievement);
+    }
+
+    // Check Three Meals Achievement
+    const todayMeals = await db
+      .select()
+      .from(meals)
+      .where(
+        and(
+          eq(meals.userId, userId),
+          gte(meals.date, startOfToday),
+          lte(meals.date, new Date(startOfToday.getTime() + 24 * 60 * 60 * 1000))
+        )
+      );
+
+    if (!achievementTypes.includes('three_meals_logged') && todayMeals.length >= 3) {
+      const achievement = await this.createAchievement({
+        userId,
+        achievementType: 'three_meals_logged',
+        title: 'Meal Tracker',
+        description: 'Logged 3 or more meals in a day',
+        iconName: 'utensils',
+        colorClass: 'bg-blue-500/20 border-blue-500/30'
+      });
+      newAchievements.push(achievement);
+    }
+
+    // Check Weekly Streak (simplified - check if user has meals for 5 of last 7 days)
+    const sevenDaysAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const weekMeals = await db
+      .select()
+      .from(meals)
+      .where(
+        and(
+          eq(meals.userId, userId),
+          gte(meals.date, sevenDaysAgo)
+        )
+      );
+
+    const daysWithMeals = new Set(
+      weekMeals.map(meal => meal.date.toISOString().split('T')[0])
+    ).size;
+
+    if (!achievementTypes.includes('five_day_streak') && daysWithMeals >= 5) {
+      const achievement = await this.createAchievement({
+        userId,
+        achievementType: 'five_day_streak',
+        title: '5 Day Streak',
+        description: 'Tracked nutrition for 5 days this week',
+        iconName: 'calendar',
+        colorClass: 'bg-yellow-500/20 border-yellow-500/30'
+      });
+      newAchievements.push(achievement);
+    }
+
+    return newAchievements;
   }
 
   // Analytics

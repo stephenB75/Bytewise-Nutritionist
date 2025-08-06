@@ -3,7 +3,7 @@
  * Features: Hero sections, food cards, nutrition breakdown, and modern navigation
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -18,6 +18,7 @@ import { AwardsAchievements } from '@/components/AwardsAchievements';
 import { ConfettiCelebration } from '@/components/ConfettiCelebration';
 import { useGoalAchievements } from '@/hooks/useGoalAchievements';
 import { useRotatingBackground } from '@/hooks/useRotatingBackground';
+import { useAchievements, getAchievementIcon, formatAchievementDate } from '@/hooks/useAchievements';
 import { 
   Search, 
   User,
@@ -73,6 +74,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const [activeTab, setActiveTab] = useState('home');
   const [previousTab, setPreviousTab] = useState('home');
   const { backgroundImage, animationKey } = useRotatingBackground(activeTab);
+  const { data: achievements = [], isLoading: achievementsLoading } = useAchievements();
   const [searchQuery, setSearchQuery] = useState('');
   const [showAchievement, setShowAchievement] = useState(false);
   const [currentAchievement, setCurrentAchievement] = useState<Achievement | null>(null);
@@ -104,7 +106,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   };
 
   // Utility function to add notifications - using useCallback for stable reference
-  const addNotification = React.useCallback((type: Notification['type'], title: string, message: string) => {
+  const addNotification = useCallback((type: Notification['type'], title: string, message: string) => {
     setNotifications(prev => [{
       id: Date.now().toString(),
       type,
@@ -148,7 +150,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   };
   
   // Achievement hooks  
-  const { achievements, celebrationAchievement, showCelebration, closeCelebration } = useGoalAchievements();
+  const { achievements: goalAchievements, celebrationAchievement, showCelebration, closeCelebration } = useGoalAchievements();
 
   // Handle new achievements
   useEffect(() => {
@@ -943,22 +945,39 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         {/* Achievement Badges */}
         <div className="space-y-4">
           <h3 className="text-2xl font-bold text-white">Recent Achievements</h3>
-          <div className="grid grid-cols-2 gap-4">
-            {[
-              { title: "First Day Complete", icon: "🎯", date: "Today", bg: "bg-green-500/20", border: "border-green-500/30" },
-              { title: "5 Day Streak", icon: "🔥", date: "Yesterday", bg: "bg-orange-500/20", border: "border-orange-500/30" },
-              { title: "Perfect Week", icon: "⭐", date: "Last Week", bg: "bg-blue-500/20", border: "border-blue-500/30" },
-              { title: "Protein Goal", icon: "💪", date: "3 days ago", bg: "bg-purple-500/20", border: "border-purple-500/30" }
-            ].map((achievement, index) => (
-              <Card key={index} className={`${achievement.bg} backdrop-blur-md ${achievement.border} p-4`}>
-                <div className="text-center">
-                  <div className="text-3xl mb-2">{achievement.icon}</div>
-                  <h4 className="text-white font-semibold text-sm">{achievement.title}</h4>
-                  <p className="text-gray-400 text-xs">{achievement.date}</p>
-                </div>
-              </Card>
-            ))}
-          </div>
+          {achievementsLoading ? (
+            <div className="grid grid-cols-2 gap-4">
+              {[1, 2, 3, 4].map((index) => (
+                <Card key={index} className="bg-gray-700/50 backdrop-blur-md border-gray-600 p-4 animate-pulse">
+                  <div className="text-center">
+                    <div className="w-8 h-8 bg-gray-600 rounded-full mx-auto mb-2"></div>
+                    <div className="w-20 h-4 bg-gray-600 rounded mx-auto mb-1"></div>
+                    <div className="w-16 h-3 bg-gray-600 rounded mx-auto"></div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          ) : achievements.length > 0 ? (
+            <div className="grid grid-cols-2 gap-4">
+              {achievements.slice(0, 4).map((achievement) => (
+                <Card key={achievement.id} className={`${achievement.colorClass || 'bg-blue-500/20 border-blue-500/30'} backdrop-blur-md p-4`}>
+                  <div className="text-center">
+                    <div className="text-3xl mb-2">{getAchievementIcon(achievement.iconName)}</div>
+                    <h4 className="text-white font-semibold text-sm">{achievement.title}</h4>
+                    <p className="text-gray-400 text-xs">{formatAchievementDate(achievement.earnedAt)}</p>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <Card className="bg-gray-700/50 backdrop-blur-md border-gray-600 p-6">
+              <div className="text-center">
+                <Trophy className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                <h4 className="text-white font-semibold mb-2">No Achievements Yet</h4>
+                <p className="text-gray-400 text-sm">Start tracking your nutrition to unlock achievements!</p>
+              </div>
+            </Card>
+          )}
         </div>
       </div>
     </div>

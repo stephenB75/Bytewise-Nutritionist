@@ -183,15 +183,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(401).json({ message: "User not found" });
       return;
     }
-    const mealData = {
-      ...req.body,
-      userId,
-      createdAt: new Date()
-    };
     
-    // Store meal in database/memory
-    
-    res.json({ success: true, meal: mealData });
+    try {
+      // Create meal entry
+      const meal = await storage.createMeal({
+        userId,
+        date: new Date(req.body.date || new Date()),
+        mealType: req.body.mealType || 'meal',
+        name: req.body.name,
+        totalCalories: req.body.totalCalories ? req.body.totalCalories.toString() : '0',
+        totalProtein: req.body.totalProtein ? req.body.totalProtein.toString() : '0',
+        totalCarbs: req.body.totalCarbs ? req.body.totalCarbs.toString() : '0',
+        totalFat: req.body.totalFat ? req.body.totalFat.toString() : '0'
+      });
+
+      // Check for new achievements after meal logging
+      const newAchievements = await storage.checkAndCreateAchievements(userId);
+      
+      res.json({ 
+        success: true, 
+        meal,
+        newAchievements: newAchievements.length > 0 ? newAchievements : undefined
+      });
+    } catch (error: any) {
+      console.error('Error logging meal:', error);
+      res.status(500).json({ message: "Failed to log meal" });
+    }
   });
 
   app.get('/api/meals/logged', isAuthenticated, async (req: any, res: Response) => {
@@ -201,10 +218,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return;
     }
     
-    // Return logged meals for the user
-    const meals: any[] = []; // Implement meal retrieval from storage
+    try {
+      const meals = await storage.getUserMeals(userId);
+      res.json(meals);
+    } catch (error: any) {
+      console.error('Error retrieving meals:', error);
+      res.status(500).json({ message: "Failed to retrieve meals" });
+    }
+  });
+
+  // Achievement API routes
+  app.get('/api/achievements', isAuthenticated, async (req: any, res: Response) => {
+    const userId = req.user?.id;
+    if (!userId) {
+      res.status(401).json({ message: "User not found" });
+      return;
+    }
     
-    res.json(meals);
+    try {
+      const achievements = await storage.getUserAchievements(userId);
+      res.json({ achievements });
+    } catch (error: any) {
+      console.error('Error retrieving achievements:', error);
+      res.status(500).json({ message: "Failed to retrieve achievements" });
+    }
+  });
+
+  app.post('/api/achievements/check', isAuthenticated, async (req: any, res: Response) => {
+    const userId = req.user?.id;
+    if (!userId) {
+      res.status(401).json({ message: "User not found" });
+      return;
+    }
+    
+    try {
+      const newAchievements = await storage.checkAndCreateAchievements(userId);
+      res.json({ 
+        newAchievements,
+        message: newAchievements.length > 0 ? 'New achievements unlocked!' : 'No new achievements'
+      });
+    } catch (error: any) {
+      console.error('Error checking achievements:', error);
+      res.status(500).json({ message: "Failed to check achievements" });
+    }
   });
 
   // Calculate calories API with real USDA integration (no auth required)
