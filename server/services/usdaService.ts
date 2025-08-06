@@ -1256,6 +1256,44 @@ export class USDAService {
       'carrot juice': { calories: 40, protein: 0.9, carbs: 9.3, fat: 0.1 },
       'beet juice': { calories: 58, protein: 2.1, carbs: 13.0, fat: 0.2 },
       
+      // Milk shakes and blended drinks
+      'vanilla milkshake': { calories: 112, protein: 3.8, carbs: 16.0, fat: 4.3 },
+      'chocolate milkshake': { calories: 119, protein: 3.2, carbs: 18.6, fat: 4.1 },
+      'strawberry milkshake': { calories: 108, protein: 3.5, carbs: 17.2, fat: 3.8 },
+      'banana milkshake': { calories: 105, protein: 3.9, carbs: 16.8, fat: 3.2 },
+      'oreo milkshake': { calories: 142, protein: 3.1, carbs: 22.4, fat: 5.2 },
+      'peanut butter milkshake': { calories: 156, protein: 5.8, carbs: 15.2, fat: 8.9 },
+      'caramel milkshake': { calories: 125, protein: 3.4, carbs: 19.8, fat: 4.6 },
+      'mint chocolate chip milkshake': { calories: 134, protein: 3.6, carbs: 20.1, fat: 5.1 },
+      
+      // Smoothies and protein shakes
+      'protein shake': { calories: 103, protein: 20.1, carbs: 3.4, fat: 1.2 },
+      'berry smoothie': { calories: 65, protein: 1.8, carbs: 15.2, fat: 0.6 },
+      'green smoothie': { calories: 42, protein: 2.1, carbs: 9.8, fat: 0.4 },
+      'mango smoothie': { calories: 71, protein: 1.2, carbs: 17.6, fat: 0.3 },
+      'banana smoothie': { calories: 89, protein: 1.1, carbs: 22.8, fat: 0.3 },
+      
+      // Sorbet and frozen treats (liquid equivalent)
+      'lemon sorbet': { calories: 134, protein: 0.2, carbs: 34.1, fat: 0.2 },
+      'orange sorbet': { calories: 138, protein: 0.6, carbs: 35.2, fat: 0.1 },
+      'strawberry sorbet': { calories: 130, protein: 0.4, carbs: 33.8, fat: 0.1 },
+      'mango sorbet': { calories: 142, protein: 0.3, carbs: 36.4, fat: 0.2 },
+      'raspberry sorbet': { calories: 132, protein: 0.7, carbs: 33.1, fat: 0.3 },
+      'coconut sorbet': { calories: 159, protein: 1.8, carbs: 25.4, fat: 6.2 },
+      'lime sorbet': { calories: 128, protein: 0.1, carbs: 33.2, fat: 0.1 },
+      'watermelon sorbet': { calories: 118, protein: 0.6, carbs: 30.2, fat: 0.2 },
+      
+      // Yogurt drinks and kefir
+      'plain yogurt drink': { calories: 59, protein: 3.5, carbs: 4.7, fat: 3.3 },
+      'strawberry yogurt drink': { calories: 79, protein: 2.9, carbs: 13.1, fat: 1.5 },
+      'vanilla yogurt drink': { calories: 77, protein: 3.1, carbs: 12.8, fat: 1.7 },
+      'blueberry yogurt drink': { calories: 81, protein: 2.8, carbs: 14.2, fat: 1.6 },
+      'peach yogurt drink': { calories: 76, protein: 2.7, carbs: 13.4, fat: 1.4 },
+      'greek yogurt drink': { calories: 97, protein: 10.0, carbs: 3.6, fat: 5.0 },
+      'kefir': { calories: 66, protein: 3.8, carbs: 4.8, fat: 3.5 },
+      'lassi': { calories: 89, protein: 2.4, carbs: 17.2, fat: 1.5 },
+      'ayran': { calories: 38, protein: 1.7, carbs: 2.9, fat: 2.3 },
+      
       // Sodas and carbonated drinks
       'soda': { calories: 41, protein: 0, carbs: 10.6, fat: 0 },
       'cola': { calories: 41, protein: 0, carbs: 10.6, fat: 0 },
