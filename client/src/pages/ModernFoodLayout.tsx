@@ -16,6 +16,7 @@ import { DataManagementPanel } from '@/components/DataManagementPanel';
 import { AchievementCelebration } from '@/components/AchievementCelebration';
 import { AwardsAchievements } from '@/components/AwardsAchievements';
 import { ConfettiCelebration } from '@/components/ConfettiCelebration';
+import { FastingTracker } from '@/components/FastingTracker';
 import { useGoalAchievements } from '@/hooks/useGoalAchievements';
 import { useRotatingBackground } from '@/hooks/useRotatingBackground';
 import { useAchievements, getAchievementIcon, formatAchievementDate } from '@/hooks/useAchievements';
@@ -35,6 +36,7 @@ import {
   BarChart3,
   UserCircle,
   Utensils,
+  Clock,
   CheckCircle2
 } from 'lucide-react';
 import { NotificationDropdown } from '@/components/NotificationDropdown';
@@ -1416,6 +1418,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         </div>
 
         {/* Profile Content - Redesigned Container */}
+        {/* Fasting Section */}
+        {activeTab === 'fasting' && <FastingTracker />}
+        
         <div className="min-h-[600px]">
           {profileSection === 'profile' && (
             <div className="space-y-4">
@@ -1583,6 +1588,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           {[
             { id: 'home', label: 'Dashboard', icon: Home },
             { id: 'nutrition', label: 'Nutrition', icon: Utensils },
+            { id: 'fasting', label: 'Fasting', icon: Clock },
             { id: 'daily', label: 'Daily', icon: BarChart3 },
             { id: 'profile', label: 'Profile', icon: UserCircle }
           ].map((tab) => {

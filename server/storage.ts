@@ -7,6 +7,7 @@ import {
   mealFoods,
   waterIntake,
   achievements,
+  fastingSessions,
   type User,
   type UpsertUser,
   type Food,
@@ -21,6 +22,8 @@ import {
   type InsertMealFood,
   type WaterIntake,
   type InsertWaterIntake,
+  type FastingSession,
+  type InsertFastingSession,
   type Achievement,
   type InsertAchievement,
   type RecipeWithIngredients,
@@ -92,6 +95,13 @@ export interface IStorage {
     totalFat: number;
     waterGlasses: number;
   }>;
+  
+  // Fasting sessions
+  createFastingSession(session: InsertFastingSession): Promise<FastingSession>;
+  getUserFastingSessions(userId: string): Promise<FastingSession[]>;
+  getFastingSession(id: string): Promise<FastingSession | null>;
+  updateFastingSession(id: string, updates: Partial<FastingSession>): Promise<FastingSession>;
+  completeFastingSession(id: string): Promise<FastingSession>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -624,6 +634,51 @@ export class DatabaseStorage implements IStorage {
       ...totals,
       waterGlasses: water?.glasses || 0,
     };
+  }
+
+  // Fasting session operations
+  async createFastingSession(session: InsertFastingSession): Promise<FastingSession> {
+    const [newSession] = await db.insert(fastingSessions).values(session).returning();
+    return newSession;
+  }
+
+  async getUserFastingSessions(userId: string): Promise<FastingSession[]> {
+    return db
+      .select()
+      .from(fastingSessions)
+      .where(eq(fastingSessions.userId, userId))
+      .orderBy(desc(fastingSessions.createdAt));
+  }
+
+  async getFastingSession(id: string): Promise<FastingSession | null> {
+    const [session] = await db
+      .select()
+      .from(fastingSessions)
+      .where(eq(fastingSessions.id, id));
+    return session || null;
+  }
+
+  async updateFastingSession(id: string, updates: Partial<FastingSession>): Promise<FastingSession> {
+    const [updated] = await db
+      .update(fastingSessions)
+      .set(updates)
+      .where(eq(fastingSessions.id, id))
+      .returning();
+    return updated;
+  }
+
+  async completeFastingSession(id: string): Promise<FastingSession> {
+    const completedAt = new Date();
+    const [completed] = await db
+      .update(fastingSessions)
+      .set({ 
+        status: 'completed',
+        endTime: completedAt,
+        completedAt 
+      })
+      .where(eq(fastingSessions.id, id))
+      .returning();
+    return completed;
   }
 }
 

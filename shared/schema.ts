@@ -160,6 +160,21 @@ export const achievements = pgTable("achievements", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Fasting sessions table for intermittent fasting tracking
+export const fastingSessions = pgTable('fasting_sessions', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  planId: text('plan_id').notNull(), // References fasting plan (16:8, 18:6, etc.)
+  planName: text('plan_name').notNull(),
+  startTime: timestamp('start_time').notNull(),
+  endTime: timestamp('end_time'),
+  targetDuration: integer('target_duration').notNull(), // in milliseconds
+  actualDuration: integer('actual_duration'), // in milliseconds  
+  status: text('status').notNull().default('active'), // 'active', 'completed', 'paused'
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  completedAt: timestamp('completed_at')
+});
+
 // Food suggestions based on user habits
 export const foodSuggestions = pgTable("food_suggestions", {
   id: serial("id").primaryKey(),
@@ -350,6 +365,8 @@ export type FoodSuggestion = typeof foodSuggestions.$inferSelect;
 export type InsertFoodSuggestion = z.infer<typeof insertFoodSuggestionSchema>;
 export type UsdaFoodCache = typeof usdaFoodCache.$inferSelect;
 export type InsertUsdaFoodCache = z.infer<typeof insertUsdaFoodCacheSchema>;
+export type FastingSession = typeof fastingSessions.$inferSelect;
+export type InsertFastingSession = typeof fastingSessions.$inferInsert;
 
 // Extended types for API responses
 export type RecipeWithIngredients = Recipe & {

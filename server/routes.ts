@@ -700,6 +700,92 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Fasting API endpoints
+  app.post('/api/fasting/start', isAuthenticated, async (req: any, res: Response) => {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ message: "User not found" });
+    }
+
+    try {
+      const { planId, planName, startTime, targetDuration, status } = req.body;
+      
+      const fastingSession = await storage.createFastingSession({
+        id: `fasting_${Date.now()}_${userId}`,
+        userId,
+        planId,
+        planName,
+        startTime: new Date(startTime),
+        targetDuration,
+        status: status || 'active'
+      });
+
+      res.json(fastingSession);
+    } catch (error: any) {
+      // Fasting session creation error handled by response
+      res.status(500).json({ message: "Failed to start fasting session" });
+    }
+  });
+
+  app.get('/api/fasting/history', isAuthenticated, async (req: any, res: Response) => {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ message: "User not found" });
+    }
+
+    try {
+      const sessions = await storage.getUserFastingSessions(userId);
+      res.json(sessions);
+    } catch (error: any) {
+      // Fasting history retrieval error handled by response
+      res.status(500).json({ message: "Failed to retrieve fasting history" });
+    }
+  });
+
+  app.put('/api/fasting/:id/complete', isAuthenticated, async (req: any, res: Response) => {
+    const userId = req.user?.id;
+    const sessionId = req.params.id;
+
+    if (!userId) {
+      return res.status(401).json({ message: "User not found" });
+    }
+
+    try {
+      const session = await storage.getFastingSession(sessionId);
+      if (!session || session.userId !== userId) {
+        return res.status(404).json({ message: "Fasting session not found" });
+      }
+
+      const completedSession = await storage.completeFastingSession(sessionId);
+      res.json(completedSession);
+    } catch (error: any) {
+      // Fasting completion error handled by response
+      res.status(500).json({ message: "Failed to complete fasting session" });
+    }
+  });
+
+  app.put('/api/fasting/:id', isAuthenticated, async (req: any, res: Response) => {
+    const userId = req.user?.id;
+    const sessionId = req.params.id;
+
+    if (!userId) {
+      return res.status(401).json({ message: "User not found" });
+    }
+
+    try {
+      const session = await storage.getFastingSession(sessionId);
+      if (!session || session.userId !== userId) {
+        return res.status(404).json({ message: "Fasting session not found" });
+      }
+
+      const updatedSession = await storage.updateFastingSession(sessionId, req.body);
+      res.json(updatedSession);
+    } catch (error: any) {
+      // Fasting update error handled by response
+      res.status(500).json({ message: "Failed to update fasting session" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
