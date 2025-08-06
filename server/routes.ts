@@ -786,6 +786,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get('/api/fasting/active', isAuthenticated, async (req: any, res: Response) => {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ message: "User not found" });
+    }
+
+    try {
+      const activeSession = await storage.getUserActiveFastingSession(userId);
+      res.json(activeSession);
+    } catch (error: any) {
+      res.status(500).json({ message: "Failed to get active fasting session" });
+    }
+  });
+
+  // Daily stats API with fasting integration
+  app.get('/api/users/:userId/daily-stats', isAuthenticated, async (req: any, res: Response) => {
+    const userId = req.user?.id;
+    const requestedUserId = req.params.userId;
+    
+    if (!userId || userId !== requestedUserId) {
+      return res.status(401).json({ message: "User not found or unauthorized" });
+    }
+
+    try {
+      const today = new Date();
+      const stats = await storage.getUserDailyStats(userId, today);
+      res.json(stats);
+    } catch (error: any) {
+      res.status(500).json({ message: "Failed to get daily stats" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

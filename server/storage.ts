@@ -94,6 +94,11 @@ export interface IStorage {
     totalCarbs: number;
     totalFat: number;
     waterGlasses: number;
+    fastingStatus?: {
+      isActive: boolean;
+      timeRemaining?: number;
+      planName?: string;
+    };
   }>;
   
   // Fasting sessions
@@ -102,6 +107,7 @@ export interface IStorage {
   getFastingSession(id: string): Promise<FastingSession | null>;
   updateFastingSession(id: string, updates: Partial<FastingSession>): Promise<FastingSession>;
   completeFastingSession(id: string): Promise<FastingSession>;
+  getUserActiveFastingSession(userId: string): Promise<FastingSession | null>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -588,6 +594,58 @@ export class DatabaseStorage implements IStorage {
       newAchievements.push(achievement);
     }
 
+    // Check Fasting Achievements
+    const userFastingSessions = await db
+      .select()
+      .from(fastingSessions)
+      .where(
+        and(
+          eq(fastingSessions.userId, userId),
+          eq(fastingSessions.status, 'completed')
+        )
+      );
+
+    const completedFasts = userFastingSessions.length;
+
+    // First Fast Achievement
+    if (!achievementTypes.includes('first_fast_completed') && completedFasts >= 1) {
+      const achievement = await this.createAchievement({
+        userId,
+        achievementType: 'first_fast_completed',
+        title: 'Fasting Beginner',
+        description: 'Completed your first intermittent fast',
+        iconName: 'clock',
+        colorClass: 'bg-blue-500/20 border-blue-500/30'
+      });
+      newAchievements.push(achievement);
+    }
+
+    // 5 Fasts Achievement
+    if (!achievementTypes.includes('five_fasts_completed') && completedFasts >= 5) {
+      const achievement = await this.createAchievement({
+        userId,
+        achievementType: 'five_fasts_completed',
+        title: 'Fasting Streak',
+        description: 'Completed 5 intermittent fasting sessions',
+        iconName: 'flame',
+        colorClass: 'bg-orange-500/20 border-orange-500/30'
+      });
+      newAchievements.push(achievement);
+    }
+
+    // 20 Fasts Achievement
+    if (!achievementTypes.includes('twenty_fasts_completed') && completedFasts >= 20) {
+      const achievement = await this.createAchievement({
+        userId,
+        achievementType: 'twenty_fasts_completed',
+        title: 'Fasting Master',
+        description: 'Completed 20 intermittent fasting sessions',
+        iconName: 'trophy',
+        colorClass: 'bg-purple-500/20 border-purple-500/30'
+      });
+      newAchievements.push(achievement);
+    }
+
     return newAchievements;
   }
 
@@ -630,9 +688,27 @@ export class DatabaseStorage implements IStorage {
     // Get water intake
     const water = await this.getUserWaterIntake(userId, date);
 
+    // Get active fasting session
+    const activeFasting = await this.getUserActiveFastingSession(userId);
+    let fastingStatus = undefined;
+    
+    if (activeFasting) {
+      const now = new Date().getTime();
+      const startTime = new Date(activeFasting.startTime).getTime();
+      const elapsed = now - startTime;
+      const remaining = Math.max(0, activeFasting.targetDuration - elapsed);
+      
+      fastingStatus = {
+        isActive: activeFasting.status === 'active' && remaining > 0,
+        timeRemaining: remaining,
+        planName: activeFasting.planName
+      };
+    }
+
     return {
       ...totals,
       waterGlasses: water?.glasses || 0,
+      fastingStatus
     };
   }
 
@@ -674,11 +750,31 @@ export class DatabaseStorage implements IStorage {
       .set({ 
         status: 'completed',
         endTime: completedAt,
-        completedAt 
+        completedAt,
+        actualDuration: sql`${fastingSessions.targetDuration}`
       })
       .where(eq(fastingSessions.id, id))
       .returning();
+    
+    // Check for fasting achievements
+    if (completed) {
+      await this.checkAndCreateAchievements(completed.userId);
+    }
+    
     return completed;
+  }
+
+  async getUserActiveFastingSession(userId: string): Promise<FastingSession | null> {
+    const [session] = await db
+      .select()
+      .from(fastingSessions)
+      .where(and(
+        eq(fastingSessions.userId, userId),
+        eq(fastingSessions.status, 'active')
+      ))
+      .orderBy(desc(fastingSessions.createdAt))
+      .limit(1);
+    return session || null;
   }
 }
 

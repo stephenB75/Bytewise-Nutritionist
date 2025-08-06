@@ -166,6 +166,19 @@ export function FastingTracker() {
         description: "Great job! You can now break your fast with a nutritious meal.",
       });
       queryClient.invalidateQueries({ queryKey: ['/api/fasting/history'] });
+      
+      // Check for new achievements after completing fast
+      fetch('/api/achievements/check', { method: 'POST' })
+        .then(res => res.json())
+        .then(data => {
+          if (data.newAchievements && data.newAchievements.length > 0) {
+            // Trigger achievement celebration
+            window.dispatchEvent(new CustomEvent('achievement-unlocked', {
+              detail: data.newAchievements[0]
+            }));
+          }
+        })
+        .catch(err => console.error('Failed to check achievements:', err));
     }
   });
 

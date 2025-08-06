@@ -17,6 +17,7 @@ import { AchievementCelebration } from '@/components/AchievementCelebration';
 import { AwardsAchievements } from '@/components/AwardsAchievements';
 import { ConfettiCelebration } from '@/components/ConfettiCelebration';
 import { FastingTracker } from '@/components/FastingTracker';
+import { FastingStatusCard } from '@/components/FastingStatusCard';
 import { useGoalAchievements } from '@/hooks/useGoalAchievements';
 import { useRotatingBackground } from '@/hooks/useRotatingBackground';
 import { useAchievements, getAchievementIcon, formatAchievementDate } from '@/hooks/useAchievements';
@@ -92,6 +93,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const [profileSection, setProfileSection] = useState<ProfileSection>('profile');
   const [notifications, setNotifications] = useState<Notification[]>([]);
   
+  // Daily stats with fasting integration
+  const [dailyStats, setDailyStats] = useState<any>(null);
+  
   // Nutrition aggregation state
   const [dailyMacros, setDailyMacros] = useState({ protein: 0, carbs: 0, fat: 0 });
   const [dailyMicronutrients, setDailyMicronutrients] = useState({
@@ -151,6 +155,21 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       read: false
     }, ...prev]);
   }, []);
+
+  // Fetch daily stats including fasting status
+  const fetchDailyStats = useCallback(async () => {
+    if (!user) return;
+    
+    try {
+      const response = await fetch(`/api/users/${user.id}/daily-stats`);
+      if (response.ok) {
+        const stats = await response.json();
+        setDailyStats(stats);
+      }
+    } catch (error) {
+      console.error('Failed to fetch daily stats:', error);
+    }
+  }, [user]);
 
   const handleProfileSectionChange = (sectionId: string) => {
     if (authLoading || !validateProfileSection(sectionId)) return;
@@ -237,9 +256,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       setGoalCalories(userCalorieGoal);
       setWeeklyGoal(userCalorieGoal * 7);
       
-
+      // Fetch daily stats when user changes
+      fetchDailyStats();
     }
-  }, [user]);
+  }, [user, fetchDailyStats]);
 
   // Load existing meal data and set up tracking
   useEffect(() => {
@@ -270,6 +290,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         // Calculate estimated micronutrients from today's meals
         const estimatedMicronutrients = calculateEstimatedMicronutrients(todayMeals);
         setDailyMicronutrients(estimatedMicronutrients);
+        
+        // Fetch daily stats including fasting status
+        if (user) {
+          fetchDailyStats();
+        }
         
         // Debug logging for micronutrient verification (remove in production)
         if (todayMeals.length > 0) {
@@ -702,6 +727,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 <div className="text-xs text-gray-400">Complete</div>
               </div>
             </div>
+          </div>
+
+          {/* Fasting Status */}
+          <div className="mb-4">
+            <FastingStatusCard fastingStatus={dailyStats?.fastingStatus} />
           </div>
 
           {/* Weekly Progress */}
