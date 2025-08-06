@@ -42,6 +42,7 @@ interface IngredientAnalysis {
     carbs: number;
     fat: number;
   };
+  fdaServing?: string;
 }
 
 interface CalorieCalculatorProps {
@@ -593,6 +594,18 @@ function CalorieCalculator({
                     </p>
                     <p className="text-xs text-blue-600 mt-1">
                       This shows nutritional density for comparison
+                    </p>
+                  </div>
+                )}
+
+                {analysis.fdaServing && (
+                  <div className="mb-3 p-2 bg-green-50 border border-green-200 rounded">
+                    <p className="text-sm text-green-700 font-medium">
+                      <Droplets className="w-4 h-4 inline mr-1" />
+                      FDA Standard Serving: {analysis.fdaServing}
+                    </p>
+                    <p className="text-xs text-green-600 mt-1">
+                      Based on FDA Reference Amounts Customarily Consumed (RACC)
                     </p>
                   </div>
                 )}

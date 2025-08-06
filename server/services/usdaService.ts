@@ -245,12 +245,13 @@ export class USDAService {
       }
       
       // Parse measurement and convert to grams
-      const { quantity, unit, gramsEquivalent } = this.parseMeasurement(measurement, food);
+      const measurementResult = this.parseMeasurement(measurement, food);
+      const { quantity, unit, gramsEquivalent } = measurementResult;
       
       // Calculate calories based on grams
       const estimatedCalories = Math.round((nutrients.calories * gramsEquivalent) / 100);
       
-      return {
+      const result: any = {
         ingredient: food.description,
         measurement: `${quantity} ${unit} (~${gramsEquivalent}g)`,
         estimatedCalories,
@@ -258,6 +259,13 @@ export class USDAService {
         note: `From USDA database (${food.dataType})`,
         nutritionPer100g: nutrients
       };
+      
+      // Include FDA serving information if available
+      if ((measurementResult as any).fdaServing) {
+        result.fdaServing = (measurementResult as any).fdaServing;
+      }
+      
+      return result;
     } catch (error) {
       
       // Fallback to enhanced estimation with proper nutrition data
@@ -349,6 +357,61 @@ export class USDAService {
   private static readonly COOKING_METHODS = ['grilled', 'fried', 'baked', 'roasted', 'boiled', 'steamed', 'raw', 'fresh', 'cooked'];
   private static readonly PREPARATION_FORMS = ['canned', 'frozen', 'dried', 'fresh', 'pickled', 'smoked'];
   private static readonly FALLBACK_FOODS = ['apple', 'chicken', 'chicken breast', 'hotdog', 'hot dog', 'egg', 'rice', 'white rice', 'brown rice', 'bread', 'white bread', 'whole wheat bread', 'pasta', 'spaghetti', 'penne', 'macaroni', 'corn', 'sweet corn', 'corn on cob', 'corn on the cob', 'potato', 'baked potato', 'oats', 'oatmeal', 'quinoa', 'barley', 'bulgur', 'cereal', 'cheerios', 'cornflakes', 'granola', 'peanut punch', 'sorrel', 'ginger beer', 'coconut water', 'rum punch', 'mauby', 'sea moss'];
+
+  // FDA Standard Liquid Serving Sizes (RACC - Reference Amounts Customarily Consumed)
+  private static readonly STANDARD_LIQUID_SERVINGS: Record<string, { 
+    standardServing: number; // in mL
+    fdaCategory: string;
+    description: string;
+  }> = {
+    // FDA: Most beverages - 12 fl oz (360 mL)
+    'soda': { standardServing: 360, fdaCategory: 'Carbonated Beverages', description: '12 fl oz standard' },
+    'cola': { standardServing: 360, fdaCategory: 'Carbonated Beverages', description: '12 fl oz standard' },
+    'pepsi': { standardServing: 360, fdaCategory: 'Carbonated Beverages', description: '12 fl oz standard' },
+    'coke': { standardServing: 360, fdaCategory: 'Carbonated Beverages', description: '12 fl oz standard' },
+    'sprite': { standardServing: 360, fdaCategory: 'Carbonated Beverages', description: '12 fl oz standard' },
+    'ginger ale': { standardServing: 360, fdaCategory: 'Carbonated Beverages', description: '12 fl oz standard' },
+    'energy drink': { standardServing: 360, fdaCategory: 'Energy Beverages', description: '12 fl oz standard' },
+    'sports drink': { standardServing: 360, fdaCategory: 'Sports Beverages', description: '12 fl oz standard' },
+    'gatorade': { standardServing: 360, fdaCategory: 'Sports Beverages', description: '12 fl oz standard' },
+    'powerade': { standardServing: 360, fdaCategory: 'Sports Beverages', description: '12 fl oz standard' },
+    
+    // FDA: Milk and fruit juices - 8 fl oz (240 mL)
+    'milk': { standardServing: 240, fdaCategory: 'Milk and Milk Products', description: '8 fl oz (1 cup) standard' },
+    'whole milk': { standardServing: 240, fdaCategory: 'Milk and Milk Products', description: '8 fl oz (1 cup) standard' },
+    'skim milk': { standardServing: 240, fdaCategory: 'Milk and Milk Products', description: '8 fl oz (1 cup) standard' },
+    'almond milk': { standardServing: 240, fdaCategory: 'Alternative Milks', description: '8 fl oz (1 cup) standard' },
+    'soy milk': { standardServing: 240, fdaCategory: 'Alternative Milks', description: '8 fl oz (1 cup) standard' },
+    'oat milk': { standardServing: 240, fdaCategory: 'Alternative Milks', description: '8 fl oz (1 cup) standard' },
+    'rice milk': { standardServing: 240, fdaCategory: 'Alternative Milks', description: '8 fl oz (1 cup) standard' },
+    'coconut milk': { standardServing: 240, fdaCategory: 'Alternative Milks', description: '8 fl oz (1 cup) standard' },
+    
+    // FDA: Fruit Juices - 8 fl oz (240 mL)
+    'orange juice': { standardServing: 240, fdaCategory: 'Fruit Juices', description: '8 fl oz (1 cup) standard' },
+    'apple juice': { standardServing: 240, fdaCategory: 'Fruit Juices', description: '8 fl oz (1 cup) standard' },
+    'grape juice': { standardServing: 240, fdaCategory: 'Fruit Juices', description: '8 fl oz (1 cup) standard' },
+    'cranberry juice': { standardServing: 240, fdaCategory: 'Fruit Juices', description: '8 fl oz (1 cup) standard' },
+    'pineapple juice': { standardServing: 240, fdaCategory: 'Fruit Juices', description: '8 fl oz (1 cup) standard' },
+    'tomato juice': { standardServing: 240, fdaCategory: 'Vegetable Juices', description: '8 fl oz (1 cup) standard' },
+    
+    // Caribbean beverages - 8 fl oz (240 mL) for traditional drinks
+    'peanut punch': { standardServing: 240, fdaCategory: 'Traditional Beverages', description: '8 fl oz (1 cup) standard' },
+    'sorrel': { standardServing: 240, fdaCategory: 'Traditional Beverages', description: '8 fl oz (1 cup) standard' },
+    'ginger beer': { standardServing: 360, fdaCategory: 'Carbonated Beverages', description: '12 fl oz standard' },
+    'rum punch': { standardServing: 120, fdaCategory: 'Alcoholic Mixed Drinks', description: '4 fl oz standard' },
+    'mauby': { standardServing: 240, fdaCategory: 'Traditional Beverages', description: '8 fl oz (1 cup) standard' },
+    'sea moss': { standardServing: 240, fdaCategory: 'Traditional Beverages', description: '8 fl oz (1 cup) standard' },
+    'coconut water': { standardServing: 240, fdaCategory: 'Natural Beverages', description: '8 fl oz (1 cup) standard' },
+    
+    // Other beverages
+    'coffee': { standardServing: 240, fdaCategory: 'Hot Beverages', description: '8 fl oz (1 cup) standard' },
+    'tea': { standardServing: 240, fdaCategory: 'Hot Beverages', description: '8 fl oz (1 cup) standard' },
+    'water': { standardServing: 240, fdaCategory: 'Water', description: '8 fl oz (1 cup) standard' },
+    'beer': { standardServing: 360, fdaCategory: 'Alcoholic Beverages', description: '12 fl oz standard' },
+    'wine': { standardServing: 150, fdaCategory: 'Alcoholic Beverages', description: '5 fl oz standard' },
+    'smoothie': { standardServing: 240, fdaCategory: 'Blended Beverages', description: '8 fl oz (1 cup) standard' },
+    'milkshake': { standardServing: 240, fdaCategory: 'Dairy Beverages', description: '8 fl oz (1 cup) standard' },
+  };
 
   // Comprehensive fallback nutrition data per 100g
   private static readonly FALLBACK_NUTRITION: Record<string, { calories: number; protein: number; carbs: number; fat: number }> = {
@@ -965,6 +1028,32 @@ export class USDAService {
     };
 
     let gramsEquivalent = quantity;
+    let fdaServingUsed = false;
+    let fdaServingInfo: string | null = null;
+
+    // Check for FDA standard liquid serving sizes first for beverages
+    if (this.isLiquidQuery(food.description || '')) {
+      const standardServing = USDAService.getStandardLiquidServing(food.description || '');
+      if (standardServing && (unit.includes('glass') || unit.includes('serving') || unit.includes('standard') || unit.includes('cup'))) {
+        gramsEquivalent = quantity * standardServing.standardServing;
+        fdaServingUsed = true;
+        fdaServingInfo = `FDA ${standardServing.fdaCategory}: ${standardServing.description}`;
+      }
+      
+      // Enhanced liquid volume conversions using FDA standards
+      else if (unit.includes('fl oz') || unit.includes('fluid ounce')) {
+        gramsEquivalent = quantity * 29.57; // 1 fl oz = 29.57 mL
+      }
+      else if (unit.includes('quart')) {
+        gramsEquivalent = quantity * 946; // 1 quart = 946 mL
+      }
+      else if (unit.includes('pint')) {
+        gramsEquivalent = quantity * 473; // 1 pint = 473 mL
+      }
+      else if (unit.includes('gallon')) {
+        gramsEquivalent = quantity * 3785; // 1 gallon = 3785 mL
+      }
+    }
 
     // Check for item-specific conversions first - prioritize ingredient name over food description
     const ingredientName = (food.description?.toLowerCase() || '').replace(/[^\w\s]/g, ' ');
@@ -1031,7 +1120,13 @@ export class USDAService {
       }
     }
 
-    return { quantity, unit, gramsEquivalent };
+    // Include FDA serving information in return if used
+    const result = { quantity, unit, gramsEquivalent };
+    if (fdaServingUsed && fdaServingInfo) {
+      (result as any).fdaServing = fdaServingInfo;
+    }
+    
+    return result;
   }
 
   // Text conversion constants
@@ -1278,6 +1373,41 @@ export class USDAService {
   }
 
   /**
+   * Get FDA standard serving size for liquid beverages
+   */
+  static getStandardLiquidServing(ingredient: string): {
+    standardServing: number;
+    fdaCategory: string;
+    description: string;
+  } | null {
+    const normalized = ingredient.toLowerCase().trim();
+    
+    // Direct match first
+    if (USDAService.STANDARD_LIQUID_SERVINGS[normalized]) {
+      return USDAService.STANDARD_LIQUID_SERVINGS[normalized];
+    }
+    
+    // Partial matching for compound names
+    for (const [key, serving] of Object.entries(USDAService.STANDARD_LIQUID_SERVINGS)) {
+      if (normalized.includes(key) || key.includes(normalized.split(' ')[0])) {
+        return serving;
+      }
+    }
+    
+    // Default liquid serving if no specific match (FDA general beverage standard)
+    const service = new USDAService('');
+    if (service.isLiquidQuery(normalized)) {
+      return {
+        standardServing: 240, // 8 fl oz default for most liquids
+        fdaCategory: 'General Beverages',
+        description: '8 fl oz (1 cup) default liquid serving'
+      };
+    }
+    
+    return null;
+  }
+
+  /**
    * Enhanced liquid-specific scoring system  
    */
   private applyLiquidScoring(searchTerm: string, description: string): number {
@@ -1348,6 +1478,14 @@ export class USDAService {
       // Alcoholic beverages
       'beer': { calories: 43, protein: 0.5, carbs: 3.6, fat: 0 },
       'light beer': { calories: 29, protein: 0.2, carbs: 1.9, fat: 0 },
+      
+      // Milk varieties (essential liquids that were missing)
+      'milk': { calories: 42, protein: 3.4, carbs: 5.0, fat: 1.0 },
+      'whole milk': { calories: 61, protein: 3.2, carbs: 4.8, fat: 3.3 },
+      '2% milk': { calories: 50, protein: 3.3, carbs: 4.9, fat: 2.0 },
+      '1% milk': { calories: 42, protein: 3.4, carbs: 5.0, fat: 1.0 },
+      'skim milk': { calories: 34, protein: 3.4, carbs: 5.0, fat: 0.2 },
+      'nonfat milk': { calories: 34, protein: 3.4, carbs: 5.0, fat: 0.2 },
       'wine': { calories: 83, protein: 0.1, carbs: 2.6, fat: 0 },
       'red wine': { calories: 85, protein: 0.1, carbs: 2.6, fat: 0 },
       'white wine': { calories: 82, protein: 0.1, carbs: 2.6, fat: 0 },
@@ -1362,20 +1500,20 @@ export class USDAService {
       // Soft drinks and juices
       'lemonade': { calories: 40, protein: 0, carbs: 10.6, fat: 0 },
       'lemon juice': { calories: 22, protein: 0.4, carbs: 6.9, fat: 0.2 },
-      'lime juice': { calories: 25, protein: 0.4, carbs: 8.4, fat: 0.1 },
+      'lime juice fresh': { calories: 25, protein: 0.4, carbs: 8.4, fat: 0.1 },
       'orange juice': { calories: 45, protein: 0.7, carbs: 10.4, fat: 0.2 },
       'apple juice': { calories: 46, protein: 0.1, carbs: 11.3, fat: 0.1 },
       'grape juice': { calories: 60, protein: 0.4, carbs: 14.8, fat: 0.2 },
       'cranberry juice': { calories: 46, protein: 0.4, carbs: 12.2, fat: 0.1 },
       'tomato juice': { calories: 17, protein: 0.8, carbs: 4.2, fat: 0.1 },
-      'coconut water': { calories: 19, protein: 0.7, carbs: 3.7, fat: 0.2 },
+      'coconut water fresh': { calories: 19, protein: 0.7, carbs: 3.7, fat: 0.2 },
       
       // Tropical and exotic fruit juices
       'pineapple juice': { calories: 53, protein: 0.5, carbs: 12.9, fat: 0.1 },
       'mango juice': { calories: 54, protein: 0.4, carbs: 13.7, fat: 0.2 },
       'guava juice': { calories: 56, protein: 0.3, carbs: 14.8, fat: 0.1 },
       'papaya juice': { calories: 43, protein: 0.5, carbs: 11.0, fat: 0.1 },
-      'passion fruit juice': { calories: 51, protein: 1.4, carbs: 11.2, fat: 0.4 },
+      'passion fruit fresh juice': { calories: 51, protein: 1.4, carbs: 11.2, fat: 0.4 },
       'pomegranate juice': { calories: 54, protein: 0.2, carbs: 13.7, fat: 0.3 },
       'kiwi juice': { calories: 61, protein: 1.1, carbs: 14.7, fat: 0.5 },
       'dragon fruit juice': { calories: 60, protein: 1.2, carbs: 13.0, fat: 0.4 },
@@ -1629,12 +1767,13 @@ export class USDAService {
       'sea moss': { calories: 49, protein: 1.5, carbs: 12.3, fat: 0.6 },
       'sea moss drink': { calories: 49, protein: 1.5, carbs: 12.3, fat: 0.6 },
       'irish moss': { calories: 49, protein: 1.5, carbs: 12.3, fat: 0.6 },
+      'coconut water': { calories: 19, protein: 0.7, carbs: 3.7, fat: 0.2 },
       'coconut milk drink': { calories: 45, protein: 0.4, carbs: 6.3, fat: 4.6 },
       'tamarind drink': { calories: 239, protein: 2.8, carbs: 62.5, fat: 0.6 },
       'soursop juice': { calories: 66, protein: 1.0, carbs: 16.8, fat: 0.3 },
       'june plum juice': { calories: 46, protein: 0.9, carbs: 11.2, fat: 0.3 },
       'guinep juice': { calories: 58, protein: 1.3, carbs: 13.7, fat: 0.1 },
-      'passion fruit juice': { calories: 97, protein: 2.2, carbs: 23.4, fat: 0.7 },
+      'passion fruit concentrate': { calories: 97, protein: 2.2, carbs: 23.4, fat: 0.7 },
       
       // Traditional fruit juices (moved here to avoid duplicates)
       'fruit punch': { calories: 45, protein: 0, carbs: 11.5, fat: 0 },
@@ -1703,10 +1842,11 @@ export class USDAService {
         dataType: 'Liquid Fallback',
         foodNutrients: []
       };
-      const { quantity, unit, gramsEquivalent } = this.parseMeasurement(measurement, mockFood);
+      const measurementResult = this.parseMeasurement(measurement, mockFood);
+      const { quantity, unit, gramsEquivalent } = measurementResult;
       const estimatedCalories = Math.round((nutrition.calories * gramsEquivalent) / 100);
       
-      return {
+      const result: any = {
         ingredient: normalized.toUpperCase(),
         measurement: `${quantity} ${unit} (~${gramsEquivalent}g)`,
         estimatedCalories,
@@ -1714,6 +1854,13 @@ export class USDAService {
         note: estimatedCalories === 0 ? 'Contains no calories' : 'Low-calorie beverage',
         nutritionPer100g: nutrition
       };
+      
+      // Include FDA serving information if available
+      if ((measurementResult as any).fdaServing) {
+        result.fdaServing = (measurementResult as any).fdaServing;
+      }
+      
+      return result;
     }
 
     // Use enhanced fallback data if available
@@ -1725,10 +1872,11 @@ export class USDAService {
         dataType: 'Enhanced Fallback',
         foodNutrients: []
       };
-      const { quantity, unit, gramsEquivalent } = this.parseMeasurement(measurement, mockFood);
+      const measurementResult = this.parseMeasurement(measurement, mockFood);
+      const { quantity, unit, gramsEquivalent } = measurementResult;
       const estimatedCalories = Math.round((nutrition.calories * gramsEquivalent) / 100);
 
-      return {
+      const result: any = {
         ingredient: normalized.toUpperCase(),
         measurement: `${quantity} ${unit} (~${gramsEquivalent}g)`,
         estimatedCalories,
@@ -1737,6 +1885,13 @@ export class USDAService {
         nutritionPer100g: nutrition,
         usdaPortionUsed: false
       };
+      
+      // Include FDA serving information if available
+      if ((measurementResult as any).fdaServing) {
+        result.fdaServing = (measurementResult as any).fdaServing;
+      }
+      
+      return result;
     }
 
     throw new Error(`No nutrition data available for "${ingredientName}"`);
