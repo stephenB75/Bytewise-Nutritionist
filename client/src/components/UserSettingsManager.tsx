@@ -228,15 +228,15 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
       </div>
 
       {/* Profile Card with Accordion */}
-      <Accordion 
-        type="single" 
-        collapsible 
-        value={accordionValue} 
-        onValueChange={setAccordionValue}
-        className="w-full"
-      >
-        <AccordionItem value="profile" className="border-none">
-          <Card className="bg-white/10 backdrop-blur-md border-white/20 overflow-hidden">
+      <Card className="bg-white/10 backdrop-blur-md border-white/20 overflow-hidden">
+        <Accordion 
+          type="single" 
+          collapsible 
+          value={accordionValue} 
+          onValueChange={setAccordionValue}
+          className="w-full"
+        >
+          <AccordionItem value="profile" className="border-none">
             <AccordionTrigger className="px-6 py-6 hover:bg-white/5 hover:no-underline [&[data-state=open]>div>div:last-child]:rotate-180">
               <div className="flex items-center space-x-4 flex-1 min-w-0">
                 <div className="relative flex-shrink-0">
@@ -515,9 +515,9 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                 </div>
               </div>
             </AccordionContent>
-          </Card>
-        </AccordionItem>
-      </Accordion>
+          </AccordionItem>
+        </Accordion>
+      </Card>
     </div>
   );
 }
