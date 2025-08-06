@@ -1418,8 +1418,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         </div>
 
         {/* Profile Content - Redesigned Container */}
-        {/* Fasting Section */}
-        {activeTab === 'fasting' && <FastingTracker />}
         
         <div className="min-h-[600px]">
           {profileSection === 'profile' && (
@@ -1470,6 +1468,30 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         return renderCalculator();
       case 'daily':
         return renderDailyWeekly();
+      case 'fasting':
+        return (
+          <div className={`space-y-0 animate-in fade-in ${getAnimationDirection('fasting', previousTab)} duration-700 ease-out`}>
+            <HeroSection
+              title="Intermittent"
+              subtitle="Fasting"
+              description="Track your fasting journey with professional IF schedules and real-time progress monitoring"
+              buttonText="Start Fasting"
+              onButtonClick={() => {
+                const fastingPanel = document.querySelector('.fasting-tracker');
+                if (fastingPanel) {
+                  fastingPanel.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
+            />
+            
+            {/* Fasting Content Section */}
+            <div className="px-6 py-8 bg-black min-h-screen">
+              <div className="fasting-tracker bg-gray-900/80 backdrop-blur-md rounded-3xl border border-gray-700 p-6">
+                <FastingTracker />
+              </div>
+            </div>
+          </div>
+        );
       case 'profile':
         return renderProfile();
       case 'calculator':
