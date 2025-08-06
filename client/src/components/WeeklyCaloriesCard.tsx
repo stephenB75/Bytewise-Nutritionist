@@ -47,27 +47,41 @@ export function WeeklyCaloriesCard() {
 
   // Calculate weekly calories from stored meal data
   const calculateWeeklyCalories = () => {
-    const weekDates = getCurrentWeekDates();
-    
-    // Load meals from localStorage where the daily page stores them
-    const storedMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-    
-    // Calculate calories for each day of the week
-    const weeklyData = weekDates.map(dayData => {
-      const dayMeals = storedMeals.filter((meal: any) => meal.date === dayData.date);
-      const dayCalories = dayMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
+    try {
+      const weekDates = getCurrentWeekDates();
       
-      return {
-        ...dayData,
-        calories: dayCalories,
-        mealCount: dayMeals.length
-      };
-    });
+      // Load meals from localStorage where the daily page stores them
+      const storedMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
+      console.log('📊 WeeklyCaloriesCard: Loaded meals from localStorage:', storedMeals.length);
+      
+      // Calculate calories for each day of the week
+      const weeklyData = weekDates.map(dayData => {
+        const dayMeals = storedMeals.filter((meal: any) => meal.date === dayData.date);
+        const dayCalories = dayMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
+        
+        if (dayMeals.length > 0) {
+          console.log(`📅 WeeklyCaloriesCard: ${dayData.day} (${dayData.date}): ${dayMeals.length} meals, ${dayCalories} calories`);
+        }
+        
+        return {
+          ...dayData,
+          calories: dayCalories,
+          mealCount: dayMeals.length
+        };
+      });
 
-    const totalCalories = weeklyData.reduce((sum, day) => sum + day.calories, 0);
-    
-    setWeeklyData(weeklyData);
-    setTotalWeeklyCalories(totalCalories);
+      const totalCalories = weeklyData.reduce((sum, day) => sum + day.calories, 0);
+      console.log('🔢 WeeklyCaloriesCard: Total weekly calories:', totalCalories);
+      
+      setWeeklyData(weeklyData);
+      setTotalWeeklyCalories(totalCalories);
+    } catch (error) {
+      console.error('❌ WeeklyCaloriesCard: Error calculating weekly calories:', error);
+      // Set empty state on error
+      const weekDates = getCurrentWeekDates();
+      setWeeklyData(weekDates.map(day => ({ ...day, calories: 0, mealCount: 0 })));
+      setTotalWeeklyCalories(0);
+    }
   };
 
   // Load data on component mount and listen for updates
@@ -92,24 +106,12 @@ export function WeeklyCaloriesCard() {
     window.addEventListener('meal-logged-success', handleMealLogged);
     window.addEventListener('refresh-weekly-data', handleMealLogged);
     window.addEventListener('storage', handleStorageChange);
-    
-    // Listen for localStorage changes within the same tab
-    const originalSetItem = localStorage.setItem;
-    localStorage.setItem = function(key, value) {
-      originalSetItem.call(this, key, value);
-      if (key === 'weeklyMeals') {
-        handleMealLogged();
-      }
-    };
 
     return () => {
       window.removeEventListener('calories-logged', handleMealLogged);
       window.removeEventListener('meal-logged-success', handleMealLogged);
       window.removeEventListener('refresh-weekly-data', handleMealLogged);
       window.removeEventListener('storage', handleStorageChange);
-      
-      // Restore original localStorage.setItem
-      localStorage.setItem = originalSetItem;
     };
   }, []);
 
