@@ -275,7 +275,18 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           console.log('📊 Macro Cards Debug:', {
             todayMealsCount: todayMeals.length,
             sampleMeal: todayMeals[0],
-            calculatedMacros: dailyMacroTotals
+            calculatedMacros: dailyMacroTotals,
+            userMacroGoals: {
+              protein: user?.dailyProteinGoal || 180,
+              carbs: user?.dailyCarbGoal || 200, 
+              fat: user?.dailyFatGoal || 70
+            },
+            remainingMacros: {
+              protein: (user?.dailyProteinGoal || 180) - dailyMacroTotals.protein,
+              carbs: (user?.dailyCarbGoal || 200) - dailyMacroTotals.carbs,
+              fat: (user?.dailyFatGoal || 70) - dailyMacroTotals.fat
+            },
+            macroCardNote: 'Enhanced macro cards now show remaining values with negative color coding'
           });
         }
         
@@ -567,31 +578,45 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     );
   });
 
-  // Optimized Macro Card Component
-  const MacroCard = React.memo(({ name, value, color, data = [0, 0, 0, 0, 0] }: {
+  // Enhanced Macro Card Component - Shows Remaining Values with Negative Color Coding
+  const MacroCard = React.memo(({ name, value, goal, color, data = [0, 0, 0, 0, 0] }: {
     name: string;
     value: number;
+    goal: number;
     color: string;
     data?: number[];
   }) => {
+    // Calculate remaining value (goal - current)
+    const remaining = goal - value;
+    const isNegative = remaining < 0;
+    
     // Memoize chart data calculation
     const chartData = React.useMemo(() => 
       data.map(height => Math.max(height * 100, 10))
     , [data]);
 
+    // Determine text color based on remaining value
+    const textColor = isNegative ? 'text-red-400' : `text-${color}-400`;
+    const labelColor = isNegative ? 'text-red-300' : 'text-gray-400';
+
     return (
       <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4 transition-all duration-300 hover:bg-white/15 hover:border-white/30">
         <div className="text-center">
-          <div className="text-sm text-gray-400 mb-1">{name}</div>
-          <div className={`text-xl font-bold text-${color}-400 mb-2`}>{value}g</div>
+          <div className={`text-sm ${labelColor} mb-1`}>Remaining {name}</div>
+          <div className={`text-xl font-bold ${textColor} mb-2`}>
+            {isNegative ? '+' : ''}{Math.abs(remaining)}g
+          </div>
           <div className="flex items-end space-x-px h-6">
             {chartData.map((height, i) => (
               <div 
                 key={i}
-                className={`flex-1 bg-${color}-400/10 rounded-t transition-all duration-500`}
+                className={`flex-1 ${isNegative ? 'bg-red-400/10' : `bg-${color}-400/10`} rounded-t transition-all duration-500`}
                 style={{ height: `${height}%` }}
               />
             ))}
+          </div>
+          <div className="text-xs text-gray-500 mt-1">
+            {value}g / {goal}g
           </div>
         </div>
       </Card>
@@ -740,11 +765,26 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             </div>
           </div>
 
-          {/* Macros Breakdown */}
+          {/* Macros Breakdown - Enhanced with Remaining Values */}
           <div className="grid grid-cols-3 gap-4 mb-4">
-            <MacroCard name="Protein" value={Math.round(dailyMacros.protein)} color="green" />
-            <MacroCard name="Carbs" value={Math.round(dailyMacros.carbs)} color="yellow" />
-            <MacroCard name="Fat" value={Math.round(dailyMacros.fat)} color="purple" />
+            <MacroCard 
+              name="Protein" 
+              value={Math.round(dailyMacros.protein)} 
+              goal={user?.dailyProteinGoal || 180} 
+              color="green" 
+            />
+            <MacroCard 
+              name="Carbs" 
+              value={Math.round(dailyMacros.carbs)} 
+              goal={user?.dailyCarbGoal || 200} 
+              color="yellow" 
+            />
+            <MacroCard 
+              name="Fat" 
+              value={Math.round(dailyMacros.fat)} 
+              goal={user?.dailyFatGoal || 70} 
+              color="purple" 
+            />
           </div>
 
           {/* Micronutrients Section */}
