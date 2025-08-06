@@ -327,129 +327,181 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     setActiveTab(newTab);
   };
 
-  // Simplified Hero Section Component
+  // Optimized Hero Section Component with enhanced performance and visuals
   const HeroSection = React.memo(({ title, subtitle, description, buttonText, onButtonClick }: {
     title: string;
     subtitle: string; 
     description: string;
     buttonText: string;
     onButtonClick: () => void;
-  }) => (
-    <div className="relative h-screen overflow-hidden">
-      <div 
-        key={animationKey}
-        className="absolute inset-0 bg-cover bg-center z-10 hero-bg-animated"
-        style={{
-          backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`
-        }}
-      />
-      
-      <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6 z-20">
-        <div className="space-y-8 max-w-2xl">
-          <div className="space-y-2">
-            <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none text-white drop-shadow-2xl animate-fadeInUp [animation-delay:0.2s]">
-              {title}
-            </h1>
-            <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none animate-fadeInUp [animation-delay:0.4s]">
-              <span className="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent drop-shadow-2xl">
-                {subtitle}
-              </span>
-            </h1>
+  }) => {
+    // Memoize the background style to prevent recalculation
+    const backgroundStyle = React.useMemo(() => ({
+      backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.45), rgba(0,0,0,0.75)), url('${backgroundImage}')`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+      willChange: 'transform',
+    }), [backgroundImage]);
+
+    return (
+      <div className="relative h-screen overflow-hidden">
+        {/* Optimized Background Layer */}
+        <div 
+          key={animationKey}
+          className="absolute inset-0 z-10 hero-bg-optimized"
+          style={backgroundStyle}
+        />
+        
+        {/* Enhanced Pattern Overlay */}
+        <div className="absolute inset-0 z-15 opacity-20">
+          <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 via-transparent to-red-500/10" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_70%,rgba(251,146,60,0.15),transparent_50%)]" />
+        </div>
+        
+        {/* Content Layer with Enhanced Typography */}
+        <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6 z-20">
+          <div className="space-y-8 max-w-2xl">
+            {/* Enhanced Title Section */}
+            <div className="space-y-3 hero-optimized">
+              <h1 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] text-white drop-shadow-2xl animate-fadeInUp [animation-delay:0.2s] font-league-spartan text-optimized">
+                {title}
+              </h1>
+              <h1 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] animate-fadeInUp [animation-delay:0.4s] font-league-spartan text-optimized">
+                <span className="bg-gradient-to-r from-orange-400 via-orange-500 to-red-500 bg-clip-text text-transparent drop-shadow-2xl animate-[text-shimmer_3s_ease-in-out_infinite]">
+                  {subtitle}
+                </span>
+              </h1>
+            </div>
+            
+            {/* Enhanced Description */}
+            <p className="text-xl md:text-2xl text-gray-100 font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl animate-fadeInUp [animation-delay:0.6s] font-work-sans opacity-95">
+              {description}
+            </p>
+            
+            {/* Enhanced Call-to-Action */}
+            <div className="pt-8 animate-fadeInUp [animation-delay:0.8s]">
+              <Button 
+                onClick={onButtonClick}
+                size="lg"
+                className="group relative bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-black px-16 py-6 rounded-full text-xl md:text-2xl shadow-2xl hover:shadow-orange-500/25 transition-all duration-300 border-2 border-orange-400/40 hover:border-orange-300/60 overflow-hidden btn-hero-enhanced"
+              >
+                <span className="relative z-10 flex items-center gap-3 text-optimized">
+                  {buttonText}
+                  <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-red-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </Button>
+            </div>
           </div>
-          
-          <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl animate-fadeInUp [animation-delay:0.6s]">
-            {description}
-          </p>
-          
-          <div className="pt-8 animate-fadeInUp [animation-delay:0.8s]">
-            <Button 
-              onClick={onButtonClick}
-              size="lg"
-              className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-black px-16 py-6 rounded-full text-2xl shadow-2xl hover:scale-105 transition-all duration-200 border-2 border-orange-400/30"
-            >
-              {buttonText}
-            </Button>
+        </div>
+        
+        {/* Enhanced Scroll Indicator */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/70 z-30 animate-bounce">
+          <div className="flex flex-col items-center gap-2">
+            <div className="w-px h-8 bg-gradient-to-b from-transparent to-white/50" />
+            <ChevronRight className="w-6 h-6 rotate-90 drop-shadow-lg" />
           </div>
         </div>
       </div>
-      
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/60 z-30 animate-bounce">
-        <ChevronRight className="w-6 h-6 rotate-90 drop-shadow-lg" />
-      </div>
-    </div>
-  ));
+    );
+  }, (prevProps, nextProps) => {
+    // Custom comparison for better performance
+    return (
+      prevProps.title === nextProps.title &&
+      prevProps.subtitle === nextProps.subtitle &&
+      prevProps.description === nextProps.description &&
+      prevProps.buttonText === nextProps.buttonText
+    );
+  });
 
-  const BytewiseLogo = () => (
-    <div className="mb-8 cursor-pointer hover:scale-105 transition-transform duration-200" onClick={() => setActiveTab('home')}>
+  // Optimized ByteWise Logo Component
+  const BytewiseLogo = React.memo(() => (
+    <div className="mb-8 cursor-pointer group transition-all duration-300 hover:scale-105" onClick={() => setActiveTab('home')}>
       <div className="text-center font-league-spartan">
-        <div className="text-7xl font-black leading-none text-sky-300 mb-2 lowercase tracking-tight drop-shadow-2xl">
+        <div className="text-7xl font-black leading-none text-sky-300 mb-2 lowercase tracking-tight drop-shadow-2xl group-hover:text-sky-200 transition-colors duration-300">
           bytewise
         </div>
-        <div className="text-xl font-light text-white/80 uppercase tracking-widest drop-shadow-lg">
+        <div className="text-xl font-light text-white/80 uppercase tracking-widest drop-shadow-lg group-hover:text-white/90 transition-colors duration-300">
           nutritionist
         </div>
       </div>
     </div>
-  );
+  ));
 
-  const ProgressCard = ({ title, icon: Icon, value, goal, percentage, color }: {
+  // Optimized Progress Card Component
+  const ProgressCard = React.memo(({ title, icon: Icon, value, goal, percentage, color }: {
     title: string;
     icon: React.ComponentType<{ className?: string }>;
     value: string;
     goal: string;
     percentage: number;
     color: string;
-  }) => (
-    <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-3">
-          <div className={`p-2 bg-${color}-500/20 rounded-xl`}>
-            <Icon className={`w-5 h-5 text-${color}-400`} />
+  }) => {
+    // Memoize calculated values
+    const progressWidth = React.useMemo(() => Math.min(percentage, 100), [percentage]);
+    const isComplete = progressWidth >= 100;
+    
+    return (
+      <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4 transition-all duration-300 hover:bg-white/15 hover:border-white/30">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-3">
+            <div className={`p-2 bg-${color}-500/20 rounded-xl`}>
+              <Icon className={`w-5 h-5 text-${color}-400`} />
+            </div>
+            <div>
+              <h3 className="text-white font-semibold">{title}</h3>
+              <p className="text-gray-400 text-sm">{value}/{goal}</p>
+            </div>
           </div>
-          <div>
-            <h3 className="text-white font-semibold">{title}</h3>
-            <p className="text-gray-400 text-sm">{value}/{goal}</p>
+          <div className="text-right">
+            <div className={`text-2xl font-bold text-${color}-400`}>{progressWidth}%</div>
+            <div className="text-xs text-gray-400">of goal</div>
           </div>
         </div>
-        <div className="text-right">
-          <div className={`text-2xl font-bold text-${color}-400`}>{percentage}%</div>
-          <div className="text-xs text-gray-400">of goal</div>
+        <div className="relative h-3 bg-gray-800 rounded-full overflow-hidden mb-4">
+          <div 
+            className={`absolute left-0 top-0 h-full bg-gradient-to-r from-${color}-400 to-${color === 'orange' ? 'red' : 'cyan'}-500 rounded-full transition-all duration-1000`}
+            style={{ width: `${progressWidth}%` }}
+          />
+          {isComplete && (
+            <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full animate-pulse" />
+          )}
         </div>
-      </div>
-      <div className="relative h-3 bg-gray-800 rounded-full overflow-hidden mb-4">
-        <div 
-          className={`absolute left-0 top-0 h-full bg-gradient-to-r from-${color}-400 to-${color === 'orange' ? 'red' : 'cyan'}-500 rounded-full transition-all duration-1000`}
-          style={{ width: `${Math.min(percentage, 100)}%` }}
-        />
-        {percentage >= 100 && (
-          <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full animate-pulse" />
-        )}
-      </div>
-    </Card>
-  );
+      </Card>
+    );
+  });
 
-  const MacroCard = ({ name, value, color, data = [0, 0, 0, 0, 0] }: {
+  // Optimized Macro Card Component
+  const MacroCard = React.memo(({ name, value, color, data = [0, 0, 0, 0, 0] }: {
     name: string;
     value: number;
     color: string;
     data?: number[];
-  }) => (
-    <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4">
-      <div className="text-center">
-        <div className="text-sm text-gray-400 mb-1">{name}</div>
-        <div className={`text-xl font-bold text-${color}-400 mb-2`}>{value}g</div>
-        <div className="flex items-end space-x-px h-6">
-          {data.map((height, i) => (
-            <div 
-              key={i}
-              className={`flex-1 bg-${color}-400/10 rounded-t`}
-              style={{ height: `${Math.max(height * 100, 10)}%` }}
-            />
-          ))}
+  }) => {
+    // Memoize chart data calculation
+    const chartData = React.useMemo(() => 
+      data.map(height => Math.max(height * 100, 10))
+    , [data]);
+
+    return (
+      <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4 transition-all duration-300 hover:bg-white/15 hover:border-white/30">
+        <div className="text-center">
+          <div className="text-sm text-gray-400 mb-1">{name}</div>
+          <div className={`text-xl font-bold text-${color}-400 mb-2`}>{value}g</div>
+          <div className="flex items-end space-x-px h-6">
+            {chartData.map((height, i) => (
+              <div 
+                key={i}
+                className={`flex-1 bg-${color}-400/10 rounded-t transition-all duration-500`}
+                style={{ height: `${height}%` }}
+              />
+            ))}
+          </div>
         </div>
-      </div>
-    </Card>
-  );
+      </Card>
+    );
+  });
 
   const MicronutrientCard = ({ name, value, goal, unit, color }: {
     name: string;
