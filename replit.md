@@ -11,6 +11,7 @@ bytewise nutritionist is a comprehensive Progressive Web App (PWA) for nutrition
 - **Enhanced Liquid Matching System**: Implemented comprehensive liquid-specific scoring system with dedicated fallback data for water (0 cal), tea (1 cal), coffee (1 cal), and other beverages. Added liquid detection prioritizing appropriate drink types over mixed dishes, resolving previous issues where water was incorrectly matched to "Fish, tuna, canned in water"
 - **Comprehensive Beverage Database Expansion**: Added 100+ liquid varieties including tropical juices (pineapple, guava, mango, papaya), berry juices (blueberry, strawberry, raspberry, acai), green juices (kale, spinach, wheatgrass), alcoholic beverages (beer, wine, spirits), dairy products (milkshakes, yogurt drinks, kefir), frozen treats (sorbets), and alternative milks with accurate USDA-based nutritional data
 - **Complete Cereal Database Integration**: Added 25+ breakfast cereals including popular brands (Cheerios, Cornflakes, Lucky Charms), health-focused options (granola, muesli, bran flakes), and hot cereals (oatmeal, grits, cream of wheat) with accurate per-100g nutritional data for precise portion calculations
+- **Comprehensive Sandwich Database**: Added 30+ sandwich varieties including chicken sandwiches, deli meats, Italian subs, burgers, specialty sandwiches (Reuben, Cuban, Monte Cristo), and breakfast sandwiches with complete nutritional profiles resolving "No nutrition data available" errors for composite foods
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.

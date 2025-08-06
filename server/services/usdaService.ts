@@ -1257,6 +1257,48 @@ export class USDAService {
       'quinoa cereal': { calories: 368, protein: 14.1, carbs: 64.2, fat: 6.1 },
       'steel cut oats': { calories: 379, protein: 13.2, carbs: 67.7, fat: 6.5 },
       
+      // Sandwiches and composite meals (per 100g)
+      'chicken sandwich': { calories: 250, protein: 15.2, carbs: 25.8, fat: 10.4 },
+      'chicken parm sandwich': { calories: 285, protein: 18.5, carbs: 28.2, fat: 12.8 },
+      'chicken parmesan sandwich': { calories: 285, protein: 18.5, carbs: 28.2, fat: 12.8 },
+      'grilled chicken sandwich': { calories: 235, protein: 17.8, carbs: 24.1, fat: 8.2 },
+      'fried chicken sandwich': { calories: 310, protein: 16.4, carbs: 26.5, fat: 16.8 },
+      'buffalo chicken sandwich': { calories: 268, protein: 16.2, carbs: 25.4, fat: 11.9 },
+      
+      // Deli sandwiches
+      'turkey sandwich': { calories: 220, protein: 12.8, carbs: 28.5, fat: 6.4 },
+      'ham sandwich': { calories: 245, protein: 14.2, carbs: 27.8, fat: 8.9 },
+      'roast beef sandwich': { calories: 258, protein: 16.4, carbs: 26.2, fat: 10.1 },
+      'tuna sandwich': { calories: 275, protein: 15.8, carbs: 24.6, fat: 12.8 },
+      'club sandwich': { calories: 295, protein: 18.2, carbs: 28.4, fat: 13.5 },
+      'blt sandwich': { calories: 320, protein: 12.4, carbs: 26.8, fat: 18.6 },
+      
+      // Italian sandwiches
+      'italian sub': { calories: 315, protein: 16.8, carbs: 32.4, fat: 14.2 },
+      'meatball sub': { calories: 345, protein: 19.2, carbs: 35.8, fat: 16.4 },
+      'philly cheesesteak': { calories: 298, protein: 17.5, carbs: 24.8, fat: 14.8 },
+      'chicken parmigiana sub': { calories: 320, protein: 20.1, carbs: 30.2, fat: 15.6 },
+      
+      // Burgers
+      'hamburger': { calories: 295, protein: 17.2, carbs: 22.9, fat: 15.5 },
+      'cheeseburger': { calories: 315, protein: 18.8, carbs: 23.2, fat: 17.9 },
+      'bacon cheeseburger': { calories: 345, protein: 20.4, carbs: 23.5, fat: 21.2 },
+      'turkey burger': { calories: 265, protein: 16.8, carbs: 22.4, fat: 12.8 },
+      'veggie burger': { calories: 195, protein: 8.4, carbs: 28.5, fat: 6.2 },
+      
+      // Specialty sandwiches
+      'reuben sandwich': { calories: 335, protein: 18.6, carbs: 28.4, fat: 17.8 },
+      'french dip': { calories: 285, protein: 19.2, carbs: 26.8, fat: 12.4 },
+      'monte cristo': { calories: 385, protein: 21.4, carbs: 32.6, fat: 20.8 },
+      'cuban sandwich': { calories: 308, protein: 18.8, carbs: 28.5, fat: 14.2 },
+      'pastrami sandwich': { calories: 298, protein: 17.6, carbs: 26.4, fat: 14.1 },
+      
+      // Breakfast sandwiches
+      'egg sandwich': { calories: 285, protein: 14.2, carbs: 28.6, fat: 13.4 },
+      'bacon egg sandwich': { calories: 325, protein: 16.8, carbs: 28.2, fat: 17.5 },
+      'sausage egg sandwich': { calories: 342, protein: 17.4, carbs: 28.8, fat: 19.6 },
+      'breakfast sandwich': { calories: 310, protein: 15.8, carbs: 28.4, fat: 16.2 },
+      
       // Sodas and carbonated drinks
       'soda': { calories: 41, protein: 0, carbs: 10.6, fat: 0 },
       'cola': { calories: 41, protein: 0, carbs: 10.6, fat: 0 },
