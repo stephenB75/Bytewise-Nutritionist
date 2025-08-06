@@ -1228,6 +1228,34 @@ export class USDAService {
       'tomato juice': { calories: 17, protein: 0.8, carbs: 4.2, fat: 0.1 },
       'coconut water': { calories: 19, protein: 0.7, carbs: 3.7, fat: 0.2 },
       
+      // Tropical and exotic fruit juices
+      'pineapple juice': { calories: 53, protein: 0.5, carbs: 12.9, fat: 0.1 },
+      'mango juice': { calories: 54, protein: 0.4, carbs: 13.7, fat: 0.2 },
+      'guava juice': { calories: 56, protein: 0.3, carbs: 14.8, fat: 0.1 },
+      'papaya juice': { calories: 43, protein: 0.5, carbs: 11.0, fat: 0.1 },
+      'passion fruit juice': { calories: 51, protein: 1.4, carbs: 11.2, fat: 0.4 },
+      'pomegranate juice': { calories: 54, protein: 0.2, carbs: 13.7, fat: 0.3 },
+      'kiwi juice': { calories: 61, protein: 1.1, carbs: 14.7, fat: 0.5 },
+      'dragon fruit juice': { calories: 60, protein: 1.2, carbs: 13.0, fat: 0.4 },
+      
+      // Berry juices
+      'blueberry juice': { calories: 57, protein: 0.7, carbs: 14.5, fat: 0.3 },
+      'strawberry juice': { calories: 33, protein: 0.7, carbs: 7.9, fat: 0.3 },
+      'raspberry juice': { calories: 53, protein: 1.2, carbs: 12.0, fat: 0.7 },
+      'blackberry juice': { calories: 43, protein: 1.4, carbs: 9.6, fat: 0.5 },
+      'acai juice': { calories: 70, protein: 1.0, carbs: 4.0, fat: 5.0 },
+      'goji juice': { calories: 349, protein: 14.3, carbs: 77.1, fat: 0.4 },
+      
+      // Green and vegetable juices
+      'green juice': { calories: 23, protein: 2.2, carbs: 4.8, fat: 0.4 },
+      'celery juice': { calories: 14, protein: 0.7, carbs: 3.0, fat: 0.2 },
+      'kale juice': { calories: 49, protein: 4.3, carbs: 9.0, fat: 0.9 },
+      'spinach juice': { calories: 23, protein: 2.9, carbs: 3.6, fat: 0.4 },
+      'cucumber juice': { calories: 16, protein: 0.7, carbs: 4.0, fat: 0.1 },
+      'wheatgrass juice': { calories: 15, protein: 2.2, carbs: 3.4, fat: 0.1 },
+      'carrot juice': { calories: 40, protein: 0.9, carbs: 9.3, fat: 0.1 },
+      'beet juice': { calories: 58, protein: 2.1, carbs: 13.0, fat: 0.2 },
+      
       // Sodas and carbonated drinks
       'soda': { calories: 41, protein: 0, carbs: 10.6, fat: 0 },
       'cola': { calories: 41, protein: 0, carbs: 10.6, fat: 0 },
