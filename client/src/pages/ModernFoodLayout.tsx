@@ -602,7 +602,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     return (
       <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4 transition-all duration-300 hover:bg-white/15 hover:border-white/30">
         <div className="text-center">
-          <div className={`text-sm ${labelColor} mb-1`}>Remaining {name}</div>
+          <div className={`text-sm ${labelColor} mb-1 leading-tight`}>
+            <div>Remaining</div>
+            <div>{name}</div>
+          </div>
           <div className={`text-xl font-bold ${textColor} mb-2`}>
             {isNegative ? '+' : ''}{Math.abs(remaining)}g
           </div>
