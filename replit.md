@@ -15,7 +15,7 @@ bytewise nutritionist is a comprehensive Progressive Web App (PWA) for nutrition
 - **Complete Bread Database Verification**: Added 30+ bread varieties including whole wheat, white, sourdough, rye, specialty breads (brioche, challah), baked goods (bagels, croissants), and international options (tortillas, naan, pita) with accurate nutritional data resolving bread-specific lookup errors
 - **Comprehensive Pasta Database Integration**: Added 35+ pasta varieties including traditional shapes (spaghetti, penne, rigatoni), specialty options (whole wheat, gluten-free, lentil, quinoa), cooked vs dry states, and Asian noodles (ramen, udon, soba) with complete nutritional profiles for accurate carbohydrate tracking
 - **Complete Database Optimization**: Fixed all LSP diagnostics (5 → 0), resolved type safety issues, implemented optimized cached food search with intelligent prioritization, and streamlined query performance for improved application stability
-- **Comprehensive Salad Database Integration**: Added 25+ salad varieties including basic mixed greens (15 cal), specialty salads (Caesar, Greek, Cobb), protein salads (chicken, tuna, egg), and unique options (Waldorf, Caprese, Niçoise) with complete nutritional profiles for accurate meal tracking
+- **Comprehensive Salad Database Integration**: Added 35+ salad varieties including basic mixed greens (15 cal), specialty salads (Caesar, Greek, Cobb), protein salads (chicken, tuna, egg), unique options (Waldorf, Caprese, Niçoise), and common spelling variations ("Cesar Salad") with complete nutritional profiles for accurate meal tracking
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.

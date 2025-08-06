@@ -1453,6 +1453,7 @@ export class USDAService {
       'garden salad': { calories: 15, protein: 1.4, carbs: 2.9, fat: 0.2 },
       'mixed greens': { calories: 15, protein: 1.4, carbs: 2.9, fat: 0.2 },
       'caesar salad': { calories: 158, protein: 7.2, carbs: 8.4, fat: 12.6 },
+      'cesar salad': { calories: 158, protein: 7.2, carbs: 8.4, fat: 12.6 }, // Common misspelling
       'greek salad': { calories: 107, protein: 3.8, carbs: 7.2, fat: 7.8 },
       'cobb salad': { calories: 235, protein: 18.5, carbs: 6.8, fat: 15.2 },
       'chef salad': { calories: 143, protein: 12.4, carbs: 5.2, fat: 8.6 },
@@ -1479,6 +1480,19 @@ export class USDAService {
       'bean salad': { calories: 89, protein: 4.2, carbs: 16.8, fat: 1.2 },
       'caprese salad': { calories: 166, protein: 9.8, carbs: 5.2, fat: 12.4 },
       'nicoise salad': { calories: 145, protein: 8.6, carbs: 7.4, fat: 9.8 },
+      
+      // Salad synonyms and variations
+      'green salad': { calories: 15, protein: 1.4, carbs: 2.9, fat: 0.2 },
+      'leafy greens': { calories: 15, protein: 1.4, carbs: 2.9, fat: 0.2 },
+      'fresh salad': { calories: 15, protein: 1.4, carbs: 2.9, fat: 0.2 },
+      'dinner salad': { calories: 15, protein: 1.4, carbs: 2.9, fat: 0.2 },
+      'lunch salad': { calories: 143, protein: 12.4, carbs: 5.2, fat: 8.6 },
+      'vegetable salad': { calories: 25, protein: 2.1, carbs: 4.8, fat: 0.3 },
+      'mixed vegetable salad': { calories: 25, protein: 2.1, carbs: 4.8, fat: 0.3 },
+      'chopped salad': { calories: 35, protein: 3.2, carbs: 5.8, fat: 0.8 },
+      'mediterranean salad': { calories: 107, protein: 3.8, carbs: 7.2, fat: 7.8 },
+      'italian salad': { calories: 107, protein: 3.8, carbs: 7.2, fat: 7.8 },
+      'antipasto salad': { calories: 145, protein: 8.6, carbs: 7.4, fat: 9.8 },
     };
 
     const liquidFallback = liquidFallbacks[normalized as keyof typeof liquidFallbacks];
