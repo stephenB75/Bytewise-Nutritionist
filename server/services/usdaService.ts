@@ -74,11 +74,12 @@ export class USDAService {
   private baseUrl = 'https://api.nal.usda.gov/fdc/v1';
   // In-memory LRU cache for performance optimization
   private memoryCache: Map<string, { data: any; timestamp: number; accessCount: number }> = new Map();
-  private cacheMaxSize = 1000;
-  private cacheExpiryTime = 3600000; // 1 hour in milliseconds
+  private cacheMaxSize = 2000; // Increased cache size for more foods
+  private cacheExpiryTime = 7200000; // Extended to 2 hours for better performance
+  private popularFoodsCache: Map<string, number> = new Map(); // Track popular foods for priority caching
 
   /**
-   * Get data from optimized memory cache with LRU eviction
+   * Get data from optimized memory cache with LRU eviction and popularity tracking
    */
   private getFromMemoryCache(key: string): any | null {
     const cached = this.memoryCache.get(key);
@@ -90,29 +91,39 @@ export class USDAService {
       return null;
     }
     
-    // Update access count for LRU
+    // Update access count for LRU and track popularity
     cached.accessCount++;
+    const currentCount = this.popularFoodsCache.get(key) || 0;
+    this.popularFoodsCache.set(key, currentCount + 1);
+    
     return cached.data;
   }
   
   /**
-   * Store data in optimized memory cache with LRU eviction
+   * Store data in optimized memory cache with intelligent LRU eviction
    */
   private setMemoryCache(key: string, data: any): void {
-    // Evict LRU items if cache is full
+    // Evict least popular and least recently used items if cache is full
     if (this.memoryCache.size >= this.cacheMaxSize) {
       let lruKey = '';
-      let lruAccess = Infinity;
+      let lruScore = Infinity; // Combination of access count and popularity
       
       for (const entry of Array.from(this.memoryCache.entries())) {
         const [k, v] = entry;
-        if (v.accessCount < lruAccess) {
+        const popularity = this.popularFoodsCache.get(k) || 0;
+        // Score combines recency and popularity (lower score = more likely to be evicted)
+        const score = v.accessCount + (popularity * 2);
+        
+        if (score < lruScore) {
           lruKey = k;
-          lruAccess = v.accessCount;
+          lruScore = score;
         }
       }
       
-      if (lruKey) this.memoryCache.delete(lruKey);
+      if (lruKey) {
+        this.memoryCache.delete(lruKey);
+        // Don't delete from popularity cache to maintain long-term tracking
+      }
     }
     
     this.memoryCache.set(key, {
@@ -120,14 +131,69 @@ export class USDAService {
       timestamp: Date.now(),
       accessCount: 1
     });
+    
+    // Initialize popularity tracking
+    if (!this.popularFoodsCache.has(key)) {
+      this.popularFoodsCache.set(key, 1);
+    }
   }
 
   constructor(apiKey: string) {
     this.apiKey = apiKey;
+    // Pre-warm cache with most popular foods on startup
+    this.preWarmCache();
+  }
+  
+  /**
+   * Pre-warm cache with popular foods for optimal performance
+   */
+  private async preWarmCache(): void {
+    const popularFoods = [
+      'chicken', 'rice', 'eggs', 'bread', 'milk', 'cheese', 'yogurt', 'apple',
+      'banana', 'salmon', 'beef', 'pasta', 'pizza', 'salad', 'potato'
+    ];
+    
+    // Pre-calculate common measurements for popular foods
+    const commonMeasurements = ['100g', '1 cup', '1 medium', '1 serving'];
+    
+    setTimeout(async () => {
+      for (const food of popularFoods) {
+        for (const measurement of commonMeasurements) {
+          try {
+            // This will cache the results without blocking startup
+            await this.calculateIngredientCalories(food, measurement);
+          } catch (error) {
+            // Silently continue if pre-warming fails
+          }
+        }
+      }
+    }, 1000); // Delay to not block server startup
   }
 
   /**
-   * Search foods with USDA API and cache results
+   * Batch process multiple food calculations for optimal performance
+   */
+  async calculateBatchCalories(requests: Array<{ingredient: string, measurement: string}>): Promise<any[]> {
+    const results = [];
+    
+    // Process in parallel batches of 5 to avoid overwhelming the API
+    const batchSize = 5;
+    for (let i = 0; i < requests.length; i += batchSize) {
+      const batch = requests.slice(i, i + batchSize);
+      const batchPromises = batch.map(req => 
+        this.calculateIngredientCalories(req.ingredient, req.measurement)
+          .catch(error => ({ error: error.message, ingredient: req.ingredient }))
+      );
+      
+      const batchResults = await Promise.all(batchPromises);
+      results.push(...batchResults);
+    }
+    
+    return results;
+  }
+
+  /**
+   * Search foods with USDA API and cache results (optimized)
    */
   async searchFoods(query: string, pageSize = 25): Promise<USDAFood[]> {
     try {
