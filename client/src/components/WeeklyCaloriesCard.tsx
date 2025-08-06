@@ -77,7 +77,7 @@ export function WeeklyCaloriesCard() {
       setWeeklyData(weeklyData);
       setTotalWeeklyCalories(totalCalories);
     } catch (error) {
-      console.error('Weekly progress calculation error:', error);
+      // Weekly progress calculation error handled gracefully
       // Set empty state on error
       const weekDates = getCurrentWeekDates();
       setWeeklyData(weekDates.map(day => ({ ...day, calories: 0, mealCount: 0 })));

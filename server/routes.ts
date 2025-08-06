@@ -206,7 +206,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         newAchievements: newAchievements.length > 0 ? newAchievements : undefined
       });
     } catch (error: any) {
-      console.error('Error logging meal:', error);
+      // Meal logging error handled by response
       res.status(500).json({ message: "Failed to log meal" });
     }
   });
@@ -222,7 +222,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const meals = await storage.getUserMeals(userId);
       res.json(meals);
     } catch (error: any) {
-      console.error('Error retrieving meals:', error);
+      // Meal retrieval error handled by response
       res.status(500).json({ message: "Failed to retrieve meals" });
     }
   });
@@ -239,7 +239,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const achievements = await storage.getUserAchievements(userId);
       res.json({ achievements });
     } catch (error: any) {
-      console.error('Error retrieving achievements:', error);
+      // Achievement retrieval error handled by response
       res.status(500).json({ message: "Failed to retrieve achievements" });
     }
   });
@@ -258,7 +258,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: newAchievements.length > 0 ? 'New achievements unlocked!' : 'No new achievements'
       });
     } catch (error: any) {
-      console.error('Error checking achievements:', error);
+      // Achievement check error handled by response
       res.status(500).json({ message: "Failed to check achievements" });
     }
   });
@@ -283,7 +283,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(calorieData);
     } catch (error: any) {
-      console.error('Error calculating calories:', error);
+      // Calorie calculation error handled by response
       res.status(500).json({ 
         error: 'Failed to calculate calories',
         message: error?.message || 'Unknown error occurred'
@@ -362,7 +362,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: "Profile updated successfully"
       });
     } catch (error: any) {
-      console.error('Profile update error:', error);
+      // Profile update error handled by response
       res.status(500).json({ 
         message: error?.message || "Failed to update profile" 
       });
@@ -638,8 +638,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         lastName,
         personalInfo
       });
-
-      console.log(`Profile updated for user ${userId}`);
 
       res.json({
         success: true,

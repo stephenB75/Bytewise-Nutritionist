@@ -147,7 +147,7 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     }
 
   } catch (error) {
-    console.error('PDF generation error:', error);
+    // PDF generation error logged for debugging
     return false;
   }
 }

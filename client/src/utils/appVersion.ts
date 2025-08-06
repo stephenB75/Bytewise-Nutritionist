@@ -70,7 +70,7 @@ export const updateApp = async (): Promise<boolean> => {
     window.location.reload();
     return true;
   } catch (error) {
-    console.error('Update failed:', error);
+    // Update failure handled silently
     return false;
   }
 };

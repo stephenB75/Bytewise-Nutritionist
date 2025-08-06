@@ -267,7 +267,7 @@ function CalorieCalculator({
       }
       
     } catch (error) {
-      console.error('⚠️ Failed to save meal to database:', error);
+      // Meal save error handled by user feedback system
       // Still check achievements even if database save fails (fallback)
       checkAchievements.mutate();
     }
