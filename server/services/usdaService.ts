@@ -641,7 +641,21 @@ export class USDAService {
     'strudel': { calories: 274, protein: 4.0, carbs: 29.0, fat: 16.0 },
     'danish': { calories: 374, protein: 6.6, carbs: 45.9, fat: 18.8 },
     'croissant': { calories: 406, protein: 8.2, carbs: 45.8, fat: 21.0 },
-    'pain au chocolat': { calories: 414, protein: 7.8, carbs: 44.6, fat: 23.2 }
+    'pain au chocolat': { calories: 414, protein: 7.8, carbs: 44.6, fat: 23.2 },
+    
+    // Olives and olive products
+    'olive': { calories: 115, protein: 0.8, carbs: 6.0, fat: 10.7 },
+    'olives': { calories: 115, protein: 0.8, carbs: 6.0, fat: 10.7 },
+    'green olives': { calories: 115, protein: 0.8, carbs: 6.0, fat: 10.7 },
+    'black olives': { calories: 115, protein: 0.8, carbs: 6.0, fat: 10.7 },
+    'kalamata olives': { calories: 115, protein: 0.8, carbs: 6.0, fat: 10.7 },
+    
+    // Peanut butter sandwiches
+    'peanut butter sandwich': { calories: 325, protein: 13.8, carbs: 32.4, fat: 16.2 },
+    'pb sandwich': { calories: 325, protein: 13.8, carbs: 32.4, fat: 16.2 },
+    'peanut butter and jelly': { calories: 342, protein: 12.4, carbs: 38.6, fat: 15.8 },
+    'pbj sandwich': { calories: 342, protein: 12.4, carbs: 38.6, fat: 15.8 },
+    'pb&j': { calories: 342, protein: 12.4, carbs: 38.6, fat: 15.8 }
   };
 
   /**
@@ -1623,6 +1637,20 @@ export class USDAService {
       // Italian sandwiches
       'italian sub': { calories: 315, protein: 16.8, carbs: 32.4, fat: 14.2 },
       'meatball sub': { calories: 345, protein: 19.2, carbs: 35.8, fat: 16.4 },
+      
+      // Peanut butter sandwiches
+      'peanut butter sandwich': { calories: 325, protein: 13.8, carbs: 32.4, fat: 16.2 },
+      'pb sandwich': { calories: 325, protein: 13.8, carbs: 32.4, fat: 16.2 },
+      'peanut butter and jelly': { calories: 342, protein: 12.4, carbs: 38.6, fat: 15.8 },
+      'pbj sandwich': { calories: 342, protein: 12.4, carbs: 38.6, fat: 15.8 },
+      'pb&j': { calories: 342, protein: 12.4, carbs: 38.6, fat: 15.8 },
+      
+      // Olives and olive products
+      'olive': { calories: 115, protein: 0.8, carbs: 6.0, fat: 10.7 },
+      'olives': { calories: 115, protein: 0.8, carbs: 6.0, fat: 10.7 },
+      'green olives': { calories: 115, protein: 0.8, carbs: 6.0, fat: 10.7 },
+      'black olives': { calories: 115, protein: 0.8, carbs: 6.0, fat: 10.7 },
+      'kalamata olives': { calories: 115, protein: 0.8, carbs: 6.0, fat: 10.7 },
       'philly cheesesteak': { calories: 298, protein: 17.5, carbs: 24.8, fat: 14.8 },
       'chicken parmigiana sub': { calories: 320, protein: 20.1, carbs: 30.2, fat: 15.6 },
       
