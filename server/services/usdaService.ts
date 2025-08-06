@@ -1294,6 +1294,36 @@ export class USDAService {
       'lassi': { calories: 89, protein: 2.4, carbs: 17.2, fat: 1.5 },
       'ayran': { calories: 38, protein: 1.7, carbs: 2.9, fat: 2.3 },
       
+      // Breakfast cereals (dry, per 100g)
+      'cheerios': { calories: 367, protein: 10.6, carbs: 73.3, fat: 6.7 },
+      'cornflakes': { calories: 357, protein: 7.5, carbs: 84.1, fat: 0.9 },
+      'frosted flakes': { calories: 375, protein: 4.5, carbs: 91.0, fat: 0.5 },
+      'rice krispies': { calories: 382, protein: 6.0, carbs: 87.0, fat: 1.0 },
+      'froot loops': { calories: 385, protein: 7.0, carbs: 87.0, fat: 2.5 },
+      'lucky charms': { calories: 375, protein: 6.3, carbs: 83.8, fat: 3.8 },
+      'cinnamon toast crunch': { calories: 420, protein: 6.7, carbs: 80.0, fat: 10.0 },
+      'honey nut cheerios': { calories: 379, protein: 9.1, carbs: 78.8, fat: 4.5 },
+      'cocoa puffs': { calories: 387, protein: 5.3, carbs: 86.7, fat: 4.0 },
+      'trix': { calories: 387, protein: 4.0, carbs: 93.3, fat: 1.3 },
+      
+      // Healthier cereals
+      'oatmeal': { calories: 389, protein: 16.9, carbs: 66.3, fat: 6.9 },
+      'granola': { calories: 471, protein: 13.0, carbs: 64.0, fat: 20.0 },
+      'muesli': { calories: 362, protein: 9.7, carbs: 72.2, fat: 5.9 },
+      'bran flakes': { calories: 321, protein: 10.7, carbs: 67.9, fat: 1.8 },
+      'shredded wheat': { calories: 336, protein: 11.4, carbs: 75.9, fat: 1.8 },
+      'raisin bran': { calories: 321, protein: 7.5, carbs: 80.5, fat: 1.8 },
+      'special k': { calories: 378, protein: 13.0, carbs: 78.0, fat: 1.5 },
+      'all bran': { calories: 333, protein: 14.0, carbs: 80.0, fat: 3.3 },
+      'fiber one': { calories: 267, protein: 13.3, carbs: 86.7, fat: 3.3 },
+      'wheaties': { calories: 352, protein: 10.6, carbs: 78.8, fat: 2.4 },
+      
+      // Hot cereals
+      'cream of wheat': { calories: 371, protein: 10.7, carbs: 76.1, fat: 1.1 },
+      'grits': { calories: 371, protein: 8.9, carbs: 79.6, fat: 1.2 },
+      'quinoa cereal': { calories: 368, protein: 14.1, carbs: 64.2, fat: 6.1 },
+      'steel cut oats': { calories: 379, protein: 13.2, carbs: 67.7, fat: 6.5 },
+      
       // Sodas and carbonated drinks
       'soda': { calories: 41, protein: 0, carbs: 10.6, fat: 0 },
       'cola': { calories: 41, protein: 0, carbs: 10.6, fat: 0 },
