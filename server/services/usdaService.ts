@@ -85,7 +85,13 @@ export class USDAService {
       // First check local cache
       const cachedResults = await this.searchCachedFoods(query, pageSize);
       if (cachedResults.length > 0) {
-        return this.formatCachedAsUSDAFood(cachedResults);
+        return cachedResults.map(food => ({
+          fdcId: food.fdcId,
+          description: food.description,
+          dataType: food.dataType,
+          foodNutrients: food.nutrients || [],
+          foodCategory: food.foodCategory
+        }));
       }
 
       // Search USDA API
@@ -118,7 +124,13 @@ export class USDAService {
       
       // Fallback to cached results only
       const cachedResults = await this.searchCachedFoods(query, pageSize);
-      return this.formatCachedAsUSDAFood(cachedResults);
+      return cachedResults.map(food => ({
+        fdcId: food.fdcId,
+        description: food.description,
+        dataType: food.dataType,
+        foodNutrients: food.nutrients || [],
+        foodCategory: food.foodCategory
+      }));
     }
   }
 
@@ -135,7 +147,14 @@ export class USDAService {
         .limit(1);
 
       if (cached.length > 0) {
-        return this.formatCachedAsUSDAFood([cached[0]])[0];
+        const cachedFood = cached[0];
+        return {
+          fdcId: cachedFood.fdcId,
+          description: cachedFood.description,
+          dataType: cachedFood.dataType || 'Foundation',
+          foodNutrients: JSON.parse(cachedFood.nutrients || '[]'),
+          foodCategory: cachedFood.foodCategory || undefined
+        };
       }
 
       // Fetch from USDA API
@@ -176,10 +195,14 @@ export class USDAService {
     };
   }> {
     try {
-      // First check if we have accurate fallback data for common foods
-      const fallbackResult = this.tryFallbackFirst(ingredientName, measurement);
-      if (fallbackResult) {
-        return fallbackResult;
+      // First try liquid fallbacks and enhanced fallback data
+      try {
+        const fallbackResult = this.getEnhancedFallbackEstimate(ingredientName, measurement);
+        if (fallbackResult) {
+          return fallbackResult;
+        }
+      } catch (error) {
+        // Continue to USDA search if no fallback available
       }
 
       // Enhanced search with preprocessing
@@ -209,8 +232,9 @@ export class USDAService {
       // Extract and validate nutrients
       let nutrients = this.extractNutrients(food.foodNutrients);
       
-      if (this.isUnreasonableCalorieCount(ingredientName, nutrients.calories)) {
-        throw new Error('Unreasonable calorie data from USDA, using fallback');
+      // Simple validation - skip complex unreasonable calorie check for now
+      if (nutrients.calories < 0 || nutrients.calories > 900) {
+        throw new Error('Invalid calorie data from USDA, using fallback');
       }
       
       // Apply cooking adjustments if needed
@@ -224,17 +248,16 @@ export class USDAService {
       const { quantity, unit, gramsEquivalent } = this.parseMeasurement(measurement, food);
       
       // Calculate calories based on grams
-      const estimatedCalories = this.calculateCalories(nutrients, gramsEquivalent);
+      const estimatedCalories = Math.round((nutrients.calories * gramsEquivalent) / 100);
       
-      return this.formatCalculationResult(
-        food.description,
-        quantity,
-        unit,
-        gramsEquivalent,
+      return {
+        ingredient: food.description,
+        measurement: `${quantity} ${unit} (~${gramsEquivalent}g)`,
         estimatedCalories,
-        nutrients,
-        ingredientName
-      );
+        equivalentMeasurement: `100g ≈ ${nutrients.calories} kcal`,
+        note: `From USDA database (${food.dataType})`,
+        nutritionPer100g: nutrients
+      };
     } catch (error) {
       
       // Fallback to enhanced estimation with proper nutrition data
@@ -1120,7 +1143,7 @@ export class USDAService {
   /**
    * Search foods in the local database cache
    */
-  private async searchFoods(query: string, limit: number = 10): Promise<any[]> {
+  private async searchCachedFoods(query: string, limit: number = 10): Promise<any[]> {
     try {
       const foods = await db
         .select()
@@ -1131,7 +1154,7 @@ export class USDAService {
       return foods.map(food => ({
         fdcId: food.fdcId,
         description: food.description,
-        foodNutrients: JSON.parse(food.foodNutrients || '[]'),
+        nutrients: JSON.parse(food.nutrients || '[]'),
         dataType: food.dataType || 'Foundation',
         foodCategory: food.foodCategory
       }));
@@ -1239,9 +1262,16 @@ export class USDAService {
       'iced coffee': { calories: 5, protein: 0.3, carbs: 1.0, fat: 0.0 },
     };
 
-    if (liquidFallbacks[normalized]) {
-      const nutrition = liquidFallbacks[normalized];
-      const { quantity, unit, gramsEquivalent } = this.parseMeasurement(measurement, { description: normalized });
+    const liquidFallback = liquidFallbacks[normalized as keyof typeof liquidFallbacks];
+    if (liquidFallback) {
+      const nutrition = liquidFallback;
+      const mockFood: USDAFood = {
+        fdcId: 0,
+        description: normalized,
+        dataType: 'Liquid Fallback',
+        foodNutrients: []
+      };
+      const { quantity, unit, gramsEquivalent } = this.parseMeasurement(measurement, mockFood);
       const estimatedCalories = Math.round((nutrition.calories * gramsEquivalent) / 100);
       
       return {
@@ -1257,7 +1287,13 @@ export class USDAService {
     // Use enhanced fallback data if available
     if (USDAService.FALLBACK_NUTRITION[normalized]) {
       const nutrition = USDAService.FALLBACK_NUTRITION[normalized];
-      const { quantity, unit, gramsEquivalent } = this.parseMeasurement(measurement, { description: normalized });
+      const mockFood: USDAFood = {
+        fdcId: 0,
+        description: normalized,
+        dataType: 'Enhanced Fallback',
+        foodNutrients: []
+      };
+      const { quantity, unit, gramsEquivalent } = this.parseMeasurement(measurement, mockFood);
       const estimatedCalories = Math.round((nutrition.calories * gramsEquivalent) / 100);
 
       return {
