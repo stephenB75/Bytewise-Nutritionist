@@ -449,7 +449,14 @@ export class USDAService {
     'guinep': { calories: 58, protein: 1.3, carbs: 13.7, fat: 0.1 },
     'spanish lime': { calories: 58, protein: 1.3, carbs: 13.7, fat: 0.1 },
     'ackee fruit': { calories: 151, protein: 2.9, carbs: 0.8, fat: 15 },
-    'breadnut': { calories: 191, protein: 7.4, carbs: 38.4, fat: 2.3 }
+    'breadnut': { calories: 191, protein: 7.4, carbs: 38.4, fat: 2.3 },
+    
+    // Additional Caribbean fruit variations
+    'tambrine': { calories: 46, protein: 0.9, carbs: 11.2, fat: 0.3 }, // Another spelling of timbrine
+    'jackfruit': { calories: 95, protein: 1.7, carbs: 23.2, fat: 0.6 },
+    'jack fruit': { calories: 95, protein: 1.7, carbs: 23.2, fat: 0.6 },
+    'caimito': { calories: 67, protein: 1.5, carbs: 15.3, fat: 0.7 }, // Star apple Spanish name
+    'milk fruit': { calories: 67, protein: 1.5, carbs: 15.3, fat: 0.7 }
   };
 
   /**
