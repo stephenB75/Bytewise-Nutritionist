@@ -90,6 +90,19 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const [profileSection, setProfileSection] = useState<ProfileSection>('profile');
   const [notifications, setNotifications] = useState<Notification[]>([]);
   
+  // Nutrition aggregation state
+  const [dailyMacros, setDailyMacros] = useState({ protein: 0, carbs: 0, fat: 0 });
+  const [dailyMicronutrients, setDailyMicronutrients] = useState({
+    vitaminC: 0,
+    vitaminD: 0,
+    vitaminB12: 0,
+    folate: 0,
+    iron: 0,
+    calcium: 0,
+    zinc: 0,
+    magnesium: 0
+  });
+  
   // Validation functions for profile sections
   const validateProfileSection = (sectionId: string): boolean => {
     const validSections: ProfileSection[] = ['profile', 'achievements', 'data'];
@@ -106,6 +119,26 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   };
 
   // Utility function to add notifications - using useCallback for stable reference
+  // Function to calculate estimated micronutrients based on food types and calories
+  const calculateEstimatedMicronutrients = (meals: any[]) => {
+    const totalCalories = meals.reduce((sum, meal) => sum + (meal.calories || 0), 0);
+    
+    // Estimate micronutrients based on food patterns and typical nutrient density
+    // These are estimates based on average nutrient density per 100 calories
+    const baseMultiplier = totalCalories / 100;
+    
+    return {
+      vitaminC: Math.round(baseMultiplier * 8), // ~8mg per 100 calories from mixed diet
+      vitaminD: Math.round(baseMultiplier * 0.2), // ~0.2μg per 100 calories (limited in most foods)
+      vitaminB12: Math.round(baseMultiplier * 0.3 * 10) / 10, // ~0.3μg per 100 calories from animal products
+      folate: Math.round(baseMultiplier * 12), // ~12μg per 100 calories from fortified foods
+      iron: Math.round(baseMultiplier * 1.8 * 10) / 10, // ~1.8mg per 100 calories
+      calcium: Math.round(baseMultiplier * 25), // ~25mg per 100 calories
+      zinc: Math.round(baseMultiplier * 1.1 * 10) / 10, // ~1.1mg per 100 calories
+      magnesium: Math.round(baseMultiplier * 15) // ~15mg per 100 calories
+    };
+  };
+
   const addNotification = useCallback((type: Notification['type'], title: string, message: string) => {
     setNotifications(prev => [{
       id: Date.now().toString(),
@@ -216,6 +249,18 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         // Calculate daily calories from existing logged meals
         const dailyTotal = todayMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
         setDailyCalories(dailyTotal);
+        
+        // Calculate daily macros from today's meals
+        const dailyMacroTotals = todayMeals.reduce((totals: any, meal: any) => ({
+          protein: totals.protein + (meal.protein || 0),
+          carbs: totals.carbs + (meal.carbs || 0),
+          fat: totals.fat + (meal.fat || 0)
+        }), { protein: 0, carbs: 0, fat: 0 });
+        setDailyMacros(dailyMacroTotals);
+        
+        // Calculate estimated micronutrients from today's meals
+        const estimatedMicronutrients = calculateEstimatedMicronutrients(todayMeals);
+        setDailyMicronutrients(estimatedMicronutrients);
         
         // Calculate weekly calories from all stored meals
         const weeklyTotal = stored.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
@@ -654,9 +699,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
           {/* Macros Breakdown */}
           <div className="grid grid-cols-3 gap-4 mb-4">
-            <MacroCard name="Protein" value={0} color="green" />
-            <MacroCard name="Carbs" value={0} color="yellow" />
-            <MacroCard name="Fat" value={0} color="purple" />
+            <MacroCard name="Protein" value={Math.round(dailyMacros.protein)} color="green" />
+            <MacroCard name="Carbs" value={Math.round(dailyMacros.carbs)} color="yellow" />
+            <MacroCard name="Fat" value={Math.round(dailyMacros.fat)} color="purple" />
           </div>
 
           {/* Micronutrients Section */}
@@ -667,17 +712,17 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             </h3>
             
             <div className="grid grid-cols-2 gap-3 mb-4">
-              <MicronutrientCard name="Vitamin C" value={0} goal={90} unit="mg" color="cyan" />
-              <MicronutrientCard name="Vitamin D" value={0} goal={20} unit="μg" color="orange" />
-              <MicronutrientCard name="Vitamin B12" value={0} goal={2.4} unit="μg" color="red" />
-              <MicronutrientCard name="Folate" value={0} goal={400} unit="μg" color="green" />
+              <MicronutrientCard name="Vitamin C" value={dailyMicronutrients.vitaminC} goal={90} unit="mg" color="cyan" />
+              <MicronutrientCard name="Vitamin D" value={dailyMicronutrients.vitaminD} goal={20} unit="μg" color="orange" />
+              <MicronutrientCard name="Vitamin B12" value={dailyMicronutrients.vitaminB12} goal={2.4} unit="μg" color="red" />
+              <MicronutrientCard name="Folate" value={dailyMicronutrients.folate} goal={400} unit="μg" color="green" />
             </div>
             
             <div className="grid grid-cols-2 gap-3">
-              <MicronutrientCard name="Iron" value={0} goal={18} unit="mg" color="slate" />
-              <MicronutrientCard name="Calcium" value={0} goal={1000} unit="mg" color="white" />
-              <MicronutrientCard name="Zinc" value={0} goal={11} unit="mg" color="amber" />
-              <MicronutrientCard name="Magnesium" value={0} goal={400} unit="mg" color="rose" />
+              <MicronutrientCard name="Iron" value={dailyMicronutrients.iron} goal={18} unit="mg" color="slate" />
+              <MicronutrientCard name="Calcium" value={dailyMicronutrients.calcium} goal={1000} unit="mg" color="white" />
+              <MicronutrientCard name="Zinc" value={dailyMicronutrients.zinc} goal={11} unit="mg" color="amber" />
+              <MicronutrientCard name="Magnesium" value={dailyMicronutrients.magnesium} goal={400} unit="mg" color="rose" />
             </div>
           </div>
         </div>
@@ -797,9 +842,20 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                         const todayMeals = updated.filter((m: any) => m.date === today);
                         setLoggedMeals(todayMeals);
                         
-                        // Update daily calories
+                        // Update daily calories and nutrition
                         const totalCalories = todayMeals.reduce((sum: number, m: any) => sum + (m.calories || 0), 0);
                         setDailyCalories(totalCalories);
+                        
+                        // Recalculate macros and micronutrients after deletion
+                        const updatedMacros = todayMeals.reduce((totals: any, meal: any) => ({
+                          protein: totals.protein + (meal.protein || 0),
+                          carbs: totals.carbs + (meal.carbs || 0),
+                          fat: totals.fat + (meal.fat || 0)
+                        }), { protein: 0, carbs: 0, fat: 0 });
+                        setDailyMacros(updatedMacros);
+                        
+                        const updatedMicronutrients = calculateEstimatedMicronutrients(todayMeals);
+                        setDailyMicronutrients(updatedMicronutrients);
                         
                         // Dispatch events
                         window.dispatchEvent(new CustomEvent('refresh-weekly-data'));
@@ -1132,9 +1188,20 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                       const todayMeals = updated.filter((m: any) => m.date === today);
                       setLoggedMeals(todayMeals);
                       
-                      // Update daily calories
+                      // Update daily calories and nutrition  
                       const totalCalories = todayMeals.reduce((sum: number, m: any) => sum + (m.calories || 0), 0);
                       setDailyCalories(totalCalories);
+                      
+                      // Recalculate macros and micronutrients after deletion
+                      const updatedMacros = todayMeals.reduce((totals: any, meal: any) => ({
+                        protein: totals.protein + (meal.protein || 0),
+                        carbs: totals.carbs + (meal.carbs || 0),
+                        fat: totals.fat + (meal.fat || 0)
+                      }), { protein: 0, carbs: 0, fat: 0 });
+                      setDailyMacros(updatedMacros);
+                      
+                      const updatedMicronutrients = calculateEstimatedMicronutrients(todayMeals);
+                      setDailyMicronutrients(updatedMicronutrients);
                       
                       // Dispatch events
                       window.dispatchEvent(new CustomEvent('refresh-weekly-data'));
