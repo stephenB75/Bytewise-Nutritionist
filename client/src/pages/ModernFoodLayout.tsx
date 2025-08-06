@@ -192,38 +192,45 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     return () => window.removeEventListener('achievement-unlocked', handleGoalAchievement);
   }, [addNotification]);
 
-  // Clear localStorage data for production-ready clean state
+  // Load existing meal data and set up tracking
   useEffect(() => {
-    // Clear all tracking data for authentic empty state
-    localStorage.removeItem('weeklyMeals');
-    localStorage.removeItem('calculatedCalories');
-    localStorage.removeItem('bytewise-weekly-tracker');
-    
-    // Initialize with clean empty state
-    setLoggedMeals([]);
-    setDailyCalories(0);
-    setWeeklyCalories(0);
-
-    // Set up event listeners for future meal logging
-    const handleMealLogged = () => {
+    // Load existing meal data on component mount
+    const loadExistingData = () => {
       const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
       const today = new Date().toISOString().split('T')[0];
       const todayMeals = stored.filter((meal: any) => meal.date === today);
       setLoggedMeals(todayMeals);
       
-      // Calculate daily calories from logged meals
-      const totalCalories = todayMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
-      setDailyCalories(totalCalories);
+      // Calculate daily calories from existing logged meals
+      const dailyTotal = todayMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
+      setDailyCalories(dailyTotal);
+      
+      // Calculate weekly calories from all stored meals
+      const weeklyTotal = stored.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
+      setWeeklyCalories(weeklyTotal);
+    };
+
+    // Load existing data immediately
+    loadExistingData();
+
+    // Set up event listeners for future meal logging
+    const handleMealLogged = () => {
+      console.log('🔄 ModernFoodLayout: Handling meal logged event');
+      loadExistingData();
+      // Also dispatch event for weekly cards to refresh
+      window.dispatchEvent(new CustomEvent('refresh-weekly-data'));
     };
 
     window.addEventListener('calories-logged', handleMealLogged);
     window.addEventListener('meal-logged-success', handleMealLogged);
     window.addEventListener('refresh-weekly-data', handleMealLogged);
+    window.addEventListener('storage', loadExistingData);
 
     return () => {
       window.removeEventListener('calories-logged', handleMealLogged);
       window.removeEventListener('meal-logged-success', handleMealLogged);
       window.removeEventListener('refresh-weekly-data', handleMealLogged);
+      window.removeEventListener('storage', loadExistingData);
     };
   }, []);
 
@@ -752,28 +759,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               </div>
             </Card>
 
-            {/* Daily Breakdown */}
-            <div className="grid grid-cols-1 gap-3">
-              {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, index) => {
-                const dayCalories = 0; // Authentic empty state
-                const isToday = index === new Date().getDay();
-                return (
-                  <Card key={day} className={`bg-white/10 backdrop-blur-md border-white/20 p-4 ${isToday ? 'border-orange-500/50' : ''}`}>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className={`w-3 h-3 rounded-full ${isToday ? 'bg-orange-500' : 'bg-gray-600'}`} />
-                        <span className="text-white font-medium">{day}</span>
-                        {isToday && <span className="text-xs text-orange-400">(Today)</span>}
-                      </div>
-                      <div className="text-right">
-                        <span className="text-white font-bold">{dayCalories} cal</span>
-                        <div className="text-xs text-gray-400">{Math.round((dayCalories/goalCalories)*100)}% of goal</div>
-                      </div>
-                    </div>
-                  </Card>
-                );
-              })}
-            </div>
+            {/* Include Weekly Calories Card */}
+            <WeeklyCaloriesCard />
           </div>
         )}
       </div>

@@ -45,18 +45,26 @@ export function WeeklyCaloriesCard() {
     return weekDates;
   };
 
-  // Initialize with clean empty state for production
+  // Calculate weekly calories from stored meal data
   const calculateWeeklyCalories = () => {
     const weekDates = getCurrentWeekDates();
     
-    // Production-ready empty state - no localStorage data loading
-    const weeklyData = weekDates.map(dayData => ({
-      ...dayData,
-      calories: 0,  // Authentic empty state
-      mealCount: 0  // No meals logged initially
-    }));
+    // Load meals from localStorage where the daily page stores them
+    const storedMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
+    
+    // Calculate calories for each day of the week
+    const weeklyData = weekDates.map(dayData => {
+      const dayMeals = storedMeals.filter((meal: any) => meal.date === dayData.date);
+      const dayCalories = dayMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
+      
+      return {
+        ...dayData,
+        calories: dayCalories,
+        mealCount: dayMeals.length
+      };
+    });
 
-    const totalCalories = 0;  // Clean total for empty state
+    const totalCalories = weeklyData.reduce((sum, day) => sum + day.calories, 0);
     
     setWeeklyData(weeklyData);
     setTotalWeeklyCalories(totalCalories);
@@ -67,17 +75,41 @@ export function WeeklyCaloriesCard() {
     calculateWeeklyCalories();
 
     const handleMealLogged = () => {
+      console.log('🔄 WeeklyCaloriesCard: Refreshing data after meal logged');
       calculateWeeklyCalories();
     };
 
+    // Listen for localStorage storage events
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'weeklyMeals') {
+        console.log('📦 WeeklyCaloriesCard: localStorage weeklyMeals updated');
+        calculateWeeklyCalories();
+      }
+    };
+
+    // Multiple event listeners to catch all meal logging scenarios
     window.addEventListener('calories-logged', handleMealLogged);
     window.addEventListener('meal-logged-success', handleMealLogged);
     window.addEventListener('refresh-weekly-data', handleMealLogged);
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Listen for localStorage changes within the same tab
+    const originalSetItem = localStorage.setItem;
+    localStorage.setItem = function(key, value) {
+      originalSetItem.call(this, key, value);
+      if (key === 'weeklyMeals') {
+        handleMealLogged();
+      }
+    };
 
     return () => {
       window.removeEventListener('calories-logged', handleMealLogged);
       window.removeEventListener('meal-logged-success', handleMealLogged);
       window.removeEventListener('refresh-weekly-data', handleMealLogged);
+      window.removeEventListener('storage', handleStorageChange);
+      
+      // Restore original localStorage.setItem
+      localStorage.setItem = originalSetItem;
     };
   }, []);
 
