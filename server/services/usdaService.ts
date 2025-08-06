@@ -653,7 +653,62 @@ export class USDAService {
     'caimito': { calories: 67, protein: 1.5, carbs: 15.3, fat: 0.7 }, // Star apple Spanish name
     'milk fruit': { calories: 67, protein: 1.5, carbs: 15.3, fat: 0.7 },
     
-    // Breakfast Foods and Pancakes (NEW)
+    // Critical Missing Foods - Phase 1 (Daily Use)
+    'eggs': { calories: 155, protein: 13.0, carbs: 1.1, fat: 11.0 },
+    'omelette': { calories: 154, protein: 11.0, carbs: 0.6, fat: 11.9 },
+    'yogurt': { calories: 59, protein: 10.0, carbs: 3.6, fat: 0.4 },
+    'yoghurt': { calories: 59, protein: 10.0, carbs: 3.6, fat: 0.4 }, // UK spelling
+    'greek yogurt': { calories: 100, protein: 17.3, carbs: 3.9, fat: 0.4 },
+    'soup': { calories: 38, protein: 1.9, carbs: 5.4, fat: 1.2 },
+    'chips': { calories: 536, protein: 7.0, carbs: 53.0, fat: 35.0 },
+    
+    // Dairy and Cheese Varieties
+    'cheese': { calories: 113, protein: 7.0, carbs: 1.0, fat: 9.0 },
+    'cheddar cheese': { calories: 403, protein: 25.0, carbs: 1.3, fat: 33.1 },
+    'mozzarella': { calories: 300, protein: 22.2, carbs: 2.2, fat: 22.4 },
+    'swiss cheese': { calories: 380, protein: 27.0, carbs: 5.4, fat: 27.8 },
+    'cream cheese': { calories: 342, protein: 6.2, carbs: 4.1, fat: 34.4 },
+    'butter': { calories: 717, protein: 0.9, carbs: 0.1, fat: 81.0 },
+    'margarine': { calories: 719, protein: 0.2, carbs: 0.9, fat: 80.7 },
+    
+    // Condiments and Spreads
+    'mayo': { calories: 680, protein: 1.0, carbs: 0.6, fat: 75.0 },
+    'mustard': { calories: 66, protein: 4.1, carbs: 8.3, fat: 4.2 },
+    'ranch dressing': { calories: 320, protein: 0.4, carbs: 5.9, fat: 33.8 },
+    'honey': { calories: 304, protein: 0.3, carbs: 82.4, fat: 0.0 },
+    'jelly': { calories: 278, protein: 0.1, carbs: 73.6, fat: 0.1 },
+    'peanut butter': { calories: 588, protein: 25.8, carbs: 20.0, fat: 50.4 },
+    'almond butter': { calories: 614, protein: 21.2, carbs: 18.8, fat: 55.5 },
+    
+    // Nuts and Seeds
+    'nuts': { calories: 607, protein: 20.3, carbs: 21.7, fat: 54.1 },
+    'almonds': { calories: 579, protein: 21.2, carbs: 21.6, fat: 49.9 },
+    'walnuts': { calories: 654, protein: 15.2, carbs: 13.7, fat: 65.2 },
+    'cashews': { calories: 553, protein: 18.2, carbs: 30.2, fat: 43.9 },
+    'peanuts': { calories: 567, protein: 25.8, carbs: 16.1, fat: 49.2 },
+    
+    // Proteins and Meats
+    'steak': { calories: 271, protein: 25.4, carbs: 0.0, fat: 18.4 },
+    'pork': { calories: 242, protein: 27.3, carbs: 0.0, fat: 13.9 },
+    'bacon': { calories: 541, protein: 37.0, carbs: 1.4, fat: 42.0 },
+    'ham': { calories: 145, protein: 20.9, carbs: 0.5, fat: 5.5 },
+    'turkey': { calories: 189, protein: 29.0, carbs: 0.0, fat: 7.4 },
+    'fish': { calories: 206, protein: 22.0, carbs: 0.0, fat: 12.4 },
+    'tuna': { calories: 144, protein: 23.3, carbs: 0.0, fat: 4.9 },
+    'cod': { calories: 105, protein: 23.0, carbs: 0.0, fat: 0.9 },
+    'shrimp': { calories: 85, protein: 20.1, carbs: 0.0, fat: 1.1 },
+    'crab': { calories: 87, protein: 18.1, carbs: 0.0, fat: 1.1 },
+    'lobster': { calories: 89, protein: 19.0, carbs: 0.6, fat: 0.9 },
+    
+    // Common Vegetables
+    'lettuce': { calories: 15, protein: 1.4, carbs: 2.9, fat: 0.2 },
+    'kale': { calories: 35, protein: 2.9, carbs: 4.4, fat: 1.5 },
+    'cauliflower': { calories: 25, protein: 1.9, carbs: 5.0, fat: 0.3 },
+    'carrots': { calories: 41, protein: 0.9, carbs: 9.6, fat: 0.2 },
+    'celery': { calories: 16, protein: 0.7, carbs: 3.5, fat: 0.2 },
+    'onion': { calories: 40, protein: 1.1, carbs: 9.3, fat: 0.1 },
+    
+    // Breakfast Foods and Pancakes
     'pancake': { calories: 227, protein: 6.2, carbs: 28.8, fat: 9.0 },
     'pancakes': { calories: 227, protein: 6.2, carbs: 28.8, fat: 9.0 },
     'buttermilk pancake': { calories: 227, protein: 6.2, carbs: 28.8, fat: 9.0 },
