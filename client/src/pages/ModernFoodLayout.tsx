@@ -82,7 +82,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const [confettiAchievement, setConfettiAchievement] = useState<Achievement | null>(null);
   const [dailyCalories, setDailyCalories] = useState(0);
   const [weeklyCalories, setWeeklyCalories] = useState(0);
-  const [goalCalories, setGoalCalories] = useState(2000);
+  const [goalCalories, setGoalCalories] = useState((user as any)?.calorie_goal || 2000);
   const [weeklyGoal, setWeeklyGoal] = useState(14000);
   const [loggedMeals, setLoggedMeals] = useState<any[]>([]);
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
@@ -193,6 +193,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     window.addEventListener('achievement-unlocked', handleGoalAchievement);
     return () => window.removeEventListener('achievement-unlocked', handleGoalAchievement);
   }, [addNotification]);
+
+  // Update calorie goals when user data changes
+  useEffect(() => {
+    if (user) {
+      const userCalorieGoal = (user as any)?.calorie_goal || 2000;
+      setGoalCalories(userCalorieGoal);
+      setWeeklyGoal(userCalorieGoal * 7);
+    }
+  }, [user]);
 
   // Load existing meal data and set up tracking
   useEffect(() => {

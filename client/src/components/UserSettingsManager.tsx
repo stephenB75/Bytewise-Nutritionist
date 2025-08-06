@@ -24,7 +24,8 @@ import {
   Calendar,
   Activity,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Target
 } from 'lucide-react';
 
 interface UserSettingsManagerProps {
@@ -53,6 +54,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
     weight: (user as any)?.weight || '',
     activityLevel: (user as any)?.activity_level || 'Moderately Active',
     dietaryPreferences: (user as any)?.dietary_preferences || [],
+    calorieGoal: (user as any)?.calorie_goal || 2000,
     joinDate: (user as any)?.created_at || new Date().toISOString(),
   });
 
@@ -71,6 +73,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
           weight: userInfo.weight,
           activity_level: userInfo.activityLevel,
           dietary_preferences: userInfo.dietaryPreferences,
+          calorie_goal: userInfo.calorieGoal,
         }
       });
 
@@ -375,6 +378,28 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
               ) : (
                 <p className="text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10 break-words">
                   {userInfo.activityLevel}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm text-gray-300 font-medium flex items-center">
+                <Target className="w-4 h-4 mr-2 text-orange-400" />
+                Daily Calorie Goal
+              </label>
+              {isEditing ? (
+                <Input
+                  type="number"
+                  value={userInfo.calorieGoal}
+                  onChange={(e) => setUserInfo(prev => ({ ...prev, calorieGoal: parseInt(e.target.value) || 2000 }))}
+                  className="bg-white/10 border-white/20 text-white placeholder-gray-400 w-full"
+                  placeholder="Enter daily calorie goal"
+                  min="1200"
+                  max="5000"
+                />
+              ) : (
+                <p className="text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10 break-words">
+                  {userInfo.calorieGoal} calories/day
                 </p>
               )}
             </div>
