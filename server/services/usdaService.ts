@@ -333,12 +333,22 @@ export class USDAService {
     'escovitch fish': 'fish fried pickled',
     'brown stew chicken': 'chicken stewed brown sauce',
     'peas and rice': 'rice pigeon peas coconut',
-    'macaroni pie': 'macaroni cheese baked caribbean'
+    'macaroni pie': 'macaroni cheese baked caribbean',
+    
+    // Caribbean beverages
+    'peanut punch': 'peanut milk beverage caribbean',
+    'sorrel': 'hibiscus drink spiced caribbean',
+    'sorrel drink': 'hibiscus drink spiced caribbean',
+    'ginger beer': 'ginger ale jamaican spiced',
+    'rum punch': 'fruit punch rum caribbean',
+    'mauby': 'bark drink caribbean traditional',
+    'sea moss': 'seaweed drink nutritious caribbean',
+    'irish moss': 'seaweed drink nutritious caribbean'
   };
 
   private static readonly COOKING_METHODS = ['grilled', 'fried', 'baked', 'roasted', 'boiled', 'steamed', 'raw', 'fresh', 'cooked'];
   private static readonly PREPARATION_FORMS = ['canned', 'frozen', 'dried', 'fresh', 'pickled', 'smoked'];
-  private static readonly FALLBACK_FOODS = ['apple', 'chicken', 'chicken breast', 'hotdog', 'hot dog', 'egg', 'rice', 'white rice', 'brown rice', 'bread', 'white bread', 'whole wheat bread', 'pasta', 'spaghetti', 'penne', 'macaroni', 'corn', 'sweet corn', 'corn on cob', 'corn on the cob', 'potato', 'baked potato', 'oats', 'oatmeal', 'quinoa', 'barley', 'bulgur', 'cereal', 'cheerios', 'cornflakes', 'granola'];
+  private static readonly FALLBACK_FOODS = ['apple', 'chicken', 'chicken breast', 'hotdog', 'hot dog', 'egg', 'rice', 'white rice', 'brown rice', 'bread', 'white bread', 'whole wheat bread', 'pasta', 'spaghetti', 'penne', 'macaroni', 'corn', 'sweet corn', 'corn on cob', 'corn on the cob', 'potato', 'baked potato', 'oats', 'oatmeal', 'quinoa', 'barley', 'bulgur', 'cereal', 'cheerios', 'cornflakes', 'granola', 'peanut punch', 'sorrel', 'ginger beer', 'coconut water', 'rum punch', 'mauby', 'sea moss'];
 
   // Comprehensive fallback nutrition data per 100g
   private static readonly FALLBACK_NUTRITION: Record<string, { calories: number; protein: number; carbs: number; fat: number }> = {
@@ -481,8 +491,6 @@ export class USDAService {
     'sweetsop': { calories: 94, protein: 2.1, carbs: 23.6, fat: 0.3 },
     'custard apple': { calories: 94, protein: 2.1, carbs: 23.6, fat: 0.3 },
     'coconut meat': { calories: 354, protein: 3.3, carbs: 15.2, fat: 33.5 },
-    'coconut water': { calories: 19, protein: 0.7, carbs: 3.7, fat: 0.2 },
-    'tamarind': { calories: 239, protein: 2.8, carbs: 62.5, fat: 0.6 },
     'june plum': { calories: 46, protein: 0.9, carbs: 11.2, fat: 0.3 },
     'golden apple': { calories: 46, protein: 0.9, carbs: 11.2, fat: 0.3 },
     'otaheite apple': { calories: 25, protein: 0.6, carbs: 5.7, fat: 0.3 },
@@ -1605,8 +1613,32 @@ export class USDAService {
       'almond milk': { calories: 17, protein: 0.6, carbs: 1.5, fat: 1.1 },
       'soy milk': { calories: 33, protein: 2.9, carbs: 1.8, fat: 1.8 },
       'oat milk': { calories: 47, protein: 1.0, carbs: 7.0, fat: 1.5 },
-      'coconut milk': { calories: 230, protein: 2.3, carbs: 5.5, fat: 23.8 },
+      'coconut milk thick': { calories: 230, protein: 2.3, carbs: 5.5, fat: 23.8 },
       'rice milk': { calories: 47, protein: 0.3, carbs: 9.2, fat: 1.0 },
+      
+      // Caribbean and Jamaican beverages
+      'peanut punch': { calories: 185, protein: 8.2, carbs: 18.5, fat: 9.8 },
+      'sorrel': { calories: 45, protein: 0.4, carbs: 11.2, fat: 0.1 },
+      'sorrel drink': { calories: 45, protein: 0.4, carbs: 11.2, fat: 0.1 },
+      'jamaican sorrel': { calories: 45, protein: 0.4, carbs: 11.2, fat: 0.1 },
+      'ginger beer': { calories: 38, protein: 0.1, carbs: 9.5, fat: 0 },
+      'jamaican ginger beer': { calories: 38, protein: 0.1, carbs: 9.5, fat: 0 },
+      'rum punch': { calories: 168, protein: 0.2, carbs: 24.8, fat: 0.1 },
+      'caribbean punch': { calories: 156, protein: 0.3, carbs: 22.4, fat: 0.2 },
+      'mauby': { calories: 42, protein: 0.1, carbs: 10.8, fat: 0 },
+      'sea moss': { calories: 49, protein: 1.5, carbs: 12.3, fat: 0.6 },
+      'sea moss drink': { calories: 49, protein: 1.5, carbs: 12.3, fat: 0.6 },
+      'irish moss': { calories: 49, protein: 1.5, carbs: 12.3, fat: 0.6 },
+      'coconut milk drink': { calories: 45, protein: 0.4, carbs: 6.3, fat: 4.6 },
+      'tamarind drink': { calories: 239, protein: 2.8, carbs: 62.5, fat: 0.6 },
+      'soursop juice': { calories: 66, protein: 1.0, carbs: 16.8, fat: 0.3 },
+      'june plum juice': { calories: 46, protein: 0.9, carbs: 11.2, fat: 0.3 },
+      'guinep juice': { calories: 58, protein: 1.3, carbs: 13.7, fat: 0.1 },
+      'passion fruit juice': { calories: 97, protein: 2.2, carbs: 23.4, fat: 0.7 },
+      
+      // Traditional fruit juices (moved here to avoid duplicates)
+      'fruit punch': { calories: 45, protein: 0, carbs: 11.5, fat: 0 },
+      'lime juice': { calories: 25, protein: 0.4, carbs: 8.4, fat: 0.2 },
       
       // Other beverages
       'kombucha': { calories: 30, protein: 0, carbs: 7, fat: 0 },
