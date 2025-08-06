@@ -89,8 +89,8 @@ export class USDAService {
           fdcId: food.fdcId,
           description: food.description,
           dataType: food.dataType,
-          foodNutrients: food.nutrients || [],
-          foodCategory: food.foodCategory
+          foodNutrients: JSON.parse(food.nutrients || '[]'),
+          foodCategory: food.foodCategory || undefined
         }));
       }
 
@@ -128,8 +128,8 @@ export class USDAService {
         fdcId: food.fdcId,
         description: food.description,
         dataType: food.dataType,
-        foodNutrients: food.nutrients || [],
-        foodCategory: food.foodCategory
+        foodNutrients: JSON.parse(food.nutrients || '[]'),
+        foodCategory: food.foodCategory || undefined
       }));
     }
   }
@@ -152,7 +152,7 @@ export class USDAService {
           fdcId: cachedFood.fdcId,
           description: cachedFood.description,
           dataType: cachedFood.dataType || 'Foundation',
-          foodNutrients: JSON.parse(cachedFood.nutrients || '[]'),
+          foodNutrients: JSON.parse(cachedFood.nutrients || '[]') as USDAFoodNutrient[],
           foodCategory: cachedFood.foodCategory || undefined
         };
       }
@@ -468,52 +468,7 @@ export class USDAService {
     return enhancedQuery.trim() || query;
   }
 
-  /**
-   * Search cached foods locally with improved basic ingredient prioritization
-   */
-  private async searchCachedFoods(query: string, limit: number) {
-    const cleanQuery = query.toLowerCase().trim();
-    
-    // First try exact matches and basic ingredient patterns
-    const basicResults = await db
-      .select()
-      .from(usdaFoodCache)
-      .where(
-        sql`LOWER(${usdaFoodCache.description}) LIKE ${`${cleanQuery},%`} OR 
-            LOWER(${usdaFoodCache.description}) LIKE ${`${cleanQuery}, raw%`} OR
-            LOWER(${usdaFoodCache.description}) = ${cleanQuery}`
-      )
-      .orderBy(
-        sql`CASE 
-          WHEN LOWER(${usdaFoodCache.description}) = ${cleanQuery} THEN 1
-          WHEN LOWER(${usdaFoodCache.description}) LIKE ${`${cleanQuery}, raw%`} THEN 2  
-          WHEN LOWER(${usdaFoodCache.description}) LIKE ${`${cleanQuery},%`} THEN 3
-          ELSE 4
-        END`,
-        desc(usdaFoodCache.searchCount)
-      )
-      .limit(limit);
 
-    if (basicResults.length > 0) {
-      return basicResults;
-    }
-
-    // Fallback to broader search if no basic matches
-    return await db
-      .select()
-      .from(usdaFoodCache)
-      .where(like(usdaFoodCache.description, `%${query}%`))
-      .orderBy(
-        sql`CASE 
-          WHEN LOWER(${usdaFoodCache.description}) NOT LIKE '%and%' AND 
-               LOWER(${usdaFoodCache.description}) NOT LIKE '%with%' AND
-               LOWER(${usdaFoodCache.description}) NOT LIKE '%mixed%' THEN 1
-          ELSE 2
-        END`,
-        desc(usdaFoodCache.searchCount)
-      )
-      .limit(limit);
-  }
 
   /**
    * Cache USDA search results
@@ -1140,29 +1095,7 @@ export class USDAService {
     return score;
   }
 
-  /**
-   * Search foods in the local database cache
-   */
-  private async searchCachedFoods(query: string, limit: number = 10): Promise<any[]> {
-    try {
-      const foods = await db
-        .select()
-        .from(usdaFoodCache)
-        .where(like(usdaFoodCache.description, `%${query}%`))
-        .limit(limit);
 
-      return foods.map(food => ({
-        fdcId: food.fdcId,
-        description: food.description,
-        nutrients: JSON.parse(food.nutrients || '[]'),
-        dataType: food.dataType || 'Foundation',
-        foodCategory: food.foodCategory
-      }));
-    } catch (error) {
-      console.error('Database search error:', error);
-      return [];
-    }
-  }
 
   /**
    * Check if food match is likely incorrect based on context
