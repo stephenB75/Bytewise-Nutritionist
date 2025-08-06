@@ -389,6 +389,26 @@ export class USDAService {
   private preprocessIngredientQuery(ingredientName: string): string {
     const query = ingredientName.toLowerCase().trim();
     
+    // Handle singular to plural conversions for better USDA matching
+    const singularToPlural = {
+      'carrot': 'carrots',
+      'tomato': 'tomatoes', 
+      'potato': 'potatoes',
+      'onion': 'onions',
+      'pepper': 'peppers',
+      'mushroom': 'mushrooms',
+      'cucumber': 'cucumbers',
+      'celery': 'celery', // already correct
+      'lettuce': 'lettuce', // already correct
+      'spinach': 'spinach', // already correct
+      'broccoli': 'broccoli' // already correct
+    };
+    
+    // Convert singular basic vegetables to plural for better USDA matching
+    if (singularToPlural[query]) {
+      return singularToPlural[query];
+    }
+    
     // Check for direct synonym matches
     if (USDAService.FOOD_SYNONYMS[query]) {
       return USDAService.FOOD_SYNONYMS[query];
@@ -426,14 +446,49 @@ export class USDAService {
   }
 
   /**
-   * Search cached foods locally
+   * Search cached foods locally with improved basic ingredient prioritization
    */
   private async searchCachedFoods(query: string, limit: number) {
+    const cleanQuery = query.toLowerCase().trim();
+    
+    // First try exact matches and basic ingredient patterns
+    const basicResults = await db
+      .select()
+      .from(usdaFoodCache)
+      .where(
+        sql`LOWER(${usdaFoodCache.description}) LIKE ${`${cleanQuery},%`} OR 
+            LOWER(${usdaFoodCache.description}) LIKE ${`${cleanQuery}, raw%`} OR
+            LOWER(${usdaFoodCache.description}) = ${cleanQuery}`
+      )
+      .orderBy(
+        sql`CASE 
+          WHEN LOWER(${usdaFoodCache.description}) = ${cleanQuery} THEN 1
+          WHEN LOWER(${usdaFoodCache.description}) LIKE ${`${cleanQuery}, raw%`} THEN 2  
+          WHEN LOWER(${usdaFoodCache.description}) LIKE ${`${cleanQuery},%`} THEN 3
+          ELSE 4
+        END`,
+        desc(usdaFoodCache.searchCount)
+      )
+      .limit(limit);
+
+    if (basicResults.length > 0) {
+      return basicResults;
+    }
+
+    // Fallback to broader search if no basic matches
     return await db
       .select()
       .from(usdaFoodCache)
       .where(like(usdaFoodCache.description, `%${query}%`))
-      .orderBy(desc(usdaFoodCache.searchCount))
+      .orderBy(
+        sql`CASE 
+          WHEN LOWER(${usdaFoodCache.description}) NOT LIKE '%and%' AND 
+               LOWER(${usdaFoodCache.description}) NOT LIKE '%with%' AND
+               LOWER(${usdaFoodCache.description}) NOT LIKE '%mixed%' THEN 1
+          ELSE 2
+        END`,
+        desc(usdaFoodCache.searchCount)
+      )
       .limit(limit);
   }
 
@@ -853,9 +908,22 @@ export class USDAService {
       let score = 0;
       const description = food.description.toLowerCase();
       
+      // PRIORITIZE SIMPLE, BASIC INGREDIENTS
+      // Strong penalty for composite/mixed dishes
+      if (description.includes(' and ') || description.includes(', ')) score -= 200;
+      if (description.includes('with ') || description.includes('mixed')) score -= 150;
+      if (description.includes('salad') || description.includes('dish') || description.includes('recipe')) score -= 300;
+      
+      // Strong preference for basic ingredient names
+      const basicTerms = ['raw', 'fresh', 'plain', 'unsweetened', 'unflavored'];
+      for (const term of basicTerms) {
+        if (description.includes(term)) score += 200;
+      }
+      
       // Higher score for exact matches
       if (description.includes(searchLower)) score += 100;
-      if (description === searchLower) score += 200;
+      if (description === searchLower) score += 300;
+      if (description.startsWith(searchLower + ',')) score += 250; // "broccoli, raw"
       
       // Strongly prefer Foundation and Survey data over Branded
       if (food.dataType === 'Foundation') score += 150;
@@ -870,9 +938,11 @@ export class USDAService {
       // Apply food-specific scoring logic
       score += this.calculateFoodSpecificScore(searchLower, description, measurementContext);
       
-      // Prefer raw/basic ingredients
-      if (description.includes('raw') || description.includes('fresh')) score += 50;
-      if (!description.includes('prepared') && !description.includes('seasoned')) score += 30;
+      // Additional penalties for composite foods
+      const complexTerms = ['stir fry', 'casserole', 'prepared', 'seasoned', 'breaded', 'battered'];
+      for (const term of complexTerms) {
+        if (description.includes(term)) score -= 100;
+      }
       
       return { food, score };
     });
@@ -890,10 +960,43 @@ export class USDAService {
   private calculateFoodSpecificScore(searchTerm: string, description: string, measurementContext: string): number {
     let score = 0;
 
+    // BROCCOLI scoring - prioritize plain broccoli
+    if (searchTerm.includes('broccoli')) {
+      if (description === 'broccoli, raw') score += 500;
+      if (description.startsWith('broccoli,') && description.includes('raw')) score += 400;
+      if (description.includes('beef and broccoli') || description.includes('tofu')) score -= 800;
+      if (description.includes('chinese') || description.includes('raab')) score -= 200;
+    }
+
+    // CARROT scoring - prioritize plain carrots
+    if (searchTerm.includes('carrot')) {
+      if (description.includes('carrots, raw') || description === 'carrots, mature, raw') score += 500;
+      if (description.includes('carrot') && description.includes('raw')) score += 400;
+      if (description.includes('muffin') || description.includes('cake') || description.includes('salad')) score -= 800;
+      if (description.includes('baby') && description.includes('raw')) score += 300; // baby carrots are good too
+    }
+
+    // TOMATO scoring - prioritize fresh tomatoes
+    if (searchTerm.includes('tomato')) {
+      if (description.includes('tomato, roma') || description.includes('tomatoes, red, ripe')) score += 500;
+      if (description.includes('tomato') && description.includes('raw')) score += 400;
+      if (description.includes('paste') || description.includes('sauce') || description.includes('puree')) score -= 300;
+      if (description.includes('canned') || description.includes('processed')) score -= 200;
+      if (description.includes('taco') || description.includes('filling')) score -= 800;
+    }
+
+    // LETTUCE scoring - prioritize fresh lettuce
+    if (searchTerm.includes('lettuce')) {
+      if (description.includes('lettuce') && description.includes('raw')) score += 500;
+      if (description.includes('romaine') || description.includes('iceberg')) score += 400;
+      if (description.includes('salad') && description.includes('mixed')) score -= 300;
+    }
+
     // Banana scoring
     if (searchTerm.includes('banana')) {
       if (description.includes('raw') && !description.includes('overripe')) score += 300;
       if (description.includes('overripe')) score -= 300;
+      if (description.includes('chips') || description.includes('dried')) score -= 400;
     }
     
     // Apple scoring
@@ -901,13 +1004,16 @@ export class USDAService {
       if (description.includes('raw') && !description.includes('dried') && !description.includes('chips')) score += 300;
       if (description.includes('dried') || description.includes('chips') || description.includes('dehydrated')) score -= 500;
       if (description.includes('fresh') || description.includes('fruit, without')) score += 200;
+      if (description.includes('candied') || description.includes('baked')) score -= 300;
     }
     
-    // Chicken scoring
+    // Chicken scoring - prioritize plain chicken breast
     if (searchTerm.includes('chicken')) {
-      if (description.includes('raw') && description.includes('breast')) score += 300;
-      if (description.includes('cooked') || description.includes('braised') || description.includes('roasted')) score -= 200;
-      if (description.includes('skinless') && description.includes('boneless')) score += 100;
+      if (description.includes('breast') && description.includes('raw')) score += 500;
+      if (description.includes('breast') && description.includes('skinless') && description.includes('boneless')) score += 400;
+      if (description.includes('wing') || description.includes('drumstick') || description.includes('thigh')) score -= 200;
+      if (description.includes('caesar') || description.includes('garden') || description.includes('biryani')) score -= 800;
+      if (description.includes('dumpling') || description.includes('salad')) score -= 600;
     }
     
     // Rice scoring with measurement context
