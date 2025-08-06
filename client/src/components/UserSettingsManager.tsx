@@ -3,7 +3,7 @@
  * Single consolidated card for profile and personal information management
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -33,7 +33,7 @@ interface UserSettingsManagerProps {
 }
 
 export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
-  const { user, supabase } = useAuth();
+  const { user, supabase, refetch } = useAuth();
   const { toast } = useToast();
   
   // Profile editing states
@@ -43,20 +43,55 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
 
   // User information state - consolidated from both components
   const [userInfo, setUserInfo] = useState({
-    firstName: (user as any)?.firstName || '',
-    lastName: (user as any)?.lastName || '',
-    name: user ? `${(user as any).firstName || ''} ${(user as any).lastName || ''}`.trim() : '',
-    email: (user as any)?.email || '',
-    phone: (user as any)?.phone || '',
-    location: (user as any)?.location || '',
-    birthDate: (user as any)?.birth_date || '',
-    height: (user as any)?.height || '',
-    weight: (user as any)?.weight || '',
-    activityLevel: (user as any)?.activity_level || 'Moderately Active',
-    dietaryPreferences: (user as any)?.dietary_preferences || [],
-    calorieGoal: (user as any)?.calorie_goal || 2000,
-    joinDate: (user as any)?.created_at || new Date().toISOString(),
+    firstName: '',
+    lastName: '',
+    name: '',
+    email: '',
+    phone: '',
+    location: '',
+    birthDate: '',
+    height: '',
+    weight: '',
+    activityLevel: 'Moderately Active',
+    dietaryPreferences: [],
+    calorieGoal: 2000,
+    joinDate: new Date().toISOString(),
   });
+
+  // Update local state when user data changes
+  useEffect(() => {
+    if (user) {
+      console.log('🔄 UserSettingsManager: Loading user data:', user);
+      
+      const userData = user as any;
+      const firstName = userData?.firstName || '';
+      const lastName = userData?.lastName || '';
+      const personalInfo = userData?.personalInfo || {};
+      
+      // Create full name from available data
+      const fullName = firstName && lastName ? `${firstName} ${lastName}`.trim() : 
+                       personalInfo?.name || userData?.name || firstName || userData?.email?.split('@')[0] || '';
+      
+      const newUserInfo = {
+        firstName,
+        lastName, 
+        name: fullName,
+        email: userData?.email || '',
+        phone: personalInfo?.phone || '',
+        location: personalInfo?.location || '',
+        birthDate: personalInfo?.birthDate || '',
+        height: personalInfo?.height || '',
+        weight: personalInfo?.weight || '',
+        activityLevel: personalInfo?.activityLevel || 'Moderately Active',
+        dietaryPreferences: personalInfo?.dietary_preferences || [],
+        calorieGoal: userData?.dailyCalorieGoal || 2000,
+        joinDate: userData?.createdAt || new Date().toISOString(),
+      };
+      
+      console.log('📋 UserSettingsManager: Mapped user info:', newUserInfo);
+      setUserInfo(newUserInfo);
+    }
+  }, [user]);
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -90,8 +125,8 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
       sonnerToast.success("Profile updated successfully!");
       setIsEditing(false);
       
-      // Update local state to reflect the saved changes
-      window.location.reload(); // Refresh to show updated data from server
+      // Refetch user data to show updated information
+      await refetch();
     } catch (error) {
       console.error('Error updating profile:', error);
       toast({
