@@ -104,7 +104,8 @@ export class USDAService {
       let lruKey = '';
       let lruAccess = Infinity;
       
-      for (const [k, v] of this.memoryCache.entries()) {
+      for (const entry of Array.from(this.memoryCache.entries())) {
+        const [k, v] = entry;
         if (v.accessCount < lruAccess) {
           lruKey = k;
           lruAccess = v.accessCount;
@@ -651,6 +652,23 @@ export class USDAService {
     'jack fruit': { calories: 95, protein: 1.7, carbs: 23.2, fat: 0.6 },
     'caimito': { calories: 67, protein: 1.5, carbs: 15.3, fat: 0.7 }, // Star apple Spanish name
     'milk fruit': { calories: 67, protein: 1.5, carbs: 15.3, fat: 0.7 },
+    
+    // Breakfast Foods and Pancakes (NEW)
+    'pancake': { calories: 227, protein: 6.2, carbs: 28.8, fat: 9.0 },
+    'pancakes': { calories: 227, protein: 6.2, carbs: 28.8, fat: 9.0 },
+    'buttermilk pancake': { calories: 227, protein: 6.2, carbs: 28.8, fat: 9.0 },
+    'buttermilk pancakes': { calories: 227, protein: 6.2, carbs: 28.8, fat: 9.0 },
+    'blueberry pancake': { calories: 253, protein: 6.7, carbs: 33.1, fat: 10.5 },
+    'blueberry pancakes': { calories: 253, protein: 6.7, carbs: 33.1, fat: 10.5 },
+    'chocolate chip pancake': { calories: 250, protein: 6.0, carbs: 32.0, fat: 11.0 },
+    'chocolate chip pancakes': { calories: 250, protein: 6.0, carbs: 32.0, fat: 11.0 },
+    'whole wheat pancake': { calories: 200, protein: 8.1, carbs: 25.0, fat: 7.9 },
+    'whole wheat pancakes': { calories: 200, protein: 8.1, carbs: 25.0, fat: 7.9 },
+    'waffle': { calories: 291, protein: 7.9, carbs: 33.4, fat: 14.7 },
+    'waffles': { calories: 291, protein: 7.9, carbs: 33.4, fat: 14.7 },
+    'belgian waffle': { calories: 291, protein: 7.9, carbs: 33.4, fat: 14.7 },
+    'belgian waffles': { calories: 291, protein: 7.9, carbs: 33.4, fat: 14.7 },
+    'french toast': { calories: 166, protein: 5.9, carbs: 16.3, fat: 7.7 },
     
     // Desserts and Sweet Treats
     'brownie': { calories: 466, protein: 6.1, carbs: 63.3, fat: 20.7 },
