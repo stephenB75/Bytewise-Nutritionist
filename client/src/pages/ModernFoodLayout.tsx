@@ -271,6 +271,19 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         const estimatedMicronutrients = calculateEstimatedMicronutrients(todayMeals);
         setDailyMicronutrients(estimatedMicronutrients);
         
+        // Debug logging for micronutrient verification (remove in production)
+        if (todayMeals.length > 0) {
+          console.log('🔬 Micronutrient Cards Debug:', {
+            totalCalories: dailyTotal,
+            baseMultiplier: dailyTotal / 100,
+            calculatedMicronutrients: estimatedMicronutrients,
+            exampleCalculation: {
+              vitaminC: `${dailyTotal}/100 * 8 = ${Math.round((dailyTotal/100) * 8)}mg`,
+              iron: `${dailyTotal}/100 * 1.8 = ${Math.round((dailyTotal/100) * 1.8 * 10) / 10}mg`
+            }
+          });
+        }
+        
         // Calculate weekly calories from all stored meals
         const weeklyTotal = stored.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
         setWeeklyCalories(weeklyTotal);
