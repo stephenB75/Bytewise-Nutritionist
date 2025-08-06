@@ -8,6 +8,7 @@
 import { useState, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { Card } from '@/components/ui/card';
+import { useCheckAchievements } from '@/hooks/useAchievements';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -95,6 +96,9 @@ function CalorieCalculator({
   const [ingredientSuggestions, setIngredientSuggestions] = useState<Array<{category: string; key: string; data: IngredientData}>>([]);
   const [selectedIngredient, setSelectedIngredient] = useState<{category: string; key: string; data: IngredientData} | null>(null);
   const [availableUnits, setAvailableUnits] = useState<string[]>([]);
+
+  // Achievement system hook
+  const checkAchievements = useCheckAchievements();
 
   // Search ingredients as user types
   useEffect(() => {
@@ -230,6 +234,9 @@ function CalorieCalculator({
     window.dispatchEvent(new CustomEvent('calories-logged', { detail: mealData }));
     window.dispatchEvent(new CustomEvent('meal-logged-success', { detail: mealData }));
     window.dispatchEvent(new CustomEvent('refresh-weekly-data'));
+    
+    // Check for new achievements after logging meal
+    checkAchievements.mutate();
     
     // Show success animation
     setLoggedData({

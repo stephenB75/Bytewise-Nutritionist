@@ -9,6 +9,7 @@ import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Flame } from 'lucide-react';
+import { useCheckAchievements } from '@/hooks/useAchievements';
 
 interface DayCalories {
   day: string;
@@ -20,6 +21,9 @@ interface DayCalories {
 export function WeeklyCaloriesCard() {
   const [weeklyData, setWeeklyData] = useState<DayCalories[]>([]);
   const [totalWeeklyCalories, setTotalWeeklyCalories] = useState(0);
+
+  // Achievement system hook
+  const checkAchievements = useCheckAchievements();
 
   // Get the current week's dates
   const getCurrentWeekDates = () => {
@@ -91,6 +95,9 @@ export function WeeklyCaloriesCard() {
     const handleMealLogged = () => {
       console.log('🔄 WeeklyCaloriesCard: Refreshing data after meal logged');
       calculateWeeklyCalories();
+      
+      // Check for achievements after weekly data updates
+      checkAchievements.mutate();
     };
 
     // Listen for localStorage storage events
