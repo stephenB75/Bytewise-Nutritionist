@@ -338,7 +338,7 @@ export class USDAService {
 
   private static readonly COOKING_METHODS = ['grilled', 'fried', 'baked', 'roasted', 'boiled', 'steamed', 'raw', 'fresh', 'cooked'];
   private static readonly PREPARATION_FORMS = ['canned', 'frozen', 'dried', 'fresh', 'pickled', 'smoked'];
-  private static readonly FALLBACK_FOODS = ['apple', 'chicken', 'chicken breast', 'hotdog', 'hot dog', 'egg', 'rice', 'bread', 'pasta', 'corn', 'sweet corn', 'corn on cob', 'corn on the cob', 'potato', 'baked potato'];
+  private static readonly FALLBACK_FOODS = ['apple', 'chicken', 'chicken breast', 'hotdog', 'hot dog', 'egg', 'rice', 'white rice', 'brown rice', 'bread', 'white bread', 'whole wheat bread', 'pasta', 'spaghetti', 'penne', 'macaroni', 'corn', 'sweet corn', 'corn on cob', 'corn on the cob', 'potato', 'baked potato', 'oats', 'oatmeal', 'quinoa', 'barley', 'bulgur', 'cereal', 'cheerios', 'cornflakes', 'granola'];
 
   // Comprehensive fallback nutrition data per 100g
   private static readonly FALLBACK_NUTRITION: Record<string, { calories: number; protein: number; carbs: number; fat: number }> = {
@@ -358,10 +358,77 @@ export class USDAService {
     'salmon': { calories: 208, protein: 20, carbs: 0, fat: 12 },
     'egg': { calories: 155, protein: 13, carbs: 1.1, fat: 11 },
     
-    // Grains
+    // Grains & Starches (Enhanced coverage)
     'rice': { calories: 130, protein: 2.7, carbs: 28, fat: 0.3 },
+    'white rice': { calories: 130, protein: 2.7, carbs: 28, fat: 0.3 },
+    'brown rice': { calories: 123, protein: 2.6, carbs: 23, fat: 0.9 },
+    'jasmine rice': { calories: 130, protein: 2.7, carbs: 28, fat: 0.3 },
+    'basmati rice': { calories: 130, protein: 2.7, carbs: 28, fat: 0.3 },
+    'wild rice': { calories: 101, protein: 4.0, carbs: 21.3, fat: 0.3 },
+    'cooked rice': { calories: 130, protein: 2.7, carbs: 28, fat: 0.3 },
+    
     'bread': { calories: 265, protein: 9, carbs: 49, fat: 3.2 },
+    'white bread': { calories: 266, protein: 8.9, carbs: 49, fat: 3.6 },
+    'whole wheat bread': { calories: 247, protein: 13.4, carbs: 41, fat: 4.2 },
+    'sourdough bread': { calories: 289, protein: 11.7, carbs: 56.3, fat: 2.1 },
+    'rye bread': { calories: 259, protein: 8.5, carbs: 48.3, fat: 3.3 },
+    'pita bread': { calories: 275, protein: 9.1, carbs: 55.7, fat: 1.2 },
+    'naan': { calories: 310, protein: 8.7, carbs: 54.3, fat: 7.4 },
+    'bagel': { calories: 277, protein: 11, carbs: 55.8, fat: 1.4 },
+    
     'pasta': { calories: 131, protein: 5, carbs: 25, fat: 1.1 },
+    'spaghetti': { calories: 131, protein: 5, carbs: 25, fat: 1.1 },
+    'penne': { calories: 131, protein: 5, carbs: 25, fat: 1.1 },
+    'macaroni': { calories: 131, protein: 5, carbs: 25, fat: 1.1 },
+    'linguine': { calories: 131, protein: 5, carbs: 25, fat: 1.1 },
+    'fettuccine': { calories: 131, protein: 5, carbs: 25, fat: 1.1 },
+    'whole wheat pasta': { calories: 124, protein: 5.3, carbs: 26.5, fat: 0.5 },
+    'cooked pasta': { calories: 131, protein: 5, carbs: 25, fat: 1.1 },
+    
+    'oats': { calories: 68, protein: 2.4, carbs: 12, fat: 1.4 },
+    'oatmeal': { calories: 68, protein: 2.4, carbs: 12, fat: 1.4 },
+    'rolled oats': { calories: 389, protein: 16.9, carbs: 66.3, fat: 6.9 },
+    'steel cut oats': { calories: 379, protein: 14.7, carbs: 67.7, fat: 6.5 },
+    'quinoa': { calories: 120, protein: 4.4, carbs: 22, fat: 1.9 },
+    'barley': { calories: 123, protein: 2.3, carbs: 28.2, fat: 0.4 },
+    'bulgur': { calories: 83, protein: 3.1, carbs: 18.6, fat: 0.2 },
+    
+    // Breakfast Cereals (per 100g dry weight)
+    'cereal': { calories: 379, protein: 8.0, carbs: 84, fat: 1.5 },
+    'cheerios': { calories: 378, protein: 11, carbs: 74, fat: 6.5 },
+    'cornflakes': { calories: 357, protein: 7.5, carbs: 84, fat: 0.4 },
+    'corn flakes': { calories: 357, protein: 7.5, carbs: 84, fat: 0.4 },
+    'rice krispies': { calories: 386, protein: 4.0, carbs: 87, fat: 1.0 },
+    'frosted flakes': { calories: 375, protein: 4.5, carbs: 88, fat: 0.5 },
+    'lucky charms': { calories: 386, protein: 6.0, carbs: 80, fat: 4.0 },
+    'fruit loops': { calories: 384, protein: 4.0, carbs: 87, fat: 3.0 },
+    'froot loops': { calories: 384, protein: 4.0, carbs: 87, fat: 3.0 },
+    'granola': { calories: 471, protein: 13.3, carbs: 57.8, fat: 20.7 },
+    'muesli': { calories: 362, protein: 9.7, carbs: 66.2, fat: 6.0 },
+    'bran flakes': { calories: 321, protein: 10.6, carbs: 76.0, fat: 1.8 },
+    'wheat flakes': { calories: 340, protein: 11.0, carbs: 73.0, fat: 2.2 },
+    'shredded wheat': { calories: 340, protein: 11.0, carbs: 73.0, fat: 2.2 },
+    'raisin bran': { calories: 316, protein: 7.5, carbs: 75.4, fat: 2.0 },
+    'cocoa puffs': { calories: 400, protein: 4.0, carbs: 87, fat: 4.0 },
+    'honey nut cheerios': { calories: 367, protein: 7.4, carbs: 78.9, fat: 4.2 },
+    'special k': { calories: 374, protein: 17.0, carbs: 74.0, fat: 1.5 },
+    'cinnamon toast crunch': { calories: 420, protein: 4.2, carbs: 76.0, fat: 12.0 },
+    'captain crunch': { calories: 420, protein: 4.2, carbs: 76.0, fat: 12.0 },
+    'trix': { calories: 393, protein: 4.5, carbs: 85.7, fat: 3.6 },
+    'cocoa krispies': { calories: 389, protein: 4.2, carbs: 87.0, fat: 2.4 },
+    'honey bunches of oats': { calories: 400, protein: 6.7, carbs: 80.0, fat: 6.7 },
+    
+    // Additional Starches & Snacks
+    'crackers': { calories: 489, protein: 8.8, carbs: 63.3, fat: 22.3 },
+    'saltine crackers': { calories: 421, protein: 7.0, carbs: 71.0, fat: 12.0 },
+    'graham crackers': { calories: 423, protein: 6.1, carbs: 77.5, fat: 9.9 },
+    'pretzels': { calories: 380, protein: 10.0, carbs: 79.0, fat: 3.0 },
+    'tortilla chips': { calories: 489, protein: 7.2, carbs: 61.9, fat: 23.3 },
+    'potato chips': { calories: 536, protein: 7.0, carbs: 53.0, fat: 32.0 },
+    'tortilla': { calories: 218, protein: 5.7, carbs: 43.6, fat: 2.9 },
+    'flour tortilla': { calories: 304, protein: 8.2, carbs: 50.4, fat: 7.3 },
+    'corn tortilla': { calories: 218, protein: 5.7, carbs: 43.6, fat: 2.9 },
+    'wrap': { calories: 304, protein: 8.2, carbs: 50.4, fat: 7.3 },
     
     // Vegetables
     'broccoli': { calories: 34, protein: 2.8, carbs: 7, fat: 0.4 },
