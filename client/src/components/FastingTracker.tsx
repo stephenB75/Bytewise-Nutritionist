@@ -130,16 +130,26 @@ export function FastingTracker() {
 
   // Start fasting session mutation
   const startFastingMutation = useMutation({
-    mutationFn: (session: Omit<FastingSession, 'id'>) => 
+    mutationFn: (session: Omit<FastingSession, 'id'> & { planName?: string }) => 
       apiRequest('POST', '/api/fasting/start', session).then(res => res.json()),
     onSuccess: (data) => {
       setCurrentSession(data);
       setIsActive(true);
       toast({
-        title: "Fasting Started!",
-        description: `${selectedPlan.name} session has begun. Stay strong!`,
+        title: "Fasting Started! 🚀",
+        description: `Your ${selectedPlan.name} session has begun. Stay strong and hydrated!`,
       });
       queryClient.invalidateQueries({ queryKey: ['/api/fasting/history'] });
+    },
+    onError: (error) => {
+      console.error('Failed to start fasting:', error);
+      toast({
+        title: "Failed to Start",
+        description: "Please try again. Make sure you're signed in.",
+        variant: "destructive"
+      });
+      // Reset timer if API call failed
+      setTimeRemaining(0);
     }
   });
 
@@ -188,8 +198,14 @@ export function FastingTracker() {
       status: 'active'
     };
     
+    // Set timer immediately for visual feedback
     setTimeRemaining(targetDuration);
-    startFastingMutation.mutate(session);
+    
+    // Start the session via API
+    startFastingMutation.mutate({
+      ...session,
+      planName: selectedPlan.name
+    });
   };
 
   const pauseFasting = () => {
@@ -300,11 +316,12 @@ export function FastingTracker() {
                   <Button 
                     onClick={startFasting}
                     size="lg"
-                    className="gap-2 w-full sm:w-auto min-w-[140px]"
+                    className="gap-2 w-full sm:w-auto min-w-[140px] bg-primary hover:bg-primary/90 text-primary-foreground"
                     data-testid="button-start-fasting"
+                    disabled={startFastingMutation.isPending}
                   >
                     <Play className="w-4 h-4" />
-                    Start Fasting
+                    {startFastingMutation.isPending ? "Starting..." : "Start Fasting"}
                   </Button>
                 ) : (
                   <>
