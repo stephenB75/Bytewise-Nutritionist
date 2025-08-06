@@ -1156,15 +1156,87 @@ export class USDAService {
 
     // Handle common liquids that may not be in USDA database or fallback data
     const liquidFallbacks = {
+      // Water varieties
       'water': { calories: 0, protein: 0, carbs: 0, fat: 0 },
       'drinking water': { calories: 0, protein: 0, carbs: 0, fat: 0 },
       'tap water': { calories: 0, protein: 0, carbs: 0, fat: 0 },
       'bottled water': { calories: 0, protein: 0, carbs: 0, fat: 0 },
+      'sparkling water': { calories: 0, protein: 0, carbs: 0, fat: 0 },
+      'mineral water': { calories: 0, protein: 0, carbs: 0, fat: 0 },
+      'seltzer water': { calories: 0, protein: 0, carbs: 0, fat: 0 },
+      
+      // Tea varieties
       'tea': { calories: 1, protein: 0, carbs: 0.3, fat: 0 },
       'black tea': { calories: 1, protein: 0, carbs: 0.3, fat: 0 },
       'green tea': { calories: 1, protein: 0, carbs: 0.3, fat: 0 },
+      'white tea': { calories: 1, protein: 0, carbs: 0.3, fat: 0 },
+      'herbal tea': { calories: 1, protein: 0, carbs: 0.3, fat: 0 },
+      'iced tea': { calories: 1, protein: 0, carbs: 0.3, fat: 0 },
+      
+      // Coffee varieties  
       'coffee': { calories: 1, protein: 0.1, carbs: 0, fat: 0 },
       'black coffee': { calories: 1, protein: 0.1, carbs: 0, fat: 0 },
+      'espresso': { calories: 1, protein: 0.1, carbs: 0, fat: 0 },
+      'americano': { calories: 1, protein: 0.1, carbs: 0, fat: 0 },
+      'cold brew': { calories: 1, protein: 0.1, carbs: 0, fat: 0 },
+      
+      // Alcoholic beverages
+      'beer': { calories: 43, protein: 0.5, carbs: 3.6, fat: 0 },
+      'light beer': { calories: 29, protein: 0.2, carbs: 1.9, fat: 0 },
+      'wine': { calories: 83, protein: 0.1, carbs: 2.6, fat: 0 },
+      'red wine': { calories: 85, protein: 0.1, carbs: 2.6, fat: 0 },
+      'white wine': { calories: 82, protein: 0.1, carbs: 2.6, fat: 0 },
+      'champagne': { calories: 80, protein: 0.2, carbs: 1.2, fat: 0 },
+      'vodka': { calories: 231, protein: 0, carbs: 0, fat: 0 },
+      'whiskey': { calories: 250, protein: 0, carbs: 0, fat: 0 },
+      'rum': { calories: 231, protein: 0, carbs: 0, fat: 0 },
+      'gin': { calories: 231, protein: 0, carbs: 0, fat: 0 },
+      'tequila': { calories: 231, protein: 0, carbs: 0, fat: 0 },
+      'brandy': { calories: 231, protein: 0, carbs: 0, fat: 0 },
+      
+      // Soft drinks and juices
+      'lemonade': { calories: 40, protein: 0, carbs: 10.6, fat: 0 },
+      'lemon juice': { calories: 22, protein: 0.4, carbs: 6.9, fat: 0.2 },
+      'lime juice': { calories: 25, protein: 0.4, carbs: 8.4, fat: 0.1 },
+      'orange juice': { calories: 45, protein: 0.7, carbs: 10.4, fat: 0.2 },
+      'apple juice': { calories: 46, protein: 0.1, carbs: 11.3, fat: 0.1 },
+      'grape juice': { calories: 60, protein: 0.4, carbs: 14.8, fat: 0.2 },
+      'cranberry juice': { calories: 46, protein: 0.4, carbs: 12.2, fat: 0.1 },
+      'tomato juice': { calories: 17, protein: 0.8, carbs: 4.2, fat: 0.1 },
+      'coconut water': { calories: 19, protein: 0.7, carbs: 3.7, fat: 0.2 },
+      
+      // Sodas and carbonated drinks
+      'soda': { calories: 41, protein: 0, carbs: 10.6, fat: 0 },
+      'cola': { calories: 41, protein: 0, carbs: 10.6, fat: 0 },
+      'pepsi': { calories: 41, protein: 0, carbs: 10.6, fat: 0 },
+      'coca cola': { calories: 41, protein: 0, carbs: 10.6, fat: 0 },
+      'sprite': { calories: 38, protein: 0, carbs: 10, fat: 0 },
+      'ginger ale': { calories: 34, protein: 0, carbs: 8.8, fat: 0 },
+      'root beer': { calories: 41, protein: 0, carbs: 10.6, fat: 0 },
+      'diet soda': { calories: 0, protein: 0, carbs: 0, fat: 0 },
+      'diet coke': { calories: 0, protein: 0, carbs: 0, fat: 0 },
+      'diet pepsi': { calories: 0, protein: 0, carbs: 0, fat: 0 },
+      
+      // Energy and sports drinks
+      'energy drink': { calories: 45, protein: 0, carbs: 11, fat: 0 },
+      'red bull': { calories: 45, protein: 0, carbs: 11, fat: 0 },
+      'monster': { calories: 50, protein: 0, carbs: 13, fat: 0 },
+      'gatorade': { calories: 25, protein: 0, carbs: 6, fat: 0 },
+      'powerade': { calories: 25, protein: 0, carbs: 6, fat: 0 },
+      
+      // Milk and alternatives
+      'almond milk': { calories: 17, protein: 0.6, carbs: 1.5, fat: 1.1 },
+      'soy milk': { calories: 33, protein: 2.9, carbs: 1.8, fat: 1.8 },
+      'oat milk': { calories: 47, protein: 1.0, carbs: 7.0, fat: 1.5 },
+      'coconut milk': { calories: 230, protein: 2.3, carbs: 5.5, fat: 23.8 },
+      'rice milk': { calories: 47, protein: 0.3, carbs: 9.2, fat: 1.0 },
+      
+      // Other beverages
+      'kombucha': { calories: 30, protein: 0, carbs: 7, fat: 0 },
+      'smoothie': { calories: 66, protein: 1.8, carbs: 16, fat: 0.2 },
+      'milkshake': { calories: 112, protein: 3.2, carbs: 17.9, fat: 3.2 },
+      'hot chocolate': { calories: 77, protein: 3.2, carbs: 13.4, fat: 2.3 },
+      'iced coffee': { calories: 5, protein: 0.3, carbs: 1.0, fat: 0.0 },
     };
 
     if (liquidFallbacks[normalized]) {
