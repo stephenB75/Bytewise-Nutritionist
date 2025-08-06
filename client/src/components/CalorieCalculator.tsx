@@ -225,6 +225,19 @@ function CalorieCalculator({
       source: 'calculator'
     };
 
+    // Debug logging for nutrition conversion verification (remove in production)
+    console.log('🍎 Nutrition Conversion Debug:', {
+      ingredient: analysis.ingredient,
+      usdaNutritionPer100g: analysis.nutritionPer100g,
+      storedMacros: {
+        protein: mealData.protein,
+        carbs: mealData.carbs,
+        fat: mealData.fat
+      },
+      portionCalories: analysis.estimatedCalories,
+      conversionNote: 'Direct mapping from USDA → meal storage'
+    });
+
     // Store in localStorage for weekly logger to access  
     const weeklyMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
     weeklyMeals.push(mealData);
