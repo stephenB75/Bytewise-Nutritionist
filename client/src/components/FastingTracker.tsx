@@ -229,8 +229,8 @@ export function FastingTracker() {
   };
 
   return (
-    <div className="space-y-6" data-testid="fasting-tracker">
-      <div className="flex items-center gap-3">
+    <div className="space-y-8 pb-24" data-testid="fasting-tracker">
+      <div className="flex items-center gap-3 mb-8">
         <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
           <Clock className="w-5 h-5 text-white" />
         </div>
@@ -257,9 +257,9 @@ export function FastingTracker() {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="tracker" className="space-y-6">
+        <TabsContent value="tracker" className="space-y-8 mt-6">
           {/* Current Fasting Session */}
-          <Card data-testid="fasting-session-card">
+          <Card data-testid="fasting-session-card" className="mb-8">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
@@ -278,9 +278,9 @@ export function FastingTracker() {
                 </Badge>
               </div>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-8">
               {/* Timer Display */}
-              <div className="text-center space-y-4">
+              <div className="text-center space-y-6 py-4">
                 <div className="text-4xl font-mono font-bold text-primary">
                   {formatTime(timeRemaining)}
                 </div>
@@ -295,7 +295,7 @@ export function FastingTracker() {
               </div>
 
               {/* Control Buttons */}
-              <div className="flex flex-col sm:flex-row justify-center items-center gap-3 px-4">
+              <div className="flex flex-col sm:flex-row justify-center items-center gap-4 px-4 py-2">
                 {!isActive && !currentSession ? (
                   <Button 
                     onClick={startFasting}
@@ -333,8 +333,8 @@ export function FastingTracker() {
               </div>
 
               {/* Schedule Display */}
-              <div className="bg-muted rounded-lg p-4">
-                <h4 className="font-medium mb-2 flex items-center gap-2">
+              <div className="bg-muted rounded-lg p-6 mt-6">
+                <h4 className="font-medium mb-3 flex items-center gap-2">
                   <Sun className="w-4 h-4" />
                   Suggested Schedule
                 </h4>
@@ -345,15 +345,15 @@ export function FastingTracker() {
 
           {/* Fasting History */}
           {fastingHistory && Array.isArray(fastingHistory) && fastingHistory.length > 0 && (
-            <Card>
-              <CardHeader>
+            <Card className="mt-8">
+              <CardHeader className="pb-4">
                 <CardTitle className="flex items-center gap-2">
                   <TrendingUp className="w-5 h-5" />
                   Recent Sessions
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {fastingHistory.slice(0, 5).map((session: any, index: number) => (
                     <div 
                       key={index}
@@ -379,8 +379,8 @@ export function FastingTracker() {
           )}
         </TabsContent>
 
-        <TabsContent value="plans" className="space-y-4">
-          <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2">
+        <TabsContent value="plans" className="space-y-6 mt-6">
+          <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2">
             {FASTING_PLANS.map((plan) => (
               <Card 
                 key={plan.id}
@@ -429,9 +429,9 @@ export function FastingTracker() {
           </div>
         </TabsContent>
 
-        <TabsContent value="tips" className="space-y-4">
+        <TabsContent value="tips" className="space-y-6 mt-6">
           <Card>
-            <CardHeader>
+            <CardHeader className="pb-6">
               <CardTitle className="flex items-center gap-2">
                 <Coffee className="w-5 h-5" />
                 Fasting Tips & Guidelines
@@ -440,15 +440,15 @@ export function FastingTracker() {
                 Expert advice to make your fasting journey successful
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-5">
               {FASTING_TIPS.map((tip, index) => (
-                <div key={index} className="flex items-start gap-3 p-3 bg-muted rounded-lg">
+                <div key={index} className="flex items-start gap-3 p-4 bg-muted rounded-lg">
                   <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                  <p className="text-sm">{tip}</p>
+                  <p className="text-sm leading-relaxed">{tip}</p>
                 </div>
               ))}
               
-              <Alert>
+              <Alert className="mt-6">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
                   <strong>Important:</strong> Consult with a healthcare provider before starting any fasting regimen, 
