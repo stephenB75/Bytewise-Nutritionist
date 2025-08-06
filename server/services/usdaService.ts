@@ -1154,22 +1154,31 @@ export class USDAService {
   private getEnhancedFallbackEstimate(ingredientName: string, measurement: string) {
     const normalized = ingredientName.toLowerCase().trim();
 
-    // Water has zero calories (not in USDA database as pure water)
-    const waterTerms = ['water', 'drinking water', 'tap water', 'bottled water'];
-    if (waterTerms.includes(normalized)) {
-      const { quantity, unit, gramsEquivalent } = this.parseMeasurement(measurement, { description: 'water' });
+    // Handle common liquids that may not be in USDA database or fallback data
+    const liquidFallbacks = {
+      'water': { calories: 0, protein: 0, carbs: 0, fat: 0 },
+      'drinking water': { calories: 0, protein: 0, carbs: 0, fat: 0 },
+      'tap water': { calories: 0, protein: 0, carbs: 0, fat: 0 },
+      'bottled water': { calories: 0, protein: 0, carbs: 0, fat: 0 },
+      'tea': { calories: 1, protein: 0, carbs: 0.3, fat: 0 },
+      'black tea': { calories: 1, protein: 0, carbs: 0.3, fat: 0 },
+      'green tea': { calories: 1, protein: 0, carbs: 0.3, fat: 0 },
+      'coffee': { calories: 1, protein: 0.1, carbs: 0, fat: 0 },
+      'black coffee': { calories: 1, protein: 0.1, carbs: 0, fat: 0 },
+    };
+
+    if (liquidFallbacks[normalized]) {
+      const nutrition = liquidFallbacks[normalized];
+      const { quantity, unit, gramsEquivalent } = this.parseMeasurement(measurement, { description: normalized });
+      const estimatedCalories = Math.round((nutrition.calories * gramsEquivalent) / 100);
+      
       return {
-        ingredient: 'WATER',
+        ingredient: normalized.toUpperCase(),
         measurement: `${quantity} ${unit} (~${gramsEquivalent}g)`,
-        estimatedCalories: 0,
-        equivalentMeasurement: '100g ≈ 0 kcal',
-        note: 'Pure water contains no calories',
-        nutritionPer100g: {
-          calories: 0,
-          protein: 0,
-          carbs: 0,
-          fat: 0
-        }
+        estimatedCalories,
+        equivalentMeasurement: `100g ≈ ${nutrition.calories} kcal`,
+        note: estimatedCalories === 0 ? 'Contains no calories' : 'Low-calorie beverage',
+        nutritionPer100g: nutrition
       };
     }
 
