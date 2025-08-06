@@ -1299,6 +1299,43 @@ export class USDAService {
       'sausage egg sandwich': { calories: 342, protein: 17.4, carbs: 28.8, fat: 19.6 },
       'breakfast sandwich': { calories: 310, protein: 15.8, carbs: 28.4, fat: 16.2 },
       
+      // Bread varieties (per 100g)
+      'white bread': { calories: 265, protein: 9.0, carbs: 49.0, fat: 3.2 },
+      'whole wheat bread': { calories: 247, protein: 13.0, carbs: 41.0, fat: 4.2 },
+      'whole grain bread': { calories: 259, protein: 12.8, carbs: 43.3, fat: 4.1 },
+      'multigrain bread': { calories: 265, protein: 11.2, carbs: 45.1, fat: 4.8 },
+      'sourdough bread': { calories: 289, protein: 11.5, carbs: 56.8, fat: 2.1 },
+      'rye bread': { calories: 259, protein: 8.5, carbs: 48.3, fat: 3.7 },
+      'pumpernickel bread': { calories: 250, protein: 8.1, carbs: 47.7, fat: 3.1 },
+      'italian bread': { calories: 271, protein: 9.2, carbs: 50.6, fat: 3.8 },
+      'french bread': { calories: 289, protein: 9.8, carbs: 58.5, fat: 2.3 },
+      'ciabatta bread': { calories: 271, protein: 9.2, carbs: 50.6, fat: 3.8 },
+      'focaccia bread': { calories: 294, protein: 8.2, carbs: 51.1, fat: 6.9 },
+      'pita bread': { calories: 275, protein: 9.1, carbs: 55.7, fat: 1.2 },
+      'naan bread': { calories: 310, protein: 8.7, carbs: 45.9, fat: 9.9 },
+      'bagel': { calories: 257, protein: 10.1, carbs: 50.9, fat: 1.7 },
+      'english muffin': { calories: 227, protein: 8.0, carbs: 44.8, fat: 2.0 },
+      'croissant': { calories: 406, protein: 8.2, carbs: 45.8, fat: 21.0 },
+      'dinner roll': { calories: 296, protein: 8.9, carbs: 54.3, fat: 5.0 },
+      'hamburger bun': { calories: 294, protein: 8.7, carbs: 54.8, fat: 4.6 },
+      'hot dog bun': { calories: 300, protein: 9.2, carbs: 56.2, fat: 4.1 },
+      
+      // Specialty breads
+      'brioche': { calories: 329, protein: 9.7, carbs: 56.0, fat: 7.4 },
+      'challah': { calories: 320, protein: 9.5, carbs: 55.2, fat: 6.8 },
+      'cornbread': { calories: 307, protein: 7.0, carbs: 51.0, fat: 9.3 },
+      'banana bread': { calories: 326, protein: 4.3, carbs: 56.3, fat: 10.5 },
+      'zucchini bread': { calories: 271, protein: 4.2, carbs: 47.8, fat: 7.9 },
+      'garlic bread': { calories: 350, protein: 8.5, carbs: 48.2, fat: 14.2 },
+      'texas toast': { calories: 310, protein: 8.8, carbs: 49.5, fat: 8.9 },
+      
+      // International breads
+      'tortilla': { calories: 304, protein: 8.2, carbs: 48.9, fat: 8.1 },
+      'flour tortilla': { calories: 304, protein: 8.2, carbs: 48.9, fat: 8.1 },
+      'corn tortilla': { calories: 218, protein: 5.7, carbs: 44.9, fat: 2.9 },
+      'lavash': { calories: 275, protein: 9.1, carbs: 55.7, fat: 1.2 },
+      'flatbread': { calories: 275, protein: 9.1, carbs: 55.7, fat: 1.2 },
+      
       // Sodas and carbonated drinks
       'soda': { calories: 41, protein: 0, carbs: 10.6, fat: 0 },
       'cola': { calories: 41, protein: 0, carbs: 10.6, fat: 0 },
