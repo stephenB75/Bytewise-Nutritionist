@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { Card } from '@/components/ui/card';
 import { useCheckAchievements } from '@/hooks/useAchievements';
+import { apiRequest } from '@/lib/queryClient';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -243,13 +244,41 @@ function CalorieCalculator({
     weeklyMeals.push(mealData);
     localStorage.setItem('weeklyMeals', JSON.stringify(weeklyMeals));
     
+    // CRITICAL FIX: Also save meal to database for achievement system
+    try {
+      const response = await apiRequest('POST', '/api/meals/logged', {
+        name: mealData.name,
+        date: mealData.timestamp, // Use ISO timestamp for proper date handling
+        mealType: mealData.mealType,
+        totalCalories: mealData.calories,
+        totalProtein: mealData.protein,
+        totalCarbs: mealData.carbs,
+        totalFat: mealData.fat
+      });
+      
+      const result = await response.json();
+      console.log('🎯 Achievement Database Fix:', {
+        localStorageMeal: mealData.name,
+        databaseSaved: result.success,
+        achievementsChecked: result.newAchievements?.length || 0,
+        fixNote: 'Meal now saved to both localStorage AND database for achievement system'
+      });
+      
+      // If achievements were earned from the database call, no need to call again
+      if (result.newAchievements && result.newAchievements.length > 0) {
+        console.log('🏆 New Achievements Unlocked:', result.newAchievements);
+      }
+      
+    } catch (error) {
+      console.error('⚠️ Failed to save meal to database:', error);
+      // Still check achievements even if database save fails (fallback)
+      checkAchievements.mutate();
+    }
+    
     // Dispatch events for weekly logger refresh
     window.dispatchEvent(new CustomEvent('calories-logged', { detail: mealData }));
     window.dispatchEvent(new CustomEvent('meal-logged-success', { detail: mealData }));
     window.dispatchEvent(new CustomEvent('refresh-weekly-data'));
-    
-    // Check for new achievements after logging meal
-    checkAchievements.mutate();
     
     // Show success animation
     setLoggedData({
