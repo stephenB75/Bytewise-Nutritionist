@@ -39,7 +39,7 @@ export class USDABulkDownloader {
    * Download popular foods by category for comprehensive local database
    */
   async downloadPopularFoods(): Promise<BulkDownloadProgress> {
-    console.log('Starting USDA bulk food download...');
+    // Starting bulk food download process
     
     // Categories of most commonly tracked foods
     const foodCategories = [
@@ -75,7 +75,7 @@ export class USDABulkDownloader {
 
     for (const categoryData of foodCategories) {
       this.progress.currentCategory = categoryData.category;
-      console.log(`Downloading ${categoryData.category} foods...`);
+      // Processing category: ${categoryData.category}
 
       for (const searchTerm of categoryData.searches) {
         try {
@@ -103,7 +103,7 @@ export class USDABulkDownloader {
           await this.delay(100);
 
         } catch (error) {
-          console.error(`Failed to download foods for ${searchTerm}:`, error);
+          // Failed to download foods - error logged to progress
           this.progress.failedFoods++;
           this.progress.errors.push(`${searchTerm}: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
@@ -113,7 +113,7 @@ export class USDABulkDownloader {
     this.progress.isComplete = true;
     this.progress.currentCategory = 'Complete';
     
-    console.log(`USDA bulk download complete: ${this.progress.downloadedFoods} foods cached locally`);
+    // Bulk download completed successfully
     return this.progress;
   }
 
@@ -133,7 +133,7 @@ export class USDABulkDownloader {
         }
         await this.delay(100);
       } catch (error) {
-        console.error(`Failed to download ${searchTerm}:`, error);
+        // Failed to download - error logged to progress
         this.progress.errors.push(`${searchTerm}: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
     }

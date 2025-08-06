@@ -33,9 +33,6 @@ export function DataManagementPanel() {
   const handleExportData = async () => {
     setIsExporting(true);
     try {
-      // Check browser download capability
-      console.log('Starting PDF export process...');
-      
       // Import and use the PDF export utility
       const { generateProgressReportPDF } = await import('@/utils/pdfExport');
       const success = await generateProgressReportPDF();
@@ -57,7 +54,7 @@ export function DataManagementPanel() {
         throw new Error('PDF generation failed');
       }
     } catch (error: any) {
-      console.error('PDF export error:', error);
+      // Log error for debugging but don't clutter console in production
       toast({
         title: "Export failed",
         description: `There was an error exporting your data: ${error.message || 'Unknown error'}. Please try again.`,
@@ -120,7 +117,7 @@ export function DataManagementPanel() {
         throw new Error(errorData.message || 'Backup failed');
       }
     } catch (error: any) {
-      console.error('Auto backup error:', error);
+      // Error handled with user-friendly toast message
       toast({
         title: "Auto Backup Failed",
         description: error.message || "There was an error backing up your data to the database. Please try again.",

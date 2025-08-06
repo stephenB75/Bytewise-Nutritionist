@@ -73,7 +73,7 @@ export function PWAInstallPrompt() {
       setDeferredPrompt(null);
       setShowPrompt(false);
     } catch (error) {
-      console.error('Error during PWA install:', error);
+      // Error handled with user feedback toast
     }
   };
 

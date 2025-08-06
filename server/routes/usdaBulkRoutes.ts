@@ -32,7 +32,7 @@ router.post('/bulk-download', async (req, res) => {
     const downloader = getBulkDownloader();
     
     // Start the download process (this may take several minutes)
-    console.log('Starting USDA bulk download...');
+    // Starting USDA bulk download process
     const progress = await downloader.downloadPopularFoods();
     
     res.json({
@@ -43,7 +43,7 @@ router.post('/bulk-download', async (req, res) => {
       errors: progress.errors
     });
   } catch (error) {
-    console.error('Bulk download failed:', error);
+    // Bulk download failed - error handled in response
     res.status(500).json({
       success: false,
       message: 'Failed to start bulk download',

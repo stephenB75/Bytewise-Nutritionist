@@ -147,7 +147,7 @@ export class USDAService {
   /**
    * Pre-warm cache with popular foods for optimal performance
    */
-  private async preWarmCache(): void {
+  private async preWarmCache(): Promise<void> {
     const popularFoods = [
       'chicken', 'rice', 'eggs', 'bread', 'milk', 'cheese', 'yogurt', 'apple',
       'banana', 'salmon', 'beef', 'pasta', 'pizza', 'salad', 'potato'
@@ -966,7 +966,7 @@ export class USDAService {
       
       return results;
     } catch (error) {
-      console.warn(`Optimized cache search failed for "${query}":`, error);
+      // Cache search failed, using fallback method
       return [];
     }
   }
@@ -1012,7 +1012,7 @@ export class USDAService {
           });
       }
     } catch (error) {
-      console.warn('Batch cache insert failed:', error);
+      // Batch cache insert failed, continuing without caching
     }
   }
 
