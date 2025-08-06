@@ -7,7 +7,7 @@
 
 import { db } from '../db';
 import { usdaFoodCache } from '@shared/schema';
-import { eq, like, desc, asc, sql } from 'drizzle-orm';
+import { eq, like, desc, asc, sql, or } from 'drizzle-orm';
 import { getPortionWeight, parseMeasurement } from '../data/portionData.js';
 import { getCalorieFactors, calculateCaloriesFromMacros } from '../data/calorieFactors.js';
 import { getRetentionFactors, applyRetentionFactors, detectCookingMethod } from '../data/retentionFactors.js';
@@ -83,9 +83,9 @@ export class USDAService {
   async searchFoods(query: string, pageSize = 25): Promise<USDAFood[]> {
     try {
       // First check local cache
-      const cachedResults = await this.searchCachedFoods(query, pageSize);
+      const cachedResults = await this.searchCachedFoodsInternal(query, pageSize);
       if (cachedResults.length > 0) {
-        return cachedResults.map(food => ({
+        return cachedResults.map((food: any) => ({
           fdcId: food.fdcId,
           description: food.description,
           dataType: food.dataType,
@@ -123,8 +123,8 @@ export class USDAService {
     } catch (error) {
       
       // Fallback to cached results only
-      const cachedResults = await this.searchCachedFoods(query, pageSize);
-      return cachedResults.map(food => ({
+      const cachedResults = await this.searchCachedFoodsInternal(query, pageSize);
+      return cachedResults.map((food: any) => ({
         fdcId: food.fdcId,
         description: food.description,
         dataType: food.dataType,
@@ -152,7 +152,7 @@ export class USDAService {
           fdcId: cachedFood.fdcId,
           description: cachedFood.description,
           dataType: cachedFood.dataType || 'Foundation',
-          foodNutrients: JSON.parse(cachedFood.nutrients || '[]') as USDAFoodNutrient[],
+          foodNutrients: JSON.parse((cachedFood.nutrients as string) || '[]') as USDAFoodNutrient[],
           foodCategory: cachedFood.foodCategory || undefined
         };
       }
@@ -469,6 +469,40 @@ export class USDAService {
   }
 
 
+
+  /**
+   * Search cached foods locally with improved basic ingredient prioritization
+   */
+  private async searchCachedFoodsInternal(query: string, limit: number) {
+    try {
+      const searchTerm = `%${query.toLowerCase()}%`;
+      const results = await db
+        .select()
+        .from(usdaFoodCache)
+        .where(
+          or(
+            like(sql`LOWER(${usdaFoodCache.description})`, searchTerm),
+            like(sql`LOWER(${usdaFoodCache.brandName})`, searchTerm || '')
+          )
+        )
+        .orderBy(
+          // Prioritize exact matches and Foundation foods first
+          sql`CASE 
+            WHEN LOWER(${usdaFoodCache.description}) = LOWER(${query}) THEN 0
+            WHEN ${usdaFoodCache.dataType} = 'Foundation' THEN 1
+            WHEN ${usdaFoodCache.dataType} = 'SR Legacy' THEN 2
+            ELSE 3
+          END`,
+          usdaFoodCache.description
+        )
+        .limit(limit);
+      
+      return results;
+    } catch (error) {
+      console.warn(`Cache search failed for "${query}":`, error);
+      return [];
+    }
+  }
 
   /**
    * Cache USDA search results
