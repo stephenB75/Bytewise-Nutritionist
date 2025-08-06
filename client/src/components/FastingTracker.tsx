@@ -241,17 +241,18 @@ export function FastingTracker() {
       </div>
 
       <Tabs defaultValue="tracker" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="tracker" data-testid="tab-tracker">
-            <Target className="w-4 h-4 mr-2" />
-            Tracker
+        <TabsList className="grid w-full grid-cols-3 h-12">
+          <TabsTrigger value="tracker" data-testid="tab-tracker" className="flex items-center justify-center gap-1 text-xs sm:text-sm">
+            <Target className="w-3 h-3 sm:w-4 sm:h-4" />
+            <span className="hidden xs:inline">Tracker</span>
+            <span className="xs:hidden">Track</span>
           </TabsTrigger>
-          <TabsTrigger value="plans" data-testid="tab-plans">
-            <Clock className="w-4 h-4 mr-2" />
+          <TabsTrigger value="plans" data-testid="tab-plans" className="flex items-center justify-center gap-1 text-xs sm:text-sm">
+            <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
             Plans
           </TabsTrigger>
-          <TabsTrigger value="tips" data-testid="tab-tips">
-            <Coffee className="w-4 h-4 mr-2" />
+          <TabsTrigger value="tips" data-testid="tab-tips" className="flex items-center justify-center gap-1 text-xs sm:text-sm">
+            <Coffee className="w-3 h-3 sm:w-4 sm:h-4" />
             Tips
           </TabsTrigger>
         </TabsList>
@@ -294,12 +295,12 @@ export function FastingTracker() {
               </div>
 
               {/* Control Buttons */}
-              <div className="flex justify-center gap-3">
+              <div className="flex flex-col sm:flex-row justify-center items-center gap-3 px-4">
                 {!isActive && !currentSession ? (
                   <Button 
                     onClick={startFasting}
                     size="lg"
-                    className="gap-2"
+                    className="gap-2 w-full sm:w-auto min-w-[140px]"
                     data-testid="button-start-fasting"
                   >
                     <Play className="w-4 h-4" />
@@ -311,7 +312,7 @@ export function FastingTracker() {
                       onClick={pauseFasting}
                       variant="outline"
                       size="lg"
-                      className="gap-2"
+                      className="gap-2 w-full sm:w-auto min-w-[120px]"
                       data-testid="button-pause-fasting"
                     >
                       {isActive ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
@@ -321,7 +322,7 @@ export function FastingTracker() {
                       onClick={stopFasting}
                       variant="destructive"
                       size="lg"
-                      className="gap-2"
+                      className="gap-2 w-full sm:w-auto min-w-[120px]"
                       data-testid="button-stop-fasting"
                     >
                       <RotateCcw className="w-4 h-4" />
@@ -379,7 +380,7 @@ export function FastingTracker() {
         </TabsContent>
 
         <TabsContent value="plans" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2">
             {FASTING_PLANS.map((plan) => (
               <Card 
                 key={plan.id}
