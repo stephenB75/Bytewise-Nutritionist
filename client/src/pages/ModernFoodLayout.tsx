@@ -299,6 +299,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         // Calculate weekly calories from all stored meals
         const weeklyTotal = stored.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
         setWeeklyCalories(weeklyTotal);
+        
+        // Debug logging for weekly validation cross-check
+        console.log('📈 Dashboard Weekly Data Debug:', {
+          totalMealsInStorage: stored.length,
+          weeklyTotalAllMeals: weeklyTotal,
+          todayMealsCount: todayMeals.length,
+          todayCalories: dailyTotal,
+          dashboardNote: 'Dashboard weekly total calculated from all stored meals'
+        });
       } catch (error) {
         // Reset to safe state on error
         setLoggedMeals([]);
