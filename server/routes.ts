@@ -369,6 +369,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // User goals update endpoint
+  app.put('/api/user/goals', isAuthenticated, async (req: any, res: Response) => {
+    const userId = req.user?.id;
+    if (!userId) {
+      res.status(401).json({ message: "User not found" });
+      return;
+    }
+    
+    try {
+      const goals = req.body;
+      
+      // Update user goals
+      const updatedUser = await storage.updateUserGoals(userId, goals);
+      
+      res.json({ 
+        success: true, 
+        user: updatedUser,
+        updatedGoals: goals,
+        message: "Goals updated successfully"
+      });
+    } catch (error: any) {
+      console.error('Goals update error:', error);
+      res.status(500).json({ 
+        message: error?.message || "Failed to update goals" 
+      });
+    }
+  });
+
   // User data deletion endpoint
   app.delete('/api/user/delete-data', isAuthenticated, async (req: any, res: Response) => {
     const userId = req.user?.id;

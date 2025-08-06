@@ -82,7 +82,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const [confettiAchievement, setConfettiAchievement] = useState<Achievement | null>(null);
   const [dailyCalories, setDailyCalories] = useState(0);
   const [weeklyCalories, setWeeklyCalories] = useState(0);
-  const [goalCalories, setGoalCalories] = useState((user as any)?.calorie_goal || 2000);
+  const [goalCalories, setGoalCalories] = useState((user as any)?.dailyCalorieGoal || 2000);
   const [weeklyGoal, setWeeklyGoal] = useState(14000);
   const [loggedMeals, setLoggedMeals] = useState<any[]>([]);
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
@@ -230,9 +230,21 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   // Update calorie goals when user data changes
   useEffect(() => {
     if (user) {
-      const userCalorieGoal = (user as any)?.calorie_goal || 2000;
+      // Fix: Use dailyCalorieGoal from database, not calorie_goal from Supabase metadata
+      const userCalorieGoal = (user as any)?.dailyCalorieGoal || (user as any)?.calorie_goal || 2000;
       setGoalCalories(userCalorieGoal);
       setWeeklyGoal(userCalorieGoal * 7);
+      
+      // Debug logging for calorie goal updates
+      console.log('🎯 Calorie Goal Update Debug:', {
+        userObject: user,
+        dailyCalorieGoalFromDB: (user as any)?.dailyCalorieGoal,
+        calorieGoalFromSupabase: (user as any)?.calorie_goal,
+        extractedCalorieGoal: userCalorieGoal,
+        updatedDailyGoal: userCalorieGoal,
+        updatedWeeklyGoal: userCalorieGoal * 7,
+        goalUpdateNote: 'Dashboard goals updated from user profile - FIXED to use dailyCalorieGoal'
+      });
     }
   }, [user]);
 

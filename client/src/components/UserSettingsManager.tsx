@@ -82,7 +82,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
         weight: personalInfo?.weight || '',
         activityLevel: personalInfo?.activityLevel || 'Moderately Active',
         dietaryPreferences: personalInfo?.dietary_preferences || [],
-        calorieGoal: userData?.dailyCalorieGoal || 2000,
+        calorieGoal: userData?.dailyCalorieGoal || userData?.calorie_goal || 2000,
         joinDate: userData?.createdAt || new Date().toISOString(),
       });
     }
@@ -95,22 +95,49 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
       // Ensure firstName and lastName are properly split from name if needed
       const [firstName = '', lastName = ''] = userInfo.name.split(' ');
       
-      const { error } = await supabase.auth.updateUser({
-        data: {
+      // Update user profile via backend API (database) instead of Supabase metadata
+      const response = await fetch('/api/user/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+        },
+        body: JSON.stringify({
           firstName: userInfo.firstName || firstName.trim(),
           lastName: userInfo.lastName || lastName.trim(),
-          phone: userInfo.phone,
-          location: userInfo.location,
-          birth_date: userInfo.birthDate,
-          height: userInfo.height,
-          weight: userInfo.weight,
-          activity_level: userInfo.activityLevel,
-          dietary_preferences: userInfo.dietaryPreferences,
-          calorie_goal: userInfo.calorieGoal,
-        }
+          personalInfo: {
+            phone: userInfo.phone,
+            location: userInfo.location,
+            birth_date: userInfo.birthDate,
+            height: userInfo.height,
+            weight: userInfo.weight,
+            activity_level: userInfo.activityLevel,
+            dietary_preferences: userInfo.dietaryPreferences,
+          }
+        })
       });
 
-      if (error) throw error;
+      if (!response.ok) {
+        throw new Error('Failed to update profile');
+      }
+
+      // Update calorie goal separately via goals endpoint
+      const goalsResponse = await fetch('/api/user/goals', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+        },
+        body: JSON.stringify({
+          dailyCalorieGoal: userInfo.calorieGoal,
+        })
+      });
+
+      if (!goalsResponse.ok) {
+        throw new Error('Failed to update calorie goal');
+      }
+
+      // Both updates successful
 
       toast({
         title: "Profile Updated",
@@ -122,6 +149,18 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
       
       // Refetch user data to show updated information
       await refetch();
+      
+      // Debug logging for profile update verification
+      console.log('👤 Profile Update Debug:', {
+        updatedCalorieGoal: userInfo.calorieGoal,
+        refetchTriggered: true,
+        profileUpdateNote: 'User profile saved, refetch triggered for dashboard sync'
+      });
+      
+      // Dispatch custom event to notify dashboard of profile changes
+      window.dispatchEvent(new CustomEvent('user-profile-updated', { 
+        detail: { calorieGoal: userInfo.calorieGoal } 
+      }));
     } catch (error) {
       toast({
         title: "Update Failed", 
