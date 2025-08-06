@@ -1447,6 +1447,38 @@ export class USDAService {
       'milkshake': { calories: 112, protein: 3.2, carbs: 17.9, fat: 3.2 },
       'hot chocolate': { calories: 77, protein: 3.2, carbs: 13.4, fat: 2.3 },
       'iced coffee': { calories: 5, protein: 0.3, carbs: 1.0, fat: 0.0 },
+      
+      // Salad varieties (per 100g)
+      'salad': { calories: 15, protein: 1.4, carbs: 2.9, fat: 0.2 },
+      'garden salad': { calories: 15, protein: 1.4, carbs: 2.9, fat: 0.2 },
+      'mixed greens': { calories: 15, protein: 1.4, carbs: 2.9, fat: 0.2 },
+      'caesar salad': { calories: 158, protein: 7.2, carbs: 8.4, fat: 12.6 },
+      'greek salad': { calories: 107, protein: 3.8, carbs: 7.2, fat: 7.8 },
+      'cobb salad': { calories: 235, protein: 18.5, carbs: 6.8, fat: 15.2 },
+      'chef salad': { calories: 143, protein: 12.4, carbs: 5.2, fat: 8.6 },
+      'spinach salad': { calories: 23, protein: 2.9, carbs: 3.6, fat: 0.4 },
+      'kale salad': { calories: 35, protein: 2.9, carbs: 6.7, fat: 0.9 },
+      'arugula salad': { calories: 25, protein: 2.6, carbs: 3.7, fat: 0.7 },
+      'lettuce salad': { calories: 15, protein: 1.4, carbs: 2.9, fat: 0.2 },
+      'iceberg salad': { calories: 14, protein: 0.9, carbs: 3.0, fat: 0.1 },
+      'romaine salad': { calories: 17, protein: 1.2, carbs: 3.3, fat: 0.3 },
+      'mixed salad': { calories: 15, protein: 1.4, carbs: 2.9, fat: 0.2 },
+      'house salad': { calories: 15, protein: 1.4, carbs: 2.9, fat: 0.2 },
+      'side salad': { calories: 15, protein: 1.4, carbs: 2.9, fat: 0.2 },
+      
+      // Specialty salads
+      'waldorf salad': { calories: 145, protein: 2.8, carbs: 14.2, fat: 9.6 },
+      'potato salad': { calories: 143, protein: 2.6, carbs: 17.8, fat: 7.2 },
+      'pasta salad': { calories: 192, protein: 4.8, carbs: 32.4, fat: 5.2 },
+      'chicken salad': { calories: 201, protein: 15.8, carbs: 3.2, fat: 14.6 },
+      'tuna salad': { calories: 158, protein: 13.4, carbs: 2.8, fat: 10.2 },
+      'egg salad': { calories: 183, protein: 10.5, carbs: 1.8, fat: 14.8 },
+      'coleslaw': { calories: 147, protein: 1.2, carbs: 12.2, fat: 10.8 },
+      'fruit salad': { calories: 50, protein: 0.6, carbs: 12.8, fat: 0.2 },
+      'quinoa salad': { calories: 172, protein: 6.8, carbs: 28.4, fat: 3.8 },
+      'bean salad': { calories: 89, protein: 4.2, carbs: 16.8, fat: 1.2 },
+      'caprese salad': { calories: 166, protein: 9.8, carbs: 5.2, fat: 12.4 },
+      'nicoise salad': { calories: 145, protein: 8.6, carbs: 7.4, fat: 9.8 },
     };
 
     const liquidFallback = liquidFallbacks[normalized as keyof typeof liquidFallbacks];
