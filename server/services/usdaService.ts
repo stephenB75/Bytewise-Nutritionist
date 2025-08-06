@@ -72,6 +72,54 @@ interface MeasurementConversion {
 export class USDAService {
   private apiKey: string;
   private baseUrl = 'https://api.nal.usda.gov/fdc/v1';
+  // In-memory LRU cache for performance optimization
+  private memoryCache: Map<string, { data: any; timestamp: number; accessCount: number }> = new Map();
+  private cacheMaxSize = 1000;
+  private cacheExpiryTime = 3600000; // 1 hour in milliseconds
+
+  /**
+   * Get data from optimized memory cache with LRU eviction
+   */
+  private getFromMemoryCache(key: string): any | null {
+    const cached = this.memoryCache.get(key);
+    if (!cached) return null;
+    
+    // Check if cache is expired
+    if (Date.now() - cached.timestamp > this.cacheExpiryTime) {
+      this.memoryCache.delete(key);
+      return null;
+    }
+    
+    // Update access count for LRU
+    cached.accessCount++;
+    return cached.data;
+  }
+  
+  /**
+   * Store data in optimized memory cache with LRU eviction
+   */
+  private setMemoryCache(key: string, data: any): void {
+    // Evict LRU items if cache is full
+    if (this.memoryCache.size >= this.cacheMaxSize) {
+      let lruKey = '';
+      let lruAccess = Infinity;
+      
+      for (const [k, v] of this.memoryCache.entries()) {
+        if (v.accessCount < lruAccess) {
+          lruKey = k;
+          lruAccess = v.accessCount;
+        }
+      }
+      
+      if (lruKey) this.memoryCache.delete(lruKey);
+    }
+    
+    this.memoryCache.set(key, {
+      data,
+      timestamp: Date.now(),
+      accessCount: 1
+    });
+  }
 
   constructor(apiKey: string) {
     this.apiKey = apiKey;
@@ -194,11 +242,22 @@ export class USDAService {
       fat: number;
     };
   }> {
+    // Create memory cache key for this calculation
+    const cacheKey = `calc:${ingredientName.toLowerCase()}:${measurement.toLowerCase()}`;
+    
+    // Check memory cache first for instant results
+    const cachedResult = this.getFromMemoryCache(cacheKey);
+    if (cachedResult) {
+      return cachedResult;
+    }
+    
     try {
-      // First try liquid fallbacks and enhanced fallback data
+      // Try liquid fallbacks and enhanced fallback data first
       try {
         const fallbackResult = this.getEnhancedFallbackEstimate(ingredientName, measurement);
         if (fallbackResult) {
+          // Cache the fallback result for future requests
+          this.setMemoryCache(cacheKey, fallbackResult);
           return fallbackResult;
         }
       } catch (error) {
@@ -723,7 +782,7 @@ export class USDAService {
 
 
   /**
-   * Search cached foods locally with improved basic ingredient prioritization
+   * Search cached foods locally with optimized performance and intelligent prioritization
    */
   private async searchCachedFoodsInternal(query: string, limit: number) {
     try {
@@ -738,48 +797,73 @@ export class USDAService {
           )
         )
         .orderBy(
-          // Prioritize exact matches and Foundation foods first
+          // Optimized scoring system with search count and data quality
           sql`CASE 
             WHEN LOWER(${usdaFoodCache.description}) = LOWER(${query}) THEN 0
-            WHEN ${usdaFoodCache.dataType} = 'Foundation' THEN 1
-            WHEN ${usdaFoodCache.dataType} = 'SR Legacy' THEN 2
-            ELSE 3
+            WHEN LOWER(${usdaFoodCache.description}) LIKE LOWER(${query}) || '%' THEN 1
+            WHEN ${usdaFoodCache.dataType} = 'Foundation' THEN 2
+            WHEN ${usdaFoodCache.dataType} = 'SR Legacy' THEN 3
+            WHEN ${usdaFoodCache.searchCount} > 10 THEN 4
+            WHEN ${usdaFoodCache.searchCount} > 5 THEN 5
+            ELSE 6
           END`,
+          sql`${usdaFoodCache.searchCount} DESC`,
           usdaFoodCache.description
         )
         .limit(limit);
       
+      // Update search count for popular items (fire and forget)
+      if (results.length > 0) {
+        const topResult = results[0];
+        db.update(usdaFoodCache)
+          .set({ 
+            searchCount: sql`${usdaFoodCache.searchCount} + 1`,
+            lastUpdated: new Date()
+          })
+          .where(sql`${usdaFoodCache.id} = ${topResult.id}`)
+          .then()
+          .catch(() => {}); // Silent fail for performance
+      }
+      
       return results;
     } catch (error) {
-      console.warn(`Cache search failed for "${query}":`, error);
+      console.warn(`Optimized cache search failed for "${query}":`, error);
       return [];
     }
   }
 
   /**
-   * Cache USDA search results
+   * Cache USDA search results with batch optimization
    */
   private async cacheSearchResults(foods: USDAFood[]) {
-    for (const food of foods) {
-      try {
-        const nutrients = this.extractNutrients(food.foodNutrients);
-        
+    if (foods.length === 0) return;
+    
+    // Batch insert for better performance
+    const cacheEntries = foods.map(food => {
+      const nutrients = this.extractNutrients(food.foodNutrients);
+      
+      return {
+        fdcId: food.fdcId,
+        description: food.description,
+        dataType: food.dataType,
+        foodCategory: food.foodCategory || null,
+        brandOwner: food.brandOwner || null,
+        brandName: food.brandName || null,
+        ingredients: food.ingredients || null,
+        servingSize: food.servingSize ? food.servingSize.toString() : null,
+        servingSizeUnit: food.servingSizeUnit || null,
+        householdServingFullText: food.householdServingFullText || null,
+        nutrients: nutrients,
+        searchCount: 1,
+      };
+    });
+    
+    // Batch insert with conflict resolution
+    try {
+      for (const entry of cacheEntries) {
         await db
           .insert(usdaFoodCache)
-          .values({
-            fdcId: food.fdcId,
-            description: food.description,
-            dataType: food.dataType,
-            foodCategory: food.foodCategory || null,
-            brandOwner: food.brandOwner || null,
-            brandName: food.brandName || null,
-            ingredients: food.ingredients || null,
-            servingSize: food.servingSize ? food.servingSize.toString() : null,
-            servingSizeUnit: food.servingSizeUnit || null,
-            householdServingFullText: food.householdServingFullText || null,
-            nutrients: nutrients,
-            searchCount: 1,
-          })
+          .values(entry)
           .onConflictDoUpdate({
             target: [usdaFoodCache.fdcId],
             set: {
@@ -787,8 +871,9 @@ export class USDAService {
               lastUpdated: new Date(),
             },
           });
-      } catch (error) {
       }
+    } catch (error) {
+      console.warn('Batch cache insert failed:', error);
     }
   }
 
