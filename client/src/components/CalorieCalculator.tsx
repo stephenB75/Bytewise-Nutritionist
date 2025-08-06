@@ -264,9 +264,24 @@ function CalorieCalculator({
         fixNote: 'Meal now saved to both localStorage AND database for achievement system'
       });
       
-      // If achievements were earned from the database call, no need to call again
+      // If achievements were earned from the database call, trigger UI notifications
       if (result.newAchievements && result.newAchievements.length > 0) {
         console.log('🏆 New Achievements Unlocked:', result.newAchievements);
+        
+        // Dispatch achievement notifications for each new achievement
+        result.newAchievements.forEach((achievement: any) => {
+          // Dispatch event that ModernFoodLayout is listening for
+          window.dispatchEvent(new CustomEvent('achievement-unlocked', {
+            detail: {
+              type: 'milestone',
+              title: achievement.title,
+              message: achievement.description || achievement.title,
+              description: achievement.description || achievement.title,
+              points: 10,
+              icon: achievement.iconName || 'trophy'
+            }
+          }));
+        });
       }
       
     } catch (error) {
