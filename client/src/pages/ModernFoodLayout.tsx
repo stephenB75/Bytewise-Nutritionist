@@ -258,6 +258,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         }), { protein: 0, carbs: 0, fat: 0 });
         setDailyMacros(dailyMacroTotals);
         
+        // Debug logging for macro verification (remove in production)
+        if (todayMeals.length > 0) {
+          console.log('📊 Macro Cards Debug:', {
+            todayMealsCount: todayMeals.length,
+            sampleMeal: todayMeals[0],
+            calculatedMacros: dailyMacroTotals
+          });
+        }
+        
         // Calculate estimated micronutrients from today's meals
         const estimatedMicronutrients = calculateEstimatedMicronutrients(todayMeals);
         setDailyMicronutrients(estimatedMicronutrients);
