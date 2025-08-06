@@ -4,6 +4,87 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Mobile Safe Area Support for iOS and Android Status Bars */
+@supports (padding: max(0px)) {
+  .top-safe {
+    top: max(1rem, env(safe-area-inset-top)) !important;
+  }
+  
+  .pt-safe {
+    padding-top: max(1rem, env(safe-area-inset-top)) !important;
+  }
+  
+  .pb-safe {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom)) !important;
+  }
+  
+  .pr-safe {
+    padding-right: max(1rem, env(safe-area-inset-right)) !important;
+  }
+  
+  .pl-safe {
+    padding-left: max(1rem, env(safe-area-inset-left)) !important;
+  }
+}
+
+/* Fallback for browsers without safe area support */
+@media screen and (max-width: 768px) {
+  .top-safe {
+    top: 3rem !important; /* ~48px for mobile status bars */
+  }
+  
+  .pt-safe {
+    padding-top: 3rem !important;
+  }
+}
+
+/* Notification positioning with enhanced mobile safe area support */
+.safe-notification-position {
+  /* For iOS devices with notch/Dynamic Island */
+  @supports (padding: max(0px)) {
+    padding-top: max(0.75rem, env(safe-area-inset-top)) !important;
+  }
+}
+
+/* Enhanced mobile notification positioning */
+@media screen and (max-width: 768px) {
+  .safe-notification-position {
+    padding-top: 0.75rem !important; /* 12px base padding */
+  }
+  
+  /* iPhone 14 Pro and newer with Dynamic Island */
+  @media screen and (min-height: 852px) {
+    .safe-notification-position {
+      padding-top: 1.25rem !important; /* 20px for Dynamic Island */
+    }
+  }
+  
+  /* iPhone with notch */
+  @media screen and (min-height: 812px) and (max-height: 851px) {
+    .safe-notification-position {
+      padding-top: 1rem !important; /* 16px for notch */
+    }
+  }
+}
+
+/* Android specific adjustments */
+@media screen and (max-width: 768px) and (-webkit-min-device-pixel-ratio: 2) {
+  .safe-notification-position {
+    padding-top: 1rem !important; /* 16px for Android status bar */
+  }
+}
+
+/* Desktop/tablet fallback */
+@media screen and (min-width: 769px) {
+  .safe-notification-position {
+    padding-top: 0 !important; /* No extra padding needed on desktop */
+  }
+  
+  .top-safe {
+    top: 1rem !important; /* Standard desktop spacing */
+  }
+}
+
 /* Critical: Override any conflicting styles */
 * {
   box-sizing: border-box;

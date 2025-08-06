@@ -1508,8 +1508,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   return (
     <div className="h-screen w-screen bg-black">
-      {/* Fixed Notification Header on all pages - Enhanced visibility */}
-      <div className="fixed top-4 right-4 z-50">
+      {/* Fixed Notification Header on all pages - Safe area positioning for iOS/Android */}
+      <div className="fixed top-safe right-4 z-50 safe-notification-position">
         <div className="relative">
           <Button
             variant="ghost"
