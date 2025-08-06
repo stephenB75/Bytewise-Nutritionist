@@ -1157,7 +1157,7 @@ export class USDAService {
     // Water has zero calories (not in USDA database as pure water)
     const waterTerms = ['water', 'drinking water', 'tap water', 'bottled water'];
     if (waterTerms.includes(normalized)) {
-      const { quantity, unit, gramsEquivalent } = this.parseMeasurement(measurement, null);
+      const { quantity, unit, gramsEquivalent } = this.parseMeasurement(measurement, { description: 'water' });
       return {
         ingredient: 'WATER',
         measurement: `${quantity} ${unit} (~${gramsEquivalent}g)`,
@@ -1176,7 +1176,7 @@ export class USDAService {
     // Use enhanced fallback data if available
     if (USDAService.FALLBACK_NUTRITION[normalized]) {
       const nutrition = USDAService.FALLBACK_NUTRITION[normalized];
-      const { quantity, unit, gramsEquivalent } = this.parseMeasurement(measurement, null);
+      const { quantity, unit, gramsEquivalent } = this.parseMeasurement(measurement, { description: normalized });
       const estimatedCalories = Math.round((nutrition.calories * gramsEquivalent) / 100);
 
       return {
