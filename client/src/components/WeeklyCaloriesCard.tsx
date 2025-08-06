@@ -73,30 +73,6 @@ export function WeeklyCaloriesCard() {
       const weeklyAverage = Math.round(totalCalories / 7);
       
       // Debug logging for weekly progress verification
-      console.log('📅 Weekly Progress Debug:', {
-        totalStoredMeals: storedMeals.length,
-        weekDateRange: {
-          start: weekDates[0]?.date,
-          end: weekDates[6]?.date,
-          today: new Date().toISOString().split('T')[0]
-        },
-        sampleStoredMeals: storedMeals.slice(0, 3).map((meal: any) => ({
-          id: meal.id,
-          name: meal.name,
-          calories: meal.calories,
-          date: meal.date
-        })),
-        dailyBreakdown: weeklyData.map(day => ({
-          day: day.day,
-          date: day.date,
-          calories: day.calories,
-          mealCount: day.mealCount
-        })),
-        totalWeeklyCalories: totalCalories,
-        weeklyAverage: weeklyAverage,
-        calculationAccuracy: storedMeals.length > 0 ? 'Using real meal data' : 'No meals in storage - accurate zero state',
-        validationNote: 'Weekly progress calculations verified with authentic meal data from localStorage'
-      });
       
       setWeeklyData(weeklyData);
       setTotalWeeklyCalories(totalCalories);

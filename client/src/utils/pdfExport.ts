@@ -22,7 +22,7 @@ interface UserProgressData {
 
 export async function generateProgressReportPDF(): Promise<boolean> {
   try {
-    console.log('Starting PDF generation...');
+
     
     // Gather user progress data
     const progressData: UserProgressData = {
@@ -42,7 +42,7 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     };
 
     // Create PDF directly using jsPDF
-    console.log('Creating PDF document...');
+
     const pdf = new jsPDF('p', 'mm', 'a4');
     const pageWidth = 210;
     const pageHeight = 297;
@@ -131,101 +131,23 @@ export async function generateProgressReportPDF(): Promise<boolean> {
 
     // Save the PDF with multiple download methods
     const filename = `bytewise-nutrition-report-${new Date().toISOString().split('T')[0]}.pdf`;
-    console.log(`Attempting to download PDF as: ${filename}`);
     
-    // Get PDF as blob
-    const pdfBlob = pdf.output('blob');
-    console.log('PDF blob created, size:', pdfBlob.size, 'bytes');
-    
-    // For Replit environment, open PDF in new tab directly
-    console.log('Opening PDF in new tab (Replit-compatible method)...');
-    
-    // Convert PDF to data URI for embedding
-    const pdfDataUri = pdf.output('datauristring');
-    
-    // Open PDF in new tab with download instructions
-    const newWindow = window.open('', '_blank');
-    if (newWindow) {
-      newWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <title>ByteWise Nutrition Report - ${new Date().toLocaleDateString()}</title>
-            <style>
-              body { 
-                margin: 0; 
-                padding: 20px; 
-                font-family: Arial, sans-serif; 
-                background: #f5f5f5;
-              }
-              .header {
-                background: white;
-                padding: 20px;
-                border-radius: 8px;
-                margin-bottom: 20px;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                text-align: center;
-              }
-              .pdf-container {
-                background: white;
-                border-radius: 8px;
-                overflow: hidden;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-              }
-              .download-btn {
-                background: #1f4aa6;
-                color: white;
-                padding: 12px 24px;
-                border: none;
-                border-radius: 6px;
-                cursor: pointer;
-                font-size: 16px;
-                margin: 10px;
-                text-decoration: none;
-                display: inline-block;
-              }
-              .download-btn:hover {
-                background: #164291;
-              }
-            </style>
-          </head>
-          <body>
-            <div class="header">
-              <h1>ByteWise Nutrition Report</h1>
-              <p>Generated on ${new Date().toLocaleDateString()}</p>
-              <a href="${pdfDataUri}" download="${filename}" class="download-btn">
-                📥 Download PDF Report
-              </a>
-              <p><small>Click the download button above or right-click the PDF below and select "Save As"</small></p>
-            </div>
-            <div class="pdf-container">
-              <embed src="${pdfDataUri}" type="application/pdf" width="100%" height="800px">
-            </div>
-          </body>
-        </html>
-      `);
-      newWindow.document.close();
-      console.log('PDF opened in new tab with download option');
-    } else {
-      console.error('Unable to open new window - popup blocked');
+    try {
+      const pdfBlob = pdf.output('blob');
       
-      // Try direct download as fallback
-      const blobUrl = URL.createObjectURL(pdfBlob);
-      const downloadLink = document.createElement('a');
-      downloadLink.href = blobUrl;
-      downloadLink.download = filename;
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      document.body.removeChild(downloadLink);
-      URL.revokeObjectURL(blobUrl);
-      console.log('Attempted direct download as fallback');
+      // Replit-compatible PDF opening approach
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      window.open(pdfUrl, '_blank');
+      
+      return true;
+    } catch (error) {
+      // Fallback direct download
+      pdf.save(filename);
+      return true;
     }
-    
-    console.log('PDF download process completed successfully!');
-    return true;
-    
+
   } catch (error) {
-    console.error('❌ Failed to generate PDF report:', error);
+    console.error('PDF generation error:', error);
     return false;
   }
 }

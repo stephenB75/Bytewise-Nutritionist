@@ -226,18 +226,7 @@ function CalorieCalculator({
       source: 'calculator'
     };
 
-    // Debug logging for nutrition conversion verification (remove in production)
-    console.log('🍎 Nutrition Conversion Debug:', {
-      ingredient: analysis.ingredient,
-      usdaNutritionPer100g: analysis.nutritionPer100g,
-      storedMacros: {
-        protein: mealData.protein,
-        carbs: mealData.carbs,
-        fat: mealData.fat
-      },
-      portionCalories: analysis.estimatedCalories,
-      conversionNote: 'Direct mapping from USDA → meal storage'
-    });
+
 
     // Store in localStorage for weekly logger to access  
     const weeklyMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
@@ -257,16 +246,9 @@ function CalorieCalculator({
       });
       
       const result = await response.json();
-      console.log('🎯 Achievement Database Fix:', {
-        localStorageMeal: mealData.name,
-        databaseSaved: result.success,
-        achievementsChecked: result.newAchievements?.length || 0,
-        fixNote: 'Meal now saved to both localStorage AND database for achievement system'
-      });
       
       // If achievements were earned from the database call, trigger UI notifications
       if (result.newAchievements && result.newAchievements.length > 0) {
-        console.log('🏆 New Achievements Unlocked:', result.newAchievements);
         
         // Dispatch achievement notifications for each new achievement
         result.newAchievements.forEach((achievement: any) => {

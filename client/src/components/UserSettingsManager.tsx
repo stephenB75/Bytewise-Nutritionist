@@ -151,11 +151,6 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
       await refetch();
       
       // Debug logging for profile update verification
-      console.log('👤 Profile Update Debug:', {
-        updatedCalorieGoal: userInfo.calorieGoal,
-        refetchTriggered: true,
-        profileUpdateNote: 'User profile saved, refetch triggered for dashboard sync'
-      });
       
       // Dispatch custom event to notify dashboard of profile changes
       window.dispatchEvent(new CustomEvent('user-profile-updated', { 

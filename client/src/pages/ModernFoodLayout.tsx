@@ -235,16 +235,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       setGoalCalories(userCalorieGoal);
       setWeeklyGoal(userCalorieGoal * 7);
       
-      // Debug logging for calorie goal updates
-      console.log('🎯 Calorie Goal Update Debug:', {
-        userObject: user,
-        dailyCalorieGoalFromDB: (user as any)?.dailyCalorieGoal,
-        calorieGoalFromSupabase: (user as any)?.calorie_goal,
-        extractedCalorieGoal: userCalorieGoal,
-        updatedDailyGoal: userCalorieGoal,
-        updatedWeeklyGoal: userCalorieGoal * 7,
-        goalUpdateNote: 'Dashboard goals updated from user profile - FIXED to use dailyCalorieGoal'
-      });
+
     }
   }, [user]);
 
@@ -272,22 +263,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         
         // Debug logging for macro verification (remove in production)
         if (todayMeals.length > 0) {
-          console.log('📊 Macro Cards Debug:', {
-            todayMealsCount: todayMeals.length,
-            sampleMeal: todayMeals[0],
-            calculatedMacros: dailyMacroTotals,
-            userMacroGoals: {
-              protein: user?.dailyProteinGoal || 180,
-              carbs: user?.dailyCarbGoal || 200, 
-              fat: user?.dailyFatGoal || 70
-            },
-            remainingMacros: {
-              protein: (user?.dailyProteinGoal || 180) - dailyMacroTotals.protein,
-              carbs: (user?.dailyCarbGoal || 200) - dailyMacroTotals.carbs,
-              fat: (user?.dailyFatGoal || 70) - dailyMacroTotals.fat
-            },
-            macroCardNote: 'Enhanced macro cards now show remaining values with negative color coding'
-          });
         }
         
         // Calculate estimated micronutrients from today's meals
@@ -296,15 +271,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         
         // Debug logging for micronutrient verification (remove in production)
         if (todayMeals.length > 0) {
-          console.log('🔬 Micronutrient Cards Debug:', {
-            totalCalories: dailyTotal,
-            baseMultiplier: dailyTotal / 100,
-            calculatedMicronutrients: estimatedMicronutrients,
-            exampleCalculation: {
-              vitaminC: `${dailyTotal}/100 * 8 = ${Math.round((dailyTotal/100) * 8)}mg`,
-              iron: `${dailyTotal}/100 * 1.8 = ${Math.round((dailyTotal/100) * 1.8 * 10) / 10}mg`
-            }
-          });
         }
         
         // Calculate weekly calories from all stored meals
@@ -312,13 +278,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         setWeeklyCalories(weeklyTotal);
         
         // Debug logging for weekly validation cross-check
-        console.log('📈 Dashboard Weekly Data Debug:', {
-          totalMealsInStorage: stored.length,
-          weeklyTotalAllMeals: weeklyTotal,
-          todayMealsCount: todayMeals.length,
-          todayCalories: dailyTotal,
-          dashboardNote: 'Dashboard weekly total calculated from all stored meals'
-        });
       } catch (error) {
         // Reset to safe state on error
         setLoggedMeals([]);

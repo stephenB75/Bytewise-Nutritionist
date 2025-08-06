@@ -478,27 +478,7 @@ export class DatabaseStorage implements IStorage {
     const existingAchievements = await this.getUserAchievements(userId);
     const achievementTypes = existingAchievements.map(a => a.achievementType);
 
-    // Debug logging for achievement checking
-    console.log('🏆 Achievement Debug Check:', {
-      userId: userId.substring(0, 8) + '...',
-      dailyStats,
-      userGoals: {
-        calories: user.dailyCalorieGoal,
-        protein: user.dailyProteinGoal,
-        carbs: user.dailyCarbGoal,
-        fat: user.dailyFatGoal
-      },
-      existingAchievementTypes: achievementTypes,
-      calorieGoalRange: {
-        min: (user.dailyCalorieGoal || 2000) * 0.9,
-        max: (user.dailyCalorieGoal || 2000) * 1.1,
-        current: dailyStats.totalCalories
-      },
-      proteinGoalTarget: {
-        min: (user.dailyProteinGoal || 150) * 0.9,
-        current: dailyStats.totalProtein
-      }
-    });
+
 
     // Check First Day Achievement
     if (!achievementTypes.includes('first_day_complete') && dailyStats.totalCalories >= 500) {
@@ -518,14 +498,6 @@ export class DatabaseStorage implements IStorage {
     const calorieGoalMax = (user.dailyCalorieGoal || 2000) * 1.1;
     const calorieGoalMet = dailyStats.totalCalories >= calorieGoalMin && dailyStats.totalCalories <= calorieGoalMax;
     
-    console.log('🔥 Calorie Goal Check:', {
-      hasExistingCalorieAchievement: achievementTypes.includes('calorie_goal_met'),
-      calorieRange: `${calorieGoalMin}-${calorieGoalMax}`,
-      currentCalories: dailyStats.totalCalories,
-      meetsRange: calorieGoalMet,
-      willCreateAchievement: !achievementTypes.includes('calorie_goal_met') && calorieGoalMet
-    });
-    
     if (!achievementTypes.includes('calorie_goal_met') && calorieGoalMet) {
       const achievement = await this.createAchievement({
         userId,
@@ -536,20 +508,11 @@ export class DatabaseStorage implements IStorage {
         colorClass: 'bg-orange-500/20 border-orange-500/30'
       });
       newAchievements.push(achievement);
-      console.log('🎉 Created Calorie Goal Achievement!', achievement);
     }
 
     // Check Protein Goal Achievement
     const proteinGoalTarget = (user.dailyProteinGoal || 150) * 0.9;
     const proteinGoalMet = dailyStats.totalProtein >= proteinGoalTarget;
-    
-    console.log('⚡ Protein Goal Check:', {
-      hasExistingProteinAchievement: achievementTypes.includes('protein_goal_met'),
-      proteinTarget: proteinGoalTarget,
-      currentProtein: dailyStats.totalProtein,
-      meetsTarget: proteinGoalMet,
-      willCreateAchievement: !achievementTypes.includes('protein_goal_met') && proteinGoalMet
-    });
     
     if (!achievementTypes.includes('protein_goal_met') && proteinGoalMet) {
       const achievement = await this.createAchievement({
@@ -561,7 +524,6 @@ export class DatabaseStorage implements IStorage {
         colorClass: 'bg-purple-500/20 border-purple-500/30'
       });
       newAchievements.push(achievement);
-      console.log('🎉 Created Protein Goal Achievement!', achievement);
     }
 
     // Check Three Meals Achievement
@@ -615,11 +577,6 @@ export class DatabaseStorage implements IStorage {
       });
       newAchievements.push(achievement);
     }
-
-    console.log('🏆 Achievement Check Complete:', {
-      totalNewAchievements: newAchievements.length,
-      achievementTitles: newAchievements.map(a => a.title)
-    });
 
     return newAchievements;
   }
