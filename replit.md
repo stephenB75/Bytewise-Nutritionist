@@ -17,6 +17,7 @@ bytewise nutritionist is a comprehensive Progressive Web App (PWA) for nutrition
 - **Complete Database Optimization**: Fixed all LSP diagnostics (5 → 0), resolved type safety issues, implemented optimized cached food search with intelligent prioritization, and streamlined query performance for improved application stability
 - **Comprehensive Salad Database Integration**: Added 35+ salad varieties including basic mixed greens (15 cal), specialty salads (Caesar, Greek, Cobb), protein salads (chicken, tuna, egg), unique options (Waldorf, Caprese, Niçoise), and common spelling variations ("Cesar Salad") with complete nutritional profiles for accurate meal tracking
 - **Complete Caribbean Fruits Database**: Added 40+ tropical fruits including mango, papaya, guava, soursop, star fruit, passion fruit, coconut (meat/water), tamarind, june plum, avocado, and lime with authentic nutritional data. Fixed "Breakfruit" misspelling (breadfruit) and added regional variations like "Plumrose", "Starapple", "Timbrine" for comprehensive Caribbean cuisine tracking
+- **Comprehensive Desserts Database**: Added 45+ dessert varieties including brownies (466 cal), cakes (chocolate 371 cal, vanilla 257 cal), cookies (chocolate chip 488 cal, oatmeal 457 cal), ice cream (207-216 cal), pies (apple 237 cal, pumpkin 229 cal), pastries (éclair 262 cal, croissant 406 cal), and international desserts (tiramisu 240 cal, baklava 307 cal) with complete nutritional profiles for accurate sweet treat tracking
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
