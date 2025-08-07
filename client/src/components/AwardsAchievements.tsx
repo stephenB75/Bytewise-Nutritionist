@@ -186,35 +186,8 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
   const progressPercentage = achievements.length > 0 ? (completedAchievements.length / achievements.length) * 100 : 0;
 
   return (
-    <div className="bg-black min-h-screen px-6 py-3">
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="p-3 bg-gradient-to-br from-[#faed39] to-[#1f4aa6] rounded-xl">
-              <Trophy className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-white" style={{ fontFamily: "'League Spartan', sans-serif" }}>Awards & Achievements</h2>
-              <p className="text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>Track your progress and unlock rewards</p>
-            </div>
-          </div>
-          {onClose && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-gray-400 hover:text-white"
-              onClick={onClose}
-            >
-              <X className="w-5 h-5" />
-            </Button>
-          )}
-        </div>
-
+    <div className="space-y-6">
         {/* Stats Overview */}
-        <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
-        <h3 className="text-xl font-semibold text-white mb-6" style={{ fontFamily: "'League Spartan', sans-serif" }}>Your Progress</h3>
-        
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <div className="text-center p-4 bg-gradient-to-br from-[#faed39]/10 to-[#faed39]/5 rounded-lg border border-[#faed39]/20">
             <div className="text-2xl font-bold text-[#faed39]" style={{ fontFamily: "'League Spartan', sans-serif" }}>{userStats.totalPoints}</div>
@@ -241,11 +214,9 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
           </div>
           <Progress value={progressPercentage} className="h-3" />
         </div>
-      </Card>
 
-      {/* Category Filter */}
-      <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {/* Category Filter */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 my-6">
           {categories.map((category) => {
             const IconComponent = category.icon;
             const isActive = selectedCategory === category.id;
@@ -279,10 +250,9 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
             );
           })}
         </div>
-      </Card>
 
-      {/* Achievements Content */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Achievements Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {loading ? (
                   <div className="col-span-full text-center py-8">
                     <div className="text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>Loading achievements...</div>
@@ -355,7 +325,6 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
             </Card>
           ))
         )}
-              </div>
       </div>
     </div>
   );

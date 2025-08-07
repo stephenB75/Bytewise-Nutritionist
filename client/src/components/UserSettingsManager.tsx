@@ -190,45 +190,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 px-4 sm:px-6 lg:px-8">
-      {/* Action Buttons when editing */}
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-white" style={{ fontFamily: "'League Spartan', sans-serif" }}>
-          User Profile
-        </h2>
-        
-        {isEditing && (
-          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsEditing(false)}
-              className="border-white/30 text-gray-300 hover:border-white/50 hover:text-white flex-1 sm:flex-none"
-            >
-              <X className="w-4 h-4 mr-2" />
-              Cancel
-            </Button>
-            <Button
-              size="sm"
-              onClick={handleSave}
-              disabled={isSaving}
-              className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white flex-1 sm:flex-none"
-            >
-              {isSaving ? (
-                <>Loading...</>
-              ) : (
-                <>
-                  <Save className="w-4 h-4 mr-2" />
-                  Save Changes
-                </>
-              )}
-            </Button>
-          </div>
-        )}
-      </div>
-
-      {/* Profile Content */}
-      <div className="space-y-6">
+    <div className="space-y-6">
             {/* Edit Button */}
             {!isEditing && (
               <div className="flex justify-center">
@@ -505,8 +467,37 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                     Sign Out
                   </Button>
                 </div>
-                </div>
               </div>
+
+      {/* Action Buttons when editing */}
+      {isEditing && (
+        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto pt-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsEditing(false)}
+            className="border-white/30 text-gray-300 hover:border-white/50 hover:text-white flex-1 sm:flex-none"
+          >
+            <X className="w-4 h-4 mr-2" />
+            Cancel
+          </Button>
+          <Button
+            size="sm"
+            onClick={handleSave}
+            disabled={isSaving}
+            className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white flex-1 sm:flex-none"
+          >
+            {isSaving ? (
+              <>Loading...</>
+            ) : (
+              <>
+                <Save className="w-4 h-4 mr-2" />
+                Save Changes
+              </>
+            )}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

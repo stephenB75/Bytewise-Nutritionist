@@ -215,7 +215,7 @@ export function DataManagementPanel() {
         </Card>
 
         {/* Data Management Content */}
-                <div className="space-y-6">
+        <div className="space-y-6">
                   {/* Export Section */}
                   <div className="p-6 bg-gradient-to-br from-[#1f4aa6]/10 to-[#1f4aa6]/5 rounded-2xl border border-[#1f4aa6]/20 backdrop-blur-md">
                     <div className="flex flex-col items-center text-center space-y-4">
