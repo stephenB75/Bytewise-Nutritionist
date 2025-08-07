@@ -19,11 +19,7 @@ const config: CapacitorConfig = {
     captureInput: true
   },
   
-  // Server configuration for development
-  server: {
-    url: 'http://localhost:5000',
-    cleartext: true
-  },
+
   
   plugins: {
     SplashScreen: {

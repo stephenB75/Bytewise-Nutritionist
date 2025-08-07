@@ -257,10 +257,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         }), { protein: 0, carbs: 0, fat: 0 });
         setDailyMacros(dailyMacroTotals);
         
-        // Debug logging for macro verification (remove in production)
-        if (todayMeals.length > 0) {
-        }
-        
         // Calculate estimated micronutrients from today's meals
         const estimatedMicronutrients = calculateEstimatedMicronutrients(todayMeals);
         setDailyMicronutrients(estimatedMicronutrients);
@@ -270,15 +266,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           fetchDailyStats();
         }
         
-        // Debug logging for micronutrient verification (remove in production)
-        if (todayMeals.length > 0) {
-        }
-        
         // Calculate weekly calories from all stored meals
         const weeklyTotal = stored.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
         setWeeklyCalories(weeklyTotal);
         
-        // Debug logging for weekly validation cross-check
       } catch (error) {
         // Reset to safe state on error
         setLoggedMeals([]);
