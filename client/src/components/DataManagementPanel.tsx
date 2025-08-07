@@ -214,26 +214,7 @@ export function DataManagementPanel() {
           </div>
         </Card>
 
-        {/* Data Actions */}
-        <Card className="bg-white/10 backdrop-blur-md border-white/20 overflow-hidden rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:bg-white/15 hover:border-white/30">
-          <AccordionTrigger className="px-6 py-6 hover:bg-white/5 hover:no-underline [&[data-state=open]>div]:text-[#faed39] [&[data-state=open]]:bg-white/5">
-                <div className="flex items-center justify-between w-full">
-                  <div className="flex items-center space-x-3 text-left">
-                    <Database className="w-6 h-6 text-[#faed39]" />
-                    <div>
-                      <h3 className="text-xl font-semibold text-white transition-colors" style={{ fontFamily: "'League Spartan', sans-serif" }}>
-                        Data Management
-                      </h3>
-                      <p className="text-sm text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>
-                        Export, backup, and manage your nutrition data
-                      </p>
-                    </div>
-                  </div>
-                  <ChevronDown className="w-5 h-5 text-gray-300 transition-transform duration-200" />
-                </div>
-              </AccordionTrigger>
-              
-              <AccordionContent className="px-6 pb-6 pt-0">
+        {/* Data Management Content */}
                 <div className="space-y-6">
                   {/* Export Section */}
                   <div className="p-6 bg-gradient-to-br from-[#1f4aa6]/10 to-[#1f4aa6]/5 rounded-2xl border border-[#1f4aa6]/20 backdrop-blur-md">
@@ -345,8 +326,6 @@ export function DataManagementPanel() {
                     </div>
                   </div>
                 </div>
-              </AccordionContent>
-        </Card>
       </div>
     </div>
   );

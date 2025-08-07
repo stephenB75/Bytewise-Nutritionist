@@ -281,26 +281,7 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
         </div>
       </Card>
 
-      {/* Achievements Grid */}
-      <Card className="bg-white/10 backdrop-blur-md border-white/20 overflow-hidden rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:bg-white/15 hover:border-white/30">
-        <AccordionTrigger className="px-6 py-6 hover:bg-white/5 hover:no-underline [&[data-state=open]>div]:text-[#faed39] [&[data-state=open]]:bg-white/5">
-              <div className="flex items-center justify-between w-full">
-                <div className="flex items-center space-x-3">
-                  <Trophy className="w-6 h-6 text-[#faed39]" />
-                  <div>
-                    <h3 className="text-xl font-semibold text-white transition-colors" style={{ fontFamily: "'League Spartan', sans-serif" }}>
-                      {selectedCategory === 'all' ? 'All Achievements' : `${categories.find(c => c.id === selectedCategory)?.name} Achievements`}
-                    </h3>
-                    <p className="text-sm text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>
-                      {filteredAchievements.length} achievements available
-                    </p>
-                  </div>
-                </div>
-                <ChevronDown className="w-5 h-5 text-gray-300 transition-transform duration-200" />
-              </div>
-            </AccordionTrigger>
-            
-            <AccordionContent className="px-6 pb-6 pt-0">
+      {/* Achievements Content */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {loading ? (
                   <div className="col-span-full text-center py-8">
@@ -375,8 +356,6 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
           ))
         )}
               </div>
-            </AccordionContent>
-      </Card>
       </div>
     </div>
   );

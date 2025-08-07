@@ -227,35 +227,8 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
         )}
       </div>
 
-      {/* Profile Card */}
-      <Card className="bg-white/10 backdrop-blur-md border-white/20 overflow-hidden rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:bg-white/15 hover:border-white/30">
-        <AccordionTrigger className="px-6 py-6 hover:bg-white/5 hover:no-underline [&[data-state=open]>div>div:last-child]:rotate-180 [&[data-state=open]]:bg-white/5">
-              <div className="flex items-center space-x-4 flex-1 min-w-0">
-                <div className="relative flex-shrink-0">
-                  <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center">
-                    <User className="w-8 h-8 text-white" />
-                  </div>
-                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-black flex items-center justify-center">
-                    <CheckCircle className="w-2 h-2 text-white" />
-                  </div>
-                </div>
-                <div className="flex-1 min-w-0 overflow-hidden text-left">
-                  <h3 className="text-xl font-bold text-white mb-1 truncate" style={{ fontFamily: "'League Spartan', sans-serif" }}>
-                    {userInfo.name || user?.email?.split('@')[0] || 'ByteWise User'}
-                  </h3>
-                  <p className="text-gray-300 text-sm truncate">{userInfo.email || user?.email}</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center space-x-2 flex-shrink-0">
-                <div className="transition-transform duration-200 text-gray-300">
-                  <ChevronDown className="w-5 h-5" />
-                </div>
-              </div>
-            </AccordionTrigger>
-
-            <AccordionContent className="px-6 pb-6 pt-0">
-              <div className="space-y-6">
+      {/* Profile Content */}
+      <div className="space-y-6">
             {/* Edit Button */}
             {!isEditing && (
               <div className="flex justify-center">
@@ -534,8 +507,6 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                 </div>
                 </div>
               </div>
-            </AccordionContent>
-      </Card>
     </div>
   );
 }

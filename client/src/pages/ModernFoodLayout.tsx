@@ -1370,16 +1370,90 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             collapsible 
             className="w-full space-y-6"
           >
+            {/* Profile Card */}
             <AccordionItem value="profile" className="border-none">
-              <UserSettingsManager />
+              <Card className="bg-white/10 backdrop-blur-md border-white/20 overflow-hidden rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:bg-white/15 hover:border-white/30">
+                <AccordionTrigger className="px-6 py-6 hover:bg-white/5 hover:no-underline [&[data-state=open]>div>div:last-child]:rotate-180 [&[data-state=open]]:bg-white/5">
+                  <div className="flex items-center space-x-4 flex-1 min-w-0">
+                    <div className="relative flex-shrink-0">
+                      <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center">
+                        <User className="w-8 h-8 text-white" />
+                      </div>
+                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-black flex items-center justify-center">
+                        <CheckCircle2 className="w-2 h-2 text-white" />
+                      </div>
+                    </div>
+                    <div className="flex-1 min-w-0 overflow-hidden text-left">
+                      <h3 className="text-xl font-bold text-white mb-1 truncate" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                        {user?.email?.split('@')[0] || 'ByteWise User'}
+                      </h3>
+                      <p className="text-gray-300 text-sm truncate">{user?.email}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2 flex-shrink-0">
+                    <div className="transition-transform duration-200 text-gray-300">
+                      <ChevronRight className="w-5 h-5" />
+                    </div>
+                  </div>
+                </AccordionTrigger>
+
+                <AccordionContent className="px-6 pb-6 pt-0">
+                  <UserSettingsManager />
+                </AccordionContent>
+              </Card>
             </AccordionItem>
             
+            {/* Awards Card */}
             <AccordionItem value="achievements" className="border-none">
-              <AwardsAchievements />
+              <Card className="bg-white/10 backdrop-blur-md border-white/20 overflow-hidden rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:bg-white/15 hover:border-white/30">
+                <AccordionTrigger className="px-6 py-6 hover:bg-white/5 hover:no-underline [&[data-state=open]>div]:text-[#faed39] [&[data-state=open]]:bg-white/5">
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center space-x-3">
+                      <Trophy className="w-6 h-6 text-[#faed39]" />
+                      <div>
+                        <h3 className="text-xl font-semibold text-white transition-colors" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                          Awards
+                        </h3>
+                        <p className="text-sm text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>
+                          View your progress and goals
+                        </p>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-gray-300 transition-transform duration-200" />
+                  </div>
+                </AccordionTrigger>
+                
+                <AccordionContent className="px-6 pb-6 pt-0">
+                  <AwardsAchievements />
+                </AccordionContent>
+              </Card>
             </AccordionItem>
             
+            {/* Data Management Card */}
             <AccordionItem value="data" className="border-none">
-              <DataManagementPanel />
+              <Card className="bg-white/10 backdrop-blur-md border-white/20 overflow-hidden rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:bg-white/15 hover:border-white/30">
+                <AccordionTrigger className="px-6 py-6 hover:bg-white/5 hover:no-underline [&[data-state=open]>div]:text-[#faed39] [&[data-state=open]]:bg-white/5">
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center space-x-3 text-left">
+                      <Download className="w-6 h-6 text-[#faed39]" />
+                      <div>
+                        <h3 className="text-xl font-semibold text-white transition-colors" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                          Data
+                        </h3>
+                        <p className="text-sm text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>
+                          Manage your nutrition data
+                        </p>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-gray-300 transition-transform duration-200" />
+                  </div>
+                </AccordionTrigger>
+                
+                <AccordionContent className="px-6 pb-6 pt-0">
+                  <DataManagementPanel />
+                </AccordionContent>
+              </Card>
             </AccordionItem>
           </Accordion>
         ) : (
