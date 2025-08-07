@@ -309,6 +309,18 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
             </AccordionTrigger>
             
             <AccordionContent className="px-6 pb-6 pt-0">
+              {/* Nested Accordion for Achievement Categories */}
+              <Accordion type="multiple" className="w-full space-y-4">
+                <AccordionItem value="active-achievements" className="border-none">
+                  <Card className="bg-white/5 backdrop-blur-sm border-white/10 overflow-hidden rounded-xl">
+                    <AccordionTrigger className="px-4 py-4 hover:bg-white/5 hover:no-underline">
+                      <div className="flex items-center space-x-3">
+                        <Star className="w-5 h-5 text-[#faed39]" />
+                        <span className="font-semibold text-white">Active Achievements</span>
+                      </div>
+                      <ChevronDown className="w-4 h-4 text-gray-300 transition-transform duration-200" />
+                    </AccordionTrigger>
+                    <AccordionContent className="px-4 pb-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {loading ? (
                   <div className="col-span-full text-center py-8">
@@ -383,6 +395,29 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
           ))
         )}
               </div>
+                    </AccordionContent>
+                  </Card>
+                </AccordionItem>
+                
+                <AccordionItem value="completed-achievements" className="border-none">
+                  <Card className="bg-white/5 backdrop-blur-sm border-white/10 overflow-hidden rounded-xl">
+                    <AccordionTrigger className="px-4 py-4 hover:bg-white/5 hover:no-underline">
+                      <div className="flex items-center space-x-3">
+                        <CheckCircle className="w-5 h-5 text-[#45c73e]" />
+                        <span className="font-semibold text-white">Completed Achievements</span>
+                      </div>
+                      <ChevronDown className="w-4 h-4 text-gray-300 transition-transform duration-200" />
+                    </AccordionTrigger>
+                    <AccordionContent className="px-4 pb-4">
+                      <div className="text-center py-8">
+                        <div className="text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>
+                          Completed achievements will appear here as you unlock them!
+                        </div>
+                      </div>
+                    </AccordionContent>
+                  </Card>
+                </AccordionItem>
+              </Accordion>
             </AccordionContent>
           </Card>
         </AccordionItem>
