@@ -242,18 +242,7 @@ export function DataManagementPanel() {
               </AccordionTrigger>
               
               <AccordionContent className="px-6 pb-6 pt-0">
-                {/* Nested Accordion for Data Actions */}
-                <Accordion type="multiple" className="w-full space-y-4">
-                  <AccordionItem value="export-section" className="border-none">
-                    <Card className="bg-white/5 backdrop-blur-sm border-white/10 overflow-hidden rounded-xl">
-                      <AccordionTrigger className="px-4 py-4 hover:bg-white/5 hover:no-underline">
-                        <div className="flex items-center space-x-3">
-                          <Download className="w-5 h-5 text-[#1f4aa6]" />
-                          <span className="font-semibold text-white">Export Data</span>
-                        </div>
-                        <ChevronDown className="w-4 h-4 text-gray-300 transition-transform duration-200" />
-                      </AccordionTrigger>
-                      <AccordionContent className="px-4 pb-4">
+                <div className="space-y-6">
                   {/* Export Section */}
                   <div className="p-6 bg-gradient-to-br from-[#1f4aa6]/10 to-[#1f4aa6]/5 rounded-2xl border border-[#1f4aa6]/20 backdrop-blur-md">
                     <div className="flex flex-col items-center text-center space-y-4">
@@ -292,20 +281,9 @@ export function DataManagementPanel() {
                       </Button>
                     </div>
                   </div>
-                      </AccordionContent>
-                    </Card>
-                  </AccordionItem>
-                  
-                  <AccordionItem value="backup-section" className="border-none">
-                    <Card className="bg-white/5 backdrop-blur-sm border-white/10 overflow-hidden rounded-xl">
-                      <AccordionTrigger className="px-4 py-4 hover:bg-white/5 hover:no-underline">
-                        <div className="flex items-center space-x-3">
-                          <Cloud className="w-5 h-5 text-[#45c73e]" />
-                          <span className="font-semibold text-white">Auto Backup</span>
-                        </div>
-                        <ChevronDown className="w-4 h-4 text-gray-300 transition-transform duration-200" />
-                      </AccordionTrigger>
-                      <AccordionContent className="px-4 pb-4">
+
+                  <Separator className="bg-white/20" />
+
                   {/* Auto Backup Section */}
                   <div className="p-6 bg-gradient-to-br from-[#45c73e]/10 to-[#45c73e]/5 rounded-2xl border border-[#45c73e]/20 backdrop-blur-md">
                     <div className="flex flex-col items-center text-center space-y-4">
@@ -343,20 +321,9 @@ export function DataManagementPanel() {
                       </Button>
                     </div>
                   </div>
-                      </AccordionContent>
-                    </Card>
-                  </AccordionItem>
-                  
-                  <AccordionItem value="danger-zone" className="border-none">
-                    <Card className="bg-white/5 backdrop-blur-sm border-white/10 overflow-hidden rounded-xl">
-                      <AccordionTrigger className="px-4 py-4 hover:bg-white/5 hover:no-underline">
-                        <div className="flex items-center space-x-3">
-                          <Trash2 className="w-5 h-5 text-red-400" />
-                          <span className="font-semibold text-white">Danger Zone</span>
-                        </div>
-                        <ChevronDown className="w-4 h-4 text-gray-300 transition-transform duration-200" />
-                      </AccordionTrigger>
-                      <AccordionContent className="px-4 pb-4">
+
+                  <Separator className="bg-white/20" />
+
                   {/* Danger Zone */}
                   <div className="p-6 bg-red-950/30 rounded-2xl border border-red-800/30 backdrop-blur-md">
                     <div className="flex flex-col items-center text-center space-y-4">
@@ -385,10 +352,7 @@ export function DataManagementPanel() {
                       </Button>
                     </div>
                   </div>
-                      </AccordionContent>
-                    </Card>
-                  </AccordionItem>
-                </Accordion>
+                </div>
               </AccordionContent>
             </Card>
           </AccordionItem>

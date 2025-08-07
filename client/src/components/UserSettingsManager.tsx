@@ -279,21 +279,13 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
               </div>
             )}
             
-            {/* Nested Accordion for Profile Sections */}
-            <Accordion type="multiple" className="w-full space-y-4">
-              <AccordionItem value="personal-info" className="border-none">
-                <Card className="bg-white/5 backdrop-blur-sm border-white/10 overflow-hidden rounded-xl">
-                  <AccordionTrigger className="px-4 py-4 hover:bg-white/5 hover:no-underline">
-                    <div className="flex items-center space-x-3">
-                      <User className="w-5 h-5 text-[#1f4aa6]" />
-                      <span className="font-semibold text-white">Personal Information</span>
-                    </div>
-                    <ChevronDown className="w-4 h-4 text-gray-300 transition-transform duration-200" />
-                  </AccordionTrigger>
-                  <AccordionContent className="px-4 pb-4">
+            {/* Profile Form */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Personal Information Fields */}
+          {/* Personal Information */}
           <div className="space-y-4">
+            <h4 className="text-lg font-semibold text-white mb-4" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+              Personal Information
+            </h4>
             
             <div className="space-y-2">
               <label className="text-sm text-gray-300 font-medium flex items-center">
@@ -482,73 +474,59 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                 {userInfo.email || 'Not provided'}
               </p>
             </div>
+          {/* Health Information */}
+          <div className="space-y-4">
+            <h4 className="text-lg font-semibold text-white mb-4" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+              Health & Fitness
+            </h4>
+
+            <div className="space-y-2">
+              <label className="text-sm text-gray-300 font-medium flex items-center">
+                <Activity className="w-4 h-4 mr-2 text-blue-400" />
+                Activity Level
+              </label>
+              {isEditing ? (
+                <select
+                  value={userInfo.activityLevel}
+                  onChange={(e) => setUserInfo(prev => ({ ...prev, activityLevel: e.target.value }))}
+                  className="w-full bg-white/10 border border-white/20 text-white p-3 rounded-lg"
+                >
+                  <option value="Sedentary">Sedentary</option>
+                  <option value="Lightly Active">Lightly Active</option>
+                  <option value="Moderately Active">Moderately Active</option>
+                  <option value="Very Active">Very Active</option>
+                  <option value="Extremely Active">Extremely Active</option>
+                </select>
+              ) : (
+                <p className="text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10 break-words">
+                  {userInfo.activityLevel || 'Not provided'}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm text-gray-300 font-medium flex items-center">
+                <Target className="w-4 h-4 mr-2 text-orange-400" />
+                Daily Calorie Goal
+              </label>
+              {isEditing ? (
+                <Input
+                  type="number"
+                  value={userInfo.calorieGoal}
+                  onChange={(e) => setUserInfo(prev => ({ ...prev, calorieGoal: parseInt(e.target.value) || 2000 }))}
+                  className="bg-white/10 border-white/20 text-white placeholder-gray-400 w-full"
+                  placeholder="Enter daily calorie goal"
+                  min="1200"
+                  max="5000"
+                />
+              ) : (
+                <p className="text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10 break-words">
+                  {userInfo.calorieGoal} calories/day
+                </p>
+              )}
+            </div>
           </div>
         </div>
-                  </AccordionContent>
-                </Card>
-              </AccordionItem>
-              
-              <AccordionItem value="health-fitness" className="border-none">
-                <Card className="bg-white/5 backdrop-blur-sm border-white/10 overflow-hidden rounded-xl">
-                  <AccordionTrigger className="px-4 py-4 hover:bg-white/5 hover:no-underline">
-                    <div className="flex items-center space-x-3">
-                      <Activity className="w-5 h-5 text-[#45c73e]" />
-                      <span className="font-semibold text-white">Health & Fitness</span>
-                    </div>
-                    <ChevronDown className="w-4 h-4 text-gray-300 transition-transform duration-200" />
-                  </AccordionTrigger>
-                  <AccordionContent className="px-4 pb-4">
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <label className="text-sm text-gray-300 font-medium flex items-center">
-                          <Activity className="w-4 h-4 mr-2 text-blue-400" />
-                          Activity Level
-                        </label>
-                        {isEditing ? (
-                          <select
-                            value={userInfo.activityLevel}
-                            onChange={(e) => setUserInfo(prev => ({ ...prev, activityLevel: e.target.value }))}
-                            className="w-full bg-white/10 border border-white/20 text-white p-3 rounded-lg"
-                          >
-                            <option value="Sedentary">Sedentary</option>
-                            <option value="Lightly Active">Lightly Active</option>
-                            <option value="Moderately Active">Moderately Active</option>
-                            <option value="Very Active">Very Active</option>
-                            <option value="Extremely Active">Extremely Active</option>
-                          </select>
-                        ) : (
-                          <p className="text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10 break-words">
-                            {userInfo.activityLevel || 'Not provided'}
-                          </p>
-                        )}
-                      </div>
-
-                      <div className="space-y-2">
-                        <label className="text-sm text-gray-300 font-medium flex items-center">
-                          <Target className="w-4 h-4 mr-2 text-orange-400" />
-                          Daily Calorie Goal
-                        </label>
-                        {isEditing ? (
-                          <Input
-                            type="number"
-                            value={userInfo.calorieGoal}
-                            onChange={(e) => setUserInfo(prev => ({ ...prev, calorieGoal: parseInt(e.target.value) || 2000 }))}
-                            className="bg-white/10 border-white/20 text-white placeholder-gray-400 w-full"
-                            placeholder="Enter daily calorie goal"
-                            min="1200"
-                            max="5000"
-                          />
-                        ) : (
-                          <p className="text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10 break-words">
-                            {userInfo.calorieGoal} calories/day
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </AccordionContent>
-                </Card>
-              </AccordionItem>
-            </Accordion>
 
                 {/* Sign Out Button */}
                 <div className="flex justify-end pt-6 border-t border-white/20 mt-8">
@@ -561,6 +539,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                     <LogOut className="w-4 h-4 mr-2" />
                     Sign Out
                   </Button>
+                </div>
                 </div>
               </div>
             </AccordionContent>
