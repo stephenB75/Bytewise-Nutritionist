@@ -1387,10 +1387,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                       </div>
                     </div>
                     <div className="flex-1 min-w-0 overflow-hidden text-left">
-                      <h3 className="text-xl font-bold text-white mb-1 truncate" style={{ fontFamily: "'League Spartan', sans-serif", transform: 'none', textOrientation: 'mixed' }}>
+                      <h3 className="profile-username-header">
                         {user?.email?.split('@')[0] || 'ByteWise User'}
                       </h3>
-                      <p className="text-gray-300 text-sm truncate" style={{ transform: 'none' }}>{user?.email}</p>
+                      <p className="profile-email-text">{user?.email}</p>
                     </div>
                   </div>
                   

@@ -210,12 +210,12 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Personal Information */}
           <div className="space-y-4">
-            <h4 className="text-lg font-semibold text-white mb-4" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+            <h4 className="profile-section-title">
               Personal Information
             </h4>
             
             <div className="space-y-2">
-              <label className="text-sm text-gray-300 font-medium flex items-center">
+              <label className="profile-label">
                 <User className="w-4 h-4 mr-2 text-blue-400" />
                 Full Name
               </label>
@@ -232,18 +232,18 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                       lastName: lastName.trim()
                     }));
                   }}
-                  className="bg-white/10 border-white/20 text-white placeholder-gray-400 w-full"
+                  className="profile-input-field"
                   placeholder="Enter your full name"
                 />
               ) : (
-                <p className="text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10 break-words" style={{ transform: 'none', textOrientation: 'mixed', writingMode: 'horizontal-tb' }}>
+                <p className="profile-display-text">
                   {userInfo.name || 'Not provided'}
                 </p>
               )}
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm text-gray-300 font-medium flex items-center">
+              <label className="profile-label">
                 <Phone className="w-4 h-4 mr-2 text-blue-400" />
                 Phone Number
               </label>
@@ -251,18 +251,18 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                 <Input
                   value={userInfo.phone}
                   onChange={(e) => setUserInfo(prev => ({ ...prev, phone: e.target.value }))}
-                  className="bg-white/10 border-white/20 text-white placeholder-gray-400 w-full"
+                  className="profile-input-field"
                   placeholder="Enter your phone number"
                 />
               ) : (
-                <p className="text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10 break-words">
+                <p className="profile-display-text">
                   {userInfo.phone || 'Not provided'}
                 </p>
               )}
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm text-gray-300 font-medium flex items-center">
+              <label className="profile-label">
                 <MapPin className="w-4 h-4 mr-2 text-blue-400" />
                 Location
               </label>
@@ -270,18 +270,18 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                 <Input
                   value={userInfo.location}
                   onChange={(e) => setUserInfo(prev => ({ ...prev, location: e.target.value }))}
-                  className="bg-white/10 border-white/20 text-white placeholder-gray-400 w-full"
+                  className="profile-input-field"
                   placeholder="Enter your location"
                 />
               ) : (
-                <p className="text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10 break-words">
+                <p className="profile-display-text">
                   {userInfo.location || 'Not provided'}
                 </p>
               )}
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm text-gray-300 font-medium flex items-center">
+              <label className="profile-label">
                 <Calendar className="w-4 h-4 mr-2 text-blue-400" />
                 Birth Date
               </label>
@@ -290,10 +290,10 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                   type="date"
                   value={userInfo.birthDate}
                   onChange={(e) => setUserInfo(prev => ({ ...prev, birthDate: e.target.value }))}
-                  className="bg-white/10 border-white/20 text-white placeholder-gray-400 w-full"
+                  className="profile-input-field"
                 />
               ) : (
-                <p className="text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10 break-words">
+                <p className="profile-display-text">
                   {userInfo.birthDate || 'Not provided'}
                 </p>
               )}
@@ -304,7 +304,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
           <div className="space-y-4">
 
             <div className="space-y-2">
-              <label className="text-sm text-gray-300 font-medium flex items-center">
+              <label className="profile-label">
                 <Activity className="w-4 h-4 mr-2 text-blue-400" />
                 Height (ft/in)
               </label>
