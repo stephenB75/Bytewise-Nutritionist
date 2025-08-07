@@ -236,7 +236,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                   placeholder="Enter your full name"
                 />
               ) : (
-                <p className="text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10 break-words">
+                <p className="text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10 break-words" style={{ transform: 'none', textOrientation: 'mixed', writingMode: 'horizontal-tb' }}>
                   {userInfo.name || 'Not provided'}
                 </p>
               )}
