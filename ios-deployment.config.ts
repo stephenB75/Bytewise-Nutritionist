@@ -4,7 +4,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 const config: CapacitorConfig = {
   appId: 'com.bytewise.nutritionist',
   appName: 'ByteWise Nutritionist',
-  webDir: 'dist',
+  webDir: 'dist/public',
   backgroundColor: '#0a0a00',
   
   // iOS-specific configuration optimized for App Store

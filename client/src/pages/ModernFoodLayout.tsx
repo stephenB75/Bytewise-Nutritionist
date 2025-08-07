@@ -156,7 +156,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         setDailyStats(stats);
       }
     } catch (error) {
-      console.error('Failed to fetch daily stats:', error);
+      // Daily stats fetch failed - continue with cached data
     }
   }, [user]);
 

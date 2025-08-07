@@ -142,7 +142,6 @@ export function FastingTracker() {
       queryClient.invalidateQueries({ queryKey: ['/api/fasting/history'] });
     },
     onError: (error) => {
-      console.error('Failed to start fasting:', error);
       toast({
         title: "Failed to Start",
         description: "Please try again. Make sure you're signed in.",
@@ -178,7 +177,9 @@ export function FastingTracker() {
             }));
           }
         })
-        .catch(err => console.error('Failed to check achievements:', err));
+        .catch(err => {
+          // Achievement check failed silently - non-critical for user experience
+        });
     }
   });
 

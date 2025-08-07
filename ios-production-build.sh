@@ -8,7 +8,6 @@ echo ""
 echo "🧹 Cleaning previous builds..."
 rm -rf dist/
 rm -rf ios/App/App/public/
-npm run build > /dev/null 2>&1
 
 # Backup current config
 echo "📋 Backing up development config..."
