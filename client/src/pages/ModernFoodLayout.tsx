@@ -69,7 +69,7 @@ interface Achievement {
   icon?: any;
 }
 
-type ProfileSection = 'profile' | 'achievements' | 'data';
+
 type TrackingView = 'daily' | 'weekly';
 
 export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) {
@@ -90,7 +90,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const [loggedMeals, setLoggedMeals] = useState<any[]>([]);
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
   const [trackingView, setTrackingView] = useState<TrackingView>('daily');
-  const [profileSection, setProfileSection] = useState<ProfileSection>('profile');
+
   const [notifications, setNotifications] = useState<Notification[]>([]);
   
   // Daily stats with fasting integration
@@ -109,20 +109,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     magnesium: 0
   });
   
-  // Validation functions for profile sections
-  const validateProfileSection = (sectionId: string): boolean => {
-    const validSections: ProfileSection[] = ['profile', 'achievements', 'data'];
-    if (!validSections.includes(sectionId as ProfileSection)) {
-      return false;
-    }
-    
-    if ((sectionId === 'profile' || sectionId === 'data') && !user) {
-      addNotification('info', 'Authentication Required', `Please sign in to access the ${sectionId} section`);
-      return false;
-    }
-    
-    return true;
-  };
+
 
   // Utility function to add notifications - using useCallback for stable reference
   // Function to calculate estimated micronutrients based on food types and calories
@@ -171,22 +158,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     }
   }, [user]);
 
-  const handleProfileSectionChange = (sectionId: string) => {
-    if (authLoading || !validateProfileSection(sectionId)) return;
-    
-    setProfileSection(sectionId as ProfileSection);
-    
-    const notificationMessages = {
-      achievements: { type: 'success' as const, title: 'Awards & Achievements', message: 'Track your progress and unlock new achievements' },
-      data: { type: 'info' as const, title: 'Data Management', message: 'Export, sync, and manage your nutrition data securely' },
-      profile: { type: 'success' as const, title: 'Profile & Account', message: 'Manage your personal information and account settings' }
-    };
-    
-    const notification = notificationMessages[sectionId as ProfileSection];
-    if (notification) {
-      addNotification(notification.type, notification.title, notification.message);
-    }
-  };
+
 
   // Notification handler functions
   const handleMarkAsRead = (id: string) => {
@@ -1341,12 +1313,16 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         buttonText={user ? "Manage Profile" : "Sign Up"}
         onButtonClick={() => {
           if (user) {
-            const profileNav = document.querySelector('.flex.flex-col.sm\\:flex-row');
-            if (profileNav) {
-              profileNav.scrollIntoView({ behavior: 'smooth' });
+            const profileCards = document.querySelector('.space-y-6');
+            if (profileCards) {
+              profileCards.scrollIntoView({ behavior: 'smooth' });
             }
           } else {
-            setProfileSection('profile');
+            // Scroll to the sign-in form
+            const signInForm = document.querySelector('.space-y-6');
+            if (signInForm) {
+              signInForm.scrollIntoView({ behavior: 'smooth' });
+            }
           }
         }}
       />
@@ -1386,104 +1362,18 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           </div>
         )}
 
-        {/* Profile Navigation - Redesigned Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          {[
-            { 
-              id: 'profile', 
-              name: 'Personal Profile', 
-              shortName: 'Profile', 
-              icon: User,
-              description: 'Edit your personal information',
-              color: 'from-blue-500 to-cyan-500'
-            },
-            { 
-              id: 'achievements', 
-              name: 'Awards & Achievements', 
-              shortName: 'Awards', 
-              icon: Trophy,
-              description: 'View your progress and goals',
-              color: 'from-yellow-500 to-orange-500'
-            },
-            { 
-              id: 'data', 
-              name: 'Data & Export', 
-              shortName: 'Data', 
-              icon: Download,
-              description: 'Manage your nutrition data',
-              color: 'from-green-500 to-emerald-500'
-            }
-          ].map((section) => {
-            const IconComponent = section.icon;
-            const isActive = profileSection === section.id;
-            return (
-              <Card
-                key={section.id}
-                className={`cursor-pointer transition-all duration-300 hover:scale-105 ${
-                  isActive
-                    ? 'bg-white/20 border-white/40 shadow-2xl ring-2 ring-orange-400/30' 
-                    : 'bg-white/10 border-white/20 hover:bg-white/15'
-                } backdrop-blur-md`}
-                onClick={() => handleProfileSectionChange(section.id)}
-              >
-                <div className="p-6 text-center">
-                  <div className={`w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br ${section.color} flex items-center justify-center shadow-lg`}>
-                    <IconComponent className="w-8 h-8 text-white" strokeWidth={2.5} />
-                  </div>
-                  <h3 className="text-lg font-bold text-white mb-2" style={{ fontFamily: "'League Spartan', sans-serif" }}>
-                    {section.shortName}
-                  </h3>
-                  <p className="text-sm text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>
-                    {section.description}
-                  </p>
-                  {isActive && (
-                    <div className="mt-3 flex justify-center">
-                      <div className="w-2 h-2 bg-orange-400 rounded-full animate-pulse"></div>
-                    </div>
-                  )}
-                </div>
-              </Card>
-            );
-          })}
-        </div>
-
-        {/* Profile Content - Redesigned Container */}
-        
-        <div className="min-h-[600px]">
-          {profileSection === 'profile' && (
-            <div className="space-y-4">
-              {user ? (
-                <UserSettingsManager 
-                  onClose={() => setProfileSection('profile')} 
-                />
-              ) : (
-                <Card className="bg-white/10 backdrop-blur-md border-white/20 p-8">
-                  <SignOnModule />
-                </Card>
-              )}
-            </div>
-          )}
-          
-          {profileSection === 'achievements' && (
-            user ? (
-              <AwardsAchievements onClose={() => setProfileSection('profile')} />
-            ) : (
-              <Card className="bg-white/10 backdrop-blur-md border-white/20 p-8">
-                <SignOnModule />
-              </Card>
-            )
-          )}
-          
-          {profileSection === 'data' && (
-            user ? (
-              <Card className="bg-white/10 backdrop-blur-md border-white/20">
-                <DataManagementPanel />
-              </Card>
-            ) : (
-              <Card className="bg-white/10 backdrop-blur-md border-white/20 p-8">
-                <SignOnModule />
-              </Card>
-            )
+        {/* Profile Cards with Accordion Functionality */}
+        <div className="space-y-6">
+          {user ? (
+            <>
+              <UserSettingsManager />
+              <AwardsAchievements />
+              <DataManagementPanel />
+            </>
+          ) : (
+            <Card className="bg-white/10 backdrop-blur-md border-white/20 p-8">
+              <SignOnModule />
+            </Card>
           )}
         </div>
       </div>
