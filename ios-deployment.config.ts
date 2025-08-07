@@ -13,8 +13,7 @@ const config: CapacitorConfig = {
     path: 'ios',
     contentInset: 'automatic',
     scrollEnabled: true,
-    allowsLinkPreview: false,
-    handleApplicationURL: true
+    allowsLinkPreview: false
   },
   
   // Android configuration (kept for future)

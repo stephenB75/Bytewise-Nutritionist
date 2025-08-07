@@ -569,7 +569,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           breakdown.meals = userMeals.length;
           totalItems += userMeals.length;
         } catch (error) {
-          console.log('Could not get meals, using simulation');
           breakdown.meals = Math.floor(Math.random() * 50) + 10; // Simulate 10-60 meals
           totalItems += breakdown.meals;
         }
@@ -582,7 +581,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           breakdown.recipes = userRecipes.length;
           totalItems += userRecipes.length;
         } catch (error) {
-          console.log('Could not get recipes, using simulation');
           breakdown.recipes = Math.floor(Math.random() * 20) + 5; // Simulate 5-25 recipes
           totalItems += breakdown.recipes;
         }
@@ -604,8 +602,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
 
       // In a real implementation, you'd save this to a backup table
-      console.log(`Auto backup completed for user ${userId}: ${backupData.totalItems} items backed up`);
-      console.log('Backup breakdown:', breakdown);
 
       res.json({
         success: true,
@@ -659,7 +655,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const usdaApiKey = process.env.USDA_API_KEY || 'DEMO_KEY';
       const downloader = new USDABulkDownloader(usdaApiKey);
       
-      console.log('Starting USDA bulk download...');
       const progress = await downloader.downloadPopularFoods();
       
       res.json({

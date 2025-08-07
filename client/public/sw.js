@@ -25,27 +25,22 @@ const API_ENDPOINTS = [
 
 // Install event - cache static assets
 self.addEventListener('install', event => {
-  console.log('🔧 Service Worker installing...');
   
   event.waitUntil(
     caches.open(STATIC_CACHE)
       .then(cache => {
-        console.log('📦 Caching static assets');
         return cache.addAll(STATIC_ASSETS);
       })
       .then(() => {
-        console.log('✅ Static assets cached successfully');
         return self.skipWaiting();
       })
       .catch(err => {
-        console.error('❌ Failed to cache static assets:', err);
       })
   );
 });
 
 // Activate event - clean up old caches
 self.addEventListener('activate', event => {
-  console.log('🚀 Service Worker activating...');
   
   event.waitUntil(
     caches.keys()
@@ -58,13 +53,11 @@ self.addEventListener('activate', event => {
                      cacheName !== API_CACHE;
             })
             .map(cacheName => {
-              console.log('🗑️ Deleting old cache:', cacheName);
               return caches.delete(cacheName);
             })
         );
       })
       .then(() => {
-        console.log('✅ Service Worker activated');
         return self.clients.claim();
       })
   );
@@ -110,7 +103,6 @@ async function handleStaticRequest(request) {
     
     return networkResponse;
   } catch (error) {
-    console.error('Static request failed:', error);
     
     // Return offline fallback for HTML requests
     if (request.headers.get('accept').includes('text/html')) {
@@ -159,7 +151,6 @@ async function handleApiRequest(request) {
     
     return networkResponse;
   } catch (error) {
-    console.log('Network failed, trying cache for:', request.url);
     
     // Try to return cached version
     const cachedResponse = await caches.match(request);
@@ -193,7 +184,6 @@ async function handleDynamicRequest(request) {
 
 // Handle background sync for offline actions
 self.addEventListener('sync', event => {
-  console.log('🔄 Background sync triggered:', event.tag);
   
   if (event.tag === 'meal-sync') {
     event.waitUntil(syncOfflineMeals());
@@ -204,10 +194,8 @@ self.addEventListener('sync', event => {
 async function syncOfflineMeals() {
   try {
     // Get offline meal data from IndexedDB if implemented
-    console.log('📤 Syncing offline meal data...');
     // Implementation would depend on offline storage strategy
   } catch (error) {
-    console.error('Failed to sync offline meals:', error);
   }
 }
 
@@ -250,4 +238,3 @@ self.addEventListener('notificationclick', event => {
   }
 });
 
-console.log('🍎 Bytewise Service Worker loaded successfully');

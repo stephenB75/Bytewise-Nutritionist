@@ -2,21 +2,25 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.bytewise.nutritionist',
-  appName: 'bytewise nutritionist',
-  webDir: 'dist',
-  backgroundColor: '#fef7cd',
+  appName: 'ByteWise Nutritionist',
+  webDir: 'dist/public',
+  backgroundColor: '#0a0a00',
   
-  // iOS-specific configuration
+  // iOS-specific configuration optimized for App Store
   ios: {
     scheme: 'bytewise-nutritionist',
-    path: 'ios'
+    path: 'ios',
+    contentInset: 'automatic',
+    scrollEnabled: true,
+    allowsLinkPreview: false
   },
   
   // Android-specific configuration
   android: {
     path: 'android',
-    allowMixedContent: true,
-    captureInput: true
+    allowMixedContent: false,
+    captureInput: true,
+    webContentsDebuggingEnabled: false
   },
   
 
@@ -25,35 +29,32 @@ const config: CapacitorConfig = {
     SplashScreen: {
       launchShowDuration: 2000,
       launchAutoHide: true,
-      backgroundColor: '#fef7cd',
+      backgroundColor: '#0a0a00',
       androidSplashResourceName: 'splash',
       androidScaleType: 'CENTER_CROP',
-      showSpinner: true,
-      androidSpinnerStyle: 'large',
-      iosSpinnerStyle: 'small',
-      spinnerColor: '#a8dadc',
+      showSpinner: false,
       splashFullScreen: true,
       splashImmersive: true,
       layoutName: 'launch_screen',
-      useDialog: true
+      useDialog: false
     },
     
     StatusBar: {
       style: 'light',
       backgroundColor: '#0a0a00',
-      overlaysWebView: true
+      overlaysWebView: false
     },
     
     Keyboard: {
-      resize: 'body' as any,
+      resize: 'ionic' as any,
       style: 'dark' as any,
       resizeOnFullScreen: true
     },
     
     LocalNotifications: {
-      smallIcon: 'ic_stat_icon_config_sample',
-      iconColor: '#a8dadc',
-      sound: 'beep.wav'
+      smallIcon: 'ic_stat_nutrition',
+      iconColor: '#faed39',
+      sound: 'notification.wav'
     },
     
     PushNotifications: {
@@ -64,14 +65,14 @@ const config: CapacitorConfig = {
     
     Camera: {
       permissions: {
-        camera: 'This app uses the camera to take photos of meals for nutrition tracking.',
-        photos: 'This app accesses photos to select meal images for logging.'
+        camera: 'ByteWise uses the camera to photograph meals for accurate nutrition tracking and food recognition.',
+        photos: 'ByteWise accesses your photo library to select meal images for nutrition logging and analysis.'
       }
     },
     
     Filesystem: {
       permissions: {
-        publicStorage: 'This app uses storage to save meal photos and export reports.'
+        publicStorage: 'ByteWise uses device storage to save meal photos, export nutrition reports, and cache data for offline use.'
       }
     }
   }
