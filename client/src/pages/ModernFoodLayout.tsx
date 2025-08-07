@@ -1394,11 +1394,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     </div>
                   </div>
                   
-                  <div className="flex items-center space-x-2 flex-shrink-0">
-                    <div className="transition-transform duration-200 text-gray-300">
-                      <ChevronRight className="w-5 h-5" />
-                    </div>
-                  </div>
+
                 </AccordionTrigger>
 
                 <AccordionContent className="px-6 pb-6 pt-0">
@@ -1423,7 +1419,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                         </p>
                       </div>
                     </div>
-                    <ChevronRight className="w-5 h-5 text-gray-300 transition-transform duration-200" />
                   </div>
                 </AccordionTrigger>
                 
@@ -1449,7 +1444,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                         </p>
                       </div>
                     </div>
-                    <ChevronRight className="w-5 h-5 text-gray-300 transition-transform duration-200" />
                   </div>
                 </AccordionTrigger>
                 
