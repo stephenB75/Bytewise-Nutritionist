@@ -45,7 +45,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
   // Profile editing states
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [accordionValue, setAccordionValue] = useState<string>("");
+
 
   // User information state - consolidated from both components
   const [userInfo, setUserInfo] = useState({
@@ -227,17 +227,9 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
         )}
       </div>
 
-      {/* Profile Card with Accordion */}
-      <Accordion 
-        type="single" 
-        collapsible 
-        value={accordionValue} 
-        onValueChange={setAccordionValue}
-        className="w-full space-y-6"
-      >
-        <AccordionItem value="profile" className="border-none">
-          <Card className="bg-white/10 backdrop-blur-md border-white/20 overflow-hidden rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:bg-white/15 hover:border-white/30">
-            <AccordionTrigger className="px-6 py-6 hover:bg-white/5 hover:no-underline [&[data-state=open]>div>div:last-child]:rotate-180 [&[data-state=open]]:bg-white/5">
+      {/* Profile Card */}
+      <Card className="bg-white/10 backdrop-blur-md border-white/20 overflow-hidden rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:bg-white/15 hover:border-white/30">
+        <AccordionTrigger className="px-6 py-6 hover:bg-white/5 hover:no-underline [&[data-state=open]>div>div:last-child]:rotate-180 [&[data-state=open]]:bg-white/5">
               <div className="flex items-center space-x-4 flex-1 min-w-0">
                 <div className="relative flex-shrink-0">
                   <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center">
@@ -543,9 +535,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                 </div>
               </div>
             </AccordionContent>
-          </Card>
-        </AccordionItem>
-      </Accordion>
+      </Card>
     </div>
   );
 }

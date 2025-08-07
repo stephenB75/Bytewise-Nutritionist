@@ -35,7 +35,7 @@ export function DataManagementPanel() {
   const { toast } = useToast();
   const [isExporting, setIsExporting] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
-  const [accordionValue, setAccordionValue] = useState<string>("");
+
 
   const handleExportData = async () => {
     setIsExporting(true);
@@ -214,17 +214,9 @@ export function DataManagementPanel() {
           </div>
         </Card>
 
-        {/* Data Actions with Accordion */}
-        <Accordion 
-          type="single" 
-          collapsible 
-          value={accordionValue} 
-          onValueChange={setAccordionValue}
-          className="w-full space-y-6"
-        >
-          <AccordionItem value="actions" className="border-none">
-            <Card className="bg-white/10 backdrop-blur-md border-white/20 overflow-hidden rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:bg-white/15 hover:border-white/30">
-              <AccordionTrigger className="px-6 py-6 hover:bg-white/5 hover:no-underline [&[data-state=open]>div]:text-[#faed39] [&[data-state=open]]:bg-white/5">
+        {/* Data Actions */}
+        <Card className="bg-white/10 backdrop-blur-md border-white/20 overflow-hidden rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:bg-white/15 hover:border-white/30">
+          <AccordionTrigger className="px-6 py-6 hover:bg-white/5 hover:no-underline [&[data-state=open]>div]:text-[#faed39] [&[data-state=open]]:bg-white/5">
                 <div className="flex items-center justify-between w-full">
                   <div className="flex items-center space-x-3 text-left">
                     <Database className="w-6 h-6 text-[#faed39]" />
@@ -354,9 +346,7 @@ export function DataManagementPanel() {
                   </div>
                 </div>
               </AccordionContent>
-            </Card>
-          </AccordionItem>
-        </Accordion>
+        </Card>
       </div>
     </div>
   );

@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import CalorieCalculator from '@/components/CalorieCalculator';
 import { UserSettingsManager } from '@/components/UserSettingsManager';
 import { SignOnModule } from '@/components/SignOnModule';
@@ -1362,20 +1363,30 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           </div>
         )}
 
-        {/* Profile Cards with Accordion Functionality */}
-        <div className="space-y-6">
-          {user ? (
-            <>
+        {/* Profile Cards with Unified Accordion System */}
+        {user ? (
+          <Accordion 
+            type="single" 
+            collapsible 
+            className="w-full space-y-6"
+          >
+            <AccordionItem value="profile" className="border-none">
               <UserSettingsManager />
+            </AccordionItem>
+            
+            <AccordionItem value="achievements" className="border-none">
               <AwardsAchievements />
+            </AccordionItem>
+            
+            <AccordionItem value="data" className="border-none">
               <DataManagementPanel />
-            </>
-          ) : (
-            <Card className="bg-white/10 backdrop-blur-md border-white/20 p-8">
-              <SignOnModule />
-            </Card>
-          )}
-        </div>
+            </AccordionItem>
+          </Accordion>
+        ) : (
+          <Card className="bg-white/10 backdrop-blur-md border-white/20 p-8">
+            <SignOnModule />
+          </Card>
+        )}
       </div>
     </div>
   );
