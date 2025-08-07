@@ -77,6 +77,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const { user, isLoading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState('home');
   const [previousTab, setPreviousTab] = useState('home');
+  const [openCard, setOpenCard] = useState<string | undefined>(undefined);
   const { backgroundImage, animationKey } = useRotatingBackground(activeTab);
   const { data: achievements = [], isLoading: achievementsLoading } = useAchievements();
   const [searchQuery, setSearchQuery] = useState('');
@@ -1369,6 +1370,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             type="single" 
             collapsible 
             className="w-full space-y-6"
+            value={openCard}
+            onValueChange={setOpenCard}
           >
             {/* Profile Card */}
             <AccordionItem value="profile" className="border-none">
