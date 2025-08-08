@@ -191,28 +191,14 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
 
   return (
     <div className="space-y-6">
-            {/* Edit Button */}
-            {!isEditing && (
-              <div className="flex justify-center">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsEditing(true)}
-                  className="border-white/30 text-gray-300 hover:border-white/50 hover:text-white"
-                >
-                  <Edit3 className="w-4 h-4 mr-2" />
-                  Edit Profile
-                </Button>
-              </div>
-            )}
             
             {/* Profile Form */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Personal Information */}
-          <div className="space-y-4">
-            <h4 className="profile-section-title">
-              Personal Information
-            </h4>
+              {/* Personal Information */}
+              <div className="space-y-4">
+                <h4 className="profile-section-title">
+                  Personal Information
+                </h4>
             
             <div className="space-y-2">
               <label className="profile-label">
@@ -300,10 +286,13 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
             </div>
           </div>
 
-          {/* Health Information Fields */}
-          <div className="space-y-4">
-
-            <div className="space-y-2">
+              {/* Health Information Fields */}
+              <div className="space-y-4">
+                <h4 className="profile-section-title">
+                  Health & Fitness
+                </h4>
+                
+                <div className="space-y-2">
               <label className="profile-label">
                 <Activity className="w-4 h-4 mr-2 text-blue-400" />
                 Height (ft/in)
@@ -346,53 +335,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
               )}
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm text-gray-300 font-medium flex items-center">
-                <Activity className="w-4 h-4 mr-2 text-blue-400" />
-                Activity Level
-              </label>
-              {isEditing ? (
-                <select
-                  value={userInfo.activityLevel}
-                  onChange={(e) => setUserInfo(prev => ({ ...prev, activityLevel: e.target.value }))}
-                  className="w-full bg-white/10 border border-white/20 text-white p-3 rounded-lg"
-                >
-                  <option value="Sedentary">Sedentary</option>
-                  <option value="Lightly Active">Lightly Active</option>
-                  <option value="Moderately Active">Moderately Active</option>
-                  <option value="Very Active">Very Active</option>
-                  <option value="Extremely Active">Extremely Active</option>
-                </select>
-              ) : (
-                <p className="text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10 break-words">
-                  {userInfo.activityLevel}
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm text-gray-300 font-medium flex items-center">
-                <Target className="w-4 h-4 mr-2 text-orange-400" />
-                Daily Calorie Goal
-              </label>
-              {isEditing ? (
-                <Input
-                  type="number"
-                  value={userInfo.calorieGoal}
-                  onChange={(e) => setUserInfo(prev => ({ ...prev, calorieGoal: parseInt(e.target.value) || 2000 }))}
-                  className="bg-white/10 border-white/20 text-white placeholder-gray-400 w-full"
-                  placeholder="Enter daily calorie goal"
-                  min="1200"
-                  max="5000"
-                />
-              ) : (
-                <p className="text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10 break-words">
-                  {userInfo.calorieGoal} calories/day
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-2">
+                <div className="space-y-2">
               <label className="text-sm text-gray-300 font-medium flex items-center">
                 <Mail className="w-4 h-4 mr-2 text-blue-400" />
                 Email Address
@@ -401,103 +344,64 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                 {userInfo.email || 'Not provided'}
               </p>
             </div>
-          {/* Health Information */}
-          <div className="space-y-4">
-            <h4 className="text-lg font-semibold text-white mb-4" style={{ fontFamily: "'League Spartan', sans-serif" }}>
-              Health & Fitness
-            </h4>
-
-            <div className="space-y-2">
-              <label className="text-sm text-gray-300 font-medium flex items-center">
-                <Activity className="w-4 h-4 mr-2 text-blue-400" />
-                Activity Level
-              </label>
-              {isEditing ? (
-                <select
-                  value={userInfo.activityLevel}
-                  onChange={(e) => setUserInfo(prev => ({ ...prev, activityLevel: e.target.value }))}
-                  className="w-full bg-white/10 border border-white/20 text-white p-3 rounded-lg"
-                >
-                  <option value="Sedentary">Sedentary</option>
-                  <option value="Lightly Active">Lightly Active</option>
-                  <option value="Moderately Active">Moderately Active</option>
-                  <option value="Very Active">Very Active</option>
-                  <option value="Extremely Active">Extremely Active</option>
-                </select>
-              ) : (
-                <p className="text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10 break-words">
-                  {userInfo.activityLevel || 'Not provided'}
-                </p>
-              )}
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm text-gray-300 font-medium flex items-center">
-                <Target className="w-4 h-4 mr-2 text-orange-400" />
-                Daily Calorie Goal
-              </label>
-              {isEditing ? (
-                <Input
-                  type="number"
-                  value={userInfo.calorieGoal}
-                  onChange={(e) => setUserInfo(prev => ({ ...prev, calorieGoal: parseInt(e.target.value) || 2000 }))}
-                  className="bg-white/10 border-white/20 text-white placeholder-gray-400 w-full"
-                  placeholder="Enter daily calorie goal"
-                  min="1200"
-                  max="5000"
-                />
-              ) : (
-                <p className="text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10 break-words">
-                  {userInfo.calorieGoal} calories/day
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-
-                {/* Sign Out Button */}
-                <div className="flex justify-end pt-6 border-t border-white/20 mt-8">
+            {/* Action Buttons - Always visible */}
+            <div className="flex justify-between items-center pt-6 border-t border-white/20 mt-8">
+              {/* Sign Out Button */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleSignOut}
+                className="border-red-400/50 text-red-400 hover:bg-red-500/10 hover:text-red-300 hover:border-red-400"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Sign Out
+              </Button>
+              
+              {/* Save/Edit Buttons */}
+              <div className="flex gap-3">
+                {isEditing ? (
+                  <>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsEditing(false)}
+                      className="border-white/30 text-gray-300 hover:border-white/50 hover:text-white"
+                    >
+                      <X className="w-4 h-4 mr-2" />
+                      Cancel
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={handleSave}
+                      disabled={isSaving}
+                      className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
+                    >
+                      {isSaving ? (
+                        <>Saving...</>
+                      ) : (
+                        <>
+                          <Save className="w-4 h-4 mr-2" />
+                          Save Changes
+                        </>
+                      )}
+                    </Button>
+                  </>
+                ) : (
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={handleSignOut}
-                    className="border-red-400/50 text-red-400 hover:bg-red-500/10 hover:text-red-300 hover:border-red-400"
+                    onClick={() => setIsEditing(true)}
+                    className="border-white/30 text-gray-300 hover:border-white/50 hover:text-white"
                   >
-                    <LogOut className="w-4 h-4 mr-2" />
-                    Sign Out
+                    <Edit3 className="w-4 h-4 mr-2" />
+                    Edit Profile
                   </Button>
-                </div>
+                )}
               </div>
-
-      {/* Action Buttons when editing */}
-      {isEditing && (
-        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto pt-4">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setIsEditing(false)}
-            className="border-white/30 text-gray-300 hover:border-white/50 hover:text-white flex-1 sm:flex-none"
-          >
-            <X className="w-4 h-4 mr-2" />
-            Cancel
-          </Button>
-          <Button
-            size="sm"
-            onClick={handleSave}
-            disabled={isSaving}
-            className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white flex-1 sm:flex-none"
-          >
-            {isSaving ? (
-              <>Loading...</>
-            ) : (
-              <>
-                <Save className="w-4 h-4 mr-2" />
-                Save Changes
-              </>
-            )}
-          </Button>
-        </div>
-      )}
+            </div>
     </div>
   );
 }
