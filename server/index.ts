@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { keepAliveMonitor } from "./keepAlive";
 
 const app = express();
 app.use(express.json());
@@ -104,5 +105,33 @@ app.use((req, res, next) => {
     log(`🌐 External preview: https://${process.env.REPLIT_DEV_DOMAIN || 'localhost'}`);
     log(`🔧 Local dev: http://localhost:${port}`);
     log(`✅ Both external and development previews are accessible`);
+    
+    // Start keep-alive monitoring
+    keepAliveMonitor.start();
+    log(`🔄 Keep-alive monitoring started`);
+  });
+
+  // Configure server timeout and keep-alive settings
+  server.timeout = 0; // Disable server timeout
+  server.keepAliveTimeout = 120000; // 2 minutes keep-alive
+  server.headersTimeout = 120000; // 2 minutes headers timeout
+  
+  // Handle graceful shutdown
+  process.on('SIGINT', () => {
+    log('🛑 Graceful shutdown initiated...');
+    keepAliveMonitor.stop();
+    server.close(() => {
+      log('✅ Server closed gracefully');
+      process.exit(0);
+    });
+  });
+
+  process.on('SIGTERM', () => {
+    log('🛑 Termination signal received...');
+    keepAliveMonitor.stop();
+    server.close(() => {
+      log('✅ Server terminated gracefully');
+      process.exit(0);
+    });
   });
 })();
