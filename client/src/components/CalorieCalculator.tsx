@@ -166,14 +166,18 @@ function CalorieCalculator({
       setRecentAnalyses(prev => [data, ...prev.slice(0, 4)]);
       resetForm();
       
-      // Send calculated calories to tracking hook
+      // Calculate scaling factor for the actual serving size
+      const caloriesPer100g = data.nutritionPer100g?.calories || 100;
+      const scalingFactor = caloriesPer100g > 0 ? data.estimatedCalories / caloriesPer100g : 1;
+      
+      // Send calculated calories to tracking hook with properly scaled macros
       if (onCaloriesCalculated) {
         onCaloriesCalculated({
           name: `${data.ingredient} (${data.measurement})`,
           calories: data.estimatedCalories,
-          protein: data.nutritionPer100g?.protein || 0,
-          carbs: data.nutritionPer100g?.carbs || 0,
-          fat: data.nutritionPer100g?.fat || 0,
+          protein: (data.nutritionPer100g?.protein || 0) * scalingFactor,
+          carbs: (data.nutritionPer100g?.carbs || 0) * scalingFactor,
+          fat: (data.nutritionPer100g?.fat || 0) * scalingFactor,
           fiber: 0,
           sugar: 0,
           sodium: 0,
@@ -229,22 +233,29 @@ function CalorieCalculator({
     const now = new Date();
     const mealType = getMealType();
 
+    // Calculate scaling factor based on actual serving vs 100g
+    // The estimatedCalories is already scaled for the actual serving
+    // So we can derive the scaling factor from calories
+    const caloriesPer100g = analysis.nutritionPer100g?.calories || 100;
+    const scalingFactor = caloriesPer100g > 0 ? analysis.estimatedCalories / caloriesPer100g : 1;
+
     const mealData: LoggedMealData = {
       id: `calc-${Date.now()}`,
       name: `${analysis.ingredient} (${analysis.measurement})`,
       calories: analysis.estimatedCalories,
-      protein: analysis.nutritionPer100g?.protein || 0,
-      carbs: analysis.nutritionPer100g?.carbs || 0,
-      fat: analysis.nutritionPer100g?.fat || 0,
-      // Include micronutrients (real data from USDA when available)
-      iron: analysis.nutritionPer100g?.iron || 0,
-      calcium: analysis.nutritionPer100g?.calcium || 0,
-      zinc: analysis.nutritionPer100g?.zinc || 0,
-      magnesium: analysis.nutritionPer100g?.magnesium || 0,
-      vitaminC: analysis.nutritionPer100g?.vitaminC || 0,
-      vitaminD: analysis.nutritionPer100g?.vitaminD || 0,
-      vitaminB12: analysis.nutritionPer100g?.vitaminB12 || 0,
-      folate: analysis.nutritionPer100g?.folate || 0,
+      // Scale macronutrients based on actual serving size
+      protein: (analysis.nutritionPer100g?.protein || 0) * scalingFactor,
+      carbs: (analysis.nutritionPer100g?.carbs || 0) * scalingFactor,
+      fat: (analysis.nutritionPer100g?.fat || 0) * scalingFactor,
+      // Scale micronutrients based on actual serving size (real data from USDA when available)
+      iron: (analysis.nutritionPer100g?.iron || 0) * scalingFactor,
+      calcium: (analysis.nutritionPer100g?.calcium || 0) * scalingFactor,
+      zinc: (analysis.nutritionPer100g?.zinc || 0) * scalingFactor,
+      magnesium: (analysis.nutritionPer100g?.magnesium || 0) * scalingFactor,
+      vitaminC: (analysis.nutritionPer100g?.vitaminC || 0) * scalingFactor,
+      vitaminD: (analysis.nutritionPer100g?.vitaminD || 0) * scalingFactor,
+      vitaminB12: (analysis.nutritionPer100g?.vitaminB12 || 0) * scalingFactor,
+      folate: (analysis.nutritionPer100g?.folate || 0) * scalingFactor,
       date: now.toISOString().split('T')[0],
       time: now.toLocaleTimeString('en-US', { 
         hour: '2-digit', 

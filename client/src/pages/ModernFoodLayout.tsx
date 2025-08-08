@@ -115,9 +115,23 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   // Utility function to add notifications - using useCallback for stable reference
   // Function to calculate micronutrients from meals - uses real data when available
-  const calculateMicronutrients = (meals: any[]) => {
+  const calculateMicronutrients = useCallback((meals: any[]) => {
     // First, try to aggregate real micronutrient data from meals
     const realMicronutrients = meals.reduce((totals, meal) => {
+      // Debug log to see what data we're getting
+      if (meal.iron > 0 || meal.calcium > 0 || meal.vitaminC > 0) {
+        console.log('Meal with micronutrients:', meal.name, {
+          iron: meal.iron,
+          calcium: meal.calcium,
+          vitaminC: meal.vitaminC,
+          vitaminD: meal.vitaminD,
+          vitaminB12: meal.vitaminB12,
+          folate: meal.folate,
+          zinc: meal.zinc,
+          magnesium: meal.magnesium
+        });
+      }
+      
       return {
         vitaminC: totals.vitaminC + (meal.vitaminC || 0),
         vitaminD: totals.vitaminD + (meal.vitaminD || 0),
@@ -144,6 +158,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     
     if (hasRealData) {
       // Return actual micronutrient data from meals
+      console.log('Using real micronutrient data:', realMicronutrients);
       return {
         vitaminC: Math.round(realMicronutrients.vitaminC * 10) / 10,
         vitaminD: Math.round(realMicronutrients.vitaminD * 10) / 10,
@@ -159,6 +174,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       const totalCalories = meals.reduce((sum, meal) => sum + (meal.calories || 0), 0);
       const baseMultiplier = totalCalories / 100;
       
+      console.log('Using estimated micronutrient data based on calories:', totalCalories);
       return {
         vitaminC: Math.round(baseMultiplier * 8),
         vitaminD: Math.round(baseMultiplier * 0.2),
@@ -170,7 +186,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         magnesium: Math.round(baseMultiplier * 15)
       };
     }
-  };
+  }, []);
 
   const addNotification = useCallback((type: Notification['type'], title: string, message: string) => {
     setNotifications(prev => [{
@@ -299,6 +315,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         const micronutrients = calculateMicronutrients(todayMeals);
         setDailyMicronutrients(micronutrients);
         
+        // Debug: Log micronutrient data to verify it's being calculated
+        console.log('Micronutrients calculated:', micronutrients);
+        console.log('Today meals with micronutrients:', todayMeals);
+        
         // Fetch daily stats including fasting status
         if (user) {
           fetchDailyStats();
@@ -309,10 +329,21 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         setWeeklyCalories(weeklyTotal);
         
       } catch (error) {
+        console.error('Error loading meal data:', error);
         // Reset to safe state on error
         setLoggedMeals([]);
         setDailyCalories(0);
         setWeeklyCalories(0);
+        setDailyMicronutrients({
+          vitaminC: 0,
+          vitaminD: 0,
+          vitaminB12: 0,
+          folate: 0,
+          iron: 0,
+          calcium: 0,
+          zinc: 0,
+          magnesium: 0
+        });
       }
     };
 
@@ -348,7 +379,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       });
       window.removeEventListener('storage', loadExistingData);
     };
-  }, []);
+  }, [user, fetchDailyStats]);
 
   // Food categories inspired by Deliveroo
   const categories = [
