@@ -768,50 +768,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <FastingStatusCard fastingStatus={dailyStats?.fastingStatus} />
           </div>
 
-          {/* Recent Meals Section - Shows logged foods */}
-          {loggedMeals.length > 0 && (
-            <div className="mb-4">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-lg font-bold text-white flex items-center">
-                  <Utensils className="w-5 h-5 mr-2 text-orange-400" />
-                  Today's Meals ({loggedMeals.length})
-                </h3>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  className="text-orange-400 hover:text-orange-300"
-                  onClick={() => setActiveTab('tracking')}
-                >
-                  View All →
-                </Button>
-              </div>
-              <div className="space-y-2">
-                {loggedMeals.slice(0, 3).map((meal, index) => (
-                  <Card key={meal.id || index} className="bg-white/10 backdrop-blur-md border-white/20 p-3 hover:bg-white/15 transition-all">
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <h4 className="text-white font-semibold text-sm">{meal.name}</h4>
-                        <p className="text-gray-400 text-xs">{meal.time} • {meal.mealType}</p>
-                        <div className="flex flex-wrap gap-2 mt-1">
-                          <span className="text-xs text-green-400">P: {(meal.protein || 0).toFixed(1)}g</span>
-                          <span className="text-xs text-yellow-400">C: {(meal.carbs || 0).toFixed(1)}g</span>
-                          <span className="text-xs text-purple-400">F: {(meal.fat || 0).toFixed(1)}g</span>
-                          {meal.iron > 0 && <span className="text-xs text-slate-400">Fe: {meal.iron.toFixed(1)}mg</span>}
-                          {meal.calcium > 0 && <span className="text-xs text-gray-300">Ca: {Math.round(meal.calcium)}mg</span>}
-                          {meal.vitaminC > 0 && <span className="text-xs text-cyan-400">Vit C: {Math.round(meal.vitaminC)}mg</span>}
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-orange-400 font-bold text-lg">{Math.round(meal.calories || 0)}</p>
-                        <p className="text-orange-400/70 text-xs">cal</p>
-                      </div>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          )}
-
           {/* Weekly Progress */}
           <div className="mb-4">
             <ProgressCard
