@@ -16,6 +16,8 @@ import {
 } from './ui/accordion';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { useQuery } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
 import { 
   Trophy, 
   Star, 
@@ -58,7 +60,6 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
   const { toast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [achievements, setAchievements] = useState<Achievement[]>([]);
-  const [loading, setLoading] = useState(true);
 
 
   const [userStats, setUserStats] = useState({
@@ -86,97 +87,125 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
     platinum: 'bg-[#1f4aa6]/20 border-[#1f4aa6]/30 text-[#1f4aa6]'
   };
 
-  // Load achievements data
+    // Fetch user achievements from backend
+  const { data: achievementsData, isLoading: achievementsLoading, refetch } = useQuery({
+    queryKey: ['/api/achievements'],
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/achievements');
+      const data = await response.json();
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  // Fetch user statistics
+  const { data: statsData } = useQuery({
+    queryKey: ['/api/user/statistics'],
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/user/statistics');
+      const data = await response.json();
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  // Update local state when data changes
   useEffect(() => {
-    loadAchievements();
-  }, [user]);
-
-  const loadAchievements = async () => {
-    try {
-      setLoading(true);
-      // Generate starter achievements for the user
-      const starterAchievements: Achievement[] = [
-        {
-          id: '1',
-          title: 'First Steps',
-          description: 'Log your first meal',
-          icon: '🥗',
-          category: 'daily',
-          difficulty: 'bronze',
-          progress: 0,
-          target: 1,
-          completed: false,
-          points: 10
-        },
-        {
-          id: '2',
-          title: 'Daily Tracker',
-          description: 'Track meals for 7 consecutive days',
-          icon: '📅',
-          category: 'weekly',
-          difficulty: 'silver',
-          progress: 0,
-          target: 7,
-          completed: false,
-          points: 50
-        },
-        {
-          id: '3',
-          title: 'Calorie Goal',
-          description: 'Meet your daily calorie goal',
-          icon: '🎯',
-          category: 'daily',
-          difficulty: 'bronze',
-          progress: 0,
-          target: 1,
-          completed: false,
-          points: 15
-        },
-        {
-          id: '4',
-          title: 'Protein Power',
-          description: 'Reach protein goal for 5 days',
-          icon: '💪',
-          category: 'weekly',
-          difficulty: 'gold',
-          progress: 0,
-          target: 5,
-          completed: false,
-          points: 75
-        },
-        {
-          id: '5',
-          title: 'Nutrition Master',
-          description: 'Complete 30 days of tracking',
-          icon: '🏆',
-          category: 'milestone',
-          difficulty: 'platinum',
-          progress: 0,
-          target: 30,
-          completed: false,
-          points: 200
-        }
-      ];
-
-      setAchievements(starterAchievements);
-      setUserStats({
-        totalPoints: 0,
-        achievementsCompleted: 0,
-        currentStreak: 0,
-        longestStreak: 0,
-        level: 1,
-        nextLevelPoints: 100
-      });
-    } catch (error) {
-      toast({
-        title: "Loading failed",
-        description: "Could not load achievements. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
+    if (achievementsData?.achievements) {
+      const userAchievements = achievementsData.achievements.map((achievement: any) => ({
+        id: achievement.id,
+        title: achievement.title,
+        description: achievement.description,
+        icon: achievement.icon || getAchievementIcon(achievement.id),
+        category: getCategoryFromAchievement(achievement),
+        difficulty: getDifficultyFromPoints(achievement.points),
+        progress: achievement.progress || 0,
+        target: achievement.target || 1,
+        completed: achievement.unlocked || false,
+        completedDate: achievement.unlockedAt ? new Date(achievement.unlockedAt) : undefined,
+        points: achievement.points || 10,
+        reward: achievement.reward
+      }));
+      setAchievements(userAchievements);
     }
+  }, [achievementsData]);
+
+  // Update user stats when data changes
+  useEffect(() => {
+    if (statsData) {
+      const completedCount = achievements.filter(a => a.completed).length;
+      const totalPoints = achievements.filter(a => a.completed)
+        .reduce((sum, a) => sum + a.points, 0);
+      
+      setUserStats({
+        totalPoints: totalPoints || statsData.totalPoints || 0,
+        achievementsCompleted: completedCount || statsData.achievementsUnlocked || 0,
+        currentStreak: statsData.currentStreak || 0,
+        longestStreak: statsData.longestStreak || 0,
+        level: Math.floor(totalPoints / 100) + 1 || 1,
+        nextLevelPoints: ((Math.floor(totalPoints / 100) + 1) * 100) || 100
+      });
+    }
+  }, [statsData, achievements]);
+
+  // Helper functions
+  const getAchievementIcon = (id: string): string => {
+    const iconMap: { [key: string]: string } = {
+      'first-meal': '🥗',
+      'first-food': '🍎',
+      'first-recipe': '👨‍🍳',
+      'daily-tracker': '📅',
+      'calorie-goal': '🎯',
+      'protein-power': '💪',
+      'balanced-nutrition': '⚖️',
+      'hydration-hero': '💧',
+      'streak-master': '🔥',
+      'nutrition-master': '🏆',
+      'recipe-creator': '📝',
+      'meal-planner': '📋',
+      'health-champion': '❤️',
+      'fitness-enthusiast': '🏃',
+      'mindful-eater': '🧘'
+    };
+    return iconMap[id] || '🏅';
   };
+
+  const getCategoryFromAchievement = (achievement: any): Achievement['category'] => {
+    if (achievement.id.includes('streak') || achievement.id.includes('weekly')) return 'weekly';
+    if (achievement.id.includes('month')) return 'monthly';
+    if (achievement.id.includes('milestone') || achievement.target >= 30) return 'milestone';
+    if (achievement.id.includes('special')) return 'special';
+    return 'daily';
+  };
+
+  const getDifficultyFromPoints = (points: number): Achievement['difficulty'] => {
+    if (points >= 100) return 'platinum';
+    if (points >= 50) return 'gold';
+    if (points >= 25) return 'silver';
+    return 'bronze';
+  };
+
+  // Check for new achievements periodically
+  useEffect(() => {
+    if (!user) return;
+    
+    const checkAchievements = async () => {
+      try {
+        await apiRequest('POST', '/api/achievements/check');
+        refetch(); // Refresh achievements list
+      } catch (error) {
+        // Silent fail - achievements will be checked on next action
+      }
+    };
+
+    // Check immediately when component mounts
+    checkAchievements();
+
+    // Check every 30 seconds for updates
+    const interval = setInterval(checkAchievements, 30000);
+    
+    return () => clearInterval(interval);
+  }, [user, refetch]);
 
   const filteredAchievements = selectedCategory === 'all' 
     ? achievements 
@@ -190,15 +219,15 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
         {/* Stats Overview */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <div className="text-center p-4 bg-gradient-to-br from-[#faed39]/10 to-[#faed39]/5 rounded-lg border border-[#faed39]/20">
-            <div className="text-2xl font-bold text-[#faed39]" style={{ fontFamily: "'League Spartan', sans-serif" }}>{userStats.totalPoints}</div>
+            <div className="text-2xl font-bold text-[#faed39]" style={{ fontFamily: "'League Spartan', sans-serif" }}>{userStats.totalPoints || 0}</div>
             <div className="text-sm text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>Total Points</div>
           </div>
           <div className="text-center p-4 bg-gradient-to-br from-[#45c73e]/10 to-[#45c73e]/5 rounded-lg border border-[#45c73e]/20">
-            <div className="text-2xl font-bold text-[#45c73e]" style={{ fontFamily: "'League Spartan', sans-serif" }}>{completedAchievements.length}</div>
+            <div className="text-2xl font-bold text-[#45c73e]" style={{ fontFamily: "'League Spartan', sans-serif" }}>{completedAchievements.length || 0}</div>
             <div className="text-sm text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>Completed</div>
           </div>
           <div className="text-center p-4 bg-gradient-to-br from-[#1f4aa6]/10 to-[#1f4aa6]/5 rounded-lg border border-[#1f4aa6]/20">
-            <div className="text-2xl font-bold text-[#1f4aa6]" style={{ fontFamily: "'League Spartan', sans-serif" }}>{userStats.currentStreak}</div>
+            <div className="text-2xl font-bold text-[#1f4aa6]" style={{ fontFamily: "'League Spartan', sans-serif" }}>{userStats.currentStreak || 0}</div>
             <div className="text-sm text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>Current Streak</div>
           </div>
           <div className="text-center p-4 bg-gradient-to-br from-[#faed39]/10 to-[#1f4aa6]/10 rounded-lg border border-[#faed39]/20">
@@ -253,13 +282,17 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
 
         {/* Achievements Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {loading ? (
+                {achievementsLoading ? (
                   <div className="col-span-full text-center py-8">
                     <div className="text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>Loading achievements...</div>
                   </div>
+                ) : !user ? (
+                  <div className="col-span-full text-center py-8">
+                    <div className="text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>Sign in to track your achievements</div>
+                  </div>
                 ) : filteredAchievements.length === 0 ? (
                   <div className="col-span-full text-center py-8">
-                    <div className="text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>No achievements found for this category.</div>
+                    <div className="text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>No achievements in this category yet. Keep tracking to unlock!</div>
                   </div>
                 ) : (
           filteredAchievements.map((achievement) => (

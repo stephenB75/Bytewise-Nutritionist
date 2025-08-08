@@ -813,6 +813,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // User statistics endpoint for achievements component
+  app.get('/api/user/statistics', isAuthenticated, async (req: any, res: Response) => {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ message: "User not found" });
+    }
+
+    try {
+      // Get user achievements and calculate stats
+      const achievements = await storage.getUserAchievements(userId);
+      const unlockedAchievements = achievements.filter(a => a.earnedAt !== null);
+      const totalPoints = unlockedAchievements.length * 10; // Basic points calculation
+      
+      // Get user meal tracking stats for streaks
+      const today = new Date();
+      const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+      const meals = await storage.getUserMeals(userId, thirtyDaysAgo, today);
+      
+      // Calculate streaks
+      let currentStreak = 0;
+      let longestStreak = 0;
+      let tempStreak = 0;
+      let lastDate: Date | null = null;
+      
+      // Sort meals by date
+      const mealsByDate = meals.reduce((acc: any, meal: any) => {
+        const dateKey = new Date(meal.createdAt).toDateString();
+        if (!acc[dateKey]) acc[dateKey] = [];
+        acc[dateKey].push(meal);
+        return acc;
+      }, {});
+      
+      const sortedDates = Object.keys(mealsByDate).sort((a, b) => 
+        new Date(a).getTime() - new Date(b).getTime()
+      );
+      
+      // Calculate streaks
+      sortedDates.forEach((dateStr, index) => {
+        const date = new Date(dateStr);
+        
+        if (!lastDate || (date.getTime() - lastDate.getTime()) === 86400000) {
+          tempStreak++;
+          if (tempStreak > longestStreak) {
+            longestStreak = tempStreak;
+          }
+          
+          // Check if this streak continues to today
+          if (index === sortedDates.length - 1) {
+            const todayStr = new Date().toDateString();
+            if (dateStr === todayStr || 
+                new Date(todayStr).getTime() - date.getTime() === 86400000) {
+              currentStreak = tempStreak;
+            }
+          }
+        } else {
+          tempStreak = 1;
+        }
+        
+        lastDate = date;
+      });
+      
+      res.json({
+        totalPoints,
+        achievementsUnlocked: unlockedAchievements.length,
+        currentStreak,
+        longestStreak,
+        totalMealsLogged: meals.length,
+        level: Math.floor(totalPoints / 100) + 1
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: "Failed to get user statistics" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
