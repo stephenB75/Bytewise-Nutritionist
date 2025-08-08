@@ -114,24 +114,62 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
 
   // Utility function to add notifications - using useCallback for stable reference
-  // Function to calculate estimated micronutrients based on food types and calories
-  const calculateEstimatedMicronutrients = (meals: any[]) => {
-    const totalCalories = meals.reduce((sum, meal) => sum + (meal.calories || 0), 0);
+  // Function to calculate micronutrients from meals - uses real data when available
+  const calculateMicronutrients = (meals: any[]) => {
+    // First, try to aggregate real micronutrient data from meals
+    const realMicronutrients = meals.reduce((totals, meal) => {
+      return {
+        vitaminC: totals.vitaminC + (meal.vitaminC || 0),
+        vitaminD: totals.vitaminD + (meal.vitaminD || 0),
+        vitaminB12: totals.vitaminB12 + (meal.vitaminB12 || 0),
+        folate: totals.folate + (meal.folate || 0),
+        iron: totals.iron + (meal.iron || 0),
+        calcium: totals.calcium + (meal.calcium || 0),
+        zinc: totals.zinc + (meal.zinc || 0),
+        magnesium: totals.magnesium + (meal.magnesium || 0)
+      };
+    }, {
+      vitaminC: 0,
+      vitaminD: 0,
+      vitaminB12: 0,
+      folate: 0,
+      iron: 0,
+      calcium: 0,
+      zinc: 0,
+      magnesium: 0
+    });
     
-    // Estimate micronutrients based on food patterns and typical nutrient density
-    // These are estimates based on average nutrient density per 100 calories
-    const baseMultiplier = totalCalories / 100;
+    // Check if we have real data (any micronutrient value > 0)
+    const hasRealData = Object.values(realMicronutrients).some(value => value > 0);
     
-    return {
-      vitaminC: Math.round(baseMultiplier * 8), // ~8mg per 100 calories from mixed diet
-      vitaminD: Math.round(baseMultiplier * 0.2), // ~0.2μg per 100 calories (limited in most foods)
-      vitaminB12: Math.round(baseMultiplier * 0.3 * 10) / 10, // ~0.3μg per 100 calories from animal products
-      folate: Math.round(baseMultiplier * 12), // ~12μg per 100 calories from fortified foods
-      iron: Math.round(baseMultiplier * 1.8 * 10) / 10, // ~1.8mg per 100 calories
-      calcium: Math.round(baseMultiplier * 25), // ~25mg per 100 calories
-      zinc: Math.round(baseMultiplier * 1.1 * 10) / 10, // ~1.1mg per 100 calories
-      magnesium: Math.round(baseMultiplier * 15) // ~15mg per 100 calories
-    };
+    if (hasRealData) {
+      // Return actual micronutrient data from meals
+      return {
+        vitaminC: Math.round(realMicronutrients.vitaminC * 10) / 10,
+        vitaminD: Math.round(realMicronutrients.vitaminD * 10) / 10,
+        vitaminB12: Math.round(realMicronutrients.vitaminB12 * 10) / 10,
+        folate: Math.round(realMicronutrients.folate),
+        iron: Math.round(realMicronutrients.iron * 10) / 10,
+        calcium: Math.round(realMicronutrients.calcium),
+        zinc: Math.round(realMicronutrients.zinc * 10) / 10,
+        magnesium: Math.round(realMicronutrients.magnesium)
+      };
+    } else {
+      // Fallback to estimation if no real data available
+      const totalCalories = meals.reduce((sum, meal) => sum + (meal.calories || 0), 0);
+      const baseMultiplier = totalCalories / 100;
+      
+      return {
+        vitaminC: Math.round(baseMultiplier * 8),
+        vitaminD: Math.round(baseMultiplier * 0.2),
+        vitaminB12: Math.round(baseMultiplier * 0.3 * 10) / 10,
+        folate: Math.round(baseMultiplier * 12),
+        iron: Math.round(baseMultiplier * 1.8 * 10) / 10,
+        calcium: Math.round(baseMultiplier * 25),
+        zinc: Math.round(baseMultiplier * 1.1 * 10) / 10,
+        magnesium: Math.round(baseMultiplier * 15)
+      };
+    }
   };
 
   const addNotification = useCallback((type: Notification['type'], title: string, message: string) => {
@@ -257,9 +295,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         }), { protein: 0, carbs: 0, fat: 0 });
         setDailyMacros(dailyMacroTotals);
         
-        // Calculate estimated micronutrients from today's meals
-        const estimatedMicronutrients = calculateEstimatedMicronutrients(todayMeals);
-        setDailyMicronutrients(estimatedMicronutrients);
+        // Calculate micronutrients from today's meals (uses real data when available)
+        const micronutrients = calculateMicronutrients(todayMeals);
+        setDailyMicronutrients(micronutrients);
         
         // Fetch daily stats including fasting status
         if (user) {
@@ -896,7 +934,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                         }), { protein: 0, carbs: 0, fat: 0 });
                         setDailyMacros(updatedMacros);
                         
-                        const updatedMicronutrients = calculateEstimatedMicronutrients(todayMeals);
+                        const updatedMicronutrients = calculateMicronutrients(todayMeals);
                         setDailyMicronutrients(updatedMicronutrients);
                         
                         // Dispatch events
@@ -1242,7 +1280,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                       }), { protein: 0, carbs: 0, fat: 0 });
                       setDailyMacros(updatedMacros);
                       
-                      const updatedMicronutrients = calculateEstimatedMicronutrients(todayMeals);
+                      const updatedMicronutrients = calculateMicronutrients(todayMeals);
                       setDailyMicronutrients(updatedMicronutrients);
                       
                       // Dispatch events

@@ -43,6 +43,19 @@ interface IngredientAnalysis {
     protein: number;
     carbs: number;
     fat: number;
+    // Micronutrients
+    iron?: number;
+    calcium?: number;
+    zinc?: number;
+    magnesium?: number;
+    vitaminC?: number;
+    vitaminD?: number;
+    vitaminB12?: number;
+    folate?: number;
+    vitaminA?: number;
+    vitaminE?: number;
+    potassium?: number;
+    phosphorus?: number;
   };
   fdaServing?: string;
 }
@@ -71,6 +84,15 @@ interface LoggedMealData {
   protein: number;
   carbs: number;
   fat: number;
+  // Micronutrients
+  iron?: number;
+  calcium?: number;
+  zinc?: number;
+  magnesium?: number;
+  vitaminC?: number;
+  vitaminD?: number;
+  vitaminB12?: number;
+  folate?: number;
   date: string;
   time: string;
   mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack';
@@ -214,6 +236,15 @@ function CalorieCalculator({
       protein: analysis.nutritionPer100g?.protein || 0,
       carbs: analysis.nutritionPer100g?.carbs || 0,
       fat: analysis.nutritionPer100g?.fat || 0,
+      // Include micronutrients (real data from USDA when available)
+      iron: analysis.nutritionPer100g?.iron || 0,
+      calcium: analysis.nutritionPer100g?.calcium || 0,
+      zinc: analysis.nutritionPer100g?.zinc || 0,
+      magnesium: analysis.nutritionPer100g?.magnesium || 0,
+      vitaminC: analysis.nutritionPer100g?.vitaminC || 0,
+      vitaminD: analysis.nutritionPer100g?.vitaminD || 0,
+      vitaminB12: analysis.nutritionPer100g?.vitaminB12 || 0,
+      folate: analysis.nutritionPer100g?.folate || 0,
       date: now.toISOString().split('T')[0],
       time: now.toLocaleTimeString('en-US', { 
         hour: '2-digit', 
@@ -242,7 +273,16 @@ function CalorieCalculator({
         totalCalories: mealData.calories,
         totalProtein: mealData.protein,
         totalCarbs: mealData.carbs,
-        totalFat: mealData.fat
+        totalFat: mealData.fat,
+        // Include micronutrients in API request
+        iron: mealData.iron,
+        calcium: mealData.calcium,
+        zinc: mealData.zinc,
+        magnesium: mealData.magnesium,
+        vitaminC: mealData.vitaminC,
+        vitaminD: mealData.vitaminD,
+        vitaminB12: mealData.vitaminB12,
+        folate: mealData.folate
       });
       
       const result = await response.json();

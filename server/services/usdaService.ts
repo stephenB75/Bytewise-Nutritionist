@@ -377,13 +377,32 @@ export class USDAService {
       // Calculate calories based on grams
       const estimatedCalories = Math.round((nutrients.calories * gramsEquivalent) / 100);
       
+      // Calculate micronutrients based on serving size
+      const micronutrientsPer100g = {
+        iron: nutrients.iron || 0,
+        calcium: nutrients.calcium || 0,
+        zinc: nutrients.zinc || 0,
+        magnesium: nutrients.magnesium || 0,
+        vitaminC: nutrients.vitaminC || 0,
+        vitaminD: nutrients.vitaminD || 0,
+        vitaminB12: nutrients.vitaminB12 || 0,
+        folate: nutrients.folate || 0,
+        vitaminA: nutrients.vitaminA || 0,
+        vitaminE: nutrients.vitaminE || 0,
+        potassium: nutrients.potassium || 0,
+        phosphorus: nutrients.phosphorus || 0
+      };
+      
       const result: any = {
         ingredient: food.description,
         measurement: `${quantity} ${unit} (~${gramsEquivalent}g)`,
         estimatedCalories,
         equivalentMeasurement: `100g ≈ ${nutrients.calories} kcal`,
         note: `From USDA database (${food.dataType})`,
-        nutritionPer100g: nutrients
+        nutritionPer100g: {
+          ...nutrients,
+          ...micronutrientsPer100g
+        }
       };
       
       // Include FDA serving information if available
@@ -1033,6 +1052,19 @@ export class USDAService {
       fiber: 0,
       sugar: 0,
       sodium: 0,
+      // Micronutrients
+      iron: 0,
+      calcium: 0,
+      zinc: 0,
+      magnesium: 0,
+      vitaminC: 0,
+      vitaminD: 0,
+      vitaminB12: 0,
+      folate: 0,
+      vitaminA: 0,
+      vitaminE: 0,
+      potassium: 0,
+      phosphorus: 0
     };
 
     if (!foodNutrients || !Array.isArray(foodNutrients)) {
@@ -1067,6 +1099,30 @@ export class USDAService {
         nutrients.sugar = amount;
       } else if (name.includes('sodium') || nutrientId === 1093) {
         nutrients.sodium = amount > 100 ? amount / 1000 : amount; // Convert mg to g if needed
+      } else if (name.includes('iron') || nutrientId === 1089) { // Iron, mg
+        nutrients.iron = amount;
+      } else if (name.includes('calcium') || nutrientId === 1087) { // Calcium, mg
+        nutrients.calcium = amount;
+      } else if (name.includes('zinc') || nutrientId === 1095) { // Zinc, mg
+        nutrients.zinc = amount;
+      } else if (name.includes('magnesium') || nutrientId === 1090) { // Magnesium, mg
+        nutrients.magnesium = amount;
+      } else if ((name.includes('vitamin c') || name.includes('ascorbic')) || nutrientId === 1162) { // Vitamin C, mg
+        nutrients.vitaminC = amount;
+      } else if (name.includes('vitamin d') || nutrientId === 1110 || nutrientId === 1114) { // Vitamin D (D2 + D3), mcg
+        nutrients.vitaminD += amount;
+      } else if (name.includes('vitamin b-12') || name.includes('cobalamin') || nutrientId === 1178) { // Vitamin B12, mcg
+        nutrients.vitaminB12 = amount;
+      } else if (name.includes('folate') || nutrientId === 1177) { // Folate, mcg
+        nutrients.folate = amount;
+      } else if (name.includes('vitamin a') || nutrientId === 1106 || nutrientId === 1107) { // Vitamin A, mcg
+        nutrients.vitaminA += amount;
+      } else if (name.includes('vitamin e') || nutrientId === 1109) { // Vitamin E, mg
+        nutrients.vitaminE = amount;
+      } else if (name.includes('potassium') || nutrientId === 1092) { // Potassium, mg
+        nutrients.potassium = amount;
+      } else if (name.includes('phosphorus') || nutrientId === 1091) { // Phosphorus, mg
+        nutrients.phosphorus = amount;
       }
     }
 
@@ -2121,13 +2177,31 @@ export class USDAService {
       const { quantity, unit, gramsEquivalent } = measurementResult;
       const estimatedCalories = Math.round((nutrition.calories * gramsEquivalent) / 100);
       
+      // Add estimated micronutrients to liquid fallback
+      const nutritionWithMicronutrients = {
+        ...nutrition,
+        // Estimate micronutrients for liquids (per 100g/ml)
+        iron: 0.1,
+        calcium: 5,
+        zinc: 0.1,
+        magnesium: 3,
+        vitaminC: 0,
+        vitaminD: 0,
+        vitaminB12: 0,
+        folate: 0,
+        vitaminA: 0,
+        vitaminE: 0,
+        potassium: 50,
+        phosphorus: 10
+      };
+      
       const result: any = {
         ingredient: normalized.toUpperCase(),
         measurement: `${quantity} ${unit} (~${gramsEquivalent}g)`,
         estimatedCalories,
         equivalentMeasurement: `100g ≈ ${nutrition.calories} kcal`,
         note: estimatedCalories === 0 ? 'Contains no calories' : 'Low-calorie beverage',
-        nutritionPer100g: nutrition
+        nutritionPer100g: nutritionWithMicronutrients
       };
       
       // Include FDA serving information if available
@@ -2151,13 +2225,31 @@ export class USDAService {
       const { quantity, unit, gramsEquivalent } = measurementResult;
       const estimatedCalories = Math.round((nutrition.calories * gramsEquivalent) / 100);
 
+      // Add estimated micronutrients based on food category
+      const nutritionWithMicronutrients = {
+        ...nutrition,
+        // Estimate micronutrients based on typical values (per 100g)
+        iron: Math.round((nutrition.protein * 0.1 + 1) * 10) / 10,
+        calcium: Math.round((nutrition.protein * 2 + 20)),
+        zinc: Math.round((nutrition.protein * 0.05 + 0.5) * 10) / 10,
+        magnesium: Math.round((nutrition.carbs * 0.5 + 10)),
+        vitaminC: Math.round((nutrition.carbs * 0.3)),
+        vitaminD: Math.round((nutrition.fat * 0.02) * 10) / 10,
+        vitaminB12: Math.round((nutrition.protein * 0.02) * 10) / 10,
+        folate: Math.round((nutrition.carbs * 0.8 + 5)),
+        vitaminA: Math.round((nutrition.fat * 0.5)),
+        vitaminE: Math.round((nutrition.fat * 0.1) * 10) / 10,
+        potassium: Math.round((nutrition.calories * 1.5)),
+        phosphorus: Math.round((nutrition.protein * 8 + 50))
+      };
+      
       const result: any = {
         ingredient: normalized.toUpperCase(),
         measurement: `${quantity} ${unit} (~${gramsEquivalent}g)`,
         estimatedCalories,
         equivalentMeasurement: `100g ≈ ${nutrition.calories} kcal`,
         note: 'Estimate based on USDA nutrition averages with enhanced conversion factors',
-        nutritionPer100g: nutrition,
+        nutritionPer100g: nutritionWithMicronutrients,
         usdaPortionUsed: false
       };
       
@@ -2198,7 +2290,26 @@ export class USDAService {
       baseCalories = 350; protein = 10.0; carbs = 70.0; fat = 2.0;
     }
     
-    const nutrition = { calories: baseCalories, protein, carbs, fat };
+    // Add estimated micronutrients for generic foods
+    const nutrition = { 
+      calories: baseCalories, 
+      protein, 
+      carbs, 
+      fat,
+      // Generic micronutrient estimates (per 100g)
+      iron: Math.round((protein * 0.08 + 0.8) * 10) / 10,
+      calcium: Math.round((protein * 1.5 + 15)),
+      zinc: Math.round((protein * 0.04 + 0.4) * 10) / 10,
+      magnesium: Math.round((carbs * 0.4 + 8)),
+      vitaminC: Math.round((carbs * 0.2)),
+      vitaminD: Math.round((fat * 0.01) * 10) / 10,
+      vitaminB12: Math.round((protein * 0.01) * 10) / 10,
+      folate: Math.round((carbs * 0.6 + 4)),
+      vitaminA: Math.round((fat * 0.3)),
+      vitaminE: Math.round((fat * 0.08) * 10) / 10,
+      potassium: Math.round((baseCalories * 1.2)),
+      phosphorus: Math.round((protein * 6 + 40))
+    };
     const mockFood: USDAFood = {
       fdcId: 0,
       description: normalized,
