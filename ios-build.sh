@@ -1,74 +1,57 @@
 #!/bin/bash
 
-echo "📱 ByteWise Nutritionist - iOS Native Build"
-echo "=========================================="
-echo ""
+echo "📱 Starting iOS Build Setup for ByteWise Nutritionist"
+echo "================================================"
 
-# Check if we're on macOS (required for iOS development)
+# Check if running on macOS
 if [[ "$OSTYPE" != "darwin"* ]]; then
-    echo "⚠️  Warning: iOS development requires macOS with Xcode installed"
-    echo "   You can still build the web app and sync files for later iOS development"
-    echo ""
-fi
-
-# Build the web application
-echo "🏗️  Building web application..."
-npm run build
-
-if [ $? -ne 0 ]; then
-    echo "❌ Web build failed. Please check the errors above."
+    echo "❌ Error: This script must be run on macOS for iOS development"
     exit 1
 fi
 
-# Ensure Capacitor CLI is available
-echo "🔧 Checking Capacitor setup..."
-if ! command -v npx cap &> /dev/null; then
-    echo "❌ Capacitor CLI not found. Installing..."
-    npm install -g @capacitor/cli
-fi
-
-# Sync the web app with iOS project
-echo "🔄 Syncing web app with iOS project..."
+# Sync Capacitor
+echo "🔄 Syncing Capacitor iOS project..."
 npx cap sync ios
 
-if [ $? -ne 0 ]; then
-    echo "❌ Capacitor sync failed. Please check the errors above."
+# Navigate to iOS directory
+cd ios/App || exit 1
+
+# Clean previous build artifacts
+echo "🧹 Cleaning previous build artifacts..."
+rm -rf Pods
+rm -f Podfile.lock
+rm -rf ~/Library/Developer/Xcode/DerivedData/*
+
+# Update CocoaPods repo
+echo "📦 Updating CocoaPods repository..."
+pod repo update
+
+# Install pods with verbose output
+echo "🔧 Installing CocoaPods dependencies..."
+pod install --verbose
+
+# Check if pod install was successful
+if [ $? -eq 0 ]; then
+    echo "✅ Pod installation successful!"
+    
+    # Open Xcode workspace
+    echo "📂 Opening Xcode workspace..."
+    open App.xcworkspace
+    
+    echo ""
+    echo "========================================="
+    echo "✨ iOS Build Setup Complete!"
+    echo "========================================="
+    echo "Next steps:"
+    echo "1. In Xcode, select your development team"
+    echo "2. Select a simulator or device"
+    echo "3. Press Cmd+R to build and run"
+    echo ""
+else
+    echo "❌ Pod installation failed!"
+    echo "Troubleshooting steps:"
+    echo "1. Make sure CocoaPods is installed: gem install cocoapods"
+    echo "2. Try: pod deintegrate && pod install"
+    echo "3. Check that all node_modules are installed: npm install"
     exit 1
 fi
-
-# Copy native resources if they exist
-echo "📦 Copying native iOS resources..."
-if [ -d "ios-assets" ]; then
-    cp -r ios-assets/* ios/App/App/Resources/ 2>/dev/null || echo "   No additional iOS assets to copy"
-fi
-
-echo ""
-echo "✅ iOS build preparation complete!"
-echo ""
-echo "📋 Next steps:"
-
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    echo "   1. Open Xcode: npx cap open ios"
-    echo "   2. Configure signing team in Xcode"
-    echo "   3. Build and run on simulator or device"
-    echo "   4. For live reload: npm run dev (then) npx cap run ios --livereload"
-    echo ""
-    echo "🚀 Ready to launch Xcode? (y/N)"
-    read -r response
-    if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
-        echo "🎯 Opening Xcode..."
-        npx cap open ios
-    else
-        echo "👍 iOS project ready. Run 'npx cap open ios' when ready."
-    fi
-else
-    echo "   1. Transfer project to macOS machine"
-    echo "   2. Run 'npx cap open ios' on macOS with Xcode"
-    echo "   3. Configure Apple Developer account and signing"
-    echo "   4. Build and test on iOS Simulator or device"
-fi
-
-echo ""
-echo "📱 iOS project location: ./ios"
-echo "🔧 App ID: com.bytewise.nutritionist"
-echo "📦 Bundle ready for Xcode development"

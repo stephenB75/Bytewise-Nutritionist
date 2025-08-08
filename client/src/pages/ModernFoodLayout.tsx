@@ -118,19 +118,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const calculateMicronutrients = useCallback((meals: any[]) => {
     // First, try to aggregate real micronutrient data from meals
     const realMicronutrients = meals.reduce((totals, meal) => {
-      // Debug log to see what data we're getting
-      if (meal.iron > 0 || meal.calcium > 0 || meal.vitaminC > 0) {
-        console.log('Meal with micronutrients:', meal.name, {
-          iron: meal.iron,
-          calcium: meal.calcium,
-          vitaminC: meal.vitaminC,
-          vitaminD: meal.vitaminD,
-          vitaminB12: meal.vitaminB12,
-          folate: meal.folate,
-          zinc: meal.zinc,
-          magnesium: meal.magnesium
-        });
-      }
       
       return {
         vitaminC: totals.vitaminC + (meal.vitaminC || 0),
@@ -158,7 +145,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     
     if (hasRealData) {
       // Return actual micronutrient data from meals
-      console.log('Using real micronutrient data:', realMicronutrients);
       return {
         vitaminC: Math.round(realMicronutrients.vitaminC * 10) / 10,
         vitaminD: Math.round(realMicronutrients.vitaminD * 10) / 10,
@@ -174,7 +160,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       const totalCalories = meals.reduce((sum, meal) => sum + (meal.calories || 0), 0);
       const baseMultiplier = totalCalories / 100;
       
-      console.log('Using estimated micronutrient data based on calories:', totalCalories);
       return {
         vitaminC: Math.round(baseMultiplier * 8),
         vitaminD: Math.round(baseMultiplier * 0.2),
@@ -289,26 +274,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     }
   }, [user, fetchDailyStats]);
 
-  // Add a refresh trigger for micronutrients
-  useEffect(() => {
-    const refreshInterval = setInterval(() => {
-      const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-      const today = new Date().toISOString().split('T')[0];
-      const todayMeals = stored.filter((meal: any) => meal.date === today);
-      const micronutrients = calculateMicronutrients(todayMeals);
-      
-      setDailyMicronutrients(prev => {
-        // Only update if values have changed
-        if (JSON.stringify(prev) !== JSON.stringify(micronutrients)) {
-          console.log('Refreshing micronutrients:', micronutrients);
-          return micronutrients;
-        }
-        return prev;
-      });
-    }, 2000); // Check every 2 seconds
-    
-    return () => clearInterval(refreshInterval);
-  }, [calculateMicronutrients]);
 
   // Load existing meal data and set up tracking
   useEffect(() => {
@@ -334,8 +299,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         
         // Calculate micronutrients from today's meals (uses real data when available)
         const micronutrients = calculateMicronutrients(todayMeals);
-        console.log('Setting dailyMicronutrients state to:', micronutrients);
-        
         // Ensure state is updated with new object reference for React to detect change
         setDailyMicronutrients({
           vitaminC: micronutrients.vitaminC || 0,
@@ -347,10 +310,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           zinc: micronutrients.zinc || 0,
           magnesium: micronutrients.magnesium || 0
         });
-        
-        // Debug: Log micronutrient data to verify it's being calculated
-        console.log('Micronutrients calculated:', micronutrients);
-        console.log('Today meals with micronutrients:', todayMeals);
         
         // Fetch daily stats including fasting status
         if (user) {
@@ -686,13 +645,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     unit: string;
     color: string;
   }) => {
-    // Debug log to see what values are being passed
-    React.useEffect(() => {
-      if (name === "Iron" || name === "Calcium") {
-        console.log(`MicronutrientCard ${name} received value:`, value, 'goal:', goal);
-      }
-    }, [name, value, goal]);
-    
     const percentage = Math.round((value / goal) * 100);
     return (
     <Card className="bg-white/10 backdrop-blur-md border-white/20 p-3">
@@ -856,13 +808,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           </div>
 
           {/* Micronutrients Section */}
-          <div className="mb-4" key={JSON.stringify(dailyMicronutrients)}>
+          <div className="mb-4">
             <h3 className="text-lg font-bold text-white mb-3 flex items-center">
               <span className="w-2 h-2 bg-cyan-400 rounded-full mr-2"></span>
               Essential Micronutrients
-              <span className="text-xs text-gray-400 ml-2">
-                (Fe: {dailyMicronutrients.iron.toFixed(1)}mg, Ca: {Math.round(dailyMicronutrients.calcium)}mg)
-              </span>
             </h3>
             
             <div className="grid grid-cols-2 gap-3 mb-4">
