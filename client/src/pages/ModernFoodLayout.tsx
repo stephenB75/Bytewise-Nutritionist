@@ -274,6 +274,19 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   }, [user, fetchDailyStats]);
 
 
+  // Refresh micronutrients when tab changes or on mount
+  useEffect(() => {
+    // Always refresh micronutrients from localStorage
+    const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
+    const today = new Date().toISOString().split('T')[0];
+    const todayMeals = stored.filter((meal: any) => meal.date === today);
+    
+    if (todayMeals.length > 0) {
+      const micronutrients = calculateMicronutrients(todayMeals);
+      setDailyMicronutrients(micronutrients);
+    }
+  }, [activeTab, calculateMicronutrients]);
+  
   // Load existing meal data and set up tracking
   useEffect(() => {
     // Load existing meal data on component mount
@@ -645,20 +658,40 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     unit: string;
     color: string;
   }) => {
-    const percentage = Math.round((value / goal) * 100);
+    const percentage = Math.min(Math.round((value / goal) * 100), 100);
+    const displayValue = value.toFixed(value < 10 ? 1 : 0);
+    
+    // Use consistent color classes
+    const getColorClasses = () => {
+      switch(color) {
+        case 'cyan': return 'text-cyan-400 from-cyan-400 to-blue-500';
+        case 'orange': return 'text-orange-400 from-orange-400 to-yellow-500';
+        case 'red': return 'text-red-400 from-red-400 to-pink-500';
+        case 'green': return 'text-green-400 from-green-400 to-emerald-500';
+        case 'slate': return 'text-slate-400 from-slate-400 to-gray-500';
+        case 'white': return 'text-white from-white to-gray-300';
+        case 'amber': return 'text-amber-400 from-amber-400 to-yellow-500';
+        case 'rose': return 'text-rose-400 from-rose-400 to-pink-500';
+        default: return 'text-gray-400 from-gray-400 to-gray-500';
+      }
+    };
+    
+    const colorClasses = getColorClasses();
+    const [textColor, gradientColors] = colorClasses.split(' from-');
+    
     return (
     <Card className="bg-white/10 backdrop-blur-md border-white/20 p-3">
       <div className="flex items-center justify-between mb-2">
-        <div className={`text-sm font-semibold text-${color}-400`}>{name}</div>
-        <div className="text-xs text-gray-400">{value}/{goal}{unit}</div>
+        <div className={`text-sm font-semibold ${textColor}`}>{name}</div>
+        <div className="text-xs text-white font-bold">{displayValue}{unit} / {goal}{unit}</div>
       </div>
       <div className="relative h-2 bg-gray-800 rounded-full overflow-hidden">
         <div 
-          className={`absolute left-0 top-0 h-full bg-gradient-to-r from-${color}-400 to-${color === 'cyan' ? 'blue' : color === 'orange' ? 'yellow' : color === 'red' ? 'pink' : 'emerald'}-500 rounded-full transition-all duration-1000`} 
+          className={`absolute left-0 top-0 h-full bg-gradient-to-r from-${gradientColors} rounded-full transition-all duration-1000`} 
           style={{ width: `${percentage}%` }} 
         />
       </div>
-      <div className="text-xs text-gray-500 mt-1">{percentage}% DV</div>
+      <div className="text-xs text-white font-semibold mt-1">{percentage}% Daily Value</div>
     </Card>
     );
   };
@@ -813,6 +846,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <span className="w-2 h-2 bg-cyan-400 rounded-full mr-2"></span>
               Essential Micronutrients
             </h3>
+            
             
             <div className="grid grid-cols-2 gap-3 mb-4">
               <MicronutrientCard name="Vitamin C" value={dailyMicronutrients.vitaminC} goal={90} unit="mg" color="cyan" />
