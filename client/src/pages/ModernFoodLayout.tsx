@@ -289,6 +289,27 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     }
   }, [user, fetchDailyStats]);
 
+  // Add a refresh trigger for micronutrients
+  useEffect(() => {
+    const refreshInterval = setInterval(() => {
+      const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
+      const today = new Date().toISOString().split('T')[0];
+      const todayMeals = stored.filter((meal: any) => meal.date === today);
+      const micronutrients = calculateMicronutrients(todayMeals);
+      
+      setDailyMicronutrients(prev => {
+        // Only update if values have changed
+        if (JSON.stringify(prev) !== JSON.stringify(micronutrients)) {
+          console.log('Refreshing micronutrients:', micronutrients);
+          return micronutrients;
+        }
+        return prev;
+      });
+    }, 2000); // Check every 2 seconds
+    
+    return () => clearInterval(refreshInterval);
+  }, [calculateMicronutrients]);
+
   // Load existing meal data and set up tracking
   useEffect(() => {
     // Load existing meal data on component mount
@@ -313,7 +334,19 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         
         // Calculate micronutrients from today's meals (uses real data when available)
         const micronutrients = calculateMicronutrients(todayMeals);
-        setDailyMicronutrients(micronutrients);
+        console.log('Setting dailyMicronutrients state to:', micronutrients);
+        
+        // Ensure state is updated with new object reference for React to detect change
+        setDailyMicronutrients({
+          vitaminC: micronutrients.vitaminC || 0,
+          vitaminD: micronutrients.vitaminD || 0,
+          vitaminB12: micronutrients.vitaminB12 || 0,
+          folate: micronutrients.folate || 0,
+          iron: micronutrients.iron || 0,
+          calcium: micronutrients.calcium || 0,
+          zinc: micronutrients.zinc || 0,
+          magnesium: micronutrients.magnesium || 0
+        });
         
         // Debug: Log micronutrient data to verify it's being calculated
         console.log('Micronutrients calculated:', micronutrients);
@@ -379,7 +412,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       });
       window.removeEventListener('storage', loadExistingData);
     };
-  }, [user, fetchDailyStats]);
+  }, [user, fetchDailyStats, calculateMicronutrients]);
 
   // Food categories inspired by Deliveroo
   const categories = [
@@ -653,6 +686,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     unit: string;
     color: string;
   }) => {
+    // Debug log to see what values are being passed
+    React.useEffect(() => {
+      if (name === "Iron" || name === "Calcium") {
+        console.log(`MicronutrientCard ${name} received value:`, value, 'goal:', goal);
+      }
+    }, [name, value, goal]);
+    
     const percentage = Math.round((value / goal) * 100);
     return (
     <Card className="bg-white/10 backdrop-blur-md border-white/20 p-3">
@@ -816,10 +856,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           </div>
 
           {/* Micronutrients Section */}
-          <div className="mb-4">
+          <div className="mb-4" key={JSON.stringify(dailyMicronutrients)}>
             <h3 className="text-lg font-bold text-white mb-3 flex items-center">
               <span className="w-2 h-2 bg-cyan-400 rounded-full mr-2"></span>
               Essential Micronutrients
+              <span className="text-xs text-gray-400 ml-2">
+                (Fe: {dailyMicronutrients.iron.toFixed(1)}mg, Ca: {Math.round(dailyMicronutrients.calcium)}mg)
+              </span>
             </h3>
             
             <div className="grid grid-cols-2 gap-3 mb-4">
