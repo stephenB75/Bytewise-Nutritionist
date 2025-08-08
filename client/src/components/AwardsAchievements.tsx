@@ -149,7 +149,7 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
   }, [statsData, achievements]);
 
   // Helper functions
-  const getAchievementIcon = (id: string): string => {
+  const getAchievementIcon = (id: string | undefined): string => {
     const iconMap: { [key: string]: string } = {
       'first-meal': '🥗',
       'first-food': '🍎',
@@ -167,14 +167,17 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
       'fitness-enthusiast': '🏃',
       'mindful-eater': '🧘'
     };
-    return iconMap[id] || '🏅';
+    return (id && iconMap[id]) || '🏅';
   };
 
   const getCategoryFromAchievement = (achievement: any): Achievement['category'] => {
-    if (achievement.id.includes('streak') || achievement.id.includes('weekly')) return 'weekly';
-    if (achievement.id.includes('month')) return 'monthly';
-    if (achievement.id.includes('milestone') || achievement.target >= 30) return 'milestone';
-    if (achievement.id.includes('special')) return 'special';
+    const id = achievement.id || '';
+    if (typeof id === 'string') {
+      if (id.includes('streak') || id.includes('weekly')) return 'weekly';
+      if (id.includes('month')) return 'monthly';
+      if (id.includes('milestone') || achievement.target >= 30) return 'milestone';
+      if (id.includes('special')) return 'special';
+    }
     return 'daily';
   };
 

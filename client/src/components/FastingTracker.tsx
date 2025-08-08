@@ -112,6 +112,10 @@ const FASTING_TIPS = [
   "Plan your eating window around your lifestyle"
 ];
 
+// Constants for localStorage keys
+const FASTING_SESSION_KEY = 'bytewise_fasting_session';
+const FASTING_ACTIVE_KEY = 'bytewise_fasting_active';
+
 export function FastingTracker() {
   const [selectedPlan, setSelectedPlan] = useState<FastingPlan>(FASTING_PLANS[0]);
   const [currentSession, setCurrentSession] = useState<FastingSession | null>(null);
@@ -133,8 +137,14 @@ export function FastingTracker() {
     mutationFn: (session: Omit<FastingSession, 'id'> & { planName?: string }) => 
       apiRequest('POST', '/api/fasting/start', session).then(res => res.json()),
     onSuccess: (data) => {
-      setCurrentSession(data);
-      setIsActive(true);
+      // Update the stored session with the ID from the server
+      const updatedSession = {
+        ...currentSession,
+        id: data.id
+      };
+      setCurrentSession(updatedSession as FastingSession);
+      localStorage.setItem(FASTING_SESSION_KEY, JSON.stringify(updatedSession));
+      
       toast({
         title: "Fasting Started! 🚀",
         description: `Your ${selectedPlan.name} session has begun. Stay strong and hydrated!`,
@@ -142,13 +152,11 @@ export function FastingTracker() {
       queryClient.invalidateQueries({ queryKey: ['/api/fasting/history'] });
     },
     onError: (error) => {
+      // Keep the timer running even if API fails - it's stored locally
       toast({
-        title: "Failed to Start",
-        description: "Please try again. Make sure you're signed in.",
-        variant: "destructive"
+        title: "Offline Mode",
+        description: "Timer started locally. We'll sync when you're back online.",
       });
-      // Reset timer if API call failed
-      setTimeRemaining(0);
     }
   });
 
@@ -157,6 +165,10 @@ export function FastingTracker() {
     mutationFn: (sessionId: string) => 
       apiRequest('PUT', `/api/fasting/${sessionId}/complete`),
     onSuccess: () => {
+      // Clear localStorage
+      localStorage.removeItem(FASTING_SESSION_KEY);
+      localStorage.removeItem(FASTING_ACTIVE_KEY);
+      
       setCurrentSession(null);
       setIsActive(false);
       setTimeRemaining(0);
@@ -180,28 +192,95 @@ export function FastingTracker() {
         .catch(err => {
           // Achievement check failed silently - non-critical for user experience
         });
+    },
+    onError: () => {
+      // Even if API fails, clear the local session
+      localStorage.removeItem(FASTING_SESSION_KEY);
+      localStorage.removeItem(FASTING_ACTIVE_KEY);
+      setCurrentSession(null);
+      setIsActive(false);
+      setTimeRemaining(0);
+      toast({
+        title: "Session Ended",
+        description: "Your fasting session has been completed locally.",
+      });
     }
   });
 
-  // Timer effect
+  // Load fasting session from localStorage on mount
+  useEffect(() => {
+    const loadStoredSession = () => {
+      try {
+        const storedSession = localStorage.getItem(FASTING_SESSION_KEY);
+        const storedActive = localStorage.getItem(FASTING_ACTIVE_KEY);
+        
+        if (storedSession) {
+          const session = JSON.parse(storedSession) as FastingSession;
+          const startTime = new Date(session.startTime).getTime();
+          const now = Date.now();
+          const elapsed = now - startTime;
+          const remaining = session.targetDuration - elapsed;
+          
+          if (remaining > 0) {
+            // Session is still valid
+            setCurrentSession(session);
+            setTimeRemaining(remaining);
+            setIsActive(storedActive === 'true');
+            
+            // Find and set the corresponding plan
+            const plan = FASTING_PLANS.find(p => p.id === session.planId);
+            if (plan) {
+              setSelectedPlan(plan);
+            }
+          } else {
+            // Session has expired, clear it
+            localStorage.removeItem(FASTING_SESSION_KEY);
+            localStorage.removeItem(FASTING_ACTIVE_KEY);
+            
+            // If there was an id, complete the session
+            if (session.id) {
+              completeFastingMutation.mutate(session.id);
+            }
+          }
+        }
+      } catch (error) {
+        // Clear corrupt data
+        localStorage.removeItem(FASTING_SESSION_KEY);
+        localStorage.removeItem(FASTING_ACTIVE_KEY);
+      }
+    };
+    
+    loadStoredSession();
+  }, []);
+
+  // Timer effect with localStorage persistence
   useEffect(() => {
     let interval: NodeJS.Timeout;
     
-    if (isActive && currentSession && timeRemaining > 0) {
+    if (isActive && currentSession) {
       interval = setInterval(() => {
-        setTimeRemaining(prev => {
-          if (prev <= 1000) {
-            // Fast complete
-            completeFastingMutation.mutate(currentSession.id!);
-            return 0;
+        // Calculate time remaining based on actual elapsed time
+        const startTime = new Date(currentSession.startTime).getTime();
+        const now = Date.now();
+        const elapsed = now - startTime;
+        const remaining = currentSession.targetDuration - elapsed;
+        
+        if (remaining <= 0) {
+          // Fast complete
+          setTimeRemaining(0);
+          localStorage.removeItem(FASTING_SESSION_KEY);
+          localStorage.removeItem(FASTING_ACTIVE_KEY);
+          if (currentSession.id) {
+            completeFastingMutation.mutate(currentSession.id);
           }
-          return prev - 1000;
-        });
+        } else {
+          setTimeRemaining(remaining);
+        }
       }, 1000);
     }
     
     return () => clearInterval(interval);
-  }, [isActive, currentSession, timeRemaining]);
+  }, [isActive, currentSession]);
 
   const startFasting = () => {
     const targetDuration = selectedPlan.fastingHours * 60 * 60 * 1000; // Convert to milliseconds
@@ -212,10 +291,16 @@ export function FastingTracker() {
       status: 'active'
     };
     
+    // Store session in localStorage immediately
+    localStorage.setItem(FASTING_SESSION_KEY, JSON.stringify(session));
+    localStorage.setItem(FASTING_ACTIVE_KEY, 'true');
+    
     // Set timer immediately for visual feedback
     setTimeRemaining(targetDuration);
+    setCurrentSession(session as FastingSession);
+    setIsActive(true);
     
-    // Start the session via API
+    // Start the session via API (this will update with the ID when successful)
     startFastingMutation.mutate({
       ...session,
       planName: selectedPlan.name
@@ -223,7 +308,30 @@ export function FastingTracker() {
   };
 
   const pauseFasting = () => {
-    setIsActive(!isActive);
+    const newActiveState = !isActive;
+    setIsActive(newActiveState);
+    
+    // Update localStorage with pause state
+    localStorage.setItem(FASTING_ACTIVE_KEY, newActiveState.toString());
+    
+    if (!newActiveState && currentSession) {
+      // When pausing, update the session with remaining time
+      const updatedSession = {
+        ...currentSession,
+        status: 'paused' as const
+      };
+      setCurrentSession(updatedSession);
+      localStorage.setItem(FASTING_SESSION_KEY, JSON.stringify(updatedSession));
+    } else if (newActiveState && currentSession) {
+      // When resuming, update status
+      const updatedSession = {
+        ...currentSession,
+        status: 'active' as const
+      };
+      setCurrentSession(updatedSession);
+      localStorage.setItem(FASTING_SESSION_KEY, JSON.stringify(updatedSession));
+    }
+    
     toast({
       title: isActive ? "Fasting Paused" : "Fasting Resumed",
       description: isActive ? "Take your time and resume when ready." : "Keep going! You've got this!",
@@ -231,8 +339,24 @@ export function FastingTracker() {
   };
 
   const stopFasting = () => {
+    // Clear localStorage immediately
+    localStorage.removeItem(FASTING_SESSION_KEY);
+    localStorage.removeItem(FASTING_ACTIVE_KEY);
+    
+    // Reset local state
+    setCurrentSession(null);
+    setIsActive(false);
+    setTimeRemaining(0);
+    
+    // Complete the session via API if it has an ID
     if (currentSession?.id) {
       completeFastingMutation.mutate(currentSession.id);
+    } else {
+      // Show toast for local-only session
+      toast({
+        title: "Fast Ended",
+        description: "Your fasting session has been stopped.",
+      });
     }
   };
 
