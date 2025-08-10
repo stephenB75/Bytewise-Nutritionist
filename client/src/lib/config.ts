@@ -3,20 +3,28 @@
  * Handles both development and production environments
  */
 
-// Environment detection - updated for better URL handling
+// Environment detection - updated for custom domain
 const isDev = typeof window !== 'undefined' && 
   (window.location.hostname === 'localhost' || 
    window.location.hostname.includes('replit.dev') ||
    window.location.hostname.includes('replit.app') ||
    window.location.hostname.includes('repl.co'));
+const isCustomDomain = typeof window !== 'undefined' && 
+  (window.location.hostname === 'bytewisenutritionist.com' ||
+   window.location.hostname === 'www.bytewisenutritionist.com');
 const isGitHubPages = typeof window !== 'undefined' && 
-  (window.location.hostname.includes('github.io') || 
-   window.location.hostname.includes('bytewise-nutritionist'));
-const isProd = !isDev && !isGitHubPages;
+  window.location.hostname.includes('github.io');
+const isProd = isCustomDomain || (!isDev && !isGitHubPages);
 
 // Dynamic API base URL based on current environment
 const getApiBaseUrl = () => {
   if (typeof window === 'undefined') return '/api';
+  
+  // Use HTTPS for custom domain
+  if (isCustomDomain) {
+    return 'https://bytewisenutritionist.com/api';
+  }
+  
   return `${window.location.protocol}//${window.location.host}/api`;
 };
 
@@ -46,9 +54,10 @@ function getEnvVar(key: string): string | undefined {
 export const config = {
   isDev,
   isProd,
+  isCustomDomain,
   isGitHubPages,
   apiMode: isGitHubPages ? 'direct' : 'proxy',
-  baseUrl: isGitHubPages ? '/Bytewise-Nutritionist' : '',
+  baseUrl: isCustomDomain ? '' : (isGitHubPages ? '/Bytewise-Nutritionist' : ''),
   apiBaseUrl: getApiBaseUrl(),
   supabase: {
     url: getEnvVar('VITE_SUPABASE_URL') || FALLBACK_CONFIG.supabaseUrl,
