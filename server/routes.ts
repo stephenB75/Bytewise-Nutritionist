@@ -244,7 +244,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     
     try {
-      const meals = await storage.getUserMeals(userId);
+      // Support date range filtering
+      const { startDate, endDate } = req.query;
+      let start: Date | undefined;
+      let end: Date | undefined;
+      
+      if (startDate) {
+        start = new Date(startDate as string);
+      }
+      if (endDate) {
+        end = new Date(endDate as string);
+      }
+      
+      const meals = await storage.getUserMeals(userId, start, end);
       res.json(meals);
     } catch (error: any) {
       // Meal retrieval error handled by response
@@ -839,6 +851,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // User statistics endpoint for achievements component
+  // Get daily summary of user entries
+  app.get('/api/user/daily-summary', isAuthenticated, async (req: any, res: Response) => {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ message: "User not found" });
+    }
+
+    try {
+      // Get today's date range
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      
+      // Get today's meals
+      const todayMeals = await storage.getUserMeals(userId, today, tomorrow);
+      
+      // Calculate totals
+      const summary = {
+        totalCalories: 0,
+        totalProtein: 0,
+        totalCarbs: 0,
+        totalFat: 0,
+        mealCount: todayMeals.length,
+        meals: todayMeals
+      };
+      
+      todayMeals.forEach(meal => {
+        summary.totalCalories += parseFloat(meal.totalCalories || '0');
+        summary.totalProtein += parseFloat(meal.totalProtein || '0');
+        summary.totalCarbs += parseFloat(meal.totalCarbs || '0');
+        summary.totalFat += parseFloat(meal.totalFat || '0');
+      });
+      
+      res.json(summary);
+    } catch (error: any) {
+      res.status(500).json({ message: "Failed to get daily summary" });
+    }
+  });
+
   app.get('/api/user/statistics', isAuthenticated, async (req: any, res: Response) => {
     const userId = req.user?.id;
     if (!userId) {

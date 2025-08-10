@@ -281,79 +281,123 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   // Refresh micronutrients when tab changes or on mount
   useEffect(() => {
-    // Always refresh micronutrients from localStorage
-    const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-    const today = new Date().toISOString().split('T')[0];
-    const todayMeals = stored.filter((meal: any) => meal.date === today);
-    
-    if (todayMeals.length > 0) {
-      const micronutrients = calculateMicronutrients(todayMeals);
+    // Use the already loaded meals from state instead of localStorage
+    if (loggedMeals.length > 0) {
+      const micronutrients = calculateMicronutrients(loggedMeals);
       setDailyMicronutrients(micronutrients);
     }
-  }, [activeTab, calculateMicronutrients]);
+  }, [activeTab, loggedMeals, calculateMicronutrients]);
   
-  // Load existing meal data and set up tracking
+  // Load existing meal data from API
   useEffect(() => {
-    // Load existing meal data on component mount
-    const loadExistingData = () => {
+    // Load existing data from API
+    const loadExistingData = async () => {
+      if (!user) return;
+      
       try {
+        // Get today's date range
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        
+        // Get week date range
+        const weekStart = new Date(today);
+        weekStart.setDate(today.getDate() - today.getDay()); // Start of week (Sunday)
+        
+        // Fetch meals from API for the current week
+        const response = await fetch(`/api/meals/logged?startDate=${weekStart.toISOString()}&endDate=${tomorrow.toISOString()}`);
+        
+        if (response.ok) {
+          const meals = await response.json();
+          
+          // Process meals data
+          const todayStr = today.toISOString().split('T')[0];
+          const todayMeals = meals.filter((meal: any) => {
+            const mealDate = new Date(meal.date).toISOString().split('T')[0];
+            return mealDate === todayStr;
+          });
+          
+          // Transform meals to the expected format
+          const transformedTodayMeals = todayMeals.map((meal: any) => ({
+            id: meal.id,
+            name: meal.name,
+            date: new Date(meal.date).toISOString().split('T')[0],
+            calories: parseFloat(meal.totalCalories) || 0,
+            protein: parseFloat(meal.totalProtein) || 0,
+            carbs: parseFloat(meal.totalCarbs) || 0,
+            fat: parseFloat(meal.totalFat) || 0,
+            mealType: meal.mealType,
+            // Include any micronutrients if available
+            vitaminC: meal.vitaminC || 0,
+            vitaminD: meal.vitaminD || 0,
+            vitaminB12: meal.vitaminB12 || 0,
+            folate: meal.folate || 0,
+            iron: meal.iron || 0,
+            calcium: meal.calcium || 0,
+            zinc: meal.zinc || 0,
+            magnesium: meal.magnesium || 0
+          }));
+          
+          setLoggedMeals(transformedTodayMeals);
+          
+          // Calculate daily totals from today's meals
+          const dailyTotal = transformedTodayMeals.reduce((sum: number, meal: any) => sum + meal.calories, 0);
+          setDailyCalories(dailyTotal);
+          
+          // Calculate daily macros
+          const dailyMacroTotals = transformedTodayMeals.reduce((totals: any, meal: any) => ({
+            protein: totals.protein + meal.protein,
+            carbs: totals.carbs + meal.carbs,
+            fat: totals.fat + meal.fat
+          }), { protein: 0, carbs: 0, fat: 0 });
+          setDailyMacros(dailyMacroTotals);
+          
+          // Calculate micronutrients from today's meals
+          const micronutrients = calculateMicronutrients(transformedTodayMeals);
+          setDailyMicronutrients({
+            vitaminC: micronutrients.vitaminC || 0,
+            vitaminD: micronutrients.vitaminD || 0,
+            vitaminB12: micronutrients.vitaminB12 || 0,
+            folate: micronutrients.folate || 0,
+            iron: micronutrients.iron || 0,
+            calcium: micronutrients.calcium || 0,
+            zinc: micronutrients.zinc || 0,
+            magnesium: micronutrients.magnesium || 0
+          });
+          
+          // Calculate weekly totals from all meals
+          const weeklyTotal = meals.reduce((sum: number, meal: any) => 
+            sum + (parseFloat(meal.totalCalories) || 0), 0);
+          setWeeklyCalories(weeklyTotal);
+          
+          // Also update localStorage for backward compatibility
+          const transformedAllMeals = meals.map((meal: any) => ({
+            id: meal.id,
+            name: meal.name,
+            date: new Date(meal.date).toISOString().split('T')[0],
+            calories: parseFloat(meal.totalCalories) || 0,
+            protein: parseFloat(meal.totalProtein) || 0,
+            carbs: parseFloat(meal.totalCarbs) || 0,
+            fat: parseFloat(meal.totalFat) || 0,
+            mealType: meal.mealType
+          }));
+          localStorage.setItem('weeklyMeals', JSON.stringify(transformedAllMeals));
+        }
+        
+        // Fetch daily stats including fasting status
+        fetchDailyStats();
+        
+      } catch (error) {
+        console.error('Error loading meal data from API:', error);
+        // Fallback to localStorage if API fails
         const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
         const today = new Date().toISOString().split('T')[0];
         const todayMeals = stored.filter((meal: any) => meal.date === today);
         setLoggedMeals(todayMeals);
         
-        // Calculate daily calories from existing logged meals
         const dailyTotal = todayMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
         setDailyCalories(dailyTotal);
-        
-        // Calculate daily macros from today's meals
-        const dailyMacroTotals = todayMeals.reduce((totals: any, meal: any) => ({
-          protein: totals.protein + (meal.protein || 0),
-          carbs: totals.carbs + (meal.carbs || 0),
-          fat: totals.fat + (meal.fat || 0)
-        }), { protein: 0, carbs: 0, fat: 0 });
-        setDailyMacros(dailyMacroTotals);
-        
-        // Calculate micronutrients from today's meals (uses real data when available)
-        const micronutrients = calculateMicronutrients(todayMeals);
-        
-        // Ensure state is updated with new object reference for React to detect change
-        setDailyMicronutrients({
-          vitaminC: micronutrients.vitaminC || 0,
-          vitaminD: micronutrients.vitaminD || 0,
-          vitaminB12: micronutrients.vitaminB12 || 0,
-          folate: micronutrients.folate || 0,
-          iron: micronutrients.iron || 0,
-          calcium: micronutrients.calcium || 0,
-          zinc: micronutrients.zinc || 0,
-          magnesium: micronutrients.magnesium || 0
-        });
-        
-        // Fetch daily stats including fasting status
-        if (user) {
-          fetchDailyStats();
-        }
-        
-        // Calculate weekly calories from all stored meals
-        const weeklyTotal = stored.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
-        setWeeklyCalories(weeklyTotal);
-        
-      } catch (error) {
-        console.error('Error loading meal data:', error);
-        // Reset to safe state on error
-        setLoggedMeals([]);
-        setDailyCalories(0);
-        setWeeklyCalories(0);
-        setDailyMicronutrients({
-          vitaminC: 0,
-          vitaminD: 0,
-          vitaminB12: 0,
-          folate: 0,
-          iron: 0,
-          calcium: 0,
-          zinc: 0,
-          magnesium: 0
-        });
       }
     };
 
@@ -362,15 +406,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
     // Set up event listeners for future meal logging
     const handleMealLogged = () => {
-      try {
-        loadExistingData();
-        // Don't dispatch circular events - let other components handle their own refresh
-      } catch (error) {
-        // Handle errors silently to avoid console spam
-      }
+      loadExistingData();
     };
 
-    // Add event listeners with unique references to avoid conflicts
+    // Add event listeners for meal updates
     const eventsToAdd = [
       { type: 'calories-logged', handler: handleMealLogged },
       { type: 'meal-logged-success', handler: handleMealLogged }
@@ -380,14 +419,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       window.addEventListener(type, handler);
     });
 
-    // Add storage listener separately
-    window.addEventListener('storage', loadExistingData);
-
     return () => {
       eventsToAdd.forEach(({ type, handler }) => {
         window.removeEventListener(type, handler);
       });
-      window.removeEventListener('storage', loadExistingData);
     };
   }, [user, fetchDailyStats, calculateMicronutrients]);
 

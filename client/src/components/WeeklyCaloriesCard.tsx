@@ -49,36 +49,77 @@ export function WeeklyCaloriesCard() {
     return weekDates;
   };
 
-  // Calculate weekly calories from stored meal data
-  const calculateWeeklyCalories = () => {
+  // Calculate weekly calories from API data
+  const calculateWeeklyCalories = async () => {
     try {
       const weekDates = getCurrentWeekDates();
       
-      // Load meals from localStorage where the daily page stores them
-      const storedMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
+      // Get date range for the current week
+      const weekStart = new Date();
+      weekStart.setDate(weekStart.getDate() - weekStart.getDay()); // Start of week (Sunday)
+      weekStart.setHours(0, 0, 0, 0);
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekEnd.getDate() + 7);
       
-      // Calculate calories for each day of the week
-      const weeklyData = weekDates.map(dayData => {
-        const dayMeals = storedMeals.filter((meal: any) => meal.date === dayData.date);
-        const dayCalories = dayMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
+      // Fetch meals from API for the current week
+      const response = await fetch(`/api/meals/logged?startDate=${weekStart.toISOString()}&endDate=${weekEnd.toISOString()}`);
+      
+      if (response.ok) {
+        const meals = await response.json();
         
-        return {
-          ...dayData,
-          calories: dayCalories,
-          mealCount: dayMeals.length
-        };
-      });
+        // Transform meals to expected format
+        const transformedMeals = meals.map((meal: any) => ({
+          id: meal.id,
+          name: meal.name,
+          date: new Date(meal.date).toISOString().split('T')[0],
+          calories: parseFloat(meal.totalCalories) || 0,
+          protein: parseFloat(meal.totalProtein) || 0,
+          carbs: parseFloat(meal.totalCarbs) || 0,
+          fat: parseFloat(meal.totalFat) || 0,
+          mealType: meal.mealType
+        }));
+        
+        // Update localStorage for backward compatibility
+        localStorage.setItem('weeklyMeals', JSON.stringify(transformedMeals));
+        
+        // Calculate calories for each day of the week
+        const weeklyData = weekDates.map(dayData => {
+          const dayMeals = transformedMeals.filter((meal: any) => meal.date === dayData.date);
+          const dayCalories = dayMeals.reduce((sum: number, meal: any) => sum + meal.calories, 0);
+          
+          return {
+            ...dayData,
+            calories: dayCalories,
+            mealCount: dayMeals.length
+          };
+        });
 
-      const totalCalories = weeklyData.reduce((sum, day) => sum + day.calories, 0);
-      const weeklyAverage = Math.round(totalCalories / 7);
-      
-      // Debug logging for weekly progress verification
-      
-      setWeeklyData(weeklyData);
-      setTotalWeeklyCalories(totalCalories);
+        const totalCalories = weeklyData.reduce((sum, day) => sum + day.calories, 0);
+        const weeklyAverage = Math.round(totalCalories / 7);
+        
+        setWeeklyData(weeklyData);
+        setTotalWeeklyCalories(totalCalories);
+      } else {
+        // Fallback to localStorage if API fails
+        const storedMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
+        
+        const weeklyData = weekDates.map(dayData => {
+          const dayMeals = storedMeals.filter((meal: any) => meal.date === dayData.date);
+          const dayCalories = dayMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
+          
+          return {
+            ...dayData,
+            calories: dayCalories,
+            mealCount: dayMeals.length
+          };
+        });
+
+        setWeeklyData(weeklyData);
+        setTotalWeeklyCalories(weeklyData.reduce((sum, day) => sum + day.calories, 0));
+      }
     } catch (error) {
       // Weekly progress calculation error handled gracefully
-      // Set empty state on error
+      // Fallback to localStorage on error
       const weekDates = getCurrentWeekDates();
       setWeeklyData(weekDates.map(day => ({ ...day, calories: 0, mealCount: 0 })));
       setTotalWeeklyCalories(0);
