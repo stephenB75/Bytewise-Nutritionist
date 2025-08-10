@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Authentication Test</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        .section { margin: 20px 0; padding: 20px; border: 1px solid #ccc; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        .success { color: green; }
+        .error { color: red; }
+        input { padding: 8px; margin: 5px; width: 200px; }
+    </style>
+</head>
+<body>
+    <h1>ByteWise Authentication Test</h1>
+    
+    <div class="section">
+        <h2>Quick Login</h2>
+        <p>Use these test credentials to log in:</p>
+        <div>
+            <label>Email: <input type="email" id="email" value="stephen75@me.com" /></label><br>
+            <label>Password: <input type="password" id="password" placeholder="Enter your password" /></label><br>
+            <button onclick="testLogin()">Test Login</button>
+        </div>
+        <div id="loginResult"></div>
+    </div>
+
+    <div class="section">
+        <h2>Check Current Session</h2>
+        <button onclick="checkSession()">Check Session</button>
+        <div id="sessionResult"></div>
+    </div>
+
+    <div class="section">
+        <h2>Test API Access</h2>
+        <button onclick="testAPI()">Test Meals API</button>
+        <div id="apiResult"></div>
+    </div>
+
+    <script>
+        async function testLogin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const resultDiv = document.getElementById('loginResult');
+            
+            if (!password) {
+                resultDiv.innerHTML = '<p class="error">Please enter your password</p>';
+                return;
+            }
+            
+            resultDiv.innerHTML = '<p>Logging in...</p>';
+            
+            try {
+                const response = await fetch('/api/auth/signin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = '<p class="success">✓ Login successful! Session token received.</p>';
+                    
+                    // Store the session if provided
+                    if (data.session) {
+                        localStorage.setItem('bytewise-auth', JSON.stringify({
+                            currentSession: data.session,
+                            expiresAt: data.session.expires_at
+                        }));
+                        resultDiv.innerHTML += '<p class="success">✓ Session stored locally</p>';
+                        resultDiv.innerHTML += '<p>You can now refresh the main app to see your data!</p>';
+                    }
+                } else {
+                    resultDiv.innerHTML = `<p class="error">Login failed: ${data.message}</p>`;
+                    if (data.message && data.message.includes('credentials')) {
+                        resultDiv.innerHTML += '<p>Please check your password and try again.</p>';
+                    }
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+            }
+        }
+        
+        async function checkSession() {
+            const resultDiv = document.getElementById('sessionResult');
+            resultDiv.innerHTML = '<p>Checking session...</p>';
+            
+            try {
+                // Check localStorage for Supabase session
+                const stored = localStorage.getItem('bytewise-auth');
+                if (stored) {
+                    const session = JSON.parse(stored);
+                    if (session.currentSession) {
+                        resultDiv.innerHTML = '<p class="success">✓ Found stored session</p>';
+                        
+                        // Test if session is valid
+                        const response = await fetch('/api/auth/user', {
+                            headers: {
+                                'Authorization': `Bearer ${session.currentSession.access_token}`
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            const user = await response.json();
+                            resultDiv.innerHTML += `<p class="success">✓ Session is valid! User: ${user.email}</p>`;
+                        } else {
+                            resultDiv.innerHTML += '<p class="error">Session expired or invalid</p>';
+                        }
+                    }
+                } else {
+                    resultDiv.innerHTML = '<p class="error">No session found - please log in first</p>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+            }
+        }
+        
+        async function testAPI() {
+            const resultDiv = document.getElementById('apiResult');
+            resultDiv.innerHTML = '<p>Testing API access...</p>';
+            
+            try {
+                // Get session token
+                const stored = localStorage.getItem('bytewise-auth');
+                if (!stored) {
+                    resultDiv.innerHTML = '<p class="error">No session - please log in first</p>';
+                    return;
+                }
+                
+                const session = JSON.parse(stored);
+                const token = session.currentSession?.access_token;
+                
+                if (!token) {
+                    resultDiv.innerHTML = '<p class="error">No access token found</p>';
+                    return;
+                }
+                
+                // Test meals API
+                const response = await fetch('/api/meals/logged?startDate=2025-08-10&endDate=2025-08-11', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const meals = await response.json();
+                    resultDiv.innerHTML = `<p class="success">✓ API Access working! Found ${meals.length} meals</p>`;
+                    if (meals.length > 0) {
+                        resultDiv.innerHTML += '<p>Sample meal: ' + meals[0].name + ' (' + meals[0].totalCalories + ' cal)</p>';
+                    }
+                } else {
+                    resultDiv.innerHTML = '<p class="error">API access failed - ' + response.status + '</p>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+            }
+        }
+        
+        // Check session on load
+        window.onload = () => {
+            checkSession();
+        };
+    </script>
+</body>
+</html>

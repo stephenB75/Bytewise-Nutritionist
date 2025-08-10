@@ -5,6 +5,11 @@ import { setupAuth, isAuthenticated, optionalAuth, serverSupabase, type Authenti
 import { usdaService } from "./services/usdaService";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Test authentication page (temporary)
+  app.get('/test-auth.html', (req: Request, res: Response) => {
+    res.sendFile('test-auth.html', { root: '.' });
+  });
+
   // Health check endpoint
   app.get('/api/health', async (req: Request, res: Response) => {
     try {
