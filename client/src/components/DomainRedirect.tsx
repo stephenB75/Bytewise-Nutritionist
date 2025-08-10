@@ -3,32 +3,41 @@ import { config } from '@/lib/config';
 import { Loader2, ExternalLink } from 'lucide-react';
 
 export default function DomainRedirect() {
-  const [countdown, setCountdown] = useState(3);
+  const [countdown, setCountdown] = useState(2);
   const [shouldRedirect, setShouldRedirect] = useState(false);
   
   useEffect(() => {
-    // Check if we're on Replit preview URL
+    // Check if we're on Replit preview URL - updated pattern matching
     const hostname = window.location.hostname;
+    const href = window.location.href;
+    
+    // More comprehensive Replit URL detection
     const isReplit = hostname.includes('replit.dev') || 
                      hostname.includes('replit.app') || 
                      hostname.includes('repl.co') ||
-                     hostname.includes('janeway.replit.dev');
+                     hostname.includes('janeway.replit.dev') ||
+                     href.includes('replit.dev') ||
+                     // Check for the specific pattern in your screenshot
+                     !!hostname.match(/^[a-f0-9-]+\.[a-z0-9-]+\.replit\.dev$/);
     
-    console.log('DomainRedirect - Hostname:', hostname);
-    console.log('DomainRedirect - Is Replit:', isReplit);
-    console.log('DomainRedirect - Primary URL:', config.primaryUrl);
+    console.log('DomainRedirect Check:');
+    console.log('- Current URL:', href);
+    console.log('- Hostname:', hostname);
+    console.log('- Is Replit Preview:', isReplit);
+    console.log('- Target:', 'https://bytewisenutritionist.com');
     
     setShouldRedirect(isReplit);
     
     if (!isReplit) return;
     
+    // Immediate redirect with short countdown
     const timer = setInterval(() => {
       setCountdown(prev => {
         if (prev <= 1) {
           clearInterval(timer);
-          // Redirect to primary domain
-          console.log('Redirecting to:', config.primaryUrl);
-          window.location.replace(config.primaryUrl);
+          // Force redirect to custom domain
+          console.log('Redirecting now to: https://bytewisenutritionist.com');
+          window.location.replace('https://bytewisenutritionist.com');
           return 0;
         }
         return prev - 1;
@@ -62,7 +71,7 @@ export default function DomainRedirect() {
         <div className="bg-gray-800 rounded-lg p-4 space-y-2">
           <div className="flex items-center justify-center gap-2 text-yellow-400">
             <ExternalLink className="w-5 h-5" />
-            <span className="font-semibold text-lg">{config.primaryDomain}</span>
+            <span className="font-semibold text-lg">bytewisenutritionist.com</span>
           </div>
           <div className="text-gray-500 text-sm">
             Redirecting in {countdown} seconds...
@@ -75,7 +84,7 @@ export default function DomainRedirect() {
         
         <div className="pt-4 border-t border-gray-800">
           <a 
-            href={config.primaryUrl}
+            href="https://bytewisenutritionist.com"
             className="inline-flex items-center gap-2 text-yellow-400 hover:text-yellow-300 transition-colors text-sm"
           >
             Click here if you're not redirected automatically
