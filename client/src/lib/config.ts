@@ -43,9 +43,8 @@ const getApiBaseUrl = () => {
   
   // Production with independent backend (Render)
   if (isCustomDomain || isProd) {
-    // Temporarily using Replit backend until Render is deployed
-    // TODO: Change back to 'https://bytewise-backend.onrender.com/api' after Render deployment
-    return 'https://workspace.stephtonybro.repl.co/api';
+    // Backend deployed on Render
+    return 'https://bytewise-backend.onrender.com/api';
   }
   
   // For local development and Replit preview
