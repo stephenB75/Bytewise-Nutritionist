@@ -20,11 +20,7 @@ export default function DomainRedirect() {
                      // Check for the specific pattern in your screenshot
                      !!hostname.match(/^[a-f0-9-]+\.[a-z0-9-]+\.replit\.dev$/);
     
-    console.log('DomainRedirect Check:');
-    console.log('- Current URL:', href);
-    console.log('- Hostname:', hostname);
-    console.log('- Is Replit Preview:', isReplit);
-    console.log('- Target:', 'https://bytewisenutritionist.com');
+    // Domain redirect check - silently redirect from Replit preview to custom domain
     
     setShouldRedirect(isReplit);
     
@@ -36,7 +32,7 @@ export default function DomainRedirect() {
         if (prev <= 1) {
           clearInterval(timer);
           // Force redirect to custom domain
-          console.log('Redirecting now to: https://bytewisenutritionist.com');
+          // Redirecting to custom domain
           window.location.replace('https://bytewisenutritionist.com');
           return 0;
         }

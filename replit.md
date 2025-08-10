@@ -42,6 +42,7 @@ Component modification policy: Do not alter existing working components unless e
 - **USDA Bulk Download System**: Local copy of USDA foods database for offline capabilities and improved performance, with batch processing and caching. Enhanced international food matching with dedicated portion weights for 75+ global dishes and full Caribbean cuisine support.
 - **Profile System**: Clean unified accordion system for Profile, Awards, and Data Management cards with proper state management and text orientation fixes. Consolidated CSS classes for consistent styling across profile components.
 - **iOS Deployment Ready**: Comprehensive code cleanup completed with production Capacitor configuration, automated build scripts, and App Store deployment checklist. Removed all debug code and optimized for mobile performance. ByteWise branded app icons (yellow background with BW logo) and splash screens fully configured for all required iOS sizes.
+- **Database Authentication Fixed**: All dashboard components now use apiRequest() for proper authentication with database. Fixed 7 components including WeeklyCaloriesCard, DataManagementPanel, CalorieCalculator, UserSettingsManager, FastingTracker, and SignOnModule. All metrics cards can now retrieve and display real-time user data.
 
 ## External Dependencies
 
