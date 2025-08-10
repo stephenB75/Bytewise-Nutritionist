@@ -307,6 +307,15 @@ export class USDAService {
       protein: number;
       carbs: number;
       fat: number;
+      // Micronutrients
+      iron?: number;
+      calcium?: number;
+      zinc?: number;
+      magnesium?: number;
+      vitaminC?: number;
+      vitaminD?: number;
+      vitaminB12?: number;
+      folate?: number;
     };
   }> {
     // Create memory cache key for this calculation

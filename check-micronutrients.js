@@ -1,20 +1,60 @@
-// Simple script to check micronutrient data in localStorage
-const meals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-console.log('Total meals stored:', meals.length);
+// Debug script to check micronutrient data in logged meals
+// Run this in browser console to check if meals have micronutrient data
 
-if (meals.length > 0) {
-  console.log('\nFirst meal micronutrient data:');
-  const firstMeal = meals[0];
-  console.log('Name:', firstMeal.name);
-  console.log('Calories:', firstMeal.calories);
-  console.log('Vitamin C:', firstMeal.vitaminC);
-  console.log('Vitamin D:', firstMeal.vitaminD);
-  console.log('Iron:', firstMeal.iron);
-  console.log('Calcium:', firstMeal.calcium);
-  
-  console.log('\nAll micronutrients in first meal:');
-  const microKeys = ['vitaminC', 'vitaminD', 'vitaminB12', 'folate', 'iron', 'calcium', 'zinc', 'magnesium'];
-  microKeys.forEach(key => {
-    console.log(`${key}: ${firstMeal[key]}`);
+console.log('=== Checking Micronutrient Data ===');
+
+// Check localStorage for meals
+const weeklyMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
+const today = new Date().toISOString().split('T')[0];
+const todayMeals = weeklyMeals.filter(meal => meal.date === today);
+
+console.log(`Found ${todayMeals.length} meals for today`);
+
+if (todayMeals.length > 0) {
+  console.log('\n--- Today\'s Meals ---');
+  todayMeals.forEach((meal, index) => {
+    console.log(`\nMeal ${index + 1}: ${meal.name}`);
+    console.log('Macros:', {
+      calories: meal.calories,
+      protein: meal.protein,
+      carbs: meal.carbs,
+      fat: meal.fat
+    });
+    console.log('Micronutrients:', {
+      vitaminC: meal.vitaminC,
+      vitaminD: meal.vitaminD,
+      vitaminB12: meal.vitaminB12,
+      folate: meal.folate,
+      iron: meal.iron,
+      calcium: meal.calcium,
+      zinc: meal.zinc,
+      magnesium: meal.magnesium
+    });
   });
+
+  // Calculate totals
+  const totals = todayMeals.reduce((acc, meal) => ({
+    vitaminC: acc.vitaminC + (meal.vitaminC || 0),
+    vitaminD: acc.vitaminD + (meal.vitaminD || 0),
+    vitaminB12: acc.vitaminB12 + (meal.vitaminB12 || 0),
+    folate: acc.folate + (meal.folate || 0),
+    iron: acc.iron + (meal.iron || 0),
+    calcium: acc.calcium + (meal.calcium || 0),
+    zinc: acc.zinc + (meal.zinc || 0),
+    magnesium: acc.magnesium + (meal.magnesium || 0)
+  }), {
+    vitaminC: 0, vitaminD: 0, vitaminB12: 0, folate: 0,
+    iron: 0, calcium: 0, zinc: 0, magnesium: 0
+  });
+
+  console.log('\n--- Daily Micronutrient Totals ---');
+  console.log(totals);
+  
+  // Check if any micronutrients have values
+  const hasAnyMicronutrients = Object.values(totals).some(value => value > 0);
+  console.log(`\nHas micronutrient data: ${hasAnyMicronutrients ? 'YES' : 'NO'}`);
+} else {
+  console.log('No meals logged today. Try logging a meal first.');
 }
+
+console.log('\n=== End Check ===');
