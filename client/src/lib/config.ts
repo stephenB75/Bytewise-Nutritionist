@@ -1,30 +1,47 @@
 /**
- * Production-Ready Configuration
- * Handles both development and production environments
+ * ByteWise Nutritionist Configuration
+ * Primary domain: bytewisenutritionist.com
  */
 
-// Environment detection - updated for custom domain
-const isDev = typeof window !== 'undefined' && 
-  (window.location.hostname === 'localhost' || 
-   window.location.hostname.includes('replit.dev') ||
+// Primary domain configuration
+const PRIMARY_DOMAIN = 'bytewisenutritionist.com';
+const PRIMARY_URL = `https://${PRIMARY_DOMAIN}`;
+
+// Environment detection 
+const isLocalDev = typeof window !== 'undefined' && 
+  window.location.hostname === 'localhost';
+
+const isReplitPreview = typeof window !== 'undefined' && 
+  (window.location.hostname.includes('replit.dev') ||
    window.location.hostname.includes('replit.app') ||
    window.location.hostname.includes('repl.co'));
+
 const isCustomDomain = typeof window !== 'undefined' && 
-  (window.location.hostname === 'bytewisenutritionist.com' ||
-   window.location.hostname === 'www.bytewisenutritionist.com');
+  (window.location.hostname === PRIMARY_DOMAIN ||
+   window.location.hostname === `www.${PRIMARY_DOMAIN}`);
+
 const isGitHubPages = typeof window !== 'undefined' && 
   window.location.hostname.includes('github.io');
-const isProd = isCustomDomain || (!isDev && !isGitHubPages);
 
-// Dynamic API base URL based on current environment
+// Redirect to primary domain if on Replit preview
+if (isReplitPreview && typeof window !== 'undefined') {
+  // Show redirect message
+  console.log(`Redirecting to primary domain: ${PRIMARY_URL}`);
+}
+
+const isDev = isLocalDev || isReplitPreview;
+const isProd = isCustomDomain;
+
+// Dynamic API base URL
 const getApiBaseUrl = () => {
   if (typeof window === 'undefined') return '/api';
   
-  // Use HTTPS for custom domain
-  if (isCustomDomain) {
-    return 'https://bytewisenutritionist.com/api';
+  // Always use primary domain for production
+  if (isCustomDomain || isProd) {
+    return `${PRIMARY_URL}/api`;
   }
   
+  // For local development
   return `${window.location.protocol}//${window.location.host}/api`;
 };
 
@@ -50,14 +67,18 @@ function getEnvVar(key: string): string | undefined {
   return undefined;
 }
 
-// Configuration object with dynamic URLs
+// Configuration object with primary domain
 export const config = {
   isDev,
   isProd,
   isCustomDomain,
+  isReplitPreview,
+  isLocalDev,
   isGitHubPages,
+  primaryDomain: PRIMARY_DOMAIN,
+  primaryUrl: PRIMARY_URL,
   apiMode: isGitHubPages ? 'direct' : 'proxy',
-  baseUrl: isCustomDomain ? '' : (isGitHubPages ? '/Bytewise-Nutritionist' : ''),
+  baseUrl: isCustomDomain || isProd ? '' : (isGitHubPages ? '/Bytewise-Nutritionist' : ''),
   apiBaseUrl: getApiBaseUrl(),
   supabase: {
     url: getEnvVar('VITE_SUPABASE_URL') || FALLBACK_CONFIG.supabaseUrl,

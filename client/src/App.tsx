@@ -9,6 +9,7 @@ import React, { useState, useEffect } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from '@/lib/queryClient';
 import ModernFoodLayout from './pages/ModernFoodLayout';
+import DomainRedirect from './components/DomainRedirect';
 
 function AppContent() {
   const [activeTab, setActiveTab] = useState<string>('redesigned');
@@ -83,11 +84,14 @@ function AppContent() {
   };
 
   return (
-    <div className="min-h-screen bg-black">
-      <main className="min-h-screen">
-        {renderCurrentPage()}
-      </main>
-    </div>
+    <>
+      <DomainRedirect />
+      <div className="min-h-screen bg-black">
+        <main className="min-h-screen">
+          {renderCurrentPage()}
+        </main>
+      </div>
+    </>
   );
 }
 
