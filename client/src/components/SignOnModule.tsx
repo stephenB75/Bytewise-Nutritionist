@@ -34,6 +34,8 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [confirmingEmail, setConfirmingEmail] = useState(false);
+  const [showVerificationMessage, setShowVerificationMessage] = useState(false);
+  const [resendingVerification, setResendingVerification] = useState(false);
   const { toast } = useToast();
   const { supabase, refetch } = useAuth();
 
@@ -56,10 +58,11 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
       if (response.ok) {
         if (isSignUp) {
           toast({
-            title: "Account created!",
-            description: "Please check your email to verify your account before signing in.",
+            title: "Account created successfully!",
+            description: "We've sent a verification email to your inbox. Please verify your email before signing in.",
           });
-          // Switch to sign-in mode after successful signup
+          // Show verification message UI
+          setShowVerificationMessage(true);
           setIsSignUp(false);
           setPassword(''); // Clear password for security
         } else {
@@ -96,12 +99,13 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
           }
         }
       } else {
-        if (data.message === "Email not confirmed") {
+        if (data.message === "Email not confirmed" || data.requiresVerification) {
           toast({
-            title: "Email not confirmed",
-            description: "Please check your email and click the confirmation link, or use the 'Verify Email Address' button below.",
+            title: "Email verification required",
+            description: "Please verify your email before signing in. Check your inbox for the verification link.",
             variant: "destructive",
           });
+          setShowVerificationMessage(true);
         } else {
           toast({
             title: "Authentication failed",
@@ -164,6 +168,52 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
       });
     } finally {
       setConfirmingEmail(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    if (!email) {
+      toast({
+        title: "Email required",
+        description: "Please enter your email address first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setResendingVerification(true);
+    
+    try {
+      const response = await fetch('/api/auth/resend-verification', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast({
+          title: "Verification email sent!",
+          description: "Please check your inbox for the verification link.",
+        });
+      } else {
+        toast({
+          title: "Failed to resend",
+          description: data.message || "Please try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setResendingVerification(false);
     }
   };
 
@@ -352,31 +402,52 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
             </Button>
           </form>
 
-          {/* Email Confirmation Helper - Hide in reset password mode */}
-          {!isResetPassword && (
-            <div className="text-center">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleConfirmEmail}
-                disabled={confirmingEmail || !email}
-                className="text-sm py-2 px-4 border-white/30 text-gray-300 hover:border-white/50 hover:text-white"
-              >
-                {confirmingEmail ? (
-                  <div className="flex items-center">
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-                    Verifying Email...
+          {/* Email Verification Message */}
+          {showVerificationMessage && !isResetPassword && (
+            <div className="bg-blue-500/10 border border-blue-400/30 rounded-lg p-4 space-y-3">
+              <div className="flex items-start space-x-3">
+                <Mail className="w-5 h-5 text-blue-400 mt-0.5" />
+                <div className="flex-1 space-y-2">
+                  <p className="text-sm text-gray-200 font-medium">
+                    Email verification required
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    We've sent a verification link to <strong className="text-gray-300">{email}</strong>. 
+                    Please check your inbox and click the link to verify your account.
+                  </p>
+                  <div className="flex gap-2 pt-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleResendVerification}
+                      disabled={resendingVerification}
+                      className="text-xs border-blue-400/50 text-blue-400 hover:bg-blue-500/10 hover:border-blue-400"
+                    >
+                      {resendingVerification ? (
+                        <div className="flex items-center">
+                          <div className="w-3 h-3 border-2 border-blue-400/30 border-t-blue-400 rounded-full animate-spin mr-2" />
+                          Sending...
+                        </div>
+                      ) : (
+                        <>
+                          <Mail className="w-3 h-3 mr-1" />
+                          Resend verification email
+                        </>
+                      )}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowVerificationMessage(false)}
+                      className="text-xs text-gray-400 hover:text-gray-300"
+                    >
+                      Dismiss
+                    </Button>
                   </div>
-                ) : (
-                  <>
-                    <Mail className="w-4 h-4 mr-2" />
-                    Verify Email Address
-                  </>
-                )}
-              </Button>
-              <p className="text-xs text-gray-400 mt-2">
-                Click to verify your email address and activate your account
-              </p>
+                </div>
+              </div>
             </div>
           )}
 

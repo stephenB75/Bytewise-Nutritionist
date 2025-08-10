@@ -57,7 +57,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       if (error) {
+        // Check if the error is related to email confirmation
+        if (error.message.includes('Email not confirmed')) {
+          return res.status(403).json({ 
+            message: "Email not confirmed",
+            requiresVerification: true 
+          });
+        }
         return res.status(400).json({ message: error.message });
+      }
+      
+      // Check if user's email is confirmed
+      if (data.user && !data.user.email_confirmed_at) {
+        return res.status(403).json({ 
+          message: "Email not confirmed",
+          requiresVerification: true 
+        });
       }
       
       // Store user in our database if they don't exist
@@ -90,11 +105,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { email, password } = req.body;
       
-
-      
       const { data, error } = await serverSupabase.auth.signUp({
         email,
         password,
+        options: {
+          emailRedirectTo: `${process.env.VITE_APP_URL || 'https://bytewisenutritionist.com'}/login?verified=true`,
+        }
       });
       
       if (error) {
@@ -116,10 +132,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      // Important: Don't return a session for unverified users
       res.json({ 
         user: data.user, 
-        session: data.session,
-        message: "Account created successfully" 
+        session: null, // No session until email is verified
+        message: "Account created successfully. Please check your email to verify your account." 
       });
     } catch (error) {
       res.status(500).json({ message: "Sign up failed" });
@@ -158,6 +175,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Signed out successfully" });
     } catch (error) {
       res.status(500).json({ message: "Sign out failed" });
+    }
+  });
+
+  // Resend verification email endpoint
+  app.post('/api/auth/resend-verification', async (req: Request, res: Response) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+      
+      // Use Supabase's resend function
+      const { error } = await serverSupabase.auth.resend({
+        type: 'signup',
+        email,
+        options: {
+          emailRedirectTo: `${process.env.VITE_APP_URL || 'https://bytewisenutritionist.com'}/login?verified=true`,
+        }
+      });
+      
+      if (error) {
+        return res.status(400).json({ message: error.message });
+      }
+      
+      res.json({ message: "Verification email sent successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to resend verification email" });
     }
   });
 
