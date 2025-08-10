@@ -43,8 +43,8 @@ const getApiBaseUrl = () => {
   
   // Production with integrated backend on Replit
   if (isCustomDomain || isProd) {
-    // Use Replit backend for production
-    return 'https://workspace.stephtonybro.repl.co/api';
+    // Use same-origin API for production (backend deployed with frontend)
+    return '/api';
   }
   
   // For local development and Replit preview
