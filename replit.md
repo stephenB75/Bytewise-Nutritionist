@@ -16,7 +16,8 @@ Component modification policy: Do not alter existing working components unless e
   - Fasting Status: Checks localStorage every 10 seconds
   - Macros/Micronutrients: Displays real-time nutritional data
 - Changed "Daily" tab to "Logger" tab name
-- Backend API accessible at: https://workspace.stephtonybro.repl.co/api
+- **Backend successfully deployed to Render**: https://bytewise-backend.onrender.com/api
+- Frontend configured to use independent backend for production
 
 ## System Architecture
 

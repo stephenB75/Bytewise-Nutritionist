@@ -43,9 +43,8 @@ const getApiBaseUrl = () => {
   
   // Production with independent backend (Render)
   if (isCustomDomain || isProd) {
-    // Update this URL after deploying to Render
-    // For now, fallback to same-origin
-    return process.env.VITE_BACKEND_URL || '/api';
+    // Backend deployed on Render
+    return 'https://bytewise-backend.onrender.com/api';
   }
   
   // For local development and Replit preview
