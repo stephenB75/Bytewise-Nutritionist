@@ -7,6 +7,16 @@ export default function DomainRedirect() {
   const [shouldRedirect, setShouldRedirect] = useState(false);
   
   useEffect(() => {
+    // Skip redirect in development mode
+    const isDevelopment = import.meta.env.MODE === 'development' || 
+                         window.location.hostname === 'localhost' ||
+                         window.location.hostname === '0.0.0.0';
+    
+    if (isDevelopment) {
+      setShouldRedirect(false);
+      return;
+    }
+    
     // Check if we're on Replit preview URL - updated pattern matching
     const hostname = window.location.hostname;
     const href = window.location.href;
