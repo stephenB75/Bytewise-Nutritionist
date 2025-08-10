@@ -1,6 +1,6 @@
 # ByteWise Nutritionist - External Deployment Guide
 
-## Deployment Options for bytewisenutiritionist.com
+## Deployment Options for bytewisenutritionist.com
 
 ### Option 1: Vercel (Recommended for Next.js/React apps)
 Free tier available, automatic SSL, global CDN
@@ -36,5 +36,5 @@ NODE_ENV=production
 
 ## Domain Configuration
 
-Domain: bytewisenutiritionist.com
+Domain: bytewisenutritionist.com
 SSL: Will be auto-configured by most hosting platforms
