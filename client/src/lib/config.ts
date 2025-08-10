@@ -36,9 +36,15 @@ const isProd = isCustomDomain;
 const getApiBaseUrl = () => {
   if (typeof window === 'undefined') return '/api';
   
-  // Always use primary domain for production
+  // Use environment variable if set (for independent backend)
+  if (import.meta.env?.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL;
+  }
+  
+  // Production with independent backend
   if (isCustomDomain || isProd) {
-    return `${PRIMARY_URL}/api`;
+    // Use your deployed backend URL (update this after deployment)
+    return 'https://bytewise-backend.onrender.com';
   }
   
   // For local development

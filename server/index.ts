@@ -7,9 +7,19 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Enhanced headers for Chrome preview compatibility
+// Enhanced CORS for independent deployment
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
+  // Configure allowed origins based on environment
+  const allowedOrigins = process.env.NODE_ENV === 'production' 
+    ? ['https://bytewisenutritionist.com', 'https://www.bytewisenutritionist.com']
+    : ['http://localhost:5173', 'http://localhost:5000'];
+  
+  const origin = req.headers.origin;
+  if (origin && (allowedOrigins.includes(origin) || process.env.NODE_ENV !== 'production')) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+  
+  res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
   
