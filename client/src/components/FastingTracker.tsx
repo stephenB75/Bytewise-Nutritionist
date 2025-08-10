@@ -537,25 +537,42 @@ export function FastingTracker() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {fastingHistory.slice(0, 5).map((session: any, index: number) => (
-                    <div 
-                      key={index}
-                      className="flex items-center justify-between p-3 bg-muted rounded-lg"
-                    >
-                      <div className="flex items-center gap-3">
-                        <CheckCircle2 className="w-4 h-4 text-green-500" />
-                        <div>
-                          <p className="font-medium">{session.planName}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {new Date(session.completedAt).toLocaleDateString()}
-                          </p>
+                  {fastingHistory.slice(0, 5).map((session: any, index: number) => {
+                    // Use appropriate date based on session status
+                    const displayDate = session.completedAt || session.endTime || session.startTime;
+                    const dateString = displayDate ? new Date(displayDate).toLocaleDateString() : 'In Progress';
+                    
+                    // Calculate duration based on available data
+                    let durationHours = 0;
+                    if (session.actualDuration) {
+                      durationHours = Math.round(session.actualDuration / (1000 * 60 * 60));
+                    } else if (session.endTime && session.startTime) {
+                      const duration = new Date(session.endTime).getTime() - new Date(session.startTime).getTime();
+                      durationHours = Math.round(duration / (1000 * 60 * 60));
+                    } else if (session.targetDuration) {
+                      durationHours = Math.round(session.targetDuration / (1000 * 60 * 60));
+                    }
+                    
+                    return (
+                      <div 
+                        key={session.id || index}
+                        className="flex items-center justify-between p-3 bg-muted rounded-lg"
+                      >
+                        <div className="flex items-center gap-3">
+                          <CheckCircle2 className={`w-4 h-4 ${session.status === 'completed' ? 'text-green-500' : 'text-yellow-500'}`} />
+                          <div>
+                            <p className="font-medium">{session.planName || 'Fasting Session'}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {dateString}
+                            </p>
+                          </div>
                         </div>
+                        <Badge variant={session.status === 'completed' ? 'secondary' : 'outline'}>
+                          {durationHours > 0 ? `${durationHours}h` : session.status}
+                        </Badge>
                       </div>
-                      <Badge variant="secondary">
-                        {Math.round(session.duration / (1000 * 60 * 60))}h
-                      </Badge>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </CardContent>
             </Card>

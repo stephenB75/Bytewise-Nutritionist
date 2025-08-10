@@ -744,14 +744,23 @@ export class DatabaseStorage implements IStorage {
   }
 
   async completeFastingSession(id: string): Promise<FastingSession> {
+    // First get the session to calculate actual duration
+    const session = await this.getFastingSession(id);
+    if (!session) {
+      throw new Error('Fasting session not found');
+    }
+    
     const completedAt = new Date();
+    const startTime = new Date(session.startTime).getTime();
+    const actualDuration = completedAt.getTime() - startTime;
+    
     const [completed] = await db
       .update(fastingSessions)
       .set({ 
         status: 'completed',
         endTime: completedAt,
         completedAt,
-        actualDuration: sql`${fastingSessions.targetDuration}`
+        actualDuration
       })
       .where(eq(fastingSessions.id, id))
       .returning();
