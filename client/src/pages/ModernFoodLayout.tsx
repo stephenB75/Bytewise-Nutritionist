@@ -22,6 +22,8 @@ import { FastingStatusCard } from '@/components/FastingStatusCard';
 import { useGoalAchievements } from '@/hooks/useGoalAchievements';
 import { useRotatingBackground } from '@/hooks/useRotatingBackground';
 import { useAchievements, getAchievementIcon, formatAchievementDate } from '@/hooks/useAchievements';
+import { useQuery } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
 import { 
   Search, 
   User,
@@ -116,6 +118,78 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     magnesium: 0
   });
   
+  // User stats state
+  const [userLevel, setUserLevel] = useState(1);
+  const [mealsLogged, setMealsLogged] = useState(0);
+  const [userStatus, setUserStatus] = useState('Getting started');
+  const [totalPoints, setTotalPoints] = useState(0);
+
+  // Fetch user statistics
+  const { data: userStats } = useQuery({
+    queryKey: ['/api/user/statistics'],
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/user/statistics');
+      return await response.json();
+    },
+    enabled: !!user,
+  });
+
+  // Fetch user entries for meals count
+  const { data: userEntries } = useQuery({
+    queryKey: ['/api/user-entries'],
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/user-entries');
+      return await response.json();
+    },
+    enabled: !!user,
+  });
+
+  // Fetch achievements for points calculation
+  const { data: achievementsData } = useQuery({
+    queryKey: ['/api/achievements'],
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/achievements');
+      return await response.json();
+    },
+    enabled: !!user,
+  });
+
+  // Update user stats when data changes
+  useEffect(() => {
+    if (userEntries) {
+      // Count total meals logged
+      const totalMeals = userEntries.length || 0;
+      setMealsLogged(totalMeals);
+    }
+  }, [userEntries]);
+
+  useEffect(() => {
+    if (achievementsData?.achievements) {
+      // Calculate total points from completed achievements
+      const points = achievementsData.achievements
+        .filter((a: any) => a.unlocked)
+        .reduce((sum: number, a: any) => sum + (a.points || 10), 0);
+      
+      setTotalPoints(points);
+      
+      // Calculate level based on points (100 points per level)
+      const level = Math.floor(points / 100) + 1;
+      setUserLevel(level);
+      
+      // Update status based on progress
+      if (points >= 500) {
+        setUserStatus('Nutrition Master');
+      } else if (points >= 250) {
+        setUserStatus('Health Champion');
+      } else if (points >= 100) {
+        setUserStatus('Making Progress');
+      } else if (points >= 50) {
+        setUserStatus('Getting Started');
+      } else {
+        setUserStatus('New Member');
+      }
+    }
+  }, [achievementsData]);
 
 
   // Utility function to add notifications - using useCallback for stable reference
@@ -1511,13 +1585,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   </h3>
                   <p className="text-gray-300 text-sm mb-2">{user?.email}</p>
                   <div className="flex items-center space-x-4 text-sm text-gray-400">
-                    <span>🏆 Level 1</span>
-                    <span>📊 0 meals logged</span>
-                    <span>🎯 Getting started</span>
+                    <span>🏆 Level {userLevel}</span>
+                    <span>📊 {mealsLogged} meals logged</span>
+                    <span>🎯 {userStatus}</span>
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-lg font-bold text-orange-400">0</div>
+                  <div className="text-lg font-bold text-orange-400">{totalPoints}</div>
                   <div className="text-xs text-gray-400">Total Points</div>
                 </div>
               </div>
