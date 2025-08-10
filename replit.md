@@ -5,6 +5,7 @@ ByteWise Nutritionist is a comprehensive Progressive Web App (PWA) designed for 
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
+Component modification policy: Do not alter existing working components unless explicitly instructed. Preserve all current functionality when making changes to unrelated parts of the app.
 
 ## System Architecture
 
