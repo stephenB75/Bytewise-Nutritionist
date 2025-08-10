@@ -1,21 +1,21 @@
 services:
   - type: web
-    name: bytewise-nutritionist-backend
+    name: bytewise-backend
     runtime: node
     buildCommand: npm install && npm run build
     startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
+      - key: PORT
+        value: 10000
       - key: DATABASE_URL
         sync: false
-      - key: SUPABASE_URL
+      - key: VITE_SUPABASE_URL
+        sync: false
+      - key: VITE_SUPABASE_ANON_KEY
         sync: false
       - key: SUPABASE_SERVICE_ROLE_KEY
         sync: false
-      - key: SUPABASE_ANON_KEY
+      - key: VITE_USDA_API_KEY
         sync: false
-      - key: PORT
-        value: 10000
-      - key: CORS_ORIGIN
-        value: https://bytewisenutritionist.com

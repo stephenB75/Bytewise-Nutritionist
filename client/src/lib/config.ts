@@ -41,10 +41,11 @@ const getApiBaseUrl = () => {
     return import.meta.env.VITE_API_BASE_URL;
   }
   
-  // Production with integrated backend on Replit
+  // Production with independent backend (Render)
   if (isCustomDomain || isProd) {
-    // Use same-origin API for production (backend deployed with frontend)
-    return '/api';
+    // Update this URL after deploying to Render
+    // For now, fallback to same-origin
+    return process.env.VITE_BACKEND_URL || '/api';
   }
   
   // For local development and Replit preview
