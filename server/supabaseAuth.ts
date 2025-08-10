@@ -11,7 +11,17 @@ const SUPABASE_URL = process.env.SUPABASE_URL || 'https://ykgqcftrfvjblmqzbqvr.s
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrZ3FjZnRyZnZqYmxtcXpicXZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU3ODcxNjQsImV4cCI6MjA1MTM2MzE2NH0.x7kMQbFJevYhYe4LvBTIb3VjcL6H6M7AQwvR8IbgAY4';
 
 // Create Supabase client for server-side operations
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+// Use service role key if available for better access, otherwise use anon key
+const supabase = createClient(
+  SUPABASE_URL, 
+  process.env.SUPABASE_SERVICE_ROLE_KEY || SUPABASE_SERVICE_KEY,
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  }
+);
 
 // Enhanced request type with user info  
 export interface AuthenticatedRequest extends Request {
@@ -55,8 +65,25 @@ export const isAuthenticated: AuthMiddleware = async (
 
     const token = authHeader.substring(7); // Remove 'Bearer ' prefix
     
-    // Verify the JWT token with Supabase
-    const { data: { user }, error } = await supabase.auth.getUser(token);
+    // Create a new client with the user's token for proper authentication
+    const authClient = createClient(
+      SUPABASE_URL,
+      SUPABASE_SERVICE_KEY,
+      {
+        global: {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        },
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
+      }
+    );
+    
+    // Verify the JWT token with Supabase using the authenticated client
+    const { data: { user }, error } = await authClient.auth.getUser();
     
     if (error || !user) {
       return res.status(401).json({ message: 'Unauthorized' });
@@ -85,7 +112,25 @@ export const optionalAuth: AuthMiddleware = async (
     const authHeader = req.headers.authorization;
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.substring(7);
-      const { data: { user } } = await supabase.auth.getUser(token);
+      
+      // Create a new client with the user's token
+      const authClient = createClient(
+        SUPABASE_URL,
+        SUPABASE_SERVICE_KEY,
+        {
+          global: {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          },
+          auth: {
+            autoRefreshToken: false,
+            persistSession: false
+          }
+        }
+      );
+      
+      const { data: { user } } = await authClient.auth.getUser();
       
       if (user) {
         req.user = {

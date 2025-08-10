@@ -15,19 +15,6 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
   
   if (session?.access_token) {
     headers.Authorization = `Bearer ${session.access_token}`;
-  } else {
-    // Try to get from localStorage as fallback
-    const stored = localStorage.getItem('bytewise-auth');
-    if (stored) {
-      try {
-        const data = JSON.parse(stored);
-        if (data.currentSession?.access_token) {
-          headers.Authorization = `Bearer ${data.currentSession.access_token}`;
-        }
-      } catch (e) {
-        // Ignore parse errors
-      }
-    }
   }
   
   return headers;

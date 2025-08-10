@@ -76,7 +76,7 @@ interface Achievement {
 type TrackingView = 'daily' | 'weekly';
 
 export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) {
-  const { user, isLoading: authLoading, refetch } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState('home');
   const [previousTab, setPreviousTab] = useState('home');
   
@@ -366,12 +366,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   useEffect(() => {
     // Load existing data from API
     const loadExistingData = async () => {
-      if (!user) {
-        // Try to get session from Supabase directly
-        const { supabase } = await import('@/lib/supabase');
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) return;
-      }
+      if (!user) return;
       
       try {
         // Get today's date range
@@ -1426,22 +1421,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           <Button className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-3 rounded-xl">
             <Calendar className="w-4 h-4 mr-2" />
             Today
-          </Button>
-          <Button 
-            onClick={async () => {
-              // Force refresh meal data
-              if (!user) {
-                // If not logged in, refetch auth first
-                await refetch();
-              }
-              
-              // Reload the page to refresh all data
-              window.location.reload();
-            }}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-3 rounded-xl"
-          >
-            <CheckCircle2 className="w-4 h-4 mr-2" />
-            Refresh Data
           </Button>
         </div>
 
