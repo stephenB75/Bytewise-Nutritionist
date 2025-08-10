@@ -10,6 +10,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Flame } from 'lucide-react';
 import { useCheckAchievements } from '@/hooks/useAchievements';
+import { apiRequest } from '@/lib/queryClient';
 
 interface DayCalories {
   day: string;
@@ -62,7 +63,7 @@ export function WeeklyCaloriesCard() {
       weekEnd.setDate(weekEnd.getDate() + 7);
       
       // Fetch meals from API for the current week
-      const response = await fetch(`/api/meals/logged?startDate=${weekStart.toISOString()}&endDate=${weekEnd.toISOString()}`);
+      const response = await apiRequest('GET', `/api/meals/logged?startDate=${weekStart.toISOString()}&endDate=${weekEnd.toISOString()}`);
       
       if (response.ok) {
         const meals = await response.json();
