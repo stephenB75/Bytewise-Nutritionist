@@ -77,6 +77,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const { user, isLoading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState('home');
   const [previousTab, setPreviousTab] = useState('home');
+  
+  // Debug logging
+  console.log('ModernFoodLayout - activeTab:', activeTab);
+  console.log('ModernFoodLayout - user:', user);
+  console.log('ModernFoodLayout - authLoading:', authLoading);
   const [openCard, setOpenCard] = useState<string | undefined>(undefined);
   const { backgroundImage, animationKey } = useRotatingBackground(activeTab);
   const { data: achievements = [], isLoading: achievementsLoading } = useAchievements();
@@ -1655,6 +1660,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         return renderHome();
     }
   };
+
+  // Don't block rendering on auth loading - allow the app to render immediately
+  // The user will be null while loading, which is fine for the home page
 
   return (
     <div className="h-screen w-screen bg-black">
