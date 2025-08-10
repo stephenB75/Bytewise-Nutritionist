@@ -29,6 +29,7 @@ interface SignOnModuleProps {
 
 export function SignOnModule({ onClose }: SignOnModuleProps) {
   const [isSignUp, setIsSignUp] = useState(false);
+  const [isResetPassword, setIsResetPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -166,6 +167,55 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
     }
   };
 
+  const handlePasswordReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) {
+      toast({
+        title: "Email required",
+        description: "Please enter your email address.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+    
+    try {
+      const response = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast({
+          title: "Password reset email sent!",
+          description: "Check your email for instructions to reset your password.",
+        });
+        setIsResetPassword(false);
+        setEmail('');
+      } else {
+        toast({
+          title: "Reset failed",
+          description: data.message || "Please try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleGoogleSignIn = () => {
     window.location.href = '/api/auth/google';
   };
@@ -183,10 +233,10 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
             <User className="w-8 h-8 text-white" />
           </div>
           <h2 className="text-3xl font-bold text-white mb-2" style={{ fontFamily: "'League Spartan', sans-serif" }}>
-            {isSignUp ? 'Join bytewise nutritionist' : 'Welcome Back'}
+            {isResetPassword ? 'Reset Password' : isSignUp ? 'Join bytewise nutritionist' : 'Welcome Back'}
           </h2>
           <p className="text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>
-            {isSignUp ? 'Start your nutrition tracking journey today' : 'Access your nutrition tracking and progress'}
+            {isResetPassword ? 'Enter your email to reset your password' : isSignUp ? 'Start your nutrition tracking journey today' : 'Access your nutrition tracking and progress'}
           </p>
         </div>
       </div>
@@ -234,7 +284,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
           </div>
 
           {/* Email Authentication Form */}
-          <form onSubmit={handleEmailAuth} className="space-y-4">
+          <form onSubmit={isResetPassword ? handlePasswordReset : handleEmailAuth} className="space-y-4">
             <div className="space-y-4">
               <div>
                 <Label htmlFor="email" className="text-sm font-medium text-gray-300">Email</Label>
@@ -252,21 +302,35 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
                 </div>
               </div>
               
-              <div>
-                <Label htmlFor="password" className="text-sm font-medium text-gray-300">Password</Label>
-                <div className="relative mt-2">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <Input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter your password"
-                    className="pl-10 bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-blue-400 focus:ring-blue-400"
-                    required
-                  />
+              {!isResetPassword && (
+                <div>
+                  <Label htmlFor="password" className="text-sm font-medium text-gray-300">Password</Label>
+                  <div className="relative mt-2">
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Input
+                      id="password"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Enter your password"
+                      className="pl-10 bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-blue-400 focus:ring-blue-400"
+                      required
+                    />
+                  </div>
+                  {!isSignUp && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsResetPassword(true);
+                        setIsSignUp(false);
+                      }}
+                      className="text-xs text-blue-400 hover:text-blue-300 mt-2 inline-block"
+                    >
+                      Forgot your password?
+                    </button>
+                  )}
                 </div>
-              </div>
+              )}
             </div>
 
             <Button
@@ -277,86 +341,106 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
               {loading ? (
                 <div className="flex items-center justify-center">
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-                  {isSignUp ? 'Creating Account...' : 'Signing In...'}
+                  {isResetPassword ? 'Sending Reset Email...' : isSignUp ? 'Creating Account...' : 'Signing In...'}
                 </div>
               ) : (
                 <>
-                  {isSignUp ? <UserPlus className="w-5 h-5 mr-2" /> : <LogIn className="w-5 h-5 mr-2" />}
-                  {isSignUp ? 'Create Account' : 'Sign In'}
+                  {isResetPassword ? <Mail className="w-5 h-5 mr-2" /> : isSignUp ? <UserPlus className="w-5 h-5 mr-2" /> : <LogIn className="w-5 h-5 mr-2" />}
+                  {isResetPassword ? 'Send Reset Email' : isSignUp ? 'Create Account' : 'Sign In'}
                 </>
               )}
             </Button>
           </form>
 
-          {/* Email Confirmation Helper */}
-          <div className="text-center">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleConfirmEmail}
-              disabled={confirmingEmail || !email}
-              className="text-sm py-2 px-4 border-white/30 text-gray-300 hover:border-white/50 hover:text-white"
-            >
-              {confirmingEmail ? (
-                <div className="flex items-center">
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-                  Verifying Email...
+          {/* Email Confirmation Helper - Hide in reset password mode */}
+          {!isResetPassword && (
+            <div className="text-center">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleConfirmEmail}
+                disabled={confirmingEmail || !email}
+                className="text-sm py-2 px-4 border-white/30 text-gray-300 hover:border-white/50 hover:text-white"
+              >
+                {confirmingEmail ? (
+                  <div className="flex items-center">
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                    Verifying Email...
+                  </div>
+                ) : (
+                  <>
+                    <Mail className="w-4 h-4 mr-2" />
+                    Verify Email Address
+                  </>
+                )}
+              </Button>
+              <p className="text-xs text-gray-400 mt-2">
+                Click to verify your email address and activate your account
+              </p>
+            </div>
+          )}
+
+          {/* OAuth Providers - Hide in reset password mode */}
+          {!isResetPassword && (
+            <div className="space-y-3">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-white/20" />
                 </div>
-              ) : (
-                <>
-                  <Mail className="w-4 h-4 mr-2" />
-                  Verify Email Address
-                </>
-              )}
-            </Button>
-            <p className="text-xs text-gray-400 mt-2">
-              Click to verify your email address and activate your account
-            </p>
-          </div>
-
-          {/* OAuth Providers */}
-          <div className="space-y-3">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-white/20" />
+                <div className="relative flex justify-center text-xs">
+                  <span className="px-2 bg-white/10 text-gray-300">Or continue with</span>
+                </div>
               </div>
-              <div className="relative flex justify-center text-xs">
-                <span className="px-2 bg-white/10 text-gray-300">Or continue with</span>
+
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleGoogleSignIn}
+                  className="flex items-center justify-center py-2 px-4 border border-white/20 bg-white/5 text-sm font-medium text-gray-300 hover:bg-white/10"
+                >
+                  <Chrome className="w-4 h-4 mr-2" />
+                  Google
+                </Button>
+                
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleGitHubSignIn}
+                  className="flex items-center justify-center py-2 px-4 border border-white/20 bg-white/5 text-sm font-medium text-gray-300 hover:bg-white/10"
+                >
+                  <Github className="w-4 h-4 mr-2" />
+                  GitHub
+                </Button>
               </div>
             </div>
+          )}
 
-            <div className="grid grid-cols-2 gap-3">
-              <Button
+          {/* Toggle Sign In / Sign Up / Reset Password */}
+          <div className="text-center space-y-2">
+            {isResetPassword ? (
+              <button
                 type="button"
-                variant="outline"
-                onClick={handleGoogleSignIn}
-                className="flex items-center justify-center py-2 px-4 border border-white/20 bg-white/5 text-sm font-medium text-gray-300 hover:bg-white/10"
+                onClick={() => {
+                  setIsResetPassword(false);
+                  setIsSignUp(false);
+                }}
+                className="text-sm text-blue-400 hover:text-blue-300 font-medium"
               >
-                <Chrome className="w-4 h-4 mr-2" />
-                Google
-              </Button>
-              
-              <Button
+                Back to sign in
+              </button>
+            ) : (
+              <button
                 type="button"
-                variant="outline"
-                onClick={handleGitHubSignIn}
-                className="flex items-center justify-center py-2 px-4 border border-white/20 bg-white/5 text-sm font-medium text-gray-300 hover:bg-white/10"
+                onClick={() => {
+                  setIsSignUp(!isSignUp);
+                  setIsResetPassword(false);
+                }}
+                className="text-sm text-blue-400 hover:text-blue-300 font-medium"
               >
-                <Github className="w-4 h-4 mr-2" />
-                GitHub
-              </Button>
-            </div>
-          </div>
-
-          {/* Toggle Sign In / Sign Up */}
-          <div className="text-center">
-            <button
-              type="button"
-              onClick={() => setIsSignUp(!isSignUp)}
-              className="text-sm text-blue-400 hover:text-blue-300 font-medium"
-            >
-              {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
-            </button>
+                {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
+              </button>
+            )}
           </div>
 
           {/* Privacy Notice */}
