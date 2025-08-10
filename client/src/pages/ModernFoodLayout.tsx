@@ -145,7 +145,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     });
     
     // Check if we have real data (any micronutrient value > 0)
-    const hasRealData = Object.values(realMicronutrients).some((value) => value > 0);
+    const hasRealData = Object.values(realMicronutrients).some((value: number) => value > 0);
     
     if (hasRealData) {
       // Return actual micronutrient data from meals
