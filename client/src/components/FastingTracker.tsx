@@ -181,7 +181,7 @@ export function FastingTracker() {
       queryClient.invalidateQueries({ queryKey: ['/api/fasting/history'] });
       
       // Check for new achievements after completing fast
-      fetch('/api/achievements/check', { method: 'POST' })
+      apiRequest('POST', '/api/achievements/check')
         .then(res => res.json())
         .then(data => {
           if (data.newAchievements && data.newAchievements.length > 0) {

@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
+import { apiRequest } from '@/lib/queryClient';
 
 interface SignOnModuleProps {
   onClose?: () => void;
@@ -45,13 +46,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
     
     try {
       const endpoint = isSignUp ? '/api/auth/signup' : '/api/auth/signin';
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      const response = await apiRequest('POST', endpoint, { email, password });
 
       const data = await response.json();
 
@@ -138,13 +133,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
     setConfirmingEmail(true);
     
     try {
-      const response = await fetch('/api/auth/confirm-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      });
+      const response = await apiRequest('POST', '/api/auth/confirm-email', { email });
 
       const data = await response.json();
 
@@ -184,13 +173,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
     setResendingVerification(true);
     
     try {
-      const response = await fetch('/api/auth/resend-verification', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      });
+      const response = await apiRequest('POST', '/api/auth/resend-verification', { email });
 
       const data = await response.json();
 
@@ -231,13 +214,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
     setLoading(true);
     
     try {
-      const response = await fetch('/api/auth/reset-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      });
+      const response = await apiRequest('POST', '/api/auth/reset-password', { email });
 
       const data = await response.json();
 
