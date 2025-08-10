@@ -179,7 +179,19 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
       if (error) throw error;
       
       sonnerToast.success("Signed out successfully!");
-      if (onClose) onClose();
+      
+      // Clear all user-related local storage data
+      localStorage.removeItem('supabase.auth.token');
+      localStorage.removeItem('userMeals');
+      localStorage.removeItem('dailyGoals');
+      localStorage.removeItem('waterIntake');
+      localStorage.removeItem('fastingState');
+      
+      // Redirect to home page after sign out
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 500);
+      
     } catch (error) {
       toast({
         title: "Sign Out Failed",
