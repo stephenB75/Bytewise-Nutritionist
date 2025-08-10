@@ -104,6 +104,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   
   // Daily stats with fasting integration
   const [dailyStats, setDailyStats] = useState<any>(null);
+  const [fastingStatus, setFastingStatus] = useState<any>(null);
   
   // Nutrition aggregation state
   const [dailyMacros, setDailyMacros] = useState({ protein: 0, carbs: 0, fat: 0 });
@@ -276,6 +277,54 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       // Daily stats fetch failed - continue with cached data
     }
   }, [user]);
+
+  // Check localStorage for active fasting session
+  const checkFastingStatus = useCallback(() => {
+    try {
+      const storedSession = localStorage.getItem('bytewise_fasting_session');
+      const storedActive = localStorage.getItem('bytewise_fasting_active');
+      
+      if (storedSession) {
+        const session = JSON.parse(storedSession);
+        const startTime = new Date(session.startTime).getTime();
+        const now = Date.now();
+        const elapsed = now - startTime - (session.totalPauseDuration || 0);
+        const remaining = session.targetDuration - elapsed;
+        
+        if (remaining > 0 && storedActive === 'true') {
+          // Active fasting session found
+          const plan = session.planId ? session.planId.replace('-', ':') : 'Custom';
+          setFastingStatus({
+            isActive: true,
+            timeRemaining: remaining,
+            planName: plan,
+            startTime: session.startTime,
+            targetDuration: session.targetDuration
+          });
+          return;
+        }
+      }
+      
+      // No active session
+      setFastingStatus({
+        isActive: false
+      });
+    } catch (error) {
+      setFastingStatus({
+        isActive: false
+      });
+    }
+  }, []);
+
+  // Check fasting status on mount and periodically
+  useEffect(() => {
+    checkFastingStatus();
+    
+    // Update every 10 seconds to keep timer accurate
+    const interval = setInterval(checkFastingStatus, 10000);
+    
+    return () => clearInterval(interval);
+  }, [checkFastingStatus]);
 
 
 
@@ -888,15 +937,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             />
             <div className="grid grid-cols-3 gap-3 mt-4">
               <div className="text-center p-2 bg-gray-800/50 rounded-lg">
-                <div className="text-sm font-bold text-orange-400">{loggedMeals.length}</div>
-                <div className="text-xs text-gray-400">Meals</div>
+                <div className="text-sm font-bold text-orange-400">{mealsLogged || loggedMeals.length}</div>
+                <div className="text-xs text-gray-400">Meals Today</div>
               </div>
               <div className="text-center p-2 bg-gray-800/50 rounded-lg">
-                <div className="text-sm font-bold text-orange-400">{Math.round(goalCalories - dailyCalories)}</div>
+                <div className="text-sm font-bold text-orange-400">{Math.max(0, Math.round(goalCalories - dailyCalories))}</div>
                 <div className="text-xs text-gray-400">Remaining</div>
               </div>
               <div className="text-center p-2 bg-gray-800/50 rounded-lg">
-                <div className="text-sm font-bold text-orange-400">{Math.round((dailyCalories/goalCalories)*100)}%</div>
+                <div className="text-sm font-bold text-orange-400">{Math.min(100, Math.round((dailyCalories/goalCalories)*100))}%</div>
                 <div className="text-xs text-gray-400">Complete</div>
               </div>
             </div>
@@ -904,7 +953,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
           {/* Fasting Status */}
           <div className="mb-4">
-            <FastingStatusCard fastingStatus={dailyStats?.fastingStatus} />
+            <FastingStatusCard fastingStatus={fastingStatus || dailyStats?.fastingStatus} />
           </div>
 
           {/* Weekly Progress */}
@@ -921,8 +970,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               {[
                 { label: 'Days', value: '7' },
                 { label: 'Avg/Day', value: Math.round(weeklyCalories/7) },
-                { label: 'Remain', value: Math.round(weeklyGoal - weeklyCalories) },
-                { label: 'Total', value: loggedMeals.length }
+                { label: 'Remain', value: Math.max(0, Math.round(weeklyGoal - weeklyCalories)) },
+                { label: 'Total', value: mealsLogged || loggedMeals.length }
               ].map((item, index) => (
                 <div key={index} className="text-center p-2 bg-gray-800/50 rounded-lg">
                   <div className="text-sm font-bold text-blue-400">{item.value}</div>
@@ -1851,7 +1900,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             { id: 'home', label: 'Dashboard', icon: Home },
             { id: 'nutrition', label: 'Nutrition', icon: Utensils },
             { id: 'fasting', label: 'Fasting', icon: Clock },
-            { id: 'daily', label: 'Daily', icon: BarChart3 },
+            { id: 'daily', label: 'Logger', icon: BarChart3 },
             { id: 'profile', label: 'Profile', icon: UserCircle }
           ].map((tab) => {
             const IconComponent = tab.icon;

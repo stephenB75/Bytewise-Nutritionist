@@ -73,7 +73,7 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
 
   const categories = [
     { id: 'all', name: 'All', icon: Trophy },
-    { id: 'daily', name: 'Daily', icon: Calendar },
+    { id: 'daily', name: 'Logger', icon: Calendar },
     { id: 'weekly', name: 'Weekly', icon: Flame },
     { id: 'monthly', name: 'Monthly', icon: Star },
     { id: 'milestone', name: 'Milestones', icon: Target },
