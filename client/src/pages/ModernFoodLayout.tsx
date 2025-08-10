@@ -379,12 +379,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         const weekStart = new Date(today);
         weekStart.setDate(today.getDate() - today.getDay()); // Start of week (Sunday)
         
-        // Fetch meals from API for the current week
-        const response = await apiRequest('GET', `/api/meals/logged?startDate=${weekStart.toISOString()}&endDate=${tomorrow.toISOString()}`);
+        // Import meals service for environment-aware data fetching
+        const { fetchMeals } = await import('@/services/mealsService');
         
-        if (response.ok) {
-          const meals = await response.json();
-          
+        // Fetch meals using the appropriate method (Supabase for production, API for dev)
+        const meals = await fetchMeals(weekStart, tomorrow);
+        
+        if (meals && meals.length > 0) {
           // Process meals data
           const todayStr = today.toISOString().split('T')[0];
           const todayMeals = meals.filter((meal: any) => {
