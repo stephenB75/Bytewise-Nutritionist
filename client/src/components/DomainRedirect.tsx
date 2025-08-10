@@ -4,17 +4,31 @@ import { Loader2, ExternalLink } from 'lucide-react';
 
 export default function DomainRedirect() {
   const [countdown, setCountdown] = useState(3);
+  const [shouldRedirect, setShouldRedirect] = useState(false);
   
   useEffect(() => {
-    // Only redirect if on Replit preview
-    if (!config.isReplitPreview) return;
+    // Check if we're on Replit preview URL
+    const hostname = window.location.hostname;
+    const isReplit = hostname.includes('replit.dev') || 
+                     hostname.includes('replit.app') || 
+                     hostname.includes('repl.co') ||
+                     hostname.includes('janeway.replit.dev');
+    
+    console.log('DomainRedirect - Hostname:', hostname);
+    console.log('DomainRedirect - Is Replit:', isReplit);
+    console.log('DomainRedirect - Primary URL:', config.primaryUrl);
+    
+    setShouldRedirect(isReplit);
+    
+    if (!isReplit) return;
     
     const timer = setInterval(() => {
       setCountdown(prev => {
         if (prev <= 1) {
           clearInterval(timer);
           // Redirect to primary domain
-          window.location.href = config.primaryUrl;
+          console.log('Redirecting to:', config.primaryUrl);
+          window.location.replace(config.primaryUrl);
           return 0;
         }
         return prev - 1;
@@ -24,7 +38,7 @@ export default function DomainRedirect() {
     return () => clearInterval(timer);
   }, []);
   
-  if (!config.isReplitPreview) return null;
+  if (!shouldRedirect) return null;
   
   return (
     <div className="fixed inset-0 bg-gray-950 z-50 flex items-center justify-center p-4">

@@ -5,7 +5,7 @@
 
 // Primary domain configuration
 const PRIMARY_DOMAIN = 'bytewisenutritionist.com';
-const PRIMARY_URL = `https://${PRIMARY_DOMAIN}`;
+const PRIMARY_URL = 'https://bytewisenutritionist.com';
 
 // Environment detection 
 const isLocalDev = typeof window !== 'undefined' && 
