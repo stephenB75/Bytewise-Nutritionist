@@ -205,12 +205,21 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getPopularFoods(limit = 10): Promise<Food[]> {
-    return await db
-      .select()
-      .from(foods)
-      .where(eq(foods.verified, true))
-      .orderBy(foods.name)
+    // Use Supabase client directly to avoid Drizzle connection issues
+    const { supabase } = await import('./db');
+    const { data, error } = await supabase
+      .from('foods')
+      .select('*')
+      .eq('verified', true)
+      .order('name')
       .limit(limit);
+    
+    if (error) {
+      console.error('Error fetching popular foods:', error);
+      return [];
+    }
+    
+    return data || [];
   }
 
   // Recipe operations
