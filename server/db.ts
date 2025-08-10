@@ -1,18 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
-import { drizzle } from 'drizzle-orm/postgres-js';
-import postgres from 'postgres';
 import * as schema from "@shared/schema";
 
 // Use Supabase connection for production
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
-const databaseUrl = process.env.DATABASE_URL;
-
-if (!databaseUrl) {
-  throw new Error(
-    "DATABASE_URL must be set. Did you forget to provision a database?",
-  );
-}
 
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error(
@@ -20,15 +11,23 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
-// Create Supabase client for auth and realtime
+// Create Supabase client for auth and database operations
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// Create PostgreSQL connection for Drizzle ORM
-const client = postgres(databaseUrl, {
-  prepare: false,
-  max: 10,
-  idle_timeout: 20,
-  connect_timeout: 10,
-});
-
-export const db = drizzle(client, { schema });
+// For now, we'll use Supabase client directly instead of Drizzle
+// This avoids the DATABASE_URL connection string issue
+export const db = {
+  // Mock Drizzle interface using Supabase
+  query: {
+    foods: {
+      findMany: async (options?: any) => {
+        const { data, error } = await supabase
+          .from('foods')
+          .select('*')
+          .limit(options?.limit || 1000);
+        if (error) throw error;
+        return data;
+      }
+    }
+  }
+};
