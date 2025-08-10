@@ -267,7 +267,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     if (!user) return;
     
     try {
-      const response = await fetch(`/api/users/${user.id}/daily-stats`);
+      const response = await apiRequest('GET', `/api/users/${user.id}/daily-stats`);
       if (response.ok) {
         const stats = await response.json();
         setDailyStats(stats);
@@ -380,7 +380,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         weekStart.setDate(today.getDate() - today.getDay()); // Start of week (Sunday)
         
         // Fetch meals from API for the current week
-        const response = await fetch(`/api/meals/logged?startDate=${weekStart.toISOString()}&endDate=${tomorrow.toISOString()}`);
+        const response = await apiRequest('GET', `/api/meals/logged?startDate=${weekStart.toISOString()}&endDate=${tomorrow.toISOString()}`);
         
         if (response.ok) {
           const meals = await response.json();
@@ -463,8 +463,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         fetchDailyStats();
         
       } catch (error) {
-        console.error('Error loading meal data from API:', error);
-        // Fallback to localStorage if API fails
+        // Error loading meal data from API - fallback to localStorage
         const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
         const today = new Date().toISOString().split('T')[0];
         const todayMeals = stored.filter((meal: any) => meal.date === today);
