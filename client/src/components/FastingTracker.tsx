@@ -47,6 +47,8 @@ interface FastingSession {
   endTime?: Date;
   targetDuration: number;
   status: 'active' | 'completed' | 'paused';
+  pausedAt?: number; // Timestamp when paused
+  totalPauseDuration?: number; // Total milliseconds paused
 }
 
 const FASTING_PLANS: FastingPlan[] = [
@@ -218,14 +220,24 @@ export function FastingTracker() {
           const session = JSON.parse(storedSession) as FastingSession;
           const startTime = new Date(session.startTime).getTime();
           const now = Date.now();
-          const elapsed = now - startTime;
+          
+          // Calculate elapsed time accounting for pauses
+          let elapsed: number;
+          if (session.status === 'paused' && session.pausedAt) {
+            // If paused, calculate elapsed up to pause time
+            elapsed = session.pausedAt - startTime - (session.totalPauseDuration || 0);
+          } else {
+            // If active, calculate total elapsed minus pause duration
+            elapsed = now - startTime - (session.totalPauseDuration || 0);
+          }
+          
           const remaining = session.targetDuration - elapsed;
           
           if (remaining > 0) {
             // Session is still valid
             setCurrentSession(session);
             setTimeRemaining(remaining);
-            setIsActive(storedActive === 'true');
+            setIsActive(storedActive === 'true' && session.status !== 'paused');
             
             // Find and set the corresponding plan
             const plan = FASTING_PLANS.find(p => p.id === session.planId);
@@ -259,10 +271,11 @@ export function FastingTracker() {
     
     if (isActive && currentSession) {
       interval = setInterval(() => {
-        // Calculate time remaining based on actual elapsed time
+        // Calculate time remaining based on actual elapsed time, accounting for pauses
         const startTime = new Date(currentSession.startTime).getTime();
         const now = Date.now();
-        const elapsed = now - startTime;
+        const totalPauseDuration = currentSession.totalPauseDuration || 0;
+        const elapsed = now - startTime - totalPauseDuration;
         const remaining = currentSession.targetDuration - elapsed;
         
         if (remaining <= 0) {
@@ -275,6 +288,11 @@ export function FastingTracker() {
           }
         } else {
           setTimeRemaining(remaining);
+          // Update localStorage every minute to persist progress
+          if (elapsed % 60000 < 1000) {
+            const updatedSession = { ...currentSession };
+            localStorage.setItem(FASTING_SESSION_KEY, JSON.stringify(updatedSession));
+          }
         }
       }, 1000);
     }
@@ -288,7 +306,9 @@ export function FastingTracker() {
       planId: selectedPlan.id,
       startTime: new Date(),
       targetDuration,
-      status: 'active'
+      status: 'active',
+      totalPauseDuration: 0,
+      pausedAt: undefined
     };
     
     // Store session in localStorage immediately
@@ -315,18 +335,26 @@ export function FastingTracker() {
     localStorage.setItem(FASTING_ACTIVE_KEY, newActiveState.toString());
     
     if (!newActiveState && currentSession) {
-      // When pausing, update the session with remaining time
+      // When pausing, store the pause timestamp
+      const now = Date.now();
       const updatedSession = {
         ...currentSession,
-        status: 'paused' as const
+        status: 'paused' as const,
+        pausedAt: now
       };
       setCurrentSession(updatedSession);
       localStorage.setItem(FASTING_SESSION_KEY, JSON.stringify(updatedSession));
     } else if (newActiveState && currentSession) {
-      // When resuming, update status
+      // When resuming, calculate pause duration and add to total
+      const now = Date.now();
+      const pauseDuration = currentSession.pausedAt ? now - currentSession.pausedAt : 0;
+      const totalPauseDuration = (currentSession.totalPauseDuration || 0) + pauseDuration;
+      
       const updatedSession = {
         ...currentSession,
-        status: 'active' as const
+        status: 'active' as const,
+        pausedAt: undefined,
+        totalPauseDuration
       };
       setCurrentSession(updatedSession);
       localStorage.setItem(FASTING_SESSION_KEY, JSON.stringify(updatedSession));
