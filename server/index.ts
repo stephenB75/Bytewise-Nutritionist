@@ -11,8 +11,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use((req, res, next) => {
   // Configure allowed origins based on environment
   const allowedOrigins = process.env.NODE_ENV === 'production' 
-    ? ['https://bytewisenutritionist.com', 'https://www.bytewisenutritionist.com']
-    : ['http://localhost:5173', 'http://localhost:5000'];
+    ? ['https://bytewisenutritionist.com', 'https://www.bytewisenutritionist.com', 'https://workspace.stephtonybro.repl.co']
+    : ['http://localhost:5173', 'http://localhost:5000', 'https://workspace.stephtonybro.repl.co'];
   
   const origin = req.headers.origin;
   if (origin && (allowedOrigins.includes(origin) || process.env.NODE_ENV !== 'production')) {

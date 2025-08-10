@@ -41,14 +41,14 @@ const getApiBaseUrl = () => {
     return import.meta.env.VITE_API_BASE_URL;
   }
   
-  // Production with independent backend
+  // Production with integrated backend on Replit
   if (isCustomDomain || isProd) {
-    // For now, use the same origin API since backend is integrated
-    return '/api';
+    // Use Replit backend for production
+    return 'https://workspace.stephtonybro.repl.co/api';
   }
   
-  // For local development
-  return `${window.location.protocol}//${window.location.host}/api`;
+  // For local development and Replit preview
+  return '/api';
 };
 
 // Fallback configuration for production

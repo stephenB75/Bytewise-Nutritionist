@@ -7,6 +7,17 @@ ByteWise Nutritionist is a comprehensive Progressive Web App (PWA) designed for 
 Preferred communication style: Simple, everyday language.
 Component modification policy: Do not alter existing working components unless explicitly instructed. Preserve all current functionality when making changes to unrelated parts of the app.
 
+## Recent Changes (August 10, 2025)
+- Fixed production database connection with correct Supabase credentials
+- Updated API endpoint configuration for backend-frontend communication
+- Fixed dashboard metrics cards to display correct data:
+  - Meals Today: Shows actual logged meals count from database
+  - Daily/Weekly Progress: Prevents negative values
+  - Fasting Status: Checks localStorage every 10 seconds
+  - Macros/Micronutrients: Displays real-time nutritional data
+- Changed "Daily" tab to "Logger" tab name
+- Backend API accessible at: https://workspace.stephtonybro.repl.co/api
+
 ## System Architecture
 
 ### UI/UX Decisions
