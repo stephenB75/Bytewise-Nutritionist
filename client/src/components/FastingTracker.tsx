@@ -47,8 +47,6 @@ interface FastingSession {
   endTime?: Date;
   targetDuration: number;
   status: 'active' | 'completed' | 'paused';
-  pausedAt?: number; // Timestamp when paused
-  totalPauseDuration?: number; // Total milliseconds paused
 }
 
 const FASTING_PLANS: FastingPlan[] = [
@@ -181,7 +179,7 @@ export function FastingTracker() {
       queryClient.invalidateQueries({ queryKey: ['/api/fasting/history'] });
       
       // Check for new achievements after completing fast
-      apiRequest('POST', '/api/achievements/check')
+      fetch('/api/achievements/check', { method: 'POST' })
         .then(res => res.json())
         .then(data => {
           if (data.newAchievements && data.newAchievements.length > 0) {
@@ -220,24 +218,14 @@ export function FastingTracker() {
           const session = JSON.parse(storedSession) as FastingSession;
           const startTime = new Date(session.startTime).getTime();
           const now = Date.now();
-          
-          // Calculate elapsed time accounting for pauses
-          let elapsed: number;
-          if (session.status === 'paused' && session.pausedAt) {
-            // If paused, calculate elapsed up to pause time
-            elapsed = session.pausedAt - startTime - (session.totalPauseDuration || 0);
-          } else {
-            // If active, calculate total elapsed minus pause duration
-            elapsed = now - startTime - (session.totalPauseDuration || 0);
-          }
-          
+          const elapsed = now - startTime;
           const remaining = session.targetDuration - elapsed;
           
           if (remaining > 0) {
             // Session is still valid
             setCurrentSession(session);
             setTimeRemaining(remaining);
-            setIsActive(storedActive === 'true' && session.status !== 'paused');
+            setIsActive(storedActive === 'true');
             
             // Find and set the corresponding plan
             const plan = FASTING_PLANS.find(p => p.id === session.planId);
@@ -271,11 +259,10 @@ export function FastingTracker() {
     
     if (isActive && currentSession) {
       interval = setInterval(() => {
-        // Calculate time remaining based on actual elapsed time, accounting for pauses
+        // Calculate time remaining based on actual elapsed time
         const startTime = new Date(currentSession.startTime).getTime();
         const now = Date.now();
-        const totalPauseDuration = currentSession.totalPauseDuration || 0;
-        const elapsed = now - startTime - totalPauseDuration;
+        const elapsed = now - startTime;
         const remaining = currentSession.targetDuration - elapsed;
         
         if (remaining <= 0) {
@@ -288,11 +275,6 @@ export function FastingTracker() {
           }
         } else {
           setTimeRemaining(remaining);
-          // Update localStorage every minute to persist progress
-          if (elapsed % 60000 < 1000) {
-            const updatedSession = { ...currentSession };
-            localStorage.setItem(FASTING_SESSION_KEY, JSON.stringify(updatedSession));
-          }
         }
       }, 1000);
     }
@@ -306,9 +288,7 @@ export function FastingTracker() {
       planId: selectedPlan.id,
       startTime: new Date(),
       targetDuration,
-      status: 'active',
-      totalPauseDuration: 0,
-      pausedAt: undefined
+      status: 'active'
     };
     
     // Store session in localStorage immediately
@@ -335,26 +315,18 @@ export function FastingTracker() {
     localStorage.setItem(FASTING_ACTIVE_KEY, newActiveState.toString());
     
     if (!newActiveState && currentSession) {
-      // When pausing, store the pause timestamp
-      const now = Date.now();
+      // When pausing, update the session with remaining time
       const updatedSession = {
         ...currentSession,
-        status: 'paused' as const,
-        pausedAt: now
+        status: 'paused' as const
       };
       setCurrentSession(updatedSession);
       localStorage.setItem(FASTING_SESSION_KEY, JSON.stringify(updatedSession));
     } else if (newActiveState && currentSession) {
-      // When resuming, calculate pause duration and add to total
-      const now = Date.now();
-      const pauseDuration = currentSession.pausedAt ? now - currentSession.pausedAt : 0;
-      const totalPauseDuration = (currentSession.totalPauseDuration || 0) + pauseDuration;
-      
+      // When resuming, update status
       const updatedSession = {
         ...currentSession,
-        status: 'active' as const,
-        pausedAt: undefined,
-        totalPauseDuration
+        status: 'active' as const
       };
       setCurrentSession(updatedSession);
       localStorage.setItem(FASTING_SESSION_KEY, JSON.stringify(updatedSession));
@@ -537,42 +509,25 @@ export function FastingTracker() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {fastingHistory.slice(0, 5).map((session: any, index: number) => {
-                    // Use appropriate date based on session status
-                    const displayDate = session.completedAt || session.endTime || session.startTime;
-                    const dateString = displayDate ? new Date(displayDate).toLocaleDateString() : 'In Progress';
-                    
-                    // Calculate duration based on available data
-                    let durationHours = 0;
-                    if (session.actualDuration) {
-                      durationHours = Math.round(session.actualDuration / (1000 * 60 * 60));
-                    } else if (session.endTime && session.startTime) {
-                      const duration = new Date(session.endTime).getTime() - new Date(session.startTime).getTime();
-                      durationHours = Math.round(duration / (1000 * 60 * 60));
-                    } else if (session.targetDuration) {
-                      durationHours = Math.round(session.targetDuration / (1000 * 60 * 60));
-                    }
-                    
-                    return (
-                      <div 
-                        key={session.id || index}
-                        className="flex items-center justify-between p-3 bg-muted rounded-lg"
-                      >
-                        <div className="flex items-center gap-3">
-                          <CheckCircle2 className={`w-4 h-4 ${session.status === 'completed' ? 'text-green-500' : 'text-yellow-500'}`} />
-                          <div>
-                            <p className="font-medium">{session.planName || 'Fasting Session'}</p>
-                            <p className="text-sm text-muted-foreground">
-                              {dateString}
-                            </p>
-                          </div>
+                  {fastingHistory.slice(0, 5).map((session: any, index: number) => (
+                    <div 
+                      key={index}
+                      className="flex items-center justify-between p-3 bg-muted rounded-lg"
+                    >
+                      <div className="flex items-center gap-3">
+                        <CheckCircle2 className="w-4 h-4 text-green-500" />
+                        <div>
+                          <p className="font-medium">{session.planName}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {new Date(session.completedAt).toLocaleDateString()}
+                          </p>
                         </div>
-                        <Badge variant={session.status === 'completed' ? 'secondary' : 'outline'}>
-                          {durationHours > 0 ? `${durationHours}h` : session.status}
-                        </Badge>
                       </div>
-                    );
-                  })}
+                      <Badge variant="secondary">
+                        {Math.round(session.duration / (1000 * 60 * 60))}h
+                      </Badge>
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>

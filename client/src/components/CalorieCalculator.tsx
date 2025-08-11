@@ -150,9 +150,10 @@ function CalorieCalculator({
   // Calculate calories mutation
   const calculateCalories = useMutation({
     mutationFn: async ({ ingredient, measurement }: { ingredient: string; measurement: string }) => {
-      const response = await apiRequest('POST', '/api/calculate-calories', { 
-        ingredient, 
-        measurement 
+      const response = await fetch('/api/calculate-calories', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ingredient, measurement }),
       });
       
       if (!response.ok) {

@@ -22,8 +22,6 @@ import { FastingStatusCard } from '@/components/FastingStatusCard';
 import { useGoalAchievements } from '@/hooks/useGoalAchievements';
 import { useRotatingBackground } from '@/hooks/useRotatingBackground';
 import { useAchievements, getAchievementIcon, formatAchievementDate } from '@/hooks/useAchievements';
-import { useQuery } from '@tanstack/react-query';
-import { apiRequest } from '@/lib/queryClient';
 import { 
   Search, 
   User,
@@ -79,11 +77,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const { user, isLoading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState('home');
   const [previousTab, setPreviousTab] = useState('home');
-  
-  // Debug logging
-  console.log('ModernFoodLayout - activeTab:', activeTab);
-  console.log('ModernFoodLayout - user:', user);
-  console.log('ModernFoodLayout - authLoading:', authLoading);
   const [openCard, setOpenCard] = useState<string | undefined>(undefined);
   const { backgroundImage, animationKey } = useRotatingBackground(activeTab);
   const { data: achievements = [], isLoading: achievementsLoading } = useAchievements();
@@ -104,7 +97,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   
   // Daily stats with fasting integration
   const [dailyStats, setDailyStats] = useState<any>(null);
-  const [fastingStatus, setFastingStatus] = useState<any>(null);
   
   // Nutrition aggregation state
   const [dailyMacros, setDailyMacros] = useState({ protein: 0, carbs: 0, fat: 0 });
@@ -119,78 +111,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     magnesium: 0
   });
   
-  // User stats state
-  const [userLevel, setUserLevel] = useState(1);
-  const [mealsLogged, setMealsLogged] = useState(0);
-  const [userStatus, setUserStatus] = useState('Getting started');
-  const [totalPoints, setTotalPoints] = useState(0);
-
-  // Fetch user statistics
-  const { data: userStats } = useQuery({
-    queryKey: ['/api/user/statistics'],
-    queryFn: async () => {
-      const response = await apiRequest('GET', '/api/user/statistics');
-      return await response.json();
-    },
-    enabled: !!user,
-  });
-
-  // Fetch user entries for meals count
-  const { data: userEntries } = useQuery({
-    queryKey: ['/api/user-entries'],
-    queryFn: async () => {
-      const response = await apiRequest('GET', '/api/user-entries');
-      return await response.json();
-    },
-    enabled: !!user,
-  });
-
-  // Fetch achievements for points calculation
-  const { data: achievementsData } = useQuery({
-    queryKey: ['/api/achievements'],
-    queryFn: async () => {
-      const response = await apiRequest('GET', '/api/achievements');
-      return await response.json();
-    },
-    enabled: !!user,
-  });
-
-  // Update user stats when data changes
-  useEffect(() => {
-    if (userEntries) {
-      // Count total meals logged
-      const totalMeals = userEntries.length || 0;
-      setMealsLogged(totalMeals);
-    }
-  }, [userEntries]);
-
-  useEffect(() => {
-    if (achievementsData?.achievements) {
-      // Calculate total points from completed achievements
-      const points = achievementsData.achievements
-        .filter((a: any) => a.unlocked)
-        .reduce((sum: number, a: any) => sum + (a.points || 10), 0);
-      
-      setTotalPoints(points);
-      
-      // Calculate level based on points (100 points per level)
-      const level = Math.floor(points / 100) + 1;
-      setUserLevel(level);
-      
-      // Update status based on progress
-      if (points >= 500) {
-        setUserStatus('Nutrition Master');
-      } else if (points >= 250) {
-        setUserStatus('Health Champion');
-      } else if (points >= 100) {
-        setUserStatus('Making Progress');
-      } else if (points >= 50) {
-        setUserStatus('Getting Started');
-      } else {
-        setUserStatus('New Member');
-      }
-    }
-  }, [achievementsData]);
 
 
   // Utility function to add notifications - using useCallback for stable reference
@@ -220,7 +140,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     });
     
     // Check if we have real data (any micronutrient value > 0)
-    const hasRealData = Object.values(realMicronutrients).some((value) => Number(value) > 0);
+    const hasRealData = Object.values(realMicronutrients).some((value: number) => value > 0);
     
     if (hasRealData) {
       // Return actual micronutrient data from meals
@@ -268,7 +188,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     if (!user) return;
     
     try {
-      const response = await apiRequest('GET', `/api/users/${user.id}/daily-stats`);
+      const response = await fetch(`/api/users/${user.id}/daily-stats`);
       if (response.ok) {
         const stats = await response.json();
         setDailyStats(stats);
@@ -277,54 +197,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       // Daily stats fetch failed - continue with cached data
     }
   }, [user]);
-
-  // Check localStorage for active fasting session
-  const checkFastingStatus = useCallback(() => {
-    try {
-      const storedSession = localStorage.getItem('bytewise_fasting_session');
-      const storedActive = localStorage.getItem('bytewise_fasting_active');
-      
-      if (storedSession) {
-        const session = JSON.parse(storedSession);
-        const startTime = new Date(session.startTime).getTime();
-        const now = Date.now();
-        const elapsed = now - startTime - (session.totalPauseDuration || 0);
-        const remaining = session.targetDuration - elapsed;
-        
-        if (remaining > 0 && storedActive === 'true') {
-          // Active fasting session found
-          const plan = session.planId ? session.planId.replace('-', ':') : 'Custom';
-          setFastingStatus({
-            isActive: true,
-            timeRemaining: remaining,
-            planName: plan,
-            startTime: session.startTime,
-            targetDuration: session.targetDuration
-          });
-          return;
-        }
-      }
-      
-      // No active session
-      setFastingStatus({
-        isActive: false
-      });
-    } catch (error) {
-      setFastingStatus({
-        isActive: false
-      });
-    }
-  }, []);
-
-  // Check fasting status on mount and periodically
-  useEffect(() => {
-    checkFastingStatus();
-    
-    // Update every 10 seconds to keep timer accurate
-    const interval = setInterval(checkFastingStatus, 10000);
-    
-    return () => clearInterval(interval);
-  }, [checkFastingStatus]);
 
 
 
@@ -404,123 +276,79 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   // Refresh micronutrients when tab changes or on mount
   useEffect(() => {
-    // Use the already loaded meals from state instead of localStorage
-    if (loggedMeals.length > 0) {
-      const micronutrients = calculateMicronutrients(loggedMeals);
+    // Always refresh micronutrients from localStorage
+    const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
+    const today = new Date().toISOString().split('T')[0];
+    const todayMeals = stored.filter((meal: any) => meal.date === today);
+    
+    if (todayMeals.length > 0) {
+      const micronutrients = calculateMicronutrients(todayMeals);
       setDailyMicronutrients(micronutrients);
     }
-  }, [activeTab, loggedMeals, calculateMicronutrients]);
+  }, [activeTab, calculateMicronutrients]);
   
-  // Load existing meal data from API
+  // Load existing meal data and set up tracking
   useEffect(() => {
-    // Load existing data from API
-    const loadExistingData = async () => {
-      if (!user) return;
-      
+    // Load existing meal data on component mount
+    const loadExistingData = () => {
       try {
-        // Get today's date range
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const tomorrow = new Date(today);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        
-        // Get week date range
-        const weekStart = new Date(today);
-        weekStart.setDate(today.getDate() - today.getDay()); // Start of week (Sunday)
-        
-        // Import meals service for environment-aware data fetching
-        const { fetchMeals } = await import('@/services/mealsService');
-        
-        // Fetch meals using the appropriate method (Supabase for production, API for dev)
-        const meals = await fetchMeals(weekStart, tomorrow);
-        
-        if (meals && meals.length > 0) {
-          // Process meals data
-          const todayStr = today.toISOString().split('T')[0];
-          const todayMeals = meals.filter((meal: any) => {
-            const mealDate = new Date(meal.date).toISOString().split('T')[0];
-            return mealDate === todayStr;
-          });
-          
-          // Transform meals to the expected format
-          const transformedTodayMeals = todayMeals.map((meal: any) => ({
-            id: meal.id,
-            name: meal.name,
-            date: new Date(meal.date).toISOString().split('T')[0],
-            calories: parseFloat(meal.totalCalories) || 0,
-            protein: parseFloat(meal.totalProtein) || 0,
-            carbs: parseFloat(meal.totalCarbs) || 0,
-            fat: parseFloat(meal.totalFat) || 0,
-            mealType: meal.mealType,
-            // Include any micronutrients if available
-            vitaminC: meal.vitaminC || 0,
-            vitaminD: meal.vitaminD || 0,
-            vitaminB12: meal.vitaminB12 || 0,
-            folate: meal.folate || 0,
-            iron: meal.iron || 0,
-            calcium: meal.calcium || 0,
-            zinc: meal.zinc || 0,
-            magnesium: meal.magnesium || 0
-          }));
-          
-          setLoggedMeals(transformedTodayMeals);
-          
-          // Calculate daily totals from today's meals
-          const dailyTotal = transformedTodayMeals.reduce((sum: number, meal: any) => sum + meal.calories, 0);
-          setDailyCalories(dailyTotal);
-          
-          // Calculate daily macros
-          const dailyMacroTotals = transformedTodayMeals.reduce((totals: any, meal: any) => ({
-            protein: totals.protein + meal.protein,
-            carbs: totals.carbs + meal.carbs,
-            fat: totals.fat + meal.fat
-          }), { protein: 0, carbs: 0, fat: 0 });
-          setDailyMacros(dailyMacroTotals);
-          
-          // Calculate micronutrients from today's meals
-          const micronutrients = calculateMicronutrients(transformedTodayMeals);
-          setDailyMicronutrients({
-            vitaminC: micronutrients.vitaminC || 0,
-            vitaminD: micronutrients.vitaminD || 0,
-            vitaminB12: micronutrients.vitaminB12 || 0,
-            folate: micronutrients.folate || 0,
-            iron: micronutrients.iron || 0,
-            calcium: micronutrients.calcium || 0,
-            zinc: micronutrients.zinc || 0,
-            magnesium: micronutrients.magnesium || 0
-          });
-          
-          // Calculate weekly totals from all meals
-          const weeklyTotal = meals.reduce((sum: number, meal: any) => 
-            sum + (parseFloat(meal.totalCalories) || 0), 0);
-          setWeeklyCalories(weeklyTotal);
-          
-          // Also update localStorage for backward compatibility
-          const transformedAllMeals = meals.map((meal: any) => ({
-            id: meal.id,
-            name: meal.name,
-            date: new Date(meal.date).toISOString().split('T')[0],
-            calories: parseFloat(meal.totalCalories) || 0,
-            protein: parseFloat(meal.totalProtein) || 0,
-            carbs: parseFloat(meal.totalCarbs) || 0,
-            fat: parseFloat(meal.totalFat) || 0,
-            mealType: meal.mealType
-          }));
-          localStorage.setItem('weeklyMeals', JSON.stringify(transformedAllMeals));
-        }
-        
-        // Fetch daily stats including fasting status
-        fetchDailyStats();
-        
-      } catch (error) {
-        // Error loading meal data from API - fallback to localStorage
         const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
         const today = new Date().toISOString().split('T')[0];
         const todayMeals = stored.filter((meal: any) => meal.date === today);
         setLoggedMeals(todayMeals);
         
+        // Calculate daily calories from existing logged meals
         const dailyTotal = todayMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
         setDailyCalories(dailyTotal);
+        
+        // Calculate daily macros from today's meals
+        const dailyMacroTotals = todayMeals.reduce((totals: any, meal: any) => ({
+          protein: totals.protein + (meal.protein || 0),
+          carbs: totals.carbs + (meal.carbs || 0),
+          fat: totals.fat + (meal.fat || 0)
+        }), { protein: 0, carbs: 0, fat: 0 });
+        setDailyMacros(dailyMacroTotals);
+        
+        // Calculate micronutrients from today's meals (uses real data when available)
+        const micronutrients = calculateMicronutrients(todayMeals);
+        
+        // Ensure state is updated with new object reference for React to detect change
+        setDailyMicronutrients({
+          vitaminC: micronutrients.vitaminC || 0,
+          vitaminD: micronutrients.vitaminD || 0,
+          vitaminB12: micronutrients.vitaminB12 || 0,
+          folate: micronutrients.folate || 0,
+          iron: micronutrients.iron || 0,
+          calcium: micronutrients.calcium || 0,
+          zinc: micronutrients.zinc || 0,
+          magnesium: micronutrients.magnesium || 0
+        });
+        
+        // Fetch daily stats including fasting status
+        if (user) {
+          fetchDailyStats();
+        }
+        
+        // Calculate weekly calories from all stored meals
+        const weeklyTotal = stored.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
+        setWeeklyCalories(weeklyTotal);
+        
+      } catch (error) {
+        console.error('Error loading meal data:', error);
+        // Reset to safe state on error
+        setLoggedMeals([]);
+        setDailyCalories(0);
+        setWeeklyCalories(0);
+        setDailyMicronutrients({
+          vitaminC: 0,
+          vitaminD: 0,
+          vitaminB12: 0,
+          folate: 0,
+          iron: 0,
+          calcium: 0,
+          zinc: 0,
+          magnesium: 0
+        });
       }
     };
 
@@ -529,10 +357,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
     // Set up event listeners for future meal logging
     const handleMealLogged = () => {
-      loadExistingData();
+      try {
+        loadExistingData();
+        // Don't dispatch circular events - let other components handle their own refresh
+      } catch (error) {
+        // Handle errors silently to avoid console spam
+      }
     };
 
-    // Add event listeners for meal updates
+    // Add event listeners with unique references to avoid conflicts
     const eventsToAdd = [
       { type: 'calories-logged', handler: handleMealLogged },
       { type: 'meal-logged-success', handler: handleMealLogged }
@@ -542,10 +375,14 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       window.addEventListener(type, handler);
     });
 
+    // Add storage listener separately
+    window.addEventListener('storage', loadExistingData);
+
     return () => {
       eventsToAdd.forEach(({ type, handler }) => {
         window.removeEventListener(type, handler);
       });
+      window.removeEventListener('storage', loadExistingData);
     };
   }, [user, fetchDailyStats, calculateMicronutrients]);
 
@@ -937,15 +774,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             />
             <div className="grid grid-cols-3 gap-3 mt-4">
               <div className="text-center p-2 bg-gray-800/50 rounded-lg">
-                <div className="text-sm font-bold text-orange-400">{mealsLogged || loggedMeals.length}</div>
-                <div className="text-xs text-gray-400">Meals Today</div>
+                <div className="text-sm font-bold text-orange-400">{loggedMeals.length}</div>
+                <div className="text-xs text-gray-400">Meals</div>
               </div>
               <div className="text-center p-2 bg-gray-800/50 rounded-lg">
-                <div className="text-sm font-bold text-orange-400">{Math.max(0, Math.round(goalCalories - dailyCalories))}</div>
+                <div className="text-sm font-bold text-orange-400">{Math.round(goalCalories - dailyCalories)}</div>
                 <div className="text-xs text-gray-400">Remaining</div>
               </div>
               <div className="text-center p-2 bg-gray-800/50 rounded-lg">
-                <div className="text-sm font-bold text-orange-400">{Math.min(100, Math.round((dailyCalories/goalCalories)*100))}%</div>
+                <div className="text-sm font-bold text-orange-400">{Math.round((dailyCalories/goalCalories)*100)}%</div>
                 <div className="text-xs text-gray-400">Complete</div>
               </div>
             </div>
@@ -953,7 +790,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
           {/* Fasting Status */}
           <div className="mb-4">
-            <FastingStatusCard fastingStatus={fastingStatus || dailyStats?.fastingStatus} />
+            <FastingStatusCard fastingStatus={dailyStats?.fastingStatus} />
           </div>
 
           {/* Weekly Progress */}
@@ -970,8 +807,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               {[
                 { label: 'Days', value: '7' },
                 { label: 'Avg/Day', value: Math.round(weeklyCalories/7) },
-                { label: 'Remain', value: Math.max(0, Math.round(weeklyGoal - weeklyCalories)) },
-                { label: 'Total', value: mealsLogged || loggedMeals.length }
+                { label: 'Remain', value: Math.round(weeklyGoal - weeklyCalories) },
+                { label: 'Total', value: loggedMeals.length }
               ].map((item, index) => (
                 <div key={index} className="text-center p-2 bg-gray-800/50 rounded-lg">
                   <div className="text-sm font-bold text-blue-400">{item.value}</div>
@@ -1634,13 +1471,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   </h3>
                   <p className="text-gray-300 text-sm mb-2">{user?.email}</p>
                   <div className="flex items-center space-x-4 text-sm text-gray-400">
-                    <span>🏆 Level {userLevel}</span>
-                    <span>📊 {mealsLogged} meals logged</span>
-                    <span>🎯 {userStatus}</span>
+                    <span>🏆 Level 1</span>
+                    <span>📊 0 meals logged</span>
+                    <span>🎯 Getting started</span>
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-lg font-bold text-orange-400">{totalPoints}</div>
+                  <div className="text-lg font-bold text-orange-400">0</div>
                   <div className="text-xs text-gray-400">Total Points</div>
                 </div>
               </div>
@@ -1819,9 +1656,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     }
   };
 
-  // Don't block rendering on auth loading - allow the app to render immediately
-  // The user will be null while loading, which is fine for the home page
-
   return (
     <div className="h-screen w-screen bg-black">
       {/* Fixed Notification Header on all pages - Safe area positioning for iOS/Android */}
@@ -1900,7 +1734,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             { id: 'home', label: 'Dashboard', icon: Home },
             { id: 'nutrition', label: 'Nutrition', icon: Utensils },
             { id: 'fasting', label: 'Fasting', icon: Clock },
-            { id: 'daily', label: 'Logger', icon: BarChart3 },
+            { id: 'daily', label: 'Daily', icon: BarChart3 },
             { id: 'profile', label: 'Profile', icon: UserCircle }
           ].map((tab) => {
             const IconComponent = tab.icon;

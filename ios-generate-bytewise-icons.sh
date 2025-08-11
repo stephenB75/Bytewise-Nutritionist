@@ -1,95 +1,59 @@
 #!/bin/bash
 
-# Create ByteWise Nutritionist branded icons for iOS
-# Uses yellow background with text overlay
-
-echo "🔧 Generating ByteWise Nutritionist iOS Icons..."
+# Generate all iOS app icons from ByteWise Nutritionist branded logo
+echo "🎨 Generating iOS app icons from ByteWise Nutritionist logo..."
 
 cd ios/App/App/Assets.xcassets/AppIcon.appiconset
 
-# First, create a base 1024x1024 icon using ImageMagick alternative
-# We'll use Node.js to generate a simple colored icon
+# Source is your branded ByteWise logo
+SOURCE="AppIcon-512@2x.png"
 
-cat > generate-icon.js << 'EOF'
-const fs = require('fs');
-const { createCanvas } = require('canvas');
-
-// Create 1024x1024 canvas
-const canvas = createCanvas(1024, 1024);
-const ctx = canvas.getContext('2d');
-
-// Fill with ByteWise yellow background
-ctx.fillStyle = '#faed39';
-ctx.fillRect(0, 0, 1024, 1024);
-
-// Add "BW" text in center
-ctx.fillStyle = '#1f4aa6';
-ctx.font = 'bold 500px Arial';
-ctx.textAlign = 'center';
-ctx.textBaseline = 'middle';
-ctx.fillText('BW', 512, 512);
-
-// Save as PNG
-const buffer = canvas.toBuffer('image/png');
-fs.writeFileSync('AppIcon-512@2x.png', buffer);
-
-// Generate all other sizes
-const sizes = [
-  { name: 'AppIcon-20.png', size: 20 },
-  { name: 'AppIcon-20@2x.png', size: 40 },
-  { name: 'AppIcon-20@3x.png', size: 60 },
-  { name: 'AppIcon-29.png', size: 29 },
-  { name: 'AppIcon-29@2x.png', size: 58 },
-  { name: 'AppIcon-29@3x.png', size: 87 },
-  { name: 'AppIcon-40.png', size: 40 },
-  { name: 'AppIcon-40@2x.png', size: 80 },
-  { name: 'AppIcon-40@3x.png', size: 120 },
-  { name: 'AppIcon-60@2x.png', size: 120 },
-  { name: 'AppIcon-60@3x.png', size: 180 },
-  { name: 'AppIcon-76.png', size: 76 },
-  { name: 'AppIcon-76@2x.png', size: 152 },
-  { name: 'AppIcon-83.5@2x.png', size: 167 }
-];
-
-sizes.forEach(({ name, size }) => {
-  const smallCanvas = createCanvas(size, size);
-  const smallCtx = smallCanvas.getContext('2d');
-  
-  // Fill with yellow
-  smallCtx.fillStyle = '#faed39';
-  smallCtx.fillRect(0, 0, size, size);
-  
-  // Add text scaled appropriately
-  smallCtx.fillStyle = '#1f4aa6';
-  const fontSize = Math.floor(size * 0.45);
-  smallCtx.font = `bold ${fontSize}px Arial`;
-  smallCtx.textAlign = 'center';
-  smallCtx.textBaseline = 'middle';
-  smallCtx.fillText('BW', size/2, size/2);
-  
-  // Save
-  const smallBuffer = smallCanvas.toBuffer('image/png');
-  fs.writeFileSync(name, smallBuffer);
-  console.log(`Generated ${name} (${size}x${size})`);
-});
-
-console.log('✅ All icons generated successfully!');
-EOF
-
-# Check if canvas is installed, if not install it
-if ! npm list canvas >/dev/null 2>&1; then
-  echo "Installing canvas package..."
-  npm install canvas
+if [ ! -f "$SOURCE" ]; then
+    echo "❌ Source icon not found: $SOURCE"
+    exit 1
 fi
 
-# Run the icon generator
-node generate-icon.js
+echo "📱 Generating iPhone icons..."
+# iPhone Notification - 20pt
+sips -z 40 40 "$SOURCE" --out "AppIcon-20@2x.png"
+sips -z 60 60 "$SOURCE" --out "AppIcon-20@3x.png"
 
-# Clean up
-rm generate-icon.js
+# iPhone Settings - 29pt  
+sips -z 58 58 "$SOURCE" --out "AppIcon-29@2x.png"
+sips -z 87 87 "$SOURCE" --out "AppIcon-29@3x.png"
 
-echo "✅ ByteWise icons generated!"
+# iPhone Spotlight - 40pt
+sips -z 80 80 "$SOURCE" --out "AppIcon-40@2x.png"
+sips -z 120 120 "$SOURCE" --out "AppIcon-40@3x.png"
+
+# iPhone App - 60pt
+sips -z 120 120 "$SOURCE" --out "AppIcon-60@2x.png"
+sips -z 180 180 "$SOURCE" --out "AppIcon-60@3x.png"
+
+echo "📱 Generating iPad icons..."
+# iPad Notification - 20pt
+sips -z 20 20 "$SOURCE" --out "AppIcon-20.png"
+sips -z 40 40 "$SOURCE" --out "AppIcon-20@2x~ipad.png"
+
+# iPad Settings - 29pt
+sips -z 29 29 "$SOURCE" --out "AppIcon-29.png"
+sips -z 58 58 "$SOURCE" --out "AppIcon-29@2x~ipad.png"
+
+# iPad Spotlight - 40pt
+sips -z 40 40 "$SOURCE" --out "AppIcon-40.png"
+sips -z 80 80 "$SOURCE" --out "AppIcon-40@2x~ipad.png"
+
+# iPad App - 76pt
+sips -z 76 76 "$SOURCE" --out "AppIcon-76.png"
+sips -z 152 152 "$SOURCE" --out "AppIcon-76@2x.png"
+
+# iPad Pro - 83.5pt
+sips -z 167 167 "$SOURCE" --out "AppIcon-83.5@2x.png"
+
+echo "✅ ByteWise Nutritionist app icons generated successfully!"
 echo ""
-echo "Now in Xcode:"
-echo "1. Clean Build Folder (Shift+Cmd+K)"
+echo "📋 Next steps:"
+echo "1. In Xcode: Clean Build Folder (Shift+Cmd+K)"
 echo "2. Build again (Cmd+B)"
+echo ""
+echo "Your ByteWise branded icons are now ready for the App Store! 🚀"

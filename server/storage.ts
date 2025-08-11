@@ -205,21 +205,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getPopularFoods(limit = 10): Promise<Food[]> {
-    // Use Supabase client directly to avoid Drizzle connection issues
-    const { supabase } = await import('./db');
-    const { data, error } = await supabase
-      .from('foods')
-      .select('*')
-      .eq('verified', true)
-      .order('name')
+    return await db
+      .select()
+      .from(foods)
+      .where(eq(foods.verified, true))
+      .orderBy(foods.name)
       .limit(limit);
-    
-    if (error) {
-      console.error('Error fetching popular foods:', error);
-      return [];
-    }
-    
-    return data || [];
   }
 
   // Recipe operations
@@ -665,11 +656,6 @@ export class DatabaseStorage implements IStorage {
     totalCarbs: number;
     totalFat: number;
     waterGlasses: number;
-    fastingStatus?: {
-      isActive: boolean;
-      timeRemaining: number;
-      planName: string;
-    };
   }> {
     const startOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
     const endOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
@@ -758,23 +744,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async completeFastingSession(id: string): Promise<FastingSession> {
-    // First get the session to calculate actual duration
-    const session = await this.getFastingSession(id);
-    if (!session) {
-      throw new Error('Fasting session not found');
-    }
-    
     const completedAt = new Date();
-    const startTime = new Date(session.startTime).getTime();
-    const actualDuration = completedAt.getTime() - startTime;
-    
     const [completed] = await db
       .update(fastingSessions)
       .set({ 
         status: 'completed',
         endTime: completedAt,
         completedAt,
-        actualDuration
+        actualDuration: sql`${fastingSessions.targetDuration}`
       })
       .where(eq(fastingSessions.id, id))
       .returning();

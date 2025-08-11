@@ -1,23 +1,8 @@
 ## Overview
-ByteWise Nutritionist is a comprehensive Progressive Web App (PWA) designed for nutrition tracking, meal planning, and recipe building. Its core purpose is to empower users to achieve their health goals through an intuitive, mobile-first interface. The application emphasizes professional mobile interactions, robust design, and real-time data for personalized health management, aiming to deliver a professional-grade nutrition tracking experience. 
-
-**Primary Domain**: https://bytewisenutritionist.com - The app automatically redirects users from Replit preview URLs to the custom domain for the best experience.
+bytewise nutritionist is a comprehensive Progressive Web App (PWA) designed for nutrition tracking, meal planning, and recipe building. Its core purpose is to empower users to achieve their health goals through an intuitive, mobile-first interface. The application emphasizes professional mobile interactions, robust design, and real-time data for personalized health management, aiming to deliver a professional-grade nutrition tracking experience.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
-Component modification policy: Do not alter existing working components unless explicitly instructed. Preserve all current functionality when making changes to unrelated parts of the app.
-
-## Recent Changes (August 10, 2025)
-- Fixed production database connection with correct Supabase credentials
-- Updated API endpoint configuration for backend-frontend communication
-- Fixed dashboard metrics cards to display correct data:
-  - Meals Today: Shows actual logged meals count from database
-  - Daily/Weekly Progress: Prevents negative values
-  - Fasting Status: Checks localStorage every 10 seconds
-  - Macros/Micronutrients: Displays real-time nutritional data
-- Changed "Daily" tab to "Logger" tab name
-- **Backend successfully deployed to Render**: https://bytewise-backend.onrender.com/api
-- Frontend configured to use independent backend for production
 
 ## System Architecture
 
@@ -53,9 +38,7 @@ Component modification policy: Do not alter existing working components unless e
 - **User Interaction**: Notification bell icon with dropdown functionality, confetti celebrations.
 - **USDA Bulk Download System**: Local copy of USDA foods database for offline capabilities and improved performance, with batch processing and caching. Enhanced international food matching with dedicated portion weights for 75+ global dishes and full Caribbean cuisine support.
 - **Profile System**: Clean unified accordion system for Profile, Awards, and Data Management cards with proper state management and text orientation fixes. Consolidated CSS classes for consistent styling across profile components.
-- **iOS Deployment Ready**: Comprehensive code cleanup completed with production Capacitor configuration, automated build scripts, and App Store deployment checklist. Removed all debug code and optimized for mobile performance. ByteWise branded app icons (yellow background with BW logo) and splash screens fully configured for all required iOS sizes.
-- **Database Authentication Fixed**: All dashboard components now use apiRequest() for proper authentication with database. Fixed 7 components including WeeklyCaloriesCard, DataManagementPanel, CalorieCalculator, UserSettingsManager, FastingTracker, and SignOnModule. All metrics cards can now retrieve and display real-time user data.
-- **Architecture Documentation**: Complete PDF documentation (ByteWise_Nutritionist_Architecture.pdf) detailing frontend/backend services, deployment architecture, database schema, API endpoints, and independent hosting strategy. Includes comprehensive guides for deploying to Render (backend) and Vercel (frontend) for complete Replit independence.
+- **iOS Deployment Ready**: Comprehensive code cleanup completed with production Capacitor configuration, automated build scripts, and App Store deployment checklist. Removed all debug code and optimized for mobile performance.
 
 ## External Dependencies
 

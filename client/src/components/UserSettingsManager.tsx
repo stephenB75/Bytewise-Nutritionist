@@ -17,7 +17,6 @@ import {
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { toast as sonnerToast } from 'sonner';
-import { apiRequest } from '@/lib/queryClient';
 import { 
   User, 
   Mail, 
@@ -103,18 +102,25 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
       const [firstName = '', lastName = ''] = userInfo.name.split(' ');
       
       // Update user profile via backend API (database) instead of Supabase metadata
-      const response = await apiRequest('PUT', '/api/user/profile', {
-        firstName: userInfo.firstName || firstName.trim(),
-        lastName: userInfo.lastName || lastName.trim(),
-        personalInfo: {
-          phone: userInfo.phone,
-          location: userInfo.location,
-          birth_date: userInfo.birthDate,
-          height: userInfo.height,
-          weight: userInfo.weight,
-          activity_level: userInfo.activityLevel,
-          dietary_preferences: userInfo.dietaryPreferences,
-        }
+      const response = await fetch('/api/user/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+        },
+        body: JSON.stringify({
+          firstName: userInfo.firstName || firstName.trim(),
+          lastName: userInfo.lastName || lastName.trim(),
+          personalInfo: {
+            phone: userInfo.phone,
+            location: userInfo.location,
+            birth_date: userInfo.birthDate,
+            height: userInfo.height,
+            weight: userInfo.weight,
+            activity_level: userInfo.activityLevel,
+            dietary_preferences: userInfo.dietaryPreferences,
+          }
+        })
       });
 
       if (!response.ok) {
@@ -122,8 +128,15 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
       }
 
       // Update calorie goal separately via goals endpoint
-      const goalsResponse = await apiRequest('PUT', '/api/user/goals', {
-        dailyCalorieGoal: userInfo.calorieGoal,
+      const goalsResponse = await fetch('/api/user/goals', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+        },
+        body: JSON.stringify({
+          dailyCalorieGoal: userInfo.calorieGoal,
+        })
       });
 
       if (!goalsResponse.ok) {
@@ -166,19 +179,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
       if (error) throw error;
       
       sonnerToast.success("Signed out successfully!");
-      
-      // Clear all user-related local storage data
-      localStorage.removeItem('supabase.auth.token');
-      localStorage.removeItem('userMeals');
-      localStorage.removeItem('dailyGoals');
-      localStorage.removeItem('waterIntake');
-      localStorage.removeItem('fastingState');
-      
-      // Redirect to home page after sign out
-      setTimeout(() => {
-        window.location.href = '/';
-      }, 500);
-      
+      if (onClose) onClose();
     } catch (error) {
       toast({
         title: "Sign Out Failed",

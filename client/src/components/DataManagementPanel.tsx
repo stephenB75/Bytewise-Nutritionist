@@ -16,7 +16,6 @@ import {
 } from '@/components/ui/accordion';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
-import { apiRequest } from '@/lib/queryClient';
 import { 
   Download,
   RefreshCw,
@@ -83,11 +82,17 @@ export function DataManagementPanel() {
       });
 
       // Make request to sync data endpoint
-      const response = await apiRequest('POST', '/api/user/sync-data', {
-        includeProfile: true,
-        includeMeals: true,
-        includeRecipes: true,
-        includeWaterIntake: true
+      const response = await fetch('/api/user/sync-data', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          includeProfile: true,
+          includeMeals: true,
+          includeRecipes: true,
+          includeWaterIntake: true
+        }),
       });
 
       if (response.ok) {
@@ -130,7 +135,9 @@ export function DataManagementPanel() {
   const handleDeleteAllData = async () => {
     if (confirm("Are you sure you want to delete all your data? This action cannot be undone.")) {
       try {
-        const response = await apiRequest('DELETE', '/api/user/delete-data');
+        const response = await fetch('/api/user/delete-data', {
+          method: 'DELETE',
+        });
         
         if (response.ok) {
           toast({

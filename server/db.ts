@@ -1,33 +1,15 @@
-import { createClient } from '@supabase/supabase-js';
+import { Pool, neonConfig } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-serverless';
+import ws from "ws";
 import * as schema from "@shared/schema";
 
-// Use Supabase connection for production
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+neonConfig.webSocketConstructor = ws;
 
-if (!supabaseUrl || !supabaseAnonKey) {
+if (!process.env.DATABASE_URL) {
   throw new Error(
-    "SUPABASE_URL and SUPABASE_ANON_KEY must be set for Supabase connection.",
+    "DATABASE_URL must be set. Did you forget to provision a database?",
   );
 }
 
-// Create Supabase client for auth and database operations
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
-// For now, we'll use Supabase client directly instead of Drizzle
-// This avoids the DATABASE_URL connection string issue
-export const db = {
-  // Mock Drizzle interface using Supabase
-  query: {
-    foods: {
-      findMany: async (options?: any) => {
-        const { data, error } = await supabase
-          .from('foods')
-          .select('*')
-          .limit(options?.limit || 1000);
-        if (error) throw error;
-        return data;
-      }
-    }
-  }
-};
+export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+export const db = drizzle({ client: pool, schema });

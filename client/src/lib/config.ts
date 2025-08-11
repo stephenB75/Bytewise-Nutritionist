@@ -1,60 +1,28 @@
 /**
- * ByteWise Nutritionist Configuration
- * Primary domain: bytewisenutritionist.com
+ * Production-Ready Configuration
+ * Handles both development and production environments
  */
 
-// Primary domain configuration
-const PRIMARY_DOMAIN = 'bytewisenutritionist.com';
-const PRIMARY_URL = 'https://bytewisenutritionist.com';
-
-// Environment detection 
-const isLocalDev = typeof window !== 'undefined' && 
-  window.location.hostname === 'localhost';
-
-const isReplitPreview = typeof window !== 'undefined' && 
-  (window.location.hostname.includes('replit.dev') ||
-   window.location.hostname.includes('replit.app') ||
-   window.location.hostname.includes('repl.co'));
-
-const isCustomDomain = typeof window !== 'undefined' && 
-  (window.location.hostname === PRIMARY_DOMAIN ||
-   window.location.hostname === `www.${PRIMARY_DOMAIN}`);
-
+// Environment detection - updated for better URL handling
+const isDev = typeof window !== 'undefined' && 
+  (window.location.hostname === 'localhost' || 
+   window.location.hostname.includes('replit.dev') ||
+   window.location.hostname.includes('replit.app'));
 const isGitHubPages = typeof window !== 'undefined' && 
-  window.location.hostname.includes('github.io');
+  (window.location.hostname.includes('github.io') || 
+   window.location.hostname.includes('bytewise-nutritionist'));
+const isProd = !isDev && !isGitHubPages;
 
-// Redirect to primary domain if on Replit preview
-if (isReplitPreview && typeof window !== 'undefined') {
-  // Show redirect message
-  console.log(`Redirecting to primary domain: ${PRIMARY_URL}`);
-}
-
-const isDev = isLocalDev || isReplitPreview;
-const isProd = isCustomDomain;
-
-// Dynamic API base URL
+// Dynamic API base URL based on current environment
 const getApiBaseUrl = () => {
   if (typeof window === 'undefined') return '/api';
-  
-  // Use environment variable if set (for independent backend)
-  if (import.meta.env?.VITE_API_BASE_URL) {
-    return import.meta.env.VITE_API_BASE_URL;
-  }
-  
-  // Production with independent backend (Render)
-  if (isCustomDomain || isProd) {
-    // Backend deployed on Render
-    return 'https://bytewise-backend.onrender.com/api';
-  }
-  
-  // For local development and Replit preview
-  return '/api';
+  return `${window.location.protocol}//${window.location.host}/api`;
 };
 
 // Fallback configuration for production
 const FALLBACK_CONFIG = {
-  supabaseUrl: 'https://bcfilsryfjwemqytwbvr.supabase.co',
-  supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJjZmlsc3J5Zmp3ZW1xeXR3YnZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQwMzU5MTksImV4cCI6MjA2OTYxMTkxOX0.9AJ51rynZVDSINfVWYsh9s2cjpUvz75BR7FiA_TqNvk',
+  supabaseUrl: 'https://ykgqcftrfvjblmqzbqvr.supabase.co',
+  supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrZ3FjZnRyZnZqYmxtcXpicXZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU3ODcxNjQsImV4cCI6MjA1MTM2MzE2NH0.x7kMQbFJevYhYe4LvBTIb3VjcL6H6M7AQwvR8IbgAY4',
   usdaApiKey: 'z4YPCZm0HAL1SLXe9sRhXXRG8meDjQDBkGqE7hqY'
 };
 
@@ -73,18 +41,13 @@ function getEnvVar(key: string): string | undefined {
   return undefined;
 }
 
-// Configuration object with primary domain
+// Configuration object with dynamic URLs
 export const config = {
   isDev,
   isProd,
-  isCustomDomain,
-  isReplitPreview,
-  isLocalDev,
   isGitHubPages,
-  primaryDomain: PRIMARY_DOMAIN,
-  primaryUrl: PRIMARY_URL,
   apiMode: isGitHubPages ? 'direct' : 'proxy',
-  baseUrl: isCustomDomain || isProd ? '' : (isGitHubPages ? '/Bytewise-Nutritionist' : ''),
+  baseUrl: isGitHubPages ? '/Bytewise-Nutritionist' : '',
   apiBaseUrl: getApiBaseUrl(),
   supabase: {
     url: getEnvVar('VITE_SUPABASE_URL') || FALLBACK_CONFIG.supabaseUrl,

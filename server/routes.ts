@@ -5,8 +5,6 @@ import { setupAuth, isAuthenticated, optionalAuth, serverSupabase, type Authenti
 import { usdaService } from "./services/usdaService";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-
-
   // Health check endpoint
   app.get('/api/health', async (req: Request, res: Response) => {
     try {
@@ -59,22 +57,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       if (error) {
-        // Check if the error is related to email confirmation
-        if (error.message.includes('Email not confirmed')) {
-          return res.status(403).json({ 
-            message: "Email not confirmed",
-            requiresVerification: true 
-          });
-        }
         return res.status(400).json({ message: error.message });
-      }
-      
-      // Check if user's email is confirmed
-      if (data.user && !data.user.email_confirmed_at) {
-        return res.status(403).json({ 
-          message: "Email not confirmed",
-          requiresVerification: true 
-        });
       }
       
       // Store user in our database if they don't exist
@@ -107,12 +90,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { email, password } = req.body;
       
+
+      
       const { data, error } = await serverSupabase.auth.signUp({
         email,
         password,
-        options: {
-          emailRedirectTo: `${process.env.VITE_APP_URL || 'https://bytewisenutritionist.com'}/login?verified=true`,
-        }
       });
       
       if (error) {
@@ -134,39 +116,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Important: Don't return a session for unverified users
       res.json({ 
         user: data.user, 
-        session: null, // No session until email is verified
-        message: "Account created successfully. Please check your email to verify your account." 
+        session: data.session,
+        message: "Account created successfully" 
       });
     } catch (error) {
       res.status(500).json({ message: "Sign up failed" });
-    }
-  });
-
-  // Password reset endpoint
-  app.post('/api/auth/reset-password', async (req: Request, res: Response) => {
-    try {
-      const { email } = req.body;
-      
-      if (!email) {
-        return res.status(400).json({ message: "Email is required" });
-      }
-      
-      const { error } = await serverSupabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${process.env.VITE_APP_URL || 'http://localhost:5000'}/reset-password`,
-      });
-      
-      if (error) {
-        return res.status(400).json({ message: error.message });
-      }
-      
-      res.json({ 
-        message: "Password reset email sent successfully" 
-      });
-    } catch (error) {
-      res.status(500).json({ message: "Failed to send password reset email" });
     }
   });
 
@@ -177,34 +133,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Signed out successfully" });
     } catch (error) {
       res.status(500).json({ message: "Sign out failed" });
-    }
-  });
-
-  // Resend verification email endpoint
-  app.post('/api/auth/resend-verification', async (req: Request, res: Response) => {
-    try {
-      const { email } = req.body;
-      
-      if (!email) {
-        return res.status(400).json({ message: "Email is required" });
-      }
-      
-      // Use Supabase's resend function
-      const { error } = await serverSupabase.auth.resend({
-        type: 'signup',
-        email,
-        options: {
-          emailRedirectTo: `${process.env.VITE_APP_URL || 'https://bytewisenutritionist.com'}/login?verified=true`,
-        }
-      });
-      
-      if (error) {
-        return res.status(400).json({ message: error.message });
-      }
-      
-      res.json({ message: "Verification email sent successfully" });
-    } catch (error) {
-      res.status(500).json({ message: "Failed to resend verification email" });
     }
   });
 
@@ -291,19 +219,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     
     try {
-      // Support date range filtering
-      const { startDate, endDate } = req.query;
-      let start: Date | undefined;
-      let end: Date | undefined;
-      
-      if (startDate) {
-        start = new Date(startDate as string);
-      }
-      if (endDate) {
-        end = new Date(endDate as string);
-      }
-      
-      const meals = await storage.getUserMeals(userId, start, end);
+      const meals = await storage.getUserMeals(userId);
       res.json(meals);
     } catch (error: any) {
       // Meal retrieval error handled by response
@@ -898,46 +814,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // User statistics endpoint for achievements component
-  // Get daily summary of user entries
-  app.get('/api/user/daily-summary', isAuthenticated, async (req: any, res: Response) => {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ message: "User not found" });
-    }
-
-    try {
-      // Get today's date range
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const tomorrow = new Date(today);
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      
-      // Get today's meals
-      const todayMeals = await storage.getUserMeals(userId, today, tomorrow);
-      
-      // Calculate totals
-      const summary = {
-        totalCalories: 0,
-        totalProtein: 0,
-        totalCarbs: 0,
-        totalFat: 0,
-        mealCount: todayMeals.length,
-        meals: todayMeals
-      };
-      
-      todayMeals.forEach(meal => {
-        summary.totalCalories += parseFloat(meal.totalCalories || '0');
-        summary.totalProtein += parseFloat(meal.totalProtein || '0');
-        summary.totalCarbs += parseFloat(meal.totalCarbs || '0');
-        summary.totalFat += parseFloat(meal.totalFat || '0');
-      });
-      
-      res.json(summary);
-    } catch (error: any) {
-      res.status(500).json({ message: "Failed to get daily summary" });
-    }
-  });
-
   app.get('/api/user/statistics', isAuthenticated, async (req: any, res: Response) => {
     const userId = req.user?.id;
     if (!userId) {
