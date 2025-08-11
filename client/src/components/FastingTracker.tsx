@@ -3,7 +3,7 @@
  * Features: Popular fasting schedules, timer tracking, meal windows, and suggestions
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -115,6 +115,7 @@ const FASTING_TIPS = [
 // Constants for localStorage keys
 const FASTING_SESSION_KEY = 'bytewise_fasting_session';
 const FASTING_ACTIVE_KEY = 'bytewise_fasting_active';
+const FASTING_HISTORY_KEY = 'bytewise_fasting_history';
 
 export function FastingTracker() {
   const [selectedPlan, setSelectedPlan] = useState<FastingPlan>(FASTING_PLANS[0]);
@@ -126,11 +127,33 @@ export function FastingTracker() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Get user's fasting history
-  const { data: fastingHistory, isLoading } = useQuery({
+  // Get user's fasting history (combine server and local)
+  const { data: serverHistory, isLoading } = useQuery({
     queryKey: ['/api/fasting/history'],
     queryFn: () => apiRequest('GET', '/api/fasting/history').then(res => res.json())
   });
+  
+  // Merge server history with local history
+  const fastingHistory = useMemo(() => {
+    const localHistory = JSON.parse(localStorage.getItem(FASTING_HISTORY_KEY) || '[]');
+    const serverData = serverHistory || [];
+    
+    // Combine and deduplicate by id
+    const combined = [...localHistory, ...serverData];
+    const seen = new Set();
+    const unique = combined.filter((session: any) => {
+      if (session.id && seen.has(session.id)) return false;
+      if (session.id) seen.add(session.id);
+      return true;
+    });
+    
+    // Sort by date (most recent first)
+    return unique.sort((a: any, b: any) => {
+      const dateA = new Date(a.completedAt || a.endTime || a.createdAt || 0).getTime();
+      const dateB = new Date(b.completedAt || b.endTime || b.createdAt || 0).getTime();
+      return dateB - dateA;
+    });
+  }, [serverHistory]);
 
   // Get active fasting session from server on mount
   const { data: activeFastingSession } = useQuery({
@@ -173,8 +196,29 @@ export function FastingTracker() {
   const completeFastingMutation = useMutation({
     mutationFn: (sessionId: string) => 
       apiRequest('PUT', `/api/fasting/${sessionId}/complete`),
-    onSuccess: () => {
-      // Clear localStorage
+    onSuccess: (data) => {
+      // Store completed session in local history
+      if (currentSession) {
+        const completedSession = {
+          ...currentSession,
+          status: 'completed',
+          completedAt: new Date().toISOString(),
+          endTime: new Date().toISOString(),
+          actualDuration: currentSession.targetDuration
+        };
+        
+        // Add to local history
+        try {
+          const existingHistory = JSON.parse(localStorage.getItem(FASTING_HISTORY_KEY) || '[]');
+          existingHistory.unshift(completedSession);
+          // Keep only last 10 sessions in local storage
+          localStorage.setItem(FASTING_HISTORY_KEY, JSON.stringify(existingHistory.slice(0, 10)));
+        } catch (e) {
+          // Silent fail for localStorage
+        }
+      }
+      
+      // Clear current session from localStorage
       localStorage.removeItem(FASTING_SESSION_KEY);
       localStorage.removeItem(FASTING_ACTIVE_KEY);
       
@@ -204,7 +248,26 @@ export function FastingTracker() {
         });
     },
     onError: () => {
-      // Even if API fails, clear the local session
+      // Even if API fails, store the completed session locally
+      if (currentSession) {
+        const completedSession = {
+          ...currentSession,
+          status: 'completed',
+          completedAt: new Date().toISOString(),
+          endTime: new Date().toISOString(),
+          actualDuration: currentSession.targetDuration
+        };
+        
+        // Add to local history
+        try {
+          const existingHistory = JSON.parse(localStorage.getItem(FASTING_HISTORY_KEY) || '[]');
+          existingHistory.unshift(completedSession);
+          localStorage.setItem(FASTING_HISTORY_KEY, JSON.stringify(existingHistory.slice(0, 10)));
+        } catch (e) {
+          // Silent fail for localStorage
+        }
+      }
+      
       localStorage.removeItem(FASTING_SESSION_KEY);
       localStorage.removeItem(FASTING_ACTIVE_KEY);
       setCurrentSession(null);
@@ -545,39 +608,63 @@ export function FastingTracker() {
           </Card>
 
           {/* Fasting History */}
-          {fastingHistory && Array.isArray(fastingHistory) && fastingHistory.length > 0 && (
-            <Card className="mt-8">
-              <CardHeader className="pb-4">
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5" />
-                  Recent Sessions
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {fastingHistory.slice(0, 5).map((session: any, index: number) => (
-                    <div 
-                      key={index}
-                      className="flex items-center justify-between p-3 bg-muted rounded-lg"
-                    >
-                      <div className="flex items-center gap-3">
-                        <CheckCircle2 className="w-4 h-4 text-green-500" />
-                        <div>
-                          <p className="font-medium">{session.planName}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {new Date(session.completedAt).toLocaleDateString()}
-                          </p>
-                        </div>
-                      </div>
-                      <Badge variant="secondary">
-                        {Math.round(session.duration / (1000 * 60 * 60))}h
-                      </Badge>
-                    </div>
-                  ))}
+          <Card className="mt-8">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="w-5 h-5" />
+                Recent Sessions
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <div className="text-center py-4">
+                  <p className="text-sm text-muted-foreground">Loading history...</p>
                 </div>
-              </CardContent>
-            </Card>
-          )}
+              ) : fastingHistory && Array.isArray(fastingHistory) && fastingHistory.length > 0 ? (
+                <div className="space-y-4">
+                  {fastingHistory
+                    .filter((session: any) => session.status === 'completed')
+                    .slice(0, 5)
+                    .map((session: any, index: number) => {
+                      const duration = session.actualDuration || session.targetDuration || 0;
+                      const completedDate = session.completedAt || session.endTime || session.createdAt;
+                      return (
+                        <div 
+                          key={session.id || index}
+                          className="flex items-center justify-between p-3 bg-muted rounded-lg"
+                        >
+                          <div className="flex items-center gap-3">
+                            <CheckCircle2 className="w-4 h-4 text-green-500" />
+                            <div>
+                              <p className="font-medium">{session.planName || 'Fasting Session'}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {completedDate ? new Date(completedDate).toLocaleDateString() : 'N/A'}
+                              </p>
+                            </div>
+                          </div>
+                          <Badge variant="secondary">
+                            {Math.round(duration / (1000 * 60 * 60))}h
+                          </Badge>
+                        </div>
+                      );
+                    })}
+                  {fastingHistory.filter((session: any) => session.status === 'completed').length === 0 && (
+                    <div className="text-center py-6">
+                      <Coffee className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
+                      <p className="text-sm text-muted-foreground">No completed fasts yet</p>
+                      <p className="text-xs text-muted-foreground mt-1">Complete your first fast to see it here!</p>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center py-6">
+                  <Coffee className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
+                  <p className="text-sm text-muted-foreground">No fasting history yet</p>
+                  <p className="text-xs text-muted-foreground mt-1">Start your first fast to build your history!</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="plans" className="space-y-6 mt-6">
