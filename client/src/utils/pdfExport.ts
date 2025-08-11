@@ -152,41 +152,86 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     const pdf = new jsPDF('p', 'mm', 'a4');
     const pageWidth = 210;
     const pageHeight = 297;
-    let yPosition = 20;
+    let yPosition = 25;
 
-    // Header
-    pdf.setFontSize(24);
+    // Add logo - using public icon file
+    try {
+      // Fetch and convert the logo to base64
+      const logoUrl = '/icons/icon-192x192.png';
+      const response = await fetch(logoUrl);
+      const blob = await response.blob();
+      const reader = new FileReader();
+      
+      await new Promise((resolve, reject) => {
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+      
+      const logoData = reader.result as string;
+      
+      // Add logo to PDF (centered, 30mm width)
+      const logoWidth = 30;
+      const logoHeight = 30;
+      const logoX = (pageWidth - logoWidth) / 2;
+      
+      pdf.addImage(logoData, 'PNG', logoX, yPosition, logoWidth, logoHeight);
+      yPosition += logoHeight + 10;
+    } catch (logoError) {
+      // If logo fails to load, continue without it
+      console.warn('Could not load logo for PDF:', logoError);
+    }
+
+    // Brand Name with colors
+    pdf.setFontSize(28);
     pdf.setFont('helvetica', 'bold');
-    pdf.text('ByteWise Nutrition Tracker', pageWidth / 2, yPosition, { align: 'center' });
+    pdf.setTextColor(31, 74, 166); // ByteWise blue color
+    pdf.text('ByteWise', pageWidth / 2, yPosition, { align: 'center' });
     
     yPosition += 10;
-    pdf.setFontSize(12);
+    pdf.setFontSize(16);
+    pdf.setTextColor(69, 199, 62); // ByteWise green color
+    pdf.text('Nutritionist', pageWidth / 2, yPosition, { align: 'center' });
+    
+    yPosition += 12;
+    pdf.setTextColor(100, 100, 100); // Gray for subtitle
+    pdf.setFontSize(14);
     pdf.setFont('helvetica', 'normal');
     pdf.text('6-Month Progress Report', pageWidth / 2, yPosition, { align: 'center' });
     
-    yPosition += 5;
+    yPosition += 7;
     pdf.setFontSize(10);
     pdf.text(`Generated on ${new Date().toLocaleDateString()}`, pageWidth / 2, yPosition, { align: 'center' });
     
-    yPosition += 20;
+    // Add a decorative line
+    yPosition += 10;
+    pdf.setDrawColor(250, 237, 57); // ByteWise yellow
+    pdf.setLineWidth(0.5);
+    pdf.line(40, yPosition, pageWidth - 40, yPosition);
+    
+    yPosition += 15;
+    
+    // Reset text color to black for content
+    pdf.setTextColor(0, 0, 0);
 
     // Statistics Grid
     pdf.setFontSize(16);
     pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(31, 74, 166); // Blue for section headers
     pdf.text('Nutrition Summary', 20, yPosition);
+    pdf.setTextColor(0, 0, 0); // Reset to black
     yPosition += 15;
 
     const stats = [
-      { label: 'Total Meals Logged', value: progressData.totalMealsLogged.toString() },
-      { label: 'Average Daily Calories', value: progressData.averageDailyCalories.toString() },
-      { label: 'Best Streak (days)', value: progressData.streakRecord.toString() },
-      { label: 'Goal Completion Rate', value: `${progressData.goalCompletionRate}%` },
-      { label: 'Achievements Earned', value: progressData.achievements.toString() },
-      { label: 'Total Calories Tracked', value: `${Math.round(progressData.monthlyBreakdown.reduce((sum, m) => sum + m.calories, 0) / 1000)}k` }
+      { label: 'Total Meals Logged', value: progressData.totalMealsLogged.toString(), color: [69, 199, 62] }, // Green
+      { label: 'Average Daily Calories', value: progressData.averageDailyCalories.toString(), color: [31, 74, 166] }, // Blue
+      { label: 'Best Streak (days)', value: progressData.streakRecord.toString(), color: [250, 237, 57] }, // Yellow
+      { label: 'Goal Completion Rate', value: `${progressData.goalCompletionRate}%`, color: [69, 199, 62] }, // Green
+      { label: 'Achievements Earned', value: progressData.achievements.toString(), color: [31, 74, 166] }, // Blue
+      { label: 'Total Calories Tracked', value: `${Math.round(progressData.monthlyBreakdown.reduce((sum, m) => sum + m.calories, 0) / 1000)}k`, color: [250, 237, 57] } // Yellow
     ];
 
     pdf.setFontSize(12);
-    pdf.setFont('helvetica', 'normal');
     
     let col = 0;
     const colWidth = 90;
@@ -195,45 +240,107 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     stats.forEach((stat, index) => {
       const xPos = startX + (col * colWidth);
       
+      // Draw a small colored rectangle as background
+      pdf.setFillColor(stat.color[0], stat.color[1], stat.color[2]);
+      pdf.rect(xPos - 2, yPosition - 5, 40, 12, 'F');
+      
+      // Value in white on colored background
       pdf.setFont('helvetica', 'bold');
-      pdf.text(stat.value, xPos, yPosition);
+      pdf.setTextColor(255, 255, 255);
+      pdf.text(stat.value, xPos + 18, yPosition, { align: 'center' });
+      
+      // Label in gray below
       pdf.setFont('helvetica', 'normal');
-      pdf.text(stat.label, xPos, yPosition + 5);
+      pdf.setTextColor(80, 80, 80);
+      pdf.text(stat.label, xPos, yPosition + 10);
       
       col++;
       if (col >= 2) {
         col = 0;
-        yPosition += 20;
+        yPosition += 25;
       }
     });
 
-    if (col > 0) yPosition += 20;
+    if (col > 0) yPosition += 25;
     yPosition += 10;
+    
+    // Reset text color for content
+    pdf.setTextColor(0, 0, 0);
 
     // Monthly Breakdown
     pdf.setFontSize(16);
     pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(31, 74, 166); // Blue for section headers
     pdf.text('Monthly Breakdown', 20, yPosition);
+    pdf.setTextColor(0, 0, 0);
     yPosition += 15;
 
-    progressData.monthlyBreakdown.forEach(month => {
+    progressData.monthlyBreakdown.forEach((month, idx) => {
+      // Alternate background colors for readability
+      if (idx % 2 === 0) {
+        pdf.setFillColor(245, 245, 245);
+        pdf.rect(15, yPosition - 5, pageWidth - 30, 12, 'F');
+      }
+      
       pdf.setFontSize(12);
       pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(31, 74, 166);
       pdf.text(month.month, 20, yPosition);
       
       pdf.setFont('helvetica', 'normal');
-      pdf.text(`${month.calories.toLocaleString()} calories • ${month.meals} meals • ${month.goals} goals`, 60, yPosition);
+      pdf.setTextColor(0, 0, 0);
       
-      yPosition += 10;
+      // Draw small colored indicators for each metric
+      const metricsX = 70;
+      
+      // Calories with green dot
+      pdf.setFillColor(69, 199, 62);
+      pdf.circle(metricsX, yPosition - 1, 1.5, 'F');
+      pdf.text(`${month.calories.toLocaleString()} cal`, metricsX + 5, yPosition);
+      
+      // Meals with blue dot
+      pdf.setFillColor(31, 74, 166);
+      pdf.circle(metricsX + 35, yPosition - 1, 1.5, 'F');
+      pdf.text(`${month.meals} meals`, metricsX + 40, yPosition);
+      
+      // Goals with yellow dot
+      pdf.setFillColor(250, 237, 57);
+      pdf.circle(metricsX + 70, yPosition - 1, 1.5, 'F');
+      pdf.text(`${month.goals} goals`, metricsX + 75, yPosition);
+      
+      yPosition += 12;
     });
 
     yPosition += 20;
 
-    // Footer
-    pdf.setFontSize(10);
+    // Footer with branding
+    yPosition = pageHeight - 30;
+    
+    // Add footer line
+    pdf.setDrawColor(250, 237, 57); // ByteWise yellow
+    pdf.setLineWidth(0.3);
+    pdf.line(40, yPosition, pageWidth - 40, yPosition);
+    
+    yPosition += 8;
+    
+    // Footer text with brand colors
+    pdf.setFontSize(11);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(31, 74, 166); // Blue
+    pdf.text('ByteWise', pageWidth / 2 - 20, yPosition, { align: 'center' });
+    
+    pdf.setFont('helvetica', 'normal');
+    pdf.setTextColor(69, 199, 62); // Green
+    pdf.text('Nutritionist', pageWidth / 2 + 20, yPosition, { align: 'center' });
+    
+    yPosition += 6;
+    pdf.setTextColor(100, 100, 100);
+    pdf.setFontSize(9);
     pdf.setFont('helvetica', 'italic');
-    pdf.text('ByteWise Nutrition Tracker - Your Personal Nutrition Companion', pageWidth / 2, pageHeight - 20, { align: 'center' });
-    pdf.text('Keep up the great work on your nutrition journey!', pageWidth / 2, pageHeight - 10, { align: 'center' });
+    pdf.text('Your Personal Nutrition Companion', pageWidth / 2, yPosition, { align: 'center' });
+    
+    yPosition += 5;
+    pdf.text('Keep up the great work on your nutrition journey!', pageWidth / 2, yPosition, { align: 'center' });
 
     // Save the PDF with proper download functionality
     const filename = `bytewise-nutrition-report-${new Date().toISOString().split('T')[0]}.pdf`;
