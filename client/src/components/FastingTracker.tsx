@@ -132,6 +132,14 @@ export function FastingTracker() {
     queryFn: () => apiRequest('GET', '/api/fasting/history').then(res => res.json())
   });
 
+  // Get active fasting session from server on mount
+  const { data: activeFastingSession } = useQuery({
+    queryKey: ['/api/fasting/active'],
+    queryFn: () => apiRequest('GET', '/api/fasting/active').then(res => res.json()),
+    enabled: !currentSession, // Only fetch if we don't have a local session
+    retry: false
+  });
+
   // Start fasting session mutation
   const startFastingMutation = useMutation({
     mutationFn: (session: Omit<FastingSession, 'id'> & { planName?: string }) => 
@@ -150,6 +158,7 @@ export function FastingTracker() {
         description: `Your ${selectedPlan.name} session has begun. Stay strong and hydrated!`,
       });
       queryClient.invalidateQueries({ queryKey: ['/api/fasting/history'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/fasting/active'] });
     },
     onError: (error) => {
       // Keep the timer running even if API fails - it's stored locally
@@ -177,6 +186,7 @@ export function FastingTracker() {
         description: "Great job! You can now break your fast with a nutritious meal.",
       });
       queryClient.invalidateQueries({ queryKey: ['/api/fasting/history'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/fasting/active'] });
       
       // Check for new achievements after completing fast
       fetch('/api/achievements/check', { method: 'POST' })
@@ -207,7 +217,7 @@ export function FastingTracker() {
     }
   });
 
-  // Load fasting session from localStorage on mount
+  // Load fasting session from localStorage on mount and sync with server
   useEffect(() => {
     const loadStoredSession = () => {
       try {
@@ -252,6 +262,42 @@ export function FastingTracker() {
     
     loadStoredSession();
   }, []);
+
+  // Sync with server active session if localStorage is empty
+  useEffect(() => {
+    if (activeFastingSession && !currentSession) {
+      const startTime = new Date(activeFastingSession.startTime).getTime();
+      const now = Date.now();
+      const elapsed = now - startTime;
+      const remaining = activeFastingSession.targetDuration - elapsed;
+      
+      if (remaining > 0) {
+        // Restore session from server
+        const session: FastingSession = {
+          id: activeFastingSession.id,
+          planId: activeFastingSession.planId,
+          startTime: new Date(activeFastingSession.startTime),
+          targetDuration: activeFastingSession.targetDuration,
+          status: activeFastingSession.status
+        };
+        
+        // Store in localStorage for persistence
+        localStorage.setItem(FASTING_SESSION_KEY, JSON.stringify(session));
+        localStorage.setItem(FASTING_ACTIVE_KEY, 'true');
+        
+        // Update state
+        setCurrentSession(session);
+        setTimeRemaining(remaining);
+        setIsActive(true);
+        
+        // Find and set the corresponding plan
+        const plan = FASTING_PLANS.find(p => p.id === session.planId);
+        if (plan) {
+          setSelectedPlan(plan);
+        }
+      }
+    }
+  }, [activeFastingSession, currentSession]);
 
   // Timer effect with localStorage persistence
   useEffect(() => {
