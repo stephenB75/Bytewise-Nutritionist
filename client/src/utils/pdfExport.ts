@@ -108,8 +108,8 @@ export async function generateProgressReportPDF(): Promise<boolean> {
       if (i === 0) {
         currentStreak = 1;
       } else {
-        const prevDate = new Date(sortedDates[i - 1]);
-        const currDate = new Date(sortedDates[i]);
+        const prevDate = new Date(sortedDates[i - 1] as string);
+        const currDate = new Date(sortedDates[i] as string);
         const dayDiff = Math.floor((currDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24));
         
         if (dayDiff === 1) {
@@ -149,7 +149,6 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     };
 
     // Create PDF directly using jsPDF
-
     const pdf = new jsPDF('p', 'mm', 'a4');
     const pageWidth = 210;
     const pageHeight = 297;
@@ -239,42 +238,13 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     // Save the PDF with proper download functionality
     const filename = `bytewise-nutrition-report-${new Date().toISOString().split('T')[0]}.pdf`;
     
-    try {
-      // Generate the PDF blob
-      const pdfBlob = pdf.output('blob');
-      
-      // Create a download link and trigger it
-      const downloadLink = document.createElement('a');
-      downloadLink.href = URL.createObjectURL(pdfBlob);
-      downloadLink.download = filename;
-      downloadLink.style.display = 'none';
-      
-      // Add to DOM, click it, and remove it
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      
-      // Clean up
-      setTimeout(() => {
-        document.body.removeChild(downloadLink);
-        URL.revokeObjectURL(downloadLink.href);
-      }, 100);
-      
-      return true;
-    } catch (error) {
-      // Fallback to direct jsPDF save method
-      try {
-        pdf.save(filename);
-        return true;
-      } catch (saveError) {
-        // If all else fails, at least open in new tab
-        const pdfBlob = pdf.output('blob');
-        const pdfUrl = URL.createObjectURL(pdfBlob);
-        window.open(pdfUrl, '_blank');
-        return true;
-      }
-    }
+    // Use jsPDF's built-in save method which triggers download
+    pdf.save(filename);
+    
+    return true;
 
   } catch (error) {
+    console.error('PDF generation failed:', error);
     // PDF generation error logged for debugging
     return false;
   }
