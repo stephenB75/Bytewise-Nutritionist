@@ -175,12 +175,30 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
 
   const handleSignOut = async () => {
     try {
+      // Sign out from Supabase
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       
+      // Clear all local storage data
+      localStorage.removeItem('bytewise-auth');
+      localStorage.removeItem('weeklyMeals');
+      localStorage.removeItem('dailyStats');
+      localStorage.removeItem('fastingStatus');
+      
+      // Clear session storage
+      sessionStorage.clear();
+      
       sonnerToast.success("Signed out successfully!");
+      
+      // Close modal if present
       if (onClose) onClose();
+      
+      // Force page reload to reset all state and redirect to login
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 500);
     } catch (error) {
+      console.error('Sign out error:', error);
       toast({
         title: "Sign Out Failed",
         description: "There was an error signing you out. Please try again.",
