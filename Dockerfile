@@ -15,6 +15,9 @@ COPY . .
 # Build the application
 RUN npm run build
 
+# Copy built client files to server/public for production serving
+RUN mkdir -p server/public && cp -r client/dist/* server/public/
+
 # Production stage
 FROM node:20-alpine
 
@@ -29,6 +32,9 @@ RUN npm ci --only=production
 # Copy built application from builder stage
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/client/dist ./client/dist
+
+# Copy the built client files to where the server expects them (server/public)
+COPY --from=builder /app/client/dist ./server/public
 
 # Copy other necessary files
 COPY server ./server

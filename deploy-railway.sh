@@ -21,6 +21,11 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+# Ensure static files are in the correct location for production
+echo "📂 Copying static files to server/public..."
+mkdir -p server/public
+cp -r client/dist/* server/public/ 2>/dev/null || true
+
 echo "✅ Build successful!"
 
 # Deploy to Railway
