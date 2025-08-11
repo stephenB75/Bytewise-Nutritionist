@@ -2019,7 +2019,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             { id: 'home', label: 'Dashboard', icon: Home },
             { id: 'nutrition', label: 'Nutrition', icon: Utensils },
             { id: 'fasting', label: 'Fasting', icon: Clock },
-            { id: 'daily', label: 'Daily', icon: BarChart3 },
+            { id: 'daily', label: 'Food Log', icon: BarChart3 },
             { id: 'profile', label: 'Profile', icon: UserCircle }
           ].map((tab) => {
             const IconComponent = tab.icon;
