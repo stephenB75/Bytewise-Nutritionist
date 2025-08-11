@@ -35,6 +35,7 @@ import {
   Lock,
   Shield
 } from 'lucide-react';
+import { SessionStatus } from './SessionStatus';
 
 interface UserSettingsManagerProps {
   onClose?: () => void;
@@ -294,6 +295,8 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
 
   return (
     <div className="space-y-6">
+            {/* Session Status Card */}
+            <SessionStatus />
             
             {/* Profile Form */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

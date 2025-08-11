@@ -14,6 +14,7 @@ import VerifyEmail from './pages/VerifyEmail';
 import { ResetPassword } from './pages/ResetPassword';
 import { useDataRestoration } from '@/hooks/useDataRestoration';
 import { DataSyncIndicator } from '@/components/DataSyncIndicator';
+import { useSessionManager } from '@/hooks/useSessionManager';
 
 function AppContent() {
   const [activeTab, setActiveTab] = useState<string>('redesigned');
@@ -22,6 +23,9 @@ function AppContent() {
   
   // Automatically restore user data from database
   const { isRestoring, hasRestored } = useDataRestoration();
+  
+  // Initialize 24-hour session management
+  useSessionManager();
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);

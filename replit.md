@@ -21,7 +21,7 @@ Preferred communication style: Simple, everyday language.
 - **Backend Architecture**: Custom Express.js server with Supabase backend-as-a-service, production-ready for Railway deployment.
 - **State Management**: TanStack Query for server state, React hooks for local state.
 - **Database**: PostgreSQL with Supabase, Row Level Security (RLS) policies, real-time subscriptions, and Drizzle Kit for schema migrations.
-- **Authentication**: Supabase Auth with email verification requirement, OAuth providers (Google, GitHub), JWT-based sessions. Email verification enforced before account activation.
+- **Authentication**: Supabase Auth with email verification requirement, OAuth providers (Google, GitHub), JWT-based sessions with 24-hour timeout, automatic token refresh, and activity-based session extension. Email verification enforced before account activation.
 - **API**: Custom Express routes with Supabase integration, USDA FoodData Central service, health check endpoint for production monitoring.
 - **Data Models**: Users, Foods (with USDA data), Recipes, Meals, Water Intake, Achievements, Calorie Calculations.
 - **Measurements**: Default imperial measurement system with metric compatibility.
@@ -42,6 +42,7 @@ Preferred communication style: Simple, everyday language.
 - **USDA Bulk Download System**: Local copy of USDA foods database for offline capabilities and improved performance, with batch processing and caching. Enhanced international food matching with dedicated portion weights for 75+ global dishes and full Caribbean cuisine support.
 - **Profile System**: Clean unified accordion system for Profile, Awards, and Data Management cards with proper state management and text orientation fixes. Consolidated CSS classes for consistent styling across profile components.
 - **iOS Deployment Ready**: Comprehensive code cleanup completed with production Capacitor configuration, automated build scripts, and App Store deployment checklist. Removed all debug code and optimized for mobile performance.
+- **Session Management**: 24-hour extended sessions with automatic token refresh, activity tracking, visual session status display, and warning notifications 30 minutes before expiry. Sessions extend with user activity for uninterrupted workflow.
 
 ## External Dependencies
 
