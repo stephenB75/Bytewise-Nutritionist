@@ -12,6 +12,7 @@ import { Route, Router, Switch } from 'wouter';
 import ModernFoodLayout from './pages/ModernFoodLayout';
 import VerifyEmail from './pages/VerifyEmail';
 import { ResetPassword } from './pages/ResetPassword';
+import IconTest from './pages/IconTest';
 import { useDataRestoration } from '@/hooks/useDataRestoration';
 import { DataSyncIndicator } from '@/components/DataSyncIndicator';
 import { useSessionManager } from '@/hooks/useSessionManager';
@@ -101,6 +102,7 @@ function AppContent() {
           <Switch>
             <Route path="/verify-email" component={VerifyEmail} />
             <Route path="/reset-password" component={ResetPassword} />
+            <Route path="/icon-test" component={IconTest} />
             <Route>{renderCurrentPage()}</Route>
           </Switch>
         </main>
