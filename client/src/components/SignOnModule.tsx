@@ -33,6 +33,8 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [confirmingEmail, setConfirmingEmail] = useState(false);
+  const [showResetPassword, setShowResetPassword] = useState(false);
+  const [resetEmailSent, setResetEmailSent] = useState(false);
   const { toast } = useToast();
   const { supabase, refetch } = useAuth();
 
@@ -175,6 +177,43 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
     window.location.href = '/api/auth/github';
   };
 
+  const handlePasswordReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email) {
+      toast({
+        title: "Email Required",
+        description: "Please enter your email address to reset your password.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+    
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+
+      if (error) throw error;
+
+      setResetEmailSent(true);
+      toast({
+        title: "Password Reset Email Sent",
+        description: "Check your email for the password reset link. It may take a few minutes to arrive.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Password Reset Failed",
+        description: error.message || "Unable to send password reset email. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="w-full space-y-6">
       {/* Header */}
@@ -254,7 +293,18 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
               </div>
               
               <div>
-                <Label htmlFor="password" className="text-sm font-medium text-gray-300">Password</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password" className="text-sm font-medium text-gray-300">Password</Label>
+                  {!isSignUp && !showResetPassword && (
+                    <button
+                      type="button"
+                      onClick={() => setShowResetPassword(true)}
+                      className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                    >
+                      Forgot password?
+                    </button>
+                  )}
+                </div>
                 <div className="relative mt-2">
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <Input
@@ -264,29 +314,67 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter your password"
                     className="pl-10 bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-blue-400 focus:ring-blue-400"
-                    required
+                    required={!showResetPassword}
                   />
                 </div>
               </div>
             </div>
 
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 py-3 text-sm font-semibold"
-            >
-              {loading ? (
-                <div className="flex items-center justify-center">
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-                  {isSignUp ? 'Creating Account...' : 'Signing In...'}
-                </div>
-              ) : (
-                <>
-                  {isSignUp ? <UserPlus className="w-5 h-5 mr-2" /> : <LogIn className="w-5 h-5 mr-2" />}
-                  {isSignUp ? 'Create Account' : 'Sign In'}
-                </>
-              )}
-            </Button>
+            {showResetPassword ? (
+              <div className="space-y-3">
+                <Button
+                  type="button"
+                  onClick={handlePasswordReset}
+                  disabled={loading || resetEmailSent}
+                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 py-3 text-sm font-semibold"
+                >
+                  {loading ? (
+                    <div className="flex items-center justify-center">
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                      Sending Reset Email...
+                    </div>
+                  ) : resetEmailSent ? (
+                    <>
+                      <Mail className="w-5 h-5 mr-2" />
+                      Reset Email Sent - Check Your Inbox
+                    </>
+                  ) : (
+                    <>
+                      <Mail className="w-5 h-5 mr-2" />
+                      Send Password Reset Email
+                    </>
+                  )}
+                </Button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowResetPassword(false);
+                    setResetEmailSent(false);
+                  }}
+                  className="w-full text-sm text-gray-300 hover:text-white transition-colors"
+                >
+                  Back to Sign In
+                </button>
+              </div>
+            ) : (
+              <Button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 py-3 text-sm font-semibold"
+              >
+                {loading ? (
+                  <div className="flex items-center justify-center">
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                    {isSignUp ? 'Creating Account...' : 'Signing In...'}
+                  </div>
+                ) : (
+                  <>
+                    {isSignUp ? <UserPlus className="w-5 h-5 mr-2" /> : <LogIn className="w-5 h-5 mr-2" />}
+                    {isSignUp ? 'Create Account' : 'Sign In'}
+                  </>
+                )}
+              </Button>
+            )}
           </form>
 
           {/* Email Confirmation Helper - Only show during sign up */}

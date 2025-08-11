@@ -11,7 +11,7 @@ import { queryClient } from '@/lib/queryClient';
 import { Route, Router, Switch } from 'wouter';
 import ModernFoodLayout from './pages/ModernFoodLayout';
 import VerifyEmail from './pages/VerifyEmail';
-import ResetPassword from './pages/ResetPassword';
+import { ResetPassword } from './pages/ResetPassword';
 
 function AppContent() {
   const [activeTab, setActiveTab] = useState<string>('redesigned');

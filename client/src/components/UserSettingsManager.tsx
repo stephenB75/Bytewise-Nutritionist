@@ -31,7 +31,9 @@ import {
   Activity,
   ChevronDown,
   ChevronUp,
-  Target
+  Target,
+  Lock,
+  Shield
 } from 'lucide-react';
 
 interface UserSettingsManagerProps {
@@ -45,6 +47,13 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
   // Profile editing states
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  
+  // Password change states
+  const [showPasswordChange, setShowPasswordChange] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [changingPassword, setChangingPassword] = useState(false);
 
 
   // User information state - consolidated from both components
@@ -170,6 +179,82 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
       });
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handlePasswordChange = async () => {
+    // Validate inputs
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all password fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      toast({
+        title: "Password Too Short",
+        description: "New password must be at least 6 characters long.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      toast({
+        title: "Passwords Don't Match",
+        description: "New password and confirmation don't match.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setChangingPassword(true);
+
+    try {
+      // First, reauthenticate the user with current password
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      
+      if (!currentUser?.email) {
+        throw new Error("User email not found");
+      }
+
+      // Try to sign in with current password to verify it's correct
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: currentUser.email,
+        password: currentPassword,
+      });
+
+      if (signInError) {
+        throw new Error("Current password is incorrect");
+      }
+
+      // Update the password
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: newPassword
+      });
+
+      if (updateError) throw updateError;
+
+      sonnerToast.success("Password changed successfully!");
+      
+      // Clear form
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      setShowPasswordChange(false);
+      
+    } catch (error: any) {
+      console.error('Password change error:', error);
+      toast({
+        title: "Password Change Failed",
+        description: error.message || "Unable to change password. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setChangingPassword(false);
     }
   };
 
@@ -363,6 +448,105 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
               </p>
             </div>
               </div>
+            </div>
+
+            {/* Password Change Section */}
+            <div className="mt-6 pt-6 border-t border-white/20">
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="profile-section-title flex items-center">
+                  <Shield className="w-5 h-5 mr-2 text-purple-400" />
+                  Security Settings
+                </h4>
+                {!showPasswordChange && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowPasswordChange(true)}
+                    className="border-purple-400/50 text-purple-400 hover:bg-purple-500/10 hover:text-purple-300 hover:border-purple-400"
+                  >
+                    <Lock className="w-4 h-4 mr-2" />
+                    Change Password
+                  </Button>
+                )}
+              </div>
+
+              {showPasswordChange && (
+                <div className="space-y-4 bg-white/5 p-4 rounded-lg border border-white/10">
+                  <div className="space-y-2">
+                    <label className="text-sm text-gray-300 font-medium flex items-center">
+                      <Lock className="w-4 h-4 mr-2 text-purple-400" />
+                      Current Password
+                    </label>
+                    <Input
+                      type="password"
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      className="bg-white/10 border-white/20 text-white placeholder-gray-400"
+                      placeholder="Enter your current password"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm text-gray-300 font-medium flex items-center">
+                      <Lock className="w-4 h-4 mr-2 text-purple-400" />
+                      New Password
+                    </label>
+                    <Input
+                      type="password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      className="bg-white/10 border-white/20 text-white placeholder-gray-400"
+                      placeholder="Enter new password (min 6 characters)"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm text-gray-300 font-medium flex items-center">
+                      <Lock className="w-4 h-4 mr-2 text-purple-400" />
+                      Confirm New Password
+                    </label>
+                    <Input
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="bg-white/10 border-white/20 text-white placeholder-gray-400"
+                      placeholder="Re-enter new password"
+                    />
+                  </div>
+
+                  <div className="flex gap-3 justify-end">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setShowPasswordChange(false);
+                        setCurrentPassword('');
+                        setNewPassword('');
+                        setConfirmPassword('');
+                      }}
+                      className="border-white/30 text-gray-300 hover:border-white/50 hover:text-white"
+                    >
+                      <X className="w-4 h-4 mr-2" />
+                      Cancel
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={handlePasswordChange}
+                      disabled={changingPassword}
+                      className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+                    >
+                      {changingPassword ? (
+                        <>Changing Password...</>
+                      ) : (
+                        <>
+                          <Shield className="w-4 h-4 mr-2" />
+                          Update Password
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Action Buttons - Always visible */}
