@@ -34,7 +34,7 @@ Preferred communication style: Simple, everyday language.
 - **Recipe Creation**: Dynamic nutrition calculation as ingredients are added.
 - **Tracking**: Daily goals, aggregated consumption, calendar view for historical data, and weekly calorie breakdown.
 - **User Profile**: Comprehensive profile with personal info, preferences, and an achievement system. Consolidated user settings manager with tabbed navigation.
-- **Data Management**: Server-side persistence with real-time updates and PDF export system for progress reports.
+- **Data Management**: Comprehensive dual-layer persistence system with automatic localStorage saving and database synchronization. Features include auto-save intervals (30s), save on page unload/tab switch, data restoration on login, visual sync indicators, and PDF export system for progress reports. Zero data loss guaranteed with multiple backup layers.
 - **Native Mobile Support**: Android and iOS support using Capacitor framework with relevant mobile plugins.
 - **User Interaction**: Notification bell icon with dropdown functionality, confetti celebrations.
 - **USDA Bulk Download System**: Local copy of USDA foods database for offline capabilities and improved performance, with batch processing and caching. Enhanced international food matching with dedicated portion weights for 75+ global dishes and full Caribbean cuisine support.

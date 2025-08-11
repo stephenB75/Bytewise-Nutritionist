@@ -293,6 +293,187 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Data restoration endpoint - get all user data from database
+  app.get('/api/user/restore-data', optionalAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      
+      if (!userId) {
+        return res.json({ 
+          success: true, 
+          data: {}, 
+          message: "No user authenticated - using local storage only" 
+        });
+      }
+      
+      // Fetch all user data from database
+      const [
+        userProfile,
+        meals,
+        recipes,
+        waterIntake,
+        achievements
+      ] = await Promise.all([
+        storage.getUser(userId),
+        storage.getUserMeals(userId),
+        storage.getUserRecipes(userId),
+        storage.getUserWaterIntake(userId),
+        storage.getUserAchievements(userId)
+      ]);
+      
+      // Return structured data for restoration
+      res.json({
+        success: true,
+        data: {
+          userProfile,
+          meals: meals || [],
+          recipes: recipes || [],
+          waterIntake: waterIntake || [],
+          achievements: achievements || [],
+          calorieGoal: userProfile?.dailyCalorieGoal || 2200,
+          proteinGoal: userProfile?.dailyProteinGoal || 120,
+          carbGoal: userProfile?.dailyCarbGoal || 300,
+          fatGoal: userProfile?.dailyFatGoal || 70,
+          waterGoal: userProfile?.dailyWaterGoal || 8
+        },
+        timestamp: new Date().toISOString()
+      });
+    } catch (error: any) {
+      res.status(500).json({ 
+        message: "Failed to restore data",
+        error: error.message 
+      });
+    }
+  });
+  
+  // Data synchronization endpoint
+  app.post('/api/user/sync-data', optionalAuth, async (req: any, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      const { key, data, timestamp } = req.body;
+      
+      if (!key || !data) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
+      
+      // Store data based on key type
+      let itemsBackedUp = 0;
+      const breakdown: any = {};
+      
+      // If user is authenticated, save to database
+      if (userId) {
+        switch(key) {
+          case 'meals':
+            if (Array.isArray(data)) {
+              for (const meal of data) {
+                try {
+                  await storage.createMeal({
+                    userId,
+                    date: new Date(meal.date || new Date()),
+                    mealType: meal.mealType || 'meal',
+                    name: meal.name || 'Unnamed meal',
+                    totalCalories: meal.calories?.toString() || '0',
+                    totalProtein: meal.protein?.toString() || '0',
+                    totalCarbs: meal.carbs?.toString() || '0',
+                    totalFat: meal.fat?.toString() || '0'
+                  });
+                  itemsBackedUp++;
+                } catch (err) {
+                  // Skip duplicate meals
+                }
+              }
+              breakdown.meals = itemsBackedUp;
+            }
+            break;
+            
+          case 'recipes':
+            if (Array.isArray(data)) {
+              for (const recipe of data) {
+                try {
+                  await storage.createRecipe({
+                    userId,
+                    name: recipe.name || 'Unnamed recipe',
+                    servings: recipe.servings || 1,
+                    totalCalories: recipe.totalCalories?.toString() || '0',
+                    totalProtein: recipe.totalProtein?.toString() || '0',
+                    totalCarbs: recipe.totalCarbs?.toString() || '0',
+                    totalFat: recipe.totalFat?.toString() || '0'
+                  });
+                  itemsBackedUp++;
+                } catch (err) {
+                  // Skip duplicate recipes
+                }
+              }
+              breakdown.recipes = itemsBackedUp;
+            }
+            break;
+            
+          case 'waterIntake':
+            if (Array.isArray(data)) {
+              for (const intake of data) {
+                try {
+                  await storage.createWaterIntake({
+                    userId,
+                    date: new Date(intake.date || new Date()),
+                    glasses: intake.glasses || 0,
+                    timestamp: new Date(intake.timestamp || new Date())
+                  });
+                  itemsBackedUp++;
+                } catch (err) {
+                  // Skip duplicate entries
+                }
+              }
+              breakdown.waterIntake = itemsBackedUp;
+            }
+            break;
+            
+          case 'userProfile':
+            if (typeof data === 'object') {
+              await storage.updateUserProfile(userId, {
+                firstName: data.firstName,
+                lastName: data.lastName,
+                personalInfo: data.personalInfo,
+                notificationSettings: data.notificationSettings,
+                privacySettings: data.privacySettings
+              });
+              itemsBackedUp = 1;
+              breakdown.profile = 1;
+            }
+            break;
+            
+          case 'calorieGoal':
+          case 'proteinGoal':
+          case 'carbGoal':
+          case 'fatGoal':
+          case 'waterGoal':
+            const goals: any = {};
+            if (key === 'calorieGoal') goals.dailyCalorieGoal = parseInt(data);
+            if (key === 'proteinGoal') goals.dailyProteinGoal = parseInt(data);
+            if (key === 'carbGoal') goals.dailyCarbGoal = parseInt(data);
+            if (key === 'fatGoal') goals.dailyFatGoal = parseInt(data);
+            if (key === 'waterGoal') goals.dailyWaterGoal = parseInt(data);
+            
+            await storage.updateUserGoals(userId, goals);
+            itemsBackedUp = 1;
+            breakdown.goals = 1;
+            break;
+        }
+      }
+      
+      res.json({ 
+        success: true, 
+        itemsBackedUp,
+        breakdown,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error: any) {
+      res.status(500).json({ 
+        message: "Failed to sync data",
+        error: error.message 
+      });
+    }
+  });
+
   // Meals API for logger
   app.post('/api/meals/logged', isAuthenticated, async (req: any, res: Response) => {
     const userId = req.user?.id;

@@ -1,0 +1,84 @@
+/**
+ * Data Sync Indicator Component
+ * Shows when data is being saved or restored
+ */
+
+import { useEffect, useState } from 'react';
+import { Cloud, CloudOff, Check } from 'lucide-react';
+
+export function DataSyncIndicator() {
+  const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'success' | 'error'>('idle');
+  const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    // Listen for sync events
+    const handleSyncStart = () => {
+      setSyncStatus('syncing');
+      setMessage('Saving your data...');
+    };
+
+    const handleSyncSuccess = (event: CustomEvent) => {
+      setSyncStatus('success');
+      setMessage(event.detail?.message || 'Data saved');
+      setTimeout(() => setSyncStatus('idle'), 3000);
+    };
+
+    const handleSyncError = () => {
+      setSyncStatus('error');
+      setMessage('Failed to sync data');
+      setTimeout(() => setSyncStatus('idle'), 5000);
+    };
+
+    const handleDataRestored = (event: CustomEvent) => {
+      if (event.detail?.itemsRestored > 0) {
+        setSyncStatus('success');
+        setMessage(`Restored ${event.detail.itemsRestored} items`);
+        setTimeout(() => setSyncStatus('idle'), 4000);
+      }
+    };
+
+    window.addEventListener('sync-start', handleSyncStart);
+    window.addEventListener('sync-success', handleSyncSuccess as EventListener);
+    window.addEventListener('sync-error', handleSyncError);
+    window.addEventListener('data-restored', handleDataRestored as EventListener);
+
+    return () => {
+      window.removeEventListener('sync-start', handleSyncStart);
+      window.removeEventListener('sync-success', handleSyncSuccess as EventListener);
+      window.removeEventListener('sync-error', handleSyncError);
+      window.removeEventListener('data-restored', handleDataRestored as EventListener);
+    };
+  }, []);
+
+  if (syncStatus === 'idle') return null;
+
+  return (
+    <div className="fixed bottom-20 right-4 z-50 animate-fade-in" data-testid="data-sync-indicator">
+      <div className={`
+        flex items-center gap-2 px-4 py-2 rounded-lg shadow-lg backdrop-blur-sm
+        ${syncStatus === 'syncing' ? 'bg-blue-500/90 text-white' : ''}
+        ${syncStatus === 'success' ? 'bg-green-500/90 text-white' : ''}
+        ${syncStatus === 'error' ? 'bg-red-500/90 text-white' : ''}
+      `}>
+        {syncStatus === 'syncing' && (
+          <>
+            <Cloud className="w-4 h-4 animate-pulse" />
+            <span className="text-sm font-medium">{message}</span>
+          </>
+        )}
+        {syncStatus === 'success' && (
+          <>
+            <Check className="w-4 h-4" />
+            <span className="text-sm font-medium">{message}</span>
+          </>
+        )}
+        {syncStatus === 'error' && (
+          <>
+            <CloudOff className="w-4 h-4" />
+            <span className="text-sm font-medium">{message}</span>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}

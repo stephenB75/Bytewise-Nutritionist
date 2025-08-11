@@ -12,11 +12,16 @@ import { Route, Router, Switch } from 'wouter';
 import ModernFoodLayout from './pages/ModernFoodLayout';
 import VerifyEmail from './pages/VerifyEmail';
 import { ResetPassword } from './pages/ResetPassword';
+import { useDataRestoration } from '@/hooks/useDataRestoration';
+import { DataSyncIndicator } from '@/components/DataSyncIndicator';
 
 function AppContent() {
   const [activeTab, setActiveTab] = useState<string>('redesigned');
   const [showNotifications, setShowNotifications] = useState(false);
   const [notificationCount, setNotificationCount] = useState(0);
+  
+  // Automatically restore user data from database
+  const { isRestoring, hasRestored } = useDataRestoration();
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
@@ -95,6 +100,7 @@ function AppContent() {
             <Route>{renderCurrentPage()}</Route>
           </Switch>
         </main>
+        <DataSyncIndicator />
       </div>
     </Router>
   );

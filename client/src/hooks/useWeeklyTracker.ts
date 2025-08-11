@@ -5,6 +5,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { useDataPersistence } from './useDataPersistence';
 
 interface MealEntry {
   id: string;
@@ -41,16 +42,33 @@ interface WeeklyData {
 export function useWeeklyTracker() {
   const [weeklyData, setWeeklyData] = useState<WeeklyData[]>([]);
   const [currentWeek, setCurrentWeek] = useState<string>('');
+  
+  // Use data persistence for automatic saving
+  const { loadFromLocalStorage, saveToLocalStorage } = useDataPersistence({
+    key: 'weeklyTrackerData',
+    data: weeklyData,
+    syncToDatabase: true,
+    debounceMs: 3000
+  });
 
   // Initialize weekly tracker
   useEffect(() => {
-    const stored = localStorage.getItem('bytewise-weekly-tracker');
-    if (stored) {
-      try {
-        const data = JSON.parse(stored);
-        setWeeklyData(data);
-      } catch (error) {
-        // Failed to parse weekly tracker data
+    // Load persisted data from the new system
+    const loaded = loadFromLocalStorage();
+    if (loaded && Array.isArray(loaded)) {
+      setWeeklyData(loaded);
+    } else {
+      // Try legacy storage for backward compatibility
+      const stored = localStorage.getItem('bytewise-weekly-tracker');
+      if (stored) {
+        try {
+          const data = JSON.parse(stored);
+          setWeeklyData(data);
+          // Migrate to new system
+          saveToLocalStorage(data);
+        } catch (error) {
+          console.error('Failed to parse legacy weekly tracker data');
+        }
       }
     }
 
@@ -83,10 +101,7 @@ export function useWeeklyTracker() {
     };
   }, []);
 
-  // Save to localStorage whenever data changes
-  useEffect(() => {
-    localStorage.setItem('bytewise-weekly-tracker', JSON.stringify(weeklyData));
-  }, [weeklyData]);
+  // Data is now automatically saved by the persistence system
 
   const logMealEntry = useCallback((entry: MealEntry) => {
     const today = new Date().toISOString().split('T')[0];
