@@ -289,31 +289,33 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
             </Button>
           </form>
 
-          {/* Email Confirmation Helper */}
-          <div className="text-center">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleConfirmEmail}
-              disabled={confirmingEmail || !email}
-              className="text-sm py-2 px-4 border-white/30 text-gray-300 hover:border-white/50 hover:text-white"
-            >
-              {confirmingEmail ? (
-                <div className="flex items-center">
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-                  Verifying Email...
-                </div>
-              ) : (
-                <>
-                  <Mail className="w-4 h-4 mr-2" />
-                  Verify Email Address
-                </>
-              )}
-            </Button>
-            <p className="text-xs text-gray-400 mt-2">
-              Click to verify your email address and activate your account
-            </p>
-          </div>
+          {/* Email Confirmation Helper - Only show during sign up */}
+          {isSignUp && (
+            <div className="text-center">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleConfirmEmail}
+                disabled={confirmingEmail || !email}
+                className="text-sm py-2 px-4 border-white/30 text-gray-300 hover:border-white/50 hover:text-white"
+              >
+                {confirmingEmail ? (
+                  <div className="flex items-center">
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                    Verifying Email...
+                  </div>
+                ) : (
+                  <>
+                    <Mail className="w-4 h-4 mr-2" />
+                    Verify Email Address
+                  </>
+                )}
+              </Button>
+              <p className="text-xs text-gray-400 mt-2">
+                Click to verify your email address and activate your account
+              </p>
+            </div>
+          )}
 
           {/* OAuth Providers */}
           <div className="space-y-3">
