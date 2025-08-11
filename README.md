@@ -1,8 +1,11 @@
-# 🥗 ByteWise Nutrition Tracker
+# 🥗 ByteWise Nutrition Tracker - BETA v1.0.0
 
 > **Professional cross-platform nutrition tracking app with USDA database integration, real-time meal logging, and native mobile support**
 
-[![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)](https://github.com/bytewise-team/bytewise-nutritionist)
+**🚀 Status: BETA Release (January 11, 2025)**  
+**✅ Feature Complete | 🔧 Production Ready | 📱 Mobile Optimized**
+
+[![Version](https://img.shields.io/badge/version-1.0.0--BETA-blue.svg)](https://github.com/bytewise-team/bytewise-nutritionist)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![PWA](https://img.shields.io/badge/PWA-ready-orange.svg)](public/manifest.json)
 [![iOS](https://img.shields.io/badge/iOS-App%20Store%20Ready-black.svg)](ios-deployment.md)

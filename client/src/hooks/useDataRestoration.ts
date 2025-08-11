@@ -8,13 +8,31 @@ import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 
+interface RestoredData {
+  success: boolean;
+  data?: {
+    userProfile?: any;
+    meals?: any[];
+    recipes?: any[];
+    waterIntake?: any[];
+    achievements?: any[];
+    calorieGoal?: number;
+    proteinGoal?: number;
+    carbGoal?: number;
+    fatGoal?: number;
+    waterGoal?: number;
+  };
+  message?: string;
+  timestamp?: string;
+}
+
 export function useDataRestoration() {
   const { user } = useAuth();
   const { toast } = useToast();
   const hasRestoredRef = useRef(false);
 
   // Restore data from database
-  const { data: restoredData, isLoading } = useQuery({
+  const { data: restoredData, isLoading } = useQuery<RestoredData>({
     queryKey: ['/api/user/restore-data'],
     enabled: !!user && !hasRestoredRef.current,
     retry: 1,

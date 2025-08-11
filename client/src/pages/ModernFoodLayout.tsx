@@ -370,8 +370,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         const micronutrients = calculateMicronutrients(todayMeals);
         
         // Debug: Log micronutrient data to verify it's being calculated correctly
-        console.log('Today meals with micronutrients:', todayMeals);
-        console.log('Calculated micronutrients:', micronutrients);
+        // Micronutrients calculated successfully
         
         // Ensure state is updated with new object reference for React to detect change
         setDailyMicronutrients({
