@@ -44,6 +44,8 @@ import {
 import { NotificationDropdown } from '@/components/NotificationDropdown';
 import { WeeklyCaloriesCard } from '@/components/WeeklyCaloriesCard';
 import { Toaster } from '@/components/ui/toaster';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/lib/supabase';
 
 // Types
 interface ModernFoodLayoutProps {
@@ -140,7 +142,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     });
     
     // Check if we have real data (any micronutrient value > 0)
-    const hasRealData = Object.values(realMicronutrients).some((value: number) => value > 0);
+    const hasRealData = Object.values(realMicronutrients).some((value) => (value as number) > 0);
     
     if (hasRealData) {
       // Return actual micronutrient data from meals
@@ -1220,49 +1222,140 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     </div>
   );
 
-  const renderSignIn = () => (
-    <div className="space-y-0 animate-in fade-in slide-in-from-top-4 duration-500">
-      <HeroSection
-        title="Welcome to"
-        subtitle="Nutrition"
-        description="Sign in to start tracking your nutrition journey"
-        buttonText="Get Started"
-        onButtonClick={() => {
-          const signInCard = document.querySelector('.bg-white\\/10');
-          if (signInCard) {
-            signInCard.scrollIntoView({ behavior: 'smooth' });
-          }
-        }}
-      />
+  const renderSignIn = () => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [isSignUp, setIsSignUp] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const { toast } = useToast();
+    const { refetch } = useAuth();
 
-      {/* Content Section - Completely Separate and Underneath */}
-      <div className="px-6 py-3 bg-black content-section">
-        {/* Sign In Component */}
-        <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
-          <h3 className="text-2xl font-bold text-white mb-6 text-center">Sign In</h3>
-          <div className="space-y-4">
-            <Input
-              placeholder="Email"
-              className="h-12 bg-white/95 border-white/20 text-gray-900 placeholder-gray-500"
-            />
-            <Input
-              type="password"
-              placeholder="Password"
-              className="h-12 bg-white/95 border-white/20 text-gray-900 placeholder-gray-500"
-            />
-            <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold h-12 rounded-xl">
-              Sign In
-            </Button>
-            <div className="text-center">
-              <Button variant="link" className="text-gray-300 hover:text-white">
-                Don't have an account? Sign up
+    const handleSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+      setIsLoading(true);
+
+      try {
+        if (isSignUp) {
+          // Sign up flow
+          const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+              emailRedirectTo: window.location.origin,
+            }
+          });
+
+          if (error) throw error;
+
+          if (data?.user?.identities?.length === 0) {
+            toast({
+              title: "Account exists",
+              description: "An account with this email already exists. Please sign in instead.",
+              variant: "destructive",
+            });
+            setIsSignUp(false);
+          } else {
+            toast({
+              title: "Check your email",
+              description: "We've sent you a verification link. Please verify your email before signing in.",
+            });
+            setIsSignUp(false);
+          }
+        } else {
+          // Sign in flow
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
+
+          if (error) throw error;
+
+          toast({
+            title: "Welcome back!",
+            description: "You've successfully signed in.",
+          });
+
+          // Refetch user data and reload
+          await refetch();
+          window.location.reload();
+        }
+      } catch (error: any) {
+        toast({
+          title: "Error",
+          description: error.message || "Something went wrong. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    return (
+      <div className="space-y-0 animate-in fade-in slide-in-from-top-4 duration-500">
+        <HeroSection
+          title="Welcome to"
+          subtitle="Nutrition"
+          description="Sign in to start tracking your nutrition journey"
+          buttonText="Get Started"
+          onButtonClick={() => {
+            const signInCard = document.querySelector('.bg-white\\/10');
+            if (signInCard) {
+              signInCard.scrollIntoView({ behavior: 'smooth' });
+            }
+          }}
+        />
+
+        {/* Content Section - Completely Separate and Underneath */}
+        <div className="px-6 py-3 bg-black content-section">
+          {/* Sign In Component */}
+          <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
+            <h3 className="text-2xl font-bold text-white mb-6 text-center">
+              {isSignUp ? 'Create Account' : 'Sign In'}
+            </h3>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <Input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="h-12 bg-white/95 border-white/20 text-gray-900 placeholder-gray-500"
+                required
+                disabled={isLoading}
+              />
+              <Input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="h-12 bg-white/95 border-white/20 text-gray-900 placeholder-gray-500"
+                required
+                disabled={isLoading}
+                minLength={6}
+              />
+              <Button 
+                type="submit"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold h-12 rounded-xl"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Loading...' : (isSignUp ? 'Sign Up' : 'Sign In')}
               </Button>
-            </div>
-          </div>
-        </Card>
+              <div className="text-center">
+                <Button 
+                  type="button"
+                  variant="link" 
+                  className="text-gray-300 hover:text-white"
+                  onClick={() => setIsSignUp(!isSignUp)}
+                  disabled={isLoading}
+                >
+                  {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
+                </Button>
+              </div>
+            </form>
+          </Card>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderDailyWeekly = () => (
     <div className={`space-y-0 animate-in fade-in ${getAnimationDirection('daily', previousTab)} duration-700 ease-out`}>
