@@ -236,21 +236,42 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     pdf.text('ByteWise Nutrition Tracker - Your Personal Nutrition Companion', pageWidth / 2, pageHeight - 20, { align: 'center' });
     pdf.text('Keep up the great work on your nutrition journey!', pageWidth / 2, pageHeight - 10, { align: 'center' });
 
-    // Save the PDF with multiple download methods
+    // Save the PDF with proper download functionality
     const filename = `bytewise-nutrition-report-${new Date().toISOString().split('T')[0]}.pdf`;
     
     try {
+      // Generate the PDF blob
       const pdfBlob = pdf.output('blob');
       
-      // Replit-compatible PDF opening approach
-      const pdfUrl = URL.createObjectURL(pdfBlob);
-      window.open(pdfUrl, '_blank');
+      // Create a download link and trigger it
+      const downloadLink = document.createElement('a');
+      downloadLink.href = URL.createObjectURL(pdfBlob);
+      downloadLink.download = filename;
+      downloadLink.style.display = 'none';
+      
+      // Add to DOM, click it, and remove it
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      
+      // Clean up
+      setTimeout(() => {
+        document.body.removeChild(downloadLink);
+        URL.revokeObjectURL(downloadLink.href);
+      }, 100);
       
       return true;
     } catch (error) {
-      // Fallback direct download
-      pdf.save(filename);
-      return true;
+      // Fallback to direct jsPDF save method
+      try {
+        pdf.save(filename);
+        return true;
+      } catch (saveError) {
+        // If all else fails, at least open in new tab
+        const pdfBlob = pdf.output('blob');
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+        window.open(pdfUrl, '_blank');
+        return true;
+      }
     }
 
   } catch (error) {

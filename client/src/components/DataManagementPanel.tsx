@@ -46,15 +46,15 @@ export function DataManagementPanel() {
       
       if (success) {
         toast({
-          title: "PDF Report Generated ✅",
-          description: "Your nutrition report has opened in a new tab. Use the download button on that page to save the PDF file.",
+          title: "PDF Report Downloaded ✅",
+          description: "Your nutrition report has been downloaded. Check your Downloads folder for the PDF file.",
         });
         
         // Additional helpful information
         setTimeout(() => {
           toast({
-            title: "PDF Available",
-            description: "Look for the new tab with your ByteWise Nutrition Report. You can view it there and download it using the download button.",
+            title: "Report Ready",
+            description: "Your ByteWise Nutrition Report PDF has been saved to your device. You can open it from your Downloads folder.",
           });
         }, 2000);
       } else {
