@@ -53,30 +53,31 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
       const data = await response.json();
 
       if (response.ok) {
-        if (isSignUp) {
+        // Check if email verification is required
+        if (data.requiresVerification) {
           toast({
-            title: "Account created!",
-            description: "Please check your email to verify your account before signing in.",
+            title: isSignUp ? "Account created!" : "Email verification required",
+            description: data.message || "Please check your email to verify your account before signing in.",
           });
-          // Switch to sign-in mode after successful signup
-          setIsSignUp(false);
-          setPassword(''); // Clear password for security
-        } else {
-          // Set the Supabase session with the returned data
-          if (data.session) {
-            try {
-              const { error: sessionError } = await supabase.auth.setSession({
-                access_token: data.session.access_token,
-                refresh_token: data.session.refresh_token,
-              });
-              
-              if (!sessionError) {
-                // Refetch auth state immediately
-                await refetch();
-              }
-            } catch (err) {
-              // Handle session errors silently
+          if (isSignUp) {
+            // Switch to sign-in mode after successful signup
+            setIsSignUp(false);
+            setPassword(''); // Clear password for security
+          }
+        } else if (data.session) {
+          // Successfully signed in with verified email
+          try {
+            const { error: sessionError } = await supabase.auth.setSession({
+              access_token: data.session.access_token,
+              refresh_token: data.session.refresh_token,
+            });
+            
+            if (!sessionError) {
+              // Refetch auth state immediately
+              await refetch();
             }
+          } catch (err) {
+            // Handle session errors silently
           }
           
           toast({
@@ -95,10 +96,10 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
           }
         }
       } else {
-        if (data.message === "Email not confirmed") {
+        if (data.requiresVerification || data.message === "Email not confirmed") {
           toast({
             title: "Email not confirmed",
-            description: "Please check your email and click the confirmation link, or use the 'Verify Email Address' button below.",
+            description: data.message || "Please check your email and click the confirmation link.",
             variant: "destructive",
           });
         } else {

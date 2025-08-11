@@ -656,6 +656,11 @@ export class DatabaseStorage implements IStorage {
     totalCarbs: number;
     totalFat: number;
     waterGlasses: number;
+    fastingStatus?: {
+      isActive: boolean;
+      timeRemaining?: number;
+      planName?: string;
+    };
   }> {
     const startOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
     const endOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);

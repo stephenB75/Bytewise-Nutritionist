@@ -1,35 +1,61 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
-import { keepAliveMonitor } from "./keepAlive";
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Enhanced headers for Chrome preview compatibility
+// Production-ready CORS configuration
+const isProduction = process.env.NODE_ENV === 'production';
+const allowedOrigins = isProduction 
+  ? [
+      'https://www.bytewisenutritionist.com',
+      'https://bytewisenutritionist.com'
+    ]
+  : ['http://localhost:3000', 'http://localhost:5173', '*'];
+
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
+  const origin = req.headers.origin;
+  if (!isProduction || (origin && allowedOrigins.includes(origin))) {
+    res.header('Access-Control-Allow-Origin', origin || '*');
+    res.header('Access-Control-Allow-Credentials', 'true');
+  }
+  
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
   
-  // Additional security headers for Chrome compatibility
-  res.header('X-Content-Type-Options', 'nosniff');
-  res.header('X-Frame-Options', 'SAMEORIGIN');
-  res.header('Referrer-Policy', 'strict-origin-when-cross-origin');
+  // Security headers for production
+  if (isProduction) {
+    res.header('X-Content-Type-Options', 'nosniff');
+    res.header('X-Frame-Options', 'SAMEORIGIN');
+    res.header('X-XSS-Protection', '1; mode=block');
+    res.header('Referrer-Policy', 'strict-origin-when-cross-origin');
+    res.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+  }
   
-  // Content Security Policy to allow external images
-  res.header('Content-Security-Policy', 
-    "default-src 'self'; " +
-    "img-src 'self' https: data: blob:; " +
-    "style-src 'self' 'unsafe-inline' https:; " +
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
-    "connect-src 'self' https: wss:; " +
-    "font-src 'self' https: data:; " +
-    "media-src 'self' https: data:; " +
-    "object-src 'none'; " +
-    "base-uri 'self';"
-  );
+  // Content Security Policy
+  const cspPolicy = isProduction
+    ? "default-src 'self'; " +
+      "img-src 'self' https: data: blob:; " +
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com; " +
+      "connect-src 'self' https://api.stripe.com https://*.supabase.co wss://*.supabase.co https://www.bytewisenutritionist.com; " +
+      "font-src 'self' https://fonts.gstatic.com data:; " +
+      "frame-src 'self' https://js.stripe.com; " +
+      "object-src 'none'; " +
+      "base-uri 'self';"
+    : "default-src 'self'; " +
+      "img-src 'self' https: data: blob:; " +
+      "style-src 'self' 'unsafe-inline' https:; " +
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+      "connect-src 'self' https: wss:; " +
+      "font-src 'self' https: data:; " +
+      "media-src 'self' https: data:; " +
+      "object-src 'none'; " +
+      "base-uri 'self';";
+      
+  res.header('Content-Security-Policy', cspPolicy);
   
   // Handle preflight requests
   if (req.method === 'OPTIONS') {
@@ -101,14 +127,13 @@ app.use((req, res, next) => {
     host,
     reusePort: true,
   }, () => {
-    log(`serving on port ${port}`);
-    log(`🌐 External preview: https://${process.env.REPLIT_DEV_DOMAIN || 'localhost'}`);
-    log(`🔧 Local dev: http://localhost:${port}`);
-    log(`✅ Both external and development previews are accessible`);
+    const appUrl = isProduction 
+      ? 'https://www.bytewisenutritionist.com'
+      : `http://localhost:${port}`;
     
-    // Start keep-alive monitoring
-    keepAliveMonitor.start();
-    log(`🔄 Keep-alive monitoring started`);
+    log(`Server running on port ${port}`);
+    log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+    log(`URL: ${appUrl}`);
   });
 
   // Configure server timeout and keep-alive settings
@@ -118,17 +143,15 @@ app.use((req, res, next) => {
   
   // Handle graceful shutdown
   process.on('SIGINT', () => {
-    log('🛑 Graceful shutdown initiated...');
-    keepAliveMonitor.stop();
+    log('Graceful shutdown initiated...');
     server.close(() => {
-      log('✅ Server closed gracefully');
+      log('Server closed gracefully');
       process.exit(0);
     });
   });
 
   process.on('SIGTERM', () => {
     log('🛑 Termination signal received...');
-    keepAliveMonitor.stop();
     server.close(() => {
       log('✅ Server terminated gracefully');
       process.exit(0);

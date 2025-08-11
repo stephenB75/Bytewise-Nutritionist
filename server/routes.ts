@@ -5,27 +5,66 @@ import { setupAuth, isAuthenticated, optionalAuth, serverSupabase, type Authenti
 import { usdaService } from "./services/usdaService";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Health check endpoint
+  // Health check endpoint - simplified for production
   app.get('/api/health', async (req: Request, res: Response) => {
+    // Basic health check - server is responding
+    res.json({
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || 'development',
+      version: '1.0.0'
+    });
+  });
+
+  // Detailed health check endpoint for monitoring
+  app.get('/api/health/detailed', async (req: Request, res: Response) => {
+    const healthStatus = {
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      services: {
+        database: 'unknown',
+        auth: 'unknown',
+        usda: 'unknown',
+        storage: 'unknown'
+      }
+    };
+
     try {
       // Check database connection
-      const dbTest = await storage.getPopularFoods(1);
-      
-      res.json({
-        status: 'healthy',
-        timestamp: new Date().toISOString(),
-        services: {
-          database: 'connected',
-          auth: 'active',
-          usda: 'available',
-          storage: 'operational'
+      try {
+        await storage.getPopularFoods(1);
+        healthStatus.services.database = 'connected';
+        healthStatus.services.storage = 'operational';
+      } catch (dbError) {
+        healthStatus.services.database = 'disconnected';
+        healthStatus.services.storage = 'error';
+        healthStatus.status = 'degraded';
+      }
+
+      // Check auth service
+      try {
+        if (serverSupabase) {
+          healthStatus.services.auth = 'active';
         }
-      });
+      } catch (authError) {
+        healthStatus.services.auth = 'inactive';
+        healthStatus.status = 'degraded';
+      }
+
+      // Check USDA service
+      healthStatus.services.usda = 'available';
+
+      // Return appropriate status code
+      const statusCode = healthStatus.status === 'healthy' ? 200 : 
+                        healthStatus.status === 'degraded' ? 200 : 503;
+      
+      res.status(statusCode).json(healthStatus);
     } catch (error) {
       res.status(503).json({
         status: 'unhealthy',
         timestamp: new Date().toISOString(),
-        error: 'Service check failed'
+        error: 'Service check failed',
+        services: healthStatus.services
       });
     }
   });
@@ -44,12 +83,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(user);
   });
 
-  // Sign in endpoint
+  // Sign in endpoint with email verification check
   app.post('/api/auth/signin', async (req: Request, res: Response) => {
     try {
       const { email, password } = req.body;
-      
-
       
       const { data, error } = await serverSupabase.auth.signInWithPassword({
         email,
@@ -57,7 +94,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       if (error) {
+        // Check if error is due to unverified email
+        if (error.message.includes('Email not confirmed')) {
+          return res.status(400).json({ 
+            message: "Email not confirmed",
+            requiresVerification: true 
+          });
+        }
         return res.status(400).json({ message: error.message });
+      }
+      
+      // Check if email is verified
+      if (data.user && !data.user.email_confirmed_at) {
+        // Sign out the user if email is not verified
+        await serverSupabase.auth.signOut();
+        return res.status(400).json({ 
+          message: "Email not confirmed",
+          requiresVerification: true 
+        });
       }
       
       // Store user in our database if they don't exist
@@ -69,7 +123,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
             firstName: data.user.user_metadata?.first_name,
             lastName: data.user.user_metadata?.last_name,
           });
-
         } catch (dbError) {
           // Continue anyway since Supabase auth succeeded
         }
@@ -85,24 +138,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Sign up endpoint
+  // Sign up endpoint with email verification requirement
   app.post('/api/auth/signup', async (req: Request, res: Response) => {
     try {
       const { email, password } = req.body;
       
-
-      
+      // Sign up user with Supabase (sends verification email automatically)
       const { data, error } = await serverSupabase.auth.signUp({
         email,
         password,
+        options: {
+          emailRedirectTo: 'https://www.bytewisenutritionist.com/verify-email'
+        }
       });
       
       if (error) {
         return res.status(400).json({ message: error.message });
       }
       
-      // Store user in our database immediately after signup
-      if (data.user) {
+      // Don't create session until email is verified
+      if (data.user && !data.user.email_confirmed_at) {
+        return res.json({
+          user: null,
+          session: null,
+          message: "Please check your email to verify your account before signing in.",
+          requiresVerification: true
+        });
+      }
+      
+      // Store user in our database only if email is verified
+      if (data.user && data.user.email_confirmed_at) {
         try {
           await storage.upsertUser({
             id: data.user.id,
@@ -110,17 +175,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
             firstName: data.user.user_metadata?.first_name,
             lastName: data.user.user_metadata?.last_name,
           });
-
         } catch (dbError) {
           // Continue anyway since Supabase auth succeeded
         }
+        
+        res.json({ 
+          user: data.user, 
+          session: data.session,
+          message: "Account created and verified successfully" 
+        });
+      } else {
+        res.json({
+          user: null,
+          session: null,
+          message: "Please check your email to verify your account.",
+          requiresVerification: true
+        });
       }
-      
-      res.json({ 
-        user: data.user, 
-        session: data.session,
-        message: "Account created successfully" 
-      });
     } catch (error) {
       res.status(500).json({ message: "Sign up failed" });
     }

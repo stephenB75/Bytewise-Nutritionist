@@ -15,14 +15,15 @@ Preferred communication style: Simple, everyday language.
 - **Iconography**: Professional Lucide React icons for navigation.
 
 ### Technical Implementations
-- **Frontend Framework**: React 18 with TypeScript.
-- **Backend Architecture**: Custom Express.js server with Supabase backend-as-a-service.
+- **Frontend Framework**: React 18 with TypeScript, Wouter for routing.
+- **Backend Architecture**: Custom Express.js server with Supabase backend-as-a-service, production-ready for Railway deployment.
 - **State Management**: TanStack Query for server state, React hooks for local state.
 - **Database**: PostgreSQL with Supabase, Row Level Security (RLS) policies, real-time subscriptions, and Drizzle Kit for schema migrations.
-- **Authentication**: Supabase Auth with email/password and OAuth providers (Google, GitHub), JWT-based sessions.
-- **API**: Custom Express routes with Supabase integration, USDA FoodData Central service.
+- **Authentication**: Supabase Auth with email verification requirement, OAuth providers (Google, GitHub), JWT-based sessions. Email verification enforced before account activation.
+- **API**: Custom Express routes with Supabase integration, USDA FoodData Central service, health check endpoint for production monitoring.
 - **Data Models**: Users, Foods (with USDA data), Recipes, Meals, Water Intake, Achievements, Calorie Calculations.
 - **Measurements**: Default imperial measurement system with metric compatibility.
+- **Deployment**: Railway-ready with Docker, Nixpacks configuration, and production environment setup for www.bytewisenutritionist.com.
 
 ### Feature Specifications
 - **PWA Capabilities**: Offline functionality, installable, service worker for caching and push notifications.
