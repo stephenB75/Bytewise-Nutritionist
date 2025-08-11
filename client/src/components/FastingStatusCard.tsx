@@ -8,6 +8,8 @@ interface FastingStatusProps {
     isActive: boolean;
     timeRemaining?: number;
     planName?: string;
+    startTime?: string;
+    targetDuration?: number;
   };
 }
 
@@ -36,10 +38,30 @@ export function FastingStatusCard({ fastingStatus }: FastingStatusProps) {
 
   const getProgressPercentage = () => {
     if (!fastingStatus.timeRemaining) return 0;
-    // Assuming a typical 16-hour fast for progress calculation
-    const assumedTotalDuration = 16 * 60 * 60 * 1000; // 16 hours in milliseconds
-    const elapsed = assumedTotalDuration - fastingStatus.timeRemaining;
-    return Math.max(0, (elapsed / assumedTotalDuration) * 100);
+    
+    // Use the actual target duration if available, otherwise fall back to plan-based estimation
+    let totalDuration = fastingStatus.targetDuration;
+    
+    if (!totalDuration) {
+      // Estimate based on plan name
+      if (fastingStatus.planName?.includes('14:10')) {
+        totalDuration = 14 * 60 * 60 * 1000;
+      } else if (fastingStatus.planName?.includes('16:8')) {
+        totalDuration = 16 * 60 * 60 * 1000;
+      } else if (fastingStatus.planName?.includes('18:6')) {
+        totalDuration = 18 * 60 * 60 * 1000;
+      } else if (fastingStatus.planName?.includes('20:4')) {
+        totalDuration = 20 * 60 * 60 * 1000;
+      } else if (fastingStatus.planName?.includes('24')) {
+        totalDuration = 24 * 60 * 60 * 1000;
+      } else {
+        // Default to 16 hours
+        totalDuration = 16 * 60 * 60 * 1000;
+      }
+    }
+    
+    const elapsed = totalDuration - fastingStatus.timeRemaining;
+    return Math.min(100, Math.max(0, (elapsed / totalDuration) * 100));
   };
 
   return (

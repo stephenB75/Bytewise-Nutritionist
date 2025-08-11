@@ -99,6 +99,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   
   // Daily stats with fasting integration
   const [dailyStats, setDailyStats] = useState<any>(null);
+  const [fastingStatus, setFastingStatus] = useState<any>(null);
   
   // Nutrition aggregation state
   const [dailyMacros, setDailyMacros] = useState({ protein: 0, carbs: 0, fat: 0 });
@@ -199,6 +200,60 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       // Daily stats fetch failed - continue with cached data
     }
   }, [user]);
+  
+  // Check fasting status from localStorage
+  const checkFastingStatus = useCallback(() => {
+    try {
+      // Check for active fasting session in localStorage
+      const storedSession = localStorage.getItem('bytewise_fasting_session');
+      const isActive = localStorage.getItem('bytewise_fasting_active');
+      
+      if (storedSession && isActive === 'true') {
+        const session = JSON.parse(storedSession);
+        const startTime = new Date(session.startTime).getTime();
+        const targetDuration = session.targetDuration;
+        const now = Date.now();
+        const elapsed = now - startTime;
+        const remaining = targetDuration - elapsed;
+        
+        if (remaining > 0) {
+          // Find the plan details
+          const plan = session.planId;
+          let planName = 'Custom';
+          if (plan === '16-8') planName = '16:8 Method';
+          else if (plan === '14-10') planName = '14:10 Method';
+          else if (plan === '18-6') planName = '18:6 Method';
+          else if (plan === '20-4') planName = '20:4 Warrior';
+          else if (plan === '24-0') planName = '24 Hour Fast';
+          
+          setFastingStatus({
+            isActive: true,
+            timeRemaining: remaining,
+            planName: planName,
+            startTime: session.startTime,
+            targetDuration: targetDuration
+          });
+        } else {
+          // Fast has completed
+          setFastingStatus({
+            isActive: false
+          });
+          // Clear expired session
+          localStorage.removeItem('bytewise_fasting_session');
+          localStorage.removeItem('bytewise_fasting_active');
+        }
+      } else {
+        setFastingStatus({
+          isActive: false
+        });
+      }
+    } catch (error) {
+      console.error('Error checking fasting status:', error);
+      setFastingStatus({
+        isActive: false
+      });
+    }
+  }, []);
 
 
 
@@ -335,6 +390,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           fetchDailyStats();
         }
         
+        // Check fasting status from localStorage
+        checkFastingStatus();
+        
         // Calculate weekly calories from all stored meals
         const weeklyTotal = stored.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
         setWeeklyCalories(weeklyTotal);
@@ -360,6 +418,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
     // Load existing data immediately
     loadExistingData();
+    
+    // Update fasting status every minute
+    const fastingInterval = setInterval(() => {
+      checkFastingStatus();
+    }, 60000); // Check every minute
 
     // Set up event listeners for future meal logging
     const handleMealLogged = () => {
@@ -389,8 +452,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         window.removeEventListener(type, handler);
       });
       window.removeEventListener('storage', loadExistingData);
+      clearInterval(fastingInterval);
     };
-  }, [user, fetchDailyStats, calculateMicronutrients]);
+  }, [user, fetchDailyStats, calculateMicronutrients, checkFastingStatus]);
 
   // Food categories inspired by Deliveroo
   const categories = [
@@ -796,7 +860,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
           {/* Fasting Status */}
           <div className="mb-4">
-            <FastingStatusCard fastingStatus={dailyStats?.fastingStatus} />
+            <FastingStatusCard fastingStatus={fastingStatus || dailyStats?.fastingStatus} />
           </div>
 
           {/* Weekly Progress */}
