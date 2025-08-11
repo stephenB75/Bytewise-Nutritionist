@@ -207,6 +207,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Password reset endpoint
+  app.post('/api/auth/reset-password', async (req: Request, res: Response) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+      
+      const { error } = await serverSupabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${process.env.VITE_APP_URL || 'http://localhost:5000'}/reset-password`,
+      });
+      
+      if (error) {
+        return res.status(400).json({ message: error.message });
+      }
+      
+      res.json({ message: "Password reset email sent successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Password reset failed" });
+    }
+  });
+
+  // Update password endpoint
+  app.post('/api/auth/update-password', isAuthenticated, async (req: any, res: Response) => {
+    try {
+      const { newPassword } = req.body;
+      
+      if (!newPassword || newPassword.length < 6) {
+        return res.status(400).json({ message: "Password must be at least 6 characters" });
+      }
+      
+      const { error } = await serverSupabase.auth.updateUser({
+        password: newPassword
+      });
+      
+      if (error) {
+        return res.status(400).json({ message: error.message });
+      }
+      
+      res.json({ message: "Password updated successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Password update failed" });
+    }
+  });
+
   // Development helper: Auto-confirm user email for testing
   app.post('/api/auth/confirm-email', async (req: Request, res: Response) => {
     try {

@@ -11,6 +11,7 @@ import { queryClient } from '@/lib/queryClient';
 import { Route, Router, Switch } from 'wouter';
 import ModernFoodLayout from './pages/ModernFoodLayout';
 import VerifyEmail from './pages/VerifyEmail';
+import ResetPassword from './pages/ResetPassword';
 
 function AppContent() {
   const [activeTab, setActiveTab] = useState<string>('redesigned');
@@ -90,6 +91,7 @@ function AppContent() {
         <main className="min-h-screen">
           <Switch>
             <Route path="/verify-email" component={VerifyEmail} />
+            <Route path="/reset-password" component={ResetPassword} />
             <Route>{renderCurrentPage()}</Route>
           </Switch>
         </main>

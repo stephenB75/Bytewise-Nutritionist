@@ -1226,6 +1226,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isSignUp, setIsSignUp] = useState(false);
+    const [isResetPassword, setIsResetPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast();
     const { refetch } = useAuth();
@@ -1235,13 +1236,29 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       setIsLoading(true);
 
       try {
-        if (isSignUp) {
-          // Sign up flow
+        if (isResetPassword) {
+          // Password reset flow
+          const { error } = await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: `${window.location.origin}/reset-password`,
+          });
+
+          if (error) throw error;
+
+          toast({
+            title: "Check your email",
+            description: "We've sent you a password reset link. Please check your email.",
+          });
+          setIsResetPassword(false);
+        } else if (isSignUp) {
+          // Sign up flow with email verification requirement
           const { data, error } = await supabase.auth.signUp({
             email,
             password,
             options: {
               emailRedirectTo: window.location.origin,
+              data: {
+                email_verified: false
+              }
             }
           });
 
@@ -1256,19 +1273,43 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             setIsSignUp(false);
           } else {
             toast({
-              title: "Check your email",
-              description: "We've sent you a verification link. Please verify your email before signing in.",
+              title: "Verify your email",
+              description: "We've sent you a verification link. You must verify your email before you can sign in.",
             });
             setIsSignUp(false);
+            setEmail('');
+            setPassword('');
           }
         } else {
-          // Sign in flow
+          // Sign in flow with email verification check
           const { data, error } = await supabase.auth.signInWithPassword({
             email,
             password,
           });
 
-          if (error) throw error;
+          if (error) {
+            // Check if error is due to unverified email
+            if (error.message.includes('Email not confirmed') || error.message.includes('email_not_confirmed')) {
+              toast({
+                title: "Email not verified",
+                description: "Please verify your email before signing in. Check your inbox for the verification link.",
+                variant: "destructive",
+              });
+              return;
+            }
+            throw error;
+          }
+
+          // Additional check for email verification
+          if (data?.user && !data.user.email_confirmed_at) {
+            await supabase.auth.signOut();
+            toast({
+              title: "Email not verified",
+              description: "Please verify your email before signing in. Check your inbox for the verification link.",
+              variant: "destructive",
+            });
+            return;
+          }
 
           toast({
             title: "Welcome back!",
@@ -1283,6 +1324,40 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         toast({
           title: "Error",
           description: error.message || "Something went wrong. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    const handleResendVerification = async () => {
+      if (!email) {
+        toast({
+          title: "Email required",
+          description: "Please enter your email address to resend verification.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setIsLoading(true);
+      try {
+        const { error } = await supabase.auth.resend({
+          type: 'signup',
+          email: email,
+        });
+
+        if (error) throw error;
+
+        toast({
+          title: "Verification email sent",
+          description: "Please check your inbox for the verification link.",
+        });
+      } catch (error: any) {
+        toast({
+          title: "Error",
+          description: error.message || "Failed to resend verification email.",
           variant: "destructive",
         });
       } finally {
@@ -1310,7 +1385,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           {/* Sign In Component */}
           <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
             <h3 className="text-2xl font-bold text-white mb-6 text-center">
-              {isSignUp ? 'Create Account' : 'Sign In'}
+              {isResetPassword ? 'Reset Password' : isSignUp ? 'Create Account' : 'Sign In'}
             </h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <Input
@@ -1322,34 +1397,83 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 required
                 disabled={isLoading}
               />
-              <Input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="h-12 bg-white/95 border-white/20 text-gray-900 placeholder-gray-500"
-                required
-                disabled={isLoading}
-                minLength={6}
-              />
+              {!isResetPassword && (
+                <Input
+                  type="password"
+                  placeholder="Password (min 6 characters)"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="h-12 bg-white/95 border-white/20 text-gray-900 placeholder-gray-500"
+                  required
+                  disabled={isLoading}
+                  minLength={6}
+                />
+              )}
               <Button 
                 type="submit"
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold h-12 rounded-xl"
                 disabled={isLoading}
               >
-                {isLoading ? 'Loading...' : (isSignUp ? 'Sign Up' : 'Sign In')}
+                {isLoading ? 'Loading...' : 
+                 isResetPassword ? 'Send Reset Link' : 
+                 isSignUp ? 'Create Account' : 'Sign In'}
               </Button>
-              <div className="text-center">
-                <Button 
-                  type="button"
-                  variant="link" 
-                  className="text-gray-300 hover:text-white"
-                  onClick={() => setIsSignUp(!isSignUp)}
-                  disabled={isLoading}
-                >
-                  {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
-                </Button>
+              
+              {/* Additional options */}
+              <div className="space-y-2">
+                {!isResetPassword && !isSignUp && (
+                  <div className="text-center">
+                    <Button 
+                      type="button"
+                      variant="link" 
+                      className="text-gray-300 hover:text-white text-sm"
+                      onClick={() => setIsResetPassword(true)}
+                      disabled={isLoading}
+                    >
+                      Forgot password?
+                    </Button>
+                  </div>
+                )}
+                
+                <div className="text-center">
+                  <Button 
+                    type="button"
+                    variant="link" 
+                    className="text-gray-300 hover:text-white"
+                    onClick={() => {
+                      setIsSignUp(!isSignUp && !isResetPassword);
+                      setIsResetPassword(false);
+                    }}
+                    disabled={isLoading}
+                  >
+                    {isResetPassword ? 'Back to sign in' : 
+                     isSignUp ? 'Already have an account? Sign in' : 
+                     "Don't have an account? Sign up"}
+                  </Button>
+                </div>
+
+                {isSignUp && (
+                  <div className="text-center">
+                    <Button 
+                      type="button"
+                      variant="link" 
+                      className="text-gray-300 hover:text-white text-sm"
+                      onClick={handleResendVerification}
+                      disabled={isLoading || !email}
+                    >
+                      Resend verification email
+                    </Button>
+                  </div>
+                )}
               </div>
+
+              {isSignUp && (
+                <div className="mt-4 p-3 bg-blue-500/20 rounded-lg">
+                  <p className="text-xs text-gray-200 text-center">
+                    By creating an account, you must verify your email address before you can sign in.
+                  </p>
+                </div>
+              )}
             </form>
           </Card>
         </div>
