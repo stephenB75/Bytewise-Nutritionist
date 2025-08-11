@@ -1,10 +1,10 @@
 // Bytewise Nutrition Tracker - Service Worker
 // Provides offline functionality and caching for PWA experience
 
-const CACHE_NAME = 'bytewise-v1.2.0';
-const STATIC_CACHE = 'bytewise-static-v1';
-const DYNAMIC_CACHE = 'bytewise-dynamic-v1';
-const API_CACHE = 'bytewise-api-v1';
+const CACHE_NAME = 'bytewise-v1.3.0';
+const STATIC_CACHE = 'bytewise-static-v2';
+const DYNAMIC_CACHE = 'bytewise-dynamic-v2';
+const API_CACHE = 'bytewise-api-v2';
 
 // Critical resources to cache immediately
 const STATIC_ASSETS = [
