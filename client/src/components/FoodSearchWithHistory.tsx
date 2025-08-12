@@ -17,15 +17,12 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
   Search, 
   Clock, 
-  Calendar,
   ChevronRight,
   Utensils,
   History,
   TrendingUp,
   Star
 } from 'lucide-react';
-import { format, subDays, subWeeks, subMonths, isToday, isYesterday, differenceInDays } from 'date-fns';
-import { getLocalDateKey } from '@/utils/dateUtils';
 
 interface LoggedFood {
   id: string;
@@ -56,7 +53,6 @@ export function FoodSearchWithHistory({
   const [searchQuery, setSearchQuery] = useState('');
   const [historicalMeals, setHistoricalMeals] = useState<LoggedFood[]>([]);
   const [showResults, setShowResults] = useState(false);
-  const [selectedTimeRange, setSelectedTimeRange] = useState<'today' | 'week' | 'month' | 'all'>('all');
 
   // Load historical meals from localStorage
   useEffect(() => {
@@ -91,21 +87,9 @@ export function FoodSearchWithHistory({
     };
   }, []);
 
-  // Filter meals based on search query and time range
+  // Filter meals based on search query
   const filteredMeals = useMemo(() => {
     let meals = [...historicalMeals];
-    const today = getLocalDateKey(new Date());
-    
-    // Filter by time range
-    if (selectedTimeRange === 'today') {
-      meals = meals.filter(meal => meal.date === today);
-    } else if (selectedTimeRange === 'week') {
-      const weekAgo = getLocalDateKey(subWeeks(new Date(), 1));
-      meals = meals.filter(meal => meal.date >= weekAgo);
-    } else if (selectedTimeRange === 'month') {
-      const monthAgo = getLocalDateKey(subMonths(new Date(), 1));
-      meals = meals.filter(meal => meal.date >= monthAgo);
-    }
     
     // Filter by search query
     if (searchQuery.trim()) {
@@ -127,7 +111,7 @@ export function FoodSearchWithHistory({
     });
     
     return Array.from(uniqueMeals.values()).slice(0, 10); // Limit to 10 results
-  }, [historicalMeals, searchQuery, selectedTimeRange]);
+  }, [historicalMeals, searchQuery]);
 
   // Group meals by frequency for popular items
   const popularMeals = useMemo(() => {
@@ -151,7 +135,7 @@ export function FoodSearchWithHistory({
 
   const handleSearch = (value: string) => {
     setSearchQuery(value);
-    setShowResults(value.length > 0 || selectedTimeRange !== 'all');
+    setShowResults(value.length > 0);
     onSearchChange(value);
   };
 
@@ -161,19 +145,7 @@ export function FoodSearchWithHistory({
     setShowResults(false);
   };
 
-  const getDateLabel = (dateStr: string) => {
-    const date = new Date(dateStr);
-    const today = new Date();
-    
-    if (isToday(date)) return 'Today';
-    if (isYesterday(date)) return 'Yesterday';
-    
-    const days = differenceInDays(today, date);
-    if (days < 7) return `${days} days ago`;
-    if (days < 30) return `${Math.floor(days / 7)} weeks ago`;
-    
-    return format(date, 'MMM d');
-  };
+
 
   return (
     <div className={`relative ${className}`}>
@@ -192,61 +164,7 @@ export function FoodSearchWithHistory({
       {/* Search Results Dropdown */}
       {showResults && (
         <Card className="absolute top-full mt-2 left-0 right-0 z-50 p-0 shadow-xl border-gray-200 overflow-hidden max-h-[400px]">
-          {/* Time Range Filters */}
-          <div className="border-b border-gray-100 p-2 bg-gray-50/50">
-            <div className="flex gap-1">
-              <Button
-                variant={selectedTimeRange === 'today' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setSelectedTimeRange('today')}
-                className={`text-xs h-7 px-2 ${
-                  selectedTimeRange === 'today' 
-                    ? 'bg-brand-yellow text-black hover:bg-brand-yellow/90' 
-                    : 'hover:bg-gray-100'
-                }`}
-              >
-                <Calendar className="h-3 w-3 mr-1" />
-                Today
-              </Button>
-              <Button
-                variant={selectedTimeRange === 'week' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setSelectedTimeRange('week')}
-                className={`text-xs h-7 px-2 ${
-                  selectedTimeRange === 'week' 
-                    ? 'bg-brand-yellow text-black hover:bg-brand-yellow/90' 
-                    : 'hover:bg-gray-100'
-                }`}
-              >
-                This Week
-              </Button>
-              <Button
-                variant={selectedTimeRange === 'month' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setSelectedTimeRange('month')}
-                className={`text-xs h-7 px-2 ${
-                  selectedTimeRange === 'month' 
-                    ? 'bg-brand-yellow text-black hover:bg-brand-yellow/90' 
-                    : 'hover:bg-gray-100'
-                }`}
-              >
-                This Month
-              </Button>
-              <Button
-                variant={selectedTimeRange === 'all' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setSelectedTimeRange('all')}
-                className={`text-xs h-7 px-2 ${
-                  selectedTimeRange === 'all' 
-                    ? 'bg-brand-yellow text-black hover:bg-brand-yellow/90' 
-                    : 'hover:bg-gray-100'
-                }`}
-              >
-                All Time
-              </Button>
-            </div>
-          </div>
-          <ScrollArea className="h-full max-h-[350px]">
+          <ScrollArea className="h-full max-h-[400px]">
             {/* Popular/Frequent Items (when no search) */}
             {!searchQuery && popularMeals.length > 0 && (
               <div className="p-2">
