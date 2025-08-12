@@ -12,6 +12,7 @@ import { Calendar, Flame } from 'lucide-react';
 import { useCheckAchievements } from '@/hooks/useAchievements';
 import { getWeekDates, getLocalDateKey } from '@/utils/dateUtils';
 import { autoFixMealDatesIfNeeded, checkMealDateMismatches } from '@/utils/mealDateFixer';
+import { debounce, getCachedLocalStorage } from '@/utils/performanceUtils';
 
 interface DayCalories {
   day: string;
@@ -40,16 +41,13 @@ export function WeeklyCaloriesCard() {
     }));
   };
 
-  // Calculate weekly calories from stored meal data
+  // Calculate weekly calories from stored meal data (optimized)
   const calculateWeeklyCalories = () => {
     try {
-      // Auto-fix any meal date mismatches first
-      autoFixMealDatesIfNeeded();
-      
       const weekDates = getCurrentWeekDates();
       
-      // Load meals from localStorage where the daily page stores them
-      const storedMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
+      // Load meals with caching for better performance
+      const storedMeals = getCachedLocalStorage('weeklyMeals', 10000) || [];
       
       // Calculate calories for each day of the week
       const weeklyData = weekDates.map(dayData => {
@@ -77,15 +75,18 @@ export function WeeklyCaloriesCard() {
     }
   };
 
+  // Debounced version of calculateWeeklyCalories for performance
+  const debouncedCalculateWeeklyCalories = debounce(calculateWeeklyCalories, 250);
+
   // Load data on component mount and listen for updates
   useEffect(() => {
     calculateWeeklyCalories();
 
     const handleMealLogged = () => {
-      calculateWeeklyCalories();
+      debouncedCalculateWeeklyCalories();
       
-      // Check for achievements after weekly data updates
-      checkAchievements.mutate();
+      // Check for achievements after weekly data updates (debounced)
+      setTimeout(() => checkAchievements.mutate(), 500);
     };
 
     // Listen for localStorage storage events

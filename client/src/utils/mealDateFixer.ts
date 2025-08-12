@@ -34,7 +34,7 @@ function getCorrectDateFromTimestamp(timestamp: string): string {
 }
 
 /**
- * Check for meal date mismatches
+ * Check for meal date mismatches (optimized version)
  */
 export function checkMealDateMismatches(): {
   mismatches: DateMismatch[];
@@ -50,6 +50,12 @@ export function checkMealDateMismatches(): {
     const meals: MealData[] = JSON.parse(weeklyMealsData);
     const mismatches: DateMismatch[] = [];
 
+    // Optimized: Early exit if no meals
+    if (meals.length === 0) {
+      return { mismatches: [], totalMeals: 0, correctMeals: 0 };
+    }
+
+    // Process meals efficiently
     meals.forEach(meal => {
       if (meal.timestamp) {
         const correctDate = getCorrectDateFromTimestamp(meal.timestamp);
@@ -168,17 +174,49 @@ export function needsMealDateFix(): boolean {
   return check.mismatches.length > 0;
 }
 
+// Performance optimization: Cache the last check to prevent excessive checking
+let lastCheckTime = 0;
+let lastDataHash = '';
+const CHECK_COOLDOWN = 30000; // 30 seconds minimum between checks
+
 /**
- * Auto-fix meal dates if mismatches are detected
+ * Get hash of current meal data to detect changes
+ */
+function getMealDataHash(): string {
+  try {
+    const weeklyMeals = localStorage.getItem('weeklyMeals') || '[]';
+    return btoa(weeklyMeals).slice(0, 16); // Simple hash of data
+  } catch {
+    return '';
+  }
+}
+
+/**
+ * Auto-fix meal dates if mismatches are detected (optimized with caching)
  */
 export function autoFixMealDatesIfNeeded(): boolean {
+  const now = Date.now();
+  const currentDataHash = getMealDataHash();
+  
+  // Skip check if:
+  // 1. Recently checked (within cooldown period)
+  // 2. Data hasn't changed since last check
+  if (now - lastCheckTime < CHECK_COOLDOWN && currentDataHash === lastDataHash) {
+    return false;
+  }
+  
+  // Only log when actually performing the check
   console.log('🔍 Checking for meal date mismatches...');
+  
+  lastCheckTime = now;
+  lastDataHash = currentDataHash;
   
   if (needsMealDateFix()) {
     console.log('📅 Date mismatches detected, applying fixes...');
     const result = fixMealDateMismatches();
     if (result.success && result.fixedCount > 0) {
       console.log(`✅ Auto-fixed ${result.fixedCount} meal date(s)`);
+      lastDataHash = getMealDataHash(); // Update hash after fixes
       return true;
     } else {
       console.log('❌ Failed to fix meal dates:', result.error);
