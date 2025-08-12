@@ -55,12 +55,6 @@ export function FoodSearchWithHistory({
   const [historicalMeals, setHistoricalMeals] = useState<LoggedFood[]>([]);
   const [showResults, setShowResults] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  
-  // Use value prop directly if provided, otherwise use internal state
-  const [internalSearchQuery, setInternalSearchQuery] = useState('');
-  const searchQuery = value !== undefined ? value : internalSearchQuery;
-  
-  console.log('FoodSearchWithHistory render - value prop:', value, 'searchQuery:', searchQuery);
 
   // Load historical meals from localStorage
   useEffect(() => {
@@ -114,8 +108,9 @@ export function FoodSearchWithHistory({
     let meals = [...historicalMeals];
     
     // Filter by search query
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
+    const searchValue = value || '';
+    if (searchValue.trim()) {
+      const query = searchValue.toLowerCase();
       meals = meals.filter(meal => 
         meal.name.toLowerCase().includes(query)
       );
@@ -133,7 +128,7 @@ export function FoodSearchWithHistory({
     });
     
     return Array.from(uniqueMeals.values()).slice(0, 10); // Limit to 10 results
-  }, [historicalMeals, searchQuery]);
+  }, [historicalMeals, value]);
 
   // Group meals by frequency for popular items
   const popularMeals = useMemo(() => {
@@ -156,18 +151,12 @@ export function FoodSearchWithHistory({
   }, [historicalMeals]);
 
   const handleSearch = (newValue: string) => {
-    // Update internal state if not controlled
-    if (value === undefined) {
-      setInternalSearchQuery(newValue);
-    }
     // Show results if there's a search query OR if there are popular meals to show
     setShowResults(newValue.length > 0 || popularMeals.length > 0);
     onSearchChange(newValue);
   };
 
   const handleSelectFood = (food: LoggedFood) => {
-    console.log('FoodSearchWithHistory - handleSelectFood called with:', food.name);
-    console.log('Current value prop:', value);
     // Close dropdown and call parent's onSelectFood
     setShowResults(false);
     onSelectFood(food);
@@ -182,7 +171,7 @@ export function FoodSearchWithHistory({
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
         <Input
-          value={searchQuery}
+          value={value || ''}
           onChange={(e) => handleSearch(e.target.value)}
           onFocus={() => setShowResults(true)}
           placeholder={placeholder}
@@ -195,7 +184,7 @@ export function FoodSearchWithHistory({
         <Card className="absolute top-full mt-2 left-0 right-0 z-[9999] p-0 shadow-2xl border border-gray-300 bg-white overflow-hidden max-h-[400px]">
           <ScrollArea className="h-full max-h-[400px] bg-white">
             {/* Popular/Frequent Items (when no search) */}
-            {!searchQuery && popularMeals.length > 0 && (
+            {!(value || '') && popularMeals.length > 0 && (
               <div className="p-2">
                 <div className="flex items-center gap-2 px-2 py-1 text-xs text-gray-500">
                   <Star className="h-3 w-3" />
@@ -242,7 +231,7 @@ export function FoodSearchWithHistory({
             {/* Search Results */}
             {filteredMeals.length > 0 ? (
               <div className="p-2">
-                {searchQuery && (
+                {(value || '') && (
                   <div className="flex items-center gap-2 px-2 py-1 text-xs text-gray-500">
                     <History className="h-3 w-3" />
                     <span className="font-medium">Previous Meals</span>
@@ -281,7 +270,7 @@ export function FoodSearchWithHistory({
                   </button>
                 ))}
               </div>
-            ) : searchQuery ? (
+            ) : (value || '') ? (
               <div className="p-8 text-center">
                 <Search className="h-8 w-8 mx-auto mb-2 text-gray-400" />
                 <p className="text-sm text-gray-700 font-medium">No matching meals found</p>

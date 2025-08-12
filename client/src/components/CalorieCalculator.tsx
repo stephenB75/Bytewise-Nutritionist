@@ -362,12 +362,9 @@ function CalorieCalculator({
             <FoodSearchWithHistory
               value={ingredient}
               onSelectFood={(food) => {
-                console.log('CalorieCalculator - onSelectFood called with:', food.name);
-                console.log('Current ingredient state before:', ingredient);
                 // Just populate the search field with the food name
                 // Don't log it automatically - wait for user to set portion and calculate
                 setIngredient(food.name);
-                console.log('Setting ingredient to:', food.name);
                 // Optionally pre-fill a standard serving size
                 if (!measurement) {
                   setMeasurement('1 serving');
