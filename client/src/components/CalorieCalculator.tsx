@@ -33,7 +33,7 @@ import {
   Droplets,
   Calendar
 } from 'lucide-react';
-import { FoodSearchWithHistory } from '@/components/FoodSearchWithHistory';
+import { SimpleFoodSearch } from '@/components/SimpleFoodSearch';
 
 interface IngredientAnalysis {
   ingredient: string;
@@ -555,65 +555,12 @@ function CalorieCalculator({
 
         <form onSubmit={handleCalculate} className="space-y-4">
           <div className="grid grid-cols-1 gap-4">
-            {/* Enhanced Food Search with History */}
+            {/* Simple Food Search */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Search Food
+                Food Ingredient
               </label>
-              <FoodSearchWithHistory
-                onSelectFood={async (food) => {
-                  // For historical meals, we can directly log them
-                  const now = getCorrectedDate(); // Use corrected date (Monday 11th)
-                  const mealType = getMealTypeByTime(now);
-                  
-                  // Create the logged meal data
-                  const mealData: LoggedMealData = {
-                    id: `relogged-${Date.now()}`,
-                    name: food.name,
-                    calories: food.calories,
-                    protein: food.protein,
-                    carbs: food.carbs,
-                    fat: food.fat,
-                    date: getLocalDateKey(now),
-                    time: formatLocalTime(now),
-                    mealType,
-                    category: mealType,
-                    timestamp: now.toISOString(),
-                    source: 'history'
-                  };
-                  
-                  // Store in localStorage
-                  const weeklyMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-                  weeklyMeals.push(mealData);
-                  localStorage.setItem('weeklyMeals', JSON.stringify(weeklyMeals));
-                  
-                  // Save to database
-                  try {
-                    await apiRequest('POST', '/api/meals/logged', {
-                      name: mealData.name,
-                      date: mealData.timestamp,
-                      mealType: mealData.mealType,
-                      totalCalories: mealData.calories,
-                      totalProtein: mealData.protein,
-                      totalCarbs: mealData.carbs,
-                      totalFat: mealData.fat
-                    });
-                    
-                    // Show success animation
-                    setLoggedData(mealData);
-                    setShowLoggedAnimation(true);
-                    setTimeout(() => setShowLoggedAnimation(false), 3000);
-                    
-                    // Dispatch events for other components
-                    window.dispatchEvent(new CustomEvent('calories-logged'));
-                    window.dispatchEvent(new CustomEvent('meals-updated'));
-                    
-                    // Check achievements
-                    checkAchievements.mutate();
-                  } catch (error) {
-                    console.error('Failed to save meal to database:', error);
-                  }
-                }}
+              <SimpleFoodSearch
                 onSearchChange={(query) => {
                   setIngredient(query);
                   // Still show ingredient suggestions from database
@@ -624,7 +571,7 @@ function CalorieCalculator({
                     setIngredientSuggestions([]);
                   }
                 }}
-                placeholder="Search today's meals, history, or new foods..."
+                placeholder="Search foods..."
                 className="w-full"
               />
               
