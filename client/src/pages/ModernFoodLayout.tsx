@@ -44,7 +44,7 @@ import {
 import { NotificationDropdown } from '@/components/NotificationDropdown';
 import { WeeklyCaloriesCard } from '@/components/WeeklyCaloriesCard';
 import { DateVerification } from '@/components/DateVerification';
-import { UserFoodSuggestions } from '@/components/UserFoodSuggestions';
+
 import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
