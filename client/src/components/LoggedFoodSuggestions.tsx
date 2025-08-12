@@ -1,10 +1,9 @@
 /**
  * Logged Food Suggestions Component
  * 
- * Shows frequently logged foods as suggestions for quick re-logging
+ * Shows frequently logged foods from database as suggestions for quick re-logging
  */
 
-import { useState, useEffect, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -12,8 +11,10 @@ import {
   TrendingUp,
   Clock,
   Utensils,
-  Plus
+  Plus,
+  Loader2
 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 
 interface LoggedFood {
   id: string;
@@ -23,9 +24,8 @@ interface LoggedFood {
   carbs: number;
   fat: number;
   date: string;
-  time: string;
   mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack';
-  timestamp?: string;
+  frequency?: number;
 }
 
 interface LoggedFoodSuggestionsProps {
@@ -33,142 +33,52 @@ interface LoggedFoodSuggestionsProps {
   className?: string;
 }
 
+interface MealHistoryResponse {
+  frequentMeals: LoggedFood[];
+  recentMeals: LoggedFood[];
+}
+
 export function LoggedFoodSuggestions({
   onSelectFood,
   className = ""
 }: LoggedFoodSuggestionsProps) {
-  const [historicalMeals, setHistoricalMeals] = useState<LoggedFood[]>([]);
+  // Fetch meal history from database
+  const { data, isLoading, error } = useQuery<MealHistoryResponse>({
+    queryKey: ['/api/meals/history'],
+    refetchInterval: 30000, // Refresh every 30 seconds
+    staleTime: 10000 // Consider data stale after 10 seconds
+  });
 
-  // Load historical meals from localStorage
-  useEffect(() => {
-    const loadHistoricalMeals = () => {
-      try {
-        // Check multiple possible storage keys
-        const calorieEntries = localStorage.getItem('calorieEntries');
-        const weeklyMeals = localStorage.getItem('weeklyMeals');
-        const userMeals = localStorage.getItem('userMeals');
-        
-        console.log('Checking localStorage for meal data:', {
-          calorieEntries: !!calorieEntries,
-          weeklyMeals: !!weeklyMeals,
-          userMeals: !!userMeals
-        });
-        
-        const allMeals: LoggedFood[] = [];
-        
-        // Try calorieEntries first
-        if (calorieEntries) {
-          const entries = JSON.parse(calorieEntries);
-          Object.entries(entries).forEach(([date, dayData]: [string, any]) => {
-            if (dayData?.meals) {
-              Object.entries(dayData.meals).forEach(([mealType, foods]: [string, any]) => {
-                if (Array.isArray(foods)) {
-                  foods.forEach(food => {
-                    allMeals.push({
-                      ...food,
-                      date,
-                      mealType,
-                      timestamp: food.timestamp || new Date(date).toISOString()
-                    });
-                  });
-                }
-              });
-            }
-          });
-        }
-        
-        // Also check weeklyMeals
-        if (weeklyMeals) {
-          const weekly = JSON.parse(weeklyMeals);
-          Object.entries(weekly).forEach(([date, dayData]: [string, any]) => {
-            if (dayData?.meals) {
-              Object.entries(dayData.meals).forEach(([mealType, foods]: [string, any]) => {
-                if (Array.isArray(foods)) {
-                  foods.forEach(food => {
-                    // Check if not already added
-                    const exists = allMeals.some(m => 
-                      m.name === food.name && m.date === date && m.mealType === mealType
-                    );
-                    if (!exists) {
-                      allMeals.push({
-                        ...food,
-                        date,
-                        mealType,
-                        timestamp: food.timestamp || new Date(date).toISOString()
-                      });
-                    }
-                  });
-                }
-              });
-            }
-          });
-        }
-        
-        console.log(`Found ${allMeals.length} total meals in history`);
-        
-        setHistoricalMeals(allMeals.sort((a, b) => 
-          new Date(b.timestamp || b.date).getTime() - new Date(a.timestamp || a.date).getTime()
-        ));
-      } catch (error) {
-        console.error('Error loading historical meals:', error);
-      }
-    };
+  const frequentMeals = data?.frequentMeals || [];
+  const recentMeals = data?.recentMeals || [];
 
-    loadHistoricalMeals();
-    
-    // Listen for updates
-    const handleRefresh = () => loadHistoricalMeals();
-    window.addEventListener('calories-logged', handleRefresh);
-    window.addEventListener('meals-updated', handleRefresh);
-    
-    return () => {
-      window.removeEventListener('calories-logged', handleRefresh);
-      window.removeEventListener('meals-updated', handleRefresh);
-    };
-  }, []);
+  // Show loading state
+  if (isLoading) {
+    return (
+      <Card className={`p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg ${className}`}>
+        <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Add from History</h3>
+        <div className="flex items-center justify-center py-8">
+          <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+          <span className="ml-2 text-sm text-gray-500">Loading meal history...</span>
+        </div>
+      </Card>
+    );
+  }
 
-  // Get most frequently logged items
-  const frequentMeals = useMemo(() => {
-    const frequency = new Map<string, { food: LoggedFood; count: number }>();
-    
-    historicalMeals.forEach(meal => {
-      const key = meal.name.toLowerCase().trim();
-      if (frequency.has(key)) {
-        frequency.get(key)!.count++;
-      } else {
-        frequency.set(key, { food: meal, count: 1 });
-      }
-    });
-    
-    return Array.from(frequency.values())
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 8)
-      .map(item => ({ ...item.food, frequency: item.count }));
-  }, [historicalMeals]);
-
-  // Get recent meals (last 24 hours)
-  const recentMeals = useMemo(() => {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    
-    const recent = historicalMeals
-      .filter(meal => {
-        const mealDate = new Date(meal.timestamp || meal.date);
-        return mealDate > yesterday;
-      })
-      .slice(0, 6);
-    
-    // Remove duplicates
-    const uniqueMeals = new Map<string, LoggedFood>();
-    recent.forEach(meal => {
-      const key = meal.name.toLowerCase().trim();
-      if (!uniqueMeals.has(key)) {
-        uniqueMeals.set(key, meal);
-      }
-    });
-    
-    return Array.from(uniqueMeals.values());
-  }, [historicalMeals]);
+  // Show error state
+  if (error) {
+    return (
+      <Card className={`p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg ${className}`}>
+        <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Add from History</h3>
+        <div className="text-center py-4">
+          <Utensils className="h-8 w-8 text-gray-300 mx-auto mb-2" />
+          <p className="text-sm text-gray-500">
+            Unable to load meal history. Please try again later.
+          </p>
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card className={`p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg ${className}`}>

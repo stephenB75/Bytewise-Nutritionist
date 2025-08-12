@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated, optionalAuth, serverSupabase, type AuthenticatedRequest } from "./supabaseAuth";
 import { usdaService } from "./services/usdaService";
+import mealsRouter from "./routes/meals";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Health check endpoint - simplified for production
@@ -713,6 +714,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to delete data" });
     }
   });
+
+  // Meals routes for history/suggestions
+  app.use(mealsRouter);
 
   // USDA Food Database Sync API
   app.post('/api/sync/food-database', isAuthenticated, async (req: any, res: Response) => {
