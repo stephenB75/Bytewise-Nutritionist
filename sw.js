@@ -1,18 +1,21 @@
 // Bytewise Nutrition Tracker - Service Worker
 // Provides offline functionality and caching for PWA experience
 
-const CACHE_NAME = 'bytewise-v1.5.0';
-const STATIC_CACHE = 'bytewise-static-v3';
-const DYNAMIC_CACHE = 'bytewise-dynamic-v3';
-const API_CACHE = 'bytewise-api-v3';
+const CACHE_NAME = 'bytewise-v2.0.1';
+const STATIC_CACHE = 'bytewise-static-v4';
+const DYNAMIC_CACHE = 'bytewise-dynamic-v4';
+const API_CACHE = 'bytewise-api-v4';
+const ICON_CACHE = 'bytewise-icons-v2';
 
 // Critical resources to cache immediately
 const STATIC_ASSETS = [
   '/',
   '/index.html',
-  '/manifest.json',
-  '/icon-192.svg',
-  '/icon-512.svg'
+  '/manifest.json?v=2.0.1',
+  '/apple-icon.png',
+  '/apple-touch-icon.png',
+  '/icons/icon-192x192.png',
+  '/icons/icon-512x512.png'
 ];
 
 // API endpoints to cache for offline functionality
@@ -43,6 +46,14 @@ self.addEventListener('install', event => {
   );
 });
 
+// Listen for skip waiting message
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    console.log('⏩ Received SKIP_WAITING, activating new service worker');
+    self.skipWaiting();
+  }
+});
+
 // Activate event - clean up old caches
 self.addEventListener('activate', event => {
   console.log('🚀 Service Worker activating...');
@@ -55,7 +66,8 @@ self.addEventListener('activate', event => {
             .filter(cacheName => {
               return cacheName !== STATIC_CACHE && 
                      cacheName !== DYNAMIC_CACHE && 
-                     cacheName !== API_CACHE;
+                     cacheName !== API_CACHE &&
+                     cacheName !== ICON_CACHE;
             })
             .map(cacheName => {
               console.log('🗑️ Deleting old cache:', cacheName);

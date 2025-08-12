@@ -18,6 +18,7 @@ import IconDebug from './pages/IconDebug';
 import { useDataRestoration } from '@/hooks/useDataRestoration';
 import { DataSyncIndicator } from '@/components/DataSyncIndicator';
 import { useSessionManager } from '@/hooks/useSessionManager';
+import { PWAUpdateNotification } from '@/components/PWAUpdateNotification';
 
 function AppContent() {
   const [activeTab, setActiveTab] = useState<string>('redesigned');
@@ -111,6 +112,7 @@ function AppContent() {
           </Switch>
         </main>
         <DataSyncIndicator />
+        <PWAUpdateNotification />
       </div>
     </Router>
   );
