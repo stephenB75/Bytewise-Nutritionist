@@ -360,6 +360,7 @@ function CalorieCalculator({
         <form onSubmit={handleCalculate} className="space-y-3">
           <div className="grid grid-cols-1 gap-2">
             <FoodSearchWithHistory
+              value={ingredient}
               onSelectFood={(food) => {
                 // Just populate the search field with the food name
                 // Don't log it automatically - wait for user to set portion and calculate

@@ -38,6 +38,7 @@ interface LoggedFood {
 }
 
 interface FoodSearchWithHistoryProps {
+  value?: string;
   onSelectFood: (food: LoggedFood) => void;
   onSearchChange: (query: string) => void;
   placeholder?: string;
@@ -45,15 +46,23 @@ interface FoodSearchWithHistoryProps {
 }
 
 export function FoodSearchWithHistory({
+  value,
   onSelectFood,
   onSearchChange,
   placeholder = "Search today's meals or history...",
   className = ""
 }: FoodSearchWithHistoryProps) {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(value || '');
   const [historicalMeals, setHistoricalMeals] = useState<LoggedFood[]>([]);
   const [showResults, setShowResults] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Sync internal state with external value prop
+  useEffect(() => {
+    if (value !== undefined) {
+      setSearchQuery(value);
+    }
+  }, [value]);
 
   // Load historical meals from localStorage
   useEffect(() => {
@@ -156,11 +165,10 @@ export function FoodSearchWithHistory({
   };
 
   const handleSelectFood = (food: LoggedFood) => {
-    // Populate the search field with the selected food name
-    setSearchQuery(food.name);
-    onSearchChange(food.name);
+    // Close dropdown and call parent's onSelectFood
     setShowResults(false);
     onSelectFood(food);
+    // Parent will handle updating the search field through the value prop
   };
 
 
