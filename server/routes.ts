@@ -317,7 +317,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         storage.getUser(userId),
         storage.getUserMeals(userId),
         storage.getUserRecipes(userId),
-        storage.getUserWaterIntake(userId),
+        storage.getUserWaterIntake(userId, new Date()),
         storage.getUserAchievements(userId)
       ]);
       
@@ -393,11 +393,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   await storage.createRecipe({
                     userId,
                     name: recipe.name || 'Unnamed recipe',
-                    servings: recipe.servings || 1,
-                    totalCalories: recipe.totalCalories?.toString() || '0',
-                    totalProtein: recipe.totalProtein?.toString() || '0',
-                    totalCarbs: recipe.totalCarbs?.toString() || '0',
-                    totalFat: recipe.totalFat?.toString() || '0'
+                    servings: recipe.servings || 1
                   });
                   itemsBackedUp++;
                 } catch (err) {
@@ -412,11 +408,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
             if (Array.isArray(data)) {
               for (const intake of data) {
                 try {
-                  await storage.createWaterIntake({
+                  await storage.upsertWaterIntake({
                     userId,
                     date: new Date(intake.date || new Date()),
-                    glasses: intake.glasses || 0,
-                    timestamp: new Date(intake.timestamp || new Date())
+                    glasses: intake.glasses || 0
                   });
                   itemsBackedUp++;
                 } catch (err) {
