@@ -43,6 +43,7 @@ import {
 } from 'lucide-react';
 import { NotificationDropdown } from '@/components/NotificationDropdown';
 import { WeeklyCaloriesCard } from '@/components/WeeklyCaloriesCard';
+import { DateVerification } from '@/components/DateVerification';
 import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
@@ -1133,6 +1134,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   return `${startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
                 })()}
               </p>
+              <p className="text-xs text-gray-500 mt-1">
+                Today: {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
+              </p>
             </div>
             
             {/* Weekly Progress Card */}
@@ -1155,6 +1159,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               </div>
             </Card>
 
+            {/* Date Verification - Temporary for debugging */}
+            <DateVerification />
+            
             {/* Include Weekly Calories Card */}
             <WeeklyCaloriesCard />
           </div>
