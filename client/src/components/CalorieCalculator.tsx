@@ -656,62 +656,26 @@ function CalorieCalculator({
               </p>
             </div>
             
-            {/* Measurement Input */}
-            {selectedIngredient ? (
-              // Enhanced mode with unit selection
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Amount
-                  </label>
-                  <Input
-                    type="number"
-                    step="0.25"
-                    placeholder="1"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    className="text-base"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Unit
-                  </label>
-                  <Select value={selectedUnit} onValueChange={setSelectedUnit}>
-                    <SelectTrigger className="text-base">
-                      <SelectValue placeholder="Select unit" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {availableUnits.map((unit) => (
-                        <SelectItem key={unit} value={unit}>
-                          {unit.replace('_', ' ')}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            ) : (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Measurement
-                </label>
-                <Input
-                  placeholder="e.g., 1 cup, 100g, 1 medium, 2 tablespoons, 1 slice"
-                  value={measurement}
-                  onChange={(e) => setMeasurement(e.target.value)}
-                  className="text-base"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Any measurement works - the system will provide the best estimate
-                </p>
-              </div>
-            )}
+            {/* Measurement Input - Simplified */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Measurement
+              </label>
+              <Input
+                placeholder="e.g., 1 cup, 100g, 1 medium, 2 tablespoons, 1 slice"
+                value={measurement}
+                onChange={(e) => setMeasurement(e.target.value)}
+                className="text-base"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Any measurement works - the system will provide the best estimate
+              </p>
+            </div>
           </div>
 
           <Button 
             type="submit" 
-            disabled={calculateCalories.isPending || !ingredient.trim() || (!measurement.trim() && !(selectedIngredient && amount && selectedUnit))}
+            disabled={calculateCalories.isPending || !ingredient.trim() || !measurement.trim()}
             className="w-full bg-blue-600 hover:bg-blue-700 text-lg py-6"
           >
             {calculateCalories.isPending ? (
