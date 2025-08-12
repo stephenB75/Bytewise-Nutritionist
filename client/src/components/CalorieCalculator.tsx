@@ -119,23 +119,14 @@ function CalorieCalculator({
   const [recentAnalyses, setRecentAnalyses] = useState<IngredientAnalysis[]>([]);
   const [showLoggedAnimation, setShowLoggedAnimation] = useState(false);
   const [loggedData, setLoggedData] = useState<any>(null);
-  const [ingredientSuggestions, setIngredientSuggestions] = useState<Array<{category: string; key: string; data: IngredientData}>>([]);
+
   const [selectedIngredient, setSelectedIngredient] = useState<{category: string; key: string; data: IngredientData} | null>(null);
   const [availableUnits, setAvailableUnits] = useState<string[]>([]);
 
   // Achievement system hook
   const checkAchievements = useCheckAchievements();
 
-  // Search ingredients as user types (handled by FoodSearchWithHistory now)
-  // This effect is kept for backward compatibility with direct ingredient input
-  useEffect(() => {
-    if (ingredient.length >= 2 && !isCompact) {
-      const customSuggestions = EnhancedIngredientDatabaseManager.searchIngredients(ingredient);
-      setIngredientSuggestions(customSuggestions.slice(0, 6));
-    } else {
-      setIngredientSuggestions([]);
-    }
-  }, [ingredient, isCompact]);
+  // Removed ingredient suggestions - using simple search only
 
   // Update available units when ingredient is selected
   useEffect(() => {
@@ -200,11 +191,7 @@ function CalorieCalculator({
     setSelectedIngredient(null);
   };
 
-  const selectIngredient = (suggestion: {category: string; key: string; data: IngredientData}) => {
-    setSelectedIngredient(suggestion);
-    setIngredient(suggestion.data.displayName);
-    setIngredientSuggestions([]);
-  };
+
 
   const handleCalculate = (e: React.FormEvent) => {
     e.preventDefault();
@@ -563,51 +550,13 @@ function CalorieCalculator({
               <SimpleFoodSearch
                 onSearchChange={(query) => {
                   setIngredient(query);
-                  // Still show ingredient suggestions from database
-                  if (query.length >= 2) {
-                    const customSuggestions = EnhancedIngredientDatabaseManager.searchIngredients(query);
-                    setIngredientSuggestions(customSuggestions.slice(0, 6));
-                  } else {
-                    setIngredientSuggestions([]);
-                  }
                 }}
-                placeholder="Search foods..."
+                placeholder="Enter food name..."
                 className="w-full"
               />
               
-              {/* Ingredient Suggestions Dropdown */}
-              {ingredientSuggestions.length > 0 && ingredient.length >= 2 && (
-                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-64 overflow-y-auto">
-                  <div className="px-3 py-1 text-xs text-gray-500 bg-gray-50 border-b">
-                    USDA Database Suggestions
-                  </div>
-                  {ingredientSuggestions.map((suggestion, index) => (
-                    <button
-                      key={`${suggestion.category}-${suggestion.key}`}
-                      type="button"
-                      onClick={() => selectIngredient(suggestion)}
-                      className="w-full px-4 py-2 text-left hover:bg-blue-50 border-b border-gray-100 last:border-b-0"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-medium text-gray-900">{suggestion.data.displayName}</p>
-                          <p className="text-xs text-gray-500">{suggestion.category}</p>
-                        </div>
-                        <Badge 
-                          variant="outline" 
-                          style={{ backgroundColor: suggestion.data.tags.categoryColor + '40', color: '#374151' }}
-                          className="text-xs"
-                        >
-                          {suggestion.data.tags.dietType[0] || 'food'}
-                        </Badge>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
-              
               <p className="text-xs text-gray-500 mt-1">
-                Search your meal history or add new foods from the USDA database
+                Enter any food item to calculate calories
               </p>
             </div>
             
