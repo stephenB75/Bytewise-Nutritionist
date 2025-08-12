@@ -1,91 +1,134 @@
-#!/usr/bin/env node
-
 /**
- * Data Persistence Verification Script
- * Ensures user data is properly saved and will persist through deployments
+ * Food Entry Data Persistence Verification Script
+ * Tests if user food entries are being saved and restored properly
  */
 
 const fs = require('fs');
-const path = require('path');
 
-console.log('=== DATA PERSISTENCE VERIFICATION ===\n');
+console.log('=== FOOD ENTRY DATA PERSISTENCE VERIFICATION ===\n');
 
-// Check 1: Local Storage Implementation
-console.log('1. LOCAL STORAGE BACKUP SYSTEM:');
-console.log('   ✓ Auto-saves every 30 seconds');
-console.log('   ✓ Saves on page unload/tab switch');
-console.log('   ✓ Creates backup copies of all data');
-console.log('   ✓ Stores timestamps for each save\n');
+// Test data structure expectations
+const expectedDataStructure = {
+  weeklyMeals: 'Array of meal objects',
+  userProfiles: 'User profile data',
+  achievements: 'Achievement progress',
+  waterIntake: 'Daily water tracking',
+  calorieGoals: 'Daily calorie targets'
+};
 
-// Check 2: Database Sync System
-console.log('2. DATABASE SYNCHRONIZATION:');
-console.log('   ✓ Syncs to PostgreSQL database');
-console.log('   ✓ User-specific data with userId foreign keys');
-console.log('   ✓ Automatic sync when online');
-console.log('   ✓ Handles offline mode gracefully\n');
+console.log('1. CHECKING DATA STRUCTURE EXPECTATIONS:\n');
+Object.entries(expectedDataStructure).forEach(([key, description]) => {
+  console.log(`📋 ${key}: ${description}`);
+});
 
-// Check 3: Data Models Protected
-console.log('3. PROTECTED DATA MODELS:');
-const protectedTables = [
-  'users - User profiles and settings',
-  'meals - Daily meal entries',
-  'recipes - Custom user recipes',
-  'waterIntake - Daily water tracking',
-  'achievements - User achievements',
-  'foods - USDA food database (shared)',
-  'recipeIngredients - Recipe components'
+console.log('\n2. CHECKING DATA PERSISTENCE IMPLEMENTATION:\n');
+
+// Check if data persistence utilities exist
+const dataFilesToCheck = [
+  'client/src/utils/performanceUtils.ts',
+  'client/src/hooks/useOptimizedMealData.ts',
+  'client/src/utils/mealDateFixer.ts',
+  'client/src/pages/ModernFoodLayout.tsx'
 ];
 
-protectedTables.forEach(table => {
-  console.log(`   ✓ ${table}`);
+dataFilesToCheck.forEach(file => {
+  try {
+    const content = fs.readFileSync(file, 'utf8');
+    
+    console.log(`✅ ${file} exists`);
+    
+    // Check for localStorage operations
+    const hasLocalStorage = content.includes('localStorage');
+    const hasGetItem = content.includes('getItem');
+    const hasSetItem = content.includes('setItem');
+    const hasCaching = content.includes('cache') || content.includes('Cache');
+    
+    console.log(`   - localStorage operations: ${hasLocalStorage ? '✅' : '❌'}`);
+    console.log(`   - Data retrieval (getItem): ${hasGetItem ? '✅' : '❌'}`);
+    console.log(`   - Data saving (setItem): ${hasSetItem ? '✅' : '❌'}`);
+    console.log(`   - Caching system: ${hasCaching ? '✅' : '❌'}`);
+    console.log('');
+    
+  } catch (error) {
+    console.log(`❌ ${file} - Error: ${error.message}\n`);
+  }
 });
-console.log();
 
-// Check 4: Deployment Safety
-console.log('4. DEPLOYMENT DATA SAFETY:');
-console.log('   ✓ Database is SEPARATE from code deployment');
-console.log('   ✓ PostgreSQL data persists across deployments');
-console.log('   ✓ All tables have CASCADE delete protection');
-console.log('   ✓ No DROP TABLE commands in deployment scripts\n');
+console.log('3. CHECKING MEAL DATA STRUCTURE:\n');
 
-// Check 5: Data Recovery Options
-console.log('5. DATA RECOVERY MECHANISMS:');
-console.log('   ✓ Local Storage backup (client-side)');
-console.log('   ✓ Database backup (server-side)');
-console.log('   ✓ Data restore endpoint (/api/user/restore-data)');
-console.log('   ✓ PDF export for offline records\n');
+// Check ModernFoodLayout for data handling
+try {
+  const layoutContent = fs.readFileSync('client/src/pages/ModernFoodLayout.tsx', 'utf8');
+  
+  const hasMealLogging = layoutContent.includes('weeklyMeals');
+  const hasDataRestoration = layoutContent.includes('loadExistingData') || layoutContent.includes('getCachedLocalStorage');
+  const hasMealDateFixer = layoutContent.includes('autoFixMealDatesIfNeeded');
+  const hasBackupSystem = layoutContent.includes('backup') || layoutContent.includes('User data backed up');
+  
+  console.log('Main App Data Handling:');
+  console.log(`  - Meal logging system: ${hasMealLogging ? '✅' : '❌'}`);
+  console.log(`  - Data restoration: ${hasDataRestoration ? '✅' : '❌'}`);
+  console.log(`  - Date fixing system: ${hasMealDateFixer ? '✅' : '❌'}`);
+  console.log(`  - Backup system: ${hasBackupSystem ? '✅' : '❌'}`);
+  
+} catch (error) {
+  console.log(`❌ Error checking main app: ${error.message}`);
+}
 
-// Check 6: Verification Results
-console.log('6. VERIFICATION RESULTS:');
-console.log('   ✅ User data WILL BE PRESERVED during deployment');
-console.log('   ✅ Database remains intact and separate');
-console.log('   ✅ No data loss from code updates');
-console.log('   ✅ Automatic restore on login\n');
+console.log('\n4. CHECKING CALORIE CALCULATOR INTEGRATION:\n');
 
-// Check 7: Data Persistence Flow
-console.log('7. HOW DATA PERSISTS THROUGH DEPLOYMENT:\n');
-console.log('   [User Input] → [Auto-Save to LocalStorage] → [Sync to Database]');
-console.log('        ↓                    ↓                          ↓');
-console.log('   [Immediate]        [Every 30 sec]            [When Online]');
-console.log('        ↓                    ↓                          ↓');
-console.log('   [Browser Cache]    [Backup Copy]          [PostgreSQL DB]');
-console.log('        ↓                    ↓                          ↓');
-console.log('   === DEPLOYMENT HAPPENS (Code Updates Only) ===');
-console.log('        ↓                    ↓                          ↓');
-console.log('   [Still There]      [Still There]          [UNCHANGED ✓]');
-console.log('        ↓                    ↓                          ↓');
-console.log('   [User Returns] → [Data Restored] ← [From Database]\n');
+// Check CalorieCalculator for meal saving
+try {
+  const calculatorContent = fs.readFileSync('client/src/components/CalorieCalculator.tsx', 'utf8');
+  
+  const hasLogMeal = calculatorContent.includes('logMeal') || calculatorContent.includes('Log Meal');
+  const hasSaveToStorage = calculatorContent.includes('localStorage.setItem');
+  const hasWeeklyMealsUpdate = calculatorContent.includes('weeklyMeals');
+  const hasTimestamp = calculatorContent.includes('timestamp') || calculatorContent.includes('new Date()');
+  
+  console.log('Calorie Calculator Data Saving:');
+  console.log(`  - Meal logging function: ${hasLogMeal ? '✅' : '❌'}`);
+  console.log(`  - Save to localStorage: ${hasSaveToStorage ? '✅' : '❌'}`);
+  console.log(`  - Weekly meals update: ${hasWeeklyMealsUpdate ? '✅' : '❌'}`);
+  console.log(`  - Timestamp tracking: ${hasTimestamp ? '✅' : '❌'}`);
+  
+} catch (error) {
+  console.log(`❌ Error checking calculator: ${error.message}`);
+}
 
-// Check 8: Important Notes
-console.log('8. IMPORTANT NOTES:');
-console.log('   • Database is hosted on Supabase (separate infrastructure)');
-console.log('   • Code deployments ONLY update application files');
-console.log('   • User data lives in PostgreSQL, not in code');
-console.log('   • Even if localStorage is cleared, database has backup');
-console.log('   • Each user\'s data is isolated by their userId\n');
+console.log('\n5. DATA PERSISTENCE VERIFICATION STEPS:\n');
 
-console.log('=== VERIFICATION COMPLETE ===');
-console.log('\n✅ SAFE TO DEPLOY: User data will NOT be removed!\n');
-console.log('The deployment process only updates the application code.');
-console.log('All user data is stored in the PostgreSQL database which');
-console.log('remains completely untouched during deployment.\n');
+console.log('To manually verify data persistence:');
+console.log('1. Open browser dev tools (F12)');
+console.log('2. Go to Application/Storage tab');
+console.log('3. Check Local Storage for your domain');
+console.log('4. Look for these keys:');
+console.log('   - weeklyMeals (array of meal objects)');
+console.log('   - userProfiles (user data)');
+console.log('   - achievements (progress data)');
+console.log('5. Log a meal and refresh the page');
+console.log('6. Verify the meal persists after refresh');
+
+console.log('\n6. EXPECTED MEAL DATA FORMAT:\n');
+
+console.log('Each meal entry should have:');
+console.log('- id: unique identifier');
+console.log('- name: food name');
+console.log('- date: YYYY-MM-DD format');
+console.log('- timestamp: ISO string');
+console.log('- calories: number');
+console.log('- protein, carbs, fat: macro values');
+console.log('- time: human-readable time');
+console.log('- mealType: breakfast/lunch/dinner/snack');
+
+console.log('\n7. TROUBLESHOOTING STEPS:\n');
+
+console.log('If food entries are not restoring:');
+console.log('1. Check browser console for localStorage errors');
+console.log('2. Verify localStorage quota (usually 5-10MB)');
+console.log('3. Test in incognito mode (fresh storage)');
+console.log('4. Check if date fixing is working properly');
+console.log('5. Verify cache system is not interfering');
+
+console.log('\n=== VERIFICATION COMPLETE ===');
+console.log('\nNext: Test by logging a meal, refreshing page, and checking persistence');
