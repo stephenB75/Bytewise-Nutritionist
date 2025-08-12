@@ -56,7 +56,6 @@ export function FoodSearchWithHistory({
   const [searchQuery, setSearchQuery] = useState('');
   const [historicalMeals, setHistoricalMeals] = useState<LoggedFood[]>([]);
   const [showResults, setShowResults] = useState(false);
-  const [selectedTimeRange, setSelectedTimeRange] = useState<'today' | 'week' | 'month' | 'all'>('all');
 
   // Load historical meals from localStorage
   useEffect(() => {
@@ -91,23 +90,11 @@ export function FoodSearchWithHistory({
     };
   }, []);
 
-  // Filter meals based on search query and time range
+  // Filter meals based on search query only
   const filteredMeals = useMemo(() => {
     let meals = [...historicalMeals];
-    const today = getLocalDateKey(new Date());
     
-    // Filter by time range
-    if (selectedTimeRange === 'today') {
-      meals = meals.filter(meal => meal.date === today);
-    } else if (selectedTimeRange === 'week') {
-      const weekAgo = getLocalDateKey(subWeeks(new Date(), 1));
-      meals = meals.filter(meal => meal.date >= weekAgo);
-    } else if (selectedTimeRange === 'month') {
-      const monthAgo = getLocalDateKey(subMonths(new Date(), 1));
-      meals = meals.filter(meal => meal.date >= monthAgo);
-    }
-    
-    // Filter by search query
+    // Filter by search query only
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       meals = meals.filter(meal => 
@@ -127,7 +114,7 @@ export function FoodSearchWithHistory({
     });
     
     return Array.from(uniqueMeals.values()).slice(0, 10); // Limit to 10 results
-  }, [historicalMeals, searchQuery, selectedTimeRange]);
+  }, [historicalMeals, searchQuery]);
 
   // Group meals by frequency for popular items
   const popularMeals = useMemo(() => {
@@ -151,7 +138,7 @@ export function FoodSearchWithHistory({
 
   const handleSearch = (value: string) => {
     setSearchQuery(value);
-    setShowResults(value.length > 0 || selectedTimeRange !== 'all');
+    setShowResults(value.length > 0);
     onSearchChange(value);
   };
 
