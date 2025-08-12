@@ -913,60 +913,60 @@ function UserFoodTextSuggestions({ onSuggestionClick }: { onSuggestionClick: (fo
                 <div className="font-medium text-blue-600 hover:text-blue-800 mb-1">
                   {food.name}
                 </div>
-              
-              {/* Macronutrients */}
-              <div className="flex flex-wrap gap-3 mb-2 text-xs">
-                <span className="text-orange-600 font-medium">{Math.round(food.calories || 0)} cal</span>
-                <span className="text-green-600">P: {(food.protein || 0).toFixed(1)}g</span>
-                <span className="text-yellow-600">C: {(food.carbs || 0).toFixed(1)}g</span>
-                <span className="text-purple-600">F: {(food.fat || 0).toFixed(1)}g</span>
-              </div>
-              
-              {/* Micronutrients - only show if values exist */}
-              {((food.iron || 0) > 0 || (food.calcium || 0) > 0 || (food.vitaminC || 0) > 0 || (food.zinc || 0) > 0 || (food.magnesium || 0) > 0 || (food.vitaminD || 0) > 0) && (
-                <div className="flex flex-wrap gap-2 text-xs">
-                  {(food.iron || 0) > 0 && (
-                    <span className="bg-slate-100 px-2 py-0.5 rounded text-slate-700">
-                      Iron: {(food.iron || 0).toFixed(1)}mg
-                    </span>
-                  )}
-                  {(food.calcium || 0) > 0 && (
-                    <span className="bg-gray-100 px-2 py-0.5 rounded text-gray-700">
-                      Ca: {Math.round(food.calcium || 0)}mg
-                    </span>
-                  )}
-                  {(food.vitaminC || 0) > 0 && (
-                    <span className="bg-cyan-100 px-2 py-0.5 rounded text-cyan-700">
-                      Vit C: {Math.round(food.vitaminC || 0)}mg
-                    </span>
-                  )}
-                  {(food.zinc || 0) > 0 && (
-                    <span className="bg-amber-100 px-2 py-0.5 rounded text-amber-700">
-                      Zn: {(food.zinc || 0).toFixed(1)}mg
-                    </span>
-                  )}
-                  {(food.magnesium || 0) > 0 && (
-                    <span className="bg-rose-100 px-2 py-0.5 rounded text-rose-700">
-                      Mg: {Math.round(food.magnesium || 0)}mg
-                    </span>
-                  )}
-                  {(food.vitaminD || 0) > 0 && (
-                    <span className="bg-orange-100 px-2 py-0.5 rounded text-orange-700">
-                      Vit D: {(food.vitaminD || 0).toFixed(1)}μg
-                    </span>
-                  )}
-                  {(food.vitaminB12 || 0) > 0 && (
-                    <span className="bg-red-100 px-2 py-0.5 rounded text-red-700">
-                      B12: {(food.vitaminB12 || 0).toFixed(1)}μg
-                    </span>
-                  )}
-                  {(food.folate || 0) > 0 && (
-                    <span className="bg-green-100 px-2 py-0.5 rounded text-green-700">
-                      Folate: {Math.round(food.folate || 0)}μg
-                    </span>
-                  )}
+                
+                {/* Macronutrients */}
+                <div className="flex flex-wrap gap-3 mb-2 text-xs">
+                  <span className="text-orange-600 font-medium">{Math.round(food.calories || 0)} cal</span>
+                  <span className="text-green-600">P: {(food.protein || 0).toFixed(1)}g</span>
+                  <span className="text-yellow-600">C: {(food.carbs || 0).toFixed(1)}g</span>
+                  <span className="text-purple-600">F: {(food.fat || 0).toFixed(1)}g</span>
                 </div>
-              )}
+                
+                {/* Micronutrients - only show if values exist */}
+                {((food.iron || 0) > 0 || (food.calcium || 0) > 0 || (food.vitaminC || 0) > 0 || (food.zinc || 0) > 0 || (food.magnesium || 0) > 0 || (food.vitaminD || 0) > 0) && (
+                  <div className="flex flex-wrap gap-2 text-xs">
+                    {(food.iron || 0) > 0 && (
+                      <span className="bg-slate-100 px-2 py-0.5 rounded text-slate-700">
+                        Iron: {(food.iron || 0).toFixed(1)}mg
+                      </span>
+                    )}
+                    {(food.calcium || 0) > 0 && (
+                      <span className="bg-gray-100 px-2 py-0.5 rounded text-gray-700">
+                        Ca: {Math.round(food.calcium || 0)}mg
+                      </span>
+                    )}
+                    {(food.vitaminC || 0) > 0 && (
+                      <span className="bg-cyan-100 px-2 py-0.5 rounded text-cyan-700">
+                        Vit C: {Math.round(food.vitaminC || 0)}mg
+                      </span>
+                    )}
+                    {(food.zinc || 0) > 0 && (
+                      <span className="bg-amber-100 px-2 py-0.5 rounded text-amber-700">
+                        Zn: {(food.zinc || 0).toFixed(1)}mg
+                      </span>
+                    )}
+                    {(food.magnesium || 0) > 0 && (
+                      <span className="bg-rose-100 px-2 py-0.5 rounded text-rose-700">
+                        Mg: {Math.round(food.magnesium || 0)}mg
+                      </span>
+                    )}
+                    {(food.vitaminD || 0) > 0 && (
+                      <span className="bg-orange-100 px-2 py-0.5 rounded text-orange-700">
+                        Vit D: {(food.vitaminD || 0).toFixed(1)}μg
+                      </span>
+                    )}
+                    {(food.vitaminB12 || 0) > 0 && (
+                      <span className="bg-red-100 px-2 py-0.5 rounded text-red-700">
+                        B12: {(food.vitaminB12 || 0).toFixed(1)}μg
+                      </span>
+                    )}
+                    {(food.folate || 0) > 0 && (
+                      <span className="bg-green-100 px-2 py-0.5 rounded text-green-700">
+                        Folate: {Math.round(food.folate || 0)}μg
+                      </span>
+                    )}
+                  </div>
+                )}
               </button>
               
               {/* Copy Button */}
