@@ -56,7 +56,7 @@ export function FoodSearchWithHistory({
   const [searchQuery, setSearchQuery] = useState('');
   const [historicalMeals, setHistoricalMeals] = useState<LoggedFood[]>([]);
   const [showResults, setShowResults] = useState(false);
-
+  const [selectedTimeRange, setSelectedTimeRange] = useState<'today' | 'week' | 'month' | 'all'>('all');
 
   // Load historical meals from localStorage
   useEffect(() => {
@@ -91,9 +91,21 @@ export function FoodSearchWithHistory({
     };
   }, []);
 
-  // Filter meals based on search query only
+  // Filter meals based on search query and time range
   const filteredMeals = useMemo(() => {
     let meals = [...historicalMeals];
+    const today = getLocalDateKey(new Date());
+    
+    // Filter by time range
+    if (selectedTimeRange === 'today') {
+      meals = meals.filter(meal => meal.date === today);
+    } else if (selectedTimeRange === 'week') {
+      const weekAgo = getLocalDateKey(subWeeks(new Date(), 1));
+      meals = meals.filter(meal => meal.date >= weekAgo);
+    } else if (selectedTimeRange === 'month') {
+      const monthAgo = getLocalDateKey(subMonths(new Date(), 1));
+      meals = meals.filter(meal => meal.date >= monthAgo);
+    }
     
     // Filter by search query
     if (searchQuery.trim()) {
@@ -115,7 +127,7 @@ export function FoodSearchWithHistory({
     });
     
     return Array.from(uniqueMeals.values()).slice(0, 10); // Limit to 10 results
-  }, [historicalMeals, searchQuery]);
+  }, [historicalMeals, searchQuery, selectedTimeRange]);
 
   // Group meals by frequency for popular items
   const popularMeals = useMemo(() => {
@@ -139,7 +151,7 @@ export function FoodSearchWithHistory({
 
   const handleSearch = (value: string) => {
     setSearchQuery(value);
-    setShowResults(value.length > 0);
+    setShowResults(value.length > 0 || selectedTimeRange !== 'all');
     onSearchChange(value);
   };
 
@@ -180,6 +192,42 @@ export function FoodSearchWithHistory({
       {/* Search Results Dropdown */}
       {showResults && (
         <Card className="absolute top-full mt-2 left-0 right-0 z-50 p-0 shadow-xl border-gray-200 overflow-hidden max-h-[400px]">
+          {/* Time Range Filters */}
+          <div className="p-2 border-b bg-gray-50 flex gap-1">
+            <Button
+              size="sm"
+              variant={selectedTimeRange === 'today' ? 'default' : 'ghost'}
+              onClick={() => setSelectedTimeRange('today')}
+              className="h-7 text-xs"
+            >
+              Today
+            </Button>
+            <Button
+              size="sm"
+              variant={selectedTimeRange === 'week' ? 'default' : 'ghost'}
+              onClick={() => setSelectedTimeRange('week')}
+              className="h-7 text-xs"
+            >
+              This Week
+            </Button>
+            <Button
+              size="sm"
+              variant={selectedTimeRange === 'month' ? 'default' : 'ghost'}
+              onClick={() => setSelectedTimeRange('month')}
+              className="h-7 text-xs"
+            >
+              This Month
+            </Button>
+            <Button
+              size="sm"
+              variant={selectedTimeRange === 'all' ? 'default' : 'ghost'}
+              onClick={() => setSelectedTimeRange('all')}
+              className="h-7 text-xs"
+            >
+              All Time
+            </Button>
+          </div>
+
           <ScrollArea className="h-full max-h-[340px]">
             {/* Popular/Frequent Items (when no search) */}
             {!searchQuery && popularMeals.length > 0 && (

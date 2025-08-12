@@ -236,7 +236,7 @@ function CalorieCalculator({
     const scalingFactor = caloriesPer100g > 0 ? analysis.estimatedCalories / caloriesPer100g : 1;
 
     const mealData: LoggedMealData = {
-      id: `calc-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+      id: `calc-${Date.now()}`,
       name: `${analysis.ingredient} (${analysis.measurement})`,
       calories: analysis.estimatedCalories,
       // Scale macronutrients based on actual serving size
@@ -541,6 +541,33 @@ function CalorieCalculator({
         </div>
       )}
 
+      {/* User Guide Card - Moved Above */}
+      <Card className="p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg">
+        <h3 className="text-lg font-bold text-gray-900 mb-4">How to Use</h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-3">
+            <h4 className="font-medium text-gray-700">Food Entry</h4>
+            <div className="space-y-2 text-sm text-gray-600">
+              <p>• Search your meal history</p>
+              <p>• Enter any food name</p>
+              <p>• Get instant calorie estimates</p>
+              <p>• Track detailed nutrition</p>
+            </div>
+          </div>
+          
+          <div className="space-y-3">
+            <h4 className="font-medium text-gray-700">Measurement Examples</h4>
+            <div className="space-y-2 text-sm text-gray-600">
+              <p>• Weight: 100g, 2 oz, 1 lb</p>
+              <p>• Volume: 1 cup, 2 tbsp, 1 tsp</p>
+              <p>• Pieces: 1 medium, 1 slice, 1 whole</p>
+              <p>• Portions: 1 serving, handful, bunch</p>
+            </div>
+          </div>
+        </div>
+      </Card>
+
       {/* Main Calculator */}
       <Card className="p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg">
         <div className="flex items-center gap-3 mb-6">
@@ -616,51 +643,15 @@ function CalorieCalculator({
                 }}
                 onSearchChange={(query) => {
                   setIngredient(query);
-                  // Still show ingredient suggestions from database
-                  if (query.length >= 2) {
-                    const customSuggestions = EnhancedIngredientDatabaseManager.searchIngredients(query);
-                    setIngredientSuggestions(customSuggestions.slice(0, 6));
-                  } else {
-                    setIngredientSuggestions([]);
-                  }
+                  // Remove USDA suggestions - only show historical meal search
+                  setIngredientSuggestions([]);
                 }}
                 placeholder="Search today's meals, history, or new foods..."
                 className="w-full"
               />
               
-              {/* Ingredient Suggestions Dropdown */}
-              {ingredientSuggestions.length > 0 && ingredient.length >= 2 && (
-                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-64 overflow-y-auto">
-                  <div className="px-3 py-1 text-xs text-gray-500 bg-gray-50 border-b">
-                    USDA Database Suggestions
-                  </div>
-                  {ingredientSuggestions.map((suggestion, index) => (
-                    <button
-                      key={`${suggestion.category}-${suggestion.key}`}
-                      type="button"
-                      onClick={() => selectIngredient(suggestion)}
-                      className="w-full px-4 py-2 text-left hover:bg-blue-50 border-b border-gray-100 last:border-b-0"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-medium text-gray-900">{suggestion.data.displayName}</p>
-                          <p className="text-xs text-gray-500">{suggestion.category}</p>
-                        </div>
-                        <Badge 
-                          variant="outline" 
-                          style={{ backgroundColor: suggestion.data.tags.categoryColor + '40', color: '#374151' }}
-                          className="text-xs"
-                        >
-                          {suggestion.data.tags.dietType[0] || 'food'}
-                        </Badge>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
-              
               <p className="text-xs text-gray-500 mt-1">
-                Search your meal history or add new foods from the USDA database
+                Search your meal history or enter new food items
               </p>
             </div>
             
@@ -852,33 +843,6 @@ function CalorieCalculator({
           </div>
         </Card>
       )}
-
-      {/* User Guide Card */}
-      <Card className="p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">How to Use</h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-3">
-            <h4 className="font-medium text-gray-700">Ingredient Entry</h4>
-            <div className="space-y-2 text-sm text-gray-600">
-              <p>• Type any food name to search</p>
-              <p>• Use USDA database for accuracy</p>
-              <p>• Select from custom ingredients</p>
-              <p>• Get detailed nutrition breakdowns</p>
-            </div>
-          </div>
-          
-          <div className="space-y-3">
-            <h4 className="font-medium text-gray-700">Measurement Examples</h4>
-            <div className="space-y-2 text-sm text-gray-600">
-              <p>• Weight: 100g, 2 oz, 1 lb</p>
-              <p>• Volume: 1 cup, 2 tbsp, 1 tsp</p>
-              <p>• Pieces: 1 medium, 1 slice, 1 whole</p>
-              <p>• Portions: 1 serving, handful, bunch</p>
-            </div>
-          </div>
-        </div>
-      </Card>
     </div>
   );
 }

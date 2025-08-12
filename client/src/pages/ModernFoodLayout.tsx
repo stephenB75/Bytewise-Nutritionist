@@ -44,10 +44,11 @@ import {
 import { NotificationDropdown } from '@/components/NotificationDropdown';
 import { WeeklyCaloriesCard } from '@/components/WeeklyCaloriesCard';
 import { DateVerification } from '@/components/DateVerification';
+import { UserFoodSuggestions } from '@/components/UserFoodSuggestions';
 import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
-import { getWeekDates, getLocalDateKey } from '@/utils/dateUtils';
+import { getWeekDates, getLocalDateKey, getMealTypeByTime, formatLocalTime } from '@/utils/dateUtils';
 import { getCorrectedDate, getCorrectedWeekDates, getCorrectedDateKey } from '@/utils/dateAdjustment';
 
 // Types
@@ -1083,28 +1084,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                       variant="ghost" 
                       className="text-gray-400 hover:text-white"
                       onClick={() => {
-                        // Enhanced delete meal action with robust ID handling
+                        // Delete meal action
+                        // Remove meal from storage
                         const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-                        const mealIndex = loggedMeals.findIndex(m => m === meal);
-                        
-                        // Handle meals that might not have IDs (legacy data)
-                        const updated = stored.filter((m: any, storedIndex: number) => {
-                          // If target meal has no ID, use array index comparison
-                          if (!meal.id) {
-                            const keepByIndex = storedIndex !== mealIndex;
-                            return keepByIndex;
-                          }
-                          
-                          // If stored meal has no ID, keep it  
-                          if (!m.id) {
-                            return true;
-                          }
-                          
-                          // Both have IDs, compare them
-                          const match = String(m.id) !== String(meal.id);
-                          return match;
-                        });
-                        
+                        const updated = stored.filter((m: any) => m.id !== meal.id);
                         localStorage.setItem('weeklyMeals', JSON.stringify(updated));
                         
                         // Refresh meal list
@@ -1679,33 +1662,55 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     variant="ghost" 
                     className="text-gray-400 hover:text-white"
                     onClick={() => {
-                      // Remove meal from storage
+                      // Remove meal from storage using index and multiple identifiers for safety
                       const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-                      const updated = stored.filter((m: any) => m.id !== meal.id);
-                      localStorage.setItem('weeklyMeals', JSON.stringify(updated));
                       
-                      // Refresh meal list
-                      const today = new Date().toISOString().split('T')[0];
-                      const todayMeals = updated.filter((m: any) => m.date === today);
-                      setLoggedMeals(todayMeals);
+                      // Find the exact meal to remove using multiple criteria
+                      const mealIndex = stored.findIndex((m: any, idx: number) => {
+                        // Try multiple ways to identify the meal for robust deletion
+                        if (meal.id && m.id === meal.id) return true;
+                        if (m.name === meal.name && m.time === meal.time && m.date === meal.date) return true;
+                        if (idx === index && m.name === meal.name && Math.abs(m.calories - meal.calories) < 1) return true;
+                        return false;
+                      });
                       
-                      // Update daily calories and nutrition  
-                      const totalCalories = todayMeals.reduce((sum: number, m: any) => sum + (m.calories || 0), 0);
-                      setDailyCalories(totalCalories);
-                      
-                      // Recalculate macros and micronutrients after deletion
-                      const updatedMacros = todayMeals.reduce((totals: any, meal: any) => ({
-                        protein: totals.protein + (meal.protein || 0),
-                        carbs: totals.carbs + (meal.carbs || 0),
-                        fat: totals.fat + (meal.fat || 0)
-                      }), { protein: 0, carbs: 0, fat: 0 });
-                      setDailyMacros(updatedMacros);
-                      
-                      const updatedMicronutrients = calculateMicronutrients(todayMeals);
-                      setDailyMicronutrients(updatedMicronutrients);
-                      
-                      // Dispatch events
-                      window.dispatchEvent(new CustomEvent('refresh-weekly-data'));
+                      if (mealIndex !== -1) {
+                        // Remove the specific meal
+                        const updated = [...stored];
+                        updated.splice(mealIndex, 1);
+                        localStorage.setItem('weeklyMeals', JSON.stringify(updated));
+                        
+                        // Refresh meal list using corrected date
+                        const today = getCorrectedDateKey(getCorrectedDate());
+                        const todayMeals = updated.filter((m: any) => m.date === today);
+                        setLoggedMeals(todayMeals);
+                        
+                        // Update daily calories and nutrition  
+                        const totalCalories = todayMeals.reduce((sum: number, m: any) => sum + (m.calories || 0), 0);
+                        setDailyCalories(totalCalories);
+                        
+                        // Recalculate macros and micronutrients after deletion
+                        const updatedMacros = todayMeals.reduce((totals: any, meal: any) => ({
+                          protein: totals.protein + (meal.protein || 0),
+                          carbs: totals.carbs + (meal.carbs || 0),
+                          fat: totals.fat + (meal.fat || 0)
+                        }), { protein: 0, carbs: 0, fat: 0 });
+                        setDailyMacros(updatedMacros);
+                        
+                        const updatedMicronutrients = calculateMicronutrients(todayMeals);
+                        setDailyMicronutrients(updatedMicronutrients);
+                        
+                        // Dispatch events
+                        window.dispatchEvent(new CustomEvent('refresh-weekly-data'));
+                        
+                        // Show success message
+                        window.dispatchEvent(new CustomEvent('show-toast', {
+                          detail: { 
+                            message: `✅ Deleted ${meal.name}`,
+                            type: 'success'
+                          }
+                        }));
+                      }
                     }}
                   >
                     Delete
@@ -1714,6 +1719,51 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               </div>
             </Card>
           )))}
+        </div>
+
+        {/* User Food Suggestions - Only shows user-entered foods */}
+        <div className="space-y-4 mt-8">
+          <UserFoodSuggestions
+            onSelectFood={async (food) => {
+              // Re-log selected user food
+              const now = getCorrectedDate();
+              const mealType = getMealTypeByTime(now);
+              
+              const mealData = {
+                id: `relogged-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                name: food.name,
+                calories: food.calories,
+                protein: food.protein,
+                carbs: food.carbs,
+                fat: food.fat,
+                date: getCorrectedDateKey(now),
+                time: formatLocalTime(now),
+                mealType,
+                category: mealType,
+                timestamp: now.toISOString(),
+                source: 'user-suggestion'
+              };
+              
+              // Store in localStorage
+              const weeklyMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
+              weeklyMeals.push(mealData);
+              localStorage.setItem('weeklyMeals', JSON.stringify(weeklyMeals));
+              
+              // Refresh displays
+              window.dispatchEvent(new CustomEvent('calories-logged'));
+              window.dispatchEvent(new CustomEvent('meals-updated'));
+              window.dispatchEvent(new CustomEvent('refresh-weekly-data'));
+              
+              // Show success toast
+              window.dispatchEvent(new CustomEvent('show-toast', {
+                detail: { 
+                  message: `✅ Re-logged ${food.name}!`,
+                  type: 'success'
+                }
+              }));
+            }}
+            className="mb-6"
+          />
         </div>
 
         {/* Weekly Calories Summary */}
