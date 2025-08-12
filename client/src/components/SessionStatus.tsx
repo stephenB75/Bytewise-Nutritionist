@@ -25,7 +25,7 @@ export function SessionStatus() {
     const interval = setInterval(updateInfo, 60000); // Update every minute
 
     return () => clearInterval(interval);
-  }, [getSessionInfo]);
+  }, []); // Remove getSessionInfo from dependencies to prevent infinite loop
 
   const handleManualRefresh = async () => {
     setIsRefreshing(true);

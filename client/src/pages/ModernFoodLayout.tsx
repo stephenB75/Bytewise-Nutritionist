@@ -44,6 +44,7 @@ import {
 import { NotificationDropdown } from '@/components/NotificationDropdown';
 import { WeeklyCaloriesCard } from '@/components/WeeklyCaloriesCard';
 import { DateVerification } from '@/components/DateVerification';
+import { MealDateTestPanel } from '@/components/MealDateTestPanel';
 
 import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/hooks/use-toast';
@@ -361,6 +362,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           
           // Show user notification about the fix
           setTimeout(() => {
+            const { toast } = useToast();
             toast({
               title: "📅 Meal Dates Corrected",
               description: `Fixed ${dateCheck.mismatches.length} meal entries that were on the wrong day.`,
@@ -1174,6 +1176,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
             {/* Date Verification - Temporary for debugging */}
             <DateVerification />
+            
+            {/* Date Fix Test Panel - only show in development */}
+            {import.meta.env.DEV && (
+              <div className="mb-4">
+                <MealDateTestPanel />
+              </div>
+            )}
             
             {/* Include Weekly Calories Card */}
             <WeeklyCaloriesCard />

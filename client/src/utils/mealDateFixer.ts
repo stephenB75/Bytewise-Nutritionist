@@ -172,12 +172,19 @@ export function needsMealDateFix(): boolean {
  * Auto-fix meal dates if mismatches are detected
  */
 export function autoFixMealDatesIfNeeded(): boolean {
+  console.log('🔍 Checking for meal date mismatches...');
+  
   if (needsMealDateFix()) {
+    console.log('📅 Date mismatches detected, applying fixes...');
     const result = fixMealDateMismatches();
     if (result.success && result.fixedCount > 0) {
-      console.log(`Auto-fixed ${result.fixedCount} meal date(s)`);
+      console.log(`✅ Auto-fixed ${result.fixedCount} meal date(s)`);
       return true;
+    } else {
+      console.log('❌ Failed to fix meal dates:', result.error);
     }
+  } else {
+    console.log('✅ All meal dates are already correct');
   }
   return false;
 }
