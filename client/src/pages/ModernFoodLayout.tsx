@@ -39,7 +39,8 @@ import {
   UserCircle,
   Utensils,
   Clock,
-  CheckCircle2
+  CheckCircle2,
+  Trash2
 } from 'lucide-react';
 import { NotificationDropdown } from '@/components/NotificationDropdown';
 import { WeeklyCaloriesCard } from '@/components/WeeklyCaloriesCard';
@@ -1092,39 +1093,48 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     <p className="text-orange-400 font-bold text-lg">{Math.round(meal.calories || 0)} cal</p>
                     <Button 
                       size="sm" 
-                      variant="ghost" 
-                      className="text-gray-400 hover:text-white"
+                      variant="destructive" 
+                      className="mt-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 hover:text-red-300 border border-red-600/30 flex items-center gap-1"
                       onClick={() => {
-                        // Delete meal action
-                        // Remove meal from storage
-                        const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-                        const updated = stored.filter((m: any) => m.id !== meal.id);
-                        localStorage.setItem('weeklyMeals', JSON.stringify(updated));
-                        
-                        // Refresh meal list
-                        const today = getCorrectedDateKey(); // Use corrected date (Monday 11th)
-                        const todayMeals = updated.filter((m: any) => m.date === today);
-                        setLoggedMeals(todayMeals);
-                        
-                        // Update daily calories and nutrition
-                        const totalCalories = todayMeals.reduce((sum: number, m: any) => sum + (m.calories || 0), 0);
-                        setDailyCalories(totalCalories);
-                        
-                        // Recalculate macros and micronutrients after deletion
-                        const updatedMacros = todayMeals.reduce((totals: any, meal: any) => ({
-                          protein: totals.protein + (meal.protein || 0),
-                          carbs: totals.carbs + (meal.carbs || 0),
-                          fat: totals.fat + (meal.fat || 0)
-                        }), { protein: 0, carbs: 0, fat: 0 });
-                        setDailyMacros(updatedMacros);
-                        
-                        const updatedMicronutrients = calculateMicronutrients(todayMeals);
-                        setDailyMicronutrients(updatedMicronutrients);
-                        
-                        // Dispatch events
-                        window.dispatchEvent(new CustomEvent('refresh-weekly-data'));
+                        // Delete meal action with confirmation
+                        if (confirm(`Delete "${meal.name}"?`)) {
+                          // Remove meal from storage
+                          const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
+                          const updated = stored.filter((m: any) => m.id !== meal.id);
+                          localStorage.setItem('weeklyMeals', JSON.stringify(updated));
+                          
+                          // Refresh meal list
+                          const today = getCorrectedDateKey(); // Use corrected date (Monday 11th)
+                          const todayMeals = updated.filter((m: any) => m.date === today);
+                          setLoggedMeals(todayMeals);
+                          
+                          // Update daily calories and nutrition
+                          const totalCalories = todayMeals.reduce((sum: number, m: any) => sum + (m.calories || 0), 0);
+                          setDailyCalories(totalCalories);
+                          
+                          // Recalculate macros and micronutrients after deletion
+                          const updatedMacros = todayMeals.reduce((totals: any, meal: any) => ({
+                            protein: totals.protein + (meal.protein || 0),
+                            carbs: totals.carbs + (meal.carbs || 0),
+                            fat: totals.fat + (meal.fat || 0)
+                          }), { protein: 0, carbs: 0, fat: 0 });
+                          setDailyMacros(updatedMacros);
+                          
+                          const updatedMicronutrients = calculateMicronutrients(todayMeals);
+                          setDailyMicronutrients(updatedMicronutrients);
+                          
+                          // Dispatch events
+                          window.dispatchEvent(new CustomEvent('refresh-weekly-data'));
+                          
+                          // Show success toast
+                          toast({
+                            title: "Meal deleted",
+                            description: `"${meal.name}" has been removed from your log.`,
+                          });
+                        }
                       }}
                     >
+                      <Trash2 className="w-3 h-3" />
                       Delete
                     </Button>
                   </div>
