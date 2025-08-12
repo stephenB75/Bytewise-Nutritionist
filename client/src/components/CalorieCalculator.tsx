@@ -224,7 +224,7 @@ function CalorieCalculator({
     const scalingFactor = caloriesPer100g > 0 ? analysis.estimatedCalories / caloriesPer100g : 1;
 
     const mealData: LoggedMealData = {
-      id: `calc-${Date.now()}`,
+      id: `calc-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
       name: `${analysis.ingredient} (${analysis.measurement})`,
       calories: analysis.estimatedCalories,
       // Scale macronutrients based on actual serving size

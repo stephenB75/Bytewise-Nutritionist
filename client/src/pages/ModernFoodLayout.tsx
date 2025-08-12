@@ -1115,8 +1115,14 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                             console.log('Current stored meals:', stored.length);
                             console.log('All meal IDs:', stored.map((m: any) => ({ name: m.name, id: m.id, idType: typeof m.id })));
                             
-                            // Use a more robust filter that handles different ID types
+                            // Use a more robust filter with null/undefined checks
                             const updated = stored.filter((m: any) => {
+                              // Ensure both IDs exist and are not null/undefined
+                              if (!m.id || !meal.id) {
+                                console.log(`Missing ID - stored meal: ${m.id}, target meal: ${meal.id}`);
+                                return m.id !== meal.id; // Keep if IDs are different (including undefined cases)
+                              }
+                              
                               const match = String(m.id) !== String(meal.id);
                               console.log(`Comparing meal "${m.name}" (ID: ${m.id}) with target "${meal.name}" (ID: ${meal.id}) - Keep: ${match}`);
                               return match;
@@ -1303,6 +1309,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                                 console.log('Weekly view - Stored meals:', stored.length);
                                 
                                 const updated = stored.filter((m: any) => {
+                                  // Ensure both IDs exist
+                                  if (!m.id || !meal.id) {
+                                    console.log(`Weekly - Missing ID - stored: ${m.id}, target: ${meal.id}`);
+                                    return m.id !== meal.id;
+                                  }
+                                  
                                   const keep = String(m.id) !== String(meal.id);
                                   console.log(`Weekly: Keep "${m.name}" (${m.id})? ${keep}`);
                                   return keep;
