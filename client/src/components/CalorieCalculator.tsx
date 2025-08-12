@@ -13,7 +13,7 @@ import { apiRequest } from '@/lib/queryClient';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
 import { EnhancedIngredientDatabaseManager, type IngredientData } from '@/data/enhancedIngredientDatabase';
 import { getLocalDateKey, formatLocalTime, getMealTypeByTime } from '@/utils/dateUtils';
 import { getCorrectedDate, getCorrectedDateKey } from '@/utils/dateAdjustment';
@@ -115,14 +115,10 @@ function CalorieCalculator({
   // State management
   const [ingredient, setIngredient] = useState('');
   const [measurement, setMeasurement] = useState('');
-  const [selectedUnit, setSelectedUnit] = useState('');
-  const [amount, setAmount] = useState('');
   const [recentAnalyses, setRecentAnalyses] = useState<IngredientAnalysis[]>([]);
   const [showLoggedAnimation, setShowLoggedAnimation] = useState(false);
   const [loggedData, setLoggedData] = useState<any>(null);
   const [ingredientSuggestions, setIngredientSuggestions] = useState<Array<{category: string; key: string; data: IngredientData}>>([]);
-  const [selectedIngredient, setSelectedIngredient] = useState<{category: string; key: string; data: IngredientData} | null>(null);
-  const [availableUnits, setAvailableUnits] = useState<string[]>([]);
 
   // Achievement system hook
   const checkAchievements = useCheckAchievements();
@@ -138,19 +134,7 @@ function CalorieCalculator({
     }
   }, [ingredient, isCompact]);
 
-  // Update available units when ingredient is selected
-  useEffect(() => {
-    if (selectedIngredient) {
-      const units = EnhancedIngredientDatabaseManager.getAvailableUnits(
-        selectedIngredient.category, 
-        selectedIngredient.key
-      );
-      setAvailableUnits(units);
-      if (units.length > 0 && !selectedUnit) {
-        setSelectedUnit(units[0]);
-      }
-    }
-  }, [selectedIngredient]);
+
 
   // Calculate calories mutation
   const calculateCalories = useMutation({
@@ -196,30 +180,16 @@ function CalorieCalculator({
   const resetForm = () => {
     setIngredient('');
     setMeasurement('');
-    setAmount('');
-    setSelectedUnit('');
-    setSelectedIngredient(null);
   };
 
-  const selectIngredient = (suggestion: {category: string; key: string; data: IngredientData}) => {
-    setSelectedIngredient(suggestion);
-    setIngredient(suggestion.data.displayName);
-    setIngredientSuggestions([]);
-  };
+
 
   const handleCalculate = (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!ingredient.trim()) return;
 
-    let measurementText = '';
-    if (selectedIngredient && amount && selectedUnit) {
-      measurementText = `${amount} ${selectedUnit}`;
-      calculateCalories.mutate({ 
-        ingredient: selectedIngredient.data.usdaQuery || ingredient.trim(), 
-        measurement: measurementText 
-      });
-    } else if (measurement.trim()) {
+    if (measurement.trim()) {
       calculateCalories.mutate({ ingredient: ingredient.trim(), measurement: measurement.trim() });
     } else {
       calculateCalories.mutate({ ingredient: ingredient.trim(), measurement: '100g' });
