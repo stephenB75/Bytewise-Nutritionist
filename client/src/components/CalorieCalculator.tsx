@@ -834,9 +834,33 @@ function UserFoodTextSuggestions({ onSuggestionClick }: { onSuggestionClick: (fo
       try {
         const weeklyMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
         
-        // Extract unique foods with their nutritional data
+        // Calculate one week ago from current date
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+        
+        // Extract unique foods with their nutritional data from last week only
         const userEnteredFoods = weeklyMeals
-          .filter((meal: any) => meal.source === 'user-suggestion' || meal.source === 'calculator')
+          .filter((meal: any) => {
+            // Only include user-entered meals
+            if (meal.source !== 'user-suggestion' && meal.source !== 'calculator') {
+              return false;
+            }
+            
+            // Only include meals from the last week
+            if (meal.date) {
+              const mealDate = new Date(meal.date);
+              return mealDate >= oneWeekAgo;
+            }
+            
+            // If no date, check if it has a dateKey in the last week
+            if (meal.dateKey) {
+              const mealDate = new Date(meal.dateKey);
+              return mealDate >= oneWeekAgo;
+            }
+            
+            // If no date info, exclude it (likely old data)
+            return false;
+          })
           .reduce((unique: UserFoodData[], meal: any) => {
             const foodName = meal.name.split(' (')[0]; // Remove measurement part
             
@@ -887,7 +911,7 @@ function UserFoodTextSuggestions({ onSuggestionClick }: { onSuggestionClick: (fo
 
   return (
     <div className="mt-4 pt-3 border-t border-gray-200">
-      <p className="text-xs text-gray-500 mb-3">Quick suggestions:</p>
+      <p className="text-xs text-gray-500 mb-3">Quick suggestions (last 7 days):</p>
       <div className="space-y-3">
         {userFoods.map((food) => (
           <div key={food.name} className="text-sm border border-gray-200 rounded-lg p-3 hover:bg-gray-50 transition-colors">
