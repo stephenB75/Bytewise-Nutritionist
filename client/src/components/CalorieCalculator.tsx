@@ -533,6 +533,10 @@ function CalorieCalculator({
       <Card className="p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg">
         <h3 className="text-lg font-bold text-gray-900 mb-4">How to Use</h3>
         
+        <p className="text-sm text-gray-700 mb-4">
+          To use the calorie calculator enter exactly what you ate and add the portion size. The calorie calculator will correctly provide the macro and micro breakdown of your meal showing the calorie amount.
+        </p>
+        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-3">
             <h4 className="font-medium text-gray-700">Ingredient Entry</h4>
