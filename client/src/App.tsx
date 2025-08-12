@@ -19,6 +19,7 @@ import { useDataRestoration } from '@/hooks/useDataRestoration';
 import { DataSyncIndicator } from '@/components/DataSyncIndicator';
 import { useSessionManager } from '@/hooks/useSessionManager';
 import { PWAUpdateNotification } from '@/components/PWAUpdateNotification';
+import { initDataProtection } from '@/utils/dataProtection';
 
 function AppContent() {
   const [activeTab, setActiveTab] = useState<string>('redesigned');
@@ -30,6 +31,11 @@ function AppContent() {
   
   // Initialize 24-hour session management
   useSessionManager();
+  
+  // Initialize data protection on app mount
+  useEffect(() => {
+    initDataProtection();
+  }, []);
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
