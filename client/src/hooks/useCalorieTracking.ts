@@ -52,7 +52,7 @@ export function useCalorieTracking() {
     
     // Listen for data migration completion
     const handleDataMigrated = () => {
-      console.log('Data migration detected, reloading calculated calories');
+      // Data migration detected, reloading calculated calories
       const migrated = loadFromLocalStorage();
       if (migrated && Array.isArray(migrated)) {
         setCalculatedCalories(migrated);

@@ -75,7 +75,7 @@ export function useWeeklyTracker() {
     
     // Listen for data migration completion
     const handleDataMigrated = () => {
-      console.log('Data migration detected, reloading weekly tracker data');
+      // Data migration detected, reloading weekly tracker data
       const migrated = loadFromLocalStorage();
       if (migrated && Array.isArray(migrated)) {
         setWeeklyData(migrated);

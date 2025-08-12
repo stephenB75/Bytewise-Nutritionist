@@ -166,7 +166,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
       // Refetch user data to show updated information
       await refetch();
       
-      // Debug logging for profile update verification
+
       
       // Dispatch custom event to notify dashboard of profile changes
       window.dispatchEvent(new CustomEvent('user-profile-updated', { 

@@ -1,7 +1,7 @@
 ## Overview
 bytewise nutritionist is a comprehensive Progressive Web App (PWA) designed for nutrition tracking, meal planning, and recipe building. Its core purpose is to empower users to achieve their health goals through an intuitive, mobile-first interface. The application emphasizes professional mobile interactions, robust design, and real-time data for personalized health management, aiming to deliver a professional-grade nutrition tracking experience.
 
-**Current Status**: BETA v1.2.0 (August 12, 2025) - Enhanced suggestion system with streamlined search interface and complete nutritional display for improved user experience.
+**Current Status**: BETA v1.21.0 (August 12, 2025) - Code cleanup and optimization release with fixed calendar alignment, removed debug tools, and production-ready interface.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
@@ -38,14 +38,14 @@ Preferred communication style: Simple, everyday language.
 - **Recipe Creation**: Dynamic nutrition calculation as ingredients are added.
 - **Tracking**: Daily goals, aggregated consumption, calendar view for historical data, and weekly calorie breakdown.
 - **User Profile**: Comprehensive profile with personal info, preferences, and an achievement system. Consolidated user settings manager with tabbed navigation.
-- **Data Management**: Comprehensive dual-layer persistence system with automatic localStorage saving and database synchronization. Features include auto-save intervals (30s), save on page unload/tab switch, data restoration on login, visual sync indicators, and PDF export system for progress reports. Zero data loss guaranteed with multiple backup layers.
+- **Data Management**: Comprehensive dual-layer persistence system with automatic localStorage saving and database synchronization. Features include auto-save intervals (30s), save on page unload/tab switch, data restoration on login, visual sync indicators, and PDF export system for progress reports. Zero data loss guaranteed with multiple backup layers. Clean production interface with streamlined data management panel.
 - **Native Mobile Support**: Android and iOS support using Capacitor framework with relevant mobile plugins.
 - **User Interaction**: Notification bell icon with dropdown functionality, confetti celebrations.
 - **USDA Bulk Download System**: Local copy of USDA foods database for offline capabilities and improved performance, with batch processing and caching. Enhanced international food matching with dedicated portion weights for 75+ global dishes and full Caribbean cuisine support.
 - **Profile System**: Clean unified accordion system for Profile, Awards, and Data Management cards with proper state management and text orientation fixes. Consolidated CSS classes for consistent styling across profile components.
 - **iOS Deployment Ready**: Comprehensive code cleanup completed with production Capacitor configuration, automated build scripts, and App Store deployment checklist. Removed all debug code and optimized for mobile performance.
 - **Session Management**: 24-hour extended sessions with automatic token refresh, activity tracking, visual session status display, and warning notifications 30 minutes before expiry. Sessions extend with user activity for uninterrupted workflow.
-- **Date Correction System**: Automatic date adjustment utility that corrects system date discrepancies (e.g., showing Tuesday Aug 12 when actual is Monday Aug 11). Ensures consistent date handling across all components with getCorrectedDate(), getCorrectedWeekDates(), and getCorrectedDateKey() functions.
+- **Calendar System**: Accurate date handling system displaying correct day-date alignment in weekly views. Weekly summary shows actual calendar dates without forced corrections for proper user experience.
 
 ## External Dependencies
 

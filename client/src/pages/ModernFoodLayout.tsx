@@ -369,13 +369,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         }), { protein: 0, carbs: 0, fat: 0 });
         setDailyMacros(dailyMacroTotals);
         
-        // Calculate micronutrients from today's meals (uses real data when available)
+        // Calculate micronutrients from today's meals
         const micronutrients = calculateMicronutrients(todayMeals);
         
-        // Debug: Log micronutrient data to verify it's being calculated correctly
-        // Micronutrients calculated successfully
-        
-        // Ensure state is updated with new object reference for React to detect change
+        // Update micronutrients state
         setDailyMicronutrients({
           vitaminC: micronutrients.vitaminC || 0,
           vitaminD: micronutrients.vitaminD || 0,
@@ -408,7 +405,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         setWeeklyCalories(weeklyTotal);
         
       } catch (error) {
-        console.error('Error loading meal data:', error);
         // Reset to safe state on error
         setLoggedMeals([]);
         setDailyCalories(0);

@@ -42,7 +42,7 @@ export function useSessionManager() {
         }
 
         if (data.session) {
-          console.log('Session refreshed successfully');
+          // Session refreshed successfully
           
           // Store refresh timestamp in localStorage
           localStorage.setItem('bytewise-last-refresh', Date.now().toString());
