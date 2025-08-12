@@ -55,11 +55,11 @@ export function LoggedFoodSuggestions({
   // Show loading state
   if (isLoading) {
     return (
-      <Card className={`p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg ${className}`}>
-        <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Add from History</h3>
+      <Card className={`p-6 border-2 border-[#faed39] shadow-xl ${className}`}>
+        <h3 className="text-lg font-bold text-[#1f4aa6] mb-4">Quick Add from History</h3>
         <div className="flex items-center justify-center py-8">
-          <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
-          <span className="ml-2 text-sm text-gray-500">Loading meal history...</span>
+          <Loader2 className="h-6 w-6 animate-spin text-[#1f4aa6]" />
+          <span className="ml-2 text-sm text-gray-600">Loading meal history...</span>
         </div>
       </Card>
     );
@@ -68,8 +68,8 @@ export function LoggedFoodSuggestions({
   // Show error state
   if (error) {
     return (
-      <Card className={`p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg ${className}`}>
-        <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Add from History</h3>
+      <Card className={`p-6 border-2 border-[#faed39] shadow-xl ${className}`}>
+        <h3 className="text-lg font-bold text-[#1f4aa6] mb-4">Quick Add from History</h3>
         <div className="text-center py-4">
           <Utensils className="h-8 w-8 text-gray-300 mx-auto mb-2" />
           <p className="text-sm text-gray-500">
@@ -81,8 +81,8 @@ export function LoggedFoodSuggestions({
   }
 
   return (
-    <Card className={`p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg ${className}`}>
-      <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Add from History</h3>
+    <Card className={`p-6 border-2 border-[#faed39] shadow-xl ${className}`}>
+      <h3 className="text-lg font-bold text-[#1f4aa6] mb-4">Quick Add from History</h3>
       
       {frequentMeals.length === 0 && recentMeals.length === 0 ? (
         <div className="text-center py-4">
@@ -92,40 +92,44 @@ export function LoggedFoodSuggestions({
           </p>
         </div>
       ) : (
-        <div className="flex gap-3 overflow-x-auto pb-2">
-          {/* Combine all meals in a single row */}
+        <div className="space-y-2">
+          {/* Stack all meals vertically */}
           {[...frequentMeals, ...recentMeals].map((meal, index) => {
             const isFrequent = index < frequentMeals.length;
             return (
               <Button
                 key={`meal-${meal.id}-${index}`}
-                variant="outline"
-                size="sm"
+                variant="ghost"
                 onClick={() => onSelectFood(meal)}
-                className="flex-shrink-0 min-w-[200px] h-auto p-3 flex flex-col items-start hover:bg-blue-50 hover:border-blue-300 transition-colors"
+                className="w-full h-auto p-3 flex items-center justify-between hover:bg-[#faed39]/10 hover:border-[#faed39] border-2 border-transparent transition-all group"
               >
-                <div className="flex items-center justify-between w-full mb-2">
-                  <span className="text-sm font-medium text-gray-900 line-clamp-1">{meal.name}</span>
-                  <Plus className="h-4 w-4 text-gray-400 ml-2" />
-                </div>
-                <div className="flex items-center gap-2 text-xs text-gray-500">
+                <div className="flex items-center gap-3 flex-1 text-left">
                   {isFrequent ? (
-                    <TrendingUp className="h-3 w-3 text-orange-500" />
+                    <TrendingUp className="h-4 w-4 text-[#faed39] flex-shrink-0" />
                   ) : (
-                    <Clock className="h-3 w-3 text-blue-500" />
+                    <Clock className="h-4 w-4 text-[#1f4aa6] flex-shrink-0" />
                   )}
-                  <span>{meal.calories} cal</span>
-                  {isFrequent && meal.frequency && meal.frequency > 1 && (
-                    <Badge variant="outline" className="text-xs px-1 py-0">
-                      {meal.frequency}x
-                    </Badge>
-                  )}
-                  {!isFrequent && (
-                    <Badge variant="outline" className="text-xs px-1 py-0">
-                      {meal.mealType}
-                    </Badge>
-                  )}
+                  <div className="flex-1">
+                    <p className="font-semibold text-[#0a0a00] text-sm">{meal.name}</p>
+                    <div className="flex items-center gap-3 mt-1">
+                      <span className="text-xs text-gray-600">{meal.calories} cal</span>
+                      <span className="text-xs text-gray-500">P: {meal.protein}g</span>
+                      <span className="text-xs text-gray-500">C: {meal.carbs}g</span>
+                      <span className="text-xs text-gray-500">F: {meal.fat}g</span>
+                      {isFrequent && meal.frequency && meal.frequency > 1 && (
+                        <Badge className="bg-[#45c73e] text-white border-0 text-xs px-2 py-0">
+                          {meal.frequency}x
+                        </Badge>
+                      )}
+                      {!isFrequent && (
+                        <Badge className="bg-[#1f4aa6] text-white border-0 text-xs px-2 py-0">
+                          {meal.mealType}
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
                 </div>
+                <Plus className="h-5 w-5 text-[#1f4aa6] group-hover:text-[#45c73e] transition-colors" />
               </Button>
             );
           })}
