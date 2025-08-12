@@ -228,7 +228,10 @@ export function WeeklyDateDebugger() {
 
         <div className="text-xs text-yellow-700 bg-yellow-100 p-2 rounded">
           💡 This debug panel helps identify why Monday 11th meals aren't showing in the weekly summary.
-          Check if the Monday date calculation matches the meal date format.
+          <br />
+          <strong>DIAGNOSIS:</strong> The issue is likely a strict date comparison in WeeklyCaloriesCard filtering.
+          <br />
+          <strong>FIX APPLIED:</strong> Enhanced filtering now tries both exact match and date parsing comparison.
         </div>
       </div>
     </Card>

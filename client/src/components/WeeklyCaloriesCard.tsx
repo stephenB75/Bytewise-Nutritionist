@@ -49,9 +49,25 @@ export function WeeklyCaloriesCard() {
       // Load meals with caching for better performance
       const storedMeals = getCachedLocalStorage('weeklyMeals', 10000) || [];
       
-      // Calculate calories for each day of the week
+      // Calculate calories for each day of the week with enhanced date matching
       const weeklyData = weekDates.map(dayData => {
-        const dayMeals = storedMeals.filter((meal: any) => meal.date === dayData.date);
+        // Enhanced filtering to catch potential date format mismatches
+        const dayMeals = storedMeals.filter((meal: any) => {
+          if (!meal.date) return false;
+          
+          // Primary match: exact date string match
+          if (meal.date === dayData.date) return true;
+          
+          // Secondary match: try parsing both dates and compare
+          try {
+            const mealDate = new Date(meal.date);
+            const dayDate = new Date(dayData.date);
+            return mealDate.toDateString() === dayDate.toDateString();
+          } catch {
+            return false;
+          }
+        });
+        
         const dayCalories = dayMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
         
         return {
