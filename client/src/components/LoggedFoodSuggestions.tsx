@@ -12,7 +12,11 @@ import {
   Clock,
   Utensils,
   Plus,
-  Loader2
+  Loader2,
+  Coffee,
+  Sun,
+  Moon,
+  Cookie
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 
@@ -122,8 +126,17 @@ export function LoggedFoodSuggestions({
                         </Badge>
                       )}
                       {!isFrequent && (
-                        <Badge className="bg-[#1f4aa6] text-white border-0 text-xs px-2 py-0">
-                          {meal.mealType}
+                        <Badge className={`text-white border-0 text-xs px-2 py-0 flex items-center gap-1 ${
+                          meal.mealType === 'breakfast' ? 'bg-orange-500' :
+                          meal.mealType === 'lunch' ? 'bg-blue-500' :
+                          meal.mealType === 'dinner' ? 'bg-purple-500' :
+                          'bg-gray-500'
+                        }`}>
+                          {meal.mealType === 'breakfast' && <Coffee className="w-3 h-3" />}
+                          {meal.mealType === 'lunch' && <Sun className="w-3 h-3" />}
+                          {meal.mealType === 'dinner' && <Moon className="w-3 h-3" />}
+                          {meal.mealType === 'snack' && <Cookie className="w-3 h-3" />}
+                          {meal.mealType.charAt(0).toUpperCase() + meal.mealType.slice(1)}
                         </Badge>
                       )}
                     </div>
