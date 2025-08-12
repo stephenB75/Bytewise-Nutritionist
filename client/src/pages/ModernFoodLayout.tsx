@@ -1108,12 +1108,19 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                         if (confirmDelete) {
                           try {
                             console.log('Starting deletion process...');
+                            console.log('Meal to delete:', meal.name, 'ID:', meal.id, 'Type of ID:', typeof meal.id);
                             
                             // Remove meal from localStorage
                             const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
                             console.log('Current stored meals:', stored.length);
+                            console.log('All meal IDs:', stored.map((m: any) => ({ name: m.name, id: m.id, idType: typeof m.id })));
                             
-                            const updated = stored.filter((m: any) => m.id !== meal.id);
+                            // Use a more robust filter that handles different ID types
+                            const updated = stored.filter((m: any) => {
+                              const match = String(m.id) !== String(meal.id);
+                              console.log(`Comparing meal "${m.name}" (ID: ${m.id}) with target "${meal.name}" (ID: ${meal.id}) - Keep: ${match}`);
+                              return match;
+                            });
                             console.log('Updated meals after filter:', updated.length);
                             
                             localStorage.setItem('weeklyMeals', JSON.stringify(updated));
@@ -1289,9 +1296,18 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                             
                             if (confirmDelete) {
                               try {
-                                // Remove meal from localStorage
+                                console.log('Weekly view - Deleting meal:', meal.name, 'ID:', meal.id, 'Type:', typeof meal.id);
+                                
+                                // Remove meal from localStorage with robust ID comparison
                                 const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-                                const updated = stored.filter((m: any) => m.id !== meal.id);
+                                console.log('Weekly view - Stored meals:', stored.length);
+                                
+                                const updated = stored.filter((m: any) => {
+                                  const keep = String(m.id) !== String(meal.id);
+                                  console.log(`Weekly: Keep "${m.name}" (${m.id})? ${keep}`);
+                                  return keep;
+                                });
+                                console.log('Weekly view - After filter:', updated.length);
                                 localStorage.setItem('weeklyMeals', JSON.stringify(updated));
                                 
                                 // Update daily calories if deleting today's meal
