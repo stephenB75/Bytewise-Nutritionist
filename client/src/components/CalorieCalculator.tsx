@@ -32,6 +32,7 @@ import {
   Droplets,
   Calendar
 } from 'lucide-react';
+import { FoodSearchWithHistory } from '@/components/FoodSearchWithHistory';
 
 interface IngredientAnalysis {
   ingredient: string;
@@ -368,11 +369,45 @@ function CalorieCalculator({
         
         <form onSubmit={handleCalculate} className="space-y-3">
           <div className="grid grid-cols-1 gap-2">
-            <Input
-              placeholder="Ingredient (e.g., chicken breast, apple)"
-              value={ingredient}
-              onChange={(e) => setIngredient(e.target.value)}
-              className="text-base"
+            <FoodSearchWithHistory
+              onSelectFood={async (food) => {
+                // Quick re-log from history
+                const now = new Date();
+                const mealType = getMealTypeByTime(now);
+                
+                const mealData: LoggedMealData = {
+                  id: `relogged-${Date.now()}`,
+                  name: food.name,
+                  calories: food.calories,
+                  protein: food.protein,
+                  carbs: food.carbs,
+                  fat: food.fat,
+                  date: getLocalDateKey(now),
+                  time: formatLocalTime(now),
+                  mealType,
+                  category: mealType,
+                  timestamp: now.toISOString(),
+                  source: 'history'
+                };
+                
+                const weeklyMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
+                weeklyMeals.push(mealData);
+                localStorage.setItem('weeklyMeals', JSON.stringify(weeklyMeals));
+                
+                window.dispatchEvent(new CustomEvent('calories-logged'));
+                window.dispatchEvent(new CustomEvent('meals-updated'));
+                
+                // Show toast
+                window.dispatchEvent(new CustomEvent('show-toast', {
+                  detail: { 
+                    message: `✅ Re-logged ${food.name}!`,
+                    type: 'success'
+                  }
+                }));
+              }}
+              onSearchChange={(query) => setIngredient(query)}
+              placeholder="Search meals or add new..."
+              className="w-full"
             />
             <Input
               placeholder="Measurement (e.g., 1 cup, 100g, 1 medium)"
@@ -518,21 +553,85 @@ function CalorieCalculator({
 
         <form onSubmit={handleCalculate} className="space-y-4">
           <div className="grid grid-cols-1 gap-4">
-            {/* Ingredient Input with Suggestions */}
-            <div className="relative">
+            {/* Enhanced Food Search with History */}
+            <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Ingredient Name
+                Search Food
               </label>
-              <Input
-                placeholder="e.g., chicken breast, Greek yogurt, banana, pizza, ice cream"
-                value={ingredient}
-                onChange={(e) => setIngredient(e.target.value)}
-                className="text-base"
+              <FoodSearchWithHistory
+                onSelectFood={async (food) => {
+                  // For historical meals, we can directly log them
+                  const now = new Date();
+                  const mealType = getMealTypeByTime(now);
+                  
+                  // Create the logged meal data
+                  const mealData: LoggedMealData = {
+                    id: `relogged-${Date.now()}`,
+                    name: food.name,
+                    calories: food.calories,
+                    protein: food.protein,
+                    carbs: food.carbs,
+                    fat: food.fat,
+                    date: getLocalDateKey(now),
+                    time: formatLocalTime(now),
+                    mealType,
+                    category: mealType,
+                    timestamp: now.toISOString(),
+                    source: 'history'
+                  };
+                  
+                  // Store in localStorage
+                  const weeklyMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
+                  weeklyMeals.push(mealData);
+                  localStorage.setItem('weeklyMeals', JSON.stringify(weeklyMeals));
+                  
+                  // Save to database
+                  try {
+                    await apiRequest('POST', '/api/meals/logged', {
+                      name: mealData.name,
+                      date: mealData.timestamp,
+                      mealType: mealData.mealType,
+                      totalCalories: mealData.calories,
+                      totalProtein: mealData.protein,
+                      totalCarbs: mealData.carbs,
+                      totalFat: mealData.fat
+                    });
+                    
+                    // Show success animation
+                    setLoggedData(mealData);
+                    setShowLoggedAnimation(true);
+                    setTimeout(() => setShowLoggedAnimation(false), 3000);
+                    
+                    // Dispatch events for other components
+                    window.dispatchEvent(new CustomEvent('calories-logged'));
+                    window.dispatchEvent(new CustomEvent('meals-updated'));
+                    
+                    // Check achievements
+                    checkAchievements.mutate();
+                  } catch (error) {
+                    console.error('Failed to save meal to database:', error);
+                  }
+                }}
+                onSearchChange={(query) => {
+                  setIngredient(query);
+                  // Still show ingredient suggestions from database
+                  if (query.length >= 2) {
+                    const customSuggestions = EnhancedIngredientDatabaseManager.searchIngredients(query);
+                    setIngredientSuggestions(customSuggestions.slice(0, 6));
+                  } else {
+                    setIngredientSuggestions([]);
+                  }
+                }}
+                placeholder="Search today's meals, history, or new foods..."
+                className="w-full"
               />
               
               {/* Ingredient Suggestions Dropdown */}
-              {ingredientSuggestions.length > 0 && (
+              {ingredientSuggestions.length > 0 && ingredient.length >= 2 && (
                 <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-64 overflow-y-auto">
+                  <div className="px-3 py-1 text-xs text-gray-500 bg-gray-50 border-b">
+                    USDA Database Suggestions
+                  </div>
                   {ingredientSuggestions.map((suggestion, index) => (
                     <button
                       key={`${suggestion.category}-${suggestion.key}`}
@@ -559,7 +658,7 @@ function CalorieCalculator({
               )}
               
               <p className="text-xs text-gray-500 mt-1">
-                Search any food item - from fresh ingredients to packaged foods and restaurant meals
+                Search your meal history or add new foods from the USDA database
               </p>
             </div>
             
