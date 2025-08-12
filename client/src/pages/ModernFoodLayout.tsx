@@ -46,6 +46,7 @@ import { WeeklyCaloriesCard } from '@/components/WeeklyCaloriesCard';
 import { DateVerification } from '@/components/DateVerification';
 import { MealDateTestPanel } from '@/components/MealDateTestPanel';
 import { DataPersistenceTest } from '@/components/DataPersistenceTest';
+import { WeeklyDateDebugger } from '@/components/WeeklyDateDebugger';
 
 import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/hooks/use-toast';
@@ -1183,6 +1184,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <div className="space-y-4 mb-4">
                 <MealDateTestPanel />
                 <DataPersistenceTest />
+                <WeeklyDateDebugger />
               </div>
             )}
             
