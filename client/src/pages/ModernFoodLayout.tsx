@@ -1083,10 +1083,28 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                       variant="ghost" 
                       className="text-gray-400 hover:text-white"
                       onClick={() => {
-                        // Delete meal action
-                        // Remove meal from storage
+                        // Enhanced delete meal action with robust ID handling
                         const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-                        const updated = stored.filter((m: any) => m.id !== meal.id);
+                        const mealIndex = loggedMeals.findIndex(m => m === meal);
+                        
+                        // Handle meals that might not have IDs (legacy data)
+                        const updated = stored.filter((m: any, storedIndex: number) => {
+                          // If target meal has no ID, use array index comparison
+                          if (!meal.id) {
+                            const keepByIndex = storedIndex !== mealIndex;
+                            return keepByIndex;
+                          }
+                          
+                          // If stored meal has no ID, keep it  
+                          if (!m.id) {
+                            return true;
+                          }
+                          
+                          // Both have IDs, compare them
+                          const match = String(m.id) !== String(meal.id);
+                          return match;
+                        });
+                        
                         localStorage.setItem('weeklyMeals', JSON.stringify(updated));
                         
                         // Refresh meal list
