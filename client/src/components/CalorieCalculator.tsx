@@ -34,6 +34,7 @@ import {
   Calendar
 } from 'lucide-react';
 import { SimpleFoodSearch } from '@/components/SimpleFoodSearch';
+import { LoggedFoodSuggestions } from '@/components/LoggedFoodSuggestions';
 
 interface IngredientAnalysis {
   ingredient: string;
@@ -775,6 +776,16 @@ function CalorieCalculator({
           </div>
         </div>
       </Card>
+
+      {/* Logged Food Suggestions */}
+      <LoggedFoodSuggestions 
+        onSelectFood={(food) => {
+          // Set the ingredient and measurement fields when a suggestion is clicked
+          setIngredient(food.name);
+          setMeasurement('1 serving');
+          // Optionally, you could auto-calculate or provide quick-add functionality
+        }}
+      />
     </div>
   );
 }
