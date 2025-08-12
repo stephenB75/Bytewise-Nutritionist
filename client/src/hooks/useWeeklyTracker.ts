@@ -72,6 +72,18 @@ export function useWeeklyTracker() {
         }
       }
     }
+    
+    // Listen for data migration completion
+    const handleDataMigrated = () => {
+      console.log('Data migration detected, reloading weekly tracker data');
+      const migrated = loadFromLocalStorage();
+      if (migrated && Array.isArray(migrated)) {
+        setWeeklyData(migrated);
+      }
+    };
+    
+    window.addEventListener('data-migrated', handleDataMigrated);
+    return () => window.removeEventListener('data-migrated', handleDataMigrated);
 
     // Set current week using local timezone
     const weekStart = getWeekStart(new Date());

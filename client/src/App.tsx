@@ -20,6 +20,7 @@ import { DataSyncIndicator } from '@/components/DataSyncIndicator';
 import { useSessionManager } from '@/hooks/useSessionManager';
 import { PWAUpdateNotification } from '@/components/PWAUpdateNotification';
 import { initDataProtection } from '@/utils/dataProtection';
+import { runDataMigration } from '@/utils/dataMigration';
 
 function AppContent() {
   const [activeTab, setActiveTab] = useState<string>('redesigned');
@@ -32,9 +33,19 @@ function AppContent() {
   // Initialize 24-hour session management
   useSessionManager();
   
-  // Initialize data protection on app mount
+  // Initialize data protection and migration on app mount
   useEffect(() => {
     initDataProtection();
+    
+    // Run data migration to convert weeklyMeals to proper format
+    setTimeout(() => {
+      const migrated = runDataMigration();
+      if (migrated) {
+        console.log('Data migration completed - your historical data should now be visible');
+        // Refresh components to show migrated data
+        window.dispatchEvent(new CustomEvent('data-migrated'));
+      }
+    }, 500);
   }, []);
 
   const handleTabChange = (tab: string) => {

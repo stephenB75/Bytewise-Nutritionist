@@ -49,6 +49,23 @@ export function useCalorieTracking() {
         .reduce((sum: number, entry: CalculatedCalories) => sum + entry.calories, 0);
       setDailyTotal(todaysTotal);
     }
+    
+    // Listen for data migration completion
+    const handleDataMigrated = () => {
+      console.log('Data migration detected, reloading calculated calories');
+      const migrated = loadFromLocalStorage();
+      if (migrated && Array.isArray(migrated)) {
+        setCalculatedCalories(migrated);
+        const today = getLocalDateKey();
+        const todaysTotal = migrated
+          .filter((entry: CalculatedCalories) => entry.date === today)
+          .reduce((sum: number, entry: CalculatedCalories) => sum + entry.calories, 0);
+        setDailyTotal(todaysTotal);
+      }
+    };
+    
+    window.addEventListener('data-migrated', handleDataMigrated);
+    return () => window.removeEventListener('data-migrated', handleDataMigrated);
   }, [loadFromLocalStorage]);
 
   // Log calories to meals (for weekly logger) - simplified without auth requirement
