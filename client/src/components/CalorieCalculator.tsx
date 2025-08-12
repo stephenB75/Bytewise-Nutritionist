@@ -785,21 +785,59 @@ function CalorieCalculator({
   );
 }
 
-// Simple text-based suggestions component
+// Enhanced food suggestions with nutritional info
+interface UserFoodData {
+  name: string;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  iron?: number;
+  calcium?: number;
+  vitaminC?: number;
+  zinc?: number;
+  magnesium?: number;
+  vitaminD?: number;
+  vitaminB12?: number;
+  folate?: number;
+}
+
 function UserFoodTextSuggestions({ onSuggestionClick }: { onSuggestionClick: (foodName: string) => void }) {
-  const [userFoods, setUserFoods] = useState<string[]>([]);
+  const [userFoods, setUserFoods] = useState<UserFoodData[]>([]);
 
   useEffect(() => {
     const loadUserFoods = () => {
       try {
         const weeklyMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
         
-        // Extract unique food names that were entered by user (not from USDA database)
+        // Extract unique foods with their nutritional data
         const userEnteredFoods = weeklyMeals
           .filter((meal: any) => meal.source === 'user-suggestion' || meal.source === 'calculator')
-          .map((meal: any) => meal.name.split(' (')[0]) // Remove measurement part
-          .filter((name: string, index: number, arr: string[]) => arr.indexOf(name) === index) // Unique only
-          .slice(0, 8); // Limit to 8 suggestions
+          .reduce((unique: UserFoodData[], meal: any) => {
+            const foodName = meal.name.split(' (')[0]; // Remove measurement part
+            
+            // Check if this food already exists
+            const existing = unique.find(f => f.name === foodName);
+            if (!existing) {
+              unique.push({
+                name: foodName,
+                calories: meal.calories || 0,
+                protein: meal.protein || 0,
+                carbs: meal.carbs || 0,
+                fat: meal.fat || 0,
+                iron: meal.iron || 0,
+                calcium: meal.calcium || 0,
+                vitaminC: meal.vitaminC || 0,
+                zinc: meal.zinc || 0,
+                magnesium: meal.magnesium || 0,
+                vitaminD: meal.vitaminD || 0,
+                vitaminB12: meal.vitaminB12 || 0,
+                folate: meal.folate || 0
+              });
+            }
+            return unique;
+          }, [])
+          .slice(0, 6); // Limit to 6 suggestions for space
         
         setUserFoods(userEnteredFoods);
       } catch (error) {
@@ -825,18 +863,73 @@ function UserFoodTextSuggestions({ onSuggestionClick }: { onSuggestionClick: (fo
 
   return (
     <div className="mt-4 pt-3 border-t border-gray-200">
-      <p className="text-xs text-gray-500 mb-2">Quick suggestions:</p>
-      <div className="text-sm">
-        {userFoods.map((food, index) => (
-          <span key={food}>
+      <p className="text-xs text-gray-500 mb-3">Quick suggestions:</p>
+      <div className="space-y-3">
+        {userFoods.map((food) => (
+          <div key={food.name} className="text-sm border border-gray-200 rounded-lg p-3 hover:bg-gray-50 transition-colors">
             <button
-              onClick={() => onSuggestionClick(food)}
-              className="text-blue-600 hover:text-blue-800 hover:underline cursor-pointer"
+              onClick={() => onSuggestionClick(food.name)}
+              className="w-full text-left"
             >
-              {food}
+              <div className="font-medium text-blue-600 hover:text-blue-800 mb-1">
+                {food.name}
+              </div>
+              
+              {/* Macronutrients */}
+              <div className="flex flex-wrap gap-3 mb-2 text-xs">
+                <span className="text-orange-600 font-medium">{Math.round(food.calories)} cal</span>
+                <span className="text-green-600">P: {food.protein.toFixed(1)}g</span>
+                <span className="text-yellow-600">C: {food.carbs.toFixed(1)}g</span>
+                <span className="text-purple-600">F: {food.fat.toFixed(1)}g</span>
+              </div>
+              
+              {/* Micronutrients - only show if values exist */}
+              {(food.iron > 0 || food.calcium > 0 || food.vitaminC > 0 || food.zinc > 0 || food.magnesium > 0 || food.vitaminD > 0) && (
+                <div className="flex flex-wrap gap-2 text-xs">
+                  {food.iron > 0 && (
+                    <span className="bg-slate-100 px-2 py-0.5 rounded text-slate-700">
+                      Iron: {food.iron.toFixed(1)}mg
+                    </span>
+                  )}
+                  {food.calcium > 0 && (
+                    <span className="bg-gray-100 px-2 py-0.5 rounded text-gray-700">
+                      Ca: {Math.round(food.calcium)}mg
+                    </span>
+                  )}
+                  {food.vitaminC > 0 && (
+                    <span className="bg-cyan-100 px-2 py-0.5 rounded text-cyan-700">
+                      Vit C: {Math.round(food.vitaminC)}mg
+                    </span>
+                  )}
+                  {food.zinc > 0 && (
+                    <span className="bg-amber-100 px-2 py-0.5 rounded text-amber-700">
+                      Zn: {food.zinc.toFixed(1)}mg
+                    </span>
+                  )}
+                  {food.magnesium > 0 && (
+                    <span className="bg-rose-100 px-2 py-0.5 rounded text-rose-700">
+                      Mg: {Math.round(food.magnesium)}mg
+                    </span>
+                  )}
+                  {food.vitaminD > 0 && (
+                    <span className="bg-orange-100 px-2 py-0.5 rounded text-orange-700">
+                      Vit D: {food.vitaminD.toFixed(1)}μg
+                    </span>
+                  )}
+                  {food.vitaminB12 > 0 && (
+                    <span className="bg-red-100 px-2 py-0.5 rounded text-red-700">
+                      B12: {food.vitaminB12.toFixed(1)}μg
+                    </span>
+                  )}
+                  {food.folate > 0 && (
+                    <span className="bg-green-100 px-2 py-0.5 rounded text-green-700">
+                      Folate: {Math.round(food.folate)}μg
+                    </span>
+                  )}
+                </div>
+              )}
             </button>
-            {index < userFoods.length - 1 && <span className="text-gray-400 mx-1">•</span>}
-          </span>
+          </div>
         ))}
       </div>
     </div>
