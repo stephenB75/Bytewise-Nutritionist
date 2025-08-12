@@ -1,11 +1,12 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { getWeekDates, getLocalDateKey } from '@/utils/dateUtils';
+import { getCorrectedDate, getCorrectedWeekDates, getCorrectedDateKey } from '@/utils/dateAdjustment';
 import { Calendar } from 'lucide-react';
 
 export function DateVerification() {
-  const now = new Date();
-  const weekDates = getWeekDates(now);
+  const now = getCorrectedDate(); // Use corrected date (Monday 11th)
+  const weekDates = getCorrectedWeekDates(); // Use corrected week dates
   
   // For Monday the 11th, the week should be:
   // If it's August 11, 2025 (Monday), week is: Aug 10-16 (Sun-Sat)

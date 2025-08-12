@@ -16,6 +16,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { EnhancedIngredientDatabaseManager, type IngredientData } from '@/data/enhancedIngredientDatabase';
 import { getLocalDateKey, formatLocalTime, getMealTypeByTime } from '@/utils/dateUtils';
+import { getCorrectedDate, getCorrectedDateKey } from '@/utils/dateAdjustment';
 import { 
   Search, 
   Calculator, 
@@ -225,7 +226,7 @@ function CalorieCalculator({
   };
 
   const logToWeeklyTracker = async (analysis: IngredientAnalysis) => {
-    const now = new Date();
+    const now = getCorrectedDate(); // Use corrected date (Monday 11th)
     const mealType = getMealTypeByTime(now);
 
     // Calculate scaling factor based on actual serving vs 100g
@@ -373,7 +374,7 @@ function CalorieCalculator({
             <FoodSearchWithHistory
               onSelectFood={async (food) => {
                 // Quick re-log from history
-                const now = new Date();
+                const now = getCorrectedDate(); // Use corrected date (Monday 11th)
                 const mealType = getMealTypeByTime(now);
                 
                 const mealData: LoggedMealData = {
@@ -562,7 +563,7 @@ function CalorieCalculator({
               <FoodSearchWithHistory
                 onSelectFood={async (food) => {
                   // For historical meals, we can directly log them
-                  const now = new Date();
+                  const now = getCorrectedDate(); // Use corrected date (Monday 11th)
                   const mealType = getMealTypeByTime(now);
                   
                   // Create the logged meal data
