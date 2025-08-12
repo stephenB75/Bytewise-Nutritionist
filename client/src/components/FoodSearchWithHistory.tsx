@@ -59,6 +59,8 @@ export function FoodSearchWithHistory({
   // Use value prop directly if provided, otherwise use internal state
   const [internalSearchQuery, setInternalSearchQuery] = useState('');
   const searchQuery = value !== undefined ? value : internalSearchQuery;
+  
+  console.log('FoodSearchWithHistory render - value prop:', value, 'searchQuery:', searchQuery);
 
   // Load historical meals from localStorage
   useEffect(() => {
@@ -164,6 +166,8 @@ export function FoodSearchWithHistory({
   };
 
   const handleSelectFood = (food: LoggedFood) => {
+    console.log('FoodSearchWithHistory - handleSelectFood called with:', food.name);
+    console.log('Current value prop:', value);
     // Close dropdown and call parent's onSelectFood
     setShowResults(false);
     onSelectFood(food);
