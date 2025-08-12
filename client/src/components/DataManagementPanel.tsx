@@ -16,6 +16,8 @@ import {
 } from '@/components/ui/accordion';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { debugLocalStorage, debugDataForDate, getYesterdayDateKey } from '@/utils/localStorageDebugger';
+import { backupUserData, restoreUserData, checkDataIntegrity } from '@/utils/dataProtection';
 import { 
   Download,
   RefreshCw,
@@ -70,6 +72,60 @@ export function DataManagementPanel() {
     } finally {
       setIsExporting(false);
     }
+  };
+
+  const handleDebugStorage = () => {
+    console.clear();
+    debugLocalStorage();
+    
+    // Check yesterday's data specifically
+    const yesterday = getYesterdayDateKey();
+    console.log('\n=== Yesterday\'s Data Check ===');
+    debugDataForDate(yesterday);
+    
+    // Check today's data
+    const today = new Date().toISOString().split('T')[0];
+    console.log('\n=== Today\'s Data Check ===');
+    debugDataForDate(today);
+    
+    toast({
+      title: "Debug info logged",
+      description: "Check the browser console for detailed localStorage information including yesterday's data",
+    });
+  };
+
+  const handleRestoreData = () => {
+    const restored = restoreUserData();
+    if (restored) {
+      toast({
+        title: "Data restored",
+        description: "Successfully restored data from backup",
+      });
+      // Refresh the page to load restored data
+      setTimeout(() => window.location.reload(), 1000);
+    } else {
+      toast({
+        title: "No backup found",
+        description: "No backup data was found to restore from",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleCheckIntegrity = () => {
+    checkDataIntegrity();
+    toast({
+      title: "Data integrity check completed",
+      description: "Check the console for results",
+    });
+  };
+
+  const handleForceBackup = () => {
+    backupUserData();
+    toast({
+      title: "Data backed up",
+      description: "All your data has been backed up to localStorage",
+    });
   };
 
   const handleSyncData = async () => {
@@ -216,7 +272,56 @@ export function DataManagementPanel() {
 
         {/* Data Management Content */}
         <div className="space-y-6">
-                  {/* Export Section */}
+          
+          {/* Debug Section - Added to help diagnose data persistence issues */}
+          <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
+            <h3 className="text-xl font-semibold text-white mb-6" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+              Debug & Recovery Tools
+            </h3>
+            <p className="text-gray-300 mb-4" style={{ fontFamily: "'Work Sans', sans-serif" }}>
+              Tools to check and restore your stored data, including yesterday's entries
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Button
+                onClick={handleDebugStorage}
+                variant="outline"
+                className="bg-blue-600/20 hover:bg-blue-600/30 border-blue-400/30 text-blue-200 hover:text-blue-100"
+              >
+                <AlertCircle className="w-4 h-4 mr-2" />
+                Debug Storage
+              </Button>
+              
+              <Button
+                onClick={handleRestoreData}
+                variant="outline" 
+                className="bg-green-600/20 hover:bg-green-600/30 border-green-400/30 text-green-200 hover:text-green-100"
+              >
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Restore Backup
+              </Button>
+              
+              <Button
+                onClick={handleCheckIntegrity}
+                variant="outline"
+                className="bg-yellow-600/20 hover:bg-yellow-600/30 border-yellow-400/30 text-yellow-200 hover:text-yellow-100"
+              >
+                <CheckCircle className="w-4 h-4 mr-2" />
+                Check Integrity
+              </Button>
+              
+              <Button
+                onClick={handleForceBackup}
+                variant="outline"
+                className="bg-purple-600/20 hover:bg-purple-600/30 border-purple-400/30 text-purple-200 hover:text-purple-100"
+              >
+                <Database className="w-4 h-4 mr-2" />
+                Force Backup
+              </Button>
+            </div>
+          </Card>
+
+          {/* Export Section */}
                   <div className="p-6 bg-gradient-to-br from-[#1f4aa6]/10 to-[#1f4aa6]/5 rounded-2xl border border-[#1f4aa6]/20 backdrop-blur-md">
                     <div className="flex flex-col items-center text-center space-y-4">
                       <div className="p-4 bg-[#1f4aa6]/20 rounded-2xl">

@@ -49,13 +49,10 @@ export function useDataPersistence({ key, data, syncToDatabase = true, debounceM
       // Emit sync start event
       window.dispatchEvent(new CustomEvent('sync-start'));
       
-      return apiRequest('/api/user/sync-data', {
-        method: 'POST',
-        body: JSON.stringify({
-          key,
-          data: dataToSync,
-          timestamp: new Date().toISOString()
-        })
+      return apiRequest('POST', '/api/user/sync-data', {
+        key,
+        data: dataToSync,
+        timestamp: new Date().toISOString()
       });
     },
     onSuccess: (response: any) => {
