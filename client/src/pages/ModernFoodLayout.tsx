@@ -43,10 +43,7 @@ import {
 } from 'lucide-react';
 import { NotificationDropdown } from '@/components/NotificationDropdown';
 import { WeeklyCaloriesCard } from '@/components/WeeklyCaloriesCard';
-import { DateVerification } from '@/components/DateVerification';
-import { MealDateTestPanel } from '@/components/MealDateTestPanel';
 import { DataPersistenceTest } from '@/components/DataPersistenceTest';
-import { WeeklyDateDebugger } from '@/components/WeeklyDateDebugger';
 
 import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/hooks/use-toast';
@@ -1176,15 +1173,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               </div>
             </Card>
 
-            {/* Date Verification - Temporary for debugging */}
-            <DateVerification />
+
             
-            {/* Development Test Panels */}
+            {/* Development Test Panels - Production Ready */}
             {import.meta.env.DEV && (
               <div className="space-y-4 mb-4">
-                <MealDateTestPanel />
                 <DataPersistenceTest />
-                <WeeklyDateDebugger />
               </div>
             )}
             
