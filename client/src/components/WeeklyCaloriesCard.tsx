@@ -62,8 +62,6 @@ export function WeeklyCaloriesCard() {
       const totalCalories = weeklyData.reduce((sum, day) => sum + day.calories, 0);
       const weeklyAverage = Math.round(totalCalories / 7);
       
-      // Debug logging for weekly progress verification
-      
       setWeeklyData(weeklyData);
       setTotalWeeklyCalories(totalCalories);
     } catch (error) {

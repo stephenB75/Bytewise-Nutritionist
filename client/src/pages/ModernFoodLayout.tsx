@@ -397,7 +397,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         const currentWeekDates = getWeekDates(new Date());
         const weekDateKeys = currentWeekDates.map(date => getLocalDateKey(date));
         
-        // Filter meals to only include those from the current week
+        // Filter meals to only include those from the current week (Sunday to Saturday)
         const currentWeekMeals = stored.filter((meal: any) => 
           weekDateKeys.includes(meal.date)
         );
@@ -1123,7 +1123,17 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         {/* Weekly View */}
         {trackingView === 'weekly' && (
           <div className="space-y-4">
-            <h2 className="text-2xl font-bold text-white mb-4">This Week's Progress</h2>
+            <div className="mb-4">
+              <h2 className="text-2xl font-bold text-white">This Week's Progress</h2>
+              <p className="text-sm text-gray-400 mt-1">
+                {(() => {
+                  const weekDates = getWeekDates(new Date());
+                  const startDate = new Date(weekDates[0]);
+                  const endDate = new Date(weekDates[6]);
+                  return `${startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+                })()}
+              </p>
+            </div>
             
             {/* Weekly Progress Card */}
             <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4">
