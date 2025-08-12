@@ -55,6 +55,7 @@ export function FoodSearchWithHistory({
   const [historicalMeals, setHistoricalMeals] = useState<LoggedFood[]>([]);
   const [showResults, setShowResults] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   
   console.log('FoodSearchWithHistory render - value prop:', value);
 
@@ -160,10 +161,15 @@ export function FoodSearchWithHistory({
 
   const handleSelectFood = (food: LoggedFood) => {
     console.log('handleSelectFood called with:', food.name);
-    // Close dropdown and call parent's onSelectFood
-    setShowResults(false);
+    // Manually set the input value using ref
+    if (inputRef.current) {
+      inputRef.current.value = food.name;
+      console.log('Manually set input value to:', food.name);
+    }
+    // Call parent's onSelectFood to update the state
     onSelectFood(food);
-    // Parent will handle updating the search field through the value prop
+    // Then close dropdown after a tiny delay to ensure state update
+    setTimeout(() => setShowResults(false), 10);
   };
 
 
@@ -174,9 +180,13 @@ export function FoodSearchWithHistory({
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
         <input
+          ref={inputRef}
           type="text"
-          value={value || ''}
-          onChange={(e) => handleSearch(e.target.value)}
+          value={value !== undefined ? value : ''}
+          onChange={(e) => {
+            console.log('Input onChange:', e.target.value);
+            handleSearch(e.target.value);
+          }}
           onFocus={() => setShowResults(true)}
           placeholder={placeholder}
           className="w-full pl-10 pr-4 h-12 text-base text-gray-900 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-md focus:border-brand-yellow focus:ring-brand-yellow focus:outline-none placeholder:text-gray-500"
