@@ -138,7 +138,7 @@ export function FoodSearchWithHistory({
 
   const handleSearch = (value: string) => {
     setSearchQuery(value);
-    setShowResults(value.length > 0);
+    setShowResults(false); // Disable dropdown results
     onSearchChange(value);
   };
 
@@ -170,14 +170,14 @@ export function FoodSearchWithHistory({
         <Input
           value={searchQuery}
           onChange={(e) => handleSearch(e.target.value)}
-          onFocus={() => setShowResults(true)}
+          onFocus={() => setShowResults(false)}
           placeholder={placeholder}
           className="pl-10 pr-4 h-12 text-base bg-white/80 backdrop-blur-sm border-gray-200 focus:border-brand-yellow focus:ring-brand-yellow"
         />
       </div>
 
-      {/* Search Results Dropdown */}
-      {showResults && (
+      {/* Search Results Dropdown - DISABLED */}
+      {false && showResults && (
         <Card className="absolute top-full mt-2 left-0 right-0 z-50 p-0 shadow-xl border-gray-200 overflow-hidden max-h-[400px]">
           <ScrollArea className="h-full max-h-[340px]">
             {/* Popular/Frequent Items (when no search) */}
