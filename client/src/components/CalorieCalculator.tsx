@@ -806,28 +806,14 @@ interface UserFoodData {
 function UserFoodTextSuggestions({ onSuggestionClick }: { onSuggestionClick: (foodName: string) => void }) {
   const [userFoods, setUserFoods] = useState<UserFoodData[]>([]);
 
-  // Copy food information to clipboard
+  // Copy food name to clipboard
   const copyFoodInfo = async (food: UserFoodData) => {
-    const macros = `${Math.round(food.calories || 0)} cal • P: ${(food.protein || 0).toFixed(1)}g • C: ${(food.carbs || 0).toFixed(1)}g • F: ${(food.fat || 0).toFixed(1)}g`;
-    
-    const micros = [];
-    if ((food.iron || 0) > 0) micros.push(`Iron: ${(food.iron || 0).toFixed(1)}mg`);
-    if ((food.calcium || 0) > 0) micros.push(`Calcium: ${Math.round(food.calcium || 0)}mg`);
-    if ((food.vitaminC || 0) > 0) micros.push(`Vitamin C: ${Math.round(food.vitaminC || 0)}mg`);
-    if ((food.zinc || 0) > 0) micros.push(`Zinc: ${(food.zinc || 0).toFixed(1)}mg`);
-    if ((food.magnesium || 0) > 0) micros.push(`Magnesium: ${Math.round(food.magnesium || 0)}mg`);
-    if ((food.vitaminD || 0) > 0) micros.push(`Vitamin D: ${(food.vitaminD || 0).toFixed(1)}μg`);
-    if ((food.vitaminB12 || 0) > 0) micros.push(`Vitamin B12: ${(food.vitaminB12 || 0).toFixed(1)}μg`);
-    if ((food.folate || 0) > 0) micros.push(`Folate: ${Math.round(food.folate || 0)}μg`);
-    
-    const copyText = `${food.name}\n${macros}${micros.length > 0 ? '\n' + micros.join(' • ') : ''}`;
-    
     try {
-      await navigator.clipboard.writeText(copyText);
+      await navigator.clipboard.writeText(food.name);
       // Show success toast
       window.dispatchEvent(new CustomEvent('show-toast', {
         detail: { 
-          message: `📋 Copied ${food.name} details!`,
+          message: `Copied ${food.name}!`,
           type: 'success'
         }
       }));
@@ -836,7 +822,7 @@ function UserFoodTextSuggestions({ onSuggestionClick }: { onSuggestionClick: (fo
       // Show error toast
       window.dispatchEvent(new CustomEvent('show-toast', {
         detail: { 
-          message: `Failed to copy meal details`,
+          message: `Failed to copy meal name`,
           type: 'error'
         }
       }));
@@ -976,7 +962,7 @@ function UserFoodTextSuggestions({ onSuggestionClick }: { onSuggestionClick: (fo
                   copyFoodInfo(food);
                 }}
                 className="ml-2 p-1 text-gray-400 hover:text-gray-600 transition-colors"
-                title="Copy meal details"
+                title="Copy meal name"
               >
                 <Copy className="w-4 h-4" />
               </button>
