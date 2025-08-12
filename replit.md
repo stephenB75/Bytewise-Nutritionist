@@ -1,7 +1,7 @@
 ## Overview
 bytewise nutritionist is a comprehensive Progressive Web App (PWA) designed for nutrition tracking, meal planning, and recipe building. Its core purpose is to empower users to achieve their health goals through an intuitive, mobile-first interface. The application emphasizes professional mobile interactions, robust design, and real-time data for personalized health management, aiming to deliver a professional-grade nutrition tracking experience.
 
-**Current Status**: BETA v1.21.1 (August 12, 2025) - Deployment-ready release with comprehensive deployment fixes, verified build process, and production environment optimization.
+**Current Status**: BETA v1.2.2 (August 12, 2025) - Deployment-ready release with comprehensive deployment fixes, verified build process, and production environment optimization.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
