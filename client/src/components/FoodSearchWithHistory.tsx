@@ -188,9 +188,10 @@ export function FoodSearchWithHistory({
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
         <input
+          key={value || 'empty'}
           ref={inputRef}
           type="text"
-          value={value !== undefined ? value : ''}
+          defaultValue={value || ''}
           onChange={(e) => {
             console.log('Input onChange:', e.target.value);
             handleSearch(e.target.value);
