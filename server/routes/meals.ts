@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { db } from '../db';
 import { meals, mealFoods, foods } from '../../shared/schema';
-import { eq, desc, and, gte } from 'drizzle-orm';
+import { eq, desc, and, gte, sql } from 'drizzle-orm';
 import { isAuthenticated } from '../supabaseAuth';
 
 const router = Router();
@@ -10,6 +10,8 @@ const router = Router();
 router.get('/api/meals/history', isAuthenticated, async (req: any, res) => {
   try {
     const userId = req.user?.id;
+    console.log('[Meals History API] User ID:', userId);
+    
     if (!userId) {
       return res.status(401).json({ error: 'User not authenticated' });
     }
@@ -25,7 +27,7 @@ router.get('/api/meals/history', isAuthenticated, async (req: any, res) => {
         mealDate: meals.date,
         mealType: meals.mealType,
         foodId: mealFoods.id,
-        foodName: foods.name,
+        foodName: sql<string>`COALESCE(${foods.name}, ${mealFoods.foodName})`, // Use food name from foods table or custom name
         quantity: mealFoods.quantity,
         unit: mealFoods.unit,
         calories: mealFoods.calories,
@@ -43,6 +45,8 @@ router.get('/api/meals/history', isAuthenticated, async (req: any, res) => {
         )
       )
       .orderBy(desc(meals.date));
+    
+    console.log(`[Meals History API] Found ${userMealData.length} meal items from database`);
 
     // Process meals to get frequency and recent items
     const frequencyMap = new Map();

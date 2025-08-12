@@ -43,7 +43,7 @@ export function LoggedFoodSuggestions({
   className = ""
 }: LoggedFoodSuggestionsProps) {
   // Fetch meal history from database
-  const { data, isLoading, error } = useQuery<MealHistoryResponse>({
+  const { data, isLoading, error, isSuccess } = useQuery<MealHistoryResponse>({
     queryKey: ['/api/meals/history'],
     refetchInterval: 30000, // Refresh every 30 seconds
     staleTime: 10000 // Consider data stale after 10 seconds
@@ -51,6 +51,20 @@ export function LoggedFoodSuggestions({
 
   const frequentMeals = data?.frequentMeals || [];
   const recentMeals = data?.recentMeals || [];
+  
+  // Log data state for verification
+  if (isSuccess && data) {
+    console.log('[LoggedFoodSuggestions] Data received from database:', {
+      frequentMeals: data.frequentMeals?.length || 0,
+      recentMeals: data.recentMeals?.length || 0,
+      sampleFrequent: data.frequentMeals?.[0],
+      sampleRecent: data.recentMeals?.[0]
+    });
+  }
+  
+  if (error) {
+    console.error('[LoggedFoodSuggestions] Error fetching from database:', error);
+  }
 
   // Show loading state
   if (isLoading) {

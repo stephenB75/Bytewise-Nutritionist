@@ -496,6 +496,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         totalFat: req.body.totalFat ? req.body.totalFat.toString() : '0'
       });
 
+      // Also create a mealFood entry for the logged item
+      // This allows the meal to appear in suggestions
+      if (meal && meal.id) {
+        await storage.addMealFood({
+          mealId: meal.id,
+          foodId: null, // Custom food, not from database
+          recipeId: null,
+          quantity: req.body.quantity || 1,
+          unit: req.body.unit || 'serving',
+          calories: req.body.totalCalories || 0,
+          protein: req.body.totalProtein || 0,
+          carbs: req.body.totalCarbs || 0,
+          fat: req.body.totalFat || 0,
+          fiber: req.body.fiber || 0,
+          sugar: req.body.sugar || 0,
+          sodium: req.body.sodium || 0,
+          foodName: req.body.name // Store the food name for custom entries
+        });
+      }
+
       // Check for new achievements after meal logging
       const newAchievements = await storage.checkAndCreateAchievements(userId);
       

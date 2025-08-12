@@ -130,12 +130,16 @@ export const mealFoods = pgTable("meal_foods", {
   mealId: integer("meal_id").notNull().references(() => meals.id, { onDelete: 'cascade' }),
   foodId: integer("food_id").references(() => foods.id),
   recipeId: integer("recipe_id").references(() => recipes.id),
+  foodName: varchar("food_name", { length: 255 }), // For custom foods when foodId is null
   quantity: decimal("quantity", { precision: 8, scale: 2 }).notNull(),
   unit: varchar("unit", { length: 50 }).notNull(),
   calories: decimal("calories", { precision: 8, scale: 2 }).notNull(),
   protein: decimal("protein", { precision: 8, scale: 2 }).default('0'),
   carbs: decimal("carbs", { precision: 8, scale: 2 }).default('0'),
   fat: decimal("fat", { precision: 8, scale: 2 }).default('0'),
+  fiber: decimal("fiber", { precision: 8, scale: 2 }).default('0'),
+  sugar: decimal("sugar", { precision: 8, scale: 2 }).default('0'),
+  sodium: decimal("sodium", { precision: 8, scale: 2 }).default('0'),
 });
 
 // Water intake tracking
