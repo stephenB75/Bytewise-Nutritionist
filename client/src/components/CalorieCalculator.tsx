@@ -125,15 +125,16 @@ function CalorieCalculator({
   // Achievement system hook
   const checkAchievements = useCheckAchievements();
 
-  // Search ingredients as user types
+  // Search ingredients as user types (handled by FoodSearchWithHistory now)
+  // This effect is kept for backward compatibility with direct ingredient input
   useEffect(() => {
-    if (ingredient.length >= 2) {
+    if (ingredient.length >= 2 && !isCompact) {
       const customSuggestions = EnhancedIngredientDatabaseManager.searchIngredients(ingredient);
       setIngredientSuggestions(customSuggestions.slice(0, 6));
     } else {
       setIngredientSuggestions([]);
     }
-  }, [ingredient]);
+  }, [ingredient, isCompact]);
 
   // Update available units when ingredient is selected
   useEffect(() => {

@@ -1,7 +1,7 @@
 ## Overview
 bytewise nutritionist is a comprehensive Progressive Web App (PWA) designed for nutrition tracking, meal planning, and recipe building. Its core purpose is to empower users to achieve their health goals through an intuitive, mobile-first interface. The application emphasizes professional mobile interactions, robust design, and real-time data for personalized health management, aiming to deliver a professional-grade nutrition tracking experience.
 
-**Current Status**: BETA v1.0.0 (January 11, 2025) - Feature complete with comprehensive data persistence system, ready for production testing.
+**Current Status**: BETA v1.1.0 (January 11, 2025) - Enhanced with comprehensive food search history, quick re-logging, and performance optimizations.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
@@ -32,6 +32,7 @@ Preferred communication style: Simple, everyday language.
 - **Real-time Updates**: Optimistic updates via TanStack Query.
 - **Component Library**: Extensive shadcn/ui base components augmented with custom nutrition-specific components.
 - **Enhanced Nutrition Analysis**: USDA-powered calorie calculations using comprehensive datasets, precise portion weights, and detailed nutritional breakdowns. Includes a professional ingredient database with accurate weight conversions, advanced measurement parsing, and comprehensive international cuisine support (95% accuracy for basic foods, 90% for grains/starches, 95% for nuts/seeds/fats, 80% for Asian, 85% for Middle Eastern, 75% for European, and 78% for Caribbean cuisine). **FDA Standard Liquid Serving Sizes**: Complete integration of FDA Reference Amounts Customarily Consumed (RACC) guidelines with 50+ standardized beverage serving sizes.
+- **Food Search with History**: Comprehensive search system that includes today's meals, previous weeks and months of logged foods, frequently consumed items display, quick time range filters (Today, This Week, This Month, All Time), and one-click re-logging of any previous meal. Seamlessly integrates historical data with new food searches from the USDA database.
 - **Meal Logging**: Real-time nutrition calculations and dashboard updates.
 - **Recipe Creation**: Dynamic nutrition calculation as ingredients are added.
 - **Tracking**: Daily goals, aggregated consumption, calendar view for historical data, and weekly calorie breakdown.
