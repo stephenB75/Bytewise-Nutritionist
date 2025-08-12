@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Favicon Force Refresh - Bytewise</title>
+    <link rel="icon" href="/favicon.ico?v=FORCE-REFRESH-NOW" type="image/x-icon" />
+    <link rel="shortcut icon" href="/favicon.ico?v=FORCE-REFRESH-NOW" type="image/x-icon" />
+</head>
+<body>
+    <h1>Favicon Force Refresh</h1>
+    <p>This page forces a favicon refresh. Check the browser tab.</p>
+    
+    <script>
+        // Force favicon refresh with JavaScript
+        function refreshFavicon() {
+            const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+            link.type = 'image/x-icon';
+            link.rel = 'shortcut icon';
+            link.href = '/favicon.ico?' + new Date().getTime();
+            document.getElementsByTagName('head')[0].appendChild(link);
+        }
+        
+        // Run on page load
+        refreshFavicon();
+        
+        // Add button to manually refresh
+        document.addEventListener('DOMContentLoaded', function() {
+            const button = document.createElement('button');
+            button.textContent = 'Force Favicon Refresh';
+            button.onclick = refreshFavicon;
+            document.body.appendChild(button);
+        });
+    </script>
+</body>
+</html>
