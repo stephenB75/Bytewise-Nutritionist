@@ -7,7 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { RefreshCw, Database, CheckCircle, AlertCircle, Eye } from 'lucide-react';
+import { RefreshCw, Database, AlertCircle, Eye } from 'lucide-react';
 import { getLocalDateKey } from '@/utils/dateUtils';
 import { useToast } from '@/hooks/use-toast';
 
@@ -62,7 +62,7 @@ export function DataPersistenceTest() {
         
         // Test 7: Check for duplicate entries
         const mealIds = weeklyMeals.map(meal => meal.id);
-        const uniqueIds = [...new Set(mealIds)];
+        const uniqueIds = Array.from(new Set(mealIds));
         const hasDuplicates = mealIds.length !== uniqueIds.length;
         
         const results = {
@@ -100,12 +100,13 @@ export function DataPersistenceTest() {
         }
         
       } catch (error) {
-        setTestResults({ error: error.message });
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        setTestResults({ error: errorMessage });
         setIsLoading(false);
         
         toast({
           title: "Test Error",
-          description: `Failed to test data persistence: ${error.message}`,
+          description: `Failed to test data persistence: ${errorMessage}`,
           duration: 4000,
         });
       }
@@ -151,7 +152,7 @@ export function DataPersistenceTest() {
     } catch (error) {
       toast({
         title: "Failed to Add Test Meal",
-        description: error.message,
+        description: error instanceof Error ? error.message : 'Unknown error',
         duration: 4000,
       });
     }
@@ -178,7 +179,7 @@ export function DataPersistenceTest() {
     } catch (error) {
       toast({
         title: "Failed to Clear Test Meals",
-        description: error.message,
+        description: error instanceof Error ? error.message : 'Unknown error',
         duration: 4000,
       });
     }

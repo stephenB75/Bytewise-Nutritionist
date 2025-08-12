@@ -45,6 +45,7 @@ import { NotificationDropdown } from '@/components/NotificationDropdown';
 import { WeeklyCaloriesCard } from '@/components/WeeklyCaloriesCard';
 import { DateVerification } from '@/components/DateVerification';
 import { MealDateTestPanel } from '@/components/MealDateTestPanel';
+import { DataPersistenceTest } from '@/components/DataPersistenceTest';
 
 import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/hooks/use-toast';
@@ -1177,10 +1178,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             {/* Date Verification - Temporary for debugging */}
             <DateVerification />
             
-            {/* Date Fix Test Panel - only show in development */}
+            {/* Development Test Panels */}
             {import.meta.env.DEV && (
-              <div className="mb-4">
+              <div className="space-y-4 mb-4">
                 <MealDateTestPanel />
+                <DataPersistenceTest />
               </div>
             )}
             
