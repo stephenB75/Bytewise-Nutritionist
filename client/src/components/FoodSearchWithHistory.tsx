@@ -8,7 +8,7 @@
  * - Quick re-log functionality
  */
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -53,6 +53,7 @@ export function FoodSearchWithHistory({
   const [searchQuery, setSearchQuery] = useState('');
   const [historicalMeals, setHistoricalMeals] = useState<LoggedFood[]>([]);
   const [showResults, setShowResults] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Load historical meals from localStorage
   useEffect(() => {
@@ -84,6 +85,20 @@ export function FoodSearchWithHistory({
     return () => {
       window.removeEventListener('meals-updated', handleRefresh);
       window.removeEventListener('calories-logged', handleRefresh);
+    };
+  }, []);
+
+  // Click away handler to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setShowResults(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
 
@@ -141,15 +156,17 @@ export function FoodSearchWithHistory({
   };
 
   const handleSelectFood = (food: LoggedFood) => {
-    onSelectFood(food);
-    setSearchQuery('');
+    // Populate the search field with the selected food name
+    setSearchQuery(food.name);
+    onSearchChange(food.name);
     setShowResults(false);
+    onSelectFood(food);
   };
 
 
 
   return (
-    <div className={`relative ${className}`}>
+    <div ref={containerRef} className={`relative ${className}`}>
       {/* Search Input */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
