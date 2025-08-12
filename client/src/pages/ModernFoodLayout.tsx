@@ -46,6 +46,7 @@ import { WeeklyCaloriesCard } from '@/components/WeeklyCaloriesCard';
 import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
+import { getWeekDates, getLocalDateKey } from '@/utils/dateUtils';
 
 // Types
 interface ModernFoodLayoutProps {
@@ -392,8 +393,16 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         // Check fasting status from localStorage
         checkFastingStatus();
         
-        // Calculate weekly calories from all stored meals
-        const weeklyTotal = stored.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
+        // Calculate weekly calories from current week's meals only
+        const currentWeekDates = getWeekDates(new Date());
+        const weekDateKeys = currentWeekDates.map(date => getLocalDateKey(date));
+        
+        // Filter meals to only include those from the current week
+        const currentWeekMeals = stored.filter((meal: any) => 
+          weekDateKeys.includes(meal.date)
+        );
+        
+        const weeklyTotal = currentWeekMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
         setWeeklyCalories(weeklyTotal);
         
       } catch (error) {
