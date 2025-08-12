@@ -188,6 +188,16 @@ export function FoodSearchWithHistory({
                             <Utensils className="h-3 w-3" />
                             {meal.calories} cal
                           </span>
+                          <Badge 
+                            className={`text-white border-0 text-xs px-2 py-0 ${
+                              meal.mealType === 'breakfast' ? 'bg-orange-500' :
+                              meal.mealType === 'lunch' ? 'bg-blue-500' :
+                              meal.mealType === 'dinner' ? 'bg-purple-500' :
+                              'bg-gray-500'
+                            }`}
+                          >
+                            {meal.mealType.charAt(0).toUpperCase() + meal.mealType.slice(1)}
+                          </Badge>
                           <span>P: {meal.protein}g</span>
                           <span>C: {meal.carbs}g</span>
                           <span>F: {meal.fat}g</span>
@@ -225,8 +235,15 @@ export function FoodSearchWithHistory({
                             <Utensils className="h-3 w-3" />
                             {meal.calories} cal
                           </span>
-                          <Badge variant="outline" className="text-xs px-1 py-0">
-                            {meal.mealType}
+                          <Badge 
+                            className={`text-white border-0 text-xs px-2 py-0 ${
+                              meal.mealType === 'breakfast' ? 'bg-orange-500' :
+                              meal.mealType === 'lunch' ? 'bg-blue-500' :
+                              meal.mealType === 'dinner' ? 'bg-purple-500' :
+                              'bg-gray-500'
+                            }`}
+                          >
+                            {meal.mealType.charAt(0).toUpperCase() + meal.mealType.slice(1)}
                           </Badge>
                         </div>
                       </div>

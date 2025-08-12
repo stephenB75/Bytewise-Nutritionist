@@ -1033,8 +1033,20 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <Card key={index} className="bg-white/10 backdrop-blur-md border-white/20 p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <h4 className="text-white font-semibold">{meal.name}</h4>
-                    <p className="text-gray-400 text-sm">{meal.time} • {meal.mealType}</p>
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4 className="text-white font-semibold">{meal.name}</h4>
+                      <Badge 
+                        className={`text-white border-0 text-xs px-2 py-0 ${
+                          meal.mealType === 'breakfast' ? 'bg-orange-500' :
+                          meal.mealType === 'lunch' ? 'bg-blue-500' :
+                          meal.mealType === 'dinner' ? 'bg-purple-500' :
+                          'bg-gray-500'
+                        }`}
+                      >
+                        {meal.mealType.charAt(0).toUpperCase() + meal.mealType.slice(1)}
+                      </Badge>
+                    </div>
+                    <p className="text-gray-400 text-sm">{meal.time}</p>
                     <div className="flex flex-wrap gap-3 mt-1">
                       <span className="text-xs text-green-400">P: {(meal.protein || 0).toFixed(1)}g</span>
                       <span className="text-xs text-yellow-400">C: {(meal.carbs || 0).toFixed(1)}g</span>

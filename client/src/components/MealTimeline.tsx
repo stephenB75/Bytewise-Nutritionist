@@ -243,6 +243,16 @@ export function MealTimeline({
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
                             <h5 className="font-semibold text-gray-900">{meal.name}</h5>
+                            <Badge 
+                              className={`text-white border-0 text-xs px-2 py-0 ${
+                                mealType === 'breakfast' ? 'bg-orange-500' :
+                                mealType === 'lunch' ? 'bg-blue-500' :
+                                mealType === 'dinner' ? 'bg-purple-500' :
+                                'bg-gray-500'
+                              }`}
+                            >
+                              {mealType.charAt(0).toUpperCase() + mealType.slice(1)}
+                            </Badge>
                             <Badge variant="outline" className="text-xs">
                               <Clock className="w-3 h-3 mr-1" />
                               {meal.time}
