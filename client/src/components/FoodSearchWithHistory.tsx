@@ -59,6 +59,14 @@ export function FoodSearchWithHistory({
   
   console.log('FoodSearchWithHistory render - value prop:', value);
 
+  // Sync input ref value when value prop changes
+  useEffect(() => {
+    if (inputRef.current && value !== undefined) {
+      inputRef.current.value = value;
+      console.log('useEffect: Forcing input ref value to:', value);
+    }
+  }, [value]);
+
   // Load historical meals from localStorage
   useEffect(() => {
     const loadHistoricalMeals = () => {
