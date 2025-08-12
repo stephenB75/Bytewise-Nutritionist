@@ -179,42 +179,6 @@ export function FoodSearchWithHistory({
       {/* Search Results Dropdown */}
       {showResults && (
         <Card className="absolute top-full mt-2 left-0 right-0 z-50 p-0 shadow-xl border-gray-200 overflow-hidden max-h-[400px]">
-          {/* Time Range Filters */}
-          <div className="p-2 border-b bg-gray-50 flex gap-1">
-            <Button
-              size="sm"
-              variant={selectedTimeRange === 'today' ? 'default' : 'ghost'}
-              onClick={() => setSelectedTimeRange('today')}
-              className="h-7 text-xs"
-            >
-              Today
-            </Button>
-            <Button
-              size="sm"
-              variant={selectedTimeRange === 'week' ? 'default' : 'ghost'}
-              onClick={() => setSelectedTimeRange('week')}
-              className="h-7 text-xs"
-            >
-              This Week
-            </Button>
-            <Button
-              size="sm"
-              variant={selectedTimeRange === 'month' ? 'default' : 'ghost'}
-              onClick={() => setSelectedTimeRange('month')}
-              className="h-7 text-xs"
-            >
-              This Month
-            </Button>
-            <Button
-              size="sm"
-              variant={selectedTimeRange === 'all' ? 'default' : 'ghost'}
-              onClick={() => setSelectedTimeRange('all')}
-              className="h-7 text-xs"
-            >
-              All Time
-            </Button>
-          </div>
-
           <ScrollArea className="h-full max-h-[340px]">
             {/* Popular/Frequent Items (when no search) */}
             {!searchQuery && popularMeals.length > 0 && (
