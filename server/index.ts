@@ -120,20 +120,27 @@ app.use((req, res, next) => {
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
   const port = parseInt(process.env.PORT || '5000', 10);
-  const host = "0.0.0.0";
+  const host = process.env.HOST || "0.0.0.0";
   
-  server.listen({
-    port,
-    host,
-    reusePort: true,
-  }, () => {
+  server.listen(port, host, () => {
     const appUrl = isProduction 
       ? 'https://www.bytewisenutritionist.com'
-      : `http://localhost:${port}`;
+      : `http://${host}:${port}`;
     
-    log(`Server running on port ${port}`);
-    log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-    log(`URL: ${appUrl}`);
+    log(`✅ Server successfully started`);
+    log(`🌐 Host: ${host}`);
+    log(`🔌 Port: ${port}`);
+    log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+    log(`🔗 URL: ${appUrl}`);
+    log(`💓 Health check: ${appUrl}/health`);
+    log(`✅ Ready check: ${appUrl}/ready`);
+    
+    // Startup verification
+    if (isProduction) {
+      log(`🚀 Production deployment ready for Replit Autoscale`);
+    } else {
+      log(`🔧 Development server ready`);
+    }
   });
 
   // Configure server timeout and keep-alive settings
@@ -157,4 +164,5 @@ app.use((req, res, next) => {
       process.exit(0);
     });
   });
+
 })();
