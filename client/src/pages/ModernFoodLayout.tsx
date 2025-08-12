@@ -1115,16 +1115,24 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                             console.log('Current stored meals:', stored.length);
                             console.log('All meal IDs:', stored.map((m: any) => ({ name: m.name, id: m.id, idType: typeof m.id })));
                             
-                            // Use a more robust filter with null/undefined checks
-                            const updated = stored.filter((m: any) => {
-                              // Ensure both IDs exist and are not null/undefined
-                              if (!m.id || !meal.id) {
-                                console.log(`Missing ID - stored meal: ${m.id}, target meal: ${meal.id}`);
-                                return m.id !== meal.id; // Keep if IDs are different (including undefined cases)
+                            // CRITICAL FIX: Handle meals that might not have IDs (legacy data)
+                            const updated = stored.filter((m: any, storedIndex: number) => {
+                              // If target meal has no ID, use array index and name comparison
+                              if (!meal.id) {
+                                const keepByIndex = storedIndex !== index;
+                                console.log(`Target meal has no ID, using index comparison: ${storedIndex} !== ${index} = ${keepByIndex}`);
+                                return keepByIndex;
                               }
                               
+                              // If stored meal has no ID, keep it (don't delete meals without IDs)
+                              if (!m.id) {
+                                console.log(`Stored meal "${m.name}" has no ID, keeping it`);
+                                return true;
+                              }
+                              
+                              // Both have IDs, compare them
                               const match = String(m.id) !== String(meal.id);
-                              console.log(`Comparing meal "${m.name}" (ID: ${m.id}) with target "${meal.name}" (ID: ${meal.id}) - Keep: ${match}`);
+                              console.log(`Both have IDs - comparing "${m.name}" (${m.id}) with target "${meal.name}" (${meal.id}) - Keep: ${match}`);
                               return match;
                             });
                             console.log('Updated meals after filter:', updated.length);
@@ -1308,13 +1316,21 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                                 const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
                                 console.log('Weekly view - Stored meals:', stored.length);
                                 
-                                const updated = stored.filter((m: any) => {
-                                  // Ensure both IDs exist
-                                  if (!m.id || !meal.id) {
-                                    console.log(`Weekly - Missing ID - stored: ${m.id}, target: ${meal.id}`);
-                                    return m.id !== meal.id;
+                                const updated = stored.filter((m: any, storedIndex: number) => {
+                                  // If target meal has no ID, use name and timestamp comparison
+                                  if (!meal.id) {
+                                    const keep = m.name !== meal.name || m.timestamp !== meal.timestamp;
+                                    console.log(`Weekly - Target has no ID, comparing by name/time: ${keep}`);
+                                    return keep;
                                   }
                                   
+                                  // If stored meal has no ID, keep it
+                                  if (!m.id) {
+                                    console.log(`Weekly - Stored meal "${m.name}" has no ID, keeping`);
+                                    return true;
+                                  }
+                                  
+                                  // Both have IDs
                                   const keep = String(m.id) !== String(meal.id);
                                   console.log(`Weekly: Keep "${m.name}" (${m.id})? ${keep}`);
                                   return keep;
