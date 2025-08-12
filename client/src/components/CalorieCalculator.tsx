@@ -31,7 +31,8 @@ import {
   Beef,
   Wheat,
   Droplets,
-  Calendar
+  Calendar,
+  Copy
 } from 'lucide-react';
 import { FoodSearchWithHistory } from '@/components/FoodSearchWithHistory';
 
@@ -805,6 +806,43 @@ interface UserFoodData {
 function UserFoodTextSuggestions({ onSuggestionClick }: { onSuggestionClick: (foodName: string) => void }) {
   const [userFoods, setUserFoods] = useState<UserFoodData[]>([]);
 
+  // Copy food information to clipboard
+  const copyFoodInfo = async (food: UserFoodData) => {
+    const macros = `${Math.round(food.calories || 0)} cal • P: ${(food.protein || 0).toFixed(1)}g • C: ${(food.carbs || 0).toFixed(1)}g • F: ${(food.fat || 0).toFixed(1)}g`;
+    
+    const micros = [];
+    if ((food.iron || 0) > 0) micros.push(`Iron: ${(food.iron || 0).toFixed(1)}mg`);
+    if ((food.calcium || 0) > 0) micros.push(`Calcium: ${Math.round(food.calcium || 0)}mg`);
+    if ((food.vitaminC || 0) > 0) micros.push(`Vitamin C: ${Math.round(food.vitaminC || 0)}mg`);
+    if ((food.zinc || 0) > 0) micros.push(`Zinc: ${(food.zinc || 0).toFixed(1)}mg`);
+    if ((food.magnesium || 0) > 0) micros.push(`Magnesium: ${Math.round(food.magnesium || 0)}mg`);
+    if ((food.vitaminD || 0) > 0) micros.push(`Vitamin D: ${(food.vitaminD || 0).toFixed(1)}μg`);
+    if ((food.vitaminB12 || 0) > 0) micros.push(`Vitamin B12: ${(food.vitaminB12 || 0).toFixed(1)}μg`);
+    if ((food.folate || 0) > 0) micros.push(`Folate: ${Math.round(food.folate || 0)}μg`);
+    
+    const copyText = `${food.name}\n${macros}${micros.length > 0 ? '\n' + micros.join(' • ') : ''}`;
+    
+    try {
+      await navigator.clipboard.writeText(copyText);
+      // Show success toast
+      window.dispatchEvent(new CustomEvent('show-toast', {
+        detail: { 
+          message: `📋 Copied ${food.name} details!`,
+          type: 'success'
+        }
+      }));
+    } catch (error) {
+      console.error('Failed to copy:', error);
+      // Show error toast
+      window.dispatchEvent(new CustomEvent('show-toast', {
+        detail: { 
+          message: `Failed to copy meal details`,
+          type: 'error'
+        }
+      }));
+    }
+  };
+
   useEffect(() => {
     const loadUserFoods = () => {
       try {
@@ -867,13 +905,14 @@ function UserFoodTextSuggestions({ onSuggestionClick }: { onSuggestionClick: (fo
       <div className="space-y-3">
         {userFoods.map((food) => (
           <div key={food.name} className="text-sm border border-gray-200 rounded-lg p-3 hover:bg-gray-50 transition-colors">
-            <button
-              onClick={() => onSuggestionClick(food.name)}
-              className="w-full text-left"
-            >
-              <div className="font-medium text-blue-600 hover:text-blue-800 mb-1">
-                {food.name}
-              </div>
+            <div className="flex items-start justify-between">
+              <button
+                onClick={() => onSuggestionClick(food.name)}
+                className="flex-1 text-left"
+              >
+                <div className="font-medium text-blue-600 hover:text-blue-800 mb-1">
+                  {food.name}
+                </div>
               
               {/* Macronutrients */}
               <div className="flex flex-wrap gap-3 mb-2 text-xs">
@@ -928,7 +967,20 @@ function UserFoodTextSuggestions({ onSuggestionClick }: { onSuggestionClick: (fo
                   )}
                 </div>
               )}
-            </button>
+              </button>
+              
+              {/* Copy Button */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  copyFoodInfo(food);
+                }}
+                className="ml-2 p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                title="Copy meal details"
+              >
+                <Copy className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         ))}
       </div>
