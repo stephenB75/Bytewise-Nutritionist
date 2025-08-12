@@ -10,6 +10,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Flame } from 'lucide-react';
 import { useCheckAchievements } from '@/hooks/useAchievements';
+import { getWeekDates, getLocalDateKey } from '@/utils/dateUtils';
 
 interface DayCalories {
   day: string;
@@ -25,28 +26,17 @@ export function WeeklyCaloriesCard() {
   // Achievement system hook
   const checkAchievements = useCheckAchievements();
 
-  // Get the current week's dates
+  // Get the current week's dates using timezone-aware utilities
   const getCurrentWeekDates = () => {
-    const today = new Date();
-    const currentDay = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
-    const startOfWeek = new Date(today);
-    startOfWeek.setDate(today.getDate() - currentDay); // Go to Sunday
-
-    const weekDates = [];
+    const weekDatesArray = getWeekDates(new Date());
     const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     
-    for (let i = 0; i < 7; i++) {
-      const date = new Date(startOfWeek);
-      date.setDate(startOfWeek.getDate() + i);
-      weekDates.push({
-        day: dayNames[i],
-        date: date.toISOString().split('T')[0],
-        calories: 0,
-        mealCount: 0
-      });
-    }
-    
-    return weekDates;
+    return weekDatesArray.map((date, index) => ({
+      day: dayNames[index],
+      date: getLocalDateKey(date),
+      calories: 0,
+      mealCount: 0
+    }));
   };
 
   // Calculate weekly calories from stored meal data

@@ -2,6 +2,7 @@ import { MealWithFoods } from '@shared/schema';
 import { Card } from './ui/card';
 import { Badge } from './ui/badge';
 import { Clock, Utensils } from 'lucide-react';
+import { formatLocalTime } from '@/utils/dateUtils';
 
 interface MealCardProps {
   meal: MealWithFoods;
@@ -25,11 +26,7 @@ export function MealCard({ meal, onClick }: MealCardProps) {
   };
 
   const formatTime = (date: Date) => {
-    return new Date(date).toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true
-    });
+    return formatLocalTime(new Date(date));
   };
 
   return (

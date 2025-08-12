@@ -6,6 +6,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useDataPersistence } from './useDataPersistence';
+import { getLocalDateKey, getWeekStart, getWeekDates } from '@/utils/dateUtils';
 
 interface MealEntry {
   id: string;
@@ -72,10 +73,9 @@ export function useWeeklyTracker() {
       }
     }
 
-    // Set current week
-    const now = new Date();
-    const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
-    setCurrentWeek(startOfWeek.toISOString().split('T')[0]);
+    // Set current week using local timezone
+    const weekStart = getWeekStart(new Date());
+    setCurrentWeek(getLocalDateKey(weekStart));
 
     // Listen for logged entries from calculator
     const handleCaloriesLogged = (event: CustomEvent) => {
@@ -104,7 +104,7 @@ export function useWeeklyTracker() {
   // Data is now automatically saved by the persistence system
 
   const logMealEntry = useCallback((entry: MealEntry) => {
-    const today = new Date().toISOString().split('T')[0];
+    const today = getLocalDateKey();
     
     setWeeklyData(prev => {
       const updated = [...prev];

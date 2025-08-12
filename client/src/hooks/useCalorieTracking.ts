@@ -6,6 +6,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useDataPersistence } from './useDataPersistence';
+import { getLocalDateKey, formatLocalTime, getMealTypeByTime } from '@/utils/dateUtils';
 
 interface CalculatedCalories {
   id: string;
@@ -41,8 +42,8 @@ export function useCalorieTracking() {
     const loaded = loadFromLocalStorage();
     if (loaded && Array.isArray(loaded)) {
       setCalculatedCalories(loaded);
-      // Calculate daily total from loaded data
-      const today = new Date().toISOString().split('T')[0];
+      // Calculate daily total from loaded data using local date
+      const today = getLocalDateKey();
       const todaysTotal = loaded
         .filter((entry: CalculatedCalories) => entry.date === today)
         .reduce((sum: number, entry: CalculatedCalories) => sum + entry.calories, 0);
@@ -63,10 +64,10 @@ export function useCalorieTracking() {
         fat: calorieEntry.fat,
         date: calorieEntry.date,
         time: calorieEntry.time.replace(/:\d\d$/, ''), // Remove seconds for display
-        category: getMealType(),
+        category: getMealTypeByTime(),
         timestamp: new Date().toISOString(),
         source: 'calculator',
-        mealType: getMealType()
+        mealType: getMealTypeByTime()
       };
       
       weeklyMeals.push(mealEntry);
@@ -84,11 +85,12 @@ export function useCalorieTracking() {
 
   // Add calculated calories
   const addCalculatedCalories = useCallback((calories: Omit<CalculatedCalories, 'id' | 'date' | 'time' | 'source'>) => {
+    const now = new Date();
     const newEntry: CalculatedCalories = {
       ...calories,
       id: Date.now().toString(),
-      date: new Date().toISOString().split('T')[0],
-      time: new Date().toLocaleTimeString(),
+      date: getLocalDateKey(now),
+      time: formatLocalTime(now),
       source: 'calculator'
     };
     
@@ -104,18 +106,9 @@ export function useCalorieTracking() {
     return newEntry;
   }, [logCaloriesMutation]);
 
-  // Get meal type based on time (enhanced logic)
-  const getMealType = (): 'breakfast' | 'lunch' | 'dinner' | 'snack' => {
-    const hour = new Date().getHours();
-    if (hour >= 5 && hour < 11) return 'breakfast';
-    if (hour >= 11 && hour < 16) return 'lunch';
-    if (hour >= 16 && hour < 21) return 'dinner';
-    return 'snack';
-  };
-
   // Get today's calculated calories
   const getTodaysCalories = useCallback(() => {
-    const today = new Date().toISOString().split('T')[0];
+    const today = getLocalDateKey();
     return calculatedCalories.filter(entry => entry.date === today);
   }, [calculatedCalories]);
 

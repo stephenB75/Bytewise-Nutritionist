@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { EnhancedIngredientDatabaseManager, type IngredientData } from '@/data/enhancedIngredientDatabase';
+import { getLocalDateKey, formatLocalTime, getMealTypeByTime } from '@/utils/dateUtils';
 import { 
   Search, 
   Calculator, 
@@ -221,17 +222,9 @@ function CalorieCalculator({
     }
   };
 
-  const getMealType = (): 'breakfast' | 'lunch' | 'dinner' | 'snack' => {
-    const hour = new Date().getHours();
-    if (hour >= 5 && hour < 11) return 'breakfast';
-    if (hour >= 11 && hour < 16) return 'lunch';  
-    if (hour >= 16 && hour < 21) return 'dinner';
-    return 'snack';
-  };
-
   const logToWeeklyTracker = async (analysis: IngredientAnalysis) => {
     const now = new Date();
-    const mealType = getMealType();
+    const mealType = getMealTypeByTime(now);
 
     // Calculate scaling factor based on actual serving vs 100g
     // The estimatedCalories is already scaled for the actual serving
@@ -256,12 +249,8 @@ function CalorieCalculator({
       vitaminD: (analysis.nutritionPer100g?.vitaminD || 0) * scalingFactor,
       vitaminB12: (analysis.nutritionPer100g?.vitaminB12 || 0) * scalingFactor,
       folate: (analysis.nutritionPer100g?.folate || 0) * scalingFactor,
-      date: now.toISOString().split('T')[0],
-      time: now.toLocaleTimeString('en-US', { 
-        hour: '2-digit', 
-        minute: '2-digit',
-        hour12: true 
-      }),
+      date: getLocalDateKey(now),
+      time: formatLocalTime(now),
       mealType,
       category: mealType,
       timestamp: now.toISOString(),

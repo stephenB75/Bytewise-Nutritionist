@@ -21,7 +21,8 @@ import {
   TrendingUp,
   Activity
 } from 'lucide-react';
-import { format, isToday, isYesterday } from 'date-fns';
+import { format } from 'date-fns';
+import { isToday, getDateLabel } from '@/utils/dateUtils';
 
 interface LoggedMeal {
   id: string;
@@ -56,11 +57,6 @@ export function MealTimeline({
   dailyCalorieGoal,
   onNavigate 
 }: MealTimelineProps) {
-  const getDateLabel = (date: Date) => {
-    if (isToday(date)) return 'Today';
-    if (isYesterday(date)) return 'Yesterday';
-    return format(date, 'EEEE, MMM d');
-  };
 
   const getMealIcon = (mealType: string) => {
     switch (mealType) {
