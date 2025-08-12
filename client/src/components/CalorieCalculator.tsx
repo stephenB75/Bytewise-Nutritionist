@@ -115,6 +115,9 @@ function CalorieCalculator({
   // State management
   const [ingredient, setIngredient] = useState('');
   const [measurement, setMeasurement] = useState('');
+  
+  // Debug logging
+  console.log('CalorieCalculator render - ingredient state:', ingredient);
   const [selectedUnit, setSelectedUnit] = useState('');
   const [amount, setAmount] = useState('');
   const [recentAnalyses, setRecentAnalyses] = useState<IngredientAnalysis[]>([]);
@@ -362,9 +365,11 @@ function CalorieCalculator({
             <FoodSearchWithHistory
               value={ingredient}
               onSelectFood={(food) => {
+                console.log('onSelectFood called with:', food.name);
                 // Just populate the search field with the food name
                 // Don't log it automatically - wait for user to set portion and calculate
                 setIngredient(food.name);
+                console.log('Called setIngredient with:', food.name);
                 // Optionally pre-fill a standard serving size
                 if (!measurement) {
                   setMeasurement('1 serving');

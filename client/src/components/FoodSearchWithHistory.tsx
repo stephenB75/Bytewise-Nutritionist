@@ -55,6 +55,8 @@ export function FoodSearchWithHistory({
   const [historicalMeals, setHistoricalMeals] = useState<LoggedFood[]>([]);
   const [showResults, setShowResults] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  
+  console.log('FoodSearchWithHistory render - value prop:', value);
 
   // Load historical meals from localStorage
   useEffect(() => {
@@ -157,6 +159,7 @@ export function FoodSearchWithHistory({
   };
 
   const handleSelectFood = (food: LoggedFood) => {
+    console.log('handleSelectFood called with:', food.name);
     // Close dropdown and call parent's onSelectFood
     setShowResults(false);
     onSelectFood(food);
@@ -170,12 +173,13 @@ export function FoodSearchWithHistory({
       {/* Search Input */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-        <Input
+        <input
+          type="text"
           value={value || ''}
           onChange={(e) => handleSearch(e.target.value)}
           onFocus={() => setShowResults(true)}
           placeholder={placeholder}
-          className="pl-10 pr-4 h-12 text-base text-gray-900 bg-white/80 backdrop-blur-sm border-gray-200 focus:border-brand-yellow focus:ring-brand-yellow placeholder:text-gray-500"
+          className="w-full pl-10 pr-4 h-12 text-base text-gray-900 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-md focus:border-brand-yellow focus:ring-brand-yellow focus:outline-none placeholder:text-gray-500"
         />
       </div>
 
