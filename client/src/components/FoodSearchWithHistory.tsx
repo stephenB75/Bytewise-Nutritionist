@@ -135,7 +135,8 @@ export function FoodSearchWithHistory({
 
   const handleSearch = (value: string) => {
     setSearchQuery(value);
-    setShowResults(value.length > 0);
+    // Show results if there's a search query OR if there are popular meals to show
+    setShowResults(value.length > 0 || popularMeals.length > 0);
     onSearchChange(value);
   };
 
