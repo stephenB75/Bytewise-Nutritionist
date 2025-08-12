@@ -34,7 +34,7 @@ import {
   Calendar
 } from 'lucide-react';
 import { FoodSearchWithHistory } from '@/components/FoodSearchWithHistory';
-import { UserFoodSuggestions } from '@/components/UserFoodSuggestions';
+
 
 interface IngredientAnalysis {
   ingredient: string;
@@ -778,49 +778,6 @@ function CalorieCalculator({
           </div>
         </Card>
       )}
-
-      {/* User Food Suggestions - Only shows user-entered foods */}
-      <UserFoodSuggestions
-        onSelectFood={async (food: any) => {
-          // Re-log selected user food
-          const now = getCorrectedDate();
-          const mealType = getMealTypeByTime(now);
-          
-          const mealData = {
-            id: `relogged-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-            name: food.name,
-            calories: food.calories,
-            protein: food.protein,
-            carbs: food.carbs,
-            fat: food.fat,
-            date: getCorrectedDateKey(now),
-            time: formatLocalTime(now),
-            mealType,
-            category: mealType,
-            timestamp: now.toISOString(),
-            source: 'user-suggestion'
-          };
-          
-          // Store in localStorage
-          const weeklyMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-          weeklyMeals.push(mealData);
-          localStorage.setItem('weeklyMeals', JSON.stringify(weeklyMeals));
-          
-          // Refresh displays
-          window.dispatchEvent(new CustomEvent('calories-logged'));
-          window.dispatchEvent(new CustomEvent('meals-updated'));
-          window.dispatchEvent(new CustomEvent('refresh-weekly-data'));
-          
-          // Show success toast
-          window.dispatchEvent(new CustomEvent('show-toast', {
-            detail: { 
-              message: `✅ Re-logged ${food.name}!`,
-              type: 'success'
-            }
-          }));
-        }}
-        className="mt-6"
-      />
     </div>
   );
 }
