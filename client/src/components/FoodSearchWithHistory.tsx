@@ -163,8 +163,8 @@ export function FoodSearchWithHistory({
 
       {/* Search Results Dropdown */}
       {showResults && (
-        <Card className="absolute top-full mt-2 left-0 right-0 z-50 p-0 shadow-xl border-gray-200 overflow-hidden max-h-[400px]">
-          <ScrollArea className="h-full max-h-[400px]">
+        <Card className="absolute top-full mt-2 left-0 right-0 z-[9999] p-0 shadow-2xl border border-gray-300 bg-white overflow-hidden max-h-[400px]">
+          <ScrollArea className="h-full max-h-[400px] bg-white">
             {/* Popular/Frequent Items (when no search) */}
             {!searchQuery && popularMeals.length > 0 && (
               <div className="p-2">
