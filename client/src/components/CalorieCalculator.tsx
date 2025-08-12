@@ -778,6 +778,67 @@ function CalorieCalculator({
           </div>
         </Card>
       )}
+
+      {/* Simple User Food Suggestions - One line text only */}
+      <UserFoodTextSuggestions onSuggestionClick={(foodName) => setIngredient(foodName)} />
+    </div>
+  );
+}
+
+// Simple text-based suggestions component
+function UserFoodTextSuggestions({ onSuggestionClick }: { onSuggestionClick: (foodName: string) => void }) {
+  const [userFoods, setUserFoods] = useState<string[]>([]);
+
+  useEffect(() => {
+    const loadUserFoods = () => {
+      try {
+        const weeklyMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
+        
+        // Extract unique food names that were entered by user (not from USDA database)
+        const userEnteredFoods = weeklyMeals
+          .filter((meal: any) => meal.source === 'user-suggestion' || meal.source === 'calculator')
+          .map((meal: any) => meal.name.split(' (')[0]) // Remove measurement part
+          .filter((name: string, index: number, arr: string[]) => arr.indexOf(name) === index) // Unique only
+          .slice(0, 8); // Limit to 8 suggestions
+        
+        setUserFoods(userEnteredFoods);
+      } catch (error) {
+        console.error('Error loading user foods:', error);
+        setUserFoods([]);
+      }
+    };
+
+    loadUserFoods();
+
+    // Listen for meal updates
+    const handleMealUpdate = () => loadUserFoods();
+    window.addEventListener('meals-updated', handleMealUpdate);
+    window.addEventListener('calories-logged', handleMealUpdate);
+
+    return () => {
+      window.removeEventListener('meals-updated', handleMealUpdate);
+      window.removeEventListener('calories-logged', handleMealUpdate);
+    };
+  }, []);
+
+  if (userFoods.length === 0) return null;
+
+  return (
+    <div className="mt-4 pt-3 border-t border-gray-200">
+      <p className="text-xs text-gray-500 mb-2">Quick suggestions:</p>
+      <div className="text-sm">
+        {userFoods.map((food, index) => (
+          <span key={food}>
+            <button
+              onClick={() => onSuggestionClick(food)}
+              className="text-blue-600 hover:text-blue-800 hover:underline cursor-pointer"
+            >
+              {food}
+            </button>
+            {index < userFoods.length - 1 && <span className="text-gray-400 mx-1">•</span>}
+          </span>
+        ))}
+      </div>
     </div>
   );
 }
