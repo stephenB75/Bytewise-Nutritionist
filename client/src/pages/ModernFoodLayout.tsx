@@ -49,6 +49,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
 import { getWeekDates, getLocalDateKey, getMealTypeByTime, formatLocalTime } from '@/utils/dateUtils';
+import { autoFixMealDatesIfNeeded, checkMealDateMismatches } from '@/utils/mealDateFixer';
 
 // Types
 interface ModernFoodLayoutProps {
@@ -352,6 +353,21 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     // Load existing meal data on component mount
     const loadExistingData = () => {
       try {
+        // Auto-fix any meal date mismatches on app startup
+        const dateCheck = checkMealDateMismatches();
+        if (dateCheck.mismatches.length > 0) {
+          console.log(`Found ${dateCheck.mismatches.length} meal date mismatches, fixing...`);
+          autoFixMealDatesIfNeeded();
+          
+          // Show user notification about the fix
+          setTimeout(() => {
+            toast({
+              title: "📅 Meal Dates Corrected",
+              description: `Fixed ${dateCheck.mismatches.length} meal entries that were on the wrong day.`,
+              duration: 4000,
+            });
+          }, 1000);
+        }
         const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
         const today = getLocalDateKey(); // Use actual current date
         const todayMeals = stored.filter((meal: any) => meal.date === today);

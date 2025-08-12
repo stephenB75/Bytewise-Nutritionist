@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Calendar, Flame } from 'lucide-react';
 import { useCheckAchievements } from '@/hooks/useAchievements';
 import { getWeekDates, getLocalDateKey } from '@/utils/dateUtils';
+import { autoFixMealDatesIfNeeded, checkMealDateMismatches } from '@/utils/mealDateFixer';
 
 interface DayCalories {
   day: string;
@@ -42,6 +43,9 @@ export function WeeklyCaloriesCard() {
   // Calculate weekly calories from stored meal data
   const calculateWeeklyCalories = () => {
     try {
+      // Auto-fix any meal date mismatches first
+      autoFixMealDatesIfNeeded();
+      
       const weekDates = getCurrentWeekDates();
       
       // Load meals from localStorage where the daily page stores them
