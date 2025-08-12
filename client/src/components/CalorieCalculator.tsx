@@ -115,9 +115,6 @@ function CalorieCalculator({
   // State management
   const [ingredient, setIngredient] = useState('');
   const [measurement, setMeasurement] = useState('');
-  
-  // Debug logging
-  console.log('CalorieCalculator render - ingredient state:', ingredient);
   const [selectedUnit, setSelectedUnit] = useState('');
   const [amount, setAmount] = useState('');
   const [recentAnalyses, setRecentAnalyses] = useState<IngredientAnalysis[]>([]);

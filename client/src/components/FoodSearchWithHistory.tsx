@@ -55,17 +55,6 @@ export function FoodSearchWithHistory({
   const [historicalMeals, setHistoricalMeals] = useState<LoggedFood[]>([]);
   const [showResults, setShowResults] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-  
-  console.log('FoodSearchWithHistory render - value prop:', value);
-
-  // Sync input ref value when value prop changes
-  useEffect(() => {
-    if (inputRef.current && value !== undefined) {
-      inputRef.current.value = value;
-      console.log('useEffect: Forcing input ref value to:', value);
-    }
-  }, [value]);
 
   // Load historical meals from localStorage
   useEffect(() => {
@@ -187,18 +176,12 @@ export function FoodSearchWithHistory({
       {/* Search Input */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-        <input
-          key={value || 'empty'}
-          ref={inputRef}
-          type="text"
-          defaultValue={value || ''}
-          onChange={(e) => {
-            console.log('Input onChange:', e.target.value);
-            handleSearch(e.target.value);
-          }}
+        <Input
+          value={value || ''}
+          onChange={(e) => handleSearch(e.target.value)}
           onFocus={() => setShowResults(true)}
           placeholder={placeholder}
-          className="w-full pl-10 pr-4 h-12 text-base text-gray-900 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-md focus:border-brand-yellow focus:ring-brand-yellow focus:outline-none placeholder:text-gray-500"
+          className="pl-10 pr-4 h-12 text-base text-gray-900 bg-white/80 backdrop-blur-sm border-gray-200 focus:border-brand-yellow focus:ring-brand-yellow placeholder:text-gray-500"
         />
       </div>
 
