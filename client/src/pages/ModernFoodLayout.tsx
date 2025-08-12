@@ -1097,30 +1097,40 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                       variant="destructive" 
                       data-testid={`delete-meal-${index}`}
                       className="mt-2 bg-red-600 hover:bg-red-700 text-white font-semibold px-3 py-1 rounded-md shadow-lg border-2 border-red-500 flex items-center gap-2 min-w-[80px]"
-                      onClick={(e) => {
+                      onClick={async (e) => {
                         e.stopPropagation();
                         console.log('Delete button clicked for meal:', meal.name, 'ID:', meal.id);
                         
                         // Delete meal action with confirmation
-                        const confirmDelete = window.confirm(`Delete "${meal.name}"?`);
+                        const confirmDelete = window.confirm(`Delete "${meal.name}" from today's log?`);
                         console.log('Confirmation result:', confirmDelete);
                         
                         if (confirmDelete) {
                           try {
-                            // Remove meal from localStorage first
+                            console.log('Starting deletion process...');
+                            
+                            // Remove meal from localStorage
                             const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
+                            console.log('Current stored meals:', stored.length);
+                            
                             const updated = stored.filter((m: any) => m.id !== meal.id);
+                            console.log('Updated meals after filter:', updated.length);
+                            
                             localStorage.setItem('weeklyMeals', JSON.stringify(updated));
                             
-                            // Update UI immediately for better UX
+                            // Update UI state immediately
                             const today = getCorrectedDateKey();
                             const todayMeals = updated.filter((m: any) => m.date === today);
+                            console.log('Today meals after deletion:', todayMeals.length);
+                            
+                            // Update all related state
                             setLoggedMeals(todayMeals);
                             
-                            // Recalculate totals
+                            // Recalculate daily totals
                             const totalCalories = todayMeals.reduce((sum: number, m: any) => sum + (m.calories || 0), 0);
                             setDailyCalories(totalCalories);
                             
+                            // Recalculate macros
                             const updatedMacros = todayMeals.reduce((totals: any, meal: any) => ({
                               protein: totals.protein + (meal.protein || 0),
                               carbs: totals.carbs + (meal.carbs || 0),
@@ -1128,16 +1138,27 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                             }), { protein: 0, carbs: 0, fat: 0 });
                             setDailyMacros(updatedMacros);
                             
+                            // Recalculate micronutrients
                             const updatedMicronutrients = calculateMicronutrients(todayMeals);
                             setDailyMicronutrients(updatedMicronutrients);
                             
-                            // Dispatch events for other components
+                            // Update weekly calories
+                            const currentWeekDates = getCorrectedWeekDates();
+                            const weekDateKeys = currentWeekDates.map(date => getLocalDateKey(date));
+                            const currentWeekMeals = updated.filter((meal: any) => weekDateKeys.includes(meal.date));
+                            const weeklyTotal = currentWeekMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
+                            setWeeklyCalories(weeklyTotal);
+                            
+                            // Force re-render of components
                             window.dispatchEvent(new CustomEvent('refresh-weekly-data'));
+                            window.dispatchEvent(new CustomEvent('storage', { detail: { key: 'weeklyMeals' } }));
+                            
+                            console.log('Deletion completed successfully');
                             
                             // Show success toast
                             toast({
                               title: "Meal deleted",
-                              description: `"${meal.name}" has been removed from your log.`,
+                              description: `"${meal.name}" removed from today's log.`,
                             });
                             
                           } catch (error) {
