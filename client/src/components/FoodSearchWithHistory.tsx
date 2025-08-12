@@ -181,10 +181,10 @@ export function FoodSearchWithHistory({
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
-                        <div className="font-medium text-sm group-hover:text-brand-blue">
+                        <div className="font-semibold text-sm text-gray-900 group-hover:text-brand-blue">
                           {meal.name}
                         </div>
-                        <div className="flex items-center gap-3 text-xs text-gray-500">
+                        <div className="flex items-center gap-3 text-xs text-gray-700">
                           <span className="flex items-center gap-1">
                             <Utensils className="h-3 w-3" />
                             {meal.calories} cal
@@ -228,10 +228,10 @@ export function FoodSearchWithHistory({
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
-                        <div className="font-medium text-sm group-hover:text-brand-blue">
+                        <div className="font-semibold text-sm text-gray-900 group-hover:text-brand-blue">
                           {meal.name}
                         </div>
-                        <div className="flex items-center gap-3 text-xs text-gray-500">
+                        <div className="flex items-center gap-3 text-xs text-gray-700">
                           <span className="flex items-center gap-1">
                             <Utensils className="h-3 w-3" />
                             {meal.calories} cal
@@ -254,16 +254,16 @@ export function FoodSearchWithHistory({
                 ))}
               </div>
             ) : searchQuery ? (
-              <div className="p-8 text-center text-gray-500">
-                <Search className="h-8 w-8 mx-auto mb-2 text-gray-300" />
-                <p className="text-sm">No matching meals found</p>
-                <p className="text-xs mt-1">Try searching in the USDA database</p>
+              <div className="p-8 text-center">
+                <Search className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                <p className="text-sm text-gray-700 font-medium">No matching meals found</p>
+                <p className="text-xs text-gray-600 mt-1">Try searching in the USDA database</p>
               </div>
             ) : (
-              <div className="p-8 text-center text-gray-500">
-                <Clock className="h-8 w-8 mx-auto mb-2 text-gray-300" />
-                <p className="text-sm">No meals logged yet</p>
-                <p className="text-xs mt-1">Start logging meals to see them here</p>
+              <div className="p-8 text-center">
+                <Clock className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                <p className="text-sm text-gray-700 font-medium">No meals logged yet</p>
+                <p className="text-xs text-gray-600 mt-1">Start logging meals to see them here</p>
               </div>
             )}
           </ScrollArea>
