@@ -1095,47 +1095,77 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     <Button 
                       size="sm" 
                       variant="destructive" 
-                      className="mt-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 hover:text-red-300 border border-red-600/30 flex items-center gap-1"
-                      onClick={() => {
+                      data-testid={`delete-meal-${index}`}
+                      className="mt-2 bg-red-600 hover:bg-red-700 text-white font-semibold px-3 py-1 rounded-md shadow-lg border-2 border-red-500 flex items-center gap-2 min-w-[80px]"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        console.log('Delete button clicked for meal:', meal.name, 'ID:', meal.id);
+                        
                         // Delete meal action with confirmation
-                        if (confirm(`Delete "${meal.name}"?`)) {
-                          // Remove meal from storage
-                          const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-                          const updated = stored.filter((m: any) => m.id !== meal.id);
-                          localStorage.setItem('weeklyMeals', JSON.stringify(updated));
-                          
-                          // Refresh meal list
-                          const today = getCorrectedDateKey(); // Use corrected date (Monday 11th)
-                          const todayMeals = updated.filter((m: any) => m.date === today);
-                          setLoggedMeals(todayMeals);
-                          
-                          // Update daily calories and nutrition
-                          const totalCalories = todayMeals.reduce((sum: number, m: any) => sum + (m.calories || 0), 0);
-                          setDailyCalories(totalCalories);
-                          
-                          // Recalculate macros and micronutrients after deletion
-                          const updatedMacros = todayMeals.reduce((totals: any, meal: any) => ({
-                            protein: totals.protein + (meal.protein || 0),
-                            carbs: totals.carbs + (meal.carbs || 0),
-                            fat: totals.fat + (meal.fat || 0)
-                          }), { protein: 0, carbs: 0, fat: 0 });
-                          setDailyMacros(updatedMacros);
-                          
-                          const updatedMicronutrients = calculateMicronutrients(todayMeals);
-                          setDailyMicronutrients(updatedMicronutrients);
-                          
-                          // Dispatch events
-                          window.dispatchEvent(new CustomEvent('refresh-weekly-data'));
-                          
-                          // Show success toast
-                          toast({
-                            title: "Meal deleted",
-                            description: `"${meal.name}" has been removed from your log.`,
-                          });
+                        const confirmDelete = window.confirm(`Delete "${meal.name}"?`);
+                        console.log('Confirmation result:', confirmDelete);
+                        
+                        if (confirmDelete) {
+                          try {
+                            // Remove meal from storage
+                            const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
+                            console.log('Before deletion - stored meals:', stored.length);
+                            console.log('Meal to delete ID:', meal.id);
+                            
+                            const updated = stored.filter((m: any) => {
+                              const keep = m.id !== meal.id;
+                              if (!keep) {
+                                console.log('Removing meal:', m.name, 'ID:', m.id);
+                              }
+                              return keep;
+                            });
+                            
+                            console.log('After deletion - remaining meals:', updated.length);
+                            localStorage.setItem('weeklyMeals', JSON.stringify(updated));
+                            
+                            // Refresh meal list
+                            const today = getCorrectedDateKey(); // Use corrected date (Monday 11th)
+                            const todayMeals = updated.filter((m: any) => m.date === today);
+                            console.log('Today meals after deletion:', todayMeals.length);
+                            setLoggedMeals(todayMeals);
+                            
+                            // Update daily calories and nutrition
+                            const totalCalories = todayMeals.reduce((sum: number, m: any) => sum + (m.calories || 0), 0);
+                            setDailyCalories(totalCalories);
+                            
+                            // Recalculate macros and micronutrients after deletion
+                            const updatedMacros = todayMeals.reduce((totals: any, meal: any) => ({
+                              protein: totals.protein + (meal.protein || 0),
+                              carbs: totals.carbs + (meal.carbs || 0),
+                              fat: totals.fat + (meal.fat || 0)
+                            }), { protein: 0, carbs: 0, fat: 0 });
+                            setDailyMacros(updatedMacros);
+                            
+                            const updatedMicronutrients = calculateMicronutrients(todayMeals);
+                            setDailyMicronutrients(updatedMicronutrients);
+                            
+                            // Dispatch events
+                            window.dispatchEvent(new CustomEvent('refresh-weekly-data'));
+                            
+                            // Show success toast
+                            toast({
+                              title: "Meal deleted",
+                              description: `"${meal.name}" has been removed from your log.`,
+                            });
+                            
+                            console.log('Delete operation completed successfully');
+                          } catch (error) {
+                            console.error('Error deleting meal:', error);
+                            toast({
+                              title: "Error",
+                              description: "Failed to delete meal. Please try again.",
+                              variant: "destructive"
+                            });
+                          }
                         }
                       }}
                     >
-                      <Trash2 className="w-3 h-3" />
+                      <Trash2 className="w-4 h-4" />
                       Delete
                     </Button>
                   </div>
