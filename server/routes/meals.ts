@@ -118,4 +118,33 @@ router.get('/api/meals/history', isAuthenticated, async (req: any, res) => {
   }
 });
 
+// Delete a logged meal entry
+router.delete('/api/meals/logged/:id', isAuthenticated, async (req: any, res) => {
+  try {
+    const userId = req.user?.id;
+    const mealId = parseInt(req.params.id);
+    
+    if (!userId) {
+      return res.status(401).json({ error: 'User not authenticated' });
+    }
+
+    if (isNaN(mealId)) {
+      return res.status(400).json({ error: 'Invalid meal ID' });
+    }
+
+    // Delete the meal (this will cascade to mealFoods due to foreign key)
+    const result = await db
+      .delete(meals)
+      .where(and(
+        eq(meals.id, mealId),
+        eq(meals.userId, userId)
+      ));
+
+    res.json({ success: true, message: 'Meal deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting meal:', error);
+    res.status(500).json({ error: 'Failed to delete meal' });
+  }
+});
+
 export default router;
