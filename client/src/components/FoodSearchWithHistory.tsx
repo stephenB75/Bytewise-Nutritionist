@@ -52,17 +52,13 @@ export function FoodSearchWithHistory({
   placeholder = "Search today's meals or history...",
   className = ""
 }: FoodSearchWithHistoryProps) {
-  const [searchQuery, setSearchQuery] = useState(value || '');
   const [historicalMeals, setHistoricalMeals] = useState<LoggedFood[]>([]);
   const [showResults, setShowResults] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-
-  // Sync internal state with external value prop
-  useEffect(() => {
-    if (value !== undefined) {
-      setSearchQuery(value);
-    }
-  }, [value]);
+  
+  // Use value prop directly if provided, otherwise use internal state
+  const [internalSearchQuery, setInternalSearchQuery] = useState('');
+  const searchQuery = value !== undefined ? value : internalSearchQuery;
 
   // Load historical meals from localStorage
   useEffect(() => {
@@ -157,11 +153,14 @@ export function FoodSearchWithHistory({
       .map(item => item.food);
   }, [historicalMeals]);
 
-  const handleSearch = (value: string) => {
-    setSearchQuery(value);
+  const handleSearch = (newValue: string) => {
+    // Update internal state if not controlled
+    if (value === undefined) {
+      setInternalSearchQuery(newValue);
+    }
     // Show results if there's a search query OR if there are popular meals to show
-    setShowResults(value.length > 0 || popularMeals.length > 0);
-    onSearchChange(value);
+    setShowResults(newValue.length > 0 || popularMeals.length > 0);
+    onSearchChange(newValue);
   };
 
   const handleSelectFood = (food: LoggedFood) => {
