@@ -3,7 +3,6 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated, optionalAuth, serverSupabase, type AuthenticatedRequest } from "./supabaseAuth";
 import { usdaService } from "./services/usdaService";
-import mealsRouter from "./routes/meals";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Health check endpoint - simplified for production
@@ -496,26 +495,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         totalFat: req.body.totalFat ? req.body.totalFat.toString() : '0'
       });
 
-      // Also create a mealFood entry for the logged item
-      // This allows the meal to appear in suggestions
-      if (meal && meal.id) {
-        await storage.addMealFood({
-          mealId: meal.id,
-          foodId: null, // Custom food, not from database
-          recipeId: null,
-          quantity: req.body.quantity || 1,
-          unit: req.body.unit || 'serving',
-          calories: req.body.totalCalories || 0,
-          protein: req.body.totalProtein || 0,
-          carbs: req.body.totalCarbs || 0,
-          fat: req.body.totalFat || 0,
-          fiber: req.body.fiber || 0,
-          sugar: req.body.sugar || 0,
-          sodium: req.body.sodium || 0,
-          foodName: req.body.name // Store the food name for custom entries
-        });
-      }
-
       // Check for new achievements after meal logging
       const newAchievements = await storage.checkAndCreateAchievements(userId);
       
@@ -734,9 +713,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to delete data" });
     }
   });
-
-  // Meals routes for history/suggestions
-  app.use(mealsRouter);
 
   // USDA Food Database Sync API
   app.post('/api/sync/food-database', isAuthenticated, async (req: any, res: Response) => {

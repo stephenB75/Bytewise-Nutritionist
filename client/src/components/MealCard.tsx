@@ -13,15 +13,15 @@ export function MealCard({ meal, onClick }: MealCardProps) {
   const getMealTypeColor = (type: string) => {
     switch (type.toLowerCase()) {
       case 'breakfast':
-        return 'bg-orange-500 text-white border-0';
+        return 'bg-yellow-100 text-yellow-800';
       case 'lunch':
-        return 'bg-blue-500 text-white border-0';
+        return 'bg-green-100 text-green-800';
       case 'dinner':
-        return 'bg-purple-500 text-white border-0';
+        return 'bg-blue-100 text-blue-800';
       case 'snack':
-        return 'bg-gray-500 text-white border-0';
+        return 'bg-purple-100 text-purple-800';
       default:
-        return 'bg-gray-500 text-white border-0';
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -42,7 +42,7 @@ export function MealCard({ meal, onClick }: MealCardProps) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center space-x-2 mb-1">
             <Badge className={`text-xs ${getMealTypeColor(meal.mealType)}`}>
-              {meal.mealType.charAt(0).toUpperCase() + meal.mealType.slice(1)}
+              {meal.mealType}
             </Badge>
             <div className="flex items-center text-xs text-muted-foreground">
               <Clock size={12} className="mr-1" />

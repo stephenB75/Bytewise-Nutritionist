@@ -39,8 +39,7 @@ import {
   UserCircle,
   Utensils,
   Clock,
-  CheckCircle2,
-  Trash2
+  CheckCircle2
 } from 'lucide-react';
 import { NotificationDropdown } from '@/components/NotificationDropdown';
 import { WeeklyCaloriesCard } from '@/components/WeeklyCaloriesCard';
@@ -81,7 +80,6 @@ type TrackingView = 'daily' | 'weekly';
 
 export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) {
   const { user, isLoading: authLoading } = useAuth();
-  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('home');
   const [previousTab, setPreviousTab] = useState('home');
   const [openCard, setOpenCard] = useState<string | undefined>(undefined);
@@ -1035,20 +1033,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <Card key={index} className="bg-white/10 backdrop-blur-md border-white/20 p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h4 className="text-white font-semibold">{meal.name}</h4>
-                      <Badge 
-                        className={`text-white border-0 text-xs px-2 py-0 ${
-                          meal.mealType === 'breakfast' ? 'bg-orange-500' :
-                          meal.mealType === 'lunch' ? 'bg-blue-500' :
-                          meal.mealType === 'dinner' ? 'bg-purple-500' :
-                          'bg-gray-500'
-                        }`}
-                      >
-                        {meal.mealType.charAt(0).toUpperCase() + meal.mealType.slice(1)}
-                      </Badge>
-                    </div>
-                    <p className="text-gray-400 text-sm">{meal.time}</p>
+                    <h4 className="text-white font-semibold">{meal.name}</h4>
+                    <p className="text-gray-400 text-sm">{meal.time} • {meal.mealType}</p>
                     <div className="flex flex-wrap gap-3 mt-1">
                       <span className="text-xs text-green-400">P: {(meal.protein || 0).toFixed(1)}g</span>
                       <span className="text-xs text-yellow-400">C: {(meal.carbs || 0).toFixed(1)}g</span>
@@ -1094,106 +1080,39 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     <p className="text-orange-400 font-bold text-lg">{Math.round(meal.calories || 0)} cal</p>
                     <Button 
                       size="sm" 
-                      variant="destructive" 
-                      data-testid={`delete-meal-${index}`}
-                      className="mt-2 bg-red-600 hover:bg-red-700 text-white font-semibold px-3 py-1 rounded-md shadow-lg border-2 border-red-500 flex items-center gap-2 min-w-[80px]"
-                      onClick={async (e) => {
-                        e.stopPropagation();
-                        console.log('Delete button clicked for meal:', meal.name, 'ID:', meal.id);
+                      variant="ghost" 
+                      className="text-gray-400 hover:text-white"
+                      onClick={() => {
+                        // Delete meal action
+                        // Remove meal from storage
+                        const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
+                        const updated = stored.filter((m: any) => m.id !== meal.id);
+                        localStorage.setItem('weeklyMeals', JSON.stringify(updated));
                         
-                        // Delete meal action with confirmation
-                        const confirmDelete = window.confirm(`Delete "${meal.name}" from today's log?`);
-                        console.log('Confirmation result:', confirmDelete);
+                        // Refresh meal list
+                        const today = getCorrectedDateKey(); // Use corrected date (Monday 11th)
+                        const todayMeals = updated.filter((m: any) => m.date === today);
+                        setLoggedMeals(todayMeals);
                         
-                        if (confirmDelete) {
-                          try {
-                            console.log('Starting deletion process...');
-                            console.log('Meal to delete:', meal.name, 'ID:', meal.id, 'Type of ID:', typeof meal.id);
-                            
-                            // Remove meal from localStorage
-                            const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-                            console.log('Current stored meals:', stored.length);
-                            console.log('All meal IDs:', stored.map((m: any) => ({ name: m.name, id: m.id, idType: typeof m.id })));
-                            
-                            // CRITICAL FIX: Handle meals that might not have IDs (legacy data)
-                            const updated = stored.filter((m: any, storedIndex: number) => {
-                              // If target meal has no ID, use array index and name comparison
-                              if (!meal.id) {
-                                const keepByIndex = storedIndex !== index;
-                                console.log(`Target meal has no ID, using index comparison: ${storedIndex} !== ${index} = ${keepByIndex}`);
-                                return keepByIndex;
-                              }
-                              
-                              // If stored meal has no ID, keep it (don't delete meals without IDs)
-                              if (!m.id) {
-                                console.log(`Stored meal "${m.name}" has no ID, keeping it`);
-                                return true;
-                              }
-                              
-                              // Both have IDs, compare them
-                              const match = String(m.id) !== String(meal.id);
-                              console.log(`Both have IDs - comparing "${m.name}" (${m.id}) with target "${meal.name}" (${meal.id}) - Keep: ${match}`);
-                              return match;
-                            });
-                            console.log('Updated meals after filter:', updated.length);
-                            
-                            localStorage.setItem('weeklyMeals', JSON.stringify(updated));
-                            
-                            // Update UI state immediately
-                            const today = getCorrectedDateKey();
-                            const todayMeals = updated.filter((m: any) => m.date === today);
-                            console.log('Today meals after deletion:', todayMeals.length);
-                            
-                            // Update all related state
-                            setLoggedMeals(todayMeals);
-                            
-                            // Recalculate daily totals
-                            const totalCalories = todayMeals.reduce((sum: number, m: any) => sum + (m.calories || 0), 0);
-                            setDailyCalories(totalCalories);
-                            
-                            // Recalculate macros
-                            const updatedMacros = todayMeals.reduce((totals: any, meal: any) => ({
-                              protein: totals.protein + (meal.protein || 0),
-                              carbs: totals.carbs + (meal.carbs || 0),
-                              fat: totals.fat + (meal.fat || 0)
-                            }), { protein: 0, carbs: 0, fat: 0 });
-                            setDailyMacros(updatedMacros);
-                            
-                            // Recalculate micronutrients
-                            const updatedMicronutrients = calculateMicronutrients(todayMeals);
-                            setDailyMicronutrients(updatedMicronutrients);
-                            
-                            // Update weekly calories
-                            const currentWeekDates = getCorrectedWeekDates();
-                            const weekDateKeys = currentWeekDates.map(date => getLocalDateKey(date));
-                            const currentWeekMeals = updated.filter((meal: any) => weekDateKeys.includes(meal.date));
-                            const weeklyTotal = currentWeekMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
-                            setWeeklyCalories(weeklyTotal);
-                            
-                            // Force re-render of components
-                            window.dispatchEvent(new CustomEvent('refresh-weekly-data'));
-                            window.dispatchEvent(new CustomEvent('storage', { detail: { key: 'weeklyMeals' } }));
-                            
-                            console.log('Deletion completed successfully');
-                            
-                            // Show success toast
-                            toast({
-                              title: "Meal deleted",
-                              description: `"${meal.name}" removed from today's log.`,
-                            });
-                            
-                          } catch (error) {
-                            console.error('Error deleting meal:', error);
-                            toast({
-                              title: "Error",
-                              description: "Failed to delete meal. Please try again.",
-                              variant: "destructive"
-                            });
-                          }
-                        }
+                        // Update daily calories and nutrition
+                        const totalCalories = todayMeals.reduce((sum: number, m: any) => sum + (m.calories || 0), 0);
+                        setDailyCalories(totalCalories);
+                        
+                        // Recalculate macros and micronutrients after deletion
+                        const updatedMacros = todayMeals.reduce((totals: any, meal: any) => ({
+                          protein: totals.protein + (meal.protein || 0),
+                          carbs: totals.carbs + (meal.carbs || 0),
+                          fat: totals.fat + (meal.fat || 0)
+                        }), { protein: 0, carbs: 0, fat: 0 });
+                        setDailyMacros(updatedMacros);
+                        
+                        const updatedMicronutrients = calculateMicronutrients(todayMeals);
+                        setDailyMicronutrients(updatedMicronutrients);
+                        
+                        // Dispatch events
+                        window.dispatchEvent(new CustomEvent('refresh-weekly-data'));
                       }}
                     >
-                      <Trash2 className="w-4 h-4" />
                       Delete
                     </Button>
                   </div>
@@ -1246,146 +1165,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             
             {/* Include Weekly Calories Card */}
             <WeeklyCaloriesCard />
-            
-            {/* Weekly Meals with Delete Functionality */}
-            <div className="space-y-4 mt-6">
-              <div className="flex justify-between items-center">
-                <h3 className="text-xl font-bold text-white">This Week's Meals</h3>
-                <Badge className="bg-purple-600 text-white">All Entries</Badge>
-              </div>
-              
-              {(() => {
-                // Get all meals from this week
-                const storedMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-                const weekDates = getCorrectedWeekDates().map(date => getLocalDateKey(date));
-                const weekMeals = storedMeals.filter((meal: any) => weekDates.includes(meal.date));
-                
-                if (weekMeals.length === 0) {
-                  return (
-                    <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6 text-center">
-                      <div className="text-gray-400">
-                        <Calendar className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                        <p className="text-lg mb-2">No meals logged this week</p>
-                        <p className="text-sm">Start logging meals to see them here</p>
-                      </div>
-                    </Card>
-                  );
-                }
-                
-                return weekMeals.map((meal: any, index: number) => (
-                  <Card key={`${meal.id}-${index}`} className="bg-white/10 backdrop-blur-md border-white/20 p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h4 className="text-white font-semibold">{meal.name}</h4>
-                          <Badge 
-                            className={`text-white border-0 text-xs px-2 py-0 ${
-                              meal.mealType === 'breakfast' ? 'bg-orange-500' :
-                              meal.mealType === 'lunch' ? 'bg-blue-500' :
-                              meal.mealType === 'dinner' ? 'bg-purple-500' :
-                              'bg-gray-500'
-                            }`}
-                          >
-                            {meal.mealType.charAt(0).toUpperCase() + meal.mealType.slice(1)}
-                          </Badge>
-                        </div>
-                        <p className="text-gray-400 text-sm">
-                          {new Date(meal.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} • {meal.time}
-                        </p>
-                        <div className="flex flex-wrap gap-3 mt-1">
-                          <span className="text-xs text-green-400">P: {(meal.protein || 0).toFixed(1)}g</span>
-                          <span className="text-xs text-yellow-400">C: {(meal.carbs || 0).toFixed(1)}g</span>
-                          <span className="text-xs text-purple-400">F: {(meal.fat || 0).toFixed(1)}g</span>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-orange-400 font-bold text-lg">{Math.round(meal.calories || 0)} cal</p>
-                        <Button 
-                          size="sm" 
-                          variant="destructive" 
-                          className="mt-2 bg-red-600 hover:bg-red-700 text-white font-semibold px-3 py-1 rounded-md shadow-lg border-2 border-red-500 flex items-center gap-2 min-w-[80px]"
-                          onClick={() => {
-                            // Delete meal action with confirmation
-                            const confirmDelete = window.confirm(`Delete "${meal.name}"?`);
-                            
-                            if (confirmDelete) {
-                              try {
-                                console.log('Weekly view - Deleting meal:', meal.name, 'ID:', meal.id, 'Type:', typeof meal.id);
-                                
-                                // Remove meal from localStorage with robust ID comparison
-                                const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-                                console.log('Weekly view - Stored meals:', stored.length);
-                                
-                                const updated = stored.filter((m: any, storedIndex: number) => {
-                                  // If target meal has no ID, use name and timestamp comparison
-                                  if (!meal.id) {
-                                    const keep = m.name !== meal.name || m.timestamp !== meal.timestamp;
-                                    console.log(`Weekly - Target has no ID, comparing by name/time: ${keep}`);
-                                    return keep;
-                                  }
-                                  
-                                  // If stored meal has no ID, keep it
-                                  if (!m.id) {
-                                    console.log(`Weekly - Stored meal "${m.name}" has no ID, keeping`);
-                                    return true;
-                                  }
-                                  
-                                  // Both have IDs
-                                  const keep = String(m.id) !== String(meal.id);
-                                  console.log(`Weekly: Keep "${m.name}" (${m.id})? ${keep}`);
-                                  return keep;
-                                });
-                                console.log('Weekly view - After filter:', updated.length);
-                                localStorage.setItem('weeklyMeals', JSON.stringify(updated));
-                                
-                                // Update daily calories if deleting today's meal
-                                const today = getCorrectedDateKey();
-                                if (meal.date === today) {
-                                  const todayMeals = updated.filter((m: any) => m.date === today);
-                                  const totalCalories = todayMeals.reduce((sum: number, m: any) => sum + (m.calories || 0), 0);
-                                  setDailyCalories(totalCalories);
-                                  setLoggedMeals(todayMeals);
-                                  
-                                  const updatedMacros = todayMeals.reduce((totals: any, meal: any) => ({
-                                    protein: totals.protein + (meal.protein || 0),
-                                    carbs: totals.carbs + (meal.carbs || 0),
-                                    fat: totals.fat + (meal.fat || 0)
-                                  }), { protein: 0, carbs: 0, fat: 0 });
-                                  setDailyMacros(updatedMacros);
-                                  
-                                  const updatedMicronutrients = calculateMicronutrients(todayMeals);
-                                  setDailyMicronutrients(updatedMicronutrients);
-                                }
-                                
-                                // Force component re-render
-                                window.dispatchEvent(new CustomEvent('refresh-weekly-data'));
-                                
-                                // Show success toast
-                                toast({
-                                  title: "Meal deleted",
-                                  description: `"${meal.name}" has been removed from your log.`,
-                                });
-                                
-                              } catch (error) {
-                                console.error('Error deleting meal:', error);
-                                toast({
-                                  title: "Error",
-                                  description: "Failed to delete meal. Please try again.",
-                                  variant: "destructive"
-                                });
-                              }
-                            }
-                          }}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                          Delete
-                        </Button>
-                      </div>
-                    </div>
-                  </Card>
-                ));
-              })()}
-            </div>
           </div>
         )}
       </div>

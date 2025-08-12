@@ -33,8 +33,7 @@ import {
   Droplets,
   Calendar
 } from 'lucide-react';
-import { SimpleFoodSearch } from '@/components/SimpleFoodSearch';
-import { LoggedFoodSuggestions } from '@/components/LoggedFoodSuggestions';
+import { FoodSearchWithHistory } from '@/components/FoodSearchWithHistory';
 
 interface IngredientAnalysis {
   ingredient: string;
@@ -120,14 +119,23 @@ function CalorieCalculator({
   const [recentAnalyses, setRecentAnalyses] = useState<IngredientAnalysis[]>([]);
   const [showLoggedAnimation, setShowLoggedAnimation] = useState(false);
   const [loggedData, setLoggedData] = useState<any>(null);
-
+  const [ingredientSuggestions, setIngredientSuggestions] = useState<Array<{category: string; key: string; data: IngredientData}>>([]);
   const [selectedIngredient, setSelectedIngredient] = useState<{category: string; key: string; data: IngredientData} | null>(null);
   const [availableUnits, setAvailableUnits] = useState<string[]>([]);
 
   // Achievement system hook
   const checkAchievements = useCheckAchievements();
 
-  // Removed ingredient suggestions - using simple search only
+  // Search ingredients as user types (handled by FoodSearchWithHistory now)
+  // This effect is kept for backward compatibility with direct ingredient input
+  useEffect(() => {
+    if (ingredient.length >= 2 && !isCompact) {
+      const customSuggestions = EnhancedIngredientDatabaseManager.searchIngredients(ingredient);
+      setIngredientSuggestions(customSuggestions.slice(0, 6));
+    } else {
+      setIngredientSuggestions([]);
+    }
+  }, [ingredient, isCompact]);
 
   // Update available units when ingredient is selected
   useEffect(() => {
@@ -192,7 +200,11 @@ function CalorieCalculator({
     setSelectedIngredient(null);
   };
 
-
+  const selectIngredient = (suggestion: {category: string; key: string; data: IngredientData}) => {
+    setSelectedIngredient(suggestion);
+    setIngredient(suggestion.data.displayName);
+    setIngredientSuggestions([]);
+  };
 
   const handleCalculate = (e: React.FormEvent) => {
     e.preventDefault();
@@ -224,7 +236,7 @@ function CalorieCalculator({
     const scalingFactor = caloriesPer100g > 0 ? analysis.estimatedCalories / caloriesPer100g : 1;
 
     const mealData: LoggedMealData = {
-      id: `calc-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+      id: `calc-${Date.now()}`,
       name: `${analysis.ingredient} (${analysis.measurement})`,
       calories: analysis.estimatedCalories,
       // Scale macronutrients based on actual serving size
@@ -360,17 +372,40 @@ function CalorieCalculator({
         <form onSubmit={handleCalculate} className="space-y-3">
           <div className="grid grid-cols-1 gap-2">
             <FoodSearchWithHistory
-              value={ingredient}
-              onSelectFood={(food) => {
-                console.log('onSelectFood called with:', food.name);
-                // Just populate the search field with the food name
-                // Don't log it automatically - wait for user to set portion and calculate
-                setIngredient(food.name);
-                console.log('Called setIngredient with:', food.name);
-                // Optionally pre-fill a standard serving size
-                if (!measurement) {
-                  setMeasurement('1 serving');
-                }
+              onSelectFood={async (food) => {
+                // Quick re-log from history
+                const now = getCorrectedDate(); // Use corrected date (Monday 11th)
+                const mealType = getMealTypeByTime(now);
+                
+                const mealData: LoggedMealData = {
+                  id: `relogged-${Date.now()}`,
+                  name: food.name,
+                  calories: food.calories,
+                  protein: food.protein,
+                  carbs: food.carbs,
+                  fat: food.fat,
+                  date: getLocalDateKey(now),
+                  time: formatLocalTime(now),
+                  mealType,
+                  category: mealType,
+                  timestamp: now.toISOString(),
+                  source: 'history'
+                };
+                
+                const weeklyMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
+                weeklyMeals.push(mealData);
+                localStorage.setItem('weeklyMeals', JSON.stringify(weeklyMeals));
+                
+                window.dispatchEvent(new CustomEvent('calories-logged'));
+                window.dispatchEvent(new CustomEvent('meals-updated'));
+                
+                // Show toast
+                window.dispatchEvent(new CustomEvent('show-toast', {
+                  detail: { 
+                    message: `✅ Re-logged ${food.name}!`,
+                    type: 'success'
+                  }
+                }));
               }}
               onSearchChange={(query) => setIngredient(query)}
               placeholder="Search meals or add new..."
@@ -506,37 +541,6 @@ function CalorieCalculator({
         </div>
       )}
 
-      {/* User Guide Card */}
-      <Card className="p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">How to Use</h3>
-        
-        <p className="text-sm text-gray-700 mb-4">
-          To use the calorie calculator enter exactly what you ate and add the portion size. The calorie calculator will correctly provide the macro and micro breakdown of your meal showing the calorie amount.
-        </p>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-3">
-            <h4 className="font-medium text-gray-700">Ingredient Entry</h4>
-            <div className="space-y-2 text-sm text-gray-600">
-              <p>• Type any food name to search</p>
-              <p>• Use USDA database for accuracy</p>
-              <p>• Select from custom ingredients</p>
-              <p>• Get detailed nutrition breakdowns</p>
-            </div>
-          </div>
-          
-          <div className="space-y-3">
-            <h4 className="font-medium text-gray-700">Measurement Examples</h4>
-            <div className="space-y-2 text-sm text-gray-600">
-              <p>• Weight: 100g, 2 oz, 1 lb</p>
-              <p>• Volume: 1 cup, 2 tbsp, 1 tsp</p>
-              <p>• Pieces: 1 medium, 1 slice, 1 whole</p>
-              <p>• Portions: 1 serving, handful, bunch</p>
-            </div>
-          </div>
-        </div>
-      </Card>
-
       {/* Main Calculator */}
       <Card className="p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg">
         <div className="flex items-center gap-3 mb-6">
@@ -551,21 +555,112 @@ function CalorieCalculator({
 
         <form onSubmit={handleCalculate} className="space-y-4">
           <div className="grid grid-cols-1 gap-4">
-            {/* Simple Food Search */}
+            {/* Enhanced Food Search with History */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Food Ingredient
+                Search Food
               </label>
-              <SimpleFoodSearch
+              <FoodSearchWithHistory
+                onSelectFood={async (food) => {
+                  // For historical meals, we can directly log them
+                  const now = getCorrectedDate(); // Use corrected date (Monday 11th)
+                  const mealType = getMealTypeByTime(now);
+                  
+                  // Create the logged meal data
+                  const mealData: LoggedMealData = {
+                    id: `relogged-${Date.now()}`,
+                    name: food.name,
+                    calories: food.calories,
+                    protein: food.protein,
+                    carbs: food.carbs,
+                    fat: food.fat,
+                    date: getLocalDateKey(now),
+                    time: formatLocalTime(now),
+                    mealType,
+                    category: mealType,
+                    timestamp: now.toISOString(),
+                    source: 'history'
+                  };
+                  
+                  // Store in localStorage
+                  const weeklyMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
+                  weeklyMeals.push(mealData);
+                  localStorage.setItem('weeklyMeals', JSON.stringify(weeklyMeals));
+                  
+                  // Save to database
+                  try {
+                    await apiRequest('POST', '/api/meals/logged', {
+                      name: mealData.name,
+                      date: mealData.timestamp,
+                      mealType: mealData.mealType,
+                      totalCalories: mealData.calories,
+                      totalProtein: mealData.protein,
+                      totalCarbs: mealData.carbs,
+                      totalFat: mealData.fat
+                    });
+                    
+                    // Show success animation
+                    setLoggedData(mealData);
+                    setShowLoggedAnimation(true);
+                    setTimeout(() => setShowLoggedAnimation(false), 3000);
+                    
+                    // Dispatch events for other components
+                    window.dispatchEvent(new CustomEvent('calories-logged'));
+                    window.dispatchEvent(new CustomEvent('meals-updated'));
+                    
+                    // Check achievements
+                    checkAchievements.mutate();
+                  } catch (error) {
+                    console.error('Failed to save meal to database:', error);
+                  }
+                }}
                 onSearchChange={(query) => {
                   setIngredient(query);
+                  // Still show ingredient suggestions from database
+                  if (query.length >= 2) {
+                    const customSuggestions = EnhancedIngredientDatabaseManager.searchIngredients(query);
+                    setIngredientSuggestions(customSuggestions.slice(0, 6));
+                  } else {
+                    setIngredientSuggestions([]);
+                  }
                 }}
-                placeholder="Enter food name..."
+                placeholder="Search today's meals, history, or new foods..."
                 className="w-full"
               />
               
+              {/* Ingredient Suggestions Dropdown */}
+              {ingredientSuggestions.length > 0 && ingredient.length >= 2 && (
+                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-64 overflow-y-auto">
+                  <div className="px-3 py-1 text-xs text-gray-500 bg-gray-50 border-b">
+                    USDA Database Suggestions
+                  </div>
+                  {ingredientSuggestions.map((suggestion, index) => (
+                    <button
+                      key={`${suggestion.category}-${suggestion.key}`}
+                      type="button"
+                      onClick={() => selectIngredient(suggestion)}
+                      className="w-full px-4 py-2 text-left hover:bg-blue-50 border-b border-gray-100 last:border-b-0"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium text-gray-900">{suggestion.data.displayName}</p>
+                          <p className="text-xs text-gray-500">{suggestion.category}</p>
+                        </div>
+                        <Badge 
+                          variant="outline" 
+                          style={{ backgroundColor: suggestion.data.tags.categoryColor + '40', color: '#374151' }}
+                          className="text-xs"
+                        >
+                          {suggestion.data.tags.dietType[0] || 'food'}
+                        </Badge>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+              
               <p className="text-xs text-gray-500 mt-1">
-                Enter any food item to calculate calories
+                Search your meal history or add new foods from the USDA database
               </p>
             </div>
             
@@ -758,15 +853,32 @@ function CalorieCalculator({
         </Card>
       )}
 
-      {/* Logged Food Suggestions */}
-      <LoggedFoodSuggestions 
-        onSelectFood={(food) => {
-          // Set the ingredient and measurement fields when a suggestion is clicked
-          setIngredient(food.name);
-          setMeasurement('1 serving');
-          // Optionally, you could auto-calculate or provide quick-add functionality
-        }}
-      />
+      {/* User Guide Card */}
+      <Card className="p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg">
+        <h3 className="text-lg font-bold text-gray-900 mb-4">How to Use</h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-3">
+            <h4 className="font-medium text-gray-700">Ingredient Entry</h4>
+            <div className="space-y-2 text-sm text-gray-600">
+              <p>• Type any food name to search</p>
+              <p>• Use USDA database for accuracy</p>
+              <p>• Select from custom ingredients</p>
+              <p>• Get detailed nutrition breakdowns</p>
+            </div>
+          </div>
+          
+          <div className="space-y-3">
+            <h4 className="font-medium text-gray-700">Measurement Examples</h4>
+            <div className="space-y-2 text-sm text-gray-600">
+              <p>• Weight: 100g, 2 oz, 1 lb</p>
+              <p>• Volume: 1 cup, 2 tbsp, 1 tsp</p>
+              <p>• Pieces: 1 medium, 1 slice, 1 whole</p>
+              <p>• Portions: 1 serving, handful, bunch</p>
+            </div>
+          </div>
+        </div>
+      </Card>
     </div>
   );
 }

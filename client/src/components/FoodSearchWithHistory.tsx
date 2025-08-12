@@ -8,7 +8,7 @@
  * - Quick re-log functionality
  */
 
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,12 +17,15 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
   Search, 
   Clock, 
+  Calendar,
   ChevronRight,
   Utensils,
   History,
   TrendingUp,
   Star
 } from 'lucide-react';
+import { format, subDays, subWeeks, subMonths, isToday, isYesterday, differenceInDays } from 'date-fns';
+import { getLocalDateKey } from '@/utils/dateUtils';
 
 interface LoggedFood {
   id: string;
@@ -38,7 +41,6 @@ interface LoggedFood {
 }
 
 interface FoodSearchWithHistoryProps {
-  value?: string;
   onSelectFood: (food: LoggedFood) => void;
   onSearchChange: (query: string) => void;
   placeholder?: string;
@@ -46,15 +48,15 @@ interface FoodSearchWithHistoryProps {
 }
 
 export function FoodSearchWithHistory({
-  value,
   onSelectFood,
   onSearchChange,
   placeholder = "Search today's meals or history...",
   className = ""
 }: FoodSearchWithHistoryProps) {
+  const [searchQuery, setSearchQuery] = useState('');
   const [historicalMeals, setHistoricalMeals] = useState<LoggedFood[]>([]);
   const [showResults, setShowResults] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [selectedTimeRange, setSelectedTimeRange] = useState<'today' | 'week' | 'month' | 'all'>('all');
 
   // Load historical meals from localStorage
   useEffect(() => {
@@ -89,28 +91,25 @@ export function FoodSearchWithHistory({
     };
   }, []);
 
-  // Click away handler to close dropdown
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setShowResults(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
-  // Filter meals based on search query
+  // Filter meals based on search query and time range
   const filteredMeals = useMemo(() => {
     let meals = [...historicalMeals];
+    const today = getLocalDateKey(new Date());
+    
+    // Filter by time range
+    if (selectedTimeRange === 'today') {
+      meals = meals.filter(meal => meal.date === today);
+    } else if (selectedTimeRange === 'week') {
+      const weekAgo = getLocalDateKey(subWeeks(new Date(), 1));
+      meals = meals.filter(meal => meal.date >= weekAgo);
+    } else if (selectedTimeRange === 'month') {
+      const monthAgo = getLocalDateKey(subMonths(new Date(), 1));
+      meals = meals.filter(meal => meal.date >= monthAgo);
+    }
     
     // Filter by search query
-    const searchValue = value || '';
-    if (searchValue.trim()) {
-      const query = searchValue.toLowerCase();
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
       meals = meals.filter(meal => 
         meal.name.toLowerCase().includes(query)
       );
@@ -128,7 +127,7 @@ export function FoodSearchWithHistory({
     });
     
     return Array.from(uniqueMeals.values()).slice(0, 10); // Limit to 10 results
-  }, [historicalMeals, value]);
+  }, [historicalMeals, searchQuery, selectedTimeRange]);
 
   // Group meals by frequency for popular items
   const popularMeals = useMemo(() => {
@@ -150,47 +149,88 @@ export function FoodSearchWithHistory({
       .map(item => item.food);
   }, [historicalMeals]);
 
-  const handleSearch = (newValue: string) => {
-    // Show results if there's a search query OR if there are popular meals to show
-    setShowResults(newValue.length > 0 || popularMeals.length > 0);
-    onSearchChange(newValue);
+  const handleSearch = (value: string) => {
+    setSearchQuery(value);
+    setShowResults(value.length > 0 || selectedTimeRange !== 'all');
+    onSearchChange(value);
   };
 
   const handleSelectFood = (food: LoggedFood) => {
-    console.log('handleSelectFood called with:', food.name);
-    // Manually set the input value using ref
-    if (inputRef.current) {
-      inputRef.current.value = food.name;
-      console.log('Manually set input value to:', food.name);
-    }
-    // Call parent's onSelectFood to update the state
     onSelectFood(food);
-    // Then close dropdown after a tiny delay to ensure state update
-    setTimeout(() => setShowResults(false), 10);
+    setSearchQuery('');
+    setShowResults(false);
   };
 
-
+  const getDateLabel = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const today = new Date();
+    
+    if (isToday(date)) return 'Today';
+    if (isYesterday(date)) return 'Yesterday';
+    
+    const days = differenceInDays(today, date);
+    if (days < 7) return `${days} days ago`;
+    if (days < 30) return `${Math.floor(days / 7)} weeks ago`;
+    
+    return format(date, 'MMM d');
+  };
 
   return (
-    <div ref={containerRef} className={`relative ${className}`}>
+    <div className={`relative ${className}`}>
       {/* Search Input */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
         <Input
-          value={value || ''}
+          value={searchQuery}
           onChange={(e) => handleSearch(e.target.value)}
           onFocus={() => setShowResults(true)}
           placeholder={placeholder}
-          className="pl-10 pr-4 h-12 text-base text-gray-900 bg-white/80 backdrop-blur-sm border-gray-200 focus:border-brand-yellow focus:ring-brand-yellow placeholder:text-gray-500"
+          className="pl-10 pr-4 h-12 text-base bg-white/80 backdrop-blur-sm border-gray-200 focus:border-brand-yellow focus:ring-brand-yellow"
         />
       </div>
 
       {/* Search Results Dropdown */}
       {showResults && (
-        <Card className="absolute top-full mt-2 left-0 right-0 z-[9999] p-0 shadow-2xl border border-gray-300 bg-white overflow-hidden max-h-[400px]">
-          <ScrollArea className="h-full max-h-[400px] bg-white">
+        <Card className="absolute top-full mt-2 left-0 right-0 z-50 p-0 shadow-xl border-gray-200 overflow-hidden max-h-[400px]">
+          {/* Time Range Filters */}
+          <div className="p-2 border-b bg-gray-50 flex gap-1">
+            <Button
+              size="sm"
+              variant={selectedTimeRange === 'today' ? 'default' : 'ghost'}
+              onClick={() => setSelectedTimeRange('today')}
+              className="h-7 text-xs"
+            >
+              Today
+            </Button>
+            <Button
+              size="sm"
+              variant={selectedTimeRange === 'week' ? 'default' : 'ghost'}
+              onClick={() => setSelectedTimeRange('week')}
+              className="h-7 text-xs"
+            >
+              This Week
+            </Button>
+            <Button
+              size="sm"
+              variant={selectedTimeRange === 'month' ? 'default' : 'ghost'}
+              onClick={() => setSelectedTimeRange('month')}
+              className="h-7 text-xs"
+            >
+              This Month
+            </Button>
+            <Button
+              size="sm"
+              variant={selectedTimeRange === 'all' ? 'default' : 'ghost'}
+              onClick={() => setSelectedTimeRange('all')}
+              className="h-7 text-xs"
+            >
+              All Time
+            </Button>
+          </div>
+
+          <ScrollArea className="h-full max-h-[340px]">
             {/* Popular/Frequent Items (when no search) */}
-            {!(value || '') && popularMeals.length > 0 && (
+            {!searchQuery && popularMeals.length > 0 && (
               <div className="p-2">
                 <div className="flex items-center gap-2 px-2 py-1 text-xs text-gray-500">
                   <Star className="h-3 w-3" />
@@ -204,24 +244,14 @@ export function FoodSearchWithHistory({
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
-                        <div className="font-semibold text-sm text-gray-900 group-hover:text-brand-blue">
+                        <div className="font-medium text-sm group-hover:text-brand-blue">
                           {meal.name}
                         </div>
-                        <div className="flex items-center gap-3 text-xs text-gray-700">
+                        <div className="flex items-center gap-3 text-xs text-gray-500">
                           <span className="flex items-center gap-1">
                             <Utensils className="h-3 w-3" />
                             {meal.calories} cal
                           </span>
-                          <Badge 
-                            className={`text-white border-0 text-xs px-2 py-0 ${
-                              meal.mealType === 'breakfast' ? 'bg-orange-500' :
-                              meal.mealType === 'lunch' ? 'bg-blue-500' :
-                              meal.mealType === 'dinner' ? 'bg-purple-500' :
-                              'bg-gray-500'
-                            }`}
-                          >
-                            {meal.mealType.charAt(0).toUpperCase() + meal.mealType.slice(1)}
-                          </Badge>
                           <span>P: {meal.protein}g</span>
                           <span>C: {meal.carbs}g</span>
                           <span>F: {meal.fat}g</span>
@@ -237,7 +267,7 @@ export function FoodSearchWithHistory({
             {/* Search Results */}
             {filteredMeals.length > 0 ? (
               <div className="p-2">
-                {(value || '') && (
+                {searchQuery && (
                   <div className="flex items-center gap-2 px-2 py-1 text-xs text-gray-500">
                     <History className="h-3 w-3" />
                     <span className="font-medium">Previous Meals</span>
@@ -251,23 +281,20 @@ export function FoodSearchWithHistory({
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
-                        <div className="font-semibold text-sm text-gray-900 group-hover:text-brand-blue">
+                        <div className="font-medium text-sm group-hover:text-brand-blue">
                           {meal.name}
                         </div>
-                        <div className="flex items-center gap-3 text-xs text-gray-700">
+                        <div className="flex items-center gap-3 text-xs text-gray-500">
+                          <span className="flex items-center gap-1">
+                            <Calendar className="h-3 w-3" />
+                            {getDateLabel(meal.date)}
+                          </span>
                           <span className="flex items-center gap-1">
                             <Utensils className="h-3 w-3" />
                             {meal.calories} cal
                           </span>
-                          <Badge 
-                            className={`text-white border-0 text-xs px-2 py-0 ${
-                              meal.mealType === 'breakfast' ? 'bg-orange-500' :
-                              meal.mealType === 'lunch' ? 'bg-blue-500' :
-                              meal.mealType === 'dinner' ? 'bg-purple-500' :
-                              'bg-gray-500'
-                            }`}
-                          >
-                            {meal.mealType.charAt(0).toUpperCase() + meal.mealType.slice(1)}
+                          <Badge variant="outline" className="text-xs px-1 py-0">
+                            {meal.mealType}
                           </Badge>
                         </div>
                       </div>
@@ -276,17 +303,17 @@ export function FoodSearchWithHistory({
                   </button>
                 ))}
               </div>
-            ) : (value || '') ? (
-              <div className="p-8 text-center">
-                <Search className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-                <p className="text-sm text-gray-700 font-medium">No matching meals found</p>
-                <p className="text-xs text-gray-600 mt-1">Try searching in the USDA database</p>
+            ) : searchQuery ? (
+              <div className="p-8 text-center text-gray-500">
+                <Search className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                <p className="text-sm">No matching meals found</p>
+                <p className="text-xs mt-1">Try searching in the USDA database</p>
               </div>
             ) : (
-              <div className="p-8 text-center">
-                <Clock className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-                <p className="text-sm text-gray-700 font-medium">No meals logged yet</p>
-                <p className="text-xs text-gray-600 mt-1">Start logging meals to see them here</p>
+              <div className="p-8 text-center text-gray-500">
+                <Clock className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                <p className="text-sm">No meals logged yet</p>
+                <p className="text-xs mt-1">Start logging meals to see them here</p>
               </div>
             )}
           </ScrollArea>
