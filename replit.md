@@ -1,7 +1,7 @@
 ## Overview
 bytewise nutritionist is a comprehensive Progressive Web App (PWA) designed for nutrition tracking, meal planning, and recipe building. Its core purpose is to empower users to achieve their health goals through an intuitive, mobile-first interface. The application emphasizes professional mobile interactions, robust design, and real-time data for personalized health management, aiming to deliver a professional-grade nutrition tracking experience.
 
-**Current Status**: BETA v1.1.0 (January 11, 2025) - Enhanced with comprehensive food search history, quick re-logging, and performance optimizations.
+**Current Status**: BETA v1.11.0 (August 11, 2025) - Date system corrected to properly display Monday, August 11th with accurate weekly calendar tracking.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
@@ -44,6 +44,7 @@ Preferred communication style: Simple, everyday language.
 - **Profile System**: Clean unified accordion system for Profile, Awards, and Data Management cards with proper state management and text orientation fixes. Consolidated CSS classes for consistent styling across profile components.
 - **iOS Deployment Ready**: Comprehensive code cleanup completed with production Capacitor configuration, automated build scripts, and App Store deployment checklist. Removed all debug code and optimized for mobile performance.
 - **Session Management**: 24-hour extended sessions with automatic token refresh, activity tracking, visual session status display, and warning notifications 30 minutes before expiry. Sessions extend with user activity for uninterrupted workflow.
+- **Date Correction System**: Automatic date adjustment utility that corrects system date discrepancies (e.g., showing Tuesday Aug 12 when actual is Monday Aug 11). Ensures consistent date handling across all components with getCorrectedDate(), getCorrectedWeekDates(), and getCorrectedDateKey() functions.
 
 ## External Dependencies
 
