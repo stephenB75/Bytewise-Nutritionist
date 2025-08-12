@@ -1204,6 +1204,175 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             
             {/* Include Weekly Calories Card */}
             <WeeklyCaloriesCard />
+            
+            {/* Weekly Meal Log with Delete Functionality */}
+            <div className="space-y-4 mt-6">
+              <div className="flex justify-between items-center">
+                <h3 className="text-xl font-bold text-white">This Week's Meals</h3>
+                <Badge className="bg-purple-600 text-white">All Entries</Badge>
+              </div>
+              
+              {(() => {
+                // Get all meals from the week
+                const storedMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
+                const weekDates = getCorrectedWeekDates().map(date => getLocalDateKey(date));
+                const weekMeals = storedMeals.filter((meal: any) => weekDates.includes(meal.date));
+                
+                // Group meals by date
+                const mealsByDate = weekMeals.reduce((acc: any, meal: any) => {
+                  if (!acc[meal.date]) acc[meal.date] = [];
+                  acc[meal.date].push(meal);
+                  return acc;
+                }, {});
+                
+                // Sort dates (most recent first)
+                const sortedDates = Object.keys(mealsByDate).sort((a, b) => b.localeCompare(a));
+                
+                if (weekMeals.length === 0) {
+                  return (
+                    <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6 text-center">
+                      <div className="text-gray-400">
+                        <Calendar className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                        <p className="text-lg mb-2">No meals logged this week</p>
+                        <p className="text-sm">Start logging meals to see them here</p>
+                      </div>
+                    </Card>
+                  );
+                }
+                
+                return sortedDates.map(date => {
+                  const dateMeals = mealsByDate[date];
+                  const dayName = new Date(date).toLocaleDateString('en-US', { weekday: 'long' });
+                  const displayDate = new Date(date).toLocaleDateString('en-US', { 
+                    month: 'short', day: 'numeric' 
+                  });
+                  const isToday = date === getCorrectedDateKey();
+                  
+                  return (
+                    <Card key={date} className={`bg-white/10 backdrop-blur-md border-white/20 p-4 ${
+                      isToday ? 'ring-2 ring-orange-400/50' : ''
+                    }`}>
+                      <div className="flex justify-between items-center mb-4">
+                        <div className="flex items-center gap-2">
+                          <h4 className={`font-semibold ${isToday ? 'text-orange-300' : 'text-white'}`}>
+                            {dayName}
+                          </h4>
+                          <span className={`text-sm ${isToday ? 'text-orange-400' : 'text-gray-400'}`}>
+                            {displayDate}
+                          </span>
+                          {isToday && (
+                            <Badge className="bg-orange-500 text-white text-xs">Today</Badge>
+                          )}
+                        </div>
+                        <Badge variant="outline" className="text-xs text-gray-300 border-gray-400">
+                          {dateMeals.length} meal{dateMeals.length !== 1 ? 's' : ''}
+                        </Badge>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        {dateMeals.map((meal: any, index: number) => (
+                          <div
+                            key={`${meal.id}-${index}`}
+                            className="bg-white/5 backdrop-blur-sm p-3 rounded-xl border border-white/10 hover:bg-white/10 transition-all"
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <h5 className="font-semibold text-white">{meal.name}</h5>
+                                  <Badge 
+                                    className={`text-white border-0 text-xs px-2 py-0 ${
+                                      meal.mealType === 'breakfast' ? 'bg-orange-500' :
+                                      meal.mealType === 'lunch' ? 'bg-blue-500' :
+                                      meal.mealType === 'dinner' ? 'bg-purple-500' :
+                                      'bg-gray-500'
+                                    }`}
+                                  >
+                                    {meal.mealType.charAt(0).toUpperCase() + meal.mealType.slice(1)}
+                                  </Badge>
+                                  <Badge variant="outline" className="text-xs border-gray-400 text-gray-300">
+                                    <Clock className="w-3 h-3 mr-1" />
+                                    {meal.time}
+                                  </Badge>
+                                </div>
+                                
+                                <div className="grid grid-cols-4 gap-3 text-xs text-gray-400">
+                                  <span>P: {(meal.protein || 0).toFixed(1)}g</span>
+                                  <span>C: {(meal.carbs || 0).toFixed(1)}g</span>
+                                  <span>F: {(meal.fat || 0).toFixed(1)}g</span>
+                                  <span>Fiber: {(meal.fiber || 0).toFixed(1)}g</span>
+                                </div>
+                              </div>
+                              
+                              <div className="text-right ml-4">
+                                <div className="text-lg font-bold text-orange-400 mb-2">
+                                  {Math.round(meal.calories || 0)} cal
+                                </div>
+                                <Button 
+                                  size="sm" 
+                                  variant="ghost" 
+                                  className="bg-red-600 hover:bg-red-700 text-white border-0 h-8 px-3"
+                                  onClick={() => {
+                                    // Delete meal action with confirmation
+                                    const confirmDelete = window.confirm(`Delete "${meal.name}" from ${dayName}?`);
+                                    
+                                    if (confirmDelete) {
+                                      try {
+                                        // Remove meal from localStorage
+                                        const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
+                                        const updated = stored.filter((m: any) => m.id !== meal.id);
+                                        localStorage.setItem('weeklyMeals', JSON.stringify(updated));
+                                        
+                                        // Update daily calories if deleting from today
+                                        if (date === getCorrectedDateKey()) {
+                                          const todayMeals = updated.filter((m: any) => m.date === date);
+                                          const totalCalories = todayMeals.reduce((sum: number, m: any) => sum + (m.calories || 0), 0);
+                                          setDailyCalories(totalCalories);
+                                          setLoggedMeals(todayMeals);
+                                          
+                                          const updatedMacros = todayMeals.reduce((totals: any, meal: any) => ({
+                                            protein: totals.protein + (meal.protein || 0),
+                                            carbs: totals.carbs + (meal.carbs || 0),
+                                            fat: totals.fat + (meal.fat || 0)
+                                          }), { protein: 0, carbs: 0, fat: 0 });
+                                          setDailyMacros(updatedMacros);
+                                          
+                                          const updatedMicronutrients = calculateMicronutrients(todayMeals);
+                                          setDailyMicronutrients(updatedMicronutrients);
+                                        }
+                                        
+                                        // Force component re-render
+                                        window.dispatchEvent(new CustomEvent('refresh-weekly-data'));
+                                        
+                                        // Show success toast
+                                        toast({
+                                          title: "Meal deleted",
+                                          description: `"${meal.name}" removed from ${dayName}.`,
+                                        });
+                                        
+                                      } catch (error) {
+                                        console.error('Error deleting meal:', error);
+                                        toast({
+                                          title: "Error",
+                                          description: "Failed to delete meal. Please try again.",
+                                          variant: "destructive"
+                                        });
+                                      }
+                                    }
+                                  }}
+                                >
+                                  <Trash2 className="w-3 h-3 mr-1" />
+                                  Delete
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </Card>
+                  );
+                });
+              })()}
+            </div>
           </div>
         )}
       </div>
