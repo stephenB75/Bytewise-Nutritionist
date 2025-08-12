@@ -17,7 +17,6 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
   Search, 
   Clock, 
-  Calendar,
   ChevronRight,
   Utensils,
   History,
@@ -285,10 +284,6 @@ export function FoodSearchWithHistory({
                           {meal.name}
                         </div>
                         <div className="flex items-center gap-3 text-xs text-gray-500">
-                          <span className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
-                            {getDateLabel(meal.date)}
-                          </span>
                           <span className="flex items-center gap-1">
                             <Utensils className="h-3 w-3" />
                             {meal.calories} cal
