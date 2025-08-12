@@ -10,7 +10,6 @@ const router = Router();
 router.get('/api/meals/history', isAuthenticated, async (req: any, res) => {
   try {
     const userId = req.user?.id;
-    console.log('[Meals History API] User ID:', userId);
     
     if (!userId) {
       return res.status(401).json({ error: 'User not authenticated' });
@@ -45,8 +44,6 @@ router.get('/api/meals/history', isAuthenticated, async (req: any, res) => {
         )
       )
       .orderBy(desc(meals.date));
-    
-    console.log(`[Meals History API] Found ${userMealData.length} meal items from database`);
 
     // Process meals to get frequency and recent items
     const frequencyMap = new Map();

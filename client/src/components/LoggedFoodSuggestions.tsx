@@ -51,20 +51,6 @@ export function LoggedFoodSuggestions({
 
   const frequentMeals = data?.frequentMeals || [];
   const recentMeals = data?.recentMeals || [];
-  
-  // Log data state for verification
-  if (isSuccess && data) {
-    console.log('[LoggedFoodSuggestions] Data received from database:', {
-      frequentMeals: data.frequentMeals?.length || 0,
-      recentMeals: data.recentMeals?.length || 0,
-      sampleFrequent: data.frequentMeals?.[0],
-      sampleRecent: data.recentMeals?.[0]
-    });
-  }
-  
-  if (error) {
-    console.error('[LoggedFoodSuggestions] Error fetching from database:', error);
-  }
 
   // Show loading state
   if (isLoading) {
@@ -106,72 +92,43 @@ export function LoggedFoodSuggestions({
           </p>
         </div>
       ) : (
-        <div>
-      
-          {/* Frequently Logged */}
-          {frequentMeals.length > 0 && (
-            <div className="mb-6">
-              <div className="flex items-center gap-2 mb-3">
-                <TrendingUp className="h-4 w-4 text-orange-500" />
-                <h4 className="text-sm font-medium text-gray-700">Frequently Logged</h4>
-              </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                {frequentMeals.map((meal) => (
-                  <Button
-                    key={`freq-${meal.id}`}
-                    variant="outline"
-                    size="sm"
-                    onClick={() => onSelectFood(meal)}
-                    className="h-auto p-2 flex flex-col items-start hover:bg-blue-50 hover:border-blue-300 transition-colors"
-                  >
-                    <div className="flex items-center justify-between w-full mb-1">
-                      <span className="text-xs font-medium text-gray-900 truncate">{meal.name}</span>
-                      <Plus className="h-3 w-3 text-gray-400" />
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
-                      <span>{meal.calories} cal</span>
-                      <Badge variant="outline" className="text-xs px-1 py-0">
-                        {meal.frequency}x
-                      </Badge>
-                    </div>
-                  </Button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Recent Meals */}
-          {recentMeals.length > 0 && (
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <Clock className="h-4 w-4 text-blue-500" />
-                <h4 className="text-sm font-medium text-gray-700">Recent Meals</h4>
-              </div>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {recentMeals.map((meal) => (
-                  <Button
-                    key={`recent-${meal.id}`}
-                    variant="outline"
-                    size="sm"
-                    onClick={() => onSelectFood(meal)}
-                    className="h-auto p-2 flex flex-col items-start hover:bg-green-50 hover:border-green-300 transition-colors"
-                  >
-                    <div className="flex items-center justify-between w-full mb-1">
-                      <span className="text-xs font-medium text-gray-900 truncate">{meal.name}</span>
-                      <Plus className="h-3 w-3 text-gray-400" />
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
-                      <Utensils className="h-3 w-3" />
-                      <span>{meal.calories} cal</span>
-                      <Badge variant="outline" className="text-xs px-1 py-0">
-                        {meal.mealType}
-                      </Badge>
-                    </div>
-                  </Button>
-                ))}
-              </div>
-            </div>
-          )}
+        <div className="flex gap-3 overflow-x-auto pb-2">
+          {/* Combine all meals in a single row */}
+          {[...frequentMeals, ...recentMeals].map((meal, index) => {
+            const isFrequent = index < frequentMeals.length;
+            return (
+              <Button
+                key={`meal-${meal.id}-${index}`}
+                variant="outline"
+                size="sm"
+                onClick={() => onSelectFood(meal)}
+                className="flex-shrink-0 min-w-[200px] h-auto p-3 flex flex-col items-start hover:bg-blue-50 hover:border-blue-300 transition-colors"
+              >
+                <div className="flex items-center justify-between w-full mb-2">
+                  <span className="text-sm font-medium text-gray-900 line-clamp-1">{meal.name}</span>
+                  <Plus className="h-4 w-4 text-gray-400 ml-2" />
+                </div>
+                <div className="flex items-center gap-2 text-xs text-gray-500">
+                  {isFrequent ? (
+                    <TrendingUp className="h-3 w-3 text-orange-500" />
+                  ) : (
+                    <Clock className="h-3 w-3 text-blue-500" />
+                  )}
+                  <span>{meal.calories} cal</span>
+                  {isFrequent && meal.frequency && meal.frequency > 1 && (
+                    <Badge variant="outline" className="text-xs px-1 py-0">
+                      {meal.frequency}x
+                    </Badge>
+                  )}
+                  {!isFrequent && (
+                    <Badge variant="outline" className="text-xs px-1 py-0">
+                      {meal.mealType}
+                    </Badge>
+                  )}
+                </div>
+              </Button>
+            );
+          })}
         </div>
       )}
     </Card>
