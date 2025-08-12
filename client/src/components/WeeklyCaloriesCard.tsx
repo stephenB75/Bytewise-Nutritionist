@@ -11,7 +11,6 @@ import { Badge } from '@/components/ui/badge';
 import { Calendar, Flame } from 'lucide-react';
 import { useCheckAchievements } from '@/hooks/useAchievements';
 import { getWeekDates, getLocalDateKey } from '@/utils/dateUtils';
-import { getCorrectedDate, getCorrectedWeekDates, getCorrectedDateKey } from '@/utils/dateAdjustment';
 
 interface DayCalories {
   day: string;
@@ -27,9 +26,9 @@ export function WeeklyCaloriesCard() {
   // Achievement system hook
   const checkAchievements = useCheckAchievements();
 
-  // Get the current week's dates using corrected date (Monday 11th)
+  // Get the current week's dates using actual calendar dates
   const getCurrentWeekDates = () => {
-    const weekDatesArray = getCorrectedWeekDates(); // Use corrected dates for Monday 11th
+    const weekDatesArray = getWeekDates(); // Use actual calendar dates
     const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     
     return weekDatesArray.map((date, index) => ({
@@ -106,8 +105,8 @@ export function WeeklyCaloriesCard() {
     };
   }, []);
 
-  // Get today's date for highlighting (using corrected date - Monday 11th)
-  const today = getCorrectedDateKey();
+  // Get today's date for highlighting (using actual date)
+  const today = getLocalDateKey();
 
   return (
     <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">

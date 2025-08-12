@@ -49,7 +49,6 @@ import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
 import { getWeekDates, getLocalDateKey, getMealTypeByTime, formatLocalTime } from '@/utils/dateUtils';
-import { getCorrectedDate, getCorrectedWeekDates, getCorrectedDateKey } from '@/utils/dateAdjustment';
 
 // Types
 interface ModernFoodLayoutProps {
@@ -354,7 +353,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     const loadExistingData = () => {
       try {
         const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-        const today = getCorrectedDateKey(); // Use corrected date (Monday 11th)
+        const today = getLocalDateKey(); // Use actual current date
         const todayMeals = stored.filter((meal: any) => meal.date === today);
         setLoggedMeals(todayMeals);
         
@@ -396,8 +395,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         // Check fasting status from localStorage
         checkFastingStatus();
         
-        // Calculate weekly calories from current week's meals only (using corrected dates)
-        const currentWeekDates = getCorrectedWeekDates(); // Use corrected week for Monday 11th
+        // Calculate weekly calories from current week's meals only
+        const currentWeekDates = getWeekDates(); // Use actual current week
         const weekDateKeys = currentWeekDates.map(date => getLocalDateKey(date));
         
         // Filter meals to only include those from the current week (Sunday to Saturday)
@@ -1091,7 +1090,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                         localStorage.setItem('weeklyMeals', JSON.stringify(updated));
                         
                         // Refresh meal list
-                        const today = getCorrectedDateKey(); // Use corrected date (Monday 11th)
+                        const today = getLocalDateKey(); // Use actual current date
                         const todayMeals = updated.filter((m: any) => m.date === today);
                         setLoggedMeals(todayMeals);
                         
@@ -1130,14 +1129,14 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <h2 className="text-2xl font-bold text-white">This Week's Progress</h2>
               <p className="text-sm text-gray-400 mt-1">
                 {(() => {
-                  const weekDates = getCorrectedWeekDates(); // Use corrected dates
+                  const weekDates = getWeekDates(); // Use actual current week dates
                   const startDate = new Date(weekDates[0]);
                   const endDate = new Date(weekDates[6]);
                   return `${startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
                 })()}
               </p>
               <p className="text-xs text-gray-500 mt-1">
-                Today: {getCorrectedDate().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
+                Today: {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
               </p>
             </div>
             
@@ -1680,8 +1679,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                         updated.splice(mealIndex, 1);
                         localStorage.setItem('weeklyMeals', JSON.stringify(updated));
                         
-                        // Refresh meal list using corrected date
-                        const today = getCorrectedDateKey(getCorrectedDate());
+                        // Refresh meal list using actual current date
+                        const today = getLocalDateKey();
                         const todayMeals = updated.filter((m: any) => m.date === today);
                         setLoggedMeals(todayMeals);
                         
