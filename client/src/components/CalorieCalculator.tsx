@@ -529,6 +529,33 @@ function CalorieCalculator({
         </div>
       )}
 
+      {/* User Guide Card */}
+      <Card className="p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg">
+        <h3 className="text-lg font-bold text-gray-900 mb-4">How to Use</h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-3">
+            <h4 className="font-medium text-gray-700">Ingredient Entry</h4>
+            <div className="space-y-2 text-sm text-gray-600">
+              <p>• Type any food name to search</p>
+              <p>• Use USDA database for accuracy</p>
+              <p>• Select from custom ingredients</p>
+              <p>• Get detailed nutrition breakdowns</p>
+            </div>
+          </div>
+          
+          <div className="space-y-3">
+            <h4 className="font-medium text-gray-700">Measurement Examples</h4>
+            <div className="space-y-2 text-sm text-gray-600">
+              <p>• Weight: 100g, 2 oz, 1 lb</p>
+              <p>• Volume: 1 cup, 2 tbsp, 1 tsp</p>
+              <p>• Pieces: 1 medium, 1 slice, 1 whole</p>
+              <p>• Portions: 1 serving, handful, bunch</p>
+            </div>
+          </div>
+        </div>
+      </Card>
+
       {/* Main Calculator */}
       <Card className="p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg">
         <div className="flex items-center gap-3 mb-6">
@@ -749,33 +776,6 @@ function CalorieCalculator({
           </div>
         </Card>
       )}
-
-      {/* User Guide Card */}
-      <Card className="p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">How to Use</h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-3">
-            <h4 className="font-medium text-gray-700">Ingredient Entry</h4>
-            <div className="space-y-2 text-sm text-gray-600">
-              <p>• Type any food name to search</p>
-              <p>• Use USDA database for accuracy</p>
-              <p>• Select from custom ingredients</p>
-              <p>• Get detailed nutrition breakdowns</p>
-            </div>
-          </div>
-          
-          <div className="space-y-3">
-            <h4 className="font-medium text-gray-700">Measurement Examples</h4>
-            <div className="space-y-2 text-sm text-gray-600">
-              <p>• Weight: 100g, 2 oz, 1 lb</p>
-              <p>• Volume: 1 cup, 2 tbsp, 1 tsp</p>
-              <p>• Pieces: 1 medium, 1 slice, 1 whole</p>
-              <p>• Portions: 1 serving, handful, bunch</p>
-            </div>
-          </div>
-        </div>
-      </Card>
 
       {/* Logged Food Suggestions */}
       <LoggedFoodSuggestions 
