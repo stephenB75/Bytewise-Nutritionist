@@ -360,40 +360,14 @@ function CalorieCalculator({
         <form onSubmit={handleCalculate} className="space-y-3">
           <div className="grid grid-cols-1 gap-2">
             <FoodSearchWithHistory
-              onSelectFood={async (food) => {
-                // Quick re-log from history
-                const now = getCorrectedDate(); // Use corrected date (Monday 11th)
-                const mealType = getMealTypeByTime(now);
-                
-                const mealData: LoggedMealData = {
-                  id: `relogged-${Date.now()}`,
-                  name: food.name,
-                  calories: food.calories,
-                  protein: food.protein,
-                  carbs: food.carbs,
-                  fat: food.fat,
-                  date: getLocalDateKey(now),
-                  time: formatLocalTime(now),
-                  mealType,
-                  category: mealType,
-                  timestamp: now.toISOString(),
-                  source: 'history'
-                };
-                
-                const weeklyMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-                weeklyMeals.push(mealData);
-                localStorage.setItem('weeklyMeals', JSON.stringify(weeklyMeals));
-                
-                window.dispatchEvent(new CustomEvent('calories-logged'));
-                window.dispatchEvent(new CustomEvent('meals-updated'));
-                
-                // Show toast
-                window.dispatchEvent(new CustomEvent('show-toast', {
-                  detail: { 
-                    message: `✅ Re-logged ${food.name}!`,
-                    type: 'success'
-                  }
-                }));
+              onSelectFood={(food) => {
+                // Just populate the search field with the food name
+                // Don't log it automatically - wait for user to set portion and calculate
+                setIngredient(food.name);
+                // Optionally pre-fill a standard serving size
+                if (!measurement) {
+                  setMeasurement('1 serving');
+                }
               }}
               onSearchChange={(query) => setIngredient(query)}
               placeholder="Search meals or add new..."
