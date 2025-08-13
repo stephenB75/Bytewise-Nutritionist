@@ -1,0 +1,103 @@
+sw.js:177 Refused to connect to 'https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap' because it violates the following Content Security Policy directive: "connect-src 'self' https://api.stripe.com https://*.supabase.co wss://*.supabase.co https://www.bytewisenutritionist.com".
+sw.js:177 Fetch API cannot load https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap. Refused to connect because it violates the document's Content Security Policy.
+
+The FetchEvent for "https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" resulted in a network error response: the promise was rejected.
+2
+sw.js:1 Uncaught (in promise) TypeError: Failed to convert value to 'Response'.
+bytewisenutritionist.com/:58 
+ GET https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap net::ERR_FAILED
+sw.js:177 Refused to connect to 'https://fonts.googleapis.com/css2?family=League+Spartan:wght@100;200;300;40…700&family=Work+Sans:wght@100;200;300;400;500;600;700;800;900&display=swap' because it violates the following Content Security Policy directive: "connect-src 'self' https://api.stripe.com https://*.supabase.co wss://*.supabase.co https://www.bytewisenutritionist.com".
+sw.js:177 Fetch API cannot load https://fonts.googleapis.com/css2?family=League+Spartan:wght@100;200;300;40…700&family=Work+Sans:wght@100;200;300;400;500;600;700;800;900&display=swap. Refused to connect because it violates the document's Content Security Policy.
+The FetchEvent for "https://fonts.googleapis.com/css2?family=League+Spartan:wght@100;200;300;40…700&family=Work+Sans:wght@100;200;300;400;500;600;700;800;900&display=swap" resulted in a network error response: the promise was rejected.
+2
+sw.js:1 Uncaught (in promise) TypeError: Failed to convert value to 'Response'.
+index-4sM1UVXM.css:1 
+ GET https://fonts.googleapis.com/css2?family=League+Spartan:wght@100;200;300;40…700&family=Work+Sans:wght@100;200;300;400;500;600;700;800;900&display=swap net::ERR_FAILED
+sw.js:177 Refused to connect to 'https://fonts.googleapis.com/css2?family=League+Spartan:wght@300;400;700;900&display=swap' because it violates the following Content Security Policy directive: "connect-src 'self' https://api.stripe.com https://*.supabase.co wss://*.supabase.co https://www.bytewisenutritionist.com".
+sw.js:177 Fetch API cannot load https://fonts.googleapis.com/css2?family=League+Spartan:wght@300;400;700;900&display=swap. Refused to connect because it violates the document's Content Security Policy.
+The FetchEvent for "https://fonts.googleapis.com/css2?family=League+Spartan:wght@300;400;700;900&display=swap" resulted in a network error response: the promise was rejected.
+2
+sw.js:1 Uncaught (in promise) TypeError: Failed to convert value to 'Response'.
+about:client:2 
+ GET https://fonts.googleapis.com/css2?family=League+Spartan:wght@300;400;700;900&display=swap net::ERR_FAILED
+index-DzjY0h0M.js:441 🔍 Checking for meal date mismatches...
+index-DzjY0h0M.js:441 ✅ All meal dates are already correct
+sw.js:177 Refused to connect to 'https://cdn.jsdelivr.net/npm/antd/dist/antd.min.css' because it violates the following Content Security Policy directive: "connect-src 'self' https://api.stripe.com https://*.supabase.co wss://*.supabase.co https://www.bytewisenutritionist.com".
+sw.js:177 Fetch API cannot load https://cdn.jsdelivr.net/npm/antd/dist/antd.min.css. Refused to connect because it violates the document's Content Security Policy.
+The FetchEvent for "https://cdn.jsdelivr.net/npm/antd/dist/antd.min.css" resulted in a network error response: the promise was rejected.
+2
+sw.js:1 Uncaught (in promise) TypeError: Failed to convert value to 'Response'.
+sw.js:178 Uncaught (in promise) TypeError: Failed to execute 'put' on 'Cache': Request scheme 'chrome-extension' is unsupported
+    at sw.js:178:11
+contentScript.bundle.js:128833 
+ GET https://cdn.jsdelivr.net/npm/antd/dist/antd.min.css net::ERR_FAILED
+sw.js:178 Uncaught (in promise) TypeError: Failed to execute 'put' on 'Cache': Request scheme 'chrome-extension' is unsupported
+    at sw.js:178:11
+index-DzjY0h0M.js:446 === Starting Data Migration ===
+index-DzjY0h0M.js:446 No migration needed
+index-DzjY0h0M.js:446 === Starting Data Migration ===
+index-DzjY0h0M.js:446 No migration needed
+bytewisenutritionist.com/:1 Error while trying to use the following icon from the Manifest: https://bytewisenutritionist.com/icons/icon-144x144.png (Download error or resource isn't a valid image)
+content.js:2 Uncaught (in promise) TypeError: Cannot read properties of undefined (reading 'checkoutUrls')
+    at content.js:2:211091
+    at async e (content.js:2:211003)
+    at async t (content.js:2:211920)
+sw.js:178 Uncaught (in promise) TypeError: Failed to execute 'put' on 'Cache': Request scheme 'chrome-extension' is unsupported
+    at sw.js:178:11
+index-DzjY0h0M.js:64 
+ GET https://bytewisenutritionist.com/api/achievements 401 (Unauthorized)
+contentScript.bundle.js:1 Uncaught (in promise) Error: No resume URL
+    at t (contentScript.bundle.js:1:845908)
+    at async contentScript.bundle.js:1:846458
+index-DzjY0h0M.js:64 
+ GET https://bytewisenutritionist.com/api/achievements 401 (Unauthorized)
+index-DzjY0h0M.js:64 
+ GET https://bytewisenutritionist.com/api/achievements 401 (Unauthorized)
+12
+The resource <URL> was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+index-DzjY0h0M.js:64 
+ GET https://bytewisenutritionist.com/api/achievements 401 (Unauthorized)
+index-DzjY0h0M.js:446 User data backed up successfully
+bytewisenutritionist.com/:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+index-DzjY0h0M.js:64 
+ GET https://bytewisenutritionist.com/api/achievements 401 (Unauthorized)
+index-DzjY0h0M.js:64 
+ GET https://bytewisenutritionist.com/api/achievements 401 (Unauthorized)
+index-DzjY0h0M.js:64 
+ GET https://bytewisenutritionist.com/api/achievements 401 (Unauthorized)
+index-DzjY0h0M.js:64 
+ GET https://bytewisenutritionist.com/api/achievements 401 (Unauthorized)
+index-DzjY0h0M.js:64 
+ GET https://bytewisenutritionist.com/api/achievements 401 (Unauthorized)
+index-DzjY0h0M.js:64 
+ GET https://bytewisenutritionist.com/api/achievements 401 (Unauthorized)
+index-DzjY0h0M.js:64 
+ GET https://bytewisenutritionist.com/api/achievements 401 (Unauthorized)
+index-DzjY0h0M.js:64 
+ GET https://bytewisenutritionist.com/api/achievements 401 (Unauthorized)
+index-DzjY0h0M.js:64 
+ GET https://bytewisenutritionist.com/api/achievements 401 (Unauthorized)
+index-DzjY0h0M.js:64 
+ GET https://bytewisenutritionist.com/api/achievements 401 (Unauthorized)
+index-DzjY0h0M.js:64 
+ GET https://bytewisenutritionist.com/api/achievements 401 (Unauthorized)
+index-DzjY0h0M.js:64 
+ GET https://bytewisenutritionist.com/api/achievements 401 (Unauthorized)
+index-DzjY0h0M.js:446 User data backed up successfully
+index-DzjY0h0M.js:64 
+ GET https://bytewisenutritionist.com/api/achievements 401 (Unauthorized)
+index-DzjY0h0M.js:64 
+ GET https://bytewisenutritionist.com/api/achievements 401 (Unauthorized)
+index-DzjY0h0M.js:64 
+ GET https://bytewisenutritionist.com/api/achievements 401 (Unauthorized)
+index-DzjY0h0M.js:64 
+ GET https://bytewisenutritionist.com/api/achievements 401 (Unauthorized)
+index-DzjY0h0M.js:64 
+ GET https://bytewisenutritionist.com/api/achievements 401 (Unauthorized)
+index-DzjY0h0M.js:64 
+ GET https://bytewisenutritionist.com/api/achievements 401 (Unauthorized)
+index-DzjY0h0M.js:64 
+ GET https://bytewisenutritionist.com/api/achievements 401 (Unauthorized)
+index-DzjY0h0M.js:64 
+ GET https://bytewisenutritionist.com/api/achievements 401 (Unauthorized)
+dr	@	index-DzjY0h0M.js:64
