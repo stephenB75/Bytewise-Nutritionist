@@ -556,6 +556,258 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Demo user creation and authentication (development only)
+  app.post('/api/demo/create-user', async (req: Request, res: Response) => {
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(403).json({ message: 'Not available in production' });
+    }
+    
+    try {
+      // Create a demo user
+      const demoUserId = `demo-user-${Date.now()}`;
+      const demoUser = await storage.upsertUser({
+        id: demoUserId,
+        email: `demo-${Date.now()}@bytewise.com`,
+        firstName: 'Demo',
+        lastName: 'User',
+        dailyCalorieGoal: 2200,
+        dailyProteinGoal: 120,
+        dailyCarbGoal: 300,
+        dailyFatGoal: 70,
+        dailyWaterGoal: 8
+      });
+      
+      // Create some sample achievements for the demo user
+      const sampleAchievements = [
+        {
+          userId: demoUser.id,
+          achievementType: 'first_day_complete',
+          title: 'Welcome to Bytewise!',
+          description: 'Successfully started your nutrition journey',
+          iconName: 'star',
+          colorClass: 'bg-yellow-500/20 border-yellow-500/30'
+        },
+        {
+          userId: demoUser.id,
+          achievementType: 'calorie_goal_met',
+          title: 'Daily Goal Achieved',
+          description: 'Met your daily calorie goal',
+          iconName: 'target',
+          colorClass: 'bg-green-500/20 border-green-500/30'
+        },
+        {
+          userId: demoUser.id,
+          achievementType: 'water_goal_met',
+          title: 'Hydration Hero',
+          description: 'Completed your daily water intake goal',
+          iconName: 'droplets',
+          colorClass: 'bg-blue-500/20 border-blue-500/30'
+        }
+      ];
+      
+      const createdAchievements = [];
+      for (const achievement of sampleAchievements) {
+        try {
+          const created = await storage.createAchievement(achievement);
+          createdAchievements.push(created);
+        } catch (err) {
+          // Skip if already exists
+        }
+      }
+      
+      res.json({
+        success: true,
+        message: 'Demo user and achievements created successfully',
+        user: {
+          id: demoUser.id,
+          email: demoUser.email,
+          firstName: demoUser.firstName,
+          lastName: demoUser.lastName
+        },
+        achievements: createdAchievements,
+        achievementCount: createdAchievements.length,
+        instructions: {
+          getAchievements: `GET /api/demo/achievements/${demoUser.id}`,
+          checkNewAchievements: `POST /api/demo/achievements/check/${demoUser.id}`
+        }
+      });
+    } catch (error: any) {
+      res.status(500).json({ 
+        success: false,
+        message: 'Failed to create demo user and achievements',
+        error: error.message
+      });
+    }
+  });
+
+  // Demo achievements endpoint (no auth required for testing)
+  app.get('/api/demo/achievements/:userId', async (req: Request, res: Response) => {
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(403).json({ message: 'Not available in production' });
+    }
+    
+    try {
+      const { userId } = req.params;
+      const achievements = await storage.getUserAchievements(userId);
+      res.json({ 
+        success: true,
+        userId,
+        achievements,
+        count: achievements.length
+      });
+    } catch (error: any) {
+      res.status(500).json({ 
+        success: false,
+        message: 'Failed to get demo achievements',
+        error: error.message
+      });
+    }
+  });
+
+  // Demo achievement checking (no auth required for testing)
+  app.post('/api/demo/achievements/check/:userId', async (req: Request, res: Response) => {
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(403).json({ message: 'Not available in production' });
+    }
+    
+    try {
+      const { userId } = req.params;
+      const newAchievements = await storage.checkAndCreateAchievements(userId);
+      res.json({ 
+        success: true,
+        userId,
+        newAchievements,
+        count: newAchievements.length,
+        message: newAchievements.length > 0 ? 'New achievements unlocked!' : 'No new achievements available'
+      });
+    } catch (error: any) {
+      res.status(500).json({ 
+        success: false,
+        message: 'Failed to check demo achievements',
+        error: error.message
+      });
+    }
+  });
+
+  // Simple database test endpoint
+  app.get('/api/test/db-status', async (req: Request, res: Response) => {
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(403).json({ message: 'Not available in production' });
+    }
+    
+    try {
+      // Test basic database operations
+      const popularFoods = await storage.getPopularFoods(1);
+      
+      res.json({
+        success: true,
+        message: 'Database is connected and operational',
+        testResults: {
+          popularFoodsQuery: 'success',
+          recordCount: popularFoods.length
+        },
+        timestamp: new Date().toISOString()
+      });
+    } catch (error: any) {
+      res.status(500).json({ 
+        success: false,
+        message: 'Database test failed',
+        error: error.message
+      });
+    }
+  });
+
+  // Test database setup and create sample achievements (development only)
+  app.post('/api/test/setup-achievements', async (req: Request, res: Response) => {
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(403).json({ message: 'Not available in production' });
+    }
+    
+    try {
+      // Create a test user for achievements  
+      const testUserId = `test-user-${Date.now()}`;
+      const testUser = await storage.upsertUser({
+        id: testUserId,
+        email: `test-${Date.now()}@bytewise.com`,
+        firstName: 'Test',
+        lastName: 'User'
+      });
+      
+      // Create some sample achievements
+      const testAchievements = [
+        {
+          userId: testUser.id,
+          achievementType: 'first_day_complete',
+          title: 'Welcome to Bytewise!',
+          description: 'Successfully started your nutrition journey',
+          iconName: 'star',
+          colorClass: 'bg-yellow-500/20 border-yellow-500/30'
+        },
+        {
+          userId: testUser.id,
+          achievementType: 'calorie_goal_met',
+          title: 'Daily Goal Achieved',
+          description: 'Met your daily calorie goal',
+          iconName: 'target',
+          colorClass: 'bg-green-500/20 border-green-500/30'
+        },
+        {
+          userId: testUser.id,
+          achievementType: 'water_goal_met',
+          title: 'Hydration Hero',
+          description: 'Completed your daily water intake goal',
+          iconName: 'droplets',
+          colorClass: 'bg-blue-500/20 border-blue-500/30'
+        }
+      ];
+      
+      const createdAchievements = [];
+      for (const achievement of testAchievements) {
+        try {
+          const created = await storage.createAchievement(achievement);
+          createdAchievements.push(created);
+        } catch (err) {
+          // Skip if already exists
+        }
+      }
+      
+      res.json({
+        success: true,
+        message: 'Test achievements created successfully',
+        user: testUser,
+        achievements: createdAchievements,
+        count: createdAchievements.length
+      });
+    } catch (error: any) {
+      res.status(500).json({ 
+        message: 'Failed to set up test achievements',
+        error: error.message
+      });
+    }
+  });
+
+  // Test endpoint to get achievements without auth (for testing)
+  app.get('/api/test/achievements/:userId', async (req: Request, res: Response) => {
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(403).json({ message: 'Not available in production' });
+    }
+    
+    try {
+      const { userId } = req.params;
+      const achievements = await storage.getUserAchievements(userId);
+      res.json({ 
+        success: true,
+        achievements,
+        count: achievements.length
+      });
+    } catch (error: any) {
+      res.status(500).json({ 
+        message: 'Failed to get test achievements',
+        error: error.message
+      });
+    }
+  });
+
   // Calculate calories API with real USDA integration (no auth required)
   app.post('/api/calculate-calories', optionalAuth, async (req: any, res: Response) => {
     try {
