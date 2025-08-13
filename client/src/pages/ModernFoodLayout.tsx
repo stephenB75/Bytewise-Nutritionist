@@ -567,16 +567,21 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   // Enhanced tab change handler with animation direction and scroll reset
   const handleTabChange = (newTab: string) => {
+    console.log(`🔄 Nav Click: ${activeTab} → ${newTab}`);
+    console.log(`📍 Current scroll position: ${window.scrollY}`);
+    
     setPreviousTab(activeTab);
     setActiveTab(newTab);
     
     // Reset scroll to hero component when navigating between pages
     setTimeout(() => {
+      console.log(`📍 Scrolling to top from position: ${window.scrollY}`);
       window.scrollTo({
         top: 0,
         left: 0,
         behavior: 'smooth'
       });
+      console.log(`✅ Scroll command executed - target: top`);
     }, 50); // Small delay to ensure tab content is rendered before scrolling
   };
 
