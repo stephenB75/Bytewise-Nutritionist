@@ -5,10 +5,10 @@
  * Optimized for iOS PWA installation
  */
 
-const CACHE_NAME = 'bytewise-v1.2.1';
-const STATIC_CACHE = 'bytewise-static-v1.2.1';
-const DYNAMIC_CACHE = 'bytewise-dynamic-v1.2.1';
-const API_CACHE = 'bytewise-api-v1.2.1';
+const CACHE_NAME = 'bytewise-v1.2.4';
+const STATIC_CACHE = 'bytewise-static-v1.2.4';
+const DYNAMIC_CACHE = 'bytewise-dynamic-v1.2.4';
+const API_CACHE = 'bytewise-api-v1.2.4';
 
 // Files to cache for offline use
 const STATIC_FILES = [

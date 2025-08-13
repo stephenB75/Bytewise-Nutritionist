@@ -111,16 +111,39 @@
   <!-- Browser Extension Error Suppression -->
   <script src="/error-suppression.js"></script>
   
-  <!-- Service Worker Registration -->
+  <!-- Service Worker Registration with Error Handling -->
   <script>
+    // Global error handler for third-party script errors
+    window.addEventListener('error', (event) => {
+      // Suppress extension-related errors that we can't control
+      if (event.filename && (
+        event.filename.includes('extension') || 
+        event.filename.includes('chrome-extension') ||
+        event.filename.includes('content.js')
+      )) {
+        event.preventDefault();
+        return false;
+      }
+    });
+
+    // Promise rejection handler for async third-party errors
+    window.addEventListener('unhandledrejection', (event) => {
+      if (event.reason && event.reason.message && 
+          (event.reason.message.includes('checkoutUrls') || 
+           event.reason.message.includes('extension'))) {
+        event.preventDefault();
+        return false;
+      }
+    });
+
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js')
           .then((registration) => {
-            // Service Worker registered successfully
+            console.log('SW registered successfully');
           })
           .catch((error) => {
-            // Service Worker registration failed
+            console.warn('SW registration failed:', error);
           });
       });
     }

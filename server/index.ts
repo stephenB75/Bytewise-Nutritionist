@@ -35,21 +35,20 @@ app.use((req, res, next) => {
     res.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
   }
   
-  // Content Security Policy - Production-ready with eval support for Vite/React
+  // Content Security Policy - More permissive for production to eliminate eval blocking
   const cspPolicy = isProduction
-    ? "default-src 'self'; " +
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https: blob: data: 'wasm-unsafe-eval'; " +
-      "style-src 'self' 'unsafe-inline' https: fonts.googleapis.com; " +
-      "font-src 'self' https: fonts.gstatic.com data:; " +
+    ? "default-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https: blob: data: 'wasm-unsafe-eval' chrome-extension:; " +
+      "style-src 'self' 'unsafe-inline' https:; " +
+      "font-src 'self' https: data:; " +
       "img-src 'self' https: data: blob:; " +
       "connect-src 'self' https: wss: data:; " +
       "media-src 'self' https: data: blob:; " +
       "worker-src 'self' blob:; " +
       "child-src 'self' blob:; " +
       "frame-src 'self' https:; " +
-      "object-src 'none'; " +
-      "base-uri 'self';"
-    : "default-src 'self'; " +
+      "object-src 'none';"
+    : "default-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' https: blob: data: 'wasm-unsafe-eval'; " +
       "style-src 'self' 'unsafe-inline' https:; " +
       "font-src 'self' https: data:; " +
@@ -59,8 +58,7 @@ app.use((req, res, next) => {
       "worker-src 'self' blob:; " +
       "child-src 'self' blob:; " +
       "frame-src 'self'; " +
-      "object-src 'none'; " +
-      "base-uri 'self';";
+      "object-src 'none';";
       
   res.header('Content-Security-Policy', cspPolicy);
   
