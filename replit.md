@@ -14,7 +14,7 @@ Preferred communication style: Simple, everyday language.
 - **Mobile-First Design**: PWA with touch-optimized interfaces, seamless header-hero integration, bottom tab navigation, and safe area support.
 - **Theme System**: CSS variables with light/dark mode support.
 - **Visuals**: Faded pattern backgrounds, high-quality food images, glass-morphism effects, rotating food background images, and a ByteWise CSS logo. Includes comprehensive directional slide animations for page transitions with intelligent direction detection and smooth fade-in effects.
-- **Iconography**: Professional Lucide React icons for navigation. Updated iOS app icons with new Bytewise Nutritionist branded iconset (August 2025) featuring consistent branding across all app icon sizes and resolutions.
+- **Iconography**: Professional Lucide React icons for navigation. Updated iOS app icons and splash screens with new Bytewise Nutritionist branded assets (August 2025) featuring consistent branding across all app icon sizes, resolutions, and launch experiences.
 
 ### Technical Implementations
 - **Frontend Framework**: React 18 with TypeScript, Wouter for routing.
