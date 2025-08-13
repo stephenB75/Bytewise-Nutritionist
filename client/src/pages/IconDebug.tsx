@@ -97,7 +97,7 @@ export default function IconDebug() {
               <li>Open Settings → Safari</li>
               <li>Tap "Clear History and Website Data"</li>
               <li>Confirm the action</li>
-              <li>Open Safari and go to bytewisenutritionist.com</li>
+              <li>Open Safari and go to {window.location.hostname === 'localhost' ? 'localhost:5000' : window.location.hostname}</li>
               <li>Tap the Share button (square with arrow)</li>
               <li>Select "Add to Home Screen"</li>
               <li>The ByteWise logo should now appear!</li>

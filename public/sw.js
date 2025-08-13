@@ -5,10 +5,10 @@
  * Optimized for iOS PWA installation
  */
 
-const CACHE_NAME = 'bytewise-v1.2.0';
-const STATIC_CACHE = 'bytewise-static-v1.2.0';
-const DYNAMIC_CACHE = 'bytewise-dynamic-v1.2.0';
-const API_CACHE = 'bytewise-api-v1.2.0';
+const CACHE_NAME = 'bytewise-v1.2.1';
+const STATIC_CACHE = 'bytewise-static-v1.2.1';
+const DYNAMIC_CACHE = 'bytewise-dynamic-v1.2.1';
+const API_CACHE = 'bytewise-api-v1.2.1';
 
 // Files to cache for offline use
 const STATIC_FILES = [
@@ -111,25 +111,28 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
-  // Parse URL safely
+  // Parse URL safely and immediately filter problematic requests
   let url;
   try {
     url = new URL(request.url);
+    
+    // Immediately skip any non-http/https protocols
+    if (!['http:', 'https:'].includes(url.protocol)) {
+      return;
+    }
+    
+    // Skip all extension-related requests before they reach the cache
+    if (url.protocol.includes('chrome-extension') || 
+        url.protocol.includes('moz-extension') ||
+        url.href.includes('chrome-extension') ||
+        url.href.includes('moz-extension') ||
+        url.href.includes('extension') ||
+        url.hostname.includes('extension')) {
+      return;
+    }
+    
   } catch (error) {
-    console.log('[SW] Invalid URL, skipping:', request.url);
-    return;
-  }
-  
-  // Skip any non-http/https requests (chrome-extension, moz-extension, etc.)
-  if (!['http:', 'https:'].includes(url.protocol)) {
-    return;
-  }
-  
-  // Skip chrome-extension explicitly
-  if (url.protocol.startsWith('chrome-extension') || 
-      url.protocol.startsWith('moz-extension') || 
-      url.href.includes('chrome-extension') ||
-      url.href.includes('moz-extension')) {
+    // Skip invalid URLs completely
     return;
   }
   
@@ -158,12 +161,13 @@ self.addEventListener('fetch', (event) => {
 });
 
 async function handleFetch(request) {
-  // Additional safety check
+  // Additional safety check - silently skip extension requests
   if (request.url.includes('chrome-extension') || 
       request.url.includes('moz-extension') ||
+      request.url.includes('extension') ||
       !request.url.startsWith('http')) {
-    console.log('[SW] Skipping unsafe request:', request.url);
-    return fetch(request);
+    // Skip silently to prevent console errors
+    return fetch(request).catch(() => new Response('', { status: 204 }));
   }
   
   const url = new URL(request.url);
