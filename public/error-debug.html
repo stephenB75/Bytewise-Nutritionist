@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ByteWise Error Debug - Console Error Tracker</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #0a0a00;
+            color: #fff;
+            padding: 20px;
+        }
+        .error {
+            background: #ff4444;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            white-space: pre-wrap;
+        }
+        .info {
+            background: #1f4aa6;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+        .success {
+            background: #45c73e;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+        #logs {
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid #333;
+            padding: 10px;
+            background: #111;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 ByteWise Console Error Debug</h1>
+    <div class="info">
+        This page tracks all console errors, warnings, and network failures that occur in our application.
+    </div>
+    
+    <h2>Error Log</h2>
+    <div id="logs"></div>
+    
+    <h2>Network Status</h2>
+    <div id="network-status"></div>
+    
+    <h2>Resource Loading</h2>
+    <div id="resource-status"></div>
+    
+    <script>
+        const logs = document.getElementById('logs');
+        const networkStatus = document.getElementById('network-status');
+        const resourceStatus = document.getElementById('resource-status');
+        
+        function addLog(type, message) {
+            const div = document.createElement('div');
+            div.className = type === 'error' ? 'error' : type === 'info' ? 'info' : 'success';
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${type.toUpperCase()}: ${message}`;
+            logs.appendChild(div);
+            logs.scrollTop = logs.scrollHeight;
+        }
+        
+        // Track console errors
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        const originalLog = console.log;
+        
+        console.error = function(...args) {
+            addLog('error', args.join(' '));
+            originalError.apply(console, args);
+        };
+        
+        console.warn = function(...args) {
+            addLog('warning', args.join(' '));
+            originalWarn.apply(console, args);
+        };
+        
+        // Track unhandled errors
+        window.addEventListener('error', (e) => {
+            addLog('error', `Unhandled Error: ${e.message} at ${e.filename}:${e.lineno}:${e.colno}`);
+        });
+        
+        window.addEventListener('unhandledrejection', (e) => {
+            addLog('error', `Unhandled Promise Rejection: ${e.reason}`);
+        });
+        
+        // Test API endpoints
+        async function testEndpoints() {
+            const endpoints = [
+                '/api/health',
+                '/api/auth/user', 
+                '/manifest.json',
+                '/icons/icon-144x144.png',
+                '/android-chrome-192x192.png',
+                '/android-chrome-512x512.png',
+                '/favicon-32x32.png'
+            ];
+            
+            for (const endpoint of endpoints) {
+                try {
+                    const response = await fetch(endpoint);
+                    const div = document.createElement('div');
+                    div.className = response.ok ? 'success' : 'error';
+                    div.textContent = `${endpoint}: ${response.status} ${response.statusText}`;
+                    networkStatus.appendChild(div);
+                } catch (error) {
+                    const div = document.createElement('div');
+                    div.className = 'error';
+                    div.textContent = `${endpoint}: NETWORK ERROR - ${error.message}`;
+                    networkStatus.appendChild(div);
+                }
+            }
+        }
+        
+        // Test resource loading
+        function testResources() {
+            const resources = [
+                { type: 'img', src: '/icons/icon-144x144.png' },
+                { type: 'img', src: '/android-chrome-192x192.png' },
+                { type: 'img', src: '/android-chrome-512x512.png' },
+                { type: 'img', src: '/favicon-32x32.png' }
+            ];
+            
+            resources.forEach(({ type, src }) => {
+                const element = document.createElement(type);
+                element.onload = () => {
+                    const div = document.createElement('div');
+                    div.className = 'success';
+                    div.textContent = `✅ ${src} loaded successfully`;
+                    resourceStatus.appendChild(div);
+                };
+                element.onerror = () => {
+                    const div = document.createElement('div');
+                    div.className = 'error';
+                    div.textContent = `❌ ${src} failed to load`;
+                    resourceStatus.appendChild(div);
+                };
+                element.src = src;
+            });
+        }
+        
+        // Run tests
+        addLog('info', 'Error tracking initialized');
+        testEndpoints();
+        testResources();
+        
+        // Test service worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then(registration => {
+                    addLog('success', 'Service Worker registered successfully');
+                })
+                .catch(error => {
+                    addLog('error', `Service Worker registration failed: ${error.message}`);
+                });
+        }
+    </script>
+</body>
+</html>
