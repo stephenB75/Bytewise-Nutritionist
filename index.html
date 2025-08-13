@@ -108,29 +108,51 @@
 <body>
   <div id="root"></div>
   
-  <!-- Browser Extension Error Suppression -->
+  <!-- Enhanced Browser Extension Error Suppression -->
   <script src="/error-suppression.js"></script>
   
-  <!-- Service Worker Registration with Error Handling -->
+  <!-- Service Worker Registration with Enhanced Error Handling -->
   <script>
-    // Global error handler for third-party script errors
+    // Enhanced global error handler for extension conflicts
     window.addEventListener('error', (event) => {
-      // Suppress extension-related errors that we can't control
+      // Comprehensive extension error suppression
       if (event.filename && (
         event.filename.includes('extension') || 
         event.filename.includes('chrome-extension') ||
-        event.filename.includes('content.js')
+        event.filename.includes('content.js') ||
+        event.filename.includes('moz-extension') ||
+        event.filename === '' // Anonymous scripts from extensions
       )) {
+        console.debug('Suppressed extension error:', event.message);
         event.preventDefault();
+        event.stopPropagation();
+        return false;
+      }
+      
+      // Suppress specific error messages
+      if (event.message && (
+        event.message.includes('checkoutUrls') ||
+        event.message.includes('paymentUrls') ||
+        event.message.includes('Cannot read properties of undefined')
+      )) {
+        console.debug('Suppressed extension-related error:', event.message);
+        event.preventDefault();
+        event.stopPropagation();
         return false;
       }
     });
 
-    // Promise rejection handler for async third-party errors
+    // Enhanced promise rejection handler
     window.addEventListener('unhandledrejection', (event) => {
-      if (event.reason && event.reason.message && 
-          (event.reason.message.includes('checkoutUrls') || 
-           event.reason.message.includes('extension'))) {
+      const error = event.reason;
+      const errorMessage = error?.message || error?.toString() || '';
+      
+      // Suppress extension-related promise rejections
+      if (errorMessage.includes('checkoutUrls') || 
+          errorMessage.includes('paymentUrls') ||
+          errorMessage.includes('extension') ||
+          errorMessage.includes('Cannot read properties of undefined')) {
+        console.debug('Suppressed extension promise rejection:', errorMessage);
         event.preventDefault();
         return false;
       }

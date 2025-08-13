@@ -1,50 +1,106 @@
-// Suppress browser extension errors in console
+/**
+ * Enhanced Error Suppression for Browser Extension Conflicts
+ * Bytewise Nutritionist - Production Error Handling
+ */
+
 (function() {
   'use strict';
   
-  // Override console.error to filter out extension errors
+  // Store original console methods to avoid suppressing our own logs
   const originalError = console.error;
+  const originalWarn = console.warn;
+  
+  // Enhanced extension detection patterns
+  const extensionPatterns = [
+    /extension/i,
+    /chrome-extension/i,
+    /moz-extension/i,
+    /content\.js/i,
+    /checkoutUrls/i,
+    /paymentUrls/i,
+    /Cannot read properties of undefined.*reading.*checkoutUrls/i,
+    /Cannot read properties of undefined.*reading.*paymentUrls/i,
+    /honey/i,
+    /capital one/i,
+    /rakuten/i,
+    /coupon/i,
+    /deal/i,
+    /shopping/i
+  ];
+  
+  // Function to check if error is from extension
+  function isExtensionError(error, filename, stack) {
+    // Check filename
+    if (filename) {
+      if (extensionPatterns.some(pattern => pattern.test(filename))) {
+        return true;
+      }
+    }
+    
+    // Check error message
+    if (error && typeof error === 'string') {
+      if (extensionPatterns.some(pattern => pattern.test(error))) {
+        return true;
+      }
+    }
+    
+    // Check stack trace
+    if (stack && typeof stack === 'string') {
+      if (extensionPatterns.some(pattern => pattern.test(stack))) {
+        return true;
+      }
+    }
+    
+    return false;
+  }
+  
+  // Override console.error to suppress extension errors
   console.error = function(...args) {
-    const message = args.join(' ');
-    
-    // Filter out known browser extension errors
-    const extensionErrors = [
-      'chrome-extension',
-      'checkoutUrls',
-      'content.js',
-      'contentScript.bundle.js',
-      'feature_extension-platform',
-      'No resume URL',
-      'Failed to execute \'put\' on \'Cache\': Request scheme \'chrome-extension\' is unsupported'
-    ];
-    
-    const shouldSuppress = extensionErrors.some(error => 
-      message.includes(error)
-    );
-    
-    if (!shouldSuppress) {
+    const errorMessage = args.join(' ');
+    if (!isExtensionError(errorMessage)) {
       originalError.apply(console, args);
     }
   };
   
-  // Override window.onerror to suppress extension errors
-  const originalOnError = window.onerror;
-  window.onerror = function(message, source, lineno, colno, error) {
-    if (source && (source.includes('chrome-extension') || source.includes('content.js'))) {
-      return true; // Suppress the error
+  // Override console.warn to suppress extension warnings
+  console.warn = function(...args) {
+    const warnMessage = args.join(' ');
+    if (!isExtensionError(warnMessage)) {
+      originalWarn.apply(console, args);
     }
-    
-    if (originalOnError) {
-      return originalOnError.call(this, message, source, lineno, colno, error);
-    }
-    return false;
   };
   
-  // Handle promise rejections from extensions
+  // Global error suppression
+  window.addEventListener('error', function(event) {
+    if (isExtensionError(event.message, event.filename, event.error?.stack)) {
+      event.preventDefault();
+      event.stopPropagation();
+      return false;
+    }
+  }, true); // Use capture phase
+  
+  // Promise rejection suppression
   window.addEventListener('unhandledrejection', function(event) {
     const error = event.reason;
-    if (error && error.stack && error.stack.includes('chrome-extension')) {
+    const errorMessage = error?.message || error?.toString() || '';
+    const stack = error?.stack || '';
+    
+    if (isExtensionError(errorMessage, '', stack)) {
       event.preventDefault();
+      return false;
     }
   });
+  
+  // CSP violation suppression for extensions
+  document.addEventListener('securitypolicyviolation', function(event) {
+    if (event.violatedDirective && 
+        (event.sourceFile?.includes('extension') || 
+         event.sourceFile?.includes('content') ||
+         !event.sourceFile)) {
+      event.preventDefault();
+      event.stopPropagation();
+      return false;
+    }
+  });
+  
 })();
