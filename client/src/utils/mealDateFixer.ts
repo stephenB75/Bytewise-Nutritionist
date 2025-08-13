@@ -24,13 +24,33 @@ export interface DateMismatch {
 
 /**
  * Get correct date key from timestamp
+ * Fixed to use browser timezone detection matching getLocalDateKey
  */
 function getCorrectDateFromTimestamp(timestamp: string): string {
   const date = new Date(timestamp);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
+  
+  // Use the same timezone-aware logic as getLocalDateKey
+  try {
+    const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const formatter = new Intl.DateTimeFormat('en-CA', { 
+      timeZone: userTimezone,
+      year: 'numeric',
+      month: '2-digit', 
+      day: '2-digit'
+    });
+    
+    return formatter.format(date); // Returns YYYY-MM-DD format
+  } catch (error) {
+    // Fallback to offset-based calculation if Intl API fails
+    const offsetMinutes = date.getTimezoneOffset();
+    const localTime = new Date(date.getTime() - (offsetMinutes * 60 * 1000));
+    
+    const year = localTime.getUTCFullYear();
+    const month = String(localTime.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(localTime.getUTCDate()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}`;
+  }
 }
 
 /**

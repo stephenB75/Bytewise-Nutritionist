@@ -49,8 +49,9 @@ import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
 import { getWeekDates, getLocalDateKey, getMealTypeByTime, formatLocalTime } from '@/utils/dateUtils';
-import { autoFixMealDatesIfNeeded, checkMealDateMismatches } from '@/utils/mealDateFixer';
+import { autoFixMealDatesIfNeeded, checkMealDateMismatches, fixMealDateMismatches } from '@/utils/mealDateFixer';
 import { getCachedLocalStorage, debounce } from '@/utils/performanceUtils';
+import { debugTimezoneInfo, debugMealDates } from '@/utils/timezoneDebugger';
 
 // Types
 interface ModernFoodLayoutProps {
@@ -354,6 +355,25 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     // Load existing meal data on component mount
     const loadExistingData = () => {
       try {
+        // Debug timezone and meal information
+        debugTimezoneInfo();
+        debugMealDates();
+        
+        // Force check and fix meal dates immediately
+        console.log('🔧 Forcing meal date check and fix...');
+        const mismatchCheck = checkMealDateMismatches();
+        console.log(`Found ${mismatchCheck.mismatches.length} mismatched meals out of ${mismatchCheck.totalMeals} total`);
+        
+        if (mismatchCheck.mismatches.length > 0) {
+          console.log('📅 Fixing meal date mismatches...', mismatchCheck.mismatches);
+          const fixResult = fixMealDateMismatches();
+          if (fixResult.success) {
+            console.log(`✅ Fixed ${fixResult.fixedCount} meal dates`);
+          } else {
+            console.error('❌ Failed to fix meal dates:', fixResult.error);
+          }
+        }
+        
         // Auto-fix any meal date mismatches on app startup (runs once with caching)
         const wasFixed = autoFixMealDatesIfNeeded();
         

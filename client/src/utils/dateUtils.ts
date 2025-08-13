@@ -5,11 +5,13 @@
 
 /**
  * Get the start of day in user's local timezone
+ * Fixed to properly handle timezone conversion
  */
 export function getLocalStartOfDay(date: Date = new Date()): Date {
-  const localDate = new Date(date);
-  localDate.setHours(0, 0, 0, 0);
-  return localDate;
+  // Create a new date from the local date string to ensure proper timezone handling
+  const localDateKey = getLocalDateKey(date);
+  const [year, month, day] = localDateKey.split('-').map(Number);
+  return new Date(year, month - 1, day, 0, 0, 0, 0);
 }
 
 /**
@@ -24,12 +26,32 @@ export function getLocalEndOfDay(date: Date = new Date()): Date {
 /**
  * Format date as YYYY-MM-DD in local timezone
  * This is used as the key for storing daily data
+ * Fixed to properly handle timezone conversion using browser's timezone detection
  */
 export function getLocalDateKey(date: Date = new Date()): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
+  // Use the browser's timezone-aware toLocaleDateString with explicit timezone
+  // This automatically handles the user's actual timezone
+  try {
+    const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const formatter = new Intl.DateTimeFormat('en-CA', { 
+      timeZone: userTimezone,
+      year: 'numeric',
+      month: '2-digit', 
+      day: '2-digit'
+    });
+    
+    return formatter.format(date); // Returns YYYY-MM-DD format
+  } catch (error) {
+    // Fallback to offset-based calculation if Intl API fails
+    const offsetMinutes = date.getTimezoneOffset();
+    const localTime = new Date(date.getTime() - (offsetMinutes * 60 * 1000));
+    
+    const year = localTime.getUTCFullYear();
+    const month = String(localTime.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(localTime.getUTCDate()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}`;
+  }
 }
 
 /**
@@ -95,22 +117,32 @@ export function getMealTypeByTime(date: Date = new Date()): 'breakfast' | 'lunch
 
 /**
  * Get the week start date (Sunday) for a given date
+ * Fixed to use proper local date calculation
  */
 export function getWeekStart(date: Date = new Date()): Date {
-  const d = new Date(date);
-  const day = d.getDay();
-  const diff = d.getDate() - day;
-  return new Date(d.setDate(diff));
+  // Get local date components properly
+  const localDateKey = getLocalDateKey(date);
+  const [year, month, day] = localDateKey.split('-').map(Number);
+  const localDate = new Date(year, month - 1, day);
+  
+  const dayOfWeek = localDate.getDay();
+  const diff = localDate.getDate() - dayOfWeek;
+  return new Date(localDate.setDate(diff));
 }
 
 /**
  * Get the week end date (Saturday) for a given date
+ * Fixed to use proper local date calculation
  */
 export function getWeekEnd(date: Date = new Date()): Date {
-  const d = new Date(date);
-  const day = d.getDay();
-  const diff = d.getDate() - day + 6;
-  return new Date(d.setDate(diff));
+  // Get local date components properly
+  const localDateKey = getLocalDateKey(date);
+  const [year, month, day] = localDateKey.split('-').map(Number);
+  const localDate = new Date(year, month - 1, day);
+  
+  const dayOfWeek = localDate.getDay();
+  const diff = localDate.getDate() - dayOfWeek + 6;
+  return new Date(localDate.setDate(diff));
 }
 
 /**
@@ -169,9 +201,12 @@ export function getCalendarMonthDates(date: Date = new Date()): Date[] {
 
 /**
  * Check if date is today in local timezone
+ * Fixed to properly handle timezone conversion
  */
 export function isToday(date: Date): boolean {
-  return isSameLocalDay(date, new Date());
+  const todayKey = getLocalDateKey(new Date());
+  const dateKey = getLocalDateKey(date);
+  return todayKey === dateKey;
 }
 
 /**
