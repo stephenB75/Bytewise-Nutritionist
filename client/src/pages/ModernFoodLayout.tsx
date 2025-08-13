@@ -567,39 +567,38 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   // Enhanced tab change handler with animation direction and scroll reset
   const handleTabChange = (newTab: string) => {
-    // First, scroll to top immediately before any state changes
+    // Temporarily disable smooth scrolling to force instant scroll
+    const originalScrollBehavior = document.documentElement.style.scrollBehavior;
+    document.documentElement.style.scrollBehavior = 'auto';
+    document.body.style.scrollBehavior = 'auto';
+    
+    // Force immediate scroll to top with all methods
     window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
     
-    // Then update state
+    // Update state
     setPreviousTab(activeTab);
     setActiveTab(newTab);
     
-    // Additional scroll attempts with various timing approaches
+    // Additional immediate scroll attempts
     setTimeout(() => {
       window.scrollTo(0, 0);
       document.documentElement.scrollTop = 0;
       document.body.scrollTop = 0;
+      
+      // Restore smooth scrolling after instant scroll is complete
+      setTimeout(() => {
+        document.documentElement.style.scrollBehavior = originalScrollBehavior;
+        document.body.style.scrollBehavior = originalScrollBehavior;
+      }, 50);
     }, 0);
     
-    setTimeout(() => {
-      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    // Final safety scroll
+    requestAnimationFrame(() => {
+      window.scrollTo(0, 0);
       document.documentElement.scrollTop = 0;
       document.body.scrollTop = 0;
-    }, 10);
-    
-    setTimeout(() => {
-      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-    }, 100);
-    
-    // Force scroll after all React updates complete
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        window.scrollTo(0, 0);
-        document.documentElement.scrollTop = 0;
-        document.body.scrollTop = 0;
-      });
     });
   };
 
