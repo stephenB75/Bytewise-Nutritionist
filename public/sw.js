@@ -80,6 +80,19 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
+  // Skip external domains (fonts, CDNs, APIs)
+  const externalDomains = [
+    'fonts.googleapis.com',
+    'fonts.gstatic.com', 
+    'cdn.jsdelivr.net',
+    'api.stripe.com',
+    'js.stripe.com'
+  ];
+  
+  if (externalDomains.some(domain => url.hostname.includes(domain))) {
+    return;
+  }
+  
   event.respondWith(handleFetch(request));
 });
 

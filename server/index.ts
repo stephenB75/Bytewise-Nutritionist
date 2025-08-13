@@ -40,8 +40,8 @@ app.use((req, res, next) => {
       "img-src 'self' https: data: blob:; " +
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com; " +
-      "connect-src 'self' https://api.stripe.com https://*.supabase.co wss://*.supabase.co https://www.bytewisenutritionist.com; " +
-      "font-src 'self' https://fonts.gstatic.com data:; " +
+      "connect-src 'self' https://api.stripe.com https://*.supabase.co wss://*.supabase.co https://www.bytewisenutritionist.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net https://api.nal.usda.gov; " +
+      "font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com data:; " +
       "frame-src 'self' https://js.stripe.com; " +
       "object-src 'none'; " +
       "base-uri 'self';"
