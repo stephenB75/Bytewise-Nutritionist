@@ -1,5 +1,26 @@
 # Bytewise Nutritionist Changelog
 
+## Version 1.3.0 (August 13, 2025) - Critical Date Bug Fix
+
+### 🐛 Critical Bug Fixes
+- **Fixed Date Logging Issue**: Resolved critical bug where meal entries were logged with server UTC dates instead of user's local dates
+- **Timezone Detection**: Implemented browser-based timezone detection using `Intl.DateTimeFormat` API
+- **Automatic Date Correction**: Added system to automatically detect and fix existing meals with incorrect dates
+- **Enhanced Weekly Summary**: Fixed weekly calorie tracking to show meals on correct days of the week
+
+### 🔧 Technical Improvements
+- **Enhanced `getLocalDateKey()` Function**: Now uses browser timezone APIs for accurate local date calculation
+- **Updated Meal Date Fixer**: Improved logic to match `getLocalDateKey()` timezone handling
+- **Timezone Debugging Utility**: Added comprehensive timezone debugging for troubleshooting date issues
+- **Performance Optimization**: Added caching to prevent excessive date checking operations
+
+### 📊 Data Integrity
+- **Meal Date Validation**: Existing meal entries are automatically validated and corrected on app startup
+- **Cross-Timezone Compatibility**: App now works correctly across all user timezones
+- **Consistent Date Display**: All meal entries and weekly summaries now show consistent, accurate local dates
+
+---
+
 ## Version 1.2.4 (August 13, 2025) - Production Ready
 
 ### 🚀 Major Features

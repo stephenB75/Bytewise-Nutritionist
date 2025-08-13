@@ -4,7 +4,7 @@
 
 ByteWise Nutritionist is a comprehensive Progressive Web App (PWA) for nutrition tracking and meal planning. Built with modern web technologies, it integrates with the USDA food database to provide accurate nutritional information and offers features including meal logging, calorie tracking, progress analytics, and achievement systems. The application is designed for both web and mobile deployment with full PWA capabilities and cross-platform compatibility.
 
-**Current Status**: BETA v1.2.4 (August 13, 2025) - **PRODUCTION READY** - Complete codebase cleanup completed. All debug code, temporary files, and development artifacts removed. CSP eval blocking fixed, PWA manifest optimized, and comprehensive error suppression implemented.
+**Current Status**: BETA v1.3.0 (August 13, 2025) - **PRODUCTION READY** - Critical date logging bug resolved. Food entries now display correct local dates instead of server UTC dates. Enhanced timezone detection using browser APIs with automatic correction of existing meal data. Weekly summary and progress tracking now show accurate date information.
 
 ## User Preferences
 
@@ -71,3 +71,18 @@ Authentication is handled through Supabase Auth with JWT token-based session man
 - **Service Worker**: Custom implementation for offline caching and background sync
 - **React Query/TanStack Query**: Server state management and caching
 - **Web App Manifest**: PWA configuration for native app installation
+
+### Recent Changes (BETA v1.3.0)
+
+#### Critical Date Bug Resolution
+- **Root Cause**: Food entries were being logged with server UTC timestamps instead of user's local timezone dates
+- **Impact**: Meals logged "today" appeared on the wrong day (e.g., Wednesday entries showing as Thursday)
+- **Solution**: Implemented browser-based timezone detection using `Intl.DateTimeFormat` API for accurate local date calculation
+- **Auto-Correction**: Added automatic detection and correction system for existing incorrectly dated meal entries
+- **Enhanced Components**: Updated `WeeklyCaloriesCard`, `getLocalDateKey()`, and meal date validation logic
+
+#### Technical Implementation
+- **Timezone Detection**: Uses `Intl.DateTimeFormat().resolvedOptions().timeZone` for user's actual timezone
+- **Date Utilities**: Enhanced `getLocalDateKey()` function with proper timezone conversion
+- **Debugging Tools**: Added comprehensive timezone debugging utility for development support
+- **Data Migration**: Automatic correction of existing meal data with wrong dates
