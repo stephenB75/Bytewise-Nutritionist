@@ -19,18 +19,6 @@
   "related_applications": [],
   "icons": [
     {
-      "src": "/apple-icon.png?v=3.0",
-      "sizes": "180x180",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/apple-touch-icon.png?v=3.0",
-      "sizes": "180x180",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
       "src": "/icons/icon-72x72.png?v=3.0",
       "sizes": "72x72",
       "type": "image/png",

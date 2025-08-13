@@ -36,19 +36,19 @@ app.use((req, res, next) => {
   
   // Content Security Policy
   const cspPolicy = isProduction
-    ? "default-src 'self'; " +
+    ? "default-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
       "img-src 'self' https: data: blob:; " +
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com blob:; " +
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com blob: 'wasm-unsafe-eval'; " +
       "connect-src 'self' https://api.stripe.com https://*.supabase.co wss://*.supabase.co https://www.bytewisenutritionist.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net https://api.nal.usda.gov; " +
       "font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com data:; " +
       "frame-src 'self' https://js.stripe.com; " +
       "object-src 'none'; " +
       "base-uri 'self';"
-    : "default-src 'self'; " +
+    : "default-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
       "img-src 'self' https: data: blob:; " +
       "style-src 'self' 'unsafe-inline' https:; " +
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: 'wasm-unsafe-eval'; " +
       "connect-src 'self' https: wss:; " +
       "font-src 'self' https: data:; " +
       "media-src 'self' https: data:; " +
