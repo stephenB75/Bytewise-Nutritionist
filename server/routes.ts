@@ -73,14 +73,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   await setupAuth(app);
 
   // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res: Response) => {
+  app.get('/api/auth/user', optionalAuth, async (req: any, res: Response) => {
     const userId = req.user?.id;
     if (!userId) {
-      res.status(401).json({ message: "User not found" });
+      // Return null for unauthenticated users instead of 401
+      res.json(null);
       return;
     }
-    const user = await storage.getUser(userId);
-    res.json(user);
+    try {
+      const user = await storage.getUser(userId);
+      res.json(user);
+    } catch (error) {
+      // If user not found in database, return null
+      res.json(null);
+    }
   });
 
   // Sign in endpoint with email verification check
