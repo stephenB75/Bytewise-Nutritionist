@@ -565,10 +565,19 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     return 'slide-in-from-bottom-4';
   };
 
-  // Enhanced tab change handler with animation direction
+  // Enhanced tab change handler with animation direction and scroll reset
   const handleTabChange = (newTab: string) => {
     setPreviousTab(activeTab);
     setActiveTab(newTab);
+    
+    // Reset scroll to hero component when navigating between pages
+    setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'smooth'
+      });
+    }, 50); // Small delay to ensure tab content is rendered before scrolling
   };
 
   // Optimized Hero Section Component with enhanced performance and visuals
@@ -661,7 +670,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   // Optimized ByteWise Logo Component
   const BytewiseLogo = React.memo(() => (
-    <div className="mb-8 cursor-pointer group transition-all duration-300 hover:scale-105" onClick={() => setActiveTab('home')}>
+    <div className="mb-8 cursor-pointer group transition-all duration-300 hover:scale-105" onClick={() => handleTabChange('home')}>
       <div className="text-center font-league-spartan">
         <div className="text-7xl font-black leading-none text-sky-300 mb-2 lowercase tracking-tight drop-shadow-2xl group-hover:text-sky-200 transition-colors duration-300">
           bytewise
@@ -842,9 +851,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <Button 
                 onClick={() => {
                   if (user) {
-                    setActiveTab('calculator');
+                    handleTabChange('calculator');
                   } else {
-                    setActiveTab('profile');
+                    handleTabChange('profile');
                   }
                 }}
                 size="lg"
@@ -869,7 +878,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <Button 
               variant="ghost" 
               className="text-orange-400 hover:text-orange-300"
-              onClick={() => setActiveTab(user ? 'calculator' : 'profile')}
+              onClick={() => handleTabChange(user ? 'calculator' : 'profile')}
             >
               {user ? 'Track Food' : 'Sign Up to Track'}
             </Button>
@@ -1011,9 +1020,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           <Button 
             onClick={() => {
               if (user) {
-                setActiveTab('calculator');
+                handleTabChange('calculator');
               } else {
-                setActiveTab('profile');
+                handleTabChange('profile');
               }
             }}
             className="w-full mt-3 bg-orange-600 hover:bg-orange-700 text-white font-bold h-12 rounded-xl"
