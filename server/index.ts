@@ -34,26 +34,29 @@ app.use((req, res, next) => {
     res.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
   }
   
-  // Content Security Policy
+  // Content Security Policy - More permissive for production issues
   const cspPolicy = isProduction
-    ? "default-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+    ? "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; " +
       "img-src 'self' https: data: blob:; " +
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com blob: 'wasm-unsafe-eval'; " +
-      "connect-src 'self' https://api.stripe.com https://*.supabase.co wss://*.supabase.co https://www.bytewisenutritionist.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net https://api.nal.usda.gov; " +
-      "font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com data:; " +
-      "frame-src 'self' https://js.stripe.com; " +
-      "object-src 'none'; " +
-      "base-uri 'self';"
-    : "default-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+      "style-src 'self' 'unsafe-inline' https: data:; " +
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https: blob: data: 'wasm-unsafe-eval'; " +
+      "connect-src 'self' https: wss: data:; " +
+      "font-src 'self' https: data:; " +
+      "frame-src 'self' https:; " +
+      "media-src 'self' https: data:; " +
+      "worker-src 'self' blob:; " +
+      "child-src 'self' blob:; " +
+      "object-src 'none';"
+    : "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; " +
       "img-src 'self' https: data: blob:; " +
-      "style-src 'self' 'unsafe-inline' https:; " +
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: 'wasm-unsafe-eval'; " +
-      "connect-src 'self' https: wss:; " +
+      "style-src 'self' 'unsafe-inline' https: data:; " +
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https: blob: data: 'wasm-unsafe-eval'; " +
+      "connect-src 'self' https: wss: data:; " +
       "font-src 'self' https: data:; " +
       "media-src 'self' https: data:; " +
-      "object-src 'none'; " +
-      "base-uri 'self';";
+      "worker-src 'self' blob:; " +
+      "child-src 'self' blob:; " +
+      "object-src 'none';";
       
   res.header('Content-Security-Policy', cspPolicy);
   
