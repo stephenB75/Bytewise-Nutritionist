@@ -89,7 +89,8 @@ Authentication is handled through Supabase Auth with JWT token-based session man
 
 #### Navigation UX Enhancement (BETA v1.3.0)
 - **Scroll Reset Functionality**: Enhanced `handleTabChange()` function with automatic scroll-to-top behavior
-- **Smooth Navigation**: When switching between pages, view smoothly scrolls back to hero component
+- **Root Cause Resolved**: Fixed CSS `scroll-behavior: smooth` interference with instant scroll attempts
+- **Smooth Navigation**: When switching between pages, view instantly scrolls back to hero component
 - **Universal Implementation**: All navigation elements (bottom tabs, hero buttons, logo) use enhanced handler
-- **Performance Optimized**: 50ms delay ensures content renders before scroll animation
-- **User Experience**: Consistent navigation behavior across all app sections
+- **Technical Solution**: Temporarily disables smooth scrolling during navigation, forces instant scroll, then restores smooth behavior
+- **User Experience**: Consistent instant scroll reset behavior across all app sections
