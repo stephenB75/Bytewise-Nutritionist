@@ -35,29 +35,32 @@ app.use((req, res, next) => {
     res.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
   }
   
-  // Content Security Policy - More permissive for production issues
+  // Content Security Policy - Production-ready with eval support for Vite/React
   const cspPolicy = isProduction
-    ? "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; " +
-      "img-src 'self' https: data: blob:; " +
-      "style-src 'self' 'unsafe-inline' https: data:; " +
+    ? "default-src 'self'; " +
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' https: blob: data: 'wasm-unsafe-eval'; " +
+      "style-src 'self' 'unsafe-inline' https: fonts.googleapis.com; " +
+      "font-src 'self' https: fonts.gstatic.com data:; " +
+      "img-src 'self' https: data: blob:; " +
       "connect-src 'self' https: wss: data:; " +
-      "font-src 'self' https: data:; " +
+      "media-src 'self' https: data: blob:; " +
+      "worker-src 'self' blob:; " +
+      "child-src 'self' blob:; " +
       "frame-src 'self' https:; " +
-      "media-src 'self' https: data:; " +
-      "worker-src 'self' blob:; " +
-      "child-src 'self' blob:; " +
-      "object-src 'none';"
-    : "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; " +
-      "img-src 'self' https: data: blob:; " +
-      "style-src 'self' 'unsafe-inline' https: data:; " +
+      "object-src 'none'; " +
+      "base-uri 'self';"
+    : "default-src 'self'; " +
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' https: blob: data: 'wasm-unsafe-eval'; " +
-      "connect-src 'self' https: wss: data:; " +
+      "style-src 'self' 'unsafe-inline' https:; " +
       "font-src 'self' https: data:; " +
-      "media-src 'self' https: data:; " +
+      "img-src 'self' https: data: blob:; " +
+      "connect-src 'self' https: wss: data:; " +
+      "media-src 'self' https: data: blob:; " +
       "worker-src 'self' blob:; " +
       "child-src 'self' blob:; " +
-      "object-src 'none';";
+      "frame-src 'self'; " +
+      "object-src 'none'; " +
+      "base-uri 'self';";
       
   res.header('Content-Security-Policy', cspPolicy);
   
