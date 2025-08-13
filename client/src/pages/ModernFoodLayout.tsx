@@ -567,21 +567,39 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   // Enhanced tab change handler with animation direction and scroll reset
   const handleTabChange = (newTab: string) => {
-    setPreviousTab(activeTab);
-    setActiveTab(newTab);
-    
-    // Force immediate scroll to top with multiple methods
+    // First, scroll to top immediately before any state changes
     window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
     
-    // Smooth scroll after content loads
+    // Then update state
+    setPreviousTab(activeTab);
+    setActiveTab(newTab);
+    
+    // Additional scroll attempts with various timing approaches
+    setTimeout(() => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }, 0);
+    
+    setTimeout(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }, 10);
+    
+    setTimeout(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    }, 100);
+    
+    // Force scroll after all React updates complete
     requestAnimationFrame(() => {
-      setTimeout(() => {
-        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+      requestAnimationFrame(() => {
+        window.scrollTo(0, 0);
         document.documentElement.scrollTop = 0;
         document.body.scrollTop = 0;
-      }, 50);
+      });
     });
   };
 
