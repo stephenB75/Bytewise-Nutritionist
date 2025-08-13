@@ -86,3 +86,10 @@ Authentication is handled through Supabase Auth with JWT token-based session man
 - **Date Utilities**: Enhanced `getLocalDateKey()` function with proper timezone conversion
 - **Debugging Tools**: Added comprehensive timezone debugging utility for development support
 - **Data Migration**: Automatic correction of existing meal data with wrong dates
+
+#### Navigation UX Enhancement (BETA v1.3.0)
+- **Scroll Reset Functionality**: Enhanced `handleTabChange()` function with automatic scroll-to-top behavior
+- **Smooth Navigation**: When switching between pages, view smoothly scrolls back to hero component
+- **Universal Implementation**: All navigation elements (bottom tabs, hero buttons, logo) use enhanced handler
+- **Performance Optimized**: 50ms delay ensures content renders before scroll animation
+- **User Experience**: Consistent navigation behavior across all app sections
