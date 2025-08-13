@@ -80,6 +80,11 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
+  // Skip chrome-extension requests specifically to prevent cache errors
+  if (url.protocol === 'chrome-extension:') {
+    return;
+  }
+  
   // Skip external domains (fonts, CDNs, APIs)
   const externalDomains = [
     'fonts.googleapis.com',
@@ -151,7 +156,11 @@ async function cacheFirst(request, cacheName) {
   const response = await fetch(request);
   
   if (response.ok) {
-    cache.put(request, response.clone());
+    try {
+      cache.put(request, response.clone());
+    } catch (error) {
+      console.log('[SW] Failed to cache request (unsupported scheme):', request.url);
+    }
   }
   
   return response;
@@ -164,7 +173,11 @@ async function networkFirst(request, cacheName) {
     
     if (response.ok) {
       const cache = await caches.open(cacheName);
-      cache.put(request, response.clone());
+      try {
+        cache.put(request, response.clone());
+      } catch (error) {
+        console.log('[SW] Failed to cache request (unsupported scheme):', request.url);
+      }
     }
     
     return response;
@@ -188,7 +201,11 @@ async function networkFirstWithFallback(request, cacheName) {
     
     if (response.ok) {
       const cache = await caches.open(cacheName);
-      cache.put(request, response.clone());
+      try {
+        cache.put(request, response.clone());
+      } catch (error) {
+        console.log('[SW] Failed to cache request (unsupported scheme):', request.url);
+      }
       return response;
     }
     
