@@ -27,6 +27,39 @@ const API_ENDPOINTS = [
   '/api/nutrition/usda'
 ];
 
+// URL validation function
+function isValidCacheableRequest(request) {
+  try {
+    const url = new URL(request.url);
+    
+    // Block chrome-extension and similar schemes
+    if (!['http:', 'https:'].includes(url.protocol)) {
+      return false;
+    }
+    
+    // Block extension URLs
+    if (url.href.includes('extension') || 
+        url.href.includes('chrome://') ||
+        url.href.includes('moz://')) {
+      return false;
+    }
+    
+    // Only allow same origin or known trusted domains
+    const trustedDomains = [
+      self.location.hostname,
+      'bytewisenutritionist.com',
+      'supabase.co',
+      'localhost'
+    ];
+    
+    return trustedDomains.some(domain => 
+      url.hostname === domain || url.hostname.endsWith('.' + domain)
+    );
+  } catch (error) {
+    return false;
+  }
+}
+
 // Install event - cache static files
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -68,20 +101,31 @@ self.addEventListener('activate', (event) => {
 // Fetch event - handle requests with caching strategy
 self.addEventListener('fetch', (event) => {
   const { request } = event;
-  const url = new URL(request.url);
   
   // Skip non-GET requests
   if (request.method !== 'GET') {
     return;
   }
   
-  // Skip chrome-extension and other non-http requests
-  if (!url.protocol.startsWith('http')) {
+  // Parse URL safely
+  let url;
+  try {
+    url = new URL(request.url);
+  } catch (error) {
+    console.log('[SW] Invalid URL, skipping:', request.url);
     return;
   }
   
-  // Skip chrome-extension requests specifically to prevent cache errors
-  if (url.protocol === 'chrome-extension:') {
+  // Skip any non-http/https requests (chrome-extension, moz-extension, etc.)
+  if (!['http:', 'https:'].includes(url.protocol)) {
+    return;
+  }
+  
+  // Skip chrome-extension explicitly
+  if (url.protocol.startsWith('chrome-extension') || 
+      url.protocol.startsWith('moz-extension') || 
+      url.href.includes('chrome-extension') ||
+      url.href.includes('moz-extension')) {
     return;
   }
   
@@ -98,10 +142,26 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
+  // Additional safety check - only handle same-origin requests or known safe domains
+  if (url.origin !== self.location.origin && 
+      !url.hostname.includes('bytewisenutritionist.com') &&
+      !url.hostname.includes('supabase.co') &&
+      !url.hostname.includes('localhost')) {
+    return;
+  }
+  
   event.respondWith(handleFetch(request));
 });
 
 async function handleFetch(request) {
+  // Additional safety check
+  if (request.url.includes('chrome-extension') || 
+      request.url.includes('moz-extension') ||
+      !request.url.startsWith('http')) {
+    console.log('[SW] Skipping unsafe request:', request.url);
+    return fetch(request);
+  }
+  
   const url = new URL(request.url);
   
   try {
@@ -155,7 +215,7 @@ async function cacheFirst(request, cacheName) {
   console.log('[SW] Cache miss, fetching:', request.url);
   const response = await fetch(request);
   
-  if (response.ok) {
+  if (response.ok && isValidCacheableRequest(request)) {
     try {
       cache.put(request, response.clone());
     } catch (error) {
@@ -171,7 +231,7 @@ async function networkFirst(request, cacheName) {
   try {
     const response = await fetch(request);
     
-    if (response.ok) {
+    if (response.ok && isValidCacheableRequest(request)) {
       const cache = await caches.open(cacheName);
       try {
         cache.put(request, response.clone());
@@ -199,7 +259,7 @@ async function networkFirstWithFallback(request, cacheName) {
   try {
     const response = await fetch(request);
     
-    if (response.ok) {
+    if (response.ok && isValidCacheableRequest(request)) {
       const cache = await caches.open(cacheName);
       try {
         cache.put(request, response.clone());
