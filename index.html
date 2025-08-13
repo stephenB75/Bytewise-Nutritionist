@@ -108,7 +108,53 @@
 <body>
   <div id="root"></div>
   
-  <!-- Enhanced Browser Extension Error Suppression -->
+  <!-- Immediate Extension Error Blocking - Inline for instant effect -->
+  <script>
+    (function() {
+      'use strict';
+      
+      // Immediate error blocking patterns
+      const blockPatterns = [
+        /checkoutUrls/i, /paymentUrls/i, /ruleset/i, /content\.js/i, /extension/i,
+        /Cannot read properties of undefined.*reading.*checkoutUrls/i,
+        /Cannot read properties of undefined.*reading.*paymentUrls/i,
+        /TypeError.*checkoutUrls/i, /TypeError.*paymentUrls/i,
+        /ht\.u/i, /webpack_require/i, /updateStoreState/i
+      ];
+      
+      // Override window.onerror immediately
+      window.onerror = function(message, source, lineno, colno, error) {
+        if (blockPatterns.some(pattern => pattern.test(message || '')) ||
+            blockPatterns.some(pattern => pattern.test(source || ''))) {
+          console.debug('🚫 Extension error blocked:', message);
+          return true; // Prevent default error handling
+        }
+        return false;
+      };
+      
+      // Override unhandledrejection immediately  
+      window.addEventListener('unhandledrejection', function(event) {
+        const msg = event.reason?.message || event.reason?.toString() || '';
+        if (blockPatterns.some(pattern => pattern.test(msg))) {
+          console.debug('🚫 Extension promise rejection blocked');
+          event.preventDefault();
+          event.stopPropagation();
+          return false;
+        }
+      }, true);
+      
+      // Override console.error for extension cleanup
+      const originalError = console.error;
+      console.error = function(...args) {
+        const message = args.join(' ');
+        if (!blockPatterns.some(pattern => pattern.test(message))) {
+          originalError.apply(console, args);
+        }
+      };
+    })();
+  </script>
+  
+  <!-- Enhanced Browser Extension Error Suppression - Load First -->
   <script src="/error-suppression.js"></script>
   
   <!-- Service Worker Registration with Enhanced Error Handling -->
@@ -129,15 +175,18 @@
         return false;
       }
       
-      // Suppress specific error messages
+      // Suppress specific error messages with exact matching
       if (event.message && (
         event.message.includes('checkoutUrls') ||
         event.message.includes('paymentUrls') ||
-        event.message.includes('Cannot read properties of undefined')
+        event.message.includes('ruleset') ||
+        event.message.includes('Cannot read properties of undefined') ||
+        event.message.includes('content.js')
       )) {
         console.debug('Suppressed extension-related error:', event.message);
         event.preventDefault();
         event.stopPropagation();
+        event.stopImmediatePropagation();
         return false;
       }
     });

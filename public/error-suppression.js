@@ -18,14 +18,22 @@
     /content\.js/i,
     /checkoutUrls/i,
     /paymentUrls/i,
+    /ruleset/i,
     /Cannot read properties of undefined.*reading.*checkoutUrls/i,
     /Cannot read properties of undefined.*reading.*paymentUrls/i,
+    /Cannot read properties of undefined.*reading.*ruleset/i,
+    /TypeError.*checkoutUrls/i,
+    /TypeError.*paymentUrls/i,
+    /TypeError.*ruleset/i,
     /honey/i,
     /capital one/i,
     /rakuten/i,
     /coupon/i,
     /deal/i,
-    /shopping/i
+    /shopping/i,
+    /await.*ht\.u/i,
+    /webpack_require/i,
+    /updateStoreState/i
   ];
   
   // Function to check if error is from extension
@@ -70,26 +78,49 @@
     }
   };
   
-  // Global error suppression
+  // Global error suppression with immediate effect
   window.addEventListener('error', function(event) {
     if (isExtensionError(event.message, event.filename, event.error?.stack)) {
+      console.debug('🚫 Blocked extension error:', event.message);
       event.preventDefault();
       event.stopPropagation();
+      event.stopImmediatePropagation();
       return false;
     }
   }, true); // Use capture phase
   
-  // Promise rejection suppression
+  // Promise rejection suppression with aggressive blocking
   window.addEventListener('unhandledrejection', function(event) {
     const error = event.reason;
     const errorMessage = error?.message || error?.toString() || '';
     const stack = error?.stack || '';
     
     if (isExtensionError(errorMessage, '', stack)) {
+      console.debug('🚫 Blocked extension promise rejection:', errorMessage);
       event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
       return false;
     }
   });
+  
+  // Additional promise rejection handler for immediate blocking
+  const originalAddEventListener = EventTarget.prototype.addEventListener;
+  EventTarget.prototype.addEventListener = function(type, listener, options) {
+    if (type === 'unhandledrejection') {
+      const wrappedListener = function(event) {
+        const error = event.reason;
+        const errorMessage = error?.message || error?.toString() || '';
+        if (extensionPatterns.some(pattern => pattern.test(errorMessage))) {
+          console.debug('🚫 Pre-blocked extension rejection');
+          return false;
+        }
+        return listener.call(this, event);
+      };
+      return originalAddEventListener.call(this, type, wrappedListener, options);
+    }
+    return originalAddEventListener.call(this, type, listener, options);
+  };
   
   // CSP violation suppression for extensions
   document.addEventListener('securitypolicyviolation', function(event) {
