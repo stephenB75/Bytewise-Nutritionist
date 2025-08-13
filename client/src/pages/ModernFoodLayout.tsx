@@ -43,7 +43,7 @@ import {
 } from 'lucide-react';
 import { NotificationDropdown } from '@/components/NotificationDropdown';
 import { WeeklyCaloriesCard } from '@/components/WeeklyCaloriesCard';
-import { DataPersistenceTest } from '@/components/DataPersistenceTest';
+
 
 import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/hooks/use-toast';
@@ -1175,12 +1175,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
 
             
-            {/* Development Test Panels - Production Ready */}
-            {import.meta.env.DEV && (
-              <div className="space-y-4 mb-4">
-                <DataPersistenceTest />
-              </div>
-            )}
+
             
             {/* Include Weekly Calories Card */}
             <WeeklyCaloriesCard />

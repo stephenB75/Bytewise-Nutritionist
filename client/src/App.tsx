@@ -12,9 +12,6 @@ import { Route, Router, Switch } from 'wouter';
 import ModernFoodLayout from './pages/ModernFoodLayout';
 import VerifyEmail from './pages/VerifyEmail';
 import { ResetPassword } from './pages/ResetPassword';
-import IconTest from './pages/IconTest';
-import DataPersistenceTest from './pages/DataPersistenceTest';
-import IconDebug from './pages/IconDebug';
 import { useDataRestoration } from '@/hooks/useDataRestoration';
 import { DataSyncIndicator } from '@/components/DataSyncIndicator';
 import { useSessionManager } from '@/hooks/useSessionManager';
@@ -41,7 +38,7 @@ function AppContent() {
     setTimeout(() => {
       const migrated = runDataMigration();
       if (migrated) {
-        console.log('Data migration completed - your historical data should now be visible');
+        // Data migration completed
         // Refresh components to show migrated data
         window.dispatchEvent(new CustomEvent('data-migrated'));
       }
@@ -122,9 +119,6 @@ function AppContent() {
           <Switch>
             <Route path="/verify-email" component={VerifyEmail} />
             <Route path="/reset-password" component={ResetPassword} />
-            <Route path="/icon-test" component={IconTest} />
-            <Route path="/data-test" component={DataPersistenceTest} />
-            <Route path="/icon-debug" component={IconDebug} />
             <Route>{renderCurrentPage()}</Route>
           </Switch>
         </main>

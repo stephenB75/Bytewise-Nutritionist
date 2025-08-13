@@ -34,7 +34,7 @@ export function backupUserData(): void {
     localStorage.setItem('bytewise_data_backup', JSON.stringify(backup));
     localStorage.setItem('bytewise_backup_timestamp', timestamp);
     
-    console.log('User data backed up successfully');
+    // Data backed up successfully
   } catch (error) {
     console.error('Failed to backup user data:', error);
   }
@@ -58,7 +58,7 @@ export function restoreUserData(): boolean {
     });
     
     if (restoredCount > 0) {
-      console.log(`Restored ${restoredCount} data keys from backup`);
+      // Restored data keys from backup
       return true;
     }
     
@@ -79,7 +79,7 @@ export function checkDataIntegrity(): void {
     // Try to restore from backup
     const restored = restoreUserData();
     if (restored) {
-      console.log('Data integrity check: Restored from backup');
+      // Data restored from backup
     }
   }
 }
