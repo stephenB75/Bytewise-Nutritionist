@@ -5,7 +5,7 @@
  * Features comprehensive notification display with proper sizing
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -56,10 +56,47 @@ export function NotificationDropdown({
   onNavigate
 }: NotificationDropdownProps) {
   const [mounted, setMounted] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Keyboard navigation and focus management
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      switch (event.key) {
+        case 'Escape':
+          event.preventDefault();
+          onClose();
+          break;
+        case 'Tab':
+          // Let natural tab behavior work, but ensure focus stays within dropdown
+          if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+            event.preventDefault();
+            const firstFocusableElement = dropdownRef.current.querySelector(
+              'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+            ) as HTMLElement;
+            firstFocusableElement?.focus();
+          }
+          break;
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    
+    // Focus management - focus the close button on open
+    setTimeout(() => {
+      const closeButton = dropdownRef.current?.querySelector('[data-testid="button-close-notifications"]') as HTMLElement;
+      closeButton?.focus();
+    }, 100);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, onClose]);
 
   if (!mounted || !isOpen) return null;
 
@@ -96,21 +133,32 @@ export function NotificationDropdown({
   };
 
   return (
-    <div className="absolute top-full right-0 mt-2 w-80 max-h-96 z-50">
-      <Card className="p-4 bg-white/80 backdrop-blur-sm border-0 shadow-lg max-h-96 overflow-y-auto">
+    <div 
+      ref={dropdownRef}
+      className="absolute top-full right-0 mt-2 w-80 max-h-96 z-50"
+    >
+      <Card 
+        className="p-4 bg-white/80 backdrop-blur-sm border-0 shadow-lg max-h-96 overflow-y-auto"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="notifications-heading"
+        data-testid="dropdown-notifications"
+      >
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <Bell className="w-5 h-5 text-blue-600" />
-            <h3 className="text-lg font-bold text-gray-900">Notifications</h3>
+            <Bell className="w-5 h-5 text-blue-600" aria-hidden="true" />
+            <h3 id="notifications-heading" className="text-lg font-bold text-gray-900">Notifications</h3>
           </div>
           <Button
             variant="ghost"
             size="sm"
             onClick={onClose}
             className="h-8 w-8 p-0"
+            aria-label="Close notifications"
+            data-testid="button-close-notifications"
           >
-            <X className="w-4 h-4" />
+            <X className="w-4 h-4" aria-hidden="true" />
           </Button>
         </div>
 
@@ -122,24 +170,24 @@ export function NotificationDropdown({
               <p className="text-sm text-gray-600">Stay updated with your nutrition progress</p>
             </div>
             <Badge variant="outline" className="text-blue-600 border-blue-600">
-              <Bell className="w-3 h-3 mr-1" />
+              <Bell className="w-3 h-3 mr-1" aria-hidden="true" />
               {notifications.filter(n => !n.read).length} New
             </Badge>
           </div>
           
           <div className="grid grid-cols-3 gap-2">
             <div className="text-center p-2 bg-blue-50 rounded-lg">
-              <Bell className="w-4 h-4 mx-auto text-blue-600 mb-1" />
+              <Bell className="w-4 h-4 mx-auto text-blue-600 mb-1" aria-hidden="true" />
               <p className="text-xs text-gray-600">Total</p>
               <p className="font-bold text-gray-900 text-sm">{notifications.length}</p>
             </div>
             <div className="text-center p-2 bg-green-50 rounded-lg">
-              <CheckCircle className="w-4 h-4 mx-auto text-green-600 mb-1" />
+              <CheckCircle className="w-4 h-4 mx-auto text-green-600 mb-1" aria-hidden="true" />
               <p className="text-xs text-gray-600">Read</p>
               <p className="font-bold text-gray-900 text-sm">{notifications.filter(n => n.read).length}</p>
             </div>
             <div className="text-center p-2 bg-orange-50 rounded-lg">
-              <AlertTriangle className="w-4 h-4 mx-auto text-orange-600 mb-1" />
+              <AlertTriangle className="w-4 h-4 mx-auto text-orange-600 mb-1" aria-hidden="true" />
               <p className="text-xs text-gray-600">Unread</p>
               <p className="font-bold text-gray-900 text-sm">{notifications.filter(n => !n.read).length}</p>
             </div>
@@ -157,8 +205,10 @@ export function NotificationDropdown({
                 size="sm"
                 onClick={onMarkAllAsRead}
                 className="border-blue-600 text-blue-600 hover:bg-blue-50 text-xs"
+                aria-label="Mark all notifications as read"
+                data-testid="button-mark-all-read"
               >
-                <CheckCircle className="w-3 h-3 mr-1" />
+                <CheckCircle className="w-3 h-3 mr-1" aria-hidden="true" />
                 Mark All Read
               </Button>
               <Button
@@ -166,8 +216,10 @@ export function NotificationDropdown({
                 size="sm"
                 onClick={() => notifications.forEach(n => onDeleteNotification(n.id))}
                 className="border-red-600 text-red-600 hover:bg-red-50 text-xs"
+                aria-label="Clear all notifications"
+                data-testid="button-clear-all"
               >
-                <Trash2 className="w-3 h-3 mr-1" />
+                <Trash2 className="w-3 h-3 mr-1" aria-hidden="true" />
                 Clear All
               </Button>
             </div>
@@ -178,7 +230,7 @@ export function NotificationDropdown({
         <div className="space-y-2 max-h-64 overflow-y-auto">
           {notifications.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
-              <Bell className="w-8 h-8 mx-auto mb-2 opacity-50" />
+              <Bell className="w-8 h-8 mx-auto mb-2 opacity-50" aria-hidden="true" />
               <p className="text-sm">No notifications</p>
               <p className="text-xs text-gray-400">You're all caught up!</p>
             </div>
@@ -219,8 +271,10 @@ export function NotificationDropdown({
                               size="sm"
                               onClick={() => onMarkAsRead(notification.id)}
                               className="h-5 w-5 p-0"
+                              aria-label={`Mark "${notification.title}" as read`}
+                              data-testid={`button-mark-read-${notification.id}`}
                             >
-                              <CheckCircle className="w-3 h-3" />
+                              <CheckCircle className="w-3 h-3" aria-hidden="true" />
                             </Button>
                           )}
                           <Button
@@ -228,8 +282,10 @@ export function NotificationDropdown({
                             size="sm"
                             onClick={() => onDeleteNotification(notification.id)}
                             className="h-5 w-5 p-0 text-red-500 hover:text-red-700"
+                            aria-label={`Delete "${notification.title}" notification`}
+                            data-testid={`button-delete-${notification.id}`}
                           >
-                            <X className="w-3 h-3" />
+                            <X className="w-3 h-3" aria-hidden="true" />
                           </Button>
                         </div>
                       </div>

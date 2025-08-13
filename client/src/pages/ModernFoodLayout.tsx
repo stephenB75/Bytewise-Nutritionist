@@ -2015,10 +2015,17 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             size="lg"
             className="bg-transparent text-white hover:bg-white/10 rounded-2xl p-4 transition-all duration-300 hover:scale-105"
             onClick={() => setShowNotificationDropdown(!showNotificationDropdown)}
+            aria-label={`Notifications${notifications.filter(n => !n.read).length > 0 ? ` - ${notifications.filter(n => !n.read).length} unread` : ''}`}
+            aria-expanded={showNotificationDropdown}
+            aria-haspopup="dialog"
+            data-testid="button-notifications"
           >
-            <Bell className="w-8 h-8 drop-shadow-lg" strokeWidth={2.5} />
+            <Bell className="w-8 h-8 drop-shadow-lg" strokeWidth={2.5} aria-hidden="true" />
             {notifications.filter(n => !n.read).length > 0 && (
-              <div className="absolute -top-2 -right-2 w-8 h-8 bg-red-600 rounded-full flex items-center justify-center border-3 border-white shadow-xl animate-pulse ring-2 ring-red-400/50">
+              <div 
+                className="absolute -top-2 -right-2 w-8 h-8 bg-red-600 rounded-full flex items-center justify-center border-3 border-white shadow-xl animate-pulse ring-2 ring-red-400/50"
+                aria-hidden="true"
+              >
                 <span className="text-sm text-white font-bold drop-shadow-lg">
                   {notifications.filter(n => !n.read).length}
                 </span>
