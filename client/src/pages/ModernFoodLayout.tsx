@@ -573,16 +573,26 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     setPreviousTab(activeTab);
     setActiveTab(newTab);
     
-    // Reset scroll to hero component when navigating between pages
+    // Immediate scroll to top - try multiple approaches
+    console.log(`📍 Immediate scroll attempt`);
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    
+    // Also try with longer delay and smooth behavior
     setTimeout(() => {
-      console.log(`📍 Scrolling to top from position: ${window.scrollY}`);
-      window.scrollTo({
-        top: 0,
-        left: 0,
-        behavior: 'smooth'
-      });
-      console.log(`✅ Scroll command executed - target: top`);
-    }, 50); // Small delay to ensure tab content is rendered before scrolling
+      console.log(`📍 Delayed smooth scroll from position: ${window.scrollY}`);
+      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+      document.documentElement.scrollTop = 0; // Fallback
+      document.body.scrollTop = 0; // Additional fallback
+      console.log(`✅ Multiple scroll commands executed`);
+    }, 100); // Increased delay
+    
+    // Final attempt with even longer delay
+    setTimeout(() => {
+      if (window.scrollY > 0) {
+        console.log(`📍 Final scroll attempt from: ${window.scrollY}`);
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+      }
+    }, 300);
   };
 
   // Optimized Hero Section Component with enhanced performance and visuals
