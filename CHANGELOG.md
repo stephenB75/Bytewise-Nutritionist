@@ -1,5 +1,24 @@
 # Bytewise Nutritionist Changelog
 
+## Version 1.3.1 (August 13, 2025) - Navigation Scroll Reset Implementation
+
+### 🔧 Navigation UX Enhancement
+- **Scroll Reset Functionality**: Implemented instant scroll to hero component on all navigation clicks
+- **Root Cause Resolution**: Fixed CSS `scroll-behavior: smooth` interference with instant scroll attempts
+- **Universal Coverage**: All navigation elements now use enhanced `handleTabChange` function (8+ buttons)
+
+### 🐛 Navigation Bug Fixes
+- **Scroll Behavior Override**: Temporarily disables smooth scrolling during navigation for instant results
+- **Multi-Method Scroll Reset**: Uses window.scrollTo, documentElement.scrollTop, and body.scrollTop fallbacks
+- **Timing Optimization**: requestAnimationFrame and setTimeout ensure proper scroll execution
+
+### 📱 Navigation Elements Enhanced
+- **Bottom Navigation Tabs**: Home, nutrition, fasting, daily, profile (5 tabs)
+- **Hero Buttons**: Track Food and Sign Up buttons
+- **ByteWise Logo**: Returns to home with scroll reset
+
+---
+
 ## Version 1.3.0 (August 13, 2025) - Critical Date Bug Fix
 
 ### 🐛 Critical Bug Fixes
