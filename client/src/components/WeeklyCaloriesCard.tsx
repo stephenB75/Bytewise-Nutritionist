@@ -136,8 +136,38 @@ export function WeeklyCaloriesCard() {
         
         const dayCalories = dayMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
         
-        // Clean up: Remove debug logging now that timestamp matching is fixed
-        // Meals should now appear on the correct days
+        // Debug EMPANADA specifically to see why it's not matching Wednesday
+        if (dayData.day === 'Wednesday' || dayData.day === 'Thursday') {
+          console.log(`🔍 DEBUGGING ${dayData.day} ${dayData.date}:`);
+          console.log(`  Looking for meals that match this day...`);
+          
+          // Check each meal individually
+          storedMeals.forEach((meal: any) => {
+            if (meal.name && meal.name.includes('EMPANADA')) {
+              const exactMatch = meal.date === dayData.date;
+              const hasTimestamp = meal.date && meal.date.includes('T');
+              const timestampMatch = hasTimestamp ? meal.date.split('T')[0] === dayData.date : false;
+              const wouldMatch = exactMatch || timestampMatch;
+              
+              console.log(`    EMPANADA: "${meal.date}" vs "${dayData.date}"`);
+              console.log(`      Exact match: ${exactMatch}`);
+              console.log(`      Has timestamp: ${hasTimestamp}`);
+              console.log(`      Timestamp match: ${timestampMatch}`);
+              console.log(`      Would match: ${wouldMatch}`);
+              
+              if (hasTimestamp) {
+                const dateOnly = meal.date.split('T')[0];
+                console.log(`      Extracted date: "${dateOnly}"`);
+                console.log(`      Comparison: "${dateOnly}" === "${dayData.date}" = ${dateOnly === dayData.date}`);
+              }
+            }
+          });
+          
+          console.log(`  Final meal count: ${dayMeals.length}`);
+          dayMeals.forEach((meal: any, index: number) => {
+            console.log(`    ${index + 1}. ${meal.name} - ${meal.calories} cal (stored: ${meal.date})`);
+          });
+        }
         
         return {
           ...dayData,
