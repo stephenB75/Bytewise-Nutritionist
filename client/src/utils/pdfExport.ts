@@ -1,10 +1,51 @@
 /**
- * PDF Export Utility
+ * Enhanced PDF Export Utility
  * 
- * Creates actual PDF reports for user progress data over 6 months using jsPDF
+ * Creates comprehensive PDF reports with 30-day daily/weekly nutrition breakdowns
  */
 
 import { jsPDF } from 'jspdf';
+
+interface DailyNutritionData {
+  date: string;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  fiber: number;
+  sodium: number;
+  vitaminC: number;
+  vitaminD: number;
+  vitaminB12: number;
+  folate: number;
+  iron: number;
+  calcium: number;
+  zinc: number;
+  magnesium: number;
+  mealsCount: number;
+}
+
+interface WeeklyNutritionData {
+  weekStart: string;
+  weekEnd: string;
+  weekNumber: number;
+  avgCalories: number;
+  avgProtein: number;
+  avgCarbs: number;
+  avgFat: number;
+  avgFiber: number;
+  avgSodium: number;
+  avgVitaminC: number;
+  avgVitaminD: number;
+  avgVitaminB12: number;
+  avgFolate: number;
+  avgIron: number;
+  avgCalcium: number;
+  avgZinc: number;
+  avgMagnesium: number;
+  totalMeals: number;
+  daysWithData: number;
+}
 
 interface UserProgressData {
   totalMealsLogged: number;
@@ -12,6 +53,8 @@ interface UserProgressData {
   streakRecord: number;
   goalCompletionRate: number;
   achievements: number;
+  dailyBreakdown: DailyNutritionData[];
+  weeklyBreakdown: WeeklyNutritionData[];
   monthlyBreakdown: Array<{
     month: string;
     calories: number;
@@ -23,7 +66,7 @@ interface UserProgressData {
 export async function generateProgressReportPDF(): Promise<boolean> {
   try {
     // Fetch actual user data from local storage and API
-    const storedMeals = localStorage.getItem('meals');
+    const storedMeals = localStorage.getItem('weeklyMeals'); // Use weeklyMeals for comprehensive data
     const storedCalorieGoal = localStorage.getItem('calorieGoal');
     const storedUserProfile = localStorage.getItem('userProfile');
     
@@ -32,16 +75,108 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     const calorieGoal = storedCalorieGoal ? parseInt(storedCalorieGoal) : 2000;
     const userProfile = storedUserProfile ? JSON.parse(storedUserProfile) : {};
     
-    // Calculate real statistics from stored meals
+    // Calculate real statistics from stored meals for 30-day period
     const now = new Date();
-    const sixMonthsAgo = new Date(now);
-    sixMonthsAgo.setMonth(now.getMonth() - 6);
+    const thirtyDaysAgo = new Date(now);
+    thirtyDaysAgo.setDate(now.getDate() - 30);
     
-    // Filter meals from last 6 months
+    // Filter meals from last 30 days
     const recentMeals = meals.filter((meal: any) => {
-      const mealDate = new Date(meal.date);
-      return mealDate >= sixMonthsAgo && mealDate <= now;
+      let mealDate;
+      // Handle both date formats: "YYYY-MM-DD" and "YYYY-MM-DDTHH:mm:ss.sssZ"
+      if (meal.date && meal.date.includes('T')) {
+        mealDate = new Date(meal.date);
+      } else {
+        mealDate = new Date(meal.date);
+      }
+      return mealDate >= thirtyDaysAgo && mealDate <= now;
     });
+
+    // Generate daily nutrition breakdowns for 30 days
+    const dailyBreakdown: DailyNutritionData[] = [];
+    for (let i = 29; i >= 0; i--) {
+      const date = new Date(now);
+      date.setDate(now.getDate() - i);
+      const dateKey = date.toISOString().split('T')[0];
+      
+      // Filter meals for this specific date
+      const dayMeals = recentMeals.filter((meal: any) => {
+        let mealDateKey;
+        if (meal.date && meal.date.includes('T')) {
+          mealDateKey = meal.date.split('T')[0];
+        } else {
+          mealDateKey = meal.date;
+        }
+        return mealDateKey === dateKey;
+      });
+      
+      // Calculate daily totals
+      const dailyData: DailyNutritionData = {
+        date: dateKey,
+        calories: dayMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0),
+        protein: dayMeals.reduce((sum: number, meal: any) => sum + (meal.protein || 0), 0),
+        carbs: dayMeals.reduce((sum: number, meal: any) => sum + (meal.carbs || 0), 0),
+        fat: dayMeals.reduce((sum: number, meal: any) => sum + (meal.fat || 0), 0),
+        fiber: dayMeals.reduce((sum: number, meal: any) => sum + (meal.fiber || 0), 0),
+        sodium: dayMeals.reduce((sum: number, meal: any) => sum + (meal.sodium || 0), 0),
+        vitaminC: dayMeals.reduce((sum: number, meal: any) => sum + (meal.vitaminC || 0), 0),
+        vitaminD: dayMeals.reduce((sum: number, meal: any) => sum + (meal.vitaminD || 0), 0),
+        vitaminB12: dayMeals.reduce((sum: number, meal: any) => sum + (meal.vitaminB12 || 0), 0),
+        folate: dayMeals.reduce((sum: number, meal: any) => sum + (meal.folate || 0), 0),
+        iron: dayMeals.reduce((sum: number, meal: any) => sum + (meal.iron || 0), 0),
+        calcium: dayMeals.reduce((sum: number, meal: any) => sum + (meal.calcium || 0), 0),
+        zinc: dayMeals.reduce((sum: number, meal: any) => sum + (meal.zinc || 0), 0),
+        magnesium: dayMeals.reduce((sum: number, meal: any) => sum + (meal.magnesium || 0), 0),
+        mealsCount: dayMeals.length
+      };
+      
+      dailyBreakdown.push(dailyData);
+    }
+
+    // Generate weekly nutrition breakdowns
+    const weeklyBreakdown: WeeklyNutritionData[] = [];
+    for (let weekIndex = 0; weekIndex < 5; weekIndex++) { // 5 weeks to cover 30+ days
+      const weekStart = new Date(now);
+      weekStart.setDate(now.getDate() - (weekIndex * 7 + 6));
+      const weekEnd = new Date(now);
+      weekEnd.setDate(now.getDate() - (weekIndex * 7));
+      
+      const weekStartKey = weekStart.toISOString().split('T')[0];
+      const weekEndKey = weekEnd.toISOString().split('T')[0];
+      
+      // Get daily data for this week
+      const weekDays = dailyBreakdown.filter(day => 
+        day.date >= weekStartKey && day.date <= weekEndKey
+      );
+      
+      const daysWithData = weekDays.filter(day => day.mealsCount > 0).length;
+      const totalMeals = weekDays.reduce((sum: number, day: DailyNutritionData) => sum + day.mealsCount, 0);
+      
+      if (daysWithData > 0) {
+        const weekData: WeeklyNutritionData = {
+          weekStart: weekStartKey,
+          weekEnd: weekEndKey,
+          weekNumber: weekIndex + 1,
+          avgCalories: Math.round(weekDays.reduce((sum: number, day: DailyNutritionData) => sum + day.calories, 0) / daysWithData),
+          avgProtein: Math.round(weekDays.reduce((sum: number, day: DailyNutritionData) => sum + day.protein, 0) / daysWithData * 10) / 10,
+          avgCarbs: Math.round(weekDays.reduce((sum: number, day: DailyNutritionData) => sum + day.carbs, 0) / daysWithData * 10) / 10,
+          avgFat: Math.round(weekDays.reduce((sum: number, day: DailyNutritionData) => sum + day.fat, 0) / daysWithData * 10) / 10,
+          avgFiber: Math.round(weekDays.reduce((sum: number, day: DailyNutritionData) => sum + day.fiber, 0) / daysWithData * 10) / 10,
+          avgSodium: Math.round(weekDays.reduce((sum: number, day: DailyNutritionData) => sum + day.sodium, 0) / daysWithData),
+          avgVitaminC: Math.round(weekDays.reduce((sum: number, day: DailyNutritionData) => sum + day.vitaminC, 0) / daysWithData * 10) / 10,
+          avgVitaminD: Math.round(weekDays.reduce((sum: number, day: DailyNutritionData) => sum + day.vitaminD, 0) / daysWithData * 10) / 10,
+          avgVitaminB12: Math.round(weekDays.reduce((sum: number, day: DailyNutritionData) => sum + day.vitaminB12, 0) / daysWithData * 10) / 10,
+          avgFolate: Math.round(weekDays.reduce((sum: number, day: DailyNutritionData) => sum + day.folate, 0) / daysWithData * 10) / 10,
+          avgIron: Math.round(weekDays.reduce((sum: number, day: DailyNutritionData) => sum + day.iron, 0) / daysWithData * 10) / 10,
+          avgCalcium: Math.round(weekDays.reduce((sum: number, day: DailyNutritionData) => sum + day.calcium, 0) / daysWithData),
+          avgZinc: Math.round(weekDays.reduce((sum: number, day: DailyNutritionData) => sum + day.zinc, 0) / daysWithData * 10) / 10,
+          avgMagnesium: Math.round(weekDays.reduce((sum: number, day: DailyNutritionData) => sum + day.magnesium, 0) / daysWithData),
+          totalMeals,
+          daysWithData
+        };
+        weeklyBreakdown.push(weekData);
+      }
+    }
     
     // Calculate monthly breakdown
     const monthlyData = new Map();
@@ -136,13 +271,15 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     // Count achievements (simplified)
     const achievements = Math.floor(totalMealsLogged / 10); // 1 achievement per 10 meals
     
-    // Gather user progress data
+    // Gather comprehensive user progress data
     const progressData: UserProgressData = {
       totalMealsLogged,
       averageDailyCalories,
       streakRecord: maxStreak,
       goalCompletionRate,
       achievements,
+      dailyBreakdown,
+      weeklyBreakdown,
       monthlyBreakdown: monthlyBreakdown.length > 0 ? monthlyBreakdown : [
         { month: 'No data yet', calories: 0, meals: 0, goals: 0 }
       ]
@@ -154,10 +291,10 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     const pageHeight = 297;
     let yPosition = 25;
 
-    // Add logo - using public icon file
+    // Add ByteWise Nutritionist logo
     try {
       // Fetch and convert the logo to base64
-      const logoUrl = '/icons/icon-192x192.png';
+      const logoUrl = '/icon-512.png'; // High quality ByteWise logo
       const response = await fetch(logoUrl);
       const blob = await response.blob();
       const reader = new FileReader();
@@ -170,38 +307,33 @@ export async function generateProgressReportPDF(): Promise<boolean> {
       
       const logoData = reader.result as string;
       
-      // Add logo to PDF (centered, 30mm width)
-      const logoWidth = 30;
-      const logoHeight = 30;
+      // Add logo to PDF (centered, 40mm width for better visibility)
+      const logoWidth = 40;
+      const logoHeight = 40;
       const logoX = (pageWidth - logoWidth) / 2;
       
       pdf.addImage(logoData, 'PNG', logoX, yPosition, logoWidth, logoHeight);
-      yPosition += logoHeight + 10;
+      yPosition += logoHeight + 5;
     } catch (logoError) {
       // If logo fails to load, continue without it
-      console.warn('Could not load logo for PDF:', logoError);
+      console.warn('Could not load ByteWise logo for PDF:', logoError);
     }
 
-    // Brand Name with colors
-    pdf.setFontSize(28);
-    pdf.setFont('helvetica', 'bold');
-    pdf.setTextColor(31, 74, 166); // ByteWise blue color
-    pdf.text('ByteWise', pageWidth / 2, yPosition, { align: 'center' });
-    
-    yPosition += 10;
-    pdf.setFontSize(16);
-    pdf.setTextColor(69, 199, 62); // ByteWise green color
-    pdf.text('Nutritionist', pageWidth / 2, yPosition, { align: 'center' });
-    
+    // Report Title
     yPosition += 12;
     pdf.setTextColor(100, 100, 100); // Gray for subtitle
-    pdf.setFontSize(14);
-    pdf.setFont('helvetica', 'normal');
-    pdf.text('6-Month Progress Report', pageWidth / 2, yPosition, { align: 'center' });
+    pdf.setFontSize(18);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('30-Day Comprehensive Nutrition Report', pageWidth / 2, yPosition, { align: 'center' });
     
-    yPosition += 7;
-    pdf.setFontSize(10);
+    yPosition += 8;
+    pdf.setFontSize(12);
+    pdf.setFont('helvetica', 'normal');
     pdf.text(`Generated on ${new Date().toLocaleDateString()}`, pageWidth / 2, yPosition, { align: 'center' });
+    
+    yPosition += 5;
+    pdf.setFontSize(10);
+    pdf.text(`Report Period: ${thirtyDaysAgo.toLocaleDateString()} - ${now.toLocaleDateString()}`, pageWidth / 2, yPosition, { align: 'center' });
     
     // Add a decorative line
     yPosition += 10;
@@ -267,49 +399,153 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     // Reset text color for content
     pdf.setTextColor(0, 0, 0);
 
-    // Monthly Breakdown
+    // Check if we need a new page for the detailed breakdowns
+    if (yPosition > 200) {
+      pdf.addPage();
+      yPosition = 25;
+    }
+
+    // Weekly Nutrition Summary
     pdf.setFontSize(16);
     pdf.setFont('helvetica', 'bold');
     pdf.setTextColor(31, 74, 166); // Blue for section headers
-    pdf.text('Monthly Breakdown', 20, yPosition);
+    pdf.text('Weekly Nutrition Averages (Last 30 Days)', 20, yPosition);
     pdf.setTextColor(0, 0, 0);
     yPosition += 15;
 
-    progressData.monthlyBreakdown.forEach((month, idx) => {
-      // Alternate background colors for readability
-      if (idx % 2 === 0) {
-        pdf.setFillColor(245, 245, 245);
-        pdf.rect(15, yPosition - 5, pageWidth - 30, 12, 'F');
-      }
-      
+    if (progressData.weeklyBreakdown.length > 0) {
+      progressData.weeklyBreakdown.forEach((week, idx) => {
+        // Week header with background
+        if (idx % 2 === 0) {
+          pdf.setFillColor(245, 245, 245);
+          pdf.rect(15, yPosition - 5, pageWidth - 30, 35, 'F');
+        }
+        
+        pdf.setFontSize(12);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(31, 74, 166);
+        const weekStartDate = new Date(week.weekStart);
+        const weekEndDate = new Date(week.weekEnd);
+        pdf.text(`Week ${week.weekNumber}: ${weekStartDate.toLocaleDateString()} - ${weekEndDate.toLocaleDateString()}`, 20, yPosition);
+        
+        yPosition += 8;
+        
+        // Macros row
+        pdf.setFont('helvetica', 'normal');
+        pdf.setTextColor(0, 0, 0);
+        pdf.setFontSize(10);
+        
+        pdf.text(`Calories: ${week.avgCalories}`, 25, yPosition);
+        pdf.text(`Protein: ${week.avgProtein}g`, 75, yPosition);
+        pdf.text(`Carbs: ${week.avgCarbs}g`, 125, yPosition);
+        pdf.text(`Fat: ${week.avgFat}g`, 175, yPosition);
+        
+        yPosition += 7;
+        
+        // Micronutrients row
+        pdf.text(`Fiber: ${week.avgFiber}g`, 25, yPosition);
+        pdf.text(`Sodium: ${week.avgSodium}mg`, 75, yPosition);
+        pdf.text(`Vit C: ${week.avgVitaminC}mg`, 125, yPosition);
+        pdf.text(`Iron: ${week.avgIron}mg`, 175, yPosition);
+        
+        yPosition += 7;
+        
+        // Additional nutrients row
+        pdf.text(`Calcium: ${week.avgCalcium}mg`, 25, yPosition);
+        pdf.text(`Zinc: ${week.avgZinc}mg`, 75, yPosition);
+        pdf.text(`Magnesium: ${week.avgMagnesium}mg`, 125, yPosition);
+        pdf.text(`Meals: ${week.totalMeals}`, 175, yPosition);
+        
+        yPosition += 15;
+        
+        // Check if we need a new page
+        if (yPosition > 250) {
+          pdf.addPage();
+          yPosition = 25;
+        }
+      });
+    } else {
       pdf.setFontSize(12);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(31, 74, 166);
-      pdf.text(month.month, 20, yPosition);
-      
-      pdf.setFont('helvetica', 'normal');
-      pdf.setTextColor(0, 0, 0);
-      
-      // Draw small colored indicators for each metric
-      const metricsX = 70;
-      
-      // Calories with green dot
-      pdf.setFillColor(69, 199, 62);
-      pdf.circle(metricsX, yPosition - 1, 1.5, 'F');
-      pdf.text(`${month.calories.toLocaleString()} cal`, metricsX + 5, yPosition);
-      
-      // Meals with blue dot
-      pdf.setFillColor(31, 74, 166);
-      pdf.circle(metricsX + 35, yPosition - 1, 1.5, 'F');
-      pdf.text(`${month.meals} meals`, metricsX + 40, yPosition);
-      
-      // Goals with yellow dot
-      pdf.setFillColor(250, 237, 57);
-      pdf.circle(metricsX + 70, yPosition - 1, 1.5, 'F');
-      pdf.text(`${month.goals} goals`, metricsX + 75, yPosition);
-      
-      yPosition += 12;
-    });
+      pdf.setTextColor(100, 100, 100);
+      pdf.text('No weekly data available for the selected period.', 20, yPosition);
+      yPosition += 15;
+    }
+
+    yPosition += 10;
+
+    // Check if we need a new page for daily breakdown
+    if (yPosition > 200) {
+      pdf.addPage();
+      yPosition = 25;
+    }
+
+    // Daily Nutrition Breakdown
+    pdf.setFontSize(16);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(31, 74, 166);
+    pdf.text('Daily Nutrition Details (Last 30 Days)', 20, yPosition);
+    pdf.setTextColor(0, 0, 0);
+    yPosition += 15;
+
+    // Filter out days with no meals for cleaner display
+    const daysWithMeals = progressData.dailyBreakdown.filter(day => day.mealsCount > 0);
+    
+    if (daysWithMeals.length > 0) {
+      daysWithMeals.forEach((day, idx) => {
+        // Check if we need a new page
+        if (yPosition > 270) {
+          pdf.addPage();
+          yPosition = 25;
+        }
+        
+        // Day header with background
+        if (idx % 2 === 0) {
+          pdf.setFillColor(245, 245, 245);
+          pdf.rect(15, yPosition - 3, pageWidth - 30, 20, 'F');
+        }
+        
+        pdf.setFontSize(11);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(31, 74, 166);
+        const dayDate = new Date(day.date);
+        pdf.text(`${dayDate.toLocaleDateString()} (${day.mealsCount} meals)`, 20, yPosition);
+        
+        yPosition += 6;
+        
+        // Nutrition data in compact format
+        pdf.setFont('helvetica', 'normal');
+        pdf.setTextColor(0, 0, 0);
+        pdf.setFontSize(9);
+        
+        // Row 1: Main macros
+        pdf.text(`${day.calories} cal`, 25, yPosition);
+        pdf.text(`P: ${day.protein.toFixed(1)}g`, 65, yPosition);
+        pdf.text(`C: ${day.carbs.toFixed(1)}g`, 95, yPosition);
+        pdf.text(`F: ${day.fat.toFixed(1)}g`, 125, yPosition);
+        pdf.text(`Fiber: ${day.fiber.toFixed(1)}g`, 155, yPosition);
+        
+        yPosition += 5;
+        
+        // Row 2: Key micronutrients (only show if > 0)
+        let microText = [];
+        if (day.vitaminC > 0) microText.push(`Vit C: ${day.vitaminC.toFixed(1)}mg`);
+        if (day.iron > 0) microText.push(`Iron: ${day.iron.toFixed(1)}mg`);
+        if (day.calcium > 0) microText.push(`Ca: ${day.calcium.toFixed(0)}mg`);
+        if (day.sodium > 0) microText.push(`Na: ${day.sodium.toFixed(0)}mg`);
+        
+        if (microText.length > 0) {
+          pdf.text(microText.join('  •  '), 25, yPosition);
+          yPosition += 5;
+        }
+        
+        yPosition += 5;
+      });
+    } else {
+      pdf.setFontSize(12);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text('No daily nutrition data available for the selected period.', 20, yPosition);
+      yPosition += 15;
+    }
 
     yPosition += 20;
 
@@ -340,10 +576,10 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     pdf.text('Your Personal Nutrition Companion', pageWidth / 2, yPosition, { align: 'center' });
     
     yPosition += 5;
-    pdf.text('Keep up the great work on your nutrition journey!', pageWidth / 2, yPosition, { align: 'center' });
+    pdf.text('Your comprehensive 30-day nutrition analysis!', pageWidth / 2, yPosition, { align: 'center' });
 
-    // Save the PDF with proper download functionality
-    const filename = `bytewise-nutrition-report-${new Date().toISOString().split('T')[0]}.pdf`;
+    // Save the comprehensive PDF with proper download functionality
+    const filename = `bytewise-30day-nutrition-report-${new Date().toISOString().split('T')[0]}.pdf`;
     
     // Use jsPDF's built-in save method which triggers download
     pdf.save(filename);
