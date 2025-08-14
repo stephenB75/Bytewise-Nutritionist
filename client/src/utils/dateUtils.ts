@@ -26,11 +26,12 @@ export function getLocalEndOfDay(date: Date = new Date()): Date {
 /**
  * Format date as YYYY-MM-DD in local timezone
  * This is used as the key for storing daily data
- * Fixed to properly handle timezone conversion using browser's timezone detection
+ * Enhanced with user preference override for timezone alignment
  */
 export function getLocalDateKey(date: Date = new Date()): string {
-  // Use the browser's timezone-aware toLocaleDateString with explicit timezone
-  // This automatically handles the user's actual timezone
+  // Check for user date override in localStorage
+  const userDateOverride = localStorage.getItem('user-date-override');
+  
   try {
     const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const formatter = new Intl.DateTimeFormat('en-CA', { 
@@ -40,7 +41,19 @@ export function getLocalDateKey(date: Date = new Date()): string {
       day: '2-digit'
     });
     
-    return formatter.format(date); // Returns YYYY-MM-DD format
+    let calculatedDate = formatter.format(date); // Returns YYYY-MM-DD format
+    
+    // Apply user date override if exists (for timezone misalignment correction)
+    if (userDateOverride) {
+      const override = JSON.parse(userDateOverride);
+      if (override.dayOffset && typeof override.dayOffset === 'number') {
+        const dateObj = new Date(calculatedDate + 'T12:00:00');
+        dateObj.setDate(dateObj.getDate() + override.dayOffset);
+        calculatedDate = dateObj.toISOString().split('T')[0];
+      }
+    }
+    
+    return calculatedDate;
   } catch (error) {
     // Fallback to offset-based calculation if Intl API fails
     const offsetMinutes = date.getTimezoneOffset();

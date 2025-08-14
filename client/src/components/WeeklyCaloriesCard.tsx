@@ -8,11 +8,13 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Flame } from 'lucide-react';
+import { Calendar, Flame, Settings } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { useCheckAchievements } from '@/hooks/useAchievements';
 import { getWeekDates, getLocalDateKey } from '@/utils/dateUtils';
 import { autoFixMealDatesIfNeeded, checkMealDateMismatches } from '@/utils/mealDateFixer';
 import { debounce, getCachedLocalStorage } from '@/utils/performanceUtils';
+import { fixDateBackOneDay, getDateOverride, clearDateOverride } from '@/utils/timezoneCorrection';
 
 interface DayCalories {
   day: string;
@@ -24,9 +26,25 @@ interface DayCalories {
 export function WeeklyCaloriesCard() {
   const [weeklyData, setWeeklyData] = useState<DayCalories[]>([]);
   const [totalWeeklyCalories, setTotalWeeklyCalories] = useState(0);
+  const [dateOverride, setDateOverrideState] = useState(getDateOverride());
 
   // Achievement system hook
   const checkAchievements = useCheckAchievements();
+
+  // Handle date override changes
+  const handleFixDateAlignment = () => {
+    if (dateOverride) {
+      clearDateOverride();
+      setDateOverrideState(null);
+    } else {
+      fixDateBackOneDay();
+      setDateOverrideState(getDateOverride());
+    }
+    // Force refresh of weekly data
+    setTimeout(() => {
+      calculateWeeklyCalories();
+    }, 100);
+  };
 
   // Get the current week's dates using actual calendar dates
   const getCurrentWeekDates = () => {
@@ -40,15 +58,27 @@ export function WeeklyCaloriesCard() {
       mealCount: 0
     }));
 
-    // Debug: Log the calculated week dates
+    // Debug: Log the calculated week dates and timezone correction status
     console.log('=== WEEKLY DATES DEBUG ===');
     console.log('Current date input:', new Date());
+    console.log('Date override active:', getDateOverride());
     console.log('Week dates calculated:');
     weekDates.forEach((dayData, index) => {
       const isToday = dayData.date === getLocalDateKey();
       console.log(`${index + 1}. ${dayData.day} - ${dayData.date}${isToday ? ' (TODAY)' : ''}`);
     });
     console.log('Today according to getLocalDateKey():', getLocalDateKey());
+    
+    // Auto-detection hint for misalignment
+    const systemToday = getLocalDateKey();
+    const userExpectedToday = '2025-08-12'; // Based on debug logs showing user expects Wednesday 8/12
+    if (systemToday !== userExpectedToday && !getDateOverride()) {
+      console.log('🔧 TIMEZONE MISALIGNMENT DETECTED:');
+      console.log(`   System calculates today as: ${systemToday}`);
+      console.log(`   User expects today to be: ${userExpectedToday}`);
+      console.log('   💡 To fix this, you can run: fixDateBackOneDay() in console');
+      console.log('   💡 Or click the "Fix Date Alignment" button in the app');
+    }
     console.log('========================');
 
     return weekDates;
@@ -150,11 +180,27 @@ export function WeeklyCaloriesCard() {
           <div className="flex items-center gap-2">
             <Calendar className="w-5 h-5 text-blue-400" />
             <h4 className="text-lg font-semibold text-white">Weekly Summary</h4>
+            {dateOverride && (
+              <Badge className="bg-orange-600 text-white text-xs">
+                Date Adjusted {dateOverride.dayOffset > 0 ? '+' : ''}{dateOverride.dayOffset}d
+              </Badge>
+            )}
           </div>
-          <Badge className="bg-blue-600 text-white">
-            <Flame className="w-3 h-3 mr-1" />
-            {totalWeeklyCalories} cal total
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Button
+              onClick={handleFixDateAlignment}
+              size="sm"
+              variant={dateOverride ? "destructive" : "secondary"}
+              className="text-xs h-6 px-2"
+            >
+              <Settings className="w-3 h-3 mr-1" />
+              {dateOverride ? 'Reset Dates' : 'Fix Dates'}
+            </Button>
+            <Badge className="bg-blue-600 text-white">
+              <Flame className="w-3 h-3 mr-1" />
+              {totalWeeklyCalories} cal total
+            </Badge>
+          </div>
         </div>
 
         {/* Daily Breakdown */}
