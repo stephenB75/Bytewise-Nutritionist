@@ -90,8 +90,9 @@ export function WeeklyCaloriesCard() {
     try {
       const weekDates = getCurrentWeekDates();
       
-      // Load meals with caching for better performance
-      const storedMeals = getCachedLocalStorage('weeklyMeals', 10000) || [];
+      // Load meals with caching for better performance - Force fresh load
+      const storedMeals = getCachedLocalStorage('weeklyMeals', 0) || []; // 0 = no cache
+      console.log(`📦 Loaded ${storedMeals.length} meals for weekly summary`);
       
       // Calculate calories for each day of the week with enhanced date matching
       const weeklyData = weekDates.map(dayData => {
@@ -139,7 +140,21 @@ export function WeeklyCaloriesCard() {
         
         const dayCalories = dayMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
         
-        // Weekly summary meal matching now working correctly
+        // Debug: Trace every meal on every day to find UI/data mismatch
+        console.log(`📊 DAY: ${dayData.day} ${dayData.date} - ${dayMeals.length} meals`);
+        if (dayMeals.length > 0) {
+          dayMeals.forEach((meal: any, index: number) => {
+            const mealName = meal.name ? meal.name.substring(0, 20) : 'Unknown';
+            console.log(`  ${index + 1}. ${mealName} - ${meal.calories || 0} cal (${meal.date})`);
+            
+            // Flag any EMPANADA meals specifically
+            if (meal.name && meal.name.includes('EMPANADA')) {
+              const extractedDate = meal.date.includes('T') ? meal.date.split('T')[0] : meal.date;
+              console.log(`    🚨 EMPANADA ALERT: Extracted date "${extractedDate}" on ${dayData.day}`);
+              console.log(`    🚨 Should be on Wed (2025-08-13): ${extractedDate === '2025-08-13'}`);
+            }
+          });
+        }
         
         return {
           ...dayData,

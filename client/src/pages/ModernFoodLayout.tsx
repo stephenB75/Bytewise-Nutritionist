@@ -391,7 +391,26 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         // Use cached localStorage for better performance
         const stored = getCachedLocalStorage('weeklyMeals', 5000) || [];
         const today = getLocalDateKey(); // Use actual current date
-        const todayMeals = stored.filter((meal: any) => meal.date === today);
+        
+        // Enhanced filtering with timestamp parsing (same logic as WeeklyCaloriesCard)
+        const todayMeals = stored.filter((meal: any) => {
+          // Direct exact match
+          if (meal.date === today) return true;
+          
+          // Timestamp parsing for ISO format dates like "2025-08-13T23:11:05.184Z"
+          if (meal.date && meal.date.includes('T')) {
+            const extractedDate = meal.date.split('T')[0];
+            return extractedDate === today;
+          }
+          
+          return false;
+        });
+        
+        console.log(`📱 Daily View: Found ${todayMeals.length} meals for today (${today})`);
+        if (todayMeals.some((meal: any) => meal.name && meal.name.includes('EMPANADA'))) {
+          console.log(`📱 Daily View: EMPANADA correctly found for today`);
+        }
+        
         setLoggedMeals(todayMeals);
         
         // Calculate daily calories from existing logged meals
@@ -433,10 +452,19 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         const currentWeekDates = getWeekDates(); // Use actual current week
         const weekDateKeys = currentWeekDates.map(date => getLocalDateKey(date));
         
-        // Filter meals to only include those from the current week (Sunday to Saturday)
-        const currentWeekMeals = stored.filter((meal: any) => 
-          weekDateKeys.includes(meal.date)
-        );
+        // Filter meals to only include those from the current week with timestamp parsing
+        const currentWeekMeals = stored.filter((meal: any) => {
+          // Direct exact match
+          if (weekDateKeys.includes(meal.date)) return true;
+          
+          // Timestamp parsing for ISO format dates
+          if (meal.date && meal.date.includes('T')) {
+            const extractedDate = meal.date.split('T')[0];
+            return weekDateKeys.includes(extractedDate);
+          }
+          
+          return false;
+        });
         
         const weeklyTotal = currentWeekMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
         setWeeklyCalories(weeklyTotal);
@@ -1767,9 +1795,20 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                         updated.splice(mealIndex, 1);
                         localStorage.setItem('weeklyMeals', JSON.stringify(updated));
                         
-                        // Refresh meal list using actual current date
+                        // Refresh meal list using enhanced date matching
                         const today = getLocalDateKey();
-                        const todayMeals = updated.filter((m: any) => m.date === today);
+                        const todayMeals = updated.filter((m: any) => {
+                          // Direct exact match
+                          if (m.date === today) return true;
+                          
+                          // Timestamp parsing for ISO format dates
+                          if (m.date && m.date.includes('T')) {
+                            const extractedDate = m.date.split('T')[0];
+                            return extractedDate === today;
+                          }
+                          
+                          return false;
+                        });
                         setLoggedMeals(todayMeals);
                         
                         // Update daily calories and nutrition  
