@@ -1850,12 +1850,28 @@ export class USDAService {
       'san pellegrino', 'pellegrino', 'perrier', 'la croix', 'lacroix', 
       'bubly', 'schweppes sparkling', 'canada dry seltzer', 'tonic water',
       'black coffee', 'plain tea', 'green tea', 'herbal tea', 'diet soda',
-      'diet coke', 'coke zero', 'pepsi max', 'diet pepsi', 'diet sprite'
+      'diet coke', 'coke zero', 'pepsi max', 'diet pepsi', 'diet sprite',
+      'smartwater', 'smart water' // electrolyte water with no calories
     ];
+    
+    // Specifically exclude vitamin water and flavored water as they often contain calories
+    const caloriedBeverages = [
+      'vitamin water', 'vitaminwater', 'flavored water', 'enhanced water',
+      'coconut water', 'sports drink', 'energy drink'
+    ];
+    
+    // Check if it's in the excluded list first
+    if (caloriedBeverages.some(beverage => zeroCalorian.includes(beverage))) {
+      return false;
+    }
     
     return zeroCalorieBeverages.some(beverage => 
       zeroCalorian.includes(beverage) || 
-      (beverage.includes('water') && zeroCalorian.includes('water') && !zeroCalorian.includes('coconut'))
+      (beverage === 'water' && zeroCalorian.includes('water') && 
+       !zeroCalorian.includes('coconut') && 
+       !zeroCalorian.includes('vitamin') &&
+       !zeroCalorian.includes('flavored') &&
+       !zeroCalorian.includes('enhanced'))
     );
   }
 
