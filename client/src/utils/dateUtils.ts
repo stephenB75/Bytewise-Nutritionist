@@ -117,17 +117,22 @@ export function getMealTypeByTime(date: Date = new Date()): 'breakfast' | 'lunch
 
 /**
  * Get the week start date (Sunday) for a given date
- * Fixed to use proper local date calculation
+ * Fixed to use proper local date calculation without timezone shifts
  */
 export function getWeekStart(date: Date = new Date()): Date {
-  // Get local date components properly
+  // Get local date components properly using timezone-aware method
   const localDateKey = getLocalDateKey(date);
   const [year, month, day] = localDateKey.split('-').map(Number);
-  const localDate = new Date(year, month - 1, day);
+  
+  // Create date object in local timezone
+  const localDate = new Date(year, month - 1, day, 12, 0, 0, 0); // Use noon to avoid timezone edge cases
   
   const dayOfWeek = localDate.getDay();
-  const diff = localDate.getDate() - dayOfWeek;
-  return new Date(localDate.setDate(diff));
+  const diff = -dayOfWeek; // Calculate days to subtract to get to Sunday
+  
+  // Create a new date for the week start to avoid mutations
+  const weekStart = new Date(year, month - 1, day + diff, 12, 0, 0, 0);
+  return weekStart;
 }
 
 /**
@@ -147,15 +152,22 @@ export function getWeekEnd(date: Date = new Date()): Date {
 
 /**
  * Get an array of dates for the current week
+ * Fixed to ensure proper timezone handling for all week days
  */
 export function getWeekDates(date: Date = new Date()): Date[] {
+  // Get the week start date in user's timezone
   const weekStart = getWeekStart(date);
   const dates: Date[] = [];
   
+  // Get base date components from week start
+  const startYear = weekStart.getFullYear();
+  const startMonth = weekStart.getMonth();
+  const startDay = weekStart.getDate();
+  
+  // Generate each day of the week without timezone drift
   for (let i = 0; i < 7; i++) {
-    const d = new Date(weekStart);
-    d.setDate(weekStart.getDate() + i);
-    dates.push(d);
+    const weekDay = new Date(startYear, startMonth, startDay + i, 12, 0, 0, 0);
+    dates.push(weekDay);
   }
   
   return dates;

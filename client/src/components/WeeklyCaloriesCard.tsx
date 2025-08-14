@@ -33,12 +33,25 @@ export function WeeklyCaloriesCard() {
     const weekDatesArray = getWeekDates(); // Use actual calendar dates
     const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     
-    return weekDatesArray.map((date, index) => ({
+    const weekDates = weekDatesArray.map((date, index) => ({
       day: dayNames[index],
       date: getLocalDateKey(date),
       calories: 0,
       mealCount: 0
     }));
+
+    // Debug: Log the calculated week dates
+    console.log('=== WEEKLY DATES DEBUG ===');
+    console.log('Current date input:', new Date());
+    console.log('Week dates calculated:');
+    weekDates.forEach((dayData, index) => {
+      const isToday = dayData.date === getLocalDateKey();
+      console.log(`${index + 1}. ${dayData.day} - ${dayData.date}${isToday ? ' (TODAY)' : ''}`);
+    });
+    console.log('Today according to getLocalDateKey():', getLocalDateKey());
+    console.log('========================');
+
+    return weekDates;
   };
 
   // Calculate weekly calories from stored meal data (optimized)
