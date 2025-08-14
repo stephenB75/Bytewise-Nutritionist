@@ -47,23 +47,7 @@ export function WeeklyCaloriesCard() {
 
 
     
-    // Auto-detection and fix for misalignment (runs once)
-    const systemToday = getLocalDateKey();
-    const userExpectedToday = '2025-08-13'; // User wants Wednesday to be Aug 13th
-    if (systemToday !== userExpectedToday && !getDateOverride()) {
-      // Calculate the needed offset correctly
-      // System shows 2025-08-14, user expects today to be 2025-08-13
-      // So we need to shift system dates back by 1 day to align with user expectations
-      const dayOffset = 1; // Fixed offset: shift all dates forward by 1 day
-      
-      setDateOverride(dayOffset, 'Auto-fix for user timezone alignment');
-      setDateOverrideState(getDateOverride());
-      
-      // Force immediate refresh of the week calculation after applying offset
-      setTimeout(() => {
-        calculateWeeklyCalories();
-      }, 100);
-    }
+    // Removed auto-detection logic that was causing date confusion
 
     return weekDates;
   };
@@ -105,43 +89,25 @@ export function WeeklyCaloriesCard() {
       
       // Calculate calories for each day of the week with fixed date matching
       const weeklyData = weekDates.map(dayData => {
-        // Fixed filtering to prevent duplicate matches
+        // Strict filtering to prevent duplicate matches - each meal should only appear once
         const dayMeals = storedMeals.filter((meal: any) => {
           if (!meal.date) return false;
           
-          // Strategy 1: Exact date string match (highest priority)
-          if (meal.date === dayData.date) return true;
+          const mealDateStr = meal.date;
           
-          // Strategy 2: Handle timestamp format dates (e.g., "2025-08-13T23:11:05.184Z")
-          if (meal.date.includes('T')) {
-            const mealDateOnly = meal.date.split('T')[0]; // Extract just the date part
-            return mealDateOnly === dayData.date;
+          // Handle timestamp format dates - extract date part first
+          const normalizedMealDate = mealDateStr.includes('T') 
+            ? mealDateStr.split('T')[0] 
+            : mealDateStr;
+          
+          // Direct date match (most common case)
+          if (normalizedMealDate === dayData.date) {
+            return true;
           }
           
-          // Strategy 3: Date override matching (only if no exact match found)
-          const dateOverride = getDateOverride();
-          if (dateOverride && dateOverride.dayOffset) {
-            try {
-              // Calculate what the original date would be for this adjusted day
-              const dayDateObj = new Date(dayData.date + 'T12:00:00');
-              const originalDayDate = new Date(dayDateObj.getTime() - (dateOverride.dayOffset * 24 * 60 * 60 * 1000));
-              const originalDayDateKey = originalDayDate.toISOString().split('T')[0];
-              
-              // If meal was stored on the original date, show it on the adjusted day
-              return meal.date === originalDayDateKey;
-            } catch {
-              return false;
-            }
-          }
-          
-          // Strategy 4: Fallback date comparison (only for simple date strings)
-          try {
-            const mealDate = new Date(meal.date + 'T12:00:00'); // Add time to prevent timezone issues
-            const dayDate = new Date(dayData.date + 'T12:00:00');
-            return mealDate.toDateString() === dayDate.toDateString();
-          } catch {
-            return false;
-          }
+          // No other matching strategies to prevent duplicates
+          // If there's a date override, we don't try to match meals to multiple days
+          return false;
         });
         
         const dayCalories = dayMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
