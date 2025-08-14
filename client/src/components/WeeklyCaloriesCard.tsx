@@ -8,13 +8,13 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Flame, Settings } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Calendar, Flame } from 'lucide-react';
+
 import { useCheckAchievements } from '@/hooks/useAchievements';
 import { getWeekDates, getLocalDateKey } from '@/utils/dateUtils';
 import { autoFixMealDatesIfNeeded, checkMealDateMismatches } from '@/utils/mealDateFixer';
 import { debounce, getCachedLocalStorage } from '@/utils/performanceUtils';
-import { fixDateBackOneDay, getDateOverride, clearDateOverride, setDateOverride } from '@/utils/timezoneCorrection';
+import { getDateOverride, setDateOverride } from '@/utils/timezoneCorrection';
 
 interface DayCalories {
   day: string;
@@ -31,22 +31,7 @@ export function WeeklyCaloriesCard() {
   // Achievement system hook
   const checkAchievements = useCheckAchievements();
 
-  // Handle date override changes
-  const handleFixDateAlignment = () => {
-    // Clear any active override since user wants Wednesday = Aug 13th (system default)
-    if (dateOverride) {
-      clearDateOverride();
-      setDateOverrideState(null);
-      console.log('✅ Cleared date override - Wednesday should now be Aug 13th');
-    } else {
-      // User wants system default behavior
-      console.log('ℹ️ No date override needed - system shows Wednesday as Aug 13th');
-    }
-    // Force refresh of weekly data
-    setTimeout(() => {
-      calculateWeeklyCalories();
-    }, 100);
-  };
+
 
   // Get the current week's dates using actual calendar dates
   const getCurrentWeekDates = () => {
@@ -60,31 +45,17 @@ export function WeeklyCaloriesCard() {
       mealCount: 0
     }));
 
-    // Debug: Log the calculated week dates and timezone correction status
-    console.log('=== WEEKLY DATES DEBUG ===');
-    console.log('Current date input:', new Date());
-    console.log('Date override active:', getDateOverride());
-    console.log('Week dates calculated:');
-    weekDates.forEach((dayData, index) => {
-      const isToday = dayData.date === getLocalDateKey();
-      console.log(`${index + 1}. ${dayData.day} - ${dayData.date}${isToday ? ' (TODAY)' : ''}`);
-    });
-    console.log('Today according to getLocalDateKey():', getLocalDateKey());
+
     
-    // Auto-detection and fix for misalignment
+    // Auto-detection and fix for misalignment (runs once)
     const systemToday = getLocalDateKey();
     const userExpectedToday = '2025-08-13'; // User wants Wednesday to be Aug 13th
     if (systemToday !== userExpectedToday && !getDateOverride()) {
-      console.log('🔧 TIMEZONE MISALIGNMENT DETECTED:');
-      console.log(`   System calculates today as: ${systemToday}`);
-      console.log(`   User expects today to be: ${userExpectedToday}`);
-      
       // Calculate the needed offset correctly
       // System shows 2025-08-14, user expects today to be 2025-08-13
       // So we need to shift system dates back by 1 day to align with user expectations
       const dayOffset = 1; // Fixed offset: shift all dates forward by 1 day
       
-      console.log(`   🔧 Applying automatic +${dayOffset} day offset to make Wednesday = Aug 13th`);
       setDateOverride(dayOffset, 'Auto-fix for user timezone alignment');
       setDateOverrideState(getDateOverride());
       
@@ -93,7 +64,6 @@ export function WeeklyCaloriesCard() {
         calculateWeeklyCalories();
       }, 100);
     }
-    console.log('========================');
 
     return weekDates;
   };
@@ -105,7 +75,7 @@ export function WeeklyCaloriesCard() {
       
       // Load meals with caching for better performance - Force fresh load
       const storedMeals = getCachedLocalStorage('weeklyMeals', 0) || []; // 0 = no cache
-      console.log(`📦 Loaded ${storedMeals.length} meals for weekly summary`);
+
       
       // Fix meals with missing calories and save back to localStorage
       let needsSave = false;
@@ -123,7 +93,7 @@ export function WeeklyCaloriesCard() {
             else if (name.includes('popcycle') || name.includes('popsicle')) meal.calories = 150;
             else meal.calories = 100; // Default estimate
             
-            console.log(`🔧 Fixed missing calories: ${meal.name} -> ${meal.calories} cal`);
+
           }
         }
       });
@@ -131,7 +101,6 @@ export function WeeklyCaloriesCard() {
       // Save the fixed data back to localStorage
       if (needsSave) {
         localStorage.setItem('weeklyMeals', JSON.stringify(storedMeals));
-        console.log(`💾 Saved ${storedMeals.length} meals with fixed calorie data`);
       }
       
       // Calculate calories for each day of the week with enhanced date matching
@@ -278,29 +247,11 @@ export function WeeklyCaloriesCard() {
           <div className="flex items-center gap-2">
             <Calendar className="w-5 h-5 text-blue-400" />
             <h4 className="text-lg font-semibold text-white">Weekly Summary</h4>
-            {dateOverride && (
-              <Badge className="bg-orange-600 text-white text-xs">
-                Date Override Active
-              </Badge>
-            )}
           </div>
-          <div className="flex items-center gap-2">
-            {dateOverride && (
-              <Button
-                onClick={handleFixDateAlignment}
-                size="sm"
-                variant="destructive"
-                className="text-xs h-6 px-2"
-              >
-                <Settings className="w-3 h-3 mr-1" />
-                Clear Override
-              </Button>
-            )}
-            <Badge className="bg-blue-600 text-white">
-              <Flame className="w-3 h-3 mr-1" />
-              {totalWeeklyCalories} cal total
-            </Badge>
-          </div>
+          <Badge className="bg-blue-600 text-white">
+            <Flame className="w-3 h-3 mr-1" />
+            {totalWeeklyCalories} cal total
+          </Badge>
         </div>
 
         {/* Daily Breakdown */}
