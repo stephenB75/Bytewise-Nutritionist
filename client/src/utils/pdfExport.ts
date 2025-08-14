@@ -595,10 +595,43 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     // Save the comprehensive PDF with proper download functionality
     const filename = `bytewise-30day-nutrition-report-${new Date().toISOString().split('T')[0]}.pdf`;
     
-    // Use jsPDF's built-in save method which triggers download
-    pdf.save(filename);
+    console.log('💾 PDF Generation: Attempting to save PDF with filename:', filename);
     
-    return true;
+    try {
+      // Use jsPDF's built-in save method which triggers download
+      pdf.save(filename);
+      console.log('✅ PDF Generation: PDF.save() called successfully');
+      
+      // Add a small delay to ensure download initiates
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Verify download was triggered by checking if the PDF blob was created
+      const pdfBlob = pdf.output('blob');
+      console.log('📄 PDF Generation: PDF blob created, size:', pdfBlob.size, 'bytes');
+      
+      if (pdfBlob.size > 0) {
+        console.log('✅ PDF Generation: PDF download should have been triggered');
+        
+        // Alternative download method as fallback
+        const url = URL.createObjectURL(pdfBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        console.log('✅ PDF Generation: Fallback download method executed');
+        
+        return true;
+      } else {
+        throw new Error('PDF blob is empty');
+      }
+    } catch (downloadError) {
+      console.error('❌ PDF Generation: Download failed:', downloadError);
+      throw downloadError;
+    }
 
   } catch (error) {
     console.error('PDF generation failed:', error);
