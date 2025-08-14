@@ -85,7 +85,8 @@ Authentication is handled through Supabase Auth with JWT token-based session man
 #### Weekly Summary Timezone Alignment Fix (August 14, 2025)
 - **Enhanced Timestamp Parsing**: Fixed meal matching logic to properly handle ISO timestamp formats (e.g., "2025-08-13T23:11:05.184Z")
 - **Date Extraction Logic**: Added timestamp parsing that extracts date portion and matches to correct calendar day
-- **Meal Alignment Resolution**: Meals now appear on the correct day of the week in weekly summary
+- **Secondary Match Fix**: Prevented timezone-based date parsing from causing meal duplications across days
+- **Meal Alignment Resolution**: Meals now appear on the correct day of the week in weekly summary without duplicates
 - **User Date Override System**: Added optional date correction utilities for timezone misalignment if needed
 - **Production Verification**: Confirmed meals stored with timestamps now appear on proper days in weekly view
 

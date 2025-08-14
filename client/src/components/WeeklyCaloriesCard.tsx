@@ -124,62 +124,22 @@ export function WeeklyCaloriesCard() {
             }
           }
           
-          // Secondary match: try parsing both dates and compare
-          try {
-            const mealDate = new Date(meal.date);
-            const dayDate = new Date(dayData.date);
-            return mealDate.toDateString() === dayDate.toDateString();
-          } catch {
-            return false;
+          // Secondary match: only for non-timestamp dates to avoid timezone confusion
+          // Skip secondary matching for timestamps (they should use timestamp matching above)
+          if (!meal.date.includes('T')) {
+            try {
+              const mealDate = new Date(meal.date);
+              const dayDate = new Date(dayData.date);
+              return mealDate.toDateString() === dayDate.toDateString();
+            } catch {
+              return false;
+            }
           }
         });
         
         const dayCalories = dayMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
         
-        // Debug to trace why EMPANADA appears on both Wednesday and Thursday
-        if (dayData.day === 'Thursday' && dayMeals.some((meal: any) => meal.name && meal.name.includes('EMPANADA'))) {
-          console.log(`❌ BUG: EMPANADA should NOT appear on Thursday ${dayData.date}`);
-          console.log(`  Debugging why it's matching Thursday...`);
-          
-          storedMeals.forEach((meal: any) => {
-            if (meal.name && meal.name.includes('EMPANADA')) {
-              // Test each matching condition individually
-              const exactMatch = meal.date === dayData.date;
-              const timestampMatch = meal.date && meal.date.includes('T') && meal.date.split('T')[0] === dayData.date;
-              
-              // Test date override logic
-              const dateOverride = getDateOverride();
-              let overrideMatch = false;
-              if (dateOverride && dateOverride.dayOffset) {
-                try {
-                  const dayDateObj = new Date(dayData.date + 'T12:00:00');
-                  const originalDayDate = new Date(dayDateObj.getTime() - (dateOverride.dayOffset * 24 * 60 * 60 * 1000));
-                  const originalDayDateKey = originalDayDate.toISOString().split('T')[0];
-                  overrideMatch = meal.date === originalDayDateKey;
-                } catch {
-                  // Skip invalid dates
-                }
-              }
-              
-              // Test secondary date matching
-              let secondaryMatch = false;
-              try {
-                const mealDate = new Date(meal.date);
-                const dayDate = new Date(dayData.date);
-                secondaryMatch = mealDate.toDateString() === dayDate.toDateString();
-              } catch {
-                // Skip invalid dates
-              }
-              
-              console.log(`    EMPANADA check: "${meal.date}" vs "${dayData.date}"`);
-              console.log(`      1. Exact match: ${exactMatch}`);
-              console.log(`      2. Timestamp match: ${timestampMatch}`);  
-              console.log(`      3. Override match: ${overrideMatch}`);
-              console.log(`      4. Secondary match: ${secondaryMatch}`);
-              console.log(`      Final result: ${exactMatch || timestampMatch || overrideMatch || secondaryMatch}`);
-            }
-          });
-        }
+        // Clean: Timestamp parsing fix applied successfully
         
         return {
           ...dayData,
