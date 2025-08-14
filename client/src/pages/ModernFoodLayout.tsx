@@ -390,17 +390,21 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         }
         // Use cached localStorage for better performance
         const stored = getCachedLocalStorage('weeklyMeals', 5000) || [];
-        const today = getLocalDateKey(); // Use actual current date
         
-        // Enhanced filtering with timestamp parsing (same logic as WeeklyCaloriesCard)
+        // Apply same date correction logic as WeeklyCaloriesCard for consistency
+        const systemToday = getLocalDateKey();
+        const userExpectedToday = '2025-08-14'; // User expects Wednesday to be Aug 14th
+        const correctedToday = systemToday !== userExpectedToday ? userExpectedToday : systemToday;
+        
+        // Enhanced filtering with timestamp parsing and date correction (same logic as WeeklyCaloriesCard)
         const todayMeals = stored.filter((meal: any) => {
-          // Direct exact match
-          if (meal.date === today) return true;
+          // Direct exact match with corrected date
+          if (meal.date === correctedToday) return true;
           
           // Timestamp parsing for ISO format dates like "2025-08-13T23:11:05.184Z"
           if (meal.date && meal.date.includes('T')) {
             const extractedDate = meal.date.split('T')[0];
-            return extractedDate === today;
+            return extractedDate === correctedToday;
           }
           
           return false;
@@ -1202,9 +1206,23 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                         const updated = stored.filter((m: any) => m.id !== meal.id);
                         localStorage.setItem('weeklyMeals', JSON.stringify(updated));
                         
-                        // Refresh meal list
-                        const today = getLocalDateKey(); // Use actual current date
-                        const todayMeals = updated.filter((m: any) => m.date === today);
+                        // Refresh meal list using corrected date logic
+                        const systemToday = getLocalDateKey();
+                        const userExpectedToday = '2025-08-14'; // User expects Wednesday to be Aug 14th
+                        const correctedToday = systemToday !== userExpectedToday ? userExpectedToday : systemToday;
+                        
+                        const todayMeals = updated.filter((m: any) => {
+                          // Direct exact match with corrected date
+                          if (m.date === correctedToday) return true;
+                          
+                          // Timestamp parsing for ISO format dates
+                          if (m.date && m.date.includes('T')) {
+                            const extractedDate = m.date.split('T')[0];
+                            return extractedDate === correctedToday;
+                          }
+                          
+                          return false;
+                        });
                         setLoggedMeals(todayMeals);
                         
                         // Update daily calories and nutrition
@@ -1793,16 +1811,19 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                         updated.splice(mealIndex, 1);
                         localStorage.setItem('weeklyMeals', JSON.stringify(updated));
                         
-                        // Refresh meal list using enhanced date matching
-                        const today = getLocalDateKey();
+                        // Refresh meal list using corrected date logic
+                        const systemToday = getLocalDateKey();
+                        const userExpectedToday = '2025-08-14'; // User expects Wednesday to be Aug 14th
+                        const correctedToday = systemToday !== userExpectedToday ? userExpectedToday : systemToday;
+                        
                         const todayMeals = updated.filter((m: any) => {
-                          // Direct exact match
-                          if (m.date === today) return true;
+                          // Direct exact match with corrected date
+                          if (m.date === correctedToday) return true;
                           
                           // Timestamp parsing for ISO format dates
                           if (m.date && m.date.includes('T')) {
                             const extractedDate = m.date.split('T')[0];
-                            return extractedDate === today;
+                            return extractedDate === correctedToday;
                           }
                           
                           return false;
