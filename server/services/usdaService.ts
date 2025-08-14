@@ -892,6 +892,20 @@ export class USDAService {
     'belgian waffles': { calories: 291, protein: 7.9, carbs: 33.4, fat: 14.7 },
     'french toast': { calories: 166, protein: 5.9, carbs: 16.3, fat: 7.7 },
     
+    // Candy and Confectionery
+    'twizzlers': { calories: 327, protein: 3.7, carbs: 79.6, fat: 0.9 },
+    'twizzler': { calories: 327, protein: 3.7, carbs: 79.6, fat: 0.9 },
+    'red licorice': { calories: 327, protein: 3.7, carbs: 79.6, fat: 0.9 },
+    'strawberry twizzlers': { calories: 327, protein: 3.7, carbs: 79.6, fat: 0.9 },
+    'licorice': { calories: 327, protein: 3.7, carbs: 79.6, fat: 0.9 },
+    'licorice candy': { calories: 327, protein: 3.7, carbs: 79.6, fat: 0.9 },
+    'candy': { calories: 380, protein: 0, carbs: 100, fat: 0 },
+    'gummy bears': { calories: 318, protein: 6.9, carbs: 77.2, fat: 0.2 },
+    'gummy candy': { calories: 318, protein: 6.9, carbs: 77.2, fat: 0.2 },
+    'hard candy': { calories: 394, protein: 0, carbs: 97.2, fat: 1.0 },
+    'lollipop': { calories: 392, protein: 0, carbs: 98, fat: 0 },
+    'chocolate candy': { calories: 535, protein: 4.2, carbs: 59.2, fat: 31.3 },
+
     // Desserts and Sweet Treats
     'brownie': { calories: 466, protein: 6.1, carbs: 63.3, fat: 20.7 },
     'brownies': { calories: 466, protein: 6.1, carbs: 63.3, fat: 20.7 },
@@ -1400,6 +1414,37 @@ export class USDAService {
         'medium': 350,
         'cup': 220,
         'slice': 60,
+      },
+      // Candy and confectionery items
+      'twizzlers': {
+        'piece': 11,  // Standard Twizzlers piece ≈ 11g
+        'pieces': 11,
+        'stick': 11,
+        'package': 70, // Small package ≈ 70g
+      },
+      'twizzler': {
+        'piece': 11,
+        'pieces': 11,
+        'stick': 11,
+        'package': 70,
+      },
+      'licorice': {
+        'piece': 11,
+        'pieces': 11,
+        'stick': 11,
+      },
+      'candy': {
+        'piece': 8,   // Average small candy piece ≈ 8g
+        'pieces': 8,
+      },
+      'gummy': {
+        'piece': 3,   // Individual gummy bear ≈ 3g
+        'pieces': 3,
+        'bear': 3,
+      },
+      'lollipop': {
+        'piece': 12,  // Standard lollipop ≈ 12g
+        'pieces': 12,
       },
     };
 
