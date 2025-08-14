@@ -565,40 +565,63 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     return 'slide-in-from-bottom-4';
   };
 
-  // Enhanced tab change handler with animation direction and scroll reset
+  // Enhanced tab change handler with hero component scroll reset
   const handleTabChange = (newTab: string) => {
     // Temporarily disable smooth scrolling to force instant scroll
     const originalScrollBehavior = document.documentElement.style.scrollBehavior;
     document.documentElement.style.scrollBehavior = 'auto';
     document.body.style.scrollBehavior = 'auto';
     
-    // Force immediate scroll to top with all methods
-    window.scrollTo(0, 0);
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-    
-    // Update state
+    // Update state first
     setPreviousTab(activeTab);
     setActiveTab(newTab);
     
-    // Additional immediate scroll attempts
-    setTimeout(() => {
-      window.scrollTo(0, 0);
+    // Function to scroll to hero component
+    const scrollToHero = () => {
+      // First, try to scroll to top immediately
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
       document.documentElement.scrollTop = 0;
       document.body.scrollTop = 0;
       
-      // Restore smooth scrolling after instant scroll is complete
+      // Then look for hero component and scroll to it specifically
+      const heroElement = document.querySelector('.hero-component, .relative.h-screen, [data-hero]');
+      if (heroElement) {
+        heroElement.scrollIntoView({ 
+          behavior: 'auto',
+          block: 'start',
+          inline: 'nearest'
+        });
+      }
+      
+      // Final safety scroll to ensure we're at the very top
+      setTimeout(() => {
+        window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+      }, 0);
+    };
+    
+    // Immediate scroll attempt
+    scrollToHero();
+    
+    // Additional scroll attempts with different timing to ensure consistency
+    setTimeout(scrollToHero, 0);
+    setTimeout(scrollToHero, 10);
+    
+    // Wait for content to render, then scroll to hero
+    setTimeout(() => {
+      scrollToHero();
+      
+      // Restore smooth scrolling after hero scroll is complete
       setTimeout(() => {
         document.documentElement.style.scrollBehavior = originalScrollBehavior;
         document.body.style.scrollBehavior = originalScrollBehavior;
-      }, 50);
-    }, 0);
+      }, 100);
+    }, 50);
     
-    // Final safety scroll
+    // Final scroll with requestAnimationFrame for next paint cycle
     requestAnimationFrame(() => {
-      window.scrollTo(0, 0);
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
+      scrollToHero();
     });
   };
 
@@ -620,7 +643,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     }), [backgroundImage]);
 
     return (
-      <div className="relative h-screen overflow-hidden">
+      <div className="relative h-screen overflow-hidden hero-component" data-hero="true">
         {/* Optimized Background Layer */}
         <div 
           key={animationKey}

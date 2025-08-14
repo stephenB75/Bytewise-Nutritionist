@@ -95,7 +95,15 @@ Authentication is handled through Supabase Auth with JWT token-based session man
 - **Debugging Tools**: Added comprehensive timezone debugging utility for development support
 - **Data Migration**: Automatic correction of existing meal data with wrong dates
 
-#### Navigation UX Enhancement (BETA v1.3.0)
+#### Enhanced Hero Component Scroll Reset (BETA v1.3.1)
+- **Hero-Targeted Scrolling**: Enhanced `handleTabChange()` function to specifically target and scroll to hero components
+- **Multi-Layer Scroll Reset**: Implements immediate scroll, hero component targeting, and safety scrolls for reliability
+- **Hero Component Identification**: Added `data-hero` attributes and CSS classes for precise hero component targeting
+- **Universal Navigation**: All navigation elements (bottom tabs, logo clicks, nav buttons) trigger hero scroll reset
+- **Technical Implementation**: Multiple scroll attempts with different timing to ensure consistent hero component focus
+- **User Experience**: Instant, reliable scroll to hero component when any navigation button is clicked
+
+#### Previous Navigation UX Enhancement (BETA v1.3.0)
 - **Scroll Reset Functionality**: Enhanced `handleTabChange()` function with automatic scroll-to-top behavior
 - **Root Cause Resolved**: Fixed CSS `scroll-behavior: smooth` interference with instant scroll attempts
 - **Smooth Navigation**: When switching between pages, view instantly scrolls back to hero component
