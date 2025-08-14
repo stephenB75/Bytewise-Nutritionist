@@ -31,10 +31,21 @@ const getMealData = memoize(
   (data: string) => data.slice(0, 100) // Cache key based on first 100 chars
 );
 
-// Memoized function to filter meals by date
+// Memoized function to filter meals by date with timestamp parsing
 const filterMealsByDate = memoize(
   (meals: MealData[], targetDate: string): MealData[] => {
-    return meals.filter(meal => meal.date === targetDate);
+    return meals.filter(meal => {
+      // Direct exact match
+      if (meal.date === targetDate) return true;
+      
+      // Timestamp parsing for ISO format dates like "2025-08-13T23:11:05.184Z"
+      if (meal.date && meal.date.includes('T')) {
+        const extractedDate = meal.date.split('T')[0];
+        return extractedDate === targetDate;
+      }
+      
+      return false;
+    });
   },
   (meals: MealData[], targetDate: string) => `${meals.length}-${targetDate}`
 );
@@ -68,12 +79,23 @@ export function useOptimizedMealData() {
     return filterMealsByDate(allMeals, today);
   }, [allMeals]);
 
-  // Get this week's meals efficiently
+  // Get this week's meals efficiently with timestamp parsing
   const getWeeklyMeals = useCallback(() => {
     const weekDates = getWeekDates();
     const weekDateKeys = weekDates.map(date => getLocalDateKey(date));
     
-    return allMeals.filter(meal => weekDateKeys.includes(meal.date));
+    return allMeals.filter(meal => {
+      // Direct exact match
+      if (weekDateKeys.includes(meal.date)) return true;
+      
+      // Timestamp parsing for ISO format dates
+      if (meal.date && meal.date.includes('T')) {
+        const extractedDate = meal.date.split('T')[0];
+        return weekDateKeys.includes(extractedDate);
+      }
+      
+      return false;
+    });
   }, [allMeals]);
 
   // Calculate daily nutritional totals
@@ -89,7 +111,7 @@ export function useOptimizedMealData() {
     return calculateDailyTotals(weekMeals);
   }, [getWeeklyMeals]);
 
-  // Get meals grouped by date for the current week
+  // Get meals grouped by date for the current week with enhanced filtering
   const getWeeklyMealsGrouped = useCallback(() => {
     const weekDates = getWeekDates();
     const weekDateKeys = weekDates.map(date => getLocalDateKey(date));
