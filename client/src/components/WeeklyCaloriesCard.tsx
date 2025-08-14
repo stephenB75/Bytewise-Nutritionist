@@ -14,7 +14,7 @@ import { useCheckAchievements } from '@/hooks/useAchievements';
 import { getWeekDates, getLocalDateKey } from '@/utils/dateUtils';
 import { autoFixMealDatesIfNeeded, checkMealDateMismatches } from '@/utils/mealDateFixer';
 import { debounce, getCachedLocalStorage } from '@/utils/performanceUtils';
-import { fixDateBackOneDay, getDateOverride, clearDateOverride } from '@/utils/timezoneCorrection';
+import { fixDateBackOneDay, getDateOverride, clearDateOverride, setDateOverride } from '@/utils/timezoneCorrection';
 
 interface DayCalories {
   day: string;
@@ -71,14 +71,27 @@ export function WeeklyCaloriesCard() {
     });
     console.log('Today according to getLocalDateKey():', getLocalDateKey());
     
-    // Auto-detection hint for misalignment
+    // Auto-detection and fix for misalignment
     const systemToday = getLocalDateKey();
     const userExpectedToday = '2025-08-13'; // User wants Wednesday to be Aug 13th
     if (systemToday !== userExpectedToday && !getDateOverride()) {
       console.log('🔧 TIMEZONE MISALIGNMENT DETECTED:');
       console.log(`   System calculates today as: ${systemToday}`);
       console.log(`   User expects today to be: ${userExpectedToday}`);
-      console.log('   💡 System appears to be showing correct dates');
+      
+      // Calculate the needed offset and apply it automatically
+      const systemDate = new Date(systemToday + 'T12:00:00');
+      const expectedDate = new Date(userExpectedToday + 'T12:00:00');
+      const dayOffset = Math.round((expectedDate.getTime() - systemDate.getTime()) / (24 * 60 * 60 * 1000));
+      
+      console.log(`   🔧 Applying automatic +${dayOffset} day offset to align dates`);
+      setDateOverride(dayOffset, 'Auto-fix for user timezone alignment');
+      setDateOverrideState(getDateOverride());
+      
+      // Force immediate refresh of the week calculation after applying offset
+      setTimeout(() => {
+        calculateWeeklyCalories();
+      }, 100);
     }
     console.log('========================');
 
