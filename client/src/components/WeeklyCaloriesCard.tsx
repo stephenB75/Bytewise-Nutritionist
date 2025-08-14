@@ -101,6 +101,22 @@ export function WeeklyCaloriesCard() {
           // Primary match: exact date string match
           if (meal.date === dayData.date) return true;
           
+          // Enhanced matching: check if stored meal should appear on this adjusted day
+          const dateOverride = getDateOverride();
+          if (dateOverride && dateOverride.dayOffset) {
+            try {
+              // Calculate what the original date would be for this adjusted day
+              const dayDateObj = new Date(dayData.date + 'T12:00:00');
+              const originalDayDate = new Date(dayDateObj.getTime() - (dateOverride.dayOffset * 24 * 60 * 60 * 1000));
+              const originalDayDateKey = originalDayDate.toISOString().split('T')[0];
+              
+              // If meal was stored on the original date, show it on the adjusted day
+              if (meal.date === originalDayDateKey) return true;
+            } catch {
+              // Skip invalid dates
+            }
+          }
+          
           // Secondary match: try parsing both dates and compare
           try {
             const mealDate = new Date(meal.date);
@@ -112,6 +128,17 @@ export function WeeklyCaloriesCard() {
         });
         
         const dayCalories = dayMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
+        
+        // Debug meal matching for all days when date override is active
+        if (getDateOverride()) {
+          console.log(`🍽️ MEAL MATCHING DEBUG for ${dayData.day} ${dayData.date}:`);
+          console.log(`  Found ${dayMeals.length} meals total`);
+          if (dayMeals.length > 0) {
+            dayMeals.forEach((meal: any, index: number) => {
+              console.log(`    ${index + 1}. ${meal.name} - ${meal.calories} cal (stored: ${meal.date})`);
+            });
+          }
+        }
         
         return {
           ...dayData,
