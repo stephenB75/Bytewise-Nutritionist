@@ -360,9 +360,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         debugMealDates();
         
         // Force check and fix meal dates immediately
-        console.log('🔧 Forcing meal date check and fix...');
+
         const mismatchCheck = checkMealDateMismatches();
-        console.log(`Found ${mismatchCheck.mismatches.length} mismatched meals out of ${mismatchCheck.totalMeals} total`);
+
         
         if (mismatchCheck.mismatches.length > 0) {
           console.log('📅 Fixing meal date mismatches...', mismatchCheck.mismatches);
@@ -406,10 +406,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           return false;
         });
         
-        console.log(`📱 Daily View: Found ${todayMeals.length} meals for today (${today})`);
-        if (todayMeals.some((meal: any) => meal.name && meal.name.includes('EMPANADA'))) {
-          console.log(`📱 Daily View: EMPANADA correctly found for today`);
-        }
+
+
         
         setLoggedMeals(todayMeals);
         

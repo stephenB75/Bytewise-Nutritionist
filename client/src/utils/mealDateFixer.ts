@@ -225,24 +225,16 @@ export function autoFixMealDatesIfNeeded(): boolean {
     return false;
   }
   
-  // Only log when actually performing the check
-  console.log('🔍 Checking for meal date mismatches...');
-  
+  // Silent operation for production
   lastCheckTime = now;
   lastDataHash = currentDataHash;
   
   if (needsMealDateFix()) {
-    console.log('📅 Date mismatches detected, applying fixes...');
     const result = fixMealDateMismatches();
     if (result.success && result.fixedCount > 0) {
-      console.log(`✅ Auto-fixed ${result.fixedCount} meal date(s)`);
       lastDataHash = getMealDataHash(); // Update hash after fixes
       return true;
-    } else {
-      console.log('❌ Failed to fix meal dates:', result.error);
     }
-  } else {
-    console.log('✅ All meal dates are already correct');
   }
   return false;
 }
