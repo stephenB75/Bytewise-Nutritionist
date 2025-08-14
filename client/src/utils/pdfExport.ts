@@ -645,17 +645,81 @@ export async function generateProgressReportPDF(): Promise<boolean> {
       
       console.log('✅ PDF Generation: Blob download method executed');
       
-      // Method 3: Open PDF in new tab as fallback
-      console.log('🔄 PDF Generation: Opening PDF in new tab as backup...');
-      const pdfUrl = URL.createObjectURL(pdfBlob);
-      const newWindow = window.open(pdfUrl, '_blank');
-      if (newWindow) {
-        console.log('✅ PDF Generation: PDF opened in new tab');
-        // Auto-cleanup the URL after some time
-        setTimeout(() => URL.revokeObjectURL(pdfUrl), 30000);
-      } else {
-        console.log('⚠️ PDF Generation: Popup blocked - PDF ready for manual download');
+      // Method 3: Create data URL for manual access
+      console.log('🔄 PDF Generation: Creating data URL for manual access...');
+      const pdfDataUrl = pdf.output('datauristring');
+      console.log('✅ PDF Generation: Data URL created, length:', pdfDataUrl.length);
+      
+      // Method 4: Try forcing download with window.location
+      console.log('🔄 PDF Generation: Trying window location method...');
+      try {
+        const tempUrl = URL.createObjectURL(pdfBlob);
+        window.location.href = tempUrl;
+        console.log('✅ PDF Generation: Window location method executed');
+        setTimeout(() => URL.revokeObjectURL(tempUrl), 2000);
+      } catch (locationError) {
+        console.log('❌ PDF Generation: Window location method failed:', locationError);
       }
+      
+      // Method 5: Show PDF inline in current page
+      console.log('🔄 PDF Generation: Preparing inline PDF display...');
+      
+      // Create a popup modal with PDF preview and download options
+      const pdfPreviewUrl = URL.createObjectURL(pdfBlob);
+      const modal = document.createElement('div');
+      modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        z-index: 10000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        box-sizing: border-box;
+      `;
+      
+      modal.innerHTML = `
+        <div style="background: white; padding: 20px; border-radius: 10px; max-width: 90%; max-height: 90%; display: flex; flex-direction: column; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #f0f0f0;">
+            <h2 style="margin: 0; color: #1f4aa6; font-family: Arial, sans-serif;">PDF Generated Successfully!</h2>
+            <button onclick="this.closest('[role=modal]').remove();" style="background: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-size: 16px;">✕</button>
+          </div>
+          
+          <div style="margin-bottom: 15px;">
+            <p style="margin: 0 0 10px 0; color: #333; font-family: Arial, sans-serif;">Your ByteWise Nutrition Report is ready! Choose how to access it:</p>
+          </div>
+          
+          <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
+            <a href="${pdfPreviewUrl}" download="${filename}" style="background: #45c757; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">📥 Download PDF</a>
+            <a href="${pdfPreviewUrl}" target="_blank" style="background: #1f4aa6; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">👀 View in New Tab</a>
+            <button onclick="navigator.clipboard.writeText('${pdfDataUrl}').then(() => alert('PDF data copied! You can paste this into a file or share it.'))" style="background: #ffd43b; color: black; padding: 10px 20px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">📋 Copy PDF Data</button>
+          </div>
+          
+          <iframe src="${pdfPreviewUrl}" style="width: 100%; height: 400px; border: 1px solid #ddd; border-radius: 5px;"></iframe>
+          
+          <p style="margin: 10px 0 0 0; font-size: 12px; color: #666; text-align: center;">
+            Report generated: ${new Date().toLocaleString()} | File: ${filename}
+          </p>
+        </div>
+      `;
+      
+      modal.setAttribute('role', 'modal');
+      document.body.appendChild(modal);
+      console.log('✅ PDF Generation: Inline PDF modal displayed');
+      
+      // Auto-cleanup after 5 minutes
+      setTimeout(() => {
+        if (modal.parentNode) {
+          modal.remove();
+        }
+        URL.revokeObjectURL(pdfPreviewUrl);
+        console.log('🧹 PDF Generation: Modal auto-cleanup completed');
+      }, 300000);
       
       return true;
       
