@@ -4,7 +4,7 @@
 
 ByteWise Nutritionist is a comprehensive Progressive Web App (PWA) for nutrition tracking and meal planning. Built with modern web technologies, it integrates with the USDA food database to provide accurate nutritional information and offers features including meal logging, calorie tracking, progress analytics, and achievement systems. The application is designed for both web and mobile deployment with full PWA capabilities and cross-platform compatibility.
 
-**Current Status**: BETA v1.3.2 (August 14, 2025) - **PRODUCTION READY** - Enhanced hero-targeted scroll reset functionality fully implemented. Navigation system now specifically targets and scrolls to hero components with multi-layer reliability. Fasting page animation bug resolved with proper tab order integration.
+**Current Status**: BETA v1.3.2 (August 14, 2025) - **PRODUCTION READY** - Enhanced hero-targeted scroll reset functionality fully implemented. Navigation system now specifically targets and scrolls to hero components with multi-layer reliability. Fasting page animation bug resolved with proper tab order integration. Weekly summary timezone alignment issues resolved with enhanced timestamp parsing.
 
 ## User Preferences
 
@@ -81,6 +81,13 @@ Authentication is handled through Supabase Auth with JWT token-based session man
 - **Advanced Scroll Logic**: Enhanced `scrollToHero()` function uses multiple DOM selectors and fallback mechanisms
 - **Smooth Scrolling Management**: Temporarily disables CSS smooth scrolling during navigation, then restores for seamless user experience
 - **Universal Implementation**: All navigation elements (bottom tabs, logo, nav buttons, hero buttons) use enhanced handler
+
+#### Weekly Summary Timezone Alignment Fix (August 14, 2025)
+- **Enhanced Timestamp Parsing**: Fixed meal matching logic to properly handle ISO timestamp formats (e.g., "2025-08-13T23:11:05.184Z")
+- **Date Extraction Logic**: Added timestamp parsing that extracts date portion and matches to correct calendar day
+- **Meal Alignment Resolution**: Meals now appear on the correct day of the week in weekly summary
+- **User Date Override System**: Added optional date correction utilities for timezone misalignment if needed
+- **Production Verification**: Confirmed meals stored with timestamps now appear on proper days in weekly view
 
 #### Fasting Page Animation Fix (August 14, 2025)
 - **Tab Order Integration**: Added 'fasting' to the tab order array that controls slide animations between pages

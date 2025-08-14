@@ -102,6 +102,12 @@ export function WeeklyCaloriesCard() {
           // Primary match: exact date string match
           if (meal.date === dayData.date) return true;
           
+          // Handle timestamp format dates (e.g., "2025-08-13T23:11:05.184Z")
+          if (meal.date && meal.date.includes('T')) {
+            const mealDateOnly = meal.date.split('T')[0]; // Extract just the date part
+            if (mealDateOnly === dayData.date) return true;
+          }
+          
           // Enhanced matching: check if stored meal should appear on this adjusted day
           const dateOverride = getDateOverride();
           if (dateOverride && dateOverride.dayOffset) {
@@ -130,16 +136,8 @@ export function WeeklyCaloriesCard() {
         
         const dayCalories = dayMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
         
-        // Debug meal matching for all days when date override is active
-        if (getDateOverride()) {
-          console.log(`🍽️ MEAL MATCHING DEBUG for ${dayData.day} ${dayData.date}:`);
-          console.log(`  Found ${dayMeals.length} meals total`);
-          if (dayMeals.length > 0) {
-            dayMeals.forEach((meal: any, index: number) => {
-              console.log(`    ${index + 1}. ${meal.name} - ${meal.calories} cal (stored: ${meal.date})`);
-            });
-          }
-        }
+        // Clean up: Remove debug logging now that timestamp matching is fixed
+        // Meals should now appear on the correct days
         
         return {
           ...dayData,
