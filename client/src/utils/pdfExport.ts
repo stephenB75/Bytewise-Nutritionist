@@ -695,8 +695,26 @@ export async function generateProgressReportPDF(): Promise<boolean> {
           </div>
           
           <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
-            <a href="${pdfPreviewUrl}" download="${filename}" onclick="console.log('🔄 PDF Modal: Download button clicked for:', '${filename}'); return true;" style="background: #45c757; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">📥 Download PDF</a>
-            <a href="${pdfPreviewUrl}" target="_blank" onclick="console.log('🔄 PDF Modal: View in new tab button clicked'); return true;" style="background: #1f4aa6; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">👀 View in New Tab</a>
+            <button onclick="
+              console.log('🔄 PDF Modal: Download button clicked for:', '${filename}'); 
+              const link = document.createElement('a'); 
+              link.href = '${pdfPreviewUrl}'; 
+              link.download = '${filename}'; 
+              link.click(); 
+              console.log('✅ PDF Modal: Download link triggered');
+            " style="background: #45c757; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">📥 Download PDF</button>
+            
+            <button onclick="
+              console.log('🔄 PDF Modal: View in new tab button clicked'); 
+              const newWindow = window.open('${pdfPreviewUrl}', '_blank'); 
+              if (newWindow) { 
+                console.log('✅ PDF Modal: New tab opened successfully'); 
+              } else { 
+                console.log('❌ PDF Modal: Popup blocked - trying alternative method'); 
+                window.location.href = '${pdfPreviewUrl}'; 
+              }
+            " style="background: #1f4aa6; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">👀 View in New Tab</button>
+            
             <button onclick="console.log('🔄 PDF Modal: Copy button clicked, data length:', '${pdfDataUrl}'.length); navigator.clipboard.writeText('${pdfDataUrl}').then(() => { console.log('✅ PDF Modal: Data copied to clipboard successfully'); alert('PDF data copied! You can paste this into a file or share it.'); }).catch(err => { console.error('❌ PDF Modal: Copy to clipboard failed:', err); alert('Copy failed. Please try the download option instead.'); });" style="background: #ffd43b; color: black; padding: 10px 20px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">📋 Copy PDF Data</button>
           </div>
           
