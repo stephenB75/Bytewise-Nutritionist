@@ -598,36 +598,67 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     console.log('💾 PDF Generation: Attempting to save PDF with filename:', filename);
     
     try {
-      // Use jsPDF's built-in save method which triggers download
-      pdf.save(filename);
-      console.log('✅ PDF Generation: PDF.save() called successfully');
-      
-      // Add a small delay to ensure download initiates
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      // Verify download was triggered by checking if the PDF blob was created
+      // Create PDF blob first for better control
       const pdfBlob = pdf.output('blob');
       console.log('📄 PDF Generation: PDF blob created, size:', pdfBlob.size, 'bytes');
       
-      if (pdfBlob.size > 0) {
-        console.log('✅ PDF Generation: PDF download should have been triggered');
-        
-        // Alternative download method as fallback
-        const url = URL.createObjectURL(pdfBlob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        a.style.display = 'none';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        console.log('✅ PDF Generation: Fallback download method executed');
-        
-        return true;
-      } else {
+      if (pdfBlob.size === 0) {
         throw new Error('PDF blob is empty');
       }
+      
+      // Method 1: Direct jsPDF save (most reliable)
+      console.log('🔄 PDF Generation: Trying direct jsPDF save...');
+      pdf.save(filename);
+      console.log('✅ PDF Generation: Direct save method executed');
+      
+      // Method 2: Blob download with user gesture (more compatible)
+      console.log('🔄 PDF Generation: Trying blob download method...');
+      const url = URL.createObjectURL(pdfBlob);
+      
+      // Create download link with proper attributes
+      const downloadLink = document.createElement('a');
+      downloadLink.href = url;
+      downloadLink.download = filename;
+      downloadLink.target = '_blank';
+      downloadLink.style.position = 'absolute';
+      downloadLink.style.left = '-9999px';
+      downloadLink.setAttribute('role', 'button');
+      downloadLink.setAttribute('aria-label', 'Download PDF Report');
+      
+      // Add to DOM and trigger
+      document.body.appendChild(downloadLink);
+      
+      // Use both click methods for maximum compatibility
+      downloadLink.dispatchEvent(new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true,
+        view: window
+      }));
+      downloadLink.click();
+      
+      // Clean up after delay
+      setTimeout(() => {
+        document.body.removeChild(downloadLink);
+        URL.revokeObjectURL(url);
+        console.log('🧹 PDF Generation: Cleanup completed');
+      }, 1000);
+      
+      console.log('✅ PDF Generation: Blob download method executed');
+      
+      // Method 3: Open PDF in new tab as fallback
+      console.log('🔄 PDF Generation: Opening PDF in new tab as backup...');
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      const newWindow = window.open(pdfUrl, '_blank');
+      if (newWindow) {
+        console.log('✅ PDF Generation: PDF opened in new tab');
+        // Auto-cleanup the URL after some time
+        setTimeout(() => URL.revokeObjectURL(pdfUrl), 30000);
+      } else {
+        console.log('⚠️ PDF Generation: Popup blocked - PDF ready for manual download');
+      }
+      
+      return true;
+      
     } catch (downloadError) {
       console.error('❌ PDF Generation: Download failed:', downloadError);
       throw downloadError;
