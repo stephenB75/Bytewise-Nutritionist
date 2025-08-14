@@ -65,15 +65,26 @@ interface UserProgressData {
 
 export async function generateProgressReportPDF(): Promise<boolean> {
   try {
+    console.log('🚀 PDF Generation: Starting PDF generation process...');
+    
     // Fetch actual user data from local storage and API
+    console.log('💾 PDF Generation: Fetching data from localStorage...');
     const storedMeals = localStorage.getItem('weeklyMeals'); // Use weeklyMeals for comprehensive data
     const storedCalorieGoal = localStorage.getItem('calorieGoal');
     const storedUserProfile = localStorage.getItem('userProfile');
     
+    console.log('💾 PDF Generation: Data fetch results:');
+    console.log('   - Meals data:', storedMeals ? `${storedMeals.length} characters` : 'null');
+    console.log('   - Calorie goal:', storedCalorieGoal);
+    console.log('   - User profile:', storedUserProfile ? 'present' : 'null');
+    
     // Parse stored data
+    console.log('🔄 PDF Generation: Parsing data...');
     const meals = storedMeals ? JSON.parse(storedMeals) : [];
     const calorieGoal = storedCalorieGoal ? parseInt(storedCalorieGoal) : 2000;
     const userProfile = storedUserProfile ? JSON.parse(storedUserProfile) : {};
+    
+    console.log(`📊 PDF Generation: Parsed ${meals.length} meals, goal: ${calorieGoal} cal`);
     
     // Calculate real statistics from stored meals for 30-day period
     const now = new Date();
@@ -286,7 +297,10 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     };
 
     // Create PDF directly using jsPDF
+    console.log('📄 PDF Generation: Creating jsPDF instance...');
+    console.log('jsPDF available:', typeof jsPDF);
     const pdf = new jsPDF('p', 'mm', 'a4');
+    console.log('✅ PDF Generation: jsPDF instance created successfully');
     const pageWidth = 210;
     const pageHeight = 297;
     let yPosition = 25;

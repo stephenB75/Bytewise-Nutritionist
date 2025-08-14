@@ -32,13 +32,21 @@ export function DataManagementPanel() {
 
 
   const handleExportData = async () => {
+    console.log('🔄 PDF Export: Button clicked, starting export process...');
     setIsExporting(true);
+    
     try {
+      console.log('📦 PDF Export: Importing PDF export utility...');
       // Import and use the PDF export utility
       const { generateProgressReportPDF } = await import('@/utils/pdfExport');
+      console.log('✅ PDF Export: Module imported successfully');
+      
+      console.log('🔄 PDF Export: Calling generateProgressReportPDF...');
       const success = await generateProgressReportPDF();
+      console.log('📊 PDF Export: Generation result:', success);
       
       if (success) {
+        console.log('✅ PDF Export: PDF generated successfully');
         toast({
           title: "PDF Report Downloaded ✅",
           description: "Your nutrition report has been downloaded. Check your Downloads folder for the PDF file.",
@@ -52,9 +60,13 @@ export function DataManagementPanel() {
           });
         }, 2000);
       } else {
+        console.error('❌ PDF Export: Generation returned false');
         throw new Error('PDF generation failed');
       }
     } catch (error: any) {
+      console.error('❌ PDF Export: Error occurred:', error);
+      console.error('❌ PDF Export: Error stack:', error.stack);
+      
       // Log error for debugging but don't clutter console in production
       toast({
         title: "Export failed",
@@ -62,6 +74,7 @@ export function DataManagementPanel() {
         variant: "destructive",
       });
     } finally {
+      console.log('🏁 PDF Export: Process completed, resetting state');
       setIsExporting(false);
     }
   };
