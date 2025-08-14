@@ -4,7 +4,7 @@
 
 ByteWise Nutritionist is a comprehensive Progressive Web App (PWA) for nutrition tracking and meal planning. Built with modern web technologies, it integrates with the USDA food database to provide accurate nutritional information and offers features including meal logging, calorie tracking, progress analytics, and achievement systems. The application is designed for both web and mobile deployment with full PWA capabilities and cross-platform compatibility.
 
-**Current Status**: BETA v1.3.4 (August 14, 2025) - **PRODUCTION READY** - Complete PDF export functionality implemented and verified. PDF generation creates comprehensive 179KB nutrition reports with modal viewer, multiple download methods, and clipboard integration. All buttons verified functional with comprehensive logging. Complete metrics synchronization achieved across all components. Daily view components use corrected date logic ensuring perfect alignment between Daily Calories card, Logged Today section, and weekly summary. All timezone and meal placement issues resolved with automatic date correction system.
+**Current Status**: BETA v1.3.5 (August 14, 2025) - **PRODUCTION READY** - Complete PDF export functionality implemented and verified. PDF generation creates comprehensive 179KB nutrition reports with modal viewer, multiple download methods, and clipboard integration. All buttons verified functional with comprehensive logging. Complete metrics synchronization achieved across all components. Daily view components use corrected date logic ensuring perfect alignment between Daily Calories card, Logged Today section, and weekly summary. All timezone and meal placement issues resolved with automatic date correction system. **CRITICAL FIX**: Branded sparkling water recognition system implemented - San Pellegrino, Perrier, La Croix, and Bubly now correctly identified as 0-calorie beverages instead of generic high-calorie estimates.
 
 ## User Preferences
 
@@ -72,7 +72,19 @@ Authentication is handled through Supabase Auth with JWT token-based session man
 - **React Query/TanStack Query**: Server state management and caching
 - **Web App Manifest**: PWA configuration for native app installation
 
-### Recent Changes (BETA v1.3.4)
+### Recent Changes (BETA v1.3.5)
+
+#### Critical Branded Beverage Recognition Fix (August 14, 2025)
+- **Sparkling Water Detection System**: Implemented comprehensive zero-calorie beverage recognition for branded sparkling waters
+- **San Pellegrino Fix**: Corrected calorie estimate from 1,500 calories to 0 calories for proper sparkling water identification
+- **Multi-Brand Support**: Added recognition for Perrier, La Croix, Bubly, Schweppes, and other major sparkling water brands
+- **Early Detection Logic**: Added zero-calorie beverage check at top of calculation pipeline to prevent generic fallback errors  
+- **Enhanced Preprocessing**: Improved brand name preprocessing with proper mapping to zero-calorie water categories
+- **FDA Serving Integration**: Branded beverages now display proper FDA serving sizes (11 fl oz bottles, 12 fl oz cans)
+- **Comprehensive Coverage**: System recognizes sparkling water, carbonated water, seltzer, club soda, and mineral water variations
+- **Console Logging**: Added logging to track zero-calorie beverage detection for debugging and verification
+
+### Previous Changes (BETA v1.3.4)
 
 #### Complete PDF Export Functionality (August 14, 2025)
 - **PDF Generation System**: Implemented comprehensive PDF export using jsPDF library creating 179KB nutrition reports

@@ -328,6 +328,43 @@ export class USDAService {
     }
     
     try {
+      // Check for zero-calorie beverages FIRST before any other processing
+      if (this.isZeroCalorieBeverage(ingredientName)) {
+        console.log(`🚰 Zero-calorie beverage detected early: ${ingredientName}`);
+        const servingInfo = USDAService.getStandardLiquidServing(ingredientName.toLowerCase());
+        
+        const zeroCalorieResult = {
+          ingredient: ingredientName.toUpperCase(),
+          measurement: `${measurement} (~330g)`,
+          estimatedCalories: 0,
+          equivalentMeasurement: '100g ≈ 0 kcal',
+          note: 'Zero-calorie sparkling water',
+          nutritionPer100g: {
+            calories: 0,
+            protein: 0,
+            carbs: 0,
+            fat: 0,
+            iron: 0.1,
+            calcium: 5,
+            zinc: 0.1,
+            magnesium: 3,
+            vitaminC: 0,
+            vitaminD: 0,
+            vitaminB12: 0,
+            folate: 0,
+            vitaminA: 0,
+            vitaminE: 0,
+            potassium: 50,
+            phosphorus: 10
+          },
+          fdaServing: servingInfo ? `FDA ${servingInfo.fdaCategory}: ${servingInfo.description}` : 'FDA Water: 8 fl oz (1 cup) standard'
+        };
+        
+        // Cache and return zero-calorie result
+        this.setMemoryCache(cacheKey, zeroCalorieResult);
+        return zeroCalorieResult;
+      }
+      
       // Try liquid fallbacks and enhanced fallback data first
       try {
         const fallbackResult = this.getEnhancedFallbackEstimate(ingredientName, measurement);
@@ -510,7 +547,25 @@ export class USDAService {
     'rum punch': 'fruit punch rum caribbean',
     'mauby': 'bark drink caribbean traditional',
     'sea moss': 'seaweed drink nutritious caribbean',
-    'irish moss': 'seaweed drink nutritious caribbean'
+    'irish moss': 'seaweed drink nutritious caribbean',
+    
+    // Branded sparkling waters (zero calorie)
+    'san pellegrino sparkling water': 'water carbonated mineral',
+    'san pellegrino water': 'water carbonated mineral',
+    'pellegrino sparkling water': 'water carbonated mineral',
+    'pellegrino water': 'water carbonated mineral',
+    'perrier sparkling water': 'water carbonated mineral',
+    'perrier water': 'water carbonated mineral',
+    'la croix sparkling water': 'water carbonated flavored',
+    'lacroix sparkling water': 'water carbonated flavored',
+    'bubly sparkling water': 'water carbonated flavored',
+    'sparkling water': 'water carbonated',
+    'carbonated water': 'water carbonated',
+    'seltzer water': 'water carbonated',
+    'club soda': 'water carbonated sodium',
+    'tonic water': 'water tonic quinine',
+    'mineral water': 'water mineral',
+    'spring water': 'water spring'
   };
 
   private static readonly COOKING_METHODS = ['grilled', 'fried', 'baked', 'roasted', 'boiled', 'steamed', 'raw', 'fresh', 'cooked'];
@@ -561,6 +616,19 @@ export class USDAService {
     'mauby': { standardServing: 240, fdaCategory: 'Traditional Beverages', description: '8 fl oz (1 cup) standard' },
     'sea moss': { standardServing: 240, fdaCategory: 'Traditional Beverages', description: '8 fl oz (1 cup) standard' },
     'coconut water': { standardServing: 240, fdaCategory: 'Natural Beverages', description: '8 fl oz (1 cup) standard' },
+    
+    // Sparkling waters and branded zero-calorie beverages
+    'sparkling water': { standardServing: 240, fdaCategory: 'Water', description: '8 fl oz (1 cup) standard' },
+    'carbonated water': { standardServing: 240, fdaCategory: 'Water', description: '8 fl oz (1 cup) standard' },
+    'seltzer': { standardServing: 240, fdaCategory: 'Water', description: '8 fl oz (1 cup) standard' },
+    'club soda': { standardServing: 240, fdaCategory: 'Water', description: '8 fl oz (1 cup) standard' },
+    'mineral water': { standardServing: 240, fdaCategory: 'Water', description: '8 fl oz (1 cup) standard' },
+    'san pellegrino': { standardServing: 330, fdaCategory: 'Water', description: '11 fl oz bottle standard' },
+    'pellegrino': { standardServing: 330, fdaCategory: 'Water', description: '11 fl oz bottle standard' },
+    'perrier': { standardServing: 330, fdaCategory: 'Water', description: '11 fl oz bottle standard' },
+    'la croix': { standardServing: 360, fdaCategory: 'Water', description: '12 fl oz can standard' },
+    'lacroix': { standardServing: 360, fdaCategory: 'Water', description: '12 fl oz can standard' },
+    'bubly': { standardServing: 360, fdaCategory: 'Water', description: '12 fl oz can standard' },
     
     // Other beverages
     'coffee': { standardServing: 240, fdaCategory: 'Hot Beverages', description: '8 fl oz (1 cup) standard' },
@@ -1596,7 +1664,11 @@ export class USDAService {
       'sprite', 'fanta', 'mountain dew', 'gatorade', 'powerade',
       'coconut water', 'almond milk', 'soy milk', 'oat milk',
       'energy drink', 'sports drink', 'protein shake', 'iced tea',
-      'hot chocolate', 'cocoa', 'lemonade', 'punch'
+      'hot chocolate', 'cocoa', 'lemonade', 'punch',
+      // Sparkling/carbonated water brands and varieties
+      'sparkling water', 'carbonated water', 'seltzer', 'club soda',
+      'perrier', 'san pellegrino', 'pellegrino', 'la croix', 'lacroix',
+      'bubly', 'schweppes', 'canada dry', 'tonic water', 'mineral water'
     ];
     
     return liquidKeywords.some(keyword => searchTerm.toLowerCase().includes(keyword));
@@ -1622,10 +1694,26 @@ export class USDAService {
     if (searchTerm.includes('water')) {
       if (description.toLowerCase() === 'water, tap') score += 800;
       if (description.toLowerCase() === 'water, bottled, generic') score += 750;
+      if (description.includes('water, municipal') || description.includes('water, well')) score += 700;
+      if (description.includes('water') && description.includes('carbonated')) score += 600;
       if (description.includes('water') && !description.includes('tuna') && !description.includes('fish') && !description.includes('coconut') && !description.includes('flavored')) score += 600;
       if (description.includes('tuna') || description.includes('fish') || description.includes('canned')) score -= 1000; // Heavy penalty for non-water items
       if (description.includes('coconut water')) score -= 200; // different drink
       if (description.includes('vitamin water') || description.includes('flavored')) score -= 400;
+    }
+    
+    // SPARKLING WATER scoring (zero calorie beverages)
+    if (searchTerm.includes('sparkling') || searchTerm.includes('carbonated') || 
+        searchTerm.includes('pellegrino') || searchTerm.includes('perrier') ||
+        searchTerm.includes('lacroix') || searchTerm.includes('la croix') ||
+        searchTerm.includes('bubly') || searchTerm.includes('seltzer')) {
+      if (description.includes('water') && description.includes('carbonated')) score += 800;
+      if (description.includes('seltzer') || description.includes('sparkling')) score += 700;
+      if (description.includes('mineral water')) score += 650;
+      if (description.includes('club soda')) score += 600;
+      // Penalize sugary drinks that might match brand names
+      if (description.includes('sugar') || description.includes('sweetened') || description.includes('cola')) score -= 500;
+      if (description.includes('fruit juice') || description.includes('flavored soda')) score -= 400;
     }
 
     // JUICE scoring
@@ -1752,10 +1840,63 @@ export class USDAService {
   }
 
   /**
+   * Check if ingredient is a zero-calorie beverage
+   */
+  private isZeroCalorieBeverage(ingredientName: string): boolean {
+    const zeroCalorian = ingredientName.toLowerCase();
+    const zeroCalorieBeverages = [
+      'water', 'sparkling water', 'carbonated water', 'seltzer', 'club soda',
+      'mineral water', 'spring water', 'tap water', 'bottled water',
+      'san pellegrino', 'pellegrino', 'perrier', 'la croix', 'lacroix', 
+      'bubly', 'schweppes sparkling', 'canada dry seltzer', 'tonic water',
+      'black coffee', 'plain tea', 'green tea', 'herbal tea', 'diet soda',
+      'diet coke', 'coke zero', 'pepsi max', 'diet pepsi', 'diet sprite'
+    ];
+    
+    return zeroCalorieBeverages.some(beverage => 
+      zeroCalorian.includes(beverage) || 
+      (beverage.includes('water') && zeroCalorian.includes('water') && !zeroCalorian.includes('coconut'))
+    );
+  }
+
+  /**
    * Enhanced fallback estimation with better nutrition data
    */
   private getEnhancedFallbackEstimate(ingredientName: string, measurement: string) {
     const normalized = ingredientName.toLowerCase().trim();
+
+    // Check for zero-calorie beverages first
+    if (this.isZeroCalorieBeverage(normalized)) {
+      console.log(`🚰 Zero-calorie beverage detected: ${normalized}`);
+      const servingInfo = USDAService.getStandardLiquidServing(normalized);
+      
+      return {
+        ingredient: ingredientName.toUpperCase(),
+        measurement: `${measurement} (~240g)`,
+        estimatedCalories: 0,
+        equivalentMeasurement: '100g ≈ 0 kcal',
+        note: 'Contains no calories',
+        nutritionPer100g: {
+          calories: 0,
+          protein: 0,
+          carbs: 0,
+          fat: 0,
+          iron: 0.1,
+          calcium: 5,
+          zinc: 0.1,
+          magnesium: 3,
+          vitaminC: 0,
+          vitaminD: 0,
+          vitaminB12: 0,
+          folate: 0,
+          vitaminA: 0,
+          vitaminE: 0,
+          potassium: 50,
+          phosphorus: 10
+        },
+        fdaServing: servingInfo ? `FDA ${servingInfo.fdaCategory}: ${servingInfo.description}` : 'FDA Water: 8 fl oz (1 cup) standard'
+      };
+    }
 
     // Handle common liquids that may not be in USDA database or fallback data
     const liquidFallbacks = {
