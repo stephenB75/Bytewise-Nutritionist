@@ -72,7 +72,15 @@ Authentication is handled through Supabase Auth with JWT token-based session man
 - **React Query/TanStack Query**: Server state management and caching
 - **Web App Manifest**: PWA configuration for native app installation
 
-### Recent Changes (BETA v1.3.0)
+### Recent Changes (BETA v1.3.1)
+
+#### Database Cleanup (August 14, 2025)
+- **User Data Cleanup**: Successfully cleaned development database for stephen75@me.com
+- **Meals Reduced**: From 60 meals down to exactly 3 meals (Monday, Tuesday, Wednesday)
+- **Data Integrity**: Maintained referential integrity by deleting meal_foods before meals
+- **Production Note**: Development cleanup verified successful; production database requires manual cleanup via database pane
+
+### Previous Changes (BETA v1.3.0)
 
 #### Critical Date Bug Resolution
 - **Root Cause**: Food entries were being logged with server UTC timestamps instead of user's local timezone dates
