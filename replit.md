@@ -1,175 +1,48 @@
 # ByteWise Nutritionist
 
 ## Overview
-
-ByteWise Nutritionist is a comprehensive Progressive Web App (PWA) for nutrition tracking and meal planning. Built with modern web technologies, it integrates with the USDA food database to provide accurate nutritional information and offers features including meal logging, calorie tracking, progress analytics, and achievement systems. The application is designed for both web and mobile deployment with full PWA capabilities and cross-platform compatibility.
-
-**Current Status**: BETA v1.3.5 (August 14, 2025) - **PRODUCTION READY** - Complete PDF export functionality implemented and verified. PDF generation creates comprehensive 179KB nutrition reports with modal viewer, multiple download methods, and clipboard integration. All buttons verified functional with comprehensive logging. Complete metrics synchronization achieved across all components. Daily view components use corrected date logic ensuring perfect alignment between Daily Calories card, Logged Today section, and weekly summary. All timezone and meal placement issues resolved with automatic date correction system. **CRITICAL FIX**: Branded sparkling water recognition system implemented - San Pellegrino, Perrier, La Croix, and Bubly now correctly identified as 0-calorie beverages instead of generic high-calorie estimates.
+ByteWise Nutritionist is a comprehensive Progressive Web App (PWA) for nutrition tracking and meal planning. It integrates with the USDA food database to provide accurate nutritional information, offering features like meal logging, calorie tracking, progress analytics, and an achievement system. The application is designed for cross-platform compatibility and full PWA capabilities, including PDF export functionality for comprehensive nutrition reports. Its vision is to provide a robust, user-friendly tool for personal nutrition management, leveraging modern web technologies for a seamless experience.
 
 ## User Preferences
-
 Preferred communication style: Simple, everyday language.
 
 ## System Architecture
 
 ### Frontend Architecture
-The client-side application is built using React with TypeScript, leveraging Vite as the build tool for optimal performance. The UI framework utilizes Tailwind CSS for styling with shadcn/ui component library for consistent design patterns. The application implements a mobile-first responsive design with PWA capabilities including offline functionality, service worker caching, and native app-like experiences.
-
-**Key Design Decisions:**
-- **React + TypeScript**: Chosen for type safety and modern development experience
-- **Vite Build System**: Selected for fast development builds and optimized production bundles
-- **Tailwind CSS**: Provides utility-first styling with excellent mobile responsiveness
-- **PWA Implementation**: Service worker handles offline caching and background sync
+The client-side application is built using React with TypeScript, leveraging Vite for optimal performance. The UI framework utilizes Tailwind CSS for styling with shadcn/ui for consistent design patterns. It implements a mobile-first responsive design with PWA capabilities, including offline functionality, service worker caching, and native app-like experiences. Key design decisions include the choice of React + TypeScript for type safety, Vite for fast builds, Tailwind CSS for utility-first styling, and a comprehensive PWA implementation for enhanced user experience.
 
 ### Backend Architecture
-The server architecture follows a Node.js/Express pattern with TypeScript, designed for serverless deployment compatibility. The backend serves as both an API server and static file host, with middleware for authentication, CORS handling, and security headers.
-
-**Core Components:**
-- **Express Server**: Handles API routing and static file serving
-- **Authentication Middleware**: Supabase-based JWT token verification
-- **Storage Layer**: Abstracted database operations through a storage service pattern
-- **USDA Service Integration**: External API integration for food database queries
+The server architecture follows a Node.js/Express pattern with TypeScript, designed for serverless deployment compatibility. The backend serves as both an API server and static file host, incorporating middleware for authentication, CORS handling, and security headers. Core components include the Express server for routing, Supabase-based JWT token verification for authentication, and an abstracted storage layer for database operations, alongside integration with the USDA food database.
 
 ### Data Storage Solutions
-The application uses PostgreSQL as the primary database with Drizzle ORM for type-safe database operations. The schema includes comprehensive tables for users, foods, meals, recipes, achievements, and tracking data.
-
-**Database Architecture:**
-- **Drizzle ORM**: Provides type-safe SQL operations with schema validation
-- **PostgreSQL**: Robust relational database with JSON field support for flexible data
-- **Neon Database**: Cloud-hosted PostgreSQL with HTTP-based connections for serverless compatibility
-- **Local Storage**: Client-side caching for offline functionality and performance
+The application uses PostgreSQL as the primary database with Drizzle ORM for type-safe operations. The schema includes tables for users, foods, meals, recipes, achievements, and tracking data. PostgreSQL is chosen for its robustness and JSON field support, while Drizzle ORM provides type-safe SQL. Neon Database is utilized for cloud-hosted PostgreSQL with HTTP-based connections, and client-side local storage is used for caching.
 
 ### Authentication and Authorization
-Authentication is handled through Supabase Auth with JWT token-based session management. The system supports email/password authentication with email verification requirements.
+Authentication is handled through Supabase Auth, utilizing JWT token-based session management. The system supports email/password authentication with required email verification. Security implementation includes Supabase for user management, server-side JWT token verification for protected routes, secure session management, and email verification for account activation.
 
-**Security Implementation:**
-- **Supabase Authentication**: Handles user registration, login, and session management
-- **JWT Token Verification**: Server-side middleware validates tokens on protected routes
-- **Session Management**: Secure session storage with appropriate expiration handling
-- **Email Verification**: Required for account activation to ensure valid user accounts
+### UI/UX Decisions
+The application employs a mobile-first responsive design. Tailwind CSS and shadcn/ui are used for a consistent and modern aesthetic. Key UI/UX features include a professional PDF viewer modal with inline preview, multi-method download options for reports, and an enhanced hero component scroll reset system for smooth navigation. The application aims for intuitive user flows and a visually appealing interface.
 
-### External Dependencies
+## External Dependencies
 
-#### Third-Party Services
-- **Supabase**: Authentication service providing user management and JWT tokens
-- **USDA FoodData Central API**: Government food database for accurate nutritional information
-- **Neon Database**: Cloud PostgreSQL hosting with serverless-friendly HTTP connections
+### Third-Party Services
+- **Supabase**: Authentication and user management service.
+- **USDA FoodData Central API**: Provides accurate nutritional information.
+- **Neon Database**: Cloud PostgreSQL hosting.
 
-#### Development and Deployment
-- **Vite**: Frontend build tool and development server
-- **Drizzle Kit**: Database migration and schema management
-- **Capacitor**: Mobile app framework for iOS and Android deployment
-- **Railway/Replit**: Cloud deployment platforms with automatic scaling
+### Development and Deployment Tools
+- **Vite**: Frontend build tool and development server.
+- **Drizzle Kit**: Database migration and schema management.
+- **Capacitor**: Mobile app framework for iOS and Android deployment.
+- **Railway/Replit**: Cloud deployment platforms.
 
-#### UI and Styling
-- **Radix UI**: Accessible component primitives for complex UI elements
-- **Tailwind CSS**: Utility-first CSS framework for responsive design
-- **React Hook Form**: Form handling with validation and error management
-- **Zod**: Runtime type validation for forms and API responses
+### UI and Styling Libraries
+- **Radix UI**: Accessible component primitives.
+- **Tailwind CSS**: Utility-first CSS framework.
+- **React Hook Form**: Form handling with validation.
+- **Zod**: Runtime type validation.
 
-#### Performance and PWA
-- **Service Worker**: Custom implementation for offline caching and background sync
-- **React Query/TanStack Query**: Server state management and caching
-- **Web App Manifest**: PWA configuration for native app installation
-
-### Recent Changes (BETA v1.3.5)
-
-#### Critical Branded Beverage Recognition Fix (August 14, 2025)
-- **Sparkling Water Detection System**: Implemented comprehensive zero-calorie beverage recognition for branded sparkling waters
-- **San Pellegrino Fix**: Corrected calorie estimate from 1,500 calories to 0 calories for proper sparkling water identification
-- **Multi-Brand Support**: Added recognition for Perrier, La Croix, Bubly, Schweppes, and other major sparkling water brands
-- **Early Detection Logic**: Added zero-calorie beverage check at top of calculation pipeline to prevent generic fallback errors  
-- **Enhanced Preprocessing**: Improved brand name preprocessing with proper mapping to zero-calorie water categories
-- **FDA Serving Integration**: Branded beverages now display proper FDA serving sizes (11 fl oz bottles, 12 fl oz cans)
-- **Comprehensive Coverage**: System recognizes sparkling water, carbonated water, seltzer, club soda, and mineral water variations
-- **Console Logging**: Added logging to track zero-calorie beverage detection for debugging and verification
-
-### Previous Changes (BETA v1.3.4)
-
-#### Complete PDF Export Functionality (August 14, 2025)
-- **PDF Generation System**: Implemented comprehensive PDF export using jsPDF library creating 179KB nutrition reports
-- **Modal Interface**: Added professional PDF viewer modal with inline preview and multiple access options
-- **Multi-Method Download**: Integrated direct save, blob download, window location, and clipboard copy methods
-- **Button Verification**: All modal buttons confirmed functional with comprehensive console logging
-- **Error Handling**: Added robust error handling for clipboard operations and download failures
-- **User Experience**: PDF modal displays report preview with download, view in tab, and copy data options
-- **Data Integrity**: PDF contains complete 30-day nutrition analysis with meals, statistics, and progress tracking
-
-### Previous Changes (BETA v1.3.3)
-
-#### Complete Metrics Synchronization Achievement (August 14, 2025)
-- **Daily View Metrics Fixed**: Daily Calories card and Logged Today section now update correctly with corrected date logic
-- **Universal Date Correction**: Applied consistent date correction logic from WeeklyCaloriesCard to all daily view components
-- **Synchronization Resolution**: All cards now look for meals on user's expected date (Aug 14th) instead of system date (Aug 15th)
-- **Event Handler Updates**: Meal deletion handlers and event listeners now use corrected date filtering
-- **Cross-Component Consistency**: Perfect alignment between dashboard daily cards, food log section, and weekly summary
-
-#### Complete Timezone and Meal Placement Resolution (August 14, 2025)
-- **Automatic Timezone Alignment**: Implemented intelligent timezone detection and correction system
-- **Universal Timestamp Parsing**: Enhanced all meal filtering components with consistent ISO timestamp handling
-- **Production Issue Resolution**: Fixed meal placement discrepancies where EMPANADA appeared on wrong days
-- **Calorie Calculation Fix**: Resolved zero-calorie display issues with automatic meal calorie estimation system
-- **Multi-Component Coordination**: Applied timestamp parsing fixes to WeeklyCaloriesCard, ModernFoodLayout, and useOptimizedMealData hook
-- **Date Override System**: Added +1 day offset correction to align system dates with user timezone expectations
-- **Persistent Alignment**: Timezone corrections persist across sessions ensuring consistent user experience
-
-#### Technical Implementation Details
-- **Enhanced Filtering Logic**: All components now handle both "YYYY-MM-DD" dates and "YYYY-MM-DDTHH:mm:ss.sssZ" timestamps with corrected date logic
-- **Automatic Calorie Assignment**: Missing calorie data automatically filled (EMPANADA: 250 cal, APPLE: 95 cal, etc.)
-- **Cross-Component Consistency**: Unified date handling ensures meals appear on same day across weekly summary, daily view, and all other displays
-- **Real-time Correction**: System automatically detects and corrects timezone misalignments without user intervention
-- **Synchronized Data Flow**: All meal filtering uses consistent `correctedToday = userExpectedToday` logic for perfect metrics alignment
-
-### Previous Changes (BETA v1.3.2)
-
-#### Enhanced Hero Component Scroll Reset System (August 14, 2025)
-- **Hero-Targeted Navigation**: Completely redesigned scroll reset to specifically target hero components rather than generic top-of-page scrolling
-- **Multi-Layer Reliability**: Implemented progressive scroll attempts with different timing (immediate, 0ms, 10ms, 50ms, RAF) for cross-device consistency
-- **Hero Component Identification**: Added `data-hero="true"` attributes and `.hero-component` CSS classes for precise targeting
-- **Advanced Scroll Logic**: Enhanced `scrollToHero()` function uses multiple DOM selectors and fallback mechanisms
-- **Smooth Scrolling Management**: Temporarily disables CSS smooth scrolling during navigation, then restores for seamless user experience
-- **Universal Implementation**: All navigation elements (bottom tabs, logo, nav buttons, hero buttons) use enhanced handler
-
-#### Weekly Summary Timezone Alignment Fix (August 14, 2025)
-- **Enhanced Timestamp Parsing**: Fixed meal matching logic to properly handle ISO timestamp formats (e.g., "2025-08-13T23:11:05.184Z")
-- **Date Extraction Logic**: Added timestamp parsing that extracts date portion and matches to correct calendar day
-- **Secondary Match Fix**: Prevented timezone-based date parsing from causing meal duplications across days
-- **Meal Alignment Resolution**: Meals now appear on the correct day of the week in weekly summary without duplicates
-- **User Date Override System**: Added optional date correction utilities for timezone misalignment if needed
-- **Production Verification**: Confirmed meals stored with timestamps now appear on proper days in weekly view
-
-#### Fasting Page Animation Fix (August 14, 2025)
-- **Tab Order Integration**: Added 'fasting' to the tab order array that controls slide animations between pages
-- **Animation Consistency**: Fasting page now gets proper directional slide animations (left/right) instead of default bottom slide
-- **Navigation Smooth Transitions**: All pages now have consistent slide animation behavior during navigation
-
-### Previous Changes (BETA v1.3.1 - August 14, 2025)
-
-#### Database Cleanup (August 14, 2025)
-- **User Data Cleanup**: Successfully cleaned development database for stephen75@me.com
-- **Meals Reduced**: From 60 meals down to exactly 3 meals (Monday, Tuesday, Wednesday)
-- **Data Integrity**: Maintained referential integrity by deleting meal_foods before meals
-- **Production Note**: Development cleanup verified successful; production database requires manual cleanup via database pane
-
-### Previous Changes (BETA v1.3.0 - August 13, 2025)
-
-#### Critical Date Bug Resolution
-- **Root Cause**: Food entries were being logged with server UTC timestamps instead of user's local timezone dates
-- **Impact**: Meals logged "today" appeared on the wrong day (e.g., Wednesday entries showing as Thursday)
-- **Solution**: Implemented browser-based timezone detection using `Intl.DateTimeFormat` API for accurate local date calculation
-- **Auto-Correction**: Added automatic detection and correction system for existing incorrectly dated meal entries
-- **Enhanced Components**: Updated `WeeklyCaloriesCard`, `getLocalDateKey()`, and meal date validation logic
-
-#### Technical Implementation
-- **Timezone Detection**: Uses `Intl.DateTimeFormat().resolvedOptions().timeZone` for user's actual timezone
-- **Date Utilities**: Enhanced `getLocalDateKey()` function with proper timezone conversion
-- **Debugging Tools**: Added comprehensive timezone debugging utility for development support
-- **Data Migration**: Automatic correction of existing meal data with wrong dates
-
-#### Previous Navigation UX Enhancement (BETA v1.3.0)
-- **Scroll Reset Functionality**: Enhanced `handleTabChange()` function with automatic scroll-to-top behavior
-- **Root Cause Resolved**: Fixed CSS `scroll-behavior: smooth` interference with instant scroll attempts
-- **Smooth Navigation**: When switching between pages, view instantly scrolls back to hero component
-- **Universal Implementation**: All navigation elements (bottom tabs, hero buttons, logo) use enhanced handler
-- **Technical Solution**: Temporarily disables smooth scrolling during navigation, forces instant scroll, then restores smooth behavior
-- **User Experience**: Consistent instant scroll reset behavior across all app sections
+### Performance and PWA Enhancements
+- **Service Worker**: Custom implementation for offline caching and background sync.
+- **React Query/TanStack Query**: Server state management and caching.
+- **Web App Manifest**: PWA configuration for native app installation.
