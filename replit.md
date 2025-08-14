@@ -4,7 +4,7 @@
 
 ByteWise Nutritionist is a comprehensive Progressive Web App (PWA) for nutrition tracking and meal planning. Built with modern web technologies, it integrates with the USDA food database to provide accurate nutritional information and offers features including meal logging, calorie tracking, progress analytics, and achievement systems. The application is designed for both web and mobile deployment with full PWA capabilities and cross-platform compatibility.
 
-**Current Status**: BETA v1.3.2 (August 14, 2025) - **PRODUCTION READY** - Enhanced hero-targeted scroll reset functionality fully implemented. Navigation system now specifically targets and scrolls to hero components with multi-layer reliability. Fasting page animation bug resolved with proper tab order integration. Weekly summary timezone alignment issues resolved with enhanced timestamp parsing.
+**Current Status**: BETA v1.3.2 (August 14, 2025) - **PRODUCTION READY** - Enhanced hero-targeted scroll reset functionality fully implemented. Navigation system now specifically targets and scrolls to hero components with multi-layer reliability. Fasting page animation bug resolved with proper tab order integration. Weekly summary timezone alignment issues completely resolved - meals now appear on correct calendar days without duplicates.
 
 ## User Preferences
 
