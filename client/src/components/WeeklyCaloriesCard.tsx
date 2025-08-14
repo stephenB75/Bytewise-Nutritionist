@@ -136,36 +136,48 @@ export function WeeklyCaloriesCard() {
         
         const dayCalories = dayMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
         
-        // Debug EMPANADA specifically to see why it's not matching Wednesday
-        if (dayData.day === 'Wednesday' || dayData.day === 'Thursday') {
-          console.log(`🔍 DEBUGGING ${dayData.day} ${dayData.date}:`);
-          console.log(`  Looking for meals that match this day...`);
+        // Debug to trace why EMPANADA appears on both Wednesday and Thursday
+        if (dayData.day === 'Thursday' && dayMeals.some((meal: any) => meal.name && meal.name.includes('EMPANADA'))) {
+          console.log(`❌ BUG: EMPANADA should NOT appear on Thursday ${dayData.date}`);
+          console.log(`  Debugging why it's matching Thursday...`);
           
-          // Check each meal individually
           storedMeals.forEach((meal: any) => {
             if (meal.name && meal.name.includes('EMPANADA')) {
+              // Test each matching condition individually
               const exactMatch = meal.date === dayData.date;
-              const hasTimestamp = meal.date && meal.date.includes('T');
-              const timestampMatch = hasTimestamp ? meal.date.split('T')[0] === dayData.date : false;
-              const wouldMatch = exactMatch || timestampMatch;
+              const timestampMatch = meal.date && meal.date.includes('T') && meal.date.split('T')[0] === dayData.date;
               
-              console.log(`    EMPANADA: "${meal.date}" vs "${dayData.date}"`);
-              console.log(`      Exact match: ${exactMatch}`);
-              console.log(`      Has timestamp: ${hasTimestamp}`);
-              console.log(`      Timestamp match: ${timestampMatch}`);
-              console.log(`      Would match: ${wouldMatch}`);
-              
-              if (hasTimestamp) {
-                const dateOnly = meal.date.split('T')[0];
-                console.log(`      Extracted date: "${dateOnly}"`);
-                console.log(`      Comparison: "${dateOnly}" === "${dayData.date}" = ${dateOnly === dayData.date}`);
+              // Test date override logic
+              const dateOverride = getDateOverride();
+              let overrideMatch = false;
+              if (dateOverride && dateOverride.dayOffset) {
+                try {
+                  const dayDateObj = new Date(dayData.date + 'T12:00:00');
+                  const originalDayDate = new Date(dayDateObj.getTime() - (dateOverride.dayOffset * 24 * 60 * 60 * 1000));
+                  const originalDayDateKey = originalDayDate.toISOString().split('T')[0];
+                  overrideMatch = meal.date === originalDayDateKey;
+                } catch {
+                  // Skip invalid dates
+                }
               }
+              
+              // Test secondary date matching
+              let secondaryMatch = false;
+              try {
+                const mealDate = new Date(meal.date);
+                const dayDate = new Date(dayData.date);
+                secondaryMatch = mealDate.toDateString() === dayDate.toDateString();
+              } catch {
+                // Skip invalid dates
+              }
+              
+              console.log(`    EMPANADA check: "${meal.date}" vs "${dayData.date}"`);
+              console.log(`      1. Exact match: ${exactMatch}`);
+              console.log(`      2. Timestamp match: ${timestampMatch}`);  
+              console.log(`      3. Override match: ${overrideMatch}`);
+              console.log(`      4. Secondary match: ${secondaryMatch}`);
+              console.log(`      Final result: ${exactMatch || timestampMatch || overrideMatch || secondaryMatch}`);
             }
-          });
-          
-          console.log(`  Final meal count: ${dayMeals.length}`);
-          dayMeals.forEach((meal: any, index: number) => {
-            console.log(`    ${index + 1}. ${meal.name} - ${meal.calories} cal (stored: ${meal.date})`);
           });
         }
         
