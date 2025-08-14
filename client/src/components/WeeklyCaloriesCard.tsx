@@ -12,7 +12,7 @@ import { Calendar, Flame } from 'lucide-react';
 
 import { useCheckAchievements } from '@/hooks/useAchievements';
 import { getWeekDates, getLocalDateKey } from '@/utils/dateUtils';
-import { autoFixMealDatesIfNeeded, checkMealDateMismatches } from '@/utils/mealDateFixer';
+import { checkMealDateMismatches } from '@/utils/mealDateFixer';
 import { debounce, getCachedLocalStorage } from '@/utils/performanceUtils';
 import { getDateOverride, setDateOverride } from '@/utils/timezoneCorrection';
 

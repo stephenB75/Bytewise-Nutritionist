@@ -359,55 +359,21 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         debugTimezoneInfo();
         debugMealDates();
         
-        // Force check and fix meal dates immediately
-
-        const mismatchCheck = checkMealDateMismatches();
-
-        
-        if (mismatchCheck.mismatches.length > 0) {
-          console.log('📅 Fixing meal date mismatches...', mismatchCheck.mismatches);
-          const fixResult = fixMealDateMismatches();
-          if (fixResult.success) {
-            console.log(`✅ Fixed ${fixResult.fixedCount} meal dates`);
-          } else {
-            console.error('❌ Failed to fix meal dates:', fixResult.error);
-          }
-        }
-        
-        // Auto-fix any meal date mismatches on app startup (runs once with caching)
-        const wasFixed = autoFixMealDatesIfNeeded();
-        
-        // Show notification if fixes were applied
-        if (wasFixed) {
-          setTimeout(() => {
-            const { toast } = useToast();
-            toast({
-              title: "📅 Meal Dates Corrected",
-              description: "Fixed meal entries that were on the wrong day.",
-              duration: 4000,
-            });
-          }, 1000);
-        }
+        // DISABLED: Automatic meal date fixing to prevent meals moving between days
         // Use cached localStorage for better performance
         const stored = getCachedLocalStorage('weeklyMeals', 5000) || [];
         
-        // Apply same date correction logic as WeeklyCaloriesCard for consistency
-        const systemToday = getLocalDateKey();
-        const userExpectedToday = '2025-08-14'; // User expects Wednesday to be Aug 14th
-        const correctedToday = systemToday !== userExpectedToday ? userExpectedToday : systemToday;
+        // Simple date matching - use today's actual date without correction
+        const today = getLocalDateKey();
         
-        // Enhanced filtering with timestamp parsing and date correction (same logic as WeeklyCaloriesCard)
+        // Filter meals for today using simple date matching
         const todayMeals = stored.filter((meal: any) => {
-          // Direct exact match with corrected date
-          if (meal.date === correctedToday) return true;
+          // Handle timestamp format dates
+          const mealDate = meal.date && meal.date.includes('T') 
+            ? meal.date.split('T')[0] 
+            : meal.date;
           
-          // Timestamp parsing for ISO format dates like "2025-08-13T23:11:05.184Z"
-          if (meal.date && meal.date.includes('T')) {
-            const extractedDate = meal.date.split('T')[0];
-            return extractedDate === correctedToday;
-          }
-          
-          return false;
+          return mealDate === today;
         });
         
 
