@@ -553,7 +553,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   // Get animation direction based on tab transition
   const getAnimationDirection = (currentTab: string, prevTab: string) => {
-    const tabOrder = ['home', 'nutrition', 'daily', 'profile', 'search', 'tracking', 'achievements', 'data'];
+    const tabOrder = ['home', 'nutrition', 'fasting', 'daily', 'profile', 'search', 'tracking', 'achievements', 'data'];
     const currentIndex = tabOrder.indexOf(currentTab);
     const prevIndex = tabOrder.indexOf(prevTab);
     
