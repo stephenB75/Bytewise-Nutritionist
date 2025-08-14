@@ -33,12 +33,14 @@ export function WeeklyCaloriesCard() {
 
   // Handle date override changes
   const handleFixDateAlignment = () => {
+    // Clear any active override since user wants Wednesday = Aug 13th (system default)
     if (dateOverride) {
       clearDateOverride();
       setDateOverrideState(null);
+      console.log('✅ Cleared date override - Wednesday should now be Aug 13th');
     } else {
-      fixDateBackOneDay();
-      setDateOverrideState(getDateOverride());
+      // User wants system default behavior
+      console.log('ℹ️ No date override needed - system shows Wednesday as Aug 13th');
     }
     // Force refresh of weekly data
     setTimeout(() => {
@@ -71,13 +73,12 @@ export function WeeklyCaloriesCard() {
     
     // Auto-detection hint for misalignment
     const systemToday = getLocalDateKey();
-    const userExpectedToday = '2025-08-12'; // Based on debug logs showing user expects Wednesday 8/12
+    const userExpectedToday = '2025-08-13'; // User wants Wednesday to be Aug 13th
     if (systemToday !== userExpectedToday && !getDateOverride()) {
       console.log('🔧 TIMEZONE MISALIGNMENT DETECTED:');
       console.log(`   System calculates today as: ${systemToday}`);
       console.log(`   User expects today to be: ${userExpectedToday}`);
-      console.log('   💡 To fix this, you can run: fixDateBackOneDay() in console');
-      console.log('   💡 Or click the "Fix Date Alignment" button in the app');
+      console.log('   💡 System appears to be showing correct dates');
     }
     console.log('========================');
 
@@ -209,20 +210,22 @@ export function WeeklyCaloriesCard() {
             <h4 className="text-lg font-semibold text-white">Weekly Summary</h4>
             {dateOverride && (
               <Badge className="bg-orange-600 text-white text-xs">
-                Date Adjusted {dateOverride.dayOffset > 0 ? '+' : ''}{dateOverride.dayOffset}d
+                Date Override Active
               </Badge>
             )}
           </div>
           <div className="flex items-center gap-2">
-            <Button
-              onClick={handleFixDateAlignment}
-              size="sm"
-              variant={dateOverride ? "destructive" : "secondary"}
-              className="text-xs h-6 px-2"
-            >
-              <Settings className="w-3 h-3 mr-1" />
-              {dateOverride ? 'Reset Dates' : 'Fix Dates'}
-            </Button>
+            {dateOverride && (
+              <Button
+                onClick={handleFixDateAlignment}
+                size="sm"
+                variant="destructive"
+                className="text-xs h-6 px-2"
+              >
+                <Settings className="w-3 h-3 mr-1" />
+                Clear Override
+              </Button>
+            )}
             <Badge className="bg-blue-600 text-white">
               <Flame className="w-3 h-3 mr-1" />
               {totalWeeklyCalories} cal total
