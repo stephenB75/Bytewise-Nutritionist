@@ -139,7 +139,27 @@ export function WeeklyCaloriesCard() {
         
         const dayCalories = dayMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
         
-        // Clean: Timestamp parsing fix applied successfully
+        // Debug: Check if EMPANADA appears on wrong days
+        if (dayMeals.some((meal: any) => meal.name && meal.name.includes('EMPANADA'))) {
+          console.log(`🍽️ EMPANADA found on ${dayData.day} ${dayData.date}:`);
+          dayMeals.forEach((meal: any) => {
+            if (meal.name && meal.name.includes('EMPANADA')) {
+              console.log(`  - ${meal.name} (stored: ${meal.date})`);
+              
+              // Should this meal be on Wednesday?
+              const expectedDate = '2025-08-13';
+              const mealDateOnly = meal.date.includes('T') ? meal.date.split('T')[0] : meal.date;
+              const shouldBeOnWednesday = mealDateOnly === expectedDate;
+              const isCurrentlyOnWednesday = dayData.date === expectedDate;
+              
+              console.log(`    Expected on: Wednesday (${expectedDate})`);
+              console.log(`    Currently on: ${dayData.day} (${dayData.date})`);
+              console.log(`    Should be Wed: ${shouldBeOnWednesday}`);
+              console.log(`    Is on Wed: ${isCurrentlyOnWednesday}`);
+              console.log(`    CORRECT: ${shouldBeOnWednesday === isCurrentlyOnWednesday}`);
+            }
+          });
+        }
         
         return {
           ...dayData,
