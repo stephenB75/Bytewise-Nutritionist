@@ -103,22 +103,22 @@ export function WeeklyCaloriesCard() {
         localStorage.setItem('weeklyMeals', JSON.stringify(storedMeals));
       }
       
-      // Calculate calories for each day of the week with enhanced date matching
+      // Calculate calories for each day of the week with fixed date matching
       const weeklyData = weekDates.map(dayData => {
-        // Enhanced filtering to catch potential date format mismatches
+        // Fixed filtering to prevent duplicate matches
         const dayMeals = storedMeals.filter((meal: any) => {
           if (!meal.date) return false;
           
-          // Primary match: exact date string match
+          // Strategy 1: Exact date string match (highest priority)
           if (meal.date === dayData.date) return true;
           
-          // Handle timestamp format dates (e.g., "2025-08-13T23:11:05.184Z")
-          if (meal.date && meal.date.includes('T')) {
+          // Strategy 2: Handle timestamp format dates (e.g., "2025-08-13T23:11:05.184Z")
+          if (meal.date.includes('T')) {
             const mealDateOnly = meal.date.split('T')[0]; // Extract just the date part
-            if (mealDateOnly === dayData.date) return true;
+            return mealDateOnly === dayData.date;
           }
           
-          // Enhanced matching: check if stored meal should appear on this adjusted day
+          // Strategy 3: Date override matching (only if no exact match found)
           const dateOverride = getDateOverride();
           if (dateOverride && dateOverride.dayOffset) {
             try {
@@ -128,22 +128,19 @@ export function WeeklyCaloriesCard() {
               const originalDayDateKey = originalDayDate.toISOString().split('T')[0];
               
               // If meal was stored on the original date, show it on the adjusted day
-              if (meal.date === originalDayDateKey) return true;
-            } catch {
-              // Skip invalid dates
-            }
-          }
-          
-          // Secondary match: only for non-timestamp dates to avoid timezone confusion
-          // Skip secondary matching for timestamps (they should use timestamp matching above)
-          if (!meal.date.includes('T')) {
-            try {
-              const mealDate = new Date(meal.date);
-              const dayDate = new Date(dayData.date);
-              return mealDate.toDateString() === dayDate.toDateString();
+              return meal.date === originalDayDateKey;
             } catch {
               return false;
             }
+          }
+          
+          // Strategy 4: Fallback date comparison (only for simple date strings)
+          try {
+            const mealDate = new Date(meal.date + 'T12:00:00'); // Add time to prevent timezone issues
+            const dayDate = new Date(dayData.date + 'T12:00:00');
+            return mealDate.toDateString() === dayDate.toDateString();
+          } catch {
+            return false;
           }
         });
         
