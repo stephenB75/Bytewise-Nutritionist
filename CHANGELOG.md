@@ -1,5 +1,42 @@
 # Bytewise Nutritionist Changelog
 
+## Version 1.3.3 (August 14, 2025) - Complete Metrics Synchronization
+
+### 🎯 Major Achievement: Daily View Metrics Synchronization
+- **Daily Calories Card Fix**: Now displays correct calorie totals from logged meals using corrected date logic
+- **Logged Today Section Fix**: Shows all meals logged today with proper date filtering
+- **Cross-Component Sync**: Perfect alignment between dashboard daily cards, food log section, and weekly summary
+- **Event Handler Updates**: Meal deletion and refresh events now use consistent corrected date logic
+
+### 🔧 Technical Implementation
+- **Universal Date Correction**: Applied WeeklyCaloriesCard's corrected date logic to all daily view components
+- **Consistent Date Filtering**: All components now look for meals on user's expected date (Aug 14th) instead of system date (Aug 15th)
+- **Enhanced Event Listeners**: Meal logging events now refresh all components with synchronized data
+- **Robust Deletion Handlers**: Meal removal properly updates all metrics cards with corrected date filtering
+
+### 🚀 Production Impact
+- **Complete Metrics Alignment**: Daily and weekly views now show identical data for the same time periods
+- **Real-time Updates**: All cards instantly reflect new meal entries and deletions
+- **Timezone Consistency**: User's expected dates maintained across all app sections
+- **Debug Logs Removed**: Clean production console output without development debugging
+
+---
+
+## Version 1.3.2 (August 14, 2025) - Enhanced Navigation & Production Cleanup
+
+### 🎯 Hero Component Scroll Reset Enhancement
+- **Hero-Targeted Navigation**: Redesigned scroll reset to specifically target hero components instead of generic top-of-page scrolling
+- **Multi-Layer Reliability**: Progressive scroll attempts with different timing (immediate, 0ms, 10ms, 50ms, RAF) for cross-device consistency
+- **Advanced Scroll Logic**: Enhanced `scrollToHero()` function with multiple DOM selectors and fallback mechanisms
+- **Smooth Scrolling Management**: Temporarily disables CSS smooth scrolling during navigation, then restores for seamless experience
+
+### 🔧 Weekly Summary & Fasting Fixes
+- **Enhanced Timestamp Parsing**: Fixed meal matching logic to properly handle ISO timestamp formats
+- **Timezone Alignment**: Meals now appear on correct calendar days in weekly summary without duplicates
+- **Fasting Animation Integration**: Added 'fasting' to tab order array for proper directional slide animations
+
+---
+
 ## Version 1.3.1 (August 13, 2025) - Navigation Scroll Reset Implementation
 
 ### 🔧 Navigation UX Enhancement
