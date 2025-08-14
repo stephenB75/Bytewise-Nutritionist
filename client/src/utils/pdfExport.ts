@@ -488,10 +488,10 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     yPosition += 15;
 
     // Filter out days with no meals for cleaner display
-    const daysWithMeals = progressData.dailyBreakdown.filter(day => day.mealsCount > 0);
+    const filteredDays = progressData.dailyBreakdown.filter(day => day.mealsCount > 0);
     
-    if (daysWithMeals.length > 0) {
-      daysWithMeals.forEach((day, idx) => {
+    if (filteredDays.length > 0) {
+      filteredDays.forEach((day, idx) => {
         // Check if we need a new page
         if (yPosition > 270) {
           pdf.addPage();
