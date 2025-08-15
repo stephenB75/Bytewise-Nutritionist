@@ -113,6 +113,15 @@ Preferred communication style: Simple, everyday language.
     - Manual "Take App Tour" button in profile settings
     - Tour covers: food search, navigation, profile, daily tracking, fasting, achievements
     - Tour completion stored in localStorage to prevent repeated shows
+    - **Enhanced mobile responsiveness for tour popups (August 15, 2025)**:
+      - Dynamic tooltip sizing: 280px on small mobile, 320px on regular mobile, 320px on desktop
+      - Smart positioning: Converts left/right positions to top/bottom on mobile for better visibility
+      - Enhanced viewport constraints with proper margins for mobile screens
+      - Mobile touch optimizations with `touch-manipulation` class and larger touch targets
+      - Responsive text sizes and padding that scale down appropriately on mobile
+      - Darker overlay (70% opacity) ensures tour popups stand out against app content
+      - Scrollable content handling with max-height constraints for tall tooltip content
+      - Improved button layouts that adapt to screen size with truncated text when needed
 
 ## System Architecture
 

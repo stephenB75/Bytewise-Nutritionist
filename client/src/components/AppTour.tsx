@@ -150,16 +150,30 @@ export function AppTour({ isOpen, onClose, onComplete }: AppTourProps) {
   const step = getCurrentStepData();
   if (!step) return null;
 
-  // Calculate tooltip position
+  // Calculate tooltip position - mobile responsive
   const getTooltipPosition = () => {
-    const tooltipWidth = 320;
-    const tooltipHeight = 200;
-    const padding = 20;
+    const isMobile = window.innerWidth < 768;
+    const isSmallMobile = window.innerWidth < 400;
+    
+    // Dynamic sizing based on screen size
+    const tooltipWidth = isSmallMobile ? Math.min(280, window.innerWidth - 32) : 
+                       isMobile ? Math.min(320, window.innerWidth - 40) : 320;
+    const tooltipHeight = isMobile ? 180 : 200;
+    const padding = isMobile ? 12 : 20;
     
     let top = 0;
     let left = 0;
     
-    switch (step.position) {
+    // On mobile, prefer bottom or top positioning for better visibility
+    let preferredPosition = step.position;
+    if (isMobile && (step.position === 'left' || step.position === 'right')) {
+      // Check if there's more space above or below
+      const spaceAbove = highlightPosition.top;
+      const spaceBelow = window.innerHeight - (highlightPosition.top + highlightPosition.height);
+      preferredPosition = spaceBelow > spaceAbove ? 'bottom' : 'top';
+    }
+    
+    switch (preferredPosition) {
       case 'top':
         top = highlightPosition.top - tooltipHeight - padding;
         left = highlightPosition.left + (highlightPosition.width / 2) - (tooltipWidth / 2);
@@ -178,22 +192,28 @@ export function AppTour({ isOpen, onClose, onComplete }: AppTourProps) {
         break;
     }
 
-    // Keep tooltip within viewport
-    const maxTop = window.innerHeight - tooltipHeight - 20;
-    const maxLeft = window.innerWidth - tooltipWidth - 20;
+    // Enhanced viewport constraints for mobile
+    const margin = isMobile ? 16 : 20;
+    const maxTop = window.innerHeight - tooltipHeight - margin;
+    const maxLeft = window.innerWidth - tooltipWidth - margin;
     
-    top = Math.max(20, Math.min(top, maxTop));
-    left = Math.max(20, Math.min(left, maxLeft));
+    top = Math.max(margin, Math.min(top, maxTop));
+    left = Math.max(margin, Math.min(left, maxLeft));
 
-    return { top, left };
+    // On very small screens, center horizontally if needed
+    if (isSmallMobile && tooltipWidth > window.innerWidth - 32) {
+      left = 16;
+    }
+
+    return { top, left, width: tooltipWidth };
   };
 
   const tooltipPosition = getTooltipPosition();
 
   return (
-    <div className="fixed inset-0 z-[9999]" data-testid="app-tour-overlay">
-      {/* Dark overlay */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+    <div className="fixed inset-0 z-[9999] touch-none" data-testid="app-tour-overlay">
+      {/* Dark overlay - prevents interaction with underlying elements */}
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
       
       {/* Highlight circle/rectangle */}
       {targetElement && (
@@ -206,27 +226,30 @@ export function AppTour({ isOpen, onClose, onComplete }: AppTourProps) {
             height: highlightPosition.height,
           }}
         >
-          <div className="w-full h-full rounded-lg border-4 border-blue-500 shadow-[0_0_0_9999px_rgba(0,0,0,0.6)] animate-pulse bg-white/10" />
+          <div className="w-full h-full rounded-lg border-4 border-blue-500 shadow-[0_0_0_9999px_rgba(0,0,0,0.7)] animate-pulse bg-white/10" />
           {/* Pulsing highlight effect */}
           <div className="absolute inset-0 rounded-lg border-2 border-blue-400 animate-ping opacity-75" />
         </div>
       )}
 
-      {/* Tour tooltip */}
+      {/* Tour tooltip - mobile responsive */}
       <Card
-        className="absolute w-80 bg-white dark:bg-gray-800 border-2 border-blue-200 dark:border-blue-700 shadow-2xl"
+        className="absolute bg-white dark:bg-gray-800 border-2 border-blue-200 dark:border-blue-700 shadow-2xl max-w-sm sm:max-w-md md:max-w-lg"
         style={{
           top: tooltipPosition.top,
           left: tooltipPosition.left,
+          width: tooltipPosition.width,
+          maxHeight: 'calc(100vh - 40px)',
+          overflow: 'auto'
         }}
         data-testid="tour-tooltip"
       >
-        <CardContent className="p-6">
+        <CardContent className="p-4 sm:p-6">
           {/* Header */}
-          <div className="flex items-start justify-between mb-4">
+          <div className="flex items-start justify-between mb-3 sm:mb-4">
             <div className="flex items-center gap-2">
-              <MapPin className="w-5 h-5 text-blue-500" />
-              <span className="text-sm text-gray-500 dark:text-gray-400">
+              <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500 flex-shrink-0" />
+              <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                 Step {currentStep + 1} of {TOUR_STEPS.length}
               </span>
             </div>
@@ -234,7 +257,7 @@ export function AppTour({ isOpen, onClose, onComplete }: AppTourProps) {
               variant="ghost"
               size="sm"
               onClick={handleSkip}
-              className="h-8 w-8 p-0"
+              className="h-8 w-8 sm:h-9 sm:w-9 p-0 flex-shrink-0 touch-manipulation"
               data-testid="tour-skip-button"
             >
               <X className="w-4 h-4" />
@@ -242,15 +265,15 @@ export function AppTour({ isOpen, onClose, onComplete }: AppTourProps) {
           </div>
 
           {/* Content */}
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
+          <div className="mb-4 sm:mb-6">
+            <h3 className="text-base sm:text-lg font-semibold mb-2 text-gray-900 dark:text-white leading-snug">
               {step.title}
             </h3>
-            <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed mb-3">
+            <p className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm leading-relaxed mb-3">
               {step.description}
             </p>
             {step.action && (
-              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 border border-blue-200 dark:border-blue-700">
+              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-2 sm:p-3 border border-blue-200 dark:border-blue-700">
                 <p className="text-blue-700 dark:text-blue-300 text-xs font-medium">
                   💡 {step.action}
                 </p>
@@ -259,7 +282,7 @@ export function AppTour({ isOpen, onClose, onComplete }: AppTourProps) {
           </div>
 
           {/* Navigation */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-3">
             <div className="flex gap-1">
               {TOUR_STEPS.map((_, index) => (
                 <div
@@ -275,26 +298,28 @@ export function AppTour({ isOpen, onClose, onComplete }: AppTourProps) {
               ))}
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-shrink-0">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handlePrevious}
                 disabled={isFirstStep}
-                className="h-9 px-3"
+                className="h-9 px-2 sm:px-3 text-xs sm:text-sm touch-manipulation"
                 data-testid="tour-previous-button"
               >
-                <ArrowLeft className="w-4 h-4 mr-1" />
-                Back
+                <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                <span className="hidden sm:inline">Back</span>
               </Button>
               <Button
                 onClick={handleNext}
                 size="sm"
-                className="h-9 px-4 bg-blue-500 hover:bg-blue-600 text-white"
+                className="h-9 px-3 sm:px-4 bg-blue-500 hover:bg-blue-600 text-white text-xs sm:text-sm touch-manipulation"
                 data-testid="tour-next-button"
               >
-                {isLastStep ? 'Complete Tour' : 'Next'}
-                {!isLastStep && <ArrowRight className="w-4 h-4 ml-1" />}
+                <span className="truncate">
+                  {isLastStep ? 'Complete' : 'Next'}
+                </span>
+                {!isLastStep && <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 ml-1" />}
               </Button>
             </div>
           </div>
