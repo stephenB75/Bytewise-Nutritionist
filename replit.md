@@ -21,11 +21,17 @@ Preferred communication style: Simple, everyday language.
     - Consolidated redundant code and improved code structure
     - Removed commented-out code and debugging comments
     - System remains 100% operational after all optimizations
-- Fixed authentication system (August 15, 2025)
+- **Enhanced authentication system with OAuth support (August 15, 2025)**
   - Resolved sign in/sign up button functionality issues
   - Added clear password requirements display
   - Improved error messaging for authentication failures
   - Removed redundant email verification button for cleaner UX
+  - **Added Google and GitHub OAuth authentication**:
+    - Implemented proper Supabase OAuth flow using signInWithOAuth
+    - Added loading states and error handling for OAuth buttons
+    - Created OAuth callback handling with session management
+    - Enhanced auth state management to handle OAuth redirects
+    - Added proper disabled states during authentication flow
 - Enhanced candy nutrition system (August 15, 2025)
   - Integrated FoodStruct.com detailed nutrition data with USDA database
   - Added comprehensive candy nutrition database with 10 candy types
@@ -45,7 +51,7 @@ The server architecture follows a Node.js/Express pattern with TypeScript, desig
 The application uses PostgreSQL as the primary database with Drizzle ORM for type-safe operations. The schema includes tables for users, foods, meals, recipes, achievements, and tracking data. PostgreSQL is chosen for its robustness and JSON field support, while Drizzle ORM provides type-safe SQL. Neon Database is utilized for cloud-hosted PostgreSQL with HTTP-based connections, and client-side local storage is used for caching.
 
 ### Authentication and Authorization
-Authentication is handled through Supabase Auth, utilizing JWT token-based session management. The system supports email/password authentication with required email verification. Security implementation includes Supabase for user management, server-side JWT token verification for protected routes, secure session management, and email verification for account activation.
+Authentication is handled through Supabase Auth, utilizing JWT token-based session management. The system supports multiple authentication methods including email/password authentication with required email verification, and OAuth providers (Google and GitHub). Security implementation includes Supabase for user management, server-side JWT token verification for protected routes, secure session management, email verification for account activation, and OAuth redirect handling with proper state management.
 
 ### UI/UX Decisions
 The application employs a mobile-first responsive design. Tailwind CSS and shadcn/ui are used for a consistent and modern aesthetic. Key UI/UX features include a professional PDF viewer modal with inline preview, multi-method download options for reports, and an enhanced hero component scroll reset system for smooth navigation. The application aims for intuitive user flows and a visually appealing interface.

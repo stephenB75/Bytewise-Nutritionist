@@ -186,12 +186,82 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
     }
   };
 
-  const handleGoogleSignIn = () => {
-    window.location.href = '/api/auth/google';
+  const handleGoogleSignIn = async () => {
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+        },
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      // OAuth will redirect automatically, so we don't need to do anything else here
+      toast({
+        title: "Redirecting to Google",
+        description: "You'll be redirected to Google to complete sign-in.",
+      });
+    } catch (error: any) {
+      setLoading(false);
+      let errorMessage = error.message;
+      
+      if (error.message.includes('fetch')) {
+        errorMessage = 'Unable to connect to Google authentication. Please try again.';
+      } else if (error.message.includes('oauth')) {
+        errorMessage = 'Google authentication is not properly configured. Please contact support.';
+      }
+      
+      toast({
+        title: "Google Sign-In Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleGitHubSignIn = () => {
-    window.location.href = '/api/auth/github';
+  const handleGitHubSignIn = async () => {
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'github',
+        options: {
+          redirectTo: `${window.location.origin}`,
+        },
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      // OAuth will redirect automatically, so we don't need to do anything else here
+      toast({
+        title: "Redirecting to GitHub",
+        description: "You'll be redirected to GitHub to complete sign-in.",
+      });
+    } catch (error: any) {
+      setLoading(false);
+      let errorMessage = error.message;
+      
+      if (error.message.includes('fetch')) {
+        errorMessage = 'Unable to connect to GitHub authentication. Please try again.';
+      } else if (error.message.includes('oauth')) {
+        errorMessage = 'GitHub authentication is not properly configured. Please contact support.';
+      }
+      
+      toast({
+        title: "GitHub Sign-In Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    }
   };
 
   const handlePasswordReset = async (e: React.FormEvent) => {
@@ -419,9 +489,15 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
                 type="button"
                 variant="outline"
                 onClick={handleGoogleSignIn}
-                className="flex items-center justify-center py-2 px-4 border border-white/20 bg-white/5 text-sm font-medium text-gray-300 hover:bg-white/10"
+                disabled={loading}
+                className="flex items-center justify-center py-2 px-4 border border-white/20 bg-white/5 text-sm font-medium text-gray-300 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                data-testid="button-google-signin"
               >
-                <Chrome className="w-4 h-4 mr-2" />
+                {loading ? (
+                  <div className="w-4 h-4 border-2 border-gray-300/30 border-t-gray-300 rounded-full animate-spin mr-2" />
+                ) : (
+                  <Chrome className="w-4 h-4 mr-2" />
+                )}
                 Google
               </Button>
               
@@ -429,9 +505,15 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
                 type="button"
                 variant="outline"
                 onClick={handleGitHubSignIn}
-                className="flex items-center justify-center py-2 px-4 border border-white/20 bg-white/5 text-sm font-medium text-gray-300 hover:bg-white/10"
+                disabled={loading}
+                className="flex items-center justify-center py-2 px-4 border border-white/20 bg-white/5 text-sm font-medium text-gray-300 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                data-testid="button-github-signin"
               >
-                <Github className="w-4 h-4 mr-2" />
+                {loading ? (
+                  <div className="w-4 h-4 border-2 border-gray-300/30 border-t-gray-300 rounded-full animate-spin mr-2" />
+                ) : (
+                  <Github className="w-4 h-4 mr-2" />
+                )}
                 GitHub
               </Button>
             </div>
