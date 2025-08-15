@@ -1910,7 +1910,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     <div className="flex items-start space-x-4 flex-1 min-w-0">
                       <div className="relative flex-shrink-0">
                         <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                          <span className="text-2xl">👤</span>
+                          <span className="text-2xl">😊</span>
                         </div>
                         <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-black flex items-center justify-center">
                           <CheckCircle2 className="w-2.5 h-2.5 text-white" />
