@@ -1909,26 +1909,23 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   <div className="flex items-start justify-between w-full pr-4">
                     <div className="flex items-start space-x-4 flex-1 min-w-0">
                       <div className="relative flex-shrink-0">
-                        <div className="w-16 h-16 rounded-full overflow-hidden flex items-center justify-center">
-                          <svg viewBox="0 0 100 100" className="w-full h-full">
-                            {/* Background circle */}
-                            <circle cx="50" cy="50" r="50" fill="#4F46E5" />
+                        <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{backgroundColor: '#4F46E5'}}>
+                          <svg viewBox="0 0 80 80" className="w-full h-full">
+                            {/* Body */}
+                            <rect x="20" y="55" width="40" height="25" rx="20" fill="#059669" />
                             
-                            {/* Face */}
-                            <circle cx="50" cy="45" r="18" fill="#FCD34D" />
+                            {/* Head */}
+                            <circle cx="40" cy="35" r="18" fill="#FEF3C7" />
                             
                             {/* Hair */}
-                            <path d="M32 35 Q32 25, 42 25 Q50 20, 58 25 Q68 25, 68 35 Q68 40, 62 42 Q38 42, 32 35 Z" fill="#8B4513" />
+                            <ellipse cx="40" cy="22" rx="20" ry="15" fill="#92400E" />
                             
                             {/* Eyes */}
-                            <circle cx="44" cy="42" r="2" fill="#1F2937" />
-                            <circle cx="56" cy="42" r="2" fill="#1F2937" />
+                            <circle cx="34" cy="32" r="1.5" fill="#374151" />
+                            <circle cx="46" cy="32" r="1.5" fill="#374151" />
                             
-                            {/* Smile */}
-                            <path d="M42 50 Q50 56, 58 50" stroke="#1F2937" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-                            
-                            {/* Body/Shirt */}
-                            <ellipse cx="50" cy="75" rx="20" ry="15" fill="#10B981" />
+                            {/* Mouth */}
+                            <ellipse cx="40" cy="40" rx="3" ry="1.5" fill="#374151" />
                           </svg>
                         </div>
                         <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-black flex items-center justify-center">
