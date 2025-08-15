@@ -146,6 +146,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
             displaySettings: null,
           };
           
+          // Important: Create the user in local database so future updates work
+          try {
+            console.log('💾 Creating user in local database from Supabase data...');
+            await storage.upsertUser({
+              id: userData.id,
+              email: userData.email,
+              firstName: userData.firstName || '',
+              lastName: userData.lastName || '',
+              emailVerified: userData.emailVerified,
+              profileIcon: userData.profileIcon
+            });
+            console.log('✅ User created/updated in local database');
+          } catch (dbError) {
+            console.log('⚠️ Failed to create user in local database:', dbError);
+            // Continue anyway - we can still return the Supabase data
+          }
+          
           console.log('✅ Returning Supabase user data to frontend');
           res.json(userData);
           return;
@@ -183,6 +200,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
             notificationSettings: null,
             displaySettings: null,
           };
+          
+          // Important: Create the user in local database so future updates work
+          try {
+            console.log('💾 Creating user in local database from Supabase data (fallback)...');
+            await storage.upsertUser({
+              id: userData.id,
+              email: userData.email,
+              firstName: userData.firstName || '',
+              lastName: userData.lastName || '',
+              emailVerified: userData.emailVerified,
+              profileIcon: userData.profileIcon
+            });
+            console.log('✅ User created/updated in local database (fallback)');
+          } catch (dbError) {
+            console.log('⚠️ Failed to create user in local database (fallback):', dbError);
+          }
+          
           res.json(userData);
           return;
         }
