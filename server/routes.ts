@@ -1065,8 +1065,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
           nutrients: food.foodNutrients?.slice(0, 10) || [] // Return limited nutrients
         }))
       });
-    } catch (error) {
-      res.status(500).json({ message: "Failed to search foods" });
+    } catch (error: any) {
+      console.error('Food search API error:', error);
+      res.status(500).json({ 
+        message: "Failed to search foods",
+        error: error.message || 'Unknown error'
+      });
+    }
+  });
+
+  // Alternative endpoint for calculator (for compatibility)
+  app.post('/api/foods/calculate', async (req, res) => {
+    try {
+      const { ingredients } = req.body;
+      
+      if (!ingredients) {
+        return res.status(400).json({ 
+          error: 'Missing required field: ingredients' 
+        });
+      }
+      
+      // Use USDA service for calculation
+      const result = await usdaService.calculateIngredientCalories(ingredients, '1 serving');
+      
+      res.json({ result });
+    } catch (error: any) {
+      console.error('Calculator API error:', error);
+      res.status(500).json({ 
+        error: 'Failed to calculate calories',
+        message: error?.message || 'Unknown error occurred'
+      });
     }
   });
 

@@ -73,11 +73,21 @@ interface MeasurementConversion {
 export class USDAService {
   private apiKey: string;
   private baseUrl = 'https://api.nal.usda.gov/fdc/v1';
+
   // In-memory LRU cache for performance optimization
   private memoryCache: Map<string, { data: any; timestamp: number; accessCount: number }> = new Map();
   private cacheMaxSize = 2000; // Increased cache size for more foods
   private cacheExpiryTime = 7200000; // Extended to 2 hours for better performance
   private popularFoodsCache: Map<string, number> = new Map(); // Track popular foods for priority caching
+
+  constructor() {
+    this.apiKey = process.env.USDA_API_KEY || 'DEMO_KEY';
+    if (this.apiKey === 'DEMO_KEY') {
+      console.warn('⚠️  Using DEMO_KEY for USDA API - limited requests available');
+    }
+    // Pre-warm cache with most popular foods on startup
+    this.preWarmCache();
+  }
 
   /**
    * Get data from optimized memory cache with LRU eviction and popularity tracking
@@ -137,12 +147,6 @@ export class USDAService {
     if (!this.popularFoodsCache.has(key)) {
       this.popularFoodsCache.set(key, 1);
     }
-  }
-
-  constructor(apiKey: string) {
-    this.apiKey = apiKey;
-    // Pre-warm cache with most popular foods on startup
-    this.preWarmCache();
   }
   
   /**
@@ -333,16 +337,41 @@ export class USDAService {
    */
   async searchFoods(query: string, pageSize = 25): Promise<USDAFood[]> {
     try {
+      // Check if this is a candy-related query first
+      if (this.isCandyRelated(query)) {
+        const candyResults = this.enhanceWithCandyData([], query);
+        if (candyResults.length > 0) {
+          return candyResults;
+        }
+      }
+
       // First check local cache
       const cachedResults = await this.searchCachedFoodsInternal(query, pageSize);
       if (cachedResults.length > 0) {
-        return cachedResults.map((food: any) => ({
-          fdcId: food.fdcId,
-          description: food.description,
-          dataType: food.dataType,
-          foodNutrients: JSON.parse(food.nutrients || '[]'),
-          foodCategory: food.foodCategory || undefined
-        }));
+        console.log(`Found ${cachedResults.length} cached results for "${query}"`);
+        return cachedResults.map((food: any) => {
+          let nutrients = [];
+          try {
+            if (typeof food.nutrients === 'string') {
+              nutrients = JSON.parse(food.nutrients || '[]');
+            } else if (Array.isArray(food.nutrients)) {
+              nutrients = food.nutrients;
+            } else if (food.nutrients && typeof food.nutrients === 'object') {
+              nutrients = [food.nutrients];
+            }
+          } catch (parseError) {
+            console.warn('Failed to parse cached nutrients for food:', food.description, parseError);
+            nutrients = [];
+          }
+          
+          return {
+            fdcId: food.fdcId,
+            description: food.description,
+            dataType: food.dataType,
+            foodNutrients: nutrients,
+            foodCategory: food.foodCategory || undefined
+          };
+        });
       }
 
       // Search USDA API
@@ -373,19 +402,56 @@ export class USDAService {
       // Enhance with FoodStruct candy data if applicable
       return this.enhanceWithCandyData(data.foods, query);
     } catch (error) {
+      console.warn('USDA API unavailable, using fallback approach:', error.message);
       
-      // Fallback to cached results only
-      const cachedResults = await this.searchCachedFoodsInternal(query, pageSize);
-      const mappedResults = cachedResults.map((food: any) => ({
-        fdcId: food.fdcId,
-        description: food.description,
-        dataType: food.dataType,
-        foodNutrients: JSON.parse(food.nutrients || '[]'),
-        foodCategory: food.foodCategory || undefined
-      }));
+      // If USDA API fails, try candy enhancement first
+      if (this.isCandyRelated(query)) {
+        const candyResults = this.enhanceWithCandyData([], query);
+        if (candyResults.length > 0) {
+          return candyResults;
+        }
+      }
       
-      // Enhance with FoodStruct candy data even for cached results
-      return this.enhanceWithCandyData(mappedResults, query);
+      // Fallback to cached results
+      try {
+        const cachedResults = await this.searchCachedFoodsInternal(query, pageSize);
+        const mappedResults = cachedResults.map((food: any) => {
+          let nutrients = [];
+          try {
+            if (typeof food.nutrients === 'string') {
+              nutrients = JSON.parse(food.nutrients || '[]');
+            } else if (Array.isArray(food.nutrients)) {
+              nutrients = food.nutrients;
+            } else if (food.nutrients && typeof food.nutrients === 'object') {
+              nutrients = [food.nutrients];
+            }
+          } catch (parseError) {
+            console.warn('Failed to parse nutrients for food:', food.description, parseError);
+            nutrients = [];
+          }
+          
+          return {
+            fdcId: food.fdcId,
+            description: food.description,
+            dataType: food.dataType,
+            foodNutrients: nutrients,
+            foodCategory: food.foodCategory || undefined
+          };
+        });
+        
+        // Enhance with FoodStruct candy data even for cached results
+        return this.enhanceWithCandyData(mappedResults, query);
+      } catch (cacheError) {
+        console.warn('Cache search also failed:', cacheError.message);
+        
+        // Last resort: return enhanced candy data if applicable
+        if (this.isCandyRelated(query)) {
+          return this.enhanceWithCandyData([], query);
+        }
+        
+        // Return empty array if all else fails
+        return [];
+      }
     }
   }
 
