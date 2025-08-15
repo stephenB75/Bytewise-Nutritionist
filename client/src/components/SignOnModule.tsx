@@ -111,6 +111,9 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
     
     try {
       const endpoint = isSignUp ? '/api/auth/signup' : '/api/auth/signin';
+      console.log('🚀 FRONTEND: Starting authentication request to:', endpoint);
+      console.log('🚀 FRONTEND: Request data:', { email: email, isSignUp });
+      
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
@@ -118,6 +121,8 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
         },
         body: JSON.stringify({ email, password }),
       });
+      
+      console.log('🚀 FRONTEND: Raw response received:', response.status, response.statusText);
 
       const data = await response.json();
       
@@ -258,17 +263,21 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
           });
         } else if (errorCode === 'ACCOUNT_NOT_FOUND') {
           // No account found - suggest signing up
-          console.log('🔥 Showing ACCOUNT_NOT_FOUND toast notification');
-          toast({
+          console.log('🔥🔥🔥 SHOWING ACCOUNT_NOT_FOUND TOAST NOTIFICATION 🔥🔥🔥');
+          console.log('🔥 Toast parameters:', { title: "Account Not Found", description: errorMessage + " Would you like to create a new account?", variant: "destructive", duration: 10000 });
+          
+          const toastResult = toast({
             title: "Account Not Found",
             description: errorMessage + " Would you like to create a new account?",
-            variant: "destructive",
+            variant: "destructive", 
             duration: 10000,
           });
-          // Auto-switch to sign-up mode for user convenience
-          console.log('🔄 Will switch to sign-up mode in 2 seconds');
+          
+          console.log('🔥 Toast function result:', toastResult);
+          console.log('🔄 Will switch to sign-up mode in 3 seconds');
+          
           setTimeout(() => {
-            console.log('🔄 Switching to sign-up mode now');
+            console.log('🔄🔄🔄 SWITCHING TO SIGN-UP MODE NOW 🔄🔄🔄');
             setIsSignUp(true);
             setPassword('');
             setPasswordErrors([]);
