@@ -146,10 +146,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
             displaySettings: null,
           };
           
-          // Important: Create the user in local database so future updates work
+          // Important: Create/update user in local database so future updates work
           try {
-            console.log('💾 Creating user in local database from Supabase data...');
-            await storage.upsertUser({
+            console.log('💾 Creating/updating user in local database from Supabase data...');
+            const databaseUser = await storage.upsertUser({
               id: userData.id,
               email: userData.email,
               firstName: userData.firstName || '',
@@ -157,7 +157,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
               emailVerified: userData.emailVerified,
               profileIcon: userData.profileIcon
             });
-            console.log('✅ User created/updated in local database');
+            
+            // CRITICAL: Use the database user's ID, not the Supabase ID
+            userData.id = databaseUser.id;
+            console.log('✅ User created/updated in local database, using database ID:', {
+              databaseId: databaseUser.id?.substring(0, 8) + '...',
+              email: databaseUser.email
+            });
           } catch (dbError) {
             console.log('⚠️ Failed to create user in local database:', dbError);
             // Continue anyway - we can still return the Supabase data
@@ -204,7 +210,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Important: Create the user in local database so future updates work
           try {
             console.log('💾 Creating user in local database from Supabase data (fallback)...');
-            await storage.upsertUser({
+            const databaseUser = await storage.upsertUser({
               id: userData.id,
               email: userData.email,
               firstName: userData.firstName || '',
@@ -212,7 +218,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
               emailVerified: userData.emailVerified,
               profileIcon: userData.profileIcon
             });
-            console.log('✅ User created/updated in local database (fallback)');
+            
+            // CRITICAL: Use the database user's ID, not the Supabase ID  
+            userData.id = databaseUser.id;
+            console.log('✅ User created/updated in local database (fallback), using database ID:', {
+              databaseId: databaseUser.id?.substring(0, 8) + '...',
+              email: databaseUser.email
+            });
           } catch (dbError) {
             console.log('⚠️ Failed to create user in local database (fallback):', dbError);
           }

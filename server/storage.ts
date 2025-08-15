@@ -163,10 +163,10 @@ export class DatabaseStorage implements IStorage {
       });
       
       if (existingUserByEmail.length > 0) {
-        // User exists by email - UPDATE THE ID to match Supabase and update their info
-        console.log('💾 Storage: Found existing user by email, updating ID to match Supabase:', {
+        // User exists by email - keep existing ID but update other fields
+        console.log('💾 Storage: Found existing user by email, keeping existing ID:', {
           existingId: existingUserByEmail[0].id?.substring(0, 8) + '...',
-          newId: userData.id?.substring(0, 8) + '...',
+          supabaseId: userData.id?.substring(0, 8) + '...',
           email: userData.email
         });
         
@@ -174,7 +174,7 @@ export class DatabaseStorage implements IStorage {
           const [updatedUser] = await db
             .update(users)
             .set({
-              id: userData.id, // CRITICAL: Update the ID to match Supabase
+              // DO NOT update ID - keep existing to avoid foreign key violations
               firstName: userData.firstName,
               lastName: userData.lastName,
               emailVerified: true,
@@ -183,8 +183,8 @@ export class DatabaseStorage implements IStorage {
             .where(eq(users.email, userData.email))
             .returning();
             
-          console.log('✅ Storage: User updated by email with new ID successfully:', {
-            newId: updatedUser.id?.substring(0, 8) + '...',
+          console.log('✅ Storage: User updated by email successfully (kept existing ID):', {
+            existingId: updatedUser.id?.substring(0, 8) + '...',
             email: updatedUser.email
           });
           return updatedUser;
