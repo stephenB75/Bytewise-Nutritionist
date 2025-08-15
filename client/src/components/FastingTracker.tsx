@@ -116,6 +116,10 @@ const FASTING_TIPS = [
 const FASTING_SESSION_KEY = 'bytewise_fasting_session';
 const FASTING_ACTIVE_KEY = 'bytewise_fasting_active';
 const FASTING_HISTORY_KEY = 'bytewise_fasting_history';
+const FASTING_MILESTONES_KEY = 'bytewise_fasting_milestones';
+
+// Fasting milestone hours (in hours)
+const MILESTONE_HOURS = [8, 12, 16, 18, 20, 24, 36, 48, 72];
 
 export function FastingTracker() {
   const [selectedPlan, setSelectedPlan] = useState<FastingPlan>(FASTING_PLANS[0]);
@@ -123,6 +127,7 @@ export function FastingTracker() {
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
   const [isActive, setIsActive] = useState(false);
   const [showTips, setShowTips] = useState(true);
+  const [completedMilestones, setCompletedMilestones] = useState<number[]>([]);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -300,6 +305,17 @@ export function FastingTracker() {
             setTimeRemaining(remaining);
             setIsActive(storedActive === 'true');
             
+            // Restore milestone tracking
+            const storedMilestones = localStorage.getItem(FASTING_MILESTONES_KEY);
+            if (storedMilestones) {
+              try {
+                const milestones = JSON.parse(storedMilestones);
+                setCompletedMilestones(milestones);
+              } catch (e) {
+                setCompletedMilestones([]);
+              }
+            }
+            
             // Find and set the corresponding plan
             const plan = FASTING_PLANS.find(p => p.id === session.planId);
             if (plan) {
@@ -309,6 +325,7 @@ export function FastingTracker() {
             // Session has expired, clear it
             localStorage.removeItem(FASTING_SESSION_KEY);
             localStorage.removeItem(FASTING_ACTIVE_KEY);
+            localStorage.removeItem(FASTING_MILESTONES_KEY);
             
             // If there was an id, complete the session
             if (session.id) {
@@ -362,7 +379,113 @@ export function FastingTracker() {
     }
   }, [activeFastingSession, currentSession]);
 
-  // Timer effect with localStorage persistence
+  // Check for milestone achievements
+  const checkMilestones = (elapsed: number, milestones: number[]) => {
+    const elapsedHours = elapsed / (1000 * 60 * 60);
+    
+    MILESTONE_HOURS.forEach(milestoneHour => {
+      // Check if we've reached this milestone and haven't celebrated it yet
+      if (elapsedHours >= milestoneHour && !milestones.includes(milestoneHour)) {
+        // Add to completed milestones
+        const newMilestones = [...milestones, milestoneHour];
+        setCompletedMilestones(newMilestones);
+        localStorage.setItem(FASTING_MILESTONES_KEY, JSON.stringify(newMilestones));
+        
+        // Celebrate the milestone
+        celebrateMilestone(milestoneHour);
+      }
+    });
+  };
+
+  const celebrateMilestone = (hours: number) => {
+    let title = "";
+    let description = "";
+    let celebration = "🎉";
+    
+    switch(hours) {
+      case 8:
+        title = "8-Hour Milestone! ⏰";
+        description = "Great progress! You've completed 8 hours of fasting. Your body is starting to enter a deeper fasted state.";
+        celebration = "⭐";
+        break;
+      case 12:
+        title = "Half-Day Champion! 🌟"; 
+        description = "Incredible! 12 hours down. Your body is now in fat-burning mode and cellular repair is ramping up.";
+        celebration = "🔥";
+        break;
+      case 16:
+        title = "16-Hour Hero! 🏆";
+        description = "Amazing achievement! You've completed the classic 16:8 fast. Maximum autophagy and metabolic benefits unlocked!";
+        celebration = "💪";
+        break;
+      case 18:
+        title = "18-Hour Warrior! ⚔️";
+        description = "Outstanding dedication! 18 hours shows serious commitment. Your mental clarity should be at its peak.";
+        celebration = "🚀";
+        break;
+      case 20:
+        title = "20-Hour Legend! 👑";
+        description = "Exceptional willpower! You've reached the warrior level. Deep ketosis and cellular rejuvenation in full swing.";
+        celebration = "🎯";
+        break;
+      case 24:
+        title = "24-Hour Master! 🌟";
+        description = "Extraordinary accomplishment! A full day of fasting. You've achieved peak autophagy and metabolic flexibility.";
+        celebration = "🏅";
+        break;
+      case 36:
+        title = "36-Hour Champion! 💎";
+        description = "Incredible discipline! Extended fasting for cellular renewal and deep metabolic reset achieved.";
+        celebration = "💫";
+        break;
+      case 48:
+        title = "48-Hour Legend! 🦅";
+        description = "Phenomenal achievement! Two full days show ultimate dedication to health and self-mastery.";
+        celebration = "🔮";
+        break;
+      case 72:
+        title = "72-Hour Master! 🏔️";
+        description = "Ultimate fasting achievement! Three days of discipline unlock maximum health benefits and mental strength.";
+        celebration = "👑";
+        break;
+      default:
+        title = `${hours}-Hour Milestone! ${celebration}`;
+        description = `Fantastic progress! You've completed ${hours} hours of fasting. Keep up the amazing work!`;
+    }
+
+    // Show celebratory toast
+    toast({
+      title,
+      description,
+      duration: 6000,
+    });
+
+    // Trigger celebration event for other components
+    window.dispatchEvent(new CustomEvent('fasting-milestone', {
+      detail: {
+        hours,
+        title,
+        description,
+        celebration
+      }
+    }));
+
+    // Check for achievements
+    fetch('/api/achievements/check', { method: 'POST' })
+      .then(res => res.json())
+      .then(data => {
+        if (data.newAchievements && data.newAchievements.length > 0) {
+          window.dispatchEvent(new CustomEvent('achievement-unlocked', {
+            detail: data.newAchievements[0]
+          }));
+        }
+      })
+      .catch(() => {
+        // Achievement check failed - non-critical
+      });
+  };
+
+  // Timer effect with localStorage persistence and milestone tracking
   useEffect(() => {
     let interval: NodeJS.Timeout;
     
@@ -374,11 +497,26 @@ export function FastingTracker() {
         const elapsed = now - startTime;
         const remaining = currentSession.targetDuration - elapsed;
         
+        // Check for milestone achievements
+        checkMilestones(elapsed, completedMilestones);
+        
         if (remaining <= 0) {
-          // Fast complete
+          // Fast complete - celebrate the final achievement
+          const targetHours = currentSession.targetDuration / (1000 * 60 * 60);
+          if (targetHours >= 8) {
+            toast({
+              title: `${Math.round(targetHours)}-Hour Fast Complete! 🎉`,
+              description: "Congratulations! You've successfully completed your fasting goal. Time to break your fast with a nutritious meal.",
+              duration: 8000,
+            });
+          }
+          
           setTimeRemaining(0);
           localStorage.removeItem(FASTING_SESSION_KEY);
           localStorage.removeItem(FASTING_ACTIVE_KEY);
+          localStorage.removeItem(FASTING_MILESTONES_KEY);
+          setCompletedMilestones([]);
+          
           if (currentSession.id) {
             completeFastingMutation.mutate(currentSession.id);
           }
@@ -389,7 +527,7 @@ export function FastingTracker() {
     }
     
     return () => clearInterval(interval);
-  }, [isActive, currentSession]);
+  }, [isActive, currentSession, completedMilestones]);
 
   const startFasting = () => {
     const targetDuration = selectedPlan.fastingHours * 60 * 60 * 1000; // Convert to milliseconds
@@ -399,6 +537,10 @@ export function FastingTracker() {
       targetDuration,
       status: 'active'
     };
+    
+    // Reset milestone tracking for new session
+    setCompletedMilestones([]);
+    localStorage.removeItem(FASTING_MILESTONES_KEY);
     
     // Store session in localStorage immediately
     localStorage.setItem(FASTING_SESSION_KEY, JSON.stringify(session));
@@ -451,11 +593,13 @@ export function FastingTracker() {
     // Clear localStorage immediately
     localStorage.removeItem(FASTING_SESSION_KEY);
     localStorage.removeItem(FASTING_ACTIVE_KEY);
+    localStorage.removeItem(FASTING_MILESTONES_KEY);
     
     // Reset local state
     setCurrentSession(null);
     setIsActive(false);
     setTimeRemaining(0);
+    setCompletedMilestones([]);
     
     // Complete the session via API if it has an ID
     if (currentSession?.id) {
