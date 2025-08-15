@@ -96,12 +96,34 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
       });
       
       // Create full name from available data
-      const fullName = firstName && lastName ? `${firstName} ${lastName}`.trim() : 
-                       personalInfo?.name || userData?.name || firstName || userData?.email?.split('@')[0] || '';
+      // Check if firstName is actually an email address (common data issue)
+      const isFirstNameEmail = firstName && firstName.includes('@');
+      
+      let fullName = '';
+      if (!isFirstNameEmail && firstName && lastName) {
+        // Normal case: we have proper first and last names
+        fullName = `${firstName} ${lastName}`.trim();
+      } else if (!isFirstNameEmail && firstName) {
+        // We have a proper first name but no last name
+        fullName = firstName.trim();
+      } else {
+        // Fallback logic: try other name sources or use email username
+        fullName = personalInfo?.name || userData?.name || 
+                   (userData?.email ? userData.email.split('@')[0] : '') || '';
+      }
+      
+      console.log('🔍 UserSettingsManager: Name resolution logic:', {
+        originalFirstName: firstName || '(empty)',
+        originalLastName: lastName || '(empty)',
+        isFirstNameEmail: isFirstNameEmail,
+        finalFullName: fullName || '(empty)',
+        fallbackFromEmail: userData?.email ? userData.email.split('@')[0] : 'none'
+      });
       
       const newUserInfo = {
-        firstName,
-        lastName, 
+        // For display purposes, clear email-as-firstname and use proper name logic
+        firstName: isFirstNameEmail ? '' : firstName,
+        lastName: isFirstNameEmail ? '' : lastName, 
         name: fullName,
         email: userData?.email || '',
         phone: personalInfo?.phone || '',
@@ -245,19 +267,29 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
         const refreshedLastName = userData?.lastName || '';
         const refreshedPersonalInfo = userData?.personalInfo || {};
         
-        const refreshedFullName = refreshedFirstName && refreshedLastName ? 
-          `${refreshedFirstName} ${refreshedLastName}`.trim() : 
-          refreshedPersonalInfo?.name || userData?.name || refreshedFirstName || userData?.email?.split('@')[0] || '';
+        // Apply same email-detection logic for refreshed data
+        const isRefreshedFirstNameEmail = refreshedFirstName && refreshedFirstName.includes('@');
+        
+        let refreshedFullName = '';
+        if (!isRefreshedFirstNameEmail && refreshedFirstName && refreshedLastName) {
+          refreshedFullName = `${refreshedFirstName} ${refreshedLastName}`.trim();
+        } else if (!isRefreshedFirstNameEmail && refreshedFirstName) {
+          refreshedFullName = refreshedFirstName.trim();
+        } else {
+          refreshedFullName = refreshedPersonalInfo?.name || userData?.name || 
+                             (userData?.email ? userData.email.split('@')[0] : '') || '';
+        }
         
         console.log('🔄 UserSettingsManager: Force updating form state with fresh data:', {
           refreshedFirstName: refreshedFirstName || '(empty)',
-          refreshedLastName: refreshedLastName || '(empty)',
+          refreshedLastName: refreshedLastName || '(empty)', 
+          isRefreshedFirstNameEmail: isRefreshedFirstNameEmail,
           refreshedFullName: refreshedFullName || '(empty)'
         });
         
         setUserInfo({
-          firstName: refreshedFirstName,
-          lastName: refreshedLastName, 
+          firstName: isRefreshedFirstNameEmail ? '' : refreshedFirstName,
+          lastName: isRefreshedFirstNameEmail ? '' : refreshedLastName, 
           name: refreshedFullName,
           email: userData?.email || '',
           phone: refreshedPersonalInfo?.phone || '',
