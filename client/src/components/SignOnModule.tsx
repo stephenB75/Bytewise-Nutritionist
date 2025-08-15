@@ -73,10 +73,8 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted', { email, password: password ? '***' : '', isSignUp });
     
     if (!email || !password) {
-      console.log('Missing email or password');
       toast({
         title: "Missing Information",
         description: "Please enter both email and password.",
@@ -110,7 +108,6 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
     
     try {
       const endpoint = isSignUp ? '/api/auth/signup' : '/api/auth/signin';
-      console.log('Making request to:', endpoint);
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
@@ -120,7 +117,6 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
       });
 
       const data = await response.json();
-      console.log('Response:', { status: response.status, data });
 
       if (response.ok) {
         // Check if email verification is required
@@ -142,24 +138,32 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
               refresh_token: data.session.refresh_token,
             });
             
-            if (!sessionError) {
-              // Refetch auth state immediately
-              await refetch();
+            if (sessionError) {
+              throw sessionError;
             }
+            
+            // Refetch auth state and wait for completion
+            await refetch();
+            
+            // Additional delay to ensure state propagation
+            await new Promise(resolve => setTimeout(resolve, 200));
+            
+            toast({
+              title: "Welcome back!",
+              description: "You've been signed in successfully.",
+            });
+            
+            // Close the sign-in module
+            if (onClose) {
+              onClose();
+            }
+            
           } catch (err) {
-            // Handle session errors silently
-          }
-          
-          toast({
-            title: "Welcome back!",
-            description: "You've been signed in successfully.",
-          });
-          
-          // Close the sign-in module or refresh
-          if (onClose) {
-            onClose();
-          } else {
-            // Force a page reload as fallback
+            // Fallback to page reload if session setting fails
+            toast({
+              title: "Signing in...",
+              description: "Refreshing page to complete sign-in.",
+            });
             setTimeout(() => {
               window.location.reload();
             }, 1000);
@@ -420,7 +424,6 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
           <form 
             onSubmit={handleEmailAuth} 
             className="space-y-4"
-            onSubmitCapture={() => console.log('Form onSubmitCapture triggered')}
           >
             <div className="space-y-4">
               <div>
@@ -534,10 +537,6 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
               <Button
                 type="submit"
                 disabled={loading}
-                onClick={(e) => {
-                  console.log('Submit button clicked');
-                  // Let the form's onSubmit handle it - don't prevent default
-                }}
                 className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 py-3 text-sm font-semibold"
                 data-testid="button-submit"
               >
