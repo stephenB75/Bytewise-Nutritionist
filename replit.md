@@ -6,6 +6,14 @@ ByteWise Nutritionist is a comprehensive Progressive Web App (PWA) for nutrition
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes
+- Fixed authentication system (August 15, 2025)
+  - Resolved sign in/sign up button functionality issues
+  - Added clear password requirements display
+  - Improved error messaging for authentication failures
+  - Removed redundant email verification button for cleaner UX
+- Confirmed nutrition calculation accuracy for food items including candy
+
 ## System Architecture
 
 ### Frontend Architecture
