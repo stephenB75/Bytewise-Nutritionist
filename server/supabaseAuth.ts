@@ -102,14 +102,14 @@ export const optionalAuth: AuthMiddleware = async (
       const token = authHeader.substring(7);
       
       // For our custom tokens, we need to extract the user ID differently
-      
+      console.log('🔍 Validating token:', token.substring(0, 20) + '...', 'Length:', token.length);
       
       if (token.startsWith('verified_')) {
         // Parse verified_userId_timestamp format
         const parts = token.split('_');
         if (parts.length >= 2) {
           const userId = parts[1];
-          
+          console.log('🔍 Extracting user ID from custom token:', userId.substring(0, 8) + '...');
           
           // Set user directly since we trust our own verified tokens
           req.user = {
@@ -117,7 +117,7 @@ export const optionalAuth: AuthMiddleware = async (
             email: null, // Will be populated by user endpoint
             claims: { sub: userId },
           };
-          
+          console.log('✅ Custom token validated, user ID set:', userId.substring(0, 8) + '...');
         }
       } else {
         // Try as standard Supabase token or generated token
@@ -130,17 +130,17 @@ export const optionalAuth: AuthMiddleware = async (
               email: user.email,
               claims: { sub: user.id },
             };
-            
+            console.log('✅ Supabase token validated for user:', user.email);
           } else {
-            
+            console.log('⚠️ Token validation failed:', error?.message);
             // If it's a 56-char token from our generateLink, try to extract from recent users
             if (token.length === 56) {
-              
+              console.log('🔍 Attempting recovery token lookup...');
               // For now, we'll skip this complex lookup
             }
           }
         } catch (tokenError) {
-          
+          console.log('⚠️ Token validation threw error:', tokenError);
         }
       }
     }

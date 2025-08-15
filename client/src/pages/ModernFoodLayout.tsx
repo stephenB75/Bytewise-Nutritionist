@@ -3,7 +3,7 @@
  * Features: Hero sections, food cards, nutrition breakdown, and modern navigation
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -356,14 +356,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       try {
         // DISABLED: Automatic meal date fixing to prevent meals moving between days
         // Use cached localStorage for better performance
-        const storedData = getCachedLocalStorage('weeklyMeals') || '[]';
-        const stored = JSON.parse(storedData);
+        const stored = getCachedLocalStorage('weeklyMeals', 5000) || [];
         
         // Simple date matching - use today's actual date without correction
         const today = getLocalDateKey();
         
         // Filter meals for today using simple date matching
-        const todayMeals = (stored || []).filter((meal: any) => {
+        const todayMeals = stored.filter((meal: any) => {
           // Handle timestamp format dates
           const mealDate = meal.date && meal.date.includes('T') 
             ? meal.date.split('T')[0] 
@@ -417,7 +416,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         const weekDateKeys = currentWeekDates.map(date => getLocalDateKey(date));
         
         // Filter meals to only include those from the current week with timestamp parsing
-        const currentWeekMeals = (stored || []).filter((meal: any) => {
+        const currentWeekMeals = stored.filter((meal: any) => {
           // Direct exact match
           if (weekDateKeys.includes(meal.date)) return true;
           
