@@ -97,6 +97,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const [goalCalories, setGoalCalories] = useState((user as any)?.dailyCalorieGoal || 2000);
   const [weeklyGoal, setWeeklyGoal] = useState(14000);
   const [loggedMeals, setLoggedMeals] = useState<any[]>([]);
+  const [weeklyMeals, setWeeklyMeals] = useState<any[]>([]);
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
   const [trackingView, setTrackingView] = useState<TrackingView>('daily');
 
@@ -375,6 +376,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
         
         setLoggedMeals(todayMeals);
+        setWeeklyMeals(stored); // Store all weekly meals for search functionality
         
         // Calculate daily calories from existing logged meals
         const dailyTotal = todayMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
@@ -1033,7 +1035,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         description="Track your nutrition progress and log meals"
         buttonText="Start Tracking"
         onButtonClick={() => {
-          const searchInput = document.querySelector('input[placeholder="Search foods to log..."]') as HTMLInputElement;
+          const searchInput = document.querySelector('input[placeholder="Search weekly food entries..."]') as HTMLInputElement;
           if (searchInput) {
             searchInput.focus();
           }
@@ -1047,7 +1049,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <Input
-              placeholder="Search foods to log..."
+              placeholder="Search weekly food entries..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="h-12 pl-10 bg-white/10 border-white/20 text-white placeholder-gray-400"
@@ -1104,7 +1106,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 </div>
               </Card>
             ) : (
-              loggedMeals.filter(meal => 
+              weeklyMeals.filter(meal => 
                 !searchQuery || 
                 meal.name.toLowerCase().includes(searchQuery.toLowerCase())
               ).map((meal, index) => (
@@ -1672,7 +1674,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         description="Track your calorie intake and search for foods to log"
         buttonText="Start Logging"
         onButtonClick={() => {
-          const searchInput = document.querySelector('input[placeholder="Search foods to log..."]') as HTMLInputElement;
+          const searchInput = document.querySelector('input[placeholder="Search weekly food entries..."]') as HTMLInputElement;
           if (searchInput) {
             searchInput.focus();
           }
@@ -1690,7 +1692,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           <div className="relative">
             <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <Input
-              placeholder="Search foods to log..."
+              placeholder="Search weekly food entries..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-28 pr-16 h-16 bg-white/95 border-white/20 text-gray-900 placeholder-gray-500 backdrop-blur-md rounded-2xl text-xl font-medium text-center"
@@ -1732,7 +1734,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               </div>
             </Card>
           ) : (
-            loggedMeals.filter(meal => 
+            weeklyMeals.filter(meal => 
               !searchQuery || 
               meal.name.toLowerCase().includes(searchQuery.toLowerCase())
             ).map((meal, index) => (
