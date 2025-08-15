@@ -75,23 +75,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Auth routes
   app.get('/api/auth/user', optionalAuth, async (req: any, res: Response) => {
-    console.log('🔍 /api/auth/user called');
     const userId = req.user?.id;
-    console.log('🆔 User ID from auth middleware:', userId);
     
     if (!userId) {
-      console.log('❌ No user ID - returning null');
-      // Return null for unauthenticated users instead of 401
       res.json(null);
       return;
     }
+    
     try {
-      console.log('🔎 Fetching user from database...');
       const user = await storage.getUser(userId);
-      console.log('✅ User found in database:', !!user, user?.email);
       res.json(user);
     } catch (error) {
-      console.log('💥 Error fetching user from database:', error);
       // If user not found in database, return null
       res.json(null);
     }
@@ -109,10 +103,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (error) {
         // Check if error is due to unverified email
-        if (error.message.includes('Email not confirmed')) {
+        if (error.message.includes('Email not confirmed') || error.message.includes('email_not_confirmed')) {
           return res.status(400).json({ 
-            message: "Email not confirmed",
-            requiresVerification: true 
+            message: "Please verify your email first. Check your inbox for a verification link and click it to activate your account.",
+            requiresVerification: true,
+            email: email
           });
         }
         return res.status(400).json({ message: error.message });
@@ -123,24 +118,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Sign out the user if email is not verified
         await serverSupabase.auth.signOut();
         return res.status(400).json({ 
-          message: "Email not confirmed",
-          requiresVerification: true 
+          message: "Please verify your email first. Check your inbox for a verification link and click it to activate your account.",
+          requiresVerification: true,
+          email: email
         });
       }
       
       // Store user in our database if they don't exist
       if (data.user) {
         try {
-          console.log('💾 Storing user in database:', data.user.id, data.user.email);
           await storage.upsertUser({
             id: data.user.id,
             email: data.user.email,
             firstName: data.user.user_metadata?.first_name,
             lastName: data.user.user_metadata?.last_name,
           });
-          console.log('✅ User stored successfully');
         } catch (dbError) {
-          console.log('💥 Error storing user:', dbError);
           // Continue anyway since Supabase auth succeeded
         }
       }
@@ -165,7 +158,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         email,
         password,
         options: {
-          emailRedirectTo: 'https://www.bytewisenutritionist.com/verify-email'
+          emailRedirectTo: `${req.headers.origin || 'http://localhost:5000'}/api/auth/verify-email`
         }
       });
       
@@ -178,8 +171,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json({
           user: null,
           session: null,
-          message: "Please check your email to verify your account before signing in.",
-          requiresVerification: true
+          message: "Account created! Please check your email for a verification link. You must click the link to activate your account before signing in.",
+          requiresVerification: true,
+          email: email
         });
       }
       
@@ -205,12 +199,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.json({
           user: null,
           session: null,
-          message: "Please check your email to verify your account.",
-          requiresVerification: true
+          message: "Account created! Please check your email for a verification link. You must click the link to activate your account before signing in.",
+          requiresVerification: true,
+          email: email
         });
       }
     } catch (error) {
       res.status(500).json({ message: "Sign up failed" });
+    }
+  });
+
+  // Email verification callback endpoint
+  app.get('/api/auth/verify-email', async (req: Request, res: Response) => {
+    try {
+      const { token_hash, type } = req.query;
+      
+      if (type === 'email' && token_hash) {
+        const { data, error } = await serverSupabase.auth.verifyOtp({
+          token_hash: token_hash as string,
+          type: 'email'
+        });
+        
+        if (error) {
+          console.log('❌ Email verification failed:', error.message);
+          return res.redirect(`${req.headers.origin || 'http://localhost:5000'}?verified=false&error=${encodeURIComponent(error.message)}`);
+        }
+        
+        if (data.user) {
+          // Store verified user in our database
+          try {
+            await storage.upsertUser({
+              id: data.user.id,
+              email: data.user.email,
+              firstName: data.user.user_metadata?.first_name,
+              lastName: data.user.user_metadata?.last_name,
+            });
+          } catch (dbError) {
+            console.log('💥 Error storing verified user:', dbError);
+          }
+        }
+        
+        console.log('✅ Email verification successful for:', data.user?.email);
+        return res.redirect(`${req.headers.origin || 'http://localhost:5000'}?verified=true`);
+      }
+      
+      res.redirect(`${req.headers.origin || 'http://localhost:5000'}?verified=false&error=Invalid verification link`);
+    } catch (error) {
+      console.log('💥 Verification callback error:', error);
+      res.redirect(`${req.headers.origin || 'http://localhost:5000'}?verified=false&error=Verification failed`);
     }
   });
 

@@ -37,6 +37,8 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [resetEmailSent, setResetEmailSent] = useState(false);
   const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
+  const [verificationRequired, setVerificationRequired] = useState(false);
+  const [verificationEmail, setVerificationEmail] = useState('');
   const { toast } = useToast();
   const { supabase, refetch } = useAuth();
 
@@ -109,8 +111,6 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
     
     try {
       const endpoint = isSignUp ? '/api/auth/signup' : '/api/auth/signin';
-      console.log('🌐 Making API call to:', endpoint);
-      
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
@@ -120,14 +120,18 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
       });
 
       const data = await response.json();
-      console.log('📨 API Response:', { status: response.status, hasSession: !!data.session, hasUser: !!data.user });
 
       if (response.ok) {
         // Check if email verification is required
         if (data.requiresVerification) {
+          setVerificationRequired(true);
+          setVerificationEmail(data.email || email);
+          setConfirmingEmail(false);
+          
           toast({
-            title: isSignUp ? "Account created!" : "Email verification required",
-            description: data.message || "Please check your email to verify your account before signing in.",
+            title: isSignUp ? "Account Created!" : "Email Verification Required",
+            description: data.message || "Please check your email and click the verification link to activate your account.",
+            duration: 10000,
           });
           if (isSignUp) {
             // Switch to sign-in mode after successful signup
@@ -135,7 +139,6 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
             setPassword(''); // Clear password for security
           }
         } else if (data.session) {
-          console.log('🔑 Setting session...');
           // Successfully signed in with verified email
           try {
             const { error: sessionError } = await supabase.auth.setSession({
@@ -144,20 +147,16 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
             });
             
             if (sessionError) {
-              console.error('❌ Session error:', sessionError);
               throw sessionError;
             }
             
-            console.log('✅ Session set, refetching auth state...');
             // Force refresh the auth state
-            const authRefetch = await refetch();
-            console.log('🔄 Auth refetch result:', !!authRefetch);
+            await refetch();
             
             // Trigger custom event for auth state change
             window.dispatchEvent(new CustomEvent('auth-state-change'));
             
-            console.log('⏰ Waiting for state propagation...');
-            // Longer delay to ensure state propagation
+            // Wait for state propagation
             await new Promise(resolve => setTimeout(resolve, 500));
             
             toast({
@@ -165,14 +164,12 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
               description: "You've been signed in successfully.",
             });
             
-            // Close modal after successful authentication and state update
-            console.log('🎯 Authentication completed - closing modal...');
+            // Close modal after successful authentication
             if (onClose) {
               onClose();
             }
             
           } catch (err) {
-            console.error('💥 Session setting failed:', err);
             // Fallback to page reload if session setting fails
             toast({
               title: "Signing in...",
@@ -184,11 +181,15 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
           }
         }
       } else {
-        if (data.requiresVerification || data.message === "Email not confirmed") {
+        if (data.requiresVerification) {
+          // Sign-in failed due to unverified email
+          setVerificationRequired(true);
+          setVerificationEmail(data.email || email);
           toast({
-            title: "Email not confirmed",
-            description: data.message || "Please check your email and click the confirmation link.",
+            title: "Email Verification Required",
+            description: data.message || "Please check your email and click the verification link to activate your account.",
             variant: "destructive",
+            duration: 10000,
           });
         } else {
           let errorMessage = data.message || "Please try again.";
@@ -214,49 +215,44 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
     }
   };
 
-  const handleConfirmEmail = async () => {
-    if (!email) {
+  const handleResendVerification = async () => {
+    if (!verificationEmail) {
       toast({
-        title: "Email required",
-        description: "Please enter your email address first.",
+        title: "No email address",
+        description: "Please try signing up again.",
         variant: "destructive",
       });
       return;
     }
 
-    setConfirmingEmail(true);
+    setLoading(true);
     
     try {
-      const response = await fetch('/api/auth/confirm-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: verificationEmail,
+        options: {
+          emailRedirectTo: `${window.location.origin}/api/auth/verify-email`
+        }
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        toast({
-          title: "Email confirmed!",
-          description: "You can now sign in with your credentials.",
-        });
-      } else {
-        toast({
-          title: "Confirmation failed",
-          description: data.message || "Please try again.",
-          variant: "destructive",
-        });
+      if (error) {
+        throw error;
       }
-    } catch (error) {
+
       toast({
-        title: "Error",
-        description: "Something went wrong. Please try again.",
+        title: "Verification Email Sent",
+        description: "A new verification email has been sent. Please check your inbox and click the link.",
+        duration: 8000,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Failed to Resend",
+        description: error.message || "Unable to resend verification email. Please try again.",
         variant: "destructive",
       });
     } finally {
-      setConfirmingEmail(false);
+      setLoading(false);
     }
   };
 
@@ -517,7 +513,54 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
               </div>
             </div>
 
-            {showResetPassword ? (
+            {verificationRequired ? (
+              <div className="space-y-4">
+                {/* Email Verification Required Message */}
+                <div className="p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-xl">
+                  <div className="flex items-start gap-3">
+                    <Mail className="w-5 h-5 text-yellow-400 mt-0.5 flex-shrink-0" />
+                    <div className="flex-1">
+                      <div className="font-semibold text-white text-sm mb-1">Email Verification Required</div>
+                      <div className="text-xs text-gray-300 mb-3">
+                        We sent a verification link to <span className="text-white font-medium">{verificationEmail}</span>.
+                        Please check your inbox (including spam folder) and click the link to activate your account.
+                      </div>
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <Button
+                          type="button"
+                          onClick={handleResendVerification}
+                          disabled={loading}
+                          variant="outline"
+                          size="sm"
+                          className="text-xs border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10"
+                        >
+                          {loading ? (
+                            <div className="flex items-center">
+                              <div className="w-3 h-3 border-2 border-yellow-400/30 border-t-yellow-400 rounded-full animate-spin mr-2" />
+                              Resending...
+                            </div>
+                          ) : (
+                            'Resend Verification Email'
+                          )}
+                        </Button>
+                        <Button
+                          type="button"
+                          onClick={() => {
+                            setVerificationRequired(false);
+                            setVerificationEmail('');
+                          }}
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs text-gray-400 hover:text-white"
+                        >
+                          Back to Sign In
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : showResetPassword ? (
               <div className="space-y-3">
                 <Button
                   type="button"
@@ -557,10 +600,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
               <Button
                 type="submit"
                 disabled={loading}
-                onClick={(e) => {
-                  console.log('🔘 Submit button clicked directly');
-                  e.stopPropagation();
-                }}
+                onClick={(e) => e.stopPropagation()}
                 className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 py-3 text-sm font-semibold"
                 data-testid="button-submit"
               >
