@@ -24,6 +24,7 @@ import { useGoalAchievements } from '@/hooks/useGoalAchievements';
 import { useRotatingBackground } from '@/hooks/useRotatingBackground';
 import { useAchievements, getAchievementIcon, formatAchievementDate } from '@/hooks/useAchievements';
 import { ProfileIcon } from '@/components/ProfileIcon';
+import { AppTour, useAppTour } from '@/components/AppTour';
 import { 
   Search, 
   User,
@@ -110,6 +111,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   
   // Profile completion state
   const [showProfileCompletion, setShowProfileCompletion] = useState(false);
+  
+  // App tour state
+  const { isTourOpen, startTour, closeTour, completeTour, shouldShowTour } = useAppTour();
   
   // Nutrition aggregation state
   const [dailyMacros, setDailyMacros] = useState({ protein: 0, carbs: 0, fat: 0 });
@@ -439,6 +443,18 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     }
   }, [activeTab, calculateMicronutrients]);
   
+  // Check if tour should be shown for new users
+  useEffect(() => {
+    if (user && shouldShowTour()) {
+      // Delay tour to allow UI to settle
+      const tourTimer = setTimeout(() => {
+        startTour();
+      }, 2000);
+      
+      return () => clearTimeout(tourTimer);
+    }
+  }, [user, shouldShowTour, startTour]);
+
   // Load existing meal data and set up tracking
   useEffect(() => {
     // Load existing meal data on component mount
@@ -1012,7 +1028,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           </div>
 
           {/* Daily Progress */}
-          <div className="mb-4">
+          <div data-testid="daily-progress" className="mb-4">
             <ProgressCard
               title="Daily Calories"
               icon={Flame}
@@ -1781,6 +1797,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           <div className="relative">
             <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <Input
+              data-testid="main-food-search"
               placeholder="Search weekly food entries..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -2002,6 +2019,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     <div className="flex items-start space-x-4 flex-1 min-w-0">
                       <div className="relative flex-shrink-0">
                         <ProfileIcon 
+                          data-testid="profile-icon"
                           iconNumber={user?.profileIcon || 1} 
                           size="md" 
                         />
@@ -2031,6 +2049,22 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 <AccordionContent className="px-6 pb-6 pt-2">
                   <div className="border-t border-white/10 pt-6 mt-2">
                     <UserSettingsManager />
+                    
+                    {/* Start Tour Button */}
+                    <div className="mt-6 pt-4 border-t border-white/10">
+                      <Button
+                        onClick={startTour}
+                        variant="outline"
+                        className="w-full bg-blue-600/20 hover:bg-blue-600/30 border-blue-500 text-blue-300 hover:text-blue-200"
+                        data-testid="start-tour-button"
+                      >
+                        <span className="text-lg mr-2">🎯</span>
+                        Take App Tour
+                      </Button>
+                      <p className="text-xs text-gray-400 mt-2 text-center">
+                        Learn how to use all the features
+                      </p>
+                    </div>
                   </div>
                 </AccordionContent>
               </Card>
@@ -2038,7 +2072,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             
             {/* Awards Card */}
             <AccordionItem value="achievements" className="border-none">
-              <Card className="bg-white/10 backdrop-blur-md border-white/20 overflow-hidden rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:bg-white/15 hover:border-white/30">
+              <Card data-testid="achievements-section" className="bg-white/10 backdrop-blur-md border-white/20 overflow-hidden rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:bg-white/15 hover:border-white/30">
                 <AccordionTrigger className="px-6 py-6 hover:bg-white/5 hover:no-underline [&[data-state=open]>div]:text-[#faed39] [&[data-state=open]]:bg-white/5">
                   <div className="flex items-center justify-between w-full">
                     <div className="flex items-center space-x-3">
@@ -2121,7 +2155,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             
             {/* Fasting Content Section */}
             <div className="px-6 py-8 bg-black min-h-screen">
-              <div className="fasting-tracker bg-gray-900/80 backdrop-blur-md rounded-3xl border border-gray-700 p-6">
+              <div data-testid="fasting-tracker" className="fasting-tracker bg-gray-900/80 backdrop-blur-md rounded-3xl border border-gray-700 p-6">
                 <FastingTracker />
               </div>
             </div>
@@ -2169,7 +2203,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   };
 
   return (
-    <div className="h-screen w-screen bg-black">
+    <div data-testid="app-container" className="h-screen w-screen bg-black">
       {/* Fixed Notification Header on all pages - Safe area positioning for iOS/Android */}
       <div className="fixed top-safe right-4 z-50 safe-notification-position">
         <div className="relative">
@@ -2247,7 +2281,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       {renderContent()}
       
       {/* Bottom Navigation - High Resolution Icons */}
-      <div className="fixed bottom-0 left-0 right-0 bg-gray-900/95 backdrop-blur-md border-t border-gray-700 safe-area-pb z-50">
+      <div data-testid="navigation-tabs" className="fixed bottom-0 left-0 right-0 bg-gray-900/95 backdrop-blur-md border-t border-gray-700 safe-area-pb z-50">
         <div className="flex items-center justify-around py-2 px-2 max-w-md mx-auto">
           {[
             { id: 'home', label: 'Dashboard', icon: Home },
@@ -2301,6 +2335,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       <ProfileCompletionModal
         isOpen={showProfileCompletion}
         onComplete={handleProfileCompletion}
+      />
+      
+      {/* App Tour */}
+      <AppTour
+        isOpen={isTourOpen}
+        onClose={closeTour}
+        onComplete={completeTour}
       />
       
       {/* Toast Notifications */}

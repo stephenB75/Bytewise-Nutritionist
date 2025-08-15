@@ -105,6 +105,14 @@ Preferred communication style: Simple, everyday language.
     - Milestone celebrations trigger achievement checks for additional rewards
     - Each milestone shows personalized messages about health benefits and progress
     - Final completion celebration shows total fasting hours achieved
+- **App Tour System (August 15, 2025)**:
+    - Created comprehensive guided tour for new users
+    - Implemented AppTour component with step-by-step highlights
+    - Added data-testid attributes to key UI elements for tour targeting
+    - Automatic tour launch for new users after UI settles
+    - Manual "Take App Tour" button in profile settings
+    - Tour covers: food search, navigation, profile, daily tracking, fasting, achievements
+    - Tour completion stored in localStorage to prevent repeated shows
 
 ## System Architecture
 
