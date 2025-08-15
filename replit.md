@@ -12,7 +12,12 @@ Preferred communication style: Simple, everyday language.
   - Added clear password requirements display
   - Improved error messaging for authentication failures
   - Removed redundant email verification button for cleaner UX
-- Confirmed nutrition calculation accuracy for food items including candy
+- Enhanced candy nutrition system (August 15, 2025)
+  - Integrated FoodStruct.com detailed nutrition data with USDA database
+  - Added comprehensive candy nutrition database with 10 candy types
+  - Enhanced mineral content data (calcium, iron, magnesium, sodium, etc.)
+  - Automatic candy detection and enhanced data prioritization
+  - Confirmed nutrition calculation accuracy for all candy items
 
 ## System Architecture
 
@@ -36,6 +41,7 @@ The application employs a mobile-first responsive design. Tailwind CSS and shadc
 ### Third-Party Services
 - **Supabase**: Authentication and user management service.
 - **USDA FoodData Central API**: Provides accurate nutritional information.
+- **FoodStruct.com**: Enhanced detailed nutrition data for candy items.
 - **Neon Database**: Cloud PostgreSQL hosting.
 
 ### Development and Deployment Tools

@@ -200,7 +200,8 @@ export class USDAService {
     const candyTerms = [
       'candy', 'candies', 'chocolate', 'gummy', 'lollipop', 'sucker',
       'hard candy', 'soft candy', 'taffy', 'caramel', 'fudge',
-      'gumdrops', 'jelly beans', 'mint', 'drops', 'sweets'
+      'gumdrops', 'jelly beans', 'jelly bean', 'mint candy', 'mint', 'drops', 'sweets',
+      'marshmallow', 'marshmallows', 'caramels', 'bonbon', 'bonbons'
     ];
     
     const lowerQuery = query.toLowerCase();
