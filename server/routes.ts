@@ -13,7 +13,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       status: 'healthy',
       timestamp: new Date().toISOString(),
       environment: process.env.NODE_ENV || 'development',
-      version: '1.2.2'
+      version: '1.5.0'
     });
   });
 

@@ -10,20 +10,20 @@ export interface AppVersion {
   required: boolean;
 }
 
-const CURRENT_VERSION = 'BETA 1.4';
+const CURRENT_VERSION = 'BETA 1.5';
 const BUILD_DATE = '2025-08-15';
 
 export const getCurrentVersion = (): AppVersion => ({
   version: CURRENT_VERSION,
   buildDate: BUILD_DATE,
   changelog: [
-    'Fixed fasting timer milestone celebration system',
-    'Added comprehensive milestone detection (8h, 12h, 16h, 18h, 20h, 24h+)',
-    'Enhanced celebration toasts with personalized health benefit messages',
-    'Implemented milestone persistence across browser sessions',
-    'Fixed text field consistency in calorie calculator',
-    'Streamlined data management with automatic sync system',
-    'Achievement system integration with milestone completion'
+    'Complete Profile system fully operational with authentication fixes',
+    'Fixed critical user ID mapping issues between Supabase and database',
+    'Enhanced search bar visibility with solid white backgrounds',
+    'Resolved profile completion flow for all verified users',
+    'Improved text contrast and readability across food search inputs',
+    'Fixed foreign key constraint violations in user management',
+    'Enhanced authentication middleware with proper ID resolution'
   ],
   required: false
 });
@@ -76,6 +76,20 @@ export const updateApp = async (): Promise<boolean> => {
 };
 
 export const getVersionHistory = (): Array<AppVersion> => [
+  {
+    version: 'BETA 1.5',
+    buildDate: '2025-08-15',
+    changelog: [
+      'Complete Profile system fully operational with authentication fixes',
+      'Fixed critical user ID mapping issues between Supabase and database',
+      'Enhanced search bar visibility with solid white backgrounds',
+      'Resolved profile completion flow for all verified users',
+      'Improved text contrast and readability across food search inputs',
+      'Fixed foreign key constraint violations in user management',
+      'Enhanced authentication middleware with proper ID resolution'
+    ],
+    required: false
+  },
   {
     version: 'BETA 1.4',
     buildDate: '2025-08-15',
