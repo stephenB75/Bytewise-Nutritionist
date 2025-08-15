@@ -18,7 +18,8 @@ import {
   Zap,
   Mail,
   Lock,
-  UserPlus
+  UserPlus,
+  CheckCircle2
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
@@ -35,8 +36,40 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
   const [confirmingEmail, setConfirmingEmail] = useState(false);
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [resetEmailSent, setResetEmailSent] = useState(false);
+  const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
   const { toast } = useToast();
   const { supabase, refetch } = useAuth();
+
+  // Password validation function
+  const validatePassword = (password: string): string[] => {
+    const errors = [];
+    if (password.length < 8) {
+      errors.push('At least 8 characters');
+    }
+    if (!/[A-Z]/.test(password)) {
+      errors.push('One uppercase letter');
+    }
+    if (!/[a-z]/.test(password)) {
+      errors.push('One lowercase letter');
+    }
+    if (!/\d/.test(password)) {
+      errors.push('One number');
+    }
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+      errors.push('One special character');
+    }
+    return errors;
+  };
+
+  // Update password validation on change
+  const handlePasswordChange = (value: string) => {
+    setPassword(value);
+    if (isSignUp) {
+      setPasswordErrors(validatePassword(value));
+    } else {
+      setPasswordErrors([]);
+    }
+  };
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,6 +78,27 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
       toast({
         title: "Missing Information",
         description: "Please enter both email and password.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast({
+        title: "Invalid Email",
+        description: "Please enter a valid email address.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate password for sign-up
+    if (isSignUp && passwordErrors.length > 0) {
+      toast({
+        title: "Password Requirements Not Met",
+        description: `Password needs: ${passwordErrors.join(', ')}`,
         variant: "destructive",
       });
       return;
@@ -405,12 +459,32 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
                     id="password"
                     type="password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => handlePasswordChange(e.target.value)}
                     placeholder="Enter your password"
                     className="pl-10 bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-blue-400 focus:ring-blue-400"
                     required={!showResetPassword}
                   />
                 </div>
+                {/* Password requirements indicator */}
+                {isSignUp && password && (
+                  <div className="mt-2 text-xs">
+                    {passwordErrors.length > 0 ? (
+                      <div className="text-red-400">
+                        <div className="font-medium">Password needs:</div>
+                        <ul className="list-disc list-inside mt-1 space-y-1">
+                          {passwordErrors.map((error, index) => (
+                            <li key={index}>{error}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : (
+                      <div className="text-green-400 flex items-center">
+                        <CheckCircle2 className="w-3 h-3 mr-1" />
+                        Password meets all requirements
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
