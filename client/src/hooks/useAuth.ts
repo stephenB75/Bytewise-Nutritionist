@@ -1,6 +1,6 @@
+import { useEffect } from 'react';
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from '@/lib/supabase';
-import { useEffect } from 'react';
 
 export function useAuth() {
   // Always call useEffect first to maintain hook order
