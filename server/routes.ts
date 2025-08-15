@@ -93,8 +93,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('✅ User found in database:', !!user);
       res.json(user);
     } catch (error) {
-      console.log('❌ User not found in database, creating from Supabase...');
-      // If user not found in database, try to get from Supabase and create
+      console.log('❌ User not found in local database, fetching from Supabase...');
+      // If user not found in database, return Supabase user data directly 
       try {
         const { data: supabaseUser, error: fetchError } = await supabaseAdmin.auth.admin.getUserById(userId);
         
@@ -105,23 +105,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         
         if (supabaseUser?.user) {
-          console.log('📝 Creating user from Supabase data:', supabaseUser.user.email);
-          const newUser = {
+          console.log('✅ Found user in Supabase:', supabaseUser.user.email);
+          
+          // Return user data in the expected format for frontend
+          const userData = {
             id: supabaseUser.user.id,
             email: supabaseUser.user.email!,
-            firstName: supabaseUser.user.user_metadata?.first_name || null,
-            lastName: supabaseUser.user.user_metadata?.last_name || null,
+            emailVerified: !!supabaseUser.user.email_confirmed_at,
+            firstName: supabaseUser.user.user_metadata?.first_name || supabaseUser.user.user_metadata?.firstName || null,
+            lastName: supabaseUser.user.user_metadata?.last_name || supabaseUser.user.user_metadata?.lastName || null,
+            profileImageUrl: supabaseUser.user.user_metadata?.avatar_url || null,
+            profileIcon: Math.floor(Math.random() * 9) + 1, // Random default icon
+            createdAt: new Date(supabaseUser.user.created_at),
+            updatedAt: new Date(supabaseUser.user.updated_at || supabaseUser.user.created_at),
+            // Default nutrition goals from metadata or defaults
+            dailyCalorieGoal: supabaseUser.user.user_metadata?.calorie_goal || 2000,
+            dailyProteinGoal: 150,
+            dailyCarbGoal: 200,
+            dailyFatGoal: 70,
+            dailyWaterGoal: 8,
+            personalInfo: supabaseUser.user.user_metadata || null,
+            privacySettings: null,
+            notificationSettings: null,
+            displaySettings: null,
           };
           
-          const createdUser = await storage.upsertUser(newUser);
-          console.log('✅ Successfully created user in database:', createdUser.email);
-          res.json(createdUser);
+          console.log('✅ Returning Supabase user data to frontend');
+          res.json(userData);
           return;
         } else {
           console.log('❌ No user data returned from Supabase');
         }
       } catch (createError) {
-        console.log('❌ Failed to create user from Supabase:', createError);
+        console.log('❌ Failed to fetch user from Supabase:', createError);
       }
       res.json(null);
     }
