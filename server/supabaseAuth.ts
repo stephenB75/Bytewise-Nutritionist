@@ -127,4 +127,5 @@ export async function setupAuth(app: any) {
   }
 }
 
+// Export regular client for authentication
 export { supabase as serverSupabase };
