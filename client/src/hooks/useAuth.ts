@@ -52,7 +52,11 @@ export function useAuth() {
         
         const userData = await response.json();
         console.log('✨ User data fetched successfully:', !!userData);
-        console.log('👤 User data details:', { hasEmail: !!userData?.email, hasId: !!userData?.id, data: userData });
+        if (userData) {
+          console.log('👤 User authenticated:', userData.email);
+        } else {
+          console.log('👤 No user data returned');
+        }
         return userData;
       } catch (error) {
         console.log('💥 Auth fetch error:', error);

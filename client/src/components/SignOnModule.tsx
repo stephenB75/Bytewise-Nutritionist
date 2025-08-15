@@ -165,8 +165,11 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
               description: "You've been signed in successfully.",
             });
             
-            // Don't close modal immediately - let the parent component handle it when user state updates
-            console.log('🎯 Authentication completed - waiting for UI update...');
+            // Close modal after successful authentication and state update
+            console.log('🎯 Authentication completed - closing modal...');
+            if (onClose) {
+              onClose();
+            }
             
           } catch (err) {
             console.error('💥 Session setting failed:', err);

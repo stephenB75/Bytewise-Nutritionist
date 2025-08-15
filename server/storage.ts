@@ -130,9 +130,9 @@ export class DatabaseStorage implements IStorage {
           return user;
         } catch (alterError) {
           console.log('❌ Failed to add profile_icon column:', alterError);
-          // Return user without profile_icon for now
-          const [userWithoutIcon] = await db.execute(sql`SELECT id, email, email_verified, first_name, last_name, profile_image_url, personal_info, privacy_settings, notification_settings, display_settings, created_at, updated_at, daily_calorie_goal, daily_protein_goal, daily_carb_goal, daily_fat_goal, daily_water_goal FROM users WHERE id = ${id}`);
-          return userWithoutIcon as any;
+          // Return user without profile_icon for now  
+          const result = await db.execute(sql`SELECT id, email, email_verified, first_name, last_name, profile_image_url, personal_info, privacy_settings, notification_settings, display_settings, created_at, updated_at, daily_calorie_goal, daily_protein_goal, daily_carb_goal, daily_fat_goal, daily_water_goal FROM users WHERE id = ${id}`);
+          return result[0] as any;
         }
       }
       throw error;
