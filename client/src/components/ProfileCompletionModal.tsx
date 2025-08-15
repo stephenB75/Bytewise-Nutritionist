@@ -159,15 +159,39 @@ export function ProfileCompletionModal({ isOpen, onComplete }: ProfileCompletion
               <label htmlFor="gender" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Avatar Style *
               </label>
-              <Select value={formData.gender} onValueChange={(value) => setFormData(prev => ({ ...prev, gender: value as 'male' | 'female' }))}>
-                <SelectTrigger className="mt-1 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600" data-testid="select-gender">
-                  <SelectValue placeholder="Select your preferred avatar" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="male">Male Avatar</SelectItem>
-                  <SelectItem value="female">Female Avatar</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="mt-2 grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, gender: 'male' }))}
+                  className={`flex items-center justify-center p-4 rounded-lg border-2 transition-all duration-200 ${
+                    formData.gender === 'male'
+                      ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300'
+                      : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:border-orange-300 dark:hover:border-orange-400'
+                  }`}
+                  data-testid="button-select-male"
+                >
+                  <div className="text-center">
+                    <div className="text-2xl mb-1">👨</div>
+                    <div className="text-sm font-medium">Male Avatar</div>
+                  </div>
+                </button>
+                
+                <button
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, gender: 'female' }))}
+                  className={`flex items-center justify-center p-4 rounded-lg border-2 transition-all duration-200 ${
+                    formData.gender === 'female'
+                      ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300'
+                      : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:border-orange-300 dark:hover:border-orange-400'
+                  }`}
+                  data-testid="button-select-female"
+                >
+                  <div className="text-center">
+                    <div className="text-2xl mb-1">👩</div>
+                    <div className="text-sm font-medium">Female Avatar</div>
+                  </div>
+                </button>
+              </div>
             </div>
           </div>
 
