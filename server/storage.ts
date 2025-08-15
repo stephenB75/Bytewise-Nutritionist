@@ -120,9 +120,15 @@ export class DatabaseStorage implements IStorage {
   async upsertUser(userData: UpsertUser): Promise<User> {
     // Try to insert first, then update if conflict occurs
     try {
+      // Assign random profile icon for new users (1-9)
+      const userDataWithIcon = {
+        ...userData,
+        profileIcon: userData.profileIcon || Math.floor(Math.random() * 9) + 1
+      };
+      
       const [user] = await db
         .insert(users)
-        .values(userData)
+        .values(userDataWithIcon)
         .onConflictDoUpdate({
           target: users.id,
           set: {
@@ -130,6 +136,7 @@ export class DatabaseStorage implements IStorage {
             firstName: userData.firstName,
             lastName: userData.lastName,
             updatedAt: new Date(),
+            // Don't update profileIcon for existing users
           },
         })
         .returning();

@@ -22,6 +22,7 @@ import { FastingStatusCard } from '@/components/FastingStatusCard';
 import { useGoalAchievements } from '@/hooks/useGoalAchievements';
 import { useRotatingBackground } from '@/hooks/useRotatingBackground';
 import { useAchievements, getAchievementIcon, formatAchievementDate } from '@/hooks/useAchievements';
+import { ProfileIcon } from '@/components/ProfileIcon';
 import { 
   Search, 
   User,
@@ -1909,33 +1910,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   <div className="flex items-start justify-between w-full pr-4">
                     <div className="flex items-start space-x-4 flex-1 min-w-0">
                       <div className="relative flex-shrink-0">
-                        <div className="w-16 h-16 rounded-full overflow-hidden flex items-center justify-center" style={{backgroundColor: '#F5E6D3'}}>
-                          <svg viewBox="0 0 120 120" className="w-full h-full">
-                            {/* Shirt/Collar */}
-                            <ellipse cx="60" cy="105" rx="45" ry="25" fill="#F59E0B" />
-                            <polygon points="45,85 75,85 70,95 50,95" fill="#FFFFFF" />
-                            
-                            {/* Head */}
-                            <circle cx="60" cy="50" r="28" fill="#E9A178" />
-                            
-                            {/* Hair */}
-                            <path d="M32 45 Q32 20, 60 20 Q88 20, 88 45 Q85 35, 75 30 Q60 25, 45 30 Q35 35, 32 45" fill="#4A2C2A" />
-                            
-                            {/* Eyes */}
-                            <circle cx="52" cy="45" r="2" fill="#2D1B1B" />
-                            <circle cx="68" cy="45" r="2" fill="#2D1B1B" />
-                            
-                            {/* Eyebrows */}
-                            <ellipse cx="52" cy="40" rx="3" ry="1" fill="#4A2C2A" />
-                            <ellipse cx="68" cy="40" rx="3" ry="1" fill="#4A2C2A" />
-                            
-                            {/* Nose */}
-                            <ellipse cx="60" cy="52" rx="1" ry="2" fill="#D4926F" />
-                            
-                            {/* Mouth */}
-                            <ellipse cx="60" cy="58" rx="3" ry="1.5" fill="#B8734F" />
-                          </svg>
-                        </div>
+                        <ProfileIcon 
+                          iconNumber={user?.profileIcon || 1} 
+                          size="md" 
+                          className="border-2 border-white/20" 
+                        />
                         <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-black flex items-center justify-center">
                           <CheckCircle2 className="w-2.5 h-2.5 text-white" />
                         </div>

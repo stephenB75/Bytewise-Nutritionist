@@ -34,6 +34,7 @@ export const users = pgTable("users", {
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
+  profileIcon: integer("profile_icon").default(1), // 1-9 corresponding to icons in the pack
   // Enhanced profile information
   personalInfo: jsonb("personal_info"), // age, height, weight, activity level, etc.
   privacySettings: jsonb("privacy_settings"), // profile visibility, data sharing preferences
