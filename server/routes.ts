@@ -7,8 +7,6 @@ import { usdaService } from "./services/usdaService";
 export async function registerRoutes(app: Express): Promise<Server> {
   // Health check endpoint - simplified for production
   app.get('/api/health', async (req: Request, res: Response) => {
-    console.log('🏥 Health check called at:', new Date().toISOString());
-    // Basic health check - server is responding
     res.json({
       status: 'healthy',
       timestamp: new Date().toISOString(),
@@ -77,52 +75,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/auth/user', optionalAuth, async (req: any, res: Response) => {
     const userId = req.user?.id;
     
-    console.log('👤 /api/auth/user request:', { 
-      hasUserId: !!userId, 
-      userId: userId?.substring(0, 8) + '...' 
-    });
-    
     if (!userId) {
-      console.log('❌ No user ID found in request');
       res.json(null);
       return;
     }
     
     try {
-      console.log('🔍 Calling storage.getUser with ID:', userId);
       const user = await storage.getUser(userId);
-      console.log('📊 Database result:', { user: !!user, userType: typeof user });
-      console.log('✅ User found in database:', !!user);
       
       // If user exists in database, return it
       if (user) {
-        console.log('✅ Returning user from database');
         res.json(user);
         return;
       }
       
       // If user doesn't exist in database, fetch from Supabase
-      console.log('❌ User not found in local database, fetching from Supabase...');
-      console.log('🔍 Attempting Supabase admin getUserById for:', userId);
-      // If user not found in database, return Supabase user data directly 
       try {
         const { data: supabaseUser, error: fetchError } = await supabaseAdmin.auth.admin.getUserById(userId);
-        console.log('📊 Supabase response:', { 
-          hasData: !!supabaseUser, 
-          hasUser: !!supabaseUser?.user, 
-          hasError: !!fetchError,
-          errorMessage: fetchError?.message 
-        });
         
         if (fetchError) {
-          console.log('❌ Failed to fetch user from Supabase:', fetchError.message);
           res.json(null);
           return;
         }
         
         if (supabaseUser?.user) {
-          console.log('✅ Found user in Supabase:', supabaseUser.user.email);
-          
           // Return user data in the expected format for frontend
           const userData = {
             id: supabaseUser.user.id,
@@ -146,18 +122,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
             displaySettings: null,
           };
           
-          console.log('✅ Returning Supabase user data to frontend');
           res.json(userData);
           return;
-        } else {
-          console.log('❌ No user data returned from Supabase');
         }
       } catch (createError) {
-        console.log('❌ Failed to fetch user from Supabase:', createError);
+        // Ignore error, return null below
       }
       res.json(null);
     } catch (error) {
-      console.log('❌ Database error, fetching from Supabase...', error);
       // If database error, also try Supabase fallback
       try {
         const { data: supabaseUser, error: fetchError } = await supabaseAdmin.auth.admin.getUserById(userId);
@@ -187,7 +159,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return;
         }
       } catch (fallbackError) {
-        console.log('❌ Supabase fallback failed:', fallbackError);
+        // Ignore fallback errors
       }
       res.json(null);
     }
@@ -199,122 +171,94 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { email: rawEmail, password } = req.body;
       const email = rawEmail?.toLowerCase().trim();
       
-      console.log('🔐 Sign-in attempt for:', email);
-      
       // Try authentication first - let Supabase tell us if user exists and credentials are valid
-      console.log('🔍 Attempting authentication with client...');
-      try {
-        const { data: signInData, error: signInError } = await serverSupabase.auth.signInWithPassword({
-          email,
-          password
-        });
+      const { data: signInData, error: signInError } = await serverSupabase.auth.signInWithPassword({
+        email,
+        password
+      });
 
-        if (signInError) {
-          console.log('❌ Authentication failed:', signInError.message);
+      if (signInError) {
+        // Now check if user exists to provide specific error messages
+        if (signInError.message.includes('Invalid login credentials')) {
+          // Try to find user in admin list (with pagination handling)
+          let existingUser = null;
+          let nextPage: string = '';
+          let attempts = 0;
+          const maxAttempts = 5; // Prevent infinite loops
           
-          // Now check if user exists to provide specific error messages
-          if (signInError.message.includes('Invalid login credentials')) {
-            console.log('🔍 Checking if user exists for better error message...');
+          while (!existingUser && attempts < maxAttempts) {
+            const listOptions: any = { perPage: 1000 };
+            if (nextPage) listOptions.page = nextPage;
             
-            // Try to find user in admin list (with pagination handling)
-            let existingUser = null;
-            let nextPage: string = '';
-            let attempts = 0;
-            const maxAttempts = 5; // Prevent infinite loops
+            const { data: users, error: listError } = await supabaseAdmin.auth.admin.listUsers(listOptions);
             
-            while (!existingUser && attempts < maxAttempts) {
-              const listOptions: any = { perPage: 1000 };
-              if (nextPage) listOptions.page = nextPage;
-              
-              const { data: users, error: listError } = await supabaseAdmin.auth.admin.listUsers(listOptions);
-              
-              if (listError) {
-                console.log('❌ Failed to list users:', listError.message);
-                break;
-              }
-              
-              existingUser = users?.users?.find(u => u.email?.toLowerCase() === email);
-              nextPage = users?.nextPage || '';
-              attempts++;
-              
-              console.log(`📄 Searched page ${attempts}, found ${users?.users?.length} users, nextPage: ${!!nextPage}`);
-              console.log('👥 Users found:', users?.users?.map(u => ({ email: u.email, verified: !!u.email_confirmed_at })));
-              
-              if (!nextPage || existingUser) break;
+            if (listError) {
+              break;
             }
             
-            if (existingUser && !existingUser.email_confirmed_at) {
-              console.log('❌ User found but email not verified');
-              return res.status(400).json({ 
-                message: "Please verify your email address before signing in. Check your email for a verification link.",
-                code: "EMAIL_NOT_VERIFIED",
-                requiresVerification: true
-              });
-            } else if (existingUser) {
-              console.log('❌ User found but wrong password');
-              return res.status(400).json({ 
-                message: "Invalid email or password. Please check your credentials and try again.",
-                code: "INVALID_CREDENTIALS"
-              });
-            } else {
-              console.log('❌ User account not found after searching all pages');
-              return res.status(400).json({ 
-                message: "No account found with this email address. Please sign up first or check your email address.",
-                code: "ACCOUNT_NOT_FOUND"
-              });
-            }
-          } else if (signInError.message.includes('Email not confirmed')) {
-            console.log('❌ Email not confirmed error');
+            existingUser = users?.users?.find(u => u.email?.toLowerCase() === email);
+            nextPage = String(users?.nextPage || '');
+            attempts++;
+            
+            if (!nextPage || existingUser) break;
+          }
+          
+          if (existingUser && !existingUser.email_confirmed_at) {
             return res.status(400).json({ 
               message: "Please verify your email address before signing in. Check your email for a verification link.",
               code: "EMAIL_NOT_VERIFIED",
               requiresVerification: true
             });
+          } else if (existingUser) {
+            return res.status(400).json({ 
+              message: "Invalid email or password. Please check your credentials and try again.",
+              code: "INVALID_CREDENTIALS"
+            });
+          } else {
+            return res.status(400).json({ 
+              message: "No account found with this email address. Please sign up first or check your email address.",
+              code: "ACCOUNT_NOT_FOUND"
+            });
           }
-          
+        } else if (signInError.message.includes('Email not confirmed')) {
           return res.status(400).json({ 
-            message: "Sign in failed. Please try again.",
-            code: "SIGNIN_FAILED"
+            message: "Please verify your email address before signing in. Check your email for a verification link.",
+            code: "EMAIL_NOT_VERIFIED",
+            requiresVerification: true
           });
         }
-
-        // Success - user authenticated
-        if (signInData?.user) {
-          console.log('✅ Authentication successful for:', signInData.user.email);
-          
-          // Create custom session token for our app
-          const fallbackSession = {
-            user: signInData.user,
-            session: {
-              access_token: `verified_${signInData.user.id}_${Date.now()}`,
-              refresh_token: `refresh_${signInData.user.id}_${Date.now()}`,
-              expires_in: 3600,
-              token_type: 'bearer',
-              user: signInData.user
-            }
-          };
-          
-          console.log('✅ Created session for authenticated user');
-          return res.json(fallbackSession);
-        }
-      } catch (authError) {
-        console.log('❌ Authentication service error:', authError);
-        return res.status(500).json({ 
-          message: "Authentication service temporarily unavailable. Please try again.",
-          code: "SERVICE_ERROR"
+        
+        return res.status(400).json({ 
+          message: "Sign in failed. Please try again.",
+          code: "SIGNIN_FAILED"
         });
+      }
+
+      // Success - user authenticated
+      if (signInData?.user) {
+        // Create custom session token for our app
+        const fallbackSession = {
+          user: signInData.user,
+          session: {
+            access_token: `verified_${signInData.user.id}_${Date.now()}`,
+            refresh_token: `refresh_${signInData.user.id}_${Date.now()}`,
+            expires_in: 3600,
+            token_type: 'bearer',
+            user: signInData.user
+          }
+        };
+        
+        return res.json(fallbackSession);
       }
 
       
       // Fallback error
-      console.log('❌ Unexpected sign-in state');
       return res.status(400).json({ 
         message: "Sign in failed. Please try again.",
         code: "SIGNIN_FAILED"
       });
       
     } catch (error) {
-      console.log('❌ Sign-in error:', error);
       res.status(500).json({ message: "Sign in failed" });
     }
   });
@@ -324,9 +268,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { email: rawEmail, password } = req.body;
       const email = rawEmail?.toLowerCase().trim(); // Normalize email case
-      
-      console.log('📝 Sign-up attempt for:', email);
-      console.log('🔐 Service key available:', !!supabaseAdmin);
       
       // Sign up user with admin Supabase client (sends verification email automatically)
       const { data, error } = await supabaseAdmin.auth.signUp({
@@ -338,13 +279,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       if (error) {
-        console.log('❌ Sign-up error:', error.message);
         return res.status(400).json({ message: error.message });
       }
-      
-      console.log('✅ User created:', data.user?.email, 'Confirmed:', !!data.user?.email_confirmed_at);
-      
-      console.log('📧 User created successfully, email verification required');
       
       // Always return verification required for admin-created users
       res.json({
@@ -364,8 +300,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { token_hash, type, next } = req.query;
       
-      console.log('🔗 Verification callback received:', { type, hasToken: !!token_hash, next });
-      
       if (type === 'email_change_confirm' || type === 'signup' || type === 'invite') {
         // Handle email confirmation, signup verification, and invites
         let verifyType = 'signup';
@@ -378,12 +312,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
         
         if (error) {
-          console.log('❌ Email verification failed:', error.message);
+          
           return res.redirect(`${req.headers.origin || 'http://localhost:5000'}?verified=false&error=${encodeURIComponent(error.message)}`);
         }
         
         if (data.user) {
-          console.log('✅ User verified successfully:', data.user.email);
+          
           // Store verified user in our database
           try {
             await storage.upsertUser({
@@ -392,9 +326,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
               firstName: data.user.user_metadata?.first_name || '',
               lastName: data.user.user_metadata?.last_name || '',
             });
-            console.log('✅ User stored in database');
+            
           } catch (dbError) {
-            console.log('💥 Error storing verified user:', dbError);
+            
           }
         }
         
@@ -403,7 +337,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Handle generic email confirmation (fallback)
       if (token_hash) {
-        console.log('🔄 Attempting generic email confirmation...');
+        
         try {
           const { data, error } = await supabaseAdmin.auth.verifyOtp({
             token_hash: token_hash as string,
@@ -411,7 +345,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
           
           if (!error && data.user) {
-            console.log('✅ Generic verification successful:', data.user.email);
+            
             try {
               await storage.upsertUser({
                 id: data.user.id,
@@ -420,19 +354,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 lastName: data.user.user_metadata?.last_name || '',
               });
             } catch (dbError) {
-              console.log('💥 Error storing user:', dbError);
+              
             }
             return res.redirect(`${req.headers.origin || 'http://localhost:5000'}?verified=true&message=Email verified successfully!`);
           }
         } catch (fallbackError) {
-          console.log('⚠️ Generic verification also failed:', fallbackError);
+          
         }
       }
       
-      console.log('❌ No valid verification parameters found');
+      
       res.redirect(`${req.headers.origin || 'http://localhost:5000'}?verified=false&error=Invalid verification link`);
     } catch (error) {
-      console.log('💥 Verification callback error:', error);
+      
       res.redirect(`${req.headers.origin || 'http://localhost:5000'}?verified=false&error=Verification failed`);
     }
   });

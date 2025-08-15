@@ -7,18 +7,9 @@ export function useAuth() {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('🔔 Auth state change:', {
-          event,
-          hasSession: !!session,
-          hasUser: !!session?.user,
-          userId: session?.user?.id?.substring(0, 8) + '...' || 'none'
-        });
-        
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-          console.log('📡 Triggering auth state change event...');
           window.dispatchEvent(new CustomEvent('auth-state-change'));
         } else if (event === 'SIGNED_OUT') {
-          console.log('🚪 User signed out, clearing auth state...');
           window.dispatchEvent(new CustomEvent('auth-state-change'));
         }
       }
@@ -40,11 +31,10 @@ export function useAuth() {
           try {
             const parsedSession = JSON.parse(storedSession);
             if (parsedSession.access_token) {
-              console.log('🔍 Found locally stored custom token');
               accessToken = parsedSession.access_token;
             }
           } catch (e) {
-            console.log('❌ Failed to parse stored session');
+            // Ignore parsing errors
           }
         }
         
@@ -52,13 +42,11 @@ export function useAuth() {
         if (!accessToken) {
           const { data: { session } } = await supabase.auth.getSession();
           if (session?.access_token) {
-            console.log('🔍 Found Supabase session token');
             accessToken = session.access_token;
           }
         }
         
         if (!accessToken) {
-          console.log('❌ No access token found');
           return null;
         }
         
@@ -70,16 +58,13 @@ export function useAuth() {
         });
         
         if (!response.ok) {
-          console.log('❌ Auth request failed:', response.status);
           return null;
         }
         
         const userData = await response.json();
-        console.log('✅ User data retrieved:', { hasUser: !!userData });
         return userData;
         
       } catch (error) {
-        console.log('❌ Auth query error:', error);
         return null;
       }
     },
@@ -90,8 +75,6 @@ export function useAuth() {
   // Sign out function
   const signOut = async () => {
     try {
-      console.log('🚪 Starting sign out process...');
-      
       // Clear custom tokens
       localStorage.removeItem('supabase.auth.token');
       
@@ -105,13 +88,10 @@ export function useAuth() {
       localStorage.clear();
       sessionStorage.clear();
       
-      console.log('✅ Sign out complete');
-      
       // Reload page to reset state
       window.location.href = '/';
       
     } catch (error) {
-      console.error('❌ Sign out error:', error);
       // Force reload anyway
       window.location.href = '/';
     }
