@@ -73,8 +73,10 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Form submitted', { email, password: password ? '***' : '', isSignUp });
     
     if (!email || !password) {
+      console.log('Missing email or password');
       toast({
         title: "Missing Information",
         description: "Please enter both email and password.",
@@ -415,7 +417,11 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
           </div>
 
           {/* Email Authentication Form */}
-          <form onSubmit={handleEmailAuth} className="space-y-4">
+          <form 
+            onSubmit={handleEmailAuth} 
+            className="space-y-4"
+            onSubmitCapture={() => console.log('Form onSubmitCapture triggered')}
+          >
             <div className="space-y-4">
               <div>
                 <Label htmlFor="email" className="text-sm font-medium text-gray-300">Email</Label>
@@ -528,7 +534,12 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
               <Button
                 type="submit"
                 disabled={loading}
+                onClick={(e) => {
+                  console.log('Submit button clicked');
+                  // Let the form's onSubmit handle it - don't prevent default
+                }}
                 className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 py-3 text-sm font-semibold"
+                data-testid="button-submit"
               >
                 {loading ? (
                   <div className="flex items-center justify-center">
