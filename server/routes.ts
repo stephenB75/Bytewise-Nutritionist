@@ -77,16 +77,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/auth/user', optionalAuth, async (req: any, res: Response) => {
     const userId = req.user?.id;
     
+    console.log('👤 /api/auth/user request:', { 
+      hasUserId: !!userId, 
+      userId: userId?.substring(0, 8) + '...' 
+    });
+    
     if (!userId) {
+      console.log('❌ No user ID found in request');
       res.json(null);
       return;
     }
     
     try {
       const user = await storage.getUser(userId);
+      console.log('✅ User found in database:', !!user);
       res.json(user);
     } catch (error) {
-      // If user not found in database, return null
+      console.log('❌ User not found in database, creating...');
+      // If user not found in database, try to get from Supabase and create
+      try {
+        const { data: supabaseUser } = await supabaseAdmin.auth.admin.getUserById(userId);
+        if (supabaseUser?.user) {
+          const newUser = {
+            id: supabaseUser.user.id,
+            email: supabaseUser.user.email!,
+            firstName: supabaseUser.user.user_metadata?.first_name,
+            lastName: supabaseUser.user.user_metadata?.last_name,
+          };
+          await storage.upsertUser(newUser);
+          console.log('✅ Created user in database from Supabase data');
+          res.json(newUser);
+          return;
+        }
+      } catch (createError) {
+        console.log('❌ Failed to create user:', createError);
+      }
       res.json(null);
     }
   });

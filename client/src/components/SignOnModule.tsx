@@ -156,7 +156,8 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
           });
           
           try {
-            const { error: sessionError } = await supabase.auth.setSession({
+            console.log('🔧 Setting session in Supabase client...');
+            const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
               access_token: data.session.access_token,
               refresh_token: data.session.refresh_token,
             });
@@ -166,7 +167,21 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
               throw sessionError;
             }
             
-            console.log('✅ Session set successfully, refreshing auth state...');
+            console.log('✅ Session set successfully:', {
+              hasUser: !!sessionData?.user,
+              hasSession: !!sessionData?.session,
+              userId: sessionData?.user?.id?.substring(0, 8) + '...'
+            });
+            
+            // Verify session was set by checking current session
+            const { data: currentSession } = await supabase.auth.getSession();
+            console.log('🔍 Current session after setting:', {
+              hasSession: !!currentSession.session,
+              hasAccessToken: !!currentSession.session?.access_token,
+              tokenPreview: currentSession.session?.access_token?.substring(0, 20) + '...'
+            });
+            
+            console.log('🔄 Refreshing auth state...');
             
             // Force refresh the auth state
             await refetch();
@@ -175,7 +190,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
             window.dispatchEvent(new CustomEvent('auth-state-change'));
             
             // Wait for state propagation
-            await new Promise(resolve => setTimeout(resolve, 500));
+            await new Promise(resolve => setTimeout(resolve, 1000));
             
             toast({
               title: "Welcome back!",
@@ -186,10 +201,14 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
             
             // Close modal after successful authentication
             if (onClose) {
+              console.log('🚪 Closing authentication modal');
               onClose();
+            } else {
+              console.log('⚠️ No onClose function provided');
             }
             
           } catch (err) {
+            console.log('❌ Session setting failed, using page reload fallback:', err);
             // Fallback to page reload if session setting fails
             toast({
               title: "Signing in...",

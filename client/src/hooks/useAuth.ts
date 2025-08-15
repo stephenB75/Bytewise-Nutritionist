@@ -7,11 +7,20 @@ export function useAuth() {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('🔔 Auth state change:', {
+          event,
+          hasSession: !!session,
+          hasUser: !!session?.user,
+          userId: session?.user?.id?.substring(0, 8) + '...' || 'none'
+        });
+        
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
           // Trigger a refetch of user data when auth state changes
+          console.log('📡 Triggering auth state change event...');
           window.dispatchEvent(new CustomEvent('auth-state-change'));
         } else if (event === 'SIGNED_OUT') {
           // Clear user data on sign out
+          console.log('🚪 User signed out, clearing auth state...');
           window.dispatchEvent(new CustomEvent('auth-state-change'));
         }
       }
