@@ -108,6 +108,34 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
     setIsSaving(true);
     
     try {
+      // Get the current access token (same logic as useAuth.ts)
+      let accessToken = null;
+      
+      // Check for locally stored custom tokens first
+      const storedSession = localStorage.getItem('supabase.auth.token');
+      if (storedSession) {
+        try {
+          const parsedSession = JSON.parse(storedSession);
+          if (parsedSession.access_token) {
+            accessToken = parsedSession.access_token;
+          }
+        } catch (parseError) {
+          console.log('Failed to parse stored session:', parseError);
+        }
+      }
+      
+      // If no custom token, check Supabase session
+      if (!accessToken) {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.access_token) {
+          accessToken = session.access_token;
+        }
+      }
+      
+      if (!accessToken) {
+        throw new Error('No authentication token available');
+      }
+      
       // Ensure firstName and lastName are properly split from name if needed
       const [firstName = '', lastName = ''] = userInfo.name.split(' ');
       
@@ -116,7 +144,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+          'Authorization': `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
           firstName: userInfo.firstName || firstName.trim(),
@@ -134,7 +162,9 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update profile');
+        const errorText = await response.text();
+        console.error('Profile update failed:', response.status, errorText);
+        throw new Error(`Failed to update profile: ${response.status}`);
       }
 
       // Update calorie goal separately via goals endpoint
@@ -142,7 +172,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+          'Authorization': `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
           dailyCalorieGoal: userInfo.calorieGoal,
@@ -150,10 +180,13 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
       });
 
       if (!goalsResponse.ok) {
-        throw new Error('Failed to update calorie goal');
+        const errorText = await goalsResponse.text();
+        console.error('Goals update failed:', goalsResponse.status, errorText);
+        throw new Error(`Failed to update calorie goal: ${goalsResponse.status}`);
       }
 
       // Both updates successful
+      console.log('✅ Profile and goals updated successfully');
 
       toast({
         title: "Profile Updated",
@@ -172,12 +205,21 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
       window.dispatchEvent(new CustomEvent('user-profile-updated', { 
         detail: { calorieGoal: userInfo.calorieGoal } 
       }));
-    } catch (error) {
+    } catch (error: any) {
+      console.error('❌ Profile save error:', error);
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack
+      });
+      
       toast({
         title: "Update Failed", 
-        description: "There was an error updating your profile. Please try again.",
+        description: error.message || "There was an error updating your profile. Please try again.",
         variant: "destructive",
       });
+      
+      // Show more detailed error via sonner for debugging
+      sonnerToast.error(`Profile save failed: ${error.message || 'Unknown error'}`);
     } finally {
       setIsSaving(false);
     }

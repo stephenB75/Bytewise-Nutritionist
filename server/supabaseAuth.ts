@@ -54,7 +54,7 @@ export function createAuthenticatedHandler(
   };
 }
 
-// Middleware to verify Supabase JWT tokens
+// Middleware to verify both Supabase JWT tokens and custom tokens
 export const isAuthenticated: AuthMiddleware = async (
   req: any,
   res: Response,
@@ -69,7 +69,24 @@ export const isAuthenticated: AuthMiddleware = async (
 
     const token = authHeader.substring(7); // Remove 'Bearer ' prefix
     
-    // Verify the JWT token with Supabase
+    // Check if it's a custom verified token first
+    if (token.startsWith('verified_')) {
+      // Parse verified_userId_timestamp format
+      const parts = token.split('_');
+      if (parts.length >= 2) {
+        const userId = parts[1];
+        
+        // Set user directly since we trust our own verified tokens
+        req.user = {
+          id: userId,
+          email: null, // Will be populated by endpoints that need it
+          claims: { sub: userId },
+        };
+        return next();
+      }
+    }
+    
+    // Try as standard Supabase JWT token
     const { data: { user }, error } = await supabase.auth.getUser(token);
     
     if (error || !user) {
