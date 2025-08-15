@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from '@/lib/supabase';
 
 export function useAuth() {
-  // Always call useEffect first to maintain hook order  
+  // Set up auth state listener
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
@@ -15,11 +15,9 @@ export function useAuth() {
         });
         
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-          // Trigger a refetch of user data when auth state changes
           console.log('📡 Triggering auth state change event...');
           window.dispatchEvent(new CustomEvent('auth-state-change'));
         } else if (event === 'SIGNED_OUT') {
-          // Clear user data on sign out
           console.log('🚪 User signed out, clearing auth state...');
           window.dispatchEvent(new CustomEvent('auth-state-change'));
         }
@@ -29,6 +27,7 @@ export function useAuth() {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Query user data
   const { data: user, isLoading, refetch } = useQuery({
     queryKey: ["/api/auth/user"],
     queryFn: async () => {
@@ -41,128 +40,88 @@ export function useAuth() {
           try {
             const parsedSession = JSON.parse(storedSession);
             if (parsedSession.access_token) {
-              console.log('🔍 Found locally stored custom token:', {
-                hasToken: true,
-                tokenLength: parsedSession.access_token.length,
-                isCustomToken: parsedSession.access_token.startsWith('verified_')
-              });
+              console.log('🔍 Found locally stored custom token');
               accessToken = parsedSession.access_token;
             }
-          } catch (parseError) {
-            console.log('⚠️ Failed to parse stored session:', parseError);
+          } catch (e) {
+            console.log('❌ Failed to parse stored session');
           }
         }
         
         // If no custom token, check Supabase session
         if (!accessToken) {
           const { data: { session } } = await supabase.auth.getSession();
-          
-          console.log('🔍 useAuth query - Supabase session check:', {
-            hasSession: !!session,
-            hasAccessToken: !!session?.access_token,
-            tokenLength: session?.access_token?.length
-          });
-          
           if (session?.access_token) {
+            console.log('🔍 Found Supabase session token');
             accessToken = session.access_token;
           }
         }
         
         if (!accessToken) {
-          console.log('❌ No valid session found (neither custom nor Supabase)');
+          console.log('❌ No access token found');
           return null;
         }
         
-        // Use the token to get user data from our backend
+        // Make authenticated request to user endpoint
         const response = await fetch('/api/auth/user', {
           headers: {
-            'Authorization': `Bearer ${accessToken}`,
-          },
-        });
-        
-        console.log('🔍 Backend user fetch response:', {
-          status: response.status,
-          ok: response.ok
+            'Authorization': `Bearer ${accessToken}`
+          }
         });
         
         if (!response.ok) {
-          // If unauthorized, return null instead of throwing
-          if (response.status === 401) {
-            console.log('❌ Unauthorized - token may be invalid');
-            return null;
-          }
-          throw new Error('Failed to fetch user');
+          console.log('❌ Auth request failed:', response.status);
+          return null;
         }
         
         const userData = await response.json();
-        console.log('✅ User data fetched successfully:', !!userData);
+        console.log('✅ User data retrieved:', { hasUser: !!userData });
         return userData;
+        
       } catch (error) {
         console.log('❌ Auth query error:', error);
-        // Return null for any authentication errors
         return null;
       }
     },
     retry: false,
     refetchOnWindowFocus: false,
-    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
-  // Listen for auth state changes to refetch
-  useEffect(() => {
-    const handleAuthChange = () => refetch();
-    window.addEventListener('auth-state-change', handleAuthChange);
-    return () => window.removeEventListener('auth-state-change', handleAuthChange);
-  }, [refetch]);
-
+  // Sign out function
   const signOut = async () => {
     try {
       console.log('🚪 Starting sign out process...');
       
-      // Clear localStorage first
+      // Clear custom tokens
       localStorage.removeItem('supabase.auth.token');
-      console.log('✅ Cleared localStorage custom tokens');
       
-      // Try to sign out from Supabase
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.log('⚠️ Supabase signOut error:', error);
-      } else {
-        console.log('✅ Supabase session cleared');
-      }
+      // Sign out from Supabase
+      await supabase.auth.signOut();
       
       // Call backend signout endpoint
-      try {
-        await fetch('/api/auth/signout', { method: 'POST' });
-        console.log('✅ Backend signout called');
-      } catch (fetchError) {
-        console.log('⚠️ Backend signout error:', fetchError);
-      }
+      await fetch('/api/auth/signout', { method: 'POST' });
       
-      // Force refresh auth state
-      await refetch();
+      // Clear all storage
+      localStorage.clear();
+      sessionStorage.clear();
       
-      // Trigger custom event for auth state change
-      window.dispatchEvent(new CustomEvent('auth-state-change'));
+      console.log('✅ Sign out complete');
       
-      console.log('✅ Sign out completed');
-      
-      // Optionally reload page to clear all state
-      setTimeout(() => {
-        window.location.reload();
-      }, 100);
+      // Reload page to reset state
+      window.location.href = '/';
       
     } catch (error) {
       console.error('❌ Sign out error:', error);
+      // Force reload anyway
+      window.location.href = '/';
     }
   };
 
   return {
     user,
     isLoading,
-    isAuthenticated: !!user,
     refetch,
-    supabase,
     signOut,
+    supabase
   };
 }
