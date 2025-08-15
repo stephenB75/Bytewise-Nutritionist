@@ -33,12 +33,10 @@ export const ProfileIcon: React.FC<ProfileIconProps> = ({
       className={`${sizeClasses[size]} rounded-full overflow-hidden flex items-center justify-center ${className}`}
       style={{
         backgroundImage: 'url(/profile-icons.jpg)',
-        backgroundSize: '300% 300%', // Optimized size for better icon centering
+        backgroundSize: '250% 250%', // Larger icons to fill the circle better and hide white background
         backgroundPosition: `${backgroundPositionX}% ${backgroundPositionY}%`,
         backgroundRepeat: 'no-repeat',
-        backgroundColor: 'transparent',
-        mixBlendMode: 'multiply',
-        filter: 'contrast(1.1) saturate(1.2)'
+        backgroundColor: 'transparent'
       }}
       data-testid={`profile-icon-${iconNumber}`}
     />
