@@ -73,6 +73,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('🔐 Form submitted:', { email: email ? 'provided' : 'missing', password: password ? 'provided' : 'missing', isSignUp });
     
     if (!email || !password) {
       toast({
@@ -108,6 +109,8 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
     
     try {
       const endpoint = isSignUp ? '/api/auth/signup' : '/api/auth/signin';
+      console.log('🌐 Making API call to:', endpoint);
+      
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
@@ -117,6 +120,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
       });
 
       const data = await response.json();
+      console.log('📨 API Response:', { status: response.status, hasSession: !!data.session, hasUser: !!data.user });
 
       if (response.ok) {
         // Check if email verification is required
@@ -131,6 +135,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
             setPassword(''); // Clear password for security
           }
         } else if (data.session) {
+          console.log('🔑 Setting session...');
           // Successfully signed in with verified email
           try {
             const { error: sessionError } = await supabase.auth.setSession({
@@ -139,12 +144,15 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
             });
             
             if (sessionError) {
+              console.error('❌ Session error:', sessionError);
               throw sessionError;
             }
             
+            console.log('✅ Session set, refetching auth state...');
             // Refetch auth state and wait for completion
             await refetch();
             
+            console.log('⏰ Waiting for state propagation...');
             // Additional delay to ensure state propagation
             await new Promise(resolve => setTimeout(resolve, 200));
             
@@ -153,12 +161,14 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
               description: "You've been signed in successfully.",
             });
             
+            console.log('🚪 Closing modal...');
             // Close the sign-in module
             if (onClose) {
               onClose();
             }
             
           } catch (err) {
+            console.error('💥 Session setting failed:', err);
             // Fallback to page reload if session setting fails
             toast({
               title: "Signing in...",
@@ -539,6 +549,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
               <Button
                 type="submit"
                 disabled={loading}
+                onClick={() => console.log('🔘 Submit button clicked directly')}
                 className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 py-3 text-sm font-semibold"
                 data-testid="button-submit"
               >
