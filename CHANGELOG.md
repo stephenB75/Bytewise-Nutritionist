@@ -1,5 +1,32 @@
 # Bytewise Nutritionist Changelog
 
+## BETA Version 1.4 (August 15, 2025) - Enhanced Fasting Milestone System
+
+### 🎯 Major Achievement: Comprehensive Fasting Milestone Celebrations
+- **Milestone Detection System**: Added comprehensive detection for 8h, 12h, 16h, 18h, 20h, 24h, 36h, 48h, and 72h fasting achievements
+- **Personalized Celebrations**: Each milestone shows unique congratulatory messages with specific health benefit descriptions
+- **Persistent Tracking**: Milestone progress saved in localStorage, preventing duplicate celebrations across browser sessions
+- **Achievement Integration**: Milestone completion triggers automatic achievement checks for additional rewards
+
+### 🔧 Technical Implementation
+- **Smart Milestone Logic**: Enhanced timer to check elapsed fasting time against milestone thresholds
+- **Session Management**: Milestones reset when starting new fasting sessions
+- **Final Celebration**: Enhanced completion message shows total fasting hours achieved
+- **Event System**: Milestone celebrations dispatch custom events for cross-component communication
+
+### 🎨 UI/UX Improvements
+- **Text Field Consistency**: Fixed calorie calculator search and measurement fields to have identical styling
+- **Consistent Borders**: Both fields now use same gray borders, blue focus states, and rounded corners
+- **Enhanced Notifications**: Milestone celebration toasts display for 6 seconds with motivational messages
+- **Search Icon Spacing**: Maintained proper search icon positioning with consistent padding
+
+### 🚀 System Enhancements
+- **Data Management Streamline**: Removed manual backup controls, enhanced "Always Active" sync status display
+- **Auto-Sync Improvements**: Background synchronization runs continuously with optimal debouncing
+- **Achievement Rewards**: Milestone completion automatically checks for unlockable achievements
+
+---
+
 ## Version 1.3.3 (August 14, 2025) - Complete Metrics Synchronization
 
 ### 🎯 Major Achievement: Daily View Metrics Synchronization
