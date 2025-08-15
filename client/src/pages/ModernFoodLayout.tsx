@@ -1141,7 +1141,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               placeholder="Search weekly food entries..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-12 pl-10 bg-white/10 border-white/20 text-gray-900 placeholder-gray-400"
+              className="h-12 pl-10 bg-white border-gray-300 text-gray-900 placeholder-gray-500"
             />
           </div>
           <Button 
@@ -1784,7 +1784,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               placeholder="Search weekly food entries..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-28 pr-16 h-16 bg-white/95 border-white/20 text-gray-900 placeholder-gray-500 backdrop-blur-md rounded-2xl text-xl font-medium text-center"
+              className="pl-28 pr-16 h-16 bg-white border-gray-300 text-gray-900 placeholder-gray-500 rounded-2xl text-xl font-medium text-center"
             />
             {searchQuery && (
               <Button
