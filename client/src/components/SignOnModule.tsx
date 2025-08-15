@@ -40,10 +40,12 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Form submitted!', { email, password, isSignUp });
     setLoading(true);
     
     try {
       const endpoint = isSignUp ? '/api/auth/signup' : '/api/auth/signin';
+      console.log('Making request to:', endpoint);
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
@@ -53,6 +55,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
       });
 
       const data = await response.json();
+      console.log('Response:', { status: response.status, data });
 
       if (response.ok) {
         // Check if email verification is required
@@ -113,6 +116,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
         }
       }
     } catch (error) {
+      console.error('Authentication error:', error);
       toast({
         title: "Error",
         description: "Something went wrong. Please try again.",
