@@ -218,7 +218,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             
             // Try to find user in admin list (with pagination handling)
             let existingUser = null;
-            let nextPage = '';
+            let nextPage: string = '';
             let attempts = 0;
             const maxAttempts = 5; // Prevent infinite loops
             
@@ -238,6 +238,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               attempts++;
               
               console.log(`📄 Searched page ${attempts}, found ${users?.users?.length} users, nextPage: ${!!nextPage}`);
+              console.log('👥 Users found:', users?.users?.map(u => ({ email: u.email, verified: !!u.email_confirmed_at })));
               
               if (!nextPage || existingUser) break;
             }
