@@ -8,10 +8,24 @@ import { createClient } from '@supabase/supabase-js';
 
 // Environment variables with fallbacks for production
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://ykgqcftrfvjblmqzbqvr.supabase.co';
-const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrZ3FjZnRyZnZqYmxtcXpicXZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU3ODcxNjQsImV4cCI6MjA1MTM2MzE2NH0.x7kMQbFJevYhYe4LvBTIb3VjcL6H6M7AQwvR8IbgAY4';
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrZ3FjZnRyZnZqYmxtcXpicXZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU3ODcxNjQsImV4cCI6MjA1MTM2MzE2NH0.x7kMQbFJevYhYe4LvBTIb3VjcL6H6M7AQwvR8IbgAY4';
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
 
-// Create Supabase client for server-side operations
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+// Create Supabase client for regular operations
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// Create admin client for server-side operations (email verification, etc.)
+const supabaseAdmin = SUPABASE_SERVICE_KEY 
+  ? createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    })
+  : supabase;
+
+// Export both clients
+export { supabaseAdmin };
 
 // Enhanced request type with user info  
 export interface AuthenticatedRequest extends Request {

@@ -1,7 +1,7 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated, optionalAuth, serverSupabase, type AuthenticatedRequest } from "./supabaseAuth";
+import { setupAuth, isAuthenticated, optionalAuth, serverSupabase, supabaseAdmin, type AuthenticatedRequest } from "./supabaseAuth";
 import { usdaService } from "./services/usdaService";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -163,7 +163,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { email, password } = req.body;
       
-      // Sign up user with Supabase (sends verification email automatically)
+      console.log('📝 Sign-up attempt for:', email);
+      console.log('🔐 Service key available:', !!supabaseAdmin);
+      
+      // Sign up user with regular Supabase client (sends verification email automatically)
       const { data, error } = await serverSupabase.auth.signUp({
         email,
         password,
@@ -173,47 +176,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       if (error) {
+        console.log('❌ Sign-up error:', error.message);
         return res.status(400).json({ message: error.message });
       }
       
-      // Don't create session until email is verified
-      if (data.user && !data.user.email_confirmed_at) {
-        return res.json({
-          user: null,
-          session: null,
-          message: "Account created! Please check your email for a verification link. You must click the link to activate your account before signing in.",
-          requiresVerification: true,
-          email: email
-        });
-      }
+      console.log('✅ User created:', data.user?.email, 'Confirmed:', !!data.user?.email_confirmed_at);
       
-      // Store user in our database only if email is verified
-      if (data.user && data.user.email_confirmed_at) {
-        try {
-          await storage.upsertUser({
-            id: data.user.id,
-            email: data.user.email,
-            firstName: data.user.user_metadata?.first_name,
-            lastName: data.user.user_metadata?.last_name,
-          });
-        } catch (dbError) {
-          // Continue anyway since Supabase auth succeeded
-        }
-        
-        res.json({ 
-          user: data.user, 
-          session: data.session,
-          message: "Account created and verified successfully" 
-        });
-      } else {
-        res.json({
-          user: null,
-          session: null,
-          message: "Account created! Please check your email for a verification link. You must click the link to activate your account before signing in.",
-          requiresVerification: true,
-          email: email
-        });
-      }
+      console.log('📧 User created successfully, email verification required');
+      
+      // Always return verification required for admin-created users
+      res.json({
+        user: null,
+        session: null,
+        message: "Account created! Please check your email for a verification link. You must click the link to activate your account before signing in.",
+        requiresVerification: true,
+        email: email
+      });
     } catch (error) {
       res.status(500).json({ message: "Sign up failed" });
     }
@@ -226,11 +204,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log('🔗 Verification callback received:', { type, hasToken: !!token_hash, next });
       
-      if (type === 'email_change_confirm' || type === 'signup') {
-        // Handle both email confirmation and signup verification
-        const verifyType = type === 'email_change_confirm' ? 'email_change' : 'signup';
+      if (type === 'email_change_confirm' || type === 'signup' || type === 'invite') {
+        // Handle email confirmation, signup verification, and invites
+        let verifyType = 'signup';
+        if (type === 'email_change_confirm') verifyType = 'email_change';
+        if (type === 'invite') verifyType = 'invite';
         
-        const { data, error } = await serverSupabase.auth.verifyOtp({
+        const { data, error } = await supabaseAdmin.auth.verifyOtp({
           token_hash: token_hash as string,
           type: verifyType as any
         });
@@ -263,7 +243,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (token_hash) {
         console.log('🔄 Attempting generic email confirmation...');
         try {
-          const { data, error } = await serverSupabase.auth.verifyOtp({
+          const { data, error } = await supabaseAdmin.auth.verifyOtp({
             token_hash: token_hash as string,
             type: 'email'
           });
