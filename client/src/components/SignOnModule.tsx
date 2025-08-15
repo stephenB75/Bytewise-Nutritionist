@@ -41,11 +41,12 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Form submitted!', { email, password, isSignUp });
+    alert(`FORM SUBMITTED! Email: ${email}, Mode: ${isSignUp ? 'SignUp' : 'SignIn'}`);
     
     // Show visible feedback that button was clicked
     toast({
       title: "Debug",
-      description: `Button clicked! Email: ${email}, Mode: ${isSignUp ? 'SignUp' : 'SignIn'}`,
+      description: `Form submitted! Email: ${email}, Mode: ${isSignUp ? 'SignUp' : 'SignIn'}`,
     });
     
     setLoading(true);
