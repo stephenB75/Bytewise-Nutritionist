@@ -87,9 +87,25 @@ function AppContent() {
     }
   };
 
-  const handleLogout = () => {
-    // Redirect to logout endpoint
-    window.location.href = '/api/logout';
+  const handleLogout = async () => {
+    try {
+      // Clear custom tokens
+      localStorage.removeItem('supabase.auth.token');
+      
+      // Call backend signout endpoint
+      await fetch('/api/auth/signout', { method: 'POST' });
+      
+      // Clear all app data
+      localStorage.clear();
+      sessionStorage.clear();
+      
+      // Reload page to reset state
+      window.location.href = '/';
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Force reload anyway
+      window.location.href = '/';
+    }
   };
 
   // Add global notification event listeners

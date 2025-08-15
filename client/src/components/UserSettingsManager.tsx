@@ -261,9 +261,27 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
 
   const handleSignOut = async () => {
     try {
+      console.log('🚪 UserSettingsManager: Starting sign out process...');
+      
+      // Clear custom tokens first
+      localStorage.removeItem('supabase.auth.token');
+      console.log('✅ Cleared custom tokens');
+      
       // Sign out from Supabase
       const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      if (error) {
+        console.log('⚠️ Supabase signOut error:', error);
+      } else {
+        console.log('✅ Supabase session cleared');
+      }
+      
+      // Call backend signout endpoint
+      try {
+        await fetch('/api/auth/signout', { method: 'POST' });
+        console.log('✅ Backend signout called');
+      } catch (fetchError) {
+        console.log('⚠️ Backend signout error:', fetchError);
+      }
       
       // Clear all local storage data
       localStorage.removeItem('bytewise-auth');
@@ -279,12 +297,15 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
       // Close modal if present
       if (onClose) onClose();
       
+      // Trigger auth state change event
+      window.dispatchEvent(new CustomEvent('auth-state-change'));
+      
       // Force page reload to reset all state and redirect to login
       setTimeout(() => {
         window.location.href = '/';
       }, 500);
     } catch (error) {
-      console.error('Sign out error:', error);
+      console.error('❌ Sign out error:', error);
       toast({
         title: "Sign Out Failed",
         description: "There was an error signing you out. Please try again.",

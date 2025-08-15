@@ -115,11 +115,54 @@ export function useAuth() {
     return () => window.removeEventListener('auth-state-change', handleAuthChange);
   }, [refetch]);
 
+  const signOut = async () => {
+    try {
+      console.log('🚪 Starting sign out process...');
+      
+      // Clear localStorage first
+      localStorage.removeItem('supabase.auth.token');
+      console.log('✅ Cleared localStorage custom tokens');
+      
+      // Try to sign out from Supabase
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.log('⚠️ Supabase signOut error:', error);
+      } else {
+        console.log('✅ Supabase session cleared');
+      }
+      
+      // Call backend signout endpoint
+      try {
+        await fetch('/api/auth/signout', { method: 'POST' });
+        console.log('✅ Backend signout called');
+      } catch (fetchError) {
+        console.log('⚠️ Backend signout error:', fetchError);
+      }
+      
+      // Force refresh auth state
+      await refetch();
+      
+      // Trigger custom event for auth state change
+      window.dispatchEvent(new CustomEvent('auth-state-change'));
+      
+      console.log('✅ Sign out completed');
+      
+      // Optionally reload page to clear all state
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
+      
+    } catch (error) {
+      console.error('❌ Sign out error:', error);
+    }
+  };
+
   return {
     user,
     isLoading,
     isAuthenticated: !!user,
     refetch,
     supabase,
+    signOut,
   };
 }
