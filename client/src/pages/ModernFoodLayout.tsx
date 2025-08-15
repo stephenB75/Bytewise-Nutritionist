@@ -1909,23 +1909,31 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   <div className="flex items-start justify-between w-full pr-4">
                     <div className="flex items-start space-x-4 flex-1 min-w-0">
                       <div className="relative flex-shrink-0">
-                        <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{backgroundColor: '#4F46E5'}}>
-                          <svg viewBox="0 0 80 80" className="w-full h-full">
-                            {/* Body */}
-                            <rect x="20" y="55" width="40" height="25" rx="20" fill="#059669" />
+                        <div className="w-16 h-16 rounded-full overflow-hidden flex items-center justify-center" style={{backgroundColor: '#F5E6D3'}}>
+                          <svg viewBox="0 0 120 120" className="w-full h-full">
+                            {/* Shirt/Collar */}
+                            <ellipse cx="60" cy="105" rx="45" ry="25" fill="#F59E0B" />
+                            <polygon points="45,85 75,85 70,95 50,95" fill="#FFFFFF" />
                             
                             {/* Head */}
-                            <circle cx="40" cy="35" r="18" fill="#FEF3C7" />
+                            <circle cx="60" cy="50" r="28" fill="#E9A178" />
                             
                             {/* Hair */}
-                            <ellipse cx="40" cy="22" rx="20" ry="15" fill="#92400E" />
+                            <path d="M32 45 Q32 20, 60 20 Q88 20, 88 45 Q85 35, 75 30 Q60 25, 45 30 Q35 35, 32 45" fill="#4A2C2A" />
                             
                             {/* Eyes */}
-                            <circle cx="34" cy="32" r="1.5" fill="#374151" />
-                            <circle cx="46" cy="32" r="1.5" fill="#374151" />
+                            <circle cx="52" cy="45" r="2" fill="#2D1B1B" />
+                            <circle cx="68" cy="45" r="2" fill="#2D1B1B" />
+                            
+                            {/* Eyebrows */}
+                            <ellipse cx="52" cy="40" rx="3" ry="1" fill="#4A2C2A" />
+                            <ellipse cx="68" cy="40" rx="3" ry="1" fill="#4A2C2A" />
+                            
+                            {/* Nose */}
+                            <ellipse cx="60" cy="52" rx="1" ry="2" fill="#D4926F" />
                             
                             {/* Mouth */}
-                            <ellipse cx="40" cy="40" rx="3" ry="1.5" fill="#374151" />
+                            <ellipse cx="60" cy="58" rx="3" ry="1.5" fill="#B8734F" />
                           </svg>
                         </div>
                         <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-black flex items-center justify-center">
