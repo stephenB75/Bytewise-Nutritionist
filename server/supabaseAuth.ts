@@ -77,32 +77,8 @@ export const isAuthenticated: AuthMiddleware = async (
         const supabaseUserId = parts[1];
         
         // CRITICAL: Map Supabase user ID to database user ID for required auth
-        let actualUserId = supabaseUserId;
-        try {
-          // Import storage here to avoid circular dependency issues
-          const { storage } = await import('./index');
-          
-          // Try to find user by Supabase ID first
-          let user = await storage.getUser(supabaseUserId);
-          
-          if (!user) {
-            // If not found by Supabase ID, try to find by email using Supabase admin
-            try {
-              const { data: supabaseUser } = await supabaseAdmin.auth.admin.getUserById(supabaseUserId);
-              if (supabaseUser?.user?.email) {
-                const allUsers = await storage.getAllUsers();
-                const userByEmail = allUsers.find(u => u.email === supabaseUser.user.email);
-                if (userByEmail) {
-                  actualUserId = userByEmail.id;
-                }
-              }
-            } catch (lookupError) {
-              console.log('⚠️ Failed to lookup user for ID mapping:', lookupError);
-            }
-          }
-        } catch (mappingError) {
-          console.log('⚠️ Failed to map user ID:', mappingError);
-        }
+        const { mapSupabaseIdToDatabaseId } = await import('./userMapping');
+        const actualUserId = await mapSupabaseIdToDatabaseId(supabaseUserId);
         
         // Set user directly since we trust our own verified tokens
         req.user = {
@@ -157,37 +133,8 @@ export const optionalAuth: AuthMiddleware = async (
           console.log('🔍 Extracting user ID from custom token:', supabaseUserId.substring(0, 8) + '...');
           
           // CRITICAL: Map Supabase user ID to database user ID
-          let actualUserId = supabaseUserId;
-          try {
-            // Import storage here to avoid circular dependency issues
-            const { storage } = await import('./index');
-            
-            // Try to find user by Supabase ID first
-            let user = await storage.getUser(supabaseUserId);
-            
-            if (!user) {
-              // If not found by Supabase ID, try to find by email using Supabase admin
-              try {
-                const { data: supabaseUser } = await supabaseAdmin.auth.admin.getUserById(supabaseUserId);
-                if (supabaseUser?.user?.email) {
-                  console.log('🔍 Looking up database user by email:', supabaseUser.user.email);
-                  const allUsers = await storage.getAllUsers(); // We'll need to add this method
-                  const userByEmail = allUsers.find(u => u.email === supabaseUser.user.email);
-                  if (userByEmail) {
-                    actualUserId = userByEmail.id;
-                    console.log('📍 Mapped Supabase ID to database ID:', {
-                      supabaseId: supabaseUserId.substring(0, 8) + '...',
-                      databaseId: actualUserId.substring(0, 8) + '...'
-                    });
-                  }
-                }
-              } catch (lookupError) {
-                console.log('⚠️ Failed to lookup user for ID mapping:', lookupError);
-              }
-            }
-          } catch (mappingError) {
-            console.log('⚠️ Failed to map user ID:', mappingError);
-          }
+          const { mapSupabaseIdToDatabaseId } = await import('./userMapping');
+          const actualUserId = await mapSupabaseIdToDatabaseId(supabaseUserId);
           
           // Set user with the correct ID (either original or mapped)
           req.user = {
