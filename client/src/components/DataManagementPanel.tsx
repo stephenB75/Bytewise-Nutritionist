@@ -28,7 +28,6 @@ export function DataManagementPanel() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [isExporting, setIsExporting] = useState(false);
-  const [isSyncing, setIsSyncing] = useState(false);
 
 
   const handleExportData = async () => {
@@ -79,66 +78,6 @@ export function DataManagementPanel() {
     }
   };
 
-  const handleSyncData = async () => {
-    setIsSyncing(true);
-    try {
-      // Show initial backup starting message
-      toast({
-        title: "Backup starting",
-        description: "Preparing to backup your nutrition data to the database...",
-      });
-
-      // Make request to sync data endpoint
-      const response = await fetch('/api/user/sync-data', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          includeProfile: true,
-          includeMeals: true,
-          includeRecipes: true,
-          includeWaterIntake: true
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        
-        // Update data stats with backup info
-        dataStats.lastSync = new Date().toLocaleDateString();
-        dataStats.backupStatus = 'Completed';
-        
-        toast({
-          title: "Auto Backup Complete ✅",
-          description: `Successfully backed up ${data.itemsBackedUp || 0} items to the database. Your data is now safely stored and synchronized.`,
-        });
-
-        // Optional: Show detailed breakdown
-        if (data.breakdown) {
-          setTimeout(() => {
-            toast({
-              title: "Backup Details",
-              description: `Profile: ${data.breakdown.profile || 0} items, Meals: ${data.breakdown.meals || 0} items, Recipes: ${data.breakdown.recipes || 0} items`,
-            });
-          }, 2000);
-        }
-      } else {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Backup failed');
-      }
-    } catch (error: any) {
-      // Error handled with user-friendly toast message
-      toast({
-        title: "Auto Backup Failed",
-        description: error.message || "There was an error backing up your data to the database. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSyncing(false);
-    }
-  };
-
   const handleDeleteAllData = async () => {
     if (confirm("Are you sure you want to delete all your data? This action cannot be undone.")) {
       try {
@@ -167,9 +106,7 @@ export function DataManagementPanel() {
   const dataStats = {
     totalMeals: 127,
     totalDays: 45,
-    dataSize: '2.3 MB',
-    lastSync: new Date().toLocaleDateString(),
-    backupStatus: 'Up to date'
+    dataSize: '2.3 MB'
   };
 
   return (
@@ -211,12 +148,12 @@ export function DataManagementPanel() {
             <div className="flex items-center space-x-3">
               <Cloud className="w-5 h-5 text-[#1f4aa6]" />
               <div>
-                <p className="font-medium text-white" style={{ fontFamily: "'Work Sans', sans-serif" }}>Backup Status</p>
-                <p className="text-sm text-gray-300" style={{ fontFamily: "'Quicksand', sans-serif" }}>Last sync: {dataStats.lastSync}</p>
+                <p className="font-medium text-white" style={{ fontFamily: "'Work Sans', sans-serif" }}>Auto Sync Status</p>
+                <p className="text-sm text-gray-300" style={{ fontFamily: "'Quicksand', sans-serif" }}>Your data syncs automatically as you use the app</p>
               </div>
             </div>
             <Badge className="bg-[#45c73e]/20 text-[#45c73e] border-[#45c73e]/30">
-              {dataStats.backupStatus}
+              Always Active
             </Badge>
           </div>
         </Card>
@@ -256,46 +193,6 @@ export function DataManagementPanel() {
                           <>
                             <Download className="w-5 h-5 mr-3" strokeWidth={2.5} />
                             Download PDF Report
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  </div>
-
-                  <Separator className="bg-white/20" />
-
-                  {/* Auto Backup Section */}
-                  <div className="p-6 bg-gradient-to-br from-[#45c73e]/10 to-[#45c73e]/5 rounded-2xl border border-[#45c73e]/20 backdrop-blur-md">
-                    <div className="flex flex-col items-center text-center space-y-4">
-                      <div className="p-4 bg-[#45c73e]/20 rounded-2xl">
-                        <Cloud className="w-8 h-8 text-[#45c73e]" strokeWidth={2.5} />
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-white text-xl mb-2" style={{ fontFamily: "'League Spartan', sans-serif" }}>
-                          Auto Backup
-                        </h4>
-                        <p className="text-sm text-gray-300 mb-4" style={{ fontFamily: "'Quicksand', sans-serif" }}>
-                          Securely backup your profile, meals, recipes, and tracking data to the database
-                        </p>
-                        <Badge className="bg-[#45c73e]/20 text-[#45c73e] border-[#45c73e]/30 mb-4">
-                          Database Backup
-                        </Badge>
-                      </div>
-                      <Button
-                        onClick={handleSyncData}
-                        disabled={isSyncing}
-                        size="lg"
-                        className="w-full bg-gradient-to-r from-[#45c73e] to-[#3ab82e] hover:from-[#3ab82e] hover:to-[#2d8f26] text-white shadow-xl rounded-2xl px-8 py-4 transition-all duration-300 font-semibold"
-                      >
-                        {isSyncing ? (
-                          <>
-                            <RefreshCw className="w-5 h-5 mr-3 animate-spin" strokeWidth={2.5} />
-                            Backing Up...
-                          </>
-                        ) : (
-                          <>
-                            <Cloud className="w-5 h-5 mr-3" strokeWidth={2.5} />
-                            Start Auto Backup
                           </>
                         )}
                       </Button>
