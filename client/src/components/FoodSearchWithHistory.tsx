@@ -172,7 +172,7 @@ export function FoodSearchWithHistory({
           onChange={(e) => handleSearch(e.target.value)}
           onFocus={() => setShowResults(false)}
           placeholder={placeholder}
-          className={`pl-10 ${className || "text-base bg-white border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg px-4 py-3 text-blue-600 placeholder-gray-500"}`}
+          className={`pl-10 ${className || "text-base bg-white border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-500"}`}
         />
       </div>
 
