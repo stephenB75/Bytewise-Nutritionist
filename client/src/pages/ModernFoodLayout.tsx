@@ -1141,7 +1141,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               placeholder="Search weekly food entries..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-12 pl-10 bg-white/10 border-white/20 text-white placeholder-gray-400"
+              className="h-12 pl-10 bg-white/10 border-white/20 text-gray-900 placeholder-gray-400"
             />
           </div>
           <Button 
