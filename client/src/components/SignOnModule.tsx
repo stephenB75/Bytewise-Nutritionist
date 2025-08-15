@@ -247,6 +247,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
   };
 
   const handleGoogleSignIn = async () => {
+    if (loading) return; // Prevent double clicks
     setLoading(true);
     try {
       const { error } = await supabase.auth.signInWithOAuth({
@@ -288,6 +289,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
   };
 
   const handleGitHubSignIn = async () => {
+    if (loading) return; // Prevent double clicks
     setLoading(true);
     try {
       const { error } = await supabase.auth.signInWithOAuth({
@@ -555,9 +557,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
             )}
           </form>
 
-
-
-          {/* OAuth Providers */}
+          {/* OAuth Providers - Separated from form */}
           <div className="space-y-3">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
@@ -572,7 +572,11 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
               <Button
                 type="button"
                 variant="outline"
-                onClick={handleGoogleSignIn}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleGoogleSignIn();
+                }}
                 disabled={loading}
                 className="flex items-center justify-center py-2 px-4 border border-white/20 bg-white/5 text-sm font-medium text-gray-300 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
                 data-testid="button-google-signin"
@@ -588,7 +592,11 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
               <Button
                 type="button"
                 variant="outline"
-                onClick={handleGitHubSignIn}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleGitHubSignIn();
+                }}
                 disabled={loading}
                 className="flex items-center justify-center py-2 px-4 border border-white/20 bg-white/5 text-sm font-medium text-gray-300 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
                 data-testid="button-github-signin"
