@@ -76,17 +76,30 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
 
   // Update local state when user data changes
   useEffect(() => {
+    console.log('🔄 UserSettingsManager: User data changed, updating form state:', {
+      hasUser: !!user,
+      userEmail: user?.email || 'none',
+      userId: user?.id?.substring(0, 8) + '...' || 'none'
+    });
+    
     if (user) {
       const userData = user as any;
       const firstName = userData?.firstName || '';
       const lastName = userData?.lastName || '';
       const personalInfo = userData?.personalInfo || {};
       
+      console.log('📝 UserSettingsManager: Extracted user data:', {
+        firstName: firstName || '(empty)',
+        lastName: lastName || '(empty)',
+        personalInfoKeys: personalInfo ? Object.keys(personalInfo) : 'none',
+        dailyCalorieGoal: userData?.dailyCalorieGoal || 'none'
+      });
+      
       // Create full name from available data
       const fullName = firstName && lastName ? `${firstName} ${lastName}`.trim() : 
                        personalInfo?.name || userData?.name || firstName || userData?.email?.split('@')[0] || '';
       
-      setUserInfo({
+      const newUserInfo = {
         firstName,
         lastName, 
         name: fullName,
@@ -100,7 +113,17 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
         dietaryPreferences: personalInfo?.dietary_preferences || [],
         calorieGoal: userData?.dailyCalorieGoal || userData?.calorie_goal || 2000,
         joinDate: userData?.createdAt || new Date().toISOString(),
+      };
+      
+      console.log('🎯 UserSettingsManager: Setting new form state:', {
+        firstName: newUserInfo.firstName || '(empty)',
+        lastName: newUserInfo.lastName || '(empty)', 
+        phone: newUserInfo.phone || '(empty)',
+        location: newUserInfo.location || '(empty)',
+        calorieGoal: newUserInfo.calorieGoal
       });
+      
+      setUserInfo(newUserInfo);
     }
   }, [user]);
 
@@ -139,6 +162,27 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
       // Ensure firstName and lastName are properly split from name if needed
       const [firstName = '', lastName = ''] = userInfo.name.split(' ');
       
+      const profileData = {
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        personalInfo: {
+          phone: userInfo.phone,
+          location: userInfo.location,
+          birth_date: userInfo.birthDate,
+          height: userInfo.height,
+          weight: userInfo.weight,
+          activity_level: userInfo.activityLevel,
+          dietary_preferences: userInfo.dietaryPreferences,
+        }
+      };
+      
+      console.log('📤 UserSettingsManager: Sending profile data:', {
+        originalName: userInfo.name,
+        splitFirstName: firstName.trim(),
+        splitLastName: lastName.trim(),
+        profileData: profileData
+      });
+      
       // Update user profile via backend API (database) instead of Supabase metadata
       const response = await fetch('/api/user/profile', {
         method: 'PUT',
@@ -146,19 +190,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${accessToken}`,
         },
-        body: JSON.stringify({
-          firstName: userInfo.firstName || firstName.trim(),
-          lastName: userInfo.lastName || lastName.trim(),
-          personalInfo: {
-            phone: userInfo.phone,
-            location: userInfo.location,
-            birth_date: userInfo.birthDate,
-            height: userInfo.height,
-            weight: userInfo.weight,
-            activity_level: userInfo.activityLevel,
-            dietary_preferences: userInfo.dietaryPreferences,
-          }
-        })
+        body: JSON.stringify(profileData)
       });
 
       if (!response.ok) {
@@ -197,9 +229,48 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
       setIsEditing(false);
       
       // Refetch user data to show updated information
-      await refetch();
-      
+      console.log('🔄 UserSettingsManager: Calling refetch to get updated user data...');
+      const refetchResult = await refetch();
+      console.log('✅ UserSettingsManager: Refetch completed, result:', {
+        hasData: !!refetchResult.data,
+        userEmail: refetchResult.data?.email || 'none',
+        firstName: refetchResult.data?.firstName || '(empty)',
+        lastName: refetchResult.data?.lastName || '(empty)'
+      });
 
+      // Force update form state with the fresh data (in case useEffect doesn't trigger)
+      if (refetchResult.data) {
+        const userData = refetchResult.data as any;
+        const refreshedFirstName = userData?.firstName || '';
+        const refreshedLastName = userData?.lastName || '';
+        const refreshedPersonalInfo = userData?.personalInfo || {};
+        
+        const refreshedFullName = refreshedFirstName && refreshedLastName ? 
+          `${refreshedFirstName} ${refreshedLastName}`.trim() : 
+          refreshedPersonalInfo?.name || userData?.name || refreshedFirstName || userData?.email?.split('@')[0] || '';
+        
+        console.log('🔄 UserSettingsManager: Force updating form state with fresh data:', {
+          refreshedFirstName: refreshedFirstName || '(empty)',
+          refreshedLastName: refreshedLastName || '(empty)',
+          refreshedFullName: refreshedFullName || '(empty)'
+        });
+        
+        setUserInfo({
+          firstName: refreshedFirstName,
+          lastName: refreshedLastName, 
+          name: refreshedFullName,
+          email: userData?.email || '',
+          phone: refreshedPersonalInfo?.phone || '',
+          location: refreshedPersonalInfo?.location || '',
+          birthDate: refreshedPersonalInfo?.birthDate || '',
+          height: refreshedPersonalInfo?.height || '',
+          weight: refreshedPersonalInfo?.weight || '',
+          activityLevel: refreshedPersonalInfo?.activityLevel || 'Moderately Active',
+          dietaryPreferences: refreshedPersonalInfo?.dietary_preferences || [],
+          calorieGoal: userData?.dailyCalorieGoal || userData?.calorie_goal || 2000,
+          joinDate: userData?.createdAt || new Date().toISOString(),
+        });
+      }
       
       // Dispatch custom event to notify dashboard of profile changes
       window.dispatchEvent(new CustomEvent('user-profile-updated', { 

@@ -95,7 +95,15 @@ export function useAuth() {
         }
         
         const userData = await response.json();
-        console.log('✅ User data fetched successfully:', !!userData);
+        console.log('✅ User data fetched successfully:', {
+          hasUserData: !!userData,
+          userEmail: userData?.email || 'none',
+          userId: userData?.id?.substring(0, 8) + '...' || 'none',
+          firstName: userData?.firstName || '(empty)',
+          lastName: userData?.lastName || '(empty)',
+          hasPersonalInfo: !!userData?.personalInfo,
+          dailyCalorieGoal: userData?.dailyCalorieGoal || 'none'
+        });
         return userData;
       } catch (error) {
         console.log('❌ Auth query error:', error);
