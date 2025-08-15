@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabase';
 import { useEffect } from 'react';
 
 export function useAuth() {
-  // Always call useEffect first to maintain hook order
+  // Always call useEffect first to maintain hook order  
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
