@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface ProfileIconProps {
-  iconNumber: number; // 1-9 for the 9 different icons in the pack
+  iconNumber: number; // 1-2 for the 2 different avatar types (1=male, 2=female)
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 }
@@ -17,24 +17,16 @@ export const ProfileIcon: React.FC<ProfileIconProps> = ({
     lg: 'w-24 h-24'
   };
 
-  // Calculate position for the specific icon in the sprite sheet
-  // The icons are arranged in a 3x3 grid
-  const row = Math.floor((iconNumber - 1) / 3);
-  const col = (iconNumber - 1) % 3;
-  
-  // Precise positioning for perfect centering within circular container
-  // For a 3x3 grid, we need to center each icon within its cell
-  // Using more precise positioning calculations
-  const backgroundPositionX = col * 50; // 0%, 50%, 100%
-  const backgroundPositionY = row * 50; // 0%, 50%, 100%
+  // Determine which avatar to use based on iconNumber
+  const avatarSrc = iconNumber === 2 ? '/avatar-female.png' : '/avatar-male.png';
 
   return (
     <div 
       className={`${sizeClasses[size]} rounded-full overflow-hidden flex items-center justify-center ${className}`}
       style={{
-        backgroundImage: 'url(/profile-icons-updated.jpg)',
-        backgroundSize: '300% 300%', // Optimized to show full icon within circle
-        backgroundPosition: `${backgroundPositionX}% ${backgroundPositionY}%`,
+        backgroundImage: `url(${avatarSrc})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'
       }}
       data-testid={`profile-icon-${iconNumber}`}
@@ -44,5 +36,5 @@ export const ProfileIcon: React.FC<ProfileIconProps> = ({
 
 // Helper function to get a random icon number for new users
 export const getRandomIconNumber = (): number => {
-  return Math.floor(Math.random() * 9) + 1; // Random number 1-9
+  return Math.floor(Math.random() * 2) + 1; // Random number 1-2 (male or female avatar)
 };
