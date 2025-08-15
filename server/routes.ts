@@ -94,9 +94,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Sign in endpoint with email verification check
   app.post('/api/auth/signin', async (req: Request, res: Response) => {
     try {
-      const { email, password } = req.body;
+      const { email: rawEmail, password } = req.body;
+      const email = rawEmail?.toLowerCase().trim(); // Normalize email case
       
-      console.log('🔐 Sign-in attempt for:', email);
+      console.log('🔐 Sign-in attempt for:', email, '(normalized from:', rawEmail, ')');
       
       const { data, error } = await serverSupabase.auth.signInWithPassword({
         email,
@@ -148,6 +149,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      console.log('✅ Sending successful response with session:', !!data.session);
+      
       res.json({ 
         user: data.user, 
         session: data.session,
@@ -161,7 +164,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Sign up endpoint with email verification requirement
   app.post('/api/auth/signup', async (req: Request, res: Response) => {
     try {
-      const { email, password } = req.body;
+      const { email: rawEmail, password } = req.body;
+      const email = rawEmail?.toLowerCase().trim(); // Normalize email case
       
       console.log('📝 Sign-up attempt for:', email);
       console.log('🔐 Service key available:', !!supabaseAdmin);

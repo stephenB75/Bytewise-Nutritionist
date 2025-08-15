@@ -120,6 +120,15 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
       });
 
       const data = await response.json();
+      
+      console.log('🔍 Frontend received response:', {
+        status: response.status,
+        ok: response.ok,
+        hasUser: !!data.user,
+        hasSession: !!data.session,
+        requiresVerification: data.requiresVerification,
+        message: data.message
+      });
 
       if (response.ok) {
         // Check if email verification is required
@@ -140,6 +149,12 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
           }
         } else if (data.session) {
           // Successfully signed in with verified email
+          console.log('🎯 Setting session with tokens:', {
+            hasAccessToken: !!data.session.access_token,
+            hasRefreshToken: !!data.session.refresh_token,
+            accessTokenLength: data.session.access_token?.length
+          });
+          
           try {
             const { error: sessionError } = await supabase.auth.setSession({
               access_token: data.session.access_token,
@@ -147,8 +162,11 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
             });
             
             if (sessionError) {
+              console.log('❌ Session setting error:', sessionError);
               throw sessionError;
             }
+            
+            console.log('✅ Session set successfully, refreshing auth state...');
             
             // Force refresh the auth state
             await refetch();
@@ -163,6 +181,8 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
               title: "Welcome back!",
               description: "You've been signed in successfully.",
             });
+            
+            console.log('🚪 Closing modal after successful sign-in');
             
             // Close modal after successful authentication
             if (onClose) {
