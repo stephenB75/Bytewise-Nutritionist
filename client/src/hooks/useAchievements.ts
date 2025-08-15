@@ -3,6 +3,10 @@ export function useAchievements() {
   return {};
 }
 
+export function useCheckAchievements() {
+  return {};
+}
+
 export function getAchievementIcon() {
   return '';
 }

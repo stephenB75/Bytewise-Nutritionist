@@ -1,6 +1,6 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import MinimalApp from "./MinimalApp";
+import SimpleTest from "./SimpleTest";
 
 // Production ready ByteWise Nutrition Tracker
 
@@ -64,8 +64,10 @@ if (!rootElement) {
       </style>
     `;
     
-    // Render minimal app
-    root.render(<MinimalApp />);
+    console.log("MAIN.TSX IS LOADING - TESTING DIRECT RENDER");
+    
+    // Test with simple React component
+    root.render(<SimpleTest />);
     
   } catch (error) {
     rootElement.innerHTML = `
