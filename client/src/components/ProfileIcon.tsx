@@ -22,18 +22,18 @@ export const ProfileIcon: React.FC<ProfileIconProps> = ({
   const row = Math.floor((iconNumber - 1) / 3);
   const col = (iconNumber - 1) % 3;
   
-  // More precise positioning for better centering
-  // Using exact percentages for 3x3 grid: 0%, 50%, 100% for col/row positions
-  const positions = [0, 50, 100];
-  const backgroundPositionX = positions[col];
-  const backgroundPositionY = positions[row];
+  // Precise positioning for perfect centering within circular container
+  // For a 3x3 grid, we need to center each icon within its cell
+  // Using more precise positioning calculations
+  const backgroundPositionX = col * 50; // 0%, 50%, 100%
+  const backgroundPositionY = row * 50; // 0%, 50%, 100%
 
   return (
     <div 
       className={`${sizeClasses[size]} rounded-full overflow-hidden flex items-center justify-center ${className}`}
       style={{
         backgroundImage: 'url(/profile-icons.jpg)',
-        backgroundSize: '320% 320%', // Slightly larger to ensure icons fit fully within circle
+        backgroundSize: '300% 300%', // Optimized size for better icon centering
         backgroundPosition: `${backgroundPositionX}% ${backgroundPositionY}%`,
         backgroundRepeat: 'no-repeat'
       }}
