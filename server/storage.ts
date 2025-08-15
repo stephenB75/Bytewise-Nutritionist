@@ -227,15 +227,39 @@ export class DatabaseStorage implements IStorage {
     personalInfo?: any;
     notificationSettings?: any;
     privacySettings?: any;
+    profileIcon?: number;
   }): Promise<User> {
     console.log('👤 Storage: updateUserProfile called:', {
       userId: userId.substring(0, 8) + '...',
       profileFields: Object.keys(profileData),
       firstName: profileData.firstName || '(empty)',
       lastName: profileData.lastName || '(empty)',
+      profileIcon: profileData.profileIcon || 'not provided',
       hasPersonalInfo: !!profileData.personalInfo,
       personalInfoKeys: profileData.personalInfo ? Object.keys(profileData.personalInfo) : 'none'
     });
+    
+    // First check if user exists
+    const existingUser = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+    
+    console.log('👤 Storage: User existence check:', {
+      userExists: existingUser.length > 0,
+      existingUserData: existingUser.length > 0 ? {
+        id: existingUser[0].id.substring(0, 8) + '...',
+        email: existingUser[0].email,
+        firstName: existingUser[0].firstName || '(empty)',
+        lastName: existingUser[0].lastName || '(empty)'
+      } : 'no user found'
+    });
+    
+    if (existingUser.length === 0) {
+      console.log('❌ Storage: User not found for update, userId:', userId);
+      throw new Error(`User not found: ${userId}`);
+    }
     
     const [user] = await db
       .update(users)
@@ -251,6 +275,7 @@ export class DatabaseStorage implements IStorage {
       userId: user?.id?.substring(0, 8) + '...' || 'none',
       firstName: user?.firstName || '(empty)',
       lastName: user?.lastName || '(empty)',
+      profileIcon: user?.profileIcon || 'none',
       hasPersonalInfo: !!user?.personalInfo
     });
     

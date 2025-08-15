@@ -1158,21 +1158,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     
     try {
-      const { firstName, lastName, personalInfo } = req.body;
+      const { firstName, lastName, personalInfo, profileIcon } = req.body;
       
       console.log('🔄 Profile update request:', {
         userId: userId.substring(0, 8) + '...',
         firstName: firstName?.trim() || '(empty)',
         lastName: lastName?.trim() || '(empty)', 
+        profileIcon: profileIcon || 'not provided',
         personalInfo: personalInfo ? Object.keys(personalInfo) : 'none'
       });
       
       // Update user profile information
-      const updatedUser = await storage.updateUserProfile(userId, {
+      const profileUpdateData: any = {
         firstName: firstName?.trim() || '',
         lastName: lastName?.trim() || '',
         personalInfo: personalInfo || {}
-      });
+      };
+      
+      // Include profileIcon if provided
+      if (profileIcon !== undefined) {
+        profileUpdateData.profileIcon = profileIcon;
+      }
+      
+      const updatedUser = await storage.updateUserProfile(userId, profileUpdateData);
       
       console.log('✅ Profile updated successfully:', {
         userId: userId.substring(0, 8) + '...',
