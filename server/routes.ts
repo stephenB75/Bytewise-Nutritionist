@@ -234,7 +234,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               }
               
               existingUser = users?.users?.find(u => u.email?.toLowerCase() === email);
-              nextPage = users?.nextPage || '';
+              nextPage = String(users?.nextPage || '');
               attempts++;
               
               console.log(`📄 Searched page ${attempts}, found ${users?.users?.length} users, nextPage: ${!!nextPage}`);
@@ -1115,7 +1115,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // User profile update endpoint (new format expected by UserSettingsManager)
+  // User profile update endpoint (used by UserSettingsManager)
   app.put('/api/user/profile', isAuthenticated, async (req: any, res: Response) => {
     const userId = req.user?.id;
     if (!userId) {
@@ -1125,13 +1125,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     try {
       const { firstName, lastName, personalInfo } = req.body;
-      
-      // Validate required fields
-      if (!firstName?.trim() && !lastName?.trim()) {
-        return res.status(400).json({ 
-          message: "At least first name or last name is required" 
-        });
-      }
       
       // Update user profile information
       const updatedUser = await storage.updateUserProfile(userId, {
@@ -1147,7 +1140,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: "Profile updated successfully"
       });
     } catch (error: any) {
-      // Profile update error handled by response
+      console.error('Profile update error:', error);
       res.status(500).json({ 
         message: error?.message || "Failed to update profile" 
       });
@@ -1430,36 +1423,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // User profile update endpoint
-  app.put('/api/user/profile', isAuthenticated, async (req: any, res: Response) => {
-    try {
-      const userId = req.user?.id;
-      if (!userId) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
 
-      const { firstName, lastName, personalInfo } = req.body;
-
-      // Update user profile in database using upsertUser
-      const updatedUser = await storage.upsertUser({
-        id: userId,
-        firstName,
-        lastName,
-        personalInfo
-      });
-
-      res.json({
-        success: true,
-        message: "Profile updated successfully",
-        user: updatedUser,
-        itemsUpdated: Object.keys(personalInfo || {}).length + 2, // personalInfo fields + firstName + lastName
-        timestamp: new Date().toISOString()
-      });
-    } catch (error) {
-      console.error('Profile update error:', error);
-      res.status(500).json({ message: "Failed to update profile" });
-    }
-  });
 
   // USDA Bulk Download API endpoints
   app.post('/api/usda/bulk-download', async (req, res) => {
