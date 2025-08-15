@@ -89,14 +89,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     
     try {
+      console.log('🔍 Calling storage.getUser with ID:', userId);
       const user = await storage.getUser(userId);
+      console.log('📊 Database result:', { user: !!user, userType: typeof user });
       console.log('✅ User found in database:', !!user);
-      res.json(user);
-    } catch (error) {
+      
+      // If user exists in database, return it
+      if (user) {
+        console.log('✅ Returning user from database');
+        res.json(user);
+        return;
+      }
+      
+      // If user doesn't exist in database, fetch from Supabase
       console.log('❌ User not found in local database, fetching from Supabase...');
+      console.log('🔍 Attempting Supabase admin getUserById for:', userId);
       // If user not found in database, return Supabase user data directly 
       try {
         const { data: supabaseUser, error: fetchError } = await supabaseAdmin.auth.admin.getUserById(userId);
+        console.log('📊 Supabase response:', { 
+          hasData: !!supabaseUser, 
+          hasUser: !!supabaseUser?.user, 
+          hasError: !!fetchError,
+          errorMessage: fetchError?.message 
+        });
         
         if (fetchError) {
           console.log('❌ Failed to fetch user from Supabase:', fetchError.message);
@@ -138,6 +154,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       } catch (createError) {
         console.log('❌ Failed to fetch user from Supabase:', createError);
+      }
+      res.json(null);
+    } catch (error) {
+      console.log('❌ Database error, fetching from Supabase...', error);
+      // If database error, also try Supabase fallback
+      try {
+        const { data: supabaseUser, error: fetchError } = await supabaseAdmin.auth.admin.getUserById(userId);
+        
+        if (!fetchError && supabaseUser?.user) {
+          const userData = {
+            id: supabaseUser.user.id,
+            email: supabaseUser.user.email!,
+            emailVerified: !!supabaseUser.user.email_confirmed_at,
+            firstName: supabaseUser.user.user_metadata?.first_name || supabaseUser.user.user_metadata?.firstName || null,
+            lastName: supabaseUser.user.user_metadata?.last_name || supabaseUser.user.user_metadata?.lastName || null,
+            profileImageUrl: supabaseUser.user.user_metadata?.avatar_url || null,
+            profileIcon: Math.floor(Math.random() * 9) + 1,
+            createdAt: new Date(supabaseUser.user.created_at),
+            updatedAt: new Date(supabaseUser.user.updated_at || supabaseUser.user.created_at),
+            dailyCalorieGoal: supabaseUser.user.user_metadata?.calorie_goal || 2000,
+            dailyProteinGoal: 150,
+            dailyCarbGoal: 200,
+            dailyFatGoal: 70,
+            dailyWaterGoal: 8,
+            personalInfo: supabaseUser.user.user_metadata || null,
+            privacySettings: null,
+            notificationSettings: null,
+            displaySettings: null,
+          };
+          res.json(userData);
+          return;
+        }
+      } catch (fallbackError) {
+        console.log('❌ Supabase fallback failed:', fallbackError);
       }
       res.json(null);
     }
