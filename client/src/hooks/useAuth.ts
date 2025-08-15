@@ -27,7 +27,14 @@ export function useAuth() {
         // Get current session from Supabase
         const { data: { session } } = await supabase.auth.getSession();
         
+        console.log('🔍 useAuth query - session check:', {
+          hasSession: !!session,
+          hasAccessToken: !!session?.access_token,
+          tokenLength: session?.access_token?.length
+        });
+        
         if (!session?.access_token) {
+          console.log('❌ No valid session found');
           return null;
         }
         
@@ -38,17 +45,25 @@ export function useAuth() {
           },
         });
         
+        console.log('🔍 Backend user fetch response:', {
+          status: response.status,
+          ok: response.ok
+        });
+        
         if (!response.ok) {
           // If unauthorized, return null instead of throwing
           if (response.status === 401) {
+            console.log('❌ Unauthorized - token may be invalid');
             return null;
           }
           throw new Error('Failed to fetch user');
         }
         
         const userData = await response.json();
+        console.log('✅ User data fetched successfully:', !!userData);
         return userData;
       } catch (error) {
+        console.log('❌ Auth query error:', error);
         // Return null for any authentication errors
         return null;
       }
