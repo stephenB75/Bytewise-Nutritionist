@@ -19,6 +19,7 @@ import { PWAUpdateNotification } from '@/components/PWAUpdateNotification';
 import { initDataProtection } from '@/utils/dataProtection';
 import { runDataMigration } from '@/utils/dataMigration';
 import { toast } from '@/hooks/use-toast';
+import { Toaster } from '@/components/ui/toaster';
 
 function AppContent() {
   const [activeTab, setActiveTab] = useState<string>('redesigned');
@@ -166,6 +167,7 @@ function AppContent() {
         </main>
         <DataSyncIndicator />
         <PWAUpdateNotification />
+        <Toaster />
       </div>
     </Router>
   );

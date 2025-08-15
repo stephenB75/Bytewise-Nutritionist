@@ -272,7 +272,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
             setIsSignUp(true);
             setPassword('');
             setPasswordErrors([]);
-          }, 2000);
+          }, 3000);
         } else if (errorCode === 'INVALID_CREDENTIALS') {
           // Wrong password or credentials
           toast({
