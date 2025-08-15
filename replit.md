@@ -115,7 +115,7 @@ Preferred communication style: Simple, everyday language.
     - Tour completion stored in localStorage to prevent repeated shows
     - **Enhanced mobile responsiveness for tour popups (August 15, 2025)**:
       - Dynamic tooltip sizing: 280px on small mobile, 320px on regular mobile, 320px on desktop
-      - Smart positioning: Converts left/right positions to top/bottom on mobile for better visibility
+      - Centered positioning: Tour popups now appear in the center of screen for consistent visibility
       - Enhanced viewport constraints with proper margins for mobile screens
       - Mobile touch optimizations with `touch-manipulation` class and larger touch targets
       - Responsive text sizes and padding that scale down appropriately on mobile

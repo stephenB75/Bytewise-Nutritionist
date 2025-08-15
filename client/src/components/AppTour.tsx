@@ -150,7 +150,7 @@ export function AppTour({ isOpen, onClose, onComplete }: AppTourProps) {
   const step = getCurrentStepData();
   if (!step) return null;
 
-  // Calculate tooltip position - mobile responsive
+  // Calculate tooltip position - centered on screen
   const getTooltipPosition = () => {
     const isMobile = window.innerWidth < 768;
     const isSmallMobile = window.innerWidth < 400;
@@ -159,53 +159,21 @@ export function AppTour({ isOpen, onClose, onComplete }: AppTourProps) {
     const tooltipWidth = isSmallMobile ? Math.min(280, window.innerWidth - 32) : 
                        isMobile ? Math.min(320, window.innerWidth - 40) : 320;
     const tooltipHeight = isMobile ? 180 : 200;
-    const padding = isMobile ? 12 : 20;
     
-    let top = 0;
-    let left = 0;
+    // Center the tooltip in the viewport
+    const top = (window.innerHeight - tooltipHeight) / 2;
+    const left = (window.innerWidth - tooltipWidth) / 2;
     
-    // On mobile, prefer bottom or top positioning for better visibility
-    let preferredPosition = step.position;
-    if (isMobile && (step.position === 'left' || step.position === 'right')) {
-      // Check if there's more space above or below
-      const spaceAbove = highlightPosition.top;
-      const spaceBelow = window.innerHeight - (highlightPosition.top + highlightPosition.height);
-      preferredPosition = spaceBelow > spaceAbove ? 'bottom' : 'top';
-    }
-    
-    switch (preferredPosition) {
-      case 'top':
-        top = highlightPosition.top - tooltipHeight - padding;
-        left = highlightPosition.left + (highlightPosition.width / 2) - (tooltipWidth / 2);
-        break;
-      case 'bottom':
-        top = highlightPosition.top + highlightPosition.height + padding;
-        left = highlightPosition.left + (highlightPosition.width / 2) - (tooltipWidth / 2);
-        break;
-      case 'left':
-        top = highlightPosition.top + (highlightPosition.height / 2) - (tooltipHeight / 2);
-        left = highlightPosition.left - tooltipWidth - padding;
-        break;
-      case 'right':
-        top = highlightPosition.top + (highlightPosition.height / 2) - (tooltipHeight / 2);
-        left = highlightPosition.left + highlightPosition.width + padding;
-        break;
-    }
-
-    // Enhanced viewport constraints for mobile
+    // Ensure minimum margins on all sides
     const margin = isMobile ? 16 : 20;
-    const maxTop = window.innerHeight - tooltipHeight - margin;
-    const maxLeft = window.innerWidth - tooltipWidth - margin;
-    
-    top = Math.max(margin, Math.min(top, maxTop));
-    left = Math.max(margin, Math.min(left, maxLeft));
+    const constrainedTop = Math.max(margin, Math.min(top, window.innerHeight - tooltipHeight - margin));
+    const constrainedLeft = Math.max(margin, Math.min(left, window.innerWidth - tooltipWidth - margin));
 
-    // On very small screens, center horizontally if needed
-    if (isSmallMobile && tooltipWidth > window.innerWidth - 32) {
-      left = 16;
-    }
-
-    return { top, left, width: tooltipWidth };
+    return { 
+      top: constrainedTop, 
+      left: constrainedLeft, 
+      width: tooltipWidth 
+    };
   };
 
   const tooltipPosition = getTooltipPosition();
@@ -232,9 +200,9 @@ export function AppTour({ isOpen, onClose, onComplete }: AppTourProps) {
         </div>
       )}
 
-      {/* Tour tooltip - mobile responsive */}
+      {/* Tour tooltip - centered on screen */}
       <Card
-        className="absolute bg-white dark:bg-gray-800 border-2 border-blue-200 dark:border-blue-700 shadow-2xl max-w-sm sm:max-w-md md:max-w-lg"
+        className="absolute bg-white dark:bg-gray-800 border-2 border-blue-200 dark:border-blue-700 shadow-2xl rounded-lg"
         style={{
           top: tooltipPosition.top,
           left: tooltipPosition.left,
