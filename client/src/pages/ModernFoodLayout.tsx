@@ -43,15 +43,13 @@ import {
 } from 'lucide-react';
 import { NotificationDropdown } from '@/components/NotificationDropdown';
 import { WeeklyCaloriesCard } from '@/components/WeeklyCaloriesCard';
-
-
 import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
 import { getWeekDates, getLocalDateKey, getMealTypeByTime, formatLocalTime } from '@/utils/dateUtils';
 import { autoFixMealDatesIfNeeded, checkMealDateMismatches, fixMealDateMismatches } from '@/utils/mealDateFixer';
 import { getCachedLocalStorage, debounce } from '@/utils/performanceUtils';
-import { debugTimezoneInfo, debugMealDates } from '@/utils/timezoneDebugger';
+
 
 // Types
 interface ModernFoodLayoutProps {
@@ -355,10 +353,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     // Load existing meal data on component mount
     const loadExistingData = () => {
       try {
-        // Debug timezone and meal information
-        debugTimezoneInfo();
-        debugMealDates();
-        
         // DISABLED: Automatic meal date fixing to prevent meals moving between days
         // Use cached localStorage for better performance
         const stored = getCachedLocalStorage('weeklyMeals', 5000) || [];

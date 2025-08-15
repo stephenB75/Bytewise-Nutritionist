@@ -97,7 +97,7 @@ export function checkMealDateMismatches(): {
       correctMeals: meals.length - mismatches.length
     };
   } catch (error) {
-    console.error('Error checking meal dates:', error);
+
     return { mismatches: [], totalMeals: 0, correctMeals: 0 };
   }
 }
@@ -123,7 +123,7 @@ export function fixMealDateMismatches(): {
       if (meal.timestamp) {
         const correctDate = getCorrectDateFromTimestamp(meal.timestamp);
         if (meal.date !== correctDate) {
-          console.log(`Fixing meal: "${meal.name}" from ${meal.date} to ${correctDate}`);
+
           fixedCount++;
           return { ...meal, date: correctDate };
         }
@@ -142,7 +142,7 @@ export function fixMealDateMismatches(): {
 
     return { fixedCount, success: true };
   } catch (error) {
-    console.error('Error fixing meal dates:', error);
+
     return { 
       fixedCount: 0, 
       success: false, 

@@ -348,7 +348,7 @@ export class USDAService {
       // First check local cache
       const cachedResults = await this.searchCachedFoodsInternal(query, pageSize);
       if (cachedResults.length > 0) {
-        console.log(`Found ${cachedResults.length} cached results for "${query}"`);
+
         return cachedResults.map((food: any) => {
           let nutrients = [];
           try {
@@ -360,7 +360,7 @@ export class USDAService {
               nutrients = [food.nutrients];
             }
           } catch (parseError) {
-            console.warn('Failed to parse cached nutrients for food:', food.description, parseError);
+
             nutrients = [];
           }
           
@@ -402,7 +402,7 @@ export class USDAService {
       // Enhance with FoodStruct candy data if applicable
       return this.enhanceWithCandyData(data.foods, query);
     } catch (error) {
-      console.warn('USDA API unavailable, using fallback approach:', error.message);
+      // USDA API unavailable, using fallback approach
       
       // If USDA API fails, try candy enhancement first
       if (this.isCandyRelated(query)) {
@@ -426,7 +426,7 @@ export class USDAService {
               nutrients = [food.nutrients];
             }
           } catch (parseError) {
-            console.warn('Failed to parse nutrients for food:', food.description, parseError);
+
             nutrients = [];
           }
           
@@ -442,7 +442,7 @@ export class USDAService {
         // Enhance with FoodStruct candy data even for cached results
         return this.enhanceWithCandyData(mappedResults, query);
       } catch (cacheError) {
-        console.warn('Cache search also failed:', cacheError.message);
+
         
         // Last resort: return enhanced candy data if applicable
         if (this.isCandyRelated(query)) {
@@ -536,7 +536,7 @@ export class USDAService {
     try {
       // Check for zero-calorie beverages FIRST before any other processing
       if (this.isZeroCalorieBeverage(ingredientName)) {
-        console.log(`🚰 Zero-calorie beverage detected early: ${ingredientName}`);
+
         const servingInfo = USDAService.getStandardLiquidServing(ingredientName.toLowerCase());
         
         const zeroCalorieResult = {
@@ -2134,7 +2134,7 @@ export class USDAService {
 
     // Check for zero-calorie beverages first
     if (this.isZeroCalorieBeverage(normalized)) {
-      console.log(`🚰 Zero-calorie beverage detected: ${normalized}`);
+
       const servingInfo = USDAService.getStandardLiquidServing(normalized);
       
       return {
