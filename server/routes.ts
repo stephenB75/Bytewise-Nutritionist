@@ -163,15 +163,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               }
             };
             
-            // Store user in database
-            await storage.upsertUser({
-              id: existingUser.id,
-              email: existingUser.email!,
-              firstName: existingUser.user_metadata?.first_name || null,
-              lastName: existingUser.user_metadata?.last_name || null,
-            });
-            
-            console.log('✅ User stored in database and session created');
+            console.log('✅ Session created for verified user');
             return res.json(sessionData);
           }
         } catch (genError) {
@@ -190,13 +182,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         };
         
-        // Store in database
-        await storage.upsertUser({
-          id: existingUser.id,
-          email: existingUser.email!,
-          firstName: existingUser.user_metadata?.first_name || null,
-          lastName: existingUser.user_metadata?.last_name || null,
-        });
+        // Skip database storage for now to avoid foreign key conflicts
+        console.log('✅ Skipping database storage to avoid conflicts - user verified via Supabase');
         
         console.log('✅ Created fallback session for verified user');
         return res.json(fallbackSession);

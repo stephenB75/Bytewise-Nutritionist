@@ -137,50 +137,66 @@ export class DatabaseStorage implements IStorage {
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
-    // Try to insert first, then update if conflict occurs
-    try {
-      // Assign random profile icon for new users (1-9)
-      const userDataWithIcon = {
-        ...userData,
-        profileIcon: userData.profileIcon || Math.floor(Math.random() * 9) + 1
-      };
+    // First check if user exists by email
+    if (userData.email) {
+      const existingUserByEmail = await db
+        .select()
+        .from(users)
+        .where(eq(users.email, userData.email))
+        .limit(1);
       
-      const [user] = await db
-        .insert(users)
-        .values(userDataWithIcon)
-        .onConflictDoUpdate({
-          target: users.id,
-          set: {
-            email: userData.email,
-            firstName: userData.firstName,
-            lastName: userData.lastName,
-            updatedAt: new Date(),
-            // Don't update profileIcon for existing users
-          },
-        })
-        .returning();
-      return user;
-    } catch (error: any) {
-      // If there's an email conflict, try to update by email
-      if (error.code === '23505' && error.constraint === 'users_email_unique') {
-
-        const [existingUser] = await db
+      if (existingUserByEmail.length > 0) {
+        // User exists by email - update their info but keep their existing ID
+        const [updatedUser] = await db
           .update(users)
           .set({
-            id: userData.id, // Update with Supabase ID
             firstName: userData.firstName,
             lastName: userData.lastName,
+            emailVerified: true, // They've signed in, so mark as verified
             updatedAt: new Date(),
           })
-          .where(eq(users.email, userData.email!))
+          .where(eq(users.email, userData.email))
           .returning();
-        
-        if (existingUser) {
-          return existingUser;
-        }
+        return updatedUser;
       }
-      throw error;
     }
+    
+    // Check if user exists by ID  
+    const existingUserById = await db
+      .select()
+      .from(users)
+      .where(sql`id = ${userData.id}`)
+      .limit(1);
+    
+    if (existingUserById.length > 0) {
+      // User exists by ID - just update non-ID fields
+      const [updatedUser] = await db
+        .update(users)
+        .set({
+          email: userData.email,
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          emailVerified: true,
+          updatedAt: new Date(),
+        })
+        .where(sql`id = ${userData.id}`)
+        .returning();
+      return updatedUser;
+    }
+    
+    // User doesn't exist - create new user
+    const userDataWithIcon = {
+      ...userData,
+      profileIcon: userData.profileIcon || Math.floor(Math.random() * 9) + 1,
+      emailVerified: true, // They've signed in, so mark as verified
+    };
+    
+    const [newUser] = await db
+      .insert(users)
+      .values(userDataWithIcon)
+      .returning();
+    
+    return newUser;
   }
 
   async updateUserGoals(userId: string, goals: Partial<Pick<User, 'dailyCalorieGoal' | 'dailyProteinGoal' | 'dailyCarbGoal' | 'dailyFatGoal' | 'dailyWaterGoal'>>): Promise<User> {
