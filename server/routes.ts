@@ -96,14 +96,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { email, password } = req.body;
       
+      console.log('🔐 Sign-in attempt for:', email);
+      
       const { data, error } = await serverSupabase.auth.signInWithPassword({
         email,
         password,
       });
       
+      console.log('📊 Supabase sign-in result:', { 
+        hasUser: !!data.user, 
+        hasSession: !!data.session, 
+        errorMessage: error?.message,
+        emailConfirmed: data.user?.email_confirmed_at ? 'YES' : 'NO'
+      });
+      
       if (error) {
+        console.log('❌ Sign-in error:', error.message);
         // Check if error is due to unverified email
-        if (error.message.includes('Email not confirmed') || error.message.includes('email_not_confirmed')) {
+        if (error.message.includes('Email not confirmed') || error.message.includes('email_not_confirmed') || error.message.includes('signup_disabled')) {
           return res.status(400).json({ 
             message: "Please verify your email first. Check your inbox for a verification link and click it to activate your account.",
             requiresVerification: true,
@@ -212,12 +222,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Email verification callback endpoint
   app.get('/api/auth/verify-email', async (req: Request, res: Response) => {
     try {
-      const { token_hash, type } = req.query;
+      const { token_hash, type, next } = req.query;
       
-      if (type === 'email' && token_hash) {
+      console.log('🔗 Verification callback received:', { type, hasToken: !!token_hash, next });
+      
+      if (type === 'email_change_confirm' || type === 'signup') {
+        // Handle both email confirmation and signup verification
+        const verifyType = type === 'email_change_confirm' ? 'email_change' : 'signup';
+        
         const { data, error } = await serverSupabase.auth.verifyOtp({
           token_hash: token_hash as string,
-          type: 'email'
+          type: verifyType as any
         });
         
         if (error) {
@@ -226,23 +241,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         
         if (data.user) {
+          console.log('✅ User verified successfully:', data.user.email);
           // Store verified user in our database
           try {
             await storage.upsertUser({
               id: data.user.id,
               email: data.user.email,
-              firstName: data.user.user_metadata?.first_name,
-              lastName: data.user.user_metadata?.last_name,
+              firstName: data.user.user_metadata?.first_name || '',
+              lastName: data.user.user_metadata?.last_name || '',
             });
+            console.log('✅ User stored in database');
           } catch (dbError) {
             console.log('💥 Error storing verified user:', dbError);
           }
         }
         
-        console.log('✅ Email verification successful for:', data.user?.email);
-        return res.redirect(`${req.headers.origin || 'http://localhost:5000'}?verified=true`);
+        return res.redirect(`${req.headers.origin || 'http://localhost:5000'}?verified=true&message=Email verified successfully! You can now sign in.`);
       }
       
+      // Handle generic email confirmation (fallback)
+      if (token_hash) {
+        console.log('🔄 Attempting generic email confirmation...');
+        try {
+          const { data, error } = await serverSupabase.auth.verifyOtp({
+            token_hash: token_hash as string,
+            type: 'email'
+          });
+          
+          if (!error && data.user) {
+            console.log('✅ Generic verification successful:', data.user.email);
+            try {
+              await storage.upsertUser({
+                id: data.user.id,
+                email: data.user.email,
+                firstName: data.user.user_metadata?.first_name || '',
+                lastName: data.user.user_metadata?.last_name || '',
+              });
+            } catch (dbError) {
+              console.log('💥 Error storing user:', dbError);
+            }
+            return res.redirect(`${req.headers.origin || 'http://localhost:5000'}?verified=true&message=Email verified successfully!`);
+          }
+        } catch (fallbackError) {
+          console.log('⚠️ Generic verification also failed:', fallbackError);
+        }
+      }
+      
+      console.log('❌ No valid verification parameters found');
       res.redirect(`${req.headers.origin || 'http://localhost:5000'}?verified=false&error=Invalid verification link`);
     } catch (error) {
       console.log('💥 Verification callback error:', error);

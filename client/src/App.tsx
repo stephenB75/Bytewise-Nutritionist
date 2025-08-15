@@ -18,6 +18,7 @@ import { useSessionManager } from '@/hooks/useSessionManager';
 import { PWAUpdateNotification } from '@/components/PWAUpdateNotification';
 import { initDataProtection } from '@/utils/dataProtection';
 import { runDataMigration } from '@/utils/dataMigration';
+import { toast } from '@/hooks/use-toast';
 
 function AppContent() {
   const [activeTab, setActiveTab] = useState<string>('redesigned');
@@ -33,6 +34,31 @@ function AppContent() {
   // Initialize data protection and migration on app mount
   useEffect(() => {
     initDataProtection();
+    
+    // Handle email verification success/failure messages from URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const verified = urlParams.get('verified');
+    const error = urlParams.get('error');
+    const message = urlParams.get('message');
+    
+    if (verified === 'true') {
+      toast({
+        title: "Email Verified!",
+        description: message || "Your email has been verified successfully. You can now sign in.",
+        duration: 8000,
+      });
+      // Clean up URL
+      window.history.replaceState({}, '', window.location.pathname);
+    } else if (verified === 'false' && error) {
+      toast({
+        title: "Verification Failed",
+        description: decodeURIComponent(error),
+        variant: "destructive",
+        duration: 8000,
+      });
+      // Clean up URL
+      window.history.replaceState({}, '', window.location.pathname);
+    }
     
     // Run data migration to convert weeklyMeals to proper format
     setTimeout(() => {
