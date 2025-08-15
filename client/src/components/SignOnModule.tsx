@@ -40,14 +40,15 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted!', { email, password, isSignUp });
-    alert(`FORM SUBMITTED! Email: ${email}, Mode: ${isSignUp ? 'SignUp' : 'SignIn'}`);
     
-    // Show visible feedback that button was clicked
-    toast({
-      title: "Debug",
-      description: `Form submitted! Email: ${email}, Mode: ${isSignUp ? 'SignUp' : 'SignIn'}`,
-    });
+    if (!email || !password) {
+      toast({
+        title: "Missing Information",
+        description: "Please enter both email and password.",
+        variant: "destructive",
+      });
+      return;
+    }
     
     setLoading(true);
     
@@ -116,9 +117,13 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
             variant: "destructive",
           });
         } else {
+          let errorMessage = data.message || "Please try again.";
+          if (errorMessage.includes("Password should contain")) {
+            errorMessage = "Password must include: uppercase letter, lowercase letter, number, and special character (!@#$%^&* etc.)";
+          }
           toast({
             title: "Authentication failed",
-            description: data.message || "Please try again.",
+            description: errorMessage,
             variant: "destructive",
           });
         }
@@ -306,7 +311,14 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
               
               <div>
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="password" className="text-sm font-medium text-gray-300">Password</Label>
+                  <Label htmlFor="password" className="text-sm font-medium text-gray-300">
+                    Password
+                    {isSignUp && (
+                      <span className="text-xs text-gray-400 ml-2">
+                        (Must include: A-Z, a-z, 0-9, special chars)
+                      </span>
+                    )}
+                  </Label>
                   {!isSignUp && !showResetPassword && (
                     <button
                       type="button"
