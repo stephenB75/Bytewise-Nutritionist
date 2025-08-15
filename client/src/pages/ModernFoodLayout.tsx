@@ -1893,39 +1893,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
       {/* Content Section - Redesigned to match other pages */}
       <div className="px-6 py-3 bg-black content-section">
-        {user && (
-          <div className="mb-8">
-            {/* User Info Card - Profile Picture and Quick Info */}
-            <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
-              <div className="flex items-center space-x-6">
-                <div className="relative">
-                  <div className="w-20 h-20 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center">
-                    <User className="w-10 h-10 text-white" />
-                  </div>
-                  <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-black flex items-center justify-center">
-                    <CheckCircle2 className="w-3 h-3 text-white" />
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-2xl font-bold text-white mb-1" style={{ fontFamily: "'League Spartan', sans-serif" }}>
-                    {user?.email?.split('@')[0] || 'ByteWise User'}
-                  </h3>
-                  <p className="text-gray-300 text-sm mb-2">{user?.email}</p>
-                  <div className="flex items-center space-x-4 text-sm text-gray-400">
-                    <span>🏆 Level 1</span>
-                    <span>📊 0 meals logged</span>
-                    <span>🎯 Getting started</span>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-lg font-bold text-orange-400">0</div>
-                  <div className="text-xs text-gray-400">Total Points</div>
-                </div>
-              </div>
-            </Card>
-          </div>
-        )}
-
         {/* Profile Cards with Unified Accordion System */}
         {user ? (
           <Accordion 
@@ -1935,32 +1902,43 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             value={openCard}
             onValueChange={setOpenCard}
           >
-            {/* Profile Card */}
+            {/* Consolidated Profile Card */}
             <AccordionItem value="profile" className="border-none">
               <Card className="bg-white/10 backdrop-blur-md border-white/20 overflow-hidden rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:bg-white/15 hover:border-white/30">
                 <AccordionTrigger className="px-6 py-6 hover:bg-white/5 hover:no-underline [&[data-state=open]]:bg-white/5">
-                  <div className="flex items-center space-x-4 flex-1 min-w-0">
-                    <div className="relative flex-shrink-0">
-                      <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center">
-                        <User className="w-8 h-8 text-white" />
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center space-x-6 flex-1 min-w-0">
+                      <div className="relative flex-shrink-0">
+                        <div className="w-20 h-20 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center">
+                          <User className="w-10 h-10 text-white" />
+                        </div>
+                        <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-black flex items-center justify-center">
+                          <CheckCircle2 className="w-3 h-3 text-white" />
+                        </div>
                       </div>
-                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-black flex items-center justify-center">
-                        <CheckCircle2 className="w-2 h-2 text-white" />
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-2xl font-bold text-white mb-1" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                          {user?.email?.split('@')[0] || 'ByteWise User'}
+                        </h3>
+                        <p className="text-gray-300 text-sm mb-2">{user?.email}</p>
+                        <div className="flex items-center space-x-4 text-sm text-gray-400">
+                          <span>🏆 Level 1</span>
+                          <span>📊 {loggedMeals?.length || 0} meals logged</span>
+                          <span>🎯 {Math.round(dailyCalories)}/{goalCalories} cal today</span>
+                        </div>
                       </div>
                     </div>
-                    <div className="flex-1 min-w-0 overflow-hidden text-left">
-                      <h3 className="profile-username-header">
-                        {user?.email?.split('@')[0] || 'ByteWise User'}
-                      </h3>
-                      <p className="profile-email-text">{user?.email}</p>
+                    <div className="text-right flex-shrink-0">
+                      <div className="text-lg font-bold text-orange-400">{achievements?.length || 0}</div>
+                      <div className="text-xs text-gray-400">Achievements</div>
                     </div>
                   </div>
-                  
-
                 </AccordionTrigger>
 
                 <AccordionContent className="px-6 pb-6 pt-0">
-                  <UserSettingsManager />
+                  <div className="border-t border-white/10 pt-4">
+                    <UserSettingsManager />
+                  </div>
                 </AccordionContent>
               </Card>
             </AccordionItem>
