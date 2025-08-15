@@ -158,33 +158,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (existingUser?.email_confirmed_at) {
         console.log('✅ Found verified user, generating session...');
         
-        // Generate a proper JWT for the user using admin client
-        try {
-          const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
-            type: 'recovery',
-            email: existingUser.email!,
-          });
-          
-          if (linkData.properties?.hashed_token) {
-            console.log('🎯 Created session for verified user');
-            
-            const sessionData = {
-              user: existingUser,
-              session: {
-                access_token: linkData.properties.hashed_token,
-                refresh_token: `refresh_${existingUser.id}`,
-                expires_in: 3600,
-                token_type: 'bearer',
-                user: existingUser
-              }
-            };
-            
-            console.log('✅ Session created for verified user');
-            return res.json(sessionData);
-          }
-        } catch (genError) {
-          console.log('⚠️ Token generation failed, trying fallback');
-        }
+        // Skip token generation, use simpler approach
+        console.log('🎯 Creating direct session for verified user');
         
         // Fallback: create session since user is verified
         const fallbackSession = {
