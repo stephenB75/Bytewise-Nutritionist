@@ -212,6 +212,14 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
         weight: userInfo.weight || '(empty)',
         profileData: profileData
       });
+
+      // Validate required fields
+      if (!firstName.trim()) {
+        throw new Error('First name is required');
+      }
+      if (!lastName.trim()) {
+        throw new Error('Last name is required');
+      }
       
       // Update user profile via backend API (database) instead of Supabase metadata
       const response = await fetch('/api/user/profile', {

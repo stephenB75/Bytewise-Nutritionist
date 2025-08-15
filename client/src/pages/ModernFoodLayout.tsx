@@ -17,6 +17,7 @@ import { DataManagementPanel } from '@/components/DataManagementPanel';
 import { AchievementCelebration } from '@/components/AchievementCelebration';
 import { AwardsAchievements } from '@/components/AwardsAchievements';
 import { ConfettiCelebration } from '@/components/ConfettiCelebration';
+import { ProfileCompletionModal } from '@/components/ProfileCompletionModal';
 import { FastingTracker } from '@/components/FastingTracker';
 import { FastingStatusCard } from '@/components/FastingStatusCard';
 import { useGoalAchievements } from '@/hooks/useGoalAchievements';
@@ -81,7 +82,7 @@ interface Achievement {
 type TrackingView = 'daily' | 'weekly';
 
 export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) {
-  const { user, isLoading: authLoading } = useAuth();
+  const { user, isLoading: authLoading, refetch: refetchUser } = useAuth();
   const [activeTab, setActiveTab] = useState('home');
   const [previousTab, setPreviousTab] = useState('home');
   const [openCard, setOpenCard] = useState<string | undefined>(undefined);
@@ -106,6 +107,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   // Daily stats with fasting integration
   const [dailyStats, setDailyStats] = useState<any>(null);
   const [fastingStatus, setFastingStatus] = useState<any>(null);
+  
+  // Profile completion state
+  const [showProfileCompletion, setShowProfileCompletion] = useState(false);
   
   // Nutrition aggregation state
   const [dailyMacros, setDailyMacros] = useState({ protein: 0, carbs: 0, fat: 0 });
@@ -180,6 +184,91 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       };
     }
   }, []);
+
+  // Check if profile completion is required
+  useEffect(() => {
+    if (user && !authLoading) {
+      const userData = user as any;
+      const hasFirstName = userData?.firstName && userData.firstName.trim() !== '';
+      const hasLastName = userData?.lastName && userData.lastName.trim() !== '';
+      
+      // Show profile completion modal if user is missing required profile info
+      if (!hasFirstName || !hasLastName) {
+        console.log('🔧 Profile incomplete - showing completion modal:', {
+          hasFirstName,
+          hasLastName,
+          firstName: userData?.firstName || '(empty)',
+          lastName: userData?.lastName || '(empty)'
+        });
+        setShowProfileCompletion(true);
+      }
+    }
+  }, [user, authLoading]);
+
+  // Handle profile completion submission
+  const handleProfileCompletion = async (profileData: {
+    firstName: string;
+    lastName: string;
+    gender: 'male' | 'female';
+    profileIcon: number;
+  }) => {
+    try {
+      // Get the current access token (same logic as useAuth.ts)
+      let accessToken = null;
+      
+      // Check for locally stored custom tokens first
+      const storedSession = localStorage.getItem('supabase.auth.token');
+      if (storedSession) {
+        try {
+          const parsedSession = JSON.parse(storedSession);
+          if (parsedSession.access_token) {
+            accessToken = parsedSession.access_token;
+          }
+        } catch (parseError) {
+          console.log('Failed to parse stored session:', parseError);
+        }
+      }
+      
+      // If no custom token, check Supabase session
+      if (!accessToken) {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.access_token) {
+          accessToken = session.access_token;
+        }
+      }
+      
+      if (!accessToken) {
+        throw new Error('No authentication token available');
+      }
+
+      // Update user profile with required information and profile icon
+      const response = await fetch('/api/user/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          firstName: profileData.firstName,
+          lastName: profileData.lastName,
+          profileIcon: profileData.profileIcon
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update profile');
+      }
+
+      // Close the modal and refresh user data
+      setShowProfileCompletion(false);
+      await refetchUser();
+      
+      console.log('✅ Profile completion successful:', profileData);
+    } catch (error) {
+      console.error('❌ Profile completion failed:', error);
+      throw error; // Re-throw to let the modal handle the error
+    }
+  };
 
   const addNotification = useCallback((type: Notification['type'], title: string, message: string) => {
     setNotifications(prev => [{
@@ -2207,6 +2296,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           onClose={() => setShowConfettiCelebration(false)}
         />
       )}
+      
+      {/* Profile Completion Modal */}
+      <ProfileCompletionModal
+        isOpen={showProfileCompletion}
+        onComplete={handleProfileCompletion}
+      />
       
       {/* Toast Notifications */}
       <Toaster />
