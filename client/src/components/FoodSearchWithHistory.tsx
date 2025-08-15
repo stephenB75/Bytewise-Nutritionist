@@ -72,7 +72,7 @@ export function FoodSearchWithHistory({
 
         setHistoricalMeals(sortedMeals);
       } catch (error) {
-        console.error('Error loading historical meals:', error);
+        // Silent fail - just set empty array
         setHistoricalMeals([]);
       }
     };

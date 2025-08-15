@@ -65,26 +65,15 @@ interface UserProgressData {
 
 export async function generateProgressReportPDF(): Promise<boolean> {
   try {
-    console.log('🚀 PDF Generation: Starting PDF generation process...');
-    
     // Fetch actual user data from local storage and API
-    console.log('💾 PDF Generation: Fetching data from localStorage...');
     const storedMeals = localStorage.getItem('weeklyMeals'); // Use weeklyMeals for comprehensive data
     const storedCalorieGoal = localStorage.getItem('calorieGoal');
     const storedUserProfile = localStorage.getItem('userProfile');
     
-    console.log('💾 PDF Generation: Data fetch results:');
-    console.log('   - Meals data:', storedMeals ? `${storedMeals.length} characters` : 'null');
-    console.log('   - Calorie goal:', storedCalorieGoal);
-    console.log('   - User profile:', storedUserProfile ? 'present' : 'null');
-    
     // Parse stored data
-    console.log('🔄 PDF Generation: Parsing data...');
     const meals = storedMeals ? JSON.parse(storedMeals) : [];
     const calorieGoal = storedCalorieGoal ? parseInt(storedCalorieGoal) : 2000;
     const userProfile = storedUserProfile ? JSON.parse(storedUserProfile) : {};
-    
-    console.log(`📊 PDF Generation: Parsed ${meals.length} meals, goal: ${calorieGoal} cal`);
     
     // Calculate real statistics from stored meals for 30-day period
     const now = new Date();
@@ -297,10 +286,10 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     };
 
     // Create PDF directly using jsPDF
-    console.log('📄 PDF Generation: Creating jsPDF instance...');
+    
     console.log('jsPDF available:', typeof jsPDF);
     const pdf = new jsPDF('p', 'mm', 'a4');
-    console.log('✅ PDF Generation: jsPDF instance created successfully');
+    
     const pageWidth = 210;
     const pageHeight = 297;
     let yPosition = 25;
@@ -595,24 +584,24 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     // Save the comprehensive PDF with proper download functionality
     const filename = `bytewise-30day-nutrition-report-${new Date().toISOString().split('T')[0]}.pdf`;
     
-    console.log('💾 PDF Generation: Attempting to save PDF with filename:', filename);
+    
     
     try {
       // Create PDF blob first for better control
       const pdfBlob = pdf.output('blob');
-      console.log('📄 PDF Generation: PDF blob created, size:', pdfBlob.size, 'bytes');
+      
       
       if (pdfBlob.size === 0) {
         throw new Error('PDF blob is empty');
       }
       
       // Method 1: Direct jsPDF save (most reliable)
-      console.log('🔄 PDF Generation: Trying direct jsPDF save...');
+      
       pdf.save(filename);
-      console.log('✅ PDF Generation: Direct save method executed');
+      
       
       // Method 2: Blob download with user gesture (more compatible)
-      console.log('🔄 PDF Generation: Trying blob download method...');
+      
       const url = URL.createObjectURL(pdfBlob);
       
       // Create download link with proper attributes
@@ -640,29 +629,29 @@ export async function generateProgressReportPDF(): Promise<boolean> {
       setTimeout(() => {
         document.body.removeChild(downloadLink);
         URL.revokeObjectURL(url);
-        console.log('🧹 PDF Generation: Cleanup completed');
+        
       }, 1000);
       
-      console.log('✅ PDF Generation: Blob download method executed');
+      
       
       // Method 3: Create data URL for manual access
-      console.log('🔄 PDF Generation: Creating data URL for manual access...');
+      
       const pdfDataUrl = pdf.output('datauristring');
-      console.log('✅ PDF Generation: Data URL created, length:', pdfDataUrl.length);
+      
       
       // Method 4: Try forcing download with window.location
-      console.log('🔄 PDF Generation: Trying window location method...');
+      
       try {
         const tempUrl = URL.createObjectURL(pdfBlob);
         window.location.href = tempUrl;
-        console.log('✅ PDF Generation: Window location method executed');
+        
         setTimeout(() => URL.revokeObjectURL(tempUrl), 2000);
       } catch (locationError) {
-        console.log('❌ PDF Generation: Window location method failed:', locationError);
+        
       }
       
       // Method 5: Show PDF inline in current page
-      console.log('🔄 PDF Generation: Preparing inline PDF display...');
+      
       
       // Create a popup modal with PDF preview and download options
       const pdfPreviewUrl = URL.createObjectURL(pdfBlob);
@@ -728,7 +717,7 @@ export async function generateProgressReportPDF(): Promise<boolean> {
       
       modal.setAttribute('role', 'modal');
       document.body.appendChild(modal);
-      console.log('✅ PDF Generation: Inline PDF modal displayed');
+      
       
       // Auto-cleanup after 5 minutes
       setTimeout(() => {
@@ -736,7 +725,7 @@ export async function generateProgressReportPDF(): Promise<boolean> {
           modal.remove();
         }
         URL.revokeObjectURL(pdfPreviewUrl);
-        console.log('🧹 PDF Generation: Modal auto-cleanup completed');
+        
       }, 300000);
       
       return true;

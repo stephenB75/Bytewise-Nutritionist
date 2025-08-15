@@ -36,7 +36,7 @@ export function useDataPersistence({ key, data, syncToDatabase = true, debounceM
       
       return true;
     } catch (error) {
-      console.error(`Failed to save ${key} to localStorage:`, error);
+      // Silent fail for localStorage issues
       return false;
     }
   }, [key]);
@@ -69,9 +69,7 @@ export function useDataPersistence({ key, data, syncToDatabase = true, debounceM
       }));
     },
     onError: (error) => {
-      console.error(`Failed to sync ${key} to database:`, error);
-      
-      // Emit sync error event
+      // Emit sync error event for user feedback
       window.dispatchEvent(new CustomEvent('sync-error', {
         detail: { key, error: error.message }
       }));

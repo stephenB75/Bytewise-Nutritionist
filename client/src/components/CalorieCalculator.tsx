@@ -123,8 +123,7 @@ function CalorieCalculator({
   // Achievement system hook
   const checkAchievements = useCheckAchievements();
 
-  // Search ingredients as user types (handled by FoodSearchWithHistory now)
-  // This effect is kept for backward compatibility with direct ingredient input
+  // Search ingredients as user types
   useEffect(() => {
     if (ingredient.length >= 2 && !isCompact) {
       const customSuggestions = EnhancedIngredientDatabaseManager.searchIngredients(ingredient);
@@ -610,12 +609,12 @@ function CalorieCalculator({
                     // Check achievements
                     checkAchievements.mutate();
                   } catch (error) {
-                    console.error('Failed to save meal to database:', error);
+                    // Silent fail - meal is already saved to localStorage
                   }
                 }}
                 onSearchChange={(query) => {
                   setIngredient(query);
-                  // Remove USDA suggestions - only show historical meal search
+                  // Clear USDA suggestions for historical search
                   setIngredientSuggestions([]);
                 }}
                 placeholder="Search today's meals, history, or new foods..."
@@ -819,7 +818,6 @@ function UserFoodTextSuggestions({ onSuggestionClick }: { onSuggestionClick: (fo
         }
       }));
     } catch (error) {
-      console.error('Failed to copy:', error);
       // Show error toast
       window.dispatchEvent(new CustomEvent('show-toast', {
         detail: { 
@@ -890,7 +888,7 @@ function UserFoodTextSuggestions({ onSuggestionClick }: { onSuggestionClick: (fo
         
         setUserFoods(userEnteredFoods);
       } catch (error) {
-        console.error('Error loading user foods:', error);
+        // Silent fail - just set empty array
         setUserFoods([]);
       }
     };
