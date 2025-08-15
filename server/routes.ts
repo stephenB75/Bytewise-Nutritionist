@@ -93,24 +93,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('✅ User found in database:', !!user);
       res.json(user);
     } catch (error) {
-      console.log('❌ User not found in database, creating...');
+      console.log('❌ User not found in database, creating from Supabase...');
       // If user not found in database, try to get from Supabase and create
       try {
-        const { data: supabaseUser } = await supabaseAdmin.auth.admin.getUserById(userId);
+        const { data: supabaseUser, error: fetchError } = await supabaseAdmin.auth.admin.getUserById(userId);
+        
+        if (fetchError) {
+          console.log('❌ Failed to fetch user from Supabase:', fetchError.message);
+          res.json(null);
+          return;
+        }
+        
         if (supabaseUser?.user) {
+          console.log('📝 Creating user from Supabase data:', supabaseUser.user.email);
           const newUser = {
             id: supabaseUser.user.id,
             email: supabaseUser.user.email!,
-            firstName: supabaseUser.user.user_metadata?.first_name,
-            lastName: supabaseUser.user.user_metadata?.last_name,
+            firstName: supabaseUser.user.user_metadata?.first_name || null,
+            lastName: supabaseUser.user.user_metadata?.last_name || null,
           };
-          await storage.upsertUser(newUser);
-          console.log('✅ Created user in database from Supabase data');
-          res.json(newUser);
+          
+          const createdUser = await storage.upsertUser(newUser);
+          console.log('✅ Successfully created user in database:', createdUser.email);
+          res.json(createdUser);
           return;
+        } else {
+          console.log('❌ No user data returned from Supabase');
         }
       } catch (createError) {
-        console.log('❌ Failed to create user:', createError);
+        console.log('❌ Failed to create user from Supabase:', createError);
       }
       res.json(null);
     }
@@ -163,13 +174,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Store user in our database if they don't exist
       if (data.user) {
         try {
-          await storage.upsertUser({
+          console.log('💾 Storing user in database after successful sign-in...');
+          const userRecord = await storage.upsertUser({
             id: data.user.id,
-            email: data.user.email,
-            firstName: data.user.user_metadata?.first_name,
-            lastName: data.user.user_metadata?.last_name,
+            email: data.user.email!,
+            firstName: data.user.user_metadata?.first_name || null,
+            lastName: data.user.user_metadata?.last_name || null,
           });
+          console.log('✅ User stored in database:', userRecord.email);
         } catch (dbError) {
+          console.log('⚠️ Database storage failed but continuing:', dbError);
           // Continue anyway since Supabase auth succeeded
         }
       }
