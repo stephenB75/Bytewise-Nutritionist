@@ -380,13 +380,14 @@ function CalorieCalculator({
               }}
               onSearchChange={(query) => setIngredient(query)}
               placeholder="Search meals or add new..."
-              className="w-full"
+              className="w-full text-base bg-white border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-500"
             />
             <Input
               placeholder="Measurement (e.g., 1 cup, 100g, 1 medium)"
               value={measurement}
               onChange={(e) => setMeasurement(e.target.value)}
-              className="text-base"
+              className="text-base bg-white border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-500"
+              data-testid="input-measurement-compact"
             />
           </div>
           
@@ -618,7 +619,7 @@ function CalorieCalculator({
                   setIngredientSuggestions([]);
                 }}
                 placeholder="Search today's meals, history, or new foods..."
-                className="w-full"
+                className="w-full text-base bg-white border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-500"
               />
               
               <p className="text-xs text-gray-500 mt-1">
@@ -635,7 +636,8 @@ function CalorieCalculator({
                 placeholder="e.g., 1 cup, 100g, 1 medium, 2 tablespoons, 1 slice"
                 value={measurement}
                 onChange={(e) => setMeasurement(e.target.value)}
-                className="text-base"
+                className="text-base bg-white border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-500"
+                data-testid="input-measurement"
               />
               <p className="text-xs text-gray-500 mt-1">
                 Any measurement works - the system will provide the best estimate
