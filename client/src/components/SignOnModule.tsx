@@ -236,25 +236,64 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
           }
         }
       } else {
-        if (data.requiresVerification) {
-          // Sign-in failed due to unverified email
+        // Handle different types of authentication errors with specific prompts
+        const errorCode = data.code;
+        const errorMessage = data.message || "Please try again.";
+        
+        console.log('🔍 Handling authentication error:', { errorCode, errorMessage });
+        
+        if (data.requiresVerification || errorCode === 'EMAIL_NOT_VERIFIED') {
+          // Email verification required
           setVerificationRequired(true);
           setVerificationEmail(data.email || email);
           toast({
             title: "Email Verification Required",
-            description: data.message || "Please check your email and click the verification link to activate your account.",
+            description: errorMessage,
+            variant: "destructive",
+            duration: 12000,
+          });
+        } else if (errorCode === 'ACCOUNT_NOT_FOUND') {
+          // No account found - suggest signing up
+          toast({
+            title: "Account Not Found",
+            description: errorMessage + " Would you like to create a new account?",
             variant: "destructive",
             duration: 10000,
           });
-        } else {
-          let errorMessage = data.message || "Please try again.";
-          if (errorMessage.includes("Password should contain")) {
-            errorMessage = "Password must include: uppercase letter, lowercase letter, number, and special character (!@#$%^&* etc.)";
-          }
+          // Auto-switch to sign-up mode for user convenience
+          setTimeout(() => {
+            setIsSignUp(true);
+            setPassword('');
+            setPasswordErrors([]);
+          }, 2000);
+        } else if (errorCode === 'INVALID_CREDENTIALS') {
+          // Wrong password or credentials
           toast({
-            title: "Authentication failed",
+            title: "Incorrect Credentials",
+            description: errorMessage + " You can reset your password if needed.",
+            variant: "destructive",
+            duration: 8000,
+          });
+        } else if (errorCode === 'SERVICE_ERROR') {
+          // Service temporarily unavailable
+          toast({
+            title: "Service Unavailable",
             description: errorMessage,
             variant: "destructive",
+            duration: 6000,
+          });
+        } else {
+          // Handle password validation errors and general errors
+          let displayMessage = errorMessage;
+          if (displayMessage.includes("Password should contain")) {
+            displayMessage = "Password must include: uppercase letter, lowercase letter, number, and special character (!@#$%^&* etc.)";
+          }
+          
+          toast({
+            title: "Authentication Failed",
+            description: displayMessage,
+            variant: "destructive",
+            duration: 6000,
           });
         }
       }

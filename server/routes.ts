@@ -201,39 +201,115 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log('🔐 Sign-in attempt for:', email);
       
-      // Get user from Supabase admin
-      const { data: users } = await supabaseAdmin.auth.admin.listUsers();
-      const existingUser = users?.users?.find(u => u.email?.toLowerCase() === email);
-      
-      if (existingUser?.email_confirmed_at) {
-        console.log('✅ Found verified user, generating session...');
-        
-        // Skip token generation, use simpler approach
-        console.log('🎯 Creating direct session for verified user');
-        
-        // Fallback: create session since user is verified
-        const fallbackSession = {
-          user: existingUser,
-          session: {
-            access_token: `verified_${existingUser.id}_${Date.now()}`,
-            refresh_token: `refresh_${existingUser.id}_${Date.now()}`,
-            expires_in: 3600,
-            token_type: 'bearer',
-            user: existingUser
+      // Try authentication first - let Supabase tell us if user exists and credentials are valid
+      console.log('🔍 Attempting authentication with client...');
+      try {
+        const { data: signInData, error: signInError } = await serverSupabase.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        if (signInError) {
+          console.log('❌ Authentication failed:', signInError.message);
+          
+          // Now check if user exists to provide specific error messages
+          if (signInError.message.includes('Invalid login credentials')) {
+            console.log('🔍 Checking if user exists for better error message...');
+            
+            // Try to find user in admin list (with pagination handling)
+            let existingUser = null;
+            let nextPage = '';
+            let attempts = 0;
+            const maxAttempts = 5; // Prevent infinite loops
+            
+            while (!existingUser && attempts < maxAttempts) {
+              const listOptions: any = { perPage: 1000 };
+              if (nextPage) listOptions.page = nextPage;
+              
+              const { data: users, error: listError } = await supabaseAdmin.auth.admin.listUsers(listOptions);
+              
+              if (listError) {
+                console.log('❌ Failed to list users:', listError.message);
+                break;
+              }
+              
+              existingUser = users?.users?.find(u => u.email?.toLowerCase() === email);
+              nextPage = users?.nextPage || '';
+              attempts++;
+              
+              console.log(`📄 Searched page ${attempts}, found ${users?.users?.length} users, nextPage: ${!!nextPage}`);
+              
+              if (!nextPage || existingUser) break;
+            }
+            
+            if (existingUser && !existingUser.email_confirmed_at) {
+              console.log('❌ User found but email not verified');
+              return res.status(400).json({ 
+                message: "Please verify your email address before signing in. Check your email for a verification link.",
+                code: "EMAIL_NOT_VERIFIED",
+                requiresVerification: true
+              });
+            } else if (existingUser) {
+              console.log('❌ User found but wrong password');
+              return res.status(400).json({ 
+                message: "Invalid email or password. Please check your credentials and try again.",
+                code: "INVALID_CREDENTIALS"
+              });
+            } else {
+              console.log('❌ User account not found after searching all pages');
+              return res.status(400).json({ 
+                message: "No account found with this email address. Please sign up first or check your email address.",
+                code: "ACCOUNT_NOT_FOUND"
+              });
+            }
+          } else if (signInError.message.includes('Email not confirmed')) {
+            console.log('❌ Email not confirmed error');
+            return res.status(400).json({ 
+              message: "Please verify your email address before signing in. Check your email for a verification link.",
+              code: "EMAIL_NOT_VERIFIED",
+              requiresVerification: true
+            });
           }
-        };
-        
-        // Skip database storage for now to avoid foreign key conflicts
-        console.log('✅ Skipping database storage to avoid conflicts - user verified via Supabase');
-        
-        console.log('✅ Created fallback session for verified user');
-        return res.json(fallbackSession);
+          
+          return res.status(400).json({ 
+            message: "Sign in failed. Please try again.",
+            code: "SIGNIN_FAILED"
+          });
+        }
+
+        // Success - user authenticated
+        if (signInData?.user) {
+          console.log('✅ Authentication successful for:', signInData.user.email);
+          
+          // Create custom session token for our app
+          const fallbackSession = {
+            user: signInData.user,
+            session: {
+              access_token: `verified_${signInData.user.id}_${Date.now()}`,
+              refresh_token: `refresh_${signInData.user.id}_${Date.now()}`,
+              expires_in: 3600,
+              token_type: 'bearer',
+              user: signInData.user
+            }
+          };
+          
+          console.log('✅ Created session for authenticated user');
+          return res.json(fallbackSession);
+        }
+      } catch (authError) {
+        console.log('❌ Authentication service error:', authError);
+        return res.status(500).json({ 
+          message: "Authentication service temporarily unavailable. Please try again.",
+          code: "SERVICE_ERROR"
+        });
       }
+
       
-      // User not found or not verified
-      console.log('❌ User not found or email not verified');
+      // Fallback error
+      console.log('❌ Unexpected sign-in state');
       return res.status(400).json({ 
-        message: "Invalid login credentials",
+        message: "Sign in failed. Please try again.",
+        code: "SIGNIN_FAILED"
       });
       
     } catch (error) {
