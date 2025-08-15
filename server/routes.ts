@@ -1660,16 +1660,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const userId = req.user?.id;
     const requestedUserId = req.params.userId;
     
+    console.log('📊 Daily stats request:', { userId, requestedUserId });
+    
     if (!userId || userId !== requestedUserId) {
+      console.log('❌ Daily stats: User not found or unauthorized');
       return res.status(401).json({ message: "User not found or unauthorized" });
     }
 
     try {
       const today = new Date();
+      console.log('📊 Getting daily stats for user:', userId, 'date:', today.toISOString());
+      
       const stats = await storage.getUserDailyStats(userId, today);
+      console.log('✅ Daily stats retrieved successfully:', stats);
+      
       res.json(stats);
     } catch (error: any) {
-      res.status(500).json({ message: "Failed to get daily stats" });
+      console.error('❌ Failed to get daily stats:', error.message, error.stack);
+      
+      // Return default stats instead of failing completely
+      const defaultStats = {
+        totalCalories: 0,
+        totalProtein: 0,
+        totalCarbs: 0,
+        totalFat: 0,
+        waterGlasses: 0,
+        fastingStatus: undefined
+      };
+      
+      res.json(defaultStats);
     }
   });
 

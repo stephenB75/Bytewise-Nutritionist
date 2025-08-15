@@ -294,9 +294,29 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       if (response.ok) {
         const stats = await response.json();
         setDailyStats(stats);
+      } else {
+        console.warn('Daily stats fetch failed with status:', response.status);
+        // Set default stats to prevent UI issues
+        setDailyStats({
+          totalCalories: 0,
+          totalProtein: 0,
+          totalCarbs: 0,
+          totalFat: 0,
+          waterGlasses: 0,
+          fastingStatus: undefined
+        });
       }
     } catch (error) {
-      // Daily stats fetch failed - continue with cached data
+      console.warn('Daily stats fetch error:', error);
+      // Set default stats to prevent UI issues
+      setDailyStats({
+        totalCalories: 0,
+        totalProtein: 0,
+        totalCarbs: 0,
+        totalFat: 0,
+        waterGlasses: 0,
+        fastingStatus: undefined
+      });
     }
   }, [user]);
   
