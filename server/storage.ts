@@ -163,20 +163,30 @@ export class DatabaseStorage implements IStorage {
       });
       
       if (existingUserByEmail.length > 0) {
-        // User exists by email - update their info but keep their existing ID
+        // User exists by email - UPDATE THE ID to match Supabase and update their info
+        console.log('💾 Storage: Found existing user by email, updating ID to match Supabase:', {
+          existingId: existingUserByEmail[0].id?.substring(0, 8) + '...',
+          newId: userData.id?.substring(0, 8) + '...',
+          email: userData.email
+        });
+        
         try {
           const [updatedUser] = await db
             .update(users)
             .set({
+              id: userData.id, // CRITICAL: Update the ID to match Supabase
               firstName: userData.firstName,
               lastName: userData.lastName,
-              emailVerified: true, // They've signed in, so mark as verified
+              emailVerified: true,
               updatedAt: new Date(),
             })
             .where(eq(users.email, userData.email))
             .returning();
             
-          console.log('✅ Storage: User updated by email successfully');
+          console.log('✅ Storage: User updated by email with new ID successfully:', {
+            newId: updatedUser.id?.substring(0, 8) + '...',
+            email: updatedUser.email
+          });
           return updatedUser;
         } catch (updateError) {
           console.log('❌ Storage: Failed to update user by email:', updateError);

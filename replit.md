@@ -54,6 +54,11 @@ Preferred communication style: Simple, everyday language.
           - Sign-out now handles both localStorage custom tokens and Supabase sessions
           - Backend signout endpoint operational and tested
           - Complete session cleanup with page reload to reset application state
+        - **Fixed profile completion database ID mismatch (August 15, 2025)**:
+          - Resolved critical issue where users created in local database had different IDs than Supabase
+          - Fixed upsertUser logic to update existing user ID to match Supabase ID for consistency
+          - Profile updates now work correctly by ensuring user ID alignment across systems
+          - Enhanced ProfileCompletionModal with visual avatar selection buttons replacing broken dropdown
         - **Fixed user authentication fallback system (August 15, 2025)**:
           - Resolved issue where users existing in Supabase but not in local database couldn't sign in
           - Enhanced /api/auth/user endpoint with proper Supabase fallback logic
