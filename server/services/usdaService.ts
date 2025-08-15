@@ -14,6 +14,7 @@ import { getRetentionFactors, applyRetentionFactors, detectCookingMethod } from 
 import { classifyFood, getNutritionalPriorities } from '../data/foodCategories.js';
 import { getProteinConversionFactor, calculateProteinFromNitrogen, getProteinCalculationMethod } from '../data/proteinFactors.js';
 import { getNutrientById, validateNutrientValue, formatNutrientValue, getPriorityNutrients } from '../data/nutrientDatabase.js';
+import { findCandyNutrition, calculateCandyNutrition, CANDY_NUTRITION_DATABASE } from '../data/candyNutritionDatabase';
 
 interface USDANutrient {
   id: number;
@@ -193,6 +194,140 @@ export class USDAService {
   }
 
   /**
+   * Check if search term is candy-related
+   */
+  private isCandyRelated(query: string): boolean {
+    const candyTerms = [
+      'candy', 'candies', 'chocolate', 'gummy', 'lollipop', 'sucker',
+      'hard candy', 'soft candy', 'taffy', 'caramel', 'fudge',
+      'gumdrops', 'jelly beans', 'mint', 'drops', 'sweets'
+    ];
+    
+    const lowerQuery = query.toLowerCase();
+    return candyTerms.some(term => lowerQuery.includes(term));
+  }
+
+  /**
+   * Enhance USDA results with FoodStruct candy data
+   */
+  private enhanceWithCandyData(foods: USDAFood[], query: string): USDAFood[] {
+    if (!this.isCandyRelated(query)) {
+      return foods;
+    }
+
+    const candyData = findCandyNutrition(query);
+    if (!candyData) {
+      return foods;
+    }
+
+    // Create enhanced food entry with FoodStruct data
+    const enhancedFood: USDAFood = {
+      fdcId: -1, // Special ID for enhanced data
+      description: `${candyData.name} (Enhanced with detailed nutrition)`,
+      dataType: 'Enhanced',
+      foodCategory: `Candy - ${candyData.category}`,
+      foodNutrients: [
+        {
+          nutrientId: 1008,
+          nutrientName: "Energy",
+          nutrientNumber: "208",
+          unitName: "KCAL",
+          value: candyData.per100g.calories
+        },
+        {
+          nutrientId: 1003,
+          nutrientName: "Protein",
+          nutrientNumber: "203",
+          unitName: "G",
+          value: candyData.per100g.protein
+        },
+        {
+          nutrientId: 1004,
+          nutrientName: "Total lipid (fat)",
+          nutrientNumber: "204",
+          unitName: "G",
+          value: candyData.per100g.fat
+        },
+        {
+          nutrientId: 1005,
+          nutrientName: "Carbohydrate, by difference",
+          nutrientNumber: "205",
+          unitName: "G",
+          value: candyData.per100g.carbs
+        },
+        {
+          nutrientId: 2000,
+          nutrientName: "Total Sugars",
+          nutrientNumber: "269",
+          unitName: "G",
+          value: candyData.per100g.sugar
+        },
+        {
+          nutrientId: 1079,
+          nutrientName: "Fiber, total dietary",
+          nutrientNumber: "291",
+          unitName: "G",
+          value: candyData.per100g.fiber
+        },
+        // Enhanced minerals from FoodStruct
+        {
+          nutrientId: 1087,
+          nutrientName: "Calcium, Ca",
+          nutrientNumber: "301",
+          unitName: "MG",
+          value: candyData.per100g.calcium
+        },
+        {
+          nutrientId: 1089,
+          nutrientName: "Iron, Fe",
+          nutrientNumber: "303",
+          unitName: "MG",
+          value: candyData.per100g.iron
+        },
+        {
+          nutrientId: 1090,
+          nutrientName: "Magnesium, Mg",
+          nutrientNumber: "304",
+          unitName: "MG",
+          value: candyData.per100g.magnesium
+        },
+        {
+          nutrientId: 1093,
+          nutrientName: "Sodium, Na",
+          nutrientNumber: "307",
+          unitName: "MG",
+          value: candyData.per100g.sodium
+        },
+        {
+          nutrientId: 1092,
+          nutrientName: "Potassium, K",
+          nutrientNumber: "306",
+          unitName: "MG",
+          value: candyData.per100g.potassium
+        },
+        // Add caffeine and theobromine if present (chocolate candies)
+        ...(candyData.per100g.caffeine ? [{
+          nutrientId: 1057,
+          nutrientName: "Caffeine",
+          nutrientNumber: "262",
+          unitName: "MG",
+          value: candyData.per100g.caffeine
+        }] : []),
+        ...(candyData.per100g.theobromine ? [{
+          nutrientId: 1058,
+          nutrientName: "Theobromine",
+          nutrientNumber: "263",
+          unitName: "MG",
+          value: candyData.per100g.theobromine
+        }] : [])
+      ]
+    };
+
+    // Add enhanced data at the beginning for priority
+    return [enhancedFood, ...foods];
+  }
+
+  /**
    * Search foods with USDA API and cache results (optimized)
    */
   async searchFoods(query: string, pageSize = 25): Promise<USDAFood[]> {
@@ -234,18 +369,22 @@ export class USDAService {
       // Cache popular results for offline use
       await this.cacheSearchResults(data.foods);
       
-      return data.foods;
+      // Enhance with FoodStruct candy data if applicable
+      return this.enhanceWithCandyData(data.foods, query);
     } catch (error) {
       
       // Fallback to cached results only
       const cachedResults = await this.searchCachedFoodsInternal(query, pageSize);
-      return cachedResults.map((food: any) => ({
+      const mappedResults = cachedResults.map((food: any) => ({
         fdcId: food.fdcId,
         description: food.description,
         dataType: food.dataType,
         foodNutrients: JSON.parse(food.nutrients || '[]'),
         foodCategory: food.foodCategory || undefined
       }));
+      
+      // Enhance with FoodStruct candy data even for cached results
+      return this.enhanceWithCandyData(mappedResults, query);
     }
   }
 
