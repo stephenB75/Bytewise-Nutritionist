@@ -113,8 +113,30 @@ export interface IStorage {
 export class DatabaseStorage implements IStorage {
   // User operations
   async getUser(id: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
-    return user;
+    try {
+      const [user] = await db.select().from(users).where(eq(users.id, id));
+      return user;
+    } catch (error: any) {
+      // Handle missing column gracefully
+      if (error.message?.includes('profile_icon') && error.code === '42703') {
+        console.log('🔧 Adding missing profile_icon column...');
+        try {
+          // Add the missing column
+          await db.execute(sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS profile_icon INTEGER DEFAULT 1`);
+          console.log('✅ profile_icon column added successfully');
+          
+          // Retry the query
+          const [user] = await db.select().from(users).where(eq(users.id, id));
+          return user;
+        } catch (alterError) {
+          console.log('❌ Failed to add profile_icon column:', alterError);
+          // Return user without profile_icon for now
+          const [userWithoutIcon] = await db.execute(sql`SELECT id, email, email_verified, first_name, last_name, profile_image_url, personal_info, privacy_settings, notification_settings, display_settings, created_at, updated_at, daily_calorie_goal, daily_protein_goal, daily_carb_goal, daily_fat_goal, daily_water_goal FROM users WHERE id = ${id}`);
+          return userWithoutIcon as any;
+        }
+      }
+      throw error;
+    }
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {

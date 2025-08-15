@@ -7,6 +7,7 @@ import { usdaService } from "./services/usdaService";
 export async function registerRoutes(app: Express): Promise<Server> {
   // Health check endpoint - simplified for production
   app.get('/api/health', async (req: Request, res: Response) => {
+    console.log('🏥 Health check called at:', new Date().toISOString());
     // Basic health check - server is responding
     res.json({
       status: 'healthy',

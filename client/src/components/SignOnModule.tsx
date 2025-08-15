@@ -435,7 +435,11 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
 
           {/* Email Authentication Form */}
           <form 
-            onSubmit={handleEmailAuth} 
+            onSubmit={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleEmailAuth(e);
+            }}
             className="space-y-4"
           >
             <div className="space-y-4">
@@ -550,7 +554,10 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
               <Button
                 type="submit"
                 disabled={loading}
-                onClick={() => console.log('🔘 Submit button clicked directly')}
+                onClick={(e) => {
+                  console.log('🔘 Submit button clicked directly');
+                  e.stopPropagation();
+                }}
                 className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 py-3 text-sm font-semibold"
                 data-testid="button-submit"
               >
@@ -569,8 +576,8 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
             )}
           </form>
 
-          {/* OAuth Providers - Separated from form */}
-          <div className="space-y-3">
+          {/* OAuth Providers - Completely separated from form */}
+          <div className="space-y-3" onClick={(e) => e.stopPropagation()}>
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-white/20" />
