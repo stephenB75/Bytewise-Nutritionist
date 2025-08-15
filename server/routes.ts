@@ -1126,11 +1126,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { firstName, lastName, personalInfo } = req.body;
       
+      console.log('🔄 Profile update request:', {
+        userId: userId.substring(0, 8) + '...',
+        firstName: firstName?.trim() || '(empty)',
+        lastName: lastName?.trim() || '(empty)', 
+        personalInfo: personalInfo ? Object.keys(personalInfo) : 'none'
+      });
+      
       // Update user profile information
       const updatedUser = await storage.updateUserProfile(userId, {
         firstName: firstName?.trim() || '',
         lastName: lastName?.trim() || '',
         personalInfo: personalInfo || {}
+      });
+      
+      console.log('✅ Profile updated successfully:', {
+        userId: userId.substring(0, 8) + '...',
+        updatedFields: Object.keys({ firstName, lastName, personalInfo }).filter(k => req.body[k] !== undefined),
+        hasUpdatedUser: !!updatedUser,
+        updatedUserId: updatedUser?.id?.substring(0, 8) + '...' || 'none'
       });
       
       res.json({ 
@@ -1140,7 +1154,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: "Profile updated successfully"
       });
     } catch (error: any) {
-      console.error('Profile update error:', error);
+      console.error('❌ Profile update error:', error);
+      console.error('Error stack:', error.stack);
       res.status(500).json({ 
         message: error?.message || "Failed to update profile" 
       });
@@ -1158,8 +1173,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const goals = req.body;
       
+      console.log('🎯 Goals update request:', {
+        userId: userId.substring(0, 8) + '...',
+        goals: goals,
+        goalKeys: Object.keys(goals)
+      });
+      
       // Update user goals
       const updatedUser = await storage.updateUserGoals(userId, goals);
+      
+      console.log('✅ Goals updated successfully:', {
+        userId: userId.substring(0, 8) + '...',
+        hasUpdatedUser: !!updatedUser,
+        updatedUserId: updatedUser?.id?.substring(0, 8) + '...' || 'none',
+        updatedGoals: goals
+      });
       
       res.json({ 
         success: true, 
@@ -1168,7 +1196,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: "Goals updated successfully"
       });
     } catch (error: any) {
-      console.error('Goals update error:', error);
+      console.error('❌ Goals update error:', error);
+      console.error('Error stack:', error.stack);
       res.status(500).json({ 
         message: error?.message || "Failed to update goals" 
       });

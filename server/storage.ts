@@ -200,11 +200,24 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateUserGoals(userId: string, goals: Partial<Pick<User, 'dailyCalorieGoal' | 'dailyProteinGoal' | 'dailyCarbGoal' | 'dailyFatGoal' | 'dailyWaterGoal'>>): Promise<User> {
+    console.log('📊 Storage: updateUserGoals called:', {
+      userId: userId.substring(0, 8) + '...',
+      goals: goals,
+      goalCount: Object.keys(goals).length
+    });
+    
     const [user] = await db
       .update(users)
       .set({ ...goals, updatedAt: new Date() })
       .where(eq(users.id, userId))
       .returning();
+      
+    console.log('📊 Storage: updateUserGoals result:', {
+      hasUser: !!user,
+      userId: user?.id?.substring(0, 8) + '...' || 'none',
+      updatedFields: Object.keys(goals)
+    });
+    
     return user;
   }
 
@@ -215,6 +228,15 @@ export class DatabaseStorage implements IStorage {
     notificationSettings?: any;
     privacySettings?: any;
   }): Promise<User> {
+    console.log('👤 Storage: updateUserProfile called:', {
+      userId: userId.substring(0, 8) + '...',
+      profileFields: Object.keys(profileData),
+      firstName: profileData.firstName || '(empty)',
+      lastName: profileData.lastName || '(empty)',
+      hasPersonalInfo: !!profileData.personalInfo,
+      personalInfoKeys: profileData.personalInfo ? Object.keys(profileData.personalInfo) : 'none'
+    });
+    
     const [user] = await db
       .update(users)
       .set({
@@ -223,6 +245,15 @@ export class DatabaseStorage implements IStorage {
       })
       .where(eq(users.id, userId))
       .returning();
+      
+    console.log('👤 Storage: updateUserProfile result:', {
+      hasUser: !!user,
+      userId: user?.id?.substring(0, 8) + '...' || 'none',
+      firstName: user?.firstName || '(empty)',
+      lastName: user?.lastName || '(empty)',
+      hasPersonalInfo: !!user?.personalInfo
+    });
+    
     return user;
   }
 
