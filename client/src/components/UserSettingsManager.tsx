@@ -128,7 +128,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
         email: userData?.email || '',
         phone: personalInfo?.phone || '',
         location: personalInfo?.location || '',
-        birthDate: personalInfo?.birthDate || '',
+        birthDate: personalInfo?.birth_date || personalInfo?.birthDate || '',
         height: personalInfo?.height || '',
         weight: personalInfo?.weight || '',
         activityLevel: personalInfo?.activityLevel || 'Moderately Active',
@@ -142,6 +142,9 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
         lastName: newUserInfo.lastName || '(empty)', 
         phone: newUserInfo.phone || '(empty)',
         location: newUserInfo.location || '(empty)',
+        birthDate: newUserInfo.birthDate || '(empty)',
+        height: newUserInfo.height || '(empty)',
+        weight: newUserInfo.weight || '(empty)',
         calorieGoal: newUserInfo.calorieGoal
       });
       
@@ -202,6 +205,11 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
         originalName: userInfo.name,
         splitFirstName: firstName.trim(),
         splitLastName: lastName.trim(),
+        birthDate: userInfo.birthDate || '(empty)',
+        phone: userInfo.phone || '(empty)',
+        location: userInfo.location || '(empty)',
+        height: userInfo.height || '(empty)',
+        weight: userInfo.weight || '(empty)',
         profileData: profileData
       });
       
@@ -294,7 +302,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
           email: userData?.email || '',
           phone: refreshedPersonalInfo?.phone || '',
           location: refreshedPersonalInfo?.location || '',
-          birthDate: refreshedPersonalInfo?.birthDate || '',
+          birthDate: refreshedPersonalInfo?.birth_date || refreshedPersonalInfo?.birthDate || '',
           height: refreshedPersonalInfo?.height || '',
           weight: refreshedPersonalInfo?.weight || '',
           activityLevel: refreshedPersonalInfo?.activityLevel || 'Moderately Active',
