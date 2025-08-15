@@ -156,22 +156,38 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
           });
           
           try {
-            console.log('🔧 Setting session in Supabase client...');
-            const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
-              access_token: data.session.access_token,
-              refresh_token: data.session.refresh_token,
-            });
+            // Check if this is a custom token or standard Supabase JWT
+            const isCustomToken = data.session.access_token.startsWith('verified_');
             
-            if (sessionError) {
-              console.log('❌ Session setting error:', sessionError);
-              throw sessionError;
+            if (isCustomToken) {
+              console.log('🔧 Handling custom token - storing locally...');
+              // For custom tokens, store session data locally
+              localStorage.setItem('supabase.auth.token', JSON.stringify({
+                access_token: data.session.access_token,
+                refresh_token: data.session.refresh_token,
+                expires_in: data.session.expires_in,
+                user: data.user
+              }));
+              
+              console.log('✅ Custom session stored locally');
+            } else {
+              console.log('🔧 Setting standard Supabase session...');
+              const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
+                access_token: data.session.access_token,
+                refresh_token: data.session.refresh_token,
+              });
+              
+              if (sessionError) {
+                console.log('❌ Session setting error:', sessionError);
+                throw sessionError;
+              }
+              
+              console.log('✅ Supabase session set successfully:', {
+                hasUser: !!sessionData?.user,
+                hasSession: !!sessionData?.session,
+                userId: sessionData?.user?.id?.substring(0, 8) + '...'
+              });
             }
-            
-            console.log('✅ Session set successfully:', {
-              hasUser: !!sessionData?.user,
-              hasSession: !!sessionData?.session,
-              userId: sessionData?.user?.id?.substring(0, 8) + '...'
-            });
             
             // Verify session was set by checking current session
             const { data: currentSession } = await supabase.auth.getSession();

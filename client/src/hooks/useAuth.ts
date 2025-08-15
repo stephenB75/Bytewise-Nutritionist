@@ -33,24 +33,50 @@ export function useAuth() {
     queryKey: ["/api/auth/user"],
     queryFn: async () => {
       try {
-        // Get current session from Supabase
-        const { data: { session } } = await supabase.auth.getSession();
+        // Check for locally stored custom tokens first
+        const storedSession = localStorage.getItem('supabase.auth.token');
+        let accessToken = null;
         
-        console.log('🔍 useAuth query - session check:', {
-          hasSession: !!session,
-          hasAccessToken: !!session?.access_token,
-          tokenLength: session?.access_token?.length
-        });
+        if (storedSession) {
+          try {
+            const parsedSession = JSON.parse(storedSession);
+            if (parsedSession.access_token) {
+              console.log('🔍 Found locally stored custom token:', {
+                hasToken: true,
+                tokenLength: parsedSession.access_token.length,
+                isCustomToken: parsedSession.access_token.startsWith('verified_')
+              });
+              accessToken = parsedSession.access_token;
+            }
+          } catch (parseError) {
+            console.log('⚠️ Failed to parse stored session:', parseError);
+          }
+        }
         
-        if (!session?.access_token) {
-          console.log('❌ No valid session found');
+        // If no custom token, check Supabase session
+        if (!accessToken) {
+          const { data: { session } } = await supabase.auth.getSession();
+          
+          console.log('🔍 useAuth query - Supabase session check:', {
+            hasSession: !!session,
+            hasAccessToken: !!session?.access_token,
+            tokenLength: session?.access_token?.length
+          });
+          
+          if (session?.access_token) {
+            accessToken = session.access_token;
+          }
+        }
+        
+        if (!accessToken) {
+          console.log('❌ No valid session found (neither custom nor Supabase)');
           return null;
         }
         
-        // Use the session token to get user data from our backend
+        // Use the token to get user data from our backend
         const response = await fetch('/api/auth/user', {
           headers: {
-            'Authorization': `Bearer ${session.access_token}`,
+            'Authorization': `Bearer ${accessToken}`,
           },
         });
         
