@@ -24,13 +24,16 @@ export function useAuth() {
     queryKey: ["/api/auth/user"],
     queryFn: async () => {
       try {
+        console.log('🔍 Fetching user data...');
         // Get current session from Supabase
         const { data: { session } } = await supabase.auth.getSession();
         
         if (!session?.access_token) {
+          console.log('❌ No session token found');
           return null;
         }
         
+        console.log('🎫 Session token found, fetching user...');
         // Use the session token to get user data from our backend
         const response = await fetch('/api/auth/user', {
           headers: {
@@ -39,6 +42,7 @@ export function useAuth() {
         });
         
         if (!response.ok) {
+          console.log('⚠️ User fetch failed:', response.status);
           // If unauthorized, return null instead of throwing
           if (response.status === 401) {
             return null;
@@ -46,8 +50,11 @@ export function useAuth() {
           throw new Error('Failed to fetch user');
         }
         
-        return response.json();
+        const userData = await response.json();
+        console.log('✨ User data fetched successfully:', !!userData);
+        return userData;
       } catch (error) {
+        console.log('💥 Auth fetch error:', error);
         // Return null for any authentication errors
         return null;
       }
@@ -59,7 +66,10 @@ export function useAuth() {
 
   // Listen for auth state changes to refetch
   useEffect(() => {
-    const handleAuthChange = () => refetch();
+    const handleAuthChange = () => {
+      console.log('🔔 Auth state change event received - refetching...');
+      refetch();
+    };
     window.addEventListener('auth-state-change', handleAuthChange);
     return () => window.removeEventListener('auth-state-change', handleAuthChange);
   }, [refetch]);

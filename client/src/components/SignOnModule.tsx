@@ -149,23 +149,24 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
             }
             
             console.log('✅ Session set, refetching auth state...');
-            // Refetch auth state and wait for completion
-            await refetch();
+            // Force refresh the auth state
+            const authRefetch = await refetch();
+            console.log('🔄 Auth refetch result:', !!authRefetch);
+            
+            // Trigger custom event for auth state change
+            window.dispatchEvent(new CustomEvent('auth-state-change'));
             
             console.log('⏰ Waiting for state propagation...');
-            // Additional delay to ensure state propagation
-            await new Promise(resolve => setTimeout(resolve, 200));
+            // Longer delay to ensure state propagation
+            await new Promise(resolve => setTimeout(resolve, 500));
             
             toast({
               title: "Welcome back!",
               description: "You've been signed in successfully.",
             });
             
-            console.log('🚪 Closing modal...');
-            // Close the sign-in module
-            if (onClose) {
-              onClose();
-            }
+            // Don't close modal immediately - let the parent component handle it when user state updates
+            console.log('🎯 Authentication completed - waiting for UI update...');
             
           } catch (err) {
             console.error('💥 Session setting failed:', err);
