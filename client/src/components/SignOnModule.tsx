@@ -127,8 +127,11 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
         hasUser: !!data.user,
         hasSession: !!data.session,
         requiresVerification: data.requiresVerification,
-        message: data.message
+        message: data.message,
+        code: data.code
       });
+
+      console.log('🔍 Response is OK?', response.ok, 'Will go to', response.ok ? 'SUCCESS' : 'ERROR', 'branch');
 
       if (response.ok) {
         // Check if email verification is required
@@ -237,10 +240,11 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
         }
       } else {
         // Handle different types of authentication errors with specific prompts
+        console.log('🚨 ENTERING ERROR HANDLING BRANCH');
         const errorCode = data.code;
         const errorMessage = data.message || "Please try again.";
         
-        console.log('🔍 Handling authentication error:', { errorCode, errorMessage });
+        console.log('🔍 Handling authentication error:', { errorCode, errorMessage, isSignUp });
         
         if (data.requiresVerification || errorCode === 'EMAIL_NOT_VERIFIED') {
           // Email verification required
@@ -254,6 +258,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
           });
         } else if (errorCode === 'ACCOUNT_NOT_FOUND') {
           // No account found - suggest signing up
+          console.log('🔥 Showing ACCOUNT_NOT_FOUND toast notification');
           toast({
             title: "Account Not Found",
             description: errorMessage + " Would you like to create a new account?",
@@ -261,7 +266,9 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
             duration: 10000,
           });
           // Auto-switch to sign-up mode for user convenience
+          console.log('🔄 Will switch to sign-up mode in 2 seconds');
           setTimeout(() => {
+            console.log('🔄 Switching to sign-up mode now');
             setIsSignUp(true);
             setPassword('');
             setPasswordErrors([]);
