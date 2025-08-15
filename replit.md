@@ -75,6 +75,11 @@ Preferred communication style: Simple, everyday language.
   - Enhanced mineral content data (calcium, iron, magnesium, sodium, etc.)
   - Automatic candy detection and enhanced data prioritization
   - Confirmed nutrition calculation accuracy for all candy items
+- **UI improvements and notification system (August 15, 2025)**
+  - Fixed notification system by adding missing Toaster component to main App
+  - Implemented comprehensive authentication error prompts for invalid accounts
+  - Added user-friendly messages for account not found, wrong credentials, and email verification
+  - Removed unnecessary white border background from user profile icon for cleaner appearance
 
 ## System Architecture
 

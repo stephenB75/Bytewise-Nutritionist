@@ -1913,7 +1913,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                         <ProfileIcon 
                           iconNumber={user?.profileIcon || 1} 
                           size="md" 
-                          className="border-2 border-white/20" 
                         />
                         <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-black flex items-center justify-center">
                           <CheckCircle2 className="w-2.5 h-2.5 text-white" />
