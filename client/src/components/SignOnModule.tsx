@@ -371,12 +371,8 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
               <Button
                 type="submit"
                 disabled={loading}
-                onClick={(e) => {
-                  console.log('Button clicked directly!');
-                  toast({
-                    title: "Button Click",
-                    description: "Direct button click detected!",
-                  });
+                onClick={() => {
+                  alert('BUTTON CLICKED! This should show if button works');
                 }}
                 className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 py-3 text-sm font-semibold"
               >
