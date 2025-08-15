@@ -30,7 +30,7 @@ export const ProfileIcon: React.FC<ProfileIconProps> = ({
 
   return (
     <div 
-      className={`${sizeClasses[size]} rounded-full overflow-hidden flex items-center justify-center ${className}`}
+      className={`${sizeClasses[size]} rounded-full overflow-hidden flex items-center justify-center bg-transparent ${className}`}
       style={{
         backgroundImage: 'url(/profile-icons.jpg)',
         backgroundSize: '300% 300%', // Optimized size for better icon centering
