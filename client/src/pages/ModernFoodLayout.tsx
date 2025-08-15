@@ -1892,51 +1892,51 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       />
 
       {/* Content Section - Redesigned to match other pages */}
-      <div className="px-6 py-3 bg-black content-section">
+      <div className="px-6 py-6 bg-black content-section min-h-screen">
         {/* Profile Cards with Unified Accordion System */}
         {user ? (
           <Accordion 
             type="single" 
             collapsible 
             className="w-full space-y-6"
-            value={openCard}
+            value={openCard || ""}
             onValueChange={setOpenCard}
           >
             {/* Consolidated Profile Card */}
             <AccordionItem value="profile" className="border-none">
               <Card className="bg-white/10 backdrop-blur-md border-white/20 overflow-hidden rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:bg-white/15 hover:border-white/30">
-                <AccordionTrigger className="px-6 py-6 hover:bg-white/5 hover:no-underline [&[data-state=open]]:bg-white/5">
-                  <div className="flex items-center justify-between w-full">
-                    <div className="flex items-center space-x-6 flex-1 min-w-0">
+                <AccordionTrigger className="px-6 py-6 hover:bg-white/5 hover:no-underline [&[data-state=open]]:bg-white/5 [&>svg]:ml-4">
+                  <div className="flex items-start justify-between w-full pr-4">
+                    <div className="flex items-start space-x-4 flex-1 min-w-0">
                       <div className="relative flex-shrink-0">
-                        <div className="w-20 h-20 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center">
-                          <User className="w-10 h-10 text-white" />
+                        <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center">
+                          <User className="w-8 h-8 text-white" />
                         </div>
-                        <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-black flex items-center justify-center">
-                          <CheckCircle2 className="w-3 h-3 text-white" />
+                        <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-black flex items-center justify-center">
+                          <CheckCircle2 className="w-2.5 h-2.5 text-white" />
                         </div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-2xl font-bold text-white mb-1" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                      <div className="flex-1 min-w-0 space-y-1">
+                        <h3 className="text-xl font-bold text-white leading-tight" style={{ fontFamily: "'League Spartan', sans-serif" }}>
                           {user?.email?.split('@')[0] || 'ByteWise User'}
                         </h3>
-                        <p className="text-gray-300 text-sm mb-2">{user?.email}</p>
-                        <div className="flex items-center space-x-4 text-sm text-gray-400">
-                          <span>🏆 Level 1</span>
-                          <span>📊 {loggedMeals?.length || 0} meals logged</span>
-                          <span>🎯 {Math.round(dailyCalories)}/{goalCalories} cal today</span>
+                        <p className="text-gray-300 text-sm truncate">{user?.email}</p>
+                        <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-gray-400 mt-1">
+                          <span className="inline-flex items-center whitespace-nowrap">🏆 Level 1</span>
+                          <span className="inline-flex items-center whitespace-nowrap">📊 {loggedMeals?.length || 0} meals</span>
+                          <span className="inline-flex items-center whitespace-nowrap">🎯 {Math.round(dailyCalories)}/{goalCalories} cal</span>
                         </div>
                       </div>
                     </div>
-                    <div className="text-right flex-shrink-0">
-                      <div className="text-lg font-bold text-orange-400">{achievements?.length || 0}</div>
-                      <div className="text-xs text-gray-400">Achievements</div>
+                    <div className="text-right flex-shrink-0 ml-3 min-w-[80px]">
+                      <div className="text-lg font-bold text-orange-400 leading-tight">{achievements?.length || 0}</div>
+                      <div className="text-xs text-gray-400 whitespace-nowrap leading-tight">Achievements</div>
                     </div>
                   </div>
                 </AccordionTrigger>
 
-                <AccordionContent className="px-6 pb-6 pt-0">
-                  <div className="border-t border-white/10 pt-4">
+                <AccordionContent className="px-6 pb-6 pt-2">
+                  <div className="border-t border-white/10 pt-6 mt-2">
                     <UserSettingsManager />
                   </div>
                 </AccordionContent>
