@@ -1,14 +1,9 @@
-import { useState } from 'react';
-
 export function TestComponent() {
-  const [test, setTest] = useState('Hello World');
-  
   return (
-    <div style={{ padding: '20px', background: 'green', color: 'white' }}>
-      <h1>Test Component: {test}</h1>
-      <button onClick={() => setTest('Hooks Working!')}>
-        Test Hook
-      </button>
+    <div style={{ padding: '20px', background: 'green', color: 'white', fontSize: '24px' }}>
+      <h1>Minimal React Component Test</h1>
+      <p>If you can see this, React is working</p>
+      <p>But hooks are disabled for testing</p>
     </div>
   );
 }

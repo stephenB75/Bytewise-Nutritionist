@@ -5,23 +5,16 @@
  * Features brand-compliant design and seamless navigation
  */
 
-import { useState, useEffect } from 'react';
-import { QueryClientProvider } from '@tanstack/react-query';
-import { queryClient } from '@/lib/queryClient';
 import { TestComponent } from './TestComponent';
 
 function AppContent() {
   return (
-    <div className="min-h-screen bg-black">
+    <div style={{ minHeight: '100vh', backgroundColor: 'black' }}>
       <TestComponent />
     </div>
   );
 }
 
 export default function App() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <AppContent />
-    </QueryClientProvider>
-  );
+  return <AppContent />;
 }
