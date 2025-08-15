@@ -1909,8 +1909,27 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   <div className="flex items-start justify-between w-full pr-4">
                     <div className="flex items-start space-x-4 flex-1 min-w-0">
                       <div className="relative flex-shrink-0">
-                        <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                          <span className="text-2xl">🧑</span>
+                        <div className="w-16 h-16 rounded-full overflow-hidden flex items-center justify-center">
+                          <svg viewBox="0 0 100 100" className="w-full h-full">
+                            {/* Background circle */}
+                            <circle cx="50" cy="50" r="50" fill="#4F46E5" />
+                            
+                            {/* Face */}
+                            <circle cx="50" cy="45" r="18" fill="#FCD34D" />
+                            
+                            {/* Hair */}
+                            <path d="M32 35 Q32 25, 42 25 Q50 20, 58 25 Q68 25, 68 35 Q68 40, 62 42 Q38 42, 32 35 Z" fill="#8B4513" />
+                            
+                            {/* Eyes */}
+                            <circle cx="44" cy="42" r="2" fill="#1F2937" />
+                            <circle cx="56" cy="42" r="2" fill="#1F2937" />
+                            
+                            {/* Smile */}
+                            <path d="M42 50 Q50 56, 58 50" stroke="#1F2937" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+                            
+                            {/* Body/Shirt */}
+                            <ellipse cx="50" cy="75" rx="20" ry="15" fill="#10B981" />
+                          </svg>
                         </div>
                         <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-black flex items-center justify-center">
                           <CheckCircle2 className="w-2.5 h-2.5 text-white" />
