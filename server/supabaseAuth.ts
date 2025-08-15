@@ -74,13 +74,41 @@ export const isAuthenticated: AuthMiddleware = async (
       // Parse verified_userId_timestamp format
       const parts = token.split('_');
       if (parts.length >= 2) {
-        const userId = parts[1];
+        const supabaseUserId = parts[1];
+        
+        // CRITICAL: Map Supabase user ID to database user ID for required auth
+        let actualUserId = supabaseUserId;
+        try {
+          // Import storage here to avoid circular dependency issues
+          const { storage } = await import('./index');
+          
+          // Try to find user by Supabase ID first
+          let user = await storage.getUser(supabaseUserId);
+          
+          if (!user) {
+            // If not found by Supabase ID, try to find by email using Supabase admin
+            try {
+              const { data: supabaseUser } = await supabaseAdmin.auth.admin.getUserById(supabaseUserId);
+              if (supabaseUser?.user?.email) {
+                const allUsers = await storage.getAllUsers();
+                const userByEmail = allUsers.find(u => u.email === supabaseUser.user.email);
+                if (userByEmail) {
+                  actualUserId = userByEmail.id;
+                }
+              }
+            } catch (lookupError) {
+              console.log('⚠️ Failed to lookup user for ID mapping:', lookupError);
+            }
+          }
+        } catch (mappingError) {
+          console.log('⚠️ Failed to map user ID:', mappingError);
+        }
         
         // Set user directly since we trust our own verified tokens
         req.user = {
-          id: userId,
+          id: actualUserId,
           email: null, // Will be populated by endpoints that need it
-          claims: { sub: userId },
+          claims: { sub: actualUserId },
         };
         return next();
       }
@@ -125,16 +153,49 @@ export const optionalAuth: AuthMiddleware = async (
         // Parse verified_userId_timestamp format
         const parts = token.split('_');
         if (parts.length >= 2) {
-          const userId = parts[1];
-          console.log('🔍 Extracting user ID from custom token:', userId.substring(0, 8) + '...');
+          const supabaseUserId = parts[1];
+          console.log('🔍 Extracting user ID from custom token:', supabaseUserId.substring(0, 8) + '...');
           
-          // Set user directly since we trust our own verified tokens
+          // CRITICAL: Map Supabase user ID to database user ID
+          let actualUserId = supabaseUserId;
+          try {
+            // Import storage here to avoid circular dependency issues
+            const { storage } = await import('./index');
+            
+            // Try to find user by Supabase ID first
+            let user = await storage.getUser(supabaseUserId);
+            
+            if (!user) {
+              // If not found by Supabase ID, try to find by email using Supabase admin
+              try {
+                const { data: supabaseUser } = await supabaseAdmin.auth.admin.getUserById(supabaseUserId);
+                if (supabaseUser?.user?.email) {
+                  console.log('🔍 Looking up database user by email:', supabaseUser.user.email);
+                  const allUsers = await storage.getAllUsers(); // We'll need to add this method
+                  const userByEmail = allUsers.find(u => u.email === supabaseUser.user.email);
+                  if (userByEmail) {
+                    actualUserId = userByEmail.id;
+                    console.log('📍 Mapped Supabase ID to database ID:', {
+                      supabaseId: supabaseUserId.substring(0, 8) + '...',
+                      databaseId: actualUserId.substring(0, 8) + '...'
+                    });
+                  }
+                }
+              } catch (lookupError) {
+                console.log('⚠️ Failed to lookup user for ID mapping:', lookupError);
+              }
+            }
+          } catch (mappingError) {
+            console.log('⚠️ Failed to map user ID:', mappingError);
+          }
+          
+          // Set user with the correct ID (either original or mapped)
           req.user = {
-            id: userId,
+            id: actualUserId,
             email: null, // Will be populated by user endpoint
-            claims: { sub: userId },
+            claims: { sub: actualUserId },
           };
-          console.log('✅ Custom token validated, user ID set:', userId.substring(0, 8) + '...');
+          console.log('✅ Custom token validated, user ID set:', actualUserId.substring(0, 8) + '...');
         }
       } else {
         // Try as standard Supabase token or generated token

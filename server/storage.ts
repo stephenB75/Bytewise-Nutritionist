@@ -108,10 +108,21 @@ export interface IStorage {
   updateFastingSession(id: string, updates: Partial<FastingSession>): Promise<FastingSession>;
   completeFastingSession(id: string): Promise<FastingSession>;
   getUserActiveFastingSession(userId: string): Promise<FastingSession | null>;
+  getAllUsers(): Promise<User[]>;
 }
 
 export class DatabaseStorage implements IStorage {
   // User operations
+  async getAllUsers(): Promise<User[]> {
+    try {
+      const users = await db.select().from(users);
+      return users;
+    } catch (error) {
+      console.log('❌ Failed to get all users:', error);
+      return [];
+    }
+  }
+
   async getUser(id: string): Promise<User | undefined> {
     try {
       const [user] = await db.select().from(users).where(eq(users.id, id));
