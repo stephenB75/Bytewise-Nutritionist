@@ -82,10 +82,16 @@ export const optionalAuth: AuthMiddleware = async (
   next: NextFunction
 ) => {
   try {
+    console.log('🛡️ OptionalAuth middleware called');
     const authHeader = req.headers.authorization;
+    console.log('📋 Auth header present:', !!authHeader);
+    
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.substring(7);
-      const { data: { user } } = await supabase.auth.getUser(token);
+      console.log('🔑 Token extracted, length:', token.length);
+      
+      const { data: { user }, error } = await supabase.auth.getUser(token);
+      console.log('🔍 Supabase user lookup result:', { hasUser: !!user, error: !!error });
       
       if (user) {
         req.user = {
@@ -93,9 +99,15 @@ export const optionalAuth: AuthMiddleware = async (
           email: user.email,
           claims: { sub: user.id },
         };
+        console.log('✅ User set on request:', user.id, user.email);
+      } else {
+        console.log('❌ No user found for token');
       }
+    } else {
+      console.log('❌ No valid Bearer token found');
     }
   } catch (error) {
+    console.log('💥 OptionalAuth error:', error);
     // Silently fail for optional auth
   }
   

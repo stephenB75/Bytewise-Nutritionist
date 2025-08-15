@@ -74,16 +74,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Auth routes
   app.get('/api/auth/user', optionalAuth, async (req: any, res: Response) => {
+    console.log('🔍 /api/auth/user called');
     const userId = req.user?.id;
+    console.log('🆔 User ID from auth middleware:', userId);
+    
     if (!userId) {
+      console.log('❌ No user ID - returning null');
       // Return null for unauthenticated users instead of 401
       res.json(null);
       return;
     }
     try {
+      console.log('🔎 Fetching user from database...');
       const user = await storage.getUser(userId);
+      console.log('✅ User found in database:', !!user, user?.email);
       res.json(user);
     } catch (error) {
+      console.log('💥 Error fetching user from database:', error);
       // If user not found in database, return null
       res.json(null);
     }
@@ -123,13 +130,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Store user in our database if they don't exist
       if (data.user) {
         try {
+          console.log('💾 Storing user in database:', data.user.id, data.user.email);
           await storage.upsertUser({
             id: data.user.id,
             email: data.user.email,
             firstName: data.user.user_metadata?.first_name,
             lastName: data.user.user_metadata?.last_name,
           });
+          console.log('✅ User stored successfully');
         } catch (dbError) {
+          console.log('💥 Error storing user:', dbError);
           // Continue anyway since Supabase auth succeeded
         }
       }
