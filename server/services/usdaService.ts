@@ -15,7 +15,7 @@ import { classifyFood, getNutritionalPriorities } from '../data/foodCategories.j
 import { getProteinConversionFactor, calculateProteinFromNitrogen, getProteinCalculationMethod } from '../data/proteinFactors.js';
 import { getNutrientById, validateNutrientValue, formatNutrientValue, getPriorityNutrients } from '../data/nutrientDatabase.js';
 import { findCandyNutrition, calculateCandyNutrition, CANDY_NUTRITION_DATABASE } from '../data/candyNutritionDatabase';
-import { findEnhancedFood, getCategoryNutrientProfile } from '../data/enhancedFoodDatabase.js';
+import { findEnhancedFood, getCategoryNutrientProfile, shouldUseUSDAData } from '../data/enhancedFoodDatabase.js';
 
 interface USDANutrient {
   id: number;
@@ -2043,8 +2043,8 @@ export class USDAService {
     }
     
     // Default liquid serving if no specific match (FDA general beverage standard)
-    const service = new USDAService('');
-    if (service.isLiquidQuery(normalized)) {
+    if (normalized.includes('water') || normalized.includes('juice') || normalized.includes('soda') || 
+        normalized.includes('coffee') || normalized.includes('tea') || normalized.includes('milk')) {
       return {
         standardServing: 240, // 8 fl oz default for most liquids
         fdaCategory: 'General Beverages',
@@ -2799,4 +2799,4 @@ export class USDAService {
 
 }
 
-export const usdaService = new USDAService(process.env.USDA_API_KEY || 'DEMO_KEY');
+export const usdaService = new USDAService();
