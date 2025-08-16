@@ -245,6 +245,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
         const errorMessage = data.message || "Please try again.";
         
         console.log('🔍 Handling authentication error:', { errorCode, errorMessage, isSignUp });
+        console.log('🔍 Full error response data:', data);
         
         if (data.requiresVerification || errorCode === 'EMAIL_NOT_VERIFIED') {
           // Email verification required
@@ -275,11 +276,17 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
           }, 3000);
         } else if (errorCode === 'INVALID_CREDENTIALS') {
           // Wrong password or credentials
+          console.log('🚨 Showing INVALID_CREDENTIALS toast notification');
           toast({
             title: "Incorrect Credentials",
             description: errorMessage + " You can reset your password if needed.",
             variant: "destructive",
             duration: 8000,
+          });
+          // Also use sonner as backup
+          console.log('🚨 Also showing sonner toast as backup');
+          import('sonner').then(({ toast: sonnerToast }) => {
+            sonnerToast.error("Incorrect password. Please check your credentials and try again.");
           });
         } else if (errorCode === 'SERVICE_ERROR') {
           // Service temporarily unavailable
