@@ -3,6 +3,8 @@
 ## Overview
 ByteWise Nutritionist is a comprehensive Progressive Web App (PWA) for nutrition tracking and meal planning. It integrates with the USDA food database to provide accurate nutritional information, offering features like meal logging, calorie tracking, progress analytics, and an achievement system. The application is designed for cross-platform compatibility and full PWA capabilities, including PDF export functionality for comprehensive nutrition reports. Its vision is to provide a robust, user-friendly tool for personal nutrition management, leveraging modern web technologies for a seamless experience.
 
+**Current Version: BETA 1.6** - Enhanced user experience with smart app tour timing, editable calorie goals, and mobile-optimized avatar visibility.
+
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 
@@ -46,4 +48,26 @@ The application employs a mobile-first responsive design. Tailwind CSS and shadc
 ### Performance and PWA Enhancements
 - **Service Worker**: Custom implementation for offline caching and background sync.
 - **React Query/TanStack Query**: Server state management and caching.
-- **Web App Manifest**: PWA configuration for native app installation.
+- **Web App Manifest**: PWA configuration for native app installation.## Version History
+
+### BETA 1.6 (August 16, 2025)
+**Milestone Release: Enhanced User Experience & Mobile Optimization**
+
+Key Features Added:
+- ✅ Smart app tour timing - triggers only after fresh sign-in/sign-up instead of for returning users
+- ✅ Editable daily calorie goals in user profile with real-time app-wide updates (1000-5000 cal range)  
+- ✅ Mobile-optimized avatar visibility with proper image loading and fallback handling
+- ✅ Enhanced mobile responsiveness throughout profile card layout
+- ✅ Improved authentication flow with fresh session detection for tour triggering
+
+Technical Improvements:
+- Enhanced ProfileIcon component with proper img tags and error handling
+- Added responsive spacing and sizing for mobile compatibility
+- Integrated calorie goal editing with existing goals API endpoint
+- Improved localStorage-based fresh authentication detection system
+- Ring styling and gradient backgrounds for better visual accessibility
+
+### BETA 1.5 (August 15, 2025)
+**Previous Release: Complete Profile System**
+- Complete Profile system fully operational with authentication fixes
+- Enhanced UI visibility and comprehensive user experience improvements
