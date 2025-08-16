@@ -1,5 +1,69 @@
 # Bytewise Nutritionist Changelog
 
+## BETA Version 1.7 (August 16, 2025) - Comprehensive Global Cuisine Database
+
+### 🍽️ Major Achievement: Complete Food Database Transformation
+- **50+ Ethnic Dishes Added**: Comprehensive coverage across 10+ global cuisines with authentic nutritional profiles
+- **Intelligent Pattern Recognition**: Advanced regex-based food matching system for cultural variants and preparation styles  
+- **Smart Database Routing**: Enhanced database prioritization - ethnic/composite foods use enhanced database, basic ingredients use USDA
+- **Authentic Nutrition Profiles**: Cultural authenticity with spice-derived nutrients, fermented vegetables, traditional cooking methods
+
+### 🌍 Global Cuisine Coverage
+- **Chinese**: General Tso's chicken (531 cal), orange chicken, lo mein (370 cal), fried rice (420 cal/cup), egg rolls
+- **Thai**: Pad thai (308 cal/serving), green curry (330 cal), tom yum soup with authentic lemongrass nutrition
+- **Korean**: Bulgogi, bibimbap (310 cal/bowl) with kimchi-derived vitamin C and fermented vegetable nutrients
+- **Vietnamese**: Pho (170 cal/bowl), banh mi with authentic herb/cilantro profiles and traditional Vietnamese preparation
+- **Greek**: Gyro (602 cal), moussaka with proper dairy/eggplant integration and Mediterranean nutrition
+- **Italian**: Lasagna (407 cal/serving), chicken parmigiana, risotto with traditional Italian ingredient profiles
+- **Indian**: Butter chicken (390 cal), biryani, samosa (138 cal/piece) with turmeric/spice-derived micronutrients
+- **Caribbean**: Enhanced Jamaican beef patty (454 cal) with authentic pastry carbohydrates and spice nutrition
+- **Middle Eastern**: Falafel, shawarma with chickpea proteins and traditional tahini nutrition profiles
+- **African**: Jollof rice (396 cal/cup) with traditional tomato/palm oil nutrition and West African spice content
+
+### 🥞 Breakfast & Vegetarian Integration
+- **Breakfast Foods**: French toast (1224 cal/2 slices), pancakes (1620 cal/3), omelets, breakfast burritos with proper egg/dairy nutrition
+- **Vegetarian Options**: Veggie burgers (185 cal) with high plant protein and fiber, Buddha bowls with quinoa/legume profiles
+- **Plant-Based Accuracy**: Enhanced micronutrient profiles for vegetarian foods including B12 fortification and iron bioavailability
+
+### 🔬 Advanced Nutritional Intelligence  
+- **Composite Food Analysis**: Proper carbohydrate calculation for pastry-wrapped foods, noodle dishes, and rice-based meals
+- **Portion Weight Accuracy**: Realistic portion sizes (gyro 280g, pho bowl 400g, samosa 45g) based on authentic serving standards
+- **Micronutrient Completeness**: All foods include 15+ vitamins and minerals with culturally appropriate nutrient densities
+- **Cultural Authenticity**: Korean foods high in vitamin C (kimchi), Indian foods with curcumin/turmeric nutrients, Mediterranean foods with olive oil profiles
+
+### 🚀 Technical Architecture Enhancements
+- **Enhanced Database Structure**: Created `server/data/enhancedFoodDatabase.ts` with 50+ detailed food entries and nutritional profiles
+- **Pattern-Based Matching**: Advanced regex patterns for food recognition including cultural variants and preparation methods
+- **Smart Fallback System**: Intelligent routing between enhanced database, USDA database, and generic estimates based on food complexity
+- **Database Prioritization**: `shouldUseUSDAData()` function intelligently selects optimal nutrition source for each food type
+- **Category-Specific Profiles**: Nutritional templates for each cuisine type ensuring cultural accuracy and realistic macro/micro distributions
+
+### 🎯 Production Impact
+- **Eliminated Generic Estimates**: Complex ethnic foods now show accurate nutrition instead of fallback calculations
+- **Enhanced User Experience**: Jamaican beef patty now correctly shows 454 calories with proper pastry carbohydrates (28g)
+- **Cultural Food Accuracy**: Pad thai shows authentic 154 cal/100g instead of generic 150 cal estimate
+- **Comprehensive Coverage**: No major ethnic cuisine categories remain uncovered in the nutrition database
+
+---
+
+## BETA Version 1.6 (August 16, 2025) - Enhanced User Experience & Mobile Optimization
+
+### 🎯 Major Achievement: Smart App Tour & Profile Enhancements
+- **Smart App Tour Timing**: Tour triggers only after fresh sign-in/sign-up instead of for returning users
+- **Editable Calorie Goals**: Real-time app-wide updates for daily calorie goals (1000-5000 cal range) 
+- **Mobile-Optimized Avatar**: Enhanced visibility with proper image loading and fallback handling
+- **Enhanced Mobile Responsiveness**: Improved profile card layout with responsive spacing and sizing
+- **Authentication Flow Improvements**: Fresh session detection system for intelligent tour triggering
+
+### 🔧 Technical Implementation
+- **ProfileIcon Component**: Enhanced with proper img tags, error handling, and ring styling
+- **Calorie Goal Integration**: Connected editing with existing goals API endpoint  
+- **localStorage Session Detection**: Improved fresh authentication detection system
+- **Mobile Compatibility**: Added responsive spacing, sizing, and gradient backgrounds
+- **Enhanced Visual Accessibility**: Ring styling and gradient backgrounds for better mobile experience
+
+---
+
 ## BETA Version 1.4 (August 15, 2025) - Enhanced Fasting Milestone System
 
 ### 🎯 Major Achievement: Comprehensive Fasting Milestone Celebrations
