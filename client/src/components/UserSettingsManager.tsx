@@ -623,6 +623,32 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
               )}
             </div>
 
+            <div className="space-y-2">
+              <label className="text-sm text-gray-300 font-medium flex items-center">
+                <Target className="w-4 h-4 mr-2 text-green-400" />
+                Daily Calorie Goal
+              </label>
+              {isEditing ? (
+                <Input
+                  type="number"
+                  value={userInfo.calorieGoal}
+                  onChange={(e) => {
+                    const goal = parseInt(e.target.value) || 2000;
+                    setUserInfo(prev => ({ ...prev, calorieGoal: goal }));
+                  }}
+                  className="bg-white/10 border-white/20 text-white placeholder-gray-400 w-full"
+                  placeholder="Enter your daily calorie goal"
+                  min="1000"
+                  max="5000"
+                  step="50"
+                />
+              ) : (
+                <p className="text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10 break-words">
+                  {userInfo.calorieGoal} calories/day
+                </p>
+              )}
+            </div>
+
                 <div className="space-y-2">
               <label className="text-sm text-gray-300 font-medium flex items-center">
                 <Mail className="w-4 h-4 mr-2 text-blue-400" />

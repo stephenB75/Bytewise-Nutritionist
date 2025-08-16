@@ -87,6 +87,12 @@ Preferred communication style: Simple, everyday language.
   - Enhanced mineral content data (calcium, iron, magnesium, sodium, etc.)
   - Automatic candy detection and enhanced data prioritization
   - Confirmed nutrition calculation accuracy for all candy items
+- **User calorie goal management (August 16, 2025)**:
+  - Added daily calorie goal editing capability in user profile card
+  - Integrated with existing goals API endpoint for persistence
+  - Goals are immediately updated and reflected throughout the app
+  - Includes validation with min/max limits (1000-5000 calories)
+  - User-friendly interface with clear labeling and proper formatting
 - **UI improvements and notification system (August 15, 2025)**
   - Fixed notification system by adding missing Toaster component to main App
   - Implemented comprehensive authentication error prompts for invalid accounts
