@@ -131,7 +131,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             firstName: supabaseUser.user.user_metadata?.first_name || supabaseUser.user.user_metadata?.firstName || null,
             lastName: supabaseUser.user.user_metadata?.last_name || supabaseUser.user.user_metadata?.lastName || null,
             profileImageUrl: supabaseUser.user.user_metadata?.avatar_url || null,
-            profileIcon: Math.floor(Math.random() * 9) + 1, // Random default icon
+            profileIcon: Math.floor(Math.random() * 2) + 1, // Random avatar: 1=male, 2=female
             createdAt: new Date(supabaseUser.user.created_at),
             updatedAt: new Date(supabaseUser.user.updated_at || supabaseUser.user.created_at),
             // Default nutrition goals from metadata or defaults
@@ -193,7 +193,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             firstName: supabaseUser.user.user_metadata?.first_name || supabaseUser.user.user_metadata?.firstName || null,
             lastName: supabaseUser.user.user_metadata?.last_name || supabaseUser.user.user_metadata?.lastName || null,
             profileImageUrl: supabaseUser.user.user_metadata?.avatar_url || null,
-            profileIcon: Math.floor(Math.random() * 9) + 1,
+            profileIcon: Math.floor(Math.random() * 2) + 1, // Random avatar: 1=male, 2=female
             createdAt: new Date(supabaseUser.user.created_at),
             updatedAt: new Date(supabaseUser.user.updated_at || supabaseUser.user.created_at),
             dailyCalorieGoal: supabaseUser.user.user_metadata?.calorie_goal || 2000,

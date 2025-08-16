@@ -17,23 +17,24 @@ export const ProfileIcon: React.FC<ProfileIconProps> = ({
     lg: 'w-24 h-24 min-w-[6rem] min-h-[6rem]'
   };
 
-  // Determine which avatar to use based on iconNumber
-  const avatarSrc = iconNumber === 2 ? '/avatar-female.png' : '/avatar-male.png';
+  // Determine which avatar to use based on iconNumber (ensure valid range)
+  const validIconNumber = iconNumber === 2 ? 2 : 1; // Default to 1 if not 2
+  const avatarSrc = validIconNumber === 2 ? '/avatar-female.png' : '/avatar-male.png';
 
   return (
     <div 
       className={`${sizeClasses[size]} rounded-full overflow-hidden flex items-center justify-center bg-gradient-to-br from-blue-400 to-purple-500 shadow-lg ${className}`}
-      data-testid={`profile-icon-${iconNumber}`}
+      data-testid={`profile-icon-${validIconNumber}`}
     >
       <img 
         src={avatarSrc}
-        alt={`Profile avatar ${iconNumber === 2 ? 'female' : 'male'}`}
+        alt={`Profile avatar ${validIconNumber === 2 ? 'female' : 'male'}`}
         className="w-full h-full object-cover rounded-full"
         onError={(e) => {
           // Fallback to showing initials if image fails to load
           const target = e.target as HTMLImageElement;
           target.style.display = 'none';
-          target.parentElement!.innerHTML = `<span class="text-white font-bold text-lg">${iconNumber === 2 ? 'F' : 'M'}</span>`;
+          target.parentElement!.innerHTML = `<span class="text-white font-bold text-lg">${validIconNumber === 2 ? 'F' : 'M'}</span>`;
         }}
       />
     </div>

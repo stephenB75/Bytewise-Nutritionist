@@ -248,7 +248,7 @@ export class DatabaseStorage implements IStorage {
     // User doesn't exist - create new user
     const userDataWithIcon = {
       ...userData,
-      profileIcon: userData.profileIcon || Math.floor(Math.random() * 9) + 1,
+      profileIcon: userData.profileIcon || Math.floor(Math.random() * 2) + 1, // Random avatar: 1=male, 2=female
       emailVerified: true, // They've signed in, so mark as verified
     };
     
