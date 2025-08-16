@@ -93,6 +93,12 @@ Preferred communication style: Simple, everyday language.
   - Goals are immediately updated and reflected throughout the app
   - Includes validation with min/max limits (1000-5000 calories)
   - User-friendly interface with clear labeling and proper formatting
+- **Mobile avatar visibility fixes (August 16, 2025)**:
+  - Fixed ProfileIcon component to use proper img tags instead of background images
+  - Added fallback error handling with gradient background and initials
+  - Enhanced mobile responsiveness for profile card layout with responsive spacing
+  - Added ring styling and responsive sizing for better mobile visibility
+  - Improved text sizing and spacing for mobile devices
 - **UI improvements and notification system (August 15, 2025)**
   - Fixed notification system by adding missing Toaster component to main App
   - Implemented comprehensive authentication error prompts for invalid accounts

@@ -12,9 +12,9 @@ export const ProfileIcon: React.FC<ProfileIconProps> = ({
   className = '' 
 }) => {
   const sizeClasses = {
-    sm: 'w-8 h-8',
-    md: 'w-16 h-16', 
-    lg: 'w-24 h-24'
+    sm: 'w-8 h-8 min-w-[2rem] min-h-[2rem]',
+    md: 'w-16 h-16 min-w-[4rem] min-h-[4rem]', 
+    lg: 'w-24 h-24 min-w-[6rem] min-h-[6rem]'
   };
 
   // Determine which avatar to use based on iconNumber
@@ -22,15 +22,21 @@ export const ProfileIcon: React.FC<ProfileIconProps> = ({
 
   return (
     <div 
-      className={`${sizeClasses[size]} rounded-full overflow-hidden flex items-center justify-center ${className}`}
-      style={{
-        backgroundImage: `url(${avatarSrc})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
-      }}
+      className={`${sizeClasses[size]} rounded-full overflow-hidden flex items-center justify-center bg-gradient-to-br from-blue-400 to-purple-500 shadow-lg ${className}`}
       data-testid={`profile-icon-${iconNumber}`}
-    />
+    >
+      <img 
+        src={avatarSrc}
+        alt={`Profile avatar ${iconNumber === 2 ? 'female' : 'male'}`}
+        className="w-full h-full object-cover rounded-full"
+        onError={(e) => {
+          // Fallback to showing initials if image fails to load
+          const target = e.target as HTMLImageElement;
+          target.style.display = 'none';
+          target.parentElement!.innerHTML = `<span class="text-white font-bold text-lg">${iconNumber === 2 ? 'F' : 'M'}</span>`;
+        }}
+      />
+    </div>
   );
 };
 

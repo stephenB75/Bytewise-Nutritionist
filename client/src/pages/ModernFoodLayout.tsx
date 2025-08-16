@@ -2052,34 +2052,35 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             {/* Consolidated Profile Card */}
             <AccordionItem value="profile" className="border-none">
               <Card className="bg-white/10 backdrop-blur-md border-white/20 overflow-hidden rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:bg-white/15 hover:border-white/30">
-                <AccordionTrigger className="px-6 py-6 hover:bg-white/5 hover:no-underline [&[data-state=open]]:bg-white/5 [&>svg]:ml-4">
-                  <div className="flex items-start justify-between w-full pr-4">
-                    <div className="flex items-start space-x-4 flex-1 min-w-0">
+                <AccordionTrigger className="px-4 sm:px-6 py-4 sm:py-6 hover:bg-white/5 hover:no-underline [&[data-state=open]]:bg-white/5 [&>svg]:ml-2 sm:[&>svg]:ml-4">
+                  <div className="flex items-start justify-between w-full pr-2 sm:pr-4">
+                    <div className="flex items-start space-x-3 sm:space-x-4 flex-1 min-w-0">
                       <div className="relative flex-shrink-0">
                         <ProfileIcon 
                           data-testid="profile-icon"
                           iconNumber={user?.profileIcon || 1} 
                           size="md" 
+                          className="ring-2 ring-white/20"
                         />
-                        <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-black flex items-center justify-center">
-                          <CheckCircle2 className="w-2.5 h-2.5 text-white" />
+                        <div className="absolute -bottom-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 bg-green-500 rounded-full border-2 border-black flex items-center justify-center">
+                          <CheckCircle2 className="w-2 h-2 sm:w-2.5 sm:h-2.5 text-white" />
                         </div>
                       </div>
                       <div className="flex-1 min-w-0 space-y-1">
-                        <h3 className="text-xl font-bold text-white leading-tight" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                        <h3 className="text-lg sm:text-xl font-bold text-white leading-tight" style={{ fontFamily: "'League Spartan', sans-serif" }}>
                           {user?.email?.split('@')[0] || 'ByteWise User'}
                         </h3>
-                        <p className="text-gray-300 text-sm truncate">{user?.email}</p>
-                        <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-gray-400 mt-1">
+                        <p className="text-gray-300 text-xs sm:text-sm truncate">{user?.email}</p>
+                        <div className="flex flex-wrap gap-x-2 sm:gap-x-3 gap-y-1 text-xs text-gray-400 mt-1">
                           <span className="inline-flex items-center whitespace-nowrap">🏆 Level 1</span>
                           <span className="inline-flex items-center whitespace-nowrap">📊 {loggedMeals?.length || 0} meals</span>
                           <span className="inline-flex items-center whitespace-nowrap">🎯 {Math.round(dailyCalories)}/{goalCalories} cal</span>
                         </div>
                       </div>
                     </div>
-                    <div className="text-right flex-shrink-0 ml-3 min-w-[80px]">
-                      <div className="text-lg font-bold text-orange-400 leading-tight">{achievements?.length || 0}</div>
-                      <div className="text-xs text-gray-400 whitespace-nowrap leading-tight">Achievements</div>
+                    <div className="text-right flex-shrink-0 ml-2 sm:ml-3 min-w-[60px] sm:min-w-[80px]">
+                      <div className="text-base sm:text-lg font-bold text-orange-400 leading-tight">{achievements?.length || 0}</div>
+                      <div className="text-xs text-gray-400 whitespace-nowrap leading-tight">Awards</div>
                     </div>
                   </div>
                 </AccordionTrigger>
