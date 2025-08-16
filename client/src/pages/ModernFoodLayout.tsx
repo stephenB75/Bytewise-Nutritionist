@@ -2068,7 +2068,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                       </div>
                       <div className="flex-1 min-w-0 space-y-1">
                         <h3 className="text-lg sm:text-xl font-bold text-white leading-tight" style={{ fontFamily: "'League Spartan', sans-serif" }}>
-                          {user?.email?.split('@')[0] || 'ByteWise User'}
+                          {user?.firstName || user?.email?.split('@')[0] || 'ByteWise User'}
                         </h3>
                         <p className="text-gray-300 text-xs sm:text-sm truncate">{user?.email}</p>
                         <div className="flex flex-wrap gap-x-2 sm:gap-x-3 gap-y-1 text-xs text-gray-400 mt-1">
