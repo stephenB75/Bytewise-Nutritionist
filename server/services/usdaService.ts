@@ -15,6 +15,7 @@ import { classifyFood, getNutritionalPriorities } from '../data/foodCategories.j
 import { getProteinConversionFactor, calculateProteinFromNitrogen, getProteinCalculationMethod } from '../data/proteinFactors.js';
 import { getNutrientById, validateNutrientValue, formatNutrientValue, getPriorityNutrients } from '../data/nutrientDatabase.js';
 import { findCandyNutrition, calculateCandyNutrition, CANDY_NUTRITION_DATABASE } from '../data/candyNutritionDatabase';
+import { findEnhancedFood, getCategoryNutrientProfile } from '../data/enhancedFoodDatabase.js';
 
 interface USDANutrient {
   id: number;
@@ -2132,7 +2133,39 @@ export class USDAService {
   private getEnhancedFallbackEstimate(ingredientName: string, measurement: string) {
     const normalized = ingredientName.toLowerCase().trim();
 
-    // Check for zero-calorie beverages first
+    // Check enhanced food database first for complex/ethnic foods
+    const enhancedFood = findEnhancedFood(normalized);
+    if (enhancedFood) {
+      const mockFood: USDAFood = {
+        fdcId: 0,
+        description: enhancedFood.name,
+        dataType: 'Enhanced Database',
+        foodNutrients: []
+      };
+      
+      const measurementResult = this.parseMeasurement(measurement, mockFood);
+      let { quantity, unit, gramsEquivalent } = measurementResult;
+      
+      // Use enhanced food's standard portion if measurement is generic
+      if (unit === 'piece' || unit === 'patty' || unit === 'serving') {
+        gramsEquivalent = enhancedFood.portionWeight * quantity;
+      }
+      
+      const estimatedCalories = Math.round((enhancedFood.nutritionPer100g.calories * gramsEquivalent) / 100);
+      
+      return {
+        ingredient: enhancedFood.name.toUpperCase(),
+        measurement: `${quantity} ${unit} (~${gramsEquivalent}g)`,
+        estimatedCalories,
+        equivalentMeasurement: `100g ≈ ${enhancedFood.nutritionPer100g.calories} kcal`,
+        note: enhancedFood.note || 'Accurate nutritional data from enhanced food database',
+        nutritionPer100g: enhancedFood.nutritionPer100g,
+        enhancedDatabase: true,
+        category: enhancedFood.category
+      };
+    }
+
+    // Check for zero-calorie beverages
     if (this.isZeroCalorieBeverage(normalized)) {
 
       const servingInfo = USDAService.getStandardLiquidServing(normalized);
@@ -2694,8 +2727,23 @@ export class USDAService {
     let carbs = 20.0;
     let fat = 3.0;
     
-    // Pattern-based nutrition estimates
-    if (normalized.includes('bar') || normalized.includes('protein')) {
+    // Enhanced pattern-based nutrition estimates for complex foods
+    if (normalized.includes('patty') || normalized.includes('pie') || normalized.includes('turnover')) {
+      // Pastry-wrapped foods (meat + pastry)
+      baseCalories = 285; protein = 12.5; carbs = 25.0; fat = 16.0;
+    } else if (normalized.includes('sandwich') || normalized.includes('burger') || normalized.includes('wrap')) {
+      // Sandwich-style foods (protein + bread/wrap)
+      baseCalories = 245; protein = 15.0; carbs = 22.0; fat = 11.0;
+    } else if (normalized.includes('burrito') || normalized.includes('taco') || normalized.includes('quesadilla')) {
+      // Mexican composite foods
+      baseCalories = 215; protein = 12.0; carbs = 24.0; fat = 9.0;
+    } else if (normalized.includes('curry') || normalized.includes('masala') || normalized.includes('stew')) {
+      // Sauce-based dishes
+      baseCalories = 185; protein = 18.0; carbs = 8.0; fat = 9.0;
+    } else if (normalized.includes('fried') && (normalized.includes('chicken') || normalized.includes('fish'))) {
+      // Fried proteins
+      baseCalories = 280; protein = 20.0; carbs = 12.0; fat = 17.0;
+    } else if (normalized.includes('bar') || normalized.includes('protein')) {
       baseCalories = 413; protein = 25.0; carbs = 45.0; fat = 8.5;
     } else if (normalized.includes('fruit') || normalized.match(/\b(apple|banana|orange|peach|pear|plum|nectarine|berry)\b/)) {
       baseCalories = 44; protein = 1.1; carbs = 10.6; fat = 0.3;

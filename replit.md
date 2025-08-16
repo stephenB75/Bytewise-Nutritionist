@@ -51,7 +51,7 @@ The application employs a mobile-first responsive design. Tailwind CSS and shadc
 - **Web App Manifest**: PWA configuration for native app installation.## Version History
 
 ### BETA 1.6 (August 16, 2025)
-**Milestone Release: Enhanced User Experience & Mobile Optimization**
+**Milestone Release: Enhanced User Experience & Intelligent Nutrition Recognition**
 
 Key Features Added:
 - ✅ Smart app tour timing - triggers only after fresh sign-in/sign-up instead of for returning users
@@ -59,6 +59,9 @@ Key Features Added:
 - ✅ Mobile-optimized avatar visibility with proper image loading and fallback handling
 - ✅ Enhanced mobile responsiveness throughout profile card layout
 - ✅ Improved authentication flow with fresh session detection for tour triggering
+- ✅ **Advanced Food Recognition System** - Accurate identification of complex ethnic and composite foods
+- ✅ **Enhanced Nutrition Database** - Comprehensive macro/micro nutrient profiles for Caribbean, Middle Eastern, Asian, and Mexican foods
+- ✅ **Intelligent Composite Food Analysis** - Proper nutrient calculation for pastry-wrapped, sandwich-style, and multi-component foods
 
 Technical Improvements:
 - Enhanced ProfileIcon component with proper img tags and error handling
@@ -66,6 +69,9 @@ Technical Improvements:
 - Integrated calorie goal editing with existing goals API endpoint
 - Improved localStorage-based fresh authentication detection system
 - Ring styling and gradient backgrounds for better visual accessibility
+- **Created Enhanced Food Database** (`server/data/enhancedFoodDatabase.ts`) with 15+ complex foods including Jamaican beef patties, burritos, falafel, shawarma, jerk chicken
+- **Upgraded USDA Service** fallback system to prioritize enhanced database over generic estimates
+- **Improved Pattern Recognition** for composite foods (meat+pastry, protein+wrap, sauce-based dishes)
 
 ### BETA 1.5 (August 15, 2025)
 **Previous Release: Complete Profile System**
