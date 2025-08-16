@@ -113,6 +113,12 @@ Preferred communication style: Simple, everyday language.
     - Manual "Take App Tour" button in profile settings
     - Tour covers: food search, navigation, profile, daily tracking, fasting, achievements
     - Tour completion stored in localStorage to prevent repeated shows
+    - **Tour triggers after sign-in/sign-up completion (August 15, 2025)**:
+      - Removed automatic tour trigger that showed for any authenticated user
+      - Added fresh authentication detection using localStorage flag
+      - Tour now only appears after successful sign-in, sign-up, or email verification
+      - Prevents tour from showing on app refreshes or returning user sessions
+      - Manual tour option still available in profile settings
     - **Enhanced mobile responsiveness for tour popups (August 15, 2025)**:
       - Dynamic tooltip sizing: 280px on small mobile, 320px on regular mobile, 320px on desktop
       - Centered positioning: Tour popups now appear in the center of screen for consistent visibility

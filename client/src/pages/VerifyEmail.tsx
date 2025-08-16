@@ -31,6 +31,10 @@ export default function VerifyEmail() {
               setVerificationStatus('success');
               setMessage('Email verified successfully! You can now sign in to your account.');
               
+              // Mark this as a fresh authentication for tour purposes
+              localStorage.setItem('fresh-auth-session', 'true');
+              console.log('🎯 Email verification completed, marking for tour trigger');
+              
               // Redirect to home after 3 seconds
               setTimeout(() => {
                 setLocation('/');

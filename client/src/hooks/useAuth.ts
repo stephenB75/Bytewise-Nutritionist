@@ -15,11 +15,18 @@ export function useAuth() {
         });
         
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+          // Mark this as a fresh authentication for tour purposes
+          if (event === 'SIGNED_IN') {
+            localStorage.setItem('fresh-auth-session', 'true');
+            console.log('🎯 Fresh sign-in detected, marking for tour trigger');
+          }
+          
           // Trigger a refetch of user data when auth state changes
           console.log('📡 Triggering auth state change event...');
           window.dispatchEvent(new CustomEvent('auth-state-change'));
         } else if (event === 'SIGNED_OUT') {
-          // Clear user data on sign out
+          // Clear user data and fresh auth flag on sign out
+          localStorage.removeItem('fresh-auth-session');
           console.log('🚪 User signed out, clearing auth state...');
           window.dispatchEvent(new CustomEvent('auth-state-change'));
         }

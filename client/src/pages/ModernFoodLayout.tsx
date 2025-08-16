@@ -463,16 +463,34 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     }
   }, [activeTab, calculateMicronutrients]);
   
-  // Check if tour should be shown for new users
+  // Check if tour should be shown after successful authentication
   useEffect(() => {
-    if (user && shouldShowTour()) {
-      // Delay tour to allow UI to settle
-      const tourTimer = setTimeout(() => {
-        startTour();
-      }, 2000);
-      
-      return () => clearTimeout(tourTimer);
-    }
+    const handleAuthStateChange = () => {
+      // Only trigger tour if user exists, hasn't completed tour, and this is a fresh auth
+      if (user && shouldShowTour()) {
+        // Set a flag to indicate fresh authentication
+        const isFreshAuth = localStorage.getItem('fresh-auth-session') === 'true';
+        
+        if (isFreshAuth) {
+          // Clear the fresh auth flag
+          localStorage.removeItem('fresh-auth-session');
+          
+          // Delay tour to allow UI to settle after sign-in
+          const tourTimer = setTimeout(() => {
+            startTour();
+          }, 3000); // Slightly longer delay to ensure UI is ready
+          
+          return () => clearTimeout(tourTimer);
+        }
+      }
+    };
+
+    // Listen for auth state changes that indicate fresh sign-in/sign-up
+    window.addEventListener('auth-state-change', handleAuthStateChange);
+    
+    return () => {
+      window.removeEventListener('auth-state-change', handleAuthStateChange);
+    };
   }, [user, shouldShowTour, startTour]);
 
   // Load existing meal data and set up tracking
