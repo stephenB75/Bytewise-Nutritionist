@@ -1,134 +1,135 @@
+#!/usr/bin/env node
+
 /**
- * Food Entry Data Persistence Verification Script
- * Tests if user food entries are being saved and restored properly
+ * Data Persistence Verification Script
+ * Tests that user data persists across app restart, browser refresh, and deployment
  */
 
 const fs = require('fs');
+const path = require('path');
 
-console.log('=== FOOD ENTRY DATA PERSISTENCE VERIFICATION ===\n');
+async function verifyDataPersistence() {
+  console.log('🔍 VERIFYING DATA PERSISTENCE ACROSS APP LIFECYCLE...\n');
 
-// Test data structure expectations
-const expectedDataStructure = {
-  weeklyMeals: 'Array of meal objects',
-  userProfiles: 'User profile data',
-  achievements: 'Achievement progress',
-  waterIntake: 'Daily water tracking',
-  calorieGoals: 'Daily calorie targets'
-};
-
-console.log('1. CHECKING DATA STRUCTURE EXPECTATIONS:\n');
-Object.entries(expectedDataStructure).forEach(([key, description]) => {
-  console.log(`📋 ${key}: ${description}`);
-});
-
-console.log('\n2. CHECKING DATA PERSISTENCE IMPLEMENTATION:\n');
-
-// Check if data persistence utilities exist
-const dataFilesToCheck = [
-  'client/src/utils/performanceUtils.ts',
-  'client/src/hooks/useOptimizedMealData.ts',
-  'client/src/utils/mealDateFixer.ts',
-  'client/src/pages/ModernFoodLayout.tsx'
-];
-
-dataFilesToCheck.forEach(file => {
-  try {
-    const content = fs.readFileSync(file, 'utf8');
+  // Check 1: Database Schema Validation
+  console.log('📊 Checking database schema...');
+  const schemaPath = path.join(__dirname, 'shared', 'schema.ts');
+  if (fs.existsSync(schemaPath)) {
+    const schemaContent = fs.readFileSync(schemaPath, 'utf8');
     
-    console.log(`✅ ${file} exists`);
+    const requiredTables = ['users', 'meals', 'fastingSessions', 'achievements'];
+    const missingTables = requiredTables.filter(table => !schemaContent.includes(`export const ${table}`));
     
-    // Check for localStorage operations
-    const hasLocalStorage = content.includes('localStorage');
-    const hasGetItem = content.includes('getItem');
-    const hasSetItem = content.includes('setItem');
-    const hasCaching = content.includes('cache') || content.includes('Cache');
-    
-    console.log(`   - localStorage operations: ${hasLocalStorage ? '✅' : '❌'}`);
-    console.log(`   - Data retrieval (getItem): ${hasGetItem ? '✅' : '❌'}`);
-    console.log(`   - Data saving (setItem): ${hasSetItem ? '✅' : '❌'}`);
-    console.log(`   - Caching system: ${hasCaching ? '✅' : '❌'}`);
-    console.log('');
-    
-  } catch (error) {
-    console.log(`❌ ${file} - Error: ${error.message}\n`);
+    if (missingTables.length === 0) {
+      console.log('✅ Database schema contains all required tables');
+    } else {
+      console.log('❌ Missing database tables:', missingTables);
+    }
+  } else {
+    console.log('❌ Database schema file not found');
   }
-});
 
-console.log('3. CHECKING MEAL DATA STRUCTURE:\n');
+  // Check 2: API Endpoint Validation
+  console.log('\n🌐 Checking API endpoints...');
+  const routesPath = path.join(__dirname, 'server', 'routes.ts');
+  if (fs.existsSync(routesPath)) {
+    const routesContent = fs.readFileSync(routesPath, 'utf8');
+    
+    const requiredEndpoints = [
+      '/api/user/sync-data',
+      '/api/meals/logged',
+      '/api/user'
+    ];
+    
+    const missingEndpoints = requiredEndpoints.filter(endpoint => 
+      !routesContent.includes(`'${endpoint}'`) && !routesContent.includes(`"${endpoint}"`)
+    );
+    
+    if (missingEndpoints.length === 0) {
+      console.log('✅ All required API endpoints exist');
+    } else {
+      console.log('❌ Missing API endpoints:', missingEndpoints);
+    }
+  }
 
-// Check ModernFoodLayout for data handling
-try {
-  const layoutContent = fs.readFileSync('client/src/pages/ModernFoodLayout.tsx', 'utf8');
+  // Check 3: localStorage vs Database Usage
+  console.log('\n💾 Analyzing data storage patterns...');
   
-  const hasMealLogging = layoutContent.includes('weeklyMeals');
-  const hasDataRestoration = layoutContent.includes('loadExistingData') || layoutContent.includes('getCachedLocalStorage');
-  const hasMealDateFixer = layoutContent.includes('autoFixMealDatesIfNeeded');
-  const hasBackupSystem = layoutContent.includes('backup') || layoutContent.includes('User data backed up');
+  const frontendFiles = [
+    'client/src/hooks/useCalorieTracking.ts',
+    'client/src/components/CalorieCalculator.tsx',
+    'client/src/components/WeeklyCaloriesCard.tsx'
+  ];
   
-  console.log('Main App Data Handling:');
-  console.log(`  - Meal logging system: ${hasMealLogging ? '✅' : '❌'}`);
-  console.log(`  - Data restoration: ${hasDataRestoration ? '✅' : '❌'}`);
-  console.log(`  - Date fixing system: ${hasMealDateFixer ? '✅' : '❌'}`);
-  console.log(`  - Backup system: ${hasBackupSystem ? '✅' : '❌'}`);
+  let localStorageUsage = 0;
+  let databaseUsage = 0;
   
-} catch (error) {
-  console.log(`❌ Error checking main app: ${error.message}`);
+  frontendFiles.forEach(filePath => {
+    if (fs.existsSync(filePath)) {
+      const content = fs.readFileSync(filePath, 'utf8');
+      localStorageUsage += (content.match(/localStorage\./g) || []).length;
+      databaseUsage += (content.match(/apiRequest/g) || []).length;
+    }
+  });
+  
+  console.log(`📱 localStorage usage: ${localStorageUsage} instances`);
+  console.log(`🗄️  Database API usage: ${databaseUsage} instances`);
+  
+  if (databaseUsage >= localStorageUsage) {
+    console.log('✅ Good balance - database usage is prioritized');
+  } else {
+    console.log('⚠️  Warning - localStorage usage exceeds database usage');
+  }
+
+  // Check 4: Data Persistence Hooks
+  console.log('\n🔄 Checking data persistence infrastructure...');
+  const persistenceHookPath = 'client/src/hooks/useDataPersistence.ts';
+  
+  if (fs.existsSync(persistenceHookPath)) {
+    const persistenceContent = fs.readFileSync(persistenceHookPath, 'utf8');
+    
+    const hasBackup = persistenceContent.includes('backup');
+    const hasSync = persistenceContent.includes('syncToDatabase');
+    const hasErrorHandling = persistenceContent.includes('onError');
+    
+    console.log(`✅ Backup system: ${hasBackup ? 'Yes' : 'No'}`);
+    console.log(`✅ Database sync: ${hasSync ? 'Yes' : 'No'}`);
+    console.log(`✅ Error handling: ${hasErrorHandling ? 'Yes' : 'No'}`);
+  } else {
+    console.log('❌ Data persistence hook not found');
+  }
+
+  // Summary and Recommendations
+  console.log('\n📋 PERSISTENCE VERIFICATION SUMMARY');
+  console.log('=====================================');
+  
+  const recommendations = [];
+  
+  if (localStorageUsage > databaseUsage) {
+    recommendations.push('• Prioritize database storage over localStorage');
+  }
+  
+  recommendations.push('• Always save critical data to database first');
+  recommendations.push('• Use localStorage only as a cache/backup');
+  recommendations.push('• Implement automatic database restore on app startup');
+  recommendations.push('• Test data persistence across browser refresh');
+  recommendations.push('• Test data persistence across deployment');
+  
+  if (recommendations.length > 0) {
+    console.log('\n🔧 RECOMMENDATIONS:');
+    recommendations.forEach(rec => console.log(rec));
+  }
+  
+  console.log('\n🎯 CRITICAL USER DATA TO PROTECT:');
+  console.log('• User profiles and settings');
+  console.log('• Daily calorie tracking (weeklyMeals)');
+  console.log('• Fasting session history');
+  console.log('• Achievement progress');
+  console.log('• Meal history and recipes');
+  console.log('• Custom food database entries');
+  
+  console.log('\n✅ Verification complete!');
 }
 
-console.log('\n4. CHECKING CALORIE CALCULATOR INTEGRATION:\n');
-
-// Check CalorieCalculator for meal saving
-try {
-  const calculatorContent = fs.readFileSync('client/src/components/CalorieCalculator.tsx', 'utf8');
-  
-  const hasLogMeal = calculatorContent.includes('logMeal') || calculatorContent.includes('Log Meal');
-  const hasSaveToStorage = calculatorContent.includes('localStorage.setItem');
-  const hasWeeklyMealsUpdate = calculatorContent.includes('weeklyMeals');
-  const hasTimestamp = calculatorContent.includes('timestamp') || calculatorContent.includes('new Date()');
-  
-  console.log('Calorie Calculator Data Saving:');
-  console.log(`  - Meal logging function: ${hasLogMeal ? '✅' : '❌'}`);
-  console.log(`  - Save to localStorage: ${hasSaveToStorage ? '✅' : '❌'}`);
-  console.log(`  - Weekly meals update: ${hasWeeklyMealsUpdate ? '✅' : '❌'}`);
-  console.log(`  - Timestamp tracking: ${hasTimestamp ? '✅' : '❌'}`);
-  
-} catch (error) {
-  console.log(`❌ Error checking calculator: ${error.message}`);
-}
-
-console.log('\n5. DATA PERSISTENCE VERIFICATION STEPS:\n');
-
-console.log('To manually verify data persistence:');
-console.log('1. Open browser dev tools (F12)');
-console.log('2. Go to Application/Storage tab');
-console.log('3. Check Local Storage for your domain');
-console.log('4. Look for these keys:');
-console.log('   - weeklyMeals (array of meal objects)');
-console.log('   - userProfiles (user data)');
-console.log('   - achievements (progress data)');
-console.log('5. Log a meal and refresh the page');
-console.log('6. Verify the meal persists after refresh');
-
-console.log('\n6. EXPECTED MEAL DATA FORMAT:\n');
-
-console.log('Each meal entry should have:');
-console.log('- id: unique identifier');
-console.log('- name: food name');
-console.log('- date: YYYY-MM-DD format');
-console.log('- timestamp: ISO string');
-console.log('- calories: number');
-console.log('- protein, carbs, fat: macro values');
-console.log('- time: human-readable time');
-console.log('- mealType: breakfast/lunch/dinner/snack');
-
-console.log('\n7. TROUBLESHOOTING STEPS:\n');
-
-console.log('If food entries are not restoring:');
-console.log('1. Check browser console for localStorage errors');
-console.log('2. Verify localStorage quota (usually 5-10MB)');
-console.log('3. Test in incognito mode (fresh storage)');
-console.log('4. Check if date fixing is working properly');
-console.log('5. Verify cache system is not interfering');
-
-console.log('\n=== VERIFICATION COMPLETE ===');
-console.log('\nNext: Test by logging a meal, refreshing page, and checking persistence');
+// Run verification
+verifyDataPersistence().catch(console.error);

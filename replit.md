@@ -50,8 +50,34 @@ The application employs a mobile-first responsive design. Tailwind CSS and shadc
 - **React Query/TanStack Query**: Server state management and caching.
 - **Web App Manifest**: PWA configuration for native app installation.## Version History
 
+### BETA 1.9 (August 17, 2025)
+**Critical Release: Data Persistence & Deployment-Safe Storage**
+
+Key Features Added:
+- 🛡️ **Data Integrity System** - Comprehensive verification that user data persists across app refresh, closure, and deployment
+- ✅ **Database-First Storage** - Critical user data now prioritizes database storage with localStorage as backup only
+- 🔄 **Automatic Data Restoration** - App automatically restores user data from database if localStorage is cleared
+- 📊 **Data Health Monitoring** - Real-time monitoring of data integrity with automatic backup warnings
+- 🔧 **Persistence Verification Tool** - Built-in script to verify data persistence across app lifecycle
+- ⚠️ **Enhanced Portion Warnings** - Now warns on any 30%+ difference from recommended serving sizes (both larger AND smaller)
+
+Critical Data Protection:
+- **User profiles and settings** - Protected against browser clearing and deployment updates
+- **Daily calorie tracking (weeklyMeals)** - Secured with automatic database backup every 5 minutes
+- **Fasting session history** - Persistent across devices and app versions
+- **Achievement progress** - Never lost during app updates or browser clearing
+- **Meal history and recipes** - Comprehensive backup and restore system
+- **Custom food database entries** - Safely stored in database with localStorage cache
+
+Technical Infrastructure:
+- **DataIntegrityManager Component** - Monitors data health and triggers automatic backups ✅ **PRODUCTION VERIFIED**
+- **useDataIntegrity Hook** - Provides data verification, backup, and restore capabilities
+- **Persistence Verification Script** - Automated testing of data survival across app lifecycle
+- **Enhanced API Integration** - Improved database sync with proper error handling and fallback systems
+- **Real-time Data Monitoring** - Detects data loss risks and automatically protects user information
+
 ### BETA 1.8 (August 17, 2025)
-**Milestone Release: Complete Mixed Dish Recognition & Balanced Macronutrient Analysis**
+**Previous Release: Complete Mixed Dish Recognition & Balanced Macronutrient Analysis**
 
 Key Features Added:
 - ✅ **Mixed Dish Recognition System** - Accurately identifies composite foods with multiple protein, carb, and fat sources

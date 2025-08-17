@@ -14,6 +14,7 @@ import VerifyEmail from './pages/VerifyEmail';
 import { ResetPassword } from './pages/ResetPassword';
 import { useDataRestoration } from '@/hooks/useDataRestoration';
 import { DataSyncIndicator } from '@/components/DataSyncIndicator';
+import { DataIntegrityManager } from '@/components/DataIntegrityManager';
 import { useSessionManager } from '@/hooks/useSessionManager';
 import { PWAUpdateNotification } from '@/components/PWAUpdateNotification';
 import { initDataProtection } from '@/utils/dataProtection';
@@ -166,6 +167,7 @@ function AppContent() {
           </Switch>
         </main>
         <DataSyncIndicator />
+        <DataIntegrityManager />
         <PWAUpdateNotification />
         <Toaster />
       </div>
