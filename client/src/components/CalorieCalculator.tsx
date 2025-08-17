@@ -158,6 +158,8 @@ function CalorieCalculator({
       return response.json();
     },
     onSuccess: (data: IngredientAnalysis) => {
+      console.log('API Response:', data);
+      console.log('Portion Info:', data.portionInfo);
       setRecentAnalyses(prev => [data, ...prev.slice(0, 4)]);
       resetForm();
       
@@ -721,31 +723,34 @@ function CalorieCalculator({
                 </div>
 
                 {/* Portion Warning Display */}
-                {analysis.portionInfo?.warning && (
-                  <div className="mb-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                    <div className="flex items-start gap-2">
-                      <AlertCircle className="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
-                      <div className="flex-1">
-                        <p className="text-sm text-yellow-800 font-medium mb-1">
-                          {analysis.portionInfo.warning}
-                        </p>
-                        {analysis.portionInfo.suggestion && (
-                          <p className="text-xs text-yellow-700">
-                            {analysis.portionInfo.suggestion}
+                {(() => {
+                  console.log(`Analysis ${index} portionInfo:`, analysis.portionInfo);
+                  return analysis.portionInfo?.warning && (
+                    <div className="mb-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                      <div className="flex items-start gap-2">
+                        <AlertCircle className="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+                        <div className="flex-1">
+                          <p className="text-sm text-yellow-800 font-medium mb-1">
+                            {analysis.portionInfo.warning}
                           </p>
-                        )}
-                        {analysis.portionInfo.recommendedServing && (
-                          <p className="text-xs text-yellow-700 mt-1">
-                            <strong>Suggested:</strong> {analysis.portionInfo.recommendedServing}
-                            {analysis.portionInfo.recommendedCalories && (
-                              <span> ({analysis.portionInfo.recommendedCalories} cal)</span>
-                            )}
-                          </p>
-                        )}
+                          {analysis.portionInfo.suggestion && (
+                            <p className="text-xs text-yellow-700">
+                              {analysis.portionInfo.suggestion}
+                            </p>
+                          )}
+                          {analysis.portionInfo.recommendedServing && (
+                            <p className="text-xs text-yellow-700 mt-1">
+                              <strong>Suggested:</strong> {analysis.portionInfo.recommendedServing}
+                              {analysis.portionInfo.recommendedCalories && (
+                                <span> ({analysis.portionInfo.recommendedCalories} cal)</span>
+                              )}
+                            </p>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  );
+                })()}
 
                 {analysis.equivalentMeasurement && (
                   <div className="mb-3 p-2 bg-blue-50 border border-blue-200 rounded">
