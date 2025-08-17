@@ -541,7 +541,7 @@ function CalorieCalculator({
                 }));
               }}
               onSearchChange={(query) => setIngredient(query)}
-              placeholder="Search meals or add new..."
+              placeholder="Search Meal's"
               className="text-base bg-white border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg pr-4 py-3 text-gray-900 placeholder-gray-500"
             />
             <Input
@@ -797,7 +797,7 @@ function CalorieCalculator({
                   // Clear USDA suggestions for historical search
                   setIngredientSuggestions([]);
                 }}
-                placeholder="Search today's meals, history, or new foods..."
+                placeholder="Search Meal's"
                 className="text-base bg-white border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg pr-4 py-3 text-gray-900 placeholder-gray-500"
               />
               
