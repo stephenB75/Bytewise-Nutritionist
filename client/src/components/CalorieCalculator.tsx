@@ -737,6 +737,31 @@ function CalorieCalculator({
                   </div>
                 )}
 
+                {/* Portion Size Warnings */}
+                {(analysis as any).portionInfo && !(analysis as any).portionInfo.isRealistic && (
+                  <div className="mb-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <div className="flex items-start space-x-2">
+                      <div className="text-yellow-600">⚠️</div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-yellow-800">
+                          {(analysis as any).portionInfo.warning}
+                        </p>
+                        {(analysis as any).portionInfo.suggestion && (
+                          <p className="text-sm text-yellow-700 mt-1">
+                            {(analysis as any).portionInfo.suggestion}
+                          </p>
+                        )}
+                        {(analysis as any).portionInfo.recommendedServing && (
+                          <p className="text-sm text-yellow-700 mt-1">
+                            Suggested serving: {(analysis as any).portionInfo.recommendedServing} 
+                            ({(analysis as any).portionInfo.recommendedCalories} cal)
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {analysis.nutritionPer100g && (
                   <div className="mb-3">
                     <p className="text-xs text-gray-500 mb-2 font-medium">Nutrition per 100g (for comparison):</p>

@@ -677,7 +677,7 @@ export class USDAService {
       
       // Parse measurement and convert to grams
       const measurementResult = this.parseMeasurement(measurement, food);
-      const { quantity, unit, gramsEquivalent } = measurementResult;
+      const { quantity, unit, gramsEquivalent, portionInfo } = measurementResult;
       
       // Calculate calories based on grams
       const estimatedCalories = Math.round((nutrients.calories * gramsEquivalent) / 100);
@@ -707,7 +707,8 @@ export class USDAService {
         nutritionPer100g: {
           ...nutrients,
           ...micronutrientsPer100g
-        }
+        },
+        portionInfo
       };
       
       // Include FDA serving information if available
@@ -1049,7 +1050,7 @@ export class USDAService {
     'ground pork meat': { calories: 297, protein: 25, carbs: 0, fat: 21 },
     
     // Fish & Seafood (USDA-based accurate data)
-    'salmon': { calories: 208, protein: 25, carbs: 0, fat: 12 },
+    'salmon fish': { calories: 208, protein: 25, carbs: 0, fat: 12 },
     'tuna': { calories: 144, protein: 30, carbs: 0, fat: 1 },
     'cod': { calories: 105, protein: 23, carbs: 0, fat: 0.9 },
     'tilapia': { calories: 128, protein: 26, carbs: 0, fat: 2.7 },
@@ -1526,10 +1527,103 @@ export class USDAService {
   /**
    * Parse measurement string and convert to grams
    */
+  /**
+   * Get smart serving sizes for realistic portions
+   */
+  private getSmartServingSize(ingredient: string, measurement: string): { grams: number; servingName: string; isRealistic: boolean; warning?: string } {
+    const cleanIngredient = ingredient.toLowerCase();
+    const cleanMeasurement = measurement.toLowerCase();
+
+    // Realistic serving sizes database
+    const servingSizes: Record<string, { [key: string]: { grams: number; name: string } }> = {
+      'potato chips': {
+        'serving': { grams: 28, name: '1 oz serving (about 15 chips)' },
+        'small bag': { grams: 28, name: '1 oz individual bag' },
+        'handful': { grams: 15, name: 'small handful' },
+        'large handful': { grams: 28, name: 'large handful' },
+        'family size': { grams: 150, name: 'family size sharing portion' }
+      },
+      'tortilla chips': {
+        'serving': { grams: 28, name: '1 oz serving (about 12 chips)' },
+        'small bag': { grams: 28, name: '1 oz bag' },
+        'handful': { grams: 20, name: 'handful (6-8 chips)' }
+      },
+      'crackers': {
+        'serving': { grams: 16, name: '4-6 crackers' },
+        'handful': { grams: 12, name: 'small handful' }
+      },
+      'chicken breast': {
+        'serving': { grams: 113, name: '4 oz serving' },
+        'piece': { grams: 113, name: '1 medium breast' },
+        'large': { grams: 170, name: '6 oz large breast' }
+      },
+      'ground beef': {
+        'serving': { grams: 113, name: '4 oz serving' },
+        'patty': { grams: 113, name: '1/4 lb burger patty' }
+      }
+    };
+
+    // Check for specific food matches
+    for (const [food, sizes] of Object.entries(servingSizes)) {
+      if (cleanIngredient.includes(food)) {
+        // Try to match measurement terms
+        for (const [term, size] of Object.entries(sizes)) {
+          if (cleanMeasurement.includes(term)) {
+            return { grams: size.grams, servingName: size.name, isRealistic: true };
+          }
+        }
+        // Default to serving size
+        if (sizes.serving) {
+          return { grams: sizes.serving.grams, servingName: sizes.serving.name, isRealistic: true };
+        }
+      }
+    }
+
+    return { grams: 100, servingName: 'standard serving', isRealistic: false };
+  }
+
+  /**
+   * Check if portion size is unrealistically large and provide warnings
+   */
+  private validatePortionSize(ingredient: string, grams: number): { warning?: string; suggestion?: string } {
+    const cleanIngredient = ingredient.toLowerCase();
+    
+    // Define unrealistic portion thresholds for different food types
+    const portionLimits = {
+      'potato chips': { warning: 100, extreme: 200 },
+      'tortilla chips': { warning: 100, extreme: 200 },
+      'crackers': { warning: 60, extreme: 120 },
+      'candy': { warning: 100, extreme: 200 },
+      'chocolate': { warning: 100, extreme: 200 },
+      'ice cream': { warning: 200, extreme: 400 },
+      'cookies': { warning: 100, extreme: 200 },
+      'nuts': { warning: 60, extreme: 120 }
+    };
+
+    for (const [food, limits] of Object.entries(portionLimits)) {
+      if (cleanIngredient.includes(food)) {
+        if (grams >= limits.extreme) {
+          return {
+            warning: `⚠️ Very large portion (${grams}g)`,
+            suggestion: `Consider a typical serving of ${limits.warning/4}g (${(limits.warning/4 * 536/100).toFixed(0)} cal) instead`
+          };
+        } else if (grams >= limits.warning) {
+          return {
+            warning: `⚠️ Large portion (${grams}g)`,
+            suggestion: `Typical serving is ${limits.warning/4}g (${(limits.warning/4 * 536/100).toFixed(0)} cal)`
+          };
+        }
+      }
+    }
+
+    return {};
+  }
+
   private parseMeasurement(measurement: string, food: USDAFood): {
     quantity: number;
     unit: string;
     gramsEquivalent: number;
+    portionInfo?: { isRealistic: boolean; warning?: string; suggestion?: string; servingName?: string };
   } {
     // Remove extra whitespace and normalize
     let normalized = measurement.toLowerCase().trim();
@@ -1844,10 +1938,35 @@ export class USDAService {
       }
     }
 
+    // Get smart serving suggestions for realistic portions
+    const smartServing = this.getSmartServingSize(food.description, measurement);
+    const portionValidation = this.validatePortionSize(food.description, gramsEquivalent);
+    
+    // Create portion info object
+    let portionInfo: any = {
+      isRealistic: gramsEquivalent <= 200 || !food.description.toLowerCase().includes('chips'),
+      servingName: smartServing.servingName
+    };
+    
+    // For snack foods with unrealistic portions, add warnings and suggestions
+    if (food.description.toLowerCase().includes('chips') && gramsEquivalent > 100) {
+      portionInfo.warning = portionValidation.warning;
+      portionInfo.suggestion = portionValidation.suggestion;
+      portionInfo.isRealistic = false;
+      portionInfo.recommendedServing = smartServing.servingName;
+      portionInfo.recommendedCalories = Math.round((smartServing.grams * 536) / 100); // Using 536 cal/100g for chips
+    }
+
     // Include FDA serving information in return if used
-    const result = { quantity, unit, gramsEquivalent };
+    const result: any = { 
+      quantity, 
+      unit, 
+      gramsEquivalent,
+      portionInfo
+    };
+    
     if (fdaServingUsed && fdaServingInfo) {
-      (result as any).fdaServing = fdaServingInfo;
+      result.fdaServing = fdaServingInfo;
     }
     
     return result;
