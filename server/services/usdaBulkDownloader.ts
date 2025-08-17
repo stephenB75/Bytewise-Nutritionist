@@ -24,7 +24,7 @@ export class USDABulkDownloader {
   private progress: BulkDownloadProgress;
 
   constructor(apiKey: string) {
-    this.usdaService = new USDAService(apiKey);
+    this.usdaService = new USDAService();
     this.progress = {
       totalFoods: 0,
       downloadedFoods: 0,

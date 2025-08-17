@@ -90,11 +90,7 @@
   box-sizing: border-box;
 }
 
-/* Force content to scroll properly and meet footer */
-.force-bottom-spacing {
-  margin-bottom: 0.5rem !important;
-  padding-bottom: 0.5rem !important;
-}
+/* Removed unused .force-bottom-spacing class */
 
 /* Content section spacing to prevent footer overlap */
 .content-section {
@@ -389,111 +385,10 @@ body {
   position: relative !important;
 }
 
-/* Override all possible content section padding */
-div.content-section,
-.bg-black.content-section,
-.bg-white.content-section {
-  padding-bottom: 20px !important;
-  margin-bottom: 0 !important;
-}
-
-/* Prevent overflow issues while maintaining scroll */
+/* Simplified and optimized spacing system */
 html, body {
   overflow-x: hidden;
   scroll-behavior: smooth;
-}
-
-/* Ensure cards and components have minimal bottom spacing */
-.card-container, .component-container {
-  margin-bottom: 0 !important;
-}
-
-/* Specific spacing for macro cards grid to clear navigation */
-.macros-grid {
-  margin-bottom: 0 !important;
-  padding-bottom: 0 !important;
-}
-
-/* Remove excessive force-bottom-spacing */
-.force-bottom-spacing {
-  margin-bottom: 0 !important;
-  padding-bottom: 0 !important;
-}
-
-/* Aggressive spacing reduction for mobile */
-.content-section > div:last-child {
-  margin-bottom: 0 !important;
-  padding-bottom: 0 !important;
-}
-
-.macros-grid {
-  margin-bottom: 0 !important;
-  padding-bottom: 0 !important;
-}
-
-/* Force override for all possible content containers */
-.px-6.py-3.bg-black.content-section,
-.px-6.py-4.bg-black.content-section {
-  padding-top: 12px !important;
-  padding-bottom: 20px !important;
-}
-
-.max-w-4xl.mx-auto.px-6.py-3.main-content,
-.max-w-4xl.mx-auto.px-6.py-4.main-content {
-  padding-top: 12px !important;
-  padding-bottom: 20px !important;
-}
-
-/* Disable mobile safe areas that add excessive padding */
-@supports (padding: max(0px)) {
-  body {
-    padding-bottom: 0 !important;
-  }
-  
-  .main-content {
-    padding-bottom: 20px !important;
-  }
-  
-  .page-container {
-    padding-bottom: 0 !important;
-  }
-}
-
-/* Additional bottom spacing for specific content areas */
-.weekly-progress-container,
-.daily-progress-container,
-.macro-breakdown-container {
-  padding-bottom: 0 !important;
-  margin-bottom: 0 !important;
-}
-
-/* Profile page specific spacing adjustments */
-.profile-content {
-  padding-bottom: 20px !important;
-  margin-bottom: 0 !important;
-}
-
-/* Sign-in module spacing */
-.signin-module {
-  padding-bottom: 20px !important;
-  margin-bottom: 0 !important;
-}
-
-/* Mobile-specific adjustments - OVERRIDE EXCESSIVE PADDING */
-@media (max-width: 768px) {
-  .main-content {
-    padding-bottom: 20px !important;
-  }
-  
-  .page-container {
-    padding-bottom: 0 !important;
-  }
-  
-  .macros-grid,
-  .force-bottom-spacing {
-    margin-bottom: 0 !important;
-    padding-bottom: 0 !important;
-  }
 }
 
 /* Smooth Hero Animation System */

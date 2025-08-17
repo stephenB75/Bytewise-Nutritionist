@@ -27,7 +27,6 @@ import { ProfileIcon } from '@/components/ProfileIcon';
 import { AppTour, useAppTour } from '@/components/AppTour';
 import { 
   Search, 
-  User,
   Plus,
   ChevronRight,
   Flame,
@@ -50,7 +49,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
 import { getWeekDates, getLocalDateKey, getMealTypeByTime, formatLocalTime } from '@/utils/dateUtils';
-import { autoFixMealDatesIfNeeded, checkMealDateMismatches, fixMealDateMismatches } from '@/utils/mealDateFixer';
+import { fixMealDateMismatches } from '@/utils/mealDateFixer';
 import { getCachedLocalStorage, debounce } from '@/utils/performanceUtils';
 
 
