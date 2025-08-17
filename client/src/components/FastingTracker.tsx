@@ -590,7 +590,50 @@ export function FastingTracker() {
   };
 
   const stopFasting = () => {
-    // Clear localStorage immediately
+    if (!currentSession) return;
+    
+    // Calculate actual time fasted and remaining time
+    const startTime = new Date(currentSession.startTime).getTime();
+    const now = Date.now();
+    const actualTimeFasted = now - startTime;
+    const actualHoursFasted = actualTimeFasted / (1000 * 60 * 60);
+    const targetHours = selectedPlan.fastingHours;
+    const remainingTime = currentSession.targetDuration - actualTimeFasted;
+    const remainingHours = Math.max(0, remainingTime / (1000 * 60 * 60));
+    
+    const isCompleted = remainingTime <= 0;
+    
+    // Format time for display
+    const formatHours = (hours: number) => {
+      const h = Math.floor(hours);
+      const m = Math.floor((hours - h) * 60);
+      return h > 0 ? `${h}h ${m}m` : `${m}m`;
+    };
+    
+    // Create session summary for storage
+    const sessionSummary = {
+      ...currentSession,
+      status: isCompleted ? 'completed' : 'stopped',
+      endTime: new Date().toISOString(),
+      actualDuration: actualTimeFasted,
+      actualHoursFasted: actualHoursFasted,
+      targetHours: targetHours,
+      wasCompleted: isCompleted,
+      remainingHours: isCompleted ? 0 : remainingHours
+    };
+    
+    // Store in history if significant time was fasted (at least 1 hour)
+    if (actualHoursFasted >= 1) {
+      try {
+        const existingHistory = JSON.parse(localStorage.getItem(FASTING_HISTORY_KEY) || '[]');
+        existingHistory.unshift(sessionSummary);
+        localStorage.setItem(FASTING_HISTORY_KEY, JSON.stringify(existingHistory.slice(0, 20))); // Keep last 20 sessions
+      } catch (e) {
+        // Silent fail for localStorage
+      }
+    }
+    
+    // Clear current session localStorage
     localStorage.removeItem(FASTING_SESSION_KEY);
     localStorage.removeItem(FASTING_ACTIVE_KEY);
     localStorage.removeItem(FASTING_MILESTONES_KEY);
@@ -601,16 +644,37 @@ export function FastingTracker() {
     setTimeRemaining(0);
     setCompletedMilestones([]);
     
+    // Show detailed feedback to user
+    if (isCompleted) {
+      toast({
+        title: "Fasting Completed! 🎉",
+        description: `Congratulations! You completed your ${formatHours(actualHoursFasted)} fast successfully.`,
+        duration: 8000,
+      });
+    } else {
+      // Show what they accomplished and what was left
+      const accomplishedText = actualHoursFasted >= 1 ? 
+        `You fasted for ${formatHours(actualHoursFasted)}` : 
+        `You fasted for ${Math.floor(actualTimeFasted / (1000 * 60))} minutes`;
+      
+      const remainingText = remainingHours > 0 ? 
+        ` with ${formatHours(remainingHours)} remaining from your ${targetHours}h goal.` : 
+        ` from your ${targetHours}h goal.`;
+      
+      toast({
+        title: "Fasting Session Ended",
+        description: accomplishedText + remainingText,
+        duration: 8000,
+      });
+    }
+    
     // Complete the session via API if it has an ID
     if (currentSession?.id) {
       completeFastingMutation.mutate(currentSession.id);
-    } else {
-      // Show toast for local-only session
-      toast({
-        title: "Fast Ended",
-        description: "Your fasting session has been stopped.",
-      });
     }
+    
+    // Invalidate queries to refresh history
+    queryClient.invalidateQueries({ queryKey: ['/api/fasting/history'] });
   };
 
   const formatTime = (milliseconds: number) => {
@@ -767,36 +831,63 @@ export function FastingTracker() {
               ) : fastingHistory && Array.isArray(fastingHistory) && fastingHistory.length > 0 ? (
                 <div className="space-y-4">
                   {fastingHistory
-                    .filter((session: any) => session.status === 'completed')
-                    .slice(0, 5)
+                    .filter((session: any) => session.status === 'completed' || session.status === 'stopped')
+                    .slice(0, 8)
                     .map((session: any, index: number) => {
                       const duration = session.actualDuration || session.targetDuration || 0;
-                      const completedDate = session.completedAt || session.endTime || session.createdAt;
+                      const actualHours = session.actualHoursFasted || (duration / (1000 * 60 * 60));
+                      const targetHours = session.targetHours || 16; // fallback to 16h
+                      const wasCompleted = session.status === 'completed' || session.wasCompleted;
+                      const remainingHours = session.remainingHours || 0;
+                      const sessionDate = session.completedAt || session.endTime || session.createdAt;
+                      
+                      const formatHours = (hours: number) => {
+                        const h = Math.floor(hours);
+                        const m = Math.floor((hours - h) * 60);
+                        return h > 0 ? `${h}h ${m}m` : `${m}m`;
+                      };
+                      
                       return (
                         <div 
                           key={session.id || index}
                           className="flex items-center justify-between p-3 bg-muted rounded-lg"
                         >
                           <div className="flex items-center gap-3">
-                            <CheckCircle2 className="w-4 h-4 text-green-500" />
+                            {wasCompleted ? (
+                              <CheckCircle2 className="w-4 h-4 text-green-500" />
+                            ) : (
+                              <AlertCircle className="w-4 h-4 text-orange-500" />
+                            )}
                             <div>
                               <p className="font-medium">{session.planName || 'Fasting Session'}</p>
                               <p className="text-sm text-muted-foreground">
-                                {completedDate ? new Date(completedDate).toLocaleDateString() : 'N/A'}
+                                {sessionDate ? new Date(sessionDate).toLocaleDateString() : 'N/A'}
                               </p>
+                              {!wasCompleted && remainingHours > 0 && (
+                                <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">
+                                  {formatHours(remainingHours)} remaining from {targetHours}h goal
+                                </p>
+                              )}
                             </div>
                           </div>
-                          <Badge variant="secondary">
-                            {Math.round(duration / (1000 * 60 * 60))}h
-                          </Badge>
+                          <div className="text-right">
+                            <Badge variant={wasCompleted ? "secondary" : "outline"} className={wasCompleted ? "" : "border-orange-300 text-orange-700 dark:text-orange-400"}>
+                              {formatHours(actualHours)} {wasCompleted ? 'completed' : 'fasted'}
+                            </Badge>
+                            {!wasCompleted && (
+                              <p className="text-xs text-muted-foreground mt-1">
+                                of {targetHours}h goal
+                              </p>
+                            )}
+                          </div>
                         </div>
                       );
                     })}
-                  {fastingHistory.filter((session: any) => session.status === 'completed').length === 0 && (
+                  {fastingHistory.filter((session: any) => session.status === 'completed' || session.status === 'stopped').length === 0 && (
                     <div className="text-center py-6">
                       <Coffee className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
-                      <p className="text-sm text-muted-foreground">No completed fasts yet</p>
-                      <p className="text-xs text-muted-foreground mt-1">Complete your first fast to see it here!</p>
+                      <p className="text-sm text-muted-foreground">No fasting sessions yet</p>
+                      <p className="text-xs text-muted-foreground mt-1">Start your first fast to see it here!</p>
                     </div>
                   )}
                 </div>
