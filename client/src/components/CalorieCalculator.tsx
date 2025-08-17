@@ -126,6 +126,7 @@ function CalorieCalculator({
   const [showLoggedAnimation, setShowLoggedAnimation] = useState(false);
   const [loggedData, setLoggedData] = useState<any>(null);
   const [ingredientSuggestions, setIngredientSuggestions] = useState<Array<{category: string; key: string; data: IngredientData}>>([]);
+  const [portionWarning, setPortionWarning] = useState<{warning: string; suggestion: string} | null>(null);
 
   // Achievement system hook
   const checkAchievements = useCheckAchievements();
@@ -139,6 +140,16 @@ function CalorieCalculator({
       setIngredientSuggestions([]);
     }
   }, [ingredient, isCompact]);
+
+  // Check portion size as user types
+  useEffect(() => {
+    if (ingredient.trim() && measurement.trim()) {
+      const warning = validatePortionSize(ingredient, measurement);
+      setPortionWarning(warning);
+    } else {
+      setPortionWarning(null);
+    }
+  }, [ingredient, measurement]);
 
 
 
@@ -197,10 +208,54 @@ function CalorieCalculator({
     },
   });
 
+  // Client-side portion validation
+  const validatePortionSize = (ingredient: string, measurement: string) => {
+    const cleanIngredient = ingredient.toLowerCase().trim();
+    const cleanMeasurement = measurement.toLowerCase().trim();
+    
+    // Extract grams from measurement
+    let grams = 0;
+    const gramMatch = cleanMeasurement.match(/(\d+(?:\.\d+)?)\s*g/);
+    if (gramMatch) {
+      grams = parseFloat(gramMatch[1]);
+    } else {
+      // Convert common measurements to grams for validation
+      const ozMatch = cleanMeasurement.match(/(\d+(?:\.\d+)?)\s*oz/);
+      if (ozMatch) {
+        grams = parseFloat(ozMatch[1]) * 28.35;
+      }
+    }
+    
+    // Define portion limits for problematic foods
+    const portionLimits: Record<string, {warning: number; realistic: number; suggestion: string}> = {
+      'potato chips': { warning: 100, realistic: 28, suggestion: '1 oz (28g)' },
+      'chips': { warning: 100, realistic: 28, suggestion: '1 oz (28g)' },
+      'tortilla chips': { warning: 100, realistic: 28, suggestion: '1 oz (28g)' },
+      'crackers': { warning: 60, realistic: 30, suggestion: '6 crackers (30g)' },
+      'candy': { warning: 100, realistic: 40, suggestion: '1.4 oz (40g)' },
+      'chocolate': { warning: 100, realistic: 40, suggestion: '1.4 oz (40g)' },
+      'ice cream': { warning: 200, realistic: 65, suggestion: '1/2 cup (65g)' },
+      'cookies': { warning: 60, realistic: 30, suggestion: '2 cookies (30g)' },
+      'cake': { warning: 150, realistic: 80, suggestion: '1 slice (80g)' }
+    };
+    
+    for (const [foodType, limits] of Object.entries(portionLimits)) {
+      if (cleanIngredient.includes(foodType) && grams >= limits.warning) {
+        return {
+          warning: `⚠️ ${grams}g seems like a very large portion`,
+          suggestion: `Typical serving: ${limits.suggestion} (${Math.round(grams / limits.realistic * 150)} vs ${Math.round(150)} cal)`
+        };
+      }
+    }
+    
+    return null;
+  };
+
   // Helper functions
   const resetForm = () => {
     setIngredient('');
     setMeasurement('');
+    setPortionWarning(null);
   };
 
 
@@ -412,6 +467,23 @@ function CalorieCalculator({
             />
           </div>
           
+          {/* Portion Warning Alert */}
+          {portionWarning && (
+            <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <div className="flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="text-sm text-yellow-800 font-medium">
+                    {portionWarning.warning}
+                  </p>
+                  <p className="text-xs text-yellow-700 mt-1">
+                    {portionWarning.suggestion}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           <Button 
             type="submit" 
             disabled={calculateCalories.isPending || !ingredient.trim() || !measurement.trim()}
@@ -665,6 +737,23 @@ function CalorieCalculator({
               </p>
             </div>
           </div>
+
+          {/* Real-time Portion Warning */}
+          {portionWarning && (
+            <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="text-sm text-yellow-800 font-medium mb-1">
+                    {portionWarning.warning}
+                  </p>
+                  <p className="text-xs text-yellow-700">
+                    {portionWarning.suggestion}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           <Button 
             type="submit" 
