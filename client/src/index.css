@@ -94,8 +94,8 @@
 
 /* Content section spacing to prevent footer overlap */
 .content-section {
-  padding-bottom: 5rem !important; /* 80px - proper clearance for fixed bottom navigation */
-  min-height: calc(100vh - 5rem) !important; /* Full viewport minus space for fixed navigation */
+  padding-bottom: 7rem !important; /* 112px - generous clearance for fixed bottom navigation */
+  min-height: calc(100vh - 7rem) !important; /* Full viewport minus space for fixed navigation */
 }
 
 /* Ensure proper scrolling behavior for pages with content sections */
@@ -360,7 +360,6 @@ body {
 
 /* Main content containers need bottom padding to clear navigation */
 .main-content {
-  padding-bottom: 20px !important; /* Minimal space for bottom navigation */
   margin-bottom: 0 !important;
   min-height: auto !important;
   height: 100% !important;
@@ -377,13 +376,7 @@ body {
   margin-bottom: 0 !important;
 }
 
-/* CRITICAL: Force minimal padding on content sections */
-.content-section {
-  margin-bottom: 0 !important;
-  padding-bottom: 20px !important;
-  min-height: auto !important;
-  position: relative !important;
-}
+/* Removed conflicting content-section rule that was overriding footer clearance */
 
 /* Simplified and optimized spacing system */
 html, body {
