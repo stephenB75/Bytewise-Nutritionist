@@ -122,7 +122,12 @@ html {
 }
 
 .profile-input-field {
-  @apply bg-white/10 border-white/20 text-white placeholder-gray-400 w-full;
+  @apply bg-white/10 border-white/20 text-white w-full;
+}
+
+.profile-input-field::placeholder {
+  color: #9ca3af !important; /* Light gray for better visibility */
+  opacity: 1 !important;
 }
 
 .profile-label {
@@ -663,7 +668,7 @@ input:focus {
   --secondary: rgba(255, 255, 255, 0.1);
   --secondary-foreground: #ffffff;
   --muted: rgba(255, 255, 255, 0.1);
-  --muted-foreground: rgba(255, 255, 255, 0.7);
+  --muted-foreground: #9ca3af;
   --accent: var(--brand-blue);
   --accent-foreground: #ffffff;
   --destructive: #dc3545;
@@ -703,7 +708,7 @@ input:focus {
   --secondary: rgba(255, 255, 255, 0.1);
   --secondary-foreground: #ffffff;
   --muted: rgba(255, 255, 255, 0.1);
-  --muted-foreground: rgba(255, 255, 255, 0.7);
+  --muted-foreground: #9ca3af;
   --accent: var(--brand-blue);
   --accent-foreground: #ffffff;
   --destructive: #dc3545;
