@@ -1010,6 +1010,59 @@ export class USDAService {
     'hamburger': { calories: 540, protein: 25, carbs: 40, fat: 31 },
     'cheeseburger': { calories: 540, protein: 25, carbs: 40, fat: 31 },
     
+    // Chicken & Poultry (USDA-based accurate data)
+    'chicken meat': { calories: 250, protein: 23, carbs: 0, fat: 15 },
+    'chicken breast': { calories: 165, protein: 31, carbs: 0, fat: 3.6 },
+    'grilled chicken breast': { calories: 165, protein: 31, carbs: 0, fat: 3.6 },
+    'baked chicken breast': { calories: 165, protein: 31, carbs: 0, fat: 3.6 },
+    'roasted chicken breast': { calories: 165, protein: 31, carbs: 0, fat: 3.6 },
+    'chicken thigh': { calories: 250, protein: 23, carbs: 0, fat: 15.5 },
+    'chicken drumstick': { calories: 250, protein: 23, carbs: 0, fat: 15.5 },
+    'chicken wing': { calories: 290, protein: 27, carbs: 0, fat: 19.5 },
+    'ground chicken': { calories: 143, protein: 26, carbs: 0, fat: 3.6 },
+    'chicken tenders': { calories: 165, protein: 31, carbs: 0, fat: 3.6 },
+    'rotisserie chicken': { calories: 190, protein: 29, carbs: 0, fat: 7.4 },
+    'fried chicken': { calories: 320, protein: 25, carbs: 8, fat: 20 },
+    
+    // Turkey
+    'turkey meat': { calories: 189, protein: 29, carbs: 0, fat: 7.4 },
+    'turkey breast': { calories: 135, protein: 30, carbs: 0, fat: 1 },
+    'ground turkey': { calories: 200, protein: 27, carbs: 0, fat: 8 },
+    
+    // Beef (USDA-based accurate data)
+    'beef meat': { calories: 250, protein: 26, carbs: 0, fat: 15 },
+    'ground beef': { calories: 254, protein: 26, carbs: 0, fat: 15 },
+    'lean ground beef': { calories: 213, protein: 26, carbs: 0, fat: 11 },
+    'sirloin steak': { calories: 271, protein: 27, carbs: 0, fat: 17 },
+    'ribeye steak': { calories: 291, protein: 25, carbs: 0, fat: 21 },
+    'filet mignon': { calories: 227, protein: 25, carbs: 0, fat: 13 },
+    'new york strip': { calories: 271, protein: 27, carbs: 0, fat: 17 },
+    'chuck roast': { calories: 293, protein: 22, carbs: 0, fat: 23 },
+    'brisket': { calories: 338, protein: 21, carbs: 0, fat: 28 },
+    
+    // Pork
+    'pork meat': { calories: 242, protein: 27, carbs: 0, fat: 14 },
+    'pork chop': { calories: 231, protein: 25, carbs: 0, fat: 14 },
+    'pork tenderloin': { calories: 143, protein: 26, carbs: 0, fat: 3.5 },
+    'bacon strips': { calories: 541, protein: 37, carbs: 1.4, fat: 42 },
+    'ham slices': { calories: 145, protein: 21, carbs: 1.5, fat: 5.5 },
+    'ground pork meat': { calories: 297, protein: 25, carbs: 0, fat: 21 },
+    
+    // Fish & Seafood (USDA-based accurate data)
+    'salmon': { calories: 208, protein: 25, carbs: 0, fat: 12 },
+    'tuna': { calories: 144, protein: 30, carbs: 0, fat: 1 },
+    'cod': { calories: 105, protein: 23, carbs: 0, fat: 0.9 },
+    'tilapia': { calories: 128, protein: 26, carbs: 0, fat: 2.7 },
+    'shrimp': { calories: 85, protein: 20, carbs: 0, fat: 0.3 },
+    'crab': { calories: 97, protein: 20, carbs: 0, fat: 1.8 },
+    'lobster': { calories: 89, protein: 19, carbs: 0, fat: 0.9 },
+    'mahi mahi': { calories: 109, protein: 23, carbs: 0, fat: 0.9 },
+    'halibut': { calories: 111, protein: 23, carbs: 0, fat: 2.3 },
+    'sea bass': { calories: 125, protein: 23, carbs: 0, fat: 2.6 },
+    'snapper': { calories: 128, protein: 26, carbs: 0, fat: 1.7 },
+    'tuna steak': { calories: 144, protein: 30, carbs: 0, fat: 1 },
+    'salmon fillet': { calories: 208, protein: 25, carbs: 0, fat: 12 },
+
     // Caribbean foods
     'plantains': { calories: 122, protein: 1.3, carbs: 32, fat: 0.4 },
     'fried plantains': { calories: 148, protein: 1.1, carbs: 38, fat: 0.1 },
@@ -1113,18 +1166,9 @@ export class USDAService {
     'cashews': { calories: 553, protein: 18.2, carbs: 30.2, fat: 43.9 },
     'peanuts': { calories: 567, protein: 25.8, carbs: 16.1, fat: 49.2 },
     
-    // Proteins and Meats
-    'steak': { calories: 271, protein: 25.4, carbs: 0.0, fat: 18.4 },
-    'pork': { calories: 242, protein: 27.3, carbs: 0.0, fat: 13.9 },
-    'bacon': { calories: 541, protein: 37.0, carbs: 1.4, fat: 42.0 },
-    'ham': { calories: 145, protein: 20.9, carbs: 0.5, fat: 5.5 },
-    'turkey': { calories: 189, protein: 29.0, carbs: 0.0, fat: 7.4 },
-    'fish': { calories: 206, protein: 22.0, carbs: 0.0, fat: 12.4 },
-    'tuna': { calories: 144, protein: 23.3, carbs: 0.0, fat: 4.9 },
-    'cod': { calories: 105, protein: 23.0, carbs: 0.0, fat: 0.9 },
-    'shrimp': { calories: 85, protein: 20.1, carbs: 0.0, fat: 1.1 },
-    'crab': { calories: 87, protein: 18.1, carbs: 0.0, fat: 1.1 },
-    'lobster': { calories: 89, protein: 19.0, carbs: 0.6, fat: 0.9 },
+    // Additional proteins
+    'steak meat': { calories: 271, protein: 25.4, carbs: 0.0, fat: 18.4 },
+    'fish fillet': { calories: 206, protein: 22.0, carbs: 0.0, fat: 12.4 },
     
     // Common Vegetables
     'lettuce': { calories: 15, protein: 1.4, carbs: 2.9, fat: 0.2 },
