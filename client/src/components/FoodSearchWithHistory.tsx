@@ -166,13 +166,12 @@ export function FoodSearchWithHistory({
     <div className="relative">
       {/* Search Input */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
         <Input
           value={searchQuery}
           onChange={(e) => handleSearch(e.target.value)}
           onFocus={() => setShowResults(false)}
           placeholder={placeholder}
-          className={`pl-10 ${className || "text-base bg-white border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-500"}`}
+          className={className || "text-base bg-white border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-500"}
         />
       </div>
 
