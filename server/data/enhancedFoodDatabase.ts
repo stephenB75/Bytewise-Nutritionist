@@ -1524,6 +1524,131 @@ export const ENHANCED_FOOD_DATABASE: Record<string, EnhancedFoodEntry> = {
       phosphorus: 195
     },
     note: "Spiced fish curry with mixed vegetables - anti-inflammatory spices with lean protein"
+  },
+
+  // Snack Foods
+  "utz_potato_chips": {
+    name: "Utz Potato Chips",
+    aliases: [
+      "utz potato chips", "utz chips", "utz regular chips", "utz original chips"
+    ],
+    category: "snacks",
+    portionWeight: 28, // 1 oz serving
+    nutritionPer100g: {
+      calories: 536,
+      protein: 7.0,   // from potatoes
+      carbs: 53.0,    // from potatoes (starch)
+      fat: 32.0,      // from frying oil
+      fiber: 4.8,
+      sugar: 0.5,
+      sodium: 1.07,   // added salt
+      iron: 1.7,
+      calcium: 34,
+      zinc: 0.9,
+      magnesium: 37,
+      vitaminC: 16,   // from potatoes
+      vitaminD: 0,
+      vitaminB12: 0,
+      folate: 47,
+      vitaminA: 16,
+      vitaminE: 3.2,  // from frying oil
+      potassium: 804, // from potatoes
+      phosphorus: 106
+    },
+    note: "Classic salted potato chips - high carbs and fats from potatoes and oil"
+  },
+
+  "doritos_nacho_cheese": {
+    name: "Doritos Nacho Cheese",
+    aliases: [
+      "doritos nacho cheese", "doritos", "nacho cheese doritos", "doritos chips"
+    ],
+    category: "snacks",
+    portionWeight: 28, // 1 oz serving
+    nutritionPer100g: {
+      calories: 500,
+      protein: 7.5,   // from corn + cheese powder
+      carbs: 58.0,    // from corn
+      fat: 26.0,      // from oils + cheese
+      fiber: 3.6,
+      sugar: 1.8,
+      sodium: 1.34,   // high sodium from seasoning
+      iron: 1.3,
+      calcium: 89,    // from cheese powder
+      zinc: 0.7,
+      magnesium: 54,
+      vitaminC: 0,
+      vitaminD: 0,
+      vitaminB12: 0.1,
+      folate: 36,
+      vitaminA: 54,   // from cheese powder
+      vitaminE: 2.8,
+      potassium: 350,
+      phosphorus: 168
+    },
+    note: "Corn tortilla chips with nacho cheese seasoning - high sodium and artificial flavors"
+  },
+
+  "cheetos_crunchy": {
+    name: "Cheetos Crunchy",
+    aliases: [
+      "cheetos crunchy", "cheetos", "crunchy cheetos", "cheese puffs"
+    ],
+    category: "snacks",
+    portionWeight: 28, // 1 oz serving  
+    nutritionPer100g: {
+      calories: 571,
+      protein: 8.9,   // from corn + cheese
+      carbs: 57.0,    // from corn meal
+      fat: 35.7,      // from oils + cheese
+      fiber: 3.6,
+      sugar: 3.6,
+      sodium: 1.25,   // high sodium
+      iron: 1.8,
+      calcium: 71,    // from cheese powder
+      zinc: 1.1,
+      magnesium: 36,
+      vitaminC: 0,
+      vitaminD: 0,
+      vitaminB12: 0.1,
+      folate: 25,
+      vitaminA: 89,   // from cheese powder coloring
+      vitaminE: 3.6,
+      potassium: 286,
+      phosphorus: 143
+    },
+    note: "Extruded corn snack with cheese coating - very high fat and sodium content"
+  },
+
+  "pretzels_salted": {
+    name: "Salted Pretzels",
+    aliases: [
+      "pretzels", "salted pretzels", "pretzel sticks", "twisted pretzels"
+    ],
+    category: "snacks",
+    portionWeight: 30, // ~1 oz serving
+    nutritionPer100g: {
+      calories: 380,
+      protein: 10.4,  // from wheat flour
+      carbs: 79.2,    // from wheat flour (high carb snack)
+      fat: 3.1,       // minimal fat
+      fiber: 2.9,
+      sugar: 1.7,
+      sodium: 1.63,   // very high sodium from salt coating
+      iron: 3.6,
+      calcium: 26,
+      zinc: 0.9,
+      magnesium: 22,
+      vitaminC: 0,
+      vitaminD: 0,
+      vitaminB12: 0,
+      folate: 88,     // from fortified flour
+      vitaminA: 0,
+      vitaminE: 0.4,
+      potassium: 130,
+      phosphorus: 87
+    },
+    note: "Baked wheat snack with salt coating - lower fat but very high sodium"
   }
 };
 
@@ -1616,6 +1741,12 @@ export function findEnhancedFood(foodName: string): EnhancedFoodEntry | null {
     { pattern: /grilled.*fish.*mediterranean|mediterranean.*grilled.*fish/i, key: 'grilled_fish_mediterranean' },
     { pattern: /fish.*curry.*vegetable|curry.*fish.*vegetable/i, key: 'fish_curry_vegetables' },
     { pattern: /fried.*fish.*(vegetable|veggies)|fish.*(vegetable|veggies)/i, key: 'fried_fish_vegetables' },
+    
+    // Snack Food patterns
+    { pattern: /utz.*potato.*chip|utz.*chip/i, key: 'utz_potato_chips' },
+    { pattern: /doritos.*nacho|nacho.*doritos/i, key: 'doritos_nacho_cheese' },
+    { pattern: /cheetos.*crunchy|crunchy.*cheetos/i, key: 'cheetos_crunchy' },
+    { pattern: /salted.*pretzel|pretzel.*salted/i, key: 'pretzels_salted' },
     { pattern: /beef.*broccoli|broccoli.*beef/i, key: 'beef_broccoli_stir_fry' },
     { pattern: /chicken.*alfredo|alfredo.*chicken/i, key: 'chicken_alfredo_pasta' },
     { pattern: /tuna.*sandwich|sandwich.*tuna/i, key: 'tuna_sandwich' },
