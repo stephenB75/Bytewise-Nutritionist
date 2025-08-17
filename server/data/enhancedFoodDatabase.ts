@@ -1143,6 +1143,226 @@ export const ENHANCED_FOOD_DATABASE: Record<string, EnhancedFoodEntry> = {
       potassium: 185,
       phosphorus: 95
     }
+  },
+
+  // Mixed Protein/Carb/Fat Dishes
+  "beef_broccoli_stir_fry": {
+    name: "Beef and Broccoli Stir Fry",
+    aliases: [
+      "beef and broccoli", "beef broccoli stir fry", "beef with broccoli",
+      "chinese beef and broccoli", "stir fried beef and broccoli"
+    ],
+    category: "chinese",
+    portionWeight: 300,
+    nutritionPer100g: {
+      calories: 155,
+      protein: 18.5, // from beef
+      carbs: 8.2,    // from broccoli + sauce
+      fat: 6.8,      // from cooking oil + beef fat
+      fiber: 2.8,
+      sugar: 3.1,
+      sodium: 0.65,
+      iron: 2.5,
+      calcium: 42,
+      zinc: 2.8,
+      magnesium: 25,
+      vitaminC: 65,  // from broccoli
+      vitaminD: 0.1,
+      vitaminB12: 1.2, // from beef
+      folate: 28,
+      vitaminA: 85,
+      vitaminE: 1.8,
+      potassium: 385,
+      phosphorus: 185
+    },
+    note: "Beef strips with broccoli in savory sauce - balanced protein and vegetables"
+  },
+
+  "chicken_alfredo_pasta": {
+    name: "Chicken Alfredo Pasta",
+    aliases: [
+      "chicken alfredo", "fettuccine alfredo with chicken", "chicken pasta alfredo",
+      "alfredo chicken", "creamy chicken pasta"
+    ],
+    category: "italian",
+    portionWeight: 280,
+    nutritionPer100g: {
+      calories: 285,
+      protein: 18.2, // from chicken
+      carbs: 22.5,   // from pasta
+      fat: 15.8,     // from cream sauce and cheese
+      fiber: 1.5,
+      sugar: 2.8,
+      sodium: 0.68,
+      iron: 1.2,
+      calcium: 185,  // from parmesan and cream
+      zinc: 1.8,
+      magnesium: 22,
+      vitaminC: 1.2,
+      vitaminD: 0.8, // from cream
+      vitaminB12: 0.6,
+      folate: 25,
+      vitaminA: 125, // from cream and cheese
+      vitaminE: 1.5,
+      potassium: 225,
+      phosphorus: 195
+    },
+    note: "Pasta with grilled chicken in rich cream sauce - high protein, carbs, and dairy fats"
+  },
+
+  "tuna_sandwich": {
+    name: "Tuna Sandwich",
+    aliases: [
+      "tuna sandwich", "tuna salad sandwich", "tuna sub", "tuna on bread"
+    ],
+    category: "american",
+    portionWeight: 180,
+    nutritionPer100g: {
+      calories: 225,
+      protein: 18.5, // from tuna
+      carbs: 22.8,   // from bread
+      fat: 8.2,      // from mayo/dressing
+      fiber: 2.8,
+      sugar: 3.1,
+      sodium: 0.58,
+      iron: 1.8,
+      calcium: 85,   // from bread fortification
+      zinc: 1.2,
+      magnesium: 22,
+      vitaminC: 2.5,
+      vitaminD: 1.8, // from tuna
+      vitaminB12: 2.8, // from tuna
+      folate: 45,    // from fortified bread
+      vitaminA: 15,
+      vitaminE: 2.2,
+      potassium: 285,
+      phosphorus: 185
+    },
+    note: "Tuna salad on bread - complete protein with complex carbohydrates"
+  },
+
+  "chicken_quesadilla": {
+    name: "Chicken Quesadilla",
+    aliases: [
+      "chicken quesadilla", "quesadilla with chicken", "grilled chicken quesadilla"
+    ],
+    category: "mexican",
+    portionWeight: 200,
+    nutritionPer100g: {
+      calories: 268,
+      protein: 19.8, // from chicken and cheese
+      carbs: 18.5,   // from tortilla
+      fat: 13.5,     // from cheese and cooking oil
+      fiber: 2.2,
+      sugar: 1.8,
+      sodium: 0.62,
+      iron: 1.5,
+      calcium: 285,  // from cheese
+      zinc: 2.2,
+      magnesium: 18,
+      vitaminC: 1.5,
+      vitaminD: 0.3,
+      vitaminB12: 0.8,
+      folate: 22,
+      vitaminA: 95,  // from cheese
+      vitaminE: 1.2,
+      potassium: 225,
+      phosphorus: 285
+    },
+    note: "Grilled chicken and cheese in flour tortilla - balanced protein, carbs, and dairy fats"
+  },
+
+  "beef_tacos": {
+    name: "Beef Tacos",
+    aliases: [
+      "beef tacos", "ground beef tacos", "hard shell tacos", "soft tacos beef"
+    ],
+    category: "mexican",
+    portionWeight: 85, // per taco
+    nutritionPer100g: {
+      calories: 245,
+      protein: 15.8, // from ground beef
+      carbs: 18.2,   // from tortilla/taco shell
+      fat: 12.5,     // from beef and cheese
+      fiber: 2.8,
+      sugar: 2.1,
+      sodium: 0.48,
+      iron: 2.2,
+      calcium: 125,  // from cheese and fortified tortilla
+      zinc: 2.8,
+      magnesium: 25,
+      vitaminC: 8.5, // from lettuce/tomato
+      vitaminD: 0.1,
+      vitaminB12: 1.1, // from beef
+      folate: 28,
+      vitaminA: 85,  // from vegetables
+      vitaminE: 1.8,
+      potassium: 285,
+      phosphorus: 165
+    },
+    note: "Ground beef in corn/flour shell with toppings - complete balanced meal"
+  },
+
+  "protein_quinoa_bowl": {
+    name: "Protein Quinoa Bowl",
+    aliases: [
+      "quinoa bowl", "protein bowl", "quinoa power bowl", "chicken quinoa bowl"
+    ],
+    category: "healthy",
+    portionWeight: 350,
+    nutritionPer100g: {
+      calories: 185,
+      protein: 16.5, // from quinoa + chicken/protein
+      carbs: 22.8,   // from quinoa
+      fat: 5.8,      // from quinoa + dressing
+      fiber: 4.2,
+      sugar: 3.5,
+      sodium: 0.25,
+      iron: 2.8,
+      calcium: 45,
+      zinc: 1.8,
+      magnesium: 85, // from quinoa
+      vitaminC: 25,  // from vegetables
+      vitaminD: 0.2,
+      vitaminB12: 0.6,
+      folate: 45,    // from quinoa
+      vitaminA: 185, // from mixed vegetables
+      vitaminE: 2.2,
+      potassium: 385,
+      phosphorus: 225
+    },
+    note: "Complete protein quinoa with vegetables - all essential amino acids"
+  },
+
+  "caesar_salad_chicken": {
+    name: "Caesar Salad with Chicken",
+    aliases: [
+      "chicken caesar salad", "caesar salad with chicken", "grilled chicken caesar"
+    ],
+    category: "american",
+    portionWeight: 250,
+    nutritionPer100g: {
+      calories: 195,
+      protein: 18.5, // from chicken
+      carbs: 6.8,    // from croutons + minimal from lettuce
+      fat: 12.5,     // from dressing and parmesan
+      fiber: 2.2,
+      sugar: 2.8,
+      sodium: 0.68,
+      iron: 1.5,
+      calcium: 185,  // from parmesan
+      zinc: 1.8,
+      magnesium: 18,
+      vitaminC: 15,  // from romaine
+      vitaminD: 0.2,
+      vitaminB12: 0.8,
+      folate: 35,    // from romaine
+      vitaminA: 285, // from romaine
+      vitaminE: 2.8,
+      potassium: 285,
+      phosphorus: 195
+    },
+    note: "Grilled chicken on romaine with creamy dressing - high protein, moderate fats"
   }
 };
 
@@ -1227,7 +1447,16 @@ export function findEnhancedFood(foodName: string): EnhancedFoodEntry | null {
     { pattern: /risotto/i, key: 'risotto' },
     
     // African patterns
-    { pattern: /jollof\s*rice/i, key: 'jollof_rice' }
+    { pattern: /jollof\s*rice/i, key: 'jollof_rice' },
+    
+    // Mixed Protein/Carb/Fat Dishes patterns
+    { pattern: /beef.*broccoli|broccoli.*beef/i, key: 'beef_broccoli_stir_fry' },
+    { pattern: /chicken.*alfredo|alfredo.*chicken/i, key: 'chicken_alfredo_pasta' },
+    { pattern: /tuna.*sandwich|sandwich.*tuna/i, key: 'tuna_sandwich' },
+    { pattern: /chicken.*quesadilla|quesadilla.*chicken/i, key: 'chicken_quesadilla' },
+    { pattern: /beef.*taco|taco.*beef/i, key: 'beef_tacos' },
+    { pattern: /quinoa.*bowl|protein.*bowl/i, key: 'protein_quinoa_bowl' },
+    { pattern: /caesar.*salad.*chicken|chicken.*caesar/i, key: 'caesar_salad_chicken' }
   ];
   
   for (const { pattern, key } of patterns) {

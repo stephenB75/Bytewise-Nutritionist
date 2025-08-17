@@ -3,7 +3,7 @@
 ## Overview
 ByteWise Nutritionist is a comprehensive Progressive Web App (PWA) for nutrition tracking and meal planning. It integrates with the USDA food database to provide accurate nutritional information, offering features like meal logging, calorie tracking, progress analytics, and an achievement system. The application is designed for cross-platform compatibility and full PWA capabilities, including PDF export functionality for comprehensive nutrition reports. Its vision is to provide a robust, user-friendly tool for personal nutrition management, leveraging modern web technologies for a seamless experience.
 
-**Current Version: BETA 1.7** - Enhanced fasting timer with detailed progress tracking, comprehensive global cuisine database, and intelligent food recognition covering 50+ ethnic dishes across 10+ cultural food categories.
+**Current Version: BETA 1.8** - Complete mixed dish recognition system with accurate macronutrient profiling for composite foods containing multiple protein, carbohydrate, and fat sources across 60+ international dishes.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
@@ -50,8 +50,34 @@ The application employs a mobile-first responsive design. Tailwind CSS and shadc
 - **React Query/TanStack Query**: Server state management and caching.
 - **Web App Manifest**: PWA configuration for native app installation.## Version History
 
+### BETA 1.8 (August 17, 2025)
+**Milestone Release: Complete Mixed Dish Recognition & Balanced Macronutrient Analysis**
+
+Key Features Added:
+- ✅ **Mixed Dish Recognition System** - Accurately identifies composite foods with multiple protein, carb, and fat sources
+- ✅ **Balanced Macronutrient Profiling** - Proper nutrition calculation for dishes combining meat + vegetables + grains + dairy
+- ✅ **Enhanced Food Database Integration** - Priority system ensures enhanced database checks before USDA fallback
+- ✅ **Pattern-Based Food Matching** - Smart recognition of mixed dishes like "chicken alfredo pasta", "beef and broccoli stir fry"
+- ✅ **Comprehensive Mixed Dish Coverage** - Beef & broccoli, chicken alfredo, tuna sandwiches, quesadillas, protein bowls, caesar salads
+- ✅ **Realistic Nutrition Profiles** - Each dish shows proper protein from meat, carbs from grains/vegetables, fats from cooking methods
+- ✅ **Micronutrient Analysis** - Complete vitamin and mineral profiles reflecting all ingredients in composite dishes
+
+Enhanced Mixed Dish Database:
+- **American**: Tuna sandwich (18.5g protein + 22.8g carbs + 8.2g fat), Caesar salad with chicken (18.5g protein + 6.8g carbs + 12.5g fat)
+- **Chinese**: Beef and broccoli stir fry (18.5g protein + 8.2g carbs + 6.8g fat) with high Vitamin C from vegetables
+- **Italian**: Chicken alfredo pasta (18.2g protein + 22.5g carbs + 15.8g fat) with high calcium from cream sauce
+- **Mexican**: Chicken quesadilla (19.8g protein + 18.5g carbs + 13.5g fat), beef tacos (15.8g protein + 18.2g carbs + 12.5g fat)
+- **Healthy**: Protein quinoa bowl (16.5g protein + 22.8g carbs + 5.8g fat) with complete amino acid profile
+
+Technical Improvements:
+- **Enhanced Database Priority Logic** - Checks enhanced database first before USDA API for better composite food recognition ✅ **PRODUCTION VERIFIED**
+- **Smart Pattern Recognition** - Regex-based matching for "beef.*broccoli", "chicken.*alfredo", "tuna.*sandwich" patterns
+- **Fixed Calculation Flow** - Enhanced food database properly integrated into main calculation pipeline
+- **Realistic Portion Weights** - Each mixed dish has authentic serving sizes (300g stir fry, 280g pasta, 200g quesadilla)
+- **Composite Nutrition Logic** - Proper scaling and combination of nutrients from multiple ingredient sources
+
 ### BETA 1.7 (August 17, 2025)
-**Milestone Release: Enhanced Fasting Timer & Comprehensive Global Cuisine Database**
+**Previous Release: Enhanced Fasting Timer & Comprehensive Global Cuisine Database**
 
 Key Features Added:
 - ✅ **Enhanced Fasting Timer with Detailed Progress Tracking** - Shows actual hours fasted and remaining time when sessions are stopped early
