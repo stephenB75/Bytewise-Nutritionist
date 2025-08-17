@@ -622,8 +622,8 @@ export function FastingTracker() {
       remainingHours: isCompleted ? 0 : remainingHours
     };
     
-    // Store in history if significant time was fasted (at least 1 hour)
-    if (actualHoursFasted >= 1) {
+    // Store in history if meaningful time was fasted (at least 1 minute for testing)
+    if (actualTimeFasted >= 60000) { // 1 minute threshold for testing
       try {
         const existingHistory = JSON.parse(localStorage.getItem(FASTING_HISTORY_KEY) || '[]');
         existingHistory.unshift(sessionSummary);
@@ -655,7 +655,9 @@ export function FastingTracker() {
       // Show what they accomplished and what was left
       const accomplishedText = actualHoursFasted >= 1 ? 
         `You fasted for ${formatHours(actualHoursFasted)}` : 
-        `You fasted for ${Math.floor(actualTimeFasted / (1000 * 60))} minutes`;
+        actualTimeFasted >= 60000 ? // More than 1 minute
+        `You fasted for ${Math.floor(actualTimeFasted / (1000 * 60))} minutes` :
+        `You fasted for ${Math.floor(actualTimeFasted / 1000)} seconds`;
       
       const remainingText = remainingHours > 0 ? 
         ` with ${formatHours(remainingHours)} remaining from your ${targetHours}h goal.` : 
