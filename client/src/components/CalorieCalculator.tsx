@@ -221,29 +221,86 @@ function CalorieCalculator({
     } else {
       // Convert common measurements to grams for validation
       const ozMatch = cleanMeasurement.match(/(\d+(?:\.\d+)?)\s*oz/);
+      const cupMatch = cleanMeasurement.match(/(\d+(?:\.\d+)?)\s*cups?/);
+      const tbspMatch = cleanMeasurement.match(/(\d+(?:\.\d+)?)\s*(?:tbsp|tablespoons?)/);
+      const tspMatch = cleanMeasurement.match(/(\d+(?:\.\d+)?)\s*(?:tsp|teaspoons?)/);
+      const mlMatch = cleanMeasurement.match(/(\d+(?:\.\d+)?)\s*ml/);
+      
       if (ozMatch) {
         grams = parseFloat(ozMatch[1]) * 28.35;
+      } else if (cupMatch) {
+        // Approximate cup conversions (varies by food)
+        grams = parseFloat(cupMatch[1]) * 120; // Average weight
+      } else if (tbspMatch) {
+        grams = parseFloat(tbspMatch[1]) * 15;
+      } else if (tspMatch) {
+        grams = parseFloat(tspMatch[1]) * 5;
+      } else if (mlMatch) {
+        grams = parseFloat(mlMatch[1]); // Approximate for liquids
       }
     }
     
-    // Define portion limits for problematic foods
-    const portionLimits: Record<string, {warning: number; realistic: number; suggestion: string}> = {
-      'potato chips': { warning: 100, realistic: 28, suggestion: '1 oz (28g)' },
-      'chips': { warning: 100, realistic: 28, suggestion: '1 oz (28g)' },
-      'tortilla chips': { warning: 100, realistic: 28, suggestion: '1 oz (28g)' },
-      'crackers': { warning: 60, realistic: 30, suggestion: '6 crackers (30g)' },
-      'candy': { warning: 100, realistic: 40, suggestion: '1.4 oz (40g)' },
-      'chocolate': { warning: 100, realistic: 40, suggestion: '1.4 oz (40g)' },
-      'ice cream': { warning: 200, realistic: 65, suggestion: '1/2 cup (65g)' },
-      'cookies': { warning: 60, realistic: 30, suggestion: '2 cookies (30g)' },
-      'cake': { warning: 150, realistic: 80, suggestion: '1 slice (80g)' }
+    // Comprehensive portion limits for all food categories
+    const portionLimits: Record<string, {warning: number; realistic: number; suggestions: string[]}> = {
+      // SNACK FOODS
+      'potato chips': { warning: 100, realistic: 28, suggestions: ['handful (28g)', '1 oz', 'small bowl (30g)'] },
+      'chips': { warning: 100, realistic: 28, suggestions: ['handful (28g)', '1 oz', 'small bowl (30g)'] },
+      'tortilla chips': { warning: 80, realistic: 28, suggestions: ['handful (28g)', '1 oz', '10-12 chips'] },
+      'crackers': { warning: 60, realistic: 30, suggestions: ['6-8 crackers (30g)', '1 oz', 'small portion'] },
+      'pretzels': { warning: 80, realistic: 30, suggestions: ['handful (30g)', '1 oz', '15-20 mini pretzels'] },
+      'nuts': { warning: 60, realistic: 28, suggestions: ['handful (28g)', '1/4 cup', '1 oz'] },
+      'popcorn': { warning: 100, realistic: 25, suggestions: ['3 cups popped (25g)', 'small bowl', '1 oz'] },
+      
+      // SWEETS & DESSERTS
+      'candy': { warning: 100, realistic: 40, suggestions: ['fun-size portion (40g)', '1.4 oz', 'small handful'] },
+      'chocolate': { warning: 80, realistic: 40, suggestions: ['2-3 squares (40g)', '1.4 oz', 'small bar'] },
+      'cookies': { warning: 60, realistic: 30, suggestions: ['2-3 cookies (30g)', '1 oz', 'small portion'] },
+      'cake': { warning: 150, realistic: 80, suggestions: ['1 slice (80g)', 'small piece', '3 oz'] },
+      'ice cream': { warning: 200, realistic: 65, suggestions: ['1/2 cup (65g)', 'small scoop', '2.3 oz'] },
+      'pie': { warning: 200, realistic: 120, suggestions: ['1 slice (120g)', 'medium piece', '4 oz'] },
+      'brownies': { warning: 100, realistic: 50, suggestions: ['1 brownie (50g)', 'small square', '1.8 oz'] },
+      
+      // BEVERAGES
+      'soda': { warning: 500, realistic: 355, suggestions: ['1 can (355ml)', '12 oz', 'standard serving'] },
+      'juice': { warning: 300, realistic: 240, suggestions: ['1 cup (240ml)', '8 oz glass', 'small glass'] },
+      'wine': { warning: 200, realistic: 150, suggestions: ['1 glass (150ml)', '5 oz', 'standard pour'] },
+      'beer': { warning: 500, realistic: 355, suggestions: ['1 bottle (355ml)', '12 oz', 'standard beer'] },
+      
+      // CONDIMENTS & SPREADS
+      'butter': { warning: 30, realistic: 15, suggestions: ['1 tbsp (15g)', '1 pat', 'thin spread'] },
+      'peanut butter': { warning: 50, realistic: 32, suggestions: ['2 tbsp (32g)', 'thin layer', '1 oz'] },
+      'mayo': { warning: 30, realistic: 15, suggestions: ['1 tbsp (15g)', 'thin layer', 'light spread'] },
+      'dressing': { warning: 60, realistic: 30, suggestions: ['2 tbsp (30g)', '1 oz', 'light drizzle'] },
+      'jam': { warning: 40, realistic: 20, suggestions: ['1 tbsp (20g)', 'thin layer', 'light spread'] },
+      
+      // GRAINS & STARCHES
+      'rice': { warning: 300, realistic: 125, suggestions: ['1/2 cup cooked (125g)', 'small portion', '4.4 oz'] },
+      'pasta': { warning: 300, realistic: 140, suggestions: ['1 cup cooked (140g)', 'small bowl', '5 oz'] },
+      'bread': { warning: 100, realistic: 50, suggestions: ['2 slices (50g)', '1.8 oz', 'normal portion'] },
+      'cereal': { warning: 100, realistic: 30, suggestions: ['1 cup (30g)', 'small bowl', '1 oz'] },
+      
+      // CHEESE & DAIRY
+      'cheese': { warning: 80, realistic: 28, suggestions: ['1 oz (28g)', 'slice', 'small cube'] },
+      'milk': { warning: 400, realistic: 240, suggestions: ['1 cup (240ml)', '8 oz glass', 'standard serving'] },
+      'yogurt': { warning: 300, realistic: 170, suggestions: ['1 container (170g)', '6 oz', 'small cup'] },
+      
+      // PROTEINS
+      'chicken': { warning: 300, realistic: 85, suggestions: ['3 oz cooked (85g)', 'palm-size', 'small breast'] },
+      'beef': { warning: 300, realistic: 85, suggestions: ['3 oz cooked (85g)', 'palm-size', 'small portion'] },
+      'fish': { warning: 300, realistic: 85, suggestions: ['3 oz cooked (85g)', 'palm-size', 'small fillet'] },
+      
+      // FRUITS
+      'banana': { warning: 300, realistic: 120, suggestions: ['1 medium (120g)', '4.2 oz', 'average banana'] },
+      'apple': { warning: 400, realistic: 180, suggestions: ['1 medium (180g)', '6.4 oz', 'average apple'] },
+      'grapes': { warning: 300, realistic: 150, suggestions: ['1 cup (150g)', 'small bunch', '5.3 oz'] }
     };
     
     for (const [foodType, limits] of Object.entries(portionLimits)) {
       if (cleanIngredient.includes(foodType) && grams >= limits.warning) {
+        const randomSuggestion = limits.suggestions[Math.floor(Math.random() * limits.suggestions.length)];
         return {
-          warning: `⚠️ ${grams}g seems like a very large portion`,
-          suggestion: `Typical serving: ${limits.suggestion} (${Math.round(grams / limits.realistic * 150)} vs ${Math.round(150)} cal)`
+          warning: `⚠️ ${grams}g seems very large for ${foodType}`,
+          suggestion: `Try: ${randomSuggestion} • Other options: ${limits.suggestions.filter(s => s !== randomSuggestion).join(', ')}`
         };
       }
     }
