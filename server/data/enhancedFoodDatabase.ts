@@ -1395,6 +1395,135 @@ export const ENHANCED_FOOD_DATABASE: Record<string, EnhancedFoodEntry> = {
       phosphorus: 225
     },
     note: "Battered fish with mixed vegetables - high protein from fish, vitamins from vegetables"
+  },
+
+  "salmon_garlic_butter_vegetables": {
+    name: "Salmon in Garlic Butter Sauce with Vegetables",
+    aliases: [
+      "salmon in garlic butter sauce with vegetables", "salmon garlic butter vegetables",
+      "garlic butter salmon with vegetables", "salmon with garlic butter and vegetables",
+      "butter salmon vegetables", "garlic salmon vegetables"
+    ],
+    category: "seafood",
+    portionWeight: 320,
+    nutritionPer100g: {
+      calories: 215,
+      protein: 22.8, // from salmon - high quality protein
+      carbs: 8.5,    // from vegetables
+      fat: 11.2,     // from salmon omega-3s + butter sauce
+      fiber: 2.8,
+      sugar: 4.2,
+      sodium: 0.45,
+      iron: 1.2,
+      calcium: 38,
+      zinc: 1.8,
+      magnesium: 35,
+      vitaminC: 28,  // from vegetables
+      vitaminD: 8.5, // very high from salmon
+      vitaminB12: 3.8, // very high from salmon
+      folate: 32,
+      vitaminA: 145, // from vegetables + salmon
+      vitaminE: 4.2, // from salmon oils
+      potassium: 485,
+      phosphorus: 285
+    },
+    note: "Premium salmon with garlic butter and vegetables - rich in omega-3s and vitamin D"
+  },
+
+  "roast_snapper_vegetables": {
+    name: "Roast Snapper with Vegetables",
+    aliases: [
+      "roast snapper with vegetables", "roasted snapper vegetables", "snapper with vegetables",
+      "baked snapper vegetables", "grilled snapper with vegetables", "snapper and vegetables"
+    ],
+    category: "seafood",
+    portionWeight: 300,
+    nutritionPer100g: {
+      calories: 165,
+      protein: 20.5, // from snapper - lean white fish
+      carbs: 7.8,    // from roasted vegetables
+      fat: 5.2,      // from fish + light roasting oils
+      fiber: 3.5,
+      sugar: 4.8,
+      sodium: 0.28,
+      iron: 1.5,
+      calcium: 45,
+      zinc: 1.6,
+      magnesium: 38,
+      vitaminC: 25,  // from roasted vegetables
+      vitaminD: 2.8, // from snapper
+      vitaminB12: 2.5, // from snapper
+      folate: 35,
+      vitaminA: 165, // from colorful vegetables
+      vitaminE: 2.5,
+      potassium: 425,
+      phosphorus: 245
+    },
+    note: "Lean white fish with roasted vegetables - high protein, low fat, vitamin-rich"
+  },
+
+  "grilled_fish_mediterranean": {
+    name: "Grilled Fish Mediterranean Style",
+    aliases: [
+      "grilled fish mediterranean", "mediterranean fish", "fish with tomatoes and olives",
+      "mediterranean grilled fish", "fish mediterranean vegetables"
+    ],
+    category: "seafood",
+    portionWeight: 280,
+    nutritionPer100g: {
+      calories: 195,
+      protein: 19.5, // from fish
+      carbs: 8.8,    // from tomatoes, vegetables
+      fat: 8.5,      // from olive oil + fish
+      fiber: 2.8,
+      sugar: 5.2,
+      sodium: 0.35,
+      iron: 1.8,
+      calcium: 55,
+      zinc: 1.4,
+      magnesium: 42,
+      vitaminC: 18,  // from tomatoes
+      vitaminD: 3.5, // from fish
+      vitaminB12: 2.8, // from fish
+      folate: 25,
+      vitaminA: 125, // from vegetables
+      vitaminE: 3.8, // from olive oil
+      potassium: 385,
+      phosphorus: 225
+    },
+    note: "Mediterranean-style grilled fish with tomatoes and olive oil - heart-healthy"
+  },
+
+  "fish_curry_vegetables": {
+    name: "Fish Curry with Vegetables",
+    aliases: [
+      "fish curry with vegetables", "curry fish vegetables", "fish curry and vegetables",
+      "vegetable fish curry", "fish vegetable curry"
+    ],
+    category: "seafood",
+    portionWeight: 350,
+    nutritionPer100g: {
+      calories: 145,
+      protein: 16.8, // from fish
+      carbs: 9.2,    // from vegetables + curry spices
+      fat: 5.8,      // from coconut milk/oil in curry
+      fiber: 2.5,
+      sugar: 4.5,
+      sodium: 0.48,
+      iron: 2.2,
+      calcium: 65,
+      zinc: 1.6,
+      magnesium: 35,
+      vitaminC: 22,  // from vegetables
+      vitaminD: 2.8, // from fish
+      vitaminB12: 2.2, // from fish
+      folate: 28,
+      vitaminA: 185, // from curry spices + vegetables
+      vitaminE: 2.2,
+      potassium: 395,
+      phosphorus: 195
+    },
+    note: "Spiced fish curry with mixed vegetables - anti-inflammatory spices with lean protein"
   }
 };
 
@@ -1481,7 +1610,11 @@ export function findEnhancedFood(foodName: string): EnhancedFoodEntry | null {
     // African patterns
     { pattern: /jollof\s*rice/i, key: 'jollof_rice' },
     
-    // Mixed Protein/Carb/Fat Dishes patterns - more specific patterns first
+    // Mixed Seafood Dishes patterns - most specific first
+    { pattern: /salmon.*garlic.*butter.*vegetable|salmon.*butter.*vegetable/i, key: 'salmon_garlic_butter_vegetables' },
+    { pattern: /roast.*snapper.*vegetable|snapper.*vegetable/i, key: 'roast_snapper_vegetables' },
+    { pattern: /grilled.*fish.*mediterranean|mediterranean.*grilled.*fish/i, key: 'grilled_fish_mediterranean' },
+    { pattern: /fish.*curry.*vegetable|curry.*fish.*vegetable/i, key: 'fish_curry_vegetables' },
     { pattern: /fried.*fish.*(vegetable|veggies)|fish.*(vegetable|veggies)/i, key: 'fried_fish_vegetables' },
     { pattern: /beef.*broccoli|broccoli.*beef/i, key: 'beef_broccoli_stir_fry' },
     { pattern: /chicken.*alfredo|alfredo.*chicken/i, key: 'chicken_alfredo_pasta' },
