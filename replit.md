@@ -3,7 +3,7 @@
 ## Overview
 ByteWise Nutritionist is a comprehensive Progressive Web App (PWA) for nutrition tracking and meal planning. It integrates with the USDA food database to provide accurate nutritional information, offering features like meal logging, calorie tracking, progress analytics, and an achievement system. The application is designed for cross-platform compatibility and full PWA capabilities, including PDF export functionality for comprehensive nutrition reports. Its vision is to provide a robust, user-friendly tool for personal nutrition management, leveraging modern web technologies for a seamless experience.
 
-**Current Version: BETA 1.7** - Comprehensive global cuisine database with intelligent food recognition covering 50+ ethnic dishes across 10+ cultural food categories.
+**Current Version: BETA 1.7** - Enhanced fasting timer with detailed progress tracking, comprehensive global cuisine database, and intelligent food recognition covering 50+ ethnic dishes across 10+ cultural food categories.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
@@ -50,10 +50,14 @@ The application employs a mobile-first responsive design. Tailwind CSS and shadc
 - **React Query/TanStack Query**: Server state management and caching.
 - **Web App Manifest**: PWA configuration for native app installation.## Version History
 
-### BETA 1.7 (August 16, 2025)
-**Milestone Release: Comprehensive Global Cuisine Database & Intelligent Nutrition Recognition**
+### BETA 1.7 (August 17, 2025)
+**Milestone Release: Enhanced Fasting Timer & Comprehensive Global Cuisine Database**
 
 Key Features Added:
+- ✅ **Enhanced Fasting Timer with Detailed Progress Tracking** - Shows actual hours fasted and remaining time when sessions are stopped early
+- ✅ **Improved Fasting History Display** - Shows both completed and stopped sessions with visual indicators and detailed progress information  
+- ✅ **Smart Session Feedback** - Toast notifications display exact fasting duration and remaining goal time for all session types
+- ✅ **Visual Session Indicators** - Green checkmarks for completed fasts, orange alerts for early-stopped sessions with remaining time display
 - ✅ Smart app tour timing - triggers only after fresh sign-in/sign-up instead of for returning users
 - ✅ Editable daily calorie goals in user profile with real-time app-wide updates (1000-5000 cal range)  
 - ✅ Mobile-optimized avatar visibility with proper image loading and fallback handling
