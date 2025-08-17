@@ -2095,7 +2095,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       />
 
       {/* Content Section - Redesigned to match other pages */}
-      <div className="px-6 py-6 bg-black content-section">
+      <div className="px-6 py-3 bg-black content-section">
         {/* Profile Cards with Unified Accordion System */}
         {user ? (
           <Accordion 
@@ -2249,7 +2249,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             />
             
             {/* Fasting Content Section */}
-            <div className="px-6 py-8 bg-black content-section">
+            <div className="px-6 py-3 bg-black content-section">
               <div data-testid="fasting-tracker" className="fasting-tracker bg-gray-900/80 backdrop-blur-md rounded-3xl border border-gray-700 p-6">
                 <FastingTracker />
               </div>
@@ -2285,7 +2285,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             />
 
             {/* Content Section - Completely Separate and Underneath */}
-            <div className="px-6 py-8 bg-black content-section">
+            <div className="px-6 py-3 bg-black content-section">
               <div className="bg-gray-900/80 backdrop-blur-md rounded-3xl border border-gray-700">
                 <DataManagementPanel />
               </div>
