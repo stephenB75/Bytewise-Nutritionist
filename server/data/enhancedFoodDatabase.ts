@@ -916,6 +916,36 @@ export const ENHANCED_FOOD_DATABASE: Record<string, EnhancedFoodEntry> = {
     }
   },
 
+  // IKEA and Swedish Foods
+  "ikea_swedish_meatballs_with_mash": {
+    name: "IKEA Swedish Meatballs with Mash",
+    aliases: ["ikea swedish meatballs with mash", "swedish meatballs with mash", "ikea meatballs with mashed potatoes", "ikea meatballs mash", "swedish meatballs mashed potatoes"],
+    category: "swedish",
+    portionWeight: 300, // typical plate serving
+    nutritionPer100g: {
+      calories: 180,
+      protein: 12.5,
+      carbs: 15.2, // Significant carbs from mashed potatoes
+      fat: 8.5,
+      fiber: 1.2,
+      sugar: 2.8,
+      sodium: 0.65,
+      iron: 1.8,
+      calcium: 45,
+      zinc: 1.6,
+      magnesium: 22,
+      vitaminC: 8.5,
+      vitaminD: 0.1,
+      vitaminB12: 0.5,
+      folate: 18,
+      vitaminA: 12,
+      vitaminE: 1.2,
+      potassium: 285,
+      phosphorus: 125
+    },
+    note: "Swedish meatballs served with mashed potatoes - composite dish with meat and potato carbohydrates"
+  },
+
   // Breakfast Foods
   "pancakes": {
     name: "Pancakes",

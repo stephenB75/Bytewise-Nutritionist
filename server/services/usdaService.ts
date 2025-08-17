@@ -572,7 +572,59 @@ export class USDAService {
         return zeroCalorieResult;
       }
       
-      // Try liquid fallbacks and enhanced fallback data first
+      // Check enhanced food database FIRST for complex/ethnic foods
+      const enhancedFood = findEnhancedFood(ingredientName.toLowerCase().trim());
+      if (enhancedFood) {
+        // Parse measurement and calculate serving
+        const measurementResult = this.parseMeasurement(measurement, {
+          fdcId: -1,
+          description: enhancedFood.name,
+          dataType: 'Enhanced',
+          foodNutrients: []
+        });
+        const { gramsEquivalent } = measurementResult;
+        
+        // Use portion weight from enhanced database if available
+        const actualGrams = gramsEquivalent || enhancedFood.portionWeight;
+        const estimatedCalories = Math.round((enhancedFood.nutritionPer100g.calories * actualGrams) / 100);
+        
+        // Scale all nutrients for actual serving size
+        const scalingFactor = actualGrams / 100;
+        
+        const enhancedResult = {
+          ingredient: enhancedFood.name.toUpperCase(),
+          measurement: `${measurement} (~${actualGrams}g)`,
+          estimatedCalories,
+          equivalentMeasurement: `100g ≈ ${enhancedFood.nutritionPer100g.calories} kcal`,
+          note: enhancedFood.note || `Traditional ${enhancedFood.category} dish with authentic nutrition data`,
+          nutritionPer100g: {
+            calories: enhancedFood.nutritionPer100g.calories,
+            protein: enhancedFood.nutritionPer100g.protein,
+            carbs: enhancedFood.nutritionPer100g.carbs,
+            fat: enhancedFood.nutritionPer100g.fat,
+            iron: enhancedFood.nutritionPer100g.iron || 0,
+            calcium: enhancedFood.nutritionPer100g.calcium || 0,
+            zinc: enhancedFood.nutritionPer100g.zinc || 0,
+            magnesium: enhancedFood.nutritionPer100g.magnesium || 0,
+            vitaminC: enhancedFood.nutritionPer100g.vitaminC || 0,
+            vitaminD: enhancedFood.nutritionPer100g.vitaminD || 0,
+            vitaminB12: enhancedFood.nutritionPer100g.vitaminB12 || 0,
+            folate: enhancedFood.nutritionPer100g.folate || 0,
+            vitaminA: enhancedFood.nutritionPer100g.vitaminA || 0,
+            vitaminE: enhancedFood.nutritionPer100g.vitaminE || 0,
+            potassium: enhancedFood.nutritionPer100g.potassium || 0,
+            phosphorus: enhancedFood.nutritionPer100g.phosphorus || 0
+          },
+          enhancedDatabase: true,
+          category: enhancedFood.category
+        };
+        
+        // Cache the enhanced result
+        this.setMemoryCache(cacheKey, enhancedResult);
+        return enhancedResult;
+      }
+      
+      // Try liquid fallbacks and enhanced fallback data
       try {
         const fallbackResult = this.getEnhancedFallbackEstimate(ingredientName, measurement);
         if (fallbackResult) {
