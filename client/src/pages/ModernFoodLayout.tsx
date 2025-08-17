@@ -52,7 +52,6 @@ import { supabase } from '@/lib/supabase';
 import { getWeekDates, getLocalDateKey, getMealTypeByTime, formatLocalTime } from '@/utils/dateUtils';
 import { autoFixMealDatesIfNeeded, checkMealDateMismatches, fixMealDateMismatches } from '@/utils/mealDateFixer';
 import { getCachedLocalStorage, debounce } from '@/utils/performanceUtils';
-import { addSampleDataToStorage, removeSampleData } from '@/utils/sampleDataGenerator';
 
 
 // Types
@@ -1218,45 +1217,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           <div className="mt-2 text-center">
             <p className="text-xs text-gray-400">
               🔍 Search through your last month of logged meals
-            </p>
-          </div>
-          
-          {/* Testing Utility for Search Enhancement */}
-          <div className="mt-3 p-3 bg-blue-500/20 border border-blue-500/30 rounded-lg">
-            <p className="text-sm text-blue-300 mb-2 text-center">
-              Test Extended Search: Add sample meals from past 3 weeks
-            </p>
-            <div className="flex gap-2">
-              <Button 
-                size="sm"
-                onClick={() => {
-                  const addedCount = addSampleDataToStorage();
-                  toast({
-                    title: "Sample data added!",
-                    description: `Added ${addedCount} sample meals spanning the past 3 weeks. Try searching for 'chicken', 'salmon', or 'yogurt'.`,
-                  });
-                }}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs"
-              >
-                Add Sample Meals
-              </Button>
-              <Button 
-                size="sm"
-                onClick={() => {
-                  const removedCount = removeSampleData();
-                  toast({
-                    title: "Sample data removed",
-                    description: `Removed ${removedCount} sample meals.`,
-                  });
-                }}
-                variant="outline"
-                className="flex-1 border-gray-500 text-gray-300 hover:bg-gray-800 text-xs"
-              >
-                Clear Samples
-              </Button>
-            </div>
-            <p className="text-xs text-gray-400 mt-2 text-center">
-              Current meals: {weeklyMeals.length}
             </p>
           </div>
           <Button 
