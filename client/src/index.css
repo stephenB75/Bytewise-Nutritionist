@@ -98,8 +98,26 @@
 
 /* Content section spacing to prevent footer overlap */
 .content-section {
-  padding-bottom: 8rem !important; /* 128px - increased space for fixed bottom navigation */
-  min-height: calc(100vh - 6rem) !important; /* Full viewport minus space for fixed navigation */
+  padding-bottom: 12rem !important; /* 192px - much larger space for fixed bottom navigation */
+  min-height: calc(100vh - 8rem) !important; /* Full viewport minus space for fixed navigation */
+}
+
+/* Additional fallback for all main content containers */
+.px-6.py-3.bg-black,
+.px-6.py-6.bg-black,
+.px-6.py-8.bg-black {
+  padding-bottom: 12rem !important;
+}
+
+/* Force spacing on all page containers */
+.page-container,
+div[class*="space-y-0"] {
+  padding-bottom: 12rem !important;
+}
+
+/* Override any conflicting bottom padding or margin */
+* {
+  scroll-padding-bottom: 12rem !important;
 }
 
 /* Ensure proper scrolling behavior for pages with content sections */
