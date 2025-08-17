@@ -1585,17 +1585,18 @@ export class USDAService {
   /**
    * Check if portion size is unrealistically large and provide warnings
    */
-  private validatePortionSize(ingredient: string, grams: number): { warning?: string; suggestion?: string } {
+  private validatePortionSize(ingredient: string, grams: number, calories?: number): any {
     const cleanIngredient = ingredient.toLowerCase();
     
     // Define unrealistic portion thresholds for different food types
     const portionLimits = {
-      'potato chips': { warning: 100, extreme: 200 },
-      'tortilla chips': { warning: 100, extreme: 200 },
-      'crackers': { warning: 60, extreme: 120 },
-      'candy': { warning: 100, extreme: 200 },
-      'chocolate': { warning: 100, extreme: 200 },
-      'ice cream': { warning: 200, extreme: 400 },
+      'potato chips': { warning: 100, extreme: 200, realistic: 28, suggestedServing: '1 oz (28g)', suggestedCalories: 152 },
+      'chips': { warning: 100, extreme: 200, realistic: 28, suggestedServing: '1 oz (28g)', suggestedCalories: 152 },
+      'tortilla chips': { warning: 100, extreme: 200, realistic: 28, suggestedServing: '1 oz (28g)', suggestedCalories: 140 },
+      'crackers': { warning: 60, extreme: 120, realistic: 30, suggestedServing: '6 crackers (30g)', suggestedCalories: 120 },
+      'candy': { warning: 100, extreme: 200, realistic: 40, suggestedServing: '1.4 oz (40g)', suggestedCalories: 150 },
+      'chocolate': { warning: 100, extreme: 200, realistic: 40, suggestedServing: '1.4 oz (40g)', suggestedCalories: 200 },
+      'ice cream': { warning: 200, extreme: 400, realistic: 65, suggestedServing: '1/2 cup (65g)', suggestedCalories: 130 },
       'cookies': { warning: 100, extreme: 200 },
       'nuts': { warning: 60, extreme: 120 }
     };
@@ -2860,13 +2861,17 @@ export class USDAService {
         phosphorus: 10
       };
       
+      // Check for portion size warnings
+      const portionInfo = this.validatePortionSize(normalized, gramsEquivalent, estimatedCalories);
+
       const result: any = {
         ingredient: normalized.toUpperCase(),
         measurement: `${quantity} ${unit} (~${gramsEquivalent}g)`,
         estimatedCalories,
         equivalentMeasurement: `100g ≈ ${nutrition.calories} kcal`,
         note: estimatedCalories === 0 ? 'Contains no calories' : 'Low-calorie beverage',
-        nutritionPer100g: nutritionWithMicronutrients
+        nutritionPer100g: nutritionWithMicronutrients,
+        portionInfo: portionInfo
       };
       
       // Include FDA serving information if available
@@ -2908,6 +2913,9 @@ export class USDAService {
         phosphorus: Math.round((nutrition.protein * 8 + 50))
       };
       
+      // Check for portion size warnings
+      const portionInfo = this.validatePortionSize(normalized, gramsEquivalent, estimatedCalories);
+
       const result: any = {
         ingredient: normalized.toUpperCase(),
         measurement: `${quantity} ${unit} (~${gramsEquivalent}g)`,
@@ -2915,7 +2923,8 @@ export class USDAService {
         equivalentMeasurement: `100g ≈ ${nutrition.calories} kcal`,
         note: 'Estimate based on USDA nutrition averages with enhanced conversion factors',
         nutritionPer100g: nutritionWithMicronutrients,
-        usdaPortionUsed: false
+        usdaPortionUsed: false,
+        portionInfo: portionInfo
       };
       
       // Include FDA serving information if available
@@ -3001,6 +3010,9 @@ export class USDAService {
     const { quantity, unit, gramsEquivalent } = measurementResult;
     const estimatedCalories = Math.round((nutrition.calories * gramsEquivalent) / 100);
     
+    // Check for portion size warnings
+    const portionInfo = this.validatePortionSize(normalized, gramsEquivalent, estimatedCalories);
+    
     return {
       ingredient: ingredientName.toUpperCase(),
       measurement: `${quantity} ${unit} (~${gramsEquivalent}g)`,
@@ -3008,7 +3020,8 @@ export class USDAService {
       equivalentMeasurement: `100g ≈ ${nutrition.calories} kcal`,
       note: 'Generic estimate - consider adding specific nutrition data',
       nutritionPer100g: nutrition,
-      isGenericEstimate: true
+      isGenericEstimate: true,
+      portionInfo: portionInfo
     };
   }
 
