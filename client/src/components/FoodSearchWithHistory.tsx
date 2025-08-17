@@ -50,7 +50,7 @@ interface FoodSearchWithHistoryProps {
 export function FoodSearchWithHistory({
   onSelectFood,
   onSearchChange,
-  placeholder = "Search today's meals or history...",
+  placeholder = "Search Meal's",
   className = ""
 }: FoodSearchWithHistoryProps) {
   const [searchQuery, setSearchQuery] = useState('');
