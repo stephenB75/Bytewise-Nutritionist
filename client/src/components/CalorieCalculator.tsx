@@ -158,7 +158,7 @@ function CalorieCalculator({
       const caloriesPer100g = data.nutritionPer100g?.calories || 100;
       const scalingFactor = caloriesPer100g > 0 ? data.estimatedCalories / caloriesPer100g : 1;
       
-      // Send calculated calories to tracking hook with properly scaled macros
+      // Send calculated calories to tracking hook with properly scaled macros AND micronutrients
       if (onCaloriesCalculated) {
         onCaloriesCalculated({
           name: `${data.ingredient} (${data.measurement})`,
@@ -166,6 +166,19 @@ function CalorieCalculator({
           protein: (data.nutritionPer100g?.protein || 0) * scalingFactor,
           carbs: (data.nutritionPer100g?.carbs || 0) * scalingFactor,
           fat: (data.nutritionPer100g?.fat || 0) * scalingFactor,
+          // Include properly scaled micronutrients from USDA data
+          iron: (data.nutritionPer100g?.iron || 0) * scalingFactor,
+          calcium: (data.nutritionPer100g?.calcium || 0) * scalingFactor,
+          zinc: (data.nutritionPer100g?.zinc || 0) * scalingFactor,
+          magnesium: (data.nutritionPer100g?.magnesium || 0) * scalingFactor,
+          vitaminC: (data.nutritionPer100g?.vitaminC || 0) * scalingFactor,
+          vitaminD: (data.nutritionPer100g?.vitaminD || 0) * scalingFactor,
+          vitaminB12: (data.nutritionPer100g?.vitaminB12 || 0) * scalingFactor,
+          folate: (data.nutritionPer100g?.folate || 0) * scalingFactor,
+          vitaminA: (data.nutritionPer100g?.vitaminA || 0) * scalingFactor,
+          vitaminE: (data.nutritionPer100g?.vitaminE || 0) * scalingFactor,
+          potassium: (data.nutritionPer100g?.potassium || 0) * scalingFactor,
+          phosphorus: (data.nutritionPer100g?.phosphorus || 0) * scalingFactor,
           fiber: 0,
           sugar: 0,
           sodium: 0,
