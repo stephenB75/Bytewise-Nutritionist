@@ -590,7 +590,15 @@ export function FastingTracker() {
   };
 
   const stopFasting = () => {
-    if (!currentSession) return;
+    console.log('🛑 Stop fasting called, currentSession:', currentSession);
+    if (!currentSession) {
+      toast({
+        title: "No Active Session",
+        description: "There's no active fasting session to stop.",
+        duration: 4000,
+      });
+      return;
+    }
     
     // Calculate actual time fasted and remaining time
     const startTime = new Date(currentSession.startTime).getTime();
@@ -600,6 +608,14 @@ export function FastingTracker() {
     const targetHours = selectedPlan.fastingHours;
     const remainingTime = currentSession.targetDuration - actualTimeFasted;
     const remainingHours = Math.max(0, remainingTime / (1000 * 60 * 60));
+    
+    console.log('⏱️ Fasting duration:', {
+      actualTimeFasted,
+      actualHoursFasted,
+      targetHours,
+      remainingTime,
+      remainingHours
+    });
     
     const isCompleted = remainingTime <= 0;
     
@@ -622,15 +638,18 @@ export function FastingTracker() {
       remainingHours: isCompleted ? 0 : remainingHours
     };
     
-    // Store in history if meaningful time was fasted (at least 1 minute for testing)
-    if (actualTimeFasted >= 60000) { // 1 minute threshold for testing
+    // Store in history if any meaningful time was fasted (5 seconds for testing)
+    if (actualTimeFasted >= 5000) { // 5 second threshold for testing
       try {
         const existingHistory = JSON.parse(localStorage.getItem(FASTING_HISTORY_KEY) || '[]');
         existingHistory.unshift(sessionSummary);
         localStorage.setItem(FASTING_HISTORY_KEY, JSON.stringify(existingHistory.slice(0, 20))); // Keep last 20 sessions
+        console.log('💾 Session stored in history:', sessionSummary);
       } catch (e) {
-        // Silent fail for localStorage
+        console.error('❌ Failed to store session in history:', e);
       }
+    } else {
+      console.log('⚠️ Session too short to store (less than 5 seconds)');
     }
     
     // Clear current session localStorage
@@ -652,16 +671,20 @@ export function FastingTracker() {
         duration: 8000,
       });
     } else {
-      // Show what they accomplished and what was left
+      // Show what they accomplished and what was left - ALWAYS show this for testing
       const accomplishedText = actualHoursFasted >= 1 ? 
         `You fasted for ${formatHours(actualHoursFasted)}` : 
         actualTimeFasted >= 60000 ? // More than 1 minute
         `You fasted for ${Math.floor(actualTimeFasted / (1000 * 60))} minutes` :
-        `You fasted for ${Math.floor(actualTimeFasted / 1000)} seconds`;
+        actualTimeFasted >= 1000 ? // More than 1 second
+        `You fasted for ${Math.floor(actualTimeFasted / 1000)} seconds` :
+        `You fasted for ${actualTimeFasted}ms`;
       
       const remainingText = remainingHours > 0 ? 
         ` with ${formatHours(remainingHours)} remaining from your ${targetHours}h goal.` : 
         ` from your ${targetHours}h goal.`;
+      
+      console.log('🎯 Showing toast:', accomplishedText + remainingText);
       
       toast({
         title: "Fasting Session Ended",
