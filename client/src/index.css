@@ -96,6 +96,36 @@
   padding-bottom: 0.5rem !important;
 }
 
+/* Content section spacing to prevent footer overlap */
+.content-section {
+  padding-bottom: 6rem !important; /* 96px - enough space for fixed bottom navigation */
+  min-height: calc(100vh - 4rem) !important; /* Full viewport minus space for fixed navigation */
+}
+
+/* Ensure proper scrolling behavior for pages with content sections */
+.page-container {
+  padding-bottom: 0 !important; /* Remove any conflicting bottom padding */
+}
+
+/* Bottom navigation spacing and safe area handling */
+.safe-area-pb {
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom)) !important;
+}
+
+/* Enhanced bottom navigation positioning */
+@media screen and (max-width: 768px) {
+  .safe-area-pb {
+    padding-bottom: 0.5rem !important; /* 8px base padding for mobile */
+  }
+  
+  /* iPhone with home indicator */
+  @supports (padding: max(0px)) {
+    .safe-area-pb {
+      padding-bottom: max(0.75rem, env(safe-area-inset-bottom)) !important; /* Account for home indicator */
+    }
+  }
+}
+
 /* Enhanced Accessibility - Increased text sizes throughout the app */
 html {
   font-size: 17px; /* Increased from 16px for better readability */
