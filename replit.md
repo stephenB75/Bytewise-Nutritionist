@@ -65,6 +65,7 @@ UI/UX Improvements:
 - 🎨 **Optimized Placeholder Text Colors** - Reduced placeholder text opacity to 60% for subtle, professional appearance
 - 🔍 **Clean Search Interface** - Removed internal search icons from food search boxes for cleaner user experience  
 - 📝 **Simplified Search Placeholders** - Updated Universal Calorie Calculator search field to "Search Meal's" for clarity
+- 📅 **Extended Food Log Search** - Enhanced food search on tracking page to search back full month of logged entries with sorting and result limits
 
 Critical Data Protection:
 - **User profiles and settings** - Protected against browser clearing and deployment updates

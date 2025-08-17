@@ -516,10 +516,23 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         });
         
 
-
+        // Enhanced: Filter meals to include last month of data for search functionality
+        const oneMonthAgo = new Date();
+        oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+        const oneMonthAgoDateKey = getLocalDateKey(oneMonthAgo);
+        
+        // Filter stored meals to include last month for comprehensive search
+        const monthlyMeals = stored.filter((meal: any) => {
+          const mealDate = meal.date && meal.date.includes('T') 
+            ? meal.date.split('T')[0] 
+            : meal.date;
+          
+          // Include meals from the last month
+          return mealDate >= oneMonthAgoDateKey;
+        });
         
         setLoggedMeals(todayMeals);
-        setWeeklyMeals(stored); // Store all weekly meals for search functionality
+        setWeeklyMeals(monthlyMeals); // Store last month's meals for comprehensive search functionality
         
         // Calculate daily calories from existing logged meals
         const dailyTotal = todayMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
@@ -1192,11 +1205,16 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <Input
-              placeholder="Search weekly food entries..."
+              placeholder="Search last month's food entries..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="h-12 pl-10 bg-white border-gray-300 text-gray-900 placeholder-gray-500"
             />
+          </div>
+          <div className="mt-2 text-center">
+            <p className="text-xs text-gray-400">
+              🔍 Search through your last month of logged meals
+            </p>
           </div>
           <Button 
             onClick={() => {
@@ -1235,29 +1253,64 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         {trackingView === 'daily' && (
           <div className="space-y-4">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold text-white">Today's Meals</h2>
+              <h2 className="text-2xl font-bold text-white">
+                {searchQuery ? 'Search Results' : "Today's Meals"}
+              </h2>
               <div className="text-orange-400 font-bold">
-                {Math.round(dailyCalories)}/{goalCalories} cal
+                {searchQuery ? (
+                  <span className="text-sm">
+                    {weeklyMeals.filter(meal => 
+                      meal.name.toLowerCase().includes(searchQuery.toLowerCase())
+                    ).length} found
+                  </span>
+                ) : (
+                  `${Math.round(dailyCalories)}/${goalCalories} cal`
+                )}
               </div>
             </div>
             
-            {loggedMeals.length === 0 ? (
+            {(!searchQuery && loggedMeals.length === 0) ? (
               <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
                 <div className="text-center text-gray-400">
                   <p className="text-lg mb-2">No meals logged today</p>
                   <p className="text-sm">Use the search bar above or nutrition calculator to start tracking</p>
                 </div>
               </Card>
+            ) : searchQuery && weeklyMeals.filter(meal => 
+              meal.name.toLowerCase().includes(searchQuery.toLowerCase())
+            ).length === 0 ? (
+              <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
+                <div className="text-center text-gray-400">
+                  <p className="text-lg mb-2">No meals found</p>
+                  <p className="text-sm">Try a different search term or add new meals to your log</p>
+                </div>
+              </Card>
             ) : (
-              weeklyMeals.filter(meal => 
-                !searchQuery || 
-                meal.name.toLowerCase().includes(searchQuery.toLowerCase())
-              ).map((meal, index) => (
+              weeklyMeals
+                .filter(meal => 
+                  !searchQuery || 
+                  meal.name.toLowerCase().includes(searchQuery.toLowerCase())
+                )
+                .sort((a, b) => {
+                  // Sort by date (most recent first) for better search experience
+                  const dateA = new Date(a.timestamp || `${a.date} ${a.time}`);
+                  const dateB = new Date(b.timestamp || `${b.date} ${b.time}`);
+                  return dateB.getTime() - dateA.getTime();
+                })
+                .slice(0, 50) // Limit results for performance
+                .map((meal, index) => (
               <Card key={index} className="bg-white/10 backdrop-blur-md border-white/20 p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
                     <h4 className="text-white font-semibold">{meal.name}</h4>
-                    <p className="text-gray-400 text-sm">{meal.time} • {meal.mealType}</p>
+                    <p className="text-gray-400 text-sm">
+                      {meal.time} • {meal.mealType}
+                      {searchQuery && (
+                        <span className="ml-2 text-blue-400">
+                          • {new Date(meal.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        </span>
+                      )}
+                    </p>
                     <div className="flex flex-wrap gap-3 mt-1">
                       <span className="text-xs text-green-400">P: {(meal.protein || 0).toFixed(1)}g</span>
                       <span className="text-xs text-yellow-400">C: {(meal.carbs || 0).toFixed(1)}g</span>
