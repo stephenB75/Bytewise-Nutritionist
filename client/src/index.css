@@ -98,8 +98,8 @@
 
 /* Content section spacing to prevent footer overlap */
 .content-section {
-  padding-bottom: 6rem !important; /* 96px - enough space for fixed bottom navigation */
-  min-height: calc(100vh - 4rem) !important; /* Full viewport minus space for fixed navigation */
+  padding-bottom: 8rem !important; /* 128px - increased space for fixed bottom navigation */
+  min-height: calc(100vh - 6rem) !important; /* Full viewport minus space for fixed navigation */
 }
 
 /* Ensure proper scrolling behavior for pages with content sections */

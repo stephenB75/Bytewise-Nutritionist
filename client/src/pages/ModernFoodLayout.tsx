@@ -2060,7 +2060,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       />
       
       {/* Content Section - Completely Separate and Underneath */}
-      <div className="bg-white content-section">
+      <div className="px-6 py-3 bg-black content-section">
         <div className="main-content">
           <CalorieCalculator 
             onNavigate={onNavigate}
