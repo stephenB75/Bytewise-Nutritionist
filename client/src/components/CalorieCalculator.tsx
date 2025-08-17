@@ -312,13 +312,23 @@ function CalorieCalculator({
                              (foodType === 'chips' && cleanIngredient.includes('chip')) ||
                              (foodType === 'potato chips' && (cleanIngredient.includes('potato') && cleanIngredient.includes('chip')));
       
-      if (matchesFoodType && grams >= limits.warning) {
-        const randomSuggestion = limits.suggestions[Math.floor(Math.random() * limits.suggestions.length)];
-        console.log(`Warning triggered for ${foodType}: ${grams}g >= ${limits.warning}g`);
-        return {
-          warning: `⚠️ ${grams}g seems very large for ${foodType}`,
-          suggestion: `Try: ${randomSuggestion} • Other options: ${limits.suggestions.filter(s => s !== randomSuggestion).join(', ')}`
-        };
+      if (matchesFoodType && grams > 0) {
+        const percentDifference = Math.abs(grams - limits.realistic) / limits.realistic;
+        
+        // Warn if portion is significantly different from realistic serving (30% or more difference)
+        if (percentDifference >= 0.3) {
+          const randomSuggestion = limits.suggestions[Math.floor(Math.random() * limits.suggestions.length)];
+          const isLarger = grams > limits.realistic;
+          
+          console.log(`Warning triggered for ${foodType}: ${grams}g vs realistic ${limits.realistic}g (${Math.round(percentDifference * 100)}% difference)`);
+          
+          return {
+            warning: isLarger 
+              ? `⚠️ ${grams}g is much larger than typical ${foodType} serving`
+              : `⚠️ ${grams}g is smaller than typical ${foodType} serving`,
+            suggestion: `Recommended: ${randomSuggestion} • Other options: ${limits.suggestions.filter(s => s !== randomSuggestion).join(', ')}`
+          };
+        }
       }
     }
     
