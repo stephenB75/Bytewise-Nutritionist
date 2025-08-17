@@ -213,15 +213,23 @@ function CalorieCalculator({
     const cleanIngredient = ingredient.toLowerCase().trim();
     const cleanMeasurement = measurement.toLowerCase().trim();
     
-    // Extract grams from measurement
+    // Extract grams from measurement - handle complex formats like "1/bowl (250g)"
     let grams = 0;
-    const gramMatch = cleanMeasurement.match(/(\d+(?:\.\d+)?)\s*g/);
-    if (gramMatch) {
+    
+    // Look for grams in parentheses first: (250g)
+    const gramInParensMatch = cleanMeasurement.match(/\((\d+(?:\.\d+)?)\s*g\)/);
+    // Look for direct grams: 250g
+    const gramMatch = cleanMeasurement.match(/(\d+(?:\.\d+)?)\s*g(?!\w)/);
+    
+    if (gramInParensMatch) {
+      grams = parseFloat(gramInParensMatch[1]);
+    } else if (gramMatch) {
       grams = parseFloat(gramMatch[1]);
     } else {
       // Convert common measurements to grams for validation
       const ozMatch = cleanMeasurement.match(/(\d+(?:\.\d+)?)\s*oz/);
       const cupMatch = cleanMeasurement.match(/(\d+(?:\.\d+)?)\s*cups?/);
+      const bowlMatch = cleanMeasurement.match(/(\d+(?:\.\d+)?)\s*bowls?/);
       const tbspMatch = cleanMeasurement.match(/(\d+(?:\.\d+)?)\s*(?:tbsp|tablespoons?)/);
       const tspMatch = cleanMeasurement.match(/(\d+(?:\.\d+)?)\s*(?:tsp|teaspoons?)/);
       const mlMatch = cleanMeasurement.match(/(\d+(?:\.\d+)?)\s*ml/);
@@ -229,8 +237,9 @@ function CalorieCalculator({
       if (ozMatch) {
         grams = parseFloat(ozMatch[1]) * 28.35;
       } else if (cupMatch) {
-        // Approximate cup conversions (varies by food)
         grams = parseFloat(cupMatch[1]) * 120; // Average weight
+      } else if (bowlMatch) {
+        grams = parseFloat(bowlMatch[1]) * 200; // Estimate bowl as ~200g
       } else if (tbspMatch) {
         grams = parseFloat(tbspMatch[1]) * 15;
       } else if (tspMatch) {
@@ -239,6 +248,8 @@ function CalorieCalculator({
         grams = parseFloat(mlMatch[1]); // Approximate for liquids
       }
     }
+    
+    console.log(`Validation Debug - Ingredient: "${cleanIngredient}", Measurement: "${cleanMeasurement}", Extracted grams: ${grams}`);
     
     // Comprehensive portion limits for all food categories
     const portionLimits: Record<string, {warning: number; realistic: number; suggestions: string[]}> = {
@@ -295,15 +306,23 @@ function CalorieCalculator({
       'grapes': { warning: 300, realistic: 150, suggestions: ['1 cup (150g)', 'small bunch', '5.3 oz'] }
     };
     
+    // Check if ingredient matches any food type (more flexible matching)
     for (const [foodType, limits] of Object.entries(portionLimits)) {
-      if (cleanIngredient.includes(foodType) && grams >= limits.warning) {
+      const matchesFoodType = cleanIngredient.includes(foodType) || 
+                             (foodType === 'chips' && cleanIngredient.includes('chip')) ||
+                             (foodType === 'potato chips' && (cleanIngredient.includes('potato') && cleanIngredient.includes('chip')));
+      
+      if (matchesFoodType && grams >= limits.warning) {
         const randomSuggestion = limits.suggestions[Math.floor(Math.random() * limits.suggestions.length)];
+        console.log(`Warning triggered for ${foodType}: ${grams}g >= ${limits.warning}g`);
         return {
           warning: `⚠️ ${grams}g seems very large for ${foodType}`,
           suggestion: `Try: ${randomSuggestion} • Other options: ${limits.suggestions.filter(s => s !== randomSuggestion).join(', ')}`
         };
       }
     }
+    
+    console.log('No warning triggered');
     
     return null;
   };
