@@ -294,7 +294,7 @@ export const ENHANCED_FOOD_DATABASE: Record<string, EnhancedFoodEntry> = {
 
   "fish_and_chips": {
     name: "Fish and Chips",
-    aliases: ["fish and chips", "fish & chips", "battered fish", "fried fish"],
+    aliases: ["fish and chips", "fish & chips", "battered fish chips", "fried fish chips"],
     category: "british",
     portionWeight: 320,
     nutritionPer100g: {
@@ -1363,6 +1363,38 @@ export const ENHANCED_FOOD_DATABASE: Record<string, EnhancedFoodEntry> = {
       phosphorus: 195
     },
     note: "Grilled chicken on romaine with creamy dressing - high protein, moderate fats"
+  },
+
+  "fried_fish_vegetables": {
+    name: "Fried Fish with Vegetables",
+    aliases: [
+      "fried fish with vegetables", "fish and vegetables", "fried fish and veggies",
+      "battered fish with vegetables", "fish vegetable combo"
+    ],
+    category: "seafood",
+    portionWeight: 280,
+    nutritionPer100g: {
+      calories: 185,
+      protein: 17.2, // from fish
+      carbs: 9.8,    // from mixed vegetables
+      fat: 9.5,      // from frying oil
+      fiber: 3.2,
+      sugar: 4.8,
+      sodium: 0.38,
+      iron: 1.8,
+      calcium: 45,
+      zinc: 1.4,
+      magnesium: 42,
+      vitaminC: 35,  // from mixed vegetables
+      vitaminD: 3.2, // from fish
+      vitaminB12: 2.1, // from fish
+      folate: 28,
+      vitaminA: 185, // from vegetables
+      vitaminE: 2.8,
+      potassium: 445,
+      phosphorus: 225
+    },
+    note: "Battered fish with mixed vegetables - high protein from fish, vitamins from vegetables"
   }
 };
 
@@ -1449,7 +1481,8 @@ export function findEnhancedFood(foodName: string): EnhancedFoodEntry | null {
     // African patterns
     { pattern: /jollof\s*rice/i, key: 'jollof_rice' },
     
-    // Mixed Protein/Carb/Fat Dishes patterns
+    // Mixed Protein/Carb/Fat Dishes patterns - more specific patterns first
+    { pattern: /fried.*fish.*(vegetable|veggies)|fish.*(vegetable|veggies)/i, key: 'fried_fish_vegetables' },
     { pattern: /beef.*broccoli|broccoli.*beef/i, key: 'beef_broccoli_stir_fry' },
     { pattern: /chicken.*alfredo|alfredo.*chicken/i, key: 'chicken_alfredo_pasta' },
     { pattern: /tuna.*sandwich|sandwich.*tuna/i, key: 'tuna_sandwich' },
