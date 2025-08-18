@@ -52,7 +52,9 @@ export function WeeklyCaloriesCard() {
     console.log('🗓️ Week calculation:', {
       systemToday: currentDate.toDateString(),
       todayKey: todayKey,
-      weekDates: weekDates.map(d => ({ day: d.day, date: d.date }))
+      weekDates: weekDates.map(d => ({ day: d.day, date: d.date })),
+      mondayDate: weekDates.find(d => d.day === 'Monday')?.date,
+      shouldHighlightMonday: weekDates.find(d => d.day === 'Monday')?.date === todayKey
     });
     
     return weekDates;
@@ -175,6 +177,12 @@ export function WeeklyCaloriesCard() {
 
   // Load data on component mount and listen for updates
   useEffect(() => {
+    // Clear any cached date overrides on component load
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.removeItem('user-date-override');
+      localStorage.removeItem('date-calculation-cache');
+    }
+    
     calculateWeeklyCalories();
 
     const handleMealLogged = () => {
@@ -250,10 +258,15 @@ export function WeeklyCaloriesCard() {
                     <p className={`text-xs ${
                       isToday ? 'text-orange-400' : 'text-gray-400'
                     }`}>
-                      {new Date(dayData.date).toLocaleDateString('en-US', { 
-                        month: 'short', 
-                        day: 'numeric' 
-                      })}
+                      {(() => {
+                        // Force correct date display by parsing as UTC to prevent timezone shift
+                        const [year, month, day] = dayData.date.split('-').map(Number);
+                        const displayDate = new Date(year, month - 1, day);
+                        return displayDate.toLocaleDateString('en-US', { 
+                          month: 'short', 
+                          day: 'numeric' 
+                        });
+                      })()}
                     </p>
                   </div>
                   
