@@ -14,7 +14,7 @@ import { useCheckAchievements } from '@/hooks/useAchievements';
 import { getWeekDates, getLocalDateKey } from '@/utils/dateUtils';
 import { checkMealDateMismatches } from '@/utils/mealDateFixer';
 import { debounce, getCachedLocalStorage } from '@/utils/performanceUtils';
-import { getDateOverride, setDateOverride } from '@/utils/timezoneCorrection';
+// Removed timezone correction import to fix date display issues
 
 interface DayCalories {
   day: string;
@@ -26,7 +26,7 @@ interface DayCalories {
 export function WeeklyCaloriesCard() {
   const [weeklyData, setWeeklyData] = useState<DayCalories[]>([]);
   const [totalWeeklyCalories, setTotalWeeklyCalories] = useState(0);
-  const [dateOverride, setDateOverrideState] = useState(getDateOverride());
+  // Removed date override state to fix date display issues
 
   // Achievement system hook
   const checkAchievements = useCheckAchievements();

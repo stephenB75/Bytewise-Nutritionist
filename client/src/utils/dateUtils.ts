@@ -38,31 +38,10 @@ export function getLocalDateKey(date: Date = new Date()): string {
       day: '2-digit'
     });
     
-    let calculatedDate = formatter.format(date); // Returns YYYY-MM-DD format
+    const calculatedDate = formatter.format(date); // Returns YYYY-MM-DD format
     
-    // Check for user date override in localStorage - but don't apply if it would cause wrong dates
-    const userDateOverride = localStorage.getItem('user-date-override');
-    if (userDateOverride) {
-      const override = JSON.parse(userDateOverride);
-      // Only apply override if it's not causing the wrong "today" to be highlighted
-      if (override.dayOffset && typeof override.dayOffset === 'number') {
-        // Check if applying this offset would make sense
-        const dateObj = new Date(calculatedDate + 'T12:00:00');
-        dateObj.setDate(dateObj.getDate() + override.dayOffset);
-        const offsetDate = dateObj.toISOString().split('T')[0];
-        
-        // Debug: Log the override application
-        console.log('📅 Date override check:', {
-          original: calculatedDate,
-          offset: override.dayOffset,
-          result: offsetDate,
-          description: override.description
-        });
-        
-        // For now, disable date overrides to fix the date issue
-        // calculatedDate = offsetDate;
-      }
-    }
+    // Removed date override logic to fix date display issues
+    // The system now uses actual calendar dates without any offset
     
     return calculatedDate;
   } catch (error) {
