@@ -35,7 +35,9 @@ export function WeeklyCaloriesCard() {
 
   // Get the current week's dates using actual calendar dates
   const getCurrentWeekDates = () => {
-    const weekDatesArray = getWeekDates(); // Use actual calendar dates
+    // Use current date without any date override to fix the offset issue
+    const currentDate = new Date();
+    const weekDatesArray = getWeekDates(currentDate); // Use actual calendar dates
     const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     
     const weekDates = weekDatesArray.map((date, index) => ({
@@ -45,10 +47,14 @@ export function WeeklyCaloriesCard() {
       mealCount: 0
     }));
 
-
+    // Debug: Check if dates are correct
+    const todayKey = getLocalDateKey(currentDate);
+    console.log('🗓️ Week calculation:', {
+      systemToday: currentDate.toDateString(),
+      todayKey: todayKey,
+      weekDates: weekDates.map(d => ({ day: d.day, date: d.date }))
+    });
     
-    // Removed auto-detection logic that was causing date confusion
-
     return weekDates;
   };
 

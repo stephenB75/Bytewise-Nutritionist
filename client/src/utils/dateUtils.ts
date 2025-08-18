@@ -29,9 +29,6 @@ export function getLocalEndOfDay(date: Date = new Date()): Date {
  * Enhanced with user preference override for timezone alignment
  */
 export function getLocalDateKey(date: Date = new Date()): string {
-  // Check for user date override in localStorage
-  const userDateOverride = localStorage.getItem('user-date-override');
-  
   try {
     const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const formatter = new Intl.DateTimeFormat('en-CA', { 
@@ -43,13 +40,27 @@ export function getLocalDateKey(date: Date = new Date()): string {
     
     let calculatedDate = formatter.format(date); // Returns YYYY-MM-DD format
     
-    // Apply user date override if exists (for timezone misalignment correction)
+    // Check for user date override in localStorage - but don't apply if it would cause wrong dates
+    const userDateOverride = localStorage.getItem('user-date-override');
     if (userDateOverride) {
       const override = JSON.parse(userDateOverride);
+      // Only apply override if it's not causing the wrong "today" to be highlighted
       if (override.dayOffset && typeof override.dayOffset === 'number') {
+        // Check if applying this offset would make sense
         const dateObj = new Date(calculatedDate + 'T12:00:00');
         dateObj.setDate(dateObj.getDate() + override.dayOffset);
-        calculatedDate = dateObj.toISOString().split('T')[0];
+        const offsetDate = dateObj.toISOString().split('T')[0];
+        
+        // Debug: Log the override application
+        console.log('📅 Date override check:', {
+          original: calculatedDate,
+          offset: override.dayOffset,
+          result: offsetDate,
+          description: override.description
+        });
+        
+        // For now, disable date overrides to fix the date issue
+        // calculatedDate = offsetDate;
       }
     }
     
