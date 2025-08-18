@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Verify Today's Food Entries</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #1a1a1a; color: #00ff00; }
+        .result { margin: 10px 0; padding: 10px; border-left: 3px solid #00ff00; }
+        .success { color: #00ff00; }
+        .error { color: #ff4444; border-left-color: #ff4444; }
+        .warning { color: #ffaa00; border-left-color: #ffaa00; }
+    </style>
+</head>
+<body>
+    <h1>🍽️ Today's Food Entry Verification</h1>
+    <div id="results"></div>
+    
+    <script>
+        function log(message, type = 'success') {
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = message;
+            document.getElementById('results').appendChild(div);
+        }
+
+        // Get today's date key
+        const today = new Date();
+        const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+        
+        log(`📅 Checking food entries for: ${today.toDateString()}`);
+        log(`🔑 Date key: ${todayKey}`);
+        
+        // Check localStorage data
+        try {
+            const weeklyMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
+            const todaysMeals = weeklyMeals.filter(meal => {
+                if (!meal.date) return false;
+                return meal.date.includes(todayKey) || meal.date.startsWith(todayKey);
+            });
+            
+            log(`📊 Total meals in storage: ${weeklyMeals.length}`);
+            log(`🍽️ Today's meals found: ${todaysMeals.length}`);
+            
+            if (todaysMeals.length > 0) {
+                log('<br><strong>✅ TODAY\'S FOOD ENTRIES:</strong>', 'success');
+                
+                let totalCalories = 0;
+                todaysMeals.forEach((meal, index) => {
+                    const calories = meal.totalCalories || 0;
+                    totalCalories += calories;
+                    
+                    log(`<strong>${index + 1}. ${meal.name || 'Unnamed meal'}</strong>`, 'success');
+                    log(`&nbsp;&nbsp;&nbsp;📊 ${calories} calories`, 'success');
+                    log(`&nbsp;&nbsp;&nbsp;🍽️ ${meal.mealType || 'unknown'} meal`, 'success');
+                    
+                    if (meal.date) {
+                        const mealTime = new Date(meal.date);
+                        log(`&nbsp;&nbsp;&nbsp;⏰ ${mealTime.toLocaleTimeString()}`, 'success');
+                    }
+                    
+                    if (meal.foods && meal.foods.length > 0) {
+                        log(`&nbsp;&nbsp;&nbsp;🥗 Contains ${meal.foods.length} food items:`, 'success');
+                        meal.foods.forEach(food => {
+                            log(`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;• ${food.name}: ${food.calories || 0} cal`, 'success');
+                        });
+                    }
+                    
+                    // Show nutrition breakdown
+                    if (meal.totalProtein || meal.totalCarbs || meal.totalFat) {
+                        log(`&nbsp;&nbsp;&nbsp;📋 Protein: ${meal.totalProtein || 0}g, Carbs: ${meal.totalCarbs || 0}g, Fat: ${meal.totalFat || 0}g`, 'success');
+                    }
+                    
+                    log('', 'success'); // spacing
+                });
+                
+                log(`<strong>📊 TOTAL CALORIES TODAY: ${totalCalories}</strong>`, 'success');
+                
+            } else {
+                log('⚪ No food entries found for today', 'warning');
+                log('This could mean:', 'warning');
+                log('&nbsp;&nbsp;• No meals have been logged today', 'warning');
+                log('&nbsp;&nbsp;• User is not signed in', 'warning');
+                log('&nbsp;&nbsp;• Data hasn\'t synced yet', 'warning');
+            }
+            
+            // Check other daily data
+            log('<br><strong>📋 OTHER TODAY\'S DATA:</strong>', 'success');
+            
+            // Water intake
+            const waterData = localStorage.getItem('dailyWaterIntake');
+            if (waterData) {
+                const water = JSON.parse(waterData);
+                const todaysWater = water[todayKey] || water[today.toDateString()] || 0;
+                log(`💧 Water intake: ${todaysWater} glasses`, 'success');
+            } else {
+                log('💧 No water intake recorded', 'warning');
+            }
+            
+            // User goals
+            const userGoals = JSON.parse(localStorage.getItem('userGoals') || '{}');
+            if (Object.keys(userGoals).length > 0) {
+                log(`🎯 Daily calorie goal: ${userGoals.dailyCalorieGoal || 'not set'}`, 'success');
+                if (userGoals.dailyProteinGoal) {
+                    log(`🍖 Protein goal: ${userGoals.dailyProteinGoal}g`, 'success');
+                }
+            } else {
+                log('🎯 No daily goals set', 'warning');
+            }
+            
+            // Check sync status
+            const lastSync = localStorage.getItem('weeklyMeals_lastSync');
+            if (lastSync) {
+                const syncTime = new Date(lastSync);
+                const minutesAgo = Math.floor((Date.now() - syncTime.getTime()) / 60000);
+                log(`🔄 Last database sync: ${minutesAgo} minutes ago`, 'success');
+            } else {
+                log('🔄 No sync timestamp found', 'warning');
+            }
+            
+        } catch (error) {
+            log(`❌ Error checking food entries: ${error.message}`, 'error');
+        }
+        
+        // Auto-refresh check
+        setTimeout(() => {
+            log('<br><strong>🔄 Live Data Check Complete</strong>', 'success');
+            log('Refresh this page to see updated entries', 'success');
+        }, 1000);
+    </script>
+</body>
+</html>
