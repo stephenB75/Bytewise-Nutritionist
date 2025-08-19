@@ -100,6 +100,16 @@ Be conservative with confidence levels - only use >0.9 for foods you're very cer
 
   } catch (error) {
     console.error('❌ AI food analysis failed:', error);
+    
+    // Check if it's a quota/rate limit error
+    if (error instanceof Error && (
+      error.message.includes('quota') || 
+      error.message.includes('429') ||
+      error.message.includes('insufficient_quota')
+    )) {
+      throw new Error('QUOTA_EXCEEDED: The OpenAI API quota has been exceeded. Please check your billing details at https://platform.openai.com/account/billing or provide a new API key with available credits.');
+    }
+    
     throw new Error(`Food analysis failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }

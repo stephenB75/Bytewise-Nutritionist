@@ -91,9 +91,18 @@ export default function AIFoodAnalyzer() {
       });
     },
     onError: (error: any) => {
+      let title = "Analysis Failed";
+      let description = error.message || "Failed to analyze the food image";
+      
+      // Handle quota exceeded error specifically
+      if (error.message && error.message.includes('QUOTA_EXCEEDED')) {
+        title = "OpenAI Quota Exceeded";
+        description = "The AI analysis feature is temporarily unavailable due to API quota limits. You can still manually add foods using the food database search.";
+      }
+      
       toast({
-        title: "Analysis Failed",
-        description: error.message || "Failed to analyze the food image",
+        title,
+        description,
         variant: "destructive",
       });
     }
