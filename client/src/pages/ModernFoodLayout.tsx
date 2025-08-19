@@ -342,7 +342,20 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   // Fetch daily stats including fasting status
   const fetchDailyStats = useCallback(async () => {
-    if (!user) return;
+    if (!user) {
+      // For unauthenticated users, load from localStorage
+      const localStats = JSON.parse(localStorage.getItem('dailyStats') || '{}');
+      setDailyStats({
+        totalCalories: 0,
+        totalProtein: 0,
+        totalCarbs: 0,
+        totalFat: 0,
+        waterGlasses: localStats.waterGlasses || 0,
+        fastingStatus: undefined
+      });
+      console.log('💧 Loaded water data from localStorage for unauthenticated user:', localStats.waterGlasses || 0);
+      return;
+    }
     
     try {
       const response = await apiRequest('GET', `/api/users/${user.id}/daily-stats`);
@@ -494,10 +507,27 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   // Listen for water updates from calorie tracker
   useEffect(() => {
-    const handleWaterUpdate = () => {
+    const handleWaterUpdate = (event: any) => {
       if (user) {
         console.log('🔄 Water updated event received, refreshing daily stats');
         fetchDailyStats();
+      } else {
+        // For unauthenticated users, update from localStorage directly
+        console.log('🔄 Water updated event received, updating from localStorage');
+        const localStats = JSON.parse(localStorage.getItem('dailyStats') || '{}');
+        const newWaterGlasses = localStats.waterGlasses || event.detail?.glasses || 0;
+        
+        setDailyStats((prev: any) => ({
+          ...prev,
+          totalCalories: prev?.totalCalories || 0,
+          totalProtein: prev?.totalProtein || 0,
+          totalCarbs: prev?.totalCarbs || 0,
+          totalFat: prev?.totalFat || 0,
+          waterGlasses: newWaterGlasses,
+          fastingStatus: prev?.fastingStatus
+        }));
+        
+        console.log('💧 Updated water intake card with localStorage data:', newWaterGlasses);
       }
     };
     
