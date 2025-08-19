@@ -1789,6 +1789,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // POST endpoint for updating daily stats (including water consumption)
+  app.post('/api/daily-stats', isAuthenticated, async (req: any, res: Response) => {
+    const userId = req.user?.id;
+    const { waterGlasses, date } = req.body;
+    
+    console.log('💧 Water update request:', { userId, waterGlasses, date });
+    
+    if (!userId) {
+      console.log('❌ Water update: User not found or unauthorized');
+      return res.status(401).json({ message: "User not found or unauthorized" });
+    }
+
+    if (typeof waterGlasses !== 'number' || waterGlasses < 0) {
+      return res.status(400).json({ message: "Invalid water glasses count" });
+    }
+
+    try {
+      // Update daily stats with new water consumption
+      const targetDate = date ? new Date(date) : new Date();
+      console.log('💧 Updating water glasses for user:', userId, 'date:', targetDate.toISOString(), 'glasses:', waterGlasses);
+      
+      const updatedStats = await storage.updateUserDailyStats(userId, targetDate, { waterGlasses });
+      console.log('✅ Water consumption updated successfully:', updatedStats);
+      
+      res.json({
+        success: true,
+        waterGlasses: updatedStats.waterGlasses,
+        message: 'Water consumption updated successfully'
+      });
+    } catch (error: any) {
+      console.error('❌ Failed to update water consumption:', error.message, error.stack);
+      res.status(500).json({ 
+        success: false,
+        message: 'Failed to update water consumption',
+        error: error.message 
+      });
+    }
+  });
+
   // User statistics endpoint for achievements component
   app.get('/api/user/statistics', isAuthenticated, async (req: any, res: Response) => {
     const userId = req.user?.id;

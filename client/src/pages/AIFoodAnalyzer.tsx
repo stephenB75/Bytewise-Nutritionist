@@ -59,8 +59,18 @@ export default function AIFoodAnalyzer() {
   // Get upload URL mutation
   const getUploadUrlMutation = useMutation({
     mutationFn: async () => {
+      console.log('🔄 Making API request to /api/objects/upload...');
       const response = await apiRequest('POST', '/api/objects/upload');
+      console.log('📝 Upload URL API response:', response);
       return response as unknown as { uploadURL: string };
+    },
+    onError: (error: any) => {
+      console.error('❌ Upload URL mutation failed:', error);
+      toast({
+        title: "Upload Error",
+        description: error.message || "Failed to prepare file upload",
+        variant: "destructive",
+      });
     }
   });
 
@@ -90,11 +100,28 @@ export default function AIFoodAnalyzer() {
 
   // Handle photo upload
   const handleGetUploadParameters = async () => {
-    const result = await getUploadUrlMutation.mutateAsync();
-    return {
-      method: 'PUT' as const,
-      url: result.uploadURL,
-    };
+    try {
+      console.log('🔄 Requesting upload URL...');
+      const result = await getUploadUrlMutation.mutateAsync();
+      console.log('✅ Upload URL received:', result);
+      
+      if (!result?.uploadURL) {
+        throw new Error('No upload URL received from server');
+      }
+      
+      return {
+        method: 'PUT' as const,
+        url: result.uploadURL,
+      };
+    } catch (error) {
+      console.error('❌ Failed to get upload URL:', error);
+      toast({
+        title: "Upload Error",
+        description: "Failed to get upload URL. Please try again.",
+        variant: "destructive",
+      });
+      throw error;
+    }
   };
 
   const handleUploadComplete = async (result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {

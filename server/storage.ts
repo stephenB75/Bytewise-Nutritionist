@@ -961,6 +961,56 @@ export class DatabaseStorage implements IStorage {
       .limit(1);
     return session || null;
   }
+
+  // Water intake management
+  async updateWaterIntake(userId: string, date: Date, glasses: number): Promise<WaterIntake> {
+    const startOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    
+    // Check if record exists for today
+    const [existing] = await db
+      .select()
+      .from(waterIntake)
+      .where(
+        and(
+          eq(waterIntake.userId, userId),
+          gte(waterIntake.date, startOfDay),
+          lte(waterIntake.date, new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1))
+        )
+      );
+
+    if (existing) {
+      // Update existing record
+      const [updated] = await db
+        .update(waterIntake)
+        .set({ glasses })
+        .where(eq(waterIntake.id, existing.id))
+        .returning();
+      return updated;
+    } else {
+      // Create new record
+      const [created] = await db
+        .insert(waterIntake)
+        .values({
+          userId,
+          date: startOfDay,
+          glasses
+        })
+        .returning();
+      return created;
+    }
+  }
+
+  // Update daily stats (including water consumption)
+  async updateUserDailyStats(userId: string, date: Date, updates: { waterGlasses?: number }): Promise<{ waterGlasses: number }> {
+    if (updates.waterGlasses !== undefined) {
+      const waterRecord = await this.updateWaterIntake(userId, date, updates.waterGlasses);
+      return { waterGlasses: waterRecord.glasses };
+    }
+    
+    // Return current water intake if no updates
+    const waterRecord = await this.getUserWaterIntake(userId, date);
+    return { waterGlasses: waterRecord?.glasses || 0 };
+  }
 }
 
 export const storage = new DatabaseStorage();
