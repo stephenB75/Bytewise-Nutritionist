@@ -61,8 +61,9 @@ export default function AIFoodAnalyzer() {
     mutationFn: async () => {
       console.log('🔄 Making API request to /api/objects/upload...');
       const response = await apiRequest('POST', '/api/objects/upload');
-      console.log('📝 Upload URL API response:', response);
-      return response as unknown as { uploadURL: string };
+      const data = await response.json();
+      console.log('📝 Upload URL API response:', data);
+      return data as { uploadURL: string };
     },
     onError: (error: any) => {
       console.error('❌ Upload URL mutation failed:', error);

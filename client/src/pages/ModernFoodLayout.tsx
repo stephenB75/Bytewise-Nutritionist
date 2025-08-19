@@ -25,6 +25,7 @@ import { useRotatingBackground } from '@/hooks/useRotatingBackground';
 import { useAchievements, getAchievementIcon, formatAchievementDate } from '@/hooks/useAchievements';
 import { ProfileIcon } from '@/components/ProfileIcon';
 import { AppTour, useAppTour } from '@/components/AppTour';
+import { apiRequest } from '@/lib/queryClient';
 import { 
   Search, 
   Plus,
@@ -148,17 +149,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       const newGlasses = Math.max(0, currentGlasses); // Prevent negative values
       
       // Optimistic update
-      setDailyStats(prev => prev ? { ...prev, waterGlasses: newGlasses } : null);
+      setDailyStats((prev: any) => prev ? { ...prev, waterGlasses: newGlasses } : null);
       
-      // Update in database
-      const response = await fetch('/api/daily-stats', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: user.id,
-          date: getLocalDateKey(),
-          waterGlasses: newGlasses
-        }),
+      // Update in database with proper authentication
+      const response = await apiRequest('POST', '/api/daily-stats', {
+        waterGlasses: newGlasses,
+        date: getLocalDateKey()
       });
       
       if (!response.ok) {
@@ -178,7 +174,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     } catch (error) {
       console.error('Error updating water consumption:', error);
       // Revert optimistic update
-      setDailyStats(prev => prev ? { ...prev, waterGlasses: (dailyStats?.waterGlasses || 0) } : null);
+      setDailyStats((prev: any) => prev ? { ...prev, waterGlasses: (dailyStats?.waterGlasses || 0) } : null);
       toast({
         title: "Error",
         description: "Failed to update water consumption",
