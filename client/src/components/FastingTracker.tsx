@@ -132,32 +132,95 @@ export function FastingTracker() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // DEBUG: Test function to create a sample completed session
+  const createTestSession = () => {
+    const testSession = {
+      id: `test_${Date.now()}`,
+      planId: '16-8',
+      planName: '16:8 Method',
+      startTime: new Date(Date.now() - 16 * 60 * 60 * 1000).toISOString(), // 16 hours ago
+      endTime: new Date().toISOString(),
+      targetDuration: 16 * 60 * 60 * 1000, // 16 hours in ms
+      actualDuration: 16 * 60 * 60 * 1000,
+      status: 'completed',
+      completedAt: new Date().toISOString(),
+      targetHours: 16,
+      actualHoursFasted: 16,
+      wasCompleted: true
+    };
+    
+    try {
+      const existingHistory = JSON.parse(localStorage.getItem(FASTING_HISTORY_KEY) || '[]');
+      existingHistory.unshift(testSession);
+      localStorage.setItem(FASTING_HISTORY_KEY, JSON.stringify(existingHistory.slice(0, 10)));
+      console.log('✅ Test session added to local history');
+      
+      // Force re-render
+      queryClient.invalidateQueries({ queryKey: ['/api/fasting/history'] });
+      
+      toast({
+        title: "Test Session Added",
+        description: "Added a sample completed fasting session to test the Recent Sessions display",
+      });
+    } catch (e) {
+      console.error('Failed to add test session:', e);
+    }
+  };
+
   // Get user's fasting history (combine server and local)
-  const { data: serverHistory, isLoading } = useQuery({
+  const { data: serverHistory, isLoading, error: historyError } = useQuery({
     queryKey: ['/api/fasting/history'],
-    queryFn: () => apiRequest('GET', '/api/fasting/history').then(res => res.json())
+    queryFn: () => apiRequest('GET', '/api/fasting/history').then(res => res.json()),
+    retry: 1,
+    staleTime: 30000, // Cache for 30 seconds
+    onError: (error: any) => {
+      console.log('🔥 Fasting history query failed:', error);
+    }
   });
   
   // Merge server history with local history
   const fastingHistory = useMemo(() => {
-    const localHistory = JSON.parse(localStorage.getItem(FASTING_HISTORY_KEY) || '[]');
-    const serverData = serverHistory || [];
+    let localHistory: any[] = [];
+    try {
+      localHistory = JSON.parse(localStorage.getItem(FASTING_HISTORY_KEY) || '[]');
+      console.log('📚 Local fasting history loaded:', localHistory.length, 'sessions');
+    } catch (e) {
+      console.warn('Failed to parse local fasting history, using empty array');
+      localHistory = [];
+    }
+    
+    const serverData = Array.isArray(serverHistory) ? serverHistory : [];
+    console.log('🌐 Server fasting history:', serverData.length, 'sessions');
+    console.log('🔄 Merging histories - Local:', localHistory.length, 'Server:', serverData.length);
     
     // Combine and deduplicate by id
     const combined = [...localHistory, ...serverData];
     const seen = new Set();
     const unique = combined.filter((session: any) => {
-      if (session.id && seen.has(session.id)) return false;
-      if (session.id) seen.add(session.id);
+      // Handle sessions without IDs (local sessions)
+      if (!session.id) {
+        // Create a temporary unique identifier for deduplication
+        const tempId = `${session.planId}_${session.startTime}_${session.status}`;
+        if (seen.has(tempId)) return false;
+        seen.add(tempId);
+        return true;
+      }
+      
+      // Handle sessions with IDs (server sessions)
+      if (seen.has(session.id)) return false;
+      seen.add(session.id);
       return true;
     });
     
     // Sort by date (most recent first)
-    return unique.sort((a: any, b: any) => {
+    const sorted = unique.sort((a: any, b: any) => {
       const dateA = new Date(a.completedAt || a.endTime || a.createdAt || 0).getTime();
       const dateB = new Date(b.completedAt || b.endTime || b.createdAt || 0).getTime();
       return dateB - dateA;
     });
+    
+    console.log('✅ Final merged history:', sorted.length, 'sessions');
+    return sorted;
   }, [serverHistory]);
 
   // Get active fasting session from server on mount
@@ -165,7 +228,11 @@ export function FastingTracker() {
     queryKey: ['/api/fasting/active'],
     queryFn: () => apiRequest('GET', '/api/fasting/active').then(res => res.json()),
     enabled: !currentSession, // Only fetch if we don't have a local session
-    retry: false
+    retry: 1,
+    staleTime: 10000, // Cache for 10 seconds
+    onError: (error: any) => {
+      console.log('🔥 Active fasting session query failed:', error);
+    }
   });
 
   // Start fasting session mutation
@@ -202,24 +269,44 @@ export function FastingTracker() {
     mutationFn: (sessionId: string) => 
       apiRequest('PUT', `/api/fasting/${sessionId}/complete`),
     onSuccess: (data) => {
+      console.log('🎉 Fasting session completed successfully on server:', data);
+      
       // Store completed session in local history
       if (currentSession) {
+        const now = new Date();
+        const startTime = new Date(currentSession.startTime);
+        const actualDuration = now.getTime() - startTime.getTime();
+        
         const completedSession = {
           ...currentSession,
           status: 'completed',
-          completedAt: new Date().toISOString(),
-          endTime: new Date().toISOString(),
-          actualDuration: currentSession.targetDuration
+          completedAt: now.toISOString(),
+          endTime: now.toISOString(),
+          actualDuration: actualDuration,
+          // Ensure we have planName for display
+          planName: currentSession.planName || selectedPlan.name,
+          // Add hours for easier display calculations
+          targetHours: currentSession.targetDuration / (1000 * 60 * 60),
+          actualHoursFasted: actualDuration / (1000 * 60 * 60),
+          wasCompleted: true
         };
+        
+        console.log('💾 Storing completed session to local storage:', completedSession);
         
         // Add to local history
         try {
           const existingHistory = JSON.parse(localStorage.getItem(FASTING_HISTORY_KEY) || '[]');
-          existingHistory.unshift(completedSession);
+          // Remove any duplicate session if it exists
+          const filteredHistory = existingHistory.filter((s: any) => 
+            s.id !== completedSession.id && s.startTime !== completedSession.startTime
+          );
+          filteredHistory.unshift(completedSession);
           // Keep only last 10 sessions in local storage
-          localStorage.setItem(FASTING_HISTORY_KEY, JSON.stringify(existingHistory.slice(0, 10)));
+          const finalHistory = filteredHistory.slice(0, 10);
+          localStorage.setItem(FASTING_HISTORY_KEY, JSON.stringify(finalHistory));
+          console.log('✅ Updated local history with', finalHistory.length, 'sessions');
         } catch (e) {
-          // Silent fail for localStorage
+          console.error('Failed to save to localStorage:', e);
         }
       }
       
@@ -234,6 +321,8 @@ export function FastingTracker() {
         title: "Fasting Complete! 🎉",
         description: "Great job! You can now break your fast with a nutritious meal.",
       });
+      
+      // Force refresh the history
       queryClient.invalidateQueries({ queryKey: ['/api/fasting/history'] });
       queryClient.invalidateQueries({ queryKey: ['/api/fasting/active'] });
       
@@ -252,24 +341,46 @@ export function FastingTracker() {
           // Achievement check failed silently - non-critical for user experience
         });
     },
-    onError: () => {
+    onError: (error: any) => {
+      console.error('🔥 Failed to complete fasting session on server:', error);
+      
       // Even if API fails, store the completed session locally
       if (currentSession) {
+        const now = new Date();
+        const startTime = new Date(currentSession.startTime);
+        const actualDuration = now.getTime() - startTime.getTime();
+        
         const completedSession = {
           ...currentSession,
           status: 'completed',
-          completedAt: new Date().toISOString(),
-          endTime: new Date().toISOString(),
-          actualDuration: currentSession.targetDuration
+          completedAt: now.toISOString(),
+          endTime: now.toISOString(),
+          actualDuration: actualDuration,
+          // Ensure we have planName for display
+          planName: currentSession.planName || selectedPlan.name,
+          // Add hours for easier display calculations
+          targetHours: currentSession.targetDuration / (1000 * 60 * 60),
+          actualHoursFasted: actualDuration / (1000 * 60 * 60),
+          wasCompleted: true,
+          // Mark as locally stored only
+          localOnly: true
         };
+        
+        console.log('💾 Storing failed session completion locally:', completedSession);
         
         // Add to local history
         try {
           const existingHistory = JSON.parse(localStorage.getItem(FASTING_HISTORY_KEY) || '[]');
-          existingHistory.unshift(completedSession);
-          localStorage.setItem(FASTING_HISTORY_KEY, JSON.stringify(existingHistory.slice(0, 10)));
+          // Remove any duplicate session if it exists
+          const filteredHistory = existingHistory.filter((s: any) => 
+            s.id !== completedSession.id && s.startTime !== completedSession.startTime
+          );
+          filteredHistory.unshift(completedSession);
+          const finalHistory = filteredHistory.slice(0, 10);
+          localStorage.setItem(FASTING_HISTORY_KEY, JSON.stringify(finalHistory));
+          console.log('✅ Saved locally with', finalHistory.length, 'sessions');
         } catch (e) {
-          // Silent fail for localStorage
+          console.error('Failed to save to localStorage:', e);
         }
       }
       
@@ -280,7 +391,7 @@ export function FastingTracker() {
       setTimeRemaining(0);
       toast({
         title: "Session Ended",
-        description: "Your fasting session has been completed locally.",
+        description: "Your fasting session has been completed locally. We'll sync when you're back online.",
       });
     }
   });
@@ -855,16 +966,44 @@ export function FastingTracker() {
                 </div>
               ) : fastingHistory && Array.isArray(fastingHistory) && fastingHistory.length > 0 ? (
                 <div className="space-y-4">
+                  {/* DEBUG: Show raw history data */}
+                  {process.env.NODE_ENV === 'development' && (
+                    <div className="mb-4 p-3 bg-blue-50 rounded-lg border">
+                      <p className="text-xs text-blue-700 mb-1">DEBUG: Raw history ({fastingHistory.length} total)</p>
+                      <button 
+                        onClick={createTestSession}
+                        className="text-xs bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
+                      >
+                        Add Test Session
+                      </button>
+                      <pre className="text-xs text-blue-600 mt-2 max-h-20 overflow-auto">
+                        {JSON.stringify(fastingHistory.slice(0, 2), null, 2)}
+                      </pre>
+                    </div>
+                  )}
                   {fastingHistory
                     .filter((session: any) => session.status === 'completed' || session.status === 'stopped')
                     .slice(0, 8)
                     .map((session: any, index: number) => {
                       const duration = session.actualDuration || session.targetDuration || 0;
                       const actualHours = session.actualHoursFasted || (duration / (1000 * 60 * 60));
-                      const targetHours = session.targetHours || 16; // fallback to 16h
+                      const targetHours = session.targetHours || session.targetDuration / (1000 * 60 * 60) || 16; // fallback to 16h
                       const wasCompleted = session.status === 'completed' || session.wasCompleted;
-                      const remainingHours = session.remainingHours || 0;
+                      const remainingHours = session.remainingHours || Math.max(0, targetHours - actualHours);
                       const sessionDate = session.completedAt || session.endTime || session.createdAt;
+                      
+                      // Additional debugging info for development
+                      if (process.env.NODE_ENV === 'development' && index === 0) {
+                        console.log('🔍 Rendering session:', {
+                          id: session.id,
+                          planName: session.planName,
+                          status: session.status,
+                          actualHours: actualHours,
+                          targetHours: targetHours,
+                          wasCompleted: wasCompleted,
+                          sessionDate: sessionDate
+                        });
+                      }
                       
                       const formatHours = (hours: number) => {
                         const h = Math.floor(hours);
@@ -884,7 +1023,7 @@ export function FastingTracker() {
                               <AlertCircle className="w-4 h-4 text-orange-500" />
                             )}
                             <div>
-                              <p className="font-medium">{session.planName || 'Fasting Session'}</p>
+                              <p className="font-medium">{session.planName || `${Math.round(targetHours)}h Fasting Session`}</p>
                               <p className="text-sm text-muted-foreground">
                                 {sessionDate ? new Date(sessionDate).toLocaleDateString() : 'N/A'}
                               </p>
