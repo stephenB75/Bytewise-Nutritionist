@@ -121,26 +121,43 @@ export class ObjectStorageService {
 
   // Gets the upload URL for an object entity.
   async getObjectEntityUploadURL(): Promise<string> {
+    console.log('🔄 Starting upload URL generation...');
+    
     const privateObjectDir = this.getPrivateObjectDir();
+    console.log('📁 Private object dir:', privateObjectDir);
+    
     if (!privateObjectDir) {
-      throw new Error(
+      const error = new Error(
         "PRIVATE_OBJECT_DIR not set. Create a bucket in 'Object Storage' " +
           "tool and set PRIVATE_OBJECT_DIR env var."
       );
+      console.error('❌ Private object dir not set:', error);
+      throw error;
     }
 
     const objectId = randomUUID();
     const fullPath = `${privateObjectDir}/uploads/${objectId}`;
+    console.log('🆔 Generated object ID:', objectId);
+    console.log('📍 Full path:', fullPath);
 
     const { bucketName, objectName } = parseObjectPath(fullPath);
+    console.log('🪣 Bucket:', bucketName);
+    console.log('📄 Object name:', objectName);
 
-    // Sign URL for PUT method with TTL
-    return signObjectURL({
-      bucketName,
-      objectName,
-      method: "PUT",
-      ttlSec: 900,
-    });
+    try {
+      // Sign URL for PUT method with TTL
+      const signedUrl = await signObjectURL({
+        bucketName,
+        objectName,
+        method: "PUT",
+        ttlSec: 900,
+      });
+      console.log('✅ Upload URL generated successfully');
+      return signedUrl;
+    } catch (error) {
+      console.error('❌ Failed to sign upload URL:', error);
+      throw error;
+    }
   }
 
   // Gets the object entity file from the object path.
@@ -228,12 +245,15 @@ async function signObjectURL({
   method: "GET" | "PUT" | "DELETE" | "HEAD";
   ttlSec: number;
 }): Promise<string> {
+  console.log('🔐 Signing URL with sidecar endpoint...');
   const request = {
     bucket_name: bucketName,
     object_name: objectName,
     method,
     expires_at: new Date(Date.now() + ttlSec * 1000).toISOString(),
   };
+  console.log('📦 Signing request:', request);
+  
   const response = await fetch(
     `${REPLIT_SIDECAR_ENDPOINT}/object-storage/signed-object-url`,
     {
@@ -244,13 +264,20 @@ async function signObjectURL({
       body: JSON.stringify(request),
     }
   );
+  
+  console.log('📡 Sidecar response status:', response.status);
+  
   if (!response.ok) {
+    const errorText = await response.text();
+    console.error('❌ Sidecar error response:', errorText);
     throw new Error(
       `Failed to sign object URL, errorcode: ${response.status}, ` +
-        `make sure you're running on Replit`
+        `response: ${errorText}, make sure you're running on Replit`
     );
   }
 
-  const { signed_url: signedURL } = await response.json();
+  const responseData = await response.json();
+  console.log('✅ Sidecar success response:', responseData);
+  const { signed_url: signedURL } = responseData;
   return signedURL;
 }
