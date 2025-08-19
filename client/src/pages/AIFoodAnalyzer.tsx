@@ -183,14 +183,14 @@ export default function AIFoodAnalyzer() {
   };
 
   // Add to calorie tracker
-  const handleAddToTracker = () => {
+  const handleAddToTracker = async () => {
     if (!analysisResult) return;
 
     const mealName = analysisResult.identifiedFoods.length === 1 
       ? analysisResult.identifiedFoods[0].name
       : `Mixed Meal (${analysisResult.identifiedFoods.length} items)`;
 
-    addCalculatedCalories({
+    await addCalculatedCalories({
       name: mealName,
       calories: analysisResult.totalNutrition.calories,
       protein: analysisResult.totalNutrition.protein,

@@ -8,6 +8,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useDataPersistence } from './useDataPersistence';
 import { getLocalDateKey, formatLocalTime, getMealTypeByTime } from '@/utils/dateUtils';
 import { apiRequest } from '@/lib/queryClient';
+import { useAuth } from './useAuth';
 
 interface CalculatedCalories {
   id: string;
@@ -29,6 +30,7 @@ export function useCalorieTracking() {
   const [calculatedCalories, setCalculatedCalories] = useState<CalculatedCalories[]>([]);
   const [dailyTotal, setDailyTotal] = useState(0);
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   
   // Use data persistence for automatic saving
   const { loadFromLocalStorage, saveToLocalStorage } = useDataPersistence({
@@ -124,45 +126,54 @@ export function useCalorieTracking() {
     const isWaterEntry = calories.name.toLowerCase().includes('water') && calories.calories === 0;
     if (isWaterEntry) {
       console.log('💧 Water detected in calorie tracker:', calories.name);
-      try {
-        // Extract water amount (default to 1 glass if bottle/glass detected)
-        let waterGlasses = 1;
-        const nameLC = calories.name.toLowerCase();
-        if (nameLC.includes('bottle') || nameLC.includes('glass') || nameLC.includes('cup')) {
-          waterGlasses = 1;
+      
+      // Extract water amount (default to 1 glass if bottle/glass detected)
+      let waterGlasses = 1;
+      const nameLC = calories.name.toLowerCase();
+      if (nameLC.includes('bottle') || nameLC.includes('glass') || nameLC.includes('cup')) {
+        waterGlasses = 1;
+      }
+      
+      // Always update localStorage immediately for instant UI feedback
+      const currentStats = JSON.parse(localStorage.getItem('dailyStats') || '{}');
+      const currentWater = currentStats.waterGlasses || 0;
+      const newWaterTotal = currentWater + waterGlasses;
+      
+      // Update localStorage immediately
+      localStorage.setItem('dailyStats', JSON.stringify({
+        ...currentStats,
+        waterGlasses: newWaterTotal
+      }));
+      
+      console.log('💧 Water updated in localStorage:', {
+        added: waterGlasses,
+        newTotal: newWaterTotal
+      });
+      
+      // Fire custom event immediately for UI update
+      window.dispatchEvent(new CustomEvent('waterUpdated', { 
+        detail: { glasses: newWaterTotal } 
+      }));
+      
+      // Try to update database if authenticated, but don't block on it
+      if (user?.id) {
+        try {
+          await apiRequest('POST', '/api/daily-stats', {
+            waterGlasses: newWaterTotal,
+            date: getLocalDateKey()
+          });
+          console.log('✅ Water consumption synced to database');
+          queryClient.invalidateQueries({ queryKey: ['dailyStats'] });
+        } catch (error) {
+          console.warn('⚠️ Failed to sync water to database (will retry later):', error);
         }
-        
-        // Get current water consumption from localStorage as backup
-        const currentStats = JSON.parse(localStorage.getItem('dailyStats') || '{}');
-        const currentWater = currentStats.waterGlasses || 0;
-        const newWaterTotal = currentWater + waterGlasses;
-        
-        // Update water consumption in database
-        await apiRequest('POST', '/api/daily-stats', {
-          waterGlasses: newWaterTotal,
-          date: getLocalDateKey()
-        });
-        
-        console.log('✅ Water consumption updated through calorie tracker:', {
-          added: waterGlasses,
-          newTotal: newWaterTotal
-        });
-        
-        // Trigger a refresh of daily stats
-        queryClient.invalidateQueries({ queryKey: ['dailyStats'] });
-        
-        // Fire custom event to notify ModernFoodLayout to refresh water display
-        window.dispatchEvent(new CustomEvent('waterUpdated', { 
-          detail: { glasses: newWaterTotal } 
-        }));
-        
-      } catch (error) {
-        console.error('❌ Failed to update water consumption from calorie tracker:', error);
+      } else {
+        console.log('ℹ️ Water saved locally (user not authenticated)');
       }
     }
     
     return newEntry;
-  }, [logCaloriesMutation, queryClient]);
+  }, [logCaloriesMutation, queryClient, user]);
 
   // Get today's calculated calories
   const getTodaysCalories = useCallback(() => {
