@@ -9,6 +9,7 @@ import { db } from '../db';
 import { usdaFoodCache } from '@shared/schema';
 import { eq, like, desc, asc, sql, or } from 'drizzle-orm';
 import { getPortionWeight, parseMeasurement } from '../data/portionData.js';
+import { findCandyNutrition, calculateCandyNutrition } from '../data/candyNutritionDatabase.js';
 import { getCalorieFactors, calculateCaloriesFromMacros } from '../data/calorieFactors.js';
 import { getRetentionFactors, applyRetentionFactors, detectCookingMethod } from '../data/retentionFactors.js';
 import { classifyFood, getNutritionalPriorities } from '../data/foodCategories.js';
@@ -206,7 +207,17 @@ export class USDAService {
       'candy', 'candies', 'chocolate', 'gummy', 'lollipop', 'sucker',
       'hard candy', 'soft candy', 'taffy', 'caramel', 'fudge',
       'gumdrops', 'jelly beans', 'jelly bean', 'mint candy', 'mint', 'drops', 'sweets',
-      'marshmallow', 'marshmallows', 'caramels', 'bonbon', 'bonbons'
+      'marshmallow', 'marshmallows', 'caramels', 'bonbon', 'bonbons',
+      // Popular candy brands
+      'skittles', 'm&m', 'snickers', 'kit kat', 'kitkat', 'reeses', 'reese',
+      'hershey', 'twizzler', 'twizzlers', 'jolly rancher', 'starburst',
+      'nerds', 'sour patch', 'swedish fish', 'haribo', 'lifesaver',
+      'tootsie', 'milky way', 'three musketeers', 'butterfinger',
+      'crunch bar', 'almond joy', 'mounds', 'york peppermint',
+      // Candy types
+      'licorice', 'gummi', 'gummies', 'sour gummies', 'fruit snacks',
+      'rock candy', 'peppermint', 'wintergreen', 'cinnamon candy',
+      'chocolate bar', 'candy bar', 'fun size', 'bite size', 'miniature'
     ];
     
     const lowerQuery = query.toLowerCase();
@@ -1620,12 +1631,113 @@ export class USDAService {
     return {};
   }
 
+  /**
+   * Get candy-specific portion data from the candy nutrition database
+   */
+  private getCandySpecificPortion(foodDescription: string, measurement: string): {
+    quantity: number;
+    unit: string;
+    gramsEquivalent: number;
+    portionInfo?: { isRealistic: boolean; warning?: string; suggestion?: string; servingName?: string };
+  } | null {
+    // Check if this is a candy item
+    if (!this.isCandyRelated(foodDescription)) {
+      return null;
+    }
+
+    // Get candy data from the enhanced database
+    const candyData = findCandyNutrition(foodDescription);
+    if (candyData) {
+      // Parse the measurement to get quantity and unit
+      const measurementParts = this.parseSimpleMeasurement(measurement);
+      let { quantity, unit } = measurementParts;
+      
+      // Find matching serving size from candy database
+      const matchingServing = candyData.servingSizes.find(serving => {
+        const servingName = serving.name.toLowerCase();
+        const unitLower = unit.toLowerCase();
+        
+        return (
+          servingName.includes(unitLower) ||
+          unitLower.includes('piece') && servingName.includes('piece') ||
+          unitLower.includes('small') && servingName.includes('small') ||
+          unitLower.includes('oz') && servingName.includes('oz')
+        );
+      });
+
+      if (matchingServing) {
+        const gramsEquivalent = quantity * matchingServing.grams;
+        return {
+          quantity,
+          unit: matchingServing.name,
+          gramsEquivalent,
+          portionInfo: {
+            isRealistic: true,
+            servingName: `${quantity} × ${matchingServing.name} (${matchingServing.grams}g each)`
+          }
+        };
+      }
+
+      // Fallback to default serving size for the candy type
+      const defaultServing = candyData.servingSizes[1] || candyData.servingSizes[0]; // Prefer "1 piece" over small
+      if (defaultServing) {
+        const gramsEquivalent = quantity * defaultServing.grams;
+        return {
+          quantity,
+          unit: defaultServing.name,
+          gramsEquivalent,
+          portionInfo: {
+            isRealistic: true,
+            servingName: `${quantity} × ${defaultServing.name} (${defaultServing.grams}g each)`,
+            warning: `Using standard ${candyData.category} candy portion`
+          }
+        };
+      }
+    }
+
+    // No candy database match, return null to use standard parsing
+    return null;
+  }
+
+  /**
+   * Simple measurement parsing for candy portion detection
+   */
+  private parseSimpleMeasurement(measurement: string): { quantity: number; unit: string } {
+    const normalized = measurement.toLowerCase().trim();
+    
+    // Handle fractions
+    const fractionMatch = normalized.match(/^(\d+)\s*\/\s*(\d+)\s*(.*)$/);
+    if (fractionMatch) {
+      const quantity = parseFloat(fractionMatch[1]) / parseFloat(fractionMatch[2]);
+      const unit = fractionMatch[3].trim() || 'piece';
+      return { quantity, unit };
+    }
+    
+    // Handle regular numbers
+    const numberMatch = normalized.match(/^(\d+(?:\.\d+)?)\s*(.*)$/);
+    if (numberMatch) {
+      return {
+        quantity: parseFloat(numberMatch[1]),
+        unit: numberMatch[2].trim() || 'piece'
+      };
+    }
+    
+    // Default case
+    return { quantity: 1, unit: normalized || 'piece' };
+  }
+
   private parseMeasurement(measurement: string, food: USDAFood): {
     quantity: number;
     unit: string;
     gramsEquivalent: number;
     portionInfo?: { isRealistic: boolean; warning?: string; suggestion?: string; servingName?: string };
   } {
+    // Check if this is a candy item first and use candy-specific portions
+    const candyPortionResult = this.getCandySpecificPortion(food.description, measurement);
+    if (candyPortionResult) {
+      return candyPortionResult;
+    }
+
     // Remove extra whitespace and normalize
     let normalized = measurement.toLowerCase().trim();
     
@@ -1728,7 +1840,7 @@ export class USDAService {
       'dollop': 15, // dollop ≈ 1 tablespoon
       'handful': 40, // handful of nuts/berries ≈ 40g
       'slice': 25, // average slice of bread/fruit ≈ 25g
-      'piece': 30, // average piece ≈ 30g (adjusted for dumplings/small items)
+      'piece': 20, // average piece ≈ 20g (reduced for better accuracy with smaller items)
       'bowl': 200, // average bowl serving ≈ 200g
       'plate': 300, // average plate serving ≈ 300g
       'wedge': 15, // wedge of lemon/lime ≈ 15g
@@ -1824,6 +1936,101 @@ export class USDAService {
         'piece': 11,
         'pieces': 11,
         'stick': 11,
+      },
+      // Comprehensive candy portion data
+      'candy': {
+        'piece': 6,  // Average candy piece
+        'pieces': 6,
+        'small': 3,  // Small candy piece
+        'large': 12, // Large candy piece
+        'fun size': 15, // Fun size candy bar
+        'bite size': 8,  // Bite-sized candy
+      },
+      'chocolate': {
+        'piece': 10,  // Average chocolate piece
+        'pieces': 10,
+        'square': 5,   // Chocolate square
+        'bar': 40,     // Standard chocolate bar
+        'mini': 7,     // Mini chocolate
+        'fun size': 17, // Fun size chocolate bar
+        'king size': 75, // King size bar
+      },
+      'gummy': {
+        'piece': 3,    // Individual gummy candy
+        'pieces': 3,
+        'bear': 3,     // Gummy bear
+        'bears': 3,
+        'worm': 2,     // Gummy worm
+        'worms': 2,
+        'package': 50, // Small package of gummies
+      },
+      'lollipop': {
+        'piece': 12,   // Standard lollipop
+        'pop': 12,
+        'sucker': 12,
+        'small': 8,    // Small lollipop
+        'large': 25,   // Large lollipop
+      },
+      'hard candy': {
+        'piece': 6,    // Standard hard candy
+        'pieces': 6,
+        'small': 3,    // Small hard candy
+        'mint': 2,     // Breath mint
+        'drop': 4,     // Cough drop or candy drop
+      },
+      'caramel': {
+        'piece': 8,    // Individual caramel
+        'pieces': 8,
+        'square': 7,   // Caramel square
+      },
+      'marshmallow': {
+        'piece': 7,    // Regular marshmallow
+        'pieces': 7,
+        'mini': 1,     // Mini marshmallow
+        'minis': 1,
+        'large': 15,   // Large marshmallow
+      },
+      'jelly bean': {
+        'piece': 1,    // Individual jelly bean
+        'pieces': 1,
+        'bean': 1,
+        'beans': 1,
+      },
+      'skittles': {
+        'piece': 1,    // Individual Skittle
+        'pieces': 1,
+        'package': 61, // Standard package
+        'fun size': 15,
+      },
+      'm&m': {
+        'piece': 1,    // Individual M&M
+        'pieces': 1,
+        'fun size': 17,
+        'package': 47, // Standard package
+      },
+      'snickers': {
+        'fun size': 17,
+        'bar': 52,     // Regular Snickers bar
+        'king size': 113,
+      },
+      'kit kat': {
+        'fun size': 15,
+        'bar': 42,     // Regular Kit Kat
+        'finger': 10,  // Single Kit Kat finger
+      },
+      'reeses': {
+        'cup': 21,     // Single Reese's cup
+        'pieces': 21,
+        'fun size': 17,
+        'king size': 79,
+      },
+      'hershey': {
+        'kiss': 4,     // Hershey's Kiss
+        'kisses': 4,
+        'bar': 43,     // Regular Hershey's bar
+        'fun size': 11,
+        'miniature': 8,
+        'stick': 11,
         'package': 70,
       },
       'licorice': {
@@ -1912,6 +2119,29 @@ export class USDAService {
       for (const [unitPattern, grams] of Object.entries(conversions)) {
         if (unit.includes(unitPattern)) {
           gramsEquivalent = quantity * grams;
+          break;
+        }
+      }
+    }
+
+    // Enhanced candy-specific logic for generic measurements when no specific conversion found
+    if (gramsEquivalent === quantity && this.isCandyRelated(food.description || '')) {
+      // Use candy-specific weights for common units
+      const candyConversions: { [key: string]: number } = {
+        'piece': 6,      // Default candy piece
+        'pieces': 6,
+        'small': 3,      // Small candy
+        'large': 12,     // Large candy
+        'mini': 2,       // Mini candy
+        'fun size': 15,  // Fun size
+        'bite size': 8,  // Bite size
+        'bar': 40,       // Standard candy bar
+        'package': 50,   // Small package
+      };
+
+      for (const [candyUnit, candyWeight] of Object.entries(candyConversions)) {
+        if (unit.includes(candyUnit)) {
+          gramsEquivalent = quantity * candyWeight;
           break;
         }
       }
