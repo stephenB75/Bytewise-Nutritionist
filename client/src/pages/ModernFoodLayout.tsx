@@ -143,16 +143,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   // Utility function to add notifications - using useCallback for stable reference
   // Water consumption update function
   const updateWaterConsumption = useCallback(async (change: number) => {
-    console.log('💧 updateWaterConsumption called:', { change, user: user?.email || 'not authenticated', currentGlasses: dailyStats?.waterGlasses || 0 });
-    
     if (!user) {
-      console.log('💧 Handling water update for unauthenticated user');
       // Update localStorage for unauthenticated users
       const localStats = JSON.parse(localStorage.getItem('dailyStats') || '{}');
       const currentGlasses = (localStats.waterGlasses || 0) + change;
       const newGlasses = Math.max(0, currentGlasses);
-      
-      console.log('💧 Updating localStorage:', { currentGlasses, newGlasses });
       
       // Update localStorage
       const updatedStats = { ...localStats, waterGlasses: newGlasses };
@@ -174,7 +169,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         });
       }
       
-      console.log('💧 Water updated for unauthenticated user:', newGlasses);
       return;
     }
     
@@ -376,15 +370,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   // Fetch daily stats including fasting status
   const fetchDailyStats = useCallback(async () => {
-    console.log('📊 fetchDailyStats called with user:', user?.email || 'not authenticated');
-    
     if (!user) {
       // For unauthenticated users, load from localStorage
-      const localStatsRaw = localStorage.getItem('dailyStats') || '{}';
-      console.log('💧 Loading from localStorage, raw data:', localStatsRaw);
-      
-      const localStats = JSON.parse(localStatsRaw);
-      console.log('💧 Parsed localStorage data:', localStats);
+      const localStats = JSON.parse(localStorage.getItem('dailyStats') || '{}');
       
       setDailyStats({
         totalCalories: 0,
@@ -394,7 +382,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         waterGlasses: localStats.waterGlasses || 0,
         fastingStatus: undefined
       });
-      console.log('💧 Set dailyStats for unauthenticated user with water glasses:', localStats.waterGlasses || 0);
       return;
     }
     
@@ -535,7 +522,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   // Load data on component mount (for both authenticated and unauthenticated users)
   useEffect(() => {
-    console.log('🚀 Component mounted, calling fetchDailyStats for initial load');
     fetchDailyStats();
   }, [fetchDailyStats]);
 
@@ -548,7 +534,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       setWeeklyGoal(userCalorieGoal * 7);
       
       // Fetch daily stats when user changes (this will refetch from server if authenticated)
-      console.log('👤 User changed, refreshing daily stats');
       fetchDailyStats();
     }
   }, [user, fetchDailyStats]);
@@ -557,11 +542,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   useEffect(() => {
     const handleWaterUpdate = (event: any) => {
       if (user) {
-        console.log('🔄 Water updated event received, refreshing daily stats');
         fetchDailyStats();
       } else {
         // For unauthenticated users, update from localStorage directly
-        console.log('🔄 Water updated event received, updating from localStorage');
         const localStats = JSON.parse(localStorage.getItem('dailyStats') || '{}');
         const newWaterGlasses = localStats.waterGlasses || event.detail?.glasses || 0;
         
@@ -574,8 +557,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           waterGlasses: newWaterGlasses,
           fastingStatus: prev?.fastingStatus
         }));
-        
-        console.log('💧 Updated water intake card with localStorage data:', newWaterGlasses);
       }
     };
     
@@ -1064,14 +1045,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     const dailyGoal = 8; // 8 glasses per day
     const percentage = Math.min((glasses / dailyGoal) * 100, 100);
     
-    // DEBUG: Log water data for troubleshooting
-    console.log('💧 WaterCard rendering with:', { 
-      glasses, 
-      dailyGoal, 
-      percentage, 
-      timestamp: new Date().toISOString() 
-    });
-    
     return (
       <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4 transition-all duration-300 hover:bg-white/15 hover:border-white/30">
         <div className="flex items-center justify-between mb-4">
@@ -1340,38 +1313,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
           {/* Water Consumption */}
           <div className="mb-4" data-testid="water-consumption-card">
-            {/* DEBUG: Show raw daily stats for troubleshooting */}
-            {process.env.NODE_ENV === 'development' && (
-              <div className="mb-2 p-2 bg-blue-50 rounded border text-xs">
-                <strong>DEBUG Water Stats:</strong>
-                <pre className="text-blue-600 mt-1 max-h-20 overflow-auto">
-                  dailyStats: {JSON.stringify({ 
-                    waterGlasses: dailyStats?.waterGlasses, 
-                    hasStats: !!dailyStats,
-                    user: user?.email || 'not authenticated'
-                  }, null, 2)}
-                  localStorage: {localStorage.getItem('dailyStats') || 'empty'}
-                </pre>
-                <button 
-                  onClick={() => {
-                    localStorage.setItem('dailyStats', JSON.stringify({ waterGlasses: 3 }));
-                    fetchDailyStats();
-                  }}
-                  className="mt-2 px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600"
-                >
-                  Add Test Water Data (3 glasses)
-                </button>
-                <button 
-                  onClick={() => {
-                    localStorage.removeItem('dailyStats');
-                    fetchDailyStats();
-                  }}
-                  className="mt-2 ml-2 px-2 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600"
-                >
-                  Clear Test Data
-                </button>
-              </div>
-            )}
             <WaterCard
               glasses={dailyStats?.waterGlasses || 0}
               onIncrement={() => updateWaterConsumption(1)}
