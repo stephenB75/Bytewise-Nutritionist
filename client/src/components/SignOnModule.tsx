@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
+import { AuthPopupNotification, useAuthPopupNotification } from './AuthPopupNotification';
 
 interface SignOnModuleProps {
   onClose?: () => void;
@@ -41,6 +42,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
   const [verificationEmail, setVerificationEmail] = useState('');
   const { toast } = useToast();
   const { supabase, refetch } = useAuth();
+  const { notification, showNotification, closeNotification } = useAuthPopupNotification();
 
   // Password validation function
   const validatePassword = (password: string): string[] => {
@@ -78,10 +80,11 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
     console.log('🔐 Form submitted:', { email: email ? 'provided' : 'missing', password: password ? 'provided' : 'missing', isSignUp });
     
     if (!email || !password) {
-      toast({
+      showNotification({
+        type: 'error',
         title: "Missing Information",
         description: "Please enter both email and password.",
-        variant: "destructive",
+        duration: 5000
       });
       return;
     }
@@ -89,20 +92,22 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      toast({
+      showNotification({
+        type: 'error',
         title: "Invalid Email",
         description: "Please enter a valid email address.",
-        variant: "destructive",
+        duration: 5000
       });
       return;
     }
 
     // Validate password for sign-up
     if (isSignUp && passwordErrors.length > 0) {
-      toast({
+      showNotification({
+        type: 'error',
         title: "Password Requirements Not Met",
         description: `Password needs: ${passwordErrors.join(', ')}`,
-        variant: "destructive",
+        duration: 6000
       });
       return;
     }
@@ -140,10 +145,11 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
           setVerificationEmail(data.email || email);
           setConfirmingEmail(false);
           
-          toast({
+          showNotification({
+            type: 'info',
             title: isSignUp ? "Account Created!" : "Email Verification Required",
             description: data.message || "Please check your email and click the verification link to activate your account.",
-            duration: 10000,
+            duration: 10000
           });
           if (isSignUp) {
             // Switch to sign-in mode after successful signup
@@ -211,9 +217,11 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
             // Wait for state propagation
             await new Promise(resolve => setTimeout(resolve, 1000));
             
-            toast({
+            showNotification({
+              type: 'success',
               title: "Welcome back!",
               description: "You've been signed in successfully.",
+              duration: 4000
             });
             
             console.log('🚪 Closing modal after successful sign-in');
@@ -229,9 +237,11 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
           } catch (err) {
             console.log('❌ Session setting failed, using page reload fallback:', err);
             // Fallback to page reload if session setting fails
-            toast({
+            showNotification({
+              type: 'info',
               title: "Signing in...",
               description: "Refreshing page to complete sign-in.",
+              duration: 3000
             });
             setTimeout(() => {
               window.location.reload();
@@ -251,20 +261,26 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
           // Email verification required
           setVerificationRequired(true);
           setVerificationEmail(data.email || email);
-          toast({
+          showNotification({
+            type: 'warning',
             title: "Email Verification Required",
             description: errorMessage,
-            variant: "destructive",
-            duration: 12000,
+            duration: 12000
           });
         } else if (errorCode === 'ACCOUNT_NOT_FOUND') {
           // No account found - suggest signing up
-          console.log('🔥 Showing ACCOUNT_NOT_FOUND toast notification');
-          toast({
+          console.log('🔥 Showing ACCOUNT_NOT_FOUND popup notification');
+          showNotification({
+            type: 'warning',
             title: "Account Not Found",
             description: errorMessage + " Would you like to create a new account?",
-            variant: "destructive",
             duration: 10000,
+            actionText: "Create Account",
+            onAction: () => {
+              setIsSignUp(true);
+              setPassword('');
+              setPasswordErrors([]);
+            }
           });
           // Auto-switch to sign-up mode for user convenience
           console.log('🔄 Will switch to sign-up mode in 2 seconds');
@@ -276,25 +292,24 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
           }, 3000);
         } else if (errorCode === 'INVALID_CREDENTIALS') {
           // Wrong password or credentials
-          console.log('🚨 Showing INVALID_CREDENTIALS toast notification');
-          toast({
+          console.log('🚨 Showing INVALID_CREDENTIALS popup notification');
+          showNotification({
+            type: 'error',
             title: "Incorrect Credentials",
             description: errorMessage + " You can reset your password if needed.",
-            variant: "destructive",
             duration: 8000,
-          });
-          // Also use sonner as backup
-          console.log('🚨 Also showing sonner toast as backup');
-          import('sonner').then(({ toast: sonnerToast }) => {
-            sonnerToast.error("Incorrect password. Please check your credentials and try again.");
+            actionText: "Reset Password",
+            onAction: () => {
+              setShowResetPassword(true);
+            }
           });
         } else if (errorCode === 'SERVICE_ERROR') {
           // Service temporarily unavailable
-          toast({
+          showNotification({
+            type: 'error',
             title: "Service Unavailable",
             description: errorMessage,
-            variant: "destructive",
-            duration: 6000,
+            duration: 6000
           });
         } else {
           // Handle password validation errors and general errors
@@ -303,20 +318,21 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
             displayMessage = "Password must include: uppercase letter, lowercase letter, number, and special character (!@#$%^&* etc.)";
           }
           
-          toast({
+          showNotification({
+            type: 'error',
             title: "Authentication Failed",
             description: displayMessage,
-            variant: "destructive",
-            duration: 6000,
+            duration: 6000
           });
         }
       }
     } catch (error) {
       console.error('Authentication error:', error);
-      toast({
+      showNotification({
+        type: 'error',
         title: "Error",
         description: "Something went wrong. Please try again.",
-        variant: "destructive",
+        duration: 5000
       });
     } finally {
       setLoading(false);
@@ -325,10 +341,11 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
 
   const handleResendVerification = async () => {
     if (!verificationEmail) {
-      toast({
+      showNotification({
+        type: 'error',
         title: "No email address",
         description: "Please try signing up again.",
-        variant: "destructive",
+        duration: 5000
       });
       return;
     }
@@ -348,16 +365,18 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
         throw error;
       }
 
-      toast({
+      showNotification({
+        type: 'success',
         title: "Verification Email Sent",
         description: "A new verification email has been sent. Please check your inbox and click the link.",
-        duration: 8000,
+        duration: 8000
       });
     } catch (error: any) {
-      toast({
+      showNotification({
+        type: 'error',
         title: "Failed to Resend",
         description: error.message || "Unable to resend verification email. Please try again.",
-        variant: "destructive",
+        duration: 6000
       });
     } finally {
       setLoading(false);
@@ -384,9 +403,11 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
       }
 
       // OAuth will redirect automatically, so we don't need to do anything else here
-      toast({
+      showNotification({
+        type: 'info',
         title: "Redirecting to Google",
         description: "You'll be redirected to Google to complete sign-in.",
+        duration: 3000
       });
     } catch (error: any) {
       setLoading(false);
@@ -398,10 +419,11 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
         errorMessage = 'Google authentication is not properly configured. Please contact support.';
       }
       
-      toast({
+      showNotification({
+        type: 'error',
         title: "Google Sign-In Failed",
         description: errorMessage,
-        variant: "destructive",
+        duration: 6000
       });
     }
   };
@@ -422,9 +444,11 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
       }
 
       // OAuth will redirect automatically, so we don't need to do anything else here
-      toast({
+      showNotification({
+        type: 'info',
         title: "Redirecting to GitHub",
         description: "You'll be redirected to GitHub to complete sign-in.",
+        duration: 3000
       });
     } catch (error: any) {
       setLoading(false);
@@ -436,10 +460,11 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
         errorMessage = 'GitHub authentication is not properly configured. Please contact support.';
       }
       
-      toast({
+      showNotification({
+        type: 'error',
         title: "GitHub Sign-In Failed",
         description: errorMessage,
-        variant: "destructive",
+        duration: 6000
       });
     }
   };
@@ -448,10 +473,11 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
     e.preventDefault();
     
     if (!email) {
-      toast({
+      showNotification({
+        type: 'error',
         title: "Email Required",
         description: "Please enter your email address to reset your password.",
-        variant: "destructive",
+        duration: 5000
       });
       return;
     }
@@ -466,15 +492,18 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
       if (error) throw error;
 
       setResetEmailSent(true);
-      toast({
+      showNotification({
+        type: 'success',
         title: "Password Reset Email Sent",
         description: "Check your email for the password reset link. It may take a few minutes to arrive.",
+        duration: 8000
       });
     } catch (error: any) {
-      toast({
+      showNotification({
+        type: 'error',
         title: "Password Reset Failed",
         description: error.message || "Unable to send password reset email. Please try again.",
-        variant: "destructive",
+        duration: 6000
       });
     } finally {
       setLoading(false);
@@ -804,6 +833,12 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
           </div>
         </div>
       </Card>
+      
+      {/* Authentication Popup Notification */}
+      <AuthPopupNotification 
+        notification={notification} 
+        onClose={closeNotification}
+      />
     </div>
   );
 }
