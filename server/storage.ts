@@ -843,13 +843,10 @@ export class DatabaseStorage implements IStorage {
     };
   }> {
     try {
-      console.log('🔍 Getting daily stats for user:', userId, 'date:', date.toISOString());
-      
       const startOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
       const endOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
 
       // Get meals for the day
-      console.log('📊 Querying meals between:', startOfDay.toISOString(), 'and', endOfDay.toISOString());
       const dayMeals = await db
         .select()
         .from(meals)
@@ -860,8 +857,6 @@ export class DatabaseStorage implements IStorage {
             lte(meals.date, endOfDay)
           )
         );
-      
-      console.log('🍽️ Found', dayMeals.length, 'meals for the day');
 
       // Sum up nutrition from all meals
       const totals = dayMeals.reduce((acc, meal) => ({
@@ -876,15 +871,10 @@ export class DatabaseStorage implements IStorage {
         totalFat: 0,
       });
 
-      console.log('🧮 Calculated totals:', totals);
-
       // Get water intake
-      console.log('💧 Getting water intake for user');
       const water = await this.getUserWaterIntake(userId, date);
-      console.log('💧 Water intake result:', water?.glasses || 0, 'glasses');
 
       // Get active fasting session
-      console.log('⏱️ Getting active fasting session');
       const activeFasting = await this.getUserActiveFastingSession(userId);
       let fastingStatus = undefined;
       
@@ -899,9 +889,6 @@ export class DatabaseStorage implements IStorage {
           timeRemaining: remaining,
           planName: activeFasting.planName
         };
-        console.log('⏱️ Fasting status:', fastingStatus);
-      } else {
-        console.log('⏱️ No active fasting session found');
       }
 
       const result = {
@@ -910,7 +897,6 @@ export class DatabaseStorage implements IStorage {
         fastingStatus
       };
       
-      console.log('✅ Daily stats result:', result);
       return result;
     } catch (error) {
       console.error('❌ Error in getUserDailyStats:', error);
