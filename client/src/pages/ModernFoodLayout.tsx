@@ -533,6 +533,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     return () => window.removeEventListener('achievement-unlocked', handleGoalAchievement);
   }, [addNotification]);
 
+  // Load data on component mount (for both authenticated and unauthenticated users)
+  useEffect(() => {
+    console.log('🚀 Component mounted, calling fetchDailyStats for initial load');
+    fetchDailyStats();
+  }, [fetchDailyStats]);
+
   // Update calorie goals when user data changes
   useEffect(() => {
     if (user) {
@@ -541,7 +547,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       setGoalCalories(userCalorieGoal);
       setWeeklyGoal(userCalorieGoal * 7);
       
-      // Fetch daily stats when user changes
+      // Fetch daily stats when user changes (this will refetch from server if authenticated)
+      console.log('👤 User changed, refreshing daily stats');
       fetchDailyStats();
     }
   }, [user, fetchDailyStats]);
@@ -1337,13 +1344,32 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             {process.env.NODE_ENV === 'development' && (
               <div className="mb-2 p-2 bg-blue-50 rounded border text-xs">
                 <strong>DEBUG Water Stats:</strong>
-                <pre className="text-blue-600 mt-1">
+                <pre className="text-blue-600 mt-1 max-h-20 overflow-auto">
                   dailyStats: {JSON.stringify({ 
                     waterGlasses: dailyStats?.waterGlasses, 
                     hasStats: !!dailyStats,
                     user: user?.email || 'not authenticated'
                   }, null, 2)}
+                  localStorage: {localStorage.getItem('dailyStats') || 'empty'}
                 </pre>
+                <button 
+                  onClick={() => {
+                    localStorage.setItem('dailyStats', JSON.stringify({ waterGlasses: 3 }));
+                    fetchDailyStats();
+                  }}
+                  className="mt-2 px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600"
+                >
+                  Add Test Water Data (3 glasses)
+                </button>
+                <button 
+                  onClick={() => {
+                    localStorage.removeItem('dailyStats');
+                    fetchDailyStats();
+                  }}
+                  className="mt-2 ml-2 px-2 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600"
+                >
+                  Clear Test Data
+                </button>
               </div>
             )}
             <WaterCard
