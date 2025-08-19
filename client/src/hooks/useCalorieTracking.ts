@@ -7,6 +7,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useDataPersistence } from './useDataPersistence';
 import { getLocalDateKey, formatLocalTime, getMealTypeByTime } from '@/utils/dateUtils';
+import { apiRequest } from '@/lib/queryClient';
 
 interface CalculatedCalories {
   id: string;
@@ -101,7 +102,7 @@ export function useCalorieTracking() {
   });
 
   // Add calculated calories
-  const addCalculatedCalories = useCallback((calories: Omit<CalculatedCalories, 'id' | 'date' | 'time' | 'source'>) => {
+  const addCalculatedCalories = useCallback(async (calories: Omit<CalculatedCalories, 'id' | 'date' | 'time' | 'source'>) => {
     const now = new Date();
     const newEntry: CalculatedCalories = {
       ...calories,
@@ -119,9 +120,49 @@ export function useCalorieTracking() {
     const existing = stored ? JSON.parse(stored) : [];
     localStorage.setItem('calculatedCalories', JSON.stringify([...existing, newEntry]));
     
+    // Check if this is a water entry and update water consumption
+    const isWaterEntry = calories.name.toLowerCase().includes('water') && calories.calories === 0;
+    if (isWaterEntry) {
+      console.log('💧 Water detected in calorie tracker:', calories.name);
+      try {
+        // Extract water amount (default to 1 glass if bottle/glass detected)
+        let waterGlasses = 1;
+        const nameLC = calories.name.toLowerCase();
+        if (nameLC.includes('bottle') || nameLC.includes('glass') || nameLC.includes('cup')) {
+          waterGlasses = 1;
+        }
+        
+        // Get current water consumption from localStorage as backup
+        const currentStats = JSON.parse(localStorage.getItem('dailyStats') || '{}');
+        const currentWater = currentStats.waterGlasses || 0;
+        const newWaterTotal = currentWater + waterGlasses;
+        
+        // Update water consumption in database
+        await apiRequest('POST', '/api/daily-stats', {
+          waterGlasses: newWaterTotal,
+          date: getLocalDateKey()
+        });
+        
+        console.log('✅ Water consumption updated through calorie tracker:', {
+          added: waterGlasses,
+          newTotal: newWaterTotal
+        });
+        
+        // Trigger a refresh of daily stats
+        queryClient.invalidateQueries({ queryKey: ['dailyStats'] });
+        
+        // Fire custom event to notify ModernFoodLayout to refresh water display
+        window.dispatchEvent(new CustomEvent('waterUpdated', { 
+          detail: { glasses: newWaterTotal } 
+        }));
+        
+      } catch (error) {
+        console.error('❌ Failed to update water consumption from calorie tracker:', error);
+      }
+    }
     
     return newEntry;
-  }, [logCaloriesMutation]);
+  }, [logCaloriesMutation, queryClient]);
 
   // Get today's calculated calories
   const getTodaysCalories = useCallback(() => {

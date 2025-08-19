@@ -492,6 +492,19 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     }
   }, [user, fetchDailyStats]);
 
+  // Listen for water updates from calorie tracker
+  useEffect(() => {
+    const handleWaterUpdate = () => {
+      if (user) {
+        console.log('🔄 Water updated event received, refreshing daily stats');
+        fetchDailyStats();
+      }
+    };
+    
+    window.addEventListener('waterUpdated', handleWaterUpdate);
+    return () => window.removeEventListener('waterUpdated', handleWaterUpdate);
+  }, [user, fetchDailyStats]);
+
 
   // Refresh micronutrients when tab changes or on mount
   useEffect(() => {
