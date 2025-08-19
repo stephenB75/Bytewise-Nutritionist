@@ -3,6 +3,8 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated, optionalAuth, serverSupabase, supabaseAdmin, type AuthenticatedRequest } from "./supabaseAuth";
 import { usdaService } from "./services/usdaService";
+import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
+import { analyzeFoodImage, getNutritionFromUSDA } from "./aiService";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Health check endpoint - simplified for production
@@ -1000,6 +1002,101 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: 'Database test failed',
         error: error.message
       });
+    }
+  });
+
+  // AI Food Analysis Routes
+  // Object storage upload endpoint
+  app.post('/api/objects/upload', async (req: Request, res: Response) => {
+    try {
+      const objectStorageService = new ObjectStorageService();
+      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      res.json({ uploadURL });
+    } catch (error: any) {
+      console.error('Error getting upload URL:', error);
+      res.status(500).json({ error: 'Failed to get upload URL' });
+    }
+  });
+
+  // AI food analysis endpoint
+  app.post('/api/ai/analyze-food', async (req: Request, res: Response) => {
+    try {
+      const { imageUrl } = req.body;
+      
+      if (!imageUrl) {
+        return res.status(400).json({ error: 'Image URL is required' });
+      }
+
+      console.log('🔍 Analyzing food image:', imageUrl);
+
+      // Step 1: Analyze image with AI to identify foods
+      const aiResult = await analyzeFoodImage(imageUrl);
+      
+      // Step 2: Get nutrition data for each identified food
+      const identifiedFoods = [];
+      for (const food of aiResult.identifiedFoods) {
+        try {
+          const nutrition = await getNutritionFromUSDA(food.name, food.estimatedGrams);
+          identifiedFoods.push({
+            name: food.name,
+            confidence: food.confidence,
+            portion: food.portion,
+            calories: nutrition.calories,
+            protein: nutrition.protein,
+            carbs: nutrition.carbs,
+            fat: nutrition.fat,
+            fiber: nutrition.fiber,
+            sugar: nutrition.sugar,
+            sodium: nutrition.sodium,
+          });
+        } catch (nutritionError) {
+          console.error(`Failed to get nutrition for ${food.name}:`, nutritionError);
+          // Add food with zero nutrition as fallback
+          identifiedFoods.push({
+            name: food.name,
+            confidence: food.confidence,
+            portion: food.portion,
+            calories: 0,
+            protein: 0,
+            carbs: 0,
+            fat: 0,
+            fiber: 0,
+            sugar: 0,
+            sodium: 0,
+          });
+        }
+      }
+
+      // Step 3: Calculate total nutrition
+      const totalNutrition = identifiedFoods.reduce(
+        (total, food) => ({
+          calories: total.calories + food.calories,
+          protein: total.protein + food.protein,
+          carbs: total.carbs + food.carbs,
+          fat: total.fat + food.fat,
+          fiber: total.fiber + food.fiber,
+          sugar: total.sugar + food.sugar,
+          sodium: total.sodium + food.sodium,
+        }),
+        { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0, sugar: 0, sodium: 0 }
+      );
+
+      const result = {
+        imageUrl,
+        identifiedFoods,
+        totalNutrition,
+        analysisTime: aiResult.analysisTime
+      };
+
+      console.log('✅ Food analysis complete:', {
+        foodsFound: identifiedFoods.length,
+        totalCalories: totalNutrition.calories
+      });
+
+      res.json(result);
+    } catch (error: any) {
+      console.error('❌ Food analysis failed:', error);
+      res.status(500).json({ error: error.message || 'Food analysis failed' });
     }
   });
 

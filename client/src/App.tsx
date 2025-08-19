@@ -12,6 +12,7 @@ import { Route, Router, Switch } from 'wouter';
 import ModernFoodLayout from './pages/ModernFoodLayout';
 import VerifyEmail from './pages/VerifyEmail';
 import { ResetPassword } from './pages/ResetPassword';
+import AIFoodAnalyzer from './pages/AIFoodAnalyzer';
 import { useDataRestoration } from '@/hooks/useDataRestoration';
 import { DataSyncIndicator } from '@/components/DataSyncIndicator';
 import { DataIntegrityManager } from '@/components/DataIntegrityManager';
@@ -163,6 +164,7 @@ function AppContent() {
           <Switch>
             <Route path="/verify-email" component={VerifyEmail} />
             <Route path="/reset-password" component={ResetPassword} />
+            <Route path="/ai-analyzer" component={AIFoodAnalyzer} />
             <Route>{renderCurrentPage()}</Route>
           </Switch>
         </main>

@@ -41,7 +41,8 @@ import {
   UserCircle,
   Utensils,
   Clock,
-  CheckCircle2
+  CheckCircle2,
+  Sparkles
 } from 'lucide-react';
 import { NotificationDropdown } from '@/components/NotificationDropdown';
 import { WeeklyCaloriesCard } from '@/components/WeeklyCaloriesCard';
@@ -51,6 +52,7 @@ import { supabase } from '@/lib/supabase';
 import { getWeekDates, getLocalDateKey, getMealTypeByTime, formatLocalTime } from '@/utils/dateUtils';
 import { fixMealDateMismatches } from '@/utils/mealDateFixer';
 import { getCachedLocalStorage, debounce } from '@/utils/performanceUtils';
+import { useLocation } from 'wouter';
 
 
 // Types
@@ -717,7 +719,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   };
 
   // Enhanced tab change handler with hero component scroll reset
+  const [, setLocation] = useLocation();
+
   const handleTabChange = (newTab: string) => {
+    // Handle AI analyzer navigation to dedicated page
+    if (newTab === 'ai') {
+      setLocation('/ai-analyzer');
+      return;
+    }
+
     // Temporarily disable smooth scrolling to force instant scroll
     const originalScrollBehavior = document.documentElement.style.scrollBehavior;
     document.documentElement.style.scrollBehavior = 'auto';
@@ -2380,6 +2390,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           {[
             { id: 'home', label: 'Dashboard', icon: Home },
             { id: 'nutrition', label: 'Nutrition', icon: Utensils },
+            { id: 'ai', label: 'AI Analyzer', icon: Sparkles },
             { id: 'fasting', label: 'Fasting', icon: Clock },
             { id: 'daily', label: 'Food Log', icon: BarChart3 },
             { id: 'profile', label: 'Profile', icon: UserCircle }
