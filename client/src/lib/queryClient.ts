@@ -10,11 +10,43 @@ async function throwIfResNotOk(res: Response) {
 
 // Get authentication headers for API requests
 async function getAuthHeaders(): Promise<Record<string, string>> {
-  const { data: { session } } = await supabase.auth.getSession();
   const headers: Record<string, string> = {};
+  let accessToken = null;
   
-  if (session?.access_token) {
-    headers.Authorization = `Bearer ${session.access_token}`;
+  // Check for locally stored custom tokens first (same logic as useAuth)
+  const storedSession = localStorage.getItem('supabase.auth.token');
+  if (storedSession) {
+    try {
+      const parsedSession = JSON.parse(storedSession);
+      if (parsedSession.access_token) {
+        accessToken = parsedSession.access_token;
+        console.log('🔍 apiRequest using custom token:', {
+          hasToken: true,
+          tokenLength: parsedSession.access_token.length,
+          isCustomToken: parsedSession.access_token.startsWith('verified_')
+        });
+      }
+    } catch (parseError) {
+      console.log('⚠️ Failed to parse stored session in apiRequest:', parseError);
+    }
+  }
+  
+  // If no custom token, check Supabase session
+  if (!accessToken) {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.access_token) {
+      accessToken = session.access_token;
+      console.log('🔍 apiRequest using Supabase token:', {
+        hasToken: true,
+        tokenLength: session.access_token.length
+      });
+    }
+  }
+  
+  if (accessToken) {
+    headers.Authorization = `Bearer ${accessToken}`;
+  } else {
+    console.log('❌ No authentication token found for apiRequest');
   }
   
   return headers;
@@ -49,9 +81,23 @@ export const getQueryFn: <T>(options: {
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
     const authHeaders = await getAuthHeaders();
-    const res = await fetch(queryKey.join("/") as string, {
+    const url = queryKey.join("/") as string;
+    
+    console.log('🔍 getQueryFn making request:', {
+      url,
+      hasAuthHeaders: Object.keys(authHeaders).length > 0,
+      headers: authHeaders
+    });
+    
+    const res = await fetch(url, {
       headers: authHeaders,
       credentials: "include",
+    });
+
+    console.log('📡 getQueryFn response:', {
+      url,
+      status: res.status,
+      ok: res.ok
     });
 
     if (unauthorizedBehavior === "returnNull" && res.status === 401) {

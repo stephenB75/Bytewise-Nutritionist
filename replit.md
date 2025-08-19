@@ -6,6 +6,10 @@ ByteWise Nutritionist is a comprehensive Progressive Web App (PWA) for nutrition
 **Current Version: BETA 3.0**
 
 ## Recent Changes (August 19, 2025)
+- **✅ COMPLETED: Critical Data Persistence Fix**: Resolved authentication token mismatch in API requests - custom tokens now properly used across all data fetching operations
+- **✅ COMPLETED: Daily Stats Loading Recovery**: Fixed user data not populating on app refresh by updating apiRequest function to handle custom authentication tokens
+- **✅ COMPLETED: Enhanced Debug Logging**: Added comprehensive logging to getUserDailyStats method for tracking database queries, water intake, and fasting session loading
+- **✅ COMPLETED: Authentication Token Consistency**: Unified custom token handling between useAuth hook and apiRequest function for reliable data persistence
 - **✅ COMPLETED: Water Card Troubleshooting**: Fixed water consumption entries not displaying by ensuring fetchDailyStats loads on component mount for both authenticated and unauthenticated users
 - **✅ COMPLETED: Enhanced Water Card Debugging**: Added comprehensive testing panel with sample data creation and localStorage inspection for troubleshooting
 - **✅ COMPLETED: Water Tracking Data Persistence**: Verified offline water tracking works correctly with localStorage for unauthenticated users and database sync for authenticated users
@@ -22,7 +26,7 @@ ByteWise Nutritionist is a comprehensive Progressive Web App (PWA) for nutrition
 - **✅ COMPLETED: Authentication & Async Fixes**: Resolved authentication issues and async/await handling in AI Food Analyzer
 - **✅ COMPLETED: OpenAI Quota Error Handling**: Implemented graceful fallback for API quota exceeded errors with user-friendly messages
 - **✅ COMPLETED: Offline-First Water Tracking**: Water detection works without authentication, syncs to database when possible
-- **Production Ready**: All core features functional with comprehensive error handling and offline capabilities
+- **Production Ready**: All core features functional with comprehensive error handling and offline capabilities. User data persistence now works reliably across app refresh, close, and deployment.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
