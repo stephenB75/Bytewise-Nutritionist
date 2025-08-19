@@ -1483,7 +1483,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 })
                 .slice(0, 50) // Limit results for performance
                 .map((meal, index) => (
-              <Card key={index} className="bg-white/10 backdrop-blur-md border-white/20 p-4">
+              <Card key={`search-${meal.id || meal.name}-${meal.timestamp || index}`} className="bg-white/10 backdrop-blur-md border-white/20 p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
                     <h4 className="text-white font-semibold">{meal.name}</h4>
@@ -1583,7 +1583,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                           
                           return mealDate === today;
                         });
+                        // Update all meal-related states  
                         setLoggedMeals(todayMeals);
+                        setWeeklyMeals(updated); // Update weekly meals state too
                         
                         // Update daily calories and nutrition
                         const totalCalories = todayMeals.reduce((sum: number, m: any) => sum + (m.calories || 0), 0);
@@ -1599,6 +1601,18 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                         
                         const updatedMicronutrients = calculateMicronutrients(todayMeals);
                         setDailyMicronutrients(updatedMicronutrients);
+                        
+                        // Force immediate re-render with React state update
+                        // Use functional state update to ensure latest state
+                        setWeeklyMeals(prevWeeklyMeals => {
+                          console.log('🔄 Force updating weeklyMeals state (Logged Today)');
+                          return [...updated]; // Force new array reference
+                        });
+                        
+                        setLoggedMeals(prevLoggedMeals => {
+                          console.log('🔄 Force updating loggedMeals state (Logged Today)');
+                          return [...todayMeals]; // Force new array reference
+                        });
                         
                         // Dispatch events
                         window.dispatchEvent(new CustomEvent('refresh-weekly-data'));
@@ -2146,7 +2160,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               !searchQuery || 
               meal.name.toLowerCase().includes(searchQuery.toLowerCase())
             ).map((meal, index) => (
-            <Card key={index} className="bg-white/10 backdrop-blur-md border-white/20 p-4">
+            <Card key={`meal-${meal.id || meal.name}-${meal.timestamp || index}`} className="bg-white/10 backdrop-blur-md border-white/20 p-4">
               <div className="flex items-center justify-between">
                 <div className="flex-1">
                   <h4 className="text-white font-semibold">{meal.name}</h4>
@@ -2200,7 +2214,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                           
                           return mealDate === today;
                         });
+                        // Update all meal-related states
                         setLoggedMeals(todayMeals);
+                        setWeeklyMeals(updated); // Update weekly meals state too
                         
                         // Update daily calories and nutrition  
                         const totalCalories = todayMeals.reduce((sum: number, m: any) => sum + (m.calories || 0), 0);
@@ -2216,6 +2232,18 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                         
                         const updatedMicronutrients = calculateMicronutrients(todayMeals);
                         setDailyMicronutrients(updatedMicronutrients);
+                        
+                        // Force immediate re-render with React state update
+                        // Use functional state update to ensure latest state
+                        setWeeklyMeals(prevWeeklyMeals => {
+                          console.log('🔄 Force updating weeklyMeals state');
+                          return [...updated]; // Force new array reference
+                        });
+                        
+                        setLoggedMeals(prevLoggedMeals => {
+                          console.log('🔄 Force updating loggedMeals state');
+                          return [...todayMeals]; // Force new array reference
+                        });
                         
                         // Dispatch events
                         window.dispatchEvent(new CustomEvent('refresh-weekly-data'));
