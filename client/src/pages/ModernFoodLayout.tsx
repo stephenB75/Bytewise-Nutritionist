@@ -1294,7 +1294,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 </div>
               </Card>
             ) : (
-              weeklyMeals
+              // Use loggedMeals for today's view when no search, weeklyMeals when searching
+              (searchQuery ? weeklyMeals : loggedMeals)
                 .filter(meal => 
                   !searchQuery || 
                   meal.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -1373,22 +1374,16 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                         const updated = stored.filter((m: any) => m.id !== meal.id);
                         localStorage.setItem('weeklyMeals', JSON.stringify(updated));
                         
-                        // Refresh meal list using corrected date logic
-                        const systemToday = getLocalDateKey();
-                        const userExpectedToday = '2025-08-14'; // User expects Wednesday to be Aug 14th
-                        const correctedToday = systemToday !== userExpectedToday ? userExpectedToday : systemToday;
+                        // Refresh meal list using today's actual date
+                        const today = getLocalDateKey();
                         
                         const todayMeals = updated.filter((m: any) => {
-                          // Direct exact match with corrected date
-                          if (m.date === correctedToday) return true;
+                          // Handle timestamp format dates
+                          const mealDate = m.date && m.date.includes('T') 
+                            ? m.date.split('T')[0] 
+                            : m.date;
                           
-                          // Timestamp parsing for ISO format dates
-                          if (m.date && m.date.includes('T')) {
-                            const extractedDate = m.date.split('T')[0];
-                            return extractedDate === correctedToday;
-                          }
-                          
-                          return false;
+                          return mealDate === today;
                         });
                         setLoggedMeals(todayMeals);
                         
@@ -1979,22 +1974,16 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                         updated.splice(mealIndex, 1);
                         localStorage.setItem('weeklyMeals', JSON.stringify(updated));
                         
-                        // Refresh meal list using corrected date logic
-                        const systemToday = getLocalDateKey();
-                        const userExpectedToday = '2025-08-14'; // User expects Wednesday to be Aug 14th
-                        const correctedToday = systemToday !== userExpectedToday ? userExpectedToday : systemToday;
+                        // Refresh meal list using today's actual date
+                        const today = getLocalDateKey();
                         
                         const todayMeals = updated.filter((m: any) => {
-                          // Direct exact match with corrected date
-                          if (m.date === correctedToday) return true;
+                          // Handle timestamp format dates
+                          const mealDate = m.date && m.date.includes('T') 
+                            ? m.date.split('T')[0] 
+                            : m.date;
                           
-                          // Timestamp parsing for ISO format dates
-                          if (m.date && m.date.includes('T')) {
-                            const extractedDate = m.date.split('T')[0];
-                            return extractedDate === correctedToday;
-                          }
-                          
-                          return false;
+                          return mealDate === today;
                         });
                         setLoggedMeals(todayMeals);
                         
