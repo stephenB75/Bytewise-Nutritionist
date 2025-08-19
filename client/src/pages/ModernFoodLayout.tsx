@@ -45,7 +45,8 @@ import {
   CheckCircle2,
   Sparkles,
   Droplets,
-  Minus
+  Minus,
+  Trash2
 } from 'lucide-react';
 import { NotificationDropdown } from '@/components/NotificationDropdown';
 import { WeeklyCaloriesCard } from '@/components/WeeklyCaloriesCard';
@@ -1540,13 +1541,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     <Button 
                       size="sm" 
                       variant="ghost" 
-                      className="text-gray-400 hover:text-white"
+                      className="text-gray-400 hover:text-red-400 p-2"
+                      data-testid={`button-delete-meal-${index}`}
                       onClick={() => {
                         // Delete meal action
                         // Remove meal from storage
                         const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
                         const updated = stored.filter((m: any) => m.id !== meal.id);
-                        localStorage.setItem('weeklyMeals', JSON.stringify(updated));
                         
                         // Refresh meal list using today's actual date
                         const today = getLocalDateKey();
@@ -1579,8 +1580,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                         // Dispatch events
                         window.dispatchEvent(new CustomEvent('refresh-weekly-data'));
                       }}
+                      title="Delete meal entry"
                     >
-                      Delete
+                      <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
                 </div>
@@ -2128,7 +2130,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   <Button 
                     size="sm" 
                     variant="ghost" 
-                    className="text-gray-400 hover:text-white"
+                    className="text-gray-400 hover:text-red-400 p-2"
+                    data-testid={`button-delete-logged-meal-${index}`}
                     onClick={() => {
                       // Remove meal from storage using index and multiple identifiers for safety
                       const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
@@ -2188,8 +2191,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                         }));
                       }
                     }}
+                    title="Delete meal entry"
                   >
-                    Delete
+                    <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
