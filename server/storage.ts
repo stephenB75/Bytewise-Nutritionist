@@ -842,59 +842,80 @@ export class DatabaseStorage implements IStorage {
       planName?: string;
     };
   }> {
-    const startOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-    const endOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
-
-    // Get meals for the day
-    const dayMeals = await db
-      .select()
-      .from(meals)
-      .where(
-        and(
-          eq(meals.userId, userId),
-          gte(meals.date, startOfDay),
-          lte(meals.date, endOfDay)
-        )
-      );
-
-    // Sum up nutrition from all meals
-    const totals = dayMeals.reduce((acc, meal) => ({
-      totalCalories: acc.totalCalories + Number(meal.totalCalories || 0),
-      totalProtein: acc.totalProtein + Number(meal.totalProtein || 0),
-      totalCarbs: acc.totalCarbs + Number(meal.totalCarbs || 0),
-      totalFat: acc.totalFat + Number(meal.totalFat || 0),
-    }), {
-      totalCalories: 0,
-      totalProtein: 0,
-      totalCarbs: 0,
-      totalFat: 0,
-    });
-
-    // Get water intake
-    const water = await this.getUserWaterIntake(userId, date);
-
-    // Get active fasting session
-    const activeFasting = await this.getUserActiveFastingSession(userId);
-    let fastingStatus = undefined;
-    
-    if (activeFasting) {
-      const now = new Date().getTime();
-      const startTime = new Date(activeFasting.startTime).getTime();
-      const elapsed = now - startTime;
-      const remaining = Math.max(0, activeFasting.targetDuration - elapsed);
+    try {
+      console.log('🔍 Getting daily stats for user:', userId, 'date:', date.toISOString());
       
-      fastingStatus = {
-        isActive: activeFasting.status === 'active' && remaining > 0,
-        timeRemaining: remaining,
-        planName: activeFasting.planName
-      };
-    }
+      const startOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      const endOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
 
-    return {
-      ...totals,
-      waterGlasses: water?.glasses || 0,
-      fastingStatus
-    };
+      // Get meals for the day
+      console.log('📊 Querying meals between:', startOfDay.toISOString(), 'and', endOfDay.toISOString());
+      const dayMeals = await db
+        .select()
+        .from(meals)
+        .where(
+          and(
+            eq(meals.userId, userId),
+            gte(meals.date, startOfDay),
+            lte(meals.date, endOfDay)
+          )
+        );
+      
+      console.log('🍽️ Found', dayMeals.length, 'meals for the day');
+
+      // Sum up nutrition from all meals
+      const totals = dayMeals.reduce((acc, meal) => ({
+        totalCalories: acc.totalCalories + Number(meal.totalCalories || 0),
+        totalProtein: acc.totalProtein + Number(meal.totalProtein || 0),
+        totalCarbs: acc.totalCarbs + Number(meal.totalCarbs || 0),
+        totalFat: acc.totalFat + Number(meal.totalFat || 0),
+      }), {
+        totalCalories: 0,
+        totalProtein: 0,
+        totalCarbs: 0,
+        totalFat: 0,
+      });
+
+      console.log('🧮 Calculated totals:', totals);
+
+      // Get water intake
+      console.log('💧 Getting water intake for user');
+      const water = await this.getUserWaterIntake(userId, date);
+      console.log('💧 Water intake result:', water?.glasses || 0, 'glasses');
+
+      // Get active fasting session
+      console.log('⏱️ Getting active fasting session');
+      const activeFasting = await this.getUserActiveFastingSession(userId);
+      let fastingStatus = undefined;
+      
+      if (activeFasting) {
+        const now = new Date().getTime();
+        const startTime = new Date(activeFasting.startTime).getTime();
+        const elapsed = now - startTime;
+        const remaining = Math.max(0, activeFasting.targetDuration - elapsed);
+        
+        fastingStatus = {
+          isActive: activeFasting.status === 'active' && remaining > 0,
+          timeRemaining: remaining,
+          planName: activeFasting.planName
+        };
+        console.log('⏱️ Fasting status:', fastingStatus);
+      } else {
+        console.log('⏱️ No active fasting session found');
+      }
+
+      const result = {
+        ...totals,
+        waterGlasses: water?.glasses || 0,
+        fastingStatus
+      };
+      
+      console.log('✅ Daily stats result:', result);
+      return result;
+    } catch (error) {
+      console.error('❌ Error in getUserDailyStats:', error);
+      throw error;
+    }
   }
 
   // Fasting session operations
