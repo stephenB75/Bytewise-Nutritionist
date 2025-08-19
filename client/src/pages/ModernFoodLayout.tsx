@@ -143,7 +143,40 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   // Utility function to add notifications - using useCallback for stable reference
   // Water consumption update function
   const updateWaterConsumption = useCallback(async (change: number) => {
-    if (!user) return;
+    console.log('💧 updateWaterConsumption called:', { change, user: user?.email || 'not authenticated', currentGlasses: dailyStats?.waterGlasses || 0 });
+    
+    if (!user) {
+      console.log('💧 Handling water update for unauthenticated user');
+      // Update localStorage for unauthenticated users
+      const localStats = JSON.parse(localStorage.getItem('dailyStats') || '{}');
+      const currentGlasses = (localStats.waterGlasses || 0) + change;
+      const newGlasses = Math.max(0, currentGlasses);
+      
+      console.log('💧 Updating localStorage:', { currentGlasses, newGlasses });
+      
+      // Update localStorage
+      const updatedStats = { ...localStats, waterGlasses: newGlasses };
+      localStorage.setItem('dailyStats', JSON.stringify(updatedStats));
+      
+      // Update component state
+      setDailyStats((prev: any) => prev ? { ...prev, waterGlasses: newGlasses } : { 
+        totalCalories: 0, totalProtein: 0, totalCarbs: 0, totalFat: 0, 
+        waterGlasses: newGlasses, fastingStatus: undefined 
+      });
+      
+      // Achievement notification
+      if (newGlasses >= 8 && (localStats.waterGlasses || 0) < 8) {
+        toast({
+          title: "Hydration Goal Achieved! 💧",
+          description: "You've reached your daily water intake goal!",
+          variant: "default",
+          duration: 3000,
+        });
+      }
+      
+      console.log('💧 Water updated for unauthenticated user:', newGlasses);
+      return;
+    }
     
     try {
       const currentGlasses = (dailyStats?.waterGlasses || 0) + change;
@@ -343,9 +376,16 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   // Fetch daily stats including fasting status
   const fetchDailyStats = useCallback(async () => {
+    console.log('📊 fetchDailyStats called with user:', user?.email || 'not authenticated');
+    
     if (!user) {
       // For unauthenticated users, load from localStorage
-      const localStats = JSON.parse(localStorage.getItem('dailyStats') || '{}');
+      const localStatsRaw = localStorage.getItem('dailyStats') || '{}';
+      console.log('💧 Loading from localStorage, raw data:', localStatsRaw);
+      
+      const localStats = JSON.parse(localStatsRaw);
+      console.log('💧 Parsed localStorage data:', localStats);
+      
       setDailyStats({
         totalCalories: 0,
         totalProtein: 0,
@@ -354,7 +394,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         waterGlasses: localStats.waterGlasses || 0,
         fastingStatus: undefined
       });
-      console.log('💧 Loaded water data from localStorage for unauthenticated user:', localStats.waterGlasses || 0);
+      console.log('💧 Set dailyStats for unauthenticated user with water glasses:', localStats.waterGlasses || 0);
       return;
     }
     
@@ -1017,6 +1057,14 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     const dailyGoal = 8; // 8 glasses per day
     const percentage = Math.min((glasses / dailyGoal) * 100, 100);
     
+    // DEBUG: Log water data for troubleshooting
+    console.log('💧 WaterCard rendering with:', { 
+      glasses, 
+      dailyGoal, 
+      percentage, 
+      timestamp: new Date().toISOString() 
+    });
+    
     return (
       <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4 transition-all duration-300 hover:bg-white/15 hover:border-white/30">
         <div className="flex items-center justify-between mb-4">
@@ -1285,6 +1333,19 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
           {/* Water Consumption */}
           <div className="mb-4" data-testid="water-consumption-card">
+            {/* DEBUG: Show raw daily stats for troubleshooting */}
+            {process.env.NODE_ENV === 'development' && (
+              <div className="mb-2 p-2 bg-blue-50 rounded border text-xs">
+                <strong>DEBUG Water Stats:</strong>
+                <pre className="text-blue-600 mt-1">
+                  dailyStats: {JSON.stringify({ 
+                    waterGlasses: dailyStats?.waterGlasses, 
+                    hasStats: !!dailyStats,
+                    user: user?.email || 'not authenticated'
+                  }, null, 2)}
+                </pre>
+              </div>
+            )}
             <WaterCard
               glasses={dailyStats?.waterGlasses || 0}
               onIncrement={() => updateWaterConsumption(1)}
