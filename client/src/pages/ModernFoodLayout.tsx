@@ -53,6 +53,7 @@ import { getWeekDates, getLocalDateKey, getMealTypeByTime, formatLocalTime } fro
 import { fixMealDateMismatches } from '@/utils/mealDateFixer';
 import { getCachedLocalStorage, debounce } from '@/utils/performanceUtils';
 import { useLocation } from 'wouter';
+import AIFoodAnalyzer from './AIFoodAnalyzer';
 
 
 // Types
@@ -722,12 +723,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const [, setLocation] = useLocation();
 
   const handleTabChange = (newTab: string) => {
-    // Handle AI analyzer navigation to dedicated page
-    if (newTab === 'ai') {
-      setLocation('/ai-analyzer');
-      return;
-    }
-
     // Temporarily disable smooth scrolling to force instant scroll
     const originalScrollBehavior = document.documentElement.style.scrollBehavior;
     document.documentElement.style.scrollBehavior = 'auto';
@@ -2053,32 +2048,70 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   );
 
 
-  const renderCalculator = () => (
-    <div className={`space-y-0 page-container animate-in fade-in ${getAnimationDirection('nutrition', previousTab)} duration-700 ease-out`}>
-      <HeroSection
-        title="USDA"
-        subtitle="Calculator"
-        description="Precise nutrition data for every ingredient using comprehensive USDA database"
-        buttonText="Start Calculating"
-        onButtonClick={() => {
-          const calculatorElement = document.querySelector('.main-content');
-          if (calculatorElement) {
-            calculatorElement.scrollIntoView({ behavior: 'smooth' });
-          }
-        }}
-      />
-      
-      {/* Content Section - Completely Separate and Underneath */}
-      <div className="px-6 py-3 bg-black content-section">
-        <div className="main-content">
-          <CalorieCalculator 
-            onNavigate={onNavigate}
-            isCompact={false}
-          />
+  const renderCalculator = () => {
+    const [nutritionMode, setNutritionMode] = useState<'ai' | 'calculator'>('ai');
+
+    return (
+      <div className={`space-y-0 page-container animate-in fade-in ${getAnimationDirection('nutrition', previousTab)} duration-700 ease-out`}>
+        <HeroSection
+          title="Smart"
+          subtitle="Nutrition"
+          description="AI-powered food analysis or precise USDA database calculator"
+          buttonText="Start Analyzing"
+          onButtonClick={() => {
+            const contentElement = document.querySelector('.main-content');
+            if (contentElement) {
+              contentElement.scrollIntoView({ behavior: 'smooth' });
+            }
+          }}
+        />
+        
+        {/* Content Section - Completely Separate and Underneath */}
+        <div className="px-6 py-3 bg-black content-section">
+          {/* Mode Toggle */}
+          <div className="mb-6">
+            <div className="flex items-center justify-center space-x-1 bg-gray-800/50 rounded-full p-1 max-w-sm mx-auto">
+              <button
+                onClick={() => setNutritionMode('ai')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                  nutritionMode === 'ai'
+                    ? 'bg-blue-500 text-white shadow-lg'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+                data-testid="button-ai-mode"
+              >
+                <Sparkles className="h-4 w-4" />
+                AI Photo Analysis
+              </button>
+              <button
+                onClick={() => setNutritionMode('calculator')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                  nutritionMode === 'calculator'
+                    ? 'bg-orange-500 text-white shadow-lg'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+                data-testid="button-calculator-mode"
+              >
+                <Target className="h-4 w-4" />
+                USDA Calculator
+              </button>
+            </div>
+          </div>
+
+          <div className="main-content">
+            {nutritionMode === 'ai' ? (
+              <AIFoodAnalyzer />
+            ) : (
+              <CalorieCalculator 
+                onNavigate={onNavigate}
+                isCompact={false}
+              />
+            )}
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderProfile = () => (
     <div className={`space-y-0 page-container animate-in fade-in ${getAnimationDirection('profile', previousTab)} duration-700 ease-out`}>
@@ -2390,7 +2423,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           {[
             { id: 'home', label: 'Dashboard', icon: Home },
             { id: 'nutrition', label: 'Nutrition', icon: Utensils },
-            { id: 'ai', label: 'AI Analyzer', icon: Sparkles },
             { id: 'fasting', label: 'Fasting', icon: Clock },
             { id: 'daily', label: 'Food Log', icon: BarChart3 },
             { id: 'profile', label: 'Profile', icon: UserCircle }

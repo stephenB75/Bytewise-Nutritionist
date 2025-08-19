@@ -164,7 +164,6 @@ function AppContent() {
           <Switch>
             <Route path="/verify-email" component={VerifyEmail} />
             <Route path="/reset-password" component={ResetPassword} />
-            <Route path="/ai-analyzer" component={AIFoodAnalyzer} />
             <Route>{renderCurrentPage()}</Route>
           </Switch>
         </main>
