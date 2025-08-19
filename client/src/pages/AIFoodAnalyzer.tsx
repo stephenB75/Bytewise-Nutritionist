@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ObjectUploader } from '@/components/ObjectUploader';
-import { Camera, Loader2, Sparkles, Plus, Eye, Utensils } from 'lucide-react';
+import { Camera, Loader2, Sparkles, Plus, Eye, Utensils, AlertTriangle } from 'lucide-react';
 import { useMutation } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
@@ -270,6 +270,45 @@ export default function AIFoodAnalyzer() {
               <p className="text-muted-foreground text-center">
                 AI is identifying ingredients and calculating nutrition information
               </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Analysis Error */}
+      {uploadedImageUrl && analyzeFoodMutation.isError && (
+        <Card>
+          <CardContent className="p-8">
+            <div className="flex flex-col items-center space-y-4">
+              <div className="text-red-500">
+                <AlertTriangle className="h-8 w-8" />
+              </div>
+              <h3 className="text-lg font-medium text-red-600">Analysis Failed</h3>
+              <p className="text-muted-foreground text-center max-w-md">
+                {analyzeFoodMutation.error?.message.includes('quota') 
+                  ? 'OpenAI quota exceeded. Please try again later or contact support for a new API key.'
+                  : 'Unable to analyze the image. Please try uploading a clearer photo with better lighting.'
+                }
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => {
+                    setUploadedImageUrl('');
+                    analyzeFoodMutation.reset();
+                  }}
+                  variant="outline"
+                >
+                  Try Another Photo
+                </Button>
+                {analyzeFoodMutation.error?.message.includes('quota') && (
+                  <Button
+                    onClick={() => analyzeFoodMutation.mutate(uploadedImageUrl)}
+                    variant="default"
+                  >
+                    Retry Analysis
+                  </Button>
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>

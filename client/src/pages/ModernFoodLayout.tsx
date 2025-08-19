@@ -161,6 +161,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         throw new Error('Failed to update water consumption');
       }
       
+      // Refresh daily stats to update UI
+      await fetchDailyStats();
+      
       // Show toast notification for achievement
       if (newGlasses >= 8 && (dailyStats?.waterGlasses || 0) < 8) {
         toast({
@@ -342,22 +345,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     if (!user) return;
     
     try {
-      const response = await fetch(`/api/users/${user.id}/daily-stats`);
-      if (response.ok) {
-        const stats = await response.json();
-        setDailyStats(stats);
-      } else {
-        console.warn('Daily stats fetch failed with status:', response.status);
-        // Set default stats to prevent UI issues
-        setDailyStats({
-          totalCalories: 0,
-          totalProtein: 0,
-          totalCarbs: 0,
-          totalFat: 0,
-          waterGlasses: 0,
-          fastingStatus: undefined
-        });
-      }
+      const response = await apiRequest('GET', `/api/users/${user.id}/daily-stats`);
+      const stats = await response.json();
+      console.log('📊 Daily stats fetched:', stats);
+      setDailyStats(stats);
     } catch (error) {
       console.warn('Daily stats fetch error:', error);
       // Set default stats to prevent UI issues
