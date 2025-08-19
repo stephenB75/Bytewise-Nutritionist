@@ -176,6 +176,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       const currentGlasses = (dailyStats?.waterGlasses || 0) + change;
       const newGlasses = Math.max(0, currentGlasses); // Prevent negative values
       
+      console.log('💧 Authenticated user water update:', { 
+        userId: user.id, 
+        currentGlasses: dailyStats?.waterGlasses || 0, 
+        change, 
+        newGlasses 
+      });
+      
       // Optimistic update
       setDailyStats((prev: any) => prev ? { ...prev, waterGlasses: newGlasses } : null);
       
@@ -186,8 +193,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       });
       
       if (!response.ok) {
-        throw new Error('Failed to update water consumption');
+        const errorText = await response.text();
+        throw new Error(`Failed to update water consumption: ${response.status} - ${errorText}`);
       }
+      
+      const result = await response.json();
+      console.log('✅ Water update response:', result);
       
       // Refresh daily stats to update UI
       await fetchDailyStats();
@@ -203,7 +214,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       }
       
     } catch (error) {
-      console.error('Error updating water consumption:', error);
+      console.error('❌ Error updating water consumption for authenticated user:', error);
       // Revert optimistic update
       setDailyStats((prev: any) => prev ? { ...prev, waterGlasses: (dailyStats?.waterGlasses || 0) } : null);
       toast({
@@ -387,11 +398,14 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     
     try {
       const response = await apiRequest('GET', `/api/users/${user.id}/daily-stats`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch daily stats: ${response.status}`);
+      }
       const stats = await response.json();
-      console.log('📊 Daily stats fetched:', stats);
+      console.log('📊 Daily stats fetched for authenticated user:', stats);
       setDailyStats(stats);
     } catch (error) {
-      console.warn('Daily stats fetch error:', error);
+      console.error('❌ Daily stats fetch error for authenticated user:', error);
       // Set default stats to prevent UI issues
       setDailyStats({
         totalCalories: 0,
