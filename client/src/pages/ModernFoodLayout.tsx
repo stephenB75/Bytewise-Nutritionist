@@ -42,7 +42,9 @@ import {
   Utensils,
   Clock,
   CheckCircle2,
-  Sparkles
+  Sparkles,
+  Droplets,
+  Minus
 } from 'lucide-react';
 import { NotificationDropdown } from '@/components/NotificationDropdown';
 import { WeeklyCaloriesCard } from '@/components/WeeklyCaloriesCard';
@@ -137,6 +139,54 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
 
   // Utility function to add notifications - using useCallback for stable reference
+  // Water consumption update function
+  const updateWaterConsumption = useCallback(async (change: number) => {
+    if (!user) return;
+    
+    try {
+      const currentGlasses = (dailyStats?.waterGlasses || 0) + change;
+      const newGlasses = Math.max(0, currentGlasses); // Prevent negative values
+      
+      // Optimistic update
+      setDailyStats(prev => prev ? { ...prev, waterGlasses: newGlasses } : null);
+      
+      // Update in database
+      const response = await fetch('/api/daily-stats', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user.id,
+          date: getLocalDateKey(),
+          waterGlasses: newGlasses
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to update water consumption');
+      }
+      
+      // Show toast notification for achievement
+      if (newGlasses >= 8 && (dailyStats?.waterGlasses || 0) < 8) {
+        toast({
+          title: "Hydration Goal Achieved! 💧",
+          description: "You've reached your daily water intake goal!",
+          variant: "default",
+          duration: 3000,
+        });
+      }
+      
+    } catch (error) {
+      console.error('Error updating water consumption:', error);
+      // Revert optimistic update
+      setDailyStats(prev => prev ? { ...prev, waterGlasses: (dailyStats?.waterGlasses || 0) } : null);
+      toast({
+        title: "Error",
+        description: "Failed to update water consumption",
+        variant: "destructive",
+      });
+    }
+  }, [user, dailyStats?.waterGlasses, toast]);
+
   // Function to calculate micronutrients from meals - uses real data when available
   const calculateMicronutrients = useCallback((meals: any[]) => {
     // First, try to aggregate real micronutrient data from meals
@@ -927,6 +977,91 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     );
   });
 
+  // Water Consumption Card Component
+  const WaterCard = React.memo(({ glasses, onIncrement, onDecrement }: {
+    glasses: number;
+    onIncrement: () => void;
+    onDecrement: () => void;
+  }) => {
+    const dailyGoal = 8; // 8 glasses per day
+    const percentage = Math.min((glasses / dailyGoal) * 100, 100);
+    
+    return (
+      <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4 transition-all duration-300 hover:bg-white/15 hover:border-white/30">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-3">
+            <div className="p-2 bg-cyan-500/20 rounded-xl">
+              <Droplets className="w-5 h-5 text-cyan-400" />
+            </div>
+            <div>
+              <h3 className="text-white font-semibold">Water Intake</h3>
+              <p className="text-gray-400 text-sm">{glasses}/{dailyGoal} glasses</p>
+            </div>
+          </div>
+          <div className="text-right">
+            <div className="text-2xl font-bold text-cyan-400">{Math.round(percentage)}%</div>
+            <div className="text-xs text-gray-400">of goal</div>
+          </div>
+        </div>
+        
+        {/* Progress bar */}
+        <div className="relative h-3 bg-gray-800 rounded-full overflow-hidden mb-4">
+          <div 
+            className="absolute left-0 top-0 h-full bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full transition-all duration-1000"
+            style={{ width: `${percentage}%` }}
+          />
+          {percentage >= 100 && (
+            <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full animate-pulse" />
+          )}
+        </div>
+        
+        {/* Water glass visualization */}
+        <div className="flex items-center justify-between">
+          <div className="flex space-x-1">
+            {Array.from({ length: dailyGoal }, (_, i) => (
+              <div
+                key={i}
+                className={`w-4 h-6 rounded-sm border-2 transition-all duration-300 ${
+                  i < glasses 
+                    ? 'bg-cyan-400 border-cyan-400' 
+                    : 'bg-transparent border-gray-600'
+                }`}
+                style={{
+                  background: i < glasses 
+                    ? 'linear-gradient(to top, #06b6d4 0%, #0891b2 100%)' 
+                    : 'transparent'
+                }}
+              />
+            ))}
+          </div>
+          
+          {/* Control buttons */}
+          <div className="flex items-center space-x-2">
+            <Button
+              onClick={onDecrement}
+              disabled={glasses <= 0}
+              size="sm"
+              variant="ghost"
+              className="h-8 w-8 p-0 text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 disabled:opacity-50"
+              data-testid="button-decrement-water"
+            >
+              <Minus className="w-4 h-4" />
+            </Button>
+            <Button
+              onClick={onIncrement}
+              size="sm"
+              variant="ghost"
+              className="h-8 w-8 p-0 text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10"
+              data-testid="button-increment-water"
+            >
+              <Plus className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      </Card>
+    );
+  });
+
   // Enhanced Macro Card Component - Shows Remaining Values with Negative Color Coding
   const MacroCard = React.memo(({ name, value, goal, color, data = [0, 0, 0, 0, 0] }: {
     name: string;
@@ -1115,6 +1250,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           {/* Fasting Status */}
           <div className="mb-4">
             <FastingStatusCard fastingStatus={fastingStatus || dailyStats?.fastingStatus} />
+          </div>
+
+          {/* Water Consumption */}
+          <div className="mb-4" data-testid="water-consumption-card">
+            <WaterCard
+              glasses={dailyStats?.waterGlasses || 0}
+              onIncrement={() => updateWaterConsumption(1)}
+              onDecrement={() => updateWaterConsumption(-1)}
+            />
           </div>
 
           {/* Weekly Progress */}
