@@ -58,6 +58,8 @@ import { fixMealDateMismatches } from '@/utils/mealDateFixer';
 import { getCachedLocalStorage, debounce } from '@/utils/performanceUtils';
 import { useLocation } from 'wouter';
 import AIFoodAnalyzer from './AIFoodAnalyzer';
+import { AppleHealthIntegration } from '../components/AppleHealthIntegration';
+import { healthKitService } from '../services/healthKit';
 
 
 // Types
@@ -169,6 +171,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         });
       }
       
+      // Auto-sync to Apple Health if enabled
+      syncHealthDataIfEnabled().catch(console.error);
+      
       return;
     }
     
@@ -213,6 +218,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         });
       }
       
+      // Auto-sync to Apple Health if enabled
+      syncHealthDataIfEnabled().catch(console.error);
+      
     } catch (error) {
       console.error('❌ Error updating water consumption for authenticated user:', error);
       // Revert optimistic update
@@ -224,6 +232,40 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       });
     }
   }, [user, dailyStats?.waterGlasses, toast]);
+
+  // Apple Health sync function
+  const handleHealthDataSync = useCallback(async (data: any) => {
+    if (data.type === 'manual_sync') {
+      try {
+        // Sync current day's water intake
+        if (dailyStats?.waterGlasses) {
+          await healthKitService.syncWaterIntake(dailyStats.waterGlasses);
+        }
+        
+        // Sync current day's nutrition data
+        if (dailyStats) {
+          await healthKitService.syncNutritionData({
+            calories: dailyStats.totalCalories,
+            protein: dailyStats.totalProtein,
+            carbohydrates: dailyStats.totalCarbs,
+            fat: dailyStats.totalFat
+          });
+        }
+        
+        console.log('✅ Manual health data sync completed');
+      } catch (error) {
+        console.error('❌ Health data sync failed:', error);
+      }
+    }
+  }, [dailyStats]);
+
+  // Auto-sync health data when enabled
+  const syncHealthDataIfEnabled = useCallback(async () => {
+    const autoSyncEnabled = localStorage.getItem('appleHealthAutoSync') === 'true';
+    if (autoSyncEnabled && healthKitService.getAuthorizationStatus()) {
+      await handleHealthDataSync({ type: 'auto_sync' });
+    }
+  }, [handleHealthDataSync]);
 
   // Function to calculate micronutrients from meals - uses real data when available
   const calculateMicronutrients = useCallback((meals: any[]) => {
@@ -2463,6 +2505,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 <AccordionContent className="px-6 pb-6 pt-2">
                   <div className="border-t border-white/10 pt-6 mt-2">
                     <UserSettingsManager />
+                    
+                    {/* Apple Health Integration */}
+                    <div className="mt-6 pt-4 border-t border-white/10">
+                      <AppleHealthIntegration onHealthDataSync={handleHealthDataSync} />
+                    </div>
                     
                     {/* Start Tour Button */}
                     <div className="mt-6 pt-4 border-t border-white/10">

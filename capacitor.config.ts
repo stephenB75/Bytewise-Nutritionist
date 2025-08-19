@@ -74,6 +74,26 @@ const config: CapacitorConfig = {
       permissions: {
         publicStorage: 'ByteWise uses device storage to save meal photos, export nutrition reports, and cache data for offline use.'
       }
+    },
+    
+    // Apple Health integration configuration
+    HealthKit: {
+      permissions: {
+        read: [
+          'HKQuantityTypeIdentifierDietaryWater',
+          'HKQuantityTypeIdentifierDietaryEnergyConsumed',
+          'HKQuantityTypeIdentifierDietaryProtein',
+          'HKQuantityTypeIdentifierDietaryCarbohydrates',
+          'HKQuantityTypeIdentifierDietaryFatTotal'
+        ],
+        write: [
+          'HKQuantityTypeIdentifierDietaryWater',
+          'HKQuantityTypeIdentifierDietaryEnergyConsumed',
+          'HKQuantityTypeIdentifierDietaryProtein',
+          'HKQuantityTypeIdentifierDietaryCarbohydrates',
+          'HKQuantityTypeIdentifierDietaryFatTotal'
+        ]
+      }
     }
   }
 };
