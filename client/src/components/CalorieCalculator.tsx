@@ -1058,57 +1058,29 @@ interface UserFoodData {
 function UserFoodTextSuggestions({ onSuggestionClick }: { onSuggestionClick: (foodName: string) => void }) {
   const [userFoods, setUserFoods] = useState<UserFoodData[]>([]);
 
-  // Copy food name and nutritional info to clipboard
+  // Copy food name to clipboard
   const copyFoodInfo = async (food: UserFoodData) => {
     try {
-      // Create detailed food information string
-      const nutritionInfo = [
-        `${food.name}`,
-        `Calories: ${Math.round(food.calories || 0)}`,
-        `Protein: ${(food.protein || 0).toFixed(1)}g`,
-        `Carbs: ${(food.carbs || 0).toFixed(1)}g`,
-        `Fat: ${(food.fat || 0).toFixed(1)}g`
-      ];
-
-      // Add micronutrients if they exist
-      const micronutrients = [];
-      if ((food.iron || 0) > 0) micronutrients.push(`Iron: ${(food.iron || 0).toFixed(1)}mg`);
-      if ((food.calcium || 0) > 0) micronutrients.push(`Calcium: ${Math.round(food.calcium || 0)}mg`);
-      if ((food.vitaminC || 0) > 0) micronutrients.push(`Vitamin C: ${Math.round(food.vitaminC || 0)}mg`);
-      if ((food.zinc || 0) > 0) micronutrients.push(`Zinc: ${(food.zinc || 0).toFixed(1)}mg`);
-      if ((food.magnesium || 0) > 0) micronutrients.push(`Magnesium: ${Math.round(food.magnesium || 0)}mg`);
-      if ((food.vitaminD || 0) > 0) micronutrients.push(`Vitamin D: ${(food.vitaminD || 0).toFixed(1)}μg`);
+      // Copy only the food name
+      await navigator.clipboard.writeText(food.name);
       
-      if (micronutrients.length > 0) {
-        nutritionInfo.push(...micronutrients);
-      }
-
-      const fullInfo = nutritionInfo.join(' • ');
-      await navigator.clipboard.writeText(fullInfo);
-      
-      // Show enhanced success confirmation with nutrition details
+      // Show simple success confirmation
       window.dispatchEvent(new CustomEvent('show-toast', {
         detail: { 
-          message: `✅ Copied food entry: ${food.name} (${Math.round(food.calories || 0)} cal, P:${(food.protein || 0).toFixed(1)}g, C:${(food.carbs || 0).toFixed(1)}g, F:${(food.fat || 0).toFixed(1)}g)`,
-          type: 'success',
-          duration: 4000 // Show longer for detailed info
+          message: `✅ Copied "${food.name}" to clipboard`,
+          type: 'success'
         }
       }));
 
-      // Log successful copy with details
-      console.log(`📋 Food entry copied to clipboard:`, {
-        name: food.name,
-        calories: food.calories,
-        macros: `P:${food.protein}g C:${food.carbs}g F:${food.fat}g`,
-        fullText: fullInfo
-      });
+      // Log successful copy
+      console.log(`📋 Food name copied to clipboard: ${food.name}`);
 
     } catch (error) {
       console.error('❌ Failed to copy food entry:', error);
-      // Show error toast with retry suggestion
+      // Show error toast
       window.dispatchEvent(new CustomEvent('show-toast', {
         detail: { 
-          message: `❌ Failed to copy ${food.name} - please try again`,
+          message: `❌ Failed to copy ${food.name}`,
           type: 'error'
         }
       }));
@@ -1273,7 +1245,7 @@ function UserFoodTextSuggestions({ onSuggestionClick }: { onSuggestionClick: (fo
                   copyFoodInfo(food);
                 }}
                 className="ml-2 p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all duration-200"
-                title={`Copy nutrition info for ${food.name} (${Math.round(food.calories || 0)} cal)`}
+                title={`Copy food name: ${food.name}`}
                 data-testid={`button-copy-food-${food.name.toLowerCase().replace(/\s+/g, '-')}`}
               >
                 <Copy className="w-4 h-4" />
