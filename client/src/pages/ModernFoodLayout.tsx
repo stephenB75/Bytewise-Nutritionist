@@ -104,6 +104,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const [weeklyMeals, setWeeklyMeals] = useState<any[]>([]);
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
   const [trackingView, setTrackingView] = useState<TrackingView>('daily');
+  const [nutritionMode, setNutritionMode] = useState<'ai' | 'calculator'>('ai');
 
   const [notifications, setNotifications] = useState<Notification[]>([]);
   
@@ -2049,8 +2050,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
 
   const renderCalculator = () => {
-    const [nutritionMode, setNutritionMode] = useState<'ai' | 'calculator'>('ai');
-
     return (
       <div className={`space-y-0 page-container animate-in fade-in ${getAnimationDirection('nutrition', previousTab)} duration-700 ease-out`}>
         <HeroSection
