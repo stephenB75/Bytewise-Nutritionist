@@ -509,7 +509,7 @@ function CalorieCalculator({
   // Compact view for smaller spaces
   if (isCompact) {
     return (
-      <Card className="p-4 bg-white/90 backdrop-blur-sm border-0 shadow-lg">
+      <Card className="p-4 bg-white/95 backdrop-blur-sm border-0 shadow-lg">
         <div className="flex items-center gap-2 mb-3">
           <Calculator className="w-5 h-5 text-blue-600" />
           <h3 className="text-lg font-bold text-gray-900">Quick Calorie Calculator</h3>
@@ -662,7 +662,7 @@ function CalorieCalculator({
     <div className="space-y-6 relative">
       {/* Success Animation Modal */}
       {showLoggedAnimation && loggedData && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/80 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="bg-white rounded-2xl p-8 mx-4 max-w-sm w-full shadow-2xl animate-in zoom-in-95 duration-500">
             <div className="text-center space-y-4">
               <div className="relative">
@@ -706,7 +706,7 @@ function CalorieCalculator({
       )}
 
       {/* User Guide Card - Moved Above */}
-      <Card className="p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg">
+      <Card className="p-6 bg-white/95 backdrop-blur-sm border-0 shadow-lg">
         <h3 className="text-lg font-bold text-gray-900 mb-4">How to Use</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -733,7 +733,7 @@ function CalorieCalculator({
       </Card>
 
       {/* Main Calculator */}
-      <Card className="p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg">
+      <Card className="p-6 bg-white/95 backdrop-blur-sm border-0 shadow-lg">
         <div className="flex items-center gap-3 mb-6">
           <div className="p-2 bg-blue-100 rounded-lg">
             <Calculator className="w-6 h-6 text-blue-600" />
@@ -890,7 +890,7 @@ function CalorieCalculator({
 
       {/* Results */}
       {recentAnalyses.length > 0 && (
-        <Card className="p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg">
+        <Card className="p-6 bg-white/95 backdrop-blur-sm border-0 shadow-lg">
           <h3 className="text-lg font-bold text-gray-900 mb-4">Recent Analyses</h3>
           
           <div className="space-y-4">

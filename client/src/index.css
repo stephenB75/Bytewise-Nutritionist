@@ -167,7 +167,7 @@ html {
 
 /* Apply Clean High-Contrast Colors to body and root */
 body {
-  background-color: #ffffff !important;
+  background-color: #fef3c7 !important; /* Light yellow background */
   color: #1f2937 !important;
   margin: 0;
   padding: 0;
@@ -176,18 +176,18 @@ body {
 }
 
 #root {
-  background-color: #ffffff !important;
+  background-color: #fef3c7 !important; /* Light yellow background */
   min-height: 100vh;
 }
 
 /* Updated mode body styling */
 .dark body {
-  background-color: #ffffff !important;
+  background-color: #fef3c7 !important; /* Light yellow background */
   color: #1f2937 !important;
 }
 
 .dark #root {
-  background-color: #ffffff !important;
+  background-color: #fef3c7 !important; /* Light yellow background */
 }
 
 /* Global text size improvements for accessibility */

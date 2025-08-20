@@ -181,7 +181,7 @@ export function AppTour({ isOpen, onClose, onComplete }: AppTourProps) {
   return (
     <div className="fixed inset-0 z-[9999] touch-none" data-testid="app-tour-overlay">
       {/* Dark overlay - prevents interaction with underlying elements */}
-      <div className="absolute inset-0 bg-white/80 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
       
       {/* Highlight circle/rectangle */}
       {targetElement && (
@@ -194,7 +194,7 @@ export function AppTour({ isOpen, onClose, onComplete }: AppTourProps) {
             height: highlightPosition.height,
           }}
         >
-          <div className="w-full h-full rounded-lg border-4 border-blue-500 shadow-[0_0_0_9999px_rgba(255,255,255,0.8)] animate-pulse bg-blue-100/30" />
+          <div className="w-full h-full rounded-lg border-4 border-white shadow-[0_0_0_9999px_rgba(0,0,0,0.6)] animate-pulse bg-white/20" />
           {/* Pulsing highlight effect */}
           <div className="absolute inset-0 rounded-lg border-2 border-blue-400 animate-ping opacity-75" />
         </div>
