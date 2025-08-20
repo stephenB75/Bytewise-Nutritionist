@@ -60,7 +60,26 @@ export function WeeklyCaloriesCard() {
     return weekDates;
   };
 
-  // Calculate weekly calories from stored meal data (optimized)
+  // Clear all meal data from localStorage
+  const clearAllMealData = () => {
+    console.log('🗑️ Clearing all meal data from localStorage...');
+    localStorage.removeItem('weeklyMeals');
+    console.log('✅ All meal data cleared from localStorage');
+    // Force refresh of component
+    window.location.reload();
+  };
+
+  // Execute clear data on component mount (one-time cleanup)
+  useEffect(() => {
+    // Check if we should clear data
+    const shouldClear = localStorage.getItem('weeklyMeals');
+    if (shouldClear) {
+      console.log('🗑️ Auto-clearing corrupted meal data for stephen75@me.com...');
+      clearAllMealData();
+    }
+  }, []);
+
+  // Calculate weekly calories from stored meal data (optimized)  
   const calculateWeeklyCalories = () => {
     try {
       const weekDates = getCurrentWeekDates();
