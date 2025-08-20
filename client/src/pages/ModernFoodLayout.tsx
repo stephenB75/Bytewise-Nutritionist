@@ -1034,7 +1034,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const BytewiseLogo = React.memo(() => (
     <div className="mb-8 cursor-pointer group transition-all duration-300 hover:scale-105" onClick={() => handleTabChange('home')}>
       <div className="text-center font-league-spartan">
-        <div className="text-7xl font-black leading-none text-blue-600 mb-2 lowercase tracking-tight drop-shadow-2xl group-hover:text-blue-500 transition-colors duration-300">
+        <div className="text-7xl font-black leading-none text-yellow-500 mb-2 lowercase tracking-tight drop-shadow-2xl group-hover:text-yellow-400 transition-colors duration-300">
           bytewise
         </div>
         <div className="text-xl font-light text-black uppercase tracking-widest drop-shadow-lg group-hover:text-black transition-colors duration-300">
@@ -1390,7 +1390,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 { label: 'Total', value: loggedMeals.length }
               ].map((item, index) => (
                 <div key={index} className="text-center p-2 bg-white border border-gray-300 rounded-lg">
-                  <div className="text-sm font-bold text-blue-400">{item.value}</div>
+                  <div className="text-sm font-bold text-yellow-500">{item.value}</div>
                   <div className="text-xs text-black">{item.label}</div>
                 </div>
               ))}
@@ -1587,7 +1587,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     <p className="text-black text-sm">
                       {meal.time} • {meal.mealType}
                       {searchQuery && (
-                        <span className="ml-2 text-blue-400">
+                        <span className="ml-2 text-yellow-500">
                           • {(() => {
                             // Handle different date formats for display
                             const displayDate = meal.date && meal.date.includes('T') 
@@ -1760,7 +1760,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   <p className="text-black text-sm">{Math.round(weeklyCalories)}/{weeklyGoal} kcal</p>
                 </div>
                 <div className="text-right">
-                  <div className="text-2xl font-bold text-blue-400">{Math.round((weeklyCalories/weeklyGoal)*100)}%</div>
+                  <div className="text-2xl font-bold text-yellow-500">{Math.round((weeklyCalories/weeklyGoal)*100)}%</div>
                   <div className="text-xs text-black">completed</div>
                 </div>
               </div>
@@ -1850,19 +1850,19 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           <Card className="bg-white backdrop-blur-md border-gray-300 p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-black font-semibold text-xl">Weekly Goals</h3>
-              <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
+              <Badge className="bg-yellow-500/20 text-yellow-500 border-blue-500/30">
                 <Calendar className="w-3 h-3 mr-1" />
                 2/4 Complete
               </Badge>
             </div>
             <div className="grid grid-cols-1 gap-3">
-              <div className="flex items-center justify-between p-3 bg-blue-500/20 rounded-xl border border-blue-500/30">
+              <div className="flex items-center justify-between p-3 bg-yellow-500/20 rounded-xl border border-blue-500/30">
                 <span className="text-black">Track 5+ days</span>
                 <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
                   <span className="text-black text-xs">✓</span>
                 </div>
               </div>
-              <div className="flex items-center justify-between p-3 bg-blue-500/20 rounded-xl border border-blue-500/30">
+              <div className="flex items-center justify-between p-3 bg-yellow-500/20 rounded-xl border border-blue-500/30">
                 <span className="text-black">Average 2000+ cal/day</span>
                 <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
                   <span className="text-black text-xs">✓</span>
@@ -1902,7 +1902,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           ) : achievements.length > 0 ? (
             <div className="grid grid-cols-2 gap-4">
               {achievements.slice(0, 4).map((achievement) => (
-                <Card key={achievement.id} className={`${achievement.colorClass || 'bg-blue-500/20 border-blue-500/30'} backdrop-blur-md p-4`}>
+                <Card key={achievement.id} className={`${achievement.colorClass || 'bg-yellow-500/20 border-blue-500/30'} backdrop-blur-md p-4`}>
                   <div className="text-center">
                     <div className="text-3xl mb-2">{getAchievementIcon(achievement.iconName)}</div>
                     <h4 className="text-black font-semibold text-sm">{achievement.title}</h4>
@@ -2171,7 +2171,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               </div>
 
               {isSignUp && (
-                <div className="mt-4 p-3 bg-blue-500/20 rounded-lg">
+                <div className="mt-4 p-3 bg-yellow-500/20 rounded-lg">
                   <p className="text-xs text-black text-center">
                     By creating an account, you must verify your email address before you can sign in.
                   </p>

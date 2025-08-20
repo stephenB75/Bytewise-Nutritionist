@@ -555,13 +555,13 @@ function CalorieCalculator({
               }}
               onSearchChange={(query) => setIngredient(query)}
               placeholder="Search Meal's"
-              className="text-base bg-white border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg pr-4 py-3 text-gray-900 placeholder-gray-500"
+              className="text-base bg-white border-2 border-gray-300 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/20 rounded-lg pr-4 py-3 text-gray-900 placeholder-gray-500"
             />
             <Input
               placeholder="Measurement (e.g., 1 cup, 100g, 1 medium)"
               value={measurement}
               onChange={(e) => setMeasurement(e.target.value)}
-              className="text-base bg-white border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-500"
+              className="text-base bg-white border-2 border-gray-300 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/20 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-500"
               data-testid="input-measurement-compact"
             />
           </div>
@@ -643,7 +643,7 @@ function CalorieCalculator({
                   <Button
                     size="sm"
                     onClick={() => logToWeeklyTracker(analysis)}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                    className="w-full bg-yellow-500 hover:bg-yellow-600 text-black"
                   >
                     <Plus className="w-3 h-3 mr-1" />
                     Log to Weekly Tracker
@@ -670,7 +670,7 @@ function CalorieCalculator({
                   <Trophy className="w-10 h-10 text-white" />
                 </div>
                 <div className="absolute -top-2 -right-2">
-                  <Sparkles className="w-6 h-6 text-blue-500 animate-spin" />
+                  <Sparkles className="w-6 h-6 text-yellow-500 animate-spin" />
                 </div>
               </div>
               
@@ -686,7 +686,7 @@ function CalorieCalculator({
                   <div className="text-gray-500">Protein</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-blue-600 font-bold">{loggedData.carbs?.toFixed(1)}g</div>
+                  <div className="text-yellow-600 font-bold">{loggedData.carbs?.toFixed(1)}g</div>
                   <div className="text-gray-500">Carbs</div>
                 </div>
                 <div className="text-center">
@@ -811,7 +811,7 @@ function CalorieCalculator({
                   setIngredientSuggestions([]);
                 }}
                 placeholder="Search Meal's"
-                className="text-base bg-white border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg pr-4 py-3 text-gray-900 placeholder-gray-500"
+                className="text-base bg-white border-2 border-gray-300 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/20 rounded-lg pr-4 py-3 text-gray-900 placeholder-gray-500"
               />
               
               <p className="text-xs text-gray-500 mt-1">
@@ -828,7 +828,7 @@ function CalorieCalculator({
                 placeholder="e.g., 1 cup, 100g, 1 medium, 2 tablespoons, 1 slice"
                 value={measurement}
                 onChange={(e) => setMeasurement(e.target.value)}
-                className="text-base bg-white border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-500"
+                className="text-base bg-white border-2 border-gray-300 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/20 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-500"
                 data-testid="input-measurement"
               />
               <p className="text-xs text-gray-500 mt-1">

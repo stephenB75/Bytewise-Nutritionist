@@ -384,7 +384,7 @@ export function WeeklyCaloriesCard() {
                   {dayData.calories > 0 ? (
                     <div className="flex items-center gap-2">
                       <Flame className={`w-4 h-4 ${
-                        isToday ? 'text-blue-600' : 'text-gray-600'
+                        isToday ? 'text-yellow-500' : 'text-gray-500'
                       }`} />
                       <span className={`font-bold text-lg ${
                         isToday ? 'text-[#0099FF]' : 'text-black'
