@@ -95,7 +95,7 @@ export function WeeklyCaloriesCard() {
           meal.calories = 150; // Reset unrealistic calories
         }
         
-        // CRITICAL: Use timestamp to place meals on their ACTUAL historical dates
+        // AGGRESSIVE RECOVERY: Force fix ALL timestamp mismatches immediately
         if (meal.timestamp) {
           const actualHistoricalDate = meal.timestamp.split('T')[0];
           let currentMealDate = meal.date;
@@ -105,15 +105,16 @@ export function WeeklyCaloriesCard() {
             currentMealDate = meal.date.split('T')[0];
           }
           
-          // HISTORICAL RECOVERY: Restore to actual logged date (even if weeks/months ago)
+          // FORCE CORRECTION: Always use timestamp date if available
           if (currentMealDate !== actualHistoricalDate) {
             recoveryCount++;
-            console.log(`🕰️ HISTORICAL RECOVERY ${recoveryCount}: "${meal.name}"`);
-            console.log(`   From: ${currentMealDate} → To: ${actualHistoricalDate} (original date)`);
+            console.log(`🚨 FORCE RECOVERY ${recoveryCount}: "${meal.name}"`);
+            console.log(`   CORRECTING: ${currentMealDate} → ${actualHistoricalDate}`);
             
+            // Return corrected meal with historical date
             return {
               ...meal,
-              date: actualHistoricalDate // Restore to actual historical date
+              date: actualHistoricalDate // Use actual timestamp date
             };
           }
         } else {
@@ -127,7 +128,8 @@ export function WeeklyCaloriesCard() {
       localStorage.setItem('weeklyMeals', JSON.stringify(recoveredMeals));
       
       if (recoveryCount > 0) {
-        console.log(`✅ RECOVERED ${recoveryCount} meals to correct dates!`);
+        console.log(`🚨 FORCE RECOVERY COMPLETED: ${recoveryCount} meals corrected`);
+        console.log(`💾 SAVED ${recoveryCount} corrected meals to localStorage`);
       } else {
         console.log('ℹ️ No recovery needed - dates are correct');
       }
