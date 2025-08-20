@@ -858,31 +858,8 @@ export class DatabaseStorage implements IStorage {
           )
         );
 
-      // Filter out corrupted meals before calculation
-      const validMeals = dayMeals.filter(meal => {
-        const calories = Number(meal.totalCalories || 0);
-        const isValidCalories = calories >= 0 && calories <= 3000;
-        const hasName = meal.name && meal.name.trim().length > 0;
-        
-        // Log invalid meals for debugging
-        if (!isValidCalories) {
-          console.log(`🚫 Invalid meal calories: "${meal.name}" = ${calories}`);
-        }
-        
-        return isValidCalories && hasName;
-      });
-      
-      // Limit to reasonable number of meals per day (max 20 meals)
-      const limitedValidMeals = validMeals.slice(0, 20);
-      
-      console.log(`📊 Daily stats: ${dayMeals.length} total meals, ${validMeals.length} valid meals, using ${limitedValidMeals.length} meals`);
-      
-      if (dayMeals.length > 30) {
-        console.log(`⚠️ High meal count (${dayMeals.length}) for single day - monitoring for potential issues`);
-      }
-      
-      // Sum up nutrition from limited valid meals only
-      const totals = limitedValidMeals.reduce((acc, meal) => ({
+      // Sum up nutrition from all meals
+      const totals = dayMeals.reduce((acc, meal) => ({
         totalCalories: acc.totalCalories + Number(meal.totalCalories || 0),
         totalProtein: acc.totalProtein + Number(meal.totalProtein || 0),
         totalCarbs: acc.totalCarbs + Number(meal.totalCarbs || 0),

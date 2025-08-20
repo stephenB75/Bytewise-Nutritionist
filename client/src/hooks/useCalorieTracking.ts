@@ -76,24 +76,18 @@ export function useCalorieTracking() {
     mutationFn: async (calorieEntry: CalculatedCalories) => {
       // Store in localStorage instead of requiring authentication
       const weeklyMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-      const now = new Date();
-      // Validate before creating meal entry
-      if (!validateNutritionData(calorieEntry)) {
-        throw new Error('Invalid meal data - nutritional values must be realistic');
-      }
-
       const mealEntry = {
         name: calorieEntry.name,
-        calories: Number(calorieEntry.calories) || 0,
-        protein: Number(calorieEntry.protein) || 0,
-        carbs: Number(calorieEntry.carbs) || 0,
-        fat: Number(calorieEntry.fat) || 0,
-        date: getLocalDateKey(now), // Ensure consistent date format (YYYY-MM-DD)
+        calories: calorieEntry.calories,
+        protein: calorieEntry.protein,
+        carbs: calorieEntry.carbs,
+        fat: calorieEntry.fat,
+        date: calorieEntry.date,
         time: calorieEntry.time.replace(/:\d\d$/, ''), // Remove seconds for display
-        category: getMealTypeByTime(now),
-        timestamp: now.toISOString(), // Keep timestamp for sorting and detailed tracking
+        category: getMealTypeByTime(),
+        timestamp: new Date().toISOString(),
         source: 'calculator',
-        mealType: getMealTypeByTime(now)
+        mealType: getMealTypeByTime()
       };
       
       weeklyMeals.push(mealEntry);
@@ -109,31 +103,8 @@ export function useCalorieTracking() {
     },
   });
 
-  // Data validation function
-  const validateNutritionData = useCallback((data: any): boolean => {
-    const calories = Number(data.calories) || 0;
-    const protein = Number(data.protein) || 0;
-    const carbs = Number(data.carbs) || 0;
-    const fat = Number(data.fat) || 0;
-
-    // Validate realistic ranges
-    if (calories < 0 || calories > 10000) return false;
-    if (protein < 0 || protein > 500) return false;
-    if (carbs < 0 || carbs > 1000) return false;
-    if (fat < 0 || fat > 500) return false;
-    if (!data.name || typeof data.name !== 'string' || data.name.trim().length === 0) return false;
-
-    return true;
-  }, []);
-
-  // Add calculated calories with validation
+  // Add calculated calories
   const addCalculatedCalories = useCallback(async (calories: Omit<CalculatedCalories, 'id' | 'date' | 'time' | 'source'>) => {
-    // Validate data before adding
-    if (!validateNutritionData(calories)) {
-      console.error('❌ Invalid nutrition data rejected:', calories);
-      throw new Error('Invalid nutrition data - values must be realistic');
-    }
-
     const now = new Date();
     const newEntry: CalculatedCalories = {
       ...calories,

@@ -86,7 +86,6 @@ interface CalorieCalculatorProps {
     category: 'breakfast' | 'lunch' | 'dinner' | 'snack';
   }) => void;
   isCompact?: boolean;
-  selectedDate?: string; // YYYY-MM-DD format date for meal logging
 }
 
 interface LoggedMealData {
@@ -118,8 +117,7 @@ function CalorieCalculator({
   onNavigate, 
   onCaloriesCalculated, 
   onLogToWeekly, 
-  isCompact = false,
-  selectedDate 
+  isCompact = false 
 }: CalorieCalculatorProps) {
   // State management
   const [ingredient, setIngredient] = useState('');
@@ -132,17 +130,6 @@ function CalorieCalculator({
 
   // Achievement system hook
   const checkAchievements = useCheckAchievements();
-  
-  // Helper function to get the correct date for meal logging
-  const getTargetDate = () => {
-    if (selectedDate) {
-      // Parse YYYY-MM-DD format and create date at current time
-      const [year, month, day] = selectedDate.split('-').map(Number);
-      const targetDate = new Date();
-      return new Date(year, month - 1, day, targetDate.getHours(), targetDate.getMinutes(), targetDate.getSeconds());
-    }
-    return new Date(); // Fallback to current date
-  };
 
   // Search ingredients as user types
   useEffect(() => {
@@ -372,8 +359,8 @@ function CalorieCalculator({
   };
 
   const logToWeeklyTracker = async (analysis: IngredientAnalysis) => {
-    const targetDate = getTargetDate(); // Use selected date for meal logging
-    const mealType = getMealTypeByTime(targetDate);
+    const now = new Date(); // Use actual current date
+    const mealType = getMealTypeByTime(now);
 
     // Calculate scaling factor based on actual serving vs 100g
     // The estimatedCalories is already scaled for the actual serving
@@ -398,11 +385,11 @@ function CalorieCalculator({
       vitaminD: (analysis.nutritionPer100g?.vitaminD || 0) * scalingFactor,
       vitaminB12: (analysis.nutritionPer100g?.vitaminB12 || 0) * scalingFactor,
       folate: (analysis.nutritionPer100g?.folate || 0) * scalingFactor,
-      date: getLocalDateKey(targetDate),
-      time: formatLocalTime(targetDate),
+      date: getLocalDateKey(now),
+      time: formatLocalTime(now),
       mealType,
       category: mealType,
-      timestamp: targetDate.toISOString(),
+      timestamp: now.toISOString(),
       source: 'calculator'
     };
 
@@ -509,7 +496,7 @@ function CalorieCalculator({
   // Compact view for smaller spaces
   if (isCompact) {
     return (
-      <Card className="p-4 bg-white/95 backdrop-blur-sm border-0 shadow-lg">
+      <Card className="p-4 bg-white/90 backdrop-blur-sm border-0 shadow-lg">
         <div className="flex items-center gap-2 mb-3">
           <Calculator className="w-5 h-5 text-blue-600" />
           <h3 className="text-lg font-bold text-gray-900">Quick Calorie Calculator</h3>
@@ -520,8 +507,8 @@ function CalorieCalculator({
             <FoodSearchWithHistory
               onSelectFood={async (food) => {
                 // Quick re-log from history
-                const targetDate = getTargetDate(); // Use selected date for meal logging
-                const mealType = getMealTypeByTime(targetDate);
+                const now = new Date(); // Use actual current date
+                const mealType = getMealTypeByTime(now);
                 
                 const mealData: LoggedMealData = {
                   id: `relogged-${Date.now()}`,
@@ -530,11 +517,11 @@ function CalorieCalculator({
                   protein: food.protein,
                   carbs: food.carbs,
                   fat: food.fat,
-                  date: getLocalDateKey(targetDate),
-                  time: formatLocalTime(targetDate),
+                  date: getLocalDateKey(now),
+                  time: formatLocalTime(now),
                   mealType,
                   category: mealType,
-                  timestamp: targetDate.toISOString(),
+                  timestamp: now.toISOString(),
                   source: 'history'
                 };
                 
@@ -555,13 +542,13 @@ function CalorieCalculator({
               }}
               onSearchChange={(query) => setIngredient(query)}
               placeholder="Search Meal's"
-              className="text-base bg-white border-2 border-gray-300 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/20 rounded-lg pr-4 py-3 text-gray-900 placeholder-gray-500"
+              className="text-base bg-white border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg pr-4 py-3 text-gray-900 placeholder-gray-500"
             />
             <Input
               placeholder="Measurement (e.g., 1 cup, 100g, 1 medium)"
               value={measurement}
               onChange={(e) => setMeasurement(e.target.value)}
-              className="text-base bg-white border-2 border-gray-300 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/20 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-500"
+              className="text-base bg-white border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-500"
               data-testid="input-measurement-compact"
             />
           </div>
@@ -643,7 +630,7 @@ function CalorieCalculator({
                   <Button
                     size="sm"
                     onClick={() => logToWeeklyTracker(analysis)}
-                    className="w-full bg-yellow-500 hover:bg-yellow-600 text-black"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                   >
                     <Plus className="w-3 h-3 mr-1" />
                     Log to Weekly Tracker
@@ -662,7 +649,7 @@ function CalorieCalculator({
     <div className="space-y-6 relative">
       {/* Success Animation Modal */}
       {showLoggedAnimation && loggedData && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
           <div className="bg-white rounded-2xl p-8 mx-4 max-w-sm w-full shadow-2xl animate-in zoom-in-95 duration-500">
             <div className="text-center space-y-4">
               <div className="relative">
@@ -670,7 +657,7 @@ function CalorieCalculator({
                   <Trophy className="w-10 h-10 text-white" />
                 </div>
                 <div className="absolute -top-2 -right-2">
-                  <Sparkles className="w-6 h-6 text-yellow-500 animate-spin" />
+                  <Sparkles className="w-6 h-6 text-yellow-400 animate-spin" />
                 </div>
               </div>
               
@@ -706,7 +693,7 @@ function CalorieCalculator({
       )}
 
       {/* User Guide Card - Moved Above */}
-      <Card className="p-6 bg-white/95 backdrop-blur-sm border-0 shadow-lg">
+      <Card className="p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg">
         <h3 className="text-lg font-bold text-gray-900 mb-4">How to Use</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -733,7 +720,7 @@ function CalorieCalculator({
       </Card>
 
       {/* Main Calculator */}
-      <Card className="p-6 bg-white/95 backdrop-blur-sm border-0 shadow-lg">
+      <Card className="p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg">
         <div className="flex items-center gap-3 mb-6">
           <div className="p-2 bg-blue-100 rounded-lg">
             <Calculator className="w-6 h-6 text-blue-600" />
@@ -754,8 +741,8 @@ function CalorieCalculator({
               <FoodSearchWithHistory
                 onSelectFood={async (food) => {
                   // For historical meals, we can directly log them
-                  const targetDate = getTargetDate(); // Use selected date for meal logging
-                  const mealType = getMealTypeByTime(targetDate);
+                  const now = new Date(); // Use actual current date
+                  const mealType = getMealTypeByTime(now);
                   
                   // Create the logged meal data
                   const mealData: LoggedMealData = {
@@ -765,11 +752,11 @@ function CalorieCalculator({
                     protein: food.protein,
                     carbs: food.carbs,
                     fat: food.fat,
-                    date: getLocalDateKey(targetDate),
-                    time: formatLocalTime(targetDate),
+                    date: getLocalDateKey(now),
+                    time: formatLocalTime(now),
                     mealType,
                     category: mealType,
-                    timestamp: targetDate.toISOString(),
+                    timestamp: now.toISOString(),
                     source: 'history'
                   };
                   
@@ -811,7 +798,7 @@ function CalorieCalculator({
                   setIngredientSuggestions([]);
                 }}
                 placeholder="Search Meal's"
-                className="text-base bg-white border-2 border-gray-300 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/20 rounded-lg pr-4 py-3 text-gray-900 placeholder-gray-500"
+                className="text-base bg-white border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg pr-4 py-3 text-gray-900 placeholder-gray-500"
               />
               
               <p className="text-xs text-gray-500 mt-1">
@@ -828,7 +815,7 @@ function CalorieCalculator({
                 placeholder="e.g., 1 cup, 100g, 1 medium, 2 tablespoons, 1 slice"
                 value={measurement}
                 onChange={(e) => setMeasurement(e.target.value)}
-                className="text-base bg-white border-2 border-gray-300 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/20 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-500"
+                className="text-base bg-white border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-500"
                 data-testid="input-measurement"
               />
               <p className="text-xs text-gray-500 mt-1">
@@ -890,7 +877,7 @@ function CalorieCalculator({
 
       {/* Results */}
       {recentAnalyses.length > 0 && (
-        <Card className="p-6 bg-white/95 backdrop-blur-sm border-0 shadow-lg">
+        <Card className="p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg">
           <h3 className="text-lg font-bold text-gray-900 mb-4">Recent Analyses</h3>
           
           <div className="space-y-4">

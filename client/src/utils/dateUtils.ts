@@ -24,68 +24,6 @@ export function getLocalEndOfDay(date: Date = new Date()): Date {
 }
 
 /**
- * Clean up old meal data, keeping only the last 30 days
- * This prevents excessive data accumulation while maintaining search history
- */
-export function cleanupOldWeeklyData(): boolean {
-  const today = new Date();
-  const thirtyDaysAgo = new Date(today.getTime() - (30 * 24 * 60 * 60 * 1000));
-  const cutoffDateKey = getLocalDateKey(thirtyDaysAgo);
-  
-  // Check if we've already cleaned up today
-  const lastCleanupDate = localStorage.getItem('lastDataCleanup');
-  const todayKey = getLocalDateKey(today);
-  
-  if (lastCleanupDate === todayKey) {
-    // Already cleaned up today
-    return false;
-  }
-  
-  console.log('🧹 Starting data cleanup - keeping last 30 days since:', cutoffDateKey);
-  
-  // Clean up weeklyMeals - keep only last 30 days
-  const weeklyMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-  const recentMeals = weeklyMeals.filter((meal: any) => {
-    let mealDate = meal.date;
-    if (mealDate && mealDate.includes('T')) {
-      mealDate = mealDate.split('T')[0];
-    }
-    return mealDate >= cutoffDateKey;
-  });
-  
-  // Clean up calculatedCalories - keep only last 30 days  
-  const calculatedCalories = JSON.parse(localStorage.getItem('calculatedCalories') || '[]');
-  const recentCalories = calculatedCalories.filter((entry: any) => {
-    let entryDate = entry.date;
-    if (entryDate && entryDate.includes('T')) {
-      entryDate = entryDate.split('T')[0];
-    }
-    return entryDate >= cutoffDateKey;
-  });
-  
-  const cleanedMeals = weeklyMeals.length - recentMeals.length;
-  const cleanedCalories = calculatedCalories.length - recentCalories.length;
-  
-  // Update localStorage with cleaned data
-  localStorage.setItem('weeklyMeals', JSON.stringify(recentMeals));
-  localStorage.setItem('calculatedCalories', JSON.stringify(recentCalories));
-  
-  // Mark today as cleaned
-  localStorage.setItem('lastDataCleanup', todayKey);
-  
-  console.log(`✅ Data cleanup complete:`, {
-    mealsRemoved: cleanedMeals,
-    caloriesRemoved: cleanedCalories,
-    cutoffDate: cutoffDateKey,
-    remainingMeals: recentMeals.length,
-    remainingCalories: recentCalories.length
-  });
-  
-  return cleanedMeals > 0 || cleanedCalories > 0;
-}
-
-
-/**
  * Format date as YYYY-MM-DD in local timezone
  * This is used as the key for storing daily data
  * Enhanced with user preference override for timezone alignment

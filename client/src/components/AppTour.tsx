@@ -181,7 +181,7 @@ export function AppTour({ isOpen, onClose, onComplete }: AppTourProps) {
   return (
     <div className="fixed inset-0 z-[9999] touch-none" data-testid="app-tour-overlay">
       {/* Dark overlay - prevents interaction with underlying elements */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
       
       {/* Highlight circle/rectangle */}
       {targetElement && (
@@ -194,15 +194,15 @@ export function AppTour({ isOpen, onClose, onComplete }: AppTourProps) {
             height: highlightPosition.height,
           }}
         >
-          <div className="w-full h-full rounded-lg border-4 border-yellow-400 shadow-[0_0_0_9999px_rgba(0,0,0,0.6)] animate-pulse bg-yellow-100/30" />
+          <div className="w-full h-full rounded-lg border-4 border-blue-500 shadow-[0_0_0_9999px_rgba(0,0,0,0.7)] animate-pulse bg-white/10" />
           {/* Pulsing highlight effect */}
-          <div className="absolute inset-0 rounded-lg border-2 border-yellow-300 animate-ping opacity-75" />
+          <div className="absolute inset-0 rounded-lg border-2 border-blue-400 animate-ping opacity-75" />
         </div>
       )}
 
       {/* Tour tooltip - centered on screen */}
       <Card
-        className="absolute bg-white dark:bg-gray-800 border-2 border-emerald-200 dark:border-emerald-700 shadow-2xl rounded-lg"
+        className="absolute bg-white dark:bg-gray-800 border-2 border-blue-200 dark:border-blue-700 shadow-2xl rounded-lg"
         style={{
           top: tooltipPosition.top,
           left: tooltipPosition.left,
@@ -216,7 +216,7 @@ export function AppTour({ isOpen, onClose, onComplete }: AppTourProps) {
           {/* Header */}
           <div className="flex items-start justify-between mb-3 sm:mb-4">
             <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500 flex-shrink-0" />
+              <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500 flex-shrink-0" />
               <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                 Step {currentStep + 1} of {TOUR_STEPS.length}
               </span>
@@ -241,8 +241,8 @@ export function AppTour({ isOpen, onClose, onComplete }: AppTourProps) {
               {step.description}
             </p>
             {step.action && (
-              <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-lg p-2 sm:p-3 border border-emerald-200 dark:border-emerald-700">
-                <p className="text-emerald-700 dark:text-emerald-300 text-xs font-medium">
+              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-2 sm:p-3 border border-blue-200 dark:border-blue-700">
+                <p className="text-blue-700 dark:text-blue-300 text-xs font-medium">
                   💡 {step.action}
                 </p>
               </div>
@@ -257,7 +257,7 @@ export function AppTour({ isOpen, onClose, onComplete }: AppTourProps) {
                   key={index}
                   className={`w-2 h-2 rounded-full transition-colors ${
                     index === currentStep 
-                      ? 'bg-emerald-500' 
+                      ? 'bg-blue-500' 
                       : index < currentStep 
                       ? 'bg-green-500' 
                       : 'bg-gray-300 dark:bg-gray-600'
@@ -281,7 +281,7 @@ export function AppTour({ isOpen, onClose, onComplete }: AppTourProps) {
               <Button
                 onClick={handleNext}
                 size="sm"
-                className="h-9 px-3 sm:px-4 bg-emerald-500 hover:bg-emerald-600 text-white text-xs sm:text-sm touch-manipulation"
+                className="h-9 px-3 sm:px-4 bg-blue-500 hover:bg-blue-600 text-white text-xs sm:text-sm touch-manipulation"
                 data-testid="tour-next-button"
               >
                 <span className="truncate">

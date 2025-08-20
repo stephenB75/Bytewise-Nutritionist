@@ -73,8 +73,8 @@ export default function VerifyEmail() {
         <div className="text-center space-y-6">
           {verificationStatus === 'verifying' && (
             <>
-              <div className="p-4 bg-emerald-500/20 rounded-full inline-block">
-                <Loader2 className="w-12 h-12 text-emerald-500 animate-spin" />
+              <div className="p-4 bg-blue-500/20 rounded-full inline-block">
+                <Loader2 className="w-12 h-12 text-blue-400 animate-spin" />
               </div>
               <h2 className="text-2xl font-bold text-white">Verifying Your Email</h2>
               <p className="text-gray-300">Please wait while we verify your email address...</p>

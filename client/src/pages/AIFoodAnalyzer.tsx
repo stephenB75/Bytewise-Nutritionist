@@ -226,7 +226,7 @@ export default function AIFoodAnalyzer() {
       {/* Header */}
       <div className="text-center space-y-2">
         <div className="flex items-center justify-center gap-2 mb-2">
-          <Sparkles className="h-6 w-6 text-emerald-500" />
+          <Sparkles className="h-6 w-6 text-blue-500" />
           <h2 className="text-2xl font-bold text-white">AI Food Analyzer</h2>
         </div>
         <p className="text-gray-400 max-w-2xl mx-auto">
@@ -274,7 +274,7 @@ export default function AIFoodAnalyzer() {
         <Card>
           <CardContent className="p-8">
             <div className="flex flex-col items-center space-y-4">
-              <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+              <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
               <h3 className="text-lg font-medium">Analyzing Your Food...</h3>
               <p className="text-muted-foreground text-center">
                 AI is identifying ingredients and calculating nutrition information
@@ -341,7 +341,7 @@ export default function AIFoodAnalyzer() {
                   <div className="text-sm text-muted-foreground">Calories</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-emerald-500">{analysisResult.totalNutrition.protein}g</div>
+                  <div className="text-2xl font-bold text-blue-600">{analysisResult.totalNutrition.protein}g</div>
                   <div className="text-sm text-muted-foreground">Protein</div>
                 </div>
                 <div className="text-center">

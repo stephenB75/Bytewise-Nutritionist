@@ -103,7 +103,7 @@
   padding-bottom: 0 !important; /* Remove any conflicting bottom padding */
 }
 
-/* Bottom navigation spacing and safe area handling - Updated colors */
+/* Bottom navigation spacing and safe area handling */
 .safe-area-pb {
   padding-bottom: max(0.5rem, env(safe-area-inset-bottom)) !important;
 }
@@ -127,48 +127,48 @@ html {
   font-size: 17px; /* Increased from 16px for better readability */
 }
 
-/* Profile Component Styles - Clean High-Contrast Color Scheme */
+/* Profile Component Styles - Clean and Consistent */
 .profile-username-header {
-  @apply text-xl font-bold text-gray-900 mb-1 truncate;
+  @apply text-xl font-bold text-white mb-1 truncate;
   font-family: 'League Spartan', sans-serif;
   transform: none;
   text-orientation: mixed;
 }
 
 .profile-email-text {
-  @apply text-gray-700 text-sm truncate;
+  @apply text-gray-300 text-sm truncate;
   transform: none;
 }
 
 .profile-display-text {
-  @apply text-gray-900 bg-white p-3 rounded-lg border border-gray-300 break-words;
+  @apply text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10 break-words;
   transform: none;
   text-orientation: mixed;
   writing-mode: horizontal-tb;
 }
 
 .profile-input-field {
-  @apply bg-white border-gray-300 text-gray-900 w-full;
+  @apply bg-white/10 border-white/20 text-white w-full;
 }
 
 .profile-input-field::placeholder {
-  color: rgba(107, 114, 128, 0.8) !important; /* Darker placeholder for visibility */
+  color: rgba(156, 163, 175, 0.5) !important; /* Lighter gray with reduced opacity */
   opacity: 1 !important;
 }
 
 .profile-label {
-  @apply text-sm text-gray-700 font-medium flex items-center;
+  @apply text-sm text-gray-300 font-medium flex items-center;
 }
 
 .profile-section-title {
-  @apply text-lg font-semibold text-gray-900 mb-4;
+  @apply text-lg font-semibold text-white mb-4;
   font-family: 'League Spartan', sans-serif;
 }
 
-/* Apply Clean High-Contrast Colors to body and root */
+/* Apply ByteWise brand colors to body and root */
 body {
-  background-color: #ffffff !important; /* Clean white background */
-  color: #1f2937 !important;
+  background-color: #0a0a00 !important;
+  color: #ffffff !important;
   margin: 0;
   padding: 0;
   min-height: 100vh;
@@ -176,18 +176,17 @@ body {
 }
 
 #root {
-  background-color: #ffffff !important; /* Clean white background */
+  background-color: #0a0a00 !important;
   min-height: 100vh;
 }
 
-/* Updated mode body styling */
+/* Dark mode body styling */
 .dark body {
-  background-color: #ffffff !important; /* Clean white background */
-  color: #1f2937 !important;
+  background-color: var(--background) !important;
 }
 
 .dark #root {
-  background-color: #ffffff !important; /* Clean white background */
+  background-color: var(--background) !important;
 }
 
 /* Global text size improvements for accessibility */
@@ -340,7 +339,7 @@ body {
   opacity: 1;
 }
 
-/* Global input text visibility improvements - Updated for high contrast */
+/* Global input text visibility improvements */
 input[type="text"], 
 input[type="email"], 
 input[type="password"], 
@@ -348,8 +347,6 @@ input[type="number"],
 input[type="search"],
 textarea {
   color: #1f2937 !important;
-  background-color: #ffffff !important;
-  border: 2px solid #d1d5db !important;
   font-weight: 400 !important;
   text-align: center !important;
 }
@@ -484,21 +481,20 @@ textarea:focus {
   background-color: #ffffff !important;
 }
 
-/* High-visibility input overrides */
+/* Dark background input overrides */
 .bg-white\/10 input,
 .bg-white\/5 input,
 .bg-gray-800 input,
 .bg-black input {
-  background-color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.95) !important;
   color: #1f2937 !important;
-  border: 2px solid #d1d5db !important;
 }
 
-/* Ensure excellent contrast on all input backgrounds */
+/* Ensure good contrast on all input backgrounds */
 input {
   background-color: #ffffff !important;
   color: #1f2937 !important;
-  border: 2px solid #d1d5db !important;
+  border: 1px solid #d1d5db;
 }
 
 /* Hero image entrance animations */
@@ -553,101 +549,99 @@ input {
   z-index: 0 !important;
 }
 
-/* Ensure navigation stays on top with new color scheme */
+/* Ensure navigation stays on top */
 .bottom-navigation {
   position: fixed !important;
   bottom: 0 !important;
   left: 0 !important;
   right: 0 !important;
   z-index: 50 !important;
-  background: #2563eb !important;
+  background: rgba(0, 0, 0, 0.9) !important;
   backdrop-filter: blur(10px) !important;
 }
 
 input:focus {
   background-color: #ffffff !important;
-  color: #1f2937 !important;
-  border-color: #2563eb !important;
-  border-width: 2px !important;
+  color: #111827 !important;
+  border-color: #3b82f6;
 }
 
 @custom-variant dark (&:is(.dark *));
 
 :root {
   --font-size: 14px;
-  /* Clean High-Contrast Brand Colors */
-  --brand-emerald: #10b981;
-  --brand-blue: #2563eb;
-  --brand-green: #059669;
-  --brand-background: #ffffff;
-  --icon-color: #6b7280;
+  /* ByteWise Brand Colors */
+  --brand-yellow: #faed39;
+  --brand-blue: #1f4aa6;
+  --brand-green: #45c73e;
+  --brand-background: #0a0a00;
   --background: var(--brand-background);
-  --foreground: #1f2937;
-  --card: #ffffff;
-  --card-foreground: #1f2937;
-  --popover: #ffffff;
-  --popover-foreground: #1f2937;
-  --primary: var(--brand-blue);
-  --primary-foreground: #ffffff;
-  --secondary: #f8fafc;
-  --secondary-foreground: #334155;
-  --muted: #f1f5f9;
-  --muted-foreground: #64748b;
+  --foreground: #ffffff;
+  --card: rgba(255, 255, 255, 0.05);
+  --card-foreground: #ffffff;
+  --popover: rgba(255, 255, 255, 0.1);
+  --popover-foreground: #ffffff;
+  --primary: var(--brand-yellow);
+  --primary-foreground: #000000;
+  --secondary: rgba(255, 255, 255, 0.1);
+  --secondary-foreground: #ffffff;
+  --muted: rgba(255, 255, 255, 0.1);
+  --muted-foreground: rgba(156, 163, 175, 0.6);
   --accent: var(--brand-blue);
-  --accent-foreground: #FFFFFF;
+  --accent-foreground: #ffffff;
   --destructive: #dc3545;
-  --destructive-foreground: #FFFFFF;
-  --border: #d1d5db;
-  --input: #ffffff;
-  --input-background: #ffffff;
-  --switch-background: #2563eb;
+  --destructive-foreground: #ffffff;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.1);
+  --input-background: rgba(255, 255, 255, 0.05);
+  --switch-background: rgba(255, 255, 255, 0.2);
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --ring: var(--brand-blue);
+  --ring: var(--brand-yellow);
   --chart-1: var(--brand-green);
   --chart-2: var(--brand-blue);
-  --chart-3: var(--brand-emerald);
+  --chart-3: var(--brand-yellow);
   --chart-4: #f59e0b;
   --chart-5: #ef4444;
   --radius: 1rem;
   --sidebar: var(--brand-background);
-  --sidebar-foreground: #000000;
-  --sidebar-primary: var(--brand-blue);
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #FFFFFF;
-  --sidebar-accent-foreground: #000000;
-  --sidebar-border: #DADADA;
-  --sidebar-ring: var(--brand-blue);
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: var(--brand-yellow);
+  --sidebar-primary-foreground: #000000;
+  --sidebar-accent: rgba(255, 255, 255, 0.1);
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-ring: var(--brand-yellow);
 }
 
 .dark {
   --background: var(--brand-background);
-  --foreground: #1f2937;
-  --card: #ffffff;
-  --card-foreground: #1f2937;
-  --popover: #ffffff;
-  --popover-foreground: #1f2937;
-  --primary: var(--brand-blue);
-  --primary-foreground: #ffffff;
-  --secondary: #f8fafc;
-  --secondary-foreground: #334155;
-  --muted: #f1f5f9;
-  --muted-foreground: #64748b;
+  --foreground: #ffffff;
+  --card: rgba(255, 255, 255, 0.05);
+  --card-foreground: #ffffff;
+  --popover: rgba(255, 255, 255, 0.1);
+  --popover-foreground: #ffffff;
+  --primary: var(--brand-yellow);
+  --primary-foreground: #000000;
+  --secondary: rgba(255, 255, 255, 0.1);
+  --secondary-foreground: #ffffff;
+  --muted: rgba(255, 255, 255, 0.1);
+  --muted-foreground: rgba(156, 163, 175, 0.6);
   --accent: var(--brand-blue);
-  --accent-foreground: #FFFFFF;
+  --accent-foreground: #ffffff;
   --destructive: #dc3545;
-  --destructive-foreground: #FFFFFF;
-  --border: #DADADA;
-  --input: #FFFFFF;
-  --ring: var(--brand-blue);
+  --destructive-foreground: #ffffff;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.1);
+  --ring: var(--brand-yellow);
   --sidebar: var(--brand-background);
-  --sidebar-foreground: #000000;
-  --sidebar-primary: var(--brand-blue);
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #FFFFFF;
-  --sidebar-accent-foreground: #000000;
-  --sidebar-border: #DADADA;
-  --sidebar-ring: var(--brand-blue);
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: var(--brand-yellow);
+  --sidebar-primary-foreground: #000000;
+  --sidebar-accent: rgba(255, 255, 255, 0.1);
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-ring: var(--brand-yellow);
 }
 
 @theme inline {
@@ -907,7 +901,7 @@ select {
 .bytewise-logo-main {
   font-family: 'League Spartan', sans-serif;
   font-weight: 700;
-  color: var(--brand-emerald);
+  color: var(--brand-yellow);
   text-transform: lowercase;
   letter-spacing: -0.02em;
   line-height: 1;
@@ -1053,7 +1047,7 @@ select {
 }
 
 .bg-brand-background {
-  background-color: var(--brand-emerald);
+  background-color: var(--pastel-yellow);
 }
 
 .text-brand-primary {
@@ -3451,8 +3445,8 @@ input.text-xs {
 }
 
 /* Brand Color Utilities */
-.bg-brand-emerald {
-  background-color: var(--brand-emerald) !important;
+.bg-brand-yellow {
+  background-color: var(--pastel-yellow) !important;
 }
 
 .bg-brand-blue {
@@ -3463,7 +3457,7 @@ input.text-xs {
   background-color: var(--pastel-blue-dark) !important;
 }
 
-.text-brand-emerald {
+.text-brand-yellow {
   color: var(--pastel-yellow) !important;
 }
 

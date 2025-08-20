@@ -808,39 +808,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // DELETE all meals for a user
-  app.delete('/api/meals/logged', isAuthenticated, async (req: any, res: Response) => {
-    const userId = req.user?.id;
-    if (!userId) {
-      res.status(401).json({ message: "User not found" });
-      return;
-    }
-    
-    try {
-      // Get all user meals and delete them
-      const meals = await storage.getUserMeals(userId);
-      let deletedCount = 0;
-      
-      for (const meal of meals) {
-        try {
-          await storage.deleteMeal(meal.id);
-          deletedCount++;
-        } catch (error) {
-          console.warn('Failed to delete meal:', meal.id);
-        }
-      }
-      
-      res.json({ 
-        success: true, 
-        message: `Deleted ${deletedCount} meals from database`,
-        deletedCount 
-      });
-    } catch (error: any) {
-      console.error('Failed to delete meals:', error);
-      res.status(500).json({ message: "Failed to delete meals" });
-    }
-  });
-
   // Achievement API routes
   app.get('/api/achievements', isAuthenticated, async (req: any, res: Response) => {
     const userId = req.user?.id;
@@ -1934,29 +1901,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       res.status(500).json({ message: "Failed to get user statistics" });
-    }
-  });
-
-  // Database cleanup endpoint (admin only)
-  app.post('/api/admin/cleanup-database', isAuthenticated, async (req: any, res: Response) => {
-    try {
-      // Import cleanup function
-      const { cleanupCorruptedMealsInDatabase } = await import('./utils/databaseCleanup');
-      
-      // Run cleanup for the authenticated user only
-      const result = await cleanupCorruptedMealsInDatabase(req.user.id);
-      
-      res.json({
-        success: true,
-        message: 'Database cleanup completed',
-        ...result
-      });
-    } catch (error: any) {
-      console.error('Database cleanup failed:', error);
-      res.status(500).json({
-        message: 'Database cleanup failed',
-        error: error.message
-      });
     }
   });
 

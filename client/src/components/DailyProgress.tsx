@@ -108,7 +108,7 @@ export function DailyProgress({
               className={`
                 relative p-5 rounded-2xl border-2 transition-all duration-300 cursor-pointer transform hover:scale-[1.02] hover:shadow-lg
                 ${isSelected 
-                  ? 'border-emerald-300 bg-gradient-to-r from-emerald-50 via-emerald-100 to-emerald-50 shadow-xl ring-2 ring-emerald-300' 
+                  ? 'border-blue-300 bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 shadow-xl ring-2 ring-blue-300' 
                   : 'border-gray-200 bg-gradient-to-br from-white to-gray-50/50 hover:border-gray-300 hover:shadow-md'
                 }
                 ${isTodayDate && !isSelected ? 'ring-2 ring-green-300 border-green-300 bg-gradient-to-r from-green-50 to-emerald-50' : ''}
@@ -130,7 +130,7 @@ export function DailyProgress({
                     variant="secondary" 
                     className={`text-xs px-2 py-1 ${
                       isTodayDate ? 'bg-green-100 text-green-800 border-green-200' : 
-                      'bg-emerald-100 text-emerald-800 border-emerald-200'
+                      'bg-blue-100 text-blue-800 border-blue-200'
                     }`}
                   >
                     {dayLabel}
