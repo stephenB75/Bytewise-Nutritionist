@@ -146,7 +146,7 @@ export function useDataIntegrity() {
         );
         
         if (hasConnectionIssues) {
-          // Don't show toast for temporary connection issues
+          // Don't show toast for temporary connection issues - this is normal
           console.log('ℹ️ Connection issues detected, data will sync when connection is restored');
         } else {
           toast({
@@ -176,18 +176,20 @@ export function useDataIntegrity() {
       let itemsBackedUp = 0;
       let connectionError = false;
 
-      // Clean data before backup
-      cleanCorruptedData();
+      // Import and use cleanup function
+      const { cleanupCorruptedMealData } = await import('@/utils/dataCleanup');
+      cleanupCorruptedMealData();
 
       // Backup meal data with validation
       const weeklyMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
       if (weeklyMeals.length > 0) {
-        // Only backup recent, valid meals
+        // Only backup recent, valid meals with strict validation
         const validMeals = weeklyMeals
           .slice(-50) // Last 50 meals
           .filter((meal: any) => {
             const calories = Number(meal.calories) || 0;
-            return calories > 0 && calories < 10000 && meal.name; // Valid meals only
+            // Stricter validation to prevent unrealistic values
+            return calories > 0 && calories < 3000 && meal.name && meal.date;
           });
 
         for (const meal of validMeals) {
@@ -275,11 +277,23 @@ export function useDataIntegrity() {
         try {
           const databaseMeals = await apiRequest('GET', '/api/meals/logged') as any;
           if (databaseMeals && Array.isArray(databaseMeals) && databaseMeals.length > 0) {
+            // Filter out corrupted database entries BEFORE restoring
+            const validDatabaseMeals = databaseMeals.filter((meal: any) => {
+              const calories = Number(meal.totalCalories) || 0;
+              // Prevent restoring unrealistic calorie values from database
+              return calories > 0 && calories < 3000 && meal.name;
+            });
+            
+            if (validDatabaseMeals.length === 0) {
+              console.log('⚠️ No valid meals found in database backup');
+              return;
+            }
+            
             // Convert database format to localStorage format
-            const restoredMeals = databaseMeals.map((meal: any) => ({
+            const restoredMeals = validDatabaseMeals.map((meal: any) => ({
               id: meal.id || `restored-${Date.now()}-${Math.random()}`,
               name: meal.name,
-              calories: meal.totalCalories || 0,
+              calories: Number(meal.totalCalories) || 0,
               protein: meal.totalProtein || 0,
               carbs: meal.totalCarbs || 0,
               fat: meal.totalFat || 0,
@@ -292,7 +306,7 @@ export function useDataIntegrity() {
 
             localStorage.setItem('weeklyMeals', JSON.stringify(restoredMeals));
             
-            console.log(`✅ Restored ${restoredMeals.length} meals from database`);
+            console.log(`✅ Restored ${restoredMeals.length} valid meals from database (filtered out ${databaseMeals.length - validDatabaseMeals.length} corrupted entries)`);
             
             toast({
               title: 'Data Restored',

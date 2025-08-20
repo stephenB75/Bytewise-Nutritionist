@@ -13,6 +13,7 @@ import { Calendar, Flame } from 'lucide-react';
 import { useCheckAchievements } from '@/hooks/useAchievements';
 import { getWeekDates, getLocalDateKey, cleanupOldWeeklyData } from '@/utils/dateUtils';
 import { cleanupCorruptedMealData } from '@/utils/dataCleanup';
+import '@/utils/emergencyCleanup'; // Initialize emergency cleanup tools
 import { checkMealDateMismatches } from '@/utils/mealDateFixer';
 import { debounce, getCachedLocalStorage } from '@/utils/performanceUtils';
 // Removed timezone correction import to fix date display issues

@@ -1937,6 +1937,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Database cleanup endpoint (admin only)
+  app.post('/api/admin/cleanup-database', isAuthenticated, async (req: any, res: Response) => {
+    try {
+      // Import cleanup function
+      const { cleanupCorruptedMealsInDatabase } = await import('./utils/databaseCleanup');
+      
+      // Run cleanup for the authenticated user only
+      const result = await cleanupCorruptedMealsInDatabase(req.user.id);
+      
+      res.json({
+        success: true,
+        message: 'Database cleanup completed',
+        ...result
+      });
+    } catch (error: any) {
+      console.error('Database cleanup failed:', error);
+      res.status(500).json({
+        message: 'Database cleanup failed',
+        error: error.message
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
