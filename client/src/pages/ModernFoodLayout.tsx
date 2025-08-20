@@ -658,39 +658,67 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         // Use cached localStorage for better performance
         const stored = getCachedLocalStorage('weeklyMeals', 5000) || [];
         
-        // Data migration: Ensure all meals have consistent date format
-        const migratedMeals = stored.map((meal: any) => {
-          // If meal has inconsistent date format, fix it
-          if (!meal.date || meal.date.includes('T')) {
-            // Extract date from timestamp or create from existing data
-            const fallbackDate = meal.timestamp 
-              ? meal.timestamp.split('T')[0]
-              : getLocalDateKey(); // Use today as fallback
-              
-            return {
-              ...meal,
-              date: fallbackDate // Ensure date is in YYYY-MM-DD format
-            };
+        // Data recovery: Restore meals to correct dates using timestamp information
+        let needsRecovery = false;
+        const recoveredMeals = stored.map((meal: any) => {
+          // For meals with timestamp, ensure date matches timestamp date
+          if (meal.timestamp) {
+            const timestampDate = meal.timestamp.split('T')[0];
+            let mealDate = meal.date;
+            
+            // Handle date field that contains timestamp
+            if (meal.date && meal.date.includes('T')) {
+              mealDate = meal.date.split('T')[0];
+            }
+            
+            // If meal date doesn't match timestamp date, restore it
+            if (mealDate !== timestampDate) {
+              needsRecovery = true;
+              console.log('🔄 Restoring meal date:', meal.name, 'from', mealDate, 'to', timestampDate);
+              return {
+                ...meal,
+                date: timestampDate // Restore to correct date from timestamp
+              };
+            }
+            
+            // Fix date format if it contains timestamp
+            if (meal.date && meal.date.includes('T')) {
+              return {
+                ...meal,
+                date: meal.date.split('T')[0]
+              };
+            }
           }
+          
           return meal;
         });
         
-        // Save migrated data back to localStorage if changes were made
-        if (JSON.stringify(stored) !== JSON.stringify(migratedMeals)) {
-          localStorage.setItem('weeklyMeals', JSON.stringify(migratedMeals));
-          console.log('📅 Migrated', migratedMeals.length - stored.length, 'meals to consistent date format');
+        // Save recovered data if changes were made
+        if (needsRecovery || JSON.stringify(stored) !== JSON.stringify(recoveredMeals)) {
+          localStorage.setItem('weeklyMeals', JSON.stringify(recoveredMeals));
+          if (needsRecovery) {
+            console.log('✅ Recovered meals to correct dates based on timestamps');
+          }
         }
         
         // Debug logging for date analysis (development only)
         if (process.env.NODE_ENV === 'development') {
-          console.log('📅 Meal Date Debug:', {
-            totalMeals: migratedMeals.length,
+          const dateDistribution = recoveredMeals.reduce((acc: any, meal: any) => {
+            let mealDate = meal.date;
+            if (meal.date && meal.date.includes('T')) {
+              mealDate = meal.date.split('T')[0];
+            } else if (!meal.date && meal.timestamp) {
+              mealDate = meal.timestamp.split('T')[0];
+            }
+            acc[mealDate] = (acc[mealDate] || 0) + 1;
+            return acc;
+          }, {});
+          
+          console.log('📅 Meal Date Distribution:', {
+            totalMeals: recoveredMeals.length,
             todayDateKey: getLocalDateKey(),
-            sampleMeal: migratedMeals[0] ? {
-              name: migratedMeals[0].name,
-              date: migratedMeals[0].date,
-              timestamp: migratedMeals[0].timestamp
-            } : 'No meals found'
+            datesWithMeals: Object.keys(dateDistribution).length,
+            distribution: dateDistribution
           });
         }
         
@@ -698,17 +726,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         const today = getLocalDateKey();
         
         // Filter meals for today using robust date matching
-        const todayMeals = migratedMeals.filter((meal: any) => {
+        const todayMeals = recoveredMeals.filter((meal: any) => {
           // Handle multiple date formats that might exist in localStorage
           let mealDate;
           
           if (meal.date) {
-            // If date field contains ISO timestamp, extract date part
-            if (meal.date.includes('T')) {
-              mealDate = meal.date.split('T')[0];
-            } else {
-              mealDate = meal.date;
-            }
+            // Date should now be in YYYY-MM-DD format after migration
+            mealDate = meal.date.includes('T') ? meal.date.split('T')[0] : meal.date;
           } else if (meal.timestamp) {
             // Fallback to timestamp field if date field is missing
             mealDate = meal.timestamp.split('T')[0];
@@ -727,16 +751,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         const oneMonthAgoDateKey = getLocalDateKey(oneMonthAgo);
         
         // Filter stored meals to include last month for comprehensive search
-        const monthlyMeals = migratedMeals.filter((meal: any) => {
+        const monthlyMeals = recoveredMeals.filter((meal: any) => {
           // Handle multiple date formats consistently
           let mealDate;
           
           if (meal.date) {
-            if (meal.date.includes('T')) {
-              mealDate = meal.date.split('T')[0];
-            } else {
-              mealDate = meal.date;
-            }
+            // Date should now be in YYYY-MM-DD format after migration
+            mealDate = meal.date.includes('T') ? meal.date.split('T')[0] : meal.date;
           } else if (meal.timestamp) {
             mealDate = meal.timestamp.split('T')[0];
           } else {
