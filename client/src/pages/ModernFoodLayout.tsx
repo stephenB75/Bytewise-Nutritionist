@@ -658,132 +658,21 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         // Force fresh data load to ensure recovery runs
         const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
         
-        // Enhanced data recovery: Force restore all meals to correct dates using timestamp
-        console.log('🔍 Starting enhanced data recovery for', stored.length, 'meals');
-        let recoveryCount = 0;
+        // Simple data loading - recovery is handled by WeeklyCaloriesCard component
+        console.log('📊 Loaded', stored.length, 'total meals for ModernFoodLayout');
+        console.log('ℹ️ Note: Meal date recovery is handled by WeeklyCaloriesCard component');
         
-        // First, check if we have any meals with mismatched dates
-        const mealsNeedingRecovery = stored.filter((meal: any) => {
-          if (!meal.timestamp) return false;
-          const timestampDate = meal.timestamp.split('T')[0];
-          let currentDate = meal.date;
+        // Use stored meals directly (recovery happens in WeeklyCaloriesCard)
+        const recoveredMeals = stored;
+        
+        // Simple date matching for today's meals
+        const todayDateKey = getLocalDateKey();
+        const todaysFilteredMeals = recoveredMeals.filter((meal: any) => {
+          let mealDate = meal.date;
           if (meal.date && meal.date.includes('T')) {
-            currentDate = meal.date.split('T')[0];
+            mealDate = meal.date.split('T')[0];
           }
-          return currentDate !== timestampDate;
-        });
-        
-        console.log(`📊 Found ${mealsNeedingRecovery.length} meals needing recovery out of ${stored.length} total`);
-        
-        // If we have meals needing recovery, force the recovery
-        if (mealsNeedingRecovery.length > 0) {
-          console.log('🔥 FORCING IMMEDIATE RECOVERY OF MEAL DATES');
-        }
-        
-        const recoveredMeals = stored.map((meal: any, index: number) => {
-          if (!meal.timestamp) {
-            console.log(`⚠️ Meal ${index + 1} "${meal.name}" has no timestamp, keeping current date: ${meal.date}`);
-            return meal;
-          }
-          
-          const timestampDate = meal.timestamp.split('T')[0];
-          let currentDate = meal.date;
-          
-          // Handle date field that contains timestamp
-          if (meal.date && meal.date.includes('T')) {
-            currentDate = meal.date.split('T')[0];
-          }
-          
-          // Always restore to timestamp date if different
-          if (currentDate !== timestampDate) {
-            recoveryCount++;
-            if (recoveryCount <= 5) { // Log first 5 for debugging
-              console.log(`🔄 Restoring meal: "${meal.name}" from ${currentDate} to ${timestampDate}`);
-            }
-            
-            return {
-              ...meal,
-              date: timestampDate // Always use timestamp date
-            };
-          }
-          
-          // Ensure date is in proper format (no T)
-          if (meal.date && meal.date.includes('T')) {
-            return {
-              ...meal,
-              date: meal.date.split('T')[0]
-            };
-          }
-          
-          return meal;
-        });
-        
-        // Save recovered data and report results
-        if (recoveryCount > 0 || JSON.stringify(stored) !== JSON.stringify(recoveredMeals)) {
-          localStorage.setItem('weeklyMeals', JSON.stringify(recoveredMeals));
-          console.log(`✅ Recovered ${recoveryCount} meals to correct dates based on timestamps`);
-          
-          // Show date distribution after recovery
-          const dateDistribution: {[key: string]: number} = {};
-          recoveredMeals.forEach((meal: any) => {
-            let mealDate = meal.date;
-            if (meal.date && meal.date.includes('T')) {
-              mealDate = meal.date.split('T')[0];
-            }
-            if (mealDate) {
-              dateDistribution[mealDate] = (dateDistribution[mealDate] || 0) + 1;
-            }
-          });
-          
-          console.log('📊 Meals distribution after recovery:');
-          Object.keys(dateDistribution).sort().forEach(date => {
-            console.log(`  ${date}: ${dateDistribution[date]} meals`);
-          });
-        } else {
-          console.log('ℹ️ No recovery needed - dates are already correct');
-        }
-        
-        // Debug logging for date analysis (development only)
-        if (process.env.NODE_ENV === 'development') {
-          const dateDistribution = recoveredMeals.reduce((acc: any, meal: any) => {
-            let mealDate = meal.date;
-            if (meal.date && meal.date.includes('T')) {
-              mealDate = meal.date.split('T')[0];
-            } else if (!meal.date && meal.timestamp) {
-              mealDate = meal.timestamp.split('T')[0];
-            }
-            acc[mealDate] = (acc[mealDate] || 0) + 1;
-            return acc;
-          }, {});
-          
-          console.log('📅 Meal Date Distribution:', {
-            totalMeals: recoveredMeals.length,
-            todayDateKey: getLocalDateKey(),
-            datesWithMeals: Object.keys(dateDistribution).length,
-            distribution: dateDistribution
-          });
-        }
-        
-        // Simple date matching - use today's actual date
-        const today = getLocalDateKey();
-        
-        // Filter meals for today using robust date matching
-        const todayMeals = recoveredMeals.filter((meal: any) => {
-          // Handle multiple date formats that might exist in localStorage
-          let mealDate;
-          
-          if (meal.date) {
-            // Date should now be in YYYY-MM-DD format after migration
-            mealDate = meal.date.includes('T') ? meal.date.split('T')[0] : meal.date;
-          } else if (meal.timestamp) {
-            // Fallback to timestamp field if date field is missing
-            mealDate = meal.timestamp.split('T')[0];
-          } else {
-            // Skip meals without proper date information
-            return false;
-          }
-          
-          return mealDate === today;
+          return mealDate === todayDateKey;
         });
         
 
@@ -794,31 +683,22 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         
         // Filter stored meals to include last month for comprehensive search
         const monthlyMeals = recoveredMeals.filter((meal: any) => {
-          // Handle multiple date formats consistently
-          let mealDate;
-          
-          if (meal.date) {
-            // Date should now be in YYYY-MM-DD format after migration
-            mealDate = meal.date.includes('T') ? meal.date.split('T')[0] : meal.date;
-          } else if (meal.timestamp) {
-            mealDate = meal.timestamp.split('T')[0];
-          } else {
-            return false;
+          let mealDate = meal.date;
+          if (meal.date && meal.date.includes('T')) {
+            mealDate = meal.date.split('T')[0];
           }
-          
-          // Include meals from the last month
           return mealDate >= oneMonthAgoDateKey;
         });
         
-        setLoggedMeals(todayMeals);
+        setLoggedMeals(todaysFilteredMeals);
         setWeeklyMeals(monthlyMeals); // Store last month's meals for comprehensive search functionality
         
         // Calculate daily calories from existing logged meals
-        const dailyTotal = todayMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
+        const dailyTotal = todaysFilteredMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
         setDailyCalories(dailyTotal);
         
         // Calculate daily macros from today's meals
-        const dailyMacroTotals = todayMeals.reduce((totals: any, meal: any) => ({
+        const dailyMacroTotals = todaysFilteredMeals.reduce((totals: any, meal: any) => ({
           protein: totals.protein + (meal.protein || 0),
           carbs: totals.carbs + (meal.carbs || 0),
           fat: totals.fat + (meal.fat || 0)
@@ -826,7 +706,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         setDailyMacros(dailyMacroTotals);
         
         // Calculate micronutrients from today's meals
-        const micronutrients = calculateMicronutrients(todayMeals);
+        const micronutrients = calculateMicronutrients(todaysFilteredMeals);
         
         // Update micronutrients state
         setDailyMicronutrients({

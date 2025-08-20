@@ -65,13 +65,71 @@ export function WeeklyCaloriesCard() {
     try {
       const weekDates = getCurrentWeekDates();
       
-      // Load meals with caching for better performance - Force fresh load
-      const storedMeals = getCachedLocalStorage('weeklyMeals', 0) || []; // 0 = no cache
+      // CRITICAL: Force fresh data load and immediate date recovery
+      const storedMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
+      
+      // EMERGENCY MEAL DATE RECOVERY - Fix historical meals showing under today
+      console.log('🔥 EMERGENCY: Starting meal date recovery in WeeklyCaloriesCard');
+      let recoveryCount = 0;
+      const recoveredMeals = storedMeals.map((meal: any, index: number) => {
+        // Skip meals without timestamps
+        if (!meal.timestamp) {
+          return meal;
+        }
+        
+        // Extract correct date from timestamp
+        const correctDate = meal.timestamp.split('T')[0];
+        let currentMealDate = meal.date;
+        
+        // Handle different date formats
+        if (meal.date && meal.date.includes('T')) {
+          currentMealDate = meal.date.split('T')[0];
+        }
+        
+        // If meal date doesn't match timestamp date, restore it
+        if (currentMealDate !== correctDate) {
+          recoveryCount++;
+          if (recoveryCount <= 5) {
+            console.log(`🔄 Recovering meal ${recoveryCount}: "${meal.name}" from ${currentMealDate} to ${correctDate}`);
+          }
+          
+          return {
+            ...meal,
+            date: correctDate // Restore to correct date from timestamp
+          };
+        }
+        
+        return meal;
+      });
+      
+      // Save recovered meals immediately if any were fixed
+      if (recoveryCount > 0) {
+        localStorage.setItem('weeklyMeals', JSON.stringify(recoveredMeals));
+        console.log(`✅ RECOVERED ${recoveryCount} meals to correct dates!`);
+        
+        // Show date distribution after recovery
+        const dateDistribution: {[key: string]: number} = {};
+        recoveredMeals.forEach((meal: any) => {
+          let date = meal.date;
+          if (date && date.includes('T')) date = date.split('T')[0];
+          if (date) {
+            dateDistribution[date] = (dateDistribution[date] || 0) + 1;
+          }
+        });
+        
+        console.log('📊 Meals after recovery:');
+        Object.keys(dateDistribution).sort().forEach(date => {
+          console.log(`  ${date}: ${dateDistribution[date]} meals`);
+        });
+      }
+      
+      // Use recovered meals for calculations
+      const mealsToProcess = recoveredMeals;
 
       
       // Fix meals with missing calories and save back to localStorage
       let needsSave = false;
-      storedMeals.forEach((meal: any) => {
+      mealsToProcess.forEach((meal: any) => {
         if (meal.calories === 0 || meal.calories === undefined || meal.calories === null) {
           needsSave = true;
           
@@ -92,13 +150,13 @@ export function WeeklyCaloriesCard() {
       
       // Save the fixed data back to localStorage
       if (needsSave) {
-        localStorage.setItem('weeklyMeals', JSON.stringify(storedMeals));
+        localStorage.setItem('weeklyMeals', JSON.stringify(mealsToProcess));
       }
       
       // Calculate calories for each day of the week with fixed date matching
       const weeklyData = weekDates.map(dayData => {
         // Strict filtering to prevent duplicate matches - each meal should only appear once
-        const dayMeals = storedMeals.filter((meal: any) => {
+        const dayMeals = mealsToProcess.filter((meal: any) => {
           if (!meal.date) return false;
           
           const mealDateStr = meal.date;
