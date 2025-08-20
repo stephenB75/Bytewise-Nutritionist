@@ -60,27 +60,14 @@ export function WeeklyCaloriesCard() {
     return weekDates;
   };
 
-  // Clear all meal data from localStorage
+  // Clear all meal data from localStorage (no reload to prevent navigation issues)
   const clearAllMealData = () => {
     console.log('🗑️ Clearing all meal data from localStorage...');
     localStorage.removeItem('weeklyMeals');
     console.log('✅ All meal data cleared from localStorage');
-    // Force refresh of component
-    window.location.reload();
+    // Force component refresh without page reload
+    window.dispatchEvent(new CustomEvent('refresh-weekly-data'));
   };
-
-  // Execute clear data only once when corruption is detected (not on every mount)
-  useEffect(() => {
-    const storedMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-    
-    // Only clear if there's severe corruption (3000+ meals)
-    if (storedMeals.length > 3000) {
-      console.log('🗑️ Clearing severely corrupted meal data...');
-      localStorage.removeItem('weeklyMeals');
-      console.log('✅ Corrupted meal data cleared from localStorage');
-      // Don't reload here - let the component update naturally
-    }
-  }, []);
 
   // Calculate weekly calories from stored meal data (optimized)  
   const calculateWeeklyCalories = () => {
@@ -90,82 +77,40 @@ export function WeeklyCaloriesCard() {
       // CRITICAL: Force fresh data load and immediate date recovery
       const storedMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
       
-      // CRITICAL MEAL DATE RECOVERY - Fix all date mismatches immediately
-      console.log('🔥 CRITICAL: Emergency meal redistribution starting');
-      console.log(`📊 Raw data: ${storedMeals.length} meals found`);
-      
-      // First, inspect what we're dealing with
-      const dateAnalysis: {[key: string]: number} = {};
-      storedMeals.forEach((meal: any) => {
-        let date = meal.date;
-        if (date && date.includes('T')) date = date.split('T')[0];
-        if (date) {
-          dateAnalysis[date] = (dateAnalysis[date] || 0) + 1;
-        }
-      });
-      
-      console.log('📊 Current date distribution BEFORE recovery:');
-      Object.keys(dateAnalysis).sort().forEach(date => {
-        console.log(`  ${date}: ${dateAnalysis[date]} meals`);
-      });
-      
-      // EMERGENCY REDISTRIBUTION: If any single day has more than 100 meals, redistribute them
-      const dateValues = Object.values(dateAnalysis);
-      const maxDailyMeals = dateValues.length > 0 ? Math.max(...dateValues) : 0;
-      console.log(`🚨 Maximum meals on any single day: ${maxDailyMeals}`);
-      
-      if (maxDailyMeals > 100) {
-        console.log('🚨 EMERGENCY: Severe data corruption detected - clearing corrupted data and keeping only today\'s meals');
-        
-        // Find today's actual date
-        const todayDateKey = getLocalDateKey();
-        console.log(`📅 Today's date: ${todayDateKey}`);
-        
-        // Keep only meals from today and yesterday (to preserve recent legitimate entries)
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        const yesterdayKey = getLocalDateKey(yesterday);
-        
-        const legitimateMeals = storedMeals.filter((meal: any) => {
-          let mealDate = meal.date;
-          if (mealDate && mealDate.includes('T')) {
-            mealDate = mealDate.split('T')[0];
-          }
-          
-          // Keep meals from today and yesterday only
-          return mealDate === todayDateKey || mealDate === yesterdayKey;
-        });
-        
-        console.log(`🚨 Cleared corrupted data: kept ${legitimateMeals.length} legitimate meals from last 2 days`);
-        console.log(`🗑️ Removed ${storedMeals.length - legitimateMeals.length} corrupted meal entries`);
-        
-        // Save cleaned data immediately
-        localStorage.setItem('weeklyMeals', JSON.stringify(legitimateMeals));
-        
-        console.log(`✅ Data cleanup complete: preserved legitimate recent meals only`);
+      // Skip intensive processing if no data
+      if (storedMeals.length === 0) {
+        console.log('📊 No meal data found - returning empty week');
+        return weekDates;
       }
       
-      // Initialize variables for data processing based on whether cleanup occurred
+      // Only run corruption detection for large datasets
+      if (storedMeals.length > 1000) {
+        console.log('🔍 Checking for data corruption...');
+        
+        const dateAnalysis: {[key: string]: number} = {};
+        storedMeals.forEach((meal: any) => {
+          let date = meal.date;
+          if (date && date.includes('T')) date = date.split('T')[0];
+          if (date) {
+            dateAnalysis[date] = (dateAnalysis[date] || 0) + 1;
+          }
+        });
+        
+        const dateValues = Object.values(dateAnalysis);
+        const maxDailyMeals = dateValues.length > 0 ? Math.max(...dateValues) : 0;
+        
+        if (maxDailyMeals > 100) {
+          console.log('🚨 EMERGENCY: Severe data corruption detected - clearing all data');
+        
+          localStorage.removeItem('weeklyMeals');
+          console.log('✅ Corrupted data cleared - returning empty week');
+          return weekDates;
+        }
+      }
+      
+      // Initialize variables for data processing
       let recoveryCount = 0;
       let redistributedMeals = storedMeals;
-      
-      // Update variables if cleanup occurred
-      if (maxDailyMeals > 100) {
-        const todayDateKey = getLocalDateKey();
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        const yesterdayKey = getLocalDateKey(yesterday);
-        
-        redistributedMeals = storedMeals.filter((meal: any) => {
-          let mealDate = meal.date;
-          if (mealDate && mealDate.includes('T')) {
-            mealDate = mealDate.split('T')[0];
-          }
-          return mealDate === todayDateKey || mealDate === yesterdayKey;
-        });
-        
-        recoveryCount = storedMeals.length - redistributedMeals.length;
-      }
       
       const recoveredMeals = redistributedMeals.map((meal: any, index: number) => {
         // Handle meals with invalid/corrupted calorie data first
