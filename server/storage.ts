@@ -858,8 +858,17 @@ export class DatabaseStorage implements IStorage {
           )
         );
 
-      // Sum up nutrition from all meals
-      const totals = dayMeals.reduce((acc, meal) => ({
+      // Filter out corrupted meals before calculation
+      const validMeals = dayMeals.filter(meal => {
+        const calories = Number(meal.totalCalories || 0);
+        // Filter out unrealistic calorie values
+        return calories >= 0 && calories <= 3000 && meal.name;
+      });
+      
+      console.log(`📊 Daily stats: ${dayMeals.length} total meals, ${validMeals.length} valid meals`);
+      
+      // Sum up nutrition from valid meals only
+      const totals = validMeals.reduce((acc, meal) => ({
         totalCalories: acc.totalCalories + Number(meal.totalCalories || 0),
         totalProtein: acc.totalProtein + Number(meal.totalProtein || 0),
         totalCarbs: acc.totalCarbs + Number(meal.totalCarbs || 0),
