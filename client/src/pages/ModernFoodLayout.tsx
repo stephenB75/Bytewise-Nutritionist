@@ -53,7 +53,7 @@ import { WeeklyCaloriesCard } from '@/components/WeeklyCaloriesCard';
 import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
-import { getWeekDates, getLocalDateKey, getMealTypeByTime, formatLocalTime } from '@/utils/dateUtils';
+import { getWeekDates, getLocalDateKey, getMealTypeByTime, formatLocalTime, resetTodaysLoggedMeals, cleanupOldWeeklyData } from '@/utils/dateUtils';
 import { fixMealDateMismatches, autoFixMealDatesIfNeeded } from '@/utils/mealDateFixer';
 import { getCachedLocalStorage, debounce } from '@/utils/performanceUtils';
 import { useLocation } from 'wouter';
@@ -2240,9 +2240,25 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <h3 className="text-xl font-bold text-black">Logged Today</h3>
-            {loggedMeals.length === 0 && (
-              <Badge className="bg-gray-600 text-black">No meals logged</Badge>
-            )}
+            <div className="flex items-center gap-2">
+              {loggedMeals.length === 0 && (
+                <Badge className="bg-gray-600 text-black">No meals logged</Badge>
+              )}
+              {loggedMeals.length > 0 && (
+                <Button 
+                  onClick={() => {
+                    const cleared = resetTodaysLoggedMeals();
+                    if (cleared > 0) {
+                      window.location.reload();
+                    }
+                  }}
+                  className="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1 h-7"
+                >
+                  <Trash2 className="w-3 h-3 mr-1" />
+                  Clear Today
+                </Button>
+              )}
+            </div>
           </div>
           {(loggedMeals.length === 0 || !weeklyMeals || weeklyMeals.length === 0) ? (
             <Card className="bg-white backdrop-blur-md border-gray-300 p-6 text-center">
