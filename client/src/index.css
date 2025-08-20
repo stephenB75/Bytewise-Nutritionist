@@ -103,7 +103,7 @@
   padding-bottom: 0 !important; /* Remove any conflicting bottom padding */
 }
 
-/* Bottom navigation spacing and safe area handling */
+/* Bottom navigation spacing and safe area handling - Updated colors */
 .safe-area-pb {
   padding-bottom: max(0.5rem, env(safe-area-inset-bottom)) !important;
 }
@@ -127,48 +127,48 @@ html {
   font-size: 17px; /* Increased from 16px for better readability */
 }
 
-/* Profile Component Styles - Clean and Consistent */
+/* Profile Component Styles - High-Visibility Color Scheme */
 .profile-username-header {
-  @apply text-xl font-bold text-white mb-1 truncate;
+  @apply text-xl font-bold text-black mb-1 truncate;
   font-family: 'League Spartan', sans-serif;
   transform: none;
   text-orientation: mixed;
 }
 
 .profile-email-text {
-  @apply text-gray-300 text-sm truncate;
+  @apply text-black text-sm truncate;
   transform: none;
 }
 
 .profile-display-text {
-  @apply text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10 break-words;
+  @apply text-black bg-white p-3 rounded-lg border border-gray-300 break-words;
   transform: none;
   text-orientation: mixed;
   writing-mode: horizontal-tb;
 }
 
 .profile-input-field {
-  @apply bg-white/10 border-white/20 text-white w-full;
+  @apply bg-white border-gray-300 text-black w-full;
 }
 
 .profile-input-field::placeholder {
-  color: rgba(156, 163, 175, 0.5) !important; /* Lighter gray with reduced opacity */
+  color: rgba(107, 114, 128, 0.8) !important; /* Darker placeholder for visibility */
   opacity: 1 !important;
 }
 
 .profile-label {
-  @apply text-sm text-gray-300 font-medium flex items-center;
+  @apply text-sm text-black font-medium flex items-center;
 }
 
 .profile-section-title {
-  @apply text-lg font-semibold text-white mb-4;
+  @apply text-lg font-semibold text-black mb-4;
   font-family: 'League Spartan', sans-serif;
 }
 
-/* Apply ByteWise brand colors to body and root */
+/* Apply Updated High-Visibility Brand Colors to body and root */
 body {
-  background-color: #0a0a00 !important;
-  color: #ffffff !important;
+  background-color: #FFFF99 !important;
+  color: #000000 !important;
   margin: 0;
   padding: 0;
   min-height: 100vh;
@@ -176,17 +176,18 @@ body {
 }
 
 #root {
-  background-color: #0a0a00 !important;
+  background-color: #FFFF99 !important;
   min-height: 100vh;
 }
 
-/* Dark mode body styling */
+/* Updated mode body styling */
 .dark body {
-  background-color: var(--background) !important;
+  background-color: #FFFF99 !important;
+  color: #000000 !important;
 }
 
 .dark #root {
-  background-color: var(--background) !important;
+  background-color: #FFFF99 !important;
 }
 
 /* Global text size improvements for accessibility */
@@ -339,14 +340,16 @@ body {
   opacity: 1;
 }
 
-/* Global input text visibility improvements */
+/* Global input text visibility improvements - Updated for high contrast */
 input[type="text"], 
 input[type="email"], 
 input[type="password"], 
 input[type="number"], 
 input[type="search"],
 textarea {
-  color: #1f2937 !important;
+  color: #000000 !important;
+  background-color: #FFFFFF !important;
+  border: 2px solid #DADADA !important;
   font-weight: 400 !important;
   text-align: center !important;
 }
@@ -481,20 +484,21 @@ textarea:focus {
   background-color: #ffffff !important;
 }
 
-/* Dark background input overrides */
+/* High-visibility input overrides */
 .bg-white\/10 input,
 .bg-white\/5 input,
 .bg-gray-800 input,
 .bg-black input {
-  background-color: rgba(255, 255, 255, 0.95) !important;
-  color: #1f2937 !important;
+  background-color: #FFFFFF !important;
+  color: #000000 !important;
+  border: 2px solid #DADADA !important;
 }
 
-/* Ensure good contrast on all input backgrounds */
+/* Ensure excellent contrast on all input backgrounds */
 input {
-  background-color: #ffffff !important;
-  color: #1f2937 !important;
-  border: 1px solid #d1d5db;
+  background-color: #FFFFFF !important;
+  color: #000000 !important;
+  border: 2px solid #DADADA !important;
 }
 
 /* Hero image entrance animations */
@@ -549,55 +553,57 @@ input {
   z-index: 0 !important;
 }
 
-/* Ensure navigation stays on top */
+/* Ensure navigation stays on top with new color scheme */
 .bottom-navigation {
   position: fixed !important;
   bottom: 0 !important;
   left: 0 !important;
   right: 0 !important;
   z-index: 50 !important;
-  background: rgba(0, 0, 0, 0.9) !important;
+  background: #0099FF !important;
   backdrop-filter: blur(10px) !important;
 }
 
 input:focus {
-  background-color: #ffffff !important;
-  color: #111827 !important;
-  border-color: #3b82f6;
+  background-color: #FFFFFF !important;
+  color: #000000 !important;
+  border-color: #0099FF !important;
+  border-width: 2px !important;
 }
 
 @custom-variant dark (&:is(.dark *));
 
 :root {
   --font-size: 14px;
-  /* ByteWise Brand Colors */
-  --brand-yellow: #faed39;
-  --brand-blue: #1f4aa6;
+  /* Updated High-Visibility Brand Colors */
+  --brand-yellow: #FFFF99;
+  --brand-blue: #0099FF;
   --brand-green: #45c73e;
-  --brand-background: #0a0a00;
+  --brand-background: #FFFF99;
+  --icon-color: #DADADA;
   --background: var(--brand-background);
-  --foreground: #ffffff;
-  --card: rgba(255, 255, 255, 0.05);
-  --card-foreground: #ffffff;
-  --popover: rgba(255, 255, 255, 0.1);
-  --popover-foreground: #ffffff;
-  --primary: var(--brand-yellow);
-  --primary-foreground: #000000;
-  --secondary: rgba(255, 255, 255, 0.1);
-  --secondary-foreground: #ffffff;
-  --muted: rgba(255, 255, 255, 0.1);
-  --muted-foreground: rgba(156, 163, 175, 0.6);
+  --foreground: #000000;
+  --card: #FFFFFF;
+  --card-foreground: #000000;
+  --popover: #FFFFFF;
+  --popover-foreground: #000000;
+  --primary: var(--brand-blue);
+  --primary-foreground: #FFFFFF;
+  --secondary: #FFFFFF;
+  --secondary-foreground: #000000;
+  --muted: #FFFFFF;
+  --muted-foreground: #000000;
   --accent: var(--brand-blue);
-  --accent-foreground: #ffffff;
+  --accent-foreground: #FFFFFF;
   --destructive: #dc3545;
-  --destructive-foreground: #ffffff;
-  --border: rgba(255, 255, 255, 0.1);
-  --input: rgba(255, 255, 255, 0.1);
-  --input-background: rgba(255, 255, 255, 0.05);
-  --switch-background: rgba(255, 255, 255, 0.2);
+  --destructive-foreground: #FFFFFF;
+  --border: #DADADA;
+  --input: #FFFFFF;
+  --input-background: #FFFFFF;
+  --switch-background: #0099FF;
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --ring: var(--brand-yellow);
+  --ring: var(--brand-blue);
   --chart-1: var(--brand-green);
   --chart-2: var(--brand-blue);
   --chart-3: var(--brand-yellow);
@@ -605,43 +611,43 @@ input:focus {
   --chart-5: #ef4444;
   --radius: 1rem;
   --sidebar: var(--brand-background);
-  --sidebar-foreground: #ffffff;
-  --sidebar-primary: var(--brand-yellow);
-  --sidebar-primary-foreground: #000000;
-  --sidebar-accent: rgba(255, 255, 255, 0.1);
-  --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: rgba(255, 255, 255, 0.1);
-  --sidebar-ring: var(--brand-yellow);
+  --sidebar-foreground: #000000;
+  --sidebar-primary: var(--brand-blue);
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #FFFFFF;
+  --sidebar-accent-foreground: #000000;
+  --sidebar-border: #DADADA;
+  --sidebar-ring: var(--brand-blue);
 }
 
 .dark {
   --background: var(--brand-background);
-  --foreground: #ffffff;
-  --card: rgba(255, 255, 255, 0.05);
-  --card-foreground: #ffffff;
-  --popover: rgba(255, 255, 255, 0.1);
-  --popover-foreground: #ffffff;
-  --primary: var(--brand-yellow);
-  --primary-foreground: #000000;
-  --secondary: rgba(255, 255, 255, 0.1);
-  --secondary-foreground: #ffffff;
-  --muted: rgba(255, 255, 255, 0.1);
-  --muted-foreground: rgba(156, 163, 175, 0.6);
+  --foreground: #000000;
+  --card: #FFFFFF;
+  --card-foreground: #000000;
+  --popover: #FFFFFF;
+  --popover-foreground: #000000;
+  --primary: var(--brand-blue);
+  --primary-foreground: #FFFFFF;
+  --secondary: #FFFFFF;
+  --secondary-foreground: #000000;
+  --muted: #FFFFFF;
+  --muted-foreground: #000000;
   --accent: var(--brand-blue);
-  --accent-foreground: #ffffff;
+  --accent-foreground: #FFFFFF;
   --destructive: #dc3545;
-  --destructive-foreground: #ffffff;
-  --border: rgba(255, 255, 255, 0.1);
-  --input: rgba(255, 255, 255, 0.1);
-  --ring: var(--brand-yellow);
+  --destructive-foreground: #FFFFFF;
+  --border: #DADADA;
+  --input: #FFFFFF;
+  --ring: var(--brand-blue);
   --sidebar: var(--brand-background);
-  --sidebar-foreground: #ffffff;
-  --sidebar-primary: var(--brand-yellow);
-  --sidebar-primary-foreground: #000000;
-  --sidebar-accent: rgba(255, 255, 255, 0.1);
-  --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: rgba(255, 255, 255, 0.1);
-  --sidebar-ring: var(--brand-yellow);
+  --sidebar-foreground: #000000;
+  --sidebar-primary: var(--brand-blue);
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #FFFFFF;
+  --sidebar-accent-foreground: #000000;
+  --sidebar-border: #DADADA;
+  --sidebar-ring: var(--brand-blue);
 }
 
 @theme inline {

@@ -700,23 +700,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         setLoggedMeals(todaysFilteredMeals);
         setWeeklyMeals(monthlyMeals); // Store last month's meals for comprehensive search functionality
         
-        // DEBUG: Log data loading details
-        if (process.env.NODE_ENV === 'development') {
-          console.log(`📊 Data Loading Debug:`, {
-            totalMeals: stored.length,
-            todayDateKey: todayDateKey,
-            todayMealsFound: todaysFilteredMeals.length,
-            monthlyMealsFound: monthlyMeals.length
-          });
-          
-          // Show sample meal dates
-          if (stored.length > 0) {
-            console.log('🔍 Sample meal dates from localStorage:');
-            stored.slice(0, 5).forEach((meal: any, i: number) => {
-              console.log(`  ${i+1}. "${meal.name}" - date: "${meal.date}" - timestamp: "${meal.timestamp}"`);
-            });
-          }
-        }
         
         // Calculate daily calories from existing logged meals
         const dailyTotal = todaysFilteredMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
@@ -2283,17 +2266,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               
               const isToday = mealDate === today;
               
-              // DEBUG: Log filtering details to identify the issue
-              if (process.env.NODE_ENV === 'development') {
-                console.log(`🔍 Meal Filter Debug:`, {
-                  mealName: meal.name,
-                  originalDate: meal.date,
-                  processedDate: mealDate,
-                  todayDate: today,
-                  isToday: isToday,
-                  willShow: isToday
-                });
-              }
               
               // Then filter by search query if provided
               const matchesSearch = !searchQuery || meal.name.toLowerCase().includes(searchQuery.toLowerCase());
