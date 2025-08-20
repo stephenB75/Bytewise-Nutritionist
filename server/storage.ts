@@ -877,8 +877,8 @@ export class DatabaseStorage implements IStorage {
       
       console.log(`📊 Daily stats: ${dayMeals.length} total meals, ${validMeals.length} valid meals, using ${limitedValidMeals.length} meals`);
       
-      if (dayMeals.length > 50) {
-        console.log(`⚠️ Unusually high meal count (${dayMeals.length}) for single day - likely data corruption`);
+      if (dayMeals.length > 30) {
+        console.log(`⚠️ High meal count (${dayMeals.length}) for single day - monitoring for potential issues`);
       }
       
       // Sum up nutrition from limited valid meals only

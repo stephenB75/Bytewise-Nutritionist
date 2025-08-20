@@ -193,8 +193,8 @@ export function useDataIntegrity() {
       const maxMealsPerDay = Math.max(...Object.values(mealsByDate).map(count => Number(count)));
       
       if (maxMealsPerDay > 30) {
-        console.log(`🚫 Skipping backup: corrupted data detected (${maxMealsPerDay} meals in one day)`);
-        return 0; // Don't backup corrupted data
+        console.log(`🚫 Skipping backup: potential corruption detected (${maxMealsPerDay} meals in one day)`);
+        return 0; // Don't backup potentially corrupted data
       }
       
       if (weeklyMeals.length > 0) {
@@ -350,14 +350,13 @@ export function useDataIntegrity() {
         // Then verify integrity
         verifyDataIntegrity();
         
-        // Periodic backup DISABLED until data corruption is resolved
-        console.log('ℹ️ Automatic backup disabled to prevent data corruption');
+        // Automatic backup RE-ENABLED after successful database cleanup
+        console.log('✅ Automatic backup system re-enabled - data corruption resolved');
         
-        // Uncomment when data is clean:
-        // const backupInterval = setInterval(() => {
-        //   backupCriticalData().catch(console.error);
-        // }, 15 * 60 * 1000);
-        // return () => clearInterval(backupInterval);
+        const backupInterval = setInterval(() => {
+          backupCriticalData().catch(console.error);
+        }, 15 * 60 * 1000); // Every 15 minutes
+        return () => clearInterval(backupInterval);
       });
     }
   }, [user, restoreDataFromDatabase, verifyDataIntegrity]);
