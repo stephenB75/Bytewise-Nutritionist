@@ -655,50 +655,92 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     // Load existing meal data on component mount
     const loadExistingData = () => {
       try {
-        // Use cached localStorage for better performance
-        const stored = getCachedLocalStorage('weeklyMeals', 5000) || [];
+        // Force fresh data load to ensure recovery runs
+        const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
         
-        // Data recovery: Restore meals to correct dates using timestamp information
-        let needsRecovery = false;
-        const recoveredMeals = stored.map((meal: any) => {
-          // For meals with timestamp, ensure date matches timestamp date
-          if (meal.timestamp) {
-            const timestampDate = meal.timestamp.split('T')[0];
-            let mealDate = meal.date;
-            
-            // Handle date field that contains timestamp
-            if (meal.date && meal.date.includes('T')) {
-              mealDate = meal.date.split('T')[0];
+        // Enhanced data recovery: Force restore all meals to correct dates using timestamp
+        console.log('🔍 Starting enhanced data recovery for', stored.length, 'meals');
+        let recoveryCount = 0;
+        
+        // First, check if we have any meals with mismatched dates
+        const mealsNeedingRecovery = stored.filter((meal: any) => {
+          if (!meal.timestamp) return false;
+          const timestampDate = meal.timestamp.split('T')[0];
+          let currentDate = meal.date;
+          if (meal.date && meal.date.includes('T')) {
+            currentDate = meal.date.split('T')[0];
+          }
+          return currentDate !== timestampDate;
+        });
+        
+        console.log(`📊 Found ${mealsNeedingRecovery.length} meals needing recovery out of ${stored.length} total`);
+        
+        // If we have meals needing recovery, force the recovery
+        if (mealsNeedingRecovery.length > 0) {
+          console.log('🔥 FORCING IMMEDIATE RECOVERY OF MEAL DATES');
+        }
+        
+        const recoveredMeals = stored.map((meal: any, index: number) => {
+          if (!meal.timestamp) {
+            console.log(`⚠️ Meal ${index + 1} "${meal.name}" has no timestamp, keeping current date: ${meal.date}`);
+            return meal;
+          }
+          
+          const timestampDate = meal.timestamp.split('T')[0];
+          let currentDate = meal.date;
+          
+          // Handle date field that contains timestamp
+          if (meal.date && meal.date.includes('T')) {
+            currentDate = meal.date.split('T')[0];
+          }
+          
+          // Always restore to timestamp date if different
+          if (currentDate !== timestampDate) {
+            recoveryCount++;
+            if (recoveryCount <= 5) { // Log first 5 for debugging
+              console.log(`🔄 Restoring meal: "${meal.name}" from ${currentDate} to ${timestampDate}`);
             }
             
-            // If meal date doesn't match timestamp date, restore it
-            if (mealDate !== timestampDate) {
-              needsRecovery = true;
-              console.log('🔄 Restoring meal date:', meal.name, 'from', mealDate, 'to', timestampDate);
-              return {
-                ...meal,
-                date: timestampDate // Restore to correct date from timestamp
-              };
-            }
-            
-            // Fix date format if it contains timestamp
-            if (meal.date && meal.date.includes('T')) {
-              return {
-                ...meal,
-                date: meal.date.split('T')[0]
-              };
-            }
+            return {
+              ...meal,
+              date: timestampDate // Always use timestamp date
+            };
+          }
+          
+          // Ensure date is in proper format (no T)
+          if (meal.date && meal.date.includes('T')) {
+            return {
+              ...meal,
+              date: meal.date.split('T')[0]
+            };
           }
           
           return meal;
         });
         
-        // Save recovered data if changes were made
-        if (needsRecovery || JSON.stringify(stored) !== JSON.stringify(recoveredMeals)) {
+        // Save recovered data and report results
+        if (recoveryCount > 0 || JSON.stringify(stored) !== JSON.stringify(recoveredMeals)) {
           localStorage.setItem('weeklyMeals', JSON.stringify(recoveredMeals));
-          if (needsRecovery) {
-            console.log('✅ Recovered meals to correct dates based on timestamps');
-          }
+          console.log(`✅ Recovered ${recoveryCount} meals to correct dates based on timestamps`);
+          
+          // Show date distribution after recovery
+          const dateDistribution: {[key: string]: number} = {};
+          recoveredMeals.forEach((meal: any) => {
+            let mealDate = meal.date;
+            if (meal.date && meal.date.includes('T')) {
+              mealDate = meal.date.split('T')[0];
+            }
+            if (mealDate) {
+              dateDistribution[mealDate] = (dateDistribution[mealDate] || 0) + 1;
+            }
+          });
+          
+          console.log('📊 Meals distribution after recovery:');
+          Object.keys(dateDistribution).sort().forEach(date => {
+            console.log(`  ${date}: ${dateDistribution[date]} meals`);
+          });
+        } else {
+          console.log('ℹ️ No recovery needed - dates are already correct');
         }
         
         // Debug logging for date analysis (development only)
