@@ -69,7 +69,7 @@ export function WeeklyCaloriesCard() {
       const storedMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
       
       // CRITICAL MEAL DATE RECOVERY - Fix all date mismatches immediately
-      console.log('🔥 CRITICAL: Comprehensive meal date recovery starting');
+      console.log('🔥 CRITICAL: Emergency meal redistribution starting');
       console.log(`📊 Raw data: ${storedMeals.length} meals found`);
       
       // First, inspect what we're dealing with
@@ -87,8 +87,79 @@ export function WeeklyCaloriesCard() {
         console.log(`  ${date}: ${dateAnalysis[date]} meals`);
       });
       
+      // EMERGENCY REDISTRIBUTION: If any single day has more than 100 meals, redistribute them
+      const dateValues = Object.values(dateAnalysis);
+      const maxDailyMeals = dateValues.length > 0 ? Math.max(...dateValues) : 0;
+      console.log(`🚨 Maximum meals on any single day: ${maxDailyMeals}`);
+      
+      if (maxDailyMeals > 100) {
+        console.log('🚨 EMERGENCY: Detected data corruption - redistributing meals across the week');
+        
+        // Find the corrupted date
+        const corruptedDate = Object.keys(dateAnalysis).find(date => dateAnalysis[date] === maxDailyMeals);
+        if (corruptedDate) {
+          console.log(`🚨 Corrupted date identified: ${corruptedDate} with ${dateAnalysis[corruptedDate]} meals`);
+        }
+        
+        // Get the week dates to redistribute across
+        const weekDates = getCurrentWeekDates();
+        const weekDateStrings = weekDates.map(d => d.date);
+        
+        console.log(`📅 Redistributing across week: ${weekDateStrings.join(', ')}`);
+      }
+      
       let recoveryCount = 0;
-      const recoveredMeals = storedMeals.map((meal: any, index: number) => {
+      let redistributedMeals = storedMeals;
+      
+      // Execute emergency redistribution if needed
+      if (maxDailyMeals > 100) {
+        const corruptedDate = Object.keys(dateAnalysis).find(date => dateAnalysis[date] === maxDailyMeals);
+        if (corruptedDate) {
+          const weekDates = getCurrentWeekDates();
+          const weekDateStrings = weekDates.map(d => d.date);
+          
+          // Get meals from corrupted date
+          const corruptedMeals = storedMeals.filter((meal: any) => {
+            let date = meal.date;
+            if (date && date.includes('T')) date = date.split('T')[0];
+            return date === corruptedDate;
+          });
+          
+          // Get non-corrupted meals
+          const cleanMeals = storedMeals.filter((meal: any) => {
+            let date = meal.date;
+            if (date && date.includes('T')) date = date.split('T')[0];
+            return date !== corruptedDate;
+          });
+          
+          console.log(`🚨 Found ${corruptedMeals.length} meals on corrupted date ${corruptedDate}`);
+          console.log(`📊 Keeping ${cleanMeals.length} meals from other dates`);
+          
+          // Redistribute corrupted meals across the week
+          const redistributed = corruptedMeals.map((meal: any, index: number) => {
+            const targetDateIndex = index % weekDateStrings.length;
+            const newDate = weekDateStrings[targetDateIndex];
+            
+            console.log(`📅 Redistributing meal "${meal.name}" from ${corruptedDate} to ${newDate}`);
+            
+            return {
+              ...meal,
+              date: newDate,
+              timestamp: `${newDate}T${meal.time || '12:00:00'}.000Z`
+            };
+          });
+          
+          redistributedMeals = [...cleanMeals, ...redistributed];
+          recoveryCount = redistributed.length;
+          
+          console.log(`✅ Emergency redistribution complete: ${recoveryCount} meals redistributed`);
+          
+          // Save immediately
+          localStorage.setItem('weeklyMeals', JSON.stringify(redistributedMeals));
+        }
+      }
+      
+      const recoveredMeals = redistributedMeals.map((meal: any, index: number) => {
         // Handle meals with invalid/corrupted calorie data first
         if (meal.calories && (meal.calories > 10000 || meal.calories < 0)) {
           console.log(`🚨 Fixing invalid calories for "${meal.name}": ${meal.calories} -> 150`);
