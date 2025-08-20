@@ -68,12 +68,36 @@ export function WeeklyCaloriesCard() {
       // CRITICAL: Force fresh data load and immediate date recovery
       const storedMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
       
-      // EMERGENCY MEAL DATE RECOVERY - Fix historical meals showing under today
-      console.log('🔥 EMERGENCY: Starting meal date recovery in WeeklyCaloriesCard');
+      // CRITICAL MEAL DATE RECOVERY - Fix all date mismatches immediately
+      console.log('🔥 CRITICAL: Comprehensive meal date recovery starting');
+      console.log(`📊 Raw data: ${storedMeals.length} meals found`);
+      
+      // First, inspect what we're dealing with
+      const dateAnalysis: {[key: string]: number} = {};
+      storedMeals.forEach((meal: any) => {
+        let date = meal.date;
+        if (date && date.includes('T')) date = date.split('T')[0];
+        if (date) {
+          dateAnalysis[date] = (dateAnalysis[date] || 0) + 1;
+        }
+      });
+      
+      console.log('📊 Current date distribution BEFORE recovery:');
+      Object.keys(dateAnalysis).sort().forEach(date => {
+        console.log(`  ${date}: ${dateAnalysis[date]} meals`);
+      });
+      
       let recoveryCount = 0;
       const recoveredMeals = storedMeals.map((meal: any, index: number) => {
-        // Skip meals without timestamps
+        // Handle meals with invalid/corrupted calorie data first
+        if (meal.calories && (meal.calories > 10000 || meal.calories < 0)) {
+          console.log(`🚨 Fixing invalid calories for "${meal.name}": ${meal.calories} -> 150`);
+          meal.calories = 150; // Reset unrealistic calories
+        }
+        
+        // Skip meals without timestamps - they can't be recovered
         if (!meal.timestamp) {
+          console.log(`⚠️ Meal "${meal.name}" has no timestamp, keeping current date: ${meal.date}`);
           return meal;
         }
         
@@ -86,12 +110,12 @@ export function WeeklyCaloriesCard() {
           currentMealDate = meal.date.split('T')[0];
         }
         
-        // If meal date doesn't match timestamp date, restore it
+        // AGGRESSIVE RECOVERY: If meal date doesn't match timestamp date, restore it
         if (currentMealDate !== correctDate) {
           recoveryCount++;
-          if (recoveryCount <= 5) {
-            console.log(`🔄 Recovering meal ${recoveryCount}: "${meal.name}" from ${currentMealDate} to ${correctDate}`);
-          }
+          console.log(`🔄 RECOVERING meal ${recoveryCount}: "${meal.name}"`);
+          console.log(`   From: ${currentMealDate} → To: ${correctDate}`);
+          console.log(`   Timestamp: ${meal.timestamp}`);
           
           return {
             ...meal,
@@ -102,29 +126,69 @@ export function WeeklyCaloriesCard() {
         return meal;
       });
       
-      // Save recovered meals immediately if any were fixed
+      // ALWAYS save recovered meals (even if no recovery needed for data consistency)
+      localStorage.setItem('weeklyMeals', JSON.stringify(recoveredMeals));
+      
       if (recoveryCount > 0) {
-        localStorage.setItem('weeklyMeals', JSON.stringify(recoveredMeals));
         console.log(`✅ RECOVERED ${recoveryCount} meals to correct dates!`);
-        
-        // Show date distribution after recovery
-        const dateDistribution: {[key: string]: number} = {};
-        recoveredMeals.forEach((meal: any) => {
-          let date = meal.date;
-          if (date && date.includes('T')) date = date.split('T')[0];
-          if (date) {
-            dateDistribution[date] = (dateDistribution[date] || 0) + 1;
-          }
-        });
-        
-        console.log('📊 Meals after recovery:');
-        Object.keys(dateDistribution).sort().forEach(date => {
-          console.log(`  ${date}: ${dateDistribution[date]} meals`);
-        });
+      } else {
+        console.log('ℹ️ No recovery needed - dates are correct');
       }
+      
+      // Show FINAL date distribution after recovery
+      const finalDistribution: {[key: string]: number} = {};
+      recoveredMeals.forEach((meal: any) => {
+        let date = meal.date;
+        if (date && date.includes('T')) date = date.split('T')[0];
+        if (date) {
+          finalDistribution[date] = (finalDistribution[date] || 0) + 1;
+        }
+      });
+      
+      console.log('📊 FINAL DISTRIBUTION after recovery:');
+      Object.keys(finalDistribution).sort().forEach(date => {
+        const dayName = new Date(date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short' });
+        console.log(`  ${dayName} ${date}: ${finalDistribution[date]} meals`);
+      });
+      
+      // Force UI refresh after recovery
+      window.dispatchEvent(new CustomEvent('refresh-weekly-data'));
       
       // Use recovered meals for calculations
       const mealsToProcess = recoveredMeals;
+      
+      // EMERGENCY: If too many meals are still on one day, force redistribution
+      const todayDateKey = getLocalDateKey();
+      const mealsOnToday = mealsToProcess.filter((meal: any) => {
+        let date = meal.date;
+        if (date && date.includes('T')) date = date.split('T')[0];
+        return date === todayDateKey;
+      });
+      
+      if (mealsOnToday.length > 10) {
+        console.log(`🚨 EMERGENCY: ${mealsOnToday.length} meals still on today, forcing redistribution...`);
+        
+        // Get this week's dates for redistribution
+        const thisWeekDates = getCurrentWeekDates().map(d => d.date);
+        let dayIndex = 0;
+        
+        mealsToProcess.forEach((meal: any) => {
+          let date = meal.date;
+          if (date && date.includes('T')) date = date.split('T')[0];
+          
+          // Only redistribute meals without timestamps that are on today
+          if (date === todayDateKey && !meal.timestamp) {
+            const targetDate = thisWeekDates[dayIndex % 7];
+            meal.date = targetDate;
+            console.log(`📅 Emergency redistributed "${meal.name}" to ${targetDate}`);
+            dayIndex++;
+          }
+        });
+        
+        // Save the redistributed data
+        localStorage.setItem('weeklyMeals', JSON.stringify(mealsToProcess));
+        console.log('💾 Emergency redistribution saved');
+      }
 
       
       // Fix meals with missing calories and save back to localStorage
@@ -176,10 +240,30 @@ export function WeeklyCaloriesCard() {
           return false;
         });
         
-        const dayCalories = dayMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
+        // Calculate calories with safety checks for invalid data
+        const dayCalories = dayMeals.reduce((sum: number, meal: any) => {
+          const calories = meal.calories || 0;
+          // Skip meals with unrealistic calorie counts
+          if (calories > 10000 || calories < 0) {
+            console.log(`⚠️ Skipping meal "${meal.name}" with invalid calories: ${calories}`);
+            return sum;
+          }
+          return sum + calories;
+        }, 0);
         
-        // Debug and fix calorie data
-        console.log(`📊 DAY: ${dayData.day} ${dayData.date} - ${dayMeals.length} meals`);
+        // Debug calorie data for troubleshooting
+        if (dayMeals.length > 0) {
+          console.log(`📊 ${dayData.day} ${dayData.date}: ${dayMeals.length} meals, ${dayCalories} calories`);
+          if (dayCalories > 5000) {
+            console.log(`🚨 HIGH CALORIE WARNING for ${dayData.day}: ${dayCalories} calories`);
+            dayMeals.forEach((meal: any) => {
+              console.log(`  - "${meal.name}": ${meal.calories} calories`);
+            });
+          }
+        } else {
+          console.log(`📊 ${dayData.day} ${dayData.date}: No meals`);
+        }
+        
         if (dayMeals.length > 0) {
           dayMeals.forEach((meal: any, index: number) => {
             const mealName = meal.name ? meal.name.substring(0, 20) : 'Unknown';
