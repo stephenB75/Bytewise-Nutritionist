@@ -60,14 +60,6 @@ export function WeeklyCaloriesCard() {
     return weekDates;
   };
 
-  // Clear all meal data from localStorage (no reload to prevent navigation issues)
-  const clearAllMealData = () => {
-    console.log('🗑️ Clearing all meal data from localStorage...');
-    localStorage.removeItem('weeklyMeals');
-    console.log('✅ All meal data cleared from localStorage');
-    // Force component refresh without page reload
-    window.dispatchEvent(new CustomEvent('refresh-weekly-data'));
-  };
 
   // Calculate weekly calories from stored meal data (optimized)  
   const calculateWeeklyCalories = () => {
@@ -83,80 +75,9 @@ export function WeeklyCaloriesCard() {
         return weekDates;
       }
       
-      // Only run corruption detection for large datasets
-      if (storedMeals.length > 1000) {
-        console.log('🔍 Checking for data corruption...');
-        
-        const dateAnalysis: {[key: string]: number} = {};
-        storedMeals.forEach((meal: any) => {
-          let date = meal.date;
-          if (date && date.includes('T')) date = date.split('T')[0];
-          if (date) {
-            dateAnalysis[date] = (dateAnalysis[date] || 0) + 1;
-          }
-        });
-        
-        const dateValues = Object.values(dateAnalysis);
-        const maxDailyMeals = dateValues.length > 0 ? Math.max(...dateValues) : 0;
-        
-        if (maxDailyMeals > 100) {
-          console.log('🚨 EMERGENCY: Severe data corruption detected - clearing all data');
-        
-          localStorage.removeItem('weeklyMeals');
-          console.log('✅ Corrupted data cleared - returning empty week');
-          return weekDates;
-        }
-      }
       
-      // Initialize variables for data processing
-      let recoveryCount = 0;
-      let redistributedMeals = storedMeals;
-      
-      const recoveredMeals = redistributedMeals.map((meal: any, index: number) => {
-        // Handle meals with invalid/corrupted calorie data first
-        if (meal.calories && (meal.calories > 10000 || meal.calories < 0)) {
-          console.log(`🚨 Fixing invalid calories for "${meal.name}": ${meal.calories} -> 150`);
-          meal.calories = 150; // Reset unrealistic calories
-        }
-        
-        // AGGRESSIVE RECOVERY: Force fix ALL timestamp mismatches immediately
-        if (meal.timestamp) {
-          const actualHistoricalDate = meal.timestamp.split('T')[0];
-          let currentMealDate = meal.date;
-          
-          // Handle different date formats
-          if (meal.date && meal.date.includes('T')) {
-            currentMealDate = meal.date.split('T')[0];
-          }
-          
-          // FORCE CORRECTION: Always use timestamp date if available
-          if (currentMealDate !== actualHistoricalDate) {
-            recoveryCount++;
-            console.log(`🚨 FORCE RECOVERY ${recoveryCount}: "${meal.name}"`);
-            console.log(`   CORRECTING: ${currentMealDate} → ${actualHistoricalDate}`);
-            
-            // Return corrected meal with historical date
-            return {
-              ...meal,
-              date: actualHistoricalDate // Use actual timestamp date
-            };
-          }
-        } else {
-          console.log(`⚠️ Meal "${meal.name}" has no timestamp, keeping current date: ${meal.date}`);
-        }
-        
-        return meal;
-      });
-      
-      // ALWAYS save recovered meals (even if no recovery needed for data consistency)
-      localStorage.setItem('weeklyMeals', JSON.stringify(recoveredMeals));
-      
-      if (recoveryCount > 0) {
-        console.log(`🚨 FORCE RECOVERY COMPLETED: ${recoveryCount} meals corrected`);
-        console.log(`💾 SAVED ${recoveryCount} corrected meals to localStorage`);
-      } else {
-        console.log('ℹ️ No recovery needed - dates are correct');
-      }
+      // Use stored meals as-is without any modification
+      const recoveredMeals = storedMeals;
       
       // Show FINAL date distribution after recovery
       const finalDistribution: {[key: string]: number} = {};
