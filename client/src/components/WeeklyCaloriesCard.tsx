@@ -12,6 +12,7 @@ import { Calendar, Flame } from 'lucide-react';
 
 import { useCheckAchievements } from '@/hooks/useAchievements';
 import { getWeekDates, getLocalDateKey, cleanupOldWeeklyData } from '@/utils/dateUtils';
+import { cleanupCorruptedMealData } from '@/utils/dataCleanup';
 import { checkMealDateMismatches } from '@/utils/mealDateFixer';
 import { debounce, getCachedLocalStorage } from '@/utils/performanceUtils';
 // Removed timezone correction import to fix date display issues
@@ -36,9 +37,8 @@ export function WeeklyCaloriesCard() {
 
   // Get the current week's dates using actual calendar dates
   const getCurrentWeekDates = () => {
-    // Use current date without any date override to fix the offset issue
     const currentDate = new Date();
-    const weekDatesArray = getWeekDates(currentDate); // Use actual calendar dates
+    const weekDatesArray = getWeekDates(currentDate);
     const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     
     const weekDates = weekDatesArray.map((date, index) => ({
@@ -47,214 +47,83 @@ export function WeeklyCaloriesCard() {
       calories: 0,
       mealCount: 0
     }));
-
-    // Debug: Check if dates are correct
-    const todayKey = getLocalDateKey(currentDate);
-    console.log('🗓️ Week calculation:', {
-      systemToday: currentDate.toDateString(),
-      todayKey: todayKey,
-      weekDates: weekDates.map(d => ({ day: d.day, date: d.date })),
-      mondayDate: weekDates.find(d => d.day === 'Monday')?.date,
-      shouldHighlightMonday: weekDates.find(d => d.day === 'Monday')?.date === todayKey
-    });
     
     return weekDates;
   };
 
 
-  // Calculate weekly calories from stored meal data (optimized)  
+  // Calculate weekly calories from stored meal data (cleaned up version)
   const calculateWeeklyCalories = () => {
     try {
-      // Clean up old data keeping last 30 days (automatic cleanup)
+      // Clean up old data keeping last 30 days
       const wasCleanedUp = cleanupOldWeeklyData();
-      if (wasCleanedUp) {
-        console.log('🔄 Data cleanup completed, refreshing display');
+      
+      // Clean up corrupted data
+      const { removedCount } = cleanupCorruptedMealData();
+      
+      if (wasCleanedUp || removedCount > 0) {
+        console.log('🔄 Data cleanup completed');
       }
       
       const weekDates = getCurrentWeekDates();
-      
-      // Get fresh data after potential cleanup
       const storedMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
       
-      // Skip intensive processing if no data
       if (storedMeals.length === 0) {
-        console.log('📊 No meal data found - returning empty week');
         return weekDates;
       }
       
-      
-      // Use stored meals as-is without any modification
-      const recoveredMeals = storedMeals;
-      
-      // Show FINAL date distribution after recovery
-      const finalDistribution: {[key: string]: number} = {};
-      recoveredMeals.forEach((meal: any) => {
-        let date = meal.date;
-        if (date && date.includes('T')) date = date.split('T')[0];
-        if (date) {
-          finalDistribution[date] = (finalDistribution[date] || 0) + 1;
+      // Data validation and cleanup
+      const validMeals = storedMeals.filter((meal: any) => {
+        // Validate meal has required fields
+        if (!meal.name || !meal.date) return false;
+        
+        // Validate calorie range (realistic values only)
+        const calories = Number(meal.calories) || 0;
+        if (calories < 0 || calories > 5000) return false;
+        
+        // Validate date format
+        let mealDate = meal.date;
+        if (mealDate && mealDate.includes('T')) {
+          mealDate = mealDate.split('T')[0];
         }
+        
+        // Check if date is valid YYYY-MM-DD format
+        const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!dateRegex.test(mealDate)) return false;
+        
+        return true;
+      }).map((meal: any) => {
+        // Normalize the meal data
+        let mealDate = meal.date;
+        if (mealDate && mealDate.includes('T')) {
+          mealDate = mealDate.split('T')[0];
+        }
+        
+        return {
+          ...meal,
+          date: mealDate, // Ensure date is in YYYY-MM-DD format
+          calories: Number(meal.calories) || 0
+        };
       });
       
-      console.log('📊 FINAL DISTRIBUTION after recovery:');
-      Object.keys(finalDistribution).sort().forEach(date => {
-        const dayName = new Date(date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short' });
-        console.log(`  ${dayName} ${date}: ${finalDistribution[date]} meals`);
-      });
-      
-      // Force UI refresh after recovery
-      window.dispatchEvent(new CustomEvent('refresh-weekly-data'));
-      
-      // Use recovered meals for calculations
-      const mealsToProcess = recoveredMeals;
-      
-      // VERIFICATION: Check today's meal accuracy after historical recovery
-      const todayDateKey = getLocalDateKey();
-      console.log(`🗓️ Today's date: ${todayDateKey}`);
-      
-      // Count meals on today after historical recovery
-      const mealsOnTodayAfterRecovery = mealsToProcess.filter((meal: any) => {
-        let date = meal.date;
-        if (date && date.includes('T')) date = date.split('T')[0];
-        return date === todayDateKey;
-      });
-      
-      console.log(`🎯 Meals on today after historical recovery: ${mealsOnTodayAfterRecovery.length}`);
-      
-      // Show all unique dates with meals
-      const uniqueDatesWithMeals = new Set<string>();
-      mealsToProcess.forEach((meal: any) => {
-        let date = meal.date;
-        if (date && date.includes('T')) date = date.split('T')[0];
-        if (date) uniqueDatesWithMeals.add(date);
-      });
-      
-      console.log(`📊 Total unique dates with meal data: ${uniqueDatesWithMeals.size}`);
-      console.log('📅 Date range:', Array.from(uniqueDatesWithMeals).sort());
-      
-      // Show today's specific meals for verification
-      if (mealsOnTodayAfterRecovery.length > 0) {
-        console.log(`🎯 TODAY'S MEALS (${todayDateKey}):`);
-        mealsOnTodayAfterRecovery.forEach((meal: any, i: number) => {
-          const timestampDate = meal.timestamp ? meal.timestamp.split('T')[0] : 'NO_TIMESTAMP';
-          const isCorrect = timestampDate === todayDateKey || timestampDate === 'NO_TIMESTAMP';
-          console.log(`  ${i+1}. "${meal.name}" - ${meal.calories} cal ${isCorrect ? '✅' : '❌'}`);
-          if (!isCorrect) {
-            console.log(`     ⚠️ Timestamp shows: ${timestampDate}`);
-          }
-        });
+      // If we cleaned up invalid data, save the valid meals back
+      if (validMeals.length !== storedMeals.length) {
+        localStorage.setItem('weeklyMeals', JSON.stringify(validMeals));
+        console.log(`🧹 Cleaned up ${storedMeals.length - validMeals.length} invalid meals`);
       }
 
       
-      // Fix meals with missing calories and save back to localStorage
-      let needsSave = false;
-      mealsToProcess.forEach((meal: any) => {
-        if (meal.calories === 0 || meal.calories === undefined || meal.calories === null) {
-          needsSave = true;
-          
-          // Estimate calories based on meal name
-          if (meal.name) {
-            const name = meal.name.toLowerCase();
-            if (name.includes('empanada')) meal.calories = 250;
-            else if (name.includes('apple')) meal.calories = 95;
-            else if (name.includes('water')) meal.calories = 0;
-            else if (name.includes('chicken')) meal.calories = 300;
-            else if (name.includes('popcycle') || name.includes('popsicle')) meal.calories = 150;
-            else meal.calories = 100; // Default estimate
-            
-
-          }
-        }
-      });
-      
-      // Save the fixed data back to localStorage
-      if (needsSave) {
-        localStorage.setItem('weeklyMeals', JSON.stringify(mealsToProcess));
-      }
-      
-      // Calculate calories for each day of the week - include ALL dates, not just this week
-      const processedDatesWithMeals = new Set<string>();
-      mealsToProcess.forEach((meal: any) => {
-        let date = meal.date;
-        if (date && date.includes('T')) date = date.split('T')[0];
-        if (date) processedDatesWithMeals.add(date);
-      });
-      
-      console.log(`📊 Processing ${processedDatesWithMeals.size} unique dates with meals`);
-      
-      // For this week's display, focus on current week dates but show accurate data
+      // Calculate calories for each day of the current week
       const weeklyData = weekDates.map(dayData => {
-        // Strict filtering to prevent duplicate matches - each meal should only appear once
-        const dayMeals = mealsToProcess.filter((meal: any) => {
-          if (!meal.date) return false;
-          
-          const mealDateStr = meal.date;
-          
-          // Handle timestamp format dates - extract date part first
-          const normalizedMealDate = mealDateStr.includes('T') 
-            ? mealDateStr.split('T')[0] 
-            : mealDateStr;
-          
-          // Direct date match (most common case)
-          if (normalizedMealDate === dayData.date) {
-            return true;
-          }
-          
-          return false;
+        // Filter meals for this specific day with strict date matching
+        const dayMeals = validMeals.filter((meal: any) => {
+          return meal.date === dayData.date;
         });
         
-        // Calculate calories with safety checks for invalid data
+        // Calculate total calories for the day
         const dayCalories = dayMeals.reduce((sum: number, meal: any) => {
-          const calories = meal.calories || 0;
-          // Skip meals with unrealistic calorie counts
-          if (calories > 10000 || calories < 0) {
-            console.log(`⚠️ Skipping meal "${meal.name}" with invalid calories: ${calories}`);
-            return sum;
-          }
-          return sum + calories;
+          return sum + (meal.calories || 0);
         }, 0);
-        
-        // Debug calorie data for troubleshooting
-        if (dayMeals.length > 0) {
-          console.log(`📊 ${dayData.day} ${dayData.date}: ${dayMeals.length} meals, ${dayCalories} calories`);
-          if (dayCalories > 5000) {
-            console.log(`🚨 HIGH CALORIE WARNING for ${dayData.day}: ${dayCalories} calories`);
-            dayMeals.forEach((meal: any) => {
-              console.log(`  - "${meal.name}": ${meal.calories} calories`);
-            });
-          }
-        } else {
-          console.log(`📊 ${dayData.day} ${dayData.date}: No meals`);
-        }
-        
-        if (dayMeals.length > 0) {
-          dayMeals.forEach((meal: any, index: number) => {
-            const mealName = meal.name ? meal.name.substring(0, 20) : 'Unknown';
-            
-            // Debug calorie values
-            if (meal.calories === 0 || meal.calories === undefined || meal.calories === null) {
-              console.log(`    ⚠️ ZERO CALORIES: ${mealName} has calories=${meal.calories} (${typeof meal.calories})`);
-              
-              // Try to fix missing calories based on meal name patterns
-              if (meal.name) {
-                let estimatedCalories = 0;
-                const name = meal.name.toLowerCase();
-                
-                if (name.includes('empanada')) estimatedCalories = 250;
-                else if (name.includes('apple')) estimatedCalories = 95;
-                else if (name.includes('water')) estimatedCalories = 0;
-                else if (name.includes('chicken')) estimatedCalories = 300;
-                else if (name.includes('popcycle') || name.includes('popsicle')) estimatedCalories = 150;
-                else estimatedCalories = 100; // Default estimate
-                
-                meal.calories = estimatedCalories;
-                console.log(`    🔧 FIXED: Set ${mealName} calories to ${estimatedCalories}`);
-              }
-            }
-            
-            console.log(`  ${index + 1}. ${mealName} - ${meal.calories || 0} cal (${meal.date})`);
-          });
-        }
         
         return {
           ...dayData,
@@ -264,16 +133,17 @@ export function WeeklyCaloriesCard() {
       });
 
       const totalCalories = weeklyData.reduce((sum, day) => sum + day.calories, 0);
-      const weeklyAverage = Math.round(totalCalories / 7);
       
       setWeeklyData(weeklyData);
       setTotalWeeklyCalories(totalCalories);
+      
+      return weeklyData;
     } catch (error) {
-      // Weekly progress calculation error handled gracefully
-      // Set empty state on error
+      console.error('Error calculating weekly calories:', error);
       const weekDates = getCurrentWeekDates();
       setWeeklyData(weekDates.map(day => ({ ...day, calories: 0, mealCount: 0 })));
       setTotalWeeklyCalories(0);
+      return weekDates.map(day => ({ ...day, calories: 0, mealCount: 0 }));
     }
   };
 
