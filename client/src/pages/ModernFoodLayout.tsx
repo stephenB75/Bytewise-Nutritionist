@@ -953,7 +953,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   }) => {
     // Memoize the background style to prevent recalculation
     const backgroundStyle = React.useMemo(() => ({
-      backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.45), rgba(0,0,0,0.75)), url('${backgroundImage}')`,
+      backgroundImage: `linear-gradient(135deg, rgba(255,255,255,0.85), rgba(255,255,255,0.95)), url('${backgroundImage}')`,
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       backgroundRepeat: 'no-repeat',
@@ -999,7 +999,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <Button 
                 onClick={onButtonClick}
                 size="lg"
-                className="group relative bg-blue-600 hover:bg-blue-600 text-white font-black px-16 py-6 rounded-full text-xl md:text-2xl shadow-2xl hover:shadow-orange-500/25 transition-all duration-300 border-2 border-orange-400/40 hover:border-orange-300/60 overflow-hidden btn-hero-enhanced"
+                className="group relative bg-blue-600 hover:bg-blue-600 text-white font-black px-16 py-6 rounded-full text-xl md:text-2xl shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 border-2 border-blue-600/40 hover:border-blue-500/60 overflow-hidden btn-hero-enhanced"
               >
                 <span className="relative z-10 flex items-center gap-3 text-optimized">
                   {buttonText}
@@ -1034,7 +1034,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const BytewiseLogo = React.memo(() => (
     <div className="mb-8 cursor-pointer group transition-all duration-300 hover:scale-105" onClick={() => handleTabChange('home')}>
       <div className="text-center font-league-spartan">
-        <div className="text-7xl font-black leading-none text-sky-300 mb-2 lowercase tracking-tight drop-shadow-2xl group-hover:text-sky-200 transition-colors duration-300">
+        <div className="text-7xl font-black leading-none text-blue-600 mb-2 lowercase tracking-tight drop-shadow-2xl group-hover:text-blue-500 transition-colors duration-300">
           bytewise
         </div>
         <div className="text-xl font-light text-black uppercase tracking-widest drop-shadow-lg group-hover:text-black transition-colors duration-300">

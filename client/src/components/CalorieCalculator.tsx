@@ -662,7 +662,7 @@ function CalorieCalculator({
     <div className="space-y-6 relative">
       {/* Success Animation Modal */}
       {showLoggedAnimation && loggedData && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/80 backdrop-blur-sm">
           <div className="bg-white rounded-2xl p-8 mx-4 max-w-sm w-full shadow-2xl animate-in zoom-in-95 duration-500">
             <div className="text-center space-y-4">
               <div className="relative">
@@ -670,7 +670,7 @@ function CalorieCalculator({
                   <Trophy className="w-10 h-10 text-white" />
                 </div>
                 <div className="absolute -top-2 -right-2">
-                  <Sparkles className="w-6 h-6 text-yellow-400 animate-spin" />
+                  <Sparkles className="w-6 h-6 text-blue-500 animate-spin" />
                 </div>
               </div>
               
@@ -686,7 +686,7 @@ function CalorieCalculator({
                   <div className="text-gray-500">Protein</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-yellow-600 font-bold">{loggedData.carbs?.toFixed(1)}g</div>
+                  <div className="text-blue-600 font-bold">{loggedData.carbs?.toFixed(1)}g</div>
                   <div className="text-gray-500">Carbs</div>
                 </div>
                 <div className="text-center">
