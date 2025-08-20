@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clear ByteWise LocalStorage</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .button { background: #dc2626; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; margin: 10px 5px; }
+        .button:hover { background: #b91c1c; }
+        .success { background: #16a34a; }
+        .success:hover { background: #15803d; }
+        .log { background: #f8f9fa; padding: 15px; border-radius: 6px; margin: 15px 0; font-family: monospace; font-size: 14px; max-height: 300px; overflow-y: auto; }
+        .key-list { columns: 2; column-gap: 20px; }
+        .key-item { margin: 5px 0; padding: 4px 8px; background: #f1f5f9; border-radius: 4px; break-inside: avoid; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ByteWise Nutritionist - LocalStorage Manager</h1>
+        
+        <h3>Current LocalStorage Keys:</h3>
+        <div id="currentKeys" class="key-list"></div>
+        
+        <div style="margin: 20px 0;">
+            <button class="button" onclick="scanStorage()">🔍 Scan Storage</button>
+            <button class="button" onclick="clearBytewiseData()">🗑️ Clear ByteWise Data</button>
+            <button class="button" onclick="clearAllStorage()">❌ Clear All Storage</button>
+            <button class="button success" onclick="verifyClean()">✅ Verify Clean</button>
+        </div>
+        
+        <div id="log" class="log"></div>
+    </div>
+
+    <script>
+        const bytewiseKeys = [
+            'weeklyMeals',
+            'calculatedCalories', 
+            'savedRecipes',
+            'waterIntake',
+            'userAchievements',
+            'userProfile',
+            'dailyCalorieGoal',
+            'dailyProteinGoal', 
+            'dailyCarbGoal',
+            'dailyFatGoal',
+            'dailyWaterGoal',
+            'weeklyTrackerData',
+            'bytewise-weekly-tracker',
+            'mealHistory',
+            'recipeData',
+            'achievements',
+            'fastingData',
+            'weeklyProgress',
+            'bytewise_data_backup',
+            'bytewise_backup_timestamp',
+            'lastDataBackup',
+            'bytewise-last-refresh',
+            'bytewise-session-start',
+            'fresh-auth-session'
+        ];
+
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            logDiv.innerHTML += `[${new Date().toLocaleTimeString()}] ${message}\n`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function scanStorage() {
+            log('🔍 Scanning localStorage...');
+            const keys = Object.keys(localStorage);
+            const bytewise = keys.filter(key => 
+                bytewiseKeys.includes(key) || 
+                key.includes('bytewise') ||
+                key.includes('_timestamp') ||
+                key.includes('_backup') ||
+                key.includes('_lastSync')
+            );
+            
+            log(`Found ${keys.length} total keys, ${bytewise.length} ByteWise related`);
+            
+            const currentKeysDiv = document.getElementById('currentKeys');
+            currentKeysDiv.innerHTML = keys.map(key => {
+                const isBytewise = bytewise.includes(key);
+                const size = localStorage.getItem(key)?.length || 0;
+                return `<div class="key-item" style="${isBytewise ? 'background: #fee2e2; border-left: 4px solid #dc2626;' : ''}">${key} (${size} chars)</div>`;
+            }).join('');
+            
+            if (bytewise.length > 0) {
+                log(`ByteWise keys found: ${bytewise.join(', ')}`);
+            }
+        }
+
+        function clearBytewiseData() {
+            log('🗑️ Clearing ByteWise data...');
+            let cleared = 0;
+            
+            // Clear all ByteWise specific keys
+            bytewiseKeys.forEach(key => {
+                if (localStorage.getItem(key)) {
+                    localStorage.removeItem(key);
+                    cleared++;
+                    log(`   Removed: ${key}`);
+                }
+            });
+            
+            // Clear any keys with timestamp/backup suffixes
+            Object.keys(localStorage).forEach(key => {
+                if (key.includes('_timestamp') || key.includes('_backup') || key.includes('_lastSync')) {
+                    const baseKey = key.replace(/_timestamp|_backup|_lastSync/, '');
+                    if (bytewiseKeys.includes(baseKey)) {
+                        localStorage.removeItem(key);
+                        cleared++;
+                        log(`   Removed: ${key}`);
+                    }
+                }
+            });
+            
+            log(`✅ Cleared ${cleared} ByteWise localStorage keys`);
+            scanStorage();
+        }
+
+        function clearAllStorage() {
+            if (confirm('Are you sure you want to clear ALL localStorage? This will affect other websites too.')) {
+                const count = localStorage.length;
+                localStorage.clear();
+                log(`❌ Cleared all ${count} localStorage keys`);
+                scanStorage();
+            }
+        }
+
+        function verifyClean() {
+            log('✅ Verifying clean state...');
+            const keys = Object.keys(localStorage);
+            const bytewise = keys.filter(key => 
+                bytewiseKeys.includes(key) || 
+                key.includes('bytewise') ||
+                key.includes('_timestamp') ||
+                key.includes('_backup') ||
+                key.includes('_lastSync')
+            );
+            
+            if (bytewise.length === 0) {
+                log('🎉 SUCCESS: No ByteWise data found in localStorage');
+            } else {
+                log(`⚠️ WARNING: Still found ${bytewise.length} ByteWise keys: ${bytewise.join(', ')}`);
+            }
+        }
+
+        // Auto-scan on load
+        window.onload = () => {
+            log('ByteWise LocalStorage Manager loaded');
+            scanStorage();
+        };
+    </script>
+</body>
+</html>
