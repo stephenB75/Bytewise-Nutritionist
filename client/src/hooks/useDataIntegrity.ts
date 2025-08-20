@@ -180,17 +180,33 @@ export function useDataIntegrity() {
       const { cleanupCorruptedMealData } = await import('@/utils/dataCleanup');
       cleanupCorruptedMealData();
 
-      // Backup meal data with validation
+      // Get cleaned meal data after cleanup
       const weeklyMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
+      
+      // Check for data corruption - if too many meals, don't backup
+      const mealsByDate = weeklyMeals.reduce((acc: any, meal: any) => {
+        const date = meal.date || new Date().toLocaleDateString();
+        acc[date] = (acc[date] || 0) + 1;
+        return acc;
+      }, {});
+      
+      const maxMealsPerDay = Math.max(...Object.values(mealsByDate).map(count => Number(count)));
+      
+      if (maxMealsPerDay > 30) {
+        console.log(`🚫 Skipping backup: corrupted data detected (${maxMealsPerDay} meals in one day)`);
+        return 0; // Don't backup corrupted data
+      }
+      
       if (weeklyMeals.length > 0) {
         // Only backup recent, valid meals with strict validation
         const validMeals = weeklyMeals
-          .slice(-50) // Last 50 meals
+          .slice(-100) // Last 100 meals max
           .filter((meal: any) => {
             const calories = Number(meal.calories) || 0;
             // Stricter validation to prevent unrealistic values
             return calories > 0 && calories < 3000 && meal.name && meal.date;
-          });
+          })
+          .slice(-50); // Final limit to 50 meals
 
         for (const meal of validMeals) {
           try {
@@ -326,7 +342,7 @@ export function useDataIntegrity() {
     }
   }, [user, toast]);
 
-  // Auto-verify data integrity on app start
+  // Auto-verify data integrity on app start (backup disabled to prevent corruption)
   useEffect(() => {
     if (user) {
       // First restore any missing data
@@ -334,15 +350,17 @@ export function useDataIntegrity() {
         // Then verify integrity
         verifyDataIntegrity();
         
-        // Set up periodic backup
-        const backupInterval = setInterval(() => {
-          backupCriticalData().catch(console.error);
-        }, 5 * 60 * 1000); // Backup every 5 minutes
-
-        return () => clearInterval(backupInterval);
+        // Periodic backup DISABLED until data corruption is resolved
+        console.log('ℹ️ Automatic backup disabled to prevent data corruption');
+        
+        // Uncomment when data is clean:
+        // const backupInterval = setInterval(() => {
+        //   backupCriticalData().catch(console.error);
+        // }, 15 * 60 * 1000);
+        // return () => clearInterval(backupInterval);
       });
     }
-  }, [user, restoreDataFromDatabase, verifyDataIntegrity, backupCriticalData]);
+  }, [user, restoreDataFromDatabase, verifyDataIntegrity]);
 
   return {
     status,
