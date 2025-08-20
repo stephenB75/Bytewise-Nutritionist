@@ -658,12 +658,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     // Load existing meal data on component mount
     const loadExistingData = () => {
       try {
-        // CRITICAL: Run meal date fixer first to correct corrupted data
-        console.log('🔧 Running meal date recovery...');
-        const fixResult = fixMealDateMismatches();
-        if (fixResult.success && fixResult.fixedCount > 0) {
-          console.log(`✅ Fixed ${fixResult.fixedCount} meals with incorrect dates`);
-        }
+        // DISABLED: Meal date fixer was causing corruption, moving all meals to single day
+        // console.log('🔧 Running meal date recovery...');
+        // const fixResult = fixMealDateMismatches();
         
         // Force fresh data load to ensure recovery runs
         const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
