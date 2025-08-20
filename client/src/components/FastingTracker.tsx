@@ -132,40 +132,7 @@ export function FastingTracker() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // DEBUG: Test function to create a sample completed session
-  const createTestSession = () => {
-    const testSession = {
-      id: `test_${Date.now()}`,
-      planId: '16-8',
-      planName: '16:8 Method',
-      startTime: new Date(Date.now() - 16 * 60 * 60 * 1000).toISOString(), // 16 hours ago
-      endTime: new Date().toISOString(),
-      targetDuration: 16 * 60 * 60 * 1000, // 16 hours in ms
-      actualDuration: 16 * 60 * 60 * 1000,
-      status: 'completed',
-      completedAt: new Date().toISOString(),
-      targetHours: 16,
-      actualHoursFasted: 16,
-      wasCompleted: true
-    };
-    
-    try {
-      const existingHistory = JSON.parse(localStorage.getItem(FASTING_HISTORY_KEY) || '[]');
-      existingHistory.unshift(testSession);
-      localStorage.setItem(FASTING_HISTORY_KEY, JSON.stringify(existingHistory.slice(0, 10)));
 
-      
-      // Force re-render
-      queryClient.invalidateQueries({ queryKey: ['/api/fasting/history'] });
-      
-      toast({
-        title: "Test Session Added",
-        description: "Added a sample completed fasting session to test the Recent Sessions display",
-      });
-    } catch (e) {
-
-    }
-  };
 
   // Get user's fasting history (combine server and local)
   const { data: serverHistory, isLoading, error: historyError } = useQuery({
@@ -949,21 +916,7 @@ export function FastingTracker() {
                 </div>
               ) : fastingHistory && Array.isArray(fastingHistory) && fastingHistory.length > 0 ? (
                 <div className="space-y-4">
-                  {/* DEBUG: Show raw history data */}
-                  {process.env.NODE_ENV === 'development' && (
-                    <div className="mb-4 p-3 bg-blue-50 rounded-lg border">
-                      <p className="text-xs text-blue-700 mb-1">DEBUG: Raw history ({fastingHistory.length} total)</p>
-                      <button 
-                        onClick={createTestSession}
-                        className="text-xs bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
-                      >
-                        Add Test Session
-                      </button>
-                      <pre className="text-xs text-blue-600 mt-2 max-h-20 overflow-auto">
-                        {JSON.stringify(fastingHistory.slice(0, 2), null, 2)}
-                      </pre>
-                    </div>
-                  )}
+
                   {fastingHistory
                     .filter((session: any) => session.status === 'completed' || session.status === 'stopped')
                     .slice(0, 8)

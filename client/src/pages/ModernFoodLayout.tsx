@@ -181,13 +181,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       const currentGlasses = (dailyStats?.waterGlasses || 0) + change;
       const newGlasses = Math.max(0, currentGlasses); // Prevent negative values
       
-      console.log('💧 Authenticated user water update:', { 
-        userId: user.id, 
-        currentGlasses: dailyStats?.waterGlasses || 0, 
-        change, 
-        newGlasses 
-      });
-      
       // Optimistic update
       setDailyStats((prev: any) => prev ? { ...prev, waterGlasses: newGlasses } : null);
       
@@ -202,8 +195,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         throw new Error(`Failed to update water consumption: ${response.status} - ${errorText}`);
       }
       
-      const result = await response.json();
-      console.log('✅ Water update response:', result);
+      await response.json();
       
       // Refresh daily stats to update UI
       await fetchDailyStats();
@@ -222,7 +214,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       syncHealthDataIfEnabled().catch(console.error);
       
     } catch (error) {
-      console.error('❌ Error updating water consumption for authenticated user:', error);
       // Revert optimistic update
       setDailyStats((prev: any) => prev ? { ...prev, waterGlasses: (dailyStats?.waterGlasses || 0) } : null);
       toast({
@@ -1092,7 +1083,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     );
   });
 
-  // Water Consumption Card Component
+  // Enhanced Water Consumption Card Component
   const WaterCard = React.memo(({ glasses, onIncrement, onDecrement }: {
     glasses: number;
     onIncrement: () => void;
@@ -1100,17 +1091,18 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   }) => {
     const dailyGoal = 8; // 8 glasses per day
     const percentage = Math.min((glasses / dailyGoal) * 100, 100);
+    const isGoalReached = glasses >= dailyGoal;
     
     return (
-      <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4 transition-all duration-300 hover:bg-white/15 hover:border-white/30">
+      <Card className={`bg-gradient-to-br from-cyan-500/10 to-blue-600/10 backdrop-blur-md border-cyan-400/20 p-6 transition-all duration-300 hover:from-cyan-500/15 hover:to-blue-600/15 hover:border-cyan-400/30 ${isGoalReached ? 'ring-2 ring-cyan-400/50' : ''}`}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
-            <div className="p-2 bg-cyan-500/20 rounded-xl">
-              <Droplets className="w-5 h-5 text-cyan-400" />
+            <div className={`p-3 rounded-xl transition-all duration-300 ${isGoalReached ? 'bg-gradient-to-br from-cyan-400 to-blue-500' : 'bg-cyan-500/20'}`}>
+              <Droplets className={`w-6 h-6 transition-colors duration-300 ${isGoalReached ? 'text-white' : 'text-cyan-400'}`} />
             </div>
             <div>
-              <h3 className="text-white font-semibold">Water Intake</h3>
-              <p className="text-gray-400 text-sm">{glasses}/{dailyGoal} glasses</p>
+              <h3 className="text-white font-semibold text-lg">Water Intake</h3>
+              <p className="text-gray-300 text-sm">{glasses}/{dailyGoal} glasses today</p>
             </div>
           </div>
           <div className="text-right">
@@ -2746,9 +2738,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         <div className="flex items-center justify-around py-2 px-2 max-w-md mx-auto">
           {[
             { id: 'home', label: 'Dashboard', icon: Home },
-            { id: 'nutrition', label: 'Nutrition', icon: Utensils },
+            { id: 'nutrition', label: 'Calorie Tracker', icon: Utensils },
             { id: 'fasting', label: 'Fasting', icon: Clock },
-            { id: 'daily', label: 'Food Log', icon: BarChart3 },
+            { id: 'daily', label: 'Meal Journal', icon: BarChart3 },
             { id: 'profile', label: 'Profile', icon: UserCircle }
           ].map((tab) => {
             const IconComponent = tab.icon;
