@@ -54,7 +54,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
 import { getWeekDates, getLocalDateKey, getMealTypeByTime, formatLocalTime } from '@/utils/dateUtils';
-import { fixMealDateMismatches } from '@/utils/mealDateFixer';
+import { fixMealDateMismatches, autoFixMealDatesIfNeeded } from '@/utils/mealDateFixer';
 import { getCachedLocalStorage, debounce } from '@/utils/performanceUtils';
 import { useLocation } from 'wouter';
 import AIFoodAnalyzer from './AIFoodAnalyzer';
@@ -125,7 +125,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const [showProfileCompletion, setShowProfileCompletion] = useState(false);
   
   // Selected date for meal logging (defaults to today)
-  const [selectedDate, setSelectedDate] = useState(getLocalDateKey());
+  const [selectedDate, setSelectedDate] = useState(new Date());
   
   // App tour state
   const { isTourOpen, startTour, closeTour, completeTour, shouldShowTour } = useAppTour();
@@ -658,12 +658,19 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     // Load existing meal data on component mount
     const loadExistingData = () => {
       try {
+        // CRITICAL: Run meal date fixer first to correct corrupted data
+        console.log('🔧 Running meal date recovery...');
+        const fixResult = fixMealDateMismatches();
+        if (fixResult.success && fixResult.fixedCount > 0) {
+          console.log(`✅ Fixed ${fixResult.fixedCount} meals with incorrect dates`);
+        }
+        
         // Force fresh data load to ensure recovery runs
         const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
         
-        // Simple data loading - recovery is handled by WeeklyCaloriesCard component
+        // Data loading with recovery completed
         console.log('📊 Loaded', stored.length, 'total meals for ModernFoodLayout');
-        console.log('ℹ️ Note: Meal date recovery is handled by WeeklyCaloriesCard component');
+        console.log('✅ Meal date recovery completed');
         
         // Use stored meals directly (recovery happens in WeeklyCaloriesCard)
         const recoveredMeals = stored;
@@ -1545,12 +1552,21 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 </div>
               </Card>
             ) : (
-              // Use loggedMeals for today's view when no search, weeklyMeals when searching
-              (searchQuery ? weeklyMeals : loggedMeals)
-                .filter(meal => 
-                  !searchQuery || 
-                  meal.name.toLowerCase().includes(searchQuery.toLowerCase())
-                )
+              // Filter meals by current date and search query
+              weeklyMeals.filter(meal => {
+                const today = getLocalDateKey();
+                let mealDate = meal.date;
+                
+                // Handle timestamp format dates
+                if (meal.date && meal.date.includes('T')) {
+                  mealDate = meal.date.split('T')[0];
+                }
+                
+                const isToday = mealDate === today;
+                const matchesSearch = !searchQuery || meal.name.toLowerCase().includes(searchQuery.toLowerCase());
+                
+                return isToday && matchesSearch;
+              })
                 .sort((a, b) => {
                   // Sort by date (most recent first) for better search experience
                   // Try multiple date sources for robust sorting
@@ -2240,10 +2256,23 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               </div>
             </Card>
           ) : (
-            weeklyMeals.filter(meal => 
-              !searchQuery || 
-              meal.name.toLowerCase().includes(searchQuery.toLowerCase())
-            ).map((meal, index) => (
+            weeklyMeals.filter(meal => {
+              // First filter by today's date
+              const today = getLocalDateKey();
+              let mealDate = meal.date;
+              
+              // Handle timestamp format dates
+              if (meal.date && meal.date.includes('T')) {
+                mealDate = meal.date.split('T')[0];
+              }
+              
+              const isToday = mealDate === today;
+              
+              // Then filter by search query if provided
+              const matchesSearch = !searchQuery || meal.name.toLowerCase().includes(searchQuery.toLowerCase());
+              
+              return isToday && matchesSearch;
+            }).map((meal, index) => (
             <Card key={`meal-${meal.id || meal.name}-${meal.timestamp || index}`} className="bg-white/10 backdrop-blur-md border-white/20 p-4">
               <div className="flex items-center justify-between">
                 <div className="flex-1">
@@ -2413,7 +2442,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <CalorieCalculator 
                 onNavigate={onNavigate}
                 isCompact={false}
-                selectedDate={selectedDate}
+                selectedDate={getLocalDateKey(selectedDate)}
               />
             )}
           </div>
