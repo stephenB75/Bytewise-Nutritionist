@@ -95,32 +95,29 @@ export function WeeklyCaloriesCard() {
           meal.calories = 150; // Reset unrealistic calories
         }
         
-        // Skip meals without timestamps - they can't be recovered
-        if (!meal.timestamp) {
-          console.log(`⚠️ Meal "${meal.name}" has no timestamp, keeping current date: ${meal.date}`);
-          return meal;
-        }
-        
-        // Extract correct date from timestamp
-        const correctDate = meal.timestamp.split('T')[0];
-        let currentMealDate = meal.date;
-        
-        // Handle different date formats
-        if (meal.date && meal.date.includes('T')) {
-          currentMealDate = meal.date.split('T')[0];
-        }
-        
-        // AGGRESSIVE RECOVERY: If meal date doesn't match timestamp date, restore it
-        if (currentMealDate !== correctDate) {
-          recoveryCount++;
-          console.log(`🔄 RECOVERING meal ${recoveryCount}: "${meal.name}"`);
-          console.log(`   From: ${currentMealDate} → To: ${correctDate}`);
-          console.log(`   Timestamp: ${meal.timestamp}`);
+        // CRITICAL: Use timestamp to place meals on their ACTUAL historical dates
+        if (meal.timestamp) {
+          const actualHistoricalDate = meal.timestamp.split('T')[0];
+          let currentMealDate = meal.date;
           
-          return {
-            ...meal,
-            date: correctDate // Restore to correct date from timestamp
-          };
+          // Handle different date formats
+          if (meal.date && meal.date.includes('T')) {
+            currentMealDate = meal.date.split('T')[0];
+          }
+          
+          // HISTORICAL RECOVERY: Restore to actual logged date (even if weeks/months ago)
+          if (currentMealDate !== actualHistoricalDate) {
+            recoveryCount++;
+            console.log(`🕰️ HISTORICAL RECOVERY ${recoveryCount}: "${meal.name}"`);
+            console.log(`   From: ${currentMealDate} → To: ${actualHistoricalDate} (original date)`);
+            
+            return {
+              ...meal,
+              date: actualHistoricalDate // Restore to actual historical date
+            };
+          }
+        } else {
+          console.log(`⚠️ Meal "${meal.name}" has no timestamp, keeping current date: ${meal.date}`);
         }
         
         return meal;
@@ -157,37 +154,41 @@ export function WeeklyCaloriesCard() {
       // Use recovered meals for calculations
       const mealsToProcess = recoveredMeals;
       
-      // EMERGENCY: If too many meals are still on one day, force redistribution
+      // VERIFICATION: Check today's meal accuracy after historical recovery
       const todayDateKey = getLocalDateKey();
-      const mealsOnToday = mealsToProcess.filter((meal: any) => {
+      console.log(`🗓️ Today's date: ${todayDateKey}`);
+      
+      // Count meals on today after historical recovery
+      const mealsOnTodayAfterRecovery = mealsToProcess.filter((meal: any) => {
         let date = meal.date;
         if (date && date.includes('T')) date = date.split('T')[0];
         return date === todayDateKey;
       });
       
-      if (mealsOnToday.length > 10) {
-        console.log(`🚨 EMERGENCY: ${mealsOnToday.length} meals still on today, forcing redistribution...`);
-        
-        // Get this week's dates for redistribution
-        const thisWeekDates = getCurrentWeekDates().map(d => d.date);
-        let dayIndex = 0;
-        
-        mealsToProcess.forEach((meal: any) => {
-          let date = meal.date;
-          if (date && date.includes('T')) date = date.split('T')[0];
-          
-          // Only redistribute meals without timestamps that are on today
-          if (date === todayDateKey && !meal.timestamp) {
-            const targetDate = thisWeekDates[dayIndex % 7];
-            meal.date = targetDate;
-            console.log(`📅 Emergency redistributed "${meal.name}" to ${targetDate}`);
-            dayIndex++;
+      console.log(`🎯 Meals on today after historical recovery: ${mealsOnTodayAfterRecovery.length}`);
+      
+      // Show all unique dates with meals
+      const uniqueDatesWithMeals = new Set<string>();
+      mealsToProcess.forEach((meal: any) => {
+        let date = meal.date;
+        if (date && date.includes('T')) date = date.split('T')[0];
+        if (date) uniqueDatesWithMeals.add(date);
+      });
+      
+      console.log(`📊 Total unique dates with meal data: ${uniqueDatesWithMeals.size}`);
+      console.log('📅 Date range:', Array.from(uniqueDatesWithMeals).sort());
+      
+      // Show today's specific meals for verification
+      if (mealsOnTodayAfterRecovery.length > 0) {
+        console.log(`🎯 TODAY'S MEALS (${todayDateKey}):`);
+        mealsOnTodayAfterRecovery.forEach((meal: any, i: number) => {
+          const timestampDate = meal.timestamp ? meal.timestamp.split('T')[0] : 'NO_TIMESTAMP';
+          const isCorrect = timestampDate === todayDateKey || timestampDate === 'NO_TIMESTAMP';
+          console.log(`  ${i+1}. "${meal.name}" - ${meal.calories} cal ${isCorrect ? '✅' : '❌'}`);
+          if (!isCorrect) {
+            console.log(`     ⚠️ Timestamp shows: ${timestampDate}`);
           }
         });
-        
-        // Save the redistributed data
-        localStorage.setItem('weeklyMeals', JSON.stringify(mealsToProcess));
-        console.log('💾 Emergency redistribution saved');
       }
 
       
@@ -217,7 +218,17 @@ export function WeeklyCaloriesCard() {
         localStorage.setItem('weeklyMeals', JSON.stringify(mealsToProcess));
       }
       
-      // Calculate calories for each day of the week with fixed date matching
+      // Calculate calories for each day of the week - include ALL dates, not just this week
+      const processedDatesWithMeals = new Set<string>();
+      mealsToProcess.forEach((meal: any) => {
+        let date = meal.date;
+        if (date && date.includes('T')) date = date.split('T')[0];
+        if (date) processedDatesWithMeals.add(date);
+      });
+      
+      console.log(`📊 Processing ${processedDatesWithMeals.size} unique dates with meals`);
+      
+      // For this week's display, focus on current week dates but show accurate data
       const weeklyData = weekDates.map(dayData => {
         // Strict filtering to prevent duplicate matches - each meal should only appear once
         const dayMeals = mealsToProcess.filter((meal: any) => {
@@ -235,8 +246,6 @@ export function WeeklyCaloriesCard() {
             return true;
           }
           
-          // No other matching strategies to prevent duplicates
-          // If there's a date override, we don't try to match meals to multiple days
           return false;
         });
         
