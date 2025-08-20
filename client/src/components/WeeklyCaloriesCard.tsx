@@ -321,9 +321,9 @@ export function WeeklyCaloriesCard() {
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
             <Calendar className="w-5 h-5 text-blue-400" />
-            <h4 className="text-lg font-semibold text-white">Weekly Summary</h4>
+            <h4 className="text-lg font-semibold text-black">Weekly Summary</h4>
           </div>
-          <Badge className="bg-blue-600 text-white">
+          <Badge className="bg-[#0099FF] text-black">
             <Flame className="w-3 h-3 mr-1" />
             {totalWeeklyCalories} cal total
           </Badge>
@@ -340,21 +340,21 @@ export function WeeklyCaloriesCard() {
                 key={dayData.date}
                 className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
                   isToday 
-                    ? 'bg-orange-500/20 border-orange-400/30 shadow-lg' 
+                    ? 'bg-[#0099FF]/20 border-orange-400/30 shadow-lg' 
                     : hasMeals
                     ? 'bg-white/5 border-white/10 hover:bg-white/10'
-                    : 'bg-gray-700/20 border-gray-600/20'
+                    : 'bg-white border-[#DADADA]'
                 }`}
               >
                 <div className="flex items-center gap-3">
                   <div className="text-center min-w-[80px]">
                     <p className={`text-sm font-medium ${
-                      isToday ? 'text-orange-300' : 'text-gray-300'
+                      isToday ? 'text-[#0099FF]' : 'text-black'
                     }`}>
                       {dayData.day}
                     </p>
                     <p className={`text-xs ${
-                      isToday ? 'text-orange-400' : 'text-gray-400'
+                      isToday ? 'text-[#0099FF]' : 'text-black'
                     }`}>
                       {(() => {
                         // Force correct date display by parsing as UTC to prevent timezone shift
@@ -370,10 +370,10 @@ export function WeeklyCaloriesCard() {
                   
                   <div className="flex items-center gap-2">
                     {isToday && (
-                      <Badge className="bg-orange-500 text-white text-xs">Today</Badge>
+                      <Badge className="bg-[#0099FF] text-black text-xs">Today</Badge>
                     )}
                     {dayData.mealCount > 0 && (
-                      <Badge variant="outline" className="text-xs text-gray-300 border-gray-400">
+                      <Badge variant="outline" className="text-xs text-black border-[#DADADA]">
                         {dayData.mealCount} meal{dayData.mealCount !== 1 ? 's' : ''}
                       </Badge>
                     )}
@@ -384,21 +384,21 @@ export function WeeklyCaloriesCard() {
                   {dayData.calories > 0 ? (
                     <div className="flex items-center gap-2">
                       <Flame className={`w-4 h-4 ${
-                        isToday ? 'text-orange-400' : 'text-orange-500'
+                        isToday ? 'text-[#0099FF]' : 'text-orange-500'
                       }`} />
                       <span className={`font-bold text-lg ${
-                        isToday ? 'text-orange-300' : 'text-white'
+                        isToday ? 'text-[#0099FF]' : 'text-black'
                       }`}>
                         {dayData.calories}
                       </span>
                       <span className={`text-sm ${
-                        isToday ? 'text-orange-400' : 'text-gray-400'
+                        isToday ? 'text-[#0099FF]' : 'text-black'
                       }`}>
                         cal
                       </span>
                     </div>
                   ) : (
-                    <span className="text-gray-500 text-sm">No meals logged</span>
+                    <span className="text-black text-sm">No meals logged</span>
                   )}
                 </div>
               </div>
@@ -410,8 +410,8 @@ export function WeeklyCaloriesCard() {
         {totalWeeklyCalories > 0 && (
           <div className="pt-3 border-t border-white/10">
             <div className="flex justify-between items-center text-sm">
-              <span className="text-gray-300">Weekly Average:</span>
-              <span className="text-white font-semibold">
+              <span className="text-black">Weekly Average:</span>
+              <span className="text-black font-semibold">
                 {Math.round(totalWeeklyCalories / 7)} cal/day
               </span>
             </div>
