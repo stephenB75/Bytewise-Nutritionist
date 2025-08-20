@@ -93,70 +93,56 @@ export function WeeklyCaloriesCard() {
       console.log(`🚨 Maximum meals on any single day: ${maxDailyMeals}`);
       
       if (maxDailyMeals > 100) {
-        console.log('🚨 EMERGENCY: Detected data corruption - redistributing meals across the week');
+        console.log('🚨 EMERGENCY: Severe data corruption detected - clearing corrupted data and keeping only today\'s meals');
         
-        // Find the corrupted date
-        const corruptedDate = Object.keys(dateAnalysis).find(date => dateAnalysis[date] === maxDailyMeals);
-        if (corruptedDate) {
-          console.log(`🚨 Corrupted date identified: ${corruptedDate} with ${dateAnalysis[corruptedDate]} meals`);
-        }
+        // Find today's actual date
+        const todayDateKey = getLocalDateKey();
+        console.log(`📅 Today's date: ${todayDateKey}`);
         
-        // Get the week dates to redistribute across
-        const weekDates = getCurrentWeekDates();
-        const weekDateStrings = weekDates.map(d => d.date);
+        // Keep only meals from today and yesterday (to preserve recent legitimate entries)
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayKey = getLocalDateKey(yesterday);
         
-        console.log(`📅 Redistributing across week: ${weekDateStrings.join(', ')}`);
+        const legitimateMeals = storedMeals.filter((meal: any) => {
+          let mealDate = meal.date;
+          if (mealDate && mealDate.includes('T')) {
+            mealDate = mealDate.split('T')[0];
+          }
+          
+          // Keep meals from today and yesterday only
+          return mealDate === todayDateKey || mealDate === yesterdayKey;
+        });
+        
+        console.log(`🚨 Cleared corrupted data: kept ${legitimateMeals.length} legitimate meals from last 2 days`);
+        console.log(`🗑️ Removed ${storedMeals.length - legitimateMeals.length} corrupted meal entries`);
+        
+        // Save cleaned data immediately
+        localStorage.setItem('weeklyMeals', JSON.stringify(legitimateMeals));
+        
+        console.log(`✅ Data cleanup complete: preserved legitimate recent meals only`);
       }
       
+      // Initialize variables for data processing based on whether cleanup occurred
       let recoveryCount = 0;
       let redistributedMeals = storedMeals;
       
-      // Execute emergency redistribution if needed
+      // Update variables if cleanup occurred
       if (maxDailyMeals > 100) {
-        const corruptedDate = Object.keys(dateAnalysis).find(date => dateAnalysis[date] === maxDailyMeals);
-        if (corruptedDate) {
-          const weekDates = getCurrentWeekDates();
-          const weekDateStrings = weekDates.map(d => d.date);
-          
-          // Get meals from corrupted date
-          const corruptedMeals = storedMeals.filter((meal: any) => {
-            let date = meal.date;
-            if (date && date.includes('T')) date = date.split('T')[0];
-            return date === corruptedDate;
-          });
-          
-          // Get non-corrupted meals
-          const cleanMeals = storedMeals.filter((meal: any) => {
-            let date = meal.date;
-            if (date && date.includes('T')) date = date.split('T')[0];
-            return date !== corruptedDate;
-          });
-          
-          console.log(`🚨 Found ${corruptedMeals.length} meals on corrupted date ${corruptedDate}`);
-          console.log(`📊 Keeping ${cleanMeals.length} meals from other dates`);
-          
-          // Redistribute corrupted meals across the week
-          const redistributed = corruptedMeals.map((meal: any, index: number) => {
-            const targetDateIndex = index % weekDateStrings.length;
-            const newDate = weekDateStrings[targetDateIndex];
-            
-            console.log(`📅 Redistributing meal "${meal.name}" from ${corruptedDate} to ${newDate}`);
-            
-            return {
-              ...meal,
-              date: newDate,
-              timestamp: `${newDate}T${meal.time || '12:00:00'}.000Z`
-            };
-          });
-          
-          redistributedMeals = [...cleanMeals, ...redistributed];
-          recoveryCount = redistributed.length;
-          
-          console.log(`✅ Emergency redistribution complete: ${recoveryCount} meals redistributed`);
-          
-          // Save immediately
-          localStorage.setItem('weeklyMeals', JSON.stringify(redistributedMeals));
-        }
+        const todayDateKey = getLocalDateKey();
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayKey = getLocalDateKey(yesterday);
+        
+        redistributedMeals = storedMeals.filter((meal: any) => {
+          let mealDate = meal.date;
+          if (mealDate && mealDate.includes('T')) {
+            mealDate = mealDate.split('T')[0];
+          }
+          return mealDate === todayDateKey || mealDate === yesterdayKey;
+        });
+        
+        recoveryCount = storedMeals.length - redistributedMeals.length;
       }
       
       const recoveredMeals = redistributedMeals.map((meal: any, index: number) => {
