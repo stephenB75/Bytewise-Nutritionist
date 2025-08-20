@@ -127,28 +127,28 @@ html {
   font-size: 17px; /* Increased from 16px for better readability */
 }
 
-/* Profile Component Styles - High-Visibility Color Scheme */
+/* Profile Component Styles - Clean High-Contrast Color Scheme */
 .profile-username-header {
-  @apply text-xl font-bold text-black mb-1 truncate;
+  @apply text-xl font-bold text-gray-900 mb-1 truncate;
   font-family: 'League Spartan', sans-serif;
   transform: none;
   text-orientation: mixed;
 }
 
 .profile-email-text {
-  @apply text-black text-sm truncate;
+  @apply text-gray-700 text-sm truncate;
   transform: none;
 }
 
 .profile-display-text {
-  @apply text-black bg-white p-3 rounded-lg border border-gray-300 break-words;
+  @apply text-gray-900 bg-white p-3 rounded-lg border border-gray-300 break-words;
   transform: none;
   text-orientation: mixed;
   writing-mode: horizontal-tb;
 }
 
 .profile-input-field {
-  @apply bg-white border-gray-300 text-black w-full;
+  @apply bg-white border-gray-300 text-gray-900 w-full;
 }
 
 .profile-input-field::placeholder {
@@ -157,18 +157,18 @@ html {
 }
 
 .profile-label {
-  @apply text-sm text-black font-medium flex items-center;
+  @apply text-sm text-gray-700 font-medium flex items-center;
 }
 
 .profile-section-title {
-  @apply text-lg font-semibold text-black mb-4;
+  @apply text-lg font-semibold text-gray-900 mb-4;
   font-family: 'League Spartan', sans-serif;
 }
 
-/* Apply Updated High-Visibility Brand Colors to body and root */
+/* Apply Clean High-Contrast Colors to body and root */
 body {
-  background-color: #FFFF99 !important;
-  color: #000000 !important;
+  background-color: #ffffff !important;
+  color: #1f2937 !important;
   margin: 0;
   padding: 0;
   min-height: 100vh;
@@ -176,18 +176,18 @@ body {
 }
 
 #root {
-  background-color: #FFFF99 !important;
+  background-color: #ffffff !important;
   min-height: 100vh;
 }
 
 /* Updated mode body styling */
 .dark body {
-  background-color: #FFFF99 !important;
-  color: #000000 !important;
+  background-color: #ffffff !important;
+  color: #1f2937 !important;
 }
 
 .dark #root {
-  background-color: #FFFF99 !important;
+  background-color: #ffffff !important;
 }
 
 /* Global text size improvements for accessibility */
@@ -347,9 +347,9 @@ input[type="password"],
 input[type="number"], 
 input[type="search"],
 textarea {
-  color: #000000 !important;
-  background-color: #FFFFFF !important;
-  border: 2px solid #DADADA !important;
+  color: #1f2937 !important;
+  background-color: #ffffff !important;
+  border: 2px solid #d1d5db !important;
   font-weight: 400 !important;
   text-align: center !important;
 }
@@ -489,16 +489,16 @@ textarea:focus {
 .bg-white\/5 input,
 .bg-gray-800 input,
 .bg-black input {
-  background-color: #FFFFFF !important;
-  color: #000000 !important;
-  border: 2px solid #DADADA !important;
+  background-color: #ffffff !important;
+  color: #1f2937 !important;
+  border: 2px solid #d1d5db !important;
 }
 
 /* Ensure excellent contrast on all input backgrounds */
 input {
-  background-color: #FFFFFF !important;
-  color: #000000 !important;
-  border: 2px solid #DADADA !important;
+  background-color: #ffffff !important;
+  color: #1f2937 !important;
+  border: 2px solid #d1d5db !important;
 }
 
 /* Hero image entrance animations */
@@ -560,14 +560,14 @@ input {
   left: 0 !important;
   right: 0 !important;
   z-index: 50 !important;
-  background: #0099FF !important;
+  background: #2563eb !important;
   backdrop-filter: blur(10px) !important;
 }
 
 input:focus {
-  background-color: #FFFFFF !important;
-  color: #000000 !important;
-  border-color: #0099FF !important;
+  background-color: #ffffff !important;
+  color: #1f2937 !important;
+  border-color: #2563eb !important;
   border-width: 2px !important;
 }
 
@@ -575,32 +575,32 @@ input:focus {
 
 :root {
   --font-size: 14px;
-  /* Updated High-Visibility Brand Colors */
-  --brand-yellow: #FFFF99;
-  --brand-blue: #0099FF;
-  --brand-green: #45c73e;
-  --brand-background: #FFFF99;
-  --icon-color: #DADADA;
+  /* Clean High-Contrast Brand Colors */
+  --brand-yellow: #f59e0b;
+  --brand-blue: #2563eb;
+  --brand-green: #059669;
+  --brand-background: #ffffff;
+  --icon-color: #6b7280;
   --background: var(--brand-background);
-  --foreground: #000000;
-  --card: #FFFFFF;
-  --card-foreground: #000000;
-  --popover: #FFFFFF;
-  --popover-foreground: #000000;
+  --foreground: #1f2937;
+  --card: #ffffff;
+  --card-foreground: #1f2937;
+  --popover: #ffffff;
+  --popover-foreground: #1f2937;
   --primary: var(--brand-blue);
-  --primary-foreground: #FFFFFF;
-  --secondary: #FFFFFF;
-  --secondary-foreground: #000000;
-  --muted: #FFFFFF;
-  --muted-foreground: #000000;
+  --primary-foreground: #ffffff;
+  --secondary: #f8fafc;
+  --secondary-foreground: #334155;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
   --accent: var(--brand-blue);
   --accent-foreground: #FFFFFF;
   --destructive: #dc3545;
   --destructive-foreground: #FFFFFF;
-  --border: #DADADA;
-  --input: #FFFFFF;
-  --input-background: #FFFFFF;
-  --switch-background: #0099FF;
+  --border: #d1d5db;
+  --input: #ffffff;
+  --input-background: #ffffff;
+  --switch-background: #2563eb;
   --font-weight-medium: 500;
   --font-weight-normal: 400;
   --ring: var(--brand-blue);
@@ -622,17 +622,17 @@ input:focus {
 
 .dark {
   --background: var(--brand-background);
-  --foreground: #000000;
-  --card: #FFFFFF;
-  --card-foreground: #000000;
-  --popover: #FFFFFF;
-  --popover-foreground: #000000;
+  --foreground: #1f2937;
+  --card: #ffffff;
+  --card-foreground: #1f2937;
+  --popover: #ffffff;
+  --popover-foreground: #1f2937;
   --primary: var(--brand-blue);
-  --primary-foreground: #FFFFFF;
-  --secondary: #FFFFFF;
-  --secondary-foreground: #000000;
-  --muted: #FFFFFF;
-  --muted-foreground: #000000;
+  --primary-foreground: #ffffff;
+  --secondary: #f8fafc;
+  --secondary-foreground: #334155;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
   --accent: var(--brand-blue);
   --accent-foreground: #FFFFFF;
   --destructive: #dc3545;
