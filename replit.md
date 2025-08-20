@@ -1,11 +1,12 @@
 # ByteWise Nutritionist
 
 ## Overview
-ByteWise Nutritionist is a comprehensive Progressive Web App (PWA) for nutrition tracking and meal planning. It integrates with the USDA food database to provide accurate nutritional information, offering features like meal logging, calorie tracking, progress analytics, and an achievement system. The application is designed for cross-platform compatibility and full PWA capabilities, including PDF export functionality for comprehensive nutrition reports. Its vision is to provide a robust, user-friendly tool for personal nutrition management, leveraging modern web technologies for a seamless experience.
+ByteWise Nutritionist is a comprehensive Progressive Web App (PWA) for nutrition tracking and meal planning. It integrates with the USDA food database to provide accurate nutritional information, offering features like meal logging, calorie tracking, progress analytics, and an achievement system. The AI Food Analyzer uses Google Gemini Vision for intelligent photo-based food recognition and nutrition analysis. The application is designed for cross-platform compatibility and full PWA capabilities, including PDF export functionality for comprehensive nutrition reports. Its vision is to provide a robust, user-friendly tool for personal nutrition management, leveraging modern web technologies for a seamless experience.
 
 **Current Version: BETA 3.0**
 
 ## Recent Changes (August 19, 2025)
+- **✅ COMPLETED: AI Service Migration**: Switched AI Photo Analyzer from OpenAI GPT-4 Vision to Google Gemini Vision API using GOOGLE_API_KEY for enhanced food recognition capabilities
 - **✅ COMPLETED: Production Code Cleanup**: Removed all debugging console.log statements from FastingTracker component and server getUserDailyStats method for clean production code
 - **✅ COMPLETED: TypeScript Error Resolution**: Fixed remaining property access issues including onError removal from TanStack Query v5 and planName property access with type assertions
 - **✅ COMPLETED: Critical Data Persistence Fix**: Resolved authentication token mismatch in API requests - custom tokens now properly used across all data fetching operations

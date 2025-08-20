@@ -1,12 +1,12 @@
 /**
  * AI Service for Food Recognition
- * Uses OpenAI GPT-4 Vision to identify foods in images
+ * Uses Google Gemini Vision to identify foods in images
  */
 
-import OpenAI from "openai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+// Initialize Google Gemini AI client
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || '');
 
 export interface IdentifiedFood {
   name: string;
@@ -21,7 +21,7 @@ export interface FoodAnalysisResult {
 }
 
 /**
- * Analyze a food image using GPT-4 Vision
+ * Analyze a food image using Google Gemini Vision
  * @param imageUrl - URL of the uploaded food image
  * @returns Promise<FoodAnalysisResult>
  */
@@ -57,36 +57,38 @@ Respond in JSON format with this structure:
 
 Be conservative with confidence levels - only use >0.9 for foods you're very certain about.`;
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "user",
-          content: [
-            {
-              type: "text",
-              text: prompt
-            },
-            {
-              type: "image_url",
-              image_url: {
-                url: imageUrl,
-                detail: "high"
-              }
-            }
-          ],
-        },
-      ],
-      response_format: { type: "json_object" },
-      max_tokens: 1500,
-    });
+    // Get the generative model
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    const content = response.choices[0].message.content;
+    // Fetch the image and convert to the required format
+    const imageResponse = await fetch(imageUrl);
+    const imageBuffer = await imageResponse.arrayBuffer();
+    const imageBase64 = Buffer.from(imageBuffer).toString('base64');
+    
+    const imagePart = {
+      inlineData: {
+        data: imageBase64,
+        mimeType: imageResponse.headers.get('content-type') || 'image/jpeg'
+      }
+    };
+
+    const result = await model.generateContent([prompt, imagePart]);
+    const response = await result.response;
+    const content = response.text();
+
     if (!content) {
-      throw new Error('No response from OpenAI');
+      throw new Error('No response from Google Gemini');
     }
 
-    const analysisResult = JSON.parse(content);
+    // Clean the response to extract JSON
+    let jsonContent = content.trim();
+    if (jsonContent.includes('```json')) {
+      jsonContent = jsonContent.split('```json')[1].split('```')[0].trim();
+    } else if (jsonContent.includes('```')) {
+      jsonContent = jsonContent.split('```')[1].split('```')[0].trim();
+    }
+
+    const analysisResult = JSON.parse(jsonContent);
     
     console.log('✅ AI analysis complete:', {
       foodsIdentified: analysisResult.identifiedFoods?.length || 0,
@@ -101,13 +103,23 @@ Be conservative with confidence levels - only use >0.9 for foods you're very cer
   } catch (error) {
     console.error('❌ AI food analysis failed:', error);
     
-    // Check if it's a quota/rate limit error
+    // Check if it's a quota/rate limit error for Google API
     if (error instanceof Error && (
       error.message.includes('quota') || 
       error.message.includes('429') ||
-      error.message.includes('insufficient_quota')
+      error.message.includes('RESOURCE_EXHAUSTED') ||
+      error.message.includes('quota exceeded')
     )) {
-      throw new Error('QUOTA_EXCEEDED: The OpenAI API quota has been exceeded. Please check your billing details at https://platform.openai.com/account/billing or provide a new API key with available credits.');
+      throw new Error('QUOTA_EXCEEDED: The Google AI API quota has been exceeded. Please check your API usage at https://console.cloud.google.com/apis/api/generativeai.googleapis.com or provide a new API key with available quota.');
+    }
+    
+    // Check for invalid API key
+    if (error instanceof Error && (
+      error.message.includes('API_KEY_INVALID') ||
+      error.message.includes('403') ||
+      error.message.includes('unauthorized')
+    )) {
+      throw new Error('INVALID_API_KEY: The Google API key is invalid or unauthorized. Please check your API key configuration.');
     }
     
     throw new Error(`Food analysis failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
