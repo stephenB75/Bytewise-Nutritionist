@@ -69,13 +69,16 @@ export function WeeklyCaloriesCard() {
     window.location.reload();
   };
 
-  // Execute clear data on component mount (one-time cleanup)
+  // Execute clear data only once when corruption is detected (not on every mount)
   useEffect(() => {
-    // Check if we should clear data
-    const shouldClear = localStorage.getItem('weeklyMeals');
-    if (shouldClear) {
-      console.log('🗑️ Auto-clearing corrupted meal data for stephen75@me.com...');
-      clearAllMealData();
+    const storedMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
+    
+    // Only clear if there's severe corruption (3000+ meals)
+    if (storedMeals.length > 3000) {
+      console.log('🗑️ Clearing severely corrupted meal data...');
+      localStorage.removeItem('weeklyMeals');
+      console.log('✅ Corrupted meal data cleared from localStorage');
+      // Don't reload here - let the component update naturally
     }
   }, []);
 

@@ -2247,7 +2247,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <Badge className="bg-gray-600 text-gray-300">No meals logged</Badge>
             )}
           </div>
-          {loggedMeals.length === 0 ? (
+          {(loggedMeals.length === 0 || !weeklyMeals || weeklyMeals.length === 0) ? (
             <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6 text-center">
               <div className="text-gray-400">
                 <Calendar className="w-12 h-12 mx-auto mb-3 opacity-50" />
@@ -2256,7 +2256,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               </div>
             </Card>
           ) : (
-            weeklyMeals.filter(meal => {
+            (weeklyMeals || []).filter(meal => {
               // First filter by today's date
               const today = getLocalDateKey();
               let mealDate = meal.date;
