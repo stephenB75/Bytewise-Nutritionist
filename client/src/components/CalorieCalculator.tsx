@@ -86,6 +86,7 @@ interface CalorieCalculatorProps {
     category: 'breakfast' | 'lunch' | 'dinner' | 'snack';
   }) => void;
   isCompact?: boolean;
+  selectedDate?: string; // YYYY-MM-DD format date for meal logging
 }
 
 interface LoggedMealData {
@@ -117,7 +118,8 @@ function CalorieCalculator({
   onNavigate, 
   onCaloriesCalculated, 
   onLogToWeekly, 
-  isCompact = false 
+  isCompact = false,
+  selectedDate 
 }: CalorieCalculatorProps) {
   // State management
   const [ingredient, setIngredient] = useState('');
@@ -130,6 +132,17 @@ function CalorieCalculator({
 
   // Achievement system hook
   const checkAchievements = useCheckAchievements();
+  
+  // Helper function to get the correct date for meal logging
+  const getTargetDate = () => {
+    if (selectedDate) {
+      // Parse YYYY-MM-DD format and create date at current time
+      const [year, month, day] = selectedDate.split('-').map(Number);
+      const targetDate = new Date();
+      return new Date(year, month - 1, day, targetDate.getHours(), targetDate.getMinutes(), targetDate.getSeconds());
+    }
+    return new Date(); // Fallback to current date
+  };
 
   // Search ingredients as user types
   useEffect(() => {
@@ -359,8 +372,8 @@ function CalorieCalculator({
   };
 
   const logToWeeklyTracker = async (analysis: IngredientAnalysis) => {
-    const now = new Date(); // Use actual current date
-    const mealType = getMealTypeByTime(now);
+    const targetDate = getTargetDate(); // Use selected date for meal logging
+    const mealType = getMealTypeByTime(targetDate);
 
     // Calculate scaling factor based on actual serving vs 100g
     // The estimatedCalories is already scaled for the actual serving
@@ -385,11 +398,11 @@ function CalorieCalculator({
       vitaminD: (analysis.nutritionPer100g?.vitaminD || 0) * scalingFactor,
       vitaminB12: (analysis.nutritionPer100g?.vitaminB12 || 0) * scalingFactor,
       folate: (analysis.nutritionPer100g?.folate || 0) * scalingFactor,
-      date: getLocalDateKey(now),
-      time: formatLocalTime(now),
+      date: getLocalDateKey(targetDate),
+      time: formatLocalTime(targetDate),
       mealType,
       category: mealType,
-      timestamp: now.toISOString(),
+      timestamp: targetDate.toISOString(),
       source: 'calculator'
     };
 
@@ -507,8 +520,8 @@ function CalorieCalculator({
             <FoodSearchWithHistory
               onSelectFood={async (food) => {
                 // Quick re-log from history
-                const now = new Date(); // Use actual current date
-                const mealType = getMealTypeByTime(now);
+                const targetDate = getTargetDate(); // Use selected date for meal logging
+                const mealType = getMealTypeByTime(targetDate);
                 
                 const mealData: LoggedMealData = {
                   id: `relogged-${Date.now()}`,
@@ -517,11 +530,11 @@ function CalorieCalculator({
                   protein: food.protein,
                   carbs: food.carbs,
                   fat: food.fat,
-                  date: getLocalDateKey(now),
-                  time: formatLocalTime(now),
+                  date: getLocalDateKey(targetDate),
+                  time: formatLocalTime(targetDate),
                   mealType,
                   category: mealType,
-                  timestamp: now.toISOString(),
+                  timestamp: targetDate.toISOString(),
                   source: 'history'
                 };
                 
@@ -741,8 +754,8 @@ function CalorieCalculator({
               <FoodSearchWithHistory
                 onSelectFood={async (food) => {
                   // For historical meals, we can directly log them
-                  const now = new Date(); // Use actual current date
-                  const mealType = getMealTypeByTime(now);
+                  const targetDate = getTargetDate(); // Use selected date for meal logging
+                  const mealType = getMealTypeByTime(targetDate);
                   
                   // Create the logged meal data
                   const mealData: LoggedMealData = {
@@ -752,11 +765,11 @@ function CalorieCalculator({
                     protein: food.protein,
                     carbs: food.carbs,
                     fat: food.fat,
-                    date: getLocalDateKey(now),
-                    time: formatLocalTime(now),
+                    date: getLocalDateKey(targetDate),
+                    time: formatLocalTime(targetDate),
                     mealType,
                     category: mealType,
-                    timestamp: now.toISOString(),
+                    timestamp: targetDate.toISOString(),
                     source: 'history'
                   };
                   

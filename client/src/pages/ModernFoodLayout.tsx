@@ -124,6 +124,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   // Profile completion state
   const [showProfileCompletion, setShowProfileCompletion] = useState(false);
   
+  // Selected date for meal logging (defaults to today)
+  const [selectedDate, setSelectedDate] = useState(getLocalDateKey());
+  
   // App tour state
   const { isTourOpen, startTour, closeTour, completeTour, shouldShowTour } = useAppTour();
   
@@ -2410,6 +2413,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <CalorieCalculator 
                 onNavigate={onNavigate}
                 isCompact={false}
+                selectedDate={selectedDate}
               />
             )}
           </div>
