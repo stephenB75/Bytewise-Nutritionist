@@ -861,14 +861,28 @@ export class DatabaseStorage implements IStorage {
       // Filter out corrupted meals before calculation
       const validMeals = dayMeals.filter(meal => {
         const calories = Number(meal.totalCalories || 0);
-        // Filter out unrealistic calorie values
-        return calories >= 0 && calories <= 3000 && meal.name;
+        const isValidCalories = calories >= 0 && calories <= 3000;
+        const hasName = meal.name && meal.name.trim().length > 0;
+        
+        // Log invalid meals for debugging
+        if (!isValidCalories) {
+          console.log(`🚫 Invalid meal calories: "${meal.name}" = ${calories}`);
+        }
+        
+        return isValidCalories && hasName;
       });
       
-      console.log(`📊 Daily stats: ${dayMeals.length} total meals, ${validMeals.length} valid meals`);
+      // Limit to reasonable number of meals per day (max 20 meals)
+      const limitedValidMeals = validMeals.slice(0, 20);
       
-      // Sum up nutrition from valid meals only
-      const totals = validMeals.reduce((acc, meal) => ({
+      console.log(`📊 Daily stats: ${dayMeals.length} total meals, ${validMeals.length} valid meals, using ${limitedValidMeals.length} meals`);
+      
+      if (dayMeals.length > 50) {
+        console.log(`⚠️ Unusually high meal count (${dayMeals.length}) for single day - likely data corruption`);
+      }
+      
+      // Sum up nutrition from limited valid meals only
+      const totals = limitedValidMeals.reduce((acc, meal) => ({
         totalCalories: acc.totalCalories + Number(meal.totalCalories || 0),
         totalProtein: acc.totalProtein + Number(meal.totalProtein || 0),
         totalCarbs: acc.totalCarbs + Number(meal.totalCarbs || 0),
