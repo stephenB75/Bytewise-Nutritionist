@@ -655,19 +655,67 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     // Load existing meal data on component mount
     const loadExistingData = () => {
       try {
-        // DISABLED: Automatic meal date fixing to prevent meals moving between days
         // Use cached localStorage for better performance
         const stored = getCachedLocalStorage('weeklyMeals', 5000) || [];
         
-        // Simple date matching - use today's actual date without correction
+        // Data migration: Ensure all meals have consistent date format
+        const migratedMeals = stored.map((meal: any) => {
+          // If meal has inconsistent date format, fix it
+          if (!meal.date || meal.date.includes('T')) {
+            // Extract date from timestamp or create from existing data
+            const fallbackDate = meal.timestamp 
+              ? meal.timestamp.split('T')[0]
+              : getLocalDateKey(); // Use today as fallback
+              
+            return {
+              ...meal,
+              date: fallbackDate // Ensure date is in YYYY-MM-DD format
+            };
+          }
+          return meal;
+        });
+        
+        // Save migrated data back to localStorage if changes were made
+        if (JSON.stringify(stored) !== JSON.stringify(migratedMeals)) {
+          localStorage.setItem('weeklyMeals', JSON.stringify(migratedMeals));
+          console.log('📅 Migrated', migratedMeals.length - stored.length, 'meals to consistent date format');
+        }
+        
+        // Debug logging for date analysis (development only)
+        if (process.env.NODE_ENV === 'development') {
+          console.log('📅 Meal Date Debug:', {
+            totalMeals: migratedMeals.length,
+            todayDateKey: getLocalDateKey(),
+            sampleMeal: migratedMeals[0] ? {
+              name: migratedMeals[0].name,
+              date: migratedMeals[0].date,
+              timestamp: migratedMeals[0].timestamp
+            } : 'No meals found'
+          });
+        }
+        
+        // Simple date matching - use today's actual date
         const today = getLocalDateKey();
         
-        // Filter meals for today using simple date matching
-        const todayMeals = stored.filter((meal: any) => {
-          // Handle timestamp format dates
-          const mealDate = meal.date && meal.date.includes('T') 
-            ? meal.date.split('T')[0] 
-            : meal.date;
+        // Filter meals for today using robust date matching
+        const todayMeals = migratedMeals.filter((meal: any) => {
+          // Handle multiple date formats that might exist in localStorage
+          let mealDate;
+          
+          if (meal.date) {
+            // If date field contains ISO timestamp, extract date part
+            if (meal.date.includes('T')) {
+              mealDate = meal.date.split('T')[0];
+            } else {
+              mealDate = meal.date;
+            }
+          } else if (meal.timestamp) {
+            // Fallback to timestamp field if date field is missing
+            mealDate = meal.timestamp.split('T')[0];
+          } else {
+            // Skip meals without proper date information
+            return false;
+          }
           
           return mealDate === today;
         });
@@ -679,10 +727,21 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         const oneMonthAgoDateKey = getLocalDateKey(oneMonthAgo);
         
         // Filter stored meals to include last month for comprehensive search
-        const monthlyMeals = stored.filter((meal: any) => {
-          const mealDate = meal.date && meal.date.includes('T') 
-            ? meal.date.split('T')[0] 
-            : meal.date;
+        const monthlyMeals = migratedMeals.filter((meal: any) => {
+          // Handle multiple date formats consistently
+          let mealDate;
+          
+          if (meal.date) {
+            if (meal.date.includes('T')) {
+              mealDate = meal.date.split('T')[0];
+            } else {
+              mealDate = meal.date;
+            }
+          } else if (meal.timestamp) {
+            mealDate = meal.timestamp.split('T')[0];
+          } else {
+            return false;
+          }
           
           // Include meals from the last month
           return mealDate >= oneMonthAgoDateKey;
@@ -1548,8 +1607,16 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 )
                 .sort((a, b) => {
                   // Sort by date (most recent first) for better search experience
-                  const dateA = new Date(a.timestamp || `${a.date} ${a.time}`);
-                  const dateB = new Date(b.timestamp || `${b.date} ${b.time}`);
+                  // Try multiple date sources for robust sorting
+                  const getDateForSorting = (meal: any) => {
+                    if (meal.timestamp) return new Date(meal.timestamp);
+                    if (meal.date && meal.time) return new Date(`${meal.date} ${meal.time}`);
+                    if (meal.date) return new Date(meal.date);
+                    return new Date(0); // Fallback for meals without proper dates
+                  };
+                  
+                  const dateA = getDateForSorting(a);
+                  const dateB = getDateForSorting(b);
                   return dateB.getTime() - dateA.getTime();
                 })
                 .slice(0, 50) // Limit results for performance
@@ -1562,7 +1629,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                       {meal.time} • {meal.mealType}
                       {searchQuery && (
                         <span className="ml-2 text-blue-400">
-                          • {new Date(meal.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          • {(() => {
+                            // Handle different date formats for display
+                            const displayDate = meal.date && meal.date.includes('T') 
+                              ? new Date(meal.date) 
+                              : meal.timestamp 
+                                ? new Date(meal.timestamp)
+                                : new Date(meal.date);
+                            return displayDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                          })()}
                         </span>
                       )}
                     </p>

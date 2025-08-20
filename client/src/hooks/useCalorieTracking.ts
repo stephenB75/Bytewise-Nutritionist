@@ -76,18 +76,19 @@ export function useCalorieTracking() {
     mutationFn: async (calorieEntry: CalculatedCalories) => {
       // Store in localStorage instead of requiring authentication
       const weeklyMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
+      const now = new Date();
       const mealEntry = {
         name: calorieEntry.name,
         calories: calorieEntry.calories,
         protein: calorieEntry.protein,
         carbs: calorieEntry.carbs,
         fat: calorieEntry.fat,
-        date: calorieEntry.date,
+        date: getLocalDateKey(now), // Ensure consistent date format (YYYY-MM-DD)
         time: calorieEntry.time.replace(/:\d\d$/, ''), // Remove seconds for display
-        category: getMealTypeByTime(),
-        timestamp: new Date().toISOString(),
+        category: getMealTypeByTime(now),
+        timestamp: now.toISOString(), // Keep timestamp for sorting and detailed tracking
         source: 'calculator',
-        mealType: getMealTypeByTime()
+        mealType: getMealTypeByTime(now)
       };
       
       weeklyMeals.push(mealEntry);
