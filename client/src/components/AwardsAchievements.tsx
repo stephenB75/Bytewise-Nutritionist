@@ -357,10 +357,11 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
       case 'three_day_streak':
       case 'weekly_consistency':
         // Calculate consecutive days with meals logged
-        const uniqueDates = [...new Set(weeklyMeals.map((meal: any) => {
+        const uniqueDatesArray = weeklyMeals.map((meal: any) => {
           const mealDate = meal.date?.includes('T') ? meal.date.split('T')[0] : meal.date;
           return mealDate;
-        }))].sort();
+        });
+        const uniqueDates = Array.from(new Set(uniqueDatesArray)).sort();
         
         if (achievement.id === 'three_day_streak') {
           let currentStreak = 0;

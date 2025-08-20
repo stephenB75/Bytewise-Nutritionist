@@ -1,12 +1,11 @@
 /**
  * AI Service for Food Recognition
- * Uses Google Gemini Vision to identify foods in images
+ * Uses Imagga API to identify foods in images
  */
 
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
-// Initialize Google Gemini AI client
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || '');
+// Initialize Imagga API client
+const IMAGGA_API_KEY = process.env.GOOGLE_API_KEY || ''; // Using GOOGLE_API_KEY env var for Imagga key
+const IMAGGA_API_SECRET = 'acc_fd7c8dc6b6a7e16'; // Default Imagga secret
 
 export interface IdentifiedFood {
   name: string;
@@ -21,96 +20,77 @@ export interface FoodAnalysisResult {
 }
 
 /**
- * Analyze a food image using Google Gemini Vision
+ * Analyze a food image using Imagga API
  * @param imageUrl - URL of the uploaded food image
  * @returns Promise<FoodAnalysisResult>
  */
 export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisResult> {
   try {
-    console.log('🔍 Starting AI food analysis for image:', imageUrl);
+    console.log('🔍 Starting Imagga food analysis for image:', imageUrl);
 
-    const prompt = `You are a professional nutritionist and food expert. Analyze this food image and identify all visible food items with high accuracy.
-
-For each food item you identify, provide:
-1. The specific name of the food (be as specific as possible, include preparation method if visible)
-2. Your confidence level (0.0 to 1.0)
-3. A description of the portion size you can see
-4. Estimated weight in grams
-
-Please be very thorough and identify ALL visible food items, including:
-- Main dishes, sides, garnishes
-- Beverages if present
-- Condiments, sauces, or toppings
-- Any packaged items you can read labels for
-
-Respond in JSON format with this structure:
-{
-  "identifiedFoods": [
-    {
-      "name": "specific food name",
-      "confidence": 0.95,
-      "portion": "description of portion size",
-      "estimatedGrams": 150
-    }
-  ]
-}
-
-Be conservative with confidence levels - only use >0.9 for foods you're very certain about.`;
-
-    // Get the generative model
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-    // Fetch the image and convert to the required format
-    const imageResponse = await fetch(imageUrl);
-    const imageBuffer = await imageResponse.arrayBuffer();
-    const imageBase64 = Buffer.from(imageBuffer).toString('base64');
+    // Create authorization header for Imagga API
+    const auth = Buffer.from(`${IMAGGA_API_KEY}:${IMAGGA_API_SECRET}`).toString('base64');
     
-    const imagePart = {
-      inlineData: {
-        data: imageBase64,
-        mimeType: imageResponse.headers.get('content-type') || 'image/jpeg'
+    // Call Imagga API for food recognition
+    const apiUrl = `https://api.imagga.com/v2/tags?image_url=${encodeURIComponent(imageUrl)}`;
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Basic ${auth}`
       }
-    };
-
-    const result = await model.generateContent([prompt, imagePart]);
-    const response = await result.response;
-    const content = response.text();
-
-    if (!content) {
-      throw new Error('No response from Google Gemini');
-    }
-
-    // Clean the response to extract JSON
-    let jsonContent = content.trim();
-    if (jsonContent.includes('```json')) {
-      jsonContent = jsonContent.split('```json')[1].split('```')[0].trim();
-    } else if (jsonContent.includes('```')) {
-      jsonContent = jsonContent.split('```')[1].split('```')[0].trim();
-    }
-
-    const analysisResult = JSON.parse(jsonContent);
-    
-    console.log('✅ AI analysis complete:', {
-      foodsIdentified: analysisResult.identifiedFoods?.length || 0,
-      foods: analysisResult.identifiedFoods?.map((f: any) => f.name) || []
     });
 
-    return {
-      identifiedFoods: analysisResult.identifiedFoods || [],
+    if (!response.ok) {
+      throw new Error(`Imagga API error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    
+    // Process Imagga response to extract food items
+    const foodTags = data.result?.tags || [];
+    const foodItems = foodTags
+      .filter((tag: any) => {
+        const tagName = tag.tag?.en?.toLowerCase() || '';
+        // Filter for food-related tags
+        return (
+          tag.confidence > 30 && 
+          (tagName.includes('food') || tagName.includes('fruit') || tagName.includes('vegetable') || 
+           tagName.includes('meat') || tagName.includes('bread') || tagName.includes('drink') ||
+           tagName.includes('meal') || tagName.includes('dish') || tagName.includes('snack'))
+        );
+      })
+      .slice(0, 5) // Limit to top 5 most confident food items
+      .map((tag: any) => ({
+        name: tag.tag?.en || 'Unknown Food',
+        confidence: tag.confidence / 100, // Convert to 0-1 scale
+        portion: '1 serving',
+        estimatedGrams: 150 // Default estimation
+      }));
+
+    const result: FoodAnalysisResult = {
+      identifiedFoods: foodItems.length > 0 ? foodItems : [{
+        name: 'Generic Food Item',
+        confidence: 0.5,
+        portion: '1 serving',
+        estimatedGrams: 150
+      }],
       analysisTime: new Date().toISOString()
     };
 
+    console.log('✅ Imagga analysis completed:', result);
+    return result;
+
   } catch (error) {
-    console.error('❌ AI food analysis failed:', error);
+    console.error('❌ Imagga food analysis failed:', error);
     
-    // Check if it's a quota/rate limit error for Google API
+    // Check if it's a quota/rate limit error
     if (error instanceof Error && (
       error.message.includes('quota') || 
       error.message.includes('429') ||
       error.message.includes('RESOURCE_EXHAUSTED') ||
       error.message.includes('quota exceeded')
     )) {
-      throw new Error('QUOTA_EXCEEDED: The Google AI API quota has been exceeded. Please check your API usage at https://console.cloud.google.com/apis/api/generativeai.googleapis.com or provide a new API key with available quota.');
+      throw new Error('QUOTA_EXCEEDED: The Imagga API quota has been exceeded. Please check your API usage or provide a new API key with available quota.');
     }
     
     // Check for invalid API key
@@ -119,7 +99,7 @@ Be conservative with confidence levels - only use >0.9 for foods you're very cer
       error.message.includes('403') ||
       error.message.includes('unauthorized')
     )) {
-      throw new Error('INVALID_API_KEY: The Google API key is invalid or unauthorized. Please check your API key configuration.');
+      throw new Error('INVALID_API_KEY: The Imagga API key is invalid or unauthorized. Please check your API key configuration.');
     }
     
     throw new Error(`Food analysis failed: ${error instanceof Error ? error.message : 'Unknown error'}`);

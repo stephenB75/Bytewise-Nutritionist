@@ -187,7 +187,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       // Update in database with proper authentication
       const response = await apiRequest('POST', '/api/daily-stats', {
         waterGlasses: newGlasses,
-        date: getLocalDateKey()
+        date: new Date().toISOString()
       });
       
       if (!response.ok) {

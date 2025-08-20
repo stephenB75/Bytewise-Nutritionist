@@ -690,14 +690,17 @@ export function FastingTracker() {
     
     // Create session summary for storage
     const sessionSummary = {
+      id: currentSession.id || `local_${Date.now()}`, // Ensure we have an ID
       ...currentSession,
       status: isCompleted ? 'completed' : 'stopped',
       endTime: new Date().toISOString(),
+      completedAt: new Date().toISOString(), // Add completedAt field for display
       actualDuration: actualTimeFasted,
       actualHoursFasted: actualHoursFasted,
       targetHours: targetHours,
       wasCompleted: isCompleted,
-      remainingHours: isCompleted ? 0 : remainingHours
+      remainingHours: isCompleted ? 0 : remainingHours,
+      planName: selectedPlan.name // Ensure planName is saved
     };
     
     // Store in history if any meaningful time was fasted (5 seconds for testing)
