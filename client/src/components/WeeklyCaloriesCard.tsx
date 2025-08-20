@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Calendar, Flame } from 'lucide-react';
 
 import { useCheckAchievements } from '@/hooks/useAchievements';
-import { getWeekDates, getLocalDateKey, cleanupOldWeeklyData, resetTodaysLoggedMeals } from '@/utils/dateUtils';
+import { getWeekDates, getLocalDateKey, cleanupOldWeeklyData } from '@/utils/dateUtils';
 import { checkMealDateMismatches } from '@/utils/mealDateFixer';
 import { debounce, getCachedLocalStorage } from '@/utils/performanceUtils';
 // Removed timezone correction import to fix date display issues
@@ -31,45 +31,6 @@ export function WeeklyCaloriesCard() {
   // Achievement system hook
   const checkAchievements = useCheckAchievements();
 
-  // Manual reset function for today's meals
-  const handleResetTodaysMeals = () => {
-    const clearedCount = resetTodaysLoggedMeals();
-    if (clearedCount > 0) {
-      console.log(`🗑️ Manually cleared ${clearedCount} entries for today`);
-      // Refresh the component data
-      const refreshedData = calculateWeeklyCalories();
-      if (refreshedData && Array.isArray(refreshedData)) {
-        setWeeklyData(refreshedData);
-        
-        // Update total
-        const newTotal = refreshedData.reduce((sum, day) => sum + day.calories, 0);
-        setTotalWeeklyCalories(newTotal);
-      }
-      
-      // Trigger data refresh event
-      window.dispatchEvent(new CustomEvent('todaysDataReset'));
-    }
-  };
-
-  // Manual weekly reset function 
-  const handleWeeklyReset = () => {
-    const wasCleanedUp = cleanupOldWeeklyData();
-    if (wasCleanedUp) {
-      console.log('🗑️ Manually triggered weekly cleanup');
-      // Refresh the component data
-      const refreshedData = calculateWeeklyCalories();
-      if (refreshedData && Array.isArray(refreshedData)) {
-        setWeeklyData(refreshedData);
-        
-        // Update total
-        const newTotal = refreshedData.reduce((sum, day) => sum + day.calories, 0);
-        setTotalWeeklyCalories(newTotal);
-      }
-      
-      // Trigger data refresh event
-      window.dispatchEvent(new CustomEvent('weeklyDataReset'));
-    }
-  };
 
 
 
@@ -104,10 +65,10 @@ export function WeeklyCaloriesCard() {
   // Calculate weekly calories from stored meal data (optimized)  
   const calculateWeeklyCalories = () => {
     try {
-      // Clean up old weekly data first (automatic weekly reset)
+      // Clean up old data keeping last 30 days (automatic cleanup)
       const wasCleanedUp = cleanupOldWeeklyData();
       if (wasCleanedUp) {
-        console.log('🔄 Weekly data was cleaned up, refreshing display');
+        console.log('🔄 Data cleanup completed, refreshing display');
       }
       
       const weekDates = getCurrentWeekDates();

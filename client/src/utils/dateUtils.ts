@@ -24,112 +24,66 @@ export function getLocalEndOfDay(date: Date = new Date()): Date {
 }
 
 /**
- * Check if it's a new week and clean up old meal data
- * This prevents data accumulation across weeks
+ * Clean up old meal data, keeping only the last 30 days
+ * This prevents excessive data accumulation while maintaining search history
  */
 export function cleanupOldWeeklyData(): boolean {
-  const currentWeekStart = getWeekStart(new Date());
-  const currentWeekKey = getLocalDateKey(currentWeekStart);
+  const today = new Date();
+  const thirtyDaysAgo = new Date(today.getTime() - (30 * 24 * 60 * 60 * 1000));
+  const cutoffDateKey = getLocalDateKey(thirtyDaysAgo);
   
-  // Check if we've already cleaned up for this week
-  const lastCleanupWeek = localStorage.getItem('lastWeeklyCleanup');
+  // Check if we've already cleaned up today
+  const lastCleanupDate = localStorage.getItem('lastDataCleanup');
+  const todayKey = getLocalDateKey(today);
   
-  if (lastCleanupWeek === currentWeekKey) {
-    // Already cleaned up this week
+  if (lastCleanupDate === todayKey) {
+    // Already cleaned up today
     return false;
   }
   
-  console.log('🧹 Starting weekly data cleanup for week:', currentWeekKey);
+  console.log('🧹 Starting data cleanup - keeping last 30 days since:', cutoffDateKey);
   
-  // Get current week's date range
-  const weekDates = getWeekDates(new Date());
-  const weekDateKeys = weekDates.map(date => getLocalDateKey(date));
-  
-  // Clean up weeklyMeals - keep only current week
+  // Clean up weeklyMeals - keep only last 30 days
   const weeklyMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-  const currentWeekMeals = weeklyMeals.filter((meal: any) => {
+  const recentMeals = weeklyMeals.filter((meal: any) => {
     let mealDate = meal.date;
     if (mealDate && mealDate.includes('T')) {
       mealDate = mealDate.split('T')[0];
     }
-    return weekDateKeys.includes(mealDate);
+    return mealDate >= cutoffDateKey;
   });
   
-  // Clean up calculatedCalories - keep only current week  
+  // Clean up calculatedCalories - keep only last 30 days  
   const calculatedCalories = JSON.parse(localStorage.getItem('calculatedCalories') || '[]');
-  const currentWeekCalories = calculatedCalories.filter((entry: any) => {
+  const recentCalories = calculatedCalories.filter((entry: any) => {
     let entryDate = entry.date;
     if (entryDate && entryDate.includes('T')) {
       entryDate = entryDate.split('T')[0];
     }
-    return weekDateKeys.includes(entryDate);
+    return entryDate >= cutoffDateKey;
   });
   
-  const cleanedMeals = weeklyMeals.length - currentWeekMeals.length;
-  const cleanedCalories = calculatedCalories.length - currentWeekCalories.length;
+  const cleanedMeals = weeklyMeals.length - recentMeals.length;
+  const cleanedCalories = calculatedCalories.length - recentCalories.length;
   
   // Update localStorage with cleaned data
-  localStorage.setItem('weeklyMeals', JSON.stringify(currentWeekMeals));
-  localStorage.setItem('calculatedCalories', JSON.stringify(currentWeekCalories));
+  localStorage.setItem('weeklyMeals', JSON.stringify(recentMeals));
+  localStorage.setItem('calculatedCalories', JSON.stringify(recentCalories));
   
-  // Mark this week as cleaned
-  localStorage.setItem('lastWeeklyCleanup', currentWeekKey);
+  // Mark today as cleaned
+  localStorage.setItem('lastDataCleanup', todayKey);
   
-  console.log(`✅ Weekly cleanup complete:`, {
+  console.log(`✅ Data cleanup complete:`, {
     mealsRemoved: cleanedMeals,
     caloriesRemoved: cleanedCalories,
-    currentWeekStart: currentWeekKey,
-    remainingMeals: currentWeekMeals.length,
-    remainingCalories: currentWeekCalories.length
+    cutoffDate: cutoffDateKey,
+    remainingMeals: recentMeals.length,
+    remainingCalories: recentCalories.length
   });
   
   return cleanedMeals > 0 || cleanedCalories > 0;
 }
 
-/**
- * Reset today's logged meals (clear all entries for today)
- */
-export function resetTodaysLoggedMeals(): number {
-  const todayKey = getLocalDateKey(new Date());
-  console.log('🗑️ Resetting today\'s logged meals for:', todayKey);
-  
-  // Clear from weeklyMeals
-  const weeklyMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-  const mealsBeforeReset = weeklyMeals.length;
-  const filteredMeals = weeklyMeals.filter((meal: any) => {
-    let mealDate = meal.date;
-    if (mealDate && mealDate.includes('T')) {
-      mealDate = mealDate.split('T')[0];
-    }
-    return mealDate !== todayKey;
-  });
-  
-  // Clear from calculatedCalories
-  const calculatedCalories = JSON.parse(localStorage.getItem('calculatedCalories') || '[]');
-  const caloriesBeforeReset = calculatedCalories.length;
-  const filteredCalories = calculatedCalories.filter((entry: any) => {
-    let entryDate = entry.date;
-    if (entryDate && entryDate.includes('T')) {
-      entryDate = entryDate.split('T')[0];
-    }
-    return entryDate !== todayKey;
-  });
-  
-  const clearedMeals = mealsBeforeReset - filteredMeals.length;
-  const clearedCalories = caloriesBeforeReset - filteredCalories.length;
-  
-  // Update localStorage
-  localStorage.setItem('weeklyMeals', JSON.stringify(filteredMeals));
-  localStorage.setItem('calculatedCalories', JSON.stringify(filteredCalories));
-  
-  console.log(`✅ Today\'s reset complete:`, {
-    date: todayKey,
-    mealsCleared: clearedMeals,
-    caloriesCleared: clearedCalories
-  });
-  
-  return clearedMeals + clearedCalories;
-}
 
 /**
  * Format date as YYYY-MM-DD in local timezone

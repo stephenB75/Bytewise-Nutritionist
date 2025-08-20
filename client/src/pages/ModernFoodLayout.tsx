@@ -53,7 +53,7 @@ import { WeeklyCaloriesCard } from '@/components/WeeklyCaloriesCard';
 import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
-import { getWeekDates, getLocalDateKey, getMealTypeByTime, formatLocalTime, resetTodaysLoggedMeals, cleanupOldWeeklyData } from '@/utils/dateUtils';
+import { getWeekDates, getLocalDateKey, getMealTypeByTime, formatLocalTime, cleanupOldWeeklyData } from '@/utils/dateUtils';
 import { fixMealDateMismatches, autoFixMealDatesIfNeeded } from '@/utils/mealDateFixer';
 import { getCachedLocalStorage, debounce } from '@/utils/performanceUtils';
 import { useLocation } from 'wouter';
@@ -2240,25 +2240,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <h3 className="text-xl font-bold text-black">Logged Today</h3>
-            <div className="flex items-center gap-2">
-              {loggedMeals.length === 0 && (
-                <Badge className="bg-gray-600 text-black">No meals logged</Badge>
-              )}
-              {loggedMeals.length > 0 && (
-                <Button 
-                  onClick={() => {
-                    const cleared = resetTodaysLoggedMeals();
-                    if (cleared > 0) {
-                      window.location.reload();
-                    }
-                  }}
-                  className="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1 h-7"
-                >
-                  <Trash2 className="w-3 h-3 mr-1" />
-                  Clear Today
-                </Button>
-              )}
-            </div>
+{loggedMeals.length === 0 && (
+              <Badge className="bg-gray-600 text-black">No meals logged</Badge>
+            )}
           </div>
           {(loggedMeals.length === 0 || !weeklyMeals || weeklyMeals.length === 0) ? (
             <Card className="bg-white backdrop-blur-md border-gray-300 p-6 text-center">
@@ -2270,7 +2254,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             </Card>
           ) : (
             (weeklyMeals || []).filter(meal => {
-              // First filter by today's date
+              // If there's a search query, search across all meals (not just today)
+              if (searchQuery) {
+                return meal.name.toLowerCase().includes(searchQuery.toLowerCase());
+              }
+              
+              // Otherwise, filter by today's date
               const today = getLocalDateKey();
               let mealDate = meal.date;
               
@@ -2279,19 +2268,41 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 mealDate = meal.date.split('T')[0];
               }
               
-              const isToday = mealDate === today;
+              return mealDate === today;
+            }).map((meal, index) => {
+              // Determine if this meal is from today
+              const today = getLocalDateKey();
+              let mealDate = meal.date;
+              if (meal.date && meal.date.includes('T')) {
+                mealDate = meal.date.split('T')[0];
+              }
+              const isFromToday = mealDate === today;
               
-              
-              // Then filter by search query if provided
-              const matchesSearch = !searchQuery || meal.name.toLowerCase().includes(searchQuery.toLowerCase());
-              
-              return isToday && matchesSearch;
-            }).map((meal, index) => (
-            <Card key={`meal-${meal.id || meal.name}-${meal.timestamp || index}`} className="bg-white backdrop-blur-md border-gray-300 p-4">
+              return (
+            <Card 
+              key={`meal-${meal.id || meal.name}-${meal.timestamp || index}`} 
+              className={`backdrop-blur-md border-gray-300 p-4 ${
+                isFromToday ? 'bg-white' : 'bg-gray-50 border-l-4 border-l-blue-400'
+              }`}
+            >
               <div className="flex items-center justify-between">
                 <div className="flex-1">
                   <h4 className="text-gray-800 font-semibold">{meal.name}</h4>
-                  <p className="text-gray-700 text-sm">{meal.time} • {meal.mealType}</p>
+                  <p className="text-gray-700 text-sm">
+                    {meal.time} • {meal.mealType}
+                    {!isFromToday && (
+                      <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
+                        {(() => {
+                          const [year, month, day] = mealDate.split('-').map(Number);
+                          const displayDate = new Date(year, month - 1, day);
+                          return displayDate.toLocaleDateString('en-US', { 
+                            month: 'short', 
+                            day: 'numeric' 
+                          });
+                        })()} 
+                      </span>
+                    )}
+                  </p>
                   <div className="flex space-x-4 mt-1">
                     <span className="text-xs text-green-600">P: {(meal.protein || 0).toFixed(1)}g</span>
                     <span className="text-xs text-emerald-500">C: {(meal.carbs || 0).toFixed(1)}g</span>
@@ -2383,7 +2394,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 </div>
               </div>
             </Card>
-          )))}
+              );
+            })
+          )}
         </div>
 
 
