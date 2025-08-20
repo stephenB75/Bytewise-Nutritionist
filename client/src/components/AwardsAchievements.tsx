@@ -404,6 +404,10 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
         const totalCalories = weeklyMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
         return { progress: Math.min(totalCalories, 50000), completed: totalCalories >= 50000 };
         
+      case 'calorie_counter':
+        const totalTrackedCalories = weeklyMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
+        return { progress: Math.min(totalTrackedCalories, 50000), completed: totalTrackedCalories >= 50000 };
+        
       default:
         return { progress: 0, completed: false };
     }
@@ -648,10 +652,15 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
                       </span>
                     </div>
                     
-                    <Progress 
-                      value={achievement.completed ? 100 : (achievement.progress / achievement.target) * 100} 
-                      className={`h-3 ${achievement.completed ? 'bg-[#45c73e]/20' : 'bg-gray-700'}`}
-                    />
+                    <div className="relative">
+                      <Progress 
+                        value={achievement.completed ? 100 : Math.min(100, (achievement.progress / achievement.target) * 100)} 
+                        className={`h-3 ${achievement.completed ? 'bg-[#45c73e]/20' : 'bg-gray-700'}`}
+                      />
+                      {achievement.completed && (
+                        <div className="absolute inset-0 bg-gradient-to-r from-[#45c73e] to-[#3ab82e] rounded-full h-3" />
+                      )}
+                    </div>
                   </div>
                   
                   {achievement.completed && achievement.completedDate && (
