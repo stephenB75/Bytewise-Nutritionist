@@ -589,7 +589,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your email"
-                    className="pl-10 bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-yellow-400 focus:ring-yellow-400"
+                    className="pl-10 bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-emerald-400 focus:ring-emerald-400"
                     required
                   />
                 </div>
@@ -609,7 +609,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
                     <button
                       type="button"
                       onClick={() => setShowResetPassword(true)}
-                      className="text-xs text-yellow-400 hover:text-yellow-300 transition-colors"
+                      className="text-xs text-emerald-400 hover:text-emerald-300 transition-colors"
                     >
                       Forgot password?
                     </button>
@@ -623,7 +623,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
                     value={password}
                     onChange={(e) => handlePasswordChange(e.target.value)}
                     placeholder="Enter your password"
-                    className="pl-10 bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-yellow-400 focus:ring-yellow-400"
+                    className="pl-10 bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-emerald-400 focus:ring-emerald-400"
                     required={!showResetPassword}
                   />
                 </div>
@@ -815,7 +815,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
             <button
               type="button"
               onClick={() => setIsSignUp(!isSignUp)}
-              className="text-sm text-yellow-400 hover:text-yellow-300 font-medium"
+              className="text-sm text-emerald-400 hover:text-emerald-300 font-medium"
             >
               {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
             </button>

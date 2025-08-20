@@ -203,7 +203,7 @@ export function UserFoodSuggestions({
             >
               <div className="flex items-center justify-between">
                 <div className="flex-1">
-                  <div className="font-medium text-sm group-hover:text-yellow-600">
+                  <div className="font-medium text-sm group-hover:text-emerald-600">
                     {food.name}
                   </div>
                   <div className="flex items-center gap-3 text-xs text-gray-500">
@@ -220,7 +220,7 @@ export function UserFoodSuggestions({
                     </Badge>
                   </div>
                 </div>
-                <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-yellow-600" />
+                <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-emerald-600" />
               </div>
             </button>
           ))}

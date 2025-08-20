@@ -55,7 +55,7 @@ export function AuthPopupNotification({ notification, onClose }: AuthPopupNotifi
       case 'error':
         return <AlertCircle className="w-8 h-8 text-red-500" />;
       case 'warning':
-        return <AlertCircle className="w-8 h-8 text-yellow-500" />;
+        return <AlertCircle className="w-8 h-8 text-amber-500" />;
       case 'info':
         return <Mail className="w-8 h-8 text-blue-500" />;
       default:
@@ -70,9 +70,9 @@ export function AuthPopupNotification({ notification, onClose }: AuthPopupNotifi
       case 'error':
         return 'bg-red-50 border-red-200';
       case 'warning':
-        return 'bg-yellow-50 border-yellow-200';
+        return 'bg-emerald-50 border-emerald-200';
       case 'info':
-        return 'bg-yellow-50 border-yellow-200';
+        return 'bg-emerald-50 border-emerald-200';
       default:
         return 'bg-gray-50 border-gray-200';
     }
