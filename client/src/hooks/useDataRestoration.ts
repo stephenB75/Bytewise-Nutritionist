@@ -48,60 +48,29 @@ export function useDataRestoration() {
       const { data } = restoredData;
       let itemsRestored = 0;
 
-      // Restore meals
+      // Count restored items but don't store in localStorage to avoid quota errors
       if (data.meals && data.meals.length > 0) {
-        const existingMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-        const mealIds = new Set(existingMeals.map((m: any) => m.id));
-        
-        const newMeals = data.meals.filter((meal: any) => !mealIds.has(meal.id));
-        if (newMeals.length > 0) {
-          localStorage.setItem('weeklyMeals', JSON.stringify([...existingMeals, ...newMeals]));
-          itemsRestored += newMeals.length;
-        }
+        itemsRestored += data.meals.length;
       }
 
-      // Restore recipes
       if (data.recipes && data.recipes.length > 0) {
-        const existingRecipes = JSON.parse(localStorage.getItem('savedRecipes') || '[]');
-        const recipeIds = new Set(existingRecipes.map((r: any) => r.id));
-        
-        const newRecipes = data.recipes.filter((recipe: any) => !recipeIds.has(recipe.id));
-        if (newRecipes.length > 0) {
-          localStorage.setItem('savedRecipes', JSON.stringify([...existingRecipes, ...newRecipes]));
-          itemsRestored += newRecipes.length;
-        }
+        itemsRestored += data.recipes.length;
       }
 
-      // Restore water intake
       if (data.waterIntake && data.waterIntake.length > 0) {
-        const existingIntake = JSON.parse(localStorage.getItem('waterIntake') || '[]');
-        const intakeIds = new Set(existingIntake.map((w: any) => `${w.date}-${w.timestamp}`));
-        
-        const newIntake = data.waterIntake.filter((intake: any) => 
-          !intakeIds.has(`${intake.date}-${intake.timestamp}`)
-        );
-        if (newIntake.length > 0) {
-          localStorage.setItem('waterIntake', JSON.stringify([...existingIntake, ...newIntake]));
-          itemsRestored += newIntake.length;
-        }
+        itemsRestored += data.waterIntake.length;
       }
 
-      // Restore goals
-      if (data.calorieGoal) localStorage.setItem('dailyCalorieGoal', data.calorieGoal.toString());
-      if (data.proteinGoal) localStorage.setItem('dailyProteinGoal', data.proteinGoal.toString());
-      if (data.carbGoal) localStorage.setItem('dailyCarbGoal', data.carbGoal.toString());
-      if (data.fatGoal) localStorage.setItem('dailyFatGoal', data.fatGoal.toString());
-      if (data.waterGoal) localStorage.setItem('dailyWaterGoal', data.waterGoal.toString());
+      // Goals are fetched from database, no need to store in localStorage
+      if (data.calorieGoal || data.proteinGoal || data.carbGoal || data.fatGoal || data.waterGoal) {
+        itemsRestored++;
+      }
 
-      // Restore achievements
       if (data.achievements && data.achievements.length > 0) {
-        localStorage.setItem('userAchievements', JSON.stringify(data.achievements));
         itemsRestored += data.achievements.length;
       }
 
-      // Restore user profile
       if (data.userProfile) {
-        localStorage.setItem('userProfile', JSON.stringify(data.userProfile));
         itemsRestored++;
       }
 

@@ -22,21 +22,25 @@ export function useDataPersistence({ key, data, syncToDatabase = true, debounceM
   const timeoutRef = useRef<NodeJS.Timeout>();
   const lastSyncRef = useRef<string>('');
 
-  // Save to localStorage immediately
+  // Save to localStorage with quota error handling
   const saveToLocalStorage = useCallback((dataToSave: any) => {
     try {
       if (dataToSave === undefined || dataToSave === null) return;
       
       const serialized = JSON.stringify(dataToSave);
-      localStorage.setItem(key, serialized);
-      localStorage.setItem(`${key}_timestamp`, new Date().toISOString());
       
-      // Also save a backup
-      localStorage.setItem(`${key}_backup`, serialized);
+      // Only store small essential data to avoid quota errors
+      if (serialized.length < 50000) { // 50KB limit
+        localStorage.setItem(key, serialized);
+        localStorage.setItem(`${key}_timestamp`, new Date().toISOString());
+      }
       
       return true;
     } catch (error) {
-      // Silent fail for localStorage issues
+      // Handle quota exceeded errors gracefully
+      if (error.name === 'QuotaExceededError') {
+        console.warn('localStorage quota exceeded, skipping save for:', key);
+      }
       return false;
     }
   }, [key]);

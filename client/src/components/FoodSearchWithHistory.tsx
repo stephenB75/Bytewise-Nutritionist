@@ -61,7 +61,12 @@ export function FoodSearchWithHistory({
   useEffect(() => {
     const loadHistoricalMeals = () => {
       try {
-        const storedMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
+        let storedMeals = [];
+        try {
+          storedMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
+        } catch (error) {
+          console.warn('Failed to load meals from localStorage:', error);
+        }
         
         // Sort by date (newest first)
         const sortedMeals = storedMeals.sort((a: LoggedFood, b: LoggedFood) => {

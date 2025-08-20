@@ -67,10 +67,15 @@ const calculateDailyTotals = memoize(
 );
 
 export function useOptimizedMealData() {
-  // Get cached meal data with 10-second TTL
+  // Get cached meal data with quota error handling
   const allMeals = useMemo(() => {
-    const data = getCachedLocalStorage('weeklyMeals', 10000) || [];
-    return getMealData(JSON.stringify(data));
+    try {
+      const data = getCachedLocalStorage('weeklyMeals', 10000) || [];
+      return getMealData(JSON.stringify(data));
+    } catch (error) {
+      // Return empty array if localStorage has issues
+      return [];
+    }
   }, []);
 
   // Get today's meals efficiently

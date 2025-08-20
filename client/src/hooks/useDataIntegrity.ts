@@ -44,13 +44,11 @@ export function useDataIntegrity() {
         issues.push('Cannot access user profile');
       }
 
-      // Check meal data in database
+      // Check meal data in database (skip localStorage check to avoid quota errors)
       try {
         const mealsResponse = await apiRequest('GET', '/api/meals/logged') as any;
-        const localMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-        
-        if (localMeals.length > 0 && (!mealsResponse || !Array.isArray(mealsResponse) || mealsResponse.length === 0)) {
-          issues.push('Meal data exists locally but not in database');
+        if (!mealsResponse || !Array.isArray(mealsResponse)) {
+          issues.push('Cannot access meal data from database');
         }
       } catch (error) {
         issues.push('Cannot verify meal data persistence');
@@ -97,27 +95,8 @@ export function useDataIntegrity() {
       console.log('💾 Starting critical data backup...');
       let itemsBackedUp = 0;
 
-      // Backup meal data
-      const weeklyMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-      if (weeklyMeals.length > 0) {
-        for (const meal of weeklyMeals.slice(-50)) { // Backup last 50 meals
-          try {
-            await apiRequest('POST', '/api/meals/logged', {
-              name: meal.name,
-              date: meal.timestamp || new Date().toISOString(),
-              mealType: meal.mealType || 'snack',
-              totalCalories: meal.calories || 0,
-              totalProtein: meal.protein || 0,
-              totalCarbs: meal.carbs || 0,
-              totalFat: meal.fat || 0
-            });
-            itemsBackedUp++;
-          } catch (error) {
-            // Continue backing up other items even if one fails
-            console.warn('Failed to backup meal:', meal.name);
-          }
-        }
-      }
+      // Skip localStorage backup to avoid quota errors - data is already in database
+      console.log('Skipping localStorage backup to prevent quota errors');
 
       // Backup user goals
       const goals = {

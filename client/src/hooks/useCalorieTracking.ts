@@ -32,44 +32,34 @@ export function useCalorieTracking() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   
-  // Use data persistence for automatic saving
-  const { loadFromLocalStorage, saveToLocalStorage } = useDataPersistence({
+  // Use data persistence for automatic saving (limited to avoid quota errors)
+  useDataPersistence({
     key: 'calculatedCalories',
     data: calculatedCalories,
     syncToDatabase: true,
     debounceMs: 2000
   });
   
-  // Load persisted data on mount
+  // Load persisted data on mount with quota error handling
   useEffect(() => {
-    const loaded = loadFromLocalStorage();
-    if (loaded && Array.isArray(loaded)) {
-      setCalculatedCalories(loaded);
-      // Calculate daily total from loaded data using local date
-      const today = getLocalDateKey();
-      const todaysTotal = loaded
-        .filter((entry: CalculatedCalories) => entry.date === today)
-        .reduce((sum: number, entry: CalculatedCalories) => sum + entry.calories, 0);
-      setDailyTotal(todaysTotal);
-    }
-    
-    // Listen for data migration completion
-    const handleDataMigrated = () => {
-      // Data migration detected, reloading calculated calories
-      const migrated = loadFromLocalStorage();
-      if (migrated && Array.isArray(migrated)) {
-        setCalculatedCalories(migrated);
-        const today = getLocalDateKey();
-        const todaysTotal = migrated
-          .filter((entry: CalculatedCalories) => entry.date === today)
-          .reduce((sum: number, entry: CalculatedCalories) => sum + entry.calories, 0);
-        setDailyTotal(todaysTotal);
+    try {
+      const stored = localStorage.getItem('calculatedCalories');
+      if (stored) {
+        const loaded = JSON.parse(stored);
+        if (loaded && Array.isArray(loaded)) {
+          setCalculatedCalories(loaded);
+          // Calculate daily total from loaded data using local date
+          const today = getLocalDateKey();
+          const todaysTotal = loaded
+            .filter((entry: CalculatedCalories) => entry.date === today)
+            .reduce((sum: number, entry: CalculatedCalories) => sum + entry.calories, 0);
+          setDailyTotal(todaysTotal);
+        }
       }
-    };
-    
-    window.addEventListener('data-migrated', handleDataMigrated);
-    return () => window.removeEventListener('data-migrated', handleDataMigrated);
-  }, [loadFromLocalStorage]);
+    } catch (error) {
+      console.warn('Failed to load calculated calories from localStorage:', error);
+    }
+  }, []);
 
   // Log calories to meals (for weekly logger) - simplified without auth requirement
   const logCaloriesMutation = useMutation({
