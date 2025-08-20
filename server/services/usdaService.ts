@@ -10,13 +10,6 @@ import { usdaFoodCache } from '@shared/schema';
 import { eq, like, desc, asc, sql, or } from 'drizzle-orm';
 import { getPortionWeight, parseMeasurement } from '../data/portionData.js';
 import { findCandyNutrition, calculateCandyNutrition } from '../data/candyNutritionDatabase.js';
-import { getCalorieFactors, calculateCaloriesFromMacros } from '../data/calorieFactors.js';
-import { getRetentionFactors, applyRetentionFactors, detectCookingMethod } from '../data/retentionFactors.js';
-import { classifyFood, getNutritionalPriorities } from '../data/foodCategories.js';
-import { getProteinConversionFactor, calculateProteinFromNitrogen, getProteinCalculationMethod } from '../data/proteinFactors.js';
-import { getNutrientById, validateNutrientValue, formatNutrientValue, getPriorityNutrients } from '../data/nutrientDatabase.js';
-import { findCandyNutrition, calculateCandyNutrition, CANDY_NUTRITION_DATABASE } from '../data/candyNutritionDatabase';
-import { findEnhancedFood, getCategoryNutrientProfile, shouldUseUSDAData } from '../data/enhancedFoodDatabase.js';
 
 interface USDANutrient {
   id: number;
