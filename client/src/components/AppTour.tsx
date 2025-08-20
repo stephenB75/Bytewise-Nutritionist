@@ -241,8 +241,8 @@ export function AppTour({ isOpen, onClose, onComplete }: AppTourProps) {
               {step.description}
             </p>
             {step.action && (
-              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-2 sm:p-3 border border-blue-200 dark:border-blue-700">
-                <p className="text-blue-700 dark:text-blue-300 text-xs font-medium">
+              <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-2 sm:p-3 border border-yellow-200 dark:border-yellow-700">
+                <p className="text-yellow-700 dark:text-yellow-300 text-xs font-medium">
                   💡 {step.action}
                 </p>
               </div>
@@ -257,7 +257,7 @@ export function AppTour({ isOpen, onClose, onComplete }: AppTourProps) {
                   key={index}
                   className={`w-2 h-2 rounded-full transition-colors ${
                     index === currentStep 
-                      ? 'bg-blue-500' 
+                      ? 'bg-yellow-500' 
                       : index < currentStep 
                       ? 'bg-green-500' 
                       : 'bg-gray-300 dark:bg-gray-600'
@@ -281,7 +281,7 @@ export function AppTour({ isOpen, onClose, onComplete }: AppTourProps) {
               <Button
                 onClick={handleNext}
                 size="sm"
-                className="h-9 px-3 sm:px-4 bg-blue-500 hover:bg-blue-600 text-white text-xs sm:text-sm touch-manipulation"
+                className="h-9 px-3 sm:px-4 bg-yellow-500 hover:bg-yellow-600 text-white text-xs sm:text-sm touch-manipulation"
                 data-testid="tour-next-button"
               >
                 <span className="truncate">

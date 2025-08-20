@@ -819,7 +819,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const categories = [
     { id: 'popular', name: 'Popular', emoji: '🔥', color: 'bg-red-500' },
     { id: 'healthy', name: 'Healthy', emoji: '🥗', color: 'bg-green-600' },
-    { id: 'protein', name: 'Protein', emoji: '🥩', color: 'bg-blue-500' },
+    { id: 'protein', name: 'Protein', emoji: '🥩', color: 'bg-yellow-500' },
     { id: 'carbs', name: 'Carbs', emoji: '🍞', color: 'bg-orange-500' },
     { id: 'snacks', name: 'Snacks', emoji: '🍿', color: 'bg-purple-500' },
   ];
@@ -983,7 +983,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 {title}
               </h1>
               <h1 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] animate-fadeInUp [animation-delay:0.4s] font-league-spartan text-optimized">
-                <span className="text-blue-600 drop-shadow-2xl animate-[text-shimmer_3s_ease-in-out_infinite]">
+                <span className="text-yellow-500 drop-shadow-2xl animate-[text-shimmer_3s_ease-in-out_infinite]">
                   {subtitle}
                 </span>
               </h1>
@@ -999,7 +999,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <Button 
                 onClick={onButtonClick}
                 size="lg"
-                className="group relative bg-blue-600 hover:bg-blue-600 text-white font-black px-16 py-6 rounded-full text-xl md:text-2xl shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 border-2 border-blue-600/40 hover:border-blue-500/60 overflow-hidden btn-hero-enhanced"
+                className="group relative bg-yellow-500 hover:bg-yellow-500 text-white font-black px-16 py-6 rounded-full text-xl md:text-2xl shadow-2xl hover:shadow-yellow-500/25 transition-all duration-300 border-2 border-yellow-500/40 hover:border-yellow-400/60 overflow-hidden btn-hero-enhanced"
               >
                 <span className="relative z-10 flex items-center gap-3 text-optimized">
                   {buttonText}
@@ -1098,11 +1098,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     const isGoalReached = glasses >= dailyGoal;
     
     return (
-      <Card className={`bg-white border-2 border-blue-600 backdrop-blur-md border-blue-600 p-6 transition-all duration-300 hover:bg-gray-50 hover:border-blue-600 ${isGoalReached ? 'ring-2 ring-blue-600' : ''}`}>
+      <Card className={`bg-white border-2 border-yellow-500 backdrop-blur-md border-yellow-500 p-6 transition-all duration-300 hover:bg-gray-50 hover:border-yellow-500 ${isGoalReached ? 'ring-2 ring-yellow-500' : ''}`}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
-            <div className={`p-3 rounded-xl transition-all duration-300 ${isGoalReached ? 'bg-blue-600' : 'bg-gray-300'}`}>
-              <Droplets className={`w-6 h-6 transition-colors duration-300 ${isGoalReached ? 'text-black' : 'text-blue-600'}`} />
+            <div className={`p-3 rounded-xl transition-all duration-300 ${isGoalReached ? 'bg-yellow-500' : 'bg-gray-300'}`}>
+              <Droplets className={`w-6 h-6 transition-colors duration-300 ${isGoalReached ? 'text-black' : 'text-yellow-500'}`} />
             </div>
             <div>
               <h3 className="text-black font-semibold text-lg">Water Intake</h3>
@@ -1110,7 +1110,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             </div>
           </div>
           <div className="text-right">
-            <div className="text-2xl font-bold text-blue-600">{Math.round(percentage)}%</div>
+            <div className="text-2xl font-bold text-yellow-500">{Math.round(percentage)}%</div>
             <div className="text-xs text-black">of goal</div>
           </div>
         </div>
@@ -1153,7 +1153,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               disabled={glasses <= 0}
               size="sm"
               variant="ghost"
-              className="h-8 w-8 p-0 text-blue-600 hover:text-cyan-300 hover:bg-cyan-500/10 disabled:opacity-50"
+              className="h-8 w-8 p-0 text-yellow-500 hover:text-cyan-300 hover:bg-cyan-500/10 disabled:opacity-50"
               data-testid="button-decrement-water"
             >
               <Minus className="w-4 h-4" />
@@ -1162,7 +1162,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               onClick={onIncrement}
               size="sm"
               variant="ghost"
-              className="h-8 w-8 p-0 text-blue-600 hover:text-cyan-300 hover:bg-cyan-500/10"
+              className="h-8 w-8 p-0 text-yellow-500 hover:text-cyan-300 hover:bg-cyan-500/10"
               data-testid="button-increment-water"
             >
               <Plus className="w-4 h-4" />
@@ -1234,8 +1234,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     // Use consistent color classes
     const getColorClasses = () => {
       switch(color) {
-        case 'cyan': return 'text-blue-600 from-cyan-400 to-blue-500';
-        case 'orange': return 'text-blue-600 from-[#0099FF] to-blue-600';
+        case 'cyan': return 'text-yellow-500 from-cyan-400 to-blue-500';
+        case 'orange': return 'text-yellow-500 from-[#0099FF] to-blue-600';
         case 'red': return 'text-red-600 from-red-400 to-pink-500';
         case 'green': return 'text-green-600 from-green-400 to-emerald-500';
         case 'slate': return 'text-slate-400 from-slate-400 to-gray-500';
@@ -1305,7 +1305,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   }
                 }}
                 size="lg"
-                className="bg-blue-600 hover:bg-blue-600 text-white font-black px-16 py-6 rounded-full text-2xl shadow-2xl hover:scale-105 transition-all duration-500 border-2 border-orange-400/30"
+                className="bg-yellow-500 hover:bg-yellow-500 text-white font-black px-16 py-6 rounded-full text-2xl shadow-2xl hover:scale-105 transition-all duration-500 border-2 border-orange-400/30"
               >
                 {user ? 'Start Tracking' : 'Sign Up to Track'}
               </Button>
@@ -1325,7 +1325,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <h2 className="text-xl font-black text-black">Today's Progress</h2>
             <Button 
               variant="ghost" 
-              className="text-blue-600 hover:text-blue-600"
+              className="text-yellow-500 hover:text-yellow-500"
               onClick={() => handleTabChange(user ? 'calculator' : 'profile')}
             >
               {user ? 'Track Food' : 'Sign Up to Track'}
@@ -1344,15 +1344,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             />
             <div className="grid grid-cols-3 gap-3 mt-4">
               <div className="text-center p-2 bg-white border border-gray-300 rounded-lg">
-                <div className="text-sm font-bold text-blue-600">{loggedMeals.length}</div>
+                <div className="text-sm font-bold text-yellow-500">{loggedMeals.length}</div>
                 <div className="text-xs text-black">Meals</div>
               </div>
               <div className="text-center p-2 bg-white border border-gray-300 rounded-lg">
-                <div className="text-sm font-bold text-blue-600">{Math.round(goalCalories - dailyCalories)}</div>
+                <div className="text-sm font-bold text-yellow-500">{Math.round(goalCalories - dailyCalories)}</div>
                 <div className="text-xs text-black">Remaining</div>
               </div>
               <div className="text-center p-2 bg-white border border-gray-300 rounded-lg">
-                <div className="text-sm font-bold text-blue-600">{Math.round((dailyCalories/goalCalories)*100)}%</div>
+                <div className="text-sm font-bold text-yellow-500">{Math.round((dailyCalories/goalCalories)*100)}%</div>
                 <div className="text-xs text-black">Complete</div>
               </div>
             </div>
@@ -1519,7 +1519,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <h2 className="text-2xl font-bold text-black">
                 {searchQuery ? 'Search Results' : "Today's Meals"}
               </h2>
-              <div className="text-blue-600 font-bold">
+              <div className="text-yellow-500 font-bold">
                 {searchQuery ? (
                   <span className="text-sm">
                     {weeklyMeals.filter(meal => 
@@ -1602,7 +1602,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     </p>
                     <div className="flex flex-wrap gap-3 mt-1">
                       <span className="text-xs text-green-600">P: {(meal.protein || 0).toFixed(1)}g</span>
-                      <span className="text-xs text-blue-600">C: {(meal.carbs || 0).toFixed(1)}g</span>
+                      <span className="text-xs text-yellow-500">C: {(meal.carbs || 0).toFixed(1)}g</span>
                       <span className="text-xs text-purple-600">F: {(meal.fat || 0).toFixed(1)}g</span>
                     </div>
                     {/* Display micronutrients if available */}
@@ -1634,7 +1634,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                           </span>
                         )}
                         {meal.vitaminD > 0 && (
-                          <span className="text-xs bg-orange-500/20 px-2 py-0.5 rounded-full text-blue-600">
+                          <span className="text-xs bg-orange-500/20 px-2 py-0.5 rounded-full text-yellow-500">
                             Vit D: {meal.vitaminD.toFixed(1)}μg
                           </span>
                         )}
@@ -1642,7 +1642,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     )}
                   </div>
                   <div className="text-right">
-                    <p className="text-blue-600 font-bold text-lg">{Math.round(meal.calories || 0)} cal</p>
+                    <p className="text-yellow-500 font-bold text-lg">{Math.round(meal.calories || 0)} cal</p>
                     <Button 
                       size="sm" 
                       variant="ghost" 
@@ -1766,7 +1766,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               </div>
               <div className="relative h-3 bg-gray-800 rounded-full overflow-hidden">
                 <div 
-                  className="absolute left-0 top-0 h-full bg-blue-400 to-cyan-500 rounded-full transition-all duration-1000"
+                  className="absolute left-0 top-0 h-full bg-yellow-400 to-yellow-500 rounded-full transition-all duration-1000"
                   style={{ width: `${Math.min((weeklyCalories/weeklyGoal)*100, 100)}%` }}
                 />
               </div>
@@ -1850,21 +1850,21 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           <Card className="bg-white backdrop-blur-md border-gray-300 p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-black font-semibold text-xl">Weekly Goals</h3>
-              <Badge className="bg-yellow-500/20 text-yellow-500 border-blue-500/30">
+              <Badge className="bg-yellow-500/20 text-yellow-500 border-yellow-400/30">
                 <Calendar className="w-3 h-3 mr-1" />
                 2/4 Complete
               </Badge>
             </div>
             <div className="grid grid-cols-1 gap-3">
-              <div className="flex items-center justify-between p-3 bg-yellow-500/20 rounded-xl border border-blue-500/30">
+              <div className="flex items-center justify-between p-3 bg-yellow-500/20 rounded-xl border border-yellow-400/30">
                 <span className="text-black">Track 5+ days</span>
-                <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                <div className="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center">
                   <span className="text-black text-xs">✓</span>
                 </div>
               </div>
-              <div className="flex items-center justify-between p-3 bg-yellow-500/20 rounded-xl border border-blue-500/30">
+              <div className="flex items-center justify-between p-3 bg-yellow-500/20 rounded-xl border border-yellow-400/30">
                 <span className="text-black">Average 2000+ cal/day</span>
-                <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                <div className="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center">
                   <span className="text-black text-xs">✓</span>
                 </div>
               </div>
@@ -1902,7 +1902,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           ) : achievements.length > 0 ? (
             <div className="grid grid-cols-2 gap-4">
               {achievements.slice(0, 4).map((achievement) => (
-                <Card key={achievement.id} className={`${achievement.colorClass || 'bg-yellow-500/20 border-blue-500/30'} backdrop-blur-md p-4`}>
+                <Card key={achievement.id} className={`${achievement.colorClass || 'bg-yellow-500/20 border-yellow-400/30'} backdrop-blur-md p-4`}>
                   <div className="text-center">
                     <div className="text-3xl mb-2">{getAchievementIcon(achievement.iconName)}</div>
                     <h4 className="text-black font-semibold text-sm">{achievement.title}</h4>
@@ -2114,7 +2114,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               )}
               <Button 
                 type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-black font-bold h-12 rounded-xl"
+                className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold h-12 rounded-xl"
                 disabled={isLoading}
               >
                 {isLoading ? 'Loading...' : 
@@ -2278,12 +2278,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   <p className="text-black text-sm">{meal.time} • {meal.mealType}</p>
                   <div className="flex space-x-4 mt-1">
                     <span className="text-xs text-green-600">P: {(meal.protein || 0).toFixed(1)}g</span>
-                    <span className="text-xs text-blue-600">C: {(meal.carbs || 0).toFixed(1)}g</span>
+                    <span className="text-xs text-yellow-500">C: {(meal.carbs || 0).toFixed(1)}g</span>
                     <span className="text-xs text-purple-600">F: {(meal.fat || 0).toFixed(1)}g</span>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-blue-600 font-bold text-lg">{Math.round(meal.calories || 0)} cal</p>
+                  <p className="text-yellow-500 font-bold text-lg">{Math.round(meal.calories || 0)} cal</p>
                   <Button 
                     size="sm" 
                     variant="ghost" 
@@ -2376,7 +2376,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         <div className="space-y-4 mt-8">
           <div className="flex justify-between items-center">
             <h3 className="text-xl font-bold text-black">This Week</h3>
-            <Badge className="bg-blue-600 text-black">Weekly Summary</Badge>
+            <Badge className="bg-yellow-500 text-black">Weekly Summary</Badge>
           </div>
           <WeeklyCaloriesCard />
         </div>
@@ -2410,7 +2410,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 onClick={() => setNutritionMode('ai')}
                 className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                   nutritionMode === 'ai'
-                    ? 'bg-blue-500 text-black shadow-lg'
+                    ? 'bg-yellow-500 text-black shadow-lg'
                     : 'text-black hover:text-black'
                 }`}
                 data-testid="button-ai-mode"
@@ -2513,7 +2513,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                       </div>
                     </div>
                     <div className="text-right flex-shrink-0 ml-2 sm:ml-3 min-w-[60px] sm:min-w-[80px]">
-                      <div className="text-base sm:text-lg font-bold text-blue-600 leading-tight">{achievements?.length || 0}</div>
+                      <div className="text-base sm:text-lg font-bold text-yellow-500 leading-tight">{achievements?.length || 0}</div>
                       <div className="text-xs text-black whitespace-nowrap leading-tight">Awards</div>
                     </div>
                   </div>
@@ -2533,7 +2533,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                       <Button
                         onClick={startTour}
                         variant="outline"
-                        className="w-full bg-blue-600/20 hover:bg-blue-600/30 border-blue-500 text-blue-300 hover:text-blue-200"
+                        className="w-full bg-yellow-500/20 hover:bg-yellow-500/30 border-yellow-400 text-yellow-300 hover:text-yellow-200"
                         data-testid="start-tour-button"
                       >
                         <span className="text-lg mr-2">🎯</span>
@@ -2728,7 +2728,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 {notifications.map((notification) => (
                   <div
                     key={notification.id}
-                    className={`p-4 border-b border-white/5 ${!notification.read ? 'bg-blue-500/10' : ''}`}
+                    className={`p-4 border-b border-white/5 ${!notification.read ? 'bg-yellow-500/10' : ''}`}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
@@ -2759,7 +2759,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       {renderContent()}
       
       {/* Bottom Navigation - High Resolution Icons */}
-      <div data-testid="navigation-tabs" className="fixed bottom-0 left-0 right-0 bg-blue-600 backdrop-blur-md border-t border-gray-300 safe-area-pb z-50 shadow-lg">
+      <div data-testid="navigation-tabs" className="fixed bottom-0 left-0 right-0 bg-yellow-500 backdrop-blur-md border-t border-gray-300 safe-area-pb z-50 shadow-lg">
         <div className="flex items-center justify-around py-2 px-2 max-w-md mx-auto">
           {[
             { id: 'home', label: 'Dashboard', icon: Home },
@@ -2775,7 +2775,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 onClick={() => handleTabChange(tab.id)}
                 className={`flex flex-col items-center py-1.5 px-1.5 rounded-md transition-all duration-200 min-w-[50px] flex-1 active:bg-yellow-400/20 ${
                   activeTab === tab.id
-                    ? 'text-blue-600'
+                    ? 'text-yellow-500'
                     : 'text-black hover:text-black hover:bg-gray-700/50'
                 }`}
               >

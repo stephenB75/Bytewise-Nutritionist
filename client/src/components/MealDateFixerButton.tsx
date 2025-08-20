@@ -113,7 +113,7 @@ export function MealDateFixerButton({ compact = false, className = '' }: MealDat
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-blue-500" />
+            <Calendar className="w-5 h-5 text-yellow-500" />
             <h3 className="font-semibold">Meal Date Checker</h3>
           </div>
           {hasChecked && (
