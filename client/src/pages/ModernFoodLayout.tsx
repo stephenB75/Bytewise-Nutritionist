@@ -325,12 +325,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       
       // Show profile completion modal if user is missing required profile info
       if (!hasFirstName || !hasLastName) {
-        console.log('🔧 Profile incomplete - showing completion modal:', {
-          hasFirstName,
-          hasLastName,
-          firstName: userData?.firstName || '(empty)',
-          lastName: userData?.lastName || '(empty)'
-        });
+        // Profile incomplete - showing completion modal
         setShowProfileCompletion(true);
       }
     }
@@ -1620,11 +1615,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                       className="text-gray-400 hover:text-red-400 p-2"
                       data-testid={`button-delete-meal-${index}`}
                       onClick={() => {
-                        console.log('🗑️ DELETE CLICKED for:', meal.name, 'ID:', meal.id);
                         // Delete meal action
                         // Remove meal from storage using robust identification
                         const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-                        console.log('📊 Before deletion:', stored.length, 'meals');
                         
                         // Find the exact meal to remove using multiple criteria
                         const mealIndex = stored.findIndex((m: any, idx: number) => {
@@ -1635,10 +1628,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                           return false;
                         });
                         
-                        console.log('🎯 Found meal at index:', mealIndex);
-                        
                         if (mealIndex === -1) {
-                          console.error('❌ Could not find meal to delete!');
                           return;
                         }
                         
@@ -1681,12 +1671,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                         // Force immediate re-render with React state update
                         // Use functional state update to ensure latest state
                         setWeeklyMeals(prevWeeklyMeals => {
-                          console.log('🔄 Force updating weeklyMeals state (Logged Today)');
                           return [...updated]; // Force new array reference
                         });
                         
                         setLoggedMeals(prevLoggedMeals => {
-                          console.log('🔄 Force updating loggedMeals state (Logged Today)');
                           return [...todayMeals]; // Force new array reference
                         });
                         
@@ -1694,7 +1682,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                         window.dispatchEvent(new CustomEvent('refresh-weekly-data'));
                         
                         // Show success message
-                        console.log('✅ Successfully deleted:', meal.name);
                         window.dispatchEvent(new CustomEvent('show-toast', {
                           detail: { 
                             message: `✅ Deleted ${meal.name}`,
@@ -2255,10 +2242,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     className="text-gray-400 hover:text-red-400 p-2"
                     data-testid={`button-delete-logged-meal-${index}`}
                     onClick={() => {
-                      console.log('🗑️ DELETE CLICKED (Logged Today) for:', meal.name, 'ID:', meal.id);
                       // Remove meal from storage using index and multiple identifiers for safety
                       const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-                      console.log('📊 Before deletion:', stored.length, 'meals');
                       
                       // Find the exact meal to remove using multiple criteria
                       const mealIndex = stored.findIndex((m: any, idx: number) => {
@@ -2269,15 +2254,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                         return false;
                       });
                       
-                      console.log('🎯 Found meal at index:', mealIndex);
-                      
                       if (mealIndex !== -1) {
-                          console.log('🗑️ DELETING meal (Logged Today):', meal.name, 'at index', mealIndex);
                         // Remove the specific meal
                         const updated = [...stored];
                         updated.splice(mealIndex, 1);
                         localStorage.setItem('weeklyMeals', JSON.stringify(updated));
-                        console.log('📊 After deletion:', updated.length, 'meals');
                         
                         // Refresh meal list using today's actual date
                         const today = getLocalDateKey();
@@ -2312,12 +2293,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                         // Force immediate re-render with React state update
                         // Use functional state update to ensure latest state
                         setWeeklyMeals(prevWeeklyMeals => {
-                          console.log('🔄 Force updating weeklyMeals state');
                           return [...updated]; // Force new array reference
                         });
                         
                         setLoggedMeals(prevLoggedMeals => {
-                          console.log('🔄 Force updating loggedMeals state');
                           return [...todayMeals]; // Force new array reference
                         });
                         
@@ -2331,9 +2310,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                             type: 'success'
                           }
                         }));
-                        console.log('✅ Successfully deleted (Logged Today):', meal.name);
-                      } else {
-                        console.error('❌ Could not find meal to delete (Logged Today)!', meal);
                       }
                     }}
                     title="Delete meal entry"
