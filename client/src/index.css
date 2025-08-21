@@ -596,6 +596,14 @@ button[data-testid^="nav-"] .lucide {
   padding: 0 !important;
 }
 
+/* CRITICAL: Override global text-white rule for navigation */
+button[data-testid*="nav-"] .text-white,
+button[data-testid^="nav-"] .text-white,
+button[data-testid*="nav-"] span.text-white,
+button[data-testid^="nav-"] span.text-white {
+  color: #ffffff !important;
+}
+
 /* Removed - consolidated into master reset above */
 
 /* Icon styling controlled by Tailwind */
