@@ -175,18 +175,35 @@ button[data-testid*="nav-"]:active {
 }
 
 /* Dashboard page hero text - lighter for better visibility */
-.dashboard-hero h1.text-white,
-.dashboard-hero .text-white,
+[data-page="dashboard"] h1,
+[data-page="dashboard"] .text-white,
+[data-page="dashboard"] h1.text-white,
 [data-page="dashboard"] .hero-component h1.text-white,
 [data-page="dashboard"] .hero-component .text-white { 
   color: #ffffff !important; 
 }
 
-.dashboard-hero p.text-gray-100,
-.dashboard-hero p.text-gray-200,
+[data-page="dashboard"] p,
+[data-page="dashboard"] p.text-gray-100,
+[data-page="dashboard"] p.text-gray-200,
 [data-page="dashboard"] .hero-component p.text-gray-100,
 [data-page="dashboard"] .hero-component p.text-gray-200 { 
   color: #f3f4f6 !important; 
+}
+
+/* Override any dark text in dashboard hero */
+[data-page="dashboard"] .text-black,
+[data-page="dashboard"] .text-gray-900,
+[data-page="dashboard"] .text-gray-800,
+[data-page="dashboard"] .text-gray-700 {
+  color: #ffffff !important;
+}
+
+/* Dashboard hero overlay text fixes */
+[data-page="dashboard"] .absolute.inset-0 h1,
+[data-page="dashboard"] .absolute.inset-0 p,
+[data-page="dashboard"] .absolute.inset-0 span {
+  color: #ffffff !important;
 }
 
 .hero-component p.text-gray-100,
@@ -530,6 +547,25 @@ nav .lucide {
   background: transparent !important;
   border: none !important;
   outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Remove white background boxes from navigation buttons */
+nav button,
+[data-testid="navigation-tabs"] > *,
+.fixed.bottom-0 button,
+.bg-white.border button {
+  background: none !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Target specific navigation button backgrounds */
+button[data-testid*="nav-"] {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
   box-shadow: none !important;
 }
 
