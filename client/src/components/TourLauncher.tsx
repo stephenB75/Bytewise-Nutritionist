@@ -76,28 +76,16 @@ const TOUR_FEATURES = [
 // Tour Steps Configuration
 const TOUR_STEPS: Step[] = [
   {
-    target: '[data-testid="food-search"]',
-    title: '🔍 Smart Food Search',
-    content: 'Search through 300,000+ USDA foods with intelligent brand recognition and autocomplete suggestions.',
-    placement: 'bottom',
-  },
-  {
-    target: '[data-testid="calorie-calculator"]',
-    title: '🧮 Calorie Calculator',
-    content: 'Get instant nutrition facts with FDA-compliant serving sizes and portion warnings for accurate tracking.',
-    placement: 'top',
-  },
-  {
-    target: '[data-testid="ai-photo-analyzer"]',
-    title: '📸 AI Food Analyzer',
-    content: 'Snap photos of your meals for instant nutrition breakdown using advanced AI vision technology.',
-    placement: 'bottom',
+    target: 'body',
+    title: '🎉 Welcome to ByteWise Nutritionist!',
+    content: 'Let\'s take a quick tour of your new nutrition tracking companion. This will help you discover all the powerful features available.',
+    placement: 'center',
   },
   {
     target: '[data-testid="daily-progress"]',
-    title: '📊 Daily Progress',
+    title: '📊 Daily Progress Dashboard',
     content: 'Track your daily calorie intake, macronutrients, and see real-time progress toward your goals.',
-    placement: 'top',
+    placement: 'bottom',
   },
   {
     target: '[data-testid="water-consumption-card"]',
@@ -106,34 +94,16 @@ const TOUR_STEPS: Step[] = [
     placement: 'top',
   },
   {
-    target: '[data-testid="fasting-tracker"]',
-    title: '⏰ Fasting Timer',
-    content: 'Track intermittent fasting sessions with real-time timers and achievement celebrations.',
-    placement: 'top',
-  },
-  {
-    target: '[data-testid="achievements-section"]',
+    target: 'body',
     title: '🏆 Achievement System',
-    content: 'Unlock rewards and badges as you hit nutrition goals and build healthy habits.',
-    placement: 'bottom',
+    content: 'As you use the app, you\'ll unlock rewards and badges for hitting nutrition goals and building healthy habits.',
+    placement: 'center',
   },
   {
-    target: '[data-testid="meal-journal"]',
-    title: '📔 Meal Journal',
-    content: 'Browse your complete meal history with search and filter capabilities.',
-    placement: 'top',
-  },
-  {
-    target: '[data-testid="profile-settings"]',
-    title: '⚙️ Profile & Goals',
-    content: 'Customize your nutrition goals, preferences, and account settings for personalized tracking.',
-    placement: 'bottom',
-  },
-  {
-    target: '[data-testid="navigation-tabs"]',
-    title: '🧭 Easy Navigation',
-    content: 'Use the bottom navigation to switch between Dashboard, Calorie Tracker, Fasting Timer, Meal Journal, and Profile sections.',
-    placement: 'top',
+    target: 'body',
+    title: '🎯 That\'s It!',
+    content: 'You\'re ready to start your nutrition journey! Explore the different sections using the bottom navigation to track food, monitor fasting, and achieve your health goals.',
+    placement: 'center',
   }
 ];
 
@@ -261,6 +231,7 @@ export function AppTour({ isOpen, onClose, onComplete }: AppTourProps) {
   };
 
   console.log('🎯 Joyride render - run:', run, 'stepIndex:', stepIndex, 'steps length:', TOUR_STEPS.length);
+  console.log('🎯 First step target:', TOUR_STEPS[0]?.target);
   
   return (
     <Joyride
