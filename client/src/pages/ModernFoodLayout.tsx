@@ -974,20 +974,20 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             left: 0,
             right: 0,
             bottom: 0,
-            zIndex: 50,
+            zIndex: 15,
             background: 'linear-gradient(to top, rgba(255, 0, 255, 0.9) 0%, rgba(255, 0, 255, 0.5) 50%, transparent 100%)',
             pointerEvents: 'none'
           }} 
         />
         
         {/* Enhanced Pattern Overlay */
-        <div className="absolute inset-0 z-13 opacity-20">
-          <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 via-transparent to-red-500/10" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_70%,rgba(251,146,60,0.15),transparent_50%)]" />
-        </div>
-        
-        {/* Content Layer with Enhanced Typography */}
-        <div className={`absolute inset-0 flex flex-col justify-center items-center text-center px-6 z-20 ${isDashboard ? 'text-white' : 'text-gray-900'}`}>
+        <>
+          <div className="absolute inset-0 z-10 opacity-20">
+            <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 via-transparent to-red-500/10" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_70%,rgba(251,146,60,0.15),transparent_50%)]" />
+          </div>
+          
+          <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-6 z-20 text-white">
           <div className="space-y-8 max-w-2xl">
             {/* Enhanced Title Section */}
             <div className="space-y-3 hero-optimized">
@@ -1021,7 +1021,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               </Button>
             </div>
           </div>
-        </div>
+        </>
         
         {/* Enhanced Scroll Indicator */}
         <div className={`absolute bottom-8 left-1/2 -translate-x-1/2 z-30 animate-bounce ${isDashboard ? 'text-white/70' : 'text-gray-600/70'}`}>
@@ -1301,7 +1301,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             left: 0,
             right: 0,
             bottom: 0,
-            zIndex: 50,
+            zIndex: 15,
             background: 'linear-gradient(to top, rgba(255, 0, 255, 0.9) 0%, rgba(255, 0, 255, 0.5) 50%, transparent 100%)',
             pointerEvents: 'none'
           }} 
