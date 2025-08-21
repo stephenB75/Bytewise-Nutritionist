@@ -141,51 +141,90 @@ const TOUR_STEPS: TourStep[] = [
 // Simplified approach - use default Joyride tooltip with enhanced styling
 const CustomTooltip = null; // Use default Joyride tooltip for better navigation
 
-// Enhanced Tour Styles
+// Enhanced Tour Styles with better visibility
 const tourStyles: Partial<Styles> = {
   options: {
     primaryColor: '#3b82f6',
-    width: 350,
+    width: 380,
     zIndex: 10000,
   },
   overlay: {
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: 'rgba(0, 0, 0, 0.4)', // Lighter overlay for better visibility
   },
   spotlight: {
-    borderRadius: '8px',
+    borderRadius: '12px',
+    border: '3px solid #3b82f6', // Add blue border to spotlight
   },
   beacon: {
     background: '#3b82f6',
     border: '4px solid rgba(59, 130, 246, 0.3)',
+    boxShadow: '0 0 20px rgba(59, 130, 246, 0.5)',
   },
   beaconInner: {
     background: '#1e40af',
   },
   tooltip: {
     padding: 0,
-    backgroundColor: 'transparent',
-    borderRadius: '12px',
+    backgroundColor: 'white',
+    borderRadius: '16px',
+    border: '2px solid #e5e7eb',
+    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(59, 130, 246, 0.1)',
+    maxWidth: '380px',
+    filter: 'none', // Ensure no blur or opacity issues
   },
   tooltipContainer: {
     textAlign: 'left' as const,
+    color: '#111827',
+    lineHeight: '1.5',
+  },
+  tooltipContent: {
+    padding: '24px',
+    fontSize: '15px',
+    lineHeight: '1.6',
+    color: '#374151',
+  },
+  tooltipTitle: {
+    fontSize: '18px',
+    fontWeight: '600',
+    color: '#111827',
+    marginBottom: '12px',
+  },
+  tooltipFooter: {
+    padding: '16px 24px',
+    borderTop: '1px solid #e5e7eb',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   buttonNext: {
     backgroundColor: '#3b82f6',
     color: 'white',
     borderRadius: '8px',
-    padding: '8px 16px',
-    fontWeight: '500',
+    padding: '10px 20px',
+    fontWeight: '600',
+    fontSize: '14px',
+    border: 'none',
+    cursor: 'pointer',
+    boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
   },
   buttonBack: {
     backgroundColor: 'transparent',
     color: '#6b7280',
     borderRadius: '8px',
-    padding: '8px 12px',
+    padding: '10px 16px',
+    fontWeight: '500',
+    fontSize: '14px',
+    border: '1px solid #d1d5db',
+    cursor: 'pointer',
   },
   buttonSkip: {
     backgroundColor: 'transparent',
     color: '#9ca3af',
-    padding: '4px',
+    padding: '8px 12px',
+    fontSize: '14px',
+    fontWeight: '500',
+    border: 'none',
+    cursor: 'pointer',
   },
 };
 
@@ -232,9 +271,9 @@ export function AppTour({ isOpen, onClose, onComplete }: AppTourProps) {
       showSkipButton
       steps={TOUR_STEPS}
       styles={tourStyles}
-      disableOverlayClose={false}
-      hideCloseButton={false}
-      spotlightClicks={false}
+      disableOverlayClose={true}
+      hideCloseButton={true}
+      spotlightClicks={true}
       stepIndex={stepIndex}
       locale={{
         back: 'Previous',

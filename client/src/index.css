@@ -4192,3 +4192,41 @@ input[class*="pr-"] {
     right: 0.625rem !important;
   }
 }
+
+/* Tour Visibility Enhancements */
+.__floater__container {
+  z-index: 10001 !important;
+}
+
+.__floater__body {
+  background: white !important;
+  color: #111827 !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+  border-radius: 16px !important;
+  border: 2px solid #e5e7eb !important;
+  max-width: 380px !important;
+}
+
+.__floater__content {
+  padding: 24px !important;
+  color: #374151 !important;
+  font-size: 15px !important;
+  line-height: 1.6 !important;
+}
+
+.__floater__arrow {
+  border-color: white transparent !important;
+}
+
+/* Ensure Joyride tooltip is always visible */
+[data-testid="tooltip"] {
+  background: white !important;
+  color: #111827 !important;
+  border: 2px solid #e5e7eb !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* Tour overlay adjustments for better visibility */
+.__floater__container + div {
+  background-color: rgba(0, 0, 0, 0.4) !important;
+}
