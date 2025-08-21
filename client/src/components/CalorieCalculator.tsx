@@ -172,8 +172,16 @@ function CalorieCalculator({
     onSuccess: (data: IngredientAnalysis) => {
       console.log('API Response:', data);
       console.log('Portion Info:', data.portionInfo);
-      setRecentAnalyses(prev => [data, ...prev.slice(0, 4)]);
-      resetForm();
+      
+      // Also set any API-provided portion warnings for display
+      if (data.portionInfo?.warning && data.portionInfo.warning !== 'No warning') {
+        console.log('Setting portion warning from API:', data.portionInfo);
+        // Don't reset form immediately if there's a warning to show
+        setRecentAnalyses(prev => [data, ...prev.slice(0, 4)]);
+      } else {
+        setRecentAnalyses(prev => [data, ...prev.slice(0, 4)]);
+        resetForm();
+      }
       
       // Calculate scaling factor for the actual serving size
       const caloriesPer100g = data.nutritionPer100g?.calories || 100;
@@ -855,24 +863,26 @@ function CalorieCalculator({
                   </div>
                 )}
 
-                {/* Portion Size Warnings */}
-                {(analysis as any).portionInfo && !(analysis as any).portionInfo.isRealistic && (
+                {/* Portion Size Warnings from API */}
+                {analysis.portionInfo && analysis.portionInfo.warning && analysis.portionInfo.warning !== 'No warning' && (
                   <div className="mb-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                     <div className="flex items-start space-x-2">
                       <div className="text-yellow-600">⚠️</div>
                       <div className="flex-1">
                         <p className="text-sm font-medium text-yellow-800">
-                          {(analysis as any).portionInfo.warning}
+                          {analysis.portionInfo.warning}
                         </p>
-                        {(analysis as any).portionInfo.suggestion && (
+                        {analysis.portionInfo.suggestion && analysis.portionInfo.suggestion !== 'No suggestion' && (
                           <p className="text-sm text-yellow-700 mt-1">
-                            {(analysis as any).portionInfo.suggestion}
+                            {analysis.portionInfo.suggestion}
                           </p>
                         )}
-                        {(analysis as any).portionInfo.recommendedServing && (
+                        {analysis.portionInfo.recommendedServing && (
                           <p className="text-sm text-yellow-700 mt-1">
-                            Suggested serving: {(analysis as any).portionInfo.recommendedServing} 
-                            ({(analysis as any).portionInfo.recommendedCalories} cal)
+                            Suggested serving: {analysis.portionInfo.recommendedServing} 
+                            {analysis.portionInfo.recommendedCalories && (
+                              <span> ({analysis.portionInfo.recommendedCalories} cal)</span>
+                            )}
                           </p>
                         )}
                       </div>

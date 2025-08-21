@@ -1666,6 +1666,8 @@ export class USDAService {
     availableConversions: { [key: string]: number }
   ): { isRealistic: boolean; warning?: string; suggestion?: string; servingName?: string } | undefined {
     
+    console.log(`🍭 Portion warning check: "${ingredient}" -> ${actualGrams}g (unit: ${unit})`);
+    
     // FDA RACC (Reference Amounts Customarily Consumed) standards
     const fdaServings: { [key: string]: { standardUnit: string; standardGrams: number; category: string } } = {
       'snickers': { standardUnit: 'bar', standardGrams: 52, category: 'candy bar' },
@@ -1680,8 +1682,29 @@ export class USDAService {
       'potato chips': { standardUnit: 'oz', standardGrams: 28, category: 'snack' },
     };
     
-    const fdaInfo = fdaServings[ingredient];
-    if (!fdaInfo) return { isRealistic: true };
+    // Normalize ingredient name for lookup
+    const normalizedIngredient = ingredient.toLowerCase().trim();
+    console.log(`🍭 Looking up FDA data for: "${normalizedIngredient}"`);
+    
+    let fdaInfo = fdaServings[normalizedIngredient];
+    
+    // Try partial matches if exact match fails
+    if (!fdaInfo) {
+      for (const [key, info] of Object.entries(fdaServings)) {
+        if (normalizedIngredient.includes(key) || key.includes(normalizedIngredient)) {
+          fdaInfo = info;
+          console.log(`🍭 Found partial match: "${key}" for "${normalizedIngredient}"`);
+          break;
+        }
+      }
+    }
+    
+    if (!fdaInfo) {
+      console.log(`🍭 No FDA data found for: "${normalizedIngredient}"`);
+      return { isRealistic: true };
+    }
+    
+    console.log(`🍭 FDA comparison: ${actualGrams}g vs ${fdaInfo.standardGrams}g (${fdaInfo.standardUnit})`);
     
     // Warning if user measurement is significantly different from FDA standard
     const percentDifference = Math.abs(actualGrams - fdaInfo.standardGrams) / fdaInfo.standardGrams;
