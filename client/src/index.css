@@ -523,8 +523,25 @@ button:hover:not(.bg-orange-500):not([class*="bg-gradient"]):not(.bg-cyan-):not(
 
 /* Allow Tailwind styling on navigation buttons */
 
-/* Remove webkit focus outlines */
-[data-testid="navigation-tabs"] button:focus-visible {
+/* Comprehensive navigation button reset */
+[data-testid="navigation-tabs"] button {
+  background: none !important;
+  background-color: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+}
+
+[data-testid="navigation-tabs"] button:focus,
+[data-testid="navigation-tabs"] button:focus-visible,
+[data-testid="navigation-tabs"] button:active,
+[data-testid="navigation-tabs"] button:hover {
+  background: none !important;
+  background-color: transparent !important;
+  border: none !important;
   outline: none !important;
   box-shadow: none !important;
 }
@@ -535,19 +552,10 @@ button:hover:not(.bg-orange-500):not([class*="bg-gradient"]):not(.bg-cyan-):not(
 
 /* Navigation buttons use Tailwind styling */
 
-/* Remove only border/outline from navigation container (keep background) */
-.border-gray-200,
-.border-t,
+/* Navigation container styling */
 [data-testid="navigation-tabs"] {
-  border: none !important;
-  border-top: none !important;
+  border-top: 1px solid rgb(234 179 8 / 0.6) !important;
 }
-
-/* Navigation button backgrounds controlled by Tailwind */
-
-/* Navigation shadows and filters controlled by Tailwind */
-
-/* Focus states controlled by Tailwind */
 
 /* Brand Style CSS Logo */
 .css-logo {
@@ -601,11 +609,7 @@ button:hover:not(.bg-orange-500):not([class*="bg-gradient"]):not(.bg-cyan-):not(
   }
 }
 
-/* Navigation styling fully managed by Tailwind */
-
-/* Outlines managed by Tailwind accessibility features */
-
-/* Interactive states controlled by Tailwind */
+/* All navigation styling complete - no additional overrides needed */
 
 /* ========== COMPREHENSIVE LIGHT THEME VISIBILITY FIXES ========== */
 
