@@ -2773,7 +2773,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       {renderContent()}
       
       {/* Bottom Navigation - High Resolution Icons */}
-      <div data-testid="navigation-tabs" className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-gray-200/60 safe-area-pb z-50 shadow-lg">
+      <div data-testid="navigation-tabs" className="fixed bottom-0 left-0 right-0 bg-yellow-400 border-t border-yellow-500/60 safe-area-pb z-50 shadow-lg">
         <div className="flex items-center justify-around py-2 px-2 max-w-md mx-auto">
           {[
             { id: 'home', label: 'Dashboard', icon: Home, testId: 'nav-dashboard' },
@@ -2788,10 +2788,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 key={tab.id}
                 data-testid={tab.testId}
                 onClick={() => handleTabChange(tab.id)}
-                className={`flex flex-col items-center py-1.5 px-1.5 rounded-md transition-all duration-200 min-w-[50px] flex-1 active:bg-yellow-400/20 ${
+                className={`flex flex-col items-center py-1.5 px-1.5 rounded-md transition-all duration-200 min-w-[50px] flex-1 active:bg-yellow-500/30 ${
                   activeTab === tab.id
-                    ? 'text-yellow-600'
-                    : 'text-gray-600 hover:text-gray-800 hover:bg-gray-200/50'
+                    ? 'text-gray-900 bg-yellow-500/40'
+                    : 'text-gray-700 hover:text-gray-900 hover:bg-yellow-500/20'
                 }`}
               >
                 <IconComponent 
