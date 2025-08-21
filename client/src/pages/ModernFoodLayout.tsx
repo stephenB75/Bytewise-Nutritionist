@@ -1021,6 +1021,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               </Button>
             </div>
           </div>
+          </div>
         </>
         
         {/* Enhanced Scroll Indicator */}
