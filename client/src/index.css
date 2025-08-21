@@ -37,7 +37,7 @@ button[data-testid^="nav-"],
   --border: 229, 229, 229;
   --input: 229, 229, 229;
   --primary: 37, 99, 235;
-  --primary-foreground: 248, 250, 252;
+  --primary-foreground: 255, 255, 255;
   --secondary: 245, 245, 245;
   --secondary-foreground: 17, 24, 39;
   --accent: 245, 245, 245;
@@ -134,8 +134,12 @@ div[class*="bg-gray-800"]:not([class*="bg-gray-800/"]):not([class*="backdrop"]):
 .btn-hero-enhanced,
 .btn-hero-enhanced *,
 .btn-hero-enhanced span,
-.btn-hero-enhanced .text-white {
+.btn-hero-enhanced .text-white,
+button.btn-hero-enhanced,
+button.btn-hero-enhanced *,
+button.btn-hero-enhanced span {
   color: #ffffff !important;
+  fill: #ffffff !important;
 }
 
 /* Fix any remaining light colors in UI elements */
