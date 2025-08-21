@@ -260,6 +260,8 @@ export function AppTour({ isOpen, onClose, onComplete }: AppTourProps) {
     }
   };
 
+  console.log('🎯 Joyride render - run:', run, 'stepIndex:', stepIndex, 'steps length:', TOUR_STEPS.length);
+  
   return (
     <Joyride
       callback={handleJoyrideCallback}
