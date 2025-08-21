@@ -1022,15 +1022,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             </div>
           </div>
           </div>
-        </>
-        
-        {/* Enhanced Scroll Indicator */}
-        <div className={`absolute bottom-8 left-1/2 -translate-x-1/2 z-30 animate-bounce ${isDashboard ? 'text-white/70' : 'text-gray-600/70'}`}>
-          <div className="flex flex-col items-center gap-2">
-            <div className={`w-px h-8 bg-gradient-to-b from-transparent ${isDashboard ? 'to-white/50' : 'to-gray-600/50'}`} />
-            <ChevronRight className="w-6 h-6 rotate-90 drop-shadow-lg" />
+          
+          {/* Enhanced Scroll Indicator */}
+          <div className={`absolute bottom-8 left-1/2 -translate-x-1/2 z-30 animate-bounce ${isDashboard ? 'text-white/70' : 'text-gray-600/70'}`}>
+            <div className="flex flex-col items-center gap-2">
+              <div className={`w-px h-8 bg-gradient-to-b from-transparent ${isDashboard ? 'to-white/50' : 'to-gray-600/50'}`} />
+              <ChevronRight className="w-6 h-6 rotate-90 drop-shadow-lg" />
+            </div>
           </div>
-        </div>
+        </>
       </div>
     );
   }, (prevProps, nextProps) => {
