@@ -2093,7 +2093,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         />
 
         {/* Content Section - Completely Separate and Underneath */}
-        <div className="px-6 py-3 bg-black content-section">
+        <div className="px-6 py-3 content-section">
           {/* Sign In Component */}
           <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
             <h3 className="text-2xl font-bold text-white mb-6 text-center">
@@ -2397,7 +2397,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         />
         
         {/* Content Section - Completely Separate and Underneath */}
-        <div className="px-6 py-3 bg-black content-section">
+        <div className="px-6 py-3 content-section">
           {/* Instructions Section */}
           <div className="mb-6 text-center">
             <div className="bg-gradient-to-r from-blue-500/10 to-orange-500/10 border border-white/10 rounded-xl p-4 mb-4">
@@ -2646,7 +2646,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             />
             
             {/* Fasting Content Section */}
-            <div className="px-6 py-3 bg-black content-section">
+            <div className="px-6 py-3 content-section">
               <div data-testid="fasting-tracker" className="fasting-tracker bg-gray-900/80 backdrop-blur-md rounded-3xl border border-gray-700 p-6">
                 <FastingTracker />
               </div>
@@ -2682,7 +2682,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             />
 
             {/* Content Section - Completely Separate and Underneath */}
-            <div className="px-6 py-3 bg-black content-section">
+            <div className="px-6 py-3 content-section">
               <div className="bg-gray-900/80 backdrop-blur-md rounded-3xl border border-gray-700">
                 <DataManagementPanel />
               </div>
@@ -2695,7 +2695,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   };
 
   return (
-    <div data-testid="app-container" className="h-screen w-screen bg-black">
+    <div data-testid="app-container" className="h-screen w-screen">
       {/* Fixed Notification Header on all pages - Safe area positioning for iOS/Android */}
       <div className="fixed top-safe right-4 z-50 safe-notification-position">
         <div className="relative">
@@ -2773,7 +2773,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       {renderContent()}
       
       {/* Bottom Navigation - High Resolution Icons */}
-      <div data-testid="navigation-tabs" className="fixed bottom-0 left-0 right-0 bg-gray-900/95 backdrop-blur-md border-t border-gray-700/80 safe-area-pb z-50 shadow-lg">
+      <div data-testid="navigation-tabs" className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-gray-200/60 safe-area-pb z-50 shadow-lg">
         <div className="flex items-center justify-around py-2 px-2 max-w-md mx-auto">
           {[
             { id: 'home', label: 'Dashboard', icon: Home, testId: 'nav-dashboard' },
@@ -2790,8 +2790,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 onClick={() => handleTabChange(tab.id)}
                 className={`flex flex-col items-center py-1.5 px-1.5 rounded-md transition-all duration-200 min-w-[50px] flex-1 active:bg-yellow-400/20 ${
                   activeTab === tab.id
-                    ? 'text-yellow-400'
-                    : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+                    ? 'text-yellow-600'
+                    : 'text-gray-600 hover:text-gray-800 hover:bg-gray-200/50'
                 }`}
               >
                 <IconComponent 
