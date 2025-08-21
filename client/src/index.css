@@ -341,12 +341,6 @@ svg[data-testid="icon-bell"] {
   background: none !important;
   outline: none !important;
 }
-  border: none !important;
-  background: none !important;
-  outline: none !important;
-  border: none !important;
-  background: none !important;
-}
 
 /* Additional card shadow consistency */
 .rounded-lg,
