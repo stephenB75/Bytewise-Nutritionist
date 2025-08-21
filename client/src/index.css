@@ -569,6 +569,24 @@ button[data-testid*="nav-"] {
   box-shadow: none !important;
 }
 
+/* Remove drop shadows from navigation icons and buttons */
+[data-testid="navigation-tabs"] button,
+nav button,
+.fixed.bottom-0 button,
+button[data-testid*="nav-"],
+[data-testid="navigation-tabs"] svg,
+nav svg,
+.lucide-home,
+.lucide-calculator,
+.lucide-calendar,
+.lucide-trophy,
+.lucide-settings,
+.lucide-user {
+  box-shadow: none !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+}
+
 /* Ensure all metrics text is dark enough */
 .backdrop-blur-md .text-white,
 .bg-white\/10 .text-white,
