@@ -1643,6 +1643,54 @@ export class USDAService {
   }
 
   /**
+   * Generate portion warnings for unrealistic measurements
+   */
+  private generatePortionWarning(
+    ingredient: string, 
+    unit: string, 
+    actualGrams: number, 
+    availableConversions: { [key: string]: number }
+  ): { isRealistic: boolean; warning?: string; suggestion?: string; servingName?: string } | undefined {
+    
+    // Define realistic serving sizes for different food categories
+    const realisticServings: { [key: string]: { standardUnit: string; standardGrams: number; warningThreshold: number } } = {
+      'snickers': { standardUnit: 'bar', standardGrams: 52, warningThreshold: 25 },
+      'snickers bar': { standardUnit: 'bar', standardGrams: 52, warningThreshold: 25 },
+      'ice cream bar': { standardUnit: 'bar', standardGrams: 60, warningThreshold: 30 },
+      'ice cream': { standardUnit: 'cup', standardGrams: 66, warningThreshold: 30 },
+      'popsicle': { standardUnit: 'piece', standardGrams: 50, warningThreshold: 25 },
+      'kit kat': { standardUnit: 'bar', standardGrams: 42, warningThreshold: 20 },
+      'reeses': { standardUnit: 'cup', standardGrams: 21, warningThreshold: 10 },
+      'hershey': { standardUnit: 'bar', standardGrams: 43, warningThreshold: 20 },
+    };
+    
+    const servingInfo = realisticServings[ingredient];
+    if (!servingInfo) return undefined;
+    
+    // Check if the current measurement is significantly smaller than standard
+    if (actualGrams < servingInfo.warningThreshold) {
+      const suggestions = [];
+      
+      // Find the most appropriate serving suggestion
+      if (availableConversions[servingInfo.standardUnit]) {
+        suggestions.push(`1 ${servingInfo.standardUnit}`);
+      }
+      if (availableConversions['piece'] && servingInfo.standardUnit !== 'piece') {
+        suggestions.push('1 piece');
+      }
+      
+      return {
+        isRealistic: false,
+        warning: `Your portion (${actualGrams}g) vs FDA standard (${servingInfo.standardGrams}g) - seems too small`,
+        suggestion: suggestions.length > 0 ? `Try: ${suggestions.join(' • Or: ')}` : undefined,
+        servingName: `FDA standard: 1 ${servingInfo.standardUnit} (${servingInfo.standardGrams}g)`
+      };
+    }
+    
+    return { isRealistic: true };
+  }
+
+  /**
    * Simple measurement parsing for candy portion detection
    */
   private parseSimpleMeasurement(measurement: string): { quantity: number; unit: string } {
@@ -1974,8 +2022,20 @@ export class USDAService {
       },
       'snickers': {
         'fun size': 17,
-        'bar': 52,     // Regular Snickers bar
+        'bar': 52,     // Regular Snickers bar  
         'king size': 113,
+        't': 15,       // 1 tablespoon = 15g (warning needed)
+        'tbsp': 15,    // 1 tablespoon = 15g (warning needed)
+        'tablespoon': 15,
+      },
+      'snickers bar': {
+        'fun size': 17,
+        'bar': 52,     // Regular Snickers bar
+        'piece': 52,   // 1 piece = 1 bar
+        'king size': 113,
+        't': 15,       // 1 tablespoon = 15g (warning needed)
+        'tbsp': 15,    // 1 tablespoon = 15g (warning needed)
+        'tablespoon': 15,
       },
       'kit kat': {
         'fun size': 15,
@@ -2041,7 +2101,10 @@ export class USDAService {
         for (const [unitPattern, grams] of Object.entries(conversions)) {
           if (unit.includes(unitPattern)) {
             gramsEquivalent = quantity * grams;
-            return { quantity, unit, gramsEquivalent };
+            
+            // Generate portion warning for unrealistic measurements
+            const portionInfo = this.generatePortionWarning(ingredient, unitPattern, grams, conversions);
+            return { quantity, unit, gramsEquivalent, portionInfo };
           }
         }
       }
@@ -2531,35 +2594,7 @@ export class USDAService {
     const normalized = ingredientName.toLowerCase().trim();
 
     // Enhanced food database integration temporarily disabled
-    if (false) {
-      const mockFood: USDAFood = {
-        fdcId: 0,
-        description: enhancedFood.name,
-        dataType: 'Enhanced Database',
-        foodNutrients: []
-      };
-      
-      const measurementResult = this.parseMeasurement(measurement, mockFood);
-      let { quantity, unit, gramsEquivalent } = measurementResult;
-      
-      // Use enhanced food's standard portion if measurement is generic
-      if (unit === 'piece' || unit === 'patty' || unit === 'serving') {
-        gramsEquivalent = enhancedFood.portionWeight * quantity;
-      }
-      
-      const estimatedCalories = Math.round((enhancedFood.nutritionPer100g.calories * gramsEquivalent) / 100);
-      
-      return {
-        ingredient: enhancedFood.name.toUpperCase(),
-        measurement: `${quantity} ${unit} (~${gramsEquivalent}g)`,
-        estimatedCalories,
-        equivalentMeasurement: `100g ≈ ${enhancedFood.nutritionPer100g.calories} kcal`,
-        note: enhancedFood.note || 'Accurate nutritional data from enhanced food database',
-        nutritionPer100g: enhancedFood.nutritionPer100g,
-        enhancedDatabase: true,
-        category: enhancedFood.category
-      };
-    }
+    // Fallback processing continues below
 
     // Check for zero-calorie beverages
     if (this.isZeroCalorieBeverage(normalized)) {
