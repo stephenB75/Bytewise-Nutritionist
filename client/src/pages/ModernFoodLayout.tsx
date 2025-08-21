@@ -1318,7 +1318,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       </div>
 
       {/* Content Section - Completely Separate and Underneath */}
-      <div className="px-6 py-3 bg-black content-section">
+      <div className="px-6 py-3 bg-gradient-to-t from-yellow-400 to-white content-section">
         <div className="space-y-3">
           {/* Welcome Banner for Tour */}
           {user && showWelcomeBanner && (
