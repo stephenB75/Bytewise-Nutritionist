@@ -1310,7 +1310,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   }
                 }}
                 size="lg"
-                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-black px-16 py-6 rounded-full text-2xl shadow-2xl hover:scale-105 transition-all duration-500 border-2 border-orange-400/30"
+                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-yellow-100 font-black px-16 py-6 rounded-full text-2xl shadow-2xl hover:scale-105 transition-all duration-500 border-2 border-orange-400/30"
               >
                 {user ? 'Start Tracking' : 'Sign Up to Track'}
               </Button>
