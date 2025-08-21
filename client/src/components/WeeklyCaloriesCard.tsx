@@ -47,15 +47,7 @@ export function WeeklyCaloriesCard() {
       mealCount: 0
     }));
 
-    // Debug: Check if dates are correct
     const todayKey = getLocalDateKey(currentDate);
-    console.log('🗓️ Week calculation:', {
-      systemToday: currentDate.toDateString(),
-      todayKey: todayKey,
-      weekDates: weekDates.map(d => ({ day: d.day, date: d.date })),
-      mondayDate: weekDates.find(d => d.day === 'Monday')?.date,
-      shouldHighlightMonday: weekDates.find(d => d.day === 'Monday')?.date === todayKey
-    });
     
     return weekDates;
   };
@@ -121,7 +113,6 @@ export function WeeklyCaloriesCard() {
         const dayCalories = dayMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
         
         // Debug and fix calorie data
-        console.log(`📊 DAY: ${dayData.day} ${dayData.date} - ${dayMeals.length} meals`);
         if (dayMeals.length > 0) {
           dayMeals.forEach((meal: any, index: number) => {
             const mealName = meal.name ? meal.name.substring(0, 20) : 'Unknown';

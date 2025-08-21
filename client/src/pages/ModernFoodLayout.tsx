@@ -434,7 +434,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         throw new Error(`Failed to fetch daily stats: ${response.status}`);
       }
       const stats = await response.json();
-      console.log('📊 Daily stats fetched for authenticated user:', stats);
       setDailyStats(stats);
     } catch (error) {
       console.error('❌ Daily stats fetch error for authenticated user:', error);
@@ -1691,7 +1690,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                         const updated = [...stored];
                         updated.splice(mealIndex, 1);
                         localStorage.setItem('weeklyMeals', JSON.stringify(updated));
-                        console.log('📊 After deletion:', updated.length, 'meals');
                         
                         // Refresh meal list using today's actual date
                         const today = getLocalDateKey();
