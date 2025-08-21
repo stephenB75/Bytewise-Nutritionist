@@ -12,7 +12,6 @@ import { eq, and, gte } from "drizzle-orm";
 export async function registerRoutes(app: Express): Promise<Server> {
   // Health check endpoint - simplified for production
   app.get('/api/health', async (req: Request, res: Response) => {
-    console.log('🏥 Health check called at:', new Date().toISOString());
     // Basic health check - server is responding
     res.json({
       status: 'healthy',
@@ -82,51 +81,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/auth/user', optionalAuth, async (req: any, res: Response) => {
     const userId = req.user?.id;
     
-    console.log('👤 /api/auth/user request:', { 
-      hasUserId: !!userId, 
-      userId: userId?.substring(0, 8) + '...' 
-    });
     
     if (!userId) {
-      console.log('❌ No user ID found in request');
       res.json(null);
       return;
     }
     
     try {
-      console.log('🔍 Calling storage.getUser with ID:', userId);
       const user = await storage.getUser(userId);
-      console.log('📊 Database result:', { user: !!user, userType: typeof user });
-      console.log('✅ User found in database:', !!user);
       
       // If user exists in database, return it
       if (user) {
-        console.log('✅ Returning user from database');
         res.json(user);
         return;
       }
       
       // If user doesn't exist in database, fetch from Supabase
-      console.log('❌ User not found in local database, fetching from Supabase...');
-      console.log('🔍 Attempting Supabase admin getUserById for:', userId);
       // If user not found in database, return Supabase user data directly 
       try {
         const { data: supabaseUser, error: fetchError } = await supabaseAdmin.auth.admin.getUserById(userId);
-        console.log('📊 Supabase response:', { 
-          hasData: !!supabaseUser, 
-          hasUser: !!supabaseUser?.user, 
-          hasError: !!fetchError,
-          errorMessage: fetchError?.message 
-        });
         
         if (fetchError) {
-          console.log('❌ Failed to fetch user from Supabase:', fetchError.message);
           res.json(null);
           return;
         }
         
         if (supabaseUser?.user) {
-          console.log('✅ Found user in Supabase:', supabaseUser.user.email);
           
           // Return user data in the expected format for frontend
           const userData = {
@@ -153,7 +133,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           // Important: Create/update user in local database so future updates work
           try {
-            console.log('💾 Creating/updating user in local database from Supabase data...');
             const databaseUser = await storage.upsertUser({
               id: userData.id,
               email: userData.email,
@@ -165,27 +144,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
             
             // CRITICAL: Use the database user's ID, not the Supabase ID
             userData.id = databaseUser.id;
-            console.log('✅ User created/updated in local database, using database ID:', {
-              databaseId: databaseUser.id?.substring(0, 8) + '...',
-              email: databaseUser.email
-            });
           } catch (dbError) {
-            console.log('⚠️ Failed to create user in local database:', dbError);
             // Continue anyway - we can still return the Supabase data
           }
           
-          console.log('✅ Returning Supabase user data to frontend');
           res.json(userData);
           return;
         } else {
-          console.log('❌ No user data returned from Supabase');
         }
       } catch (createError) {
-        console.log('❌ Failed to fetch user from Supabase:', createError);
       }
       res.json(null);
     } catch (error) {
-      console.log('❌ Database error, fetching from Supabase...', error);
       // If database error, also try Supabase fallback
       try {
         const { data: supabaseUser, error: fetchError } = await supabaseAdmin.auth.admin.getUserById(userId);

@@ -423,13 +423,11 @@ export function getVisualReference(foodName: string): string | null {
 export function convertToGrams(measurement: string, foodName?: string): number {
   const cleanMeasurement = measurement.toLowerCase().trim();
   
-  console.log(`🔄 Converting measurement: "${cleanMeasurement}" for food: "${foodName}"`);
   
   // Look for grams first
   const gramMatch = cleanMeasurement.match(/(\d+(?:\.\d+)?)\s*g(?!\w)/);
   if (gramMatch) {
     const result = parseFloat(gramMatch[1]);
-    console.log(`✅ Gram match: ${result}g`);
     return result;
   }
   
@@ -437,7 +435,6 @@ export function convertToGrams(measurement: string, foodName?: string): number {
   const ozMatch = cleanMeasurement.match(/(\d+(?:\.\d+)?)\s*oz/);
   if (ozMatch) {
     const result = parseFloat(ozMatch[1]) * 28.35;
-    console.log(`✅ Ounce match: ${result}g`);
     return result;
   }
   
@@ -450,7 +447,6 @@ export function convertToGrams(measurement: string, foodName?: string): number {
     else if (foodName?.includes('milk')) result = cups * 240;
     else if (foodName?.includes('rice') || foodName?.includes('pasta')) result = cups * 125;
     else result = cups * 120; // Generic average
-    console.log(`✅ Cup match: ${result}g`);
     return result;
   }
   
@@ -458,7 +454,6 @@ export function convertToGrams(measurement: string, foodName?: string): number {
   const tbspMatch = cleanMeasurement.match(/(\d+(?:\.\d+)?)\s*(?:tbsp|tablespoons?)/);
   if (tbspMatch) {
     const result = parseFloat(tbspMatch[1]) * 15;
-    console.log(`✅ Tablespoon match: ${result}g`);
     return result;
   }
   
@@ -466,14 +461,12 @@ export function convertToGrams(measurement: string, foodName?: string): number {
   const tspMatch = cleanMeasurement.match(/(\d+(?:\.\d+)?)\s*(?:tsp|teaspoons?)/);
   if (tspMatch) {
     const result = parseFloat(tspMatch[1]) * 5;
-    console.log(`✅ Teaspoon match: ${result}g`);
     return result;
   }
   
   // Handle common abbreviations BEFORE pieces match - "t" usually means tablespoon
   if (cleanMeasurement.match(/^\d+\s*t$/)) {
     const result = parseInt(cleanMeasurement) * 15; // 1 tablespoon = 15g
-    console.log(`✅ "t" abbreviation match (tablespoon): ${result}g`);
     return result;
   }
   
@@ -484,11 +477,9 @@ export function convertToGrams(measurement: string, foodName?: string): number {
     const serving = getFDAServingSize(foodName || '');
     if (serving) {
       const result = pieces * serving.fdaRACCgrams;
-      console.log(`✅ Piece/bar match: ${pieces} x ${serving.fdaRACCgrams}g = ${result}g`);
       return result;
     }
   }
   
-  console.log(`❌ No conversion match found for: "${cleanMeasurement}"`);
   return 0; // Could not convert
 }
