@@ -1111,50 +1111,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log('🔍 Analyzing food image:', imageUrl);
 
-      // Check if this is a private object storage URL that needs proxying
-      let processableImageUrl = imageUrl;
-      if (imageUrl.includes('storage.googleapis.com') && imageUrl.includes('.private')) {
-        console.log('🔐 Converting private storage URL to proxy URL for AI analysis...');
-        try {
-          // Extract the object path from the Google Cloud Storage URL
-          const url = new URL(imageUrl);
-          const pathParts = url.pathname.split('/');
-          
-          // Find bucket name (starts with replit-objstore-)
-          const bucketIndex = pathParts.findIndex(part => part.includes('replit-objstore-'));
-          if (bucketIndex !== -1) {
-            // Get everything after the bucket name as the object path
-            const objectPath = pathParts.slice(bucketIndex + 1).join('/');
-            
-            console.log('🔍 Extracted object path from upload URL:', {
-              originalUrl: imageUrl.substring(0, 100) + '...',
-              extractedPath: objectPath,
-              bucketName: pathParts[bucketIndex]
-            });
-            
-            // Use our proxy endpoint to serve the private image (use public URL for external API access)
-            const publicUrl = process.env.REPLIT_DEV_DOMAIN 
-              ? `https://${process.env.REPLIT_DEV_DOMAIN}` 
-              : process.env.REPL_URL || 'http://localhost:5000';
-            processableImageUrl = `${publicUrl}/api/ai/proxy-image?path=${encodeURIComponent(objectPath)}`;
-            
-            console.log('✅ Converted to proxy URL for AI analysis:', processableImageUrl);
-            
-            // Add a small delay to allow the image to be fully saved
-            console.log('⏳ Waiting 3 seconds for image to be fully uploaded...');
-            await new Promise(resolve => setTimeout(resolve, 3000));
-          }
-        } catch (proxyUrlError) {
-          console.error('⚠️ Failed to generate proxy URL, using original URL:', proxyUrlError);
-          // Continue with original URL as fallback
-        }
-      }
-
-      // Step 1: Analyze image with AI to identify foods
-      console.log('🔬 Starting AI image analysis with URL:', processableImageUrl);
+      // With Gemini Vision, we pass the storage URL directly as it downloads the image internally
+      console.log('🔬 Starting Gemini Vision AI analysis with URL:', imageUrl);
       
       // Add validation for empty analysis results
-      const aiResult = await analyzeFoodImage(processableImageUrl);
+      const aiResult = await analyzeFoodImage(imageUrl);
       console.log('🔬 AI analysis result:', { 
         success: true, 
         foodsFound: aiResult.identifiedFoods?.length || 0,
@@ -1167,59 +1128,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json({
           imageUrl,
           identifiedFoods: [],
-          totalNutrition: { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0, sugar: 0, sodium: 0 },
+          totalNutrition: { calories: 0, protein: 0, carbs: 0, fat: 0 },
           analysisTime: aiResult.analysisTime,
           message: "No food items were detected in this image. Please try a different photo with clear food items."
         });
       }
       
-      // Step 2: Get nutrition data for each identified food
-      const identifiedFoods = [];
-      for (const food of aiResult.identifiedFoods) {
-        try {
-          const nutrition = await getNutritionFromUSDA(food.name, food.estimatedGrams);
-          identifiedFoods.push({
-            name: food.name,
-            confidence: food.confidence,
-            portion: food.portion,
-            calories: nutrition.calories,
-            protein: nutrition.protein,
-            carbs: nutrition.carbs,
-            fat: nutrition.fat,
-            fiber: nutrition.fiber,
-            sugar: nutrition.sugar,
-            sodium: nutrition.sodium,
-          });
-        } catch (nutritionError) {
-          console.error(`Failed to get nutrition for ${food.name}:`, nutritionError);
-          // Add food with zero nutrition as fallback
-          identifiedFoods.push({
-            name: food.name,
-            confidence: food.confidence,
-            portion: food.portion,
-            calories: 0,
-            protein: 0,
-            carbs: 0,
-            fat: 0,
-            fiber: 0,
-            sugar: 0,
-            sodium: 0,
-          });
-        }
-      }
+      // The Gemini AI service already includes nutrition data in identifiedFoods
+      const identifiedFoods = aiResult.identifiedFoods.map(food => ({
+        name: food.name,
+        confidence: food.confidence,
+        portion: food.portion,
+        calories: food.calories || 0,
+        protein: food.protein || 0,
+        carbs: food.carbs || 0,
+        fat: food.fat || 0,
+      }));
 
-      // Step 3: Calculate total nutrition
+      // Calculate total nutrition
       const totalNutrition = identifiedFoods.reduce(
         (total, food) => ({
           calories: total.calories + food.calories,
           protein: total.protein + food.protein,
           carbs: total.carbs + food.carbs,
           fat: total.fat + food.fat,
-          fiber: total.fiber + food.fiber,
-          sugar: total.sugar + food.sugar,
-          sodium: total.sodium + food.sodium,
         }),
-        { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0, sugar: 0, sodium: 0 }
+        { calories: 0, protein: 0, carbs: 0, fat: 0 }
       );
 
       const result = {

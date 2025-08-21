@@ -186,13 +186,13 @@ export default function AIFoodAnalyzer() {
         
         setUploadedImageUrl(imageUrl);
         
-        // Wait a moment for the upload to fully complete before starting analysis
-        console.log('⏳ Waiting 3 seconds for upload to fully complete...');
+        // Wait longer for upload to fully complete before starting analysis
+        console.log('⏳ Waiting 5 seconds for upload to fully complete and propagate...');
         const finalImageUrl = imageUrl; // Capture in closure to ensure type safety
         setTimeout(() => {
-          console.log('🚀 Starting AI food analysis...');
+          console.log('🚀 Starting AI food analysis with Gemini Vision...');
           analyzeFoodMutation.mutate(finalImageUrl);
-        }, 3000);
+        }, 5000);
         
       } else {
         console.error('❌ No upload URL received from completed upload');
