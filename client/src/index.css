@@ -43,30 +43,75 @@ html,
 .bg-gray-700 { background-color: #f3f4f6 !important; }
 
 /* Enhanced text color overrides for better contrast */
-.text-white { color: #1f2937 !important; } /* Dark gray instead of pure black for better readability */
-.text-gray-100 { color: #374151 !important; }
-.text-gray-200 { color: #4b5563 !important; }  
-.text-gray-300 { color: #6b7280 !important; }
-.text-gray-400 { color: #9ca3af !important; }
-.text-gray-500 { color: #6b7280 !important; }
+.text-white { color: #111827 !important; } /* Darker for maximum contrast */
+.text-gray-100 { color: #1f2937 !important; } /* Much darker */
+.text-gray-200 { color: #374151 !important; } /* Darker */
+.text-gray-300 { color: #4b5563 !important; } /* Darker gray */
+.text-gray-400 { color: #6b7280 !important; } /* Medium gray */
+.text-gray-500 { color: #4b5563 !important; } /* Darker */
 .border-gray-700 { border-color: #e5e7eb !important; }
 .border-gray-800 { border-color: #d1d5db !important; }
 
+/* Fix remaining light text colors */
+.text-gray-100.font-light, .text-gray-200, .text-gray-300 { 
+  color: #374151 !important; 
+}
+
+/* Navigation button border removal */
+nav button, .bottom-navigation button, [role="tablist"] button {
+  border: none !important;
+}
+
+/* Remove all button borders in navigation contexts */
+.fixed.bottom-0 button, 
+button[class*="nav"], 
+button[data-tab],
+button[aria-selected],
+button[data-testid*="nav-"] {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Specific navigation button styling */
+[data-testid="navigation-tabs"] button {
+  border: none !important;
+  background-color: transparent !important;
+}
+
+/* Fix navigation text colors */
+.text-yellow-400 { 
+  color: #ca8a04 !important; /* Much darker yellow/amber for visibility */
+}
+.active\:bg-yellow-400\/20:active,
+.bg-yellow-400\/20 { 
+  background-color: rgba(202, 138, 4, 0.15) !important; 
+}
+
 /* Light theme colored text overrides for better visibility */
-.text-sky-300 { color: #0284c7 !important; } /* Darker sky blue for contrast */
-.text-sky-200 { color: #0369a1 !important; } /* Even darker on hover */
-.text-cyan-300 { color: #0891b2 !important; } /* Darker cyan */
+.text-sky-300 { color: #0c4a6e !important; } /* Much darker sky blue */
+.text-sky-200 { color: #075985 !important; } /* Very dark blue */
+.text-cyan-300 { color: #155e75 !important; } /* Very dark cyan */
 .text-cyan-400 { color: #0e7490 !important; } /* Strong cyan for good contrast */
-.text-orange-400 { color: #ea580c !important; } /* Strong orange */
+.text-orange-400 { color: #c2410c !important; } /* Darker orange */
 .text-red-400 { color: #dc2626 !important; } /* Strong red */
-.text-red-300 { color: #ef4444 !important; } /* Visible red */
-.text-green-400 { color: #16a34a !important; } /* Strong green */
-.text-blue-400 { color: #2563eb !important; } /* Strong blue */
+.text-red-300 { color: #dc2626 !important; } /* Strong red instead of light */
+.text-green-400 { color: #15803d !important; } /* Darker green */
+.text-blue-400 { color: #1d4ed8 !important; } /* Darker blue */
+
+/* Additional light color fixes */
+.text-emerald-500 { color: #059669 !important; }
+.text-yellow-400 { color: #d97706 !important; } /* Amber instead of yellow */
+.text-purple-400 { color: #7c3aed !important; }
 
 /* Semi-transparent text color fixes */
-.text-white\/70 { color: #4b5563 !important; } /* Medium gray */
-.text-white\/80 { color: #374151 !important; } /* Darker gray */
-.text-white\/90 { color: #1f2937 !important; } /* Very dark gray */
+.text-white\/70 { color: #374151 !important; } /* Darker gray */
+.text-white\/80 { color: #1f2937 !important; } /* Very dark gray */
+.text-white\/90 { color: #111827 !important; } /* Nearly black */
+
+/* Fix any remaining light colors in UI elements */
+.text-gray-200.font-light { color: #374151 !important; }
+.text-gray-100.opacity-95 { color: #1f2937 !important; }
+.opacity-95 { opacity: 1 !important; } /* Remove opacity that reduces contrast */
 
 /* Progress bar and UI element fixes */
 .bg-gray-800 { background-color: #e5e7eb !important; } /* Light gray for progress bars */
@@ -145,6 +190,17 @@ button:hover:not(.bg-orange-500):not([class*="bg-gradient"]):not(.bg-cyan-):not(
 .text-white.font-semibold { 
   color: #1f2937 !important; 
   font-weight: 600 !important;
+}
+
+/* Fix small text visibility */
+.text-\[9px\] { 
+  color: #374151 !important; 
+  font-weight: 500 !important;
+}
+
+/* Hover state text fixes */
+.hover\:text-white:hover { 
+  color: #111827 !important; 
 }
 
 /* Placeholder and input text fixes */
