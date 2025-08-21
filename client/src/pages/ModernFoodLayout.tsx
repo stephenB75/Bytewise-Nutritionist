@@ -1059,13 +1059,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <Icon className={`w-5 h-5 text-${color}-600`} />
             </div>
             <div>
-              <h3 className="text-gray-900 font-semibold">{title}</h3>
-              <p className="text-gray-600 text-sm">{value}/{goal}</p>
+              <h3 className="text-black font-semibold">{title}</h3>
+              <p className="text-black text-sm">{value}/{goal}</p>
             </div>
           </div>
           <div className="text-right">
             <div className={`text-2xl font-bold text-${color}-600`}>{progressWidth}%</div>
-            <div className="text-xs text-gray-600">of goal</div>
+            <div className="text-xs text-black">of goal</div>
           </div>
         </div>
         <div className="relative h-3 bg-gray-300 rounded-full overflow-hidden mb-4">
@@ -1096,16 +1096,16 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
             <div className={`p-3 rounded-xl transition-all duration-300 ${isGoalReached ? 'bg-gradient-to-br from-cyan-400 to-blue-500' : 'bg-cyan-500/20'}`}>
-              <Droplets className={`w-6 h-6 transition-colors duration-300 ${isGoalReached ? 'text-white' : 'text-cyan-600'}`} />
+              <Droplets className={`w-6 h-6 transition-colors duration-300 ${isGoalReached ? 'text-black' : 'text-cyan-600'}`} />
             </div>
             <div>
-              <h3 className="text-gray-900 font-semibold text-lg">Water Intake</h3>
-              <p className="text-gray-600 text-sm">{glasses}/{dailyGoal} glasses today</p>
+              <h3 className="text-black font-semibold text-lg">Water Intake</h3>
+              <p className="text-black text-sm">{glasses}/{dailyGoal} glasses today</p>
             </div>
           </div>
           <div className="text-right">
-            <div className="text-2xl font-bold text-cyan-600">{Math.round(percentage)}%</div>
-            <div className="text-xs text-gray-600">of goal</div>
+            <div className="text-2xl font-bold text-black">{Math.round(percentage)}%</div>
+            <div className="text-xs text-black">of goal</div>
           </div>
         </div>
         
@@ -1186,7 +1186,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
     // Determine text color based on remaining value
     const textColor = isNegative ? 'text-red-600' : `text-${color}-600`;
-    const labelColor = isNegative ? 'text-red-500' : 'text-gray-700';
+    const labelColor = isNegative ? 'text-red-500' : 'text-black';
 
     return (
       <Card className="bg-gray-50 border-gray-200 p-4 transition-all duration-300 hover:bg-gray-100 hover:border-gray-300 border-2 shadow-sm">
@@ -1207,7 +1207,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               />
             ))}
           </div>
-          <div className="text-xs text-gray-600 mt-1">
+          <div className="text-xs text-black mt-1">
             {value}g / {goal}g
           </div>
         </div>
@@ -1247,7 +1247,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     <Card className="bg-gray-50 border-gray-200 p-3 border-2 shadow-sm">
       <div className="flex items-center justify-between mb-2">
         <div className={`text-sm font-semibold ${textColor}`}>{name}</div>
-        <div className="text-xs text-gray-900 font-bold">{displayValue}{unit} / {goal}{unit}</div>
+        <div className="text-xs text-black font-bold">{displayValue}{unit} / {goal}{unit}</div>
       </div>
       <div className="relative h-2 bg-gray-300 rounded-full overflow-hidden">
         <div 
@@ -1255,7 +1255,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           style={{ width: `${percentage}%` }} 
         />
       </div>
-      <div className="text-xs text-gray-900 font-semibold mt-1">{percentage}% Daily Value</div>
+      <div className="text-xs text-black font-semibold mt-1">{percentage}% Daily Value</div>
     </Card>
     );
   };
