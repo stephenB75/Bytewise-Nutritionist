@@ -157,6 +157,37 @@ h1.text-white { color: #111827 !important; }
 p.text-gray-100 { color: #1f2937 !important; }
 p.text-gray-200 { color: #374151 !important; }
 
+/* Comprehensive hero component text fixes */
+.text-white.drop-shadow-2xl,
+.text-white.drop-shadow-xl { 
+  color: #111827 !important; 
+}
+
+.text-gray-100.font-light,
+.text-gray-200.font-light { 
+  color: #1f2937 !important; 
+}
+
+/* Hero section container text overrides */
+.absolute.inset-0.flex.flex-col .text-white,
+.hero-component .text-white,
+[data-hero="true"] .text-white { 
+  color: #111827 !important; 
+}
+
+/* Hero description text fixes */
+.text-xl.text-gray-100,
+.text-2xl.text-gray-100,
+.text-xl.text-gray-200,
+.text-2xl.text-gray-200 { 
+  color: #1f2937 !important; 
+}
+
+/* Scroll indicator text */
+.text-white\/70.z-30 { 
+  color: #4b5563 !important; 
+}
+
 /* Metrics cards drop shadows like profile page */
 .bg-white\/10.backdrop-blur-md,
 .bg-white\/15,
@@ -172,6 +203,21 @@ span.text-white { color: #111827 !important; }
 div.text-white { color: #111827 !important; }
 h1.text-white, h2.text-white, h3.text-white, h4.text-white { color: #111827 !important; }
 p.text-white { color: #111827 !important; }
+
+/* Button text in hero sections */
+.bg-gradient-to-r .text-white,
+.btn-hero-enhanced .text-white,
+button .text-white { 
+  color: #ffffff !important; /* Keep white for buttons with colored backgrounds */
+}
+
+/* Override for actual button content - keep white on colored buttons */
+button.bg-gradient-to-r .text-white,
+button[class*="bg-gradient"] .text-white,
+button.bg-orange-500 .text-white,
+button.bg-red-500 .text-white { 
+  color: #ffffff !important; 
+}
 
 /* Achievement and goal section text fixes */
 .text-white.font-semibold.text-xl { color: #111827 !important; }
