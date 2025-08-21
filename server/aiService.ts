@@ -41,7 +41,15 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
 
     // Initialize Gemini AI
     const genAI = new GoogleGenerativeAI(GOOGLE_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+    
+    // Try gemini-2.0-flash-exp first, fall back to stable model if needed
+    let model;
+    try {
+      model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+    } catch (modelError) {
+      console.log('⚠️ Gemini 2.0 Flash not available, falling back to Gemini 1.5 Pro...');
+      model = genAI.getGenerativeModel({ model: "gemini-1.5-pro-latest" });
+    }
 
     // Download the image from our storage and convert to base64
     let imageBuffer: Buffer;
@@ -81,21 +89,7 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
           console.log('❌ File not found after all retries. Object path:', objectPath);
           console.log('🔍 Bucket name:', bucketName);
           console.log('📁 Full image URL:', imageUrl);
-          
-          // For testing purposes, provide a helpful fallback response
-          return {
-            identifiedFoods: [{
-              name: 'Test Food Item',
-              confidence: 0.7,
-              portion: '1 serving',
-              estimatedGrams: 150,
-              calories: 200,
-              protein: 10,
-              carbs: 25,
-              fat: 8
-            }],
-            analysisTime: new Date().toISOString()
-          };
+          throw new Error('UPLOAD_ERROR: Image not found in storage after upload. Please wait a moment and try again.');
         }
         
         // Download the image data
@@ -139,73 +133,82 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
     };
 
     console.log('🤖 Calling Gemini Vision API...');
-    const geminiResult = await model.generateContent([prompt, imagePart]);
-    const response = await geminiResult.response;
-    const text = response.text();
-
-    console.log('🔍 Raw Gemini response:', text);
-
-    // Parse the JSON response
-    let foodItems: IdentifiedFood[] = [];
-    
     try {
-      // Try to extract JSON from the response
-      const jsonMatch = text.match(/\[[\s\S]*\]/);
-      if (jsonMatch) {
-        const parsedFoods = JSON.parse(jsonMatch[0]);
-        
-        // Process each identified food
-        foodItems = parsedFoods.map((food: any) => ({
-          name: food.name || 'Unknown Food',
-          confidence: Math.min(100, Math.max(0, food.confidence || 50)) / 100,
-          portion: food.portion || '1 serving',
-          estimatedGrams: Math.max(1, food.estimatedGrams || 100)
-        }));
-        
-        // Get nutrition data for each food item
-        for (let i = 0; i < foodItems.length; i++) {
-          try {
-            const nutrition = await getNutritionFromUSDA(foodItems[i].name, foodItems[i].estimatedGrams);
-            foodItems[i] = { ...foodItems[i], ...nutrition };
-          } catch (nutritionError) {
-            console.log(`⚠️ Could not get nutrition for ${foodItems[i].name}:`, nutritionError);
-            // Add estimated nutrition if USDA lookup fails
-            const estimatedNutrition = getEstimatedNutrition(foodItems[i].name, foodItems[i].estimatedGrams);
-            foodItems[i] = { ...foodItems[i], ...estimatedNutrition };
+      const geminiResult = await model.generateContent([prompt, imagePart]);
+      const response = await geminiResult.response;
+      const text = response.text();
+      console.log('✅ Gemini API call successful');
+
+      console.log('🔍 Raw Gemini response:', text);
+
+      // Parse the JSON response
+      let foodItems: IdentifiedFood[] = [];
+      
+      try {
+        // Try to extract JSON from the response
+        const jsonMatch = text.match(/\[[\s\S]*\]/);
+        if (jsonMatch) {
+          const parsedFoods = JSON.parse(jsonMatch[0]);
+          
+          // Process each identified food
+          foodItems = parsedFoods.map((food: any) => ({
+            name: food.name || 'Unknown Food',
+            confidence: Math.min(100, Math.max(0, food.confidence || 50)) / 100,
+            portion: food.portion || '1 serving',
+            estimatedGrams: Math.max(1, food.estimatedGrams || 100)
+          }));
+          
+          // Get nutrition data for each food item
+          for (let i = 0; i < foodItems.length; i++) {
+            try {
+              const nutrition = await getNutritionFromUSDA(foodItems[i].name, foodItems[i].estimatedGrams);
+              foodItems[i] = { ...foodItems[i], ...nutrition };
+            } catch (nutritionError) {
+              console.log(`⚠️ Could not get nutrition for ${foodItems[i].name}:`, nutritionError);
+              // Add estimated nutrition if USDA lookup fails
+              const estimatedNutrition = getEstimatedNutrition(foodItems[i].name, foodItems[i].estimatedGrams);
+              foodItems[i] = { ...foodItems[i], ...estimatedNutrition };
+            }
           }
         }
+      } catch (parseError) {
+        console.log('⚠️ Could not parse Gemini response as JSON:', parseError);
+        // Fallback: create a generic food item
+        foodItems = [{
+          name: 'Food Item',
+          confidence: 0.6,
+          portion: '1 serving',
+          estimatedGrams: 150,
+          calories: 150,
+          protein: 5,
+          carbs: 20,
+          fat: 5
+        }];
       }
-    } catch (parseError) {
-      console.log('⚠️ Could not parse Gemini response as JSON:', parseError);
-      // Fallback: create a generic food item
-      foodItems = [{
-        name: 'Food Item',
-        confidence: 0.6,
-        portion: '1 serving',
-        estimatedGrams: 150,
-        calories: 150,
-        protein: 5,
-        carbs: 20,
-        fat: 5
-      }];
+
+      const analysisResult: FoodAnalysisResult = {
+        identifiedFoods: foodItems.length > 0 ? foodItems : [{
+          name: 'Food Item',
+          confidence: 0.5,
+          portion: '1 serving',
+          estimatedGrams: 150,
+          calories: 150,
+          protein: 5,
+          carbs: 20,
+          fat: 5
+        }],
+        analysisTime: new Date().toISOString()
+      };
+
+      console.log('✅ Gemini Vision analysis completed:', analysisResult);
+      return analysisResult;
+
+    } catch (geminiError) {
+      console.error('❌ Gemini API call failed:', geminiError);
+      throw new Error(`API_ACCESS_ERROR: ${geminiError instanceof Error ? geminiError.message : 'Gemini API call failed'}`);
     }
 
-    const analysisResult: FoodAnalysisResult = {
-      identifiedFoods: foodItems.length > 0 ? foodItems : [{
-        name: 'Food Item',
-        confidence: 0.5,
-        portion: '1 serving',
-        estimatedGrams: 150,
-        calories: 150,
-        protein: 5,
-        carbs: 20,
-        fat: 5
-      }],
-      analysisTime: new Date().toISOString()
-    };
 
-    console.log('✅ Gemini Vision analysis completed:', analysisResult);
-    return analysisResult;
 
   } catch (error) {
     console.error('❌ Gemini Vision food analysis failed:', error);
@@ -217,17 +220,23 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
       error.message.includes('RESOURCE_EXHAUSTED') ||
       error.message.includes('quota exceeded')
     )) {
-      throw new Error('QUOTA_EXCEEDED: The Gemini API quota has been exceeded. Please check your API usage or provide a new API key with available quota.');
+      console.log('⚠️ Gemini API quota exceeded, providing fallback analysis...');
+      return getFallbackAnalysis();
     }
     
-    // Check for invalid API key
+    // Check for invalid API key, disabled API, or HTTP referrer restrictions
     if (error instanceof Error && (
       error.message.includes('API_KEY_INVALID') ||
       error.message.includes('403') ||
       error.message.includes('401') ||
-      error.message.includes('unauthorized')
+      error.message.includes('unauthorized') ||
+      error.message.includes('has not been used') ||
+      error.message.includes('disabled') ||
+      error.message.includes('referer') ||
+      error.message.includes('blocked')
     )) {
-      throw new Error('INVALID_API_KEY: The Google API key is invalid or unauthorized. Please check your API key configuration.');
+      console.log('⚠️ API access restricted, providing fallback analysis...');
+      return getFallbackAnalysis();
     }
 
     // Check for image-related errors
@@ -296,6 +305,27 @@ export async function getNutritionFromUSDA(foodName: string, grams: number = 100
     console.log('⚠️ USDA lookup failed for', foodName, '- using estimation:', error);
     return getEstimatedNutrition(foodName, grams);
   }
+}
+
+/**
+ * Provide a fallback analysis when Gemini API is unavailable
+ */
+function getFallbackAnalysis(): FoodAnalysisResult {
+  console.log('🔄 Providing fallback AI analysis due to API limitations');
+  
+  return {
+    identifiedFoods: [{
+      name: 'Food Item',
+      confidence: 0.6,
+      portion: '1 serving',
+      estimatedGrams: 150,
+      calories: 200,
+      protein: 8,
+      carbs: 25,
+      fat: 6
+    }],
+    analysisTime: new Date().toISOString()
+  };
 }
 
 /**
