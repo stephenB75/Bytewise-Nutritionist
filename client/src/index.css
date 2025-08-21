@@ -2763,7 +2763,7 @@ select {
   position: absolute;
   inset: 0;
   z-index: 12;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.15) 0%, transparent 60%);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.1) 50%, transparent 80%);
 }
 
 /* Hero Content Layout - Three-Column Standard */
