@@ -14,7 +14,7 @@ button[data-testid^="nav-"],
   align-items: center !important;
   justify-content: center !important;
   cursor: pointer !important;
-  padding: 0.5rem 0.25rem !important;
+  padding: 0.625rem 0.25rem !important;
   min-width: 60px !important;
   flex: 1 !important;
   transition: all 300ms ease-out !important;
