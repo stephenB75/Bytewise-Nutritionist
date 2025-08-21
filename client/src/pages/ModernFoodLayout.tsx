@@ -1267,7 +1267,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           key={`home-bg-${animationKey}`}
           className="absolute inset-0 bg-cover bg-center z-10 hero-bg-slide"
           style={{
-            backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${backgroundImage}')`
+            backgroundImage: `linear-gradient(135deg, rgba(251, 191, 36, 0.3), rgba(255, 255, 255, 0.8)), url('${backgroundImage}')`
           }}
         />
         

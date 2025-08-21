@@ -31,7 +31,8 @@
 /* Override dark theme with gradient background */
 body,
 html,
-#root {
+#root,
+.min-h-screen:not([class*="bg-gradient"]) {
   background: linear-gradient(to top, #fbbf24 0%, #ffffff 100%) !important;
   background-attachment: fixed !important;
   color: rgb(var(--foreground)) !important;
@@ -46,11 +47,18 @@ html,
   background: inherit !important;
 }
 
-/* Light theme overrides for page backgrounds only */
+/* Override ANY dark backgrounds with gradient */
+.bg-black:not(.bg-black\/80):not(.bg-black\/50),
+.bg-gray-900,
+.bg-gray-800:not(.bg-gray-800\/50),
+.bg-gray-700,
 .min-h-screen.bg-black,
 .min-h-screen.bg-gray-900,
 .min-h-screen.bg-gray-800,
-.min-h-screen.bg-gray-700 {
+.min-h-screen.bg-gray-700,
+div[class*="bg-black"]:not([class*="bg-black/"]):not([class*="backdrop"]),
+div[class*="bg-gray-900"]:not([class*="bg-gray-900/"]):not([class*="backdrop"]),
+div[class*="bg-gray-800"]:not([class*="bg-gray-800/"]):not([class*="backdrop"]) {
   background: linear-gradient(to top, #fbbf24 0%, #ffffff 100%) !important;
   background-attachment: fixed !important;
 }
@@ -872,18 +880,28 @@ button.text-blue-400 {
 }
 
 /* Global gradient background ensures dark text for readability */
-body *:not([class*="text-"]):not([class*="bg-"]) {
+body *:not([class*="text-"]):not([class*="bg-"]):not(.text-white):not([class*="text-cyan"]):not([class*="text-orange"]):not([class*="text-red"]):not([class*="text-blue"]):not([class*="text-green"]) {
   color: #1f2937 !important;
 }
 
 /* Ensure specific text elements are dark on gradient background */
-body h1:not([class*="text-"]),
-body h2:not([class*="text-"]),
-body h3:not([class*="text-"]),
-body p:not([class*="text-"]),
-body span:not([class*="text-"]),
-body div:not([class*="text-"]) {
+body h1:not([class*="text-"]):not(.text-white),
+body h2:not([class*="text-"]):not(.text-white),
+body h3:not([class*="text-"]):not(.text-white),
+body p:not([class*="text-"]):not(.text-white),
+body span:not([class*="text-"]):not(.text-white),
+body div:not([class*="text-"]):not(.text-white) {
   color: #1f2937 !important;
+}
+
+/* Force gradient background on main container elements */
+.min-h-screen,
+.h-screen,
+main,
+div[class*="min-h-screen"],
+[data-page],
+.page-container {
+  background: inherit !important;
 }
 
 /* ========== COMPLETE NAVIGATION AND NOTIFICATION ICON FRAME REMOVAL ========== */

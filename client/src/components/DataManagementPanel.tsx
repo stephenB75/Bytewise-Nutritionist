@@ -110,7 +110,7 @@ export function DataManagementPanel() {
   };
 
   return (
-    <div className="bg-black min-h-screen px-6 py-3">
+    <div className="min-h-screen px-6 py-3">
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
