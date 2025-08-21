@@ -2796,7 +2796,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               >
                 <IconComponent 
                   size={28} 
-                  className={`mb-1 transition-all duration-300 ease-out transform ${
+                  className={`mb-2 transition-all duration-300 ease-out transform ${
                     activeTab === tab.id 
                       ? 'scale-110 drop-shadow-lg text-yellow-600' 
                       : 'scale-100 hover:scale-105 active:scale-125 active:text-white'
@@ -2805,7 +2805,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 />
                 <span className={`text-[10px] font-semibold leading-tight text-center w-full transition-all duration-300 ease-out ${
                   activeTab === tab.id 
-                    ? 'text-yellow-600 transform scale-105' 
+                    ? 'text-white transform scale-105 drop-shadow-md' 
                     : 'text-gray-600 hover:text-gray-800 active:text-white'
                 }`}>{tab.label}</span>
               </button>
