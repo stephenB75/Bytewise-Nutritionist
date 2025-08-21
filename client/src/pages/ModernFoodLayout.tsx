@@ -937,7 +937,18 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   };
 
   // Optimized Hero Section Component with enhanced performance and visuals
-  const HeroSection = React.memo(({ title, subtitle, description, buttonText, onButtonClick }: {
+  const HeroSection = ({ title, subtitle, description, buttonText, onButtonClick }: {
+    title: string;
+    subtitle: string; 
+    description: string;
+    buttonText: string;
+    onButtonClick: () => void;
+  }) => {
+    return <div>Hero Section Placeholder</div>;
+  };
+  
+  /*
+  const HeroSectionOriginal = ({ title, subtitle, description, buttonText, onButtonClick }: {
     title: string;
     subtitle: string; 
     description: string;
@@ -981,7 +992,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         />
         
         {/* Enhanced Pattern Overlay */
-        <>
+        <div>
           <div className="absolute inset-0 z-10 opacity-20">
             <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 via-transparent to-red-500/10" />
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_70%,rgba(251,146,60,0.15),transparent_50%)]" />
@@ -1030,18 +1041,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <ChevronRight className="w-6 h-6 rotate-90 drop-shadow-lg" />
             </div>
           </div>
-        </>
+        </div>
       </div>
     );
-  }, (prevProps, nextProps) => {
-    // Custom comparison for better performance - include activeTab for overlay changes
-    return (
-      prevProps.title === nextProps.title &&
-      prevProps.subtitle === nextProps.subtitle &&
-      prevProps.description === nextProps.description &&
-      prevProps.buttonText === nextProps.buttonText
-    );
-  });
+  };
+  */
 
   // Optimized ByteWise Logo Component
   const BytewiseLogo = React.memo(() => (
