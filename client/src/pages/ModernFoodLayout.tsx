@@ -2829,7 +2829,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         <div className="fixed bottom-20 right-6 z-50">
           <TourLauncher
             onStartTour={() => {
-              console.log('Tour functionality will be implemented');
+              console.log('Starting ByteWise tour...');
+              // Mark tour as started
+              localStorage.setItem('tour-started', 'true');
             }}
             isVisible={shouldShowTour()}
           />

@@ -67,16 +67,80 @@ const TOUR_FEATURES = [
 
 export function TourLauncher({ onStartTour, isVisible = true }: TourLauncherProps) {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [isTourRunning, setIsTourRunning] = useState(false);
+  const [tourStep, setTourStep] = useState(0);
 
   if (!isVisible) return null;
 
   const handleStartTour = () => {
     setIsPreviewOpen(false);
+    setIsTourRunning(true);
+    setTourStep(0);
     onStartTour();
+    
+    // Start the tour sequence
+    startTourSequence();
+  };
+
+  const startTourSequence = () => {
+    // Show welcome message and guide through features
+    setTimeout(() => {
+      setTourStep(1);
+      showTourMessage("Welcome to ByteWise! 🎯", "Let's explore the key features that will help you track nutrition and build healthy habits.");
+      
+      // Guide through dashboard features
+      setTimeout(() => {
+        setTourStep(2);
+        showTourMessage("Dashboard Overview 📊", "Here you can see your daily progress, calories consumed, and track your wellness goals.");
+        
+        setTimeout(() => {
+          setTourStep(3);
+          showTourMessage("Navigation Tabs 🔄", "Use the bottom navigation to access Calorie Tracker, Fasting Timer, Meal Journal, and Profile settings.");
+          
+          setTimeout(() => {
+            setTourStep(4);
+            showTourMessage("Tour Complete! 🎉", "You're all set! Explore the app and start tracking your nutrition journey. The tour button will disappear once you're familiar with the features.");
+            
+            // Mark tour as completed after a delay
+            setTimeout(() => {
+              setIsTourRunning(false);
+              localStorage.setItem('bytewise-tour-completed', 'true');
+            }, 3000);
+          }, 3000);
+        }, 3000);
+      }, 3000);
+    }, 500);
+  };
+
+  const showTourMessage = (title: string, message: string) => {
+    // Create a custom tour tooltip
+    const tourTooltip = document.createElement('div');
+    tourTooltip.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white p-4 rounded-lg shadow-lg z-[9999] max-w-sm mx-4';
+    tourTooltip.innerHTML = `
+      <div class="font-bold text-lg mb-2">${title}</div>
+      <div class="text-sm">${message}</div>
+      <div class="mt-3 text-xs opacity-75">Tour step ${tourStep} of 4</div>
+    `;
+    
+    document.body.appendChild(tourTooltip);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+      if (document.body.contains(tourTooltip)) {
+        document.body.removeChild(tourTooltip);
+      }
+    }, 2800);
   };
 
   return (
     <>
+      {/* Tour Running Indicator */}
+      {isTourRunning && (
+        <div className="fixed top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded-full text-xs z-[9998]">
+          Tour in Progress... Step {tourStep}/4
+        </div>
+      )}
+      
       {/* Tour Preview Dialog */}
       <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
         <DialogTrigger asChild>
