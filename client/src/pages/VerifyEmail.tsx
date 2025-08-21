@@ -68,16 +68,16 @@ export default function VerifyEmail() {
   }, [supabase, setLocation]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-gray-900 via-black to-gray-900">
-      <Card className="max-w-md w-full bg-white/10 backdrop-blur-md border-white/20 p-8">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-t from-yellow-400 to-white">
+      <Card className="max-w-md w-full bg-white/80 backdrop-blur-md border-gray-200 p-8">
         <div className="text-center space-y-6">
           {verificationStatus === 'verifying' && (
             <>
               <div className="p-4 bg-blue-500/20 rounded-full inline-block">
                 <Loader2 className="w-12 h-12 text-blue-400 animate-spin" />
               </div>
-              <h2 className="text-2xl font-bold text-white">Verifying Your Email</h2>
-              <p className="text-gray-300">Please wait while we verify your email address...</p>
+              <h2 className="text-2xl font-bold text-gray-800">Verifying Your Email</h2>
+              <p className="text-gray-600">Please wait while we verify your email address...</p>
             </>
           )}
           
@@ -86,8 +86,8 @@ export default function VerifyEmail() {
               <div className="p-4 bg-green-500/20 rounded-full inline-block">
                 <CheckCircle className="w-12 h-12 text-green-400" />
               </div>
-              <h2 className="text-2xl font-bold text-white">Email Verified!</h2>
-              <p className="text-gray-300">{message}</p>
+              <h2 className="text-2xl font-bold text-gray-800">Email Verified!</h2>
+              <p className="text-gray-600">{message}</p>
               <Button
                 onClick={() => setLocation('/')}
                 className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
@@ -102,8 +102,8 @@ export default function VerifyEmail() {
               <div className="p-4 bg-red-500/20 rounded-full inline-block">
                 <XCircle className="w-12 h-12 text-red-400" />
               </div>
-              <h2 className="text-2xl font-bold text-white">Verification Failed</h2>
-              <p className="text-gray-300">{message}</p>
+              <h2 className="text-2xl font-bold text-gray-800">Verification Failed</h2>
+              <p className="text-gray-600">{message}</p>
               <div className="space-y-3">
                 <Button
                   onClick={() => setLocation('/')}
@@ -111,7 +111,7 @@ export default function VerifyEmail() {
                 >
                   Go to Home
                 </Button>
-                <p className="text-sm text-gray-400">
+                <p className="text-sm text-gray-500">
                   <Mail className="w-4 h-4 inline mr-1" />
                   Need a new verification email? Sign in and request a new one from your profile.
                 </p>

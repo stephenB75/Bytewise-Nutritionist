@@ -286,14 +286,15 @@ export default function AIFoodAnalyzer() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6" data-testid="page-ai-food-analyzer">
+    <div className="min-h-screen bg-gradient-to-t from-yellow-400 to-white">
+      <div className="max-w-4xl mx-auto space-y-6 p-6" data-testid="page-ai-food-analyzer">
       {/* Header */}
       <div className="text-center space-y-2">
         <div className="flex items-center justify-center gap-2 mb-2">
           <Sparkles className="h-6 w-6 text-blue-500" />
-          <h2 className="text-2xl font-bold text-white">AI Food Analyzer</h2>
+          <h2 className="text-2xl font-bold text-gray-800">AI Food Analyzer</h2>
         </div>
-        <p className="text-gray-400 max-w-2xl mx-auto">
+        <p className="text-gray-600 max-w-2xl mx-auto">
           Take a photo of your food and let AI identify ingredients and calculate nutrition information using the USDA database
         </p>
       </div>
@@ -515,6 +516,7 @@ export default function AIFoodAnalyzer() {
           </Card>
         </div>
       )}
+      </div>
     </div>
   );
 }
