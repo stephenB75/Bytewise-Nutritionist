@@ -583,7 +583,7 @@ button:hover:not(.bg-orange-500):not([class*="bg-gradient"]):not(.bg-cyan-):not(
 
 /* Removed - consolidated into master reset above */
 
-/* Navigation icon and text reset */
+/* Navigation icon and text reset - exclude bottom margin to allow spacing classes */
 button[data-testid*="nav-"] svg,
 button[data-testid^="nav-"] svg,
 button[data-testid*="nav-"] .lucide,
@@ -592,7 +592,9 @@ button[data-testid^="nav-"] .lucide {
   border: 0 !important;
   outline: 0 !important;
   box-shadow: none !important;
-  margin: 0 !important;
+  margin-top: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
   padding: 0 !important;
 }
 
