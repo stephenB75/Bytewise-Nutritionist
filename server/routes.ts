@@ -1089,9 +1089,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // AI food analysis endpoint
   app.post('/api/ai/analyze-food', async (req: Request, res: Response) => {
     try {
+      console.log('🤖 AI Food Analysis request received');
       const { imageUrl } = req.body;
       
       if (!imageUrl) {
+        console.log('❌ AI Analysis failed: No image URL provided');
         return res.status(400).json({ error: 'Image URL is required' });
       }
 
@@ -1123,7 +1125,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Step 1: Analyze image with AI to identify foods
+      console.log('🔬 Starting AI image analysis with URL:', processableImageUrl);
+      
+      // Add validation for empty analysis results
       const aiResult = await analyzeFoodImage(processableImageUrl);
+      console.log('🔬 AI analysis result:', { 
+        success: true, 
+        foodsFound: aiResult.identifiedFoods?.length || 0,
+        analysisTime: aiResult.analysisTime 
+      });
+
+      // Handle case where no foods are identified
+      if (!aiResult.identifiedFoods || aiResult.identifiedFoods.length === 0) {
+        console.log('⚠️ No foods identified in the image');
+        return res.json({
+          imageUrl,
+          identifiedFoods: [],
+          totalNutrition: { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0, sugar: 0, sodium: 0 },
+          analysisTime: aiResult.analysisTime,
+          message: "No food items were detected in this image. Please try a different photo with clear food items."
+        });
+      }
       
       // Step 2: Get nutrition data for each identified food
       const identifiedFoods = [];
@@ -1188,8 +1210,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json(result);
     } catch (error: any) {
-      console.error('❌ Food analysis failed:', error);
-      res.status(500).json({ error: error.message || 'Food analysis failed' });
+      console.error('❌ Food analysis failed with detailed error:');
+      console.error('Error name:', error.name);
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+      console.error('Full error object:', error);
+      
+      // Send a more detailed error response
+      const errorMessage = error.message || 'Food analysis failed';
+      res.status(500).json({ 
+        error: errorMessage,
+        details: 'Please check the server logs for more information'
+      });
     }
   });
 
