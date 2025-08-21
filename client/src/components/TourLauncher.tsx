@@ -10,8 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import Joyride, { CallBackProps, STATUS, Step, Styles } from 'react-joyride';
 
-// Test react-joyride import
-console.log('🔍 React Joyride imported:', !!Joyride);
+
 import { 
   Play, 
   Sparkles, 
@@ -76,36 +75,66 @@ const TOUR_FEATURES = [
   }
 ];
 
-// Tour Steps Configuration
+// Tour Steps Configuration - Comprehensive App Walkthrough
 const TOUR_STEPS: Step[] = [
   {
     target: 'body',
     title: '🎉 Welcome to ByteWise Nutritionist!',
-    content: 'Let\'s take a quick tour of your new nutrition tracking companion. This will help you discover all the powerful features available.',
+    content: 'Let\'s explore all the powerful features of your nutrition tracking companion. This tour will show you how to track food, monitor health metrics, and achieve your goals.',
     placement: 'center',
   },
   {
     target: '[data-testid="daily-progress"]',
     title: '📊 Daily Progress Dashboard',
-    content: 'Track your daily calorie intake, macronutrients, and see real-time progress toward your goals.',
+    content: 'Your home base shows daily calorie intake, meals logged, remaining calories, and completion percentage. Track your progress at a glance.',
     placement: 'bottom',
   },
   {
     target: '[data-testid="water-consumption-card"]',
     title: '💧 Hydration Tracking',
-    content: 'Monitor your water intake with beautiful visual indicators and daily hydration goals.',
+    content: 'Click the water glasses to log your daily hydration. The visual indicator fills up as you reach your daily water goal.',
+    placement: 'top',
+  },
+  {
+    target: '[data-testid="navigation-tabs"]',
+    title: '🧭 Navigation Menu',
+    content: 'Use the bottom navigation to access: Dashboard, Calorie Tracker (food search), Fasting Timer, Meal Journal, and Profile settings.',
     placement: 'top',
   },
   {
     target: 'body',
-    title: '🏆 Achievement System',
-    content: 'As you use the app, you\'ll unlock rewards and badges for hitting nutrition goals and building healthy habits.',
+    title: '🍎 Food Tracking Features',
+    content: 'In the Calorie Tracker section, you can: search 300,000+ USDA foods, get AI photo analysis, calculate precise nutrition with FDA serving sizes.',
     placement: 'center',
   },
   {
     target: 'body',
-    title: '🎯 That\'s It!',
-    content: 'You\'re ready to start your nutrition journey! Explore the different sections using the bottom navigation to track food, monitor fasting, and achieve your health goals.',
+    title: '⏰ Fasting Timer',
+    content: 'Track intermittent fasting sessions with real-time timers, view fasting history, and celebrate achievements when you complete fasting goals.',
+    placement: 'center',
+  },
+  {
+    target: 'body',
+    title: '📔 Meal Journal',
+    content: 'Browse your complete meal history, search past entries, filter by date, and review your nutrition patterns over time.',
+    placement: 'center',
+  },
+  {
+    target: 'body',
+    title: '⚙️ Profile & Goals',
+    content: 'Customize your daily calorie goals, update personal information, manage account settings, and view detailed nutrition analytics.',
+    placement: 'center',
+  },
+  {
+    target: 'body',
+    title: '🏆 Achievement System',
+    content: 'Unlock badges and rewards as you: log meals consistently, hit calorie goals, complete fasting sessions, and build healthy habits.',
+    placement: 'center',
+  },
+  {
+    target: 'body',
+    title: '🎯 You\'re Ready!',
+    content: 'Start tracking by clicking "Track Food" or use the navigation menu to explore. Your nutrition journey begins now!',
     placement: 'center',
   }
 ];
@@ -203,13 +232,10 @@ export function AppTour({ isOpen, onClose, onComplete }: AppTourProps) {
   const [stepIndex, setStepIndex] = useState(0);
 
   useEffect(() => {
-    console.log('🎯 AppTour useEffect - isOpen:', isOpen);
     if (isOpen) {
-      console.log('✅ Tour is opening - setting run to true');
       setRun(true);
       setStepIndex(0);
     } else {
-      console.log('❌ Tour is closing - setting run to false');
       setRun(false);
     }
   }, [isOpen]);
@@ -217,8 +243,6 @@ export function AppTour({ isOpen, onClose, onComplete }: AppTourProps) {
   const handleJoyrideCallback = (data: CallBackProps) => {
     const { status, type, index, action } = data;
     const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
-
-    console.log('Tour callback:', { status, type, index, action });
 
     if (finishedStatuses.includes(status)) {
       localStorage.setItem('bytewise-tour-completed', 'true');
@@ -233,8 +257,7 @@ export function AppTour({ isOpen, onClose, onComplete }: AppTourProps) {
     }
   };
 
-  console.log('🎯 Joyride render - run:', run, 'stepIndex:', stepIndex, 'steps length:', TOUR_STEPS.length);
-  console.log('🎯 First step target:', TOUR_STEPS[0]?.target);
+
   
   return (
     <Joyride
@@ -266,8 +289,6 @@ export function useAppTour() {
   const [isTourOpen, setIsTourOpen] = useState(false);
 
   const startTour = () => {
-    console.log('🚀 Starting tour - isTourOpen will be set to true');
-    console.log('🔍 Current isTourOpen state:', isTourOpen);
     setIsTourOpen(true);
   };
 
@@ -310,19 +331,6 @@ export function TourLauncher({ onStartTour, isVisible = true }: TourLauncherProp
 
   return (
     <>
-      {/* Floating Tour Button */}
-      <div className="fixed bottom-20 right-4 z-50 md:bottom-6 md:right-6">
-        <Button
-          onClick={onStartTour}
-          className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-lg rounded-full h-12 w-12 p-0 transition-all duration-200 hover:scale-105"
-          data-testid="floating-tour-button"
-        >
-          <Play className="w-5 h-5" />
-        </Button>
-        <div className="absolute -top-8 -left-16 bg-black/80 text-white text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 hover:opacity-100 transition-opacity">
-          Start App Tour
-        </div>
-      </div>
 
       {/* Tour Preview Dialog */}
       <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
@@ -435,10 +443,7 @@ export function WelcomeBanner({ onStartTour, onDismiss }: { onStartTour: () => v
             </p>
             <div className="flex flex-wrap gap-2">
               <Button
-                onClick={() => {
-                  console.log('🎯 Welcome banner tour button clicked');
-                  onStartTour();
-                }}
+                onClick={onStartTour}
                 size="sm"
                 className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white"
               >
