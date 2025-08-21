@@ -172,6 +172,7 @@ export function FoodSearchWithHistory({
       {/* Search Input */}
       <div className="relative">
         <Input
+          data-testid="nutrition-food-search"
           value={searchQuery}
           onChange={(e) => handleSearch(e.target.value)}
           onFocus={() => setShowResults(false)}

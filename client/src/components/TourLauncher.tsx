@@ -110,7 +110,7 @@ const createTourSteps = (handleTabChange: (tab: string) => void): Step[] => [
     data: { action: 'navigate', tab: 'nutrition' }
   },
   {
-    target: '[data-testid="main-food-search"]',
+    target: '[data-testid="nutrition-food-search"]',
     title: '🔍 Smart Food Search',
     content: 'Search for any food here. The system recognizes brand names, provides autocomplete suggestions, and shows FDA-compliant serving sizes.',
     placement: 'bottom',
@@ -136,10 +136,10 @@ const createTourSteps = (handleTabChange: (tab: string) => void): Step[] => [
     data: { action: 'navigate', tab: 'daily' }
   },
   {
-    target: '[data-testid="meal-history"]',
+    target: '[data-testid="main-food-search"]',
     title: '📔 Meal History',
     content: 'Browse your complete meal history, search past entries, filter by date, and review your nutrition patterns over time.',
-    placement: 'top',
+    placement: 'bottom',
   },
   {
     target: '[data-testid="nav-profile"]',
@@ -292,7 +292,7 @@ export function AppTour({ isOpen, onClose, onComplete, onNavigate }: AppTourProp
         // Small delay to allow navigation to complete
         setTimeout(() => {
           setStepIndex(index + 1);
-        }, 500);
+        }, 1000);
       } else {
         setStepIndex(index + 1);
       }
