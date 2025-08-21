@@ -24,7 +24,7 @@ import { useGoalAchievements } from '@/hooks/useGoalAchievements';
 import { useRotatingBackground } from '@/hooks/useRotatingBackground';
 import { useAchievements, getAchievementIcon, formatAchievementDate } from '@/hooks/useAchievements';
 import { ProfileIcon } from '@/components/ProfileIcon';
-// Tour imports removed
+import { TourLauncher, useAppTour } from '@/components/TourLauncher';
 import { apiRequest } from '@/lib/queryClient';
 import { 
   Search, 
@@ -126,7 +126,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   // Profile completion state
   const [showProfileCompletion, setShowProfileCompletion] = useState(false);
   
-  // Tour functionality completely removed
+  // App tour state
+  const { shouldShowTour, dismissTour } = useAppTour();
+  const [showWelcomeBanner, setShowWelcomeBanner] = useState(() => shouldShowTour());
   
   // Nutrition aggregation state
   const [dailyMacros, setDailyMacros] = useState({ protein: 0, carbs: 0, fat: 0 });
@@ -625,7 +627,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   useEffect(() => {
     const handleAuthStateChange = () => {
       // Only trigger tour if user exists, hasn't completed tour, and this is a fresh auth
-      if (false) { // Tour functionality removed
+      if (user && shouldShowTour()) {
         // Set a flag to indicate fresh authentication
         const isFreshAuth = localStorage.getItem('fresh-auth-session') === 'true';
         
@@ -633,7 +635,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           // Clear the fresh auth flag
           localStorage.removeItem('fresh-auth-session');
           
-          // Tour functionality removed
+          // Show welcome banner instead of immediately starting tour
+          setShowWelcomeBanner(true);
+          
+          // Show welcome banner for user awareness
 
         }
       }
@@ -645,7 +650,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     return () => {
       window.removeEventListener('auth-state-change', handleAuthStateChange);
     };
-  }, [user]);
+  }, [user, shouldShowTour]);
 
   // Load existing meal data and set up tracking
   useEffect(() => {
@@ -1309,7 +1314,38 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       {/* Content Section - Completely Separate and Underneath */}
       <div className="px-6 py-3 bg-black content-section">
         <div className="space-y-3">
-          {/* Tour functionality completely removed */}
+          {/* Welcome Banner for Tour */}
+          {user && showWelcomeBanner && (
+            <div className="mb-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-2xl">🎯</span>
+                <h3 className="font-semibold text-lg">Welcome to ByteWise!</h3>
+              </div>
+              <p className="text-gray-600 dark:text-gray-300 text-sm mb-3">
+                Ready to discover all the amazing features? Take our interactive tour to learn how to track nutrition and build healthy habits.
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    setShowWelcomeBanner(false);
+                    // Future tour functionality
+                  }}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors"
+                >
+                  Take Tour
+                </button>
+                <button
+                  onClick={() => {
+                    setShowWelcomeBanner(false);
+                    dismissTour();
+                  }}
+                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-300 transition-colors"
+                >
+                  Maybe Later
+                </button>
+              </div>
+            </div>
+          )}
           
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-xl font-black text-white">Today's Progress</h2>
@@ -2788,7 +2824,17 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         onComplete={handleProfileCompletion}
       />
       
-      {/* Tour functionality completely removed */}
+      {/* Tour Launcher - Fixed position, available on all pages */}
+      {user && (
+        <div className="fixed bottom-20 right-6 z-50">
+          <TourLauncher
+            onStartTour={() => {
+              console.log('Tour functionality will be implemented');
+            }}
+            isVisible={shouldShowTour()}
+          />
+        </div>
+      )}
       
 
       
