@@ -230,10 +230,13 @@ export function AppTour({ isOpen, onClose, onComplete }: AppTourProps) {
   const [stepIndex, setStepIndex] = useState(0);
 
   useEffect(() => {
+    console.log('🎯 AppTour useEffect - isOpen:', isOpen);
     if (isOpen) {
+      console.log('✅ Tour is opening - setting run to true');
       setRun(true);
       setStepIndex(0);
     } else {
+      console.log('❌ Tour is closing - setting run to false');
       setRun(false);
     }
   }, [isOpen]);
@@ -287,6 +290,8 @@ export function useAppTour() {
   const [isTourOpen, setIsTourOpen] = useState(false);
 
   const startTour = () => {
+    console.log('🚀 Starting tour - isTourOpen will be set to true');
+    console.log('🔍 Current isTourOpen state:', isTourOpen);
     setIsTourOpen(true);
   };
 
@@ -454,7 +459,10 @@ export function WelcomeBanner({ onStartTour, onDismiss }: { onStartTour: () => v
             </p>
             <div className="flex flex-wrap gap-2">
               <Button
-                onClick={onStartTour}
+                onClick={() => {
+                  console.log('🎯 Welcome banner tour button clicked');
+                  onStartTour();
+                }}
                 size="sm"
                 className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white"
               >

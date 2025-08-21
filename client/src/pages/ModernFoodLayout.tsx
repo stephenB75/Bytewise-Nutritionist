@@ -1342,7 +1342,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   variant="ghost" 
                   size="sm"
                   className="text-blue-400 hover:text-blue-300"
-                  onClick={() => startTour()}
+                  onClick={() => {
+                    console.log('🎯 Manual tour button clicked');
+                    console.log('🔍 Current tour completion status:', localStorage.getItem('bytewise-tour-completed'));
+                    // Reset tour for testing
+                    localStorage.removeItem('bytewise-tour-completed');
+                    startTour();
+                  }}
                   data-testid="manual-tour-button"
                 >
                   Take Tour
