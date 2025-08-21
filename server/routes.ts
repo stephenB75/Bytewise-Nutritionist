@@ -1006,10 +1006,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // AI Food Analysis Routes
-  // Object storage upload endpoint
+  // Object storage upload endpoint (no authentication required for AI analysis)
   app.post('/api/objects/upload', async (req: Request, res: Response) => {
     try {
-      console.log('🔄 Upload URL request received');
+      console.log('🔄 Upload URL request received for AI Food Analysis');
       const objectStorageService = new ObjectStorageService();
       const uploadURL = await objectStorageService.getObjectEntityUploadURL();
       console.log('✅ Generated upload URL:', uploadURL ? 'URL Generated' : 'No URL');

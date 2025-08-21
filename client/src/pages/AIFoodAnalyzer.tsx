@@ -56,20 +56,28 @@ export default function AIFoodAnalyzer() {
   const { toast } = useToast();
   const { addCalculatedCalories } = useCalorieTracking();
 
-  // Get upload URL mutation
+  // Get upload URL mutation (works without authentication)
   const getUploadUrlMutation = useMutation({
     mutationFn: async () => {
       console.log('🔄 Making API request to /api/objects/upload...');
-      const response = await apiRequest('POST', '/api/objects/upload');
-      const data = await response.json();
-      console.log('📝 Upload URL API response:', data);
-      return data as { uploadURL: string };
+      try {
+        const response = await apiRequest('POST', '/api/objects/upload');
+        if (!response.ok) {
+          throw new Error(`Upload preparation failed: ${response.status} ${response.statusText}`);
+        }
+        const data = await response.json();
+        console.log('📝 Upload URL API response:', data);
+        return data as { uploadURL: string };
+      } catch (error: any) {
+        console.error('❌ Upload URL request failed:', error);
+        throw new Error(error.message || 'Failed to prepare file upload');
+      }
     },
     onError: (error: any) => {
       console.error('❌ Upload URL mutation failed:', error);
       toast({
         title: "Upload Error",
-        description: error.message || "Failed to prepare file upload",
+        description: "Unable to prepare image upload. Please try refreshing the page.",
         variant: "destructive",
       });
     }
@@ -78,9 +86,11 @@ export default function AIFoodAnalyzer() {
   // Analyze food image mutation
   const analyzeFoodMutation = useMutation({
     mutationFn: async (imageUrl: string) => {
+      console.log('🔬 Starting AI food analysis for image:', imageUrl);
       const response = await apiRequest('POST', '/api/ai/analyze-food', {
         imageUrl
       });
+      console.log('🔬 AI analysis response received:', response.status, response.statusText);
       return response as unknown as AnalysisResult;
     },
     onSuccess: (result) => {
@@ -124,10 +134,10 @@ export default function AIFoodAnalyzer() {
     }
   });
 
-  // Handle photo upload
+  // Handle photo upload (works without authentication)
   const handleGetUploadParameters = async () => {
     try {
-      console.log('🔄 Requesting upload URL...');
+      console.log('🔄 Requesting upload URL for AI Food Analysis...');
       const result = await getUploadUrlMutation.mutateAsync();
       console.log('✅ Upload URL received:', result);
       
@@ -151,16 +161,39 @@ export default function AIFoodAnalyzer() {
   };
 
   const handleUploadComplete = async (result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
+    console.log('📤 Upload completed:', result);
+    
     if (result.successful && result.successful.length > 0) {
       const uploadedFile = result.successful[0];
       const imageUrl = uploadedFile.uploadURL;
       
+      console.log('✅ Image uploaded successfully:', {
+        fileName: uploadedFile.name,
+        uploadURL: imageUrl,
+        size: uploadedFile.size
+      });
+      
       if (imageUrl) {
         setUploadedImageUrl(imageUrl);
         
-        // Start food analysis
+        // Start food analysis with detailed logging
+        console.log('🚀 Starting AI food analysis...');
         analyzeFoodMutation.mutate(imageUrl);
+      } else {
+        console.error('❌ No upload URL received from completed upload');
+        toast({
+          title: "Upload Error",
+          description: "Upload completed but no URL was returned. Please try again.",
+          variant: "destructive",
+        });
       }
+    } else {
+      console.error('❌ Upload failed or no successful uploads:', result);
+      toast({
+        title: "Upload Failed", 
+        description: `Upload failed: ${result.failed?.map(f => f.error).join(', ') || 'Unknown error'}`,
+        variant: "destructive",
+      });
     }
   };
 
