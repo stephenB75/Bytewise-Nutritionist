@@ -966,21 +966,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         />
         
         {/* CSS-controlled Overlay for consistent opacity */}
-        <div 
-          className="hero-gradient-overlay" 
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 50,
-            background: 'linear-gradient(to top, rgba(255, 0, 255, 0.9) 0%, rgba(255, 0, 255, 0.5) 50%, transparent 100%)',
-            pointerEvents: 'none'
-          }} 
-        />
+        <div className="hero-gradient-overlay" />
         
-        {/* Enhanced Pattern Overlay */
+        {/* Enhanced Pattern Overlay */}
         <div className="absolute inset-0 z-13 opacity-20">
           <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 via-transparent to-red-500/10" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_70%,rgba(251,146,60,0.15),transparent_50%)]" />
@@ -1293,19 +1281,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         />
         
         {/* CSS-controlled Overlay for consistent opacity */}
-        <div 
-          className="hero-gradient-overlay" 
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 50,
-            background: 'linear-gradient(to top, rgba(255, 0, 255, 0.9) 0%, rgba(255, 0, 255, 0.5) 50%, transparent 100%)',
-            pointerEvents: 'none'
-          }} 
-        />
+        <div className="hero-gradient-overlay" />
         
         <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6 z-20">
           <div className="space-y-8 max-w-2xl">
