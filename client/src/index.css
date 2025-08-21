@@ -145,34 +145,34 @@ button[data-testid*="nav-"]:active {
 .opacity-95 { opacity: 1 !important; } /* Remove opacity that reduces contrast */
 
 /* Fix ALL remaining white and light text */
-.text-white.text-lg { color: #111827 !important; }
-.text-white.text-xl { color: #111827 !important; }
-.text-white.text-2xl { color: #111827 !important; }
-.text-white.text-6xl { color: #111827 !important; }
-.text-white.text-7xl { color: #111827 !important; }
-.text-white.text-8xl { color: #111827 !important; }
+.text-white.text-lg { color: #374151 !important; }
+.text-white.text-xl { color: #374151 !important; }
+.text-white.text-2xl { color: #374151 !important; }
+.text-white.text-6xl { color: #374151 !important; }
+.text-white.text-7xl { color: #374151 !important; }
+.text-white.text-8xl { color: #374151 !important; }
 
 /* Hero section specific fixes */
-h1.text-white { color: #111827 !important; }
-p.text-gray-100 { color: #1f2937 !important; }
-p.text-gray-200 { color: #374151 !important; }
+h1.text-white { color: #374151 !important; }
+p.text-gray-100 { color: #4b5563 !important; }
+p.text-gray-200 { color: #6b7280 !important; }
 
 /* Comprehensive hero component text fixes */
 .text-white.drop-shadow-2xl,
 .text-white.drop-shadow-xl { 
-  color: #111827 !important; 
+  color: #374151 !important; 
 }
 
 .text-gray-100.font-light,
 .text-gray-200.font-light { 
-  color: #1f2937 !important; 
+  color: #4b5563 !important; 
 }
 
 /* Hero section container text overrides */
 .absolute.inset-0.flex.flex-col .text-white,
 .hero-component .text-white,
 [data-hero="true"] .text-white { 
-  color: #111827 !important; 
+  color: #374151 !important; 
 }
 
 /* Hero description text fixes */
@@ -180,12 +180,12 @@ p.text-gray-200 { color: #374151 !important; }
 .text-2xl.text-gray-100,
 .text-xl.text-gray-200,
 .text-2xl.text-gray-200 { 
-  color: #1f2937 !important; 
+  color: #4b5563 !important; 
 }
 
 /* Scroll indicator text */
 .text-white\/70.z-30 { 
-  color: #4b5563 !important; 
+  color: #6b7280 !important; 
 }
 
 /* Metrics cards drop shadows like profile page */
@@ -199,10 +199,10 @@ p.text-gray-200 { color: #374151 !important; }
 }
 
 /* Comprehensive white text fixes for ALL remaining cases */
-span.text-white { color: #111827 !important; }
-div.text-white { color: #111827 !important; }
-h1.text-white, h2.text-white, h3.text-white, h4.text-white { color: #111827 !important; }
-p.text-white { color: #111827 !important; }
+span.text-white { color: #374151 !important; }
+div.text-white { color: #374151 !important; }
+h1.text-white, h2.text-white, h3.text-white, h4.text-white { color: #374151 !important; }
+p.text-white { color: #374151 !important; }
 
 /* Button text in hero sections */
 .bg-gradient-to-r .text-white,
@@ -220,10 +220,10 @@ button.bg-red-500 .text-white {
 }
 
 /* Achievement and goal section text fixes */
-.text-white.font-semibold.text-xl { color: #111827 !important; }
-.text-white.text-xs { color: #111827 !important; }
-.text-white.text-sm { color: #111827 !important; }
-.text-white.font-bold.text-2xl { color: #111827 !important; }
+.text-white.font-semibold.text-xl { color: #374151 !important; }
+.text-white.text-xs { color: #374151 !important; }
+.text-white.text-sm { color: #374151 !important; }
+.text-white.font-bold.text-2xl { color: #374151 !important; }
 
 /* Icon color fixes inside navigation */
 .w-6.h-6.transition-colors { color: #0e7490 !important; }
@@ -334,7 +334,7 @@ button:hover:not(.bg-orange-500):not([class*="bg-gradient"]):not(.bg-cyan-):not(
 
 /* Hover state text fixes */
 .hover\:text-white:hover { 
-  color: #111827 !important; 
+  color: #374151 !important; 
 }
 
 /* Comprehensive light gray text fixes */
@@ -385,7 +385,7 @@ button:hover:not(.bg-orange-500):not([class*="bg-gradient"]):not(.bg-cyan-):not(
 .backdrop-blur-md .text-white,
 .bg-white\/10 .text-white,
 .bg-white\/15 .text-white {
-  color: #111827 !important;
+  color: #374151 !important;
 }
 
 /* Placeholder and input text fixes */
