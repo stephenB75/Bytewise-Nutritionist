@@ -4,6 +4,49 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Force Light Theme */
+:root {
+  --background: 255, 255, 255;
+  --foreground: 0, 0, 0;
+  --muted: 245, 245, 245;
+  --muted-foreground: 115, 115, 115;
+  --popover: 255, 255, 255;
+  --popover-foreground: 0, 0, 0;
+  --card: 255, 255, 255;
+  --card-foreground: 0, 0, 0;
+  --border: 229, 229, 229;
+  --input: 229, 229, 229;
+  --primary: 37, 99, 235;
+  --primary-foreground: 248, 250, 252;
+  --secondary: 245, 245, 245;
+  --secondary-foreground: 17, 24, 39;
+  --accent: 245, 245, 245;
+  --accent-foreground: 17, 24, 39;
+  --destructive: 239, 68, 68;
+  --destructive-foreground: 248, 250, 252;
+  --ring: 37, 99, 235;
+  --radius: 0.5rem;
+}
+
+/* Override dark theme */
+body,
+html,
+#root {
+  background-color: rgb(var(--background)) !important;
+  color: rgb(var(--foreground)) !important;
+}
+
+/* Light theme overrides for common elements */
+.bg-black { background-color: #ffffff !important; }
+.bg-gray-900 { background-color: #f9fafb !important; }
+.bg-gray-800 { background-color: #ffffff !important; }
+.bg-gray-700 { background-color: #f3f4f6 !important; }
+.text-white { color: #000000 !important; }
+.text-gray-300 { color: #6b7280 !important; }
+.text-gray-400 { color: #9ca3af !important; }
+.border-gray-700 { border-color: #e5e7eb !important; }
+.border-gray-800 { border-color: #d1d5db !important; }
+
 /* Mobile Safe Area Support for iOS and Android Status Bars */
 @supports (padding: max(0px)) {
   .top-safe {
