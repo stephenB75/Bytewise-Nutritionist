@@ -24,7 +24,7 @@ import { useGoalAchievements } from '@/hooks/useGoalAchievements';
 import { useRotatingBackground } from '@/hooks/useRotatingBackground';
 import { useAchievements, getAchievementIcon, formatAchievementDate } from '@/hooks/useAchievements';
 import { ProfileIcon } from '@/components/ProfileIcon';
-import { TourLauncher, WelcomeBanner, useAppTour } from '@/components/TourLauncher';
+// Tour imports removed
 import { apiRequest } from '@/lib/queryClient';
 import { 
   Search, 
@@ -126,9 +126,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   // Profile completion state
   const [showProfileCompletion, setShowProfileCompletion] = useState(false);
   
-  // App tour state
-  const { shouldShowTour, dismissTour } = useAppTour();
-  const [showWelcomeBanner, setShowWelcomeBanner] = useState(() => shouldShowTour());
+  // Tour functionality completely removed
   
   // Nutrition aggregation state
   const [dailyMacros, setDailyMacros] = useState({ protein: 0, carbs: 0, fat: 0 });
@@ -627,7 +625,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   useEffect(() => {
     const handleAuthStateChange = () => {
       // Only trigger tour if user exists, hasn't completed tour, and this is a fresh auth
-      if (user && shouldShowTour()) {
+      if (false) { // Tour functionality removed
         // Set a flag to indicate fresh authentication
         const isFreshAuth = localStorage.getItem('fresh-auth-session') === 'true';
         
@@ -635,10 +633,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           // Clear the fresh auth flag
           localStorage.removeItem('fresh-auth-session');
           
-          // Show welcome banner instead of immediately starting tour
-          setShowWelcomeBanner(true);
-          
-          // Show welcome banner for user awareness
+          // Tour functionality removed
 
         }
       }
@@ -650,7 +645,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     return () => {
       window.removeEventListener('auth-state-change', handleAuthStateChange);
     };
-  }, [user, shouldShowTour]);
+  }, [user]);
 
   // Load existing meal data and set up tracking
   useEffect(() => {
@@ -1314,19 +1309,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       {/* Content Section - Completely Separate and Underneath */}
       <div className="px-6 py-3 bg-black content-section">
         <div className="space-y-3">
-          {/* Welcome Banner for Tour */}
-          {user && showWelcomeBanner && (
-            <WelcomeBanner
-              onStartTour={() => {
-                setShowWelcomeBanner(false);
-                // Tour functionality removed
-              }}
-              onDismiss={() => {
-                setShowWelcomeBanner(false);
-                dismissTour();
-              }}
-            />
-          )}
+          {/* Tour functionality completely removed */}
           
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-xl font-black text-white">Today's Progress</h2>
@@ -2805,16 +2788,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         onComplete={handleProfileCompletion}
       />
       
-      {/* Visual Tour Launcher (no actual tour functionality) */}
-      {user && (
-        <TourLauncher
-          onStartTour={() => {
-            // Tour functionality removed - just show info
-            console.log('Tour functionality has been removed');
-          }}
-          isVisible={shouldShowTour()}
-        />
-      )}
+      {/* Tour functionality completely removed */}
       
 
       
