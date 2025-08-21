@@ -2707,7 +2707,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           <Button
             variant="ghost"
             size="lg"
-            className="bg-transparent text-white hover:bg-white/10 rounded-2xl p-4 transition-all duration-300 hover:scale-105"
+            className="bg-transparent text-white rounded-2xl p-4 transition-all duration-300 hover:scale-105"
             onClick={() => setShowNotificationDropdown(!showNotificationDropdown)}
             aria-label={`Notifications${notifications.filter(n => !n.read).length > 0 ? ` - ${notifications.filter(n => !n.read).length} unread` : ''}`}
             aria-expanded={showNotificationDropdown}

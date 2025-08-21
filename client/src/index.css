@@ -345,6 +345,7 @@ svg[data-testid="icon-bell"] {
 /* Specific notification button in header - remove ALL white frames */
 button[data-testid="button-notifications"] {
   background: transparent !important;
+  background-color: transparent !important;
   border: none !important;
   outline: none !important;
   box-shadow: none !important;
@@ -352,16 +353,30 @@ button[data-testid="button-notifications"] {
   -webkit-backdrop-filter: none !important;
 }
 
-/* Remove white frame on hover and focus */
+/* Remove white frame on hover and focus - override all Tailwind classes */
 button[data-testid="button-notifications"]:hover,
 button[data-testid="button-notifications"]:focus,
 button[data-testid="button-notifications"]:active {
   background: transparent !important;
+  background-color: transparent !important;
   border: none !important;
   outline: none !important;
   box-shadow: none !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
+}
+
+/* Override ghost variant hover states for notification button */
+button[data-testid="button-notifications"].inline-flex:hover {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* Override bg-white/10 styles specifically for notification button */
+button[data-testid="button-notifications"].hover\:bg-white\/10:hover {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
 }
 
 /* Additional card shadow consistency */
