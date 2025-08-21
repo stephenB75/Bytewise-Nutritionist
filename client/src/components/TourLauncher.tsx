@@ -83,32 +83,61 @@ export function TourLauncher({ onStartTour, isVisible = true }: TourLauncherProp
   };
 
   const startTourSequence = () => {
-    // Show welcome message and guide through features
+    // Comprehensive 10-step tour covering all major features
     setTimeout(() => {
       setTourStep(1);
-      showTourMessage("Welcome to ByteWise! 🎯", "Let's explore the key features that will help you track nutrition and build healthy habits.");
+      showTourMessage("Welcome to ByteWise! 🎯", "Let's take a comprehensive tour of all features that will help you track nutrition and build healthy habits.");
       
-      // Guide through dashboard features
       setTimeout(() => {
         setTourStep(2);
-        showTourMessage("Dashboard Overview 📊", "Here you can see your daily progress, calories consumed, and track your wellness goals.");
+        showTourMessage("Dashboard Overview 📊", "Your central hub shows daily calories, water intake, fasting status, and progress towards your goals.");
         
         setTimeout(() => {
           setTourStep(3);
-          showTourMessage("Navigation Tabs 🔄", "Use the bottom navigation to access Calorie Tracker, Fasting Timer, Meal Journal, and Profile settings.");
+          showTourMessage("Food Search & Calculator 🔍", "Access the Calorie Tracker tab to search 300,000+ USDA foods with brand recognition and get instant nutrition facts.");
           
           setTimeout(() => {
             setTourStep(4);
-            showTourMessage("Tour Complete! 🎉", "You're all set! Explore the app and start tracking your nutrition journey. The tour button will disappear once you're familiar with the features.");
+            showTourMessage("AI Photo Analysis 📸", "Take photos of your meals! The AI Food Analyzer uses computer vision to identify foods and calculate nutrition automatically.");
             
-            // Mark tour as completed after a delay
             setTimeout(() => {
-              setIsTourRunning(false);
-              localStorage.setItem('bytewise-tour-completed', 'true');
-            }, 3000);
-          }, 3000);
-        }, 3000);
-      }, 3000);
+              setTourStep(5);
+              showTourMessage("Fasting Timer ⏱️", "Track intermittent fasting with visual progress, goal celebrations, and detailed session history.");
+              
+              setTimeout(() => {
+                setTourStep(6);
+                showTourMessage("Water Tracking 💧", "Beautiful hydration visualization - track daily water intake with animated glass indicators and goal achievements.");
+                
+                setTimeout(() => {
+                  setTourStep(7);
+                  showTourMessage("Meal Journal 📝", "View your complete meal timeline, edit entries, and track nutrition trends over time in the Meal Journal.");
+                  
+                  setTimeout(() => {
+                    setTourStep(8);
+                    showTourMessage("Achievement System 🏆", "Unlock badges and rewards as you hit milestones - build streaks and celebrate your progress!");
+                    
+                    setTimeout(() => {
+                      setTourStep(9);
+                      showTourMessage("Profile & Settings ⚙️", "Customize your experience, set calorie goals, manage preferences, and sync with health apps.");
+                      
+                      setTimeout(() => {
+                        setTourStep(10);
+                        showTourMessage("Tour Complete! 🎉", "You're ready to start your nutrition journey! Each feature is designed to make healthy living easier and more rewarding.");
+                        
+                        // Mark tour as completed after a delay
+                        setTimeout(() => {
+                          setIsTourRunning(false);
+                          localStorage.setItem('bytewise-tour-completed', 'true');
+                        }, 4000);
+                      }, 3500);
+                    }, 3500);
+                  }, 3500);
+                }, 3500);
+              }, 3500);
+            }, 3500);
+          }, 3500);
+        }, 3500);
+      }, 3500);
     }, 500);
   };
 
@@ -119,7 +148,7 @@ export function TourLauncher({ onStartTour, isVisible = true }: TourLauncherProp
     tourTooltip.innerHTML = `
       <div class="font-bold text-lg mb-2">${title}</div>
       <div class="text-sm">${message}</div>
-      <div class="mt-3 text-xs opacity-75">Tour step ${tourStep} of 4</div>
+      <div class="mt-3 text-xs opacity-75">Tour step ${tourStep} of 10</div>
     `;
     
     document.body.appendChild(tourTooltip);
@@ -137,7 +166,7 @@ export function TourLauncher({ onStartTour, isVisible = true }: TourLauncherProp
       {/* Tour Running Indicator */}
       {isTourRunning && (
         <div className="fixed top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded-full text-xs z-[9998]">
-          Tour in Progress... Step {tourStep}/4
+          Tour in Progress... Step {tourStep}/10
         </div>
       )}
       
@@ -167,14 +196,14 @@ export function TourLauncher({ onStartTour, isVisible = true }: TourLauncherProp
             <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg p-4">
               <h3 className="font-semibold text-lg mb-2">🎯 What You'll Learn</h3>
               <p className="text-gray-600 dark:text-gray-300 text-sm">
-                This interactive tour will guide you through all major features, 
-                showing you how to track nutrition, use AI analysis, earn achievements, 
-                and build healthy habits.
+                This comprehensive 10-step tour covers all major features: food search, 
+                AI photo analysis, fasting timer, water tracking, meal journaling, 
+                achievements, and profile customization.
               </p>
               <div className="flex items-center gap-4 mt-3 text-sm text-gray-500">
                 <span className="flex items-center gap-1">
                   <Clock className="w-4 h-4" />
-                  5-7 minutes
+                  8-10 minutes
                 </span>
                 <span className="flex items-center gap-1">
                   <Target className="w-4 h-4" />
@@ -247,8 +276,8 @@ export function WelcomeBanner({ onStartTour, onDismiss }: { onStartTour: () => v
               <h3 className="font-semibold text-lg">Welcome to ByteWise Nutritionist! 🎉</h3>
             </div>
             <p className="text-gray-600 dark:text-gray-300 text-sm mb-3">
-              Ready to discover all the amazing features? Take our interactive tour to learn 
-              how to track nutrition, use AI analysis, and build healthy habits.
+              Ready to discover all the amazing features? Take our comprehensive 10-step tour 
+              covering food tracking, AI analysis, fasting, achievements, and more!
             </p>
             <div className="flex flex-wrap gap-2">
               <Button
@@ -257,7 +286,7 @@ export function WelcomeBanner({ onStartTour, onDismiss }: { onStartTour: () => v
                 className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white"
               >
                 <Play className="w-4 h-4 mr-2" />
-                Take Tour (5 min)
+                Take Tour (10 min)
               </Button>
               <Button
                 variant="outline"
