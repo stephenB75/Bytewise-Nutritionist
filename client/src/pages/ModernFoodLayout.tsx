@@ -969,11 +969,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         
         
         {/* Content Layer with Enhanced Typography */}
-        <div className={`absolute inset-0 flex flex-col justify-center items-center text-center px-6 z-20 ${isDashboard ? 'text-white' : 'text-white'}`}>
+        <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-6 z-20 text-white">
           <div className="space-y-8 max-w-2xl">
             {/* Enhanced Title Section */}
             <div className="space-y-3 hero-optimized">
-              <h1 className={`text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] drop-shadow-2xl animate-fadeInUp [animation-delay:0.2s] font-league-spartan text-optimized ${isDashboard ? 'text-white' : 'text-white'}`}>
+              <h1 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] drop-shadow-2xl animate-fadeInUp [animation-delay:0.2s] font-league-spartan text-optimized text-white">
                 {title}
               </h1>
               <h1 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] animate-fadeInUp [animation-delay:0.4s] font-league-spartan text-optimized">
@@ -984,7 +984,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             </div>
             
             {/* Enhanced Description */}
-            <p className={`text-xl md:text-2xl font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl animate-fadeInUp [animation-delay:0.6s] font-work-sans ${isDashboard ? 'text-gray-100' : 'text-gray-100'}`}>
+            <p className="text-xl md:text-2xl font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl animate-fadeInUp [animation-delay:0.6s] font-work-sans text-gray-100">
               {description}
             </p>
             
@@ -1005,9 +1005,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         </div>
         
         {/* Enhanced Scroll Indicator */}
-        <div className={`absolute bottom-8 left-1/2 -translate-x-1/2 z-30 animate-bounce ${isDashboard ? 'text-white' : 'text-white'}`}>
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 animate-bounce text-white">
           <div className="flex flex-col items-center gap-2">
-            <div className={`w-px h-8 bg-gradient-to-b from-transparent ${isDashboard ? 'to-white' : 'to-white'}`} />
+            <div className="w-px h-8 bg-gradient-to-b from-transparent to-white" />
             <ChevronRight className="w-6 h-6 rotate-90 drop-shadow-lg" />
           </div>
         </div>
