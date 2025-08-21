@@ -995,7 +995,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 size="lg"
                 className="group relative bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-black px-16 py-6 rounded-full text-xl md:text-2xl shadow-2xl transition-all duration-300 border-2 border-orange-400 hover:border-orange-300 overflow-hidden btn-hero-enhanced"
               >
-                <span className="relative z-10 flex items-center gap-3 text-optimized">
+                <span className="relative z-10 flex items-center gap-3 text-white">
                   {buttonText}
                   <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
                 </span>
