@@ -1971,15 +1971,10 @@ export class USDAService {
         'bar': 60,     // FDA RACC: 1 bar = 60g
         'piece': 60,   // 1 piece = 1 bar
         'bars': 60,
-        't': 15,       // 1 tablespoon = 15g (warning needed)
-        'tbsp': 15,    // 1 tablespoon = 15g (warning needed)
-        'tablespoon': 15,
       },
       'ice cream': {
         'cup': 66,     // FDA RACC: 2/3 cup = 66g
         'scoop': 66,   // 1 scoop ≈ 2/3 cup
-        't': 15,       // 1 tablespoon = 15g (warning needed)
-        'tbsp': 15,    // 1 tablespoon = 15g (warning needed)
         'tablespoon': 15,
       },
       'popsicle': {
@@ -2074,18 +2069,12 @@ export class USDAService {
         'fun size': 17,
         'bar': 52,     // Regular Snickers bar  
         'king size': 113,
-        't': 15,       // 1 tablespoon = 15g (warning needed)
-        'tbsp': 15,    // 1 tablespoon = 15g (warning needed)
-        'tablespoon': 15,
       },
       'snickers bar': {
         'fun size': 17,
         'bar': 52,     // Regular Snickers bar
         'piece': 52,   // 1 piece = 1 bar
         'king size': 113,
-        't': 15,       // 1 tablespoon = 15g (warning needed)
-        'tbsp': 15,    // 1 tablespoon = 15g (warning needed)
-        'tablespoon': 15,
       },
       'kit kat': {
         'fun size': 15,
