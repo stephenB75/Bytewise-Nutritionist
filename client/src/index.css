@@ -83,8 +83,8 @@ div[class*="bg-gray-800"]:not([class*="bg-gray-800/"]):not([class*="backdrop"]):
   background-attachment: fixed !important;
 }
 
-/* Enhanced text color overrides for better contrast */
-.text-white { color: #111827 !important; } /* Darker for maximum contrast */
+/* Enhanced text color overrides for better contrast - EXCLUDE navigation */
+.text-white:not([data-testid*="nav-"] *):not([data-testid*="nav-"]) { color: #111827 !important; } /* Darker for maximum contrast */
 .text-gray-100 { color: #1f2937 !important; } /* Much darker */
 .text-gray-200 { color: #374151 !important; } /* Darker */
 .text-gray-300 { color: #4b5563 !important; } /* Darker gray */
@@ -353,14 +353,14 @@ svg[data-testid="icon-bell"] {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 4px 16px rgba(0, 0, 0, 0.05) !important;
 }
 
-/* Comprehensive white text fixes for ALL remaining cases - except hero */
-span.text-white:not(.hero-component *):not([data-hero="true"] *) { color: #374151 !important; }
-div.text-white:not(.hero-component *):not([data-hero="true"] *) { color: #374151 !important; }
-h1.text-white:not(.hero-component *):not([data-hero="true"] *), 
-h2.text-white:not(.hero-component *):not([data-hero="true"] *), 
-h3.text-white:not(.hero-component *):not([data-hero="true"] *), 
-h4.text-white:not(.hero-component *):not([data-hero="true"] *) { color: #374151 !important; }
-p.text-white:not(.hero-component *):not([data-hero="true"] *) { color: #374151 !important; }
+/* Comprehensive white text fixes for ALL remaining cases - except hero and navigation */
+span.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *) { color: #374151 !important; }
+div.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *) { color: #374151 !important; }
+h1.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *), 
+h2.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *), 
+h3.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *), 
+h4.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *) { color: #374151 !important; }
+p.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *) { color: #374151 !important; }
 
 /* Hero white text elements - keep white for dark overlay visibility */
 .hero-component span.text-white,
@@ -395,11 +395,11 @@ button.bg-red-500 .text-white {
   color: #ffffff !important; 
 }
 
-/* Achievement and goal section text fixes */
-.text-white.font-semibold.text-xl { color: #374151 !important; }
-.text-white.text-xs { color: #374151 !important; }
-.text-white.text-sm { color: #374151 !important; }
-.text-white.font-bold.text-2xl { color: #374151 !important; }
+/* Achievement and goal section text fixes - exclude navigation */
+.text-white.font-semibold.text-xl:not([data-testid*="nav-"] *) { color: #374151 !important; }
+.text-white.text-xs:not([data-testid*="nav-"] *) { color: #374151 !important; }
+.text-white.text-sm:not([data-testid*="nav-"] *) { color: #374151 !important; }
+.text-white.font-bold.text-2xl:not([data-testid*="nav-"] *) { color: #374151 !important; }
 
 /* Icon color fixes inside navigation */
 .w-6.h-6.transition-colors { color: #0e7490 !important; }
@@ -431,7 +431,7 @@ svg.w-4 {
 
 /* Button and interactive element visibility */
 .hover\:text-cyan-300:hover { color: #0891b2 !important; }
-.hover\:text-white:hover { color: #1f2937 !important; }
+.hover\:text-white:hover:not([data-testid*="nav-"] *) { color: #1f2937 !important; }
 .hover\:text-red-400:hover { color: #dc2626 !important; }
 
 /* Special cases for icon colors */
@@ -596,11 +596,12 @@ button[data-testid^="nav-"] .lucide {
   padding: 0 !important;
 }
 
-/* CRITICAL: Override global text-white rule for navigation */
+/* CRITICAL: Force white text for navigation - highest priority */
 button[data-testid*="nav-"] .text-white,
 button[data-testid^="nav-"] .text-white,
 button[data-testid*="nav-"] span.text-white,
-button[data-testid^="nav-"] span.text-white {
+button[data-testid^="nav-"] span.text-white,
+[data-testid*="nav-"] .text-white {
   color: #ffffff !important;
 }
 
