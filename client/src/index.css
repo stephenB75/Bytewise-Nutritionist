@@ -361,9 +361,11 @@ svg[data-testid="icon-bell"] {
   outline: none !important;
 }
 
-/* Modern notification button styling - preserves new design */
+/* Modern notification button styling - preserves new design - NO BORDERS */
 button[data-testid="button-notifications"] {
   outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 /* Ensure proper hover effects for modern design */
@@ -514,9 +516,9 @@ svg.w-4 {
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15)) !important;
 }
 
-/* Light theme border overrides for cards and components */
-.border-white\/20 { border-color: #d1d5db !important; }
-.border-white\/10 { border-color: #e5e7eb !important; }
+/* Light theme border overrides for cards and components - EXCLUDE notification button */
+.border-white\/20:not([data-testid="button-notifications"]) { border-color: #d1d5db !important; }
+.border-white\/10:not([data-testid="button-notifications"]) { border-color: #e5e7eb !important; }
 .border-cyan-400\/20 { border-color: #67e8f9 !important; }
 .border-cyan-400\/30 { border-color: #22d3ee !important; }
 .border-blue-200 { border-color: #dbeafe !important; }
@@ -5145,7 +5147,8 @@ input[class*="pr-"] {
 }
 
 .__floater__arrow {
-  border-color: white transparent !important;
+  border-color: transparent !important;
+  border: none !important;
 }
 
 /* Ensure Joyride tooltip is always visible */
