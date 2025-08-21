@@ -597,11 +597,24 @@ nav .lucide {
 nav button,
 [data-testid="navigation-tabs"] > *,
 .fixed.bottom-0 button,
-.bg-white.border button {
+.bg-white.border button,
+.bg-white,
+.border-gray-200,
+.border-t {
   background: none !important;
   background-color: transparent !important;
   border: none !important;
   box-shadow: none !important;
+}
+
+/* Additional nav frame removal */
+.fixed.bottom-0.left-0.right-0,
+.fixed.bottom-0,
+nav,
+[data-testid="navigation-tabs"] {
+  background: transparent !important;
+  border: none !important;
+  border-top: none !important;
 }
 
 /* Target specific navigation button backgrounds */
@@ -648,6 +661,29 @@ button[data-testid*="nav-"]:active {
   outline-style: none !important;
   outline-color: transparent !important;
   -webkit-focus-ring-color: transparent !important;
+}
+
+/* CSS Logo Styling */
+.css-logo {
+  text-align: center;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.css-logo span {
+  text-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Comprehensive nav button frame removal */
+button[data-testid*="nav-"],
+.fixed button,
+nav button {
+  border: none !important;
+  border-radius: 0 !important;
+  background-image: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 /* Ensure all metrics text is dark enough */

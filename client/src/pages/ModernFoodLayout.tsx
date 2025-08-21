@@ -1274,11 +1274,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6 z-20">
           <div className="space-y-8 max-w-2xl">
             <div className="animate-fadeInUp [animation-delay:0.2s]">
-              <BytewiseLogo />
+              <div className="css-logo">
+                <span className="text-4xl font-black text-cyan-400">Byte</span>
+                <span className="text-4xl font-black text-orange-500">Wise</span>
+                <div className="text-sm font-medium text-gray-300 mt-1 tracking-wider">NUTRITIONIST</div>
+              </div>
             </div>
             
             <div className="space-y-2">
-              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none text-white drop-shadow-2xl animate-fadeInUp [animation-delay:0.4s]">Track Your</h1>
+              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none text-cyan-400 drop-shadow-2xl animate-fadeInUp [animation-delay:0.4s]">Track Your</h1>
               <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none animate-fadeInUp [animation-delay:0.6s]">
                 <span className="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent drop-shadow-2xl">Nutrition</span>
               </h1>
