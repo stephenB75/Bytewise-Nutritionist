@@ -855,7 +855,7 @@ export function FastingTracker() {
               </div>
 
               {/* Control Buttons */}
-              <div className="flex flex-col sm:flex-row justify-center items-center gap-4 px-4 py-2">
+              <div data-testid="fasting-controls" className="flex flex-col sm:flex-row justify-center items-center gap-4 px-4 py-2">
                 {!isActive && !currentSession ? (
                   <Button 
                     onClick={startFasting}

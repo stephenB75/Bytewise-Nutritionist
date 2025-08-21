@@ -34,6 +34,7 @@ interface AppTourProps {
   isOpen: boolean;
   onClose: () => void;
   onComplete: () => void;
+  onNavigate?: (tab: string) => void;
 }
 
 const TOUR_FEATURES = [
@@ -75,66 +76,95 @@ const TOUR_FEATURES = [
   }
 ];
 
-// Tour Steps Configuration - Comprehensive App Walkthrough
-const TOUR_STEPS: Step[] = [
+// Tour Steps Configuration - Interactive App Walkthrough with Navigation
+const createTourSteps = (handleTabChange: (tab: string) => void): Step[] => [
   {
     target: 'body',
     title: '🎉 Welcome to ByteWise Nutritionist!',
-    content: 'Let\'s explore all the powerful features of your nutrition tracking companion. This tour will show you how to track food, monitor health metrics, and achieve your goals.',
+    content: 'Let\'s take an interactive tour of your nutrition tracking companion. I\'ll guide you through each section and show you the key features.',
     placement: 'center',
   },
   {
     target: '[data-testid="daily-progress"]',
     title: '📊 Daily Progress Dashboard',
-    content: 'Your home base shows daily calorie intake, meals logged, remaining calories, and completion percentage. Track your progress at a glance.',
+    content: 'Your home base shows daily calorie intake, meals logged, remaining calories, and completion percentage. This updates in real-time as you track food.',
     placement: 'bottom',
   },
   {
     target: '[data-testid="water-consumption-card"]',
     title: '💧 Hydration Tracking',
-    content: 'Click the water glasses to log your daily hydration. The visual indicator fills up as you reach your daily water goal.',
+    content: 'Click any water glass to log your hydration. Watch the visual indicator fill up as you reach your daily 8-glass goal.',
     placement: 'top',
   },
   {
     target: '[data-testid="navigation-tabs"]',
     title: '🧭 Navigation Menu',
-    content: 'Use the bottom navigation to access: Dashboard, Calorie Tracker (food search), Fasting Timer, Meal Journal, and Profile settings.',
+    content: 'The bottom navigation gives you access to all app sections. Let\'s explore each one starting with the Calorie Tracker.',
     placement: 'top',
   },
   {
-    target: 'body',
-    title: '🍎 Food Tracking Features',
-    content: 'In the Calorie Tracker section, you can: search 300,000+ USDA foods, get AI photo analysis, calculate precise nutrition with FDA serving sizes.',
-    placement: 'center',
+    target: '[data-testid="nav-calculator"]',
+    title: '🍎 Food Tracking - Step 1',
+    content: 'Click here to access the Calorie Tracker where you can search 300,000+ USDA foods, scan photos with AI, and calculate precise nutrition.',
+    placement: 'top',
+    data: { action: 'navigate', tab: 'nutrition' }
   },
   {
-    target: 'body',
-    title: '⏰ Fasting Timer',
-    content: 'Track intermittent fasting sessions with real-time timers, view fasting history, and celebrate achievements when you complete fasting goals.',
-    placement: 'center',
+    target: '[data-testid="main-food-search"]',
+    title: '🔍 Smart Food Search',
+    content: 'Search for any food here. The system recognizes brand names, provides autocomplete suggestions, and shows FDA-compliant serving sizes.',
+    placement: 'bottom',
   },
   {
-    target: 'body',
-    title: '📔 Meal Journal',
+    target: '[data-testid="nav-fasting"]',
+    title: '⏰ Fasting Timer - Step 1',
+    content: 'Click here to access the Fasting Timer for tracking intermittent fasting sessions.',
+    placement: 'top',
+    data: { action: 'navigate', tab: 'fasting' }
+  },
+  {
+    target: '[data-testid="fasting-controls"]',
+    title: '⏰ Fasting Controls',
+    content: 'Start, pause, or stop fasting sessions here. Track your fasting history and celebrate achievements when you reach your goals.',
+    placement: 'bottom',
+  },
+  {
+    target: '[data-testid="nav-journal"]',
+    title: '📔 Meal Journal - Step 1',
+    content: 'Click here to access your Meal Journal where you can review your complete food history.',
+    placement: 'top',
+    data: { action: 'navigate', tab: 'daily' }
+  },
+  {
+    target: '[data-testid="meal-history"]',
+    title: '📔 Meal History',
     content: 'Browse your complete meal history, search past entries, filter by date, and review your nutrition patterns over time.',
-    placement: 'center',
+    placement: 'top',
+  },
+  {
+    target: '[data-testid="nav-profile"]',
+    title: '⚙️ Profile Settings - Step 1',
+    content: 'Click here to access your Profile where you can customize goals and view achievements.',
+    placement: 'top',
+    data: { action: 'navigate', tab: 'profile' }
+  },
+  {
+    target: '[data-testid="profile-goals"]',
+    title: '🎯 Goal Customization',
+    content: 'Set your daily calorie goals, update personal information, and track your progress with detailed analytics.',
+    placement: 'bottom',
+  },
+  {
+    target: '[data-testid="nav-dashboard"]',
+    title: '🏠 Return to Dashboard',
+    content: 'Let\'s return to your main dashboard to complete the tour.',
+    placement: 'top',
+    data: { action: 'navigate', tab: 'home' }
   },
   {
     target: 'body',
-    title: '⚙️ Profile & Goals',
-    content: 'Customize your daily calorie goals, update personal information, manage account settings, and view detailed nutrition analytics.',
-    placement: 'center',
-  },
-  {
-    target: 'body',
-    title: '🏆 Achievement System',
-    content: 'Unlock badges and rewards as you: log meals consistently, hit calorie goals, complete fasting sessions, and build healthy habits.',
-    placement: 'center',
-  },
-  {
-    target: 'body',
-    title: '🎯 You\'re Ready!',
-    content: 'Start tracking by clicking "Track Food" or use the navigation menu to explore. Your nutrition journey begins now!',
+    title: '🎯 Tour Complete!',
+    content: 'You\'ve explored all the major features! Start tracking your nutrition journey by searching for foods, logging water, or setting up fasting sessions.',
     placement: 'center',
   }
 ];
@@ -227,21 +257,24 @@ const tourStyles: Partial<Styles> = {
 };
 
 // Integrated App Tour Component - Export for main layout
-export function AppTour({ isOpen, onClose, onComplete }: AppTourProps) {
+export function AppTour({ isOpen, onClose, onComplete, onNavigate }: AppTourProps) {
   const [run, setRun] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
+  const [tourSteps, setTourSteps] = useState<Step[]>([]);
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && onNavigate) {
+      const steps = createTourSteps(onNavigate);
+      setTourSteps(steps);
       setRun(true);
       setStepIndex(0);
     } else {
       setRun(false);
     }
-  }, [isOpen]);
+  }, [isOpen, onNavigate]);
 
   const handleJoyrideCallback = (data: CallBackProps) => {
-    const { status, type, index, action } = data;
+    const { status, type, index, action, step } = data;
     const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
 
     if (finishedStatuses.includes(status)) {
@@ -251,9 +284,20 @@ export function AppTour({ isOpen, onClose, onComplete }: AppTourProps) {
         onComplete();
       }
       onClose();
-    } else if (type === 'step:after') {
-      const newIndex = action === 'next' ? index + 1 : index - 1;
-      setStepIndex(Math.max(0, Math.min(newIndex, TOUR_STEPS.length - 1)));
+    } else if (type === 'step:after' && action === 'next') {
+      // Handle navigation before moving to next step
+      const currentStep = tourSteps[index];
+      if (currentStep?.data?.action === 'navigate' && onNavigate) {
+        onNavigate(currentStep.data.tab);
+        // Small delay to allow navigation to complete
+        setTimeout(() => {
+          setStepIndex(index + 1);
+        }, 500);
+      } else {
+        setStepIndex(index + 1);
+      }
+    } else if (type === 'step:after' && action === 'prev') {
+      setStepIndex(Math.max(0, index - 1));
     }
   };
 
@@ -267,7 +311,7 @@ export function AppTour({ isOpen, onClose, onComplete }: AppTourProps) {
       scrollToFirstStep
       showProgress
       showSkipButton
-      steps={TOUR_STEPS}
+      steps={tourSteps}
       styles={tourStyles}
       disableOverlayClose={true}
       hideCloseButton={true}

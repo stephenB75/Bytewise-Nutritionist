@@ -2242,7 +2242,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         </div>
 
         {/* Logged Foods - Real entries from calculator */}
-        <div className="space-y-4">
+        <div data-testid="meal-history" className="space-y-4">
           <div className="flex justify-between items-center">
             <h3 className="text-xl font-bold text-white">Logged Today</h3>
             {loggedMeals.length === 0 && (
@@ -2786,16 +2786,17 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       <div data-testid="navigation-tabs" className="fixed bottom-0 left-0 right-0 bg-gray-900/95 backdrop-blur-md border-t border-gray-700/80 safe-area-pb z-50 shadow-lg">
         <div className="flex items-center justify-around py-2 px-2 max-w-md mx-auto">
           {[
-            { id: 'home', label: 'Dashboard', icon: Home },
-            { id: 'nutrition', label: 'Calorie Tracker', icon: Utensils },
-            { id: 'fasting', label: 'Fasting', icon: Clock },
-            { id: 'daily', label: 'Meal Journal', icon: BarChart3 },
-            { id: 'profile', label: 'Profile', icon: UserCircle }
+            { id: 'home', label: 'Dashboard', icon: Home, testId: 'nav-dashboard' },
+            { id: 'nutrition', label: 'Calorie Tracker', icon: Utensils, testId: 'nav-calculator' },
+            { id: 'fasting', label: 'Fasting', icon: Clock, testId: 'nav-fasting' },
+            { id: 'daily', label: 'Meal Journal', icon: BarChart3, testId: 'nav-journal' },
+            { id: 'profile', label: 'Profile', icon: UserCircle, testId: 'nav-profile' }
           ].map((tab) => {
             const IconComponent = tab.icon;
             return (
               <button
                 key={tab.id}
+                data-testid={tab.testId}
                 onClick={() => handleTabChange(tab.id)}
                 className={`flex flex-col items-center py-1.5 px-1.5 rounded-md transition-all duration-200 min-w-[50px] flex-1 active:bg-yellow-400/20 ${
                   activeTab === tab.id
@@ -2850,6 +2851,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             isOpen={isTourOpen}
             onClose={closeTour}
             onComplete={completeTour}
+            onNavigate={handleTabChange}
           />
         </>
       )}

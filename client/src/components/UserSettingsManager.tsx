@@ -623,7 +623,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
               )}
             </div>
 
-            <div className="space-y-2">
+            <div data-testid="profile-goals" className="space-y-2">
               <label className="text-sm text-gray-300 font-medium flex items-center">
                 <Target className="w-4 h-4 mr-2 text-green-400" />
                 Daily Calorie Goal
