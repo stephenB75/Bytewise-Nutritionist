@@ -1977,6 +1977,64 @@ export class USDAService {
         'scoop': 66,   // 1 scoop ≈ 2/3 cup
         'tablespoon': 15,
       },
+      // Premium ice cream bars - specific brands
+      'haagen dazs bar': {
+        'bar': 88,     // Standard Haagen-Dazs bar (88ml/~85g)
+        'piece': 88,   // 1 piece = 1 bar
+        'bars': 88,
+      },
+      'haagen dazs': {
+        'bar': 88,     // Standard Haagen-Dazs bar (88ml/~85g)
+        'piece': 88,   // 1 piece = 1 bar
+        'bars': 88,
+      },
+      'haagen-dazs bar': {
+        'bar': 88,     // Standard Haagen-Dazs bar (88ml/~85g)
+        'piece': 88,   // 1 piece = 1 bar
+        'bars': 88,
+      },
+      'haagen-dazs': {
+        'bar': 88,     // Standard Haagen-Dazs bar (88ml/~85g)
+        'piece': 88,   // 1 piece = 1 bar
+        'bars': 88,
+      },
+      'klondike bar': {
+        'bar': 91,     // Standard Klondike bar (~3 oz/85-97g average)
+        'piece': 91,   // 1 piece = 1 bar
+        'bars': 91,
+      },
+      'klondike': {
+        'bar': 91,     // Standard Klondike bar (~3 oz/85-97g average)
+        'piece': 91,   // 1 piece = 1 bar
+        'bars': 91,
+      },
+      'good humor bar': {
+        'bar': 78,     // Good Humor bar (2.75 fl oz/~78g)
+        'piece': 78,   // 1 piece = 1 bar
+        'bars': 78,
+      },
+      'good humor': {
+        'bar': 78,     // Good Humor bar (2.75 fl oz/~78g)
+        'piece': 78,   // 1 piece = 1 bar
+        'bars': 78,
+      },
+      'creamsicle': {
+        'bar': 78,     // Good Humor Creamsicle bar (2.75 fl oz)
+        'piece': 78,   // 1 piece = 1 bar
+        'bars': 78,
+      },
+      'ben jerry bar': {
+        'bar': 71,     // Ben & Jerry's pint slice bar (~250 cal/3.5 oz)
+        'piece': 71,   // 1 piece = 1 bar
+        'bars': 71,
+        'slice': 71,   // Pint slice
+      },
+      'ben jerrys bar': {
+        'bar': 71,     // Ben & Jerry's pint slice bar
+        'piece': 71,   // 1 piece = 1 bar
+        'bars': 71,
+        'slice': 71,   // Pint slice
+      },
       'popsicle': {
         'piece': 50,   // FDA RACC: 1 popsicle = 50g
         'popsicle': 50,
@@ -2211,8 +2269,19 @@ export class USDAService {
         // For items like "medium", "large", use food-specific defaults
         const foodType = food.description.toLowerCase();
         
+        // Ice cream bars - assume "1" means "1 bar" when no unit specified
+        if (foodType.includes('haagen') && foodType.includes('daz')) {
+          gramsEquivalent = quantity * 88; // Haagen-Dazs bar standard size
+        } else if (foodType.includes('klondike')) {
+          gramsEquivalent = quantity * 91; // Klondike bar standard size
+        } else if (foodType.includes('good humor') || foodType.includes('creamsicle')) {
+          gramsEquivalent = quantity * 78; // Good Humor bar standard size
+        } else if (foodType.includes('ben') && foodType.includes('jer')) {
+          gramsEquivalent = quantity * 71; // Ben & Jerry's pint slice bar
+        } else if (foodType.includes('ice cream bar')) {
+          gramsEquivalent = quantity * 60; // Generic ice cream bar FDA standard
         // Candy bars - assume "1" means "1 bar" when no unit specified
-        if (foodType.includes('snickers')) {
+        } else if (foodType.includes('snickers')) {
           gramsEquivalent = quantity * 52; // Snickers bar standard size
         } else if (foodType.includes('kit kat')) {
           gramsEquivalent = quantity * 42; // Kit Kat bar standard size
