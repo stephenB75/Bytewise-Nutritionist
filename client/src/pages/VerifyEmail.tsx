@@ -68,7 +68,7 @@ export default function VerifyEmail() {
   }, [supabase, setLocation]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-t from-yellow-400 to-white">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="max-w-md w-full bg-white/80 backdrop-blur-md border-gray-200 p-8">
         <div className="text-center space-y-6">
           {verificationStatus === 'verifying' && (

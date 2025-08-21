@@ -286,7 +286,7 @@ export default function AIFoodAnalyzer() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-t from-yellow-400 to-white">
+    <div className="min-h-screen">
       <div className="max-w-4xl mx-auto space-y-6 p-6" data-testid="page-ai-food-analyzer">
       {/* Header */}
       <div className="text-center space-y-2">

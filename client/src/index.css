@@ -860,28 +860,19 @@ button.text-blue-400 {
   color: #ffffff !important;
 }
 
-/* Light gradient background text colors */
-.bg-gradient-to-t.from-yellow-400.to-white *:not([class*="bg-"]),
-.from-yellow-400.to-white *:not([class*="bg-"]) {
-  color: #1f2937 !important; /* dark text on light gradient background */
-}
-
-.bg-gradient-to-t.from-yellow-400.to-white h1,
-.bg-gradient-to-t.from-yellow-400.to-white h2,
-.bg-gradient-to-t.from-yellow-400.to-white h3,
-.bg-gradient-to-t.from-yellow-400.to-white p,
-.bg-gradient-to-t.from-yellow-400.to-white span {
+/* Global gradient background ensures dark text for readability */
+body *:not([class*="text-"]):not([class*="bg-"]) {
   color: #1f2937 !important;
 }
 
-/* Global gradient background text color enforcement */
-body.bg-gradient-to-t * {
-  color: #1f2937;
-}
-
-/* Ensure all pages with gradient background have dark text */
-.min-h-screen.bg-gradient-to-t.from-yellow-400.to-white * {
-  color: #374151 !important;
+/* Ensure specific text elements are dark on gradient background */
+body h1:not([class*="text-"]),
+body h2:not([class*="text-"]),
+body h3:not([class*="text-"]),
+body p:not([class*="text-"]),
+body span:not([class*="text-"]),
+body div:not([class*="text-"]) {
+  color: #1f2937 !important;
 }
 
 /* ========== COMPLETE NAVIGATION AND NOTIFICATION ICON FRAME REMOVAL ========== */
