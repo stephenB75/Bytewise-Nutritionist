@@ -980,8 +980,8 @@ button[data-testid*="nav-"] {
 
 /* Content section spacing to prevent footer overlap */
 .content-section {
-  padding-bottom: 6rem !important; /* 96px - adequate clearance to prevent navigation overlap */
-  min-height: calc(100vh - 6rem) !important; /* Full viewport minus space for fixed navigation */
+  padding-bottom: 7rem !important; /* 112px - generous clearance to prevent navigation overlap */
+  min-height: calc(100vh - 7rem) !important; /* Full viewport minus space for fixed navigation */
 }
 
 /* Ensure proper scrolling behavior for pages with content sections */
