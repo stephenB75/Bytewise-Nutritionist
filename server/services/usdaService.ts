@@ -2142,7 +2142,7 @@ export class USDAService {
             gramsEquivalent = quantity * grams;
             
             // Generate portion warning comparing user input to FDA standards
-            const portionInfo = this.generatePortionWarning(ingredient, unitPattern, grams, conversions);
+            const portionInfo = this.generatePortionWarning(ingredient, unitPattern, gramsEquivalent, conversions);
             return { quantity, unit, gramsEquivalent, portionInfo };
           }
         }
@@ -2200,7 +2200,7 @@ export class USDAService {
       }
     }
 
-    // If no conversion found, check if unit suggests grams or use serving size
+    // If no conversion found, try smart defaults based on food type
     if (gramsEquivalent === quantity) {
       if (unit.match(/^g$|^grams?$|^\d+g$/) || unit.includes('gram')) {
         // Already in grams, don't multiply
@@ -2210,7 +2210,19 @@ export class USDAService {
       } else {
         // For items like "medium", "large", use food-specific defaults
         const foodType = food.description.toLowerCase();
-        if (foodType.includes('apple')) {
+        
+        // Candy bars - assume "1" means "1 bar" when no unit specified
+        if (foodType.includes('snickers')) {
+          gramsEquivalent = quantity * 52; // Snickers bar standard size
+        } else if (foodType.includes('kit kat')) {
+          gramsEquivalent = quantity * 42; // Kit Kat bar standard size
+        } else if (foodType.includes('hershey')) {
+          gramsEquivalent = quantity * 43; // Hershey bar standard size
+        } else if (foodType.includes('reese')) {
+          gramsEquivalent = quantity * 21; // Reese's cup standard size
+        } else if (this.isCandyRelated(foodType)) {
+          gramsEquivalent = quantity * 40; // Generic candy bar
+        } else if (foodType.includes('apple')) {
           gramsEquivalent = quantity * 180; // medium apple
         } else if (foodType.includes('banana')) {
           gramsEquivalent = quantity * 120; // medium banana  
