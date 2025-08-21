@@ -158,7 +158,7 @@ function AppContent() {
 
   return (
     <Router>
-      <div className="min-h-screen bg-black">
+      <div className="min-h-screen">
         <main className="min-h-screen">
           <Switch>
             <Route path="/verify-email" component={VerifyEmail} />

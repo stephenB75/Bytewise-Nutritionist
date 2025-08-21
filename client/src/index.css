@@ -38,11 +38,22 @@ html,
   min-height: 100vh !important;
 }
 
-/* Light theme overrides for common elements */
-.bg-black { background-color: #ffffff !important; }
-.bg-gray-900 { background-color: #f9fafb !important; }
-.bg-gray-800 { background-color: #ffffff !important; }
-.bg-gray-700 { background-color: #f3f4f6 !important; }
+/* Ensure page containers don't override gradient */
+.min-h-screen:not([class*="bg-"]),
+.min-h-screen:not([style*="background"]),
+.h-screen:not([class*="bg-"]),
+.h-screen:not([style*="background"]) {
+  background: inherit !important;
+}
+
+/* Light theme overrides for page backgrounds only */
+.min-h-screen.bg-black,
+.min-h-screen.bg-gray-900,
+.min-h-screen.bg-gray-800,
+.min-h-screen.bg-gray-700 {
+  background: linear-gradient(to top, #fbbf24 0%, #ffffff 100%) !important;
+  background-attachment: fixed !important;
+}
 
 /* Enhanced text color overrides for better contrast */
 .text-white { color: #111827 !important; } /* Darker for maximum contrast */
