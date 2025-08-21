@@ -656,14 +656,56 @@ button[data-testid*="nav-"]:active {
   -webkit-focus-ring-color: transparent !important;
 }
 
-/* CSS Logo Styling */
+/* Brand Style CSS Logo */
 .css-logo {
   text-align: center;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.css-logo span {
-  text-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+.css-logo .brand-name {
+  display: flex;
+  align-items: baseline;
+  gap: 0.1rem;
+  font-weight: 900;
+  font-size: 3rem;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.css-logo .brand-name .byte {
+  color: #22d3ee; /* cyan-400 */
+  text-shadow: 0 0 30px rgba(34, 211, 238, 0.4);
+}
+
+.css-logo .brand-name .wise {
+  color: #f97316; /* orange-500 */
+  text-shadow: 0 0 30px rgba(249, 115, 22, 0.4);
+}
+
+.css-logo .brand-tagline {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #d1d5db; /* gray-300 */
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.9;
+  margin-top: 0.25rem;
+}
+
+/* Responsive logo sizing */
+@media (max-width: 768px) {
+  .css-logo .brand-name {
+    font-size: 2.5rem;
+  }
+  
+  .css-logo .brand-tagline {
+    font-size: 0.625rem;
+    letter-spacing: 0.15em;
+  }
 }
 
 /* Comprehensive nav button frame removal */

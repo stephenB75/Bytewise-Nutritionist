@@ -1275,9 +1275,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           <div className="space-y-8 max-w-2xl">
             <div className="animate-fadeInUp [animation-delay:0.2s]">
               <div className="css-logo">
-                <span className="text-4xl font-black text-cyan-400">Byte</span>
-                <span className="text-4xl font-black text-orange-500">Wise</span>
-                <div className="text-sm font-medium text-gray-300 mt-1 tracking-wider">NUTRITIONIST</div>
+                <div className="brand-name">
+                  <span className="byte">Byte</span>
+                  <span className="wise">Wise</span>
+                </div>
+                <div className="brand-tagline">Nutritionist</div>
               </div>
             </div>
             
