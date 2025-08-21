@@ -858,6 +858,85 @@ button.text-blue-400 {
   color: #ffffff !important;
 }
 
+/* ========== COMPLETE NAVIGATION AND NOTIFICATION ICON FRAME REMOVAL ========== */
+
+/* Remove all frames, borders, backgrounds from navigation and notification icons */
+nav button,
+nav button *,
+[data-testid="navigation-tabs"] button,
+[data-testid="navigation-tabs"] button *,
+.fixed.bottom-0 button,
+.fixed.bottom-0 button *,
+button[data-testid*="nav-"],
+button[data-testid*="nav-"] *,
+[data-testid="notification-icon"],
+[data-testid="notification-icon"] *,
+.notification-icon,
+.notification-icon *,
+button[class*="notification"],
+button[class*="notification"] *,
+svg[class*="lucide"],
+.lucide,
+.lucide-home,
+.lucide-calculator,
+.lucide-calendar,
+.lucide-trophy,
+.lucide-settings,
+.lucide-user,
+.lucide-bell {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  outline-color: transparent !important;
+  -webkit-focus-ring-color: transparent !important;
+  -moz-outline: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background-image: none !important;
+}
+
+/* Remove frames on all interaction states */
+nav button:hover,
+nav button:focus,
+nav button:active,
+[data-testid="navigation-tabs"] button:hover,
+[data-testid="navigation-tabs"] button:focus,
+[data-testid="navigation-tabs"] button:active,
+.fixed.bottom-0 button:hover,
+.fixed.bottom-0 button:focus,
+.fixed.bottom-0 button:active,
+button[data-testid*="nav-"]:hover,
+button[data-testid*="nav-"]:focus,
+button[data-testid*="nav-"]:active,
+[data-testid="notification-icon"]:hover,
+[data-testid="notification-icon"]:focus,
+[data-testid="notification-icon"]:active {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Force remove any default button styling */
+nav button[type="button"],
+[data-testid="navigation-tabs"] button[type="button"],
+.fixed.bottom-0 button[type="button"],
+button[data-testid*="nav-"][type="button"] {
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  background: transparent !important;
+  border: none !important;
+}
+
 /* Ensure all metrics text is dark enough */
 .backdrop-blur-md .text-white,
 .bg-white\/10 .text-white,
