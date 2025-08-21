@@ -980,8 +980,8 @@ button[data-testid*="nav-"] {
 
 /* Content section spacing to prevent footer overlap */
 .content-section {
-  padding-bottom: 5rem !important; /* 80px - further reduced clearance for even smaller fixed bottom navigation */
-  min-height: calc(100vh - 5rem) !important; /* Full viewport minus space for fixed navigation */
+  padding-bottom: 6rem !important; /* 96px - adequate clearance to prevent navigation overlap */
+  min-height: calc(100vh - 6rem) !important; /* Full viewport minus space for fixed navigation */
 }
 
 /* Ensure proper scrolling behavior for pages with content sections */
@@ -991,7 +991,7 @@ button[data-testid*="nav-"] {
 
 /* Bottom navigation spacing and safe area handling */
 .safe-area-pb {
-  padding-bottom: max(0.5rem, env(safe-area-inset-bottom)) !important;
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom)) !important;
 }
 
 /* Enhanced bottom navigation positioning */
