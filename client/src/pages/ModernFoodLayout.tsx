@@ -943,14 +943,19 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     buttonText: string;
     onButtonClick: () => void;
   }) => {
+    // Determine if current page is dashboard
+    const isDashboard = activeTab === 'home';
+    
     // Memoize the background style to prevent recalculation
     const backgroundStyle = React.useMemo(() => ({
-      backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.45), rgba(0,0,0,0.75)), url('${backgroundImage}')`,
+      backgroundImage: isDashboard 
+        ? `linear-gradient(135deg, rgba(0,0,0,0.45), rgba(0,0,0,0.75)), url('${backgroundImage}')`
+        : `linear-gradient(135deg, rgba(255,255,255,0.75), rgba(255,255,255,0.85)), url('${backgroundImage}')`,
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       backgroundRepeat: 'no-repeat',
       willChange: 'transform',
-    }), [backgroundImage]);
+    }), [backgroundImage, isDashboard]);
 
     return (
       <div className="relative h-screen overflow-hidden hero-component" data-hero="true">
@@ -968,11 +973,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         </div>
         
         {/* Content Layer with Enhanced Typography */}
-        <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6 z-20">
+        <div className={`absolute inset-0 flex flex-col justify-center items-center text-center px-6 z-20 ${isDashboard ? 'text-white' : 'text-gray-900'}`}>
           <div className="space-y-8 max-w-2xl">
             {/* Enhanced Title Section */}
             <div className="space-y-3 hero-optimized">
-              <h1 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] text-white drop-shadow-2xl animate-fadeInUp [animation-delay:0.2s] font-league-spartan text-optimized">
+              <h1 className={`text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] drop-shadow-2xl animate-fadeInUp [animation-delay:0.2s] font-league-spartan text-optimized ${isDashboard ? 'text-white' : 'text-gray-900'}`}>
                 {title}
               </h1>
               <h1 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] animate-fadeInUp [animation-delay:0.4s] font-league-spartan text-optimized">
@@ -983,7 +988,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             </div>
             
             {/* Enhanced Description */}
-            <p className="text-xl md:text-2xl text-gray-100 font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl animate-fadeInUp [animation-delay:0.6s] font-work-sans opacity-95">
+            <p className={`text-xl md:text-2xl font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl animate-fadeInUp [animation-delay:0.6s] font-work-sans opacity-95 ${isDashboard ? 'text-gray-100' : 'text-gray-700'}`}>
               {description}
             </p>
             
@@ -1005,16 +1010,16 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         </div>
         
         {/* Enhanced Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/70 z-30 animate-bounce">
+        <div className={`absolute bottom-8 left-1/2 -translate-x-1/2 z-30 animate-bounce ${isDashboard ? 'text-white/70' : 'text-gray-600/70'}`}>
           <div className="flex flex-col items-center gap-2">
-            <div className="w-px h-8 bg-gradient-to-b from-transparent to-white/50" />
+            <div className={`w-px h-8 bg-gradient-to-b from-transparent ${isDashboard ? 'to-white/50' : 'to-gray-600/50'}`} />
             <ChevronRight className="w-6 h-6 rotate-90 drop-shadow-lg" />
           </div>
         </div>
       </div>
     );
   }, (prevProps, nextProps) => {
-    // Custom comparison for better performance
+    // Custom comparison for better performance - include activeTab for overlay changes
     return (
       prevProps.title === nextProps.title &&
       prevProps.subtitle === nextProps.subtitle &&
