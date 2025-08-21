@@ -2,133 +2,31 @@
  * Modern Food App Layout - Clean Version
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { Card } from '@/components/ui/card';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import CalorieCalculator from '@/components/CalorieCalculator';
 import { UserSettingsManager } from '@/components/UserSettingsManager';
 import { SignOnModule } from '@/components/SignOnModule';
 import { useAuth } from '@/hooks/useAuth';
-import { DataManagementPanel } from '@/components/DataManagementPanel';
-import { AchievementCelebration } from '@/components/AchievementCelebration';
-import { AwardsAchievements } from '@/components/AwardsAchievements';
-import { ConfettiCelebration } from '@/components/ConfettiCelebration';
-import { ProfileCompletionModal } from '@/components/ProfileCompletionModal';
-import { FastingTracker } from '@/components/FastingTracker';
-import { FastingStatusCard } from '@/components/FastingStatusCard';
-import { useGoalAchievements } from '@/hooks/useGoalAchievements';
 import { useRotatingBackground } from '@/hooks/useRotatingBackground';
-import { useAchievements, getAchievementIcon, formatAchievementDate } from '@/hooks/useAchievements';
-import { ProfileIcon } from '@/components/ProfileIcon';
-import { TourLauncher, useAppTour } from '@/components/TourLauncher';
-import { apiRequest } from '@/lib/queryClient';
 import { 
-  Search, 
-  Plus,
   ChevronRight,
-  Flame,
-  Target,
-  Trophy,
-  Calendar,
-  Download,
   Bell,
-  BellRing,
-  X,
   Home,
-  BarChart3,
   UserCircle,
-  Utensils,
-  Clock,
-  CheckCircle2,
-  Sparkles,
-  Droplets,
-  Minus,
-  Trash2,
-  ArrowLeft,
-  ArrowRight
+  Utensils
 } from 'lucide-react';
-import { NotificationDropdown } from '@/components/NotificationDropdown';
-import { WeeklyCaloriesCard } from '@/components/WeeklyCaloriesCard';
 import { Toaster } from '@/components/ui/toaster';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/lib/supabase';
-import { getWeekDates, getLocalDateKey, getMealTypeByTime, formatLocalTime } from '@/utils/dateUtils';
-import { fixMealDateMismatches } from '@/utils/mealDateFixer';
-import { getCachedLocalStorage, debounce } from '@/utils/performanceUtils';
-import { useLocation } from 'wouter';
-import AIFoodAnalyzer from './AIFoodAnalyzer';
-import { AppleHealthIntegration } from '../components/AppleHealthIntegration';
-import { healthKitService } from '../services/healthKit';
 
 // Types
 interface ModernFoodLayoutProps {
   onNavigate?: (page: string) => void;
 }
 
-interface Notification {
-  id: string;
-  type: 'achievement' | 'info' | 'success';
-  title: string;
-  message: string;
-  timestamp: Date;
-  read: boolean;
-}
-
-interface Achievement {
-  type: 'daily-goal' | 'weekly-goal' | 'milestone' | 'special';
-  title: string;
-  message: string;
-  description: string;
-  confetti?: boolean;
-  trophy?: boolean;
-  points?: number;
-  icon?: any;
-}
-
-type TrackingView = 'daily' | 'weekly';
-
 export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) {
-  const { user, isLoading: authLoading, refetch: refetchUser } = useAuth();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('home');
-  const [previousTab, setPreviousTab] = useState('home');
-  const [openCard, setOpenCard] = useState<string | undefined>(undefined);
-  const { backgroundImage, animationKey } = useRotatingBackground(activeTab);
-  const { data: achievements = [], isLoading: achievementsLoading } = useAchievements();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showAchievement, setShowAchievement] = useState(false);
-  const [currentAchievement, setCurrentAchievement] = useState<Achievement | null>(null);
-  const [showConfettiCelebration, setShowConfettiCelebration] = useState(false);
-  const [confettiAchievement, setConfettiAchievement] = useState<Achievement | null>(null);
-  const [dailyCalories, setDailyCalories] = useState(0);
-  const [weeklyCalories, setWeeklyCalories] = useState(0);
-  const [goalCalories, setGoalCalories] = useState((user as any)?.dailyCalorieGoal || 2000);
-  const [weeklyGoal, setWeeklyGoal] = useState(14000);
-  const [loggedMeals, setLoggedMeals] = useState<any[]>([]);
-  const [weeklyMeals, setWeeklyMeals] = useState<any[]>([]);
-  const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
-  const [trackingView, setTrackingView] = useState<TrackingView>('daily');
-  const [nutritionMode, setNutritionMode] = useState<'ai' | 'calculator'>('ai');
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const { toast } = useToast();
-  const [dailyStats, setDailyStats] = useState<any>(null);
-  const [fastingStatus, setFastingStatus] = useState<any>(null);
-  const [showProfileCompletion, setShowProfileCompletion] = useState(false);
-  const { shouldShowTour, dismissTour } = useAppTour();
-  const [showWelcomeBanner, setShowWelcomeBanner] = useState(() => shouldShowTour());
-  const [dailyMacros, setDailyMacros] = useState({ protein: 0, carbs: 0, fat: 0 });
-  const [dailyMicronutrients, setDailyMicronutrients] = useState({
-    vitaminC: 0,
-    vitaminD: 0,
-    vitaminB12: 0,
-    folate: 0,
-    iron: 0,
-    calcium: 0,
-    zinc: 0,
-    magnesium: 0
-  });
+  const { backgroundImage } = useRotatingBackground(activeTab);
 
   // Simple placeholder components
   const HeroSection = ({ title, subtitle, description, buttonText, onButtonClick }: {
@@ -207,7 +105,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   // Tab change handler
   const handleTabChange = (newTab: string) => {
-    setPreviousTab(activeTab);
     setActiveTab(newTab);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
