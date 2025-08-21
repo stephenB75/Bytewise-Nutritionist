@@ -83,8 +83,8 @@ div[class*="bg-gray-800"]:not([class*="bg-gray-800/"]):not([class*="backdrop"]):
   background-attachment: fixed !important;
 }
 
-/* Enhanced text color overrides for better contrast - EXCLUDE navigation, notifications, and hero components */
-.text-white:not([data-testid*="nav-"] *):not([data-testid*="nav-"]):not([data-testid*="notification"] *):not([aria-label*="notification"] *):not(.btn-hero-enhanced *):not(.btn-hero-enhanced):not(.hero-component *):not([data-hero="true"] *) { color: #111827 !important; } /* Darker for maximum contrast */
+/* Enhanced text color overrides for better contrast - EXCLUDE navigation, notifications, hero components, and hero buttons */
+.text-white:not([data-testid*="nav-"] *):not([data-testid*="nav-"]):not([data-testid*="notification"] *):not([aria-label*="notification"] *):not(.btn-hero-enhanced *):not(.btn-hero-enhanced):not(.hero-component *):not([data-hero="true"] *):not(.hero-component button *):not([data-hero="true"] button *) { color: #111827 !important; } /* Darker for maximum contrast */
 .text-gray-100 { color: #1f2937 !important; } /* Much darker */
 .text-gray-200 { color: #374151 !important; } /* Darker */
 .text-gray-300 { color: #4b5563 !important; } /* Darker gray */
@@ -130,16 +130,23 @@ div[class*="bg-gray-800"]:not([class*="bg-gray-800/"]):not([class*="backdrop"]):
 .text-white\/80 { color: #1f2937 !important; } /* Very dark gray */
 .text-white\/90 { color: #111827 !important; } /* Nearly black */
 
-/* Force white text in hero buttons - Override all conflicts */
+/* Force white text in hero buttons - Override all conflicts - MAXIMUM SPECIFICITY */
 .btn-hero-enhanced,
 .btn-hero-enhanced *,
 .btn-hero-enhanced span,
 .btn-hero-enhanced .text-white,
 button.btn-hero-enhanced,
 button.btn-hero-enhanced *,
-button.btn-hero-enhanced span {
+button.btn-hero-enhanced span,
+.hero-component .btn-hero-enhanced,
+.hero-component .btn-hero-enhanced *,
+.hero-component .btn-hero-enhanced span,
+[data-hero="true"] .btn-hero-enhanced,
+[data-hero="true"] .btn-hero-enhanced *,
+[data-hero="true"] .btn-hero-enhanced span {
   color: #ffffff !important;
   fill: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
 }
 
 /* Fix any remaining light colors in UI elements */
@@ -2799,12 +2806,38 @@ select {
   color: white !important;
 }
 
-/* Force all buttons in hero components to have white text */
+/* Force all buttons in hero components to have white text - HIGHEST PRIORITY */
 .hero-component button,
 .hero-component button *,
+.hero-component button span,
+.hero-component Button,
+.hero-component Button *,
+.hero-component Button span,
 [data-hero="true"] button,
-[data-hero="true"] button * {
+[data-hero="true"] button *,
+[data-hero="true"] button span,
+[data-hero="true"] Button,
+[data-hero="true"] Button *,
+[data-hero="true"] Button span,
+button.btn-hero-enhanced,
+button.btn-hero-enhanced *,
+button.btn-hero-enhanced span {
   color: white !important;
+  fill: white !important;
+  -webkit-text-fill-color: white !important;
+}
+
+/* Ultimate override for ANY button text in hero components */
+.hero-component button.text-white,
+.hero-component Button.text-white,
+[data-hero="true"] button.text-white,
+[data-hero="true"] Button.text-white,
+.hero-component button *,
+.hero-component Button *,
+[data-hero="true"] button *,
+[data-hero="true"] Button * {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
 }
 
 .hero-layout {
