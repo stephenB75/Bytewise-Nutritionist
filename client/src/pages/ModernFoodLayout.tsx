@@ -1337,21 +1337,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-xl font-black text-white">Today's Progress</h2>
             <div className="flex gap-2">
-              {user && (
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  className="text-blue-400 hover:text-blue-300"
-                  onClick={() => {
-                    // Reset tour for testing
-                    localStorage.removeItem('bytewise-tour-completed');
-                    startTour();
-                  }}
-                  data-testid="manual-tour-button"
-                >
-                  Take Tour
-                </Button>
-              )}
               <Button 
                 variant="ghost" 
                 className="text-orange-400 hover:text-orange-300"
@@ -2552,21 +2537,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                       <AppleHealthIntegration onHealthDataSync={handleHealthDataSync} />
                     </div>
                     
-                    {/* Start Tour Button */}
-                    <div className="mt-6 pt-4 border-t border-white/10">
-                      <Button
-                        onClick={startTour}
-                        variant="outline"
-                        className="w-full bg-blue-600/20 hover:bg-blue-600/30 border-blue-500 text-blue-300 hover:text-blue-200"
-                        data-testid="start-tour-button"
-                      >
-                        <span className="text-lg mr-2">🎯</span>
-                        Take App Tour
-                      </Button>
-                      <p className="text-xs text-gray-400 mt-2 text-center">
-                        Learn how to use all the features
-                      </p>
-                    </div>
+
                   </div>
                 </AccordionContent>
               </Card>
