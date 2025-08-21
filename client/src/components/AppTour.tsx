@@ -6,7 +6,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Joyride, { CallBackProps, STATUS, Step, Styles } from 'react-joyride';
 import { Button } from '@/components/ui/button';
-import { X, ArrowLeft, ArrowRight, MapPin, Play, Sparkles, Target, Camera, Trophy, Clock, Utensils, Droplets } from 'lucide-react';
+import { X, ArrowLeft, ArrowRight, MapPin, Play, Sparkles, Target, Camera, Trophy, Clock, Utensils, Droplets, CheckCircle2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
@@ -138,72 +138,8 @@ const TOUR_STEPS: TourStep[] = [
   }
 ];
 
-// Custom Tooltip Component for enhanced visuals
-const CustomTooltip = ({ step, index, size, ...props }: any) => {
-  const stepData = TOUR_STEPS.find(s => s.target === step.target);
-  
-  return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 max-w-sm w-full">
-      {/* Header with category badge */}
-      <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-3 rounded-t-xl">
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-2">
-            {stepData?.icon}
-            <Badge variant="secondary" className="text-xs bg-white/20 text-white border-white/30">
-              {stepData?.category.replace('-', ' ')}
-            </Badge>
-          </div>
-          <span className="text-xs opacity-80">
-            {index + 1} / {size}
-          </span>
-        </div>
-        <h3 className="font-bold text-lg leading-tight">{step.title}</h3>
-      </div>
-      
-      {/* Content */}
-      <div className="p-4">
-        <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed mb-3">
-          {step.content}
-        </p>
-        
-        {stepData?.benefits && (
-          <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-3 mb-3">
-            <p className="text-green-700 dark:text-green-300 text-xs font-medium">
-              ✨ <strong>Benefit:</strong> {stepData.benefits}
-            </p>
-          </div>
-        )}
-        
-        {stepData?.tips && stepData.tips.length > 0 && (
-          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 mb-3">
-            <p className="text-blue-700 dark:text-blue-300 text-xs font-medium mb-2">💡 <strong>Pro Tips:</strong></p>
-            <ul className="space-y-1">
-              {stepData.tips.map((tip, i) => (
-                <li key={i} className="text-blue-600 dark:text-blue-400 text-xs">• {tip}</li>
-              ))}
-            </ul>
-          </div>
-        )}
-        
-        {/* Progress indicator */}
-        <div className="flex gap-1 justify-center mb-3">
-          {Array.from({ length: size }).map((_, i) => (
-            <div
-              key={i}
-              className={`w-2 h-2 rounded-full transition-colors ${
-                i === index 
-                  ? 'bg-blue-500' 
-                  : i < index 
-                  ? 'bg-green-500' 
-                  : 'bg-gray-300 dark:bg-gray-600'
-              }`}
-            />
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
+// Simplified approach - use default Joyride tooltip with enhanced styling
+const CustomTooltip = null; // Use default Joyride tooltip for better navigation
 
 // Enhanced Tour Styles
 const tourStyles: Partial<Styles> = {
@@ -267,8 +203,10 @@ export function AppTour({ isOpen, onClose, onComplete }: AppTourProps) {
   }, [isOpen]);
 
   const handleJoyrideCallback = (data: CallBackProps) => {
-    const { status, type, index } = data;
+    const { status, type, index, action } = data;
     const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
+
+    console.log('Tour callback:', { status, type, index, action });
 
     if (finishedStatuses.includes(status)) {
       localStorage.setItem('bytewise-tour-completed', 'true');
@@ -278,7 +216,9 @@ export function AppTour({ isOpen, onClose, onComplete }: AppTourProps) {
       }
       onClose();
     } else if (type === 'step:after') {
-      setStepIndex(index + (data.action === 'next' ? 1 : -1));
+      // Update step index based on action
+      const newIndex = action === 'next' ? index + 1 : index - 1;
+      setStepIndex(newIndex);
     }
   };
 
@@ -292,10 +232,9 @@ export function AppTour({ isOpen, onClose, onComplete }: AppTourProps) {
       showSkipButton
       steps={TOUR_STEPS}
       styles={tourStyles}
-      tooltipComponent={CustomTooltip}
-      disableOverlayClose
-      hideCloseButton
-      spotlightClicks
+      disableOverlayClose={false}
+      hideCloseButton={false}
+      spotlightClicks={false}
       stepIndex={stepIndex}
       locale={{
         back: 'Previous',
