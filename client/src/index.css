@@ -576,19 +576,54 @@ button[data-testid^="nav-"] {
   transition: all 300ms ease-out !important;
 }
 
-/* Override ANY possible browser/framework button styling */
+/* ABSOLUTE NUCLEAR RESET: Override ANY possible styling */
 * button[data-testid*="nav-"],
 * button[data-testid^="nav-"],
 html button[data-testid*="nav-"],
-body button[data-testid*="nav-"] {
+body button[data-testid*="nav-"],
+button[data-testid*="nav-"] *,
+button[data-testid^="nav-"] *,
+button[data-testid*="nav-"] svg,
+button[data-testid^="nav-"] svg,
+button[data-testid*="nav-"] .lucide,
+button[data-testid^="nav-"] .lucide {
   background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
   border: 0 !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
   outline: 0 !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  outline-color: transparent !important;
   box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  -moz-box-shadow: none !important;
   margin: 0 !important;
+  padding: 0 !important;
   -webkit-appearance: none !important;
   -moz-appearance: none !important;
   appearance: none !important;
+  text-shadow: none !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Force remove all possible button container styling */
+[data-testid="navigation-tabs"] button,
+[data-testid="navigation-tabs"] button:hover,
+[data-testid="navigation-tabs"] button:focus,
+[data-testid="navigation-tabs"] button:active,
+[data-testid="navigation-tabs"] button:visited {
+  all: unset !important;
+  background: none !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 /* Icon styling controlled by Tailwind */

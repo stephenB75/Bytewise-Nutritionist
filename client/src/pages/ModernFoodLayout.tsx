@@ -2788,6 +2788,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 key={tab.id}
                 data-testid={tab.testId}
                 onClick={() => handleTabChange(tab.id)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  outline: 'none',
+                  boxShadow: 'none',
+                  WebkitAppearance: 'none',
+                  MozAppearance: 'none',
+                  appearance: 'none'
+                }}
                 className={`group flex flex-col items-center py-2 px-2 transition-all duration-300 ease-out min-w-[60px] flex-1 ${
                   activeTab === tab.id
                     ? 'text-yellow-600'
