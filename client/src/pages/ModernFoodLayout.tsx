@@ -1331,7 +1331,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <div className="mb-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-2xl">🎯</span>
-                <h3 className="font-semibold text-lg text-gray-800 dark:text-white">Welcome to ByteWise!</h3>
+                <h3 className="font-semibold text-lg text-white">Welcome to ByteWise!</h3>
               </div>
               <p className="text-gray-700 dark:text-gray-300 text-sm mb-3">
                 Ready to discover all the amazing features? Take our interactive tour to learn how to track nutrition and build healthy habits.
@@ -1351,7 +1351,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     setShowWelcomeBanner(false);
                     dismissTour();
                   }}
-                  className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg text-sm font-medium hover:bg-gray-300 transition-colors"
+                  className="px-4 py-2 bg-gray-200 text-white rounded-lg text-sm font-medium hover:bg-gray-300 transition-colors btn-hero-enhanced"
                 >
                   Maybe Later
                 </button>
