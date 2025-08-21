@@ -2788,18 +2788,26 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 key={tab.id}
                 data-testid={tab.testId}
                 onClick={() => handleTabChange(tab.id)}
-                className={`group flex flex-col items-center py-2.5 px-3 rounded-2xl transition-all duration-300 ease-out min-w-[60px] flex-1 transform hover:scale-105 active:scale-95 active:bg-white active:text-gray-900 ${
+                className={`group flex flex-col items-center py-2 px-2 transition-all duration-300 ease-out min-w-[60px] flex-1 ${
                   activeTab === tab.id
-                    ? 'text-gray-900 bg-yellow-400 shadow-lg shadow-yellow-500/40'
-                    : 'text-gray-800 bg-yellow-400/80 hover:text-gray-900 hover:bg-yellow-400 hover:shadow-md hover:shadow-yellow-400/30'
+                    ? 'text-yellow-600'
+                    : 'text-gray-600 hover:text-gray-800 active:text-white'
                 }`}
               >
                 <IconComponent 
-                  size={20} 
-                  className={`mb-1 transition-all duration-300 ease-out ${activeTab === tab.id ? 'drop-shadow-lg transform scale-110 filter brightness-110' : 'transform scale-100 group-active:scale-125 group-active:text-gray-900'}`}
-                  strokeWidth={activeTab === tab.id ? 2.8 : 2.2}
+                  size={24} 
+                  className={`mb-1 transition-all duration-300 ease-out transform ${
+                    activeTab === tab.id 
+                      ? 'scale-110 drop-shadow-lg text-yellow-600' 
+                      : 'scale-100 hover:scale-105 active:scale-125 active:text-white'
+                  }`}
+                  strokeWidth={activeTab === tab.id ? 2.5 : 2}
                 />
-                <span className={`text-[10px] font-bold leading-tight text-center transition-all duration-300 ease-out ${activeTab === tab.id ? 'transform scale-105 drop-shadow-sm' : 'transform scale-100 group-active:text-gray-900'}`}>{tab.label}</span>
+                <span className={`text-[9px] font-semibold leading-tight text-center transition-all duration-300 ease-out ${
+                  activeTab === tab.id 
+                    ? 'text-yellow-600 transform scale-105' 
+                    : 'text-gray-600 hover:text-gray-800 active:text-white'
+                }`}>{tab.label}</span>
               </button>
             )
           })}
