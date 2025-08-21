@@ -949,14 +949,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     
     // Memoize the background style to prevent recalculation
     const backgroundStyle = React.useMemo(() => ({
-      backgroundImage: isDashboard 
-        ? `linear-gradient(135deg, rgba(0,0,0,0.25), rgba(0,0,0,0.35)), url('${backgroundImage}')`
-        : `linear-gradient(135deg, rgba(255,255,255,0.75), rgba(255,255,255,0.85)), url('${backgroundImage}')`,
+      backgroundImage: `url('${backgroundImage}')`,
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       backgroundRepeat: 'no-repeat',
       willChange: 'transform',
-    }), [backgroundImage, isDashboard]);
+    }), [backgroundImage]);
 
     return (
       <div className="relative h-screen overflow-hidden hero-component" data-hero="true">
@@ -966,6 +964,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           className="absolute inset-0 z-10 hero-bg-optimized"
           style={backgroundStyle}
         />
+        
+        {/* CSS-controlled Overlay for consistent opacity */}
+        <div className="hero-gradient-overlay" />
         
         {/* Enhanced Pattern Overlay */}
         <div className="absolute inset-0 z-15 opacity-20">
@@ -1273,9 +1274,14 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           key={`home-bg-${animationKey}`}
           className="absolute inset-0 bg-cover bg-center z-10 hero-bg-slide"
           style={{
-            backgroundImage: `linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(255, 255, 255, 0.6)), url('${backgroundImage}')`
+            backgroundImage: `url('${backgroundImage}')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
           }}
         />
+        
+        {/* CSS-controlled Overlay for consistent opacity */}
+        <div className="hero-gradient-overlay" />
         
         <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6 z-20">
           <div className="space-y-8 max-w-2xl">
