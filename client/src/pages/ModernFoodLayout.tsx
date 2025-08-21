@@ -2796,7 +2796,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               >
                 <IconComponent 
                   size={28} 
-                  className={`mb-2 transition-all duration-300 ease-out transform ${
+                  className={`mb-1.5 transition-all duration-300 ease-out transform ${
                     activeTab === tab.id 
                       ? 'scale-110 drop-shadow-lg text-yellow-600' 
                       : 'scale-100 hover:scale-105 active:scale-125 active:text-white'
