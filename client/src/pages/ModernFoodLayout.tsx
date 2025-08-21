@@ -2812,7 +2812,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   }`}
                   strokeWidth={activeTab === tab.id ? 2.5 : 2}
                 />
-                <span className={`text-[8px] font-semibold leading-tight text-center w-full transition-all duration-300 ease-out ${
+                <span className={`text-[10px] font-semibold leading-tight text-center w-full transition-all duration-300 ease-out ${
                   activeTab === tab.id 
                     ? 'text-yellow-600 transform scale-105' 
                     : 'text-gray-600 hover:text-gray-800 active:text-white'
