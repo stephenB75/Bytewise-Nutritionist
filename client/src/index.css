@@ -47,6 +47,32 @@ html,
 .border-gray-700 { border-color: #e5e7eb !important; }
 .border-gray-800 { border-color: #d1d5db !important; }
 
+/* Light theme border overrides for cards and components */
+.border-white\/20 { border-color: #d1d5db !important; }
+.border-white\/10 { border-color: #e5e7eb !important; }
+.border-cyan-400\/20 { border-color: #67e8f9 !important; }
+.border-cyan-400\/30 { border-color: #22d3ee !important; }
+.border-blue-200 { border-color: #dbeafe !important; }
+.border-green-500\/30 { border-color: #22c55e !important; }
+
+/* Enhanced borders for buttons and cards */
+.light-theme .bg-white\/10 { 
+  background-color: #f8fafc !important; 
+  border: 1px solid #e2e8f0 !important;
+}
+.light-theme .bg-white\/15 { 
+  background-color: #f1f5f9 !important; 
+  border-color: #cbd5e1 !important;
+}
+
+/* Button border enhancements */
+.light-theme button:not(.bg-orange-500):not([class*="bg-gradient"]) {
+  border: 1px solid #e2e8f0 !important;
+}
+.light-theme button:hover:not(.bg-orange-500):not([class*="bg-gradient"]) {
+  border-color: #cbd5e1 !important;
+}
+
 /* Mobile Safe Area Support for iOS and Android Status Bars */
 @supports (padding: max(0px)) {
   .top-safe {

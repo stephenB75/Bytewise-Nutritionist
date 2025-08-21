@@ -1051,7 +1051,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     const isComplete = progressWidth >= 100;
     
     return (
-      <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4 transition-all duration-300 hover:bg-white/15 hover:border-white/30">
+      <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4 transition-all duration-300 hover:bg-white/15 hover:border-white/30 border-2">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
             <div className={`p-2 bg-${color}-500/20 rounded-xl`}>
@@ -1091,7 +1091,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     const isGoalReached = glasses >= dailyGoal;
     
     return (
-      <Card className={`bg-gradient-to-br from-cyan-500/10 to-blue-600/10 backdrop-blur-md border-cyan-400/20 p-6 transition-all duration-300 hover:from-cyan-500/15 hover:to-blue-600/15 hover:border-cyan-400/30 ${isGoalReached ? 'ring-2 ring-cyan-400/50' : ''}`}>
+      <Card className={`bg-gradient-to-br from-cyan-500/10 to-blue-600/10 backdrop-blur-md border-cyan-400/20 p-6 transition-all duration-300 hover:from-cyan-500/15 hover:to-blue-600/15 hover:border-cyan-400/30 border-2 ${isGoalReached ? 'ring-2 ring-cyan-400/50' : ''}`}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
             <div className={`p-3 rounded-xl transition-all duration-300 ${isGoalReached ? 'bg-gradient-to-br from-cyan-400 to-blue-500' : 'bg-cyan-500/20'}`}>
@@ -1146,7 +1146,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               disabled={glasses <= 0}
               size="sm"
               variant="ghost"
-              className="h-8 w-8 p-0 text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 disabled:opacity-50 shadow-lg hover:shadow-xl transition-shadow duration-200"
+              className="h-8 w-8 p-0 text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 disabled:opacity-50 shadow-lg hover:shadow-xl transition-shadow duration-200 border border-cyan-400/30 hover:border-cyan-400/50"
               data-testid="button-decrement-water"
             >
               <Minus className="w-4 h-4" />
@@ -1155,7 +1155,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               onClick={onIncrement}
               size="sm"
               variant="ghost"
-              className="h-8 w-8 p-0 text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 shadow-lg hover:shadow-xl transition-shadow duration-200"
+              className="h-8 w-8 p-0 text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 shadow-lg hover:shadow-xl transition-shadow duration-200 border border-cyan-400/30 hover:border-cyan-400/50"
               data-testid="button-increment-water"
             >
               <Plus className="w-4 h-4" />
@@ -1188,7 +1188,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     const labelColor = isNegative ? 'text-red-300' : 'text-gray-400';
 
     return (
-      <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4 transition-all duration-300 hover:bg-white/15 hover:border-white/30">
+      <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4 transition-all duration-300 hover:bg-white/15 hover:border-white/30 border-2">
         <div className="text-center">
           <div className={`text-sm ${labelColor} mb-1 leading-tight`}>
             <div>Remaining</div>
@@ -1243,7 +1243,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     const [textColor, gradientColors] = colorClasses.split(' from-');
     
     return (
-    <Card className="bg-white/10 backdrop-blur-md border-white/20 p-3">
+    <Card className="bg-white/10 backdrop-blur-md border-white/20 p-3 border-2">
       <div className="flex items-center justify-between mb-2">
         <div className={`text-sm font-semibold ${textColor}`}>{name}</div>
         <div className="text-xs text-white font-bold">{displayValue}{unit} / {goal}{unit}</div>
@@ -1561,7 +1561,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             </div>
             
             {(!searchQuery && loggedMeals.length === 0) ? (
-              <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
+              <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6 border-2">
                 <div className="text-center text-gray-400">
                   <p className="text-lg mb-2">No meals logged today</p>
                   <p className="text-sm">Use the search bar above or nutrition calculator to start tracking</p>
@@ -1570,7 +1570,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             ) : searchQuery && weeklyMeals.filter(meal => 
               meal.name.toLowerCase().includes(searchQuery.toLowerCase())
             ).length === 0 ? (
-              <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
+              <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6 border-2">
                 <div className="text-center text-gray-400">
                   <p className="text-lg mb-2">No meals found</p>
                   <p className="text-sm">Try a different search term or add new meals to your log</p>
@@ -1591,7 +1591,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 })
                 .slice(0, 50) // Limit results for performance
                 .map((meal, index) => (
-              <Card key={`search-${meal.id || meal.name}-${meal.timestamp || index}`} className="bg-white/10 backdrop-blur-md border-white/20 p-4">
+              <Card key={`search-${meal.id || meal.name}-${meal.timestamp || index}`} className="bg-white/10 backdrop-blur-md border-white/20 p-4 border-2">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
                     <h4 className="text-white font-semibold">{meal.name}</h4>
@@ -1649,7 +1649,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     <Button 
                       size="sm" 
                       variant="ghost" 
-                      className="text-gray-400 hover:text-red-400 p-2 shadow-md hover:shadow-lg transition-shadow duration-200"
+                      className="text-gray-400 hover:text-red-400 p-2 shadow-md hover:shadow-lg transition-shadow duration-200 border border-gray-400/30 hover:border-red-400/50"
                       data-testid={`button-delete-meal-${index}`}
                       onClick={() => {
                         // Delete meal action
@@ -2223,7 +2223,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <Button
                 variant="ghost"
                 size="sm"
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white shadow-md hover:shadow-lg transition-shadow duration-200"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white shadow-md hover:shadow-lg transition-shadow duration-200 border border-gray-400/30 hover:border-gray-300/50"
                 onClick={() => setSearchQuery('')}
               >
                 <X className="w-5 h-5" />
@@ -2233,7 +2233,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         </div>
         {/* Daily Header */}
         <div className="flex space-x-4 mb-6">
-          <Button className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-200">
+          <Button className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-200 border border-orange-400/50 hover:border-orange-300/70">
             <Calendar className="w-4 h-4 mr-2" />
             Today
           </Button>
