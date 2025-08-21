@@ -2762,6 +2762,7 @@ select {
 .hero-gradient-overlay {
   position: absolute;
   inset: 0;
+  z-index: 12;
   background: linear-gradient(to top, rgba(0, 0, 0, 0.462) 0%, rgba(0, 0, 0, 0.231) 50%, transparent 100%);
 }
 
