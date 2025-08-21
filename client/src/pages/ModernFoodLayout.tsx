@@ -36,6 +36,7 @@ import {
   Calendar,
   Download,
   Bell,
+  BellRing,
   X,
   Home,
   BarChart3,
@@ -2707,21 +2708,31 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           <Button
             variant="ghost"
             size="lg"
-            className="bg-transparent text-white rounded-2xl p-4 transition-all duration-300 hover:scale-105"
+            className="group relative bg-white/5 backdrop-blur-xl text-white rounded-2xl p-4 transition-all duration-500 hover:scale-110 hover:bg-white/10 hover:shadow-2xl hover:shadow-blue-500/20 border border-white/10"
             onClick={() => setShowNotificationDropdown(!showNotificationDropdown)}
             aria-label={`Notifications${notifications.filter(n => !n.read).length > 0 ? ` - ${notifications.filter(n => !n.read).length} unread` : ''}`}
             aria-expanded={showNotificationDropdown}
             aria-haspopup="dialog"
             data-testid="button-notifications"
           >
-            <Bell className="w-8 h-8" strokeWidth={2.5} aria-hidden="true" />
+            <div className="relative">
+              {notifications.filter(n => !n.read).length > 0 ? (
+                <BellRing className="w-8 h-8 transition-all duration-300 group-hover:rotate-12 group-hover:text-blue-300" strokeWidth={2} aria-hidden="true" />
+              ) : (
+                <Bell className="w-8 h-8 transition-all duration-300 group-hover:rotate-6 group-hover:text-blue-300" strokeWidth={2} aria-hidden="true" />
+              )}
+              
+              {/* Modern gradient glow effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+            </div>
+            
             {notifications.filter(n => !n.read).length > 0 && (
               <div 
-                className="absolute -top-2 -right-2 w-8 h-8 bg-red-600 rounded-full flex items-center justify-center border-3 border-white shadow-xl animate-pulse ring-2 ring-red-400/50"
+                className="absolute -top-1 -right-1 min-w-6 h-6 bg-gradient-to-r from-red-500 to-pink-500 rounded-full flex items-center justify-center border-2 border-white/20 shadow-lg animate-pulse"
                 aria-hidden="true"
               >
-                <span className="text-sm text-white font-bold drop-shadow-lg">
-                  {notifications.filter(n => !n.read).length}
+                <span className="text-xs text-white font-bold px-1">
+                  {notifications.filter(n => !n.read).length > 9 ? '9+' : notifications.filter(n => !n.read).length}
                 </span>
               </div>
             )}

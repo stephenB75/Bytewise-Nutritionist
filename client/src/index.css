@@ -342,54 +342,43 @@ svg[data-testid="icon-bell"] {
   outline: none !important;
 }
 
-/* Specific notification button in header - remove ALL white frames */
+/* Modern notification button styling - preserves new design */
 button[data-testid="button-notifications"] {
-  background: transparent !important;
-  background-color: transparent !important;
-  border: none !important;
   outline: none !important;
-  box-shadow: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
 }
 
-/* Remove white frame on hover and focus - override all Tailwind classes */
-button[data-testid="button-notifications"]:hover,
-button[data-testid="button-notifications"]:focus,
-button[data-testid="button-notifications"]:active {
-  background: transparent !important;
-  background-color: transparent !important;
-  border: none !important;
+/* Ensure proper hover effects for modern design */
+button[data-testid="button-notifications"]:focus {
   outline: none !important;
-  box-shadow: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5) !important;
 }
 
-/* Override ghost variant hover states for notification button */
-button[data-testid="button-notifications"].inline-flex:hover {
-  background: transparent !important;
-  background-color: transparent !important;
-}
-
-/* Override bg-white/10 styles specifically for notification button */
-button[data-testid="button-notifications"].hover\:bg-white\/10:hover {
-  background: transparent !important;
-  background-color: transparent !important;
-  border: none !important;
-}
-
-/* Remove drop shadow and any background from notification bell icon */
+/* Modern notification icons - Bell and BellRing */
 button[data-testid="button-notifications"] .lucide-bell,
+button[data-testid="button-notifications"] .lucide-bell-ring,
 button[data-testid="button-notifications"] svg {
   background: transparent !important;
-  background-color: transparent !important;
   border: none !important;
-  box-shadow: none !important;
-  filter: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  drop-shadow: none !important;
+}
+
+/* Enhanced notification badge styling */
+button[data-testid="button-notifications"] .animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Smooth gradient animations */
+@keyframes gradientShift {
+  0%, 100% { 
+    background-position: 0% 50%; 
+  }
+  50% { 
+    background-position: 100% 50%; 
+  }
+}
+
+/* Modern glow effect optimization */
+button[data-testid="button-notifications"] .blur-lg {
+  filter: blur(16px);
 }
 
 /* Target the specific header container for notification */
@@ -397,8 +386,6 @@ button[data-testid="button-notifications"] svg {
 .safe-notification-position > div {
   background: transparent !important;
   background-color: transparent !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
 }
 
 /* Additional card shadow consistency */
