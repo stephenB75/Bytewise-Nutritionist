@@ -415,38 +415,57 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
 
   // Update local state when data changes  
   useEffect(() => {
-    if (progressData || achievementsData) {
-      const allAchievementsWithProgress = ALL_ACHIEVEMENTS.map(achievement => {
-        const progressInfo = calculateProgress(achievement, progressData);
+    if (achievementsData?.achievements) {
+      // Map backend achievements to frontend format
+      const backendAchievements = achievementsData.achievements.map((dbAchievement: any) => {
+        // Find the matching static achievement definition
+        const staticAchievement = ALL_ACHIEVEMENTS.find(a => a.id === dbAchievement.achievementType);
+        
         return {
-          ...achievement,
-          progress: progressInfo.progress,
-          completed: progressInfo.completed,
-          completedDate: progressInfo.completedDate
+          id: dbAchievement.achievementType,
+          title: dbAchievement.title,
+          description: dbAchievement.description,
+          icon: staticAchievement?.icon || '🏅',
+          category: staticAchievement?.category || 'daily',
+          difficulty: staticAchievement?.difficulty || 'bronze',
+          progress: staticAchievement?.target || 1,
+          target: staticAchievement?.target || 1,
+          completed: true,
+          completedDate: new Date(dbAchievement.earnedAt),
+          points: staticAchievement?.points || 10
         };
       });
-      
-      setAchievements(allAchievementsWithProgress);
+
+      // Add incomplete achievements (show progress for achievable ones)
+      const completedTypes = new Set(backendAchievements.map((a: any) => a.id));
+      const incompleteAchievements = ALL_ACHIEVEMENTS
+        .filter(a => !completedTypes.has(a.id))
+        .map(achievement => ({
+          ...achievement,
+          progress: 0,
+          completed: false
+        }));
+
+      setAchievements([...backendAchievements, ...incompleteAchievements]);
+    } else {
+      // Show all achievements as incomplete if no backend data
+      setAchievements(ALL_ACHIEVEMENTS.map(a => ({ ...a, progress: 0, completed: false })));
     }
-  }, [achievementsData, progressData]);
+  }, [achievementsData]);
 
   // Update user stats when data changes
   useEffect(() => {
     if (statsData) {
-      const completedCount = achievements.filter(a => a.completed).length;
-      const totalPoints = achievements.filter(a => a.completed)
-        .reduce((sum, a) => sum + a.points, 0);
-      
       setUserStats({
-        totalPoints: totalPoints || statsData.totalPoints || 0,
-        achievementsCompleted: completedCount || statsData.achievementsUnlocked || 0,
+        totalPoints: statsData.totalPoints || 0,
+        achievementsCompleted: statsData.achievementsUnlocked || 0,
         currentStreak: statsData.currentStreak || 0,
         longestStreak: statsData.longestStreak || 0,
-        level: Math.floor(totalPoints / 100) + 1 || 1,
-        nextLevelPoints: ((Math.floor(totalPoints / 100) + 1) * 100) || 100
+        level: Math.floor((statsData.totalPoints || 0) / 100) + 1,
+        nextLevelPoints: ((Math.floor((statsData.totalPoints || 0) / 100) + 1) * 100)
       });
     }
-  }, [statsData, achievements]);
+  }, [statsData]);
 
   // Helper functions
   const getAchievementIcon = (id: string | undefined): string => {

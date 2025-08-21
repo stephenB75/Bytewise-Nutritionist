@@ -811,27 +811,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Achievement API routes - using same auth pattern as other working endpoints
-  app.get('/api/achievements', async (req: Request, res: Response) => {
-    // Use the same auth pattern as daily-stats endpoint
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('verified_')) {
+  // Achievement API routes - using same auth middleware as daily-stats
+  app.get('/api/achievements', isAuthenticated, async (req: any, res: Response) => {
+    const userId = req.user?.id;
+    if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-
-    // Extract user ID from the custom token (same as daily-stats)
-    const token = authHeader.replace('Bearer ', '');
-    const userIdMatch = token.match(/verified_([a-f0-9-]+)/);
-    if (!userIdMatch) {
-      return res.status(401).json({ message: "Invalid token format" });
-    }
-
-    // Map to the actual database user ID (same pattern as other endpoints)  
-    const supabaseId = userIdMatch[1];
-    const userId = '378f2abb-69ed-4288-9382-989650715948'; // Hardcoded for stephen75@me.com for now
+    
+    console.log('🏆 Getting achievements for user:', userId.substring(0, 8) + '...');
     
     try {
       const achievements = await storage.getUserAchievements(userId);
+      console.log('🏆 Found', achievements.length, 'achievements');
       res.json({ achievements });
     } catch (error: any) {
       console.error('Failed to retrieve achievements:', error);
@@ -839,22 +830,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/achievements/check', async (req: Request, res: Response) => {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('verified_')) {
+  app.post('/api/achievements/check', isAuthenticated, async (req: any, res: Response) => {
+    const userId = req.user?.id;
+    if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-
-    const token = authHeader.replace('Bearer ', '');
-    const userIdMatch = token.match(/verified_([a-f0-9-]+)/);
-    if (!userIdMatch) {
-      return res.status(401).json({ message: "Invalid token format" });
-    }
-
-    const userId = '378f2abb-69ed-4288-9382-989650715948'; // Hardcoded for stephen75@me.com for now
+    
+    console.log('🏆 Checking achievements for user:', userId.substring(0, 8) + '...');
     
     try {
       const newAchievements = await storage.checkAndCreateAchievements(userId);
+      console.log('🏆 Created', newAchievements.length, 'new achievements');
       res.json({ 
         newAchievements,
         message: newAchievements.length > 0 ? 'New achievements unlocked!' : 'No new achievements'
@@ -866,19 +852,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // User statistics API for awards page
-  app.get('/api/user/statistics', async (req: Request, res: Response) => {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('verified_')) {
+  app.get('/api/user/statistics', isAuthenticated, async (req: any, res: Response) => {
+    const userId = req.user?.id;
+    if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-
-    const token = authHeader.replace('Bearer ', '');
-    const userIdMatch = token.match(/verified_([a-f0-9-]+)/);
-    if (!userIdMatch) {
-      return res.status(401).json({ message: "Invalid token format" });
-    }
-
-    const userId = '378f2abb-69ed-4288-9382-989650715948'; // Hardcoded for stephen75@me.com for now
+    
+    console.log('📊 Getting user statistics for:', userId.substring(0, 8) + '...');
     
     try {
       const achievements = await storage.getUserAchievements(userId);
@@ -909,6 +889,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const daysWithMeals = new Set(
         recentMeals.map((meal: any) => meal.date.toISOString().split('T')[0])
       ).size;
+
+      console.log('📊 User stats:', { totalPoints, achievementsCount: achievements.length, streak: daysWithMeals });
 
       res.json({
         totalPoints,
