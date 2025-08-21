@@ -133,7 +133,7 @@ div[class*="bg-gray-800"]:not([class*="bg-gray-800/"]):not([class*="backdrop"]):
 /* Fix any remaining light colors in UI elements */
 .text-gray-200.font-light { color: #374151 !important; }
 .text-gray-100.opacity-95 { color: #1f2937 !important; }
-.opacity-95 { opacity: 1 !important; } /* Remove opacity that reduces contrast */
+.opacity-95 { opacity: 0.95 !important; } /* Maintain intended transparency */
 
 /* Fix ALL remaining white and light text - except hero components */
 .text-white.text-lg:not(.hero-component *):not([data-hero="true"] *) { color: #374151 !important; }

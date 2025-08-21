@@ -965,12 +965,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         />
         
         {/* CSS-controlled Overlay for consistent opacity */}
-        <div className="hero-gradient-overlay" />
+        <div className="hero-gradient-overlay" style={{ zIndex: 11 }} />
         
-        {/* Enhanced Pattern Overlay */}
-        <div className="absolute inset-0 z-13 opacity-20">
-          <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 via-transparent to-red-500/10" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_70%,rgba(251,146,60,0.15),transparent_50%)]" />
+        {/* Enhanced Pattern Overlay - Reduced opacity to prevent conflicts */}
+        <div className="absolute inset-0 z-12 opacity-10">
+          <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 via-transparent to-red-500/5" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_70%,rgba(251,146,60,0.08),transparent_50%)]" />
         </div>
         
         {/* Content Layer with Enhanced Typography */}
@@ -989,7 +989,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             </div>
             
             {/* Enhanced Description */}
-            <p className={`text-xl md:text-2xl font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl animate-fadeInUp [animation-delay:0.6s] font-work-sans opacity-95 ${isDashboard ? 'text-gray-100' : 'text-gray-700'}`}>
+            <p className={`text-xl md:text-2xl font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl animate-fadeInUp [animation-delay:0.6s] font-work-sans opacity-90 ${isDashboard ? 'text-gray-100' : 'text-gray-700'}`}>
               {description}
             </p>
             
