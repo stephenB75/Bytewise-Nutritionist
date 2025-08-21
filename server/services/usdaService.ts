@@ -527,6 +527,20 @@ export class USDAService {
       vitaminD?: number;
       vitaminB12?: number;
       folate?: number;
+      vitaminA?: number;
+      vitaminE?: number;
+      potassium?: number;
+      phosphorus?: number;
+    };
+    fdaServing?: string;
+    enhancedDatabase?: boolean;
+    category?: string;
+    portionInfo?: {
+      isRealistic?: boolean;
+      warning?: string;
+      suggestion?: string;
+      recommendedServing?: string;
+      recommendedCalories?: number;
     };
   }> {
     // Create memory cache key for this calculation

@@ -1341,6 +1341,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { ingredient, measurement } = req.body;
       
+      console.log('🍭 Calorie calculation request:', { ingredient, measurement });
+      
       // Validate input
       if (!ingredient && !measurement) {
         return res.status(400).json({ 
@@ -1354,8 +1356,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         measurement || '1 serving'
       );
       
+      console.log('🍭 Calorie calculation result:', {
+        ingredient: calorieData.ingredient,
+        measurement: calorieData.measurement,
+        calories: calorieData.estimatedCalories,
+        hasPortionInfo: !!calorieData.portionInfo,
+        portionWarning: calorieData.portionInfo?.warning || 'No warning',
+        portionSuggestion: calorieData.portionInfo?.suggestion || 'No suggestion'
+      });
+      
       res.json(calorieData);
     } catch (error: any) {
+      console.error('❌ Calorie calculation error:', error.message);
       // Calorie calculation error handled by response
       res.status(500).json({ 
         error: 'Failed to calculate calories',
