@@ -969,7 +969,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         <div className="hero-gradient-overlay" />
         
         {/* Enhanced Pattern Overlay */}
-        <div className="absolute inset-0 z-15 opacity-20">
+        <div className="absolute inset-0 z-13 opacity-20">
           <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 via-transparent to-red-500/10" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_70%,rgba(251,146,60,0.15),transparent_50%)]" />
         </div>
