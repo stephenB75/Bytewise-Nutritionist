@@ -25,7 +25,7 @@ import { useRotatingBackground } from '@/hooks/useRotatingBackground';
 import { useAchievements, getAchievementIcon, formatAchievementDate } from '@/hooks/useAchievements';
 import { ProfileIcon } from '@/components/ProfileIcon';
 import { AppTour, useAppTour } from '@/components/AppTour';
-import { TourLauncher, WelcomeBanner } from '@/components/TourLauncher';
+import { WelcomeBanner } from '@/components/TourLauncher';
 import { apiRequest } from '@/lib/queryClient';
 import { 
   Search, 
@@ -2811,8 +2811,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         onComplete={completeTour}
       />
       
-      {/* Tour Launcher - Floating button and preview dialog */}
-      <TourLauncher onStartTour={startTour} />
+
       
       {/* Toast Notifications */}
       <Toaster />
