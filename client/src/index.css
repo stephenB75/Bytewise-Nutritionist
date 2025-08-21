@@ -379,6 +379,28 @@ button[data-testid="button-notifications"].hover\:bg-white\/10:hover {
   border: none !important;
 }
 
+/* Remove drop shadow and any background from notification bell icon */
+button[data-testid="button-notifications"] .lucide-bell,
+button[data-testid="button-notifications"] svg {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  drop-shadow: none !important;
+}
+
+/* Target the specific header container for notification */
+.safe-notification-position,
+.safe-notification-position > div {
+  background: transparent !important;
+  background-color: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
 /* Additional card shadow consistency */
 .rounded-lg,
 .rounded-xl,

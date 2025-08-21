@@ -2714,7 +2714,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             aria-haspopup="dialog"
             data-testid="button-notifications"
           >
-            <Bell className="w-8 h-8 drop-shadow-lg" strokeWidth={2.5} aria-hidden="true" />
+            <Bell className="w-8 h-8" strokeWidth={2.5} aria-hidden="true" />
             {notifications.filter(n => !n.read).length > 0 && (
               <div 
                 className="absolute -top-2 -right-2 w-8 h-8 bg-red-600 rounded-full flex items-center justify-center border-3 border-white shadow-xl animate-pulse ring-2 ring-red-400/50"
