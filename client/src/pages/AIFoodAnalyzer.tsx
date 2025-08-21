@@ -165,7 +165,7 @@ export default function AIFoodAnalyzer() {
     
     if (result.successful && result.successful.length > 0) {
       const uploadedFile = result.successful[0];
-      const imageUrl = uploadedFile.uploadURL;
+      let imageUrl = uploadedFile.uploadURL;
       
       console.log('✅ Image uploaded successfully:', {
         fileName: uploadedFile.name,
@@ -174,11 +174,26 @@ export default function AIFoodAnalyzer() {
       });
       
       if (imageUrl) {
+        // Clean the URL - remove query parameters to get the clean storage URL
+        try {
+          const url = new URL(imageUrl);
+          const cleanUrl = `${url.protocol}//${url.host}${url.pathname}`;
+          imageUrl = cleanUrl;
+          console.log('🔧 Cleaned upload URL for analysis:', cleanUrl);
+        } catch (urlError) {
+          console.log('⚠️ Could not clean URL, using original:', imageUrl);
+        }
+        
         setUploadedImageUrl(imageUrl);
         
-        // Start food analysis with detailed logging
-        console.log('🚀 Starting AI food analysis...');
-        analyzeFoodMutation.mutate(imageUrl);
+        // Wait a moment for the upload to fully complete before starting analysis
+        console.log('⏳ Waiting 3 seconds for upload to fully complete...');
+        const finalImageUrl = imageUrl; // Capture in closure to ensure type safety
+        setTimeout(() => {
+          console.log('🚀 Starting AI food analysis...');
+          analyzeFoodMutation.mutate(finalImageUrl);
+        }, 3000);
+        
       } else {
         console.error('❌ No upload URL received from completed upload');
         toast({

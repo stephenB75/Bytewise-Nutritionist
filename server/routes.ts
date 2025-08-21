@@ -1048,13 +1048,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if file exists with retries for recent uploads
       let exists = false;
       let retryCount = 0;
-      const maxRetries = 3;
+      const maxRetries = 5; // Increased retry count
       
       while (!exists && retryCount < maxRetries) {
         [exists] = await file.exists();
         if (!exists) {
-          console.log(`⏳ Image not found (attempt ${retryCount + 1}/${maxRetries}), retrying in 1 second...`);
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          console.log(`⏳ Image not found (attempt ${retryCount + 1}/${maxRetries}), retrying in 2 seconds...`);
+          await new Promise(resolve => setTimeout(resolve, 2000)); // Longer delay between retries
           retryCount++;
         }
       }
@@ -1141,8 +1141,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             console.log('✅ Converted to proxy URL for AI analysis:', processableImageUrl);
             
             // Add a small delay to allow the image to be fully saved
-            console.log('⏳ Waiting 2 seconds for image to be fully uploaded...');
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            console.log('⏳ Waiting 3 seconds for image to be fully uploaded...');
+            await new Promise(resolve => setTimeout(resolve, 3000));
           }
         } catch (proxyUrlError) {
           console.error('⚠️ Failed to generate proxy URL, using original URL:', proxyUrlError);
