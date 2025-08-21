@@ -2774,7 +2774,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       
       {/* Bottom Navigation - High Resolution Icons */}
       <div data-testid="navigation-tabs" className="fixed bottom-0 left-0 right-0 bg-yellow-400 border-t border-yellow-500/60 safe-area-pb z-50 shadow-lg">
-        <div className="flex items-center justify-around py-2 px-2 max-w-md mx-auto">
+        <div className="flex items-center justify-around py-3 px-3 max-w-md mx-auto gap-1">
           {[
             { id: 'home', label: 'Dashboard', icon: Home, testId: 'nav-dashboard' },
             { id: 'nutrition', label: 'Calorie Tracker', icon: Utensils, testId: 'nav-calculator' },
@@ -2788,18 +2788,18 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 key={tab.id}
                 data-testid={tab.testId}
                 onClick={() => handleTabChange(tab.id)}
-                className={`flex flex-col items-center py-1.5 px-1.5 rounded-md transition-all duration-200 min-w-[50px] flex-1 active:bg-yellow-500/30 ${
+                className={`flex flex-col items-center py-2 px-3 rounded-xl transition-all duration-300 min-w-[60px] flex-1 transform hover:scale-105 active:scale-95 ${
                   activeTab === tab.id
-                    ? 'text-gray-900 bg-yellow-500/40'
-                    : 'text-gray-700 hover:text-gray-900 hover:bg-yellow-500/20'
+                    ? 'text-gray-900 bg-yellow-500 shadow-lg shadow-yellow-500/30 border-2 border-yellow-600'
+                    : 'text-gray-700 bg-yellow-300/60 hover:text-gray-900 hover:bg-yellow-400/80 hover:shadow-md border-2 border-yellow-400/50'
                 }`}
               >
                 <IconComponent 
-                  size={18} 
-                  className={`mb-0.5 ${activeTab === tab.id ? 'drop-shadow-lg' : ''}`}
+                  size={20} 
+                  className={`mb-1 transition-all duration-300 ${activeTab === tab.id ? 'drop-shadow-lg transform scale-110' : 'transform scale-100'}`}
                   strokeWidth={activeTab === tab.id ? 2.5 : 2}
                 />
-                <span className="text-[9px] font-medium leading-tight text-center">{tab.label}</span>
+                <span className={`text-[10px] font-semibold leading-tight text-center transition-all duration-300 ${activeTab === tab.id ? 'transform scale-105' : 'transform scale-100'}`}>{tab.label}</span>
               </button>
             )
           })}
