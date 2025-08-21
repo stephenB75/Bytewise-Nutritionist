@@ -636,10 +636,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           // Clear the fresh auth flag
           localStorage.removeItem('fresh-auth-session');
           
-          // Delay tour to allow UI to settle after sign-in
+          // Show welcome banner instead of immediately starting tour
+          setShowWelcomeBanner(true);
+          
+          // Also optionally auto-start tour after a delay
           const tourTimer = setTimeout(() => {
-            startTour();
-          }, 3000); // Slightly longer delay to ensure UI is ready
+            if (shouldShowTour()) {
+              startTour();
+            }
+          }, 5000); // Give user time to see welcome banner first
           
           return () => clearTimeout(tourTimer);
         }
@@ -1316,15 +1321,42 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       {/* Content Section - Completely Separate and Underneath */}
       <div className="px-6 py-3 bg-black content-section">
         <div className="space-y-3">
+          {/* Welcome Banner for Tour */}
+          {user && showWelcomeBanner && (
+            <WelcomeBanner
+              onStartTour={() => {
+                setShowWelcomeBanner(false);
+                startTour();
+              }}
+              onDismiss={() => {
+                setShowWelcomeBanner(false);
+                localStorage.setItem('bytewise-tour-completed', 'true');
+              }}
+            />
+          )}
+          
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-xl font-black text-white">Today's Progress</h2>
-            <Button 
-              variant="ghost" 
-              className="text-orange-400 hover:text-orange-300"
-              onClick={() => handleTabChange(user ? 'calculator' : 'profile')}
-            >
-              {user ? 'Track Food' : 'Sign Up to Track'}
-            </Button>
+            <div className="flex gap-2">
+              {user && (
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className="text-blue-400 hover:text-blue-300"
+                  onClick={() => startTour()}
+                  data-testid="manual-tour-button"
+                >
+                  Take Tour
+                </Button>
+              )}
+              <Button 
+                variant="ghost" 
+                className="text-orange-400 hover:text-orange-300"
+                onClick={() => handleTabChange(user ? 'calculator' : 'profile')}
+              >
+                {user ? 'Track Food' : 'Sign Up to Track'}
+              </Button>
+            </div>
           </div>
 
           {/* Daily Progress */}

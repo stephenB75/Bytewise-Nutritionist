@@ -257,7 +257,7 @@ export function AppTour({ isOpen, onClose, onComplete }: AppTourProps) {
     } else if (type === 'step:after') {
       // Update step index based on action
       const newIndex = action === 'next' ? index + 1 : index - 1;
-      setStepIndex(newIndex);
+      setStepIndex(Math.max(0, Math.min(newIndex, TOUR_STEPS.length - 1)));
     }
   };
 
