@@ -587,6 +587,26 @@ nav svg,
   -webkit-filter: none !important;
 }
 
+/* Remove outline from navigation icon buttons */
+[data-testid="navigation-tabs"] button,
+nav button,
+.fixed.bottom-0 button,
+button[data-testid*="nav-"],
+[data-testid="navigation-tabs"] button:focus,
+nav button:focus,
+.fixed.bottom-0 button:focus,
+button[data-testid*="nav-"]:focus,
+[data-testid="navigation-tabs"] button:active,
+nav button:active,
+.fixed.bottom-0 button:active,
+button[data-testid*="nav-"]:active {
+  outline: none !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  outline-color: transparent !important;
+  -webkit-focus-ring-color: transparent !important;
+}
+
 /* Ensure all metrics text is dark enough */
 .backdrop-blur-md .text-white,
 .bg-white\/10 .text-white,
