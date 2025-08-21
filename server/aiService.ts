@@ -53,6 +53,12 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
         error: errorText,
         imageUrl: imageUrl.substring(0, 100) + '...'
       });
+      
+      // Check if this is an image not found error from our proxy
+      if (response.status === 404 && imageUrl.includes('/api/ai/proxy-image')) {
+        throw new Error('UPLOAD_ERROR: The image upload may not be complete yet. Please wait a moment and try again, or upload a new image.');
+      }
+      
       throw new Error(`Imagga API error: ${response.status} ${response.statusText}${errorText ? ` - ${errorText}` : ''}`);
     }
 

@@ -1048,8 +1048,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if file exists
       const [exists] = await file.exists();
       if (!exists) {
-        console.log('❌ Image not found:', objectPath);
-        return res.status(404).json({ error: 'Image not found' });
+        console.log('❌ Image not found in object storage:', objectPath);
+        // Return a more helpful error for the AI service
+        return res.status(404).json({ 
+          error: 'Image not found in storage',
+          details: 'The image may still be uploading or the upload may have failed. Please try uploading again.',
+          path: objectPath
+        });
       }
       
       // Get file metadata to set proper content type
@@ -1103,8 +1108,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           if (bucketIndex !== -1) {
             const objectPath = urlParts.slice(bucketIndex + 1).join('/');
             
-            // Use our proxy endpoint to serve the private image
-            processableImageUrl = `http://localhost:5000/api/ai/proxy-image?path=${encodeURIComponent(objectPath)}`;
+            // Use our proxy endpoint to serve the private image (use public URL for external API access)
+            const publicUrl = process.env.REPLIT_DEV_DOMAIN 
+              ? `https://${process.env.REPLIT_DEV_DOMAIN}` 
+              : process.env.REPL_URL || 'http://localhost:5000';
+            processableImageUrl = `${publicUrl}/api/ai/proxy-image?path=${encodeURIComponent(objectPath)}`;
             
             console.log('✅ Converted to proxy URL for AI analysis:', processableImageUrl);
           }
