@@ -2795,15 +2795,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 }`}
               >
                 <IconComponent 
-                  size={24} 
-                  className={`mr-2 transition-all duration-300 ease-out transform ${
+                  size={28} 
+                  className={`mb-1 transition-all duration-300 ease-out transform ${
                     activeTab === tab.id 
                       ? 'scale-110 drop-shadow-lg text-yellow-600' 
                       : 'scale-100 hover:scale-105 active:scale-125 active:text-white'
                   }`}
                   strokeWidth={activeTab === tab.id ? 2.5 : 2}
                 />
-                <span className={`text-[9px] font-semibold leading-tight text-center transition-all duration-300 ease-out ${
+                <span className={`text-[10px] font-semibold leading-tight text-center w-full transition-all duration-300 ease-out ${
                   activeTab === tab.id 
                     ? 'text-white transform scale-105 drop-shadow-md' 
                     : 'text-gray-600 hover:text-gray-800 active:text-white'
