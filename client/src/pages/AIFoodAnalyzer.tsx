@@ -96,8 +96,14 @@ export default function AIFoodAnalyzer() {
       
       // Handle quota exceeded error specifically
       if (error.message && error.message.includes('QUOTA_EXCEEDED')) {
-        title = "OpenAI Quota Exceeded";
+        title = "Imagga API Quota Exceeded";
         description = "The AI analysis feature is temporarily unavailable due to API quota limits. You can still manually add foods using the food database search.";
+      } else if (error.message && error.message.includes('INVALID_API_KEY')) {
+        title = "API Configuration Error";
+        description = "The Imagga API key is invalid. Please check the API configuration.";
+      } else if (error.message && error.message.includes('MISSING_CREDENTIALS')) {
+        title = "API Not Configured";
+        description = "Imagga API credentials are not configured. Please contact support.";
       }
       
       toast({

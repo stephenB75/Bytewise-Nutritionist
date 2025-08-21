@@ -3,9 +3,9 @@
  * Uses Imagga API to identify foods in images
  */
 
-// Initialize Imagga API client
-const IMAGGA_API_KEY = process.env.GOOGLE_API_KEY || ''; // Using GOOGLE_API_KEY env var for Imagga key
-const IMAGGA_API_SECRET = 'acc_fd7c8dc6b6a7e16'; // Default Imagga secret
+// Initialize Imagga API client with proper credentials
+const IMAGGA_API_KEY = process.env.IMAGGA_API_KEY || '';
+const IMAGGA_API_SECRET = process.env.IMAGGA_API_SECRET || '';
 
 export interface IdentifiedFood {
   name: string;
@@ -28,6 +28,11 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
   try {
     console.log('🔍 Starting Imagga food analysis for image:', imageUrl);
 
+    // Validate API credentials
+    if (!IMAGGA_API_KEY || !IMAGGA_API_SECRET) {
+      throw new Error('MISSING_CREDENTIALS: Imagga API credentials are not configured. Please check IMAGGA_API_KEY and IMAGGA_API_SECRET environment variables.');
+    }
+
     // Create authorization header for Imagga API
     const auth = Buffer.from(`${IMAGGA_API_KEY}:${IMAGGA_API_SECRET}`).toString('base64');
     
@@ -48,15 +53,24 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
     
     // Process Imagga response to extract food items
     const foodTags = data.result?.tags || [];
+    
+    // Enhanced food keyword list for better identification
+    const foodKeywords = [
+      'food', 'fruit', 'vegetable', 'meat', 'bread', 'drink', 'meal', 'dish', 'snack',
+      'chicken', 'beef', 'pork', 'fish', 'rice', 'pasta', 'salad', 'pizza', 'burger',
+      'apple', 'banana', 'orange', 'tomato', 'potato', 'carrot', 'lettuce', 'cheese',
+      'milk', 'water', 'juice', 'coffee', 'tea', 'sandwich', 'soup', 'cake', 'cookie',
+      'breakfast', 'lunch', 'dinner', 'dessert', 'appetizer', 'sauce', 'spice', 'herb',
+      'grain', 'cereal', 'nuts', 'berry', 'egg', 'butter', 'oil', 'sugar', 'flour'
+    ];
+    
     const foodItems = foodTags
       .filter((tag: any) => {
         const tagName = tag.tag?.en?.toLowerCase() || '';
-        // Filter for food-related tags
+        // Check if tag matches any food keywords and has sufficient confidence
         return (
-          tag.confidence > 30 && 
-          (tagName.includes('food') || tagName.includes('fruit') || tagName.includes('vegetable') || 
-           tagName.includes('meat') || tagName.includes('bread') || tagName.includes('drink') ||
-           tagName.includes('meal') || tagName.includes('dish') || tagName.includes('snack'))
+          tag.confidence > 25 && 
+          foodKeywords.some(keyword => tagName.includes(keyword) || keyword.includes(tagName))
         );
       })
       .slice(0, 5) // Limit to top 5 most confident food items
@@ -64,7 +78,7 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
         name: tag.tag?.en || 'Unknown Food',
         confidence: tag.confidence / 100, // Convert to 0-1 scale
         portion: '1 serving',
-        estimatedGrams: 150 // Default estimation
+        estimatedGrams: estimateGrams(tag.tag?.en || 'Unknown Food') // Dynamic gram estimation
       }));
 
     const result: FoodAnalysisResult = {
@@ -97,6 +111,7 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
     if (error instanceof Error && (
       error.message.includes('API_KEY_INVALID') ||
       error.message.includes('403') ||
+      error.message.includes('401') ||
       error.message.includes('unauthorized')
     )) {
       throw new Error('INVALID_API_KEY: The Imagga API key is invalid or unauthorized. Please check your API key configuration.');
@@ -123,12 +138,19 @@ export async function getNutritionFromUSDA(foodName: string, grams: number = 100
     
     const foods = await response.json();
     
-    if (foods.length === 0) {
+    if (!foods || foods.length === 0) {
       // Return estimated nutrition if no USDA match found
       return getEstimatedNutrition(foodName, grams);
     }
     
     const food = foods[0];
+    
+    // Check if food object has the required nutritional data
+    if (!food || typeof food !== 'object') {
+      console.log('⚠️ Invalid food object from USDA, using estimation for:', foodName);
+      return getEstimatedNutrition(foodName, grams);
+    }
+    
     const multiplier = grams / 100; // USDA data is typically per 100g
     
     return {
@@ -206,4 +228,32 @@ function getEstimatedNutrition(foodName: string, grams: number) {
     sugar: Math.round(baseSugar * multiplier * 10) / 10,
     sodium: Math.round(baseSodium * multiplier * 10) / 10,
   };
+}
+
+/**
+ * Estimate portion size in grams based on food type
+ */
+function estimateGrams(foodName: string): number {
+  const name = foodName.toLowerCase();
+  
+  // Portion size estimates based on common food types
+  if (name.includes('apple') || name.includes('orange') || name.includes('banana')) {
+    return 180; // Medium fruit
+  } else if (name.includes('chicken') || name.includes('beef') || name.includes('fish')) {
+    return 120; // Standard protein serving
+  } else if (name.includes('rice') || name.includes('pasta')) {
+    return 200; // Cooked grain serving
+  } else if (name.includes('bread') || name.includes('slice')) {
+    return 30; // Slice of bread
+  } else if (name.includes('salad')) {
+    return 100; // Side salad
+  } else if (name.includes('soup')) {
+    return 250; // Bowl of soup
+  } else if (name.includes('cookie') || name.includes('candy')) {
+    return 20; // Small sweet treat
+  } else if (name.includes('drink') || name.includes('beverage') || name.includes('juice')) {
+    return 250; // Glass of liquid
+  } else {
+    return 150; // Default serving size
+  }
 }
