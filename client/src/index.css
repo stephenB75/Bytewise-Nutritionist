@@ -593,26 +593,19 @@ nav .lucide {
   box-shadow: none !important;
 }
 
-/* Remove white background boxes from navigation buttons */
+/* Remove white outline/frame from navigation buttons (keep background) */
 nav button,
-[data-testid="navigation-tabs"] > *,
+[data-testid="navigation-tabs"] button,
 .fixed.bottom-0 button,
-.bg-white.border button,
-.bg-white,
-.border-gray-200,
-.border-t {
-  background: none !important;
-  background-color: transparent !important;
+button[data-testid*="nav-"] {
   border: none !important;
   box-shadow: none !important;
 }
 
-/* Additional nav frame removal */
-.fixed.bottom-0.left-0.right-0,
-.fixed.bottom-0,
-nav,
+/* Remove only border/outline from navigation container (keep background) */
+.border-gray-200,
+.border-t,
 [data-testid="navigation-tabs"] {
-  background: transparent !important;
   border: none !important;
   border-top: none !important;
 }
