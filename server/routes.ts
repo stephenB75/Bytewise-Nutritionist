@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated, optionalAuth, serverSupabase, supabaseAdmin, type AuthenticatedRequest } from "./supabaseAuth";
 import { usdaService } from "./services/usdaService";
-import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
+import { ObjectStorageService, ObjectNotFoundError, objectStorageClient } from "./objectStorage";
 import { analyzeFoodImage, getNutritionFromUSDA } from "./aiService";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -1020,6 +1020,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Image proxy endpoint for AI analysis
+  app.get('/api/ai/proxy-image', async (req: Request, res: Response) => {
+    try {
+      const objectPath = req.query.path as string;
+      if (!objectPath) {
+        return res.status(400).json({ error: 'Object path is required' });
+      }
+
+      console.log('🖼️ Proxying private image for AI analysis:', objectPath);
+      
+      // Get the object file from private storage
+      const objectStorageService = new ObjectStorageService();
+      const privateDir = objectStorageService.getPrivateObjectDir();
+      const fullPath = `${privateDir}/${objectPath}`;
+      
+      // Parse the path to get bucket and object name
+      const pathParts = fullPath.split("/").filter(p => p);
+      if (pathParts.length < 2) {
+        return res.status(400).json({ error: 'Invalid object path' });
+      }
+      const bucketName = pathParts[0]; 
+      const objectName = pathParts.slice(1).join("/");
+      const bucket = objectStorageClient.bucket(bucketName);
+      const file = bucket.file(objectName);
+      
+      // Check if file exists
+      const [exists] = await file.exists();
+      if (!exists) {
+        console.log('❌ Image not found:', objectPath);
+        return res.status(404).json({ error: 'Image not found' });
+      }
+      
+      // Get file metadata to set proper content type
+      const [metadata] = await file.getMetadata();
+      res.set({
+        'Content-Type': metadata.contentType || 'image/jpeg',
+        'Content-Length': metadata.size,
+        'Cache-Control': 'private, max-age=300' // 5 minutes cache
+      });
+      
+      console.log('✅ Streaming private image to AI service');
+      
+      // Stream the file data
+      const stream = file.createReadStream();
+      stream.pipe(res);
+      
+      stream.on('error', (err: any) => {
+        console.error('❌ Stream error:', err);
+        if (!res.headersSent) {
+          res.status(500).json({ error: 'Error streaming image' });
+        }
+      });
+      
+    } catch (error: any) {
+      console.error('❌ Error proxying image:', error);
+      if (!res.headersSent) {
+        res.status(500).json({ error: 'Failed to proxy image', details: error.message });
+      }
+    }
+  });
+
   // AI food analysis endpoint
   app.post('/api/ai/analyze-food', async (req: Request, res: Response) => {
     try {
@@ -1031,8 +1092,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log('🔍 Analyzing food image:', imageUrl);
 
+      // Check if this is a private object storage URL that needs proxying
+      let processableImageUrl = imageUrl;
+      if (imageUrl.includes('storage.googleapis.com') && imageUrl.includes('.private')) {
+        console.log('🔐 Converting private storage URL to proxy URL for AI analysis...');
+        try {
+          // Extract the object path from the URL
+          const urlParts = imageUrl.split('/');
+          const bucketIndex = urlParts.findIndex((part: string) => part.includes('replit-objstore-'));
+          if (bucketIndex !== -1) {
+            const objectPath = urlParts.slice(bucketIndex + 1).join('/');
+            
+            // Use our proxy endpoint to serve the private image
+            processableImageUrl = `http://localhost:5000/api/ai/proxy-image?path=${encodeURIComponent(objectPath)}`;
+            
+            console.log('✅ Converted to proxy URL for AI analysis:', processableImageUrl);
+          }
+        } catch (proxyUrlError) {
+          console.error('⚠️ Failed to generate proxy URL, using original URL:', proxyUrlError);
+          // Continue with original URL as fallback
+        }
+      }
+
       // Step 1: Analyze image with AI to identify foods
-      const aiResult = await analyzeFoodImage(imageUrl);
+      const aiResult = await analyzeFoodImage(processableImageUrl);
       
       // Step 2: Get nutrition data for each identified food
       const identifiedFoods = [];

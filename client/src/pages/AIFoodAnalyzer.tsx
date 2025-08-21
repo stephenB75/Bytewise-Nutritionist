@@ -104,6 +104,16 @@ export default function AIFoodAnalyzer() {
       } else if (error.message && error.message.includes('MISSING_CREDENTIALS')) {
         title = "API Not Configured";
         description = "Imagga API credentials are not configured. Please contact support.";
+      } else if (error.message && error.message.includes('IMAGE_ERROR')) {
+        title = "Image Processing Error";
+        description = "Unable to analyze the image. Please try uploading a clearer photo with better lighting or a different format (JPG, PNG).";
+      } else if (error.message && error.message.includes('NETWORK_ERROR')) {
+        title = "Connection Error";
+        description = "Unable to connect to the analysis service. Please check your internet connection and try again.";
+      } else {
+        // For any other errors, show a more helpful message
+        title = "Analysis Failed";
+        description = "Unable to analyze the image. Please try uploading a clearer photo with better lighting.";
       }
       
       toast({

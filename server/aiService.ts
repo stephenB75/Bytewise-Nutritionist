@@ -46,7 +46,14 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
     });
 
     if (!response.ok) {
-      throw new Error(`Imagga API error: ${response.status} ${response.statusText}`);
+      const errorText = await response.text();
+      console.log('❌ Imagga API error details:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorText,
+        imageUrl: imageUrl.substring(0, 100) + '...'
+      });
+      throw new Error(`Imagga API error: ${response.status} ${response.statusText}${errorText ? ` - ${errorText}` : ''}`);
     }
 
     const data = await response.json();
@@ -115,6 +122,24 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
       error.message.includes('unauthorized')
     )) {
       throw new Error('INVALID_API_KEY: The Imagga API key is invalid or unauthorized. Please check your API key configuration.');
+    }
+
+    // Check for image-related errors
+    if (error instanceof Error && (
+      error.message.includes('400') ||
+      error.message.includes('Bad Request')
+    )) {
+      throw new Error('IMAGE_ERROR: Unable to access or process the image. The image URL may be invalid, the file may be corrupted, or the image format may not be supported. Please try uploading a different image.');
+    }
+
+    // Check for network/connectivity errors
+    if (error instanceof Error && (
+      error.message.includes('network') ||
+      error.message.includes('timeout') ||
+      error.message.includes('ECONNREFUSED') ||
+      error.message.includes('fetch failed')
+    )) {
+      throw new Error('NETWORK_ERROR: Unable to connect to the image analysis service. Please check your internet connection and try again.');
     }
     
     throw new Error(`Food analysis failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
