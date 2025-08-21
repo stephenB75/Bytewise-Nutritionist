@@ -251,12 +251,9 @@ function CalorieCalculator({
     e.preventDefault();
     
     if (!ingredient.trim()) return;
+    if (!measurement.trim()) return; // Require measurement input, no defaults
 
-    if (measurement.trim()) {
-      calculateCalories.mutate({ ingredient: ingredient.trim(), measurement: measurement.trim() });
-    } else {
-      calculateCalories.mutate({ ingredient: ingredient.trim(), measurement: '100g' });
-    }
+    calculateCalories.mutate({ ingredient: ingredient.trim(), measurement: measurement.trim() });
   };
 
   const logToWeeklyTracker = async (analysis: IngredientAnalysis) => {
