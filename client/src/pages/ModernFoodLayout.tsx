@@ -1527,7 +1527,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 handleTabChange('profile');
               }
             }}
-            className="w-full mt-3 bg-orange-600 hover:bg-orange-700 text-white font-bold h-12 rounded-xl"
+            className="w-full mt-3 bg-orange-600 hover:bg-orange-700 text-white font-bold h-12 rounded-xl btn-hero-enhanced"
           >
             <Plus className="w-4 h-4 mr-2" />
             {user ? 'Log Food with Calculator' : 'Sign Up to Log Food'}
@@ -2128,7 +2128,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               )}
               <Button 
                 type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold h-12 rounded-xl"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold h-12 rounded-xl btn-hero-enhanced"
                 disabled={isLoading}
               >
                 {isLoading ? 'Loading...' : 
@@ -2244,7 +2244,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         </div>
         {/* Daily Header */}
         <div className="flex space-x-4 mb-6">
-          <Button className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-200 border border-orange-400/50 hover:border-orange-300/70">
+          <Button className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-200 border border-orange-400/50 hover:border-orange-300/70 btn-hero-enhanced">
             <Calendar className="w-4 h-4 mr-2" />
             Today
           </Button>
