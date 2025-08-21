@@ -344,14 +344,16 @@ export function getFDAServingSize(foodName: string): ServingSize | null {
     }
   }
   
-  // Category-based fallbacks
+  // Category-based fallbacks with priority order
+  if (normalizedName.includes('ice cream bar') || normalizedName.includes('ice cream sandwich')) return FDA_RACC_DATABASE['ice cream bar'];
+  if (normalizedName.includes('popsicle') || normalizedName.includes('ice pop')) return FDA_RACC_DATABASE['popsicle'];
+  if (normalizedName.includes('ice cream')) return FDA_RACC_DATABASE['ice cream'];
   if (normalizedName.includes('chip')) return FDA_RACC_DATABASE['potato chips'];
   if (normalizedName.includes('nut') && !normalizedName.includes('butter')) return FDA_RACC_DATABASE['nuts'];
   if (normalizedName.includes('candy')) return FDA_RACC_DATABASE['soft candy'];
   if (normalizedName.includes('cookie')) return FDA_RACC_DATABASE['cookies'];
   if (normalizedName.includes('cracker')) return FDA_RACC_DATABASE['crackers'];
   if (normalizedName.includes('jerky')) return FDA_RACC_DATABASE['beef jerky'];
-  if (normalizedName.includes('ice cream')) return FDA_RACC_DATABASE['ice cream'];
   
   return null;
 }
@@ -376,8 +378,8 @@ export function validatePortionSize(foodName: string, gramsAmount: number): {
   if (gramsAmount > (serving.warningThreshold || serving.fdaRACCgrams * 3)) {
     return {
       isReasonable: false,
-      warning: `This portion (${gramsAmount}g) is very large compared to a typical serving.`,
-      recommendation: `Consider ${serving.commonDescription} (${serving.fdaRACCgrams}g)`,
+      warning: `⚠️ This portion (${gramsAmount}g) is much larger than typical serving`,
+      recommendation: `FDA Standard: ${serving.commonDescription} (${serving.fdaRACCgrams}g)`,
       fdaServing: serving.commonDescription
     };
   }
@@ -385,8 +387,18 @@ export function validatePortionSize(foodName: string, gramsAmount: number): {
   if (ratio > 2) {
     return {
       isReasonable: false,
-      warning: `This portion is ${Math.round(ratio)}x larger than a typical serving.`,
-      recommendation: `Typical serving: ${serving.commonDescription} (${serving.fdaRACCgrams}g)`,
+      warning: `⚠️ This portion is ${Math.round(ratio)}x larger than FDA standard`,
+      recommendation: `FDA Standard: ${serving.commonDescription} (${serving.fdaRACCgrams}g)`,
+      fdaServing: serving.commonDescription
+    };
+  }
+  
+  // Check for very small portions that might indicate wrong unit
+  if (ratio < 0.3) {
+    return {
+      isReasonable: false,
+      warning: `⚠️ This portion (${gramsAmount}g) seems too small - check your measurement`,
+      recommendation: `FDA Standard: ${serving.commonDescription} (${serving.fdaRACCgrams}g)`,
       fdaServing: serving.commonDescription
     };
   }
@@ -438,11 +450,22 @@ export function convertToGrams(measurement: string, foodName?: string): number {
   if (tspMatch) return parseFloat(tspMatch[1]) * 5;
   
   // Look for pieces/units (food-specific)
-  const pieceMatch = cleanMeasurement.match(/(\d+)\s*(?:pieces?|bars?|pops?)/);
+  const pieceMatch = cleanMeasurement.match(/(\d+)\s*(?:pieces?|bars?|pops?|whole|medium|large|small)/);
   if (pieceMatch) {
     const pieces = parseInt(pieceMatch[1]);
     const serving = getFDAServingSize(foodName || '');
     if (serving) return pieces * serving.fdaRACCgrams;
+  }
+  
+  // Handle common abbreviations
+  if (cleanMeasurement.match(/^\d+\s*t$/)) {
+    // "1 t" could mean tablespoon, but warn for inappropriate foods
+    const tbspValue = parseInt(cleanMeasurement) * 15;
+    if (foodName?.includes('ice cream') || foodName?.includes('bar') || foodName?.includes('popsicle')) {
+      // Return a small value to trigger warning system
+      return tbspValue;
+    }
+    return tbspValue;
   }
   
   return 0; // Could not convert

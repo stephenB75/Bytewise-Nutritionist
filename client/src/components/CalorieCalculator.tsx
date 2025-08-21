@@ -230,17 +230,12 @@ function CalorieCalculator({
     
     if (!validation.isReasonable) {
       return {
-        warning: validation.warning,
-        suggestion: validation.recommendation,
-        recommendedServing: validation.fdaServing,
-        visualReference: visualRef
+        warning: validation.warning || 'Portion size may not be accurate',
+        suggestion: validation.recommendation || `FDA Standard: ${validation.fdaServing || 'check serving size'}`
       };
     }
     
-    return {
-      fdaServing: validation.fdaServing,
-      visualReference: visualRef
-    };
+    return null; // No warning needed
   };
 
   // Helper functions
