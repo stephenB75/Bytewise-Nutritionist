@@ -967,11 +967,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         {/* CSS-controlled Overlay for consistent opacity */}
         <div className="hero-gradient-overlay" style={{ zIndex: 11 }} />
         
-        {/* Enhanced Pattern Overlay - Reduced opacity to prevent conflicts */}
-        <div className="absolute inset-0 z-12 opacity-10">
-          <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 via-transparent to-red-500/5" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_70%,rgba(251,146,60,0.08),transparent_50%)]" />
-        </div>
         
         {/* Content Layer with Enhanced Typography */}
         <div className={`absolute inset-0 flex flex-col justify-center items-center text-center px-6 z-20 ${isDashboard ? 'text-white' : 'text-gray-900'}`}>
@@ -989,7 +984,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             </div>
             
             {/* Enhanced Description */}
-            <p className={`text-xl md:text-2xl font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl animate-fadeInUp [animation-delay:0.6s] font-work-sans opacity-90 ${isDashboard ? 'text-gray-100' : 'text-gray-700'}`}>
+            <p className={`text-xl md:text-2xl font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl animate-fadeInUp [animation-delay:0.6s] font-work-sans ${isDashboard ? 'text-gray-100' : 'text-gray-700'}`}>
               {description}
             </p>
             
@@ -998,22 +993,21 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <Button 
                 onClick={onButtonClick}
                 size="lg"
-                className="group relative bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-black px-16 py-6 rounded-full text-xl md:text-2xl shadow-2xl hover:shadow-orange-500/25 transition-all duration-300 border-2 border-orange-400/40 hover:border-orange-300/60 overflow-hidden btn-hero-enhanced"
+                className="group relative bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-black px-16 py-6 rounded-full text-xl md:text-2xl shadow-2xl transition-all duration-300 border-2 border-orange-400 hover:border-orange-300 overflow-hidden btn-hero-enhanced"
               >
                 <span className="relative z-10 flex items-center gap-3 text-optimized">
                   {buttonText}
                   <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
                 </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-red-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </Button>
             </div>
           </div>
         </div>
         
         {/* Enhanced Scroll Indicator */}
-        <div className={`absolute bottom-8 left-1/2 -translate-x-1/2 z-30 animate-bounce ${isDashboard ? 'text-white/70' : 'text-gray-600/70'}`}>
+        <div className={`absolute bottom-8 left-1/2 -translate-x-1/2 z-30 animate-bounce ${isDashboard ? 'text-white' : 'text-gray-600'}`}>
           <div className="flex flex-col items-center gap-2">
-            <div className={`w-px h-8 bg-gradient-to-b from-transparent ${isDashboard ? 'to-white/50' : 'to-gray-600/50'}`} />
+            <div className={`w-px h-8 bg-gradient-to-b from-transparent ${isDashboard ? 'to-white' : 'to-gray-600'}`} />
             <ChevronRight className="w-6 h-6 rotate-90 drop-shadow-lg" />
           </div>
         </div>

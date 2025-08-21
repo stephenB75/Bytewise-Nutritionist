@@ -2763,7 +2763,7 @@ select {
   position: absolute;
   inset: 0;
   z-index: 12;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.3) 50%, transparent 100%);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, transparent 60%);
 }
 
 /* Hero Content Layout - Three-Column Standard */
@@ -3164,21 +3164,6 @@ select {
   }
 }
 
-@media (prefers-contrast: high) {
-  .hero-gradient-overlay {
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.78) 0%, rgba(0, 0, 0, 0.39) 50%, rgba(0, 0, 0, 0.156) 100%);
-  }
-  
-  .hero-stats-card {
-    border: 2px solid rgba(255, 255, 255, 0.8);
-    background: rgba(0, 0, 0, 0.6);
-  }
-  
-  .hero-bottom-info {
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    background: rgba(0, 0, 0, 0.7);
-  }
-}
 
 /* Print Styles for Hero Components */
 @media print {
