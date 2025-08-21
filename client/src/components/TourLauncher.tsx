@@ -1,15 +1,13 @@
 /**
  * Tour Launcher Component
- * Provides multiple ways to start the app tour with visual preview
+ * Visual tour launcher without actual tour functionality
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import Joyride, { CallBackProps, STATUS, Step, Styles } from 'react-joyride';
-
 
 import { 
   Play, 
@@ -20,21 +18,12 @@ import {
   Target, 
   Camera, 
   Utensils,
-  User,
-  BarChart3,
   Droplets
 } from 'lucide-react';
 
 interface TourLauncherProps {
   onStartTour: () => void;
   isVisible?: boolean;
-}
-
-interface AppTourProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onComplete: () => void;
-  onNavigate?: (tab: string) => void;
 }
 
 const TOUR_FEATURES = [
@@ -76,293 +65,6 @@ const TOUR_FEATURES = [
   }
 ];
 
-// Tour Steps Configuration - Interactive App Walkthrough with Navigation
-const createTourSteps = (handleTabChange: (tab: string) => void): Step[] => [
-  {
-    target: 'body',
-    title: '🎉 Welcome to ByteWise Nutritionist!',
-    content: 'Let\'s take an interactive tour of your nutrition tracking companion. I\'ll guide you through each section and show you the key features.',
-    placement: 'center',
-  },
-  {
-    target: '[data-testid="daily-progress"]',
-    title: '📊 Daily Progress Dashboard',
-    content: 'Your home base shows daily calorie intake, meals logged, remaining calories, and completion percentage. This updates in real-time as you track food.',
-    placement: 'bottom',
-  },
-  {
-    target: '[data-testid="water-consumption-card"]',
-    title: '💧 Hydration Tracking',
-    content: 'Click any water glass to log your hydration. Watch the visual indicator fill up as you reach your daily 8-glass goal.',
-    placement: 'top',
-  },
-  {
-    target: '[data-testid="navigation-tabs"]',
-    title: '🧭 Navigation Menu',
-    content: 'The bottom navigation gives you access to all app sections. Let\'s explore each one starting with the Calorie Tracker.',
-    placement: 'top',
-  },
-  {
-    target: '[data-testid="nav-calculator"]',
-    title: '🍎 Food Tracking - Step 1',
-    content: 'Click here to access the Calorie Tracker where you can search 300,000+ USDA foods, scan photos with AI, and calculate precise nutrition.',
-    placement: 'top',
-    data: { action: 'navigate', tab: 'nutrition' }
-  },
-  {
-    target: '[data-testid="nutrition-food-search"]',
-    title: '🔍 Smart Food Search',
-    content: 'Search for any food here. The system recognizes brand names, provides autocomplete suggestions, and shows FDA-compliant serving sizes.',
-    placement: 'bottom',
-  },
-  {
-    target: '[data-testid="nav-fasting"]',
-    title: '⏰ Fasting Timer - Step 1',
-    content: 'Click here to access the Fasting Timer for tracking intermittent fasting sessions.',
-    placement: 'top',
-    data: { action: 'navigate', tab: 'fasting' }
-  },
-  {
-    target: '[data-testid="fasting-controls"]',
-    title: '⏰ Fasting Controls',
-    content: 'Start, pause, or stop fasting sessions here. Track your fasting history and celebrate achievements when you reach your goals.',
-    placement: 'bottom',
-  },
-  {
-    target: '[data-testid="nav-journal"]',
-    title: '📔 Meal Journal - Step 1',
-    content: 'Click here to access your Meal Journal where you can review your complete food history.',
-    placement: 'top',
-    data: { action: 'navigate', tab: 'daily' }
-  },
-  {
-    target: '[data-testid="main-food-search"]',
-    title: '📔 Meal History',
-    content: 'Browse your complete meal history, search past entries, filter by date, and review your nutrition patterns over time.',
-    placement: 'bottom',
-  },
-  {
-    target: '[data-testid="nav-profile"]',
-    title: '⚙️ Profile Settings - Step 1',
-    content: 'Click here to access your Profile where you can customize goals and view achievements.',
-    placement: 'top',
-    data: { action: 'navigate', tab: 'profile' }
-  },
-  {
-    target: '[data-testid="profile-goals"]',
-    title: '🎯 Goal Customization',
-    content: 'Set your daily calorie goals, update personal information, and track your progress with detailed analytics.',
-    placement: 'bottom',
-  },
-  {
-    target: '[data-testid="nav-dashboard"]',
-    title: '🏠 Return to Dashboard',
-    content: 'Let\'s return to your main dashboard to complete the tour.',
-    placement: 'top',
-    data: { action: 'navigate', tab: 'home' }
-  },
-  {
-    target: 'body',
-    title: '🎯 Tour Complete!',
-    content: 'You\'ve explored all the major features! Start tracking your nutrition journey by searching for foods, logging water, or setting up fasting sessions.',
-    placement: 'center',
-  }
-];
-
-// Enhanced Tour Styles with better visibility
-const tourStyles: Partial<Styles> = {
-  options: {
-    primaryColor: '#3b82f6',
-    width: 380,
-    zIndex: 10000,
-  },
-  overlay: {
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
-  },
-  spotlight: {
-    borderRadius: '12px',
-    border: '3px solid #3b82f6',
-  },
-  beacon: {
-    background: '#3b82f6',
-    border: '4px solid rgba(59, 130, 246, 0.3)',
-    boxShadow: '0 0 20px rgba(59, 130, 246, 0.5)',
-  },
-  beaconInner: {
-    background: '#1e40af',
-  },
-  tooltip: {
-    padding: 0,
-    backgroundColor: 'white',
-    borderRadius: '16px',
-    border: '2px solid #e5e7eb',
-    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(59, 130, 246, 0.1)',
-    maxWidth: '380px',
-    filter: 'none',
-  },
-  tooltipContainer: {
-    textAlign: 'left' as const,
-    color: '#111827',
-    lineHeight: '1.5',
-  },
-  tooltipContent: {
-    padding: '24px',
-    fontSize: '15px',
-    lineHeight: '1.6',
-    color: '#374151',
-  },
-  tooltipTitle: {
-    fontSize: '18px',
-    fontWeight: '600',
-    color: '#111827',
-    marginBottom: '12px',
-  },
-  tooltipFooter: {
-    padding: '16px 24px',
-    borderTop: '1px solid #e5e7eb',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  buttonNext: {
-    backgroundColor: '#3b82f6',
-    color: 'white',
-    borderRadius: '8px',
-    padding: '10px 20px',
-    fontWeight: '600',
-    fontSize: '14px',
-    border: 'none',
-    cursor: 'pointer',
-    boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-  },
-  buttonBack: {
-    backgroundColor: 'transparent',
-    color: '#6b7280',
-    borderRadius: '8px',
-    padding: '10px 16px',
-    fontWeight: '500',
-    fontSize: '14px',
-    border: '1px solid #d1d5db',
-    cursor: 'pointer',
-  },
-  buttonSkip: {
-    backgroundColor: 'transparent',
-    color: '#9ca3af',
-    padding: '8px 12px',
-    fontSize: '14px',
-    fontWeight: '500',
-    border: 'none',
-    cursor: 'pointer',
-  },
-};
-
-// Integrated App Tour Component - Export for main layout
-export function AppTour({ isOpen, onClose, onComplete, onNavigate }: AppTourProps) {
-  const [run, setRun] = useState(false);
-  const [stepIndex, setStepIndex] = useState(0);
-  const [tourSteps, setTourSteps] = useState<Step[]>([]);
-
-  useEffect(() => {
-    if (isOpen && onNavigate) {
-      const steps = createTourSteps(onNavigate);
-      setTourSteps(steps);
-      setRun(true);
-      setStepIndex(0);
-    } else {
-      setRun(false);
-    }
-  }, [isOpen, onNavigate]);
-
-  const handleJoyrideCallback = (data: CallBackProps) => {
-    const { status, type, index, action, step } = data;
-    const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
-
-    if (finishedStatuses.includes(status)) {
-      localStorage.setItem('bytewise-tour-completed', 'true');
-      setRun(false);
-      if (status === STATUS.FINISHED) {
-        onComplete();
-      }
-      onClose();
-    } else if (type === 'step:after' && action === 'next') {
-      // Handle navigation before moving to next step
-      const currentStep = tourSteps[index];
-      if (currentStep?.data?.action === 'navigate' && onNavigate) {
-        onNavigate(currentStep.data.tab);
-        // Small delay to allow navigation to complete
-        setTimeout(() => {
-          setStepIndex(index + 1);
-        }, 1000);
-      } else {
-        setStepIndex(index + 1);
-      }
-    } else if (type === 'step:after' && action === 'prev') {
-      setStepIndex(Math.max(0, index - 1));
-    }
-  };
-
-
-  
-  return (
-    <Joyride
-      callback={handleJoyrideCallback}
-      continuous
-      run={run}
-      scrollToFirstStep
-      showProgress
-      showSkipButton
-      steps={tourSteps}
-      styles={tourStyles}
-      disableOverlayClose={true}
-      hideCloseButton={true}
-      spotlightClicks={true}
-      stepIndex={stepIndex}
-      locale={{
-        back: 'Previous',
-        close: 'Close',
-        last: 'Complete Tour',
-        next: 'Next',
-        skip: 'Skip Tour',
-      }}
-    />
-  );
-}
-
-// Hook to manage tour state
-export function useAppTour() {
-  const [isTourOpen, setIsTourOpen] = useState(false);
-
-  const startTour = () => {
-    setIsTourOpen(true);
-  };
-
-  const closeTour = () => {
-    setIsTourOpen(false);
-  };
-
-  const completeTour = () => {
-    localStorage.setItem('bytewise-tour-completed', 'true');
-    setIsTourOpen(false);
-  };
-
-  const shouldShowTour = () => {
-    return localStorage.getItem('bytewise-tour-completed') !== 'true';
-  };
-
-  const resetTour = () => {
-    localStorage.removeItem('bytewise-tour-completed');
-  };
-
-  return {
-    isTourOpen,
-    startTour,
-    closeTour,
-    completeTour,
-    shouldShowTour,
-    resetTour
-  };
-}
-
 export function TourLauncher({ onStartTour, isVisible = true }: TourLauncherProps) {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
@@ -375,7 +77,6 @@ export function TourLauncher({ onStartTour, isVisible = true }: TourLauncherProp
 
   return (
     <>
-
       {/* Tour Preview Dialog */}
       <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
         <DialogTrigger asChild>
@@ -509,21 +210,23 @@ export function WelcomeBanner({ onStartTour, onDismiss }: { onStartTour: () => v
   );
 }
 
-// Main Unified Tour Component
-export function UnifiedTourSystem() {
-  const { isTourOpen, startTour, closeTour, completeTour, shouldShowTour } = useAppTour();
+// Simple hook for tour visibility (without actual tour functionality)
+export function useAppTour() {
+  const shouldShowTour = () => {
+    return localStorage.getItem('bytewise-tour-completed') !== 'true';
+  };
 
-  return (
-    <>
-      <TourLauncher
-        onStartTour={startTour}
-        isVisible={shouldShowTour()}
-      />
-      <AppTour
-        isOpen={isTourOpen}
-        onClose={closeTour}
-        onComplete={completeTour}
-      />
-    </>
-  );
+  const resetTour = () => {
+    localStorage.removeItem('bytewise-tour-completed');
+  };
+
+  const dismissTour = () => {
+    localStorage.setItem('bytewise-tour-completed', 'true');
+  };
+
+  return {
+    shouldShowTour,
+    resetTour,
+    dismissTour
+  };
 }

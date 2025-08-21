@@ -24,7 +24,7 @@ import { useGoalAchievements } from '@/hooks/useGoalAchievements';
 import { useRotatingBackground } from '@/hooks/useRotatingBackground';
 import { useAchievements, getAchievementIcon, formatAchievementDate } from '@/hooks/useAchievements';
 import { ProfileIcon } from '@/components/ProfileIcon';
-import { TourLauncher, WelcomeBanner, useAppTour, AppTour } from '@/components/TourLauncher';
+import { TourLauncher, WelcomeBanner, useAppTour } from '@/components/TourLauncher';
 import { apiRequest } from '@/lib/queryClient';
 import { 
   Search, 
@@ -127,7 +127,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const [showProfileCompletion, setShowProfileCompletion] = useState(false);
   
   // App tour state
-  const { isTourOpen, startTour, closeTour, completeTour, shouldShowTour } = useAppTour();
+  const { shouldShowTour, dismissTour } = useAppTour();
   const [showWelcomeBanner, setShowWelcomeBanner] = useState(() => shouldShowTour());
   
   // Nutrition aggregation state
@@ -638,14 +638,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           // Show welcome banner instead of immediately starting tour
           setShowWelcomeBanner(true);
           
-          // Also optionally auto-start tour after a delay
-          const tourTimer = setTimeout(() => {
-            if (shouldShowTour()) {
-              startTour();
-            }
-          }, 5000); // Give user time to see welcome banner first
-          
-          return () => clearTimeout(tourTimer);
+          // Show welcome banner for user awareness
+
         }
       }
     };
@@ -656,7 +650,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     return () => {
       window.removeEventListener('auth-state-change', handleAuthStateChange);
     };
-  }, [user, shouldShowTour, startTour]);
+  }, [user, shouldShowTour]);
 
   // Load existing meal data and set up tracking
   useEffect(() => {
@@ -1325,11 +1319,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <WelcomeBanner
               onStartTour={() => {
                 setShowWelcomeBanner(false);
-                startTour();
+                // Tour functionality removed
               }}
               onDismiss={() => {
                 setShowWelcomeBanner(false);
-                localStorage.setItem('bytewise-tour-completed', 'true');
+                dismissTour();
               }}
             />
           )}
@@ -2811,20 +2805,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         onComplete={handleProfileCompletion}
       />
       
-      {/* Unified Tour System */}
+      {/* Visual Tour Launcher (no actual tour functionality) */}
       {user && (
-        <>
-          <TourLauncher
-            onStartTour={startTour}
-            isVisible={shouldShowTour()}
-          />
-          <AppTour
-            isOpen={isTourOpen}
-            onClose={closeTour}
-            onComplete={completeTour}
-            onNavigate={handleTabChange}
-          />
-        </>
+        <TourLauncher
+          onStartTour={() => {
+            // Tour functionality removed - just show info
+            console.log('Tour functionality has been removed');
+          }}
+          isVisible={shouldShowTour()}
+        />
       )}
       
 
