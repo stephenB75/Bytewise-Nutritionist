@@ -1056,19 +1056,19 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
             <div className={`p-2 bg-${color}-500/20 rounded-xl`}>
-              <Icon className={`w-5 h-5 text-${color}-400`} />
+              <Icon className={`w-5 h-5 text-${color}-600`} />
             </div>
             <div>
-              <h3 className="text-white font-semibold">{title}</h3>
-              <p className="text-gray-400 text-sm">{value}/{goal}</p>
+              <h3 className="text-gray-900 font-semibold">{title}</h3>
+              <p className="text-gray-600 text-sm">{value}/{goal}</p>
             </div>
           </div>
           <div className="text-right">
-            <div className={`text-2xl font-bold text-${color}-400`}>{progressWidth}%</div>
-            <div className="text-xs text-gray-400">of goal</div>
+            <div className={`text-2xl font-bold text-${color}-600`}>{progressWidth}%</div>
+            <div className="text-xs text-gray-600">of goal</div>
           </div>
         </div>
-        <div className="relative h-3 bg-gray-800 rounded-full overflow-hidden mb-4">
+        <div className="relative h-3 bg-gray-300 rounded-full overflow-hidden mb-4">
           <div 
             className={`absolute left-0 top-0 h-full bg-gradient-to-r from-${color}-400 to-${color === 'orange' ? 'red' : 'cyan'}-500 rounded-full transition-all duration-1000`}
             style={{ width: `${progressWidth}%` }}
@@ -1099,18 +1099,18 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <Droplets className={`w-6 h-6 transition-colors duration-300 ${isGoalReached ? 'text-white' : 'text-cyan-400'}`} />
             </div>
             <div>
-              <h3 className="text-white font-semibold text-lg">Water Intake</h3>
-              <p className="text-gray-300 text-sm">{glasses}/{dailyGoal} glasses today</p>
+              <h3 className="text-gray-900 font-semibold text-lg">Water Intake</h3>
+              <p className="text-gray-600 text-sm">{glasses}/{dailyGoal} glasses today</p>
             </div>
           </div>
           <div className="text-right">
-            <div className="text-2xl font-bold text-cyan-400">{Math.round(percentage)}%</div>
-            <div className="text-xs text-gray-400">of goal</div>
+            <div className="text-2xl font-bold text-cyan-600">{Math.round(percentage)}%</div>
+            <div className="text-xs text-gray-600">of goal</div>
           </div>
         </div>
         
         {/* Progress bar */}
-        <div className="relative h-3 bg-gray-800 rounded-full overflow-hidden mb-4">
+        <div className="relative h-3 bg-gray-300 rounded-full overflow-hidden mb-4">
           <div 
             className="absolute left-0 top-0 h-full bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full transition-all duration-1000"
             style={{ width: `${percentage}%` }}
@@ -1129,7 +1129,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 className={`w-4 h-6 rounded-sm border-2 transition-all duration-300 ${
                   i < glasses 
                     ? 'bg-cyan-400 border-cyan-400' 
-                    : 'bg-transparent border-gray-600'
+                    : 'bg-transparent border-gray-400'
                 }`}
                 style={{
                   background: i < glasses 
@@ -1147,7 +1147,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               disabled={glasses <= 0}
               size="sm"
               variant="ghost"
-              className="h-8 w-8 p-0 text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 disabled:opacity-50 shadow-lg hover:shadow-xl transition-shadow duration-200 border border-cyan-400/30 hover:border-cyan-400/50"
+              className="h-8 w-8 p-0 text-cyan-600 hover:text-cyan-500 hover:bg-cyan-500/10 disabled:opacity-50 shadow-lg hover:shadow-xl transition-shadow duration-200 border border-cyan-500/50 hover:border-cyan-500/70"
               data-testid="button-decrement-water"
             >
               <Minus className="w-4 h-4" />
@@ -1156,7 +1156,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               onClick={onIncrement}
               size="sm"
               variant="ghost"
-              className="h-8 w-8 p-0 text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 shadow-lg hover:shadow-xl transition-shadow duration-200 border border-cyan-400/30 hover:border-cyan-400/50"
+              className="h-8 w-8 p-0 text-cyan-600 hover:text-cyan-500 hover:bg-cyan-500/10 shadow-lg hover:shadow-xl transition-shadow duration-200 border border-cyan-500/50 hover:border-cyan-500/70"
               data-testid="button-increment-water"
             >
               <Plus className="w-4 h-4" />
@@ -1185,8 +1185,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     , [data]);
 
     // Determine text color based on remaining value
-    const textColor = isNegative ? 'text-red-400' : `text-${color}-400`;
-    const labelColor = isNegative ? 'text-red-300' : 'text-gray-400';
+    const textColor = isNegative ? 'text-red-600' : `text-${color}-600`;
+    const labelColor = isNegative ? 'text-red-500' : 'text-gray-700';
 
     return (
       <Card className="bg-white/10 backdrop-blur-md border-white/20 p-4 transition-all duration-300 hover:bg-white/15 hover:border-white/30 border-2">
@@ -1202,12 +1202,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             {chartData.map((height, i) => (
               <div 
                 key={i}
-                className={`flex-1 ${isNegative ? 'bg-red-400/10' : `bg-${color}-400/10`} rounded-t transition-all duration-500`}
+                className={`flex-1 ${isNegative ? 'bg-red-400/30' : `bg-${color}-400/30`} rounded-t transition-all duration-500`}
                 style={{ height: `${height}%` }}
               />
             ))}
           </div>
-          <div className="text-xs text-gray-500 mt-1">
+          <div className="text-xs text-gray-600 mt-1">
             {value}g / {goal}g
           </div>
         </div>
@@ -1225,18 +1225,18 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     const percentage = Math.min(Math.round((value / goal) * 100), 100);
     const displayValue = value.toFixed(value < 10 ? 1 : 0);
     
-    // Use consistent color classes
+    // Use consistent color classes optimized for light theme
     const getColorClasses = () => {
       switch(color) {
-        case 'cyan': return 'text-cyan-400 from-cyan-400 to-blue-500';
-        case 'orange': return 'text-orange-400 from-orange-400 to-yellow-500';
-        case 'red': return 'text-red-400 from-red-400 to-pink-500';
-        case 'green': return 'text-green-400 from-green-400 to-emerald-500';
-        case 'slate': return 'text-slate-400 from-slate-400 to-gray-500';
-        case 'white': return 'text-white from-white to-gray-300';
-        case 'amber': return 'text-amber-400 from-amber-400 to-yellow-500';
-        case 'rose': return 'text-rose-400 from-rose-400 to-pink-500';
-        default: return 'text-gray-400 from-gray-400 to-gray-500';
+        case 'cyan': return 'text-cyan-600 from-cyan-400 to-blue-500';
+        case 'orange': return 'text-orange-600 from-orange-400 to-yellow-500';
+        case 'red': return 'text-red-600 from-red-400 to-pink-500';
+        case 'green': return 'text-green-600 from-green-400 to-emerald-500';
+        case 'slate': return 'text-slate-600 from-slate-400 to-gray-500';
+        case 'white': return 'text-gray-900 from-white to-gray-300';
+        case 'amber': return 'text-amber-600 from-amber-400 to-yellow-500';
+        case 'rose': return 'text-rose-600 from-rose-400 to-pink-500';
+        default: return 'text-gray-600 from-gray-400 to-gray-500';
       }
     };
     
@@ -1247,15 +1247,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     <Card className="bg-white/10 backdrop-blur-md border-white/20 p-3 border-2">
       <div className="flex items-center justify-between mb-2">
         <div className={`text-sm font-semibold ${textColor}`}>{name}</div>
-        <div className="text-xs text-white font-bold">{displayValue}{unit} / {goal}{unit}</div>
+        <div className="text-xs text-gray-900 font-bold">{displayValue}{unit} / {goal}{unit}</div>
       </div>
-      <div className="relative h-2 bg-gray-800 rounded-full overflow-hidden">
+      <div className="relative h-2 bg-gray-300 rounded-full overflow-hidden">
         <div 
           className={`absolute left-0 top-0 h-full bg-gradient-to-r from-${gradientColors} rounded-full transition-all duration-1000`} 
           style={{ width: `${percentage}%` }} 
         />
       </div>
-      <div className="text-xs text-white font-semibold mt-1">{percentage}% Daily Value</div>
+      <div className="text-xs text-gray-900 font-semibold mt-1">{percentage}% Daily Value</div>
     </Card>
     );
   };
