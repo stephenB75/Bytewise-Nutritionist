@@ -2790,7 +2790,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       
       {/* Bottom Navigation - High Resolution Icons */}
       <div data-testid="navigation-tabs" className="fixed bottom-0 left-0 right-0 bg-yellow-400 border-t border-yellow-500/60 safe-area-pb z-50 shadow-lg">
-        <div className="flex items-center justify-around py-2 px-3 max-w-md mx-auto gap-1">
+        <div className="flex items-center justify-around py-1.5 px-2.5 max-w-md mx-auto gap-0.5">
           {[
             { id: 'home', label: 'Dashboard', icon: Home, testId: 'nav-dashboard' },
             { id: 'nutrition', label: 'Calorie Tracker', icon: Utensils, testId: 'nav-calculator' },
