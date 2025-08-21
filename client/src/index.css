@@ -78,6 +78,13 @@ button[data-testid*="nav-"] {
   background-color: transparent !important;
 }
 
+/* Remove borders from navigation icons specifically */
+[data-testid="navigation-tabs"] button svg,
+[data-testid*="nav-"] svg,
+.lucide-icon {
+  border: none !important;
+}
+
 /* Fix navigation text colors */
 .text-yellow-400 { 
   color: #ca8a04 !important; /* Much darker yellow/amber for visibility */
@@ -112,6 +119,63 @@ button[data-testid*="nav-"] {
 .text-gray-200.font-light { color: #374151 !important; }
 .text-gray-100.opacity-95 { color: #1f2937 !important; }
 .opacity-95 { opacity: 1 !important; } /* Remove opacity that reduces contrast */
+
+/* Fix ALL remaining white and light text */
+.text-white.text-lg { color: #111827 !important; }
+.text-white.text-xl { color: #111827 !important; }
+.text-white.text-2xl { color: #111827 !important; }
+.text-white.text-6xl { color: #111827 !important; }
+.text-white.text-7xl { color: #111827 !important; }
+.text-white.text-8xl { color: #111827 !important; }
+
+/* Hero section specific fixes */
+h1.text-white { color: #111827 !important; }
+p.text-gray-100 { color: #1f2937 !important; }
+p.text-gray-200 { color: #374151 !important; }
+
+/* Metrics cards drop shadows like profile page */
+.bg-white\/10.backdrop-blur-md,
+.bg-white\/15,
+[class*="ProgressCard"],
+[class*="MacroCard"],
+[class*="WaterCard"],
+[class*="MicronutrientCard"] {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 4px 16px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Comprehensive white text fixes for ALL remaining cases */
+span.text-white { color: #111827 !important; }
+div.text-white { color: #111827 !important; }
+h1.text-white, h2.text-white, h3.text-white, h4.text-white { color: #111827 !important; }
+p.text-white { color: #111827 !important; }
+
+/* Achievement and goal section text fixes */
+.text-white.font-semibold.text-xl { color: #111827 !important; }
+.text-white.text-xs { color: #111827 !important; }
+.text-white.text-sm { color: #111827 !important; }
+.text-white.font-bold.text-2xl { color: #111827 !important; }
+
+/* Icon color fixes inside navigation */
+.w-6.h-6.transition-colors { color: #0e7490 !important; }
+.lucide-icon, .lucide { color: inherit !important; border: none !important; }
+
+/* Complete navigation icon border removal */
+[data-testid="navigation-tabs"] .lucide,
+[data-testid="navigation-tabs"] svg,
+button svg.lucide,
+svg.w-6,
+svg.w-5,
+svg.w-4 {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Fix small navigation text */
+.text-\[9px\].font-medium { 
+  color: #4b5563 !important; 
+  font-weight: 600 !important;
+}
 
 /* Progress bar and UI element fixes */
 .bg-gray-800 { background-color: #e5e7eb !important; } /* Light gray for progress bars */
@@ -201,6 +265,32 @@ button:hover:not(.bg-orange-500):not([class*="bg-gradient"]):not(.bg-cyan-):not(
 /* Hover state text fixes */
 .hover\:text-white:hover { 
   color: #111827 !important; 
+}
+
+/* Comprehensive light gray text fixes */
+.text-gray-300.text-sm { color: #4b5563 !important; }
+.text-gray-400.text-sm { color: #6b7280 !important; }
+.text-gray-400.text-xs { color: #6b7280 !important; }
+.text-gray-500.text-xs { color: #6b7280 !important; }
+
+/* Fix water card and progress card text specifically */
+.text-cyan-400 { color: #0e7490 !important; }
+.hover\:text-cyan-300:hover { color: #0891b2 !important; }
+.text-red-300 { color: #dc2626 !important; }
+
+/* Remove any remaining icon borders */
+.lucide-home, .lucide-utensils, .lucide-clock, 
+.lucide-bar-chart-3, .lucide-user-circle,
+.lucide-bell, .lucide-droplets, .lucide-target,
+.lucide-trophy, .lucide-calendar {
+  border: none !important;
+}
+
+/* Ensure all metrics text is dark enough */
+.backdrop-blur-md .text-white,
+.bg-white\/10 .text-white,
+.bg-white\/15 .text-white {
+  color: #111827 !important;
 }
 
 /* Placeholder and input text fixes */
