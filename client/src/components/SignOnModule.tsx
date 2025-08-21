@@ -125,15 +125,6 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
 
       const data = await response.json();
       
-      // Frontend received response
-        status: response.status,
-        ok: response.ok,
-        hasUser: !!data.user,
-        hasSession: !!data.session,
-        requiresVerification: data.requiresVerification,
-        message: data.message,
-        code: data.code
-      });
 
 
       if (response.ok) {
@@ -156,11 +147,6 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
           }
         } else if (data.session) {
           // Successfully signed in with verified email
-          // Setting session with tokens
-            hasAccessToken: !!data.session.access_token,
-            hasRefreshToken: !!data.session.refresh_token,
-            accessTokenLength: data.session.access_token?.length
-          });
           
           try {
             // Check if this is a custom token or standard Supabase JWT
@@ -186,20 +172,10 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
                 throw sessionError;
               }
               
-              // Supabase session set successfully
-                hasUser: !!sessionData?.user,
-                hasSession: !!sessionData?.session,
-                userId: sessionData?.user?.id?.substring(0, 8) + '...'
-              });
             }
             
             // Verify session was set by checking current session
             const { data: currentSession } = await supabase.auth.getSession();
-            // Current session after setting
-              hasSession: !!currentSession.session,
-              hasAccessToken: !!currentSession.session?.access_token,
-              tokenPreview: currentSession.session?.access_token?.substring(0, 20) + '...'
-            });
             
             console.log('🔄 Refreshing auth state...');
             

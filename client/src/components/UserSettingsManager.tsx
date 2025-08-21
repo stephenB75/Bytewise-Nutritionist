@@ -76,11 +76,6 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
 
   // Update local state when user data changes
   useEffect(() => {
-    // User data changed, updating form state
-      hasUser: !!user,
-      userEmail: user?.email || 'none',
-      userId: user?.id?.substring(0, 8) + '...' || 'none'
-    });
     
     if (user) {
       const userData = user as any;
@@ -88,12 +83,6 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
       const lastName = userData?.lastName || '';
       const personalInfo = userData?.personalInfo || {};
       
-      // Extracted user data
-        firstName: firstName || '(empty)',
-        lastName: lastName || '(empty)',
-        personalInfoKeys: personalInfo ? Object.keys(personalInfo) : 'none',
-        dailyCalorieGoal: userData?.dailyCalorieGoal || 'none'
-      });
       
       // Create full name from available data
       // Check if firstName is actually an email address (common data issue)
@@ -112,13 +101,6 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                    (userData?.email ? userData.email.split('@')[0] : '') || '';
       }
       
-      // Name resolution logic
-        originalFirstName: firstName || '(empty)',
-        originalLastName: lastName || '(empty)',
-        isFirstNameEmail: isFirstNameEmail,
-        finalFullName: fullName || '(empty)',
-        fallbackFromEmail: userData?.email ? userData.email.split('@')[0] : 'none'
-      });
       
       const newUserInfo = {
         // For display purposes, clear email-as-firstname and use proper name logic
@@ -137,16 +119,6 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
         joinDate: userData?.createdAt || new Date().toISOString(),
       };
       
-      // Setting new form state
-        firstName: newUserInfo.firstName || '(empty)',
-        lastName: newUserInfo.lastName || '(empty)', 
-        phone: newUserInfo.phone || '(empty)',
-        location: newUserInfo.location || '(empty)',
-        birthDate: newUserInfo.birthDate || '(empty)',
-        height: newUserInfo.height || '(empty)',
-        weight: newUserInfo.weight || '(empty)',
-        calorieGoal: newUserInfo.calorieGoal
-      });
       
       setUserInfo(newUserInfo);
     }
@@ -200,17 +172,6 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
         }
       };
       
-      // Sending profile data
-        originalName: userInfo.name,
-        splitFirstName: firstName.trim(),
-        splitLastName: lastName.trim(),
-        birthDate: userInfo.birthDate || '(empty)',
-        phone: userInfo.phone || '(empty)',
-        location: userInfo.location || '(empty)',
-        height: userInfo.height || '(empty)',
-        weight: userInfo.weight || '(empty)',
-        profileData: profileData
-      });
 
       // Validate required fields
       if (!firstName.trim()) {
@@ -266,12 +227,6 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
       
       // Refetch user data to show updated information
       const refetchResult = await refetch();
-      // Refetch completed
-        hasData: !!refetchResult.data,
-        userEmail: refetchResult.data?.email || 'none',
-        firstName: refetchResult.data?.firstName || '(empty)',
-        lastName: refetchResult.data?.lastName || '(empty)'
-      });
 
       // Force update form state with the fresh data (in case useEffect doesn't trigger)
       if (refetchResult.data) {
@@ -293,12 +248,6 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                              (userData?.email ? userData.email.split('@')[0] : '') || '';
         }
         
-        // Force updating form state with fresh data
-          refreshedFirstName: refreshedFirstName || '(empty)',
-          refreshedLastName: refreshedLastName || '(empty)', 
-          isRefreshedFirstNameEmail: isRefreshedFirstNameEmail,
-          refreshedFullName: refreshedFullName || '(empty)'
-        });
         
         setUserInfo({
           firstName: isRefreshedFirstNameEmail ? '' : refreshedFirstName,
