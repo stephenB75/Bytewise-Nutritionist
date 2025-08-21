@@ -41,11 +41,53 @@ html,
 .bg-gray-900 { background-color: #f9fafb !important; }
 .bg-gray-800 { background-color: #ffffff !important; }
 .bg-gray-700 { background-color: #f3f4f6 !important; }
-.text-white { color: #000000 !important; }
+
+/* Enhanced text color overrides for better contrast */
+.text-white { color: #1f2937 !important; } /* Dark gray instead of pure black for better readability */
+.text-gray-100 { color: #374151 !important; }
+.text-gray-200 { color: #4b5563 !important; }  
 .text-gray-300 { color: #6b7280 !important; }
 .text-gray-400 { color: #9ca3af !important; }
+.text-gray-500 { color: #6b7280 !important; }
 .border-gray-700 { border-color: #e5e7eb !important; }
 .border-gray-800 { border-color: #d1d5db !important; }
+
+/* Light theme colored text overrides for better visibility */
+.text-sky-300 { color: #0284c7 !important; } /* Darker sky blue for contrast */
+.text-sky-200 { color: #0369a1 !important; } /* Even darker on hover */
+.text-cyan-300 { color: #0891b2 !important; } /* Darker cyan */
+.text-cyan-400 { color: #0e7490 !important; } /* Strong cyan for good contrast */
+.text-orange-400 { color: #ea580c !important; } /* Strong orange */
+.text-red-400 { color: #dc2626 !important; } /* Strong red */
+.text-red-300 { color: #ef4444 !important; } /* Visible red */
+.text-green-400 { color: #16a34a !important; } /* Strong green */
+.text-blue-400 { color: #2563eb !important; } /* Strong blue */
+
+/* Semi-transparent text color fixes */
+.text-white\/70 { color: #4b5563 !important; } /* Medium gray */
+.text-white\/80 { color: #374151 !important; } /* Darker gray */
+.text-white\/90 { color: #1f2937 !important; } /* Very dark gray */
+
+/* Progress bar and UI element fixes */
+.bg-gray-800 { background-color: #e5e7eb !important; } /* Light gray for progress bars */
+.text-xs.text-gray-400 { color: #6b7280 !important; }
+.text-xs.text-gray-500 { color: #6b7280 !important; }
+.text-sm.text-gray-400 { color: #9ca3af !important; }
+
+/* Button and interactive element visibility */
+.hover\:text-cyan-300:hover { color: #0891b2 !important; }
+.hover\:text-white:hover { color: #1f2937 !important; }
+.hover\:text-red-400:hover { color: #dc2626 !important; }
+
+/* Special cases for icon colors */
+.text-cyan-400.w-4, .text-cyan-400.w-5, .text-cyan-400.w-6 { 
+  color: #0e7490 !important; 
+}
+
+/* Drop shadow enhancements for better text visibility */
+.drop-shadow-2xl, .drop-shadow-xl, .drop-shadow-lg {
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15)) !important;
+}
 
 /* Light theme border overrides for cards and components */
 .border-white\/20 { border-color: #d1d5db !important; }
@@ -55,22 +97,63 @@ html,
 .border-blue-200 { border-color: #dbeafe !important; }
 .border-green-500\/30 { border-color: #22c55e !important; }
 
-/* Enhanced borders for buttons and cards */
-.light-theme .bg-white\/10 { 
+/* Enhanced borders and backgrounds for buttons and cards */
+.bg-white\/10 { 
   background-color: #f8fafc !important; 
   border: 1px solid #e2e8f0 !important;
 }
-.light-theme .bg-white\/15 { 
+.bg-white\/15 { 
   background-color: #f1f5f9 !important; 
   border-color: #cbd5e1 !important;
 }
 
 /* Button border enhancements */
-.light-theme button:not(.bg-orange-500):not([class*="bg-gradient"]) {
+button:not(.bg-orange-500):not([class*="bg-gradient"]):not(.bg-cyan-):not(.bg-red-) {
   border: 1px solid #e2e8f0 !important;
 }
-.light-theme button:hover:not(.bg-orange-500):not([class*="bg-gradient"]) {
+button:hover:not(.bg-orange-500):not([class*="bg-gradient"]):not(.bg-cyan-):not(.bg-red-) {
   border-color: #cbd5e1 !important;
+}
+
+/* Card background overrides for better contrast */
+.backdrop-blur-md {
+  background-color: rgba(248, 250, 252, 0.95) !important;
+}
+
+/* Gradient background fixes for light theme */
+.bg-gradient-to-br.from-cyan-500\/10.to-blue-600\/10 {
+  background: linear-gradient(to bottom right, #ecfeff 50%, #dbeafe 100%) !important;
+}
+
+/* Hover state improvements */
+.hover\:bg-white\/15:hover {
+  background-color: #f1f5f9 !important;
+}
+
+/* Specific font weight and styling fixes */
+.font-black { font-weight: 900 !important; }
+.font-bold { font-weight: 700 !important; }
+.font-semibold { font-weight: 600 !important; }
+.font-light { font-weight: 300 !important; }
+
+/* Enhanced visibility for specific text combinations */
+.text-white.font-black, .text-white.font-bold { 
+  color: #111827 !important; 
+  font-weight: 800 !important;
+}
+
+.text-white.font-semibold { 
+  color: #1f2937 !important; 
+  font-weight: 600 !important;
+}
+
+/* Placeholder and input text fixes */
+.placeholder-gray-500::placeholder { 
+  color: #6b7280 !important; 
+}
+
+.text-gray-900 { 
+  color: #111827 !important; 
 }
 
 /* Mobile Safe Area Support for iOS and Android Status Bars */
