@@ -1261,7 +1261,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   // Render functions for each page with enhanced animations
   const renderHome = () => (
-    <div className={`space-y-0 page-container animate-in fade-in ${getAnimationDirection('home', previousTab)} duration-700 ease-out`}>
+    <div className={`space-y-0 page-container animate-in fade-in ${getAnimationDirection('home', previousTab)} duration-700 ease-out`} data-page="dashboard">
       <div className="relative h-screen overflow-hidden">
         <div 
           key={`home-bg-${animationKey}`}

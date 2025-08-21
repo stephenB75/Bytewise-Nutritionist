@@ -174,6 +174,21 @@ button[data-testid*="nav-"]:active {
   color: #ffffff !important; 
 }
 
+/* Dashboard page hero text - lighter for better visibility */
+.dashboard-hero h1.text-white,
+.dashboard-hero .text-white,
+[data-page="dashboard"] .hero-component h1.text-white,
+[data-page="dashboard"] .hero-component .text-white { 
+  color: #ffffff !important; 
+}
+
+.dashboard-hero p.text-gray-100,
+.dashboard-hero p.text-gray-200,
+[data-page="dashboard"] .hero-component p.text-gray-100,
+[data-page="dashboard"] .hero-component p.text-gray-200 { 
+  color: #f3f4f6 !important; 
+}
+
 .hero-component p.text-gray-100,
 [data-hero="true"] p.text-gray-100 { 
   color: #f3f4f6 !important; 
@@ -243,6 +258,47 @@ button[data-testid*="nav-"]:active {
 [class*="MacroCard"],
 [class*="WaterCard"],
 [class*="MicronutrientCard"] {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 4px 16px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Add consistent drop shadows to all cards and boxes */
+.bg-gray-700\/50.backdrop-blur-md,
+.bg-blue-500\/20,
+.bg-green-500\/20,
+.bg-yellow-500\/20,
+.bg-red-500\/20,
+.bg-purple-500\/20,
+.bg-gray-800\/50,
+.border-gray-600,
+.border-blue-500\/30,
+.border-green-500\/30,
+.border-yellow-500\/30,
+.border-red-500\/30 {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 4px 16px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Notification icon fixes - solid and remove white frame */
+.lucide-bell,
+[data-testid*="notification"] svg,
+button[aria-label*="notification"] svg,
+svg[data-testid="icon-bell"] {
+  fill: currentColor !important;
+  stroke-width: 2 !important;
+  border: none !important;
+  background: none !important;
+}
+
+/* Additional card shadow consistency */
+.rounded-lg,
+.rounded-xl,
+.rounded-2xl {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Override for cards with existing shadows */
+.bg-white\/5.backdrop-blur-md,
+.bg-black\/20,
+.bg-gray-900\/50 {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 4px 16px rgba(0, 0, 0, 0.05) !important;
 }
 
@@ -446,6 +502,33 @@ button:hover:not(.bg-orange-500):not([class*="bg-gradient"]):not(.bg-cyan-):not(
 
 /* Remove webkit focus outlines */
 [data-testid="navigation-tabs"] button:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Remove background frames from navigation icons */
+[data-testid="navigation-tabs"] button,
+[data-testid="navigation-tabs"] button *,
+button[class*="nav-"],
+.lucide-home,
+.lucide-calculator,
+.lucide-calendar,
+.lucide-trophy,
+.lucide-settings,
+.lucide-user {
+  background: none !important;
+  background-color: transparent !important;
+  border-radius: 0 !important;
+  border: none !important;
+}
+
+/* Comprehensive navigation icon frame removal */
+[data-testid="navigation-tabs"] svg,
+[data-testid="navigation-tabs"] .lucide,
+nav button svg,
+nav .lucide {
+  background: transparent !important;
+  border: none !important;
   outline: none !important;
   box-shadow: none !important;
 }
