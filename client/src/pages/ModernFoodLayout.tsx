@@ -2797,7 +2797,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   MozAppearance: 'none',
                   appearance: 'none'
                 }}
-                className={`group flex flex-col items-center justify-center py-2 px-1 transition-all duration-300 ease-out min-w-[60px] flex-1 ${
+                className={`group flex flex-col items-center py-2 px-1 transition-all duration-300 ease-out min-w-[60px] flex-1 ${
                   activeTab === tab.id
                     ? 'text-yellow-600'
                     : 'text-gray-600 hover:text-gray-800 active:text-white'
