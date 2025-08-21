@@ -1146,7 +1146,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               disabled={glasses <= 0}
               size="sm"
               variant="ghost"
-              className="h-8 w-8 p-0 text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 disabled:opacity-50"
+              className="h-8 w-8 p-0 text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 disabled:opacity-50 shadow-lg hover:shadow-xl transition-shadow duration-200"
               data-testid="button-decrement-water"
             >
               <Minus className="w-4 h-4" />
@@ -1155,7 +1155,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               onClick={onIncrement}
               size="sm"
               variant="ghost"
-              className="h-8 w-8 p-0 text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10"
+              className="h-8 w-8 p-0 text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 shadow-lg hover:shadow-xl transition-shadow duration-200"
               data-testid="button-increment-water"
             >
               <Plus className="w-4 h-4" />
@@ -1649,7 +1649,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     <Button 
                       size="sm" 
                       variant="ghost" 
-                      className="text-gray-400 hover:text-red-400 p-2"
+                      className="text-gray-400 hover:text-red-400 p-2 shadow-md hover:shadow-lg transition-shadow duration-200"
                       data-testid={`button-delete-meal-${index}`}
                       onClick={() => {
                         // Delete meal action
@@ -2223,7 +2223,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <Button
                 variant="ghost"
                 size="sm"
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white shadow-md hover:shadow-lg transition-shadow duration-200"
                 onClick={() => setSearchQuery('')}
               >
                 <X className="w-5 h-5" />
@@ -2233,7 +2233,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         </div>
         {/* Daily Header */}
         <div className="flex space-x-4 mb-6">
-          <Button className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-3 rounded-xl">
+          <Button className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-200">
             <Calendar className="w-4 h-4 mr-2" />
             Today
           </Button>
