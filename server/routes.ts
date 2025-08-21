@@ -1045,10 +1045,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const bucket = objectStorageClient.bucket(bucketName);
       const file = bucket.file(objectName);
       
-      // Check if file exists
-      const [exists] = await file.exists();
+      // Check if file exists with retries for recent uploads
+      let exists = false;
+      let retryCount = 0;
+      const maxRetries = 3;
+      
+      while (!exists && retryCount < maxRetries) {
+        [exists] = await file.exists();
+        if (!exists) {
+          console.log(`⏳ Image not found (attempt ${retryCount + 1}/${maxRetries}), retrying in 1 second...`);
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          retryCount++;
+        }
+      }
+      
       if (!exists) {
-        console.log('❌ Image not found in object storage:', objectPath);
+        console.log('❌ Image not found in object storage after retries:', objectPath);
         // Return a more helpful error for the AI service
         return res.status(404).json({ 
           error: 'Image not found in storage',
@@ -1104,11 +1116,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (imageUrl.includes('storage.googleapis.com') && imageUrl.includes('.private')) {
         console.log('🔐 Converting private storage URL to proxy URL for AI analysis...');
         try {
-          // Extract the object path from the URL
-          const urlParts = imageUrl.split('/');
-          const bucketIndex = urlParts.findIndex((part: string) => part.includes('replit-objstore-'));
+          // Extract the object path from the Google Cloud Storage URL
+          const url = new URL(imageUrl);
+          const pathParts = url.pathname.split('/');
+          
+          // Find bucket name (starts with replit-objstore-)
+          const bucketIndex = pathParts.findIndex(part => part.includes('replit-objstore-'));
           if (bucketIndex !== -1) {
-            const objectPath = urlParts.slice(bucketIndex + 1).join('/');
+            // Get everything after the bucket name as the object path
+            const objectPath = pathParts.slice(bucketIndex + 1).join('/');
+            
+            console.log('🔍 Extracted object path from upload URL:', {
+              originalUrl: imageUrl.substring(0, 100) + '...',
+              extractedPath: objectPath,
+              bucketName: pathParts[bucketIndex]
+            });
             
             // Use our proxy endpoint to serve the private image (use public URL for external API access)
             const publicUrl = process.env.REPLIT_DEV_DOMAIN 
@@ -1117,6 +1139,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
             processableImageUrl = `${publicUrl}/api/ai/proxy-image?path=${encodeURIComponent(objectPath)}`;
             
             console.log('✅ Converted to proxy URL for AI analysis:', processableImageUrl);
+            
+            // Add a small delay to allow the image to be fully saved
+            console.log('⏳ Waiting 2 seconds for image to be fully uploaded...');
+            await new Promise(resolve => setTimeout(resolve, 2000));
           }
         } catch (proxyUrlError) {
           console.error('⚠️ Failed to generate proxy URL, using original URL:', proxyUrlError);
