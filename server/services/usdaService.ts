@@ -1918,6 +1918,27 @@ export class USDAService {
         'cup': 220,
         'slice': 60,
       },
+      // Ice cream products - FDA RACC compliant
+      'ice cream bar': {
+        'bar': 60,     // FDA RACC: 1 bar = 60g
+        'piece': 60,   // 1 piece = 1 bar
+        'bars': 60,
+        't': 15,       // 1 tablespoon = 15g (warning needed)
+        'tbsp': 15,    // 1 tablespoon = 15g (warning needed)
+        'tablespoon': 15,
+      },
+      'ice cream': {
+        'cup': 66,     // FDA RACC: 2/3 cup = 66g
+        'scoop': 66,   // 1 scoop ≈ 2/3 cup
+        't': 15,       // 1 tablespoon = 15g (warning needed)
+        'tbsp': 15,    // 1 tablespoon = 15g (warning needed)
+        'tablespoon': 15,
+      },
+      'popsicle': {
+        'piece': 50,   // FDA RACC: 1 popsicle = 50g
+        'popsicle': 50,
+        'pop': 50,
+      },
       // Candy and confectionery items
       'twizzlers': {
         'piece': 11,  // Standard Twizzlers piece ≈ 11g
