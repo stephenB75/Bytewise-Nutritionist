@@ -25,6 +25,7 @@ import { useRotatingBackground } from '@/hooks/useRotatingBackground';
 import { useAchievements, getAchievementIcon, formatAchievementDate } from '@/hooks/useAchievements';
 import { ProfileIcon } from '@/components/ProfileIcon';
 import { AppTour, useAppTour } from '@/components/AppTour';
+import { TourLauncher, WelcomeBanner } from '@/components/TourLauncher';
 import { apiRequest } from '@/lib/queryClient';
 import { 
   Search, 
@@ -128,6 +129,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   
   // App tour state
   const { isTourOpen, startTour, closeTour, completeTour, shouldShowTour } = useAppTour();
+  const [showWelcomeBanner, setShowWelcomeBanner] = useState(() => shouldShowTour());
   
   // Nutrition aggregation state
   const [dailyMacros, setDailyMacros] = useState({ protein: 0, carbs: 0, fat: 0 });
@@ -2808,6 +2810,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         onClose={closeTour}
         onComplete={completeTour}
       />
+      
+      {/* Tour Launcher - Floating button and preview dialog */}
+      <TourLauncher onStartTour={startTour} />
       
       {/* Toast Notifications */}
       <Toaster />

@@ -1,20 +1,21 @@
 /**
- * App Tour Component
- * Provides guided tour for new users to learn key features
+ * Enhanced App Tour Component
+ * Provides comprehensive guided tour with visual highlights and interactive features
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
+import Joyride, { CallBackProps, STATUS, Step, Styles } from 'react-joyride';
 import { Button } from '@/components/ui/button';
-import { X, ArrowLeft, ArrowRight, MapPin } from 'lucide-react';
+import { X, ArrowLeft, ArrowRight, MapPin, Play, Sparkles, Target, Camera, Trophy, Clock, Utensils, Droplets } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
-interface TourStep {
+interface TourStep extends Step {
   id: string;
-  title: string;
-  description: string;
-  target: string; // CSS selector for element to highlight
-  position: 'top' | 'bottom' | 'left' | 'right';
-  action?: string; // Optional action text
+  icon?: React.ReactNode;
+  category: 'getting-started' | 'tracking' | 'features' | 'advanced';
+  tips?: string[];
+  benefits?: string;
 }
 
 interface AppTourProps {
@@ -26,274 +27,284 @@ interface AppTourProps {
 const TOUR_STEPS: TourStep[] = [
   {
     id: 'welcome',
-    title: 'Welcome to ByteWise Nutritionist!',
-    description: 'Let me show you around the app. This quick tour will help you get started with tracking your nutrition and reaching your health goals.',
     target: '[data-testid="app-container"]',
-    position: 'bottom'
+    title: '🎉 Welcome to ByteWise Nutritionist!',
+    content: 'Your personal nutrition companion is ready! This interactive tour will show you everything you need to track your health and reach your goals.',
+    placement: 'center',
+    category: 'getting-started',
+    icon: <Sparkles className="w-5 h-5 text-yellow-500" />,
+    benefits: 'Track nutrition, earn achievements, and build healthy habits',
+    tips: ['Complete the tour to unlock your first achievement!', 'Each feature has helpful tooltips when you need them'],
+    disableBeacon: true
   },
   {
     id: 'search',
-    title: 'Food Search',
-    description: 'Search for foods using our comprehensive database. Type any food name to get detailed nutrition information.',
     target: '[data-testid="main-food-search"]',
-    position: 'bottom',
-    action: 'Try searching for "apple" or "chicken breast"'
+    title: '🔍 Smart Food Search',
+    content: 'Search our comprehensive USDA database with 300,000+ foods. Just type "chicken breast", "haagen dazs bar", or any food name!',
+    placement: 'bottom',
+    category: 'tracking',
+    icon: <Utensils className="w-5 h-5 text-blue-500" />,
+    benefits: 'Accurate nutrition data from official USDA sources',
+    tips: ['Try brand names like "Snickers bar"', 'Search works with partial matches', 'Get portion warnings for realistic serving sizes']
   },
   {
-    id: 'navigation',
-    title: 'Navigation Tabs',
-    description: 'Use these tabs to navigate between different sections: Home, Tracking, Profile, and more.',
-    target: '[data-testid="navigation-tabs"]',
-    position: 'top'
+    id: 'calorie-calculator',
+    target: '[data-testid="calorie-calculator"]',
+    title: '⚡ Instant Calorie Calculator',
+    content: 'Enter any food and measurement for instant nutrition facts. Our smart system recognizes portions and provides FDA-compliant warnings.',
+    placement: 'right',
+    category: 'tracking',
+    icon: <Target className="w-5 h-5 text-green-500" />,
+    benefits: 'Get accurate calories, protein, carbs, and fat instantly',
+    tips: ['Use specific measurements like "1 bar" or "2 scoops"', 'System warns about unrealistic portions', 'Supports brand-specific foods']
   },
   {
-    id: 'profile',
-    title: 'Your Profile',
-    description: 'Tap here to complete your profile, set your goals, and personalize your nutrition tracking experience.',
-    target: '[data-testid="profile-icon"]',
-    position: 'bottom',
-    action: 'Complete your profile for better recommendations'
+    id: 'ai-analyzer',
+    target: '[data-testid="ai-food-analyzer"]',
+    title: '📸 AI Food Analyzer',
+    content: 'Take photos of your meals for instant AI-powered nutrition analysis. Our Google Gemini Vision AI identifies foods and estimates portions!',
+    placement: 'top',
+    category: 'features',
+    icon: <Camera className="w-5 h-5 text-purple-500" />,
+    benefits: 'Snap photos to instantly log complex meals',
+    tips: ['Works best with clear, well-lit photos', 'Identifies multiple foods in one image', 'Provides detailed nutrition breakdown']
   },
   {
-    id: 'daily-tracking',
-    title: 'Daily Progress',
-    description: 'Track your daily calories and see your progress towards your goals. Your achievements unlock as you hit milestones!',
+    id: 'daily-progress',
     target: '[data-testid="daily-progress"]',
-    position: 'top'
+    title: '📊 Daily Progress Tracking',
+    content: 'Watch your daily calories and nutrients in beautiful visual charts. Your progress updates in real-time as you log meals!',
+    placement: 'left',
+    category: 'tracking',
+    icon: <Target className="w-5 h-5 text-blue-600" />,
+    benefits: 'Visual feedback keeps you motivated and on track',
+    tips: ['Progress saves automatically', 'Data syncs across all your devices', 'Set custom daily calorie goals']
   },
   {
-    id: 'fasting',
-    title: 'Fasting Tracker',
-    description: 'Start and track intermittent fasting sessions. Get celebration notifications when you hit major milestones!',
+    id: 'fasting-tracker',
     target: '[data-testid="fasting-tracker"]',
-    position: 'top'
+    title: '⏰ Intermittent Fasting Timer',
+    content: 'Start fasting sessions with our built-in timer. Track 16:8, 18:6, or custom fasting schedules with progress notifications!',
+    placement: 'top',
+    category: 'features',
+    icon: <Clock className="w-5 h-5 text-orange-500" />,
+    benefits: 'Build consistent fasting habits with guided support',
+    tips: ['Get milestone celebrations', 'History tracks your fasting streaks', 'Works offline and in background']
   },
   {
     id: 'achievements',
-    title: 'Achievements',
-    description: 'Earn achievements as you meet your nutrition goals. Check your progress and celebrate your success!',
     target: '[data-testid="achievements-section"]',
-    position: 'left'
+    title: '🏆 Achievement System',
+    content: 'Unlock achievements as you hit nutrition milestones! Celebrate your progress with our comprehensive rewards system.',
+    placement: 'left',
+    category: 'features',
+    icon: <Trophy className="w-5 h-5 text-yellow-600" />,
+    benefits: 'Gamification makes healthy eating more engaging and fun',
+    tips: ['New achievements unlock weekly', 'Share your progress with friends', 'Streak achievements boost motivation']
+  },
+  {
+    id: 'water-tracking',
+    target: '[data-testid="water-card"]',
+    title: '💧 Water Intake Tracking',
+    content: 'Stay hydrated with our beautiful water tracking card. Tap to add glasses and watch your daily hydration goal fill up!',
+    placement: 'top',
+    category: 'tracking',
+    icon: <Droplets className="w-5 h-5 text-cyan-500" />,
+    benefits: 'Proper hydration supports your nutrition goals',
+    tips: ['Visual glass indicators show progress', 'Quick tap interface for easy logging', 'Syncs with your daily nutrition data']
+  },
+  {
+    id: 'profile-setup',
+    target: '[data-testid="profile-icon"]',
+    title: '👤 Complete Your Profile',
+    content: 'Set up your profile with goals, preferences, and personal info for customized nutrition recommendations tailored just for you!',
+    placement: 'bottom',
+    category: 'getting-started',
+    icon: <Target className="w-5 h-5 text-indigo-500" />,
+    benefits: 'Personalized recommendations improve your results',
+    tips: ['Set realistic daily calorie goals', 'Choose your preferred units', 'Enable notifications for better habits']
+  },
+  {
+    id: 'navigation',
+    target: '[data-testid="bottom-navigation"]',
+    title: '🧭 Easy Navigation',
+    content: 'Use the bottom navigation to switch between Dashboard, Calorie Tracker, Fasting Timer, Meal Journal, and Profile sections.',
+    placement: 'top',
+    category: 'getting-started',
+    icon: <MapPin className="w-5 h-5 text-gray-600" />,
+    benefits: 'Quick access to all app features from anywhere',
+    tips: ['Swipe gestures work too', 'Icons show current section', 'All data syncs between sections']
   }
 ];
 
+// Custom Tooltip Component for enhanced visuals
+const CustomTooltip = ({ step, index, size, ...props }: any) => {
+  const stepData = TOUR_STEPS.find(s => s.target === step.target);
+  
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 max-w-sm w-full">
+      {/* Header with category badge */}
+      <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-3 rounded-t-xl">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            {stepData?.icon}
+            <Badge variant="secondary" className="text-xs bg-white/20 text-white border-white/30">
+              {stepData?.category.replace('-', ' ')}
+            </Badge>
+          </div>
+          <span className="text-xs opacity-80">
+            {index + 1} / {size}
+          </span>
+        </div>
+        <h3 className="font-bold text-lg leading-tight">{step.title}</h3>
+      </div>
+      
+      {/* Content */}
+      <div className="p-4">
+        <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed mb-3">
+          {step.content}
+        </p>
+        
+        {stepData?.benefits && (
+          <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-3 mb-3">
+            <p className="text-green-700 dark:text-green-300 text-xs font-medium">
+              ✨ <strong>Benefit:</strong> {stepData.benefits}
+            </p>
+          </div>
+        )}
+        
+        {stepData?.tips && stepData.tips.length > 0 && (
+          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 mb-3">
+            <p className="text-blue-700 dark:text-blue-300 text-xs font-medium mb-2">💡 <strong>Pro Tips:</strong></p>
+            <ul className="space-y-1">
+              {stepData.tips.map((tip, i) => (
+                <li key={i} className="text-blue-600 dark:text-blue-400 text-xs">• {tip}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+        
+        {/* Progress indicator */}
+        <div className="flex gap-1 justify-center mb-3">
+          {Array.from({ length: size }).map((_, i) => (
+            <div
+              key={i}
+              className={`w-2 h-2 rounded-full transition-colors ${
+                i === index 
+                  ? 'bg-blue-500' 
+                  : i < index 
+                  ? 'bg-green-500' 
+                  : 'bg-gray-300 dark:bg-gray-600'
+              }`}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Enhanced Tour Styles
+const tourStyles: Partial<Styles> = {
+  options: {
+    primaryColor: '#3b82f6',
+    width: 350,
+    zIndex: 10000,
+  },
+  overlay: {
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+  },
+  spotlight: {
+    borderRadius: '8px',
+  },
+  beacon: {
+    background: '#3b82f6',
+    border: '4px solid rgba(59, 130, 246, 0.3)',
+  },
+  beaconInner: {
+    background: '#1e40af',
+  },
+  tooltip: {
+    padding: 0,
+    backgroundColor: 'transparent',
+    borderRadius: '12px',
+  },
+  tooltipContainer: {
+    textAlign: 'left' as const,
+  },
+  buttonNext: {
+    backgroundColor: '#3b82f6',
+    color: 'white',
+    borderRadius: '8px',
+    padding: '8px 16px',
+    fontWeight: '500',
+  },
+  buttonBack: {
+    backgroundColor: 'transparent',
+    color: '#6b7280',
+    borderRadius: '8px',
+    padding: '8px 12px',
+  },
+  buttonSkip: {
+    backgroundColor: 'transparent',
+    color: '#9ca3af',
+    padding: '4px',
+  },
+};
+
 export function AppTour({ isOpen, onClose, onComplete }: AppTourProps) {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [targetElement, setTargetElement] = useState<HTMLElement | null>(null);
-  const [highlightPosition, setHighlightPosition] = useState({ top: 0, left: 0, width: 0, height: 0 });
-
-  const getCurrentStepData = () => TOUR_STEPS[currentStep];
-  const isLastStep = currentStep === TOUR_STEPS.length - 1;
-  const isFirstStep = currentStep === 0;
-
-  // Find and highlight target element
-  const updateHighlight = useCallback(() => {
-    const step = getCurrentStepData();
-    if (!step) return;
-
-    const element = document.querySelector(step.target) as HTMLElement;
-    setTargetElement(element);
-    
-    if (element) {
-      const rect = element.getBoundingClientRect();
-      setHighlightPosition({
-        top: rect.top + window.scrollY - 8,
-        left: rect.left + window.scrollX - 8,
-        width: rect.width + 16,
-        height: rect.height + 16
-      });
-    }
-  }, [currentStep]);
+  const [run, setRun] = useState(false);
+  const [stepIndex, setStepIndex] = useState(0);
 
   useEffect(() => {
     if (isOpen) {
-      updateHighlight();
-      // Update highlight on scroll/resize
-      const handleResize = () => updateHighlight();
-      window.addEventListener('resize', handleResize);
-      window.addEventListener('scroll', handleResize);
-      
-      return () => {
-        window.removeEventListener('resize', handleResize);
-        window.removeEventListener('scroll', handleResize);
-      };
-    }
-  }, [isOpen, currentStep, updateHighlight]);
-
-  const handleNext = () => {
-    if (isLastStep) {
-      handleComplete();
+      setRun(true);
+      setStepIndex(0);
     } else {
-      setCurrentStep(currentStep + 1);
+      setRun(false);
+    }
+  }, [isOpen]);
+
+  const handleJoyrideCallback = (data: CallBackProps) => {
+    const { status, type, index } = data;
+    const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
+
+    if (finishedStatuses.includes(status)) {
+      localStorage.setItem('bytewise-tour-completed', 'true');
+      setRun(false);
+      if (status === STATUS.FINISHED) {
+        onComplete();
+      }
+      onClose();
+    } else if (type === 'step:after') {
+      setStepIndex(index + (data.action === 'next' ? 1 : -1));
     }
   };
-
-  const handlePrevious = () => {
-    if (!isFirstStep) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
-  const handleComplete = () => {
-    localStorage.setItem('bytewise-tour-completed', 'true');
-    onComplete();
-    onClose();
-  };
-
-  const handleSkip = () => {
-    localStorage.setItem('bytewise-tour-completed', 'true');
-    onClose();
-  };
-
-  if (!isOpen) return null;
-
-  const step = getCurrentStepData();
-  if (!step) return null;
-
-  // Calculate tooltip position - centered on screen
-  const getTooltipPosition = () => {
-    const isMobile = window.innerWidth < 768;
-    const isSmallMobile = window.innerWidth < 400;
-    
-    // Dynamic sizing based on screen size
-    const tooltipWidth = isSmallMobile ? Math.min(280, window.innerWidth - 32) : 
-                       isMobile ? Math.min(320, window.innerWidth - 40) : 320;
-    const tooltipHeight = isMobile ? 180 : 200;
-    
-    // Center the tooltip in the viewport
-    const top = (window.innerHeight - tooltipHeight) / 2;
-    const left = (window.innerWidth - tooltipWidth) / 2;
-    
-    // Ensure minimum margins on all sides
-    const margin = isMobile ? 16 : 20;
-    const constrainedTop = Math.max(margin, Math.min(top, window.innerHeight - tooltipHeight - margin));
-    const constrainedLeft = Math.max(margin, Math.min(left, window.innerWidth - tooltipWidth - margin));
-
-    return { 
-      top: constrainedTop, 
-      left: constrainedLeft, 
-      width: tooltipWidth 
-    };
-  };
-
-  const tooltipPosition = getTooltipPosition();
 
   return (
-    <div className="fixed inset-0 z-[9999] touch-none" data-testid="app-tour-overlay">
-      {/* Dark overlay - prevents interaction with underlying elements */}
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
-      
-      {/* Highlight circle/rectangle */}
-      {targetElement && (
-        <div
-          className="absolute pointer-events-none"
-          style={{
-            top: highlightPosition.top,
-            left: highlightPosition.left,
-            width: highlightPosition.width,
-            height: highlightPosition.height,
-          }}
-        >
-          <div className="w-full h-full rounded-lg border-4 border-blue-500 shadow-[0_0_0_9999px_rgba(0,0,0,0.7)] animate-pulse bg-white/10" />
-          {/* Pulsing highlight effect */}
-          <div className="absolute inset-0 rounded-lg border-2 border-blue-400 animate-ping opacity-75" />
-        </div>
-      )}
-
-      {/* Tour tooltip - centered on screen */}
-      <Card
-        className="absolute bg-white dark:bg-gray-800 border-2 border-blue-200 dark:border-blue-700 shadow-2xl rounded-lg"
-        style={{
-          top: tooltipPosition.top,
-          left: tooltipPosition.left,
-          width: tooltipPosition.width,
-          maxHeight: 'calc(100vh - 40px)',
-          overflow: 'auto'
-        }}
-        data-testid="tour-tooltip"
-      >
-        <CardContent className="p-4 sm:p-6">
-          {/* Header */}
-          <div className="flex items-start justify-between mb-3 sm:mb-4">
-            <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500 flex-shrink-0" />
-              <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                Step {currentStep + 1} of {TOUR_STEPS.length}
-              </span>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleSkip}
-              className="h-8 w-8 sm:h-9 sm:w-9 p-0 flex-shrink-0 touch-manipulation"
-              data-testid="tour-skip-button"
-            >
-              <X className="w-4 h-4" />
-            </Button>
-          </div>
-
-          {/* Content */}
-          <div className="mb-4 sm:mb-6">
-            <h3 className="text-base sm:text-lg font-semibold mb-2 text-gray-900 dark:text-white leading-snug">
-              {step.title}
-            </h3>
-            <p className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm leading-relaxed mb-3">
-              {step.description}
-            </p>
-            {step.action && (
-              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-2 sm:p-3 border border-blue-200 dark:border-blue-700">
-                <p className="text-blue-700 dark:text-blue-300 text-xs font-medium">
-                  💡 {step.action}
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* Navigation */}
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex gap-1">
-              {TOUR_STEPS.map((_, index) => (
-                <div
-                  key={index}
-                  className={`w-2 h-2 rounded-full transition-colors ${
-                    index === currentStep 
-                      ? 'bg-blue-500' 
-                      : index < currentStep 
-                      ? 'bg-green-500' 
-                      : 'bg-gray-300 dark:bg-gray-600'
-                  }`}
-                />
-              ))}
-            </div>
-
-            <div className="flex gap-2 flex-shrink-0">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handlePrevious}
-                disabled={isFirstStep}
-                className="h-9 px-2 sm:px-3 text-xs sm:text-sm touch-manipulation"
-                data-testid="tour-previous-button"
-              >
-                <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
-                <span className="hidden sm:inline">Back</span>
-              </Button>
-              <Button
-                onClick={handleNext}
-                size="sm"
-                className="h-9 px-3 sm:px-4 bg-blue-500 hover:bg-blue-600 text-white text-xs sm:text-sm touch-manipulation"
-                data-testid="tour-next-button"
-              >
-                <span className="truncate">
-                  {isLastStep ? 'Complete' : 'Next'}
-                </span>
-                {!isLastStep && <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 ml-1" />}
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+    <Joyride
+      callback={handleJoyrideCallback}
+      continuous
+      run={run}
+      scrollToFirstStep
+      showProgress
+      showSkipButton
+      steps={TOUR_STEPS}
+      styles={tourStyles}
+      tooltipComponent={CustomTooltip}
+      disableOverlayClose
+      hideCloseButton
+      spotlightClicks
+      stepIndex={stepIndex}
+      locale={{
+        back: 'Previous',
+        close: 'Close',
+        last: 'Complete Tour',
+        next: 'Next',
+        skip: 'Skip Tour',
+      }}
+    />
   );
 }
 

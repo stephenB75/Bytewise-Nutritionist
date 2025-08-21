@@ -629,7 +629,7 @@ function CalorieCalculator({
       </Card>
 
       {/* Main Calculator */}
-      <Card className="p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg">
+      <Card className="p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg" data-testid="calorie-calculator">
         <div className="flex items-center gap-3 mb-6">
           <div className="p-2 bg-blue-100 rounded-lg">
             <Calculator className="w-6 h-6 text-blue-600" />
