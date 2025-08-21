@@ -78,12 +78,7 @@ div[class*="bg-gray-800"]:not([class*="bg-gray-800/"]):not([class*="backdrop"]):
   color: #374151 !important; 
 }
 
-/* Navigation buttons: Allow styled backgrounds and borders */
-[data-testid="navigation-tabs"] button {
-  /* Let Tailwind classes control styling */
-}
-
-/* Allow navigation buttons to use their defined styling */
+/* Navigation buttons completely reset - no interference */
 
 /* Fix navigation text colors */
 .text-yellow-400 { 
@@ -523,27 +518,77 @@ button:hover:not(.bg-orange-500):not([class*="bg-gradient"]):not(.bg-cyan-):not(
 
 /* Allow Tailwind styling on navigation buttons */
 
-/* Comprehensive navigation button reset */
-[data-testid="navigation-tabs"] button {
+/* ULTRA-COMPREHENSIVE navigation button reset - eliminate ALL frames */
+[data-testid="navigation-tabs"] button,
+[data-testid="navigation-tabs"] button *,
+[data-testid="navigation-tabs"] button:before,
+[data-testid="navigation-tabs"] button:after {
   background: none !important;
   background-color: transparent !important;
+  background-image: none !important;
   border: none !important;
+  border-radius: 0 !important;
   outline: none !important;
   box-shadow: none !important;
   -webkit-appearance: none !important;
   -moz-appearance: none !important;
   appearance: none !important;
+  -webkit-box-shadow: none !important;
+  -moz-box-shadow: none !important;
+  text-shadow: none !important;
+  filter: none !important;
+  -webkit-filter: none !important;
 }
 
 [data-testid="navigation-tabs"] button:focus,
 [data-testid="navigation-tabs"] button:focus-visible,
+[data-testid="navigation-tabs"] button:focus-within,
 [data-testid="navigation-tabs"] button:active,
-[data-testid="navigation-tabs"] button:hover {
+[data-testid="navigation-tabs"] button:hover,
+[data-testid="navigation-tabs"] button:visited,
+[data-testid="navigation-tabs"] button:link {
   background: none !important;
   background-color: transparent !important;
+  background-image: none !important;
   border: none !important;
+  border-radius: 0 !important;
   outline: none !important;
   box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  -moz-box-shadow: none !important;
+  text-shadow: none !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+}
+
+/* NUCLEAR OPTION: Complete button reset for navigation */
+button[data-testid*="nav-"],
+button[data-testid^="nav-"] {
+  all: unset !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  padding: 0.5rem 0.5rem !important;
+  min-width: 60px !important;
+  flex: 1 !important;
+  transition: all 300ms ease-out !important;
+}
+
+/* Override ANY possible browser/framework button styling */
+* button[data-testid*="nav-"],
+* button[data-testid^="nav-"],
+html button[data-testid*="nav-"],
+body button[data-testid*="nav-"] {
+  background: transparent !important;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
 }
 
 /* Icon styling controlled by Tailwind */
