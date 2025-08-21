@@ -378,8 +378,8 @@ export function validatePortionSize(foodName: string, gramsAmount: number): {
   if (gramsAmount > (serving.warningThreshold || serving.fdaRACCgrams * 3)) {
     return {
       isReasonable: false,
-      warning: `⚠️ This portion (${gramsAmount}g) is much larger than typical serving`,
-      recommendation: `FDA Standard: ${serving.commonDescription} (${serving.fdaRACCgrams}g)`,
+      warning: `Your portion (${gramsAmount}g) vs FDA standard (${serving.fdaRACCgrams}g) - ${Math.round(ratio)}x larger`,
+      recommendation: `Try: ${serving.commonDescription} • Or: ${serving.alternativeUnits?.join(' • ') || 'standard serving'}`,
       fdaServing: serving.commonDescription
     };
   }
@@ -387,8 +387,8 @@ export function validatePortionSize(foodName: string, gramsAmount: number): {
   if (ratio > 2) {
     return {
       isReasonable: false,
-      warning: `⚠️ This portion is ${Math.round(ratio)}x larger than FDA standard`,
-      recommendation: `FDA Standard: ${serving.commonDescription} (${serving.fdaRACCgrams}g)`,
+      warning: `Your portion (${gramsAmount}g) vs FDA standard (${serving.fdaRACCgrams}g) - ${Math.round(ratio)}x larger`,
+      recommendation: `Try: ${serving.commonDescription} • Or: ${serving.alternativeUnits?.join(' • ') || 'standard serving'}`,
       fdaServing: serving.commonDescription
     };
   }
@@ -397,8 +397,8 @@ export function validatePortionSize(foodName: string, gramsAmount: number): {
   if (ratio < 0.3) {
     return {
       isReasonable: false,
-      warning: `⚠️ This portion (${gramsAmount}g) seems too small - check your measurement`,
-      recommendation: `FDA Standard: ${serving.commonDescription} (${serving.fdaRACCgrams}g)`,
+      warning: `Your portion (${gramsAmount}g) vs FDA standard (${serving.fdaRACCgrams}g) - seems too small`,
+      recommendation: `Try: ${serving.commonDescription} • Or: ${serving.alternativeUnits?.join(' • ') || 'standard serving'}`,
       fdaServing: serving.commonDescription
     };
   }
