@@ -1896,9 +1896,6 @@ select {
   transition: all 0.2s ease-in-out;
 }
 
-.hero-gradient {
-  background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 50%, transparent 100%);
-}
 
 /**
  * Brand Color Utilities
