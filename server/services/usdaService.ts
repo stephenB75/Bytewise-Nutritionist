@@ -1652,38 +1652,50 @@ export class USDAService {
     availableConversions: { [key: string]: number }
   ): { isRealistic: boolean; warning?: string; suggestion?: string; servingName?: string } | undefined {
     
-    // Define realistic serving sizes for different food categories
-    const realisticServings: { [key: string]: { standardUnit: string; standardGrams: number; warningThreshold: number } } = {
-      'snickers': { standardUnit: 'bar', standardGrams: 52, warningThreshold: 25 },
-      'snickers bar': { standardUnit: 'bar', standardGrams: 52, warningThreshold: 25 },
-      'ice cream bar': { standardUnit: 'bar', standardGrams: 60, warningThreshold: 30 },
-      'ice cream': { standardUnit: 'cup', standardGrams: 66, warningThreshold: 30 },
-      'popsicle': { standardUnit: 'piece', standardGrams: 50, warningThreshold: 25 },
-      'kit kat': { standardUnit: 'bar', standardGrams: 42, warningThreshold: 20 },
-      'reeses': { standardUnit: 'cup', standardGrams: 21, warningThreshold: 10 },
-      'hershey': { standardUnit: 'bar', standardGrams: 43, warningThreshold: 20 },
+    // FDA RACC (Reference Amounts Customarily Consumed) standards
+    const fdaServings: { [key: string]: { standardUnit: string; standardGrams: number; category: string } } = {
+      'snickers': { standardUnit: 'bar', standardGrams: 52, category: 'candy bar' },
+      'snickers bar': { standardUnit: 'bar', standardGrams: 52, category: 'candy bar' },
+      'ice cream bar': { standardUnit: 'bar', standardGrams: 60, category: 'ice cream bar' },
+      'ice cream': { standardUnit: 'cup', standardGrams: 66, category: 'ice cream' },
+      'popsicle': { standardUnit: 'piece', standardGrams: 50, category: 'popsicle' },
+      'kit kat': { standardUnit: 'bar', standardGrams: 42, category: 'candy bar' },
+      'reeses': { standardUnit: 'cup', standardGrams: 21, category: 'candy' },
+      'hershey': { standardUnit: 'bar', standardGrams: 43, category: 'candy bar' },
+      'chips': { standardUnit: 'oz', standardGrams: 28, category: 'snack' },
+      'potato chips': { standardUnit: 'oz', standardGrams: 28, category: 'snack' },
     };
     
-    const servingInfo = realisticServings[ingredient];
-    if (!servingInfo) return undefined;
+    const fdaInfo = fdaServings[ingredient];
+    if (!fdaInfo) return { isRealistic: true };
     
-    // Check if the current measurement is significantly smaller than standard
-    if (actualGrams < servingInfo.warningThreshold) {
+    // Warning if user measurement is significantly different from FDA standard
+    const percentDifference = Math.abs(actualGrams - fdaInfo.standardGrams) / fdaInfo.standardGrams;
+    
+    // Warn if portion is more than 50% different from FDA standard
+    if (percentDifference > 0.5) {
       const suggestions = [];
       
-      // Find the most appropriate serving suggestion
-      if (availableConversions[servingInfo.standardUnit]) {
-        suggestions.push(`1 ${servingInfo.standardUnit}`);
+      // Find available FDA-compliant serving suggestions
+      if (availableConversions[fdaInfo.standardUnit]) {
+        suggestions.push(`1 ${fdaInfo.standardUnit} (${fdaInfo.standardGrams}g)`);
       }
-      if (availableConversions['piece'] && servingInfo.standardUnit !== 'piece') {
-        suggestions.push('1 piece');
+      if (availableConversions['piece'] && fdaInfo.standardUnit !== 'piece') {
+        suggestions.push(`1 piece`);
       }
+      if (availableConversions['bar'] && fdaInfo.standardUnit !== 'bar') {
+        suggestions.push(`1 bar`);
+      }
+      
+      const comparisonText = actualGrams < fdaInfo.standardGrams 
+        ? `much smaller than` 
+        : `much larger than`;
       
       return {
         isRealistic: false,
-        warning: `Your portion (${actualGrams}g) vs FDA standard (${servingInfo.standardGrams}g) - seems too small`,
-        suggestion: suggestions.length > 0 ? `Try: ${suggestions.join(' • Or: ')}` : undefined,
-        servingName: `FDA standard: 1 ${servingInfo.standardUnit} (${servingInfo.standardGrams}g)`
+        warning: `Your portion (${actualGrams}g) is ${comparisonText} FDA standard (${fdaInfo.standardGrams}g)`,
+        suggestion: suggestions.length > 0 ? `FDA recommendation: ${suggestions.join(' or ')}` : undefined,
+        servingName: `FDA RACC: 1 ${fdaInfo.standardUnit} (${fdaInfo.standardGrams}g)`
       };
     }
     
@@ -1808,7 +1820,7 @@ export class USDAService {
       'handful': ['handful', 'handfuls']
     };
 
-    // Standard conversions with base unit names
+    // Standard conversions with base unit names (realistic servings prioritized)
     const conversions: { [key: string]: number } = {
       'gram': 1,
       'kilogram': 1000,
@@ -1816,6 +1828,7 @@ export class USDAService {
       'pound': 453.6,
       'cup': 240, // standard cup volume ≈ 240ml/g
       'cups': 240, // same as singular for consistency
+      // Small measurements (trigger warnings for candy bars)
       'tablespoon': 15,
       'teaspoon': 5,
       'ml': 1, // for liquids, approximate to grams
@@ -1831,7 +1844,7 @@ export class USDAService {
       'dollop': 15, // dollop ≈ 1 tablespoon
       'handful': 40, // handful of nuts/berries ≈ 40g
       'slice': 25, // average slice of bread/fruit ≈ 25g
-      'piece': 20, // average piece ≈ 20g (reduced for better accuracy with smaller items)
+      'piece': 50, // average piece ≈ 50g (FDA standard for most food items)
       'bowl': 200, // average bowl serving ≈ 200g
       'plate': 300, // average plate serving ≈ 300g
       'wedge': 15, // wedge of lemon/lime ≈ 15g
@@ -2102,7 +2115,7 @@ export class USDAService {
           if (unit.includes(unitPattern)) {
             gramsEquivalent = quantity * grams;
             
-            // Generate portion warning for unrealistic measurements
+            // Generate portion warning comparing user input to FDA standards
             const portionInfo = this.generatePortionWarning(ingredient, unitPattern, grams, conversions);
             return { quantity, unit, gramsEquivalent, portionInfo };
           }
