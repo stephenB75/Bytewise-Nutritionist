@@ -144,48 +144,96 @@ button[data-testid*="nav-"]:active {
 .text-gray-100.opacity-95 { color: #1f2937 !important; }
 .opacity-95 { opacity: 1 !important; } /* Remove opacity that reduces contrast */
 
-/* Fix ALL remaining white and light text */
-.text-white.text-lg { color: #374151 !important; }
-.text-white.text-xl { color: #374151 !important; }
-.text-white.text-2xl { color: #374151 !important; }
-.text-white.text-6xl { color: #374151 !important; }
-.text-white.text-7xl { color: #374151 !important; }
-.text-white.text-8xl { color: #374151 !important; }
+/* Fix ALL remaining white and light text - except hero components */
+.text-white.text-lg:not(.hero-component *):not([data-hero="true"] *) { color: #374151 !important; }
+.text-white.text-xl:not(.hero-component *):not([data-hero="true"] *) { color: #374151 !important; }
+.text-white.text-2xl:not(.hero-component *):not([data-hero="true"] *) { color: #374151 !important; }
+.text-white.text-6xl:not(.hero-component *):not([data-hero="true"] *) { color: #374151 !important; }
+.text-white.text-7xl:not(.hero-component *):not([data-hero="true"] *) { color: #374151 !important; }
+.text-white.text-8xl:not(.hero-component *):not([data-hero="true"] *) { color: #374151 !important; }
 
-/* Hero section specific fixes */
-h1.text-white { color: #374151 !important; }
-p.text-gray-100 { color: #4b5563 !important; }
-p.text-gray-200 { color: #6b7280 !important; }
-
-/* Comprehensive hero component text fixes */
-.text-white.drop-shadow-2xl,
-.text-white.drop-shadow-xl { 
-  color: #374151 !important; 
+/* Hero text sizes - keep white for visibility on dark overlay */
+.hero-component .text-white.text-lg,
+.hero-component .text-white.text-xl,
+.hero-component .text-white.text-2xl,
+.hero-component .text-white.text-6xl,
+.hero-component .text-white.text-7xl,
+.hero-component .text-white.text-8xl,
+[data-hero="true"] .text-white.text-lg,
+[data-hero="true"] .text-white.text-xl,
+[data-hero="true"] .text-white.text-2xl,
+[data-hero="true"] .text-white.text-6xl,
+[data-hero="true"] .text-white.text-7xl,
+[data-hero="true"] .text-white.text-8xl { 
+  color: #ffffff !important; 
 }
 
-.text-gray-100.font-light,
-.text-gray-200.font-light { 
-  color: #4b5563 !important; 
+/* Hero section specific fixes - light colors for dark overlays */
+.hero-component h1.text-white,
+[data-hero="true"] h1.text-white { 
+  color: #ffffff !important; 
 }
 
-/* Hero section container text overrides */
-.absolute.inset-0.flex.flex-col .text-white,
+.hero-component p.text-gray-100,
+[data-hero="true"] p.text-gray-100 { 
+  color: #f3f4f6 !important; 
+}
+
+.hero-component p.text-gray-200,
+[data-hero="true"] p.text-gray-200 { 
+  color: #e5e7eb !important; 
+}
+
+/* Hero component text with drop shadows - keep light */
+.hero-component .text-white.drop-shadow-2xl,
+.hero-component .text-white.drop-shadow-xl,
+[data-hero="true"] .text-white.drop-shadow-2xl,
+[data-hero="true"] .text-white.drop-shadow-xl { 
+  color: #ffffff !important; 
+}
+
+.hero-component .text-gray-100.font-light,
+.hero-component .text-gray-200.font-light,
+[data-hero="true"] .text-gray-100.font-light,
+[data-hero="true"] .text-gray-200.font-light { 
+  color: #f3f4f6 !important; 
+}
+
+/* Hero section container text overrides - light for dark overlay */
+.hero-component .absolute.inset-0.flex.flex-col .text-white,
 .hero-component .text-white,
+[data-hero="true"] .absolute.inset-0.flex.flex-col .text-white,
 [data-hero="true"] .text-white { 
-  color: #374151 !important; 
+  color: #ffffff !important; 
 }
 
-/* Hero description text fixes */
-.text-xl.text-gray-100,
-.text-2xl.text-gray-100,
-.text-xl.text-gray-200,
-.text-2xl.text-gray-200 { 
-  color: #4b5563 !important; 
+/* Hero description text fixes - light colors */
+.hero-component .text-xl.text-gray-100,
+.hero-component .text-2xl.text-gray-100,
+.hero-component .text-xl.text-gray-200,
+.hero-component .text-2xl.text-gray-200,
+[data-hero="true"] .text-xl.text-gray-100,
+[data-hero="true"] .text-2xl.text-gray-100,
+[data-hero="true"] .text-xl.text-gray-200,
+[data-hero="true"] .text-2xl.text-gray-200 { 
+  color: #f3f4f6 !important; 
 }
 
-/* Scroll indicator text */
-.text-white\/70.z-30 { 
-  color: #6b7280 !important; 
+/* Hero scroll indicator text - light */
+.hero-component .text-white\/70.z-30,
+[data-hero="true"] .text-white\/70.z-30 { 
+  color: #d1d5db !important; 
+}
+
+/* ByteWise logo text in hero - keep light */
+.hero-component .text-sky-300,
+[data-hero="true"] .text-sky-300 { 
+  color: #7dd3fc !important; 
+}
+
+.hero-component .text-white\/80,
+[data-hero="true"] .text-white\/80 { 
+  color: #f9fafb !important; 
 }
 
 /* Metrics cards drop shadows like profile page */
@@ -198,11 +246,32 @@ p.text-gray-200 { color: #6b7280 !important; }
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 4px 16px rgba(0, 0, 0, 0.05) !important;
 }
 
-/* Comprehensive white text fixes for ALL remaining cases */
-span.text-white { color: #374151 !important; }
-div.text-white { color: #374151 !important; }
-h1.text-white, h2.text-white, h3.text-white, h4.text-white { color: #374151 !important; }
-p.text-white { color: #374151 !important; }
+/* Comprehensive white text fixes for ALL remaining cases - except hero */
+span.text-white:not(.hero-component *):not([data-hero="true"] *) { color: #374151 !important; }
+div.text-white:not(.hero-component *):not([data-hero="true"] *) { color: #374151 !important; }
+h1.text-white:not(.hero-component *):not([data-hero="true"] *), 
+h2.text-white:not(.hero-component *):not([data-hero="true"] *), 
+h3.text-white:not(.hero-component *):not([data-hero="true"] *), 
+h4.text-white:not(.hero-component *):not([data-hero="true"] *) { color: #374151 !important; }
+p.text-white:not(.hero-component *):not([data-hero="true"] *) { color: #374151 !important; }
+
+/* Hero white text elements - keep white for dark overlay visibility */
+.hero-component span.text-white,
+.hero-component div.text-white,
+.hero-component h1.text-white, 
+.hero-component h2.text-white, 
+.hero-component h3.text-white, 
+.hero-component h4.text-white,
+.hero-component p.text-white,
+[data-hero="true"] span.text-white,
+[data-hero="true"] div.text-white,
+[data-hero="true"] h1.text-white, 
+[data-hero="true"] h2.text-white, 
+[data-hero="true"] h3.text-white, 
+[data-hero="true"] h4.text-white,
+[data-hero="true"] p.text-white { 
+  color: #ffffff !important; 
+}
 
 /* Button text in hero sections */
 .bg-gradient-to-r .text-white,
