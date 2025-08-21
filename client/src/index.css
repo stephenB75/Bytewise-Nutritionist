@@ -4,6 +4,24 @@
 @tailwind components;
 @tailwind utilities;
 
+/* CRITICAL: Navigation button reset - MUST be first to override everything */
+button[data-testid*="nav-"],
+button[data-testid^="nav-"],
+[data-testid*="nav-"] button {
+  all: unset !important;
+  background: transparent !important;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  cursor: pointer !important;
+}
+
 /* Force Light Theme */
 :root {
   --background: 255, 255, 255;
@@ -210,8 +228,8 @@ div[class*="bg-gray-800"]:not([class*="bg-gray-800/"]):not([class*="backdrop"]):
   color: #ffffff !important;
 }
 
-/* Dashboard button and interactive text */
-[data-page="dashboard"] button:not(.bg-gradient-to-r) {
+/* Dashboard button and interactive text - EXCLUDE navigation buttons */
+[data-page="dashboard"] button:not(.bg-gradient-to-r):not([data-testid*="nav-"]) {
   color: #ffffff !important;
 }
 
@@ -442,11 +460,11 @@ svg.w-4 {
   border-color: #cbd5e1 !important;
 }
 
-/* Button border enhancements */
-button:not(.bg-orange-500):not([class*="bg-gradient"]):not(.bg-cyan-):not(.bg-red-) {
+/* Button border enhancements - EXCLUDE navigation buttons */
+button:not(.bg-orange-500):not([class*="bg-gradient"]):not(.bg-cyan-):not(.bg-red-):not([data-testid*="nav-"]) {
   border: 1px solid #e2e8f0 !important;
 }
-button:hover:not(.bg-orange-500):not([class*="bg-gradient"]):not(.bg-cyan-):not(.bg-red-) {
+button:hover:not(.bg-orange-500):not([class*="bg-gradient"]):not(.bg-cyan-):not(.bg-red-):not([data-testid*="nav-"]) {
   border-color: #cbd5e1 !important;
 }
 
