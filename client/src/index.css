@@ -324,6 +324,7 @@ button.btn-hero-enhanced span,
 /* Metrics cards drop shadows like profile page */
 .bg-white\/10.backdrop-blur-md,
 .bg-white\/15,
+.bg-gray-50,
 [class*="ProgressCard"],
 [class*="MacroCard"],
 [class*="WaterCard"],
@@ -548,6 +549,12 @@ svg.w-4 {
 .bg-white\/15 { 
   background-color: #f1f5f9 !important; 
   border-color: #cbd5e1 !important;
+}
+
+/* Ensure metrics cards are visible */
+.bg-gray-50 {
+  background-color: #f9fafb !important;
+  border-color: #d1d5db !important;
 }
 
 /* Button border enhancements - EXCLUDE navigation buttons */
@@ -809,6 +816,17 @@ button.bg-gray-100 {
   color: #ffffff !important;
 }
 
+/* Ensure metrics card text is dark and visible */
+.bg-gray-50 h1,
+.bg-gray-50 h2,
+.bg-gray-50 h3,
+.bg-gray-50 h4,
+.bg-gray-50 p,
+.bg-gray-50 span,
+.bg-gray-50 div {
+  color: #1f2937 !important;
+}
+
 /* Form Elements */
 input:not([class*="bg-"]),
 textarea:not([class*="bg-"]),
@@ -918,6 +936,16 @@ button[data-testid*="nav-"] {
 .bg-white\/10 .text-white,
 .bg-white\/15 .text-white {
   color: #374151 !important;
+}
+
+/* Force metrics cards to be visible and properly styled */
+[data-testid*="progress"],
+[data-testid*="water"],
+[data-testid*="macro"],
+[data-testid*="micro"] {
+  background-color: #f9fafb !important;
+  border: 2px solid #d1d5db !important;
+  color: #1f2937 !important;
 }
 
 /* Placeholder and input text fixes */
