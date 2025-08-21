@@ -368,18 +368,34 @@ button[data-testid="button-notifications"] {
   box-shadow: none !important;
 }
 
-/* Ensure proper hover effects for modern design */
-button[data-testid="button-notifications"]:focus {
+/* Ensure no borders on notification button at all levels */
+button[data-testid="button-notifications"],
+button[data-testid="button-notifications"]:hover,
+button[data-testid="button-notifications"]:focus,
+button[data-testid="button-notifications"]:active {
+  border: none !important;
   outline: none !important;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5) !important;
+  box-shadow: none !important;
 }
 
-/* Modern notification icons - Bell and BellRing */
+/* Remove all focus styling that adds borders or outlines */
+button[data-testid="button-notifications"]:focus {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Modern notification icons - Bell and BellRing - NO BORDERS */
 button[data-testid="button-notifications"] .lucide-bell,
 button[data-testid="button-notifications"] .lucide-bell-ring,
-button[data-testid="button-notifications"] svg {
+button[data-testid="button-notifications"] svg,
+.lucide-bell,
+.lucide-bell-ring {
   background: transparent !important;
   border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  stroke: currentColor !important;
 }
 
 /* Enhanced notification badge styling */
