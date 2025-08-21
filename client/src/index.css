@@ -750,6 +750,114 @@ button:hover {
   box-shadow: none !important;
 }
 
+/* ========== COMPREHENSIVE LIGHT THEME VISIBILITY FIXES ========== */
+
+/* Welcome Banner Text Visibility */
+.bg-gradient-to-r.from-blue-50.to-purple-50 h3,
+.bg-gradient-to-r.from-blue-50.to-purple-50 p,
+.from-blue-50.to-purple-50 h3,
+.from-blue-50.to-purple-50 p {
+  color: #1f2937 !important; /* gray-800 for good contrast on light backgrounds */
+}
+
+/* Button Text Visibility */
+button.bg-blue-500,
+button.bg-orange-500,
+button.bg-red-500,
+.bg-gradient-to-r.from-orange-500.to-red-500 {
+  color: #ffffff !important;
+}
+
+button.bg-gray-200,
+button.bg-gray-100 {
+  color: #1f2937 !important; /* dark text on light buttons */
+}
+
+/* Card and Content Area Text */
+.bg-white h1,
+.bg-white h2, 
+.bg-white h3,
+.bg-white h4,
+.bg-white p,
+.bg-white span,
+.bg-white div:not([class*="bg-"]) {
+  color: #1f2937 !important;
+}
+
+.bg-white\/10 h1,
+.bg-white\/10 h2,
+.bg-white\/10 h3,
+.bg-white\/10 h4,
+.bg-white\/10 p,
+.bg-white\/10 span {
+  color: #ffffff !important;
+}
+
+/* Form Elements */
+input:not([class*="bg-"]),
+textarea:not([class*="bg-"]),
+select:not([class*="bg-"]) {
+  color: #1f2937 !important;
+  background-color: #ffffff !important;
+}
+
+input[class*="bg-gray"],
+textarea[class*="bg-gray"],
+select[class*="bg-gray"] {
+  color: #1f2937 !important;
+}
+
+/* Modal and Overlay Content */
+.modal-content,
+.overlay-content,
+[role="dialog"],
+[role="modal"] {
+  color: #1f2937 !important;
+}
+
+.modal-content h1,
+.modal-content h2,
+.modal-content h3,
+.modal-content p,
+.overlay-content h1,
+.overlay-content h2, 
+.overlay-content h3,
+.overlay-content p {
+  color: #1f2937 !important;
+}
+
+/* Progress Cards and Stats */
+.progress-card,
+.stats-card {
+  color: #ffffff !important;
+}
+
+.text-white.font-semibold,
+.text-white.font-bold {
+  color: #ffffff !important;
+}
+
+/* Ghost Button Text */
+button.text-orange-400,
+button.text-cyan-400,
+button.text-blue-400 {
+  color: inherit !important;
+}
+
+/* Light Background Content Areas */
+.bg-gray-50 *:not([class*="bg-"]),
+.bg-gray-100 *:not([class*="bg-"]),
+.bg-white *:not([class*="bg-"]) {
+  color: #1f2937 !important;
+}
+
+/* Ensure dark backgrounds have light text */
+.bg-gray-800 *:not([class*="bg-"]),
+.bg-gray-900 *:not([class*="bg-"]),
+.bg-black *:not([class*="bg-"]) {
+  color: #ffffff !important;
+}
+
 /* Ensure all metrics text is dark enough */
 .backdrop-blur-md .text-white,
 .bg-white\/10 .text-white,
