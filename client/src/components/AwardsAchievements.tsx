@@ -273,22 +273,34 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
 
   // Fetch user progress data for calculating achievement progress
   const { data: progressData } = useQuery({
-    queryKey: ['/api/user/progress'],
+    queryKey: ['/api/user/progress', user?.id],
     queryFn: async () => {
-      const response = await apiRequest('GET', '/api/daily-stats');
-      const dailyStats = await response.json();
+      if (!user?.id) return null;
       
-      // Get additional data from localStorage for offline tracking
-      const weeklyMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-      const fastingHistory = JSON.parse(localStorage.getItem('fastingHistory') || '[]');
-      const aiAnalyzerUsage = JSON.parse(localStorage.getItem('aiAnalyzerUsage') || '[]');
-      
-      return {
-        dailyStats,
-        weeklyMeals,
-        fastingHistory,
-        aiAnalyzerUsage
-      };
+      try {
+        const response = await apiRequest('GET', `/api/users/${user.id}/daily-stats`);
+        const dailyStats = await response.json();
+        
+        // Get additional data from localStorage for offline tracking
+        const weeklyMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
+        const fastingHistory = JSON.parse(localStorage.getItem('fastingHistory') || '[]');
+        const aiAnalyzerUsage = JSON.parse(localStorage.getItem('aiAnalyzerUsage') || '[]');
+        
+        return {
+          dailyStats,
+          weeklyMeals,
+          fastingHistory,
+          aiAnalyzerUsage
+        };
+      } catch (error) {
+        console.error('Error fetching daily stats:', error);
+        return {
+          dailyStats: { totalCalories: 0, totalProtein: 0, waterGlasses: 0 },
+          weeklyMeals: JSON.parse(localStorage.getItem('weeklyMeals') || '[]'),
+          fastingHistory: JSON.parse(localStorage.getItem('fastingHistory') || '[]'),
+          aiAnalyzerUsage: JSON.parse(localStorage.getItem('aiAnalyzerUsage') || '[]')
+        };
+      }
     },
     enabled: !!user,
   });
