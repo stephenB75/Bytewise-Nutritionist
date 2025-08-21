@@ -76,7 +76,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
 
   // Update local state when user data changes
   useEffect(() => {
-    console.log('🔄 UserSettingsManager: User data changed, updating form state:', {
+    // User data changed, updating form state
       hasUser: !!user,
       userEmail: user?.email || 'none',
       userId: user?.id?.substring(0, 8) + '...' || 'none'
@@ -88,7 +88,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
       const lastName = userData?.lastName || '';
       const personalInfo = userData?.personalInfo || {};
       
-      console.log('📝 UserSettingsManager: Extracted user data:', {
+      // Extracted user data
         firstName: firstName || '(empty)',
         lastName: lastName || '(empty)',
         personalInfoKeys: personalInfo ? Object.keys(personalInfo) : 'none',
@@ -112,7 +112,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                    (userData?.email ? userData.email.split('@')[0] : '') || '';
       }
       
-      console.log('🔍 UserSettingsManager: Name resolution logic:', {
+      // Name resolution logic
         originalFirstName: firstName || '(empty)',
         originalLastName: lastName || '(empty)',
         isFirstNameEmail: isFirstNameEmail,
@@ -137,7 +137,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
         joinDate: userData?.createdAt || new Date().toISOString(),
       };
       
-      console.log('🎯 UserSettingsManager: Setting new form state:', {
+      // Setting new form state
         firstName: newUserInfo.firstName || '(empty)',
         lastName: newUserInfo.lastName || '(empty)', 
         phone: newUserInfo.phone || '(empty)',
@@ -168,7 +168,6 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
             accessToken = parsedSession.access_token;
           }
         } catch (parseError) {
-          console.log('Failed to parse stored session:', parseError);
         }
       }
       
@@ -201,7 +200,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
         }
       };
       
-      console.log('📤 UserSettingsManager: Sending profile data:', {
+      // Sending profile data
         originalName: userInfo.name,
         splitFirstName: firstName.trim(),
         splitLastName: lastName.trim(),
@@ -256,7 +255,6 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
       }
 
       // Both updates successful
-      console.log('✅ Profile and goals updated successfully');
 
       toast({
         title: "Profile Updated",
@@ -267,9 +265,8 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
       setIsEditing(false);
       
       // Refetch user data to show updated information
-      console.log('🔄 UserSettingsManager: Calling refetch to get updated user data...');
       const refetchResult = await refetch();
-      console.log('✅ UserSettingsManager: Refetch completed, result:', {
+      // Refetch completed
         hasData: !!refetchResult.data,
         userEmail: refetchResult.data?.email || 'none',
         firstName: refetchResult.data?.firstName || '(empty)',
@@ -296,7 +293,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                              (userData?.email ? userData.email.split('@')[0] : '') || '';
         }
         
-        console.log('🔄 UserSettingsManager: Force updating form state with fresh data:', {
+        // Force updating form state with fresh data
           refreshedFirstName: refreshedFirstName || '(empty)',
           refreshedLastName: refreshedLastName || '(empty)', 
           isRefreshedFirstNameEmail: isRefreshedFirstNameEmail,

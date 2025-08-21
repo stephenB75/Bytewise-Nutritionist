@@ -7,27 +7,18 @@ export function useAuth() {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('🔔 Auth state change:', {
-          event,
-          hasSession: !!session,
-          hasUser: !!session?.user,
-          userId: session?.user?.id?.substring(0, 8) + '...' || 'none'
-        });
         
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
           // Mark this as a fresh authentication for tour purposes
           if (event === 'SIGNED_IN') {
             localStorage.setItem('fresh-auth-session', 'true');
-            console.log('🎯 Fresh sign-in detected, marking for tour trigger');
           }
           
           // Trigger a refetch of user data when auth state changes
-          console.log('📡 Triggering auth state change event...');
           window.dispatchEvent(new CustomEvent('auth-state-change'));
         } else if (event === 'SIGNED_OUT') {
           // Clear user data and fresh auth flag on sign out
           localStorage.removeItem('fresh-auth-session');
-          console.log('🚪 User signed out, clearing auth state...');
           window.dispatchEvent(new CustomEvent('auth-state-change'));
         }
       }
@@ -48,15 +39,9 @@ export function useAuth() {
           try {
             const parsedSession = JSON.parse(storedSession);
             if (parsedSession.access_token) {
-              console.log('🔍 Found locally stored custom token:', {
-                hasToken: true,
-                tokenLength: parsedSession.access_token.length,
-                isCustomToken: parsedSession.access_token.startsWith('verified_')
-              });
               accessToken = parsedSession.access_token;
             }
           } catch (parseError) {
-            console.log('⚠️ Failed to parse stored session:', parseError);
           }
         }
         
@@ -64,11 +49,6 @@ export function useAuth() {
         if (!accessToken) {
           const { data: { session } } = await supabase.auth.getSession();
           
-          console.log('🔍 useAuth query - Supabase session check:', {
-            hasSession: !!session,
-            hasAccessToken: !!session?.access_token,
-            tokenLength: session?.access_token?.length
-          });
           
           if (session?.access_token) {
             accessToken = session.access_token;

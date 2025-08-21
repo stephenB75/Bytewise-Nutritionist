@@ -77,7 +77,6 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('🔐 Form submitted:', { email: email ? 'provided' : 'missing', password: password ? 'provided' : 'missing', isSignUp });
     
     if (!email || !password) {
       showNotification({
@@ -126,7 +125,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
 
       const data = await response.json();
       
-      console.log('🔍 Frontend received response:', {
+      // Frontend received response
         status: response.status,
         ok: response.ok,
         hasUser: !!data.user,
@@ -136,7 +135,6 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
         code: data.code
       });
 
-      console.log('🔍 Response is OK?', response.ok, 'Will go to', response.ok ? 'SUCCESS' : 'ERROR', 'branch');
 
       if (response.ok) {
         // Check if email verification is required
@@ -158,7 +156,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
           }
         } else if (data.session) {
           // Successfully signed in with verified email
-          console.log('🎯 Setting session with tokens:', {
+          // Setting session with tokens
             hasAccessToken: !!data.session.access_token,
             hasRefreshToken: !!data.session.refresh_token,
             accessTokenLength: data.session.access_token?.length
@@ -169,7 +167,6 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
             const isCustomToken = data.session.access_token.startsWith('verified_');
             
             if (isCustomToken) {
-              console.log('🔧 Handling custom token - storing locally...');
               // For custom tokens, store session data locally
               localStorage.setItem('supabase.auth.token', JSON.stringify({
                 access_token: data.session.access_token,
@@ -178,20 +175,18 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
                 user: data.user
               }));
               
-              console.log('✅ Custom session stored locally');
             } else {
-              console.log('🔧 Setting standard Supabase session...');
               const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
                 access_token: data.session.access_token,
                 refresh_token: data.session.refresh_token,
               });
               
               if (sessionError) {
-                console.log('❌ Session setting error:', sessionError);
+                console.error('Session setting error:', sessionError);
                 throw sessionError;
               }
               
-              console.log('✅ Supabase session set successfully:', {
+              // Supabase session set successfully
                 hasUser: !!sessionData?.user,
                 hasSession: !!sessionData?.session,
                 userId: sessionData?.user?.id?.substring(0, 8) + '...'
@@ -200,7 +195,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
             
             // Verify session was set by checking current session
             const { data: currentSession } = await supabase.auth.getSession();
-            console.log('🔍 Current session after setting:', {
+            // Current session after setting
               hasSession: !!currentSession.session,
               hasAccessToken: !!currentSession.session?.access_token,
               tokenPreview: currentSession.session?.access_token?.substring(0, 20) + '...'
