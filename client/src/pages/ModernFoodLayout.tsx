@@ -2856,6 +2856,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         </>
       )}
       
+      {/* Debug Tour Status */}
+      {user && (
+        <div className="fixed top-4 right-4 bg-black/80 text-white p-2 rounded text-xs z-[10001]">
+          Tour Open: {isTourOpen ? 'YES' : 'NO'}
+        </div>
+      )}
+      
 
       
       {/* Toast Notifications */}

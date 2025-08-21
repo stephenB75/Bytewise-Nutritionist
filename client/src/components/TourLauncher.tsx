@@ -9,6 +9,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import Joyride, { CallBackProps, STATUS, Step, Styles } from 'react-joyride';
+
+// Test react-joyride import
+console.log('🔍 React Joyride imported:', !!Joyride);
 import { 
   Play, 
   Sparkles, 
