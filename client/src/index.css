@@ -83,8 +83,8 @@ div[class*="bg-gray-800"]:not([class*="bg-gray-800/"]):not([class*="backdrop"]):
   background-attachment: fixed !important;
 }
 
-/* Enhanced text color overrides for better contrast - EXCLUDE navigation */
-.text-white:not([data-testid*="nav-"] *):not([data-testid*="nav-"]) { color: #111827 !important; } /* Darker for maximum contrast */
+/* Enhanced text color overrides for better contrast - EXCLUDE navigation and notifications */
+.text-white:not([data-testid*="nav-"] *):not([data-testid*="nav-"]):not([data-testid*="notification"] *):not([aria-label*="notification"] *) { color: #111827 !important; } /* Darker for maximum contrast */
 .text-gray-100 { color: #1f2937 !important; } /* Much darker */
 .text-gray-200 { color: #374151 !important; } /* Darker */
 .text-gray-300 { color: #4b5563 !important; } /* Darker gray */
@@ -332,9 +332,18 @@ div[class*="bg-gray-800"]:not([class*="bg-gray-800/"]):not([class*="backdrop"]):
 .lucide-bell,
 [data-testid*="notification"] svg,
 button[aria-label*="notification"] svg,
+button[data-testid*="notification"] svg,
+button[data-testid="button-notifications"] svg,
 svg[data-testid="icon-bell"] {
   fill: currentColor !important;
   stroke-width: 2 !important;
+  border: none !important;
+  background: none !important;
+  outline: none !important;
+}
+  border: none !important;
+  background: none !important;
+  outline: none !important;
   border: none !important;
   background: none !important;
 }
@@ -598,12 +607,16 @@ button[data-testid^="nav-"] .lucide {
   padding: 0 !important;
 }
 
-/* CRITICAL: Force white text for navigation - highest priority */
+/* CRITICAL: Force white text for navigation and notifications - highest priority */
 button[data-testid*="nav-"] .text-white,
 button[data-testid^="nav-"] .text-white,
 button[data-testid*="nav-"] span.text-white,
 button[data-testid^="nav-"] span.text-white,
-[data-testid*="nav-"] .text-white {
+[data-testid*="nav-"] .text-white,
+button[data-testid*="notification"] .text-white,
+button[aria-label*="notification"] .text-white,
+button[data-testid="button-notifications"] .text-white,
+button[data-testid="button-notifications"] svg {
   color: #ffffff !important;
 }
 
