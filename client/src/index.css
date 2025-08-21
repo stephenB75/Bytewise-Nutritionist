@@ -2762,7 +2762,7 @@ select {
 .hero-gradient-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.507) 0%, rgba(0, 0, 0, 0.254) 50%, transparent 100%);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.175) 50%, transparent 100%);
 }
 
 /* Hero Content Layout - Three-Column Standard */
@@ -3165,7 +3165,7 @@ select {
 
 @media (prefers-contrast: high) {
   .hero-gradient-overlay {
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.845) 0%, rgba(0, 0, 0, 0.423) 50%, rgba(0, 0, 0, 0.169) 100%);
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.59) 0%, rgba(0, 0, 0, 0.295) 50%, rgba(0, 0, 0, 0.118) 100%);
   }
   
   .hero-stats-card {
