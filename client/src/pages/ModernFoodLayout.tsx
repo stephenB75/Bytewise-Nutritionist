@@ -993,7 +993,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <Button 
                 onClick={onButtonClick}
                 size="lg"
-                className="group relative bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-black px-16 py-6 rounded-full text-xl md:text-2xl shadow-2xl transition-all duration-300 border-2 border-orange-400 hover:border-orange-300 overflow-hidden btn-hero-enhanced"
+                className="group relative bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 font-black px-16 py-6 rounded-full text-xl md:text-2xl shadow-2xl transition-all duration-300 border-2 border-orange-400 hover:border-orange-300 overflow-hidden btn-hero-enhanced"
+                style={{ color: '#ffffff !important' }}
               >
                 <span className="relative z-10 flex items-center gap-3 text-white">
                   {buttonText}

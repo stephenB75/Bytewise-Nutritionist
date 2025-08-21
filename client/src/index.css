@@ -130,6 +130,14 @@ div[class*="bg-gray-800"]:not([class*="bg-gray-800/"]):not([class*="backdrop"]):
 .text-white\/80 { color: #1f2937 !important; } /* Very dark gray */
 .text-white\/90 { color: #111827 !important; } /* Nearly black */
 
+/* Force white text in hero buttons - Override all conflicts */
+.btn-hero-enhanced,
+.btn-hero-enhanced *,
+.btn-hero-enhanced span,
+.btn-hero-enhanced .text-white {
+  color: #ffffff !important;
+}
+
 /* Fix any remaining light colors in UI elements */
 .text-gray-200.font-light { color: #374151 !important; }
 .text-gray-100.opacity-95 { color: #1f2937 !important; }
@@ -432,7 +440,9 @@ p.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*=
 /* Button text in hero sections */
 .bg-gradient-to-r .text-white,
 .btn-hero-enhanced .text-white,
-button .text-white { 
+button .text-white,
+.btn-hero-enhanced span,
+.btn-hero-enhanced { 
   color: #ffffff !important; /* Keep white for buttons with colored backgrounds */
 }
 
