@@ -47,18 +47,18 @@ html,
   background: inherit !important;
 }
 
-/* Override ANY dark backgrounds with gradient */
-.bg-black:not(.bg-black\/80):not(.bg-black\/50),
-.bg-gray-900,
-.bg-gray-800:not(.bg-gray-800\/50),
-.bg-gray-700,
+/* Override ANY dark backgrounds with gradient - EXCLUDE navigation buttons */
+.bg-black:not(.bg-black\/80):not(.bg-black\/50):not([data-testid*="nav-"]),
+.bg-gray-900:not([data-testid*="nav-"]):not([class*="navigation"]),
+.bg-gray-800:not(.bg-gray-800\/50):not([data-testid*="nav-"]),
+.bg-gray-700:not([data-testid*="nav-"]),
 .min-h-screen.bg-black,
 .min-h-screen.bg-gray-900,
 .min-h-screen.bg-gray-800,
 .min-h-screen.bg-gray-700,
-div[class*="bg-black"]:not([class*="bg-black/"]):not([class*="backdrop"]),
-div[class*="bg-gray-900"]:not([class*="bg-gray-900/"]):not([class*="backdrop"]),
-div[class*="bg-gray-800"]:not([class*="bg-gray-800/"]):not([class*="backdrop"]) {
+div[class*="bg-black"]:not([class*="bg-black/"]):not([class*="backdrop"]):not([data-testid*="navigation"]):not([data-testid*="nav-"]),
+div[class*="bg-gray-900"]:not([class*="bg-gray-900/"]):not([class*="backdrop"]):not([data-testid*="navigation"]):not([data-testid*="nav-"]),
+div[class*="bg-gray-800"]:not([class*="bg-gray-800/"]):not([class*="backdrop"]):not([data-testid*="navigation"]):not([data-testid*="nav-"]) {
   background: linear-gradient(to top, #fbbf24 0%, #ffffff 100%) !important;
   background-attachment: fixed !important;
 }
@@ -78,57 +78,12 @@ div[class*="bg-gray-800"]:not([class*="bg-gray-800/"]):not([class*="backdrop"]) 
   color: #374151 !important; 
 }
 
-/* Navigation button border removal */
-nav button, .bottom-navigation button, [role="tablist"] button {
-  border: none !important;
-}
-
-/* Remove all button borders in navigation contexts */
-.fixed.bottom-0 button, 
-button[class*="nav"], 
-button[data-tab],
-button[aria-selected],
-button[data-testid*="nav-"] {
-  border: none !important;
-  box-shadow: none !important;
-}
-
-/* Specific navigation button styling */
+/* Navigation buttons: Allow styled backgrounds and borders */
 [data-testid="navigation-tabs"] button {
-  border: none !important;
-  background-color: transparent !important;
+  /* Let Tailwind classes control styling */
 }
 
-/* Remove borders from navigation icons specifically */
-[data-testid="navigation-tabs"] button svg,
-[data-testid*="nav-"] svg,
-.lucide-icon {
-  border: none !important;
-}
-
-/* Complete frame removal from navigation icons */
-[data-testid="navigation-tabs"] button,
-[data-testid="navigation-tabs"] button svg,
-[data-testid="navigation-tabs"] .lucide,
-button[data-testid*="nav-"],
-button[data-testid*="nav-"] svg,
-button[data-testid*="nav-"] .lucide {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-  background: none !important;
-  background-color: transparent !important;
-}
-
-/* Remove focus rings and active states that create frames */
-[data-testid="navigation-tabs"] button:focus,
-[data-testid="navigation-tabs"] button:active,
-button[data-testid*="nav-"]:focus,
-button[data-testid*="nav-"]:active {
-  outline: none !important;
-  border: none !important;
-  box-shadow: none !important;
-}
+/* Allow navigation buttons to use their defined styling */
 
 /* Fix navigation text colors */
 .text-yellow-400 { 
@@ -894,14 +849,22 @@ body div:not([class*="text-"]):not(.text-white) {
   color: #1f2937 !important;
 }
 
-/* Force gradient background on main container elements */
-.min-h-screen,
-.h-screen,
-main,
-div[class*="min-h-screen"],
-[data-page],
-.page-container {
+/* Force gradient background on main container elements - EXCLUDE navigation */
+.min-h-screen:not([data-testid*="navigation"]),
+.h-screen:not([data-testid*="navigation"]),
+main:not([data-testid*="navigation"]),
+div[class*="min-h-screen"]:not([data-testid*="navigation"]),
+[data-page]:not([data-testid*="navigation"]),
+.page-container:not([data-testid*="navigation"]) {
   background: inherit !important;
+}
+
+/* Ensure navigation elements keep their intended Tailwind styling */
+[data-testid*="navigation"] *,
+[data-testid*="nav-"] *,
+.navigation-tabs *,
+button[data-testid*="nav-"] {
+  /* Allow Tailwind classes to control all styling */
 }
 
 /* ========== COMPLETE NAVIGATION AND NOTIFICATION ICON FRAME REMOVAL ========== */
