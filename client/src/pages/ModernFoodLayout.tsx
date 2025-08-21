@@ -2789,7 +2789,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       
       {/* Bottom Navigation - High Resolution Icons */}
       <div data-testid="navigation-tabs" className="fixed bottom-0 left-0 right-0 bg-yellow-400 border-t border-yellow-500/60 safe-area-pb z-50 shadow-lg">
-        <div className="flex items-center justify-around py-1 px-2 max-w-md mx-auto gap-0.5">
+        <div className="flex items-center justify-around py-0.5 px-1 max-w-md mx-auto gap-0.5">
           {[
             { id: 'home', label: 'Dashboard', icon: Home, testId: 'nav-dashboard' },
             { id: 'nutrition', label: 'Calorie Tracker', icon: Utensils, testId: 'nav-calculator' },
@@ -2810,15 +2810,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 }`}
               >
                 <IconComponent 
-                  size={28} 
-                  className={`mb-1.5 transition-all duration-300 ease-out transform ${
+                  size={20} 
+                  className={`mb-0.5 transition-all duration-300 ease-out transform ${
                     activeTab === tab.id 
                       ? 'scale-110 drop-shadow-lg text-yellow-600' 
                       : 'scale-100 hover:scale-105 active:scale-125 active:text-white'
                   }`}
                   strokeWidth={activeTab === tab.id ? 2.5 : 2}
                 />
-                <span className={`text-[10px] font-semibold leading-tight text-center w-full transition-all duration-300 ease-out ${
+                <span className={`text-[8px] font-semibold leading-tight text-center w-full transition-all duration-300 ease-out ${
                   activeTab === tab.id 
                     ? 'text-white transform scale-105 drop-shadow-md' 
                     : 'text-gray-600 hover:text-gray-800 active:text-white'
