@@ -519,22 +519,9 @@ button:hover:not(.bg-orange-500):not([class*="bg-gradient"]):not(.bg-cyan-):not(
   box-shadow: none !important;
 }
 
-/* Additional navigation icon frame removal */
-[data-testid="navigation-tabs"] *,
-[data-testid="navigation-tabs"] *:before,
-[data-testid="navigation-tabs"] *:after {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-}
+/* Navigation styling fully controlled by Tailwind classes */
 
-/* Remove Tailwind default button styling */
-[data-testid="navigation-tabs"] button {
-  border: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  outline-offset: 0 !important;
-}
+/* Allow Tailwind styling on navigation buttons */
 
 /* Remove webkit focus outlines */
 [data-testid="navigation-tabs"] button:focus-visible {
@@ -542,41 +529,11 @@ button:hover:not(.bg-orange-500):not([class*="bg-gradient"]):not(.bg-cyan-):not(
   box-shadow: none !important;
 }
 
-/* Remove background frames from navigation icons */
-[data-testid="navigation-tabs"] button,
-[data-testid="navigation-tabs"] button *,
-button[class*="nav-"],
-.lucide-home,
-.lucide-calculator,
-.lucide-calendar,
-.lucide-trophy,
-.lucide-settings,
-.lucide-user {
-  background: none !important;
-  background-color: transparent !important;
-  border-radius: 0 !important;
-  border: none !important;
-}
+/* Icon styling controlled by Tailwind */
 
-/* Comprehensive navigation icon frame removal */
-[data-testid="navigation-tabs"] svg,
-[data-testid="navigation-tabs"] .lucide,
-nav button svg,
-nav .lucide {
-  background: transparent !important;
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-}
+/* SVG icons use parent styling */
 
-/* Remove white outline/frame from navigation buttons (keep background) */
-nav button,
-[data-testid="navigation-tabs"] button,
-.fixed.bottom-0 button,
-button[data-testid*="nav-"] {
-  border: none !important;
-  box-shadow: none !important;
-}
+/* Navigation buttons use Tailwind styling */
 
 /* Remove only border/outline from navigation container (keep background) */
 .border-gray-200,
@@ -586,51 +543,11 @@ button[data-testid*="nav-"] {
   border-top: none !important;
 }
 
-/* Target specific navigation button backgrounds */
-button[data-testid*="nav-"] {
-  background: transparent !important;
-  background-color: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-}
+/* Navigation button backgrounds controlled by Tailwind */
 
-/* Remove drop shadows from navigation icons and buttons */
-[data-testid="navigation-tabs"] button,
-nav button,
-.fixed.bottom-0 button,
-button[data-testid*="nav-"],
-[data-testid="navigation-tabs"] svg,
-nav svg,
-.lucide-home,
-.lucide-calculator,
-.lucide-calendar,
-.lucide-trophy,
-.lucide-settings,
-.lucide-user {
-  box-shadow: none !important;
-  filter: none !important;
-  -webkit-filter: none !important;
-}
+/* Navigation shadows and filters controlled by Tailwind */
 
-/* Remove outline from navigation icon buttons */
-[data-testid="navigation-tabs"] button,
-nav button,
-.fixed.bottom-0 button,
-button[data-testid*="nav-"],
-[data-testid="navigation-tabs"] button:focus,
-nav button:focus,
-.fixed.bottom-0 button:focus,
-button[data-testid*="nav-"]:focus,
-[data-testid="navigation-tabs"] button:active,
-nav button:active,
-.fixed.bottom-0 button:active,
-button[data-testid*="nav-"]:active {
-  outline: none !important;
-  outline-width: 0 !important;
-  outline-style: none !important;
-  outline-color: transparent !important;
-  -webkit-focus-ring-color: transparent !important;
-}
+/* Focus states controlled by Tailwind */
 
 /* Brand Style CSS Logo */
 .css-logo {
@@ -684,47 +601,11 @@ button[data-testid*="nav-"]:active {
   }
 }
 
-/* Comprehensive nav button frame removal */
-button[data-testid*="nav-"],
-.fixed button,
-nav button {
-  border: none !important;
-  border-radius: 0 !important;
-  background-image: none !important;
-  box-shadow: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
+/* Navigation styling fully managed by Tailwind */
 
-/* Hide all outlines on navigation buttons and notification icon */
-button[data-testid*="nav-"],
-.fixed button,
-nav button,
-.notification-icon,
-[data-testid="notification-icon"],
-button[class*="notification"],
-button:focus,
-button:active,
-button:hover {
-  outline: none !important;
-  outline-width: 0 !important;
-  outline-style: none !important;
-  outline-color: transparent !important;
-  -webkit-focus-ring-color: transparent !important;
-  -moz-outline: none !important;
-}
+/* Outlines managed by Tailwind accessibility features */
 
-/* Specific targeting for bottom navigation */
-.fixed.bottom-0 button:focus,
-.fixed.bottom-0 button:active,
-.fixed.bottom-0 button:hover,
-[data-testid="navigation-tabs"] button:focus,
-[data-testid="navigation-tabs"] button:active,
-[data-testid="navigation-tabs"] button:hover {
-  outline: none !important;
-  border: none !important;
-  box-shadow: none !important;
-}
+/* Interactive states controlled by Tailwind */
 
 /* ========== COMPREHENSIVE LIGHT THEME VISIBILITY FIXES ========== */
 
