@@ -24,8 +24,7 @@ import { useGoalAchievements } from '@/hooks/useGoalAchievements';
 import { useRotatingBackground } from '@/hooks/useRotatingBackground';
 import { useAchievements, getAchievementIcon, formatAchievementDate } from '@/hooks/useAchievements';
 import { ProfileIcon } from '@/components/ProfileIcon';
-import { AppTour, useAppTour } from '@/components/AppTour';
-import { WelcomeBanner } from '@/components/TourLauncher';
+import { TourLauncher, WelcomeBanner, useAppTour, AppTour } from '@/components/TourLauncher';
 import { apiRequest } from '@/lib/queryClient';
 import { 
   Search, 
@@ -2836,12 +2835,20 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         onComplete={handleProfileCompletion}
       />
       
-      {/* App Tour */}
-      <AppTour
-        isOpen={isTourOpen}
-        onClose={closeTour}
-        onComplete={completeTour}
-      />
+      {/* Unified Tour System */}
+      {user && (
+        <>
+          <TourLauncher
+            onStartTour={startTour}
+            isVisible={shouldShowTour()}
+          />
+          <AppTour
+            isOpen={isTourOpen}
+            onClose={closeTour}
+            onComplete={completeTour}
+          />
+        </>
+      )}
       
 
       

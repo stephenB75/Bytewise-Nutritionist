@@ -3,11 +3,12 @@
  * Provides multiple ways to start the app tour with visual preview
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import Joyride, { CallBackProps, STATUS, Step, Styles } from 'react-joyride';
 import { 
   Play, 
   Sparkles, 
@@ -25,6 +26,12 @@ import {
 interface TourLauncherProps {
   onStartTour: () => void;
   isVisible?: boolean;
+}
+
+interface AppTourProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onComplete: () => void;
 }
 
 const TOUR_FEATURES = [
@@ -65,6 +72,250 @@ const TOUR_FEATURES = [
     category: 'Wellness'
   }
 ];
+
+// Tour Steps Configuration
+const TOUR_STEPS: Step[] = [
+  {
+    target: '[data-testid="food-search"]',
+    title: '🔍 Smart Food Search',
+    content: 'Search through 300,000+ USDA foods with intelligent brand recognition and autocomplete suggestions.',
+    placement: 'bottom',
+  },
+  {
+    target: '[data-testid="calorie-calculator"]',
+    title: '🧮 Calorie Calculator',
+    content: 'Get instant nutrition facts with FDA-compliant serving sizes and portion warnings for accurate tracking.',
+    placement: 'top',
+  },
+  {
+    target: '[data-testid="ai-photo-analyzer"]',
+    title: '📸 AI Food Analyzer',
+    content: 'Snap photos of your meals for instant nutrition breakdown using advanced AI vision technology.',
+    placement: 'bottom',
+  },
+  {
+    target: '[data-testid="daily-progress"]',
+    title: '📊 Daily Progress',
+    content: 'Track your daily calorie intake, macronutrients, and see real-time progress toward your goals.',
+    placement: 'top',
+  },
+  {
+    target: '[data-testid="water-consumption-card"]',
+    title: '💧 Hydration Tracking',
+    content: 'Monitor your water intake with beautiful visual indicators and daily hydration goals.',
+    placement: 'top',
+  },
+  {
+    target: '[data-testid="fasting-tracker"]',
+    title: '⏰ Fasting Timer',
+    content: 'Track intermittent fasting sessions with real-time timers and achievement celebrations.',
+    placement: 'top',
+  },
+  {
+    target: '[data-testid="achievements-section"]',
+    title: '🏆 Achievement System',
+    content: 'Unlock rewards and badges as you hit nutrition goals and build healthy habits.',
+    placement: 'bottom',
+  },
+  {
+    target: '[data-testid="meal-journal"]',
+    title: '📔 Meal Journal',
+    content: 'Browse your complete meal history with search and filter capabilities.',
+    placement: 'top',
+  },
+  {
+    target: '[data-testid="profile-settings"]',
+    title: '⚙️ Profile & Goals',
+    content: 'Customize your nutrition goals, preferences, and account settings for personalized tracking.',
+    placement: 'bottom',
+  },
+  {
+    target: '[data-testid="navigation-tabs"]',
+    title: '🧭 Easy Navigation',
+    content: 'Use the bottom navigation to switch between Dashboard, Calorie Tracker, Fasting Timer, Meal Journal, and Profile sections.',
+    placement: 'top',
+  }
+];
+
+// Enhanced Tour Styles with better visibility
+const tourStyles: Partial<Styles> = {
+  options: {
+    primaryColor: '#3b82f6',
+    width: 380,
+    zIndex: 10000,
+  },
+  overlay: {
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+  },
+  spotlight: {
+    borderRadius: '12px',
+    border: '3px solid #3b82f6',
+  },
+  beacon: {
+    background: '#3b82f6',
+    border: '4px solid rgba(59, 130, 246, 0.3)',
+    boxShadow: '0 0 20px rgba(59, 130, 246, 0.5)',
+  },
+  beaconInner: {
+    background: '#1e40af',
+  },
+  tooltip: {
+    padding: 0,
+    backgroundColor: 'white',
+    borderRadius: '16px',
+    border: '2px solid #e5e7eb',
+    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(59, 130, 246, 0.1)',
+    maxWidth: '380px',
+    filter: 'none',
+  },
+  tooltipContainer: {
+    textAlign: 'left' as const,
+    color: '#111827',
+    lineHeight: '1.5',
+  },
+  tooltipContent: {
+    padding: '24px',
+    fontSize: '15px',
+    lineHeight: '1.6',
+    color: '#374151',
+  },
+  tooltipTitle: {
+    fontSize: '18px',
+    fontWeight: '600',
+    color: '#111827',
+    marginBottom: '12px',
+  },
+  tooltipFooter: {
+    padding: '16px 24px',
+    borderTop: '1px solid #e5e7eb',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  buttonNext: {
+    backgroundColor: '#3b82f6',
+    color: 'white',
+    borderRadius: '8px',
+    padding: '10px 20px',
+    fontWeight: '600',
+    fontSize: '14px',
+    border: 'none',
+    cursor: 'pointer',
+    boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+  },
+  buttonBack: {
+    backgroundColor: 'transparent',
+    color: '#6b7280',
+    borderRadius: '8px',
+    padding: '10px 16px',
+    fontWeight: '500',
+    fontSize: '14px',
+    border: '1px solid #d1d5db',
+    cursor: 'pointer',
+  },
+  buttonSkip: {
+    backgroundColor: 'transparent',
+    color: '#9ca3af',
+    padding: '8px 12px',
+    fontSize: '14px',
+    fontWeight: '500',
+    border: 'none',
+    cursor: 'pointer',
+  },
+};
+
+// Integrated App Tour Component - Export for main layout
+export function AppTour({ isOpen, onClose, onComplete }: AppTourProps) {
+  const [run, setRun] = useState(false);
+  const [stepIndex, setStepIndex] = useState(0);
+
+  useEffect(() => {
+    if (isOpen) {
+      setRun(true);
+      setStepIndex(0);
+    } else {
+      setRun(false);
+    }
+  }, [isOpen]);
+
+  const handleJoyrideCallback = (data: CallBackProps) => {
+    const { status, type, index, action } = data;
+    const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
+
+    console.log('Tour callback:', { status, type, index, action });
+
+    if (finishedStatuses.includes(status)) {
+      localStorage.setItem('bytewise-tour-completed', 'true');
+      setRun(false);
+      if (status === STATUS.FINISHED) {
+        onComplete();
+      }
+      onClose();
+    } else if (type === 'step:after') {
+      const newIndex = action === 'next' ? index + 1 : index - 1;
+      setStepIndex(Math.max(0, Math.min(newIndex, TOUR_STEPS.length - 1)));
+    }
+  };
+
+  return (
+    <Joyride
+      callback={handleJoyrideCallback}
+      continuous
+      run={run}
+      scrollToFirstStep
+      showProgress
+      showSkipButton
+      steps={TOUR_STEPS}
+      styles={tourStyles}
+      disableOverlayClose={true}
+      hideCloseButton={true}
+      spotlightClicks={true}
+      stepIndex={stepIndex}
+      locale={{
+        back: 'Previous',
+        close: 'Close',
+        last: 'Complete Tour',
+        next: 'Next',
+        skip: 'Skip Tour',
+      }}
+    />
+  );
+}
+
+// Hook to manage tour state
+export function useAppTour() {
+  const [isTourOpen, setIsTourOpen] = useState(false);
+
+  const startTour = () => {
+    setIsTourOpen(true);
+  };
+
+  const closeTour = () => {
+    setIsTourOpen(false);
+  };
+
+  const completeTour = () => {
+    localStorage.setItem('bytewise-tour-completed', 'true');
+    setIsTourOpen(false);
+  };
+
+  const shouldShowTour = () => {
+    return localStorage.getItem('bytewise-tour-completed') !== 'true';
+  };
+
+  const resetTour = () => {
+    localStorage.removeItem('bytewise-tour-completed');
+  };
+
+  return {
+    isTourOpen,
+    startTour,
+    closeTour,
+    completeTour,
+    shouldShowTour,
+    resetTour
+  };
+}
 
 export function TourLauncher({ onStartTour, isVisible = true }: TourLauncherProps) {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
@@ -222,5 +473,24 @@ export function WelcomeBanner({ onStartTour, onDismiss }: { onStartTour: () => v
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+// Main Unified Tour Component
+export function UnifiedTourSystem() {
+  const { isTourOpen, startTour, closeTour, completeTour, shouldShowTour } = useAppTour();
+
+  return (
+    <>
+      <TourLauncher
+        onStartTour={startTour}
+        isVisible={shouldShowTour()}
+      />
+      <AppTour
+        isOpen={isTourOpen}
+        onClose={closeTour}
+        onComplete={completeTour}
+      />
+    </>
   );
 }
