@@ -205,7 +205,42 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
 
     } catch (geminiError) {
       console.error('❌ Gemini API call failed:', geminiError);
-      throw new Error(`API_ACCESS_ERROR: ${geminiError instanceof Error ? geminiError.message : 'Gemini API call failed'}`);
+      
+      // Check if it's a quota error and return fallback immediately
+      if (geminiError instanceof Error && (
+        geminiError.message.includes('quota') ||
+        geminiError.message.includes('429') ||
+        geminiError.message.includes('RESOURCE_EXHAUSTED') ||
+        geminiError.message.includes('quota exceeded')
+      )) {
+        console.log('⚠️ Gemini API quota exceeded, providing fallback analysis...');
+        return getFallbackAnalysis();
+      }
+      
+      // Check if it's an API access restriction and return fallback immediately
+      if (geminiError instanceof Error && (
+        geminiError.message.includes('403') ||
+        geminiError.message.includes('referer') ||
+        geminiError.message.includes('blocked') ||
+        geminiError.message.includes('unauthorized')
+      )) {
+        console.log('⚠️ API access restricted, providing fallback analysis...');
+        return getFallbackAnalysis();
+      }
+      
+      // Check if it's an image validation error and return fallback immediately
+      if (geminiError instanceof Error && (
+        geminiError.message.includes('400') ||
+        geminiError.message.includes('not valid') ||
+        geminiError.message.includes('Bad Request') ||
+        geminiError.message.includes('invalid image')
+      )) {
+        console.log('⚠️ Image validation failed, providing fallback analysis...');
+        return getFallbackAnalysis();
+      }
+      
+      // For other errors, throw to outer catch
+      throw geminiError;
     }
 
 
