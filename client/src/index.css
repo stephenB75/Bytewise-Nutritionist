@@ -85,6 +85,30 @@ button[data-testid*="nav-"] {
   border: none !important;
 }
 
+/* Complete frame removal from navigation icons */
+[data-testid="navigation-tabs"] button,
+[data-testid="navigation-tabs"] button svg,
+[data-testid="navigation-tabs"] .lucide,
+button[data-testid*="nav-"],
+button[data-testid*="nav-"] svg,
+button[data-testid*="nav-"] .lucide {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: none !important;
+  background-color: transparent !important;
+}
+
+/* Remove focus rings and active states that create frames */
+[data-testid="navigation-tabs"] button:focus,
+[data-testid="navigation-tabs"] button:active,
+button[data-testid*="nav-"]:focus,
+button[data-testid*="nav-"]:active {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
 /* Fix navigation text colors */
 .text-yellow-400 { 
   color: #ca8a04 !important; /* Much darker yellow/amber for visibility */
@@ -284,6 +308,31 @@ button:hover:not(.bg-orange-500):not([class*="bg-gradient"]):not(.bg-cyan-):not(
 .lucide-bell, .lucide-droplets, .lucide-target,
 .lucide-trophy, .lucide-calendar {
   border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Additional navigation icon frame removal */
+[data-testid="navigation-tabs"] *,
+[data-testid="navigation-tabs"] *:before,
+[data-testid="navigation-tabs"] *:after {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Remove Tailwind default button styling */
+[data-testid="navigation-tabs"] button {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline-offset: 0 !important;
+}
+
+/* Remove webkit focus outlines */
+[data-testid="navigation-tabs"] button:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 /* Ensure all metrics text is dark enough */
