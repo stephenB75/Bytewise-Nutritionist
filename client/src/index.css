@@ -206,6 +206,49 @@ button[data-testid*="nav-"]:active {
   color: #ffffff !important;
 }
 
+/* Comprehensive dark text fixes for entire dashboard page */
+[data-page="dashboard"] .text-gray-900,
+[data-page="dashboard"] .text-gray-800,
+[data-page="dashboard"] .text-gray-700,
+[data-page="dashboard"] .text-gray-600,
+[data-page="dashboard"] .text-gray-500,
+[data-page="dashboard"] .text-black {
+  color: #ffffff !important;
+}
+
+[data-page="dashboard"] .text-gray-400 {
+  color: #e5e7eb !important;
+}
+
+[data-page="dashboard"] .text-gray-300 {
+  color: #f3f4f6 !important;
+}
+
+/* Dashboard content text fixes */
+[data-page="dashboard"] h1,
+[data-page="dashboard"] h2,
+[data-page="dashboard"] h3,
+[data-page="dashboard"] h4,
+[data-page="dashboard"] h5,
+[data-page="dashboard"] h6 {
+  color: #ffffff !important;
+}
+
+[data-page="dashboard"] span,
+[data-page="dashboard"] div:not(.bg-gradient-to-r):not([class*="bg-"]) {
+  color: #ffffff !important;
+}
+
+/* Dashboard button and interactive text */
+[data-page="dashboard"] button:not(.bg-gradient-to-r) {
+  color: #ffffff !important;
+}
+
+/* Dashboard card and section text */
+[data-page="dashboard"] .content-section *:not(.bg-gradient-to-r *):not([class*="bg-"] *) {
+  color: #ffffff !important;
+}
+
 .hero-component p.text-gray-100,
 [data-hero="true"] p.text-gray-100 { 
   color: #f3f4f6 !important; 
