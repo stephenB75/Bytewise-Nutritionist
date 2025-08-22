@@ -83,8 +83,8 @@ div[class*="bg-gray-800"]:not([class*="bg-gray-800/"]):not([class*="backdrop"]):
   background-attachment: fixed !important;
 }
 
-/* Enhanced text color overrides for better contrast - EXCLUDE navigation, notifications, hero components, and hero buttons */
-.text-white:not([data-testid*="nav-"] *):not([data-testid*="nav-"]):not([data-testid*="notification"] *):not([aria-label*="notification"] *):not(.btn-hero-enhanced *):not(.btn-hero-enhanced):not(.hero-component *):not([data-hero="true"] *):not(.hero-component button *):not([data-hero="true"] button *) { color: #111827 !important; } /* Darker for maximum contrast */
+/* Enhanced text color overrides for better contrast - EXCLUDE navigation, notifications, hero components, hero buttons, and metrics cards */
+.text-white:not([data-testid*="nav-"] *):not([data-testid*="nav-"]):not([data-testid*="notification"] *):not([aria-label*="notification"] *):not(.btn-hero-enhanced *):not(.btn-hero-enhanced):not(.hero-component *):not([data-hero="true"] *):not(.hero-component button *):not([data-hero="true"] button *):not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *) { color: #111827 !important; } /* Darker for maximum contrast */
 .text-gray-100 { color: #1f2937 !important; } /* Much darker */
 .text-gray-200 { color: #374151 !important; } /* Darker */
 .text-gray-300 { color: #4b5563 !important; } /* Darker gray */
@@ -216,9 +216,9 @@ button.btn-hero-enhanced span,
   color: #ffffff !important;
 }
 
-/* Comprehensive dark text fixes for entire dashboard page */
-[data-page="dashboard"] .text-gray-900,
-[data-page="dashboard"] .text-gray-800,
+/* Comprehensive dark text fixes for entire dashboard page - EXCLUDE metrics cards */
+[data-page="dashboard"] .text-gray-900:not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *),
+[data-page="dashboard"] .text-gray-800:not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *),
 /* Dashboard page text override - EXCLUDE metrics cards */
 [data-page="dashboard"] .text-gray-700:not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *),
 [data-page="dashboard"] .text-gray-600:not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *),
@@ -975,11 +975,19 @@ button[data-testid*="nav-"] {
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
 }
 
-/* Override any conflicting text colors in metrics cards - HIGHEST PRIORITY */
+/* Override any conflicting text colors in metrics cards - MAXIMUM PRIORITY */
 [data-page="dashboard"] [data-testid*="progress"] *,
 [data-page="dashboard"] [data-testid*="water"] *,
 [data-page="dashboard"] [data-testid*="macro"] *,
-[data-page="dashboard"] [data-testid*="micro"] * {
+[data-page="dashboard"] [data-testid*="micro"] *,
+[data-testid*="progress"] .text-gray-900,
+[data-testid*="progress"] .text-gray-800,
+[data-testid*="water"] .text-gray-900,
+[data-testid*="water"] .text-gray-800,
+[data-testid*="macro"] .text-gray-900,
+[data-testid*="macro"] .text-gray-800,
+[data-testid*="micro"] .text-gray-900,
+[data-testid*="micro"] .text-gray-800 {
   color: #111827 !important;
 }
 
