@@ -5486,3 +5486,9 @@ input[class*="pr-"] {
 .__floater__container + div {
   background-color: rgba(0, 0, 0, 0.4) !important;
 }
+
+/* Tour button override - force light hover state */
+.tour-button-override:hover {
+  background: linear-gradient(to right, #fef3c7, #fde68a) !important;
+  color: #1f2937 !important;
+}
