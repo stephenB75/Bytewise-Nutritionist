@@ -1057,8 +1057,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <Icon className={`w-5 h-5 text-${color}-700`} />
             </div>
             <div>
-              <h3 className="text-gray-900 font-bold">{title}</h3>
-              <p className="text-gray-900 text-sm font-medium">{value}/{goal}</p>
+              <h3 className="text-white font-bold">{title}</h3>
+              <p className="text-white text-sm font-medium">{value}/{goal}</p>
             </div>
           </div>
           <div className="text-right">
@@ -1097,8 +1097,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <Droplets className={`w-6 h-6 transition-colors duration-300 ${isGoalReached ? 'text-gray-900' : 'text-cyan-700'}`} />
             </div>
             <div>
-              <h3 className="text-gray-900 font-bold text-lg">Water Intake</h3>
-              <p className="text-gray-900 text-sm font-medium">{glasses}/{dailyGoal} glasses today</p>
+              <h3 className="text-white font-bold text-lg">Water Intake</h3>
+              <p className="text-white text-sm font-medium">{glasses}/{dailyGoal} glasses today</p>
             </div>
           </div>
           <div className="text-right">
@@ -1329,7 +1329,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <div className="mb-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-2xl">🎯</span>
-                <h3 className="font-semibold text-lg text-gray-900">Welcome to ByteWise!</h3>
+                <h3 className="font-semibold text-lg text-white">Welcome to ByteWise!</h3>
               </div>
               <p className="text-gray-700 dark:text-gray-300 text-sm mb-3">
                 Ready to discover all the amazing features? Take our interactive tour to learn how to track nutrition and build healthy habits.
@@ -1358,7 +1358,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           )}
           
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-3xl font-black text-gray-900">Today's Progress</h2>
+            <h2 className="text-3xl font-black text-white">Today's Progress</h2>
             <div className="flex gap-2">
               <Button 
                 variant="ghost" 
@@ -1459,7 +1459,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
           {/* Micronutrients Section */}
           <div className="mb-4">
-            <h3 className="text-lg font-bold text-gray-900 mb-3 flex items-center">
+            <h3 className="text-lg font-bold text-white mb-3 flex items-center">
               <span className="w-2 h-2 bg-cyan-400 rounded-full mr-2"></span>
               Essential Micronutrients
             </h3>
@@ -1554,7 +1554,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         {trackingView === 'daily' && (
           <div className="space-y-4">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold text-gray-900">
+              <h2 className="text-2xl font-bold text-white">
                 {searchQuery ? 'Search Results' : "Today's Meals"}
               </h2>
               <div className="text-orange-400 font-bold">
@@ -1604,7 +1604,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <Card key={`search-${meal.id || meal.name}-${meal.timestamp || index}`} className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <h4 className="text-gray-900 font-semibold">{meal.name}</h4>
+                    <h4 className="text-white font-semibold">{meal.name}</h4>
                     <p className="text-gray-400 text-sm">
                       {meal.time} • {meal.mealType}
                       {searchQuery && (
@@ -1750,7 +1750,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         {trackingView === 'weekly' && (
           <div className="space-y-4">
             <div className="mb-4">
-              <h2 className="text-2xl font-bold text-gray-900">This Week's Progress</h2>
+              <h2 className="text-2xl font-bold text-white">This Week's Progress</h2>
               <p className="text-sm text-gray-400 mt-1">
                 {(() => {
                   const weekDates = getWeekDates(); // Use actual current week dates
@@ -1768,7 +1768,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md p-4">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h3 className="text-gray-900 font-semibold">Weekly Total</h3>
+                  <h3 className="text-white font-semibold">Weekly Total</h3>
                   <p className="text-gray-400 text-sm">{Math.round(weeklyCalories)}/{weeklyGoal} kcal</p>
                 </div>
                 <div className="text-right">
@@ -1818,7 +1818,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           {/* Daily Goals */}
           <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-gray-900 font-semibold text-2xl">Daily Goals</h3>
+              <h3 className="text-white font-semibold text-2xl">Daily Goals</h3>
               <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
                 <Target className="w-3 h-3 mr-1" />
                 3/5 Complete
@@ -1861,7 +1861,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           {/* Weekly Goals */}
           <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-gray-900 font-semibold text-2xl">Weekly Goals</h3>
+              <h3 className="text-white font-semibold text-2xl">Weekly Goals</h3>
               <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
                 <Calendar className="w-3 h-3 mr-1" />
                 2/4 Complete
@@ -1927,7 +1927,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <Card className="bg-gradient-to-br from-amber-100 to-amber-200 backdrop-blur-md border-amber-300 p-6">
               <div className="text-center">
                 <Trophy className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                <h4 className="text-gray-900 font-semibold mb-2">No Achievements Yet</h4>
+                <h4 className="text-white font-semibold mb-2">No Achievements Yet</h4>
                 <p className="text-gray-400 text-sm">Start tracking your nutrition to unlock achievements!</p>
               </div>
             </Card>
