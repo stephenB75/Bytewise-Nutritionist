@@ -619,7 +619,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                     variant="outline"
                     size="sm"
                     onClick={() => setShowPasswordChange(true)}
-                    className="border-amber-600/60 text-amber-700 hover:bg-amber-600/20 hover:text-amber-800 hover:border-amber-600 bg-amber-50/50"
+                    className="border-amber-300/60 text-amber-600 hover:bg-amber-200/30 hover:text-amber-700 hover:border-amber-400 bg-white/70"
                   >
                     <Lock className="w-4 h-4 mr-2" />
                     Change Password
@@ -690,7 +690,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                       size="sm"
                       onClick={handlePasswordChange}
                       disabled={changingPassword}
-                      className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white shadow-lg"
+                      className="bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-white shadow-lg"
                     >
                       {changingPassword ? (
                         <>Changing Password...</>
@@ -713,7 +713,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                 variant="outline"
                 size="sm"
                 onClick={handleSignOut}
-                className="border-red-600/60 text-red-700 hover:bg-red-600/20 hover:text-red-800 hover:border-red-600 bg-red-50/50"
+                className="border-red-300/60 text-red-600 hover:bg-red-200/30 hover:text-red-700 hover:border-red-400 bg-white/70"
               >
                 <LogOut className="w-4 h-4 mr-2" />
                 Sign Out
@@ -736,7 +736,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                       size="sm"
                       onClick={handleSave}
                       disabled={isSaving}
-                      className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg"
+                      className="bg-gradient-to-r from-green-400 to-emerald-400 hover:from-green-500 hover:to-emerald-500 text-white shadow-lg"
                     >
                       {isSaving ? (
                         <>Saving...</>
