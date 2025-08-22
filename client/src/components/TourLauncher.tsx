@@ -245,6 +245,7 @@ export function TourLauncher({ onStartTour, isVisible = true }: TourLauncherProp
                 <Button
                   variant="outline"
                   onClick={() => setIsPreviewOpen(false)}
+                  className="border-gray-300 text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:border-gray-400 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
                 >
                   Maybe Later
                 </Button>
@@ -292,6 +293,7 @@ export function WelcomeBanner({ onStartTour, onDismiss }: { onStartTour: () => v
                 variant="outline"
                 size="sm"
                 onClick={onDismiss}
+                className="border-gray-300 text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:border-gray-400 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
               >
                 Skip for now
               </Button>
