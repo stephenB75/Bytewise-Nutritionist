@@ -250,7 +250,7 @@ export function TourLauncher({ onStartTour, isVisible = true }: TourLauncherProp
                 </Button>
                 <Button
                   onClick={handleStartTour}
-                  className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-300 hover:to-teal-300 text-white shadow-lg"
+                  className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-yellow-200 hover:to-amber-200 hover:text-gray-900 text-white shadow-lg"
                 >
                   <Play className="w-4 h-4 mr-2" />
                   Start Tour
@@ -283,7 +283,7 @@ export function WelcomeBanner({ onStartTour, onDismiss }: { onStartTour: () => v
               <Button
                 onClick={onStartTour}
                 size="sm"
-                className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-300 hover:to-teal-300 text-white shadow-lg"
+                className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-yellow-200 hover:to-amber-200 hover:text-gray-900 text-white shadow-lg"
               >
                 <Play className="w-4 h-4 mr-2" />
                 Take Tour (10 min)
