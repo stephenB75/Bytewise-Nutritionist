@@ -24,7 +24,7 @@ import { useGoalAchievements } from '@/hooks/useGoalAchievements';
 import { useRotatingBackground } from '@/hooks/useRotatingBackground';
 import { useAchievements, getAchievementIcon, formatAchievementDate } from '@/hooks/useAchievements';
 import { ProfileIcon } from '@/components/ProfileIcon';
-import { TourLauncher, useAppTour } from '@/components/TourLauncher';
+import { TourLauncher, useAppTour, WelcomeBanner } from '@/components/TourLauncher';
 import { apiRequest } from '@/lib/queryClient';
 import { 
   Search, 
@@ -49,7 +49,10 @@ import {
   Minus,
   Trash2,
   ArrowLeft,
-  ArrowRight
+  ArrowRight,
+  PlayCircle,
+  MapPin,
+  GraduationCap
 } from 'lucide-react';
 import { NotificationDropdown } from '@/components/NotificationDropdown';
 import { WeeklyCaloriesCard } from '@/components/WeeklyCaloriesCard';
@@ -2514,6 +2517,139 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     </div>
                     
 
+                  </div>
+                </AccordionContent>
+              </Card>
+            </AccordionItem>
+
+            {/* App Tour Launcher Card */}
+            <AccordionItem value="tour" className="border-none">
+              <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 overflow-hidden rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:from-amber-100 hover:to-amber-200 hover:border-amber-300/50">
+                <AccordionTrigger className="px-6 py-6 hover:bg-amber-200/30 hover:no-underline [&[data-state=open]>div]:text-[#faed39] [&[data-state=open]]:bg-amber-200/30">
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center space-x-3">
+                      <GraduationCap className="w-6 h-6 text-[#faed39]" />
+                      <div>
+                        <h3 className="text-xl font-semibold transition-colors" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                          App Tour & Training
+                        </h3>
+                        <p className="text-sm text-gray-700" style={{ fontFamily: "'Work Sans', sans-serif" }}>
+                          Explore features or retake the guided tour
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right flex-shrink-0 ml-3">
+                      <div className="text-xs text-gray-600">
+                        {localStorage.getItem('bytewise-tour-completed') === 'true' ? 'Completed' : 'Available'}
+                      </div>
+                    </div>
+                  </div>
+                </AccordionTrigger>
+                
+                <AccordionContent className="px-6 pb-6 pt-0">
+                  <div className="space-y-4">
+                    {/* Tour Status */}
+                    <div className="bg-amber-200/30 rounded-lg p-4">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center space-x-3">
+                          <PlayCircle className="w-5 h-5 text-blue-500 flex-shrink-0" />
+                          <div>
+                            <h4 className="font-semibold text-gray-900 mb-1">Comprehensive App Tour</h4>
+                            <p className="text-sm text-gray-700 leading-relaxed">
+                              Take our interactive 10-step tour covering food search, AI photo analysis, 
+                              fasting timer, water tracking, meal journaling, achievements, and profile settings.
+                            </p>
+                            <div className="flex items-center gap-4 mt-2 text-xs text-gray-600">
+                              <span className="flex items-center gap-1">
+                                <Clock className="w-3 h-3" />
+                                8-10 minutes
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Target className="w-3 h-3" />
+                                10 key features
+                              </span>
+                              {localStorage.getItem('bytewise-tour-completed') === 'true' && (
+                                <span className="flex items-center gap-1 text-green-600">
+                                  <CheckCircle2 className="w-3 h-3" />
+                                  Completed
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Tour Actions */}
+                    <div className="flex flex-wrap gap-3">
+                      <div className="flex-1 min-w-0">
+                        <TourLauncher
+                          onStartTour={() => {
+                            console.log('Starting ByteWise tour from profile...');
+                            // Mark tour as started
+                            localStorage.setItem('tour-started', 'true');
+                          }}
+                          isVisible={true}
+                        />
+                      </div>
+                      
+                      {localStorage.getItem('bytewise-tour-completed') === 'true' && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            localStorage.removeItem('bytewise-tour-completed');
+                            window.location.reload();
+                          }}
+                          className="text-gray-600 hover:text-gray-900 border-amber-300 hover:bg-amber-100"
+                        >
+                          Reset Tour Progress
+                        </Button>
+                      )}
+                    </div>
+
+                    {/* Feature Quick Links */}
+                    <div className="border-t border-amber-300/30 pt-4">
+                      <h5 className="font-medium text-gray-900 mb-3 text-sm">Quick Feature Access</h5>
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="justify-start h-8 text-gray-700 hover:text-gray-900 hover:bg-amber-200/30"
+                          onClick={() => handleTabChange('nutrition')}
+                        >
+                          <Utensils className="w-3 h-3 mr-2" />
+                          Food Search
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="justify-start h-8 text-gray-700 hover:text-gray-900 hover:bg-amber-200/30"
+                          onClick={() => handleTabChange('fasting')}
+                        >
+                          <Clock className="w-3 h-3 mr-2" />
+                          Fasting Timer
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="justify-start h-8 text-gray-700 hover:text-gray-900 hover:bg-amber-200/30"
+                          onClick={() => handleTabChange('daily')}
+                        >
+                          <BarChart3 className="w-3 h-3 mr-2" />
+                          Meal Journal
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="justify-start h-8 text-gray-700 hover:text-gray-900 hover:bg-amber-200/30"
+                          onClick={() => setOpenCard('achievements')}
+                        >
+                          <Trophy className="w-3 h-3 mr-2" />
+                          Achievements
+                        </Button>
+                      </div>
+                    </div>
                   </div>
                 </AccordionContent>
               </Card>
