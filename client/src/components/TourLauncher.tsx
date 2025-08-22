@@ -250,7 +250,7 @@ export function TourLauncher({ onStartTour, isVisible = true }: TourLauncherProp
                 </Button>
                 <Button
                   onClick={handleStartTour}
-                  className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-yellow-200 hover:to-amber-200 hover:text-gray-900 text-white shadow-lg"
+                  className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg" style={{"--tw-gradient-from": "#10b981", "--tw-gradient-to": "#0891b2"}} onMouseEnter={(e) => { e.target.style.background = 'linear-gradient(to right, #fef3c7, #fde68a)'; e.target.style.color = '#1f2937'; }} onMouseLeave={(e) => { e.target.style.background = 'linear-gradient(to right, #10b981, #0891b2)'; e.target.style.color = '#ffffff'; }}
                 >
                   <Play className="w-4 h-4 mr-2" />
                   Start Tour
@@ -283,7 +283,7 @@ export function WelcomeBanner({ onStartTour, onDismiss }: { onStartTour: () => v
               <Button
                 onClick={onStartTour}
                 size="sm"
-                className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-yellow-200 hover:to-amber-200 hover:text-gray-900 text-white shadow-lg"
+                className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg" style={{"--tw-gradient-from": "#10b981", "--tw-gradient-to": "#0891b2"}} onMouseEnter={(e) => { e.target.style.background = 'linear-gradient(to right, #fef3c7, #fde68a)'; e.target.style.color = '#1f2937'; }} onMouseLeave={(e) => { e.target.style.background = 'linear-gradient(to right, #10b981, #0891b2)'; e.target.style.color = '#ffffff'; }}
               >
                 <Play className="w-4 h-4 mr-2" />
                 Take Tour (10 min)
