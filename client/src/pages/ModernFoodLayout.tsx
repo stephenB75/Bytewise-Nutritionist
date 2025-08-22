@@ -272,8 +272,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             fat: dailyStats.totalFat
           });
         }
+        
+        console.log('✅ Manual health data sync completed');
       } catch (error) {
-        // Silent error handling for health sync
+        console.error('❌ Health data sync failed:', error);
       }
     }
   }, [dailyStats]);
@@ -3068,7 +3070,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   };
 
   return (
-    <div data-testid="app-container" className="h-screen w-screen pb-20">
+    <div data-testid="app-container" className="h-screen w-screen">
       {/* Fixed Notification Header on all pages - Safe area positioning for iOS/Android */}
       <div className="fixed top-safe right-4 z-50 safe-notification-position">
         <div className="relative">

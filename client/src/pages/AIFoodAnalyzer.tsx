@@ -59,18 +59,22 @@ export default function AIFoodAnalyzer() {
   // Get upload URL mutation (works without authentication)
   const getUploadUrlMutation = useMutation({
     mutationFn: async () => {
+      console.log('🔄 Making API request to /api/objects/upload...');
       try {
         const response = await apiRequest('POST', '/api/objects/upload');
         if (!response.ok) {
           throw new Error(`Upload preparation failed: ${response.status} ${response.statusText}`);
         }
         const data = await response.json();
+        console.log('📝 Upload URL API response:', data);
         return data as { uploadURL: string };
       } catch (error: any) {
+        console.error('❌ Upload URL request failed:', error);
         throw new Error(error.message || 'Failed to prepare file upload');
       }
     },
     onError: (error: any) => {
+      console.error('❌ Upload URL mutation failed:', error);
       toast({
         title: "Upload Error",
         description: "Unable to prepare image upload. Please try refreshing the page.",
@@ -82,9 +86,11 @@ export default function AIFoodAnalyzer() {
   // Analyze food image mutation
   const analyzeFoodMutation = useMutation({
     mutationFn: async (imageUrl: string) => {
+      console.log('🔬 Starting AI food analysis for image:', imageUrl);
       const response = await apiRequest('POST', '/api/ai/analyze-food', {
         imageUrl
       });
+      console.log('🔬 AI analysis response received:', response.status, response.statusText);
       return response as unknown as AnalysisResult;
     },
     onSuccess: (result) => {
@@ -131,7 +137,9 @@ export default function AIFoodAnalyzer() {
   // Handle photo upload (works without authentication)
   const handleGetUploadParameters = async () => {
     try {
+      console.log('🔄 Requesting upload URL for AI Food Analysis...');
       const result = await getUploadUrlMutation.mutateAsync();
+      console.log('✅ Upload URL received:', result);
       
       if (!result?.uploadURL) {
         throw new Error('No upload URL received from server');
@@ -142,6 +150,7 @@ export default function AIFoodAnalyzer() {
         url: result.uploadURL,
       };
     } catch (error) {
+      console.error('❌ Failed to get upload URL:', error);
       toast({
         title: "Upload Error",
         description: "Failed to get upload URL. Please try again.",
@@ -152,9 +161,17 @@ export default function AIFoodAnalyzer() {
   };
 
   const handleUploadComplete = async (result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
+    console.log('📤 Upload completed:', result);
+    
     if (result.successful && result.successful.length > 0) {
       const uploadedFile = result.successful[0];
       let imageUrl = uploadedFile.uploadURL;
+      
+      console.log('✅ Image uploaded successfully:', {
+        fileName: uploadedFile.name,
+        uploadURL: imageUrl,
+        size: uploadedFile.size
+      });
       
       if (imageUrl) {
         // Clean the URL - remove query parameters to get the clean storage URL
@@ -162,15 +179,18 @@ export default function AIFoodAnalyzer() {
           const url = new URL(imageUrl);
           const cleanUrl = `${url.protocol}//${url.host}${url.pathname}`;
           imageUrl = cleanUrl;
+          console.log('🔧 Cleaned upload URL for analysis:', cleanUrl);
         } catch (urlError) {
-          // Use original URL if cleaning fails
+          console.log('⚠️ Could not clean URL, using original:', imageUrl);
         }
         
         setUploadedImageUrl(imageUrl);
         
         // Wait longer for upload to fully complete before starting analysis
+        console.log('⏳ Waiting 5 seconds for upload to fully complete and propagate...');
         const finalImageUrl = imageUrl; // Capture in closure to ensure type safety
         setTimeout(() => {
+          console.log('🚀 Starting AI food analysis with Gemini Vision...');
           analyzeFoodMutation.mutate(finalImageUrl);
         }, 5000);
         
