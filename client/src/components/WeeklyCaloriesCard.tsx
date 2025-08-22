@@ -208,8 +208,9 @@ export function WeeklyCaloriesCard() {
   const today = getLocalDateKey();
 
   return (
-    <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 p-6">
-      <div className="space-y-4">
+    <div className="weekly-calories-card-wrapper">
+      <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 p-6">
+        <div className="space-y-4">
         {/* Weekly Summary Header */}
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
@@ -310,7 +311,8 @@ export function WeeklyCaloriesCard() {
             </div>
           </div>
         )}
-      </div>
-    </Card>
+        </div>
+      </Card>
+    </div>
   );
 }
