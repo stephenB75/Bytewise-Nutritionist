@@ -973,7 +973,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           <div className="space-y-8 max-w-2xl">
             {/* Enhanced Title Section */}
             <div className="space-y-3 hero-optimized">
-              <h1 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] drop-shadow-2xl animate-fadeInUp [animation-delay:0.2s] font-league-spartan text-optimized text-white">
+              <h1 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] drop-shadow-2xl animate-fadeInUp [animation-delay:0.2s] font-league-spartan text-optimized">
                 {title}
               </h1>
               <h1 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] animate-fadeInUp [animation-delay:0.4s] font-league-spartan text-optimized">
@@ -1331,7 +1331,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <div className="mb-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-2xl">🎯</span>
-                <h3 className="font-semibold text-lg text-white">Welcome to ByteWise!</h3>
+                <h3 className="font-semibold text-lg text-gray-900">Welcome to ByteWise!</h3>
               </div>
               <p className="text-gray-700 dark:text-gray-300 text-sm mb-3">
                 Ready to discover all the amazing features? Take our interactive tour to learn how to track nutrition and build healthy habits.
@@ -1900,7 +1900,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
         {/* Achievement Badges */}
         <div className="space-y-4">
-          <h3 className="text-2xl font-bold text-white">Recent Achievements</h3>
+          <h3 className="text-2xl font-bold">Recent Achievements</h3>
           {achievementsLoading ? (
             <div className="grid grid-cols-2 gap-4">
               {[1, 2, 3, 4].map((index) => (
@@ -2101,7 +2101,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         <div className="px-6 py-3 content-section">
           {/* Sign In Component */}
           <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md p-6">
-            <h3 className="text-2xl font-bold text-white mb-6 text-center">
+            <h3 className="text-2xl font-bold mb-6 text-center">
               {isResetPassword ? 'Reset Password' : isSignUp ? 'Create Account' : 'Sign In'}
             </h3>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -2218,7 +2218,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         {/* Food Search Bar - Enhanced with filtering */}
         <div className="space-y-4 mb-8">
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-white mb-2">Food Search</h2>
+            <h2 className="text-2xl font-bold mb-2">Food Search</h2>
             <p className="text-gray-400">Find and log nutrition information</p>
           </div>
           <div className="relative">
@@ -2253,7 +2253,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         {/* Logged Foods - Real entries from calculator */}
         <div data-testid="meal-history" className="space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="text-xl font-bold text-white">Logged Today</h3>
+            <h3 className="text-xl font-bold">Logged Today</h3>
             {loggedMeals.length === 0 && (
               <Badge className="bg-gray-600 text-gray-300">No meals logged</Badge>
             )}
@@ -2375,7 +2375,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         {/* Weekly Calories Summary */}
         <div className="space-y-4 mt-8">
           <div className="flex justify-between items-center">
-            <h3 className="text-xl font-bold text-white">This Week</h3>
+            <h3 className="text-xl font-bold">This Week</h3>
             <Badge className="bg-blue-600 text-white">Weekly Summary</Badge>
           </div>
           <WeeklyCaloriesCard />
@@ -2406,7 +2406,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           {/* Instructions Section */}
           <div className="mb-6 text-center">
             <div className="bg-gradient-to-r from-blue-500/10 to-orange-500/10 border border-white/10 rounded-xl p-4 mb-4">
-              <h3 className="text-white font-semibold text-lg mb-3">Choose Your Nutrition Analysis Method</h3>
+              <h3 className="font-semibold text-lg mb-3">Choose Your Nutrition Analysis Method</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div className="bg-blue-500/5 border border-blue-500/20 rounded-lg p-3">
                   <div className="flex items-center gap-2 mb-2">
@@ -2534,7 +2534,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                         </div>
                       </div>
                       <div className="flex-1 min-w-0 space-y-1">
-                        <h3 className="text-lg sm:text-xl font-bold text-white leading-tight" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                        <h3 className="text-lg sm:text-xl font-bold leading-tight" style={{ fontFamily: "'League Spartan', sans-serif" }}>
                           {user?.firstName || user?.email?.split('@')[0] || 'ByteWise User'}
                         </h3>
                         <p className="text-gray-300 text-xs sm:text-sm truncate">{user?.email}</p>
@@ -2575,7 +2575,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     <div className="flex items-center space-x-3">
                       <Trophy className="w-6 h-6 text-[#faed39]" />
                       <div>
-                        <h3 className="text-xl font-semibold text-white transition-colors" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                        <h3 className="text-xl font-semibold transition-colors" style={{ fontFamily: "'League Spartan', sans-serif" }}>
                           Awards
                         </h3>
                         <p className="text-sm text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>
@@ -2600,7 +2600,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     <div className="flex items-center space-x-3 text-left">
                       <Download className="w-6 h-6 text-[#faed39]" />
                       <div>
-                        <h3 className="text-xl font-semibold text-white transition-colors" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                        <h3 className="text-xl font-semibold transition-colors" style={{ fontFamily: "'League Spartan', sans-serif" }}>
                           Data
                         </h3>
                         <p className="text-sm text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>
@@ -2742,7 +2742,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <div className="absolute top-full right-0 mt-2 w-80 bg-black/90 backdrop-blur-md border border-white/20 rounded-2xl shadow-2xl overflow-hidden z-40">
               <div className="p-4 border-b border-white/10">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-white font-semibold">Notifications</h3>
+                  <h3 className="font-semibold">Notifications</h3>
                   <Button
                     variant="ghost"
                     size="sm"
