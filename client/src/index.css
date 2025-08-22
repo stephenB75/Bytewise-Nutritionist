@@ -229,28 +229,38 @@ button.btn-hero-enhanced span,
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
 
-/* Hero headlines - vibrant colors for dark overlays */
-.hero-component h1.text-white,
+/* CONSOLIDATED Hero headlines - vibrant colors for dark overlays */
 .hero-component h1,
-[data-hero="true"] h1.text-white,
-[data-hero="true"] h1 { 
+.hero-component h1.text-white,
+[data-hero="true"] h1,
+[data-hero="true"] h1.text-white { 
   color: #22d3ee !important; /* Bright cyan for primary headlines */
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
 
-.hero-component h2.text-white,
 .hero-component h2,
-[data-hero="true"] h2.text-white,
-[data-hero="true"] h2 { 
+.hero-component h2.text-white,
+[data-hero="true"] h2,
+[data-hero="true"] h2.text-white { 
   color: #fbbf24 !important; /* Bright amber for secondary headlines */
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
 
-.hero-component h3.text-white,
 .hero-component h3,
-[data-hero="true"] h3.text-white,
-[data-hero="true"] h3 { 
+.hero-component h3.text-white,
+[data-hero="true"] h3,
+[data-hero="true"] h3.text-white { 
   color: #10b981 !important; /* Bright emerald for tertiary headlines */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
+.hero-component h4,
+.hero-component h5,
+.hero-component h6,
+[data-hero="true"] h4,
+[data-hero="true"] h5,
+[data-hero="true"] h6 { 
+  color: #a855f7 !important; /* Purple for smaller headlines */
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
 
@@ -295,22 +305,7 @@ button.btn-hero-enhanced span,
   color: #ffffff !important;
 }
 
-/* Dashboard hero overlay - vibrant headlines, white for other text */
-[data-page="dashboard"] .absolute.inset-0 h1 {
-  color: #22d3ee !important; /* Bright cyan for overlay h1 */
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
-}
-
-[data-page="dashboard"] .absolute.inset-0 h2 {
-  color: #fbbf24 !important; /* Bright amber for overlay h2 */
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
-}
-
-[data-page="dashboard"] .absolute.inset-0 h3 {
-  color: #10b981 !important; /* Bright emerald for overlay h3 */
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
-}
-
+/* Dashboard hero overlay - inherits hero headline colors, white for other text */
 [data-page="dashboard"] .absolute.inset-0 p,
 [data-page="dashboard"] .absolute.inset-0 span {
   color: #ffffff !important;
@@ -348,34 +343,7 @@ button.btn-hero-enhanced span,
   color: #111827 !important; /* Dark for yellow background */
 }
 
-/* Dashboard hero headings - vibrant colors for visual hierarchy */
-[data-page="dashboard"] .hero-component h1,
-[data-page="dashboard"] [data-hero="true"] h1 {
-  color: #22d3ee !important; /* Bright cyan for h1 */
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
-}
-
-[data-page="dashboard"] .hero-component h2,
-[data-page="dashboard"] [data-hero="true"] h2 {
-  color: #fbbf24 !important; /* Bright amber for h2 */
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
-}
-
-[data-page="dashboard"] .hero-component h3,
-[data-page="dashboard"] [data-hero="true"] h3 {
-  color: #10b981 !important; /* Bright emerald for h3 */
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
-}
-
-[data-page="dashboard"] .hero-component h4,
-[data-page="dashboard"] .hero-component h5,
-[data-page="dashboard"] .hero-component h6,
-[data-page="dashboard"] [data-hero="true"] h4,
-[data-page="dashboard"] [data-hero="true"] h5,
-[data-page="dashboard"] [data-hero="true"] h6 {
-  color: #a855f7 !important; /* Purple for smaller headlines */
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
-}
+/* Dashboard hero headings inherit global hero colors - no override needed */
 
 /* Dashboard spans and divs - dark for yellow background, EXCLUDE hero components and metrics cards */
 [data-page="dashboard"] span:not(.hero-component *):not([data-hero="true"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
@@ -3050,34 +3018,7 @@ select {
   color: white !important;
 }
 
-/* Override to ensure hero headlines get vibrant colors */
-.hero-component h1,
-[data-hero="true"] h1 {
-  color: #22d3ee !important; /* Bright cyan for all h1 */
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
-}
-
-.hero-component h2,
-[data-hero="true"] h2 {
-  color: #fbbf24 !important; /* Bright amber for all h2 */
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
-}
-
-.hero-component h3,
-[data-hero="true"] h3 {
-  color: #10b981 !important; /* Bright emerald for all h3 */
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
-}
-
-.hero-component h4,
-.hero-component h5,
-.hero-component h6,
-[data-hero="true"] h4,
-[data-hero="true"] h5,
-[data-hero="true"] h6 {
-  color: #a855f7 !important; /* Purple for smaller headlines */
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
-}
+/* Hero headlines defined above - no duplicate rules needed */
 
 /* Force all buttons in hero components to have white text - HIGHEST PRIORITY */
 .hero-component button,
