@@ -94,7 +94,7 @@ body,
 html,
 #root,
 .min-h-screen:not([class*="bg-gradient"]) {
-  background: linear-gradient(to top, #fbbf24 0%, #fbbf24 30%, #ffffff 70%) !important;
+  background: linear-gradient(to top, #fbbf24 0%, #fbbf24 35%, #ffffff 65%) !important;
   background-attachment: fixed !important;
   color: rgb(var(--foreground)) !important;
   min-height: 100vh !important;
@@ -115,7 +115,7 @@ html,
 .min-h-screen.bg-black:not(.content-section):not(.content-section *),
 .min-h-screen.bg-gray-900:not(.content-section):not(.content-section *),
 .min-h-screen.bg-gray-800:not(.content-section):not(.content-section *) {
-  background: linear-gradient(to top, #fbbf24 0%, #fbbf24 30%, #ffffff 70%) !important;
+  background: linear-gradient(to top, #fbbf24 0%, #fbbf24 35%, #ffffff 65%) !important;
   background-attachment: fixed !important;
 }
 
