@@ -591,12 +591,12 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
             
             // Define colors for each category
             const categoryColors = {
-              all: { bg: 'from-purple-400 to-pink-400', icon: 'text-white', active: 'from-purple-600 to-pink-600' },
-              daily: { bg: 'from-orange-400 to-yellow-400', icon: 'text-white', active: 'from-orange-600 to-yellow-600' },
-              weekly: { bg: 'from-blue-400 to-cyan-400', icon: 'text-white', active: 'from-blue-600 to-cyan-600' },
-              monthly: { bg: 'from-green-400 to-emerald-400', icon: 'text-white', active: 'from-green-600 to-emerald-600' },
-              milestone: { bg: 'from-red-400 to-rose-400', icon: 'text-white', active: 'from-red-600 to-rose-600' },
-              special: { bg: 'from-amber-400 to-orange-400', icon: 'text-white', active: 'from-amber-600 to-orange-600' }
+              all: { bg: 'from-purple-200 to-pink-200', icon: 'text-purple-700', active: 'from-purple-300 to-pink-300' },
+              daily: { bg: 'from-orange-200 to-yellow-200', icon: 'text-orange-700', active: 'from-orange-300 to-yellow-300' },
+              weekly: { bg: 'from-blue-200 to-cyan-200', icon: 'text-blue-700', active: 'from-blue-300 to-cyan-300' },
+              monthly: { bg: 'from-green-200 to-emerald-200', icon: 'text-green-700', active: 'from-green-300 to-emerald-300' },
+              milestone: { bg: 'from-red-200 to-rose-200', icon: 'text-red-700', active: 'from-red-300 to-rose-300' },
+              special: { bg: 'from-amber-200 to-orange-200', icon: 'text-amber-700', active: 'from-amber-300 to-orange-300' }
             };
             
             const colors = categoryColors[category.id as keyof typeof categoryColors];
