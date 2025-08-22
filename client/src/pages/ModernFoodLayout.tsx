@@ -2688,14 +2688,14 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           
           {/* Notification Dropdown */}
           {showNotificationDropdown && (
-            <div className="absolute top-full right-0 mt-2 w-80 bg-black/90 backdrop-blur-md border border-white/20 rounded-2xl shadow-2xl overflow-hidden z-40">
-              <div className="p-4 border-b border-white/10">
+            <div className="absolute top-full right-0 mt-2 w-80 bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border border-amber-200/60 rounded-2xl shadow-2xl overflow-hidden z-40">
+              <div className="p-4 border-b border-amber-200/40">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-white">Notifications</h3>
+                  <h3 className="font-semibold text-gray-900">Notifications</h3>
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-gray-300 hover:text-white bg-gray-700/50 hover:bg-gray-600/50"
+                    className="text-gray-700 hover:text-gray-900 bg-amber-200/50 hover:bg-amber-300/50"
                     onClick={handleMarkAllAsRead}
                   >
                     Mark all read
@@ -2706,20 +2706,20 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 {notifications.map((notification) => (
                   <div
                     key={notification.id}
-                    className={`p-4 border-b border-white/5 ${!notification.read ? 'bg-blue-500/10' : ''}`}
+                    className={`p-4 border-b border-amber-200/30 ${!notification.read ? 'bg-blue-200/20' : ''}`}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <h4 className="text-white font-medium text-sm">{notification.title}</h4>
-                        <p className="text-gray-400 text-xs mt-1">{notification.message}</p>
-                        <p className="text-gray-300 text-xs mt-2">
+                        <h4 className="text-gray-900 font-medium text-sm">{notification.title}</h4>
+                        <p className="text-gray-700 text-xs mt-1">{notification.message}</p>
+                        <p className="text-gray-600 text-xs mt-2">
                           {notification.timestamp.toLocaleDateString()}
                         </p>
                       </div>
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="text-gray-400 hover:text-white p-1"
+                        className="text-gray-600 hover:text-gray-900 p-1"
                         onClick={() => handleDeleteNotification(notification.id)}
                       >
                         <X className="w-4 h-4" />
