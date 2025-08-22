@@ -841,7 +841,7 @@ export function FastingTracker() {
             <CardContent className="space-y-8">
               {/* Timer Display */}
               <div className="text-center space-y-6 py-4">
-                <div className="text-4xl font-mono font-bold text-gray-900">
+                <div className="text-4xl font-mono font-black text-gray-900">
                   {formatTime(timeRemaining)}
                 </div>
                 <Progress 

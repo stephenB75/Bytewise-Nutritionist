@@ -77,7 +77,7 @@ export function FastingStatusCard({ fastingStatus }: FastingStatusProps) {
       </CardHeader>
       <CardContent className="space-y-3">
         <div className="text-center">
-          <div className="text-2xl font-mono font-bold text-gray-900">
+          <div className="text-2xl font-mono font-black text-gray-900">
             {formatTime(fastingStatus.timeRemaining || 0)}
           </div>
           <p className="text-xs text-gray-700">remaining</p>
