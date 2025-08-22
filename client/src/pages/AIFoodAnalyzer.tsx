@@ -5,7 +5,7 @@
  * Uses GPT-4 Vision to identify foods and cross-references with USDA database
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -53,8 +53,50 @@ interface AnalysisResult {
 export default function AIFoodAnalyzer() {
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string>('');
+  const [weeklyAnalyzedFoods, setWeeklyAnalyzedFoods] = useState<AnalysisResult[]>([]);
   const { toast } = useToast();
   const { addCalculatedCalories } = useCalorieTracking();
+
+  // Load weekly analyzed foods from localStorage on component mount
+  useEffect(() => {
+    const loadWeeklyAnalyzedFoods = () => {
+      try {
+        const stored = localStorage.getItem('weeklyAnalyzedFoods');
+        if (stored) {
+          const allAnalyzed: AnalysisResult[] = JSON.parse(stored);
+          // Filter to current week only
+          const oneWeekAgo = new Date();
+          oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+          
+          const currentWeekAnalyzed = allAnalyzed.filter(analysis => 
+            new Date(analysis.analysisTime) >= oneWeekAgo
+          );
+          
+          setWeeklyAnalyzedFoods(currentWeekAnalyzed);
+          
+          // Update localStorage with filtered data
+          if (currentWeekAnalyzed.length !== allAnalyzed.length) {
+            localStorage.setItem('weeklyAnalyzedFoods', JSON.stringify(currentWeekAnalyzed));
+          }
+        }
+      } catch (error) {
+        console.error('Error loading weekly analyzed foods:', error);
+      }
+    };
+
+    loadWeeklyAnalyzedFoods();
+  }, []);
+
+  // Save analyzed food to weekly history
+  const saveAnalyzedFood = (analysis: AnalysisResult) => {
+    try {
+      const updatedHistory = [analysis, ...weeklyAnalyzedFoods];
+      setWeeklyAnalyzedFoods(updatedHistory);
+      localStorage.setItem('weeklyAnalyzedFoods', JSON.stringify(updatedHistory));
+    } catch (error) {
+      console.error('Error saving analyzed food:', error);
+    }
+  };
 
   // Get upload URL mutation (works without authentication)
   const getUploadUrlMutation = useMutation({
@@ -95,6 +137,8 @@ export default function AIFoodAnalyzer() {
     },
     onSuccess: (result) => {
       setAnalysisResult(result);
+      // Save to weekly history
+      saveAnalyzedFood(result);
       toast({
         title: "Analysis Complete!",
         description: `Identified ${result.identifiedFoods.length} food items`,
@@ -515,6 +559,72 @@ export default function AIFoodAnalyzer() {
             </CardContent>
           </Card>
         </div>
+      )}
+
+      {/* Weekly Analyzed Photos Section */}
+      {weeklyAnalyzedFoods.length > 0 && (
+        <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200/40">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-gray-900">
+              <Eye className="h-5 w-5 text-blue-500" />
+              Recent Analyzed Photos ({weeklyAnalyzedFoods.length} this week)
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {weeklyAnalyzedFoods.map((analysis, index) => (
+                <div 
+                  key={`${analysis.analysisTime}-${index}`} 
+                  className="bg-white/80 border border-amber-200 rounded-lg p-4 space-y-3"
+                  data-testid={`analyzed-photo-${index}`}
+                >
+                  {/* Photo */}
+                  <div className="aspect-square rounded-lg overflow-hidden bg-gray-100">
+                    <img 
+                      src={analysis.imageUrl} 
+                      alt="Analyzed food photo" 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  
+                  {/* Analysis Info */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-gray-900">
+                        {analysis.identifiedFoods.length} item{analysis.identifiedFoods.length !== 1 ? 's' : ''}
+                      </span>
+                      <span className="text-xs text-gray-600">
+                        {new Date(analysis.analysisTime).toLocaleDateString()}
+                      </span>
+                    </div>
+                    
+                    {/* Food Names */}
+                    <div className="text-sm text-gray-800">
+                      {analysis.identifiedFoods.slice(0, 2).map(food => food.name).join(', ')}
+                      {analysis.identifiedFoods.length > 2 && ` +${analysis.identifiedFoods.length - 2} more`}
+                    </div>
+                    
+                    {/* Total Nutrition */}
+                    <div className="flex justify-between text-xs bg-amber-100/50 rounded px-2 py-1">
+                      <span className="font-medium text-orange-600">
+                        {Math.round(analysis.totalNutrition.calories)} cal
+                      </span>
+                      <span className="text-gray-700">
+                        P: {Math.round(analysis.totalNutrition.protein)}g
+                      </span>
+                      <span className="text-gray-700">
+                        C: {Math.round(analysis.totalNutrition.carbs)}g
+                      </span>
+                      <span className="text-gray-700">
+                        F: {Math.round(analysis.totalNutrition.fat)}g
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       )}
       </div>
     </div>
