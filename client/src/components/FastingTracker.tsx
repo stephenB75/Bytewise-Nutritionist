@@ -795,7 +795,7 @@ export function FastingTracker() {
           <Clock className="w-5 h-5 text-white" />
         </div>
         <div>
-          <h2 className="text-2xl font-bold">Intermittent Fasting</h2>
+          <h2 className="text-2xl font-bold text-gray-900">Intermittent Fasting</h2>
           <p className="text-gray-700">Track your fasting journey and optimize your health</p>
         </div>
       </div>
@@ -804,8 +804,8 @@ export function FastingTracker() {
         <TabsList className="grid w-full grid-cols-3 h-12">
           <TabsTrigger value="tracker" data-testid="tab-tracker" className="flex items-center justify-center gap-1 text-xs sm:text-sm">
             <Target className="w-3 h-3 sm:w-4 sm:h-4" />
-            <span className="hidden xs:inline">Tracker</span>
-            <span className="xs:hidden">Track</span>
+            <span className="hidden xs:inline text-gray-900">Tracker</span>
+            <span className="xs:hidden text-gray-900">Track</span>
           </TabsTrigger>
           <TabsTrigger value="plans" data-testid="tab-plans" className="flex items-center justify-center gap-1 text-xs sm:text-sm">
             <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -823,7 +823,7 @@ export function FastingTracker() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2 text-gray-900">
                     {isActive ? (
                       <Flame className="w-5 h-5 text-orange-500" />
                     ) : (
@@ -895,11 +895,11 @@ export function FastingTracker() {
 
               {/* Schedule Display */}
               <div className="bg-amber-100/50 rounded-lg p-6 mt-6">
-                <h4 className="font-medium mb-3 flex items-center gap-2">
-                  <Sun className="w-4 h-4" />
+                <h4 className="font-medium mb-3 flex items-center gap-2 text-gray-900">
+                  <Sun className="w-4 h-4 text-gray-900" />
                   Suggested Schedule
                 </h4>
-                <p className="text-sm">{selectedPlan.suggestedSchedule}</p>
+                <p className="text-sm text-gray-900">{selectedPlan.suggestedSchedule}</p>
               </div>
             </CardContent>
           </Card>
@@ -907,8 +907,8 @@ export function FastingTracker() {
           {/* Fasting History */}
           <Card className="mt-8 bg-gradient-to-br from-amber-50 to-amber-100 border-none shadow-none">
             <CardHeader className="pb-4">
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="w-5 h-5" />
+              <CardTitle className="flex items-center gap-2 text-gray-900">
+                <TrendingUp className="w-5 h-5 text-gray-900" />
                 Recent Sessions
               </CardTitle>
             </CardHeader>
@@ -951,12 +951,12 @@ export function FastingTracker() {
                               <AlertCircle className="w-4 h-4 text-orange-500" />
                             )}
                             <div>
-                              <p className="font-medium">{session.planName || `${Math.round(targetHours)}h Fasting Session`}</p>
+                              <p className="font-medium text-gray-900">{session.planName || `${Math.round(targetHours)}h Fasting Session`}</p>
                               <p className="text-sm text-gray-700">
                                 {sessionDate ? new Date(sessionDate).toLocaleDateString() : 'N/A'}
                               </p>
                               {!wasCompleted && remainingHours > 0 && (
-                                <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">
+                                <p className="text-xs text-orange-700 mt-1">
                                   {formatHours(remainingHours)} remaining from {targetHours}h goal
                                 </p>
                               )}
@@ -1028,10 +1028,10 @@ export function FastingTracker() {
                     </div>
                     
                     <div>
-                      <p className="text-sm font-medium mb-2">Benefits:</p>
+                      <p className="text-sm font-medium mb-2 text-gray-900">Benefits:</p>
                       <div className="flex flex-wrap gap-1">
                         {plan.benefits.map((benefit, index) => (
-                          <Badge key={index} variant="outline" className="text-xs">
+                          <Badge key={index} variant="outline" className="text-xs bg-amber-200 text-gray-900 border-none">
                             {benefit}
                           </Badge>
                         ))}
