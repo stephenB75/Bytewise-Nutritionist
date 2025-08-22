@@ -588,34 +588,42 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
           {categories.map((category) => {
             const IconComponent = category.icon;
             const isActive = selectedCategory === category.id;
+            
+            // Define colors for each category
+            const categoryColors = {
+              all: { bg: 'from-purple-400 to-pink-400', icon: 'text-white', active: 'from-purple-600 to-pink-600' },
+              daily: { bg: 'from-orange-400 to-yellow-400', icon: 'text-white', active: 'from-orange-600 to-yellow-600' },
+              weekly: { bg: 'from-blue-400 to-cyan-400', icon: 'text-white', active: 'from-blue-600 to-cyan-600' },
+              monthly: { bg: 'from-green-400 to-emerald-400', icon: 'text-white', active: 'from-green-600 to-emerald-600' },
+              milestone: { bg: 'from-red-400 to-rose-400', icon: 'text-white', active: 'from-red-600 to-rose-600' },
+              special: { bg: 'from-amber-400 to-orange-400', icon: 'text-white', active: 'from-amber-600 to-orange-600' }
+            };
+            
+            const colors = categoryColors[category.id as keyof typeof categoryColors];
+            
             return (
               <div
                 key={category.id}
                 onClick={() => setSelectedCategory(category.id)}
                 className="cursor-pointer transition-all duration-300 transform hover:scale-105 flex flex-col items-center space-y-2"
               >
-                <div className={`p-4 rounded-2xl transition-all duration-300 ${
+                <div className={`p-4 rounded-2xl transition-all duration-300 shadow-lg ${
                   isActive 
-                    ? 'bg-gradient-to-br from-blue-500 to-purple-600 shadow-lg shadow-blue-500/30'
-                    : 'bg-white/70 hover:bg-white/90 shadow-md hover:shadow-lg'
+                    ? `bg-gradient-to-br ${colors.active} shadow-xl transform scale-110`
+                    : `bg-gradient-to-br ${colors.bg} hover:shadow-xl hover:scale-105`
                 }`}>
                   <IconComponent 
-                    className={`w-8 h-8 transition-all duration-300 ${
-                      isActive 
-                        ? 'text-white' 
-                        : 'text-gray-700 hover:text-blue-600'
-                    }`}
-                    strokeWidth={2}
+                    className={`w-8 h-8 transition-all duration-300 ${colors.icon}`}
+                    strokeWidth={2.5}
+                    fill="currentColor"
                     style={{
-                      filter: isActive 
-                        ? 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' 
-                        : 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))'
+                      filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))',
                     }}
                   />
                 </div>
                 <span className={`text-sm font-medium transition-all duration-300 ${
                   isActive 
-                    ? 'text-blue-600 font-bold' 
+                    ? 'text-gray-900 font-bold' 
                     : 'text-gray-700'
                 }`}>
                   {category.name}
