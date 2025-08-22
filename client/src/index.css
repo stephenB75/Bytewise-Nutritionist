@@ -77,7 +77,7 @@ button[data-testid^="nav-"]:hover span,
   --card-foreground: 0, 0, 0;
   --border: 229, 229, 229;
   --input: 229, 229, 229;
-  --primary: 37, 99, 235;
+  --primary: 245, 158, 11;
   --primary-foreground: 255, 255, 255;
   --secondary: 245, 245, 245;
   --secondary-foreground: 17, 24, 39;
@@ -85,7 +85,7 @@ button[data-testid^="nav-"]:hover span,
   --accent-foreground: 17, 24, 39;
   --destructive: 239, 68, 68;
   --destructive-foreground: 248, 250, 252;
-  --ring: 37, 99, 235;
+  --ring: 245, 158, 11;
   --radius: 0.5rem;
 }
 
