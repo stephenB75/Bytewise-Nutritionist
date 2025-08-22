@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { useLocation } from 'wouter';
 
 import { 
   Play, 
@@ -24,53 +25,75 @@ import {
 interface TourLauncherProps {
   onStartTour: () => void;
   isVisible?: boolean;
+  onNavigateToFeature?: (tab: string) => void;
 }
 
 const TOUR_FEATURES = [
   {
-    icon: <Utensils className="w-5 h-5 text-blue-500" />,
+    icon: <Utensils className="w-5 h-5 text-orange-500" />,
     title: 'Smart Food Search',
     description: 'Search 300,000+ USDA foods with brand recognition',
-    category: 'Core Feature'
+    category: 'Core Feature',
+    targetTab: 'calorie-tracker'
   },
   {
     icon: <Camera className="w-5 h-5 text-purple-500" />,
     title: 'AI Photo Analysis',
     description: 'Snap photos for instant nutrition breakdown',
-    category: 'AI Feature'
+    category: 'AI Feature',
+    targetTab: 'ai-analyzer'
   },
   {
     icon: <Target className="w-5 h-5 text-green-500" />,
     title: 'Calorie Calculator',
     description: 'Instant nutrition facts with portion warnings',
-    category: 'Core Feature'
+    category: 'Core Feature',
+    targetTab: 'calorie-tracker'
   },
   {
     icon: <Clock className="w-5 h-5 text-orange-500" />,
     title: 'Fasting Timer',
     description: 'Track intermittent fasting with celebrations',
-    category: 'Wellness'
+    category: 'Wellness',
+    targetTab: 'fasting'
   },
   {
     icon: <Trophy className="w-5 h-5 text-amber-700" />,
     title: 'Achievement System',
     description: 'Unlock rewards as you hit your goals',
-    category: 'Motivation'
+    category: 'Motivation',
+    targetTab: 'achievements'
   },
   {
     icon: <Droplets className="w-5 h-5 text-cyan-500" />,
     title: 'Hydration Tracking',
     description: 'Beautiful water intake visualization',
-    category: 'Wellness'
+    category: 'Wellness',
+    targetTab: 'home'
   }
 ];
 
-export function TourLauncher({ onStartTour, isVisible = true }: TourLauncherProps) {
+export function TourLauncher({ onStartTour, isVisible = true, onNavigateToFeature }: TourLauncherProps) {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isTourRunning, setIsTourRunning] = useState(false);
   const [tourStep, setTourStep] = useState(0);
+  const [, setLocation] = useLocation();
 
   if (!isVisible) return null;
+
+  const handleFeatureClick = (feature: any) => {
+    setIsPreviewOpen(false);
+    
+    // Navigate to the feature's page/tab
+    if (onNavigateToFeature) {
+      onNavigateToFeature(feature.targetTab);
+    } else {
+      // Fallback: use custom event to communicate with parent layout
+      window.dispatchEvent(new CustomEvent('navigate-to-tab', {
+        detail: { tab: feature.targetTab }
+      }));
+    }
+  };
 
   const handleStartTour = () => {
     setIsPreviewOpen(false);
@@ -217,18 +240,25 @@ export function TourLauncher({ onStartTour, isVisible = true }: TourLauncherProp
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {TOUR_FEATURES.map((feature, index) => (
-                <Card key={index} className="border border-amber-300 dark:border-amber-400 bg-gradient-to-br from-amber-50 to-amber-100">
+                <Card 
+                  key={index} 
+                  className="border border-amber-300 dark:border-amber-400 bg-gradient-to-br from-amber-50 to-amber-100 cursor-pointer hover:shadow-lg transition-all duration-200 hover:scale-105"
+                  onClick={() => handleFeatureClick(feature)}
+                >
                   <CardContent className="p-4">
                     <div className="flex items-start gap-3">
                       {feature.icon}
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-sm mb-1">{feature.title}</h4>
-                        <p className="text-xs text-gray-950 dark:text-gray-950 mb-2">
+                        <h4 className="font-medium text-sm mb-1 text-gray-900">{feature.title}</h4>
+                        <p className="text-xs text-gray-700 mb-2">
                           {feature.description}
                         </p>
-                        <Badge variant="outline" className="text-xs text-gray-900 border-gray-400">
-                          {feature.category}
-                        </Badge>
+                        <div className="flex items-center justify-between">
+                          <Badge variant="outline" className="text-xs text-gray-900 border-gray-400">
+                            {feature.category}
+                          </Badge>
+                          <span className="text-xs text-orange-600 font-medium">Go to feature →</span>
+                        </div>
                       </div>
                     </div>
                   </CardContent>

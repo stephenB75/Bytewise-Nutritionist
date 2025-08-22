@@ -788,10 +788,17 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       }
     };
 
+    // Handle tour navigation
+    const handleTourNavigation = (event: CustomEvent) => {
+      const { tab } = event.detail;
+      setActiveTab(tab);
+    };
+
     // Add event listeners with unique references to avoid conflicts
     const eventsToAdd = [
       { type: 'calories-logged', handler: handleMealLogged },
-      { type: 'meal-logged-success', handler: handleMealLogged }
+      { type: 'meal-logged-success', handler: handleMealLogged },
+      { type: 'navigate-to-tab', handler: handleTourNavigation }
     ];
 
     eventsToAdd.forEach(({ type, handler }) => {
@@ -2589,6 +2596,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                             // Mark tour as started
                             localStorage.setItem('tour-started', 'true');
                           }}
+                          onNavigateToFeature={(tab) => setActiveTab(tab)}
                           isVisible={true}
                         />
                       </div>
@@ -2961,6 +2969,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 // Mark tour as started
                 localStorage.setItem('tour-started', 'true');
               }}
+              onNavigateToFeature={(tab) => setActiveTab(tab)}
               isVisible={shouldShowTour()}
             />
           </div>
