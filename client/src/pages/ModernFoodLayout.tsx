@@ -2694,7 +2694,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                           </Button>
                         </DialogTrigger>
                         
-                        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-amber-50 to-yellow-50 border-amber-200">
                           <DialogHeader>
                             <DialogTitle className="flex items-center gap-2 text-xl">
                               <Sparkles className="w-6 h-6 text-yellow-500" />
