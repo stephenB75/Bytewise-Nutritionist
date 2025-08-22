@@ -2659,7 +2659,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           <Button
             variant="ghost"
             size="lg"
-            className="group relative text-gray-300 p-3 transition-all duration-500 hover:scale-110"
+            className="group relative text-gray-300 p-3 transition-all duration-500 hover:scale-110 active:text-gray-100 focus:text-gray-100 active:bg-gray-700/30 focus:bg-gray-700/30"
             onClick={() => setShowNotificationDropdown(!showNotificationDropdown)}
             aria-label={`Notifications${notifications.filter(n => !n.read).length > 0 ? ` - ${notifications.filter(n => !n.read).length} unread` : ''}`}
             aria-expanded={showNotificationDropdown}
@@ -2695,7 +2695,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-gray-400 hover:text-white"
+                    className="text-gray-300 hover:text-white bg-gray-700/50 hover:bg-gray-600/50"
                     onClick={handleMarkAllAsRead}
                   >
                     Mark all read
