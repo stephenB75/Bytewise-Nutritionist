@@ -1261,66 +1261,19 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   // Render functions for each page with enhanced animations
   const renderHome = () => (
     <div className={`space-y-0 page-container animate-in fade-in ${getAnimationDirection('home', previousTab)} duration-700 ease-out`} data-page="dashboard">
-      <div className="relative h-screen overflow-hidden">
-        <div 
-          key={`home-bg-${animationKey}`}
-          className="absolute inset-0 bg-cover bg-center z-10 hero-bg-slide"
-          style={{
-            backgroundImage: `url('${backgroundImage}')`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center'
-          }}
-        />
-        
-        {/* CSS-controlled Overlay for consistent opacity */}
-        <div className="hero-gradient-overlay" />
-        
-        <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6 z-20">
-          <div className="space-y-8 max-w-2xl">
-            <div className="animate-fadeInUp [animation-delay:0.2s]">
-              <div className="css-logo">
-                <div className="brand-name">
-                  <span className="byte">Byte</span>
-                  <span className="wise">Wise</span>
-                </div>
-                <div className="brand-tagline">Nutritionist</div>
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none text-cyan-400 drop-shadow-2xl animate-fadeInUp [animation-delay:0.4s]">Track Your</h1>
-              <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-none animate-fadeInUp [animation-delay:0.6s]">
-                <span className="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent drop-shadow-2xl">Nutrition</span>
-              </h1>
-            </div>
-            
-            <p className="text-2xl text-white font-light leading-relaxed max-w-xl mx-auto drop-shadow-2xl animate-fadeInUp [animation-delay:0.8s]" 
-               style={{ textShadow: '0 4px 8px rgba(0,0,0,0.8), 0 2px 4px rgba(0,0,0,0.6)' }}>
-              Track nutrition with scientific precision using our comprehensive USDA database
-            </p>
-            
-            <div className="pt-8 animate-fadeInUp [animation-delay:1.0s]">
-              <Button 
-                onClick={() => {
-                  if (user) {
-                    handleTabChange('calculator');
-                  } else {
-                    handleTabChange('profile');
-                  }
-                }}
-                size="lg"
-                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-yellow-100 font-black px-16 py-6 rounded-full text-2xl shadow-2xl hover:scale-105 transition-all duration-500"
-              >
-                {user ? 'Start Tracking' : 'Sign Up to Track'}
-              </Button>
-            </div>
-          </div>
-        </div>
-        
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/60 z-30 animate-bounce">
-          <ChevronRight className="w-6 h-6 rotate-90 drop-shadow-lg" />
-        </div>
-      </div>
+      <HeroSection
+        title="Track Your"
+        subtitle="Nutrition"
+        description="Track nutrition with scientific precision using our comprehensive USDA database"
+        buttonText={user ? 'Start Tracking' : 'Sign Up to Track'}
+        onButtonClick={() => {
+          if (user) {
+            handleTabChange('calculator');
+          } else {
+            handleTabChange('profile');
+          }
+        }}
+      />
 
       {/* Content Section - Completely Separate and Underneath */}
       <div className="px-6 py-3 content-section">
