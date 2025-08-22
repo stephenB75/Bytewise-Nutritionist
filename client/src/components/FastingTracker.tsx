@@ -819,7 +819,7 @@ export function FastingTracker() {
 
         <TabsContent value="tracker" className="space-y-8 mt-6">
           {/* Current Fasting Session */}
-          <Card data-testid="fasting-session-card" className="mb-8 bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200/40">
+          <Card data-testid="fasting-session-card" className="mb-8 bg-gradient-to-br from-amber-50 to-amber-100 border-none shadow-none">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
@@ -873,7 +873,7 @@ export function FastingTracker() {
                       onClick={pauseFasting}
                       variant="outline"
                       size="lg"
-                      className="gap-2 w-full sm:w-auto min-w-[120px] bg-gray-800 hover:bg-gray-900 text-white border-gray-800"
+                      className="gap-2 w-full sm:w-auto min-w-[120px] bg-gray-800 hover:bg-gray-900 text-white border-none"
                       data-testid="button-pause-fasting"
                     >
                       {isActive ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
@@ -905,7 +905,7 @@ export function FastingTracker() {
           </Card>
 
           {/* Fasting History */}
-          <Card className="mt-8 bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200/40">
+          <Card className="mt-8 bg-gradient-to-br from-amber-50 to-amber-100 border-none shadow-none">
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center gap-2">
                 <TrendingUp className="w-5 h-5" />
@@ -963,7 +963,7 @@ export function FastingTracker() {
                             </div>
                           </div>
                           <div className="text-right">
-                            <Badge variant={wasCompleted ? "secondary" : "outline"} className={wasCompleted ? "" : "border-orange-300 text-orange-700 dark:text-orange-400"}>
+                            <Badge variant={wasCompleted ? "secondary" : "outline"} className={wasCompleted ? "bg-amber-200 text-gray-900" : "bg-orange-100 text-orange-700 border-none"}>
                               {formatHours(actualHours)} {wasCompleted ? 'completed' : 'fasted'}
                             </Badge>
                             {!wasCompleted && (
@@ -999,8 +999,8 @@ export function FastingTracker() {
             {FASTING_PLANS.map((plan) => (
               <Card 
                 key={plan.id}
-                className={`cursor-pointer transition-all bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200/40 ${
-                  selectedPlan.id === plan.id ? 'ring-2 ring-primary' : ''
+                className={`cursor-pointer transition-all bg-gradient-to-br from-amber-50 to-amber-100 border-none shadow-none ${
+                  selectedPlan.id === plan.id ? 'bg-gradient-to-br from-amber-100 to-amber-200' : ''
                 }`}
                 onClick={() => setSelectedPlan(plan)}
                 data-testid={`plan-card-${plan.id}`}
@@ -1045,7 +1045,7 @@ export function FastingTracker() {
         </TabsContent>
 
         <TabsContent value="tips" className="space-y-6 mt-6">
-          <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200/40">
+          <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-none shadow-none">
             <CardHeader className="pb-6">
               <CardTitle className="flex items-center gap-2 text-gray-900">
                 <Coffee className="w-5 h-5 text-gray-900" />
@@ -1063,7 +1063,7 @@ export function FastingTracker() {
                 </div>
               ))}
               
-              <Alert className="mt-6 bg-amber-100/50 border-amber-300 text-gray-900">
+              <Alert className="mt-6 bg-amber-100/50 border-none text-gray-900">
                 <AlertCircle className="h-4 w-4 text-gray-900" />
                 <AlertDescription className="text-gray-900">
                   <strong>Important:</strong> Consult with a healthcare provider before starting any fasting regimen, 

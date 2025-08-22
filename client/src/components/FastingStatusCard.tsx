@@ -16,7 +16,7 @@ interface FastingStatusProps {
 export function FastingStatusCard({ fastingStatus }: FastingStatusProps) {
   if (!fastingStatus || !fastingStatus.isActive) {
     return (
-      <Card className="border-dashed bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200/40" data-testid="fasting-status-inactive">
+      <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-none shadow-none" data-testid="fasting-status-inactive">
         <CardContent className="flex flex-col items-center justify-center py-6">
           <Coffee className="w-8 h-8 text-gray-700 mb-2" />
           <p className="text-sm text-gray-700 text-center">
@@ -65,7 +65,7 @@ export function FastingStatusCard({ fastingStatus }: FastingStatusProps) {
   };
 
   return (
-    <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200/40" data-testid="fasting-status-active">
+    <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-none shadow-none" data-testid="fasting-status-active">
       <CardHeader className="pb-3">
         <CardTitle className="text-sm flex items-center gap-2 text-gray-900">
           <Clock className="w-4 h-4 text-blue-500" />
