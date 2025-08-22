@@ -201,11 +201,11 @@ button.btn-hero-enhanced span,
   color: #f3f4f6 !important; 
 }
 
-/* Override any dark text in dashboard hero */
-[data-page="dashboard"] .text-black,
-[data-page="dashboard"] .text-gray-900,
-[data-page="dashboard"] .text-gray-800,
-[data-page="dashboard"] .text-gray-700 {
+/* Override any dark text in dashboard hero - EXCLUDE metrics cards */
+[data-page="dashboard"] .text-black:not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *),
+[data-page="dashboard"] .text-gray-900:not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *),
+[data-page="dashboard"] .text-gray-800:not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *),
+[data-page="dashboard"] .text-gray-700:not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *) {
   color: #ffffff !important;
 }
 
@@ -219,10 +219,11 @@ button.btn-hero-enhanced span,
 /* Comprehensive dark text fixes for entire dashboard page */
 [data-page="dashboard"] .text-gray-900,
 [data-page="dashboard"] .text-gray-800,
-[data-page="dashboard"] .text-gray-700,
-[data-page="dashboard"] .text-gray-600,
-[data-page="dashboard"] .text-gray-500,
-[data-page="dashboard"] .text-black {
+/* Dashboard page text override - EXCLUDE metrics cards */
+[data-page="dashboard"] .text-gray-700:not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *),
+[data-page="dashboard"] .text-gray-600:not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *),
+[data-page="dashboard"] .text-gray-500:not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *),
+[data-page="dashboard"] .text-black:not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *) {
   color: #ffffff !important;
 }
 
@@ -824,7 +825,17 @@ button.bg-gray-100 {
 .bg-gray-50 p,
 .bg-gray-50 span,
 .bg-gray-50 div {
-  color: #1f2937 !important;
+  color: #000000 !important;
+}
+
+/* Force black text on all metrics cards */
+.bg-gray-50 .text-black,
+.bg-gray-50 [class*="text-"],
+[data-testid*="progress"] *,
+[data-testid*="water"] *,
+[data-testid*="macro"] *,
+[data-testid*="micro"] * {
+  color: #000000 !important;
 }
 
 /* Form Elements */
@@ -945,7 +956,39 @@ button[data-testid*="nav-"] {
 [data-testid*="micro"] {
   background-color: #f9fafb !important;
   border: 2px solid #d1d5db !important;
-  color: #1f2937 !important;
+  color: #000000 !important;
+}
+
+/* Override any conflicting text colors in metrics cards - HIGHEST PRIORITY */
+[data-page="dashboard"] [data-testid*="progress"] h1,
+[data-page="dashboard"] [data-testid*="progress"] h2,
+[data-page="dashboard"] [data-testid*="progress"] h3,
+[data-page="dashboard"] [data-testid*="progress"] p,
+[data-page="dashboard"] [data-testid*="progress"] span,
+[data-page="dashboard"] [data-testid*="progress"] div,
+[data-page="dashboard"] [data-testid*="progress"] .text-black,
+[data-page="dashboard"] [data-testid*="water"] h1,
+[data-page="dashboard"] [data-testid*="water"] h2,
+[data-page="dashboard"] [data-testid*="water"] h3,
+[data-page="dashboard"] [data-testid*="water"] p,
+[data-page="dashboard"] [data-testid*="water"] span,
+[data-page="dashboard"] [data-testid*="water"] div,
+[data-page="dashboard"] [data-testid*="water"] .text-black,
+[data-page="dashboard"] [data-testid*="macro"] h1,
+[data-page="dashboard"] [data-testid*="macro"] h2,
+[data-page="dashboard"] [data-testid*="macro"] h3,
+[data-page="dashboard"] [data-testid*="macro"] p,
+[data-page="dashboard"] [data-testid*="macro"] span,
+[data-page="dashboard"] [data-testid*="macro"] div,
+[data-page="dashboard"] [data-testid*="macro"] .text-black,
+[data-page="dashboard"] [data-testid*="micro"] h1,
+[data-page="dashboard"] [data-testid*="micro"] h2,
+[data-page="dashboard"] [data-testid*="micro"] h3,
+[data-page="dashboard"] [data-testid*="micro"] p,
+[data-page="dashboard"] [data-testid*="micro"] span,
+[data-page="dashboard"] [data-testid*="micro"] div,
+[data-page="dashboard"] [data-testid*="micro"] .text-black {
+  color: #000000 !important;
 }
 
 /* Placeholder and input text fixes */
