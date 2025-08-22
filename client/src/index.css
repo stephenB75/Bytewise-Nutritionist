@@ -970,9 +970,11 @@ button[data-testid*="nav-"] {
 [data-testid="macro-card"],
 [data-testid="micro-card"] {
   background-color: #ffffff !important;
-  border: 2px solid #6b7280 !important;
+  background-image: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+  border: 3px solid #4b5563 !important;
   color: #111827 !important;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.1), 
+              0 0 0 1px rgba(75, 85, 99, 0.1) !important;
 }
 
 /* Override any conflicting text colors in metrics cards - ULTIMATE PRIORITY */
@@ -992,7 +994,8 @@ button[data-testid*="nav-"] {
 [data-testid="macro-card"] .text-gray-800,
 [data-testid="micro-card"] .text-gray-900,
 [data-testid="micro-card"] .text-gray-800 {
-  color: #111827 !important;
+  color: #1f2937 !important;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8) !important;
 }
 
 /* Placeholder and input text fixes */
