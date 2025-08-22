@@ -33,7 +33,12 @@ import {
   Lock,
   Gift,
   X,
-  ChevronDown
+  ChevronDown,
+  Grid,
+  Sun,
+  CalendarCheck,
+  Flag,
+  Crown
 } from 'lucide-react';
 
 interface Achievement {
@@ -245,12 +250,12 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
   });
 
   const categories = [
-    { id: 'all', name: 'All', icon: Trophy },
-    { id: 'daily', name: 'Daily', icon: Calendar },
-    { id: 'weekly', name: 'Weekly', icon: TrendingUp },
-    { id: 'monthly', name: 'Monthly', icon: Star },
-    { id: 'milestone', name: 'Milestones', icon: Target },
-    { id: 'special', name: 'Special', icon: Award }
+    { id: 'all', name: 'All', icon: Grid },
+    { id: 'daily', name: 'Daily', icon: Sun },
+    { id: 'weekly', name: 'Weekly', icon: Calendar },
+    { id: 'monthly', name: 'Monthly', icon: CalendarCheck },
+    { id: 'milestone', name: 'Milestones', icon: Flag },
+    { id: 'special', name: 'Special', icon: Crown }
   ];
 
   const difficultyColors = {
@@ -579,7 +584,7 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
         </div>
 
         {/* Category Filter */}
-        <div className="flex flex-wrap justify-center gap-8 my-8">
+        <div className="grid grid-cols-3 lg:grid-cols-6 gap-6 my-8">
           {categories.map((category) => {
             const IconComponent = category.icon;
             const isActive = selectedCategory === category.id;
@@ -587,21 +592,34 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
               <div
                 key={category.id}
                 onClick={() => setSelectedCategory(category.id)}
-                className="cursor-pointer transition-all duration-300 transform hover:scale-110"
+                className="cursor-pointer transition-all duration-300 transform hover:scale-105 flex flex-col items-center space-y-2"
               >
-                <IconComponent 
-                  className={`w-16 h-16 transition-all duration-300 ${
-                    isActive 
-                      ? 'text-blue-600' 
-                      : 'text-gray-600 hover:text-blue-500'
-                  }`}
-                  strokeWidth={2.5}
-                  style={{
-                    filter: isActive 
-                      ? 'drop-shadow(0 8px 16px rgba(37, 99, 235, 0.4)) drop-shadow(0 4px 8px rgba(37, 99, 235, 0.6)) drop-shadow(0 2px 4px rgba(255,255,255,0.8))' 
-                      : 'drop-shadow(0 4px 12px rgba(0,0,0,0.3)) drop-shadow(0 2px 6px rgba(0,0,0,0.2)) drop-shadow(0 1px 3px rgba(255,255,255,0.7))'
-                  }}
-                />
+                <div className={`p-4 rounded-2xl transition-all duration-300 ${
+                  isActive 
+                    ? 'bg-gradient-to-br from-blue-500 to-purple-600 shadow-lg shadow-blue-500/30'
+                    : 'bg-white/70 hover:bg-white/90 shadow-md hover:shadow-lg'
+                }`}>
+                  <IconComponent 
+                    className={`w-8 h-8 transition-all duration-300 ${
+                      isActive 
+                        ? 'text-white' 
+                        : 'text-gray-700 hover:text-blue-600'
+                    }`}
+                    strokeWidth={2}
+                    style={{
+                      filter: isActive 
+                        ? 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' 
+                        : 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))'
+                    }}
+                  />
+                </div>
+                <span className={`text-sm font-medium transition-all duration-300 ${
+                  isActive 
+                    ? 'text-blue-600 font-bold' 
+                    : 'text-gray-700'
+                }`}>
+                  {category.name}
+                </span>
               </div>
             );
           })}
