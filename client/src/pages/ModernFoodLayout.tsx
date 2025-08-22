@@ -176,6 +176,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           variant: "default",
           duration: 3000,
         });
+        // Add bell notification
+        addNotification('success', 'Daily Hydration Goal! 💧', 'You\'ve reached your 8-glass water goal today!');
+      }
+      
+      // Milestone notifications for water intake
+      if (newGlasses === 4 && (localStats.waterGlasses || 0) < 4) {
+        addNotification('info', 'Halfway There! 💧', 'You\'ve had 4 glasses of water today. Keep going!');
       }
       
       // Auto-sync to Apple Health if enabled
@@ -215,6 +222,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           variant: "default",
           duration: 3000,
         });
+        // Add bell notification
+        addNotification('success', 'Daily Hydration Goal! 💧', 'You\'ve reached your 8-glass water goal today!');
+      }
+      
+      // Milestone notifications for water intake
+      if (newGlasses === 4 && (dailyStats?.waterGlasses || 0) < 4) {
+        addNotification('info', 'Halfway There! 💧', 'You\'ve had 4 glasses of water today. Keep going!');
       }
       
       // Auto-sync to Apple Health if enabled
@@ -541,8 +555,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       };
       setCurrentAchievement(achievement);
       setShowAchievement(true);
+      
+      // Add bell notification for achievement
+      addNotification('achievement', achievement.title, achievement.message);
     }
-  }, [celebrationAchievement]);
+  }, [celebrationAchievement, addNotification]);
 
   // Listen for goal achievements and trigger confetti
   useEffect(() => {
@@ -567,6 +584,29 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     window.addEventListener('achievement-unlocked', handleGoalAchievement);
     return () => window.removeEventListener('achievement-unlocked', handleGoalAchievement);
   }, [addNotification]);
+  
+  // Monitor daily calorie goals and trigger notifications
+  useEffect(() => {
+    if (dailyStats && goalCalories > 0) {
+      const { totalCalories } = dailyStats;
+      const progress = (totalCalories / goalCalories) * 100;
+      
+      // Goal achievement notifications
+      if (totalCalories >= goalCalories && (dailyCalories < goalCalories || dailyCalories === 0)) {
+        addNotification('success', 'Daily Calorie Goal! 🎯', `Congratulations! You've reached your ${goalCalories} calorie goal today.`);
+      }
+      
+      // Milestone notifications
+      if (progress >= 75 && (dailyCalories / goalCalories) * 100 < 75) {
+        addNotification('info', '75% Complete! 🍽️', `You're almost there! ${Math.round(goalCalories - totalCalories)} calories to go.`);
+      } else if (progress >= 50 && (dailyCalories / goalCalories) * 100 < 50) {
+        addNotification('info', 'Halfway There! 🥗', `You've hit 50% of your daily calorie goal. Keep it up!`);
+      }
+      
+      // Update tracked calories
+      setDailyCalories(totalCalories);
+    }
+  }, [dailyStats, goalCalories, dailyCalories, addNotification]);
 
   // Load data on component mount (for both authenticated and unauthenticated users)
   useEffect(() => {
@@ -779,9 +819,23 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     }, 60000); // Check every minute
 
     // Set up event listeners for future meal logging
-    const handleMealLogged = () => {
+    const handleMealLogged = (event?: any) => {
       try {
         loadExistingData();
+        
+        // Add notification for meal logging
+        if (event?.detail) {
+          const { foodName, calories, mealType, protein } = event.detail;
+          addNotification(
+            'success', 
+            'Meal Logged! 🍽️', 
+            `Added ${foodName || 'food item'} (${calories || 0} cal${protein ? `, ${protein}g protein` : ''}) to ${mealType || 'your meals'}`
+          );
+        } else {
+          // Generic meal logged notification when no details available
+          addNotification('success', 'Meal Updated! 🍽️', 'Your nutrition data has been updated');
+        }
+        
         // Don't dispatch circular events - let other components handle their own refresh
       } catch (error) {
         // Handle errors silently to avoid console spam
@@ -807,11 +861,26 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       }
     };
 
+    // Handle fasting events
+    const handleFastingCompleted = (event: any) => {
+      const { planName, duration, message } = event.detail;
+      addNotification('success', `Fasting Complete! 🎉`, message);
+    };
+    
+    const handleFastingMilestone = (event: any) => {
+      const { hours, title, message } = event.detail;
+      if (hours >= 12) { // Only notify for significant milestones
+        addNotification('achievement', title, message);
+      }
+    };
+
     // Add event listeners with unique references to avoid conflicts
     const eventsToAdd = [
       { type: 'calories-logged', handler: handleMealLogged },
       { type: 'meal-logged-success', handler: handleMealLogged },
-      { type: 'navigate-to-tab', handler: handleTourNavigation }
+      { type: 'navigate-to-tab', handler: handleTourNavigation },
+      { type: 'fasting-completed', handler: handleFastingCompleted },
+      { type: 'fasting-milestone', handler: handleFastingMilestone }
     ];
 
     eventsToAdd.forEach(({ type, handler }) => {

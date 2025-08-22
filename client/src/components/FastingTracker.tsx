@@ -534,7 +534,8 @@ export function FastingTracker() {
         hours,
         title,
         description,
-        celebration
+        celebration,
+        message: `${title} - ${description}`
       }
     }));
 
@@ -578,6 +579,15 @@ export function FastingTracker() {
               duration: 8000,
             });
           }
+          
+          // Dispatch fasting completion event for notifications
+          window.dispatchEvent(new CustomEvent('fasting-completed', {
+            detail: {
+              planName: selectedPlan.name,
+              duration: Math.round(targetHours),
+              message: `You completed a ${Math.round(targetHours)}-hour ${selectedPlan.name} fast! Time to break your fast with a nutritious meal.`
+            }
+          }));
           
           setTimeRemaining(0);
           localStorage.removeItem(FASTING_SESSION_KEY);
