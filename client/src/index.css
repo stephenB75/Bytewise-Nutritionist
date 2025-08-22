@@ -154,13 +154,13 @@ button.btn-hero-enhanced span,
 .text-gray-100.opacity-95 { color: #1f2937 !important; }
 .opacity-95 { opacity: 0.95 !important; } /* Maintain intended transparency */
 
-/* Fix ALL remaining white and light text - except hero components */
-.text-white.text-lg:not(.hero-component *):not([data-hero="true"] *) { color: #374151 !important; }
-.text-white.text-xl:not(.hero-component *):not([data-hero="true"] *) { color: #374151 !important; }
-.text-white.text-2xl:not(.hero-component *):not([data-hero="true"] *) { color: #374151 !important; }
-.text-white.text-6xl:not(.hero-component *):not([data-hero="true"] *) { color: #374151 !important; }
-.text-white.text-7xl:not(.hero-component *):not([data-hero="true"] *) { color: #374151 !important; }
-.text-white.text-8xl:not(.hero-component *):not([data-hero="true"] *) { color: #374151 !important; }
+/* Fix ALL remaining white and light text - except hero components and metrics cards */
+.text-white.text-lg:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *) { color: #374151 !important; }
+.text-white.text-xl:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *) { color: #374151 !important; }
+.text-white.text-2xl:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *) { color: #374151 !important; }
+.text-white.text-6xl:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *) { color: #374151 !important; }
+.text-white.text-7xl:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *) { color: #374151 !important; }
+.text-white.text-8xl:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *) { color: #374151 !important; }
 
 /* Hero text sizes - keep white for visibility on dark overlay */
 .hero-component .text-white.text-lg,
@@ -441,14 +441,14 @@ button[data-testid="button-notifications"] .blur-lg {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 4px 16px rgba(0, 0, 0, 0.05) !important;
 }
 
-/* Comprehensive white text fixes for ALL remaining cases - except hero and navigation */
-span.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *) { color: #374151 !important; }
-div.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *) { color: #374151 !important; }
-h1.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *), 
-h2.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *), 
-h3.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *), 
-h4.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *) { color: #374151 !important; }
-p.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *) { color: #374151 !important; }
+/* Comprehensive white text fixes for ALL remaining cases - except hero, navigation, and metrics cards */
+span.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *):not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *) { color: #374151 !important; }
+div.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *):not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *) { color: #374151 !important; }
+h1.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *):not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *), 
+h2.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *):not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *), 
+h3.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *):not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *), 
+h4.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *):not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *) { color: #374151 !important; }
+p.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *):not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *) { color: #374151 !important; }
 
 /* Hero white text elements - keep white for dark overlay visibility */
 .hero-component span.text-white,
@@ -918,18 +918,18 @@ button.text-blue-400 {
   color: #ffffff !important;
 }
 
-/* Global gradient background ensures dark text for readability */
-body *:not([class*="text-"]):not([class*="bg-"]):not(.text-white):not([class*="text-cyan"]):not([class*="text-orange"]):not([class*="text-red"]):not([class*="text-blue"]):not([class*="text-green"]) {
+/* Global gradient background ensures dark text for readability - EXCLUDE metrics cards */
+body *:not([class*="text-"]):not([class*="bg-"]):not(.text-white):not([class*="text-cyan"]):not([class*="text-orange"]):not([class*="text-red"]):not([class*="text-blue"]):not([class*="text-green"]):not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *) {
   color: #1f2937 !important;
 }
 
-/* Ensure specific text elements are dark on gradient background */
-body h1:not([class*="text-"]):not(.text-white),
-body h2:not([class*="text-"]):not(.text-white),
-body h3:not([class*="text-"]):not(.text-white),
-body p:not([class*="text-"]):not(.text-white),
-body span:not([class*="text-"]):not(.text-white),
-body div:not([class*="text-"]):not(.text-white) {
+/* Ensure specific text elements are dark on gradient background - EXCLUDE metrics cards */
+body h1:not([class*="text-"]):not(.text-white):not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *),
+body h2:not([class*="text-"]):not(.text-white):not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *),
+body h3:not([class*="text-"]):not(.text-white):not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *),
+body p:not([class*="text-"]):not(.text-white):not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *),
+body span:not([class*="text-"]):not(.text-white):not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *),
+body div:not([class*="text-"]):not(.text-white):not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *) {
   color: #1f2937 !important;
 }
 
@@ -975,11 +975,15 @@ button[data-testid*="nav-"] {
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
 }
 
-/* Override any conflicting text colors in metrics cards - MAXIMUM PRIORITY */
+/* Override any conflicting text colors in metrics cards - ULTIMATE PRIORITY */
 [data-page="dashboard"] [data-testid*="progress"] *,
 [data-page="dashboard"] [data-testid*="water"] *,
 [data-page="dashboard"] [data-testid*="macro"] *,
 [data-page="dashboard"] [data-testid*="micro"] *,
+[data-testid*="progress"] *,
+[data-testid*="water"] *,
+[data-testid*="macro"] *,
+[data-testid*="micro"] *,
 [data-testid*="progress"] .text-gray-900,
 [data-testid*="progress"] .text-gray-800,
 [data-testid*="water"] .text-gray-900,
