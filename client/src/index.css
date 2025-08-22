@@ -190,35 +190,81 @@ button.btn-hero-enhanced span,
 .text-white.text-7xl:not(.hero-component *):not([data-hero="true"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *) { color: #374151 !important; }
 .text-white.text-8xl:not(.hero-component *):not([data-hero="true"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *) { color: #374151 !important; }
 
-/* Hero text sizes - keep white for visibility on dark overlay */
-.hero-component .text-white.text-lg,
-.hero-component .text-white.text-xl,
-.hero-component .text-white.text-2xl,
-.hero-component .text-white.text-6xl,
-.hero-component .text-white.text-7xl,
-.hero-component .text-white.text-8xl,
-[data-hero="true"] .text-white.text-lg,
-[data-hero="true"] .text-white.text-xl,
-[data-hero="true"] .text-white.text-2xl,
-[data-hero="true"] .text-white.text-6xl,
-[data-hero="true"] .text-white.text-7xl,
-[data-hero="true"] .text-white.text-8xl { 
+/* Hero text sizes - vibrant colors for headlines, white for other text */
+.hero-component .text-white.text-lg:not(h1):not(h2):not(h3):not(h4):not(h5):not(h6),
+.hero-component .text-white.text-xl:not(h1):not(h2):not(h3):not(h4):not(h5):not(h6),
+[data-hero="true"] .text-white.text-lg:not(h1):not(h2):not(h3):not(h4):not(h5):not(h6),
+[data-hero="true"] .text-white.text-xl:not(h1):not(h2):not(h3):not(h4):not(h5):not(h6) { 
   color: #ffffff !important; 
 }
 
-/* Hero section specific fixes - light colors for dark overlays */
+/* Large hero headlines with vibrant colors */
+.hero-component h1.text-2xl,
+.hero-component h1.text-6xl,
+.hero-component h1.text-7xl,
+.hero-component h1.text-8xl,
+[data-hero="true"] h1.text-2xl,
+[data-hero="true"] h1.text-6xl,
+[data-hero="true"] h1.text-7xl,
+[data-hero="true"] h1.text-8xl { 
+  color: #22d3ee !important; /* Bright cyan for large h1 */
+  text-shadow: 0 3px 6px rgba(0, 0, 0, 0.6) !important;
+}
+
+.hero-component h2.text-lg,
+.hero-component h2.text-xl,
+.hero-component h2.text-2xl,
+[data-hero="true"] h2.text-lg,
+[data-hero="true"] h2.text-xl,
+[data-hero="true"] h2.text-2xl { 
+  color: #fbbf24 !important; /* Bright amber for h2 */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
+.hero-component h3.text-lg,
+.hero-component h3.text-xl,
+[data-hero="true"] h3.text-lg,
+[data-hero="true"] h3.text-xl { 
+  color: #10b981 !important; /* Bright emerald for h3 */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Hero headlines - vibrant colors for dark overlays */
 .hero-component h1.text-white,
-[data-hero="true"] h1.text-white { 
+.hero-component h1,
+[data-hero="true"] h1.text-white,
+[data-hero="true"] h1 { 
+  color: #22d3ee !important; /* Bright cyan for primary headlines */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
+.hero-component h2.text-white,
+.hero-component h2,
+[data-hero="true"] h2.text-white,
+[data-hero="true"] h2 { 
+  color: #fbbf24 !important; /* Bright amber for secondary headlines */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
+.hero-component h3.text-white,
+.hero-component h3,
+[data-hero="true"] h3.text-white,
+[data-hero="true"] h3 { 
+  color: #10b981 !important; /* Bright emerald for tertiary headlines */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Dashboard hero text - vibrant headlines, white for other elements */
+[data-page="dashboard"] .text-white:not(h1):not(h2):not(h3):not(h4):not(h5):not(h6),
+[data-page="dashboard"] .hero-component .text-white:not(h1):not(h2):not(h3):not(h4):not(h5):not(h6) { 
   color: #ffffff !important; 
 }
 
-/* Dashboard page hero text - lighter for better visibility */
-[data-page="dashboard"] h1,
-[data-page="dashboard"] .text-white,
-[data-page="dashboard"] h1.text-white,
-[data-page="dashboard"] .hero-component h1.text-white,
-[data-page="dashboard"] .hero-component .text-white { 
-  color: #ffffff !important; 
+/* Non-hero headings stay dark for regular content */
+[data-page="dashboard"] h1:not(.hero-component *):not([data-hero="true"] *),
+[data-page="dashboard"] h2:not(.hero-component *):not([data-hero="true"] *),
+[data-page="dashboard"] h3:not(.hero-component *):not([data-hero="true"] *) {
+  color: #111827 !important; /* Dark for yellow background */
 }
 
 [data-page="dashboard"] p,
@@ -249,8 +295,22 @@ button.btn-hero-enhanced span,
   color: #ffffff !important;
 }
 
-/* Dashboard hero overlay text fixes */
-[data-page="dashboard"] .absolute.inset-0 h1,
+/* Dashboard hero overlay - vibrant headlines, white for other text */
+[data-page="dashboard"] .absolute.inset-0 h1 {
+  color: #22d3ee !important; /* Bright cyan for overlay h1 */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-page="dashboard"] .absolute.inset-0 h2 {
+  color: #fbbf24 !important; /* Bright amber for overlay h2 */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-page="dashboard"] .absolute.inset-0 h3 {
+  color: #10b981 !important; /* Bright emerald for overlay h3 */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
 [data-page="dashboard"] .absolute.inset-0 p,
 [data-page="dashboard"] .absolute.inset-0 span {
   color: #ffffff !important;
@@ -288,20 +348,33 @@ button.btn-hero-enhanced span,
   color: #111827 !important; /* Dark for yellow background */
 }
 
-/* Hero headings keep white text for dark overlays */
+/* Dashboard hero headings - vibrant colors for visual hierarchy */
 [data-page="dashboard"] .hero-component h1,
+[data-page="dashboard"] [data-hero="true"] h1 {
+  color: #22d3ee !important; /* Bright cyan for h1 */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
 [data-page="dashboard"] .hero-component h2,
+[data-page="dashboard"] [data-hero="true"] h2 {
+  color: #fbbf24 !important; /* Bright amber for h2 */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
 [data-page="dashboard"] .hero-component h3,
+[data-page="dashboard"] [data-hero="true"] h3 {
+  color: #10b981 !important; /* Bright emerald for h3 */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
 [data-page="dashboard"] .hero-component h4,
 [data-page="dashboard"] .hero-component h5,
 [data-page="dashboard"] .hero-component h6,
-[data-page="dashboard"] [data-hero="true"] h1,
-[data-page="dashboard"] [data-hero="true"] h2,
-[data-page="dashboard"] [data-hero="true"] h3,
 [data-page="dashboard"] [data-hero="true"] h4,
 [data-page="dashboard"] [data-hero="true"] h5,
 [data-page="dashboard"] [data-hero="true"] h6 {
-  color: #ffffff !important;
+  color: #a855f7 !important; /* Purple for smaller headlines */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
 
 /* Dashboard spans and divs - dark for yellow background, EXCLUDE hero components and metrics cards */
@@ -534,19 +607,31 @@ p.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*=
 /* Hero white text elements - keep white for dark overlay visibility */
 .hero-component span.text-white,
 .hero-component div.text-white,
-.hero-component h1.text-white, 
-.hero-component h2.text-white, 
-.hero-component h3.text-white, 
+/* Hero elements with specific colors - headlines get vibrant colors, others stay white */
 .hero-component h4.text-white,
+.hero-component h5.text-white,
+.hero-component h6.text-white,
 .hero-component p.text-white,
-[data-hero="true"] span.text-white,
-[data-hero="true"] div.text-white,
-[data-hero="true"] h1.text-white, 
-[data-hero="true"] h2.text-white, 
-[data-hero="true"] h3.text-white, 
+.hero-component span.text-white,
+.hero-component div.text-white,
 [data-hero="true"] h4.text-white,
-[data-hero="true"] p.text-white { 
+[data-hero="true"] h5.text-white,
+[data-hero="true"] h6.text-white,
+[data-hero="true"] p.text-white,
+[data-hero="true"] span.text-white,
+[data-hero="true"] div.text-white { 
   color: #ffffff !important; 
+}
+
+/* Hero headline hierarchy with vibrant colors */
+.hero-component h4,
+.hero-component h5,
+.hero-component h6,
+[data-hero="true"] h4,
+[data-hero="true"] h5,
+[data-hero="true"] h6 { 
+  color: #a855f7 !important; /* Purple for smaller headlines */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
 
 /* Button text in hero sections */
@@ -2959,10 +3044,39 @@ select {
   color: white;
 }
 
-/* Hero components text - comprehensive white text for dark overlays */
-.hero-component *:not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
-[data-hero="true"] *:not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *) {
+/* Hero components text - vibrant headlines, white for other elements */
+.hero-component *:not(h1):not(h2):not(h3):not(h4):not(h5):not(h6):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
+[data-hero="true"] *:not(h1):not(h2):not(h3):not(h4):not(h5):not(h6):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *) {
   color: white !important;
+}
+
+/* Override to ensure hero headlines get vibrant colors */
+.hero-component h1,
+[data-hero="true"] h1 {
+  color: #22d3ee !important; /* Bright cyan for all h1 */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
+.hero-component h2,
+[data-hero="true"] h2 {
+  color: #fbbf24 !important; /* Bright amber for all h2 */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
+.hero-component h3,
+[data-hero="true"] h3 {
+  color: #10b981 !important; /* Bright emerald for all h3 */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
+.hero-component h4,
+.hero-component h5,
+.hero-component h6,
+[data-hero="true"] h4,
+[data-hero="true"] h5,
+[data-hero="true"] h6 {
+  color: #a855f7 !important; /* Purple for smaller headlines */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
 
 /* Force all buttons in hero components to have white text - HIGHEST PRIORITY */
