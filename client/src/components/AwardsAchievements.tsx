@@ -580,11 +580,12 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
             <span className="text-gray-900" style={{ fontFamily: "'Work Sans', sans-serif" }}>Overall Progress</span>
             <span className="text-gray-950 font-medium" style={{ fontFamily: "'Work Sans', sans-serif" }}>{Math.round(progressPercentage)}%</span>
           </div>
-          <Progress 
-            value={progressPercentage} 
-            className="h-3 bg-blue-100" 
-            style={{ backgroundColor: '#dbeafe' }}
-          />
+          <div className="relative w-full bg-blue-100 rounded-full h-3" style={{ backgroundColor: '#dbeafe' }}>
+            <div 
+              className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-300"
+              style={{ width: `${progressPercentage}%` }}
+            />
+          </div>
         </div>
 
         {/* Category Filter */}
@@ -707,16 +708,17 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
                     </div>
                     
                     <div className="relative">
-                      <Progress 
-                        value={achievement.completed ? 100 : Math.min(100, (achievement.progress / achievement.target) * 100)} 
-                        className={`h-3 ${achievement.completed ? 'bg-green-100' : 'bg-blue-100'}`}
-                        style={{
-                          backgroundColor: achievement.completed ? '#dcfce7' : '#dbeafe'
-                        }}
-                      />
-                      {achievement.completed && (
-                        <div className="absolute inset-0 bg-gradient-to-r from-[#45c73e] to-[#3ab82e] rounded-full h-3" />
-                      )}
+                      <div className={`relative w-full rounded-full h-3 ${achievement.completed ? 'bg-green-100' : 'bg-blue-100'}`}
+                           style={{ backgroundColor: achievement.completed ? '#dcfce7' : '#dbeafe' }}>
+                        <div 
+                          className={`h-3 rounded-full transition-all duration-300 ${
+                            achievement.completed 
+                              ? 'bg-gradient-to-r from-green-500 to-green-600' 
+                              : 'bg-gradient-to-r from-blue-500 to-blue-600'
+                          }`}
+                          style={{ width: `${achievement.completed ? 100 : Math.min(100, (achievement.progress / achievement.target) * 100)}%` }}
+                        />
+                      </div>
                     </div>
                   </div>
                   
