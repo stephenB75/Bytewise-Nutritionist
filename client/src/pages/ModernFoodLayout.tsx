@@ -4,11 +4,12 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import CalorieCalculator from '@/components/CalorieCalculator';
 import { UserSettingsManager } from '@/components/UserSettingsManager';
 import { SignOnModule } from '@/components/SignOnModule';
@@ -52,7 +53,9 @@ import {
   ArrowRight,
   PlayCircle,
   MapPin,
-  GraduationCap
+  GraduationCap,
+  Play,
+  Camera
 } from 'lucide-react';
 import { NotificationDropdown } from '@/components/NotificationDropdown';
 import { WeeklyCaloriesCard } from '@/components/WeeklyCaloriesCard';
