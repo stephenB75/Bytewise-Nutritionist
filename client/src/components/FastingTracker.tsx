@@ -775,8 +775,8 @@ export function FastingTracker() {
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case 'Beginner': return 'bg-green-100 text-green-800';
-      case 'Intermediate': return 'bg-yellow-100 text-yellow-800';
+      case 'Beginner': return 'bg-blue-100 text-blue-800';
+      case 'Intermediate': return 'bg-orange-100 text-orange-800';
       case 'Advanced': return 'bg-red-100 text-red-800';
       default: return 'bg-gradient-to-br from-amber-100 to-amber-200 text-gray-800';
     }
@@ -831,7 +831,7 @@ export function FastingTracker() {
                     )}
                     {selectedPlan.name}
                   </CardTitle>
-                  <CardDescription>{selectedPlan.description}</CardDescription>
+                  <CardDescription className="text-gray-700">{selectedPlan.description}</CardDescription>
                 </div>
                 <Badge className={getDifficultyColor(selectedPlan.difficulty)}>
                   {selectedPlan.difficulty}
@@ -1012,7 +1012,7 @@ export function FastingTracker() {
                       {plan.difficulty}
                     </Badge>
                   </div>
-                  <CardDescription>{plan.description}</CardDescription>
+                  <CardDescription className="text-gray-700">{plan.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
