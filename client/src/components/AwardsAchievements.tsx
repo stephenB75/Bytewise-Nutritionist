@@ -579,40 +579,30 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
         </div>
 
         {/* Category Filter */}
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 my-6">
+        <div className="flex flex-wrap justify-center gap-8 my-8">
           {categories.map((category) => {
             const IconComponent = category.icon;
             const isActive = selectedCategory === category.id;
             return (
-              <Button
+              <div
                 key={category.id}
-                variant="outline"
-                size="lg"
                 onClick={() => setSelectedCategory(category.id)}
-                className={`h-32 w-full min-w-[160px] max-w-[180px] p-6 flex flex-col items-center justify-center space-y-3 transition-all duration-300 ${
-                  isActive
-                    ? 'bg-gradient-to-br from-blue-600 via-green-500 to-emerald-400 text-white shadow-2xl border-3 border-white/40 transform scale-105 shadow-blue-500/25' 
-                    : 'bg-gradient-to-br from-white via-gray-50 to-white text-gray-800 border-3 border-gray-300/70 hover:border-blue-400 hover:shadow-xl hover:shadow-blue-200/30 hover:scale-102 shadow-lg shadow-gray-300/40'
-                } rounded-3xl backdrop-blur-sm relative`}
+                className="cursor-pointer transition-all duration-300 transform hover:scale-110"
               >
                 <IconComponent 
-                  className={`w-12 h-12 ${isActive ? 'text-white drop-shadow-lg filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.3)]' : 'text-gray-700 drop-shadow-lg filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.2)]'}`}
-                  strokeWidth={3}
+                  className={`w-16 h-16 transition-all duration-300 ${
+                    isActive 
+                      ? 'text-blue-600' 
+                      : 'text-gray-600 hover:text-blue-500'
+                  }`}
+                  strokeWidth={2.5}
                   style={{
                     filter: isActive 
-                      ? 'drop-shadow(0 4px 8px rgba(0,0,0,0.4)) drop-shadow(0 2px 4px rgba(255,255,255,0.2))' 
-                      : 'drop-shadow(0 2px 6px rgba(0,0,0,0.3)) drop-shadow(0 1px 2px rgba(255,255,255,0.6))'
+                      ? 'drop-shadow(0 8px 16px rgba(37, 99, 235, 0.4)) drop-shadow(0 4px 8px rgba(37, 99, 235, 0.6)) drop-shadow(0 2px 4px rgba(255,255,255,0.8))' 
+                      : 'drop-shadow(0 4px 12px rgba(0,0,0,0.3)) drop-shadow(0 2px 6px rgba(0,0,0,0.2)) drop-shadow(0 1px 3px rgba(255,255,255,0.7))'
                   }}
                 />
-                <div className="text-center">
-                  <div className={`text-base font-bold ${isActive ? 'text-white drop-shadow-sm' : 'text-gray-800'}`}>
-                    {category.name}
-                  </div>
-                </div>
-                {isActive && (
-                  <div className="absolute top-2 right-2 w-2 h-2 bg-white rounded-full animate-pulse"></div>
-                )}
-              </Button>
+              </div>
             );
           })}
         </div>
