@@ -791,8 +791,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     // Handle tour navigation
     const handleTourNavigation = (event: Event) => {
       const customEvent = event as CustomEvent;
-      const { tab } = customEvent.detail;
+      const { tab, nutritionMode } = customEvent.detail;
       setActiveTab(tab);
+      
+      // Set nutrition mode if specified
+      if (nutritionMode && (nutritionMode === 'ai' || nutritionMode === 'calculator')) {
+        setNutritionMode(nutritionMode);
+      }
     };
 
     // Add event listeners with unique references to avoid conflicts

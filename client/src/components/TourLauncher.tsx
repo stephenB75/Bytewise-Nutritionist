@@ -33,21 +33,24 @@ const TOUR_FEATURES = [
     title: 'Smart Food Search',
     description: 'Search 300,000+ USDA foods with brand recognition',
     category: 'Core Feature',
-    targetTab: 'nutrition'
+    targetTab: 'nutrition',
+    nutritionMode: 'calculator'
   },
   {
     icon: <Camera className="w-5 h-5 text-purple-500" />,
     title: 'AI Photo Analysis',
     description: 'Snap photos for instant nutrition breakdown',
     category: 'AI Feature',
-    targetTab: 'nutrition'
+    targetTab: 'nutrition',
+    nutritionMode: 'ai'
   },
   {
     icon: <Target className="w-5 h-5 text-green-500" />,
     title: 'Calorie Calculator',
     description: 'Instant nutrition facts with portion warnings',
     category: 'Core Feature',
-    targetTab: 'nutrition'
+    targetTab: 'nutrition',
+    nutritionMode: 'calculator'
   },
   {
     icon: <Clock className="w-5 h-5 text-orange-500" />,
@@ -80,15 +83,18 @@ export function TourLauncher({ isVisible = true, onNavigateToFeature }: TourLaun
   const handleFeatureClick = (feature: any) => {
     setIsPreviewOpen(false);
     
-    // Navigate to the feature's page/tab
+    // Navigate to the feature's page/tab with mode information
     if (onNavigateToFeature) {
       onNavigateToFeature(feature.targetTab);
-    } else {
-      // Fallback: use custom event to communicate with parent layout
-      window.dispatchEvent(new CustomEvent('navigate-to-tab', {
-        detail: { tab: feature.targetTab }
-      }));
     }
+    
+    // Always send custom event with both tab and mode info
+    window.dispatchEvent(new CustomEvent('navigate-to-tab', {
+      detail: { 
+        tab: feature.targetTab,
+        nutritionMode: feature.nutritionMode
+      }
+    }));
   };
 
 
