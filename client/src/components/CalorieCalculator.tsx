@@ -934,7 +934,7 @@ function CalorieCalculator({
                   )}
                   <Button
                     onClick={() => logToWeeklyTracker(analysis)}
-                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
+                    className="w-full bg-gradient-to-r from-purple-400 to-blue-400 hover:from-purple-500 hover:to-blue-500 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
                   >
                     <Calendar className="w-5 h-5 mr-2" />
                     Log to Weekly Tracker
