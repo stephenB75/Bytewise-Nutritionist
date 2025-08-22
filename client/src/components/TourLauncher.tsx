@@ -34,21 +34,21 @@ const TOUR_FEATURES = [
     title: 'Smart Food Search',
     description: 'Search 300,000+ USDA foods with brand recognition',
     category: 'Core Feature',
-    targetTab: 'calorie-tracker'
+    targetTab: 'nutrition'
   },
   {
     icon: <Camera className="w-5 h-5 text-purple-500" />,
     title: 'AI Photo Analysis',
     description: 'Snap photos for instant nutrition breakdown',
     category: 'AI Feature',
-    targetTab: 'ai-analyzer'
+    targetTab: 'nutrition'
   },
   {
     icon: <Target className="w-5 h-5 text-green-500" />,
     title: 'Calorie Calculator',
     description: 'Instant nutrition facts with portion warnings',
     category: 'Core Feature',
-    targetTab: 'calorie-tracker'
+    targetTab: 'nutrition'
   },
   {
     icon: <Clock className="w-5 h-5 text-orange-500" />,
@@ -62,7 +62,7 @@ const TOUR_FEATURES = [
     title: 'Achievement System',
     description: 'Unlock rewards as you hit your goals',
     category: 'Motivation',
-    targetTab: 'achievements'
+    targetTab: 'profile'
   },
   {
     icon: <Droplets className="w-5 h-5 text-cyan-500" />,

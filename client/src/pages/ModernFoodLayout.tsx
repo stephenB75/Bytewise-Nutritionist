@@ -789,8 +789,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     };
 
     // Handle tour navigation
-    const handleTourNavigation = (event: CustomEvent) => {
-      const { tab } = event.detail;
+    const handleTourNavigation = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const { tab } = customEvent.detail;
       setActiveTab(tab);
     };
 
