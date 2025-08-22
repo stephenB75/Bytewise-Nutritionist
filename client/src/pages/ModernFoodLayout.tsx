@@ -977,9 +977,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 {title}
               </h1>
               <h1 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] animate-fadeInUp [animation-delay:0.4s] font-league-spartan text-optimized">
-                <span className="bg-gradient-to-r from-orange-400 via-orange-500 to-red-500 bg-clip-text text-transparent drop-shadow-2xl animate-[text-shimmer_3s_ease-in-out_infinite]">
-                  {subtitle}
-                </span>
+                {subtitle}
               </h1>
             </div>
             
