@@ -144,7 +144,7 @@ export function TourLauncher({ onStartTour, isVisible = true }: TourLauncherProp
   const showTourMessage = (title: string, message: string) => {
     // Create a custom tour tooltip
     const tourTooltip = document.createElement('div');
-    tourTooltip.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white p-4 rounded-lg shadow-lg z-[9999] max-w-sm mx-4';
+    tourTooltip.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-br from-amber-100 to-amber-200 text-gray-900 p-4 rounded-lg shadow-lg border border-amber-300 z-[9999] max-w-sm mx-4';
     tourTooltip.innerHTML = `
       <div class="font-bold text-lg mb-2">${title}</div>
       <div class="text-sm">${message}</div>
@@ -165,7 +165,7 @@ export function TourLauncher({ onStartTour, isVisible = true }: TourLauncherProp
     <>
       {/* Tour Running Indicator */}
       {isTourRunning && (
-        <div className="fixed top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded-full text-xs z-[9998]">
+        <div className="fixed top-4 right-4 bg-gradient-to-r from-amber-100 to-amber-200 text-gray-900 px-3 py-1 rounded-full text-xs z-[9998] border border-amber-300 shadow-lg">
           Tour in Progress... Step {tourStep}/10
         </div>
       )}
