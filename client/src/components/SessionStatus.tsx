@@ -68,8 +68,8 @@ export function SessionStatus() {
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm font-medium">
-            <Shield className="w-4 h-4 text-green-600 dark:text-green-400" />
-            <span className="text-gray-700 dark:text-gray-300">Session Status</span>
+            <Shield className="w-4 h-4 text-green-600" />
+            <span className="text-gray-900">Session Status</span>
           </div>
           <Button
             size="sm"
@@ -85,31 +85,31 @@ export function SessionStatus() {
 
         <div className="grid grid-cols-2 gap-3 text-xs">
           <div className="space-y-1">
-            <p className="text-gray-500 dark:text-gray-400">Session Started</p>
-            <p className="font-medium text-gray-700 dark:text-gray-300">
+            <p className="text-gray-600">Session Started</p>
+            <p className="font-medium text-gray-900">
               {formatDate(sessionInfo.sessionStart)}
             </p>
           </div>
 
           <div className="space-y-1">
-            <p className="text-gray-500 dark:text-gray-400">Last Refresh</p>
-            <p className="font-medium text-gray-700 dark:text-gray-300">
+            <p className="text-gray-600">Last Refresh</p>
+            <p className="font-medium text-gray-900">
               {formatDate(sessionInfo.lastRefresh)}
             </p>
           </div>
 
           <div className="space-y-1">
-            <p className="text-gray-500 dark:text-gray-400">Last Activity</p>
-            <p className="font-medium text-gray-700 dark:text-gray-300">
+            <p className="text-gray-600">Last Activity</p>
+            <p className="font-medium text-gray-900">
               {formatDate(sessionInfo.lastActivity)}
             </p>
           </div>
 
           <div className="space-y-1">
-            <p className="text-gray-500 dark:text-gray-400">Time Remaining</p>
+            <p className="text-gray-600">Time Remaining</p>
             <div className="flex items-center gap-1">
               <Clock className={`w-3 h-3 ${isExpiringSoon ? 'text-yellow-600' : 'text-green-600'}`} />
-              <p className={`font-medium ${isExpiringSoon ? 'text-yellow-600 dark:text-yellow-400' : 'text-green-600 dark:text-green-400'}`}>
+              <p className={`font-medium ${isExpiringSoon ? 'text-yellow-700' : 'text-green-700'}`}>
                 {formatTimeRemaining(timeRemaining)}
               </p>
             </div>
@@ -117,8 +117,8 @@ export function SessionStatus() {
         </div>
 
         {isExpiringSoon && (
-          <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
-            <p className="text-xs text-yellow-600 dark:text-yellow-400 flex items-center gap-1">
+          <div className="pt-2 border-t border-gray-300">
+            <p className="text-xs text-yellow-700 flex items-center gap-1">
               <Clock className="w-3 h-3" />
               Session expiring soon. Any activity will extend it.
             </p>
@@ -126,7 +126,7 @@ export function SessionStatus() {
         )}
 
         <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
-          <p className="text-xs text-gray-500 dark:text-gray-400">
+          <p className="text-xs text-gray-600">
             Your session stays active for 24 hours. It automatically refreshes with your activity.
           </p>
         </div>

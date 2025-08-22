@@ -275,7 +275,7 @@ export function WelcomeBanner({ onStartTour, onDismiss }: { onStartTour: () => v
               <Sparkles className="w-5 h-5 text-yellow-500" />
               <h3 className="font-semibold text-lg">Welcome to ByteWise Nutritionist! 🎉</h3>
             </div>
-            <p className="text-gray-600 dark:text-gray-300 text-sm mb-3">
+            <p className="text-gray-600 text-sm mb-3">
               Ready to discover all the amazing features? Take our comprehensive 10-step tour 
               covering food tracking, AI analysis, fasting, achievements, and more!
             </p>

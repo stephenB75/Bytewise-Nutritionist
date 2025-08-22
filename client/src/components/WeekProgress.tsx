@@ -99,7 +99,7 @@ export function WeekProgress({
         <div className="bg-gradient-to-br from-orange-50 to-red-50 p-4 rounded-xl border border-orange-100">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
-              <Flame className="w-4 h-4 text-white" />
+              <Flame className="w-4 h-4 text-amber-700" />
             </div>
             <div>
               <p className="text-sm font-medium text-gray-700">Total Calories</p>
@@ -112,7 +112,7 @@ export function WeekProgress({
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-4 rounded-xl border border-blue-100">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
-              <Activity className="w-4 h-4 text-white" />
+              <Activity className="w-4 h-4 text-amber-700" />
             </div>
             <div>
               <p className="text-sm font-medium text-gray-700">Daily Average</p>
@@ -125,7 +125,7 @@ export function WeekProgress({
         <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-xl border border-green-100">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
-              <Target className="w-4 h-4 text-white" />
+              <Target className="w-4 h-4 text-amber-700" />
             </div>
             <div>
               <p className="text-sm font-medium text-gray-700">Meals Logged</p>
@@ -147,7 +147,7 @@ export function WeekProgress({
         <div className="bg-gradient-to-br from-purple-50 to-violet-50 p-4 rounded-xl border border-purple-100">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
-              <TrendingUp className="w-4 h-4 text-white" />
+              <TrendingUp className="w-4 h-4 text-amber-700" />
             </div>
             <div>
               <p className="text-sm font-medium text-gray-700">Progress</p>

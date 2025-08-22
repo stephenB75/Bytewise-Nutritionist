@@ -53,6 +53,28 @@ The application includes an enhanced fasting timer with detailed progress tracki
 
 ## Recent Changes (August 2025)
 
+### Text Color Optimization for Amber Theme - August 22, 2025
+**Status**: ✅ **COMPLETED** - All components optimized with dark text for amber background
+
+**Component Text Color Updates:**
+- ✅ Updated all light text colors (text-white, text-gray-100/200/300) to darker variants
+- ✅ SessionStatus: Converted all dark theme references to amber-compatible colors
+- ✅ UserSettingsManager: Updated form inputs and labels to darker colors
+- ✅ FastingTracker: Changed Clock icon and difficulty badges to amber theme
+- ✅ WeekProgress: Updated all stat card icons to amber-700 for better visibility
+- ✅ ProfileCompletionModal: Removed dark theme references, improved form contrast
+- ✅ TourLauncher: Cleaned up dark theme text references
+- ✅ ConfettiCelebration: Complete text color overhaul for amber background compatibility
+- ✅ AppleHealthIntegration: Updated privacy notice background to amber gradient
+
+**Text Color Pattern Applied:**
+- Primary text: `text-gray-900` for maximum contrast on amber background
+- Secondary text: `text-gray-700` for medium emphasis
+- Tertiary text: `text-gray-600` for subtle information
+- Icon colors: `text-amber-700` for thematic consistency
+
+**Result**: Perfect readability and visual harmony across all components with the yellow/amber gradient background theme.
+
 ### Code Cleanup and Optimization - August 22, 2025
 **Status**: ✅ **COMPLETED** - Production-ready code optimization
 

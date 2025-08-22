@@ -535,18 +535,18 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                 <Input
                   value={userInfo.height}
                   onChange={(e) => setUserInfo(prev => ({ ...prev, height: e.target.value }))}
-                  className="bg-white/10 border-white/20 text-white placeholder-gray-400 w-full"
+                  className="bg-white/80 border-amber-300 text-gray-900 placeholder-gray-500 w-full"
                   placeholder="e.g., 5'8&quot; or 5 ft 8 in"
                 />
               ) : (
-                <p className="text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10 break-words">
+                <p className="text-gray-700 bg-gradient-to-br from-amber-50 to-amber-100 p-3 rounded-lg border border-amber-200/40 break-words">
                   {userInfo.height || 'Not provided'}
                 </p>
               )}
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm text-gray-300 font-medium flex items-center">
+              <label className="text-sm text-gray-700 font-medium flex items-center">
                 <Activity className="w-4 h-4 mr-2 text-blue-400" />
                 Weight (lbs)
               </label>
@@ -559,18 +559,18 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                     const kg = lbs / 2.20462;
                     setUserInfo(prev => ({ ...prev, weight: kg.toFixed(1) }));
                   }}
-                  className="bg-white/10 border-white/20 text-white placeholder-gray-400 w-full"
+                  className="bg-white/80 border-amber-300 text-gray-900 placeholder-gray-500 w-full"
                   placeholder="Enter your weight in pounds"
                 />
               ) : (
-                <p className="text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10 break-words">
+                <p className="text-gray-700 bg-gradient-to-br from-amber-50 to-amber-100 p-3 rounded-lg border border-amber-200/40 break-words">
                   {userInfo.weight ? `${Math.round(parseFloat(userInfo.weight) * 2.20462)} lbs` : 'Not provided'}
                 </p>
               )}
             </div>
 
             <div data-testid="profile-goals" className="space-y-2">
-              <label className="text-sm text-gray-300 font-medium flex items-center">
+              <label className="text-sm text-gray-700 font-medium flex items-center">
                 <Target className="w-4 h-4 mr-2 text-green-400" />
                 Daily Calorie Goal
               </label>
@@ -582,21 +582,21 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                     const goal = parseInt(e.target.value) || 2000;
                     setUserInfo(prev => ({ ...prev, calorieGoal: goal }));
                   }}
-                  className="bg-white/10 border-white/20 text-white placeholder-gray-400 w-full"
+                  className="bg-white/80 border-amber-300 text-gray-900 placeholder-gray-500 w-full"
                   placeholder="Enter your daily calorie goal"
                   min="1000"
                   max="5000"
                   step="50"
                 />
               ) : (
-                <p className="text-gray-200 bg-white/5 p-3 rounded-lg border border-white/10 break-words">
+                <p className="text-gray-700 bg-gradient-to-br from-amber-50 to-amber-100 p-3 rounded-lg border border-amber-200/40 break-words">
                   {userInfo.calorieGoal} calories/day
                 </p>
               )}
             </div>
 
                 <div className="space-y-2">
-              <label className="text-sm text-gray-300 font-medium flex items-center">
+              <label className="text-sm text-gray-700 font-medium flex items-center">
                 <Mail className="w-4 h-4 mr-2 text-blue-400" />
                 Email Address
               </label>
@@ -630,7 +630,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
               {showPasswordChange && (
                 <div className="space-y-4 bg-white/5 p-4 rounded-lg border border-white/10">
                   <div className="space-y-2">
-                    <label className="text-sm text-gray-300 font-medium flex items-center">
+                    <label className="text-sm text-gray-700 font-medium flex items-center">
                       <Lock className="w-4 h-4 mr-2 text-purple-400" />
                       Current Password
                     </label>
@@ -644,7 +644,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm text-gray-300 font-medium flex items-center">
+                    <label className="text-sm text-gray-700 font-medium flex items-center">
                       <Lock className="w-4 h-4 mr-2 text-purple-400" />
                       New Password
                     </label>
@@ -658,7 +658,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm text-gray-300 font-medium flex items-center">
+                    <label className="text-sm text-gray-700 font-medium flex items-center">
                       <Lock className="w-4 h-4 mr-2 text-purple-400" />
                       Confirm New Password
                     </label>

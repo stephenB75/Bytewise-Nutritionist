@@ -113,7 +113,7 @@ export function ProfileCompletionModal({ isOpen, onComplete }: ProfileCompletion
               )}
             </div>
           </div>
-          <DialogTitle className="text-2xl font-bold text-gray-900 dark:text-white">
+          <DialogTitle className="text-2xl font-bold text-gray-900">
             Complete Your Profile
           </DialogTitle>
           <p className="text-gray-600 dark:text-gray-400 mt-2">
@@ -124,7 +124,7 @@ export function ProfileCompletionModal({ isOpen, onComplete }: ProfileCompletion
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-4">
             <div>
-              <label htmlFor="firstName" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="firstName" className="text-sm font-medium text-gray-700">
                 First Name *
               </label>
               <Input
@@ -140,7 +140,7 @@ export function ProfileCompletionModal({ isOpen, onComplete }: ProfileCompletion
             </div>
 
             <div>
-              <label htmlFor="lastName" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="lastName" className="text-sm font-medium text-gray-700">
                 Last Name *
               </label>
               <Input
@@ -156,7 +156,7 @@ export function ProfileCompletionModal({ isOpen, onComplete }: ProfileCompletion
             </div>
 
             <div>
-              <label htmlFor="gender" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="gender" className="text-sm font-medium text-gray-700">
                 Avatar Style *
               </label>
               <div className="mt-2 grid grid-cols-2 gap-3">

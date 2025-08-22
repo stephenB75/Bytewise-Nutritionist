@@ -100,7 +100,7 @@ export function ConfettiCelebration({ isOpen, onClose, achievement }: ConfettiCe
         <Button
           variant="ghost"
           size="sm"
-          className="absolute top-2 right-2 text-white/60 hover:text-white"
+          className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
           onClick={onClose}
         >
           <X className="w-4 h-4" />
@@ -130,11 +130,11 @@ export function ConfettiCelebration({ isOpen, onClose, achievement }: ConfettiCe
 
         {/* Achievement Content */}
         <div className="space-y-4">
-          <h2 className="text-2xl font-bold text-white animate-fadeIn">
+          <h2 className="text-2xl font-bold text-gray-900 animate-fadeIn">
             {achievement.title}
           </h2>
           
-          <p className="text-lg text-white/90 animate-fadeIn animation-delay-300">
+          <p className="text-lg text-gray-700 animate-fadeIn animation-delay-300">
             {achievement.message}
           </p>
 
@@ -142,7 +142,7 @@ export function ConfettiCelebration({ isOpen, onClose, achievement }: ConfettiCe
             <div className="animate-fadeIn animation-delay-500">
               <div className="inline-flex items-center space-x-2 bg-white/20 rounded-full px-4 py-2">
                 <Star className="w-5 h-5 text-yellow-400" />
-                <span className="text-white font-semibold">+{achievement.points} points</span>
+                <span className="text-gray-900 font-semibold">+{achievement.points} points</span>
               </div>
             </div>
           )}
@@ -151,7 +151,7 @@ export function ConfettiCelebration({ isOpen, onClose, achievement }: ConfettiCe
           <div className="flex space-x-3 justify-center mt-6 animate-fadeIn animation-delay-700">
             <Button
               onClick={onClose}
-              className="bg-white/20 hover:bg-white/30 text-white border-white/30"
+              className="bg-gradient-to-br from-amber-100 to-amber-200 hover:bg-amber-200 text-gray-900 border-amber-300"
             >
               Awesome!
             </Button>
@@ -161,7 +161,7 @@ export function ConfettiCelebration({ isOpen, onClose, achievement }: ConfettiCe
                 onClose();
               }}
               variant="outline"
-              className="border-white/30 text-white hover:bg-white/10"
+              className="border-amber-300 text-gray-900 hover:bg-amber-100"
             >
               Share
             </Button>
