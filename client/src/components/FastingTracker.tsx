@@ -792,11 +792,11 @@ export function FastingTracker() {
     <div className="space-y-8 pb-24" data-testid="fasting-tracker">
       <div className="flex items-center gap-3 mb-8">
         <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
-          <Clock className="w-5 h-5 text-amber-700" />
+          <Clock className="w-5 h-5 text-white" />
         </div>
         <div>
           <h2 className="text-2xl font-bold">Intermittent Fasting</h2>
-          <p className="text-muted-foreground">Track your fasting journey and optimize your health</p>
+          <p className="text-gray-700">Track your fasting journey and optimize your health</p>
         </div>
       </div>
 
@@ -819,7 +819,7 @@ export function FastingTracker() {
 
         <TabsContent value="tracker" className="space-y-8 mt-6">
           {/* Current Fasting Session */}
-          <Card data-testid="fasting-session-card" className="mb-8">
+          <Card data-testid="fasting-session-card" className="mb-8 bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200/40">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
@@ -849,7 +849,7 @@ export function FastingTracker() {
                   className="h-3"
                   data-testid="fasting-progress"
                 />
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-gray-700">
                   {isActive ? 'Time remaining in your fast' : 'Ready to start fasting'}
                 </p>
               </div>
@@ -894,7 +894,7 @@ export function FastingTracker() {
               </div>
 
               {/* Schedule Display */}
-              <div className="bg-muted rounded-lg p-6 mt-6">
+              <div className="bg-amber-100/50 rounded-lg p-6 mt-6">
                 <h4 className="font-medium mb-3 flex items-center gap-2">
                   <Sun className="w-4 h-4" />
                   Suggested Schedule
@@ -905,7 +905,7 @@ export function FastingTracker() {
           </Card>
 
           {/* Fasting History */}
-          <Card className="mt-8">
+          <Card className="mt-8 bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200/40">
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center gap-2">
                 <TrendingUp className="w-5 h-5" />
@@ -915,7 +915,7 @@ export function FastingTracker() {
             <CardContent>
               {isLoading ? (
                 <div className="text-center py-4">
-                  <p className="text-sm text-muted-foreground">Loading history...</p>
+                  <p className="text-sm text-gray-700">Loading history...</p>
                 </div>
               ) : fastingHistory && Array.isArray(fastingHistory) && fastingHistory.length > 0 ? (
                 <div className="space-y-4">
@@ -942,7 +942,7 @@ export function FastingTracker() {
                       return (
                         <div 
                           key={session.id || index}
-                          className="flex items-center justify-between p-3 bg-muted rounded-lg"
+                          className="flex items-center justify-between p-3 bg-amber-100/50 rounded-lg"
                         >
                           <div className="flex items-center gap-3">
                             {wasCompleted ? (
@@ -952,7 +952,7 @@ export function FastingTracker() {
                             )}
                             <div>
                               <p className="font-medium">{session.planName || `${Math.round(targetHours)}h Fasting Session`}</p>
-                              <p className="text-sm text-muted-foreground">
+                              <p className="text-sm text-gray-700">
                                 {sessionDate ? new Date(sessionDate).toLocaleDateString() : 'N/A'}
                               </p>
                               {!wasCompleted && remainingHours > 0 && (
@@ -967,7 +967,7 @@ export function FastingTracker() {
                               {formatHours(actualHours)} {wasCompleted ? 'completed' : 'fasted'}
                             </Badge>
                             {!wasCompleted && (
-                              <p className="text-xs text-muted-foreground mt-1">
+                              <p className="text-xs text-gray-700 mt-1">
                                 of {targetHours}h goal
                               </p>
                             )}
@@ -977,17 +977,17 @@ export function FastingTracker() {
                     })}
                   {fastingHistory.filter((session: any) => session.status === 'completed' || session.status === 'stopped').length === 0 && (
                     <div className="text-center py-6">
-                      <Coffee className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
-                      <p className="text-sm text-muted-foreground">No fasting sessions yet</p>
-                      <p className="text-xs text-muted-foreground mt-1">Start your first fast to see it here!</p>
+                      <Coffee className="w-8 h-8 mx-auto text-gray-700 mb-2" />
+                      <p className="text-sm text-gray-700">No fasting sessions yet</p>
+                      <p className="text-xs text-gray-700 mt-1">Start your first fast to see it here!</p>
                     </div>
                   )}
                 </div>
               ) : (
                 <div className="text-center py-6">
-                  <Coffee className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
-                  <p className="text-sm text-muted-foreground">No fasting history yet</p>
-                  <p className="text-xs text-muted-foreground mt-1">Start your first fast to build your history!</p>
+                  <Coffee className="w-8 h-8 mx-auto text-gray-700 mb-2" />
+                  <p className="text-sm text-gray-700">No fasting history yet</p>
+                  <p className="text-xs text-gray-700 mt-1">Start your first fast to build your history!</p>
                 </div>
               )}
             </CardContent>
@@ -999,7 +999,7 @@ export function FastingTracker() {
             {FASTING_PLANS.map((plan) => (
               <Card 
                 key={plan.id}
-                className={`cursor-pointer transition-all ${
+                className={`cursor-pointer transition-all bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200/40 ${
                   selectedPlan.id === plan.id ? 'ring-2 ring-primary' : ''
                 }`}
                 onClick={() => setSelectedPlan(plan)}
@@ -1007,7 +1007,7 @@ export function FastingTracker() {
               >
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">{plan.name}</CardTitle>
+                    <CardTitle className="text-lg text-gray-900">{plan.name}</CardTitle>
                     <Badge className={getDifficultyColor(plan.difficulty)}>
                       {plan.difficulty}
                     </Badge>
@@ -1045,27 +1045,27 @@ export function FastingTracker() {
         </TabsContent>
 
         <TabsContent value="tips" className="space-y-6 mt-6">
-          <Card>
+          <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200/40">
             <CardHeader className="pb-6">
-              <CardTitle className="flex items-center gap-2">
-                <Coffee className="w-5 h-5" />
+              <CardTitle className="flex items-center gap-2 text-gray-900">
+                <Coffee className="w-5 h-5 text-gray-900" />
                 Fasting Tips & Guidelines
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-gray-700">
                 Expert advice to make your fasting journey successful
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-5">
               {FASTING_TIPS.map((tip, index) => (
-                <div key={index} className="flex items-start gap-3 p-4 bg-muted rounded-lg">
+                <div key={index} className="flex items-start gap-3 p-4 bg-amber-100/50 rounded-lg">
                   <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                  <p className="text-sm leading-relaxed">{tip}</p>
+                  <p className="text-sm leading-relaxed text-gray-900">{tip}</p>
                 </div>
               ))}
               
-              <Alert className="mt-6">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>
+              <Alert className="mt-6 bg-amber-100/50 border-amber-300 text-gray-900">
+                <AlertCircle className="h-4 w-4 text-gray-900" />
+                <AlertDescription className="text-gray-900">
                   <strong>Important:</strong> Consult with a healthcare provider before starting any fasting regimen, 
                   especially if you have medical conditions, are pregnant, or taking medications.
                 </AlertDescription>
