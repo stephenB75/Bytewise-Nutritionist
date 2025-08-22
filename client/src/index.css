@@ -176,6 +176,12 @@ html,
   color: #1d4ed8 !important; /* Dark blue for calendar icon */
 }
 
+/* Badge icon color override - ensure Flame icon is light amber */
+.weekly-calories-card-wrapper Badge .text-amber-100,
+.weekly-calories-card-wrapper .text-amber-100 {
+  color: #fef3c7 !important; /* Light amber for badge icons */
+}
+
 /* Semi-transparent text color fixes - EXCLUDE hero components */
 .text-white\/70:not(.hero-component *):not([data-hero="true"] *) { color: #374151 !important; } /* Darker gray */
 .text-white\/80:not(.hero-component *):not([data-hero="true"] *) { color: #1f2937 !important; } /* Very dark gray */
