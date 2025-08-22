@@ -619,7 +619,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                     variant="outline"
                     size="sm"
                     onClick={() => setShowPasswordChange(true)}
-                    className="border-purple-400/50 text-purple-400 hover:bg-purple-500/10 hover:text-purple-300 hover:border-purple-400"
+                    className="border-amber-600/60 text-amber-700 hover:bg-amber-600/20 hover:text-amber-800 hover:border-amber-600 bg-amber-50/50"
                   >
                     <Lock className="w-4 h-4 mr-2" />
                     Change Password
@@ -681,7 +681,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                         setNewPassword('');
                         setConfirmPassword('');
                       }}
-                      className="border-white/30 text-gray-300 hover:border-white/50 hover:text-white"
+                      className="border-amber-400/50 text-gray-700 hover:border-amber-500 hover:text-gray-900 bg-amber-50/30"
                     >
                       <X className="w-4 h-4 mr-2" />
                       Cancel
@@ -690,7 +690,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                       size="sm"
                       onClick={handlePasswordChange}
                       disabled={changingPassword}
-                      className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+                      className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white shadow-lg"
                     >
                       {changingPassword ? (
                         <>Changing Password...</>
@@ -713,7 +713,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                 variant="outline"
                 size="sm"
                 onClick={handleSignOut}
-                className="border-red-400/50 text-red-400 hover:bg-red-500/10 hover:text-red-300 hover:border-red-400"
+                className="border-red-600/60 text-red-700 hover:bg-red-600/20 hover:text-red-800 hover:border-red-600 bg-red-50/50"
               >
                 <LogOut className="w-4 h-4 mr-2" />
                 Sign Out
@@ -727,7 +727,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                       variant="outline"
                       size="sm"
                       onClick={() => setIsEditing(false)}
-                      className="border-white/30 text-gray-300 hover:border-white/50 hover:text-white"
+                      className="border-amber-400/50 text-gray-700 hover:border-amber-500 hover:text-gray-900 bg-amber-50/30"
                     >
                       <X className="w-4 h-4 mr-2" />
                       Cancel
@@ -736,7 +736,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                       size="sm"
                       onClick={handleSave}
                       disabled={isSaving}
-                      className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
+                      className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg"
                     >
                       {isSaving ? (
                         <>Saving...</>

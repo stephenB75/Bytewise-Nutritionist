@@ -171,7 +171,7 @@ export function DataManagementPanel() {
                         onClick={handleExportData}
                         disabled={isExporting}
                         size="lg"
-                        className="w-full bg-gradient-to-r from-[#1f4aa6] to-[#1850a0] hover:from-[#1850a0] hover:to-[#164291] text-white shadow-xl rounded-2xl px-8 py-4 transition-all duration-300 font-semibold"
+                        className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white shadow-xl rounded-2xl px-8 py-4 transition-all duration-300 font-semibold"
                         data-testid="button-download-pdf"
                       >
                         {isExporting ? (
