@@ -40,20 +40,41 @@ const foodImages = [
   new URL('@assets/tomatoes-1238255_1920_1753859477803-BBxmQtT1.jpg', import.meta.url).href,
   new URL('@assets/variety-5044809_1920_1753859530087-C7xAS9wM.jpg', import.meta.url).href,
   new URL('@assets/vegetable-2924245_1920_1753859477807-CZELXr6Z.jpg', import.meta.url).href,
+  // New delicious food photos added
+  new URL('@assets/sushi-5885530_1280_1755903678470.jpg', import.meta.url).href, // 33
+  new URL('@assets/pizza-1317699_1280_1755903678471.jpg', import.meta.url).href, // 34
+  new URL('@assets/cherries-1845053_1280_1755903678472.jpg', import.meta.url).href, // 35
+  new URL('@assets/bread-1836411_1280_1755903678472.jpg', import.meta.url).href, // 36
+  new URL('@assets/popcorn-4885565_1280_1755903678473.jpg', import.meta.url).href, // 37
+  new URL('@assets/baked-goods-1846460_1280_1755903678474.jpg', import.meta.url).href, // 38
+  new URL('@assets/cinnamon-roll-4719023_1280_1755903678474.jpg', import.meta.url).href, // 39
+  new URL('@assets/blueberry-3357568_1280_1755903678475.jpg', import.meta.url).href, // 40
+  new URL('@assets/pomegranates-7859172_1280_1755903678476.jpg', import.meta.url).href, // 41
+  new URL('@assets/pretzels-3379552_1280_1755903678476.jpg', import.meta.url).href, // 42
+  new URL('@assets/noodles-2150181_1280_1755903678477.jpg', import.meta.url).href, // 43
+  new URL('@assets/fresh-pasta-5154248_1280_1755903678477.jpg', import.meta.url).href, // 44
+  new URL('@assets/cookies-8668140_1280_1755903678478.jpg', import.meta.url).href, // 45
+  new URL('@assets/chocolates-1737503_1280_1755903678479.jpg', import.meta.url).href, // 46
+  new URL('@assets/white-chocolate-380702_1280_1755903678479.jpg', import.meta.url).href, // 47
+  new URL('@assets/loaf-4957679_1280_1755903678480.jpg', import.meta.url).href, // 48
+  new URL('@assets/mango-2360551_1280_1755903678481.jpg', import.meta.url).href, // 49
+  new URL('@assets/mango-1534061_1280_1755903678481.jpg', import.meta.url).href, // 50
+  new URL('@assets/strawberries-823782_1280_1755903678482.jpg', import.meta.url).href, // 51
+  new URL('@assets/pistachios-3223610_1280_1755903678482.jpg', import.meta.url).href, // 52
 ];
 
 // Food-themed page mappings for thematic consistency
 const pageImageMap: Record<string, number[]> = {
-  'home': [0, 2, 10, 22, 31], // Healthy foods (apple, bowl, food, salad, variety)
-  'nutrition': [3, 4, 5, 6, 11, 23], // Proteins and main dishes
-  'daily': [3, 19, 26, 27], // Meals (burgers, pizza, steaks)
-  'profile': [7, 9, 14, 28], // Desserts and treats
-  'tracking': [1, 12, 17, 21], // Breakfast and healthy options
-  'achievements': [0, 8, 13, 15, 16, 20], // Fruits and colorful foods (added mango)
-  'signin': [18, 25, 31, 32], // Welcoming foods (pancakes, pasta, variety)
-  'calculator': [11, 24, 29], // Cooking ingredients and prep
-  'search': [2, 10, 22, 31], // Variety and discovery
-  'data': [13, 15, 16, 20, 30, 32] // Fresh produce and analytics (added mango)
+  'home': [0, 2, 10, 22, 31, 35, 40, 51], // Healthy foods (apple, bowl, food, salad, variety, cherries, blueberries, strawberries)
+  'nutrition': [3, 4, 5, 6, 11, 23, 33, 34, 36, 48], // Proteins and main dishes (burgers, chicken, sushi, pizza, bread, artisan loaf)
+  'daily': [3, 19, 26, 27, 34, 36, 43, 44], // Meals (burgers, pizza, steaks, pizza slice, bread, noodles, pasta)
+  'profile': [7, 9, 14, 28, 38, 39, 45, 46, 47], // Desserts and treats (chocolate, cupcakes, baked goods, cinnamon rolls, cookies, chocolates, white chocolate)
+  'tracking': [1, 12, 17, 21, 36, 40, 48, 51], // Breakfast and healthy options (blueberries, oatmeal, bread, blueberries, artisan bread, strawberries)
+  'achievements': [0, 8, 13, 15, 16, 20, 35, 40, 41, 49, 50, 51], // Fruits and colorful foods (apple, churros, grapes, mango, cherries, blueberries, pomegranates, mangoes, strawberries)
+  'signin': [18, 25, 31, 32, 36, 38, 39, 48], // Welcoming foods (pancakes, pasta, variety, bread, baked goods, cinnamon rolls, artisan loaf)
+  'calculator': [11, 24, 29, 43, 44, 52], // Cooking ingredients and prep (food, spaghetti, noodles, pasta, nuts)
+  'search': [2, 10, 22, 31, 33, 37, 42], // Variety and discovery (bowl, food, salad, variety, sushi, popcorn, pretzels)
+  'data': [13, 15, 16, 20, 30, 32, 35, 40, 41, 49, 50, 52] // Fresh produce and analytics (grapes, mangoes, cherries, blueberries, pomegranates, mangoes, nuts)
 };
 
 export function useRotatingBackground(activeTab: string) {
