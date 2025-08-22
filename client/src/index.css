@@ -347,7 +347,25 @@ button.btn-hero-enhanced span,
   color: #ffffff !important;
 }
 
-/* Dashboard hero overlay - inherits hero headline colors, white for other text */
+/* Dashboard hero overlay - FORCE vibrant colors for headlines, white for other text */
+[data-page="dashboard"] .absolute.inset-0 h1 {
+  color: #22d3ee !important; /* Bright cyan for h1 */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+}
+[data-page="dashboard"] .absolute.inset-0 h2 {
+  color: #fbbf24 !important; /* Bright amber for h2 */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+}
+[data-page="dashboard"] .absolute.inset-0 h3 {
+  color: #10b981 !important; /* Bright emerald for h3 */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+}
+[data-page="dashboard"] .absolute.inset-0 h4,
+[data-page="dashboard"] .absolute.inset-0 h5,
+[data-page="dashboard"] .absolute.inset-0 h6 {
+  color: #a855f7 !important; /* Purple for smaller headlines */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+}
 [data-page="dashboard"] .absolute.inset-0 p,
 [data-page="dashboard"] .absolute.inset-0 span {
   color: #ffffff !important;
