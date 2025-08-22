@@ -229,71 +229,27 @@ button.btn-hero-enhanced span,
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
 
-/* CONSOLIDATED Hero headlines - vibrant colors for dark overlays - MAXIMUM SPECIFICITY */
+/* Clean Hero Headlines - Vibrant Colors for All Hero Components */
 .hero-component h1,
-.hero-component h1.text-white,
 .hero-component .text-white h1,
-.hero-component h1.text-6xl,
-.hero-component h1.text-7xl,
-.hero-component h1.text-8xl,
-.hero-component h1.text-optimized,
-.hero-component h1.font-black,
 [data-hero="true"] h1,
-[data-hero="true"] h1.text-white,
-[data-hero="true"] .text-white h1,
-[data-hero="true"] h1.text-6xl,
-[data-hero="true"] h1.text-7xl,
-[data-hero="true"] h1.text-8xl,
-[data-hero="true"] h1.text-optimized,
-[data-hero="true"] h1.font-black,
-[data-page="dashboard"] .hero-component h1,
-[data-page="dashboard"] .hero-component h1.text-white,
-[data-page="dashboard"] .hero-component .text-white h1,
-[data-page="dashboard"] .hero-component h1.text-6xl,
-[data-page="dashboard"] .hero-component h1.text-7xl,
-[data-page="dashboard"] .hero-component h1.text-8xl,
-[data-page="dashboard"] .hero-component h1.text-optimized,
-[data-page="dashboard"] .hero-component h1.font-black,
-[data-page="dashboard"] [data-hero="true"] h1,
-[data-page="dashboard"] [data-hero="true"] h1.text-white,
-[data-page="dashboard"] [data-hero="true"] .text-white h1,
-[data-page="dashboard"] [data-hero="true"] h1.text-6xl,
-[data-page="dashboard"] [data-hero="true"] h1.text-7xl,
-[data-page="dashboard"] [data-hero="true"] h1.text-8xl,
-[data-page="dashboard"] [data-hero="true"] h1.text-optimized,
-[data-page="dashboard"] [data-hero="true"] h1.font-black { 
+[data-hero="true"] .text-white h1 { 
   color: #22d3ee !important; /* Bright cyan for primary headlines */
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
 
 .hero-component h2,
-.hero-component h2.text-white,
 .hero-component .text-white h2,
 [data-hero="true"] h2,
-[data-hero="true"] h2.text-white,
-[data-hero="true"] .text-white h2,
-[data-page="dashboard"] .hero-component h2,
-[data-page="dashboard"] .hero-component h2.text-white,
-[data-page="dashboard"] .hero-component .text-white h2,
-[data-page="dashboard"] [data-hero="true"] h2,
-[data-page="dashboard"] [data-hero="true"] h2.text-white,
-[data-page="dashboard"] [data-hero="true"] .text-white h2 { 
+[data-hero="true"] .text-white h2 { 
   color: #fbbf24 !important; /* Bright amber for secondary headlines */
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
 
 .hero-component h3,
-.hero-component h3.text-white,
 .hero-component .text-white h3,
 [data-hero="true"] h3,
-[data-hero="true"] h3.text-white,
-[data-hero="true"] .text-white h3,
-[data-page="dashboard"] .hero-component h3,
-[data-page="dashboard"] .hero-component h3.text-white,
-[data-page="dashboard"] .hero-component .text-white h3,
-[data-page="dashboard"] [data-hero="true"] h3,
-[data-page="dashboard"] [data-hero="true"] h3.text-white,
-[data-page="dashboard"] [data-hero="true"] .text-white h3 { 
+[data-hero="true"] .text-white h3 { 
   color: #10b981 !important; /* Bright emerald for tertiary headlines */
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
@@ -309,19 +265,7 @@ button.btn-hero-enhanced span,
 [data-hero="true"] h6,
 [data-hero="true"] .text-white h4,
 [data-hero="true"] .text-white h5,
-[data-hero="true"] .text-white h6,
-[data-page="dashboard"] .hero-component h4,
-[data-page="dashboard"] .hero-component h5,
-[data-page="dashboard"] .hero-component h6,
-[data-page="dashboard"] .hero-component .text-white h4,
-[data-page="dashboard"] .hero-component .text-white h5,
-[data-page="dashboard"] .hero-component .text-white h6,
-[data-page="dashboard"] [data-hero="true"] h4,
-[data-page="dashboard"] [data-hero="true"] h5,
-[data-page="dashboard"] [data-hero="true"] h6,
-[data-page="dashboard"] [data-hero="true"] .text-white h4,
-[data-page="dashboard"] [data-hero="true"] .text-white h5,
-[data-page="dashboard"] [data-hero="true"] .text-white h6 { 
+[data-hero="true"] .text-white h6 { 
   color: #a855f7 !important; /* Purple for smaller headlines */
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
@@ -367,48 +311,51 @@ button.btn-hero-enhanced span,
   color: #ffffff !important;
 }
 
-/* Dashboard hero overlay - MAXIMUM SPECIFICITY - FORCE vibrant colors for headlines */
-[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col .text-white h1,
-[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col h1.text-6xl,
-[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col h1.text-7xl,
-[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col h1.text-8xl,
-[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col h1.text-optimized,
-[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col h1.font-black,
-[data-page="dashboard"] .absolute.inset-0 h1 {
+/* Dashboard Hero Headlines - High Specificity Override */
+[data-page="dashboard"] .hero-component h1,
+[data-page="dashboard"] .hero-component .text-white h1,
+[data-page="dashboard"] [data-hero="true"] h1,
+[data-page="dashboard"] [data-hero="true"] .text-white h1 {
   color: #22d3ee !important; /* Bright cyan for h1 */
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
-[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col .text-white h2,
-[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col h2.text-6xl,
-[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col h2.text-7xl,
-[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col h2.text-8xl,
-[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col h2.text-optimized,
-[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col h2.font-black,
-[data-page="dashboard"] .absolute.inset-0 h2 {
+
+[data-page="dashboard"] .hero-component h2,
+[data-page="dashboard"] .hero-component .text-white h2,
+[data-page="dashboard"] [data-hero="true"] h2,
+[data-page="dashboard"] [data-hero="true"] .text-white h2 {
   color: #fbbf24 !important; /* Bright amber for h2 */
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
-[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col .text-white h3,
-[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col h3.text-6xl,
-[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col h3.text-7xl,
-[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col h3.text-8xl,
-[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col h3.text-optimized,
-[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col h3.font-black,
-[data-page="dashboard"] .absolute.inset-0 h3 {
+
+[data-page="dashboard"] .hero-component h3,
+[data-page="dashboard"] .hero-component .text-white h3,
+[data-page="dashboard"] [data-hero="true"] h3,
+[data-page="dashboard"] [data-hero="true"] .text-white h3 {
   color: #10b981 !important; /* Bright emerald for h3 */
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
-[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col .text-white h4,
-[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col .text-white h5,
-[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col .text-white h6,
-[data-page="dashboard"] .absolute.inset-0 h4,
-[data-page="dashboard"] .absolute.inset-0 h5,
-[data-page="dashboard"] .absolute.inset-0 h6 {
+
+[data-page="dashboard"] .hero-component h4,
+[data-page="dashboard"] .hero-component h5,
+[data-page="dashboard"] .hero-component h6,
+[data-page="dashboard"] .hero-component .text-white h4,
+[data-page="dashboard"] .hero-component .text-white h5,
+[data-page="dashboard"] .hero-component .text-white h6,
+[data-page="dashboard"] [data-hero="true"] h4,
+[data-page="dashboard"] [data-hero="true"] h5,
+[data-page="dashboard"] [data-hero="true"] h6,
+[data-page="dashboard"] [data-hero="true"] .text-white h4,
+[data-page="dashboard"] [data-hero="true"] .text-white h5,
+[data-page="dashboard"] [data-hero="true"] .text-white h6 {
   color: #a855f7 !important; /* Purple for smaller headlines */
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
-[data-page="dashboard"] .absolute.inset-0 p,
-[data-page="dashboard"] .absolute.inset-0 span {
+/* Dashboard Hero Container - White Text for Non-Headlines */
+[data-page="dashboard"] .hero-component .absolute.inset-0 p,
+[data-page="dashboard"] .hero-component .absolute.inset-0 span,
+[data-page="dashboard"] [data-hero="true"] .absolute.inset-0 p,
+[data-page="dashboard"] [data-hero="true"] .absolute.inset-0 span {
   color: #ffffff !important;
 }
 
