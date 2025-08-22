@@ -102,7 +102,7 @@ export function PWAStatus() {
   };
 
   return (
-    <Card className="p-4 bg-white/90 backdrop-blur-sm border-0 shadow-sm">
+    <Card className="p-4 bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-sm border-amber-200/40 shadow-sm">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
@@ -122,7 +122,7 @@ export function PWAStatus() {
             ) : (
               <AlertCircle className="w-4 h-4 text-yellow-600" />
             )}
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-gray-950">
               Service Worker
             </span>
           </div>
@@ -135,7 +135,7 @@ export function PWAStatus() {
             ) : (
               <AlertCircle className="w-4 h-4 text-yellow-600" />
             )}
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-gray-950">
               Cache
             </span>
           </div>

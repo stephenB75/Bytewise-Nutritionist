@@ -177,7 +177,7 @@ export function FoodSearchWithHistory({
           onChange={(e) => handleSearch(e.target.value)}
           onFocus={() => setShowResults(false)}
           placeholder={placeholder}
-          className={className || "text-base bg-white border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-500"}
+          className={className || "text-base bg-white/80 border-2 border-amber-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg px-4 py-3 text-gray-950 placeholder-gray-700"}
         />
       </div>
 
@@ -196,7 +196,7 @@ export function FoodSearchWithHistory({
                   <button
                     key={`popular-${meal.id}`}
                     onClick={() => handleSelectFood(meal)}
-                    className="w-full text-left p-2 hover:bg-gray-50 rounded-lg transition-colors group"
+                    className="w-full text-left p-2 hover:bg-amber-100/50 rounded-lg transition-colors group"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
@@ -233,7 +233,7 @@ export function FoodSearchWithHistory({
                   <button
                     key={meal.id}
                     onClick={() => handleSelectFood(meal)}
-                    className="w-full text-left p-2 hover:bg-gray-50 rounded-lg transition-colors group"
+                    className="w-full text-left p-2 hover:bg-amber-100/50 rounded-lg transition-colors group"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex-1">

@@ -554,26 +554,26 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <div className="text-center p-4 bg-gradient-to-br from-[#faed39]/10 to-[#faed39]/5 rounded-lg border border-[#faed39]/20">
             <div className="text-2xl font-bold text-[#faed39]" style={{ fontFamily: "'League Spartan', sans-serif" }}>{userStats.totalPoints || 0}</div>
-            <div className="text-sm text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>Total Points</div>
+            <div className="text-sm text-gray-900" style={{ fontFamily: "'Work Sans', sans-serif" }}>Total Points</div>
           </div>
           <div className="text-center p-4 bg-gradient-to-br from-[#45c73e]/10 to-[#45c73e]/5 rounded-lg border border-[#45c73e]/20">
             <div className="text-2xl font-bold text-[#45c73e]" style={{ fontFamily: "'League Spartan', sans-serif" }}>{completedAchievements.length || 0}</div>
-            <div className="text-sm text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>Completed</div>
+            <div className="text-sm text-gray-900" style={{ fontFamily: "'Work Sans', sans-serif" }}>Completed</div>
           </div>
           <div className="text-center p-4 bg-gradient-to-br from-[#1f4aa6]/10 to-[#1f4aa6]/5 rounded-lg border border-[#1f4aa6]/20">
             <div className="text-2xl font-bold text-[#1f4aa6]" style={{ fontFamily: "'League Spartan', sans-serif" }}>{userStats.currentStreak || 0}</div>
-            <div className="text-sm text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>Current Streak</div>
+            <div className="text-sm text-gray-900" style={{ fontFamily: "'Work Sans', sans-serif" }}>Current Streak</div>
           </div>
           <div className="text-center p-4 bg-gradient-to-br from-[#faed39]/10 to-[#1f4aa6]/10 rounded-lg border border-[#faed39]/20">
-            <div className="text-2xl font-bold text-white" style={{ fontFamily: "'League Spartan', sans-serif" }}>Level {userStats.level}</div>
-            <div className="text-sm text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>Current Level</div>
+            <div className="text-2xl font-bold text-gray-950" style={{ fontFamily: "'League Spartan', sans-serif" }}>Level {userStats.level}</div>
+            <div className="text-sm text-gray-900" style={{ fontFamily: "'Work Sans', sans-serif" }}>Current Level</div>
           </div>
         </div>
 
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
-            <span className="text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>Overall Progress</span>
-            <span className="text-white font-medium" style={{ fontFamily: "'Work Sans', sans-serif" }}>{Math.round(progressPercentage)}%</span>
+            <span className="text-gray-900" style={{ fontFamily: "'Work Sans', sans-serif" }}>Overall Progress</span>
+            <span className="text-gray-950 font-medium" style={{ fontFamily: "'Work Sans', sans-serif" }}>{Math.round(progressPercentage)}%</span>
           </div>
           <Progress value={progressPercentage} className="h-3" />
         </div>
@@ -591,18 +591,18 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
                 onClick={() => setSelectedCategory(category.id)}
                 className={`h-24 w-full min-w-[140px] max-w-[140px] p-4 flex flex-col items-center justify-center space-y-2 transition-all duration-300 ${
                   isActive
-                    ? 'bg-gradient-to-br from-[#1f4aa6] via-[#45c73e] to-[#faed39] text-white shadow-2xl border-2 border-transparent transform scale-105' 
+                    ? 'bg-gradient-to-br from-[#1f4aa6] via-[#45c73e] to-[#faed39] text-gray-950 shadow-2xl border-2 border-transparent transform scale-105' 
                     : 'bg-white/95 hover:bg-white text-gray-700 border-2 border-white/30 hover:border-[#1f4aa6] hover:shadow-xl hover:scale-102'
                 } rounded-2xl backdrop-blur-sm relative`}
               >
                 <div className={`w-12 h-12 p-3 rounded-xl flex items-center justify-center ${isActive ? 'bg-white/20' : 'bg-[#1f4aa6]/10'}`}>
                   <IconComponent 
-                    className={`w-6 h-6 ${isActive ? 'text-white' : 'text-[#1f4aa6]'}`}
+                    className={`w-6 h-6 ${isActive ? 'text-gray-950' : 'text-[#1f4aa6]'}`}
                     strokeWidth={2.5}
                   />
                 </div>
                 <div className="text-center">
-                  <div className={`text-sm font-bold ${isActive ? 'text-white' : 'text-gray-900'}`}>
+                  <div className={`text-sm font-bold ${isActive ? 'text-gray-950' : 'text-gray-900'}`}>
                     {category.name}
                   </div>
                 </div>
@@ -618,15 +618,15 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {achievementsLoading ? (
                   <div className="col-span-full text-center py-8">
-                    <div className="text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>Loading achievements...</div>
+                    <div className="text-gray-900" style={{ fontFamily: "'Work Sans', sans-serif" }}>Loading achievements...</div>
                   </div>
                 ) : !user ? (
                   <div className="col-span-full text-center py-8">
-                    <div className="text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>Sign in to track your achievements</div>
+                    <div className="text-gray-900" style={{ fontFamily: "'Work Sans', sans-serif" }}>Sign in to track your achievements</div>
                   </div>
                 ) : filteredAchievements.length === 0 ? (
                   <div className="col-span-full text-center py-8">
-                    <div className="text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>No achievements in this category yet. Keep tracking to unlock!</div>
+                    <div className="text-gray-900" style={{ fontFamily: "'Work Sans', sans-serif" }}>No achievements in this category yet. Keep tracking to unlock!</div>
                   </div>
                 ) : (
           filteredAchievements.sort((a, b) => {
@@ -653,7 +653,7 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
                     : 'bg-gray-100'
                 }`}>
                   {achievement.completed ? (
-                    <CheckCircle className="w-6 h-6 text-white" />
+                    <CheckCircle className="w-6 h-6 text-gray-950" />
                   ) : (
                     <span>{achievement.icon}</span>
                   )}
@@ -661,7 +661,7 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
                 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-semibold text-white truncate" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                    <h4 className="font-semibold text-gray-950 truncate" style={{ fontFamily: "'League Spartan', sans-serif" }}>
                       {achievement.title}
                     </h4>
                     <Badge className={`${difficultyColors[achievement.difficulty]} capitalize text-xs`}>
@@ -669,13 +669,13 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
                     </Badge>
                   </div>
                   
-                  <p className="text-sm text-gray-300 mb-3" style={{ fontFamily: "'Quicksand', sans-serif" }}>
+                  <p className="text-sm text-gray-900 mb-3" style={{ fontFamily: "'Quicksand', sans-serif" }}>
                     {achievement.description}
                   </p>
                   
                   <div className="space-y-2">
                     <div className="flex justify-between text-xs">
-                      <span className="text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>
+                      <span className="text-gray-900" style={{ fontFamily: "'Work Sans', sans-serif" }}>
                         Progress: {achievement.progress}/{achievement.target}
                       </span>
                       <span className="text-[#faed39] font-medium" style={{ fontFamily: "'Work Sans', sans-serif" }}>

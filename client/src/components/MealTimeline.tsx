@@ -121,7 +121,7 @@ export function MealTimeline({
   const dailyProgress = Math.min((dailyTotals.calories / dailyCalorieGoal) * 100, 100);
 
   return (
-    <Card className="p-6 bg-gradient-to-br from-white via-orange-50/20 to-yellow-50/30 border-0 shadow-xl backdrop-blur-sm">
+    <Card className="p-6 bg-gradient-to-br from-amber-50 via-amber-100/50 to-amber-200/30 border-amber-200/40 shadow-xl backdrop-blur-sm">
       {/* Header with Daily Summary */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-4">
@@ -141,25 +141,25 @@ export function MealTimeline({
         </div>
 
         {/* Daily Progress Summary */}
-        <div className="p-4 bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 rounded-xl border border-blue-200 shadow-lg">
+        <div className="p-4 bg-gradient-to-r from-amber-50 via-amber-100 to-amber-200 rounded-xl border border-amber-300 shadow-lg">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-md">
                 <Target className="w-5 h-5 text-white" />
               </div>
               <div>
-                <p className="font-semibold text-blue-900">Daily Progress</p>
-                <p className="text-sm text-blue-700">
+                <p className="font-semibold text-gray-950">Daily Progress</p>
+                <p className="text-sm text-gray-900">
                   {dailyTotals.calories.toLocaleString()} / {dailyCalorieGoal.toLocaleString()} calories
                 </p>
               </div>
             </div>
             <div className="text-right">
-              <p className="text-2xl font-bold bg-gradient-to-r from-blue-900 to-indigo-900 bg-clip-text text-transparent">{Math.round(dailyProgress)}%</p>
-              <p className="text-xs text-blue-700">{dailyTotals.meals} meals</p>
+              <p className="text-2xl font-bold text-gray-950">{Math.round(dailyProgress)}%</p>
+              <p className="text-xs text-gray-900">{dailyTotals.meals} meals</p>
             </div>
           </div>
-          <Progress value={dailyProgress} className="h-3 bg-blue-100 [&>div]:bg-gradient-to-r [&>div]:from-blue-500 [&>div]:to-indigo-600" />
+          <Progress value={dailyProgress} className="h-3 bg-amber-200 [&>div]:bg-gradient-to-r [&>div]:from-orange-500 [&>div]:to-orange-600" />
         </div>
       </div>
 
