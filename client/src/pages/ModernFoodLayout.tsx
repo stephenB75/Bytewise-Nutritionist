@@ -969,7 +969,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         
         
         {/* Content Layer with Enhanced Typography */}
-        <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-6 z-20 text-white">
+        <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-6 z-20 text-gray-900">
           <div className="space-y-8 max-w-2xl">
             {/* Enhanced Title Section */}
             <div className="space-y-3 hero-optimized">
@@ -982,7 +982,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             </div>
             
             {/* Enhanced Description */}
-            <p className="text-2xl md:text-3xl font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl animate-fadeInUp [animation-delay:0.6s] font-work-sans text-gray-100">
+            <p className="text-2xl md:text-3xl font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl animate-fadeInUp [animation-delay:0.6s] font-work-sans text-gray-900">
               {description}
             </p>
             
@@ -1004,9 +1004,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         </div>
         
         {/* Enhanced Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 animate-bounce text-white">
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 animate-bounce text-gray-900">
           <div className="flex flex-col items-center gap-2">
-            <div className="w-px h-8 bg-gradient-to-b from-transparent to-white" />
+            <div className="w-px h-8 bg-gradient-to-b from-transparent to-gray-900" />
             <ChevronRight className="w-6 h-6 rotate-90 drop-shadow-lg" />
           </div>
         </div>
@@ -1029,7 +1029,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         <div className="text-8xl font-black leading-none text-sky-300 mb-2 lowercase tracking-tight drop-shadow-2xl group-hover:text-sky-200 transition-colors duration-300">
           bytewise
         </div>
-        <div className="text-2xl font-light text-white/80 uppercase tracking-widest drop-shadow-lg group-hover:text-white/90 transition-colors duration-300">
+        <div className="text-2xl font-light text-gray-900/80 uppercase tracking-widest drop-shadow-lg group-hover:text-gray-900/90 transition-colors duration-300">
           nutritionist
         </div>
       </div>
@@ -1057,8 +1057,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <Icon className={`w-5 h-5 text-${color}-700`} />
             </div>
             <div>
-              <h3 className="text-white font-bold">{title}</h3>
-              <p className="text-white text-sm font-medium">{value}/{goal}</p>
+              <h3 className="text-gray-900 font-bold">{title}</h3>
+              <p className="text-gray-900 text-sm font-medium">{value}/{goal}</p>
             </div>
           </div>
           <div className="text-right">
@@ -1097,8 +1097,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <Droplets className={`w-6 h-6 transition-colors duration-300 ${isGoalReached ? 'text-gray-900' : 'text-cyan-700'}`} />
             </div>
             <div>
-              <h3 className="text-white font-bold text-lg">Water Intake</h3>
-              <p className="text-white text-sm font-medium">{glasses}/{dailyGoal} glasses today</p>
+              <h3 className="text-gray-900 font-bold text-lg">Water Intake</h3>
+              <p className="text-gray-900 text-sm font-medium">{glasses}/{dailyGoal} glasses today</p>
             </div>
           </div>
           <div className="text-right">
@@ -1275,7 +1275,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         {/* CSS-controlled Overlay for consistent opacity */}
         <div className="hero-gradient-overlay" />
         
-        <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6 z-20">
+        <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-gray-900 px-6 z-20">
           <div className="space-y-8 max-w-2xl">
             <div className="animate-fadeInUp [animation-delay:0.2s]">
               <div className="css-logo">
@@ -1294,7 +1294,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               </h1>
             </div>
             
-            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl animate-fadeInUp [animation-delay:0.8s]">
+            <p className="text-2xl text-gray-900 font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl animate-fadeInUp [animation-delay:0.8s]">
               Track nutrition with scientific precision using our comprehensive USDA database
             </p>
             
@@ -1316,7 +1316,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           </div>
         </div>
         
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/60 z-30 animate-bounce">
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-gray-900/60 z-30 animate-bounce">
           <ChevronRight className="w-6 h-6 rotate-90 drop-shadow-lg" />
         </div>
       </div>
@@ -1329,9 +1329,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <div className="mb-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-2xl">🎯</span>
-                <h3 className="font-semibold text-lg text-white">Welcome to ByteWise!</h3>
+                <h3 className="font-semibold text-lg text-gray-900">Welcome to ByteWise!</h3>
               </div>
-              <p className="text-gray-700 dark:text-gray-300 text-sm mb-3">
+              <p className="text-gray-700 text-sm mb-3">
                 Ready to discover all the amazing features? Take our interactive tour to learn how to track nutrition and build healthy habits.
               </p>
               <div className="flex gap-2">
@@ -1358,7 +1358,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           )}
           
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-3xl font-black text-white">Today's Progress</h2>
+            <h2 className="text-3xl font-black text-gray-900">Today's Progress</h2>
             <div className="flex gap-2">
               <Button 
                 variant="ghost" 
@@ -1459,7 +1459,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
           {/* Micronutrients Section */}
           <div className="mb-4">
-            <h3 className="text-lg font-bold text-white mb-3 flex items-center">
+            <h3 className="text-lg font-bold text-gray-900 mb-3 flex items-center">
               <span className="w-2 h-2 bg-cyan-400 rounded-full mr-2"></span>
               Essential Micronutrients
             </h3>
@@ -1554,7 +1554,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         {trackingView === 'daily' && (
           <div className="space-y-4">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold text-white">
+              <h2 className="text-2xl font-bold text-gray-900">
                 {searchQuery ? 'Search Results' : "Today's Meals"}
               </h2>
               <div className="text-orange-400 font-bold">
@@ -1604,7 +1604,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <Card key={`search-${meal.id || meal.name}-${meal.timestamp || index}`} className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <h4 className="text-white font-semibold">{meal.name}</h4>
+                    <h4 className="text-gray-900 font-semibold">{meal.name}</h4>
                     <p className="text-gray-400 text-sm">
                       {meal.time} • {meal.mealType}
                       {searchQuery && (
@@ -1750,7 +1750,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         {trackingView === 'weekly' && (
           <div className="space-y-4">
             <div className="mb-4">
-              <h2 className="text-2xl font-bold text-white">This Week's Progress</h2>
+              <h2 className="text-2xl font-bold text-gray-900">This Week's Progress</h2>
               <p className="text-sm text-gray-400 mt-1">
                 {(() => {
                   const weekDates = getWeekDates(); // Use actual current week dates
@@ -1768,7 +1768,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md p-4">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h3 className="text-white font-semibold">Weekly Total</h3>
+                  <h3 className="text-gray-900 font-semibold">Weekly Total</h3>
                   <p className="text-gray-400 text-sm">{Math.round(weeklyCalories)}/{weeklyGoal} kcal</p>
                 </div>
                 <div className="text-right">
@@ -1818,7 +1818,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           {/* Daily Goals */}
           <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-white font-semibold text-2xl">Daily Goals</h3>
+              <h3 className="text-gray-900 font-semibold text-2xl">Daily Goals</h3>
               <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
                 <Target className="w-3 h-3 mr-1" />
                 3/5 Complete
@@ -2141,7 +2141,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     <Button 
                       type="button"
                       variant="link" 
-                      className="text-gray-300 hover:text-white text-sm"
+                      className="text-gray-700 hover:text-gray-900 text-sm"
                       onClick={() => setIsResetPassword(true)}
                       disabled={isLoading}
                     >
@@ -2154,7 +2154,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   <Button 
                     type="button"
                     variant="link" 
-                    className="text-gray-300 hover:text-white"
+                    className="text-gray-700 hover:text-gray-900"
                     onClick={() => {
                       setIsSignUp(!isSignUp && !isResetPassword);
                       setIsResetPassword(false);
@@ -2172,7 +2172,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     <Button 
                       type="button"
                       variant="link" 
-                      className="text-gray-300 hover:text-white text-sm"
+                      className="text-gray-700 hover:text-gray-900 text-sm"
                       onClick={handleResendVerification}
                       disabled={isLoading || !email}
                     >
@@ -2184,7 +2184,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
               {isSignUp && (
                 <div className="mt-4 p-3 bg-blue-500/20 rounded-lg">
-                  <p className="text-xs text-gray-200 text-center">
+                  <p className="text-xs text-gray-700 text-center">
                     By creating an account, you must verify your email address before you can sign in.
                   </p>
                 </div>
@@ -2272,7 +2272,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <Card key={`meal-${meal.id || meal.name}-${meal.timestamp || index}`} className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 p-4">
               <div className="flex items-center justify-between">
                 <div className="flex-1">
-                  <h4 className="text-white font-semibold">{meal.name}</h4>
+                  <h4 className="text-gray-900 font-semibold">{meal.name}</h4>
                   <p className="text-gray-400 text-sm">{meal.time} • {meal.mealType}</p>
                   <div className="flex space-x-4 mt-1">
                     <span className="text-xs text-green-400">P: {(meal.protein || 0).toFixed(1)}g</span>
@@ -2443,7 +2443,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                   nutritionMode === 'ai'
                     ? 'bg-blue-500 text-white shadow-lg'
-                    : 'text-gray-400 hover:text-white'
+                    : 'text-gray-600 hover:text-gray-900'
                 }`}
                 data-testid="button-ai-mode"
               >
@@ -2455,7 +2455,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                   nutritionMode === 'calculator'
                     ? 'bg-orange-500 text-white shadow-lg'
-                    : 'text-gray-400 hover:text-white'
+                    : 'text-gray-600 hover:text-gray-900'
                 }`}
                 data-testid="button-calculator-mode"
               >
@@ -2535,8 +2535,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                         <h3 className="text-lg sm:text-xl font-bold leading-tight" style={{ fontFamily: "'League Spartan', sans-serif" }}>
                           {user?.firstName || user?.email?.split('@')[0] || 'ByteWise User'}
                         </h3>
-                        <p className="text-gray-300 text-xs sm:text-sm truncate">{user?.email}</p>
-                        <div className="flex flex-wrap gap-x-2 sm:gap-x-3 gap-y-1 text-xs text-gray-400 mt-1">
+                        <p className="text-gray-700 text-xs sm:text-sm truncate">{user?.email}</p>
+                        <div className="flex flex-wrap gap-x-2 sm:gap-x-3 gap-y-1 text-xs text-gray-700 mt-1">
                           <span className="inline-flex items-center whitespace-nowrap">🏆 Level 1</span>
                           <span className="inline-flex items-center whitespace-nowrap">📊 {loggedMeals?.length || 0} meals</span>
                           <span className="inline-flex items-center whitespace-nowrap">🎯 {Math.round(dailyCalories)}/{goalCalories} cal</span>
@@ -2545,7 +2545,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     </div>
                     <div className="text-right flex-shrink-0 ml-2 sm:ml-3 min-w-[60px] sm:min-w-[80px]">
                       <div className="text-base sm:text-lg font-bold text-orange-400 leading-tight">{achievements?.length || 0}</div>
-                      <div className="text-xs text-gray-400 whitespace-nowrap leading-tight">Awards</div>
+                      <div className="text-xs text-gray-700 whitespace-nowrap leading-tight">Awards</div>
                     </div>
                   </div>
                 </AccordionTrigger>
@@ -2576,7 +2576,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                         <h3 className="text-xl font-semibold transition-colors" style={{ fontFamily: "'League Spartan', sans-serif" }}>
                           Awards
                         </h3>
-                        <p className="text-sm text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>
+                        <p className="text-sm text-gray-700" style={{ fontFamily: "'Work Sans', sans-serif" }}>
                           View your progress and goals
                         </p>
                       </div>
@@ -2601,7 +2601,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                         <h3 className="text-xl font-semibold transition-colors" style={{ fontFamily: "'League Spartan', sans-serif" }}>
                           Data
                         </h3>
-                        <p className="text-sm text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>
+                        <p className="text-sm text-gray-700" style={{ fontFamily: "'Work Sans', sans-serif" }}>
                           Manage your nutrition data
                         </p>
                       </div>
@@ -2804,7 +2804,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 className={`group ${
                   activeTab === tab.id
                     ? 'text-yellow-600'
-                    : 'text-gray-600 hover:text-gray-800 active:text-white'
+                    : 'text-gray-600 hover:text-gray-800 active:text-gray-900'
                 }`}
               >
                 <IconComponent 
@@ -2812,14 +2812,14 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   className={`mb-0.5 transition-all duration-300 ease-out transform ${
                     activeTab === tab.id 
                       ? 'scale-110 drop-shadow-lg text-yellow-600' 
-                      : 'scale-100 hover:scale-105 active:scale-125 active:text-white'
+                      : 'scale-100 hover:scale-105 active:scale-125 active:text-gray-900'
                   }`}
                   strokeWidth={activeTab === tab.id ? 2.5 : 2}
                 />
                 <span className={`text-[8px] font-semibold leading-tight text-center w-full transition-all duration-300 ease-out ${
                   activeTab === tab.id 
-                    ? 'text-white transform scale-105 drop-shadow-md' 
-                    : 'text-gray-600 hover:text-gray-800 active:text-white'
+                    ? 'text-gray-900 transform scale-105 drop-shadow-md' 
+                    : 'text-gray-600 hover:text-gray-800 active:text-gray-900'
                 }`}>{tab.label}</span>
               </button>
             )
