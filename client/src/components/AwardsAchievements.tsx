@@ -595,12 +595,15 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
                     : 'bg-gradient-to-br from-white via-gray-50 to-white text-gray-800 border-3 border-gray-300/70 hover:border-blue-400 hover:shadow-xl hover:shadow-blue-200/30 hover:scale-102 shadow-lg shadow-gray-300/40'
                 } rounded-3xl backdrop-blur-sm relative`}
               >
-                <div className={`w-16 h-16 p-4 rounded-2xl flex items-center justify-center ${isActive ? 'bg-white/25 border-2 border-white/40 shadow-lg shadow-black/20' : 'bg-gradient-to-br from-gray-100 to-gray-200 border-2 border-gray-300/50 shadow-inner shadow-gray-400/30'}`}>
-                  <IconComponent 
-                    className={`w-8 h-8 ${isActive ? 'text-white drop-shadow-sm' : 'text-gray-700'}`}
-                    strokeWidth={2.5}
-                  />
-                </div>
+                <IconComponent 
+                  className={`w-12 h-12 ${isActive ? 'text-white drop-shadow-lg filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.3)]' : 'text-gray-700 drop-shadow-lg filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.2)]'}`}
+                  strokeWidth={3}
+                  style={{
+                    filter: isActive 
+                      ? 'drop-shadow(0 4px 8px rgba(0,0,0,0.4)) drop-shadow(0 2px 4px rgba(255,255,255,0.2))' 
+                      : 'drop-shadow(0 2px 6px rgba(0,0,0,0.3)) drop-shadow(0 1px 2px rgba(255,255,255,0.6))'
+                  }}
+                />
                 <div className="text-center">
                   <div className={`text-base font-bold ${isActive ? 'text-white drop-shadow-sm' : 'text-gray-800'}`}>
                     {category.name}
