@@ -64,7 +64,7 @@ export function SessionStatus() {
   const isExpiringSoon = timeRemaining < 30 * 60 * 1000; // Less than 30 minutes
 
   return (
-    <Card className="p-4 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border-gray-200 dark:border-gray-700">
+    <Card className="p-4 bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-sm border-amber-200/40">
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm font-medium">

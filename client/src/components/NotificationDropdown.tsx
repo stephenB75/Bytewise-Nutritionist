@@ -138,7 +138,7 @@ export function NotificationDropdown({
       className="absolute top-full right-0 mt-2 w-80 max-h-96 z-50"
     >
       <Card 
-        className="p-4 bg-white/80 backdrop-blur-sm border-0 shadow-lg max-h-96 overflow-y-auto"
+        className="p-4 bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-sm border-0 shadow-lg max-h-96 overflow-y-auto"
         role="dialog"
         aria-modal="true"
         aria-labelledby="notifications-heading"
@@ -243,7 +243,7 @@ export function NotificationDropdown({
                   key={notification.id}
                   className={`p-2 rounded-lg border transition-all duration-200 ${
                     notification.read 
-                      ? 'bg-gray-50 border-gray-200' 
+                      ? 'bg-amber-50 border-amber-200' 
                       : 'bg-blue-50 border-blue-200 shadow-sm'
                   }`}
                 >
@@ -302,7 +302,7 @@ export function NotificationDropdown({
           <Separator className="my-4" />
           
           {/* View All Notifications Section */}
-          <div className="bg-gray-50 -mx-6 -mb-6 px-6 py-4 rounded-b-lg">
+          <div className="bg-amber-50 -mx-6 -mb-6 px-6 py-4 rounded-b-lg">
             <div className="flex items-center justify-between mb-3">
               <div>
                 <h4 className="text-sm font-medium text-gray-900">Notification Center</h4>

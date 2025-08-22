@@ -91,7 +91,7 @@ export function ResetPassword() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-white/80 backdrop-blur-md border-gray-200">
+      <Card className="w-full max-w-md bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40">
         <CardHeader className="text-center">
           <div className="mx-auto p-3 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full w-fit mb-4">
             <Lock className="w-8 h-8 text-white" />
@@ -140,7 +140,7 @@ export function ResetPassword() {
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="Enter new password (min 6 characters)"
-                    className="pl-10 bg-white/50 border-gray-300 text-gray-800 placeholder-gray-500 focus:border-purple-400 focus:ring-purple-400"
+                    className="pl-10 bg-white/80 border-amber-300 text-gray-900 placeholder-gray-500 focus:border-amber-400 focus:ring-amber-400"
                     required
                     minLength={6}
                   />
@@ -159,7 +159,7 @@ export function ResetPassword() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Re-enter new password"
-                    className="pl-10 bg-white/50 border-gray-300 text-gray-800 placeholder-gray-500 focus:border-purple-400 focus:ring-purple-400"
+                    className="pl-10 bg-white/80 border-amber-300 text-gray-900 placeholder-gray-500 focus:border-amber-400 focus:ring-amber-400"
                     required
                     minLength={6}
                   />

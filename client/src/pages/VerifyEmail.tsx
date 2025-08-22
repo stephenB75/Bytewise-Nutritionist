@@ -69,7 +69,7 @@ export default function VerifyEmail() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <Card className="max-w-md w-full bg-white/80 backdrop-blur-md border-gray-200 p-8">
+      <Card className="max-w-md w-full bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 p-8">
         <div className="text-center space-y-6">
           {verificationStatus === 'verifying' && (
             <>

@@ -21,7 +21,7 @@ export function MealCard({ meal, onClick }: MealCardProps) {
       case 'snack':
         return 'bg-purple-100 text-purple-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gradient-to-br from-amber-50 to-amber-100 text-gray-900';
     }
   };
 
