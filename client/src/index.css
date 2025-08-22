@@ -993,7 +993,7 @@ button[data-testid*="nav-"] {
 [data-testid="macro-card"] .text-gray-800,
 [data-testid="micro-card"] .text-gray-900,
 [data-testid="micro-card"] .text-gray-800 {
-  color: #374151 !important;
+  color: #111827 !important;
   text-shadow: none !important;
 }
 
