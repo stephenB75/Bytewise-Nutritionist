@@ -106,11 +106,11 @@ export function DataManagementPanel() {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="p-3 bg-gradient-to-br from-[#faed39] to-[#1f4aa6] rounded-xl">
-              <Database className="w-6 h-6 text-white" />
+              <Database className="w-6 h-6 text-gray-900" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-white" style={{ fontFamily: "'League Spartan', sans-serif" }}>Data Management</h2>
-              <p className="text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>Export, sync, and manage your nutrition data</p>
+              <h2 className="text-2xl font-bold text-gray-900" style={{ fontFamily: "'League Spartan', sans-serif" }}>Data Management</h2>
+              <p className="text-gray-700" style={{ fontFamily: "'Work Sans', sans-serif" }}>Export, sync, and manage your nutrition data</p>
             </div>
           </div>
         </div>
@@ -189,7 +189,7 @@ export function DataManagementPanel() {
                     </div>
                   </div>
 
-                  <Separator className="bg-white/20" />
+                  <Separator className="bg-amber-300/40" />
 
                   {/* Danger Zone */}
                   <div className="p-6 bg-red-950/30 rounded-2xl border border-red-800/30 backdrop-blur-md">

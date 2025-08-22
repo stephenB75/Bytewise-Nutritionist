@@ -592,10 +592,10 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
                 className={`h-24 w-full min-w-[140px] max-w-[140px] p-4 flex flex-col items-center justify-center space-y-2 transition-all duration-300 ${
                   isActive
                     ? 'bg-gradient-to-br from-[#1f4aa6] via-[#45c73e] to-[#faed39] text-gray-950 shadow-2xl border-2 border-transparent transform scale-105' 
-                    : 'bg-white/95 hover:bg-white text-gray-700 border-2 border-white/30 hover:border-[#1f4aa6] hover:shadow-xl hover:scale-102'
+                    : 'bg-gradient-to-br from-amber-100 to-amber-200 hover:from-amber-200 hover:to-amber-300 text-gray-700 border-2 border-amber-300/40 hover:border-[#1f4aa6] hover:shadow-xl hover:scale-102'
                 } rounded-2xl backdrop-blur-sm relative`}
               >
-                <div className={`w-12 h-12 p-3 rounded-xl flex items-center justify-center ${isActive ? 'bg-white/20' : 'bg-[#1f4aa6]/10'}`}>
+                <div className={`w-12 h-12 p-3 rounded-xl flex items-center justify-center ${isActive ? 'bg-white/20' : 'bg-amber-50/80 border border-amber-200'}`}>
                   <IconComponent 
                     className={`w-6 h-6 ${isActive ? 'text-gray-950' : 'text-[#1f4aa6]'}`}
                     strokeWidth={2.5}
@@ -642,7 +642,7 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
           }).map((achievement) => (
             <Card 
               key={achievement.id} 
-              className={`bg-white/10 backdrop-blur-md border-white/20 p-6 transition-all duration-200 hover:bg-white/15 ${
+              className={`bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200/40 p-6 transition-all duration-200 hover:from-amber-100 hover:to-amber-200 ${
                 achievement.completed ? 'ring-2 ring-[#45c73e]/30' : ''
               }`}
             >

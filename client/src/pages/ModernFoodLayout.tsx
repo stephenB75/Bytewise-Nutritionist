@@ -2516,8 +2516,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           >
             {/* Consolidated Profile Card */}
             <AccordionItem value="profile" className="border-none">
-              <Card className="bg-white/10 backdrop-blur-md border-white/20 overflow-hidden rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:bg-white/15 hover:border-white/30">
-                <AccordionTrigger className="px-4 sm:px-6 py-4 sm:py-6 hover:bg-white/5 hover:no-underline [&[data-state=open]]:bg-white/5 [&>svg]:ml-2 sm:[&>svg]:ml-4">
+              <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 overflow-hidden rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:from-amber-100 hover:to-amber-200 hover:border-amber-300/50">
+                <AccordionTrigger className="px-4 sm:px-6 py-4 sm:py-6 hover:bg-amber-200/30 hover:no-underline [&[data-state=open]]:bg-amber-200/30 [&>svg]:ml-2 sm:[&>svg]:ml-4">
                   <div className="flex items-start justify-between w-full pr-2 sm:pr-4">
                     <div className="flex items-start space-x-3 sm:space-x-4 flex-1 min-w-0">
                       <div className="relative flex-shrink-0">
@@ -2535,8 +2535,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                         <h3 className="text-lg sm:text-xl font-bold leading-tight" style={{ fontFamily: "'League Spartan', sans-serif" }}>
                           {user?.firstName || user?.email?.split('@')[0] || 'ByteWise User'}
                         </h3>
-                        <p className="text-gray-300 text-xs sm:text-sm truncate">{user?.email}</p>
-                        <div className="flex flex-wrap gap-x-2 sm:gap-x-3 gap-y-1 text-xs text-gray-400 mt-1">
+                        <p className="text-gray-700 text-xs sm:text-sm truncate">{user?.email}</p>
+                        <div className="flex flex-wrap gap-x-2 sm:gap-x-3 gap-y-1 text-xs text-gray-600 mt-1">
                           <span className="inline-flex items-center whitespace-nowrap">🏆 Level 1</span>
                           <span className="inline-flex items-center whitespace-nowrap">📊 {loggedMeals?.length || 0} meals</span>
                           <span className="inline-flex items-center whitespace-nowrap">🎯 {Math.round(dailyCalories)}/{goalCalories} cal</span>
@@ -2545,17 +2545,17 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     </div>
                     <div className="text-right flex-shrink-0 ml-2 sm:ml-3 min-w-[60px] sm:min-w-[80px]">
                       <div className="text-base sm:text-lg font-bold text-orange-400 leading-tight">{achievements?.length || 0}</div>
-                      <div className="text-xs text-gray-400 whitespace-nowrap leading-tight">Awards</div>
+                      <div className="text-xs text-gray-600 whitespace-nowrap leading-tight">Awards</div>
                     </div>
                   </div>
                 </AccordionTrigger>
 
                 <AccordionContent className="px-6 pb-6 pt-2">
-                  <div className="border-t border-white/10 pt-6 mt-2">
+                  <div className="border-t border-amber-300/30 pt-6 mt-2">
                     <UserSettingsManager />
                     
                     {/* Apple Health Integration */}
-                    <div className="mt-6 pt-4 border-t border-white/10">
+                    <div className="mt-6 pt-4 border-t border-amber-300/30">
                       <AppleHealthIntegration onHealthDataSync={handleHealthDataSync} />
                     </div>
                     
@@ -2567,8 +2567,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             
             {/* Awards Card */}
             <AccordionItem value="achievements" className="border-none">
-              <Card data-testid="achievements-section" className="bg-white/10 backdrop-blur-md border-white/20 overflow-hidden rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:bg-white/15 hover:border-white/30">
-                <AccordionTrigger className="px-6 py-6 hover:bg-white/5 hover:no-underline [&[data-state=open]>div]:text-[#faed39] [&[data-state=open]]:bg-white/5">
+              <Card data-testid="achievements-section" className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 overflow-hidden rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:from-amber-100 hover:to-amber-200 hover:border-amber-300/50">
+                <AccordionTrigger className="px-6 py-6 hover:bg-amber-200/30 hover:no-underline [&[data-state=open]>div]:text-[#faed39] [&[data-state=open]]:bg-amber-200/30">
                   <div className="flex items-center justify-between w-full">
                     <div className="flex items-center space-x-3">
                       <Trophy className="w-6 h-6 text-[#faed39]" />
@@ -2576,7 +2576,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                         <h3 className="text-xl font-semibold transition-colors" style={{ fontFamily: "'League Spartan', sans-serif" }}>
                           Awards
                         </h3>
-                        <p className="text-sm text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>
+                        <p className="text-sm text-gray-700" style={{ fontFamily: "'Work Sans', sans-serif" }}>
                           View your progress and goals
                         </p>
                       </div>
@@ -2592,8 +2592,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             
             {/* Data Management Card */}
             <AccordionItem value="data" className="border-none">
-              <Card className="bg-white/10 backdrop-blur-md border-white/20 overflow-hidden rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:bg-white/15 hover:border-white/30">
-                <AccordionTrigger className="px-6 py-6 hover:bg-white/5 hover:no-underline [&[data-state=open]>div]:text-[#faed39] [&[data-state=open]]:bg-white/5">
+              <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 overflow-hidden rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:from-amber-100 hover:to-amber-200 hover:border-amber-300/50">
+                <AccordionTrigger className="px-6 py-6 hover:bg-amber-200/30 hover:no-underline [&[data-state=open]>div]:text-[#faed39] [&[data-state=open]]:bg-amber-200/30">
                   <div className="flex items-center justify-between w-full">
                     <div className="flex items-center space-x-3 text-left">
                       <Download className="w-6 h-6 text-[#faed39]" />
@@ -2601,7 +2601,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                         <h3 className="text-xl font-semibold transition-colors" style={{ fontFamily: "'League Spartan', sans-serif" }}>
                           Data
                         </h3>
-                        <p className="text-sm text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>
+                        <p className="text-sm text-gray-700" style={{ fontFamily: "'Work Sans', sans-serif" }}>
                           Manage your nutrition data
                         </p>
                       </div>
