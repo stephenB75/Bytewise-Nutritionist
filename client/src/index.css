@@ -449,11 +449,11 @@ button.btn-hero-enhanced span,
   color: #f3f4f6 !important; 
 }
 
-/* Hero section container text overrides - light for dark overlay */
-.hero-component .absolute.inset-0.flex.flex-col .text-white,
-.hero-component .text-white,
-[data-hero="true"] .absolute.inset-0.flex.flex-col .text-white,
-[data-hero="true"] .text-white { 
+/* Hero section container text overrides - light for dark overlay, EXCEPT headlines */
+.hero-component .absolute.inset-0.flex.flex-col .text-white:not(h1):not(h2):not(h3):not(h4):not(h5):not(h6),
+.hero-component .text-white:not(h1):not(h2):not(h3):not(h4):not(h5):not(h6),
+[data-hero="true"] .absolute.inset-0.flex.flex-col .text-white:not(h1):not(h2):not(h3):not(h4):not(h5):not(h6),
+[data-hero="true"] .text-white:not(h1):not(h2):not(h3):not(h4):not(h5):not(h6) { 
   color: #ffffff !important; 
 }
 
