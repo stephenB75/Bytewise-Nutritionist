@@ -960,19 +960,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     }
   ];
 
-  // Get animation direction based on tab transition
-  const getAnimationDirection = (currentTab: string, prevTab: string) => {
-    const tabOrder = ['home', 'nutrition', 'fasting', 'daily', 'profile', 'search', 'tracking', 'achievements', 'data'];
-    const currentIndex = tabOrder.indexOf(currentTab);
-    const prevIndex = tabOrder.indexOf(prevTab);
-    
-    if (currentIndex > prevIndex) {
-      return 'slide-in-from-right-4';
-    } else if (currentIndex < prevIndex) {
-      return 'slide-in-from-left-4';
-    }
-    return 'slide-in-from-bottom-4';
-  };
+  // Removed page animation direction function
 
   // Enhanced tab change handler with hero component scroll reset
   const [, setLocation] = useLocation();
@@ -1361,7 +1349,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   // Render functions for each page with enhanced animations
   const renderHome = () => (
-    <div className={`space-y-0 page-container animate-in fade-in ${getAnimationDirection('home', previousTab)} duration-700 ease-out`} data-page="dashboard">
+    <div className="space-y-0 page-container" data-page="dashboard">
       <HeroSection
         title="Track Your"
         subtitle="Nutrition"
@@ -1540,7 +1528,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   );
 
   const renderTracking = () => (
-    <div className={`space-y-0 page-container animate-in fade-in ${getAnimationDirection('tracking', previousTab)} duration-700 ease-out`}>
+    <div className="space-y-0 page-container">
       <HeroSection
         title="Daily &"
         subtitle="Weekly"
@@ -1852,7 +1840,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   );
 
   const renderAchievements = () => (
-    <div className={`space-y-0 animate-in fade-in ${getAnimationDirection('achievements', previousTab)} duration-700 ease-out`}>
+    <div className="space-y-0">
       <HeroSection
         title="Your"
         subtitle="Goals"
@@ -2136,7 +2124,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     };
 
     return (
-      <div className="space-y-0 animate-in fade-in slide-in-from-top-4 duration-500">
+      <div className="space-y-0">
         <HeroSection
           title="Welcome to"
           subtitle="Nutrition"
@@ -2252,7 +2240,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   };
 
   const renderDailyWeekly = () => (
-    <div className={`space-y-0 animate-in fade-in ${getAnimationDirection('daily', previousTab)} duration-700 ease-out`}>
+    <div className="space-y-0">
       <HeroSection
         title="Daily &"
         subtitle="Weekly"
@@ -2440,7 +2428,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   const renderCalculator = () => {
     return (
-      <div className={`space-y-0 page-container animate-in fade-in ${getAnimationDirection('nutrition', previousTab)} duration-700 ease-out`}>
+      <div className="space-y-0 page-container">
         <HeroSection
           title="Smart"
           subtitle="Nutrition"
@@ -2536,7 +2524,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   };
 
   const renderProfile = () => (
-    <div className={`space-y-0 page-container animate-in fade-in ${getAnimationDirection('profile', previousTab)} duration-700 ease-out`}>
+    <div className="space-y-0 page-container">
       <HeroSection
         title="Your"
         subtitle="Profile"
@@ -3006,7 +2994,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         return renderDailyWeekly();
       case 'fasting':
         return (
-          <div className={`space-y-0 animate-in fade-in ${getAnimationDirection('fasting', previousTab)} duration-700 ease-out`}>
+          <div className="space-y-0">
             <HeroSection
               title="Intermittent"
               subtitle="Fasting"
@@ -3042,7 +3030,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         return renderDailyWeekly();
       case 'data':
         return (
-          <div className={`space-y-0 animate-in fade-in ${getAnimationDirection('data', previousTab)} duration-700 ease-out`}>
+          <div className="space-y-0">
             <HeroSection
               title="Data"
               subtitle="Management"
