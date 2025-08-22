@@ -846,7 +846,7 @@ export function FastingTracker() {
                 </div>
                 <Progress 
                   value={getProgressPercentage()} 
-                  className="h-3 [&>div]:bg-blue-500"
+                  className="h-3 [&>div]:bg-orange-500"
                   data-testid="fasting-progress"
                 />
                 <p className="text-sm text-gray-700">

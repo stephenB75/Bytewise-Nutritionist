@@ -111,7 +111,7 @@ export function WeekProgress({
 
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-4 rounded-xl border border-blue-100">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
               <Activity className="w-4 h-4 text-amber-700" />
             </div>
             <div>

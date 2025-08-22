@@ -1027,7 +1027,6 @@ button[data-testid="button-notifications"] svg {
 }
 
 /* Button Text Visibility */
-button.bg-blue-500,
 button.bg-orange-500,
 button.bg-red-500,
 .bg-gradient-to-r.from-orange-500.to-red-500 {
