@@ -2772,7 +2772,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 />
                 <span className={`text-[8px] font-semibold leading-tight text-center w-full transition-all duration-300 ease-out ${
                   activeTab === tab.id 
-                    ? 'text-gray-900 transform scale-105 drop-shadow-md' 
+                    ? 'text-white transform scale-105 drop-shadow-md' 
                     : 'text-gray-600 hover:text-white active:text-gray-900'
                 }`}>{tab.label}</span>
               </button>
