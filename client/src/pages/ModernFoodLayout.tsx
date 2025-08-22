@@ -2691,7 +2691,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <div className="absolute top-full right-0 mt-2 w-80 bg-black/90 backdrop-blur-md border border-white/20 rounded-2xl shadow-2xl overflow-hidden z-40">
               <div className="p-4 border-b border-white/10">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-semibold">Notifications</h3>
+                  <h3 className="font-semibold text-white">Notifications</h3>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -2712,7 +2712,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                       <div className="flex-1">
                         <h4 className="text-white font-medium text-sm">{notification.title}</h4>
                         <p className="text-gray-400 text-xs mt-1">{notification.message}</p>
-                        <p className="text-gray-500 text-xs mt-2">
+                        <p className="text-gray-300 text-xs mt-2">
                           {notification.timestamp.toLocaleDateString()}
                         </p>
                       </div>
