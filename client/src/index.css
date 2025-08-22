@@ -229,11 +229,23 @@ button.btn-hero-enhanced span,
   color: #f3f4f6 !important; 
 }
 
-/* Override any dark text in dashboard hero - EXCLUDE metrics cards */
-[data-page="dashboard"] .text-black:not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
-[data-page="dashboard"] .text-gray-900:not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
-[data-page="dashboard"] .text-gray-800:not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
-[data-page="dashboard"] .text-gray-700:not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *) {
+/* Make dashboard content dark for yellow background - EXCLUDE hero components and metrics cards */
+[data-page="dashboard"] .text-black:not(.hero-component *):not([data-hero="true"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
+[data-page="dashboard"] .text-gray-900:not(.hero-component *):not([data-hero="true"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
+[data-page="dashboard"] .text-gray-800:not(.hero-component *):not([data-hero="true"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
+[data-page="dashboard"] .text-gray-700:not(.hero-component *):not([data-hero="true"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *) {
+  color: #111827 !important; /* Dark for yellow background */
+}
+
+/* Hero components keep white text for dark overlays */
+[data-page="dashboard"] .hero-component .text-black,
+[data-page="dashboard"] .hero-component .text-gray-900,
+[data-page="dashboard"] .hero-component .text-gray-800,
+[data-page="dashboard"] .hero-component .text-gray-700,
+[data-page="dashboard"] [data-hero="true"] .text-black,
+[data-page="dashboard"] [data-hero="true"] .text-gray-900,
+[data-page="dashboard"] [data-hero="true"] .text-gray-800,
+[data-page="dashboard"] [data-hero="true"] .text-gray-700 {
   color: #ffffff !important;
 }
 
@@ -244,15 +256,18 @@ button.btn-hero-enhanced span,
   color: #ffffff !important;
 }
 
-/* Comprehensive dark text fixes for entire dashboard page - EXCLUDE metrics cards */
-[data-page="dashboard"] .text-gray-900:not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
-[data-page="dashboard"] .text-gray-800:not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
-/* Dashboard page text override - EXCLUDE metrics cards */
-[data-page="dashboard"] .text-gray-700:not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
-[data-page="dashboard"] .text-gray-600:not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
-[data-page="dashboard"] .text-gray-500:not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
-[data-page="dashboard"] .text-black:not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *) {
-  color: #ffffff !important;
+/* Dashboard content text - dark for yellow background, EXCLUDE hero components and metrics cards */
+[data-page="dashboard"] .text-gray-600:not(.hero-component *):not([data-hero="true"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
+[data-page="dashboard"] .text-gray-500:not(.hero-component *):not([data-hero="true"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *) {
+  color: #374151 !important; /* Medium gray for yellow background */
+}
+
+/* Hero components keep lighter gray text for dark overlays */
+[data-page="dashboard"] .hero-component .text-gray-600,
+[data-page="dashboard"] .hero-component .text-gray-500,
+[data-page="dashboard"] [data-hero="true"] .text-gray-600,
+[data-page="dashboard"] [data-hero="true"] .text-gray-500 {
+  color: #9ca3af !important;
 }
 
 [data-page="dashboard"] .text-gray-400 {
@@ -263,28 +278,66 @@ button.btn-hero-enhanced span,
   color: #f3f4f6 !important;
 }
 
-/* Dashboard content text fixes */
-[data-page="dashboard"] h1,
-[data-page="dashboard"] h2,
-[data-page="dashboard"] h3,
-[data-page="dashboard"] h4,
-[data-page="dashboard"] h5,
-[data-page="dashboard"] h6 {
+/* Dashboard headings - dark for yellow background, EXCLUDE hero components */
+[data-page="dashboard"] h1:not(.hero-component *):not([data-hero="true"] *),
+[data-page="dashboard"] h2:not(.hero-component *):not([data-hero="true"] *),
+[data-page="dashboard"] h3:not(.hero-component *):not([data-hero="true"] *),
+[data-page="dashboard"] h4:not(.hero-component *):not([data-hero="true"] *),
+[data-page="dashboard"] h5:not(.hero-component *):not([data-hero="true"] *),
+[data-page="dashboard"] h6:not(.hero-component *):not([data-hero="true"] *) {
+  color: #111827 !important; /* Dark for yellow background */
+}
+
+/* Hero headings keep white text for dark overlays */
+[data-page="dashboard"] .hero-component h1,
+[data-page="dashboard"] .hero-component h2,
+[data-page="dashboard"] .hero-component h3,
+[data-page="dashboard"] .hero-component h4,
+[data-page="dashboard"] .hero-component h5,
+[data-page="dashboard"] .hero-component h6,
+[data-page="dashboard"] [data-hero="true"] h1,
+[data-page="dashboard"] [data-hero="true"] h2,
+[data-page="dashboard"] [data-hero="true"] h3,
+[data-page="dashboard"] [data-hero="true"] h4,
+[data-page="dashboard"] [data-hero="true"] h5,
+[data-page="dashboard"] [data-hero="true"] h6 {
   color: #ffffff !important;
 }
 
-[data-page="dashboard"] span,
-[data-page="dashboard"] div:not(.bg-gradient-to-r):not([class*="bg-"]) {
+/* Dashboard spans and divs - dark for yellow background, EXCLUDE hero components and metrics cards */
+[data-page="dashboard"] span:not(.hero-component *):not([data-hero="true"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
+[data-page="dashboard"] div:not(.bg-gradient-to-r):not([class*="bg-"]):not(.hero-component *):not([data-hero="true"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *) {
+  color: #111827 !important; /* Dark for yellow background */
+}
+
+/* Hero spans and divs keep white text for dark overlays */
+[data-page="dashboard"] .hero-component span,
+[data-page="dashboard"] .hero-component div:not(.bg-gradient-to-r):not([class*="bg-"]),
+[data-page="dashboard"] [data-hero="true"] span,
+[data-page="dashboard"] [data-hero="true"] div:not(.bg-gradient-to-r):not([class*="bg-"]) {
   color: #ffffff !important;
 }
 
-/* Dashboard button and interactive text - EXCLUDE navigation buttons */
-[data-page="dashboard"] button:not(.bg-gradient-to-r):not([data-testid*="nav-"]) {
+/* Dashboard buttons - dark for yellow background, EXCLUDE hero components and navigation */
+[data-page="dashboard"] button:not(.bg-gradient-to-r):not([data-testid*="nav-"]):not(.hero-component *):not([data-hero="true"] *):not(.btn-hero-enhanced) {
+  color: #111827 !important; /* Dark for yellow background */
+}
+
+/* Hero buttons keep white text for dark overlays */
+[data-page="dashboard"] .hero-component button:not([data-testid*="nav-"]),
+[data-page="dashboard"] [data-hero="true"] button:not([data-testid*="nav-"]),
+[data-page="dashboard"] .btn-hero-enhanced {
   color: #ffffff !important;
 }
 
-/* Dashboard card and section text */
-[data-page="dashboard"] .content-section *:not(.bg-gradient-to-r *):not([class*="bg-"] *) {
+/* Dashboard content sections - dark for yellow background, EXCLUDE hero components and metrics cards */
+[data-page="dashboard"] .content-section *:not(.bg-gradient-to-r *):not([class*="bg-"] *):not(.hero-component *):not([data-hero="true"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *) {
+  color: #111827 !important; /* Dark for yellow background */
+}
+
+/* Hero content sections keep white text for dark overlays */
+[data-page="dashboard"] .hero-component .content-section *:not(.bg-gradient-to-r *):not([class*="bg-"] *),
+[data-page="dashboard"] [data-hero="true"] .content-section *:not(.bg-gradient-to-r *):not([class*="bg-"] *) {
   color: #ffffff !important;
 }
 
@@ -842,7 +895,14 @@ button.bg-gray-100 {
 .bg-white\/10 h3:not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
 .bg-white\/10 h4:not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
 .bg-white\/10 p:not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
-.bg-white\/10 span:not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *) {
+/* Semi-transparent backgrounds - dark text for yellow background, EXCLUDE hero components and metrics cards */
+.bg-white\/10 span:not(.hero-component *):not([data-hero="true"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *) {
+  color: #374151 !important; /* Dark gray for yellow background */
+}
+
+/* Hero components keep white text for dark overlays */
+.hero-component .bg-white\/10 span,
+[data-hero="true"] .bg-white\/10 span {
   color: #ffffff !important;
 }
 
@@ -911,8 +971,21 @@ select[class*="bg-gray"] {
 
 /* Progress Cards and Stats - use original component styling */
 
-.text-white.font-semibold,
-.text-white.font-bold {
+/* Bold text - dark for yellow background, white for hero components and special buttons */
+.text-white.font-semibold:not(.hero-component *):not([data-hero="true"] *):not(.btn-hero-enhanced):not([data-testid*="nav-"] *),
+.text-white.font-bold:not(.hero-component *):not([data-hero="true"] *):not(.btn-hero-enhanced):not([data-testid*="nav-"] *) {
+  color: #111827 !important; /* Dark for yellow background */
+}
+
+/* Hero and special elements keep white bold text */
+.hero-component .text-white.font-semibold,
+.hero-component .text-white.font-bold,
+[data-hero="true"] .text-white.font-semibold,
+[data-hero="true"] .text-white.font-bold,
+.btn-hero-enhanced.text-white.font-semibold,
+.btn-hero-enhanced.text-white.font-bold,
+[data-testid*="nav-"] .text-white.font-semibold,
+[data-testid*="nav-"] .text-white.font-bold {
   color: #ffffff !important;
 }
 
@@ -930,25 +1003,32 @@ button.text-blue-400 {
   color: #1f2937 !important;
 }
 
-/* Ensure dark backgrounds have light text */
-.bg-gray-800 *:not([class*="bg-"]),
-.bg-gray-900 *:not([class*="bg-"]),
-.bg-black *:not([class*="bg-"]) {
+/* Dark backgrounds - white text for actual dark backgrounds, EXCLUDE when used on yellow background */
+.bg-gray-800:not(.min-h-screen) *:not([class*="bg-"]),
+.bg-gray-900:not(.min-h-screen) *:not([class*="bg-"]),
+.bg-black:not(.min-h-screen) *:not([class*="bg-"]) {
   color: #ffffff !important;
 }
 
-/* Global gradient background ensures dark text for readability - EXCLUDE metrics cards */
-body *:not([class*="text-"]):not([class*="bg-"]):not(.text-white):not([class*="text-cyan"]):not([class*="text-orange"]):not([class*="text-red"]):not([class*="text-blue"]):not([class*="text-green"]):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *) {
+/* Full screen dark backgrounds that get overridden by yellow gradient should use dark text */
+.bg-gray-800.min-h-screen *:not([class*="bg-"]):not(.hero-component *):not([data-hero="true"] *),
+.bg-gray-900.min-h-screen *:not([class*="bg-"]):not(.hero-component *):not([data-hero="true"] *),
+.bg-black.min-h-screen *:not([class*="bg-"]):not(.hero-component *):not([data-hero="true"] *) {
+  color: #1f2937 !important; /* Dark for yellow background */
+}
+
+/* Global gradient background ensures dark text for readability - EXCLUDE hero components and metrics cards */
+body *:not([class*="text-"]):not([class*="bg-"]):not(.text-white):not([class*="text-cyan"]):not([class*="text-orange"]):not([class*="text-red"]):not([class*="text-blue"]):not([class*="text-green"]):not(.hero-component *):not([data-hero="true"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *) {
   color: #1f2937 !important;
 }
 
-/* Ensure specific text elements are dark on gradient background - EXCLUDE metrics cards */
-body h1:not([class*="text-"]):not(.text-white):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
-body h2:not([class*="text-"]):not(.text-white):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
-body h3:not([class*="text-"]):not(.text-white):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
-body p:not([class*="text-"]):not(.text-white):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
-body span:not([class*="text-"]):not(.text-white):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
-body div:not([class*="text-"]):not(.text-white):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *) {
+/* Ensure specific text elements are dark on gradient background - EXCLUDE hero components and metrics cards */
+body h1:not([class*="text-"]):not(.text-white):not(.hero-component *):not([data-hero="true"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
+body h2:not([class*="text-"]):not(.text-white):not(.hero-component *):not([data-hero="true"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
+body h3:not([class*="text-"]):not(.text-white):not(.hero-component *):not([data-hero="true"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
+body p:not([class*="text-"]):not(.text-white):not(.hero-component *):not([data-hero="true"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
+body span:not([class*="text-"]):not(.text-white):not(.hero-component *):not([data-hero="true"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
+body div:not([class*="text-"]):not(.text-white):not(.hero-component *):not([data-hero="true"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *) {
   color: #1f2937 !important;
 }
 
@@ -965,11 +1045,21 @@ div[class*="min-h-screen"]:not([data-testid*="navigation"]),
 /* Navigation elements use standard Tailwind styling */
 
 
-/* Ensure all metrics text is dark enough - EXCLUDE metrics cards */
-.backdrop-blur-md .text-white:not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
-.bg-white\/10 .text-white:not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
-.bg-white\/15 .text-white:not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *) {
-  color: #374151 !important;
+/* Backdrop blur and semi-transparent elements - dark text for yellow background, EXCLUDE hero components and metrics cards */
+.backdrop-blur-md .text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
+.bg-white\/10 .text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
+.bg-white\/15 .text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *) {
+  color: #374151 !important; /* Dark gray for yellow background */
+}
+
+/* Hero components keep white text for dark overlays */
+.hero-component .backdrop-blur-md .text-white,
+.hero-component .bg-white\/10 .text-white,
+.hero-component .bg-white\/15 .text-white,
+[data-hero="true"] .backdrop-blur-md .text-white,
+[data-hero="true"] .bg-white\/10 .text-white,
+[data-hero="true"] .bg-white\/15 .text-white {
+  color: #ffffff !important;
 }
 
 /* Metrics cards use their original component styling - no overrides */
@@ -2869,9 +2959,9 @@ select {
   color: white;
 }
 
-/* Force all text in hero components to be white */
-.hero-component *,
-[data-hero="true"] * {
+/* Hero components text - comprehensive white text for dark overlays */
+.hero-component *:not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
+[data-hero="true"] *:not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *) {
   color: white !important;
 }
 
