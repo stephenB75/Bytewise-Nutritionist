@@ -1360,7 +1360,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           )}
           
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-xl font-black text-white">Today's Progress</h2>
+            <h2 className="text-xl font-black text-gray-950">Today's Progress</h2>
             <div className="flex gap-2">
               <Button 
                 variant="ghost" 
@@ -1383,17 +1383,17 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               color="orange"
             />
             <div className="grid grid-cols-3 gap-3 mt-4">
-              <div className="text-center p-2 bg-gray-800/50 rounded-lg">
-                <div className="text-sm font-bold text-orange-400">{loggedMeals.length}</div>
-                <div className="text-xs text-gray-400">Meals</div>
+              <div className="text-center p-2 bg-gradient-to-br from-amber-100 to-amber-200 rounded-lg">
+                <div className="text-sm font-bold text-orange-600">{loggedMeals.length}</div>
+                <div className="text-xs text-gray-900">Meals</div>
               </div>
-              <div className="text-center p-2 bg-gray-800/50 rounded-lg">
-                <div className="text-sm font-bold text-orange-400">{Math.round(goalCalories - dailyCalories)}</div>
-                <div className="text-xs text-gray-400">Remaining</div>
+              <div className="text-center p-2 bg-gradient-to-br from-amber-100 to-amber-200 rounded-lg">
+                <div className="text-sm font-bold text-orange-600">{Math.round(goalCalories - dailyCalories)}</div>
+                <div className="text-xs text-gray-900">Remaining</div>
               </div>
-              <div className="text-center p-2 bg-gray-800/50 rounded-lg">
-                <div className="text-sm font-bold text-orange-400">{Math.round((dailyCalories/goalCalories)*100)}%</div>
-                <div className="text-xs text-gray-400">Complete</div>
+              <div className="text-center p-2 bg-gradient-to-br from-amber-100 to-amber-200 rounded-lg">
+                <div className="text-sm font-bold text-orange-600">{Math.round((dailyCalories/goalCalories)*100)}%</div>
+                <div className="text-xs text-gray-900">Complete</div>
               </div>
             </div>
           </div>
@@ -1429,9 +1429,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 { label: 'Remain', value: Math.round(weeklyGoal - weeklyCalories) },
                 { label: 'Total', value: loggedMeals.length }
               ].map((item, index) => (
-                <div key={index} className="text-center p-2 bg-gray-800/50 rounded-lg">
-                  <div className="text-sm font-bold text-blue-400">{item.value}</div>
-                  <div className="text-xs text-gray-400">{item.label}</div>
+                <div key={index} className="text-center p-2 bg-gradient-to-br from-amber-100 to-amber-200 rounded-lg">
+                  <div className="text-sm font-bold text-blue-700">{item.value}</div>
+                  <div className="text-xs text-gray-900">{item.label}</div>
                 </div>
               ))}
             </div>
@@ -1461,7 +1461,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
           {/* Micronutrients Section */}
           <div className="mb-4">
-            <h3 className="text-lg font-bold text-white mb-3 flex items-center">
+            <h3 className="text-lg font-bold text-gray-950 mb-3 flex items-center">
               <span className="w-2 h-2 bg-cyan-400 rounded-full mr-2"></span>
               Essential Micronutrients
             </h3>
@@ -1515,7 +1515,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             />
           </div>
           <div className="mt-2 text-center">
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-gray-900">
               🔍 Search through your last month of logged meals
             </p>
           </div>
