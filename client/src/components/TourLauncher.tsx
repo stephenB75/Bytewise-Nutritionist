@@ -64,7 +64,8 @@ const TOUR_FEATURES = [
     title: 'Achievement System',
     description: 'Unlock rewards as you hit your goals',
     category: 'Motivation',
-    targetTab: 'profile'
+    targetTab: 'profile',
+    accordionTarget: 'achievements'
   },
   {
     icon: <Droplets className="w-5 h-5 text-cyan-500" />,
@@ -88,11 +89,12 @@ export function TourLauncher({ isVisible = true, onNavigateToFeature }: TourLaun
       onNavigateToFeature(feature.targetTab);
     }
     
-    // Always send custom event with both tab and mode info
+    // Always send custom event with tab, mode, and accordion info
     window.dispatchEvent(new CustomEvent('navigate-to-tab', {
       detail: { 
         tab: feature.targetTab,
-        nutritionMode: feature.nutritionMode
+        nutritionMode: feature.nutritionMode,
+        accordionTarget: feature.accordionTarget
       }
     }));
   };

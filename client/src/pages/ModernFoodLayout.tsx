@@ -791,12 +791,19 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     // Handle tour navigation
     const handleTourNavigation = (event: Event) => {
       const customEvent = event as CustomEvent;
-      const { tab, nutritionMode } = customEvent.detail;
+      const { tab, nutritionMode, accordionTarget } = customEvent.detail;
       setActiveTab(tab);
       
       // Set nutrition mode if specified
       if (nutritionMode && (nutritionMode === 'ai' || nutritionMode === 'calculator')) {
         setNutritionMode(nutritionMode);
+      }
+      
+      // Open specific accordion if specified
+      if (accordionTarget) {
+        setTimeout(() => {
+          setOpenCard(accordionTarget);
+        }, 100); // Small delay to ensure tab switch completes first
       }
     };
 
