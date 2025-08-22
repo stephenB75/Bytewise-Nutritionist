@@ -123,6 +123,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   const [notifications, setNotifications] = useState<Notification[]>([]);
   
+  // Tour progress tracking
+  const [tourProgress, setTourProgress] = useState(() => {
+    const saved = localStorage.getItem('tour-progress');
+    return saved ? JSON.parse(saved) : { clickedCards: [], suggestedNext: 0 };
+  });
+  
   // Toast hook for notifications
   const { toast } = useToast();
   
@@ -2714,11 +2720,28 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                               </div>
                             </div>
                             
+                            {/* Progress indicator */}
+                            {tourProgress.clickedCards.length > 0 && (
+                              <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
+                                <div className="flex items-center gap-2 text-green-800">
+                                  <CheckCircle2 className="w-4 h-4" />
+                                  <span className="text-sm font-medium">
+                                    Progress: {tourProgress.clickedCards.length}/6 features explored
+                                  </span>
+                                </div>
+                                {tourProgress.suggestedNext < 6 && (
+                                  <p className="text-xs text-green-700 mt-1">
+                                    Try the highlighted card next! 💫
+                                  </p>
+                                )}
+                              </div>
+                            )}
+                            
                             {/* Feature Cards Grid */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                               {[
                                 {
-                                  icon: <Utensils className="w-5 h-5 text-orange-500" />,
+                                  icon: <Utensils className="w-5 h-5 text-orange-600" />,
                                   title: 'Smart Food Search',
                                   description: 'Search 300,000+ USDA foods with brand recognition',
                                   category: 'Core Feature',
@@ -2726,7 +2749,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                                   nutritionMode: 'calculator'
                                 },
                                 {
-                                  icon: <Camera className="w-5 h-5 text-purple-500" />,
+                                  icon: <Camera className="w-5 h-5 text-purple-600" />,
                                   title: 'AI Photo Analysis',
                                   description: 'Snap photos for instant nutrition breakdown',
                                   category: 'AI Feature',
@@ -2734,7 +2757,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                                   nutritionMode: 'ai'
                                 },
                                 {
-                                  icon: <Target className="w-5 h-5 text-green-500" />,
+                                  icon: <Target className="w-5 h-5 text-green-600" />,
                                   title: 'Calorie Calculator',
                                   description: 'Instant nutrition facts with portion warnings',
                                   category: 'Core Feature',
@@ -2742,14 +2765,14 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                                   nutritionMode: 'calculator'
                                 },
                                 {
-                                  icon: <Clock className="w-5 h-5 text-orange-500" />,
+                                  icon: <Clock className="w-5 h-5 text-orange-600" />,
                                   title: 'Fasting Timer',
                                   description: 'Track intermittent fasting with celebrations',
                                   category: 'Wellness',
                                   targetTab: 'fasting'
                                 },
                                 {
-                                  icon: <Trophy className="w-5 h-5 text-amber-700" />,
+                                  icon: <Trophy className="w-5 h-5 text-amber-800" />,
                                   title: 'Achievement System',
                                   description: 'Unlock rewards as you hit your goals',
                                   category: 'Motivation',
@@ -2757,7 +2780,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                                   accordionTarget: 'achievements'
                                 },
                                 {
-                                  icon: <Droplets className="w-5 h-5 text-cyan-500" />,
+                                  icon: <Droplets className="w-5 h-5 text-cyan-600" />,
                                   title: 'Hydration Tracking',
                                   description: 'Beautiful water intake visualization',
                                   category: 'Wellness',
@@ -2766,8 +2789,26 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                               ].map((feature, index) => (
                                 <Card
                                   key={index}
-                                  className="cursor-pointer hover:shadow-lg transition-all duration-200 border-amber-200 hover:border-amber-300 hover:bg-amber-50"
+                                  className={`cursor-pointer transition-all duration-200 ${
+                                    tourProgress.clickedCards.includes(feature.title)
+                                      ? 'bg-green-100 border-green-300 shadow-md' // Already clicked
+                                      : index === tourProgress.suggestedNext
+                                      ? 'bg-gradient-to-br from-blue-50 to-blue-100 border-blue-300 shadow-lg ring-2 ring-blue-200 hover:ring-blue-300' // Suggested next
+                                      : 'bg-white border-gray-200 hover:border-gray-300 hover:bg-gray-50 hover:shadow-md' // Default
+                                  }`}
                                   onClick={() => {
+                                    // Track this card click
+                                    const newProgress = {
+                                      clickedCards: tourProgress.clickedCards.includes(feature.title)
+                                        ? tourProgress.clickedCards
+                                        : [...tourProgress.clickedCards, feature.title],
+                                      suggestedNext: tourProgress.clickedCards.includes(feature.title)
+                                        ? tourProgress.suggestedNext
+                                        : Math.min(tourProgress.suggestedNext + 1, 5)
+                                    };
+                                    setTourProgress(newProgress);
+                                    localStorage.setItem('tour-progress', JSON.stringify(newProgress));
+                                    
                                     // Navigate to the feature's page/tab with mode information
                                     setActiveTab(feature.targetTab);
                                     
@@ -2783,19 +2824,44 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                                 >
                                   <CardContent className="p-4">
                                     <div className="flex items-start gap-3">
-                                      <div className="p-2 rounded-lg bg-white/80">
+                                      <div className={`p-2 rounded-lg ${
+                                        tourProgress.clickedCards.includes(feature.title)
+                                          ? 'bg-green-200' // Already clicked
+                                          : index === tourProgress.suggestedNext
+                                          ? 'bg-blue-200' // Suggested next
+                                          : 'bg-gray-100' // Default
+                                      }`}>
                                         {feature.icon}
                                       </div>
                                       <div className="flex-1">
                                         <div className="flex items-center justify-between mb-1">
-                                          <h4 className="font-medium text-gray-900">{feature.title}</h4>
-                                          <Badge variant="outline" className="text-xs text-gray-700 bg-white/60">
+                                          <h4 className="font-medium text-gray-900 flex items-center gap-2">
+                                            {feature.title}
+                                            {tourProgress.clickedCards.includes(feature.title) && (
+                                              <CheckCircle2 className="w-4 h-4 text-green-600" />
+                                            )}
+                                            {index === tourProgress.suggestedNext && !tourProgress.clickedCards.includes(feature.title) && (
+                                              <Sparkles className="w-4 h-4 text-blue-600 animate-pulse" />
+                                            )}
+                                          </h4>
+                                          <Badge variant="outline" className={`text-xs ${
+                                            tourProgress.clickedCards.includes(feature.title)
+                                              ? 'text-green-700 bg-green-100 border-green-300'
+                                              : index === tourProgress.suggestedNext
+                                              ? 'text-blue-700 bg-blue-100 border-blue-300'
+                                              : 'text-gray-700 bg-gray-100 border-gray-300'
+                                          }`}>
                                             {feature.category}
                                           </Badge>
                                         </div>
-                                        <p className="text-sm text-gray-700 leading-relaxed">
+                                        <p className="text-sm text-gray-800 leading-relaxed">
                                           {feature.description}
                                         </p>
+                                        {index === tourProgress.suggestedNext && !tourProgress.clickedCards.includes(feature.title) && (
+                                          <p className="text-xs text-blue-600 mt-1 font-medium">
+                                            💫 Try this next!
+                                          </p>
+                                        )}
                                       </div>
                                     </div>
                                   </CardContent>
@@ -2813,6 +2879,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                           onClick={() => {
                             localStorage.removeItem('bytewise-tour-completed');
                             localStorage.removeItem('tour-cards-clicked');
+                            localStorage.removeItem('tour-progress');
+                            setTourProgress({ clickedCards: [], suggestedNext: 0 });
                             window.location.reload();
                           }}
                           className="text-gray-600 hover:text-gray-900 border-amber-300 hover:bg-amber-100"
