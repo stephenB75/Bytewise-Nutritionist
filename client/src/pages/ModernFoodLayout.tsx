@@ -2706,7 +2706,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 {notifications.map((notification) => (
                   <div
                     key={notification.id}
-                    className={`p-4 border-b border-amber-200/30 ${!notification.read ? 'bg-blue-200/20' : ''}`}
+                    className={`p-4 border-b border-amber-200/30 ${!notification.read ? 'bg-amber-200/30' : ''}`}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
