@@ -1057,13 +1057,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <Icon className={`w-5 h-5 text-${color}-700`} />
             </div>
             <div>
-              <h3 className="text-white font-bold">{title}</h3>
+              <h3 className="text-white font-medium">{title}</h3>
               <p className="text-white text-sm font-medium">{value}/{goal}</p>
             </div>
           </div>
           <div className="text-right">
-            <div className={`text-2xl font-bold text-${color}-700`}>{progressWidth}%</div>
-            <div className="text-xs text-gray-900 font-semibold">of goal</div>
+            <div className={`text-2xl font-medium text-${color}-700`}>{progressWidth}%</div>
+            <div className="text-xs text-gray-900 font-normal">of goal</div>
           </div>
         </div>
         <div className="relative h-3 bg-amber-200 rounded-full overflow-hidden mb-4 shadow-inner">
@@ -1097,13 +1097,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <Droplets className={`w-6 h-6 transition-colors duration-300 ${isGoalReached ? 'text-gray-900' : 'text-cyan-700'}`} />
             </div>
             <div>
-              <h3 className="text-white font-bold text-lg">Water Intake</h3>
+              <h3 className="text-white font-medium text-lg">Water Intake</h3>
               <p className="text-white text-sm font-medium">{glasses}/{dailyGoal} glasses today</p>
             </div>
           </div>
           <div className="text-right">
-            <div className="text-2xl font-bold text-gray-900">{Math.round(percentage)}%</div>
-            <div className="text-xs text-gray-900 font-semibold">of goal</div>
+            <div className="text-2xl font-medium text-gray-900">{Math.round(percentage)}%</div>
+            <div className="text-xs text-gray-900 font-normal">of goal</div>
           </div>
         </div>
         
@@ -1189,11 +1189,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     return (
       <Card className="bg-amber-100 border-none p-4 transition-all duration-300 hover:bg-gradient-to-br hover:from-amber-100 hover:to-amber-200 shadow-lg hover:shadow-xl" data-testid="macro-card">
         <div className="text-center">
-          <div className={`text-sm ${labelColor} mb-1 leading-tight font-semibold`}>
+          <div className={`text-sm ${labelColor} mb-1 leading-tight font-normal`}>
             <div>Remaining</div>
             <div>{name}</div>
           </div>
-          <div className={`text-xl font-bold ${textColor} mb-2`}>
+          <div className={`text-xl font-medium ${textColor} mb-2`}>
             {isNegative ? '+' : ''}{Math.abs(remaining)}g
           </div>
           <div className="flex items-end space-x-px h-6 rounded bg-amber-100">
@@ -1205,7 +1205,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               />
             ))}
           </div>
-          <div className="text-xs text-gray-900 font-semibold mt-1">
+          <div className="text-xs text-gray-900 font-normal mt-1">
             {value}g / {goal}g
           </div>
         </div>
@@ -1244,8 +1244,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     return (
     <Card className="bg-amber-100 border-none p-3 shadow-lg hover:shadow-xl transition-all duration-300 hover:bg-gradient-to-br hover:from-amber-100 hover:to-amber-200" data-testid="micro-card">
       <div className="flex items-center justify-between mb-2">
-        <div className={`text-sm font-bold ${textColor}`}>{name}</div>
-        <div className="text-xs text-gray-900 font-bold">{displayValue}{unit} / {goal}{unit}</div>
+        <div className={`text-sm font-medium ${textColor}`}>{name}</div>
+        <div className="text-xs text-gray-900 font-normal">{displayValue}{unit} / {goal}{unit}</div>
       </div>
       <div className="relative h-2 bg-amber-200 rounded-full overflow-hidden shadow-inner">
         <div 
@@ -1253,7 +1253,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           style={{ width: `${percentage}%` }} 
         />
       </div>
-      <div className="text-xs text-gray-900 font-bold mt-1">{percentage}% Daily Value</div>
+      <div className="text-xs text-gray-900 font-normal mt-1">{percentage}% Daily Value</div>
     </Card>
     );
   };
@@ -1283,7 +1283,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <div className="mb-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-2xl">🎯</span>
-                <h3 className="font-semibold text-lg text-gray-900">Welcome to ByteWise!</h3>
+                <h3 className="font-medium text-lg text-gray-900">Welcome to ByteWise!</h3>
               </div>
               <p className="text-gray-700 text-sm mb-3">
                 Ready to discover all the amazing features? Take our interactive tour to learn how to track nutrition and build healthy habits.
@@ -1312,7 +1312,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           )}
           
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-3xl font-black text-gray-900">Today's Progress</h2>
+            <h2 className="text-3xl font-semibold text-gray-900">Today's Progress</h2>
             <div className="flex gap-2">
               <Button 
                 variant="ghost" 
@@ -1336,11 +1336,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             />
             <div className="grid grid-cols-3 gap-3 mt-4">
               <div className="text-center p-2 bg-gradient-to-br from-amber-100 to-amber-200 rounded-lg">
-                <div className="text-sm font-bold text-orange-600">{loggedMeals.length}</div>
+                <div className="text-sm font-medium text-orange-600">{loggedMeals.length}</div>
                 <div className="text-xs text-gray-900">Meals</div>
               </div>
               <div className="text-center p-2 bg-gradient-to-br from-amber-100 to-amber-200 rounded-lg">
-                <div className="text-sm font-bold text-orange-600">{Math.round(goalCalories - dailyCalories)}</div>
+                <div className="text-sm font-medium text-orange-600">{Math.round(goalCalories - dailyCalories)}</div>
                 <div className="text-xs text-gray-900">Remaining</div>
               </div>
               <div className="text-center p-2 bg-gradient-to-br from-amber-100 to-amber-200 rounded-lg">
