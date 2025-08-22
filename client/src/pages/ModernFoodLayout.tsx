@@ -1052,7 +1052,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     const isComplete = progressWidth >= 100;
     
     return (
-      <Card className="bg-white border-gray-700 p-5 transition-all duration-300 hover:bg-gradient-to-br hover:from-white hover:to-gray-50 hover:border-gray-800 border-3 shadow-xl hover:shadow-2xl" data-testid="progress-card">
+      <Card className="bg-amber-100 border-amber-800 p-5 transition-all duration-300 hover:bg-gradient-to-br hover:from-amber-100 hover:to-amber-200 hover:border-amber-900 border-3 shadow-xl hover:shadow-2xl" data-testid="progress-card">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
             <div className={`p-2 bg-${color}-500/30 rounded-xl border border-${color}-200`}>
@@ -1092,7 +1092,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     const isGoalReached = glasses >= dailyGoal;
     
     return (
-      <Card className={`bg-gradient-to-br from-white to-cyan-50 border-cyan-600 p-6 transition-all duration-300 hover:from-cyan-50 hover:to-cyan-100 hover:border-cyan-700 border-3 shadow-xl hover:shadow-2xl ${isGoalReached ? 'ring-3 ring-cyan-700/70' : ''}`} data-testid="water-card">
+      <Card className={`bg-gradient-to-br from-amber-100 to-cyan-100 border-cyan-600 p-6 transition-all duration-300 hover:from-amber-100 hover:to-cyan-200 hover:border-cyan-700 border-3 shadow-xl hover:shadow-2xl ${isGoalReached ? 'ring-3 ring-cyan-700/70' : ''}`} data-testid="water-card">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
             <div className={`p-3 rounded-xl transition-all duration-300 border ${isGoalReached ? 'bg-gradient-to-br from-cyan-500 to-blue-600 border-cyan-400' : 'bg-cyan-500/30 border-cyan-300'}`}>
@@ -1189,7 +1189,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     const labelColor = isNegative ? 'text-red-600' : 'text-gray-900';
 
     return (
-      <Card className="bg-white border-gray-700 p-4 transition-all duration-300 hover:bg-gradient-to-br hover:from-white hover:to-gray-50 hover:border-gray-800 border-3 shadow-xl hover:shadow-2xl" data-testid="macro-card">
+      <Card className="bg-amber-100 border-amber-800 p-4 transition-all duration-300 hover:bg-gradient-to-br hover:from-amber-100 hover:to-amber-200 hover:border-amber-900 border-3 shadow-xl hover:shadow-2xl" data-testid="macro-card">
         <div className="text-center">
           <div className={`text-sm ${labelColor} mb-1 leading-tight font-semibold`}>
             <div>Remaining</div>
@@ -1244,7 +1244,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     const [textColor, gradientColors] = colorClasses.split(' from-');
     
     return (
-    <Card className="bg-white border-gray-700 p-3 border-3 shadow-xl hover:shadow-2xl transition-all duration-300 hover:bg-gradient-to-br hover:from-white hover:to-gray-50 hover:border-gray-800" data-testid="micro-card">
+    <Card className="bg-amber-100 border-amber-800 p-3 border-3 shadow-xl hover:shadow-2xl transition-all duration-300 hover:bg-gradient-to-br hover:from-amber-100 hover:to-amber-200 hover:border-amber-900" data-testid="micro-card">
       <div className="flex items-center justify-between mb-2">
         <div className={`text-sm font-bold ${textColor}`}>{name}</div>
         <div className="text-xs text-gray-900 font-bold">{displayValue}{unit} / {goal}{unit}</div>
