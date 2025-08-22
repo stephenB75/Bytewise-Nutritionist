@@ -5488,7 +5488,16 @@ input[class*="pr-"] {
 }
 
 /* Tour button override - force light hover state */
-.tour-button-override:hover {
+button.tour-button-override:hover,
+.tour-button-override:hover,
+button[class*="tour-button-override"]:hover {
+  background: linear-gradient(to right, #fef3c7, #fde68a) !important;
+  color: #1f2937 !important;
+  border-color: transparent !important;
+}
+
+/* More specific override for shadcn Button component */
+button.inline-flex.tour-button-override:hover {
   background: linear-gradient(to right, #fef3c7, #fde68a) !important;
   color: #1f2937 !important;
 }
