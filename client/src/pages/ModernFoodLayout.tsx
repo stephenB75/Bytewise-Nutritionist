@@ -2220,13 +2220,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <p className="text-gray-700">Find and log nutrition information</p>
           </div>
           <div className="relative">
-            <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-600 w-5 h-5" />
             <Input
               data-testid="main-food-search"
               placeholder="Search weekly food entries..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-28 pr-16 h-16 bg-white/80 border-amber-300 text-gray-900 placeholder-gray-500 rounded-2xl text-xl font-medium text-center"
+              className="pl-28 pr-16 h-16 bg-white/90 border-amber-300 text-gray-900 placeholder-gray-600 rounded-2xl text-xl font-medium text-center"
             />
             {searchQuery && (
               <Button
@@ -2253,15 +2253,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           <div className="flex justify-between items-center">
             <h3 className="text-xl font-bold text-gray-900">Logged Today</h3>
             {loggedMeals.length === 0 && (
-              <Badge className="bg-gray-600 text-gray-300">No meals logged</Badge>
+              <Badge className="bg-gray-600 text-gray-200">No meals logged</Badge>
             )}
           </div>
           {loggedMeals.length === 0 ? (
             <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 p-6 text-center">
               <div className="text-gray-700">
                 <Calendar className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                <p className="text-lg mb-2">No meals logged today</p>
-                <p className="text-sm">Use the nutrition calculator to start tracking your meals</p>
+                <p className="text-lg mb-2 text-gray-900">No meals logged today</p>
+                <p className="text-sm text-gray-700">Use the nutrition calculator to start tracking your meals</p>
               </div>
             </Card>
           ) : (
@@ -2275,17 +2275,17 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   <h4 className="text-gray-900 font-semibold">{meal.name}</h4>
                   <p className="text-gray-700 text-sm">{meal.time} • {meal.mealType}</p>
                   <div className="flex space-x-4 mt-1">
-                    <span className="text-xs text-green-400">P: {(meal.protein || 0).toFixed(1)}g</span>
-                    <span className="text-xs text-yellow-400">C: {(meal.carbs || 0).toFixed(1)}g</span>
-                    <span className="text-xs text-purple-400">F: {(meal.fat || 0).toFixed(1)}g</span>
+                    <span className="text-xs text-green-600">P: {(meal.protein || 0).toFixed(1)}g</span>
+                    <span className="text-xs text-yellow-600">C: {(meal.carbs || 0).toFixed(1)}g</span>
+                    <span className="text-xs text-purple-600">F: {(meal.fat || 0).toFixed(1)}g</span>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-orange-400 font-bold text-lg">{Math.round(meal.calories || 0)} cal</p>
+                  <p className="text-orange-600 font-bold text-lg">{Math.round(meal.calories || 0)} cal</p>
                   <Button 
                     size="sm" 
                     variant="ghost" 
-                    className="text-gray-400 hover:text-red-400 p-2"
+                    className="text-gray-600 hover:text-red-600 p-2"
                     data-testid={`button-delete-logged-meal-${index}`}
                     onClick={() => {
                       // Remove meal from storage using index and multiple identifiers for safety
