@@ -2592,11 +2592,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     <div className="flex flex-wrap gap-3">
                       <div className="flex-1 min-w-0">
                         <TourLauncher
-                          onStartTour={() => {
-                            console.log('Starting ByteWise tour from profile...');
-                            // Mark tour as started
-                            localStorage.setItem('tour-started', 'true');
-                          }}
                           onNavigateToFeature={(tab) => setActiveTab(tab)}
                           isVisible={true}
                         />
@@ -2965,11 +2960,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         return profileCompleted ? (
           <div className="fixed bottom-20 right-6 z-50">
             <TourLauncher
-              onStartTour={() => {
-                console.log('Starting ByteWise tour...');
-                // Mark tour as started
-                localStorage.setItem('tour-started', 'true');
-              }}
               onNavigateToFeature={(tab) => setActiveTab(tab)}
               isVisible={shouldShowTour()}
             />
