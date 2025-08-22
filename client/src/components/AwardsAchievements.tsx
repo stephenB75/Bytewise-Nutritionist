@@ -261,7 +261,7 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
   const difficultyColors = {
     bronze: 'bg-amber-600/20 border-amber-500/30 text-amber-700',
     silver: 'bg-gray-400/20 border-gray-400/30 text-gray-700',
-    gold: 'bg-[#faed39]/20 border-[#faed39]/50 text-[#faed39]',
+    gold: 'bg-orange-100/80 border-orange-400/50 text-orange-700',
     platinum: 'bg-[#1f4aa6]/20 border-[#1f4aa6]/30 text-[#1f4aa6]'
   };
 
@@ -558,7 +558,7 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
         {/* Stats Overview */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <div className="text-center p-4 bg-gradient-to-br from-[#faed39]/10 to-[#faed39]/5 rounded-lg border border-[#faed39]/20">
-            <div className="text-2xl font-bold text-[#faed39]" style={{ fontFamily: "'League Spartan', sans-serif" }}>{userStats.totalPoints || 0}</div>
+            <div className="text-2xl font-bold text-orange-600" style={{ fontFamily: "'League Spartan', sans-serif" }}>{userStats.totalPoints || 0}</div>
             <div className="text-sm text-gray-900" style={{ fontFamily: "'Work Sans', sans-serif" }}>Total Points</div>
           </div>
           <div className="text-center p-4 bg-gradient-to-br from-[#45c73e]/10 to-[#45c73e]/5 rounded-lg border border-[#45c73e]/20">
