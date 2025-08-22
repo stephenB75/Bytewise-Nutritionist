@@ -791,7 +791,7 @@ export function FastingTracker() {
   return (
     <div className="space-y-8 pb-24" data-testid="fasting-tracker">
       <div className="flex items-center gap-3 mb-8">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-600 to-purple-800 flex items-center justify-center">
+        <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-400 to-purple-500 flex items-center justify-center">
           <Clock className="w-5 h-5 text-white" />
         </div>
         <div>
