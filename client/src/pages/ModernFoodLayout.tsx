@@ -2671,12 +2671,137 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
                     {/* Tour Actions */}
                     <div className="flex flex-wrap gap-3">
-                      <div className="flex-1 min-w-0">
-                        <TourLauncher
-                          onNavigateToFeature={(tab) => setActiveTab(tab)}
-                          isVisible={true}
-                        />
-                      </div>
+                      {/* Always show explore features for existing users */}
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="default"
+                            size="sm"
+                            className="bg-amber-600 hover:bg-amber-700 text-white font-medium"
+                            data-testid="tour-launch-button"
+                          >
+                            <Play className="w-4 h-4 mr-2" />
+                            {localStorage.getItem('bytewise-tour-completed') === 'true' ? 'Retake Tour' : 'Start Tour'}
+                          </Button>
+                        </DialogTrigger>
+                        
+                        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                          <DialogHeader>
+                            <DialogTitle className="flex items-center gap-2 text-xl">
+                              <Sparkles className="w-6 h-6 text-yellow-500" />
+                              ByteWise Features Tour
+                            </DialogTitle>
+                          </DialogHeader>
+                          
+                          <div className="space-y-4">
+                            <div className="bg-gradient-to-r from-amber-50 to-amber-100 rounded-lg p-4">
+                              <h3 className="font-semibold text-lg mb-2">🎯 App Features</h3>
+                              <p className="text-gray-900 text-sm">
+                                Explore all the powerful features available in ByteWise Nutritionist. 
+                                Click any card below to navigate directly to that feature.
+                              </p>
+                              <div className="flex items-center gap-4 mt-3 text-sm text-gray-900">
+                                <span className="flex items-center gap-1">
+                                  <Target className="w-4 h-4" />
+                                  6 key features
+                                </span>
+                                <Badge variant="secondary" className="text-xs text-gray-900 bg-gray-100">
+                                  Click to explore
+                                </Badge>
+                              </div>
+                            </div>
+                            
+                            {/* Feature Cards Grid */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              {[
+                                {
+                                  icon: <Utensils className="w-5 h-5 text-orange-500" />,
+                                  title: 'Smart Food Search',
+                                  description: 'Search 300,000+ USDA foods with brand recognition',
+                                  category: 'Core Feature',
+                                  targetTab: 'nutrition',
+                                  nutritionMode: 'calculator'
+                                },
+                                {
+                                  icon: <Camera className="w-5 h-5 text-purple-500" />,
+                                  title: 'AI Photo Analysis',
+                                  description: 'Snap photos for instant nutrition breakdown',
+                                  category: 'AI Feature',
+                                  targetTab: 'nutrition',
+                                  nutritionMode: 'ai'
+                                },
+                                {
+                                  icon: <Target className="w-5 h-5 text-green-500" />,
+                                  title: 'Calorie Calculator',
+                                  description: 'Instant nutrition facts with portion warnings',
+                                  category: 'Core Feature',
+                                  targetTab: 'nutrition',
+                                  nutritionMode: 'calculator'
+                                },
+                                {
+                                  icon: <Clock className="w-5 h-5 text-orange-500" />,
+                                  title: 'Fasting Timer',
+                                  description: 'Track intermittent fasting with celebrations',
+                                  category: 'Wellness',
+                                  targetTab: 'fasting'
+                                },
+                                {
+                                  icon: <Trophy className="w-5 h-5 text-amber-700" />,
+                                  title: 'Achievement System',
+                                  description: 'Unlock rewards as you hit your goals',
+                                  category: 'Motivation',
+                                  targetTab: 'profile',
+                                  accordionTarget: 'achievements'
+                                },
+                                {
+                                  icon: <Droplets className="w-5 h-5 text-cyan-500" />,
+                                  title: 'Hydration Tracking',
+                                  description: 'Beautiful water intake visualization',
+                                  category: 'Wellness',
+                                  targetTab: 'home'
+                                }
+                              ].map((feature, index) => (
+                                <Card
+                                  key={index}
+                                  className="cursor-pointer hover:shadow-lg transition-all duration-200 border-amber-200 hover:border-amber-300 hover:bg-amber-50"
+                                  onClick={() => {
+                                    // Navigate to the feature's page/tab with mode information
+                                    setActiveTab(feature.targetTab);
+                                    
+                                    // Send custom event with tab, mode, and accordion info
+                                    window.dispatchEvent(new CustomEvent('navigate-to-tab', {
+                                      detail: { 
+                                        tab: feature.targetTab,
+                                        nutritionMode: feature.nutritionMode,
+                                        accordionTarget: feature.accordionTarget
+                                      }
+                                    }));
+                                  }}
+                                >
+                                  <CardContent className="p-4">
+                                    <div className="flex items-start gap-3">
+                                      <div className="p-2 rounded-lg bg-white/80">
+                                        {feature.icon}
+                                      </div>
+                                      <div className="flex-1">
+                                        <div className="flex items-center justify-between mb-1">
+                                          <h4 className="font-medium text-gray-900">{feature.title}</h4>
+                                          <Badge variant="outline" className="text-xs text-gray-700 bg-white/60">
+                                            {feature.category}
+                                          </Badge>
+                                        </div>
+                                        <p className="text-sm text-gray-700 leading-relaxed">
+                                          {feature.description}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              ))}
+                            </div>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
                       
                       {localStorage.getItem('bytewise-tour-completed') === 'true' && (
                         <Button
