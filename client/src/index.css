@@ -943,19 +943,8 @@ div[class*="min-h-screen"]:not([data-testid*="navigation"]),
   background: inherit !important;
 }
 
-/* Ensure navigation elements keep their intended Tailwind styling */
-[data-testid*="navigation"] *,
-[data-testid*="nav-"] *,
-.navigation-tabs *,
-button[data-testid*="nav-"] {
-  /* Allow Tailwind classes to control all styling */
-}
+/* Navigation elements use standard Tailwind styling */
 
-/* Navigation styling now controlled by Tailwind classes */
-
-/* Interaction states controlled by Tailwind */
-
-/* CSS custom properties controlled by Tailwind */
 
 /* Ensure all metrics text is dark enough - EXCLUDE metrics cards */
 .backdrop-blur-md .text-white:not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
@@ -964,35 +953,21 @@ button[data-testid*="nav-"] {
   color: #374151 !important;
 }
 
-/* Force metrics cards to be visible and properly styled - Enhanced for yellow theme */
+/* Metrics cards styling for amber theme */
 [data-testid="progress-card"],
 [data-testid="water-card"],
 [data-testid="macro-card"],
 [data-testid="micro-card"] {
-  background-color: #fef3c7 !important;
-  background-image: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%) !important;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%) !important;
   border: none !important;
-  color: #374151 !important;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
 }
 
-/* Override any conflicting text colors in metrics cards - ULTIMATE PRIORITY */
-[data-page="dashboard"] [data-testid="progress-card"] *,
-[data-page="dashboard"] [data-testid="water-card"] *,
-[data-page="dashboard"] [data-testid="macro-card"] *,
-[data-page="dashboard"] [data-testid="micro-card"] *,
+/* Metrics cards text - pure black for maximum contrast */
 [data-testid="progress-card"] *,
 [data-testid="water-card"] *,
 [data-testid="macro-card"] *,
-[data-testid="micro-card"] *,
-[data-testid="progress-card"] .text-gray-900,
-[data-testid="progress-card"] .text-gray-800,
-[data-testid="water-card"] .text-gray-900,
-[data-testid="water-card"] .text-gray-800,
-[data-testid="macro-card"] .text-gray-900,
-[data-testid="macro-card"] .text-gray-800,
-[data-testid="micro-card"] .text-gray-900,
-[data-testid="micro-card"] .text-gray-800 {
+[data-testid="micro-card"] * {
   color: #000000 !important;
   text-shadow: none !important;
 }
@@ -1002,9 +977,6 @@ button[data-testid*="nav-"] {
   color: #6b7280 !important; 
 }
 
-.text-gray-900 { 
-  color: #111827 !important; 
-}
 
 /* Mobile Safe Area Support for iOS and Android Status Bars */
 @supports (padding: max(0px)) {
