@@ -301,10 +301,10 @@ export default function AIFoodAnalyzer() {
 
       {/* Upload Section */}
       {!uploadedImageUrl && (
-        <Card>
+        <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200/40">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Camera className="h-5 w-5" />
+            <CardTitle className="flex items-center gap-2 text-gray-900">
+              <Camera className="h-5 w-5 text-gray-900" />
               Upload Food Photo
             </CardTitle>
           </CardHeader>
@@ -315,7 +315,7 @@ export default function AIFoodAnalyzer() {
                 maxFileSize={10485760} // 10MB
                 onGetUploadParameters={handleGetUploadParameters}
                 onComplete={handleUploadComplete}
-                buttonClassName="w-full max-w-md h-16 text-lg"
+                buttonClassName="w-full max-w-md h-16 text-lg bg-amber-500 hover:bg-amber-600 text-white border-amber-600"
               >
                 <div className="flex items-center gap-3">
                   <Camera className="h-6 w-6" />
@@ -323,9 +323,9 @@ export default function AIFoodAnalyzer() {
                 </div>
               </ObjectUploader>
               
-              <Alert>
-                <Eye className="h-4 w-4" />
-                <AlertDescription>
+              <Alert className="bg-amber-100/50 border-amber-300 text-gray-900">
+                <Eye className="h-4 w-4 text-gray-900" />
+                <AlertDescription className="text-gray-900">
                   For best results, ensure good lighting and that all food items are clearly visible in the photo.
                 </AlertDescription>
               </Alert>
