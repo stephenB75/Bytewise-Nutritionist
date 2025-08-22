@@ -482,7 +482,7 @@ function CalorieCalculator({
           <Button 
             type="submit" 
             disabled={calculateCalories.isPending || !ingredient.trim() || !measurement.trim()}
-            className="w-full bg-blue-600 hover:bg-blue-700"
+            className="w-full"
           >
             {calculateCalories.isPending ? (
               <>
@@ -539,7 +539,7 @@ function CalorieCalculator({
                   <Button
                     size="sm"
                     onClick={() => logToWeeklyTracker(analysis)}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                    className="w-full text-white"
                   >
                     <Plus className="w-3 h-3 mr-1" />
                     Log to Weekly Tracker
@@ -756,7 +756,7 @@ function CalorieCalculator({
           <Button 
             type="submit" 
             disabled={calculateCalories.isPending || !ingredient.trim() || !measurement.trim()}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-lg py-6"
+            className="w-full text-lg py-6"
           >
             {calculateCalories.isPending ? (
               <>

@@ -860,7 +860,7 @@ export function FastingTracker() {
                   <Button 
                     onClick={startFasting}
                     size="lg"
-                    className="gap-2 w-full sm:w-auto min-w-[140px] bg-blue-600 hover:bg-blue-700 text-white"
+                    className="gap-2 w-full sm:w-auto min-w-[140px] text-white"
                     data-testid="button-start-fasting"
                     disabled={startFastingMutation.isPending}
                   >

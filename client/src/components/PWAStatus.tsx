@@ -145,7 +145,7 @@ export function PWAStatus() {
           <Button
             onClick={handleInstall}
             size="sm"
-            className="bg-blue-600 hover:bg-blue-700"
+            className=""
           >
             <Download className="w-4 h-4 mr-1" />
             Install App
