@@ -542,12 +542,12 @@ svg.w-4 {
 .border-blue-200 { border-color: #dbeafe !important; }
 .border-green-500\/30 { border-color: #22c55e !important; }
 
-/* Enhanced borders and backgrounds for buttons and cards */
-.bg-white\/10 { 
+/* Enhanced borders and backgrounds for buttons and cards - EXCLUDE metrics cards */
+.bg-white\/10:not([data-testid*="progress"]):not([data-testid*="water"]):not([data-testid*="macro"]):not([data-testid*="micro"]) { 
   background-color: #f8fafc !important; 
   border: 1px solid #e2e8f0 !important;
 }
-.bg-white\/15 { 
+.bg-white\/15:not([data-testid*="progress"]):not([data-testid*="water"]):not([data-testid*="macro"]):not([data-testid*="micro"]) { 
   background-color: #f1f5f9 !important; 
   border-color: #cbd5e1 !important;
 }
@@ -572,8 +572,8 @@ button:hover:not(.bg-orange-500):not([class*="bg-gradient"]):not(.bg-cyan-):not(
   border-color: #cbd5e1 !important;
 }
 
-/* Card background overrides for better contrast */
-.backdrop-blur-md {
+/* Card background overrides for better contrast - EXCLUDE metrics cards */
+.backdrop-blur-md:not([data-testid*="progress"]):not([data-testid*="water"]):not([data-testid*="macro"]):not([data-testid*="micro"]) {
   background-color: rgba(248, 250, 252, 0.95) !important;
 }
 
@@ -582,8 +582,8 @@ button:hover:not(.bg-orange-500):not([class*="bg-gradient"]):not(.bg-cyan-):not(
   background: linear-gradient(to bottom right, #ecfeff 50%, #dbeafe 100%) !important;
 }
 
-/* Hover state improvements */
-.hover\:bg-white\/15:hover {
+/* Hover state improvements - EXCLUDE metrics cards */
+.hover\:bg-white\/15:hover:not([data-testid*="progress"]):not([data-testid*="water"]):not([data-testid*="macro"]):not([data-testid*="micro"]) {
   background-color: #f1f5f9 !important;
 }
 
@@ -814,12 +814,12 @@ button.bg-gray-100 {
   color: #1f2937 !important;
 }
 
-.bg-white\/10 h1,
-.bg-white\/10 h2,
-.bg-white\/10 h3,
-.bg-white\/10 h4,
-.bg-white\/10 p,
-.bg-white\/10 span {
+.bg-white\/10 h1:not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *),
+.bg-white\/10 h2:not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *),
+.bg-white\/10 h3:not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *),
+.bg-white\/10 h4:not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *),
+.bg-white\/10 p:not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *),
+.bg-white\/10 span:not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *) {
   color: #ffffff !important;
 }
 
@@ -957,10 +957,10 @@ button[data-testid*="nav-"] {
 
 /* CSS custom properties controlled by Tailwind */
 
-/* Ensure all metrics text is dark enough */
-.backdrop-blur-md .text-white,
-.bg-white\/10 .text-white,
-.bg-white\/15 .text-white {
+/* Ensure all metrics text is dark enough - EXCLUDE metrics cards */
+.backdrop-blur-md .text-white:not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *),
+.bg-white\/10 .text-white:not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *),
+.bg-white\/15 .text-white:not([data-testid*="progress"] *):not([data-testid*="water"] *):not([data-testid*="macro"] *):not([data-testid*="micro"] *) {
   color: #374151 !important;
 }
 
