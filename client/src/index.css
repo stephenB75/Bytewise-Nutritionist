@@ -558,6 +558,12 @@ svg.w-4 {
   border-color: #d1d5db !important;
 }
 
+/* Ensure white background cards maintain proper styling */
+.bg-white {
+  background-color: #ffffff !important;
+  border-color: #d1d5db !important;
+}
+
 /* Button border enhancements - EXCLUDE navigation buttons */
 button:not(.bg-orange-500):not([class*="bg-gradient"]):not(.bg-cyan-):not(.bg-red-):not([data-testid*="nav-"]) {
   border: 1px solid #e2e8f0 !important;
@@ -824,13 +830,22 @@ button.bg-gray-100 {
 .bg-gray-50 h4,
 .bg-gray-50 p,
 .bg-gray-50 span,
-.bg-gray-50 div {
+.bg-gray-50 div,
+.bg-white h1,
+.bg-white h2,
+.bg-white h3,
+.bg-white h4,
+.bg-white p,
+.bg-white span,
+.bg-white div {
   color: #000000 !important;
 }
 
 /* Force black text on all metrics cards */
 .bg-gray-50 .text-black,
 .bg-gray-50 [class*="text-"],
+.bg-white .text-black,
+.bg-white [class*="text-"],
 [data-testid*="progress"] *,
 [data-testid*="water"] *,
 [data-testid*="macro"] *,
@@ -954,9 +969,10 @@ button[data-testid*="nav-"] {
 [data-testid*="water"],
 [data-testid*="macro"],
 [data-testid*="micro"] {
-  background-color: #f9fafb !important;
+  background-color: #ffffff !important;
   border: 2px solid #d1d5db !important;
   color: #000000 !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
 }
 
 /* Override any conflicting text colors in metrics cards - HIGHEST PRIORITY */

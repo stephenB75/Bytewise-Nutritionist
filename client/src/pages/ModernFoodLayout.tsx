@@ -1052,7 +1052,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     const isComplete = progressWidth >= 100;
     
     return (
-      <Card className="bg-gray-50 border-gray-200 p-4 transition-all duration-300 hover:bg-gray-100 hover:border-gray-300 border-2 shadow-sm">
+      <Card className="bg-white border-gray-300 p-4 transition-all duration-300 hover:bg-gray-50 hover:border-gray-400 border-2 shadow-md hover:shadow-lg">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
             <div className={`p-2 bg-${color}-500/20 rounded-xl`}>
@@ -1092,7 +1092,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     const isGoalReached = glasses >= dailyGoal;
     
     return (
-      <Card className={`bg-gradient-to-br from-cyan-50 to-blue-50 border-cyan-200 p-6 transition-all duration-300 hover:from-cyan-100 hover:to-blue-100 hover:border-cyan-300 border-2 shadow-sm ${isGoalReached ? 'ring-2 ring-cyan-400/70' : ''}`}>
+      <Card className={`bg-gradient-to-br from-white to-cyan-50 border-cyan-300 p-6 transition-all duration-300 hover:from-cyan-50 hover:to-cyan-100 hover:border-cyan-400 border-2 shadow-md hover:shadow-lg ${isGoalReached ? 'ring-2 ring-cyan-500/50' : ''}`}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
             <div className={`p-3 rounded-xl transition-all duration-300 ${isGoalReached ? 'bg-gradient-to-br from-cyan-400 to-blue-500' : 'bg-cyan-500/20'}`}>
@@ -1189,7 +1189,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     const labelColor = isNegative ? 'text-red-500' : 'text-black';
 
     return (
-      <Card className="bg-gray-50 border-gray-200 p-4 transition-all duration-300 hover:bg-gray-100 hover:border-gray-300 border-2 shadow-sm">
+      <Card className="bg-white border-gray-300 p-4 transition-all duration-300 hover:bg-gray-50 hover:border-gray-400 border-2 shadow-md hover:shadow-lg">
         <div className="text-center">
           <div className={`text-sm ${labelColor} mb-1 leading-tight`}>
             <div>Remaining</div>
@@ -1244,7 +1244,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     const [textColor, gradientColors] = colorClasses.split(' from-');
     
     return (
-    <Card className="bg-gray-50 border-gray-200 p-3 border-2 shadow-sm">
+    <Card className="bg-white border-gray-300 p-3 border-2 shadow-md hover:shadow-lg transition-all duration-300 hover:bg-gray-50 hover:border-gray-400">
       <div className="flex items-center justify-between mb-2">
         <div className={`text-sm font-semibold ${textColor}`}>{name}</div>
         <div className="text-xs text-black font-bold">{displayValue}{unit} / {goal}{unit}</div>
