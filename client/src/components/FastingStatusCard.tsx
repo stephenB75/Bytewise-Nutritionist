@@ -85,7 +85,7 @@ export function FastingStatusCard({ fastingStatus }: FastingStatusProps) {
         
         <Progress 
           value={getProgressPercentage()} 
-          className="h-2"
+          className="h-2 bg-gray-300 [&>div]:bg-gradient-to-r [&>div]:from-blue-600 [&>div]:to-blue-700"
           data-testid="fasting-progress-mini"
         />
         
