@@ -1054,13 +1054,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       backgroundPosition: 'center',
       backgroundRepeat: 'no-repeat',
       willChange: 'transform',
+      transform: 'translateZ(0)', // Force GPU acceleration
     }), [backgroundImage]);
 
     return (
       <div className="relative h-screen overflow-hidden hero-component" data-hero="true">
-        {/* Optimized Background Layer */}
+        {/* Optimized Background Layer - removed key to prevent remounting */}
         <div 
-          key={animationKey}
           className="absolute inset-0 z-10 hero-bg-optimized"
           style={backgroundStyle}
         />
@@ -1074,25 +1074,25 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           <div className="space-y-8 max-w-2xl">
             {/* Enhanced Title Section */}
             <div className="space-y-3 hero-optimized">
-              <h1 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] drop-shadow-2xl animate-fadeInUp [animation-delay:0.9s] font-league-spartan text-optimized">
+              <h1 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] drop-shadow-2xl animate-fadeInUp [animation-delay:0.2s] font-league-spartan text-optimized">
                 {title}
               </h1>
-              <h1 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] animate-fadeInUp [animation-delay:1.1s] font-league-spartan text-optimized">
+              <h1 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] animate-fadeInUp [animation-delay:0.4s] font-league-spartan text-optimized">
                 {subtitle}
               </h1>
             </div>
             
             {/* Enhanced Description */}
-            <p className="text-2xl md:text-3xl font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl animate-fadeInUp [animation-delay:1.3s] font-work-sans text-gray-100">
+            <p className="text-2xl md:text-3xl font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl animate-fadeInUp [animation-delay:0.6s] font-work-sans text-gray-100">
               {description}
             </p>
             
             {/* Enhanced Call-to-Action */}
-            <div className="pt-8 animate-fadeInUp [animation-delay:1.5s]">
+            <div className="pt-8 animate-fadeInUp [animation-delay:0.8s]">
               <Button 
                 onClick={onButtonClick}
                 size="lg"
-                className="group relative bg-gradient-to-r from-orange-400 to-red-400 hover:from-orange-500 hover:to-red-500 font-bold px-16 py-6 rounded-full text-xl md:text-2xl shadow-2xl transition-all duration-300 overflow-hidden btn-hero-enhanced"
+                className="group relative bg-gradient-to-r from-orange-400 to-red-400 hover:from-orange-500 hover:to-red-500 font-bold px-16 py-6 rounded-full text-xl md:text-2xl shadow-2xl transition-all duration-200 ease-out overflow-hidden btn-hero-enhanced"
                 style={{ color: '#ffffff !important' }}
               >
                 <span className="relative z-10 flex items-center gap-3" style={{ color: '#ffffff !important' }}>
@@ -1105,7 +1105,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         </div>
         
         {/* Enhanced Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 animate-bounce text-white">
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 animate-pulse text-white">
           <div className="flex flex-col items-center gap-2">
             <div className="w-px h-8 bg-gradient-to-b from-transparent to-white" />
             <ChevronRight className="w-6 h-6 rotate-90 drop-shadow-lg" />
