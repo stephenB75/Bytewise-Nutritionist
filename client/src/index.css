@@ -78,15 +78,25 @@ html,
   background: inherit !important;
 }
 
-/* Override dark backgrounds with gradient - EXCLUDE navigation */
-.bg-black:not(.bg-black\/80):not(.bg-black\/50):not([data-testid*="nav-"]),
-.bg-gray-900:not([data-testid*="nav-"]):not([class*="navigation"]),
-.bg-gray-800:not(.bg-gray-800\/50):not([data-testid*="nav-"]),
-.min-h-screen.bg-black,
-.min-h-screen.bg-gray-900,
-.min-h-screen.bg-gray-800 {
+/* Override dark backgrounds with gradient - EXCLUDE navigation and content sections */
+.bg-black:not(.bg-black\/80):not(.bg-black\/50):not([data-testid*="nav-"]):not(.content-section):not(.content-section *),
+.bg-gray-900:not([data-testid*="nav-"]):not([class*="navigation"]):not(.content-section):not(.content-section *),
+.bg-gray-800:not(.bg-gray-800\/50):not([data-testid*="nav-"]):not(.content-section):not(.content-section *),
+.min-h-screen.bg-black:not(.content-section):not(.content-section *),
+.min-h-screen.bg-gray-900:not(.content-section):not(.content-section *),
+.min-h-screen.bg-gray-800:not(.content-section):not(.content-section *) {
   background: linear-gradient(to top, #fbbf24 0%, #ffffff 100%) !important;
   background-attachment: fixed !important;
+}
+
+/* Content sections with dark backgrounds use amber gradient instead */
+.content-section.bg-black,
+.content-section .bg-black:not(.bg-black\/80):not(.bg-black\/50),
+.content-section.bg-gray-900,
+.content-section .bg-gray-900:not(.bg-gray-900\/80):not(.bg-gray-900\/50),
+.content-section.bg-gray-800,
+.content-section .bg-gray-800:not(.bg-gray-800\/50) {
+  background: linear-gradient(to-br, rgb(254 243 199), rgb(253 230 138)) !important;
 }
 
 /* Enhanced text color overrides for better contrast - EXCLUDE navigation, notifications, hero components, hero buttons, and metrics cards */
@@ -1109,18 +1119,21 @@ button.text-blue-400 {
   color: #1f2937 !important;
 }
 
-/* Dark backgrounds - white text for actual dark backgrounds, EXCLUDE when used on yellow background and content sections */
-.bg-gray-800:not(.min-h-screen):not(.content-section *) *:not([class*="bg-"]),
-.bg-gray-900:not(.min-h-screen):not(.content-section *) *:not([class*="bg-"]),
-.bg-black:not(.min-h-screen):not(.content-section *) *:not([class*="bg-"]) {
+/* Dark backgrounds - white text for actual dark backgrounds, EXCLUDE content sections which use amber gradient */
+.bg-gray-800:not(.min-h-screen):not(.content-section):not(.content-section *) *:not([class*="bg-"]),
+.bg-gray-900:not(.min-h-screen):not(.content-section):not(.content-section *) *:not([class*="bg-"]),
+.bg-black:not(.min-h-screen):not(.content-section):not(.content-section *) *:not([class*="bg-"]) {
   color: #ffffff !important;
 }
 
-/* Content sections with dark backgrounds should use dark text for yellow background */
+/* Content sections with dark background classes use dark text for amber gradient background */
+.content-section.bg-gray-800 *:not([class*="bg-"]):not(.hero-component *):not([data-hero="true"] *),
+.content-section.bg-gray-900 *:not([class*="bg-"]):not(.hero-component *):not([data-hero="true"] *),
+.content-section.bg-black *:not([class*="bg-"]):not(.hero-component *):not([data-hero="true"] *),
 .content-section .bg-gray-800 *:not([class*="bg-"]):not(.hero-component *):not([data-hero="true"] *),
 .content-section .bg-gray-900 *:not([class*="bg-"]):not(.hero-component *):not([data-hero="true"] *),
 .content-section .bg-black *:not([class*="bg-"]):not(.hero-component *):not([data-hero="true"] *) {
-  color: #111827 !important; /* Dark text for yellow background */
+  color: #111827 !important; /* Dark text for amber background */
 }
 
 /* Full screen dark backgrounds that get overridden by yellow gradient should use dark text */
