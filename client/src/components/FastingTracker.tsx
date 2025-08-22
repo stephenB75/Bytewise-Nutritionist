@@ -801,18 +801,18 @@ export function FastingTracker() {
       </div>
 
       <Tabs defaultValue="tracker" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 h-12">
-          <TabsTrigger value="tracker" data-testid="tab-tracker" className="flex items-center justify-center gap-1 text-xs sm:text-sm">
-            <Target className="w-3 h-3 sm:w-4 sm:h-4" />
+        <TabsList className="grid w-full grid-cols-3 h-12 bg-amber-100/50 border-none shadow-none">
+          <TabsTrigger value="tracker" data-testid="tab-tracker" className="flex items-center justify-center gap-1 text-xs sm:text-sm text-gray-900 border-none data-[state=active]:bg-amber-200 data-[state=active]:text-gray-900">
+            <Target className="w-3 h-3 sm:w-4 sm:h-4 text-gray-900" />
             <span className="hidden xs:inline text-gray-900">Tracker</span>
             <span className="xs:hidden text-gray-900">Track</span>
           </TabsTrigger>
-          <TabsTrigger value="plans" data-testid="tab-plans" className="flex items-center justify-center gap-1 text-xs sm:text-sm">
-            <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
+          <TabsTrigger value="plans" data-testid="tab-plans" className="flex items-center justify-center gap-1 text-xs sm:text-sm text-gray-900 border-none data-[state=active]:bg-amber-200 data-[state=active]:text-gray-900">
+            <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-gray-900" />
             Plans
           </TabsTrigger>
-          <TabsTrigger value="tips" data-testid="tab-tips" className="flex items-center justify-center gap-1 text-xs sm:text-sm">
-            <Coffee className="w-3 h-3 sm:w-4 sm:h-4" />
+          <TabsTrigger value="tips" data-testid="tab-tips" className="flex items-center justify-center gap-1 text-xs sm:text-sm text-gray-900 border-none data-[state=active]:bg-amber-200 data-[state=active]:text-gray-900">
+            <Coffee className="w-3 h-3 sm:w-4 sm:h-4 text-gray-900" />
             Tips
           </TabsTrigger>
         </TabsList>
