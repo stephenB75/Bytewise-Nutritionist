@@ -1297,7 +1297,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     setShowWelcomeBanner(false);
                     // Future tour functionality
                   }}
-                  className="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors"
+                  className="px-4 py-2 bg-amber-400 text-white rounded-lg text-sm font-medium hover:bg-amber-500 transition-colors"
                 >
                   Take Tour
                 </button>
@@ -1385,7 +1385,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 { label: 'Total', value: loggedMeals.length }
               ].map((item, index) => (
                 <div key={index} className="text-center p-2 bg-gradient-to-br from-amber-100 to-amber-200 rounded-lg">
-                  <div className="text-sm font-bold text-blue-700">{item.value}</div>
+                  <div className="text-sm font-bold text-gray-900">{item.value}</div>
                   <div className="text-xs text-gray-900">{item.label}</div>
                 </div>
               ))}
@@ -1565,7 +1565,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     <p className="text-gray-400 text-sm">
                       {meal.time} • {meal.mealType}
                       {searchQuery && (
-                        <span className="ml-2 text-blue-400">
+                        <span className="ml-2 text-amber-600">
                           • {new Date(meal.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                         </span>
                       )}
@@ -1729,7 +1729,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   <p className="text-gray-400 text-sm">{Math.round(weeklyCalories)}/{weeklyGoal} kcal</p>
                 </div>
                 <div className="text-right">
-                  <div className="text-2xl font-bold text-blue-400">{Math.round((weeklyCalories/weeklyGoal)*100)}%</div>
+                  <div className="text-2xl font-bold text-amber-600">{Math.round((weeklyCalories/weeklyGoal)*100)}%</div>
                   <div className="text-xs text-gray-400">completed</div>
                 </div>
               </div>
@@ -1819,21 +1819,21 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-white font-semibold text-2xl">Weekly Goals</h3>
-              <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
+              <Badge className="bg-amber-200/50 text-amber-700 border-amber-300/50">
                 <Calendar className="w-3 h-3 mr-1" />
                 2/4 Complete
               </Badge>
             </div>
             <div className="grid grid-cols-1 gap-3">
-              <div className="flex items-center justify-between p-3 bg-blue-500/20 rounded-xl border border-blue-500/30">
+              <div className="flex items-center justify-between p-3 bg-amber-200/40 rounded-xl border border-amber-300/50">
                 <span className="text-gray-900">Track 5+ days</span>
-                <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                <div className="w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center">
                   <span className="text-white text-sm">✓</span>
                 </div>
               </div>
-              <div className="flex items-center justify-between p-3 bg-blue-500/20 rounded-xl border border-blue-500/30">
+              <div className="flex items-center justify-between p-3 bg-amber-200/40 rounded-xl border border-amber-300/50">
                 <span className="text-gray-900">Average 2000+ cal/day</span>
-                <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                <div className="w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center">
                   <span className="text-white text-sm">✓</span>
                 </div>
               </div>
@@ -2083,7 +2083,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               )}
               <Button 
                 type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold h-12 rounded-xl btn-hero-enhanced"
+                className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold h-12 rounded-xl btn-hero-enhanced"
                 disabled={isLoading}
               >
                 {isLoading ? 'Loading...' : 
@@ -2365,8 +2365,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-base">
                 <div className="bg-blue-500/5 border border-blue-500/20 rounded-lg p-3">
                   <div className="flex items-center gap-2 mb-2">
-                    <Sparkles className="h-4 w-4 text-blue-400" />
-                    <span className="font-medium text-blue-300">AI Photo Analysis</span>
+                    <Sparkles className="h-4 w-4 text-amber-500" />
+                    <span className="font-medium text-amber-100">AI Photo Analysis</span>
                   </div>
                   <p className="text-gray-300 text-sm">
                     Take a photo of your food and let AI identify it automatically. 
@@ -2399,7 +2399,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 onClick={() => setNutritionMode('ai')}
                 className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                   nutritionMode === 'ai'
-                    ? 'bg-blue-500 text-white shadow-lg'
+                    ? 'bg-amber-500 text-white shadow-lg'
                     : 'text-gray-400 hover:text-white'
                 }`}
                 data-testid="button-ai-mode"
@@ -2552,7 +2552,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     <div className="bg-amber-200/30 rounded-lg p-4">
                       <div className="flex items-start justify-between">
                         <div className="flex items-center space-x-3">
-                          <PlayCircle className="w-5 h-5 text-blue-500 flex-shrink-0" />
+                          <PlayCircle className="w-5 h-5 text-amber-600 flex-shrink-0" />
                           <div>
                             <h4 className="font-semibold text-gray-900 mb-1">Comprehensive App Tour</h4>
                             <p className="text-sm text-gray-700 leading-relaxed">

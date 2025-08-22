@@ -176,7 +176,7 @@ export function TourLauncher({ onStartTour, isVisible = true }: TourLauncherProp
           <Button
             variant="ghost"
             size="sm"
-            className="text-blue-600 hover:text-blue-700 font-medium"
+            className="text-amber-600 hover:text-amber-800 font-medium"
             data-testid="tour-preview-button"
           >
             <MapPin className="w-4 h-4 mr-2" />
@@ -250,7 +250,7 @@ export function TourLauncher({ onStartTour, isVisible = true }: TourLauncherProp
                 </Button>
                 <Button
                   onClick={handleStartTour}
-                  className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white"
+                  className="bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white"
                 >
                   <Play className="w-4 h-4 mr-2" />
                   Start Tour
@@ -283,7 +283,7 @@ export function WelcomeBanner({ onStartTour, onDismiss }: { onStartTour: () => v
               <Button
                 onClick={onStartTour}
                 size="sm"
-                className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white"
+                className="bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white"
               >
                 <Play className="w-4 h-4 mr-2" />
                 Take Tour (10 min)
