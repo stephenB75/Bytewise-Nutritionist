@@ -964,47 +964,23 @@ button[data-testid*="nav-"] {
   color: #374151 !important;
 }
 
-/* Force metrics cards to be visible and properly styled */
+/* Force metrics cards to be visible and properly styled - Enhanced for yellow theme */
 [data-testid*="progress"],
 [data-testid*="water"],
 [data-testid*="macro"],
 [data-testid*="micro"] {
   background-color: #ffffff !important;
-  border: 2px solid #d1d5db !important;
-  color: #000000 !important;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+  border: 2px solid #6b7280 !important;
+  color: #111827 !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
 }
 
 /* Override any conflicting text colors in metrics cards - HIGHEST PRIORITY */
-[data-page="dashboard"] [data-testid*="progress"] h1,
-[data-page="dashboard"] [data-testid*="progress"] h2,
-[data-page="dashboard"] [data-testid*="progress"] h3,
-[data-page="dashboard"] [data-testid*="progress"] p,
-[data-page="dashboard"] [data-testid*="progress"] span,
-[data-page="dashboard"] [data-testid*="progress"] div,
-[data-page="dashboard"] [data-testid*="progress"] .text-black,
-[data-page="dashboard"] [data-testid*="water"] h1,
-[data-page="dashboard"] [data-testid*="water"] h2,
-[data-page="dashboard"] [data-testid*="water"] h3,
-[data-page="dashboard"] [data-testid*="water"] p,
-[data-page="dashboard"] [data-testid*="water"] span,
-[data-page="dashboard"] [data-testid*="water"] div,
-[data-page="dashboard"] [data-testid*="water"] .text-black,
-[data-page="dashboard"] [data-testid*="macro"] h1,
-[data-page="dashboard"] [data-testid*="macro"] h2,
-[data-page="dashboard"] [data-testid*="macro"] h3,
-[data-page="dashboard"] [data-testid*="macro"] p,
-[data-page="dashboard"] [data-testid*="macro"] span,
-[data-page="dashboard"] [data-testid*="macro"] div,
-[data-page="dashboard"] [data-testid*="macro"] .text-black,
-[data-page="dashboard"] [data-testid*="micro"] h1,
-[data-page="dashboard"] [data-testid*="micro"] h2,
-[data-page="dashboard"] [data-testid*="micro"] h3,
-[data-page="dashboard"] [data-testid*="micro"] p,
-[data-page="dashboard"] [data-testid*="micro"] span,
-[data-page="dashboard"] [data-testid*="micro"] div,
-[data-page="dashboard"] [data-testid*="micro"] .text-black {
-  color: #000000 !important;
+[data-page="dashboard"] [data-testid*="progress"] *,
+[data-page="dashboard"] [data-testid*="water"] *,
+[data-page="dashboard"] [data-testid*="macro"] *,
+[data-page="dashboard"] [data-testid*="micro"] * {
+  color: #111827 !important;
 }
 
 /* Placeholder and input text fixes */

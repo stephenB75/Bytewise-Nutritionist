@@ -1052,25 +1052,25 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     const isComplete = progressWidth >= 100;
     
     return (
-      <Card className="bg-white border-gray-300 p-4 transition-all duration-300 hover:bg-gray-50 hover:border-gray-400 border-2 shadow-md hover:shadow-lg">
+      <Card className="bg-white border-gray-500 p-4 transition-all duration-300 hover:bg-gray-50 hover:border-gray-600 border-2 shadow-lg hover:shadow-xl">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
-            <div className={`p-2 bg-${color}-500/20 rounded-xl`}>
-              <Icon className={`w-5 h-5 text-${color}-600`} />
+            <div className={`p-2 bg-${color}-500/30 rounded-xl border border-${color}-200`}>
+              <Icon className={`w-5 h-5 text-${color}-700`} />
             </div>
             <div>
-              <h3 className="text-black font-semibold">{title}</h3>
-              <p className="text-black text-sm">{value}/{goal}</p>
+              <h3 className="text-gray-900 font-bold">{title}</h3>
+              <p className="text-gray-800 text-sm font-medium">{value}/{goal}</p>
             </div>
           </div>
           <div className="text-right">
-            <div className={`text-2xl font-bold text-${color}-600`}>{progressWidth}%</div>
-            <div className="text-xs text-black">of goal</div>
+            <div className={`text-2xl font-bold text-${color}-700`}>{progressWidth}%</div>
+            <div className="text-xs text-gray-800 font-semibold">of goal</div>
           </div>
         </div>
-        <div className="relative h-3 bg-gray-300 rounded-full overflow-hidden mb-4">
+        <div className="relative h-3 bg-gray-400 rounded-full overflow-hidden mb-4 border border-gray-300">
           <div 
-            className={`absolute left-0 top-0 h-full bg-gradient-to-r from-${color}-400 to-${color === 'orange' ? 'red' : 'cyan'}-500 rounded-full transition-all duration-1000`}
+            className={`absolute left-0 top-0 h-full bg-gradient-to-r from-${color}-500 to-${color === 'orange' ? 'red' : 'cyan'}-600 rounded-full transition-all duration-1000`}
             style={{ width: `${progressWidth}%` }}
           />
           {isComplete && (
@@ -1092,27 +1092,27 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     const isGoalReached = glasses >= dailyGoal;
     
     return (
-      <Card className={`bg-gradient-to-br from-white to-cyan-50 border-cyan-300 p-6 transition-all duration-300 hover:from-cyan-50 hover:to-cyan-100 hover:border-cyan-400 border-2 shadow-md hover:shadow-lg ${isGoalReached ? 'ring-2 ring-cyan-500/50' : ''}`}>
+      <Card className={`bg-gradient-to-br from-white to-cyan-50 border-cyan-500 p-6 transition-all duration-300 hover:from-cyan-50 hover:to-cyan-100 hover:border-cyan-600 border-2 shadow-lg hover:shadow-xl ${isGoalReached ? 'ring-2 ring-cyan-600/70' : ''}`}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
-            <div className={`p-3 rounded-xl transition-all duration-300 ${isGoalReached ? 'bg-gradient-to-br from-cyan-400 to-blue-500' : 'bg-cyan-500/20'}`}>
-              <Droplets className={`w-6 h-6 transition-colors duration-300 ${isGoalReached ? 'text-black' : 'text-cyan-600'}`} />
+            <div className={`p-3 rounded-xl transition-all duration-300 border ${isGoalReached ? 'bg-gradient-to-br from-cyan-500 to-blue-600 border-cyan-400' : 'bg-cyan-500/30 border-cyan-300'}`}>
+              <Droplets className={`w-6 h-6 transition-colors duration-300 ${isGoalReached ? 'text-white' : 'text-cyan-700'}`} />
             </div>
             <div>
-              <h3 className="text-black font-semibold text-lg">Water Intake</h3>
-              <p className="text-black text-sm">{glasses}/{dailyGoal} glasses today</p>
+              <h3 className="text-gray-900 font-bold text-lg">Water Intake</h3>
+              <p className="text-gray-800 text-sm font-medium">{glasses}/{dailyGoal} glasses today</p>
             </div>
           </div>
           <div className="text-right">
-            <div className="text-2xl font-bold text-black">{Math.round(percentage)}%</div>
-            <div className="text-xs text-black">of goal</div>
+            <div className="text-2xl font-bold text-gray-900">{Math.round(percentage)}%</div>
+            <div className="text-xs text-gray-800 font-semibold">of goal</div>
           </div>
         </div>
         
         {/* Progress bar */}
-        <div className="relative h-3 bg-gray-300 rounded-full overflow-hidden mb-4">
+        <div className="relative h-3 bg-gray-400 rounded-full overflow-hidden mb-4 border border-gray-300">
           <div 
-            className="absolute left-0 top-0 h-full bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full transition-all duration-1000"
+            className="absolute left-0 top-0 h-full bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full transition-all duration-1000"
             style={{ width: `${percentage}%` }}
           />
           {percentage >= 100 && (
@@ -1129,7 +1129,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 className={`w-4 h-6 rounded-sm border-2 transition-all duration-300 ${
                   i < glasses 
                     ? 'bg-cyan-400 border-cyan-400' 
-                    : 'bg-transparent border-gray-400'
+                    : 'bg-transparent border-gray-500'
                 }`}
                 style={{
                   background: i < glasses 
@@ -1185,29 +1185,29 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     , [data]);
 
     // Determine text color based on remaining value
-    const textColor = isNegative ? 'text-red-600' : `text-${color}-600`;
-    const labelColor = isNegative ? 'text-red-500' : 'text-black';
+    const textColor = isNegative ? 'text-red-700' : `text-${color}-700`;
+    const labelColor = isNegative ? 'text-red-600' : 'text-gray-900';
 
     return (
-      <Card className="bg-white border-gray-300 p-4 transition-all duration-300 hover:bg-gray-50 hover:border-gray-400 border-2 shadow-md hover:shadow-lg">
+      <Card className="bg-white border-gray-500 p-4 transition-all duration-300 hover:bg-gray-50 hover:border-gray-600 border-2 shadow-lg hover:shadow-xl">
         <div className="text-center">
-          <div className={`text-sm ${labelColor} mb-1 leading-tight`}>
+          <div className={`text-sm ${labelColor} mb-1 leading-tight font-semibold`}>
             <div>Remaining</div>
             <div>{name}</div>
           </div>
           <div className={`text-xl font-bold ${textColor} mb-2`}>
             {isNegative ? '+' : ''}{Math.abs(remaining)}g
           </div>
-          <div className="flex items-end space-x-px h-6">
+          <div className="flex items-end space-x-px h-6 border border-gray-300 rounded bg-gray-100">
             {chartData.map((height, i) => (
               <div 
                 key={i}
-                className={`flex-1 ${isNegative ? 'bg-red-400/30' : `bg-${color}-400/30`} rounded-t transition-all duration-500`}
+                className={`flex-1 ${isNegative ? 'bg-red-500/40' : `bg-${color}-500/40`} rounded-t transition-all duration-500`}
                 style={{ height: `${height}%` }}
               />
             ))}
           </div>
-          <div className="text-xs text-black mt-1">
+          <div className="text-xs text-gray-800 font-semibold mt-1">
             {value}g / {goal}g
           </div>
         </div>
@@ -1244,18 +1244,18 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     const [textColor, gradientColors] = colorClasses.split(' from-');
     
     return (
-    <Card className="bg-white border-gray-300 p-3 border-2 shadow-md hover:shadow-lg transition-all duration-300 hover:bg-gray-50 hover:border-gray-400">
+    <Card className="bg-white border-gray-500 p-3 border-2 shadow-lg hover:shadow-xl transition-all duration-300 hover:bg-gray-50 hover:border-gray-600">
       <div className="flex items-center justify-between mb-2">
-        <div className={`text-sm font-semibold ${textColor}`}>{name}</div>
-        <div className="text-xs text-black font-bold">{displayValue}{unit} / {goal}{unit}</div>
+        <div className={`text-sm font-bold ${textColor}`}>{name}</div>
+        <div className="text-xs text-gray-900 font-bold">{displayValue}{unit} / {goal}{unit}</div>
       </div>
-      <div className="relative h-2 bg-gray-300 rounded-full overflow-hidden">
+      <div className="relative h-2 bg-gray-400 rounded-full overflow-hidden border border-gray-300">
         <div 
           className={`absolute left-0 top-0 h-full bg-gradient-to-r from-${gradientColors} rounded-full transition-all duration-1000`} 
           style={{ width: `${percentage}%` }} 
         />
       </div>
-      <div className="text-xs text-black font-semibold mt-1">{percentage}% Daily Value</div>
+      <div className="text-xs text-gray-900 font-bold mt-1">{percentage}% Daily Value</div>
     </Card>
     );
   };
