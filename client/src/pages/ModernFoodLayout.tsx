@@ -2811,18 +2811,25 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       />
       
       {/* Tour Launcher - Fixed position, available on all pages */}
-      {user && (
-        <div className="fixed bottom-20 right-6 z-50">
-          <TourLauncher
-            onStartTour={() => {
-              console.log('Starting ByteWise tour...');
-              // Mark tour as started
-              localStorage.setItem('tour-started', 'true');
-            }}
-            isVisible={shouldShowTour()}
-          />
-        </div>
-      )}
+      {user && !showProfileCompletion && (() => {
+        const userData = user as any;
+        const hasFirstName = userData?.firstName && userData.firstName.trim() !== '';
+        const hasLastName = userData?.lastName && userData.lastName.trim() !== '';
+        const profileCompleted = hasFirstName && hasLastName;
+        
+        return profileCompleted ? (
+          <div className="fixed bottom-20 right-6 z-50">
+            <TourLauncher
+              onStartTour={() => {
+                console.log('Starting ByteWise tour...');
+                // Mark tour as started
+                localStorage.setItem('tour-started', 'true');
+              }}
+              isVisible={shouldShowTour()}
+            />
+          </div>
+        ) : null;
+      })()}
       
 
       
