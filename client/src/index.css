@@ -5487,17 +5487,22 @@ input[class*="pr-"] {
   background-color: rgba(0, 0, 0, 0.4) !important;
 }
 
-/* Tour button override - force light hover state */
+/* Tour button override - force light text for dark background */
 button.tour-button-override:hover,
 .tour-button-override:hover,
 button[class*="tour-button-override"]:hover {
-  background: linear-gradient(to right, #fef3c7, #fde68a) !important;
-  color: #1f2937 !important;
+  color: #ffffff !important;
   border-color: transparent !important;
 }
 
 /* More specific override for shadcn Button component */
 button.inline-flex.tour-button-override:hover {
-  background: linear-gradient(to right, #fef3c7, #fde68a) !important;
-  color: #1f2937 !important;
+  color: #ffffff !important;
+}
+
+/* Make sure all text inside tour buttons is white on hover */
+button.tour-button-override:hover *,
+.tour-button-override:hover *,
+button[class*="tour-button-override"]:hover * {
+  color: #ffffff !important;
 }
