@@ -52,7 +52,7 @@ const TOUR_FEATURES = [
     category: 'Wellness'
   },
   {
-    icon: <Trophy className="w-5 h-5 text-yellow-500" />,
+    icon: <Trophy className="w-5 h-5 text-amber-700" />,
     title: 'Achievement System',
     description: 'Unlock rewards as you hit your goals',
     category: 'Motivation'
@@ -209,7 +209,7 @@ export function TourLauncher({ onStartTour, isVisible = true }: TourLauncherProp
                   <Target className="w-4 h-4" />
                   10 key features
                 </span>
-                <Badge variant="secondary" className="text-xs">
+                <Badge variant="secondary" className="text-xs text-gray-900 bg-gray-100">
                   Interactive
                 </Badge>
               </div>
@@ -226,7 +226,7 @@ export function TourLauncher({ onStartTour, isVisible = true }: TourLauncherProp
                         <p className="text-xs text-gray-950 dark:text-gray-950 mb-2">
                           {feature.description}
                         </p>
-                        <Badge variant="outline" className="text-xs">
+                        <Badge variant="outline" className="text-xs text-gray-900 border-gray-400">
                           {feature.category}
                         </Badge>
                       </div>
