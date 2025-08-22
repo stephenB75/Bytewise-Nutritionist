@@ -2253,7 +2253,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           <div className="flex justify-between items-center">
             <h3 className="text-xl font-bold text-gray-900">Logged Today</h3>
             {loggedMeals.length === 0 && (
-              <Badge className="bg-gray-600 text-gray-200">No meals logged</Badge>
+              <Badge className="bg-amber-800 text-amber-100 border border-amber-700">No meals logged</Badge>
             )}
           </div>
           {loggedMeals.length === 0 ? (
@@ -2374,7 +2374,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         <div className="space-y-4 mt-8">
           <div className="flex justify-between items-center">
             <h3 className="text-xl font-bold text-gray-900">This Week</h3>
-            <Badge className="bg-blue-600 text-white">Weekly Summary</Badge>
+            <Badge className="bg-amber-800 text-amber-100 border border-amber-700">Weekly Summary</Badge>
           </div>
           <WeeklyCaloriesCard />
         </div>

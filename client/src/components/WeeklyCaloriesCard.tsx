@@ -217,7 +217,7 @@ export function WeeklyCaloriesCard() {
             <Calendar className="w-5 h-5 text-blue-400" />
             <h4 className="text-lg font-semibold text-gray-950">Weekly Summary</h4>
           </div>
-          <Badge className="bg-blue-600 text-white">
+          <Badge className="bg-amber-800 text-amber-100 border border-amber-700">
             <Flame className="w-3 h-3 mr-1" />
             {totalWeeklyCalories} cal total
           </Badge>
