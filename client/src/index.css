@@ -944,9 +944,13 @@ button[data-testid^="nav-"] span.text-white,
 [data-testid*="nav-"] .text-white,
 button[data-testid*="notification"] .text-white,
 button[aria-label*="notification"] .text-white,
-button[data-testid="button-notifications"] .text-white,
-button[data-testid="button-notifications"] svg {
+button[data-testid="button-notifications"] .text-white {
   color: #ffffff !important;
+}
+
+/* Allow notification icon to use its own color (grey by default, white on hover) */
+button[data-testid="button-notifications"] svg {
+  color: inherit !important;
 }
 
 /* Removed - consolidated into master reset above */
