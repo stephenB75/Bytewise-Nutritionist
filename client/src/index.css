@@ -5487,22 +5487,44 @@ input[class*="pr-"] {
   background-color: rgba(0, 0, 0, 0.4) !important;
 }
 
-/* Tour button override - force light text for dark background */
-button.tour-button-override:hover,
-.tour-button-override:hover,
-button[class*="tour-button-override"]:hover {
+/* Tour button override - lighter background for yellow theme */
+button.tour-button-override,
+.tour-button-override,
+button[class*="tour-button-override"] {
+  background: linear-gradient(to right, #f59e0b, #d97706) !important;
   color: #ffffff !important;
   border-color: transparent !important;
 }
 
+/* Tour button hover state */
+button.tour-button-override:hover,
+.tour-button-override:hover,
+button[class*="tour-button-override"]:hover {
+  background: linear-gradient(to right, #fbbf24, #f59e0b) !important;
+  color: #1f2937 !important;
+  border-color: transparent !important;
+}
+
 /* More specific override for shadcn Button component */
-button.inline-flex.tour-button-override:hover {
+button.inline-flex.tour-button-override {
+  background: linear-gradient(to right, #f59e0b, #d97706) !important;
   color: #ffffff !important;
 }
 
-/* Make sure all text inside tour buttons is white on hover */
+button.inline-flex.tour-button-override:hover {
+  background: linear-gradient(to right, #fbbf24, #f59e0b) !important;
+  color: #1f2937 !important;
+}
+
+/* Make sure all text inside tour buttons follows the color scheme */
+button.tour-button-override *,
+.tour-button-override *,
+button[class*="tour-button-override"] * {
+  color: #ffffff !important;
+}
+
 button.tour-button-override:hover *,
 .tour-button-override:hover *,
 button[class*="tour-button-override"]:hover * {
-  color: #ffffff !important;
+  color: #1f2937 !important;
 }
