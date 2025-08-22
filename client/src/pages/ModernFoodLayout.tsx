@@ -993,7 +993,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <Button 
                 onClick={onButtonClick}
                 size="lg"
-                className="group relative bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 font-black px-16 py-6 rounded-full text-xl md:text-2xl shadow-2xl transition-all duration-300 border-2 border-orange-400 hover:border-orange-300 overflow-hidden btn-hero-enhanced"
+                className="group relative bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 font-black px-16 py-6 rounded-full text-xl md:text-2xl shadow-2xl transition-all duration-300 overflow-hidden btn-hero-enhanced"
                 style={{ color: '#ffffff !important' }}
               >
                 <span className="relative z-10 flex items-center gap-3" style={{ color: '#ffffff !important' }}>
@@ -1055,7 +1055,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       <Card className="bg-amber-100 border-none p-5 transition-all duration-300 hover:bg-gradient-to-br hover:from-amber-100 hover:to-amber-200 shadow-lg hover:shadow-xl" data-testid="progress-card">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
-            <div className={`p-2 bg-${color}-500/30 rounded-xl border border-${color}-200`}>
+            <div className={`p-2 bg-${color}-500/30 rounded-xl`}>
               <Icon className={`w-5 h-5 text-${color}-700`} />
             </div>
             <div>
@@ -1092,10 +1092,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     const isGoalReached = glasses >= dailyGoal;
     
     return (
-      <Card className={`bg-gradient-to-br from-amber-100 to-cyan-100 border-none p-6 transition-all duration-300 hover:from-amber-100 hover:to-cyan-200 shadow-lg hover:shadow-xl ${isGoalReached ? 'ring-2 ring-cyan-500/50' : ''}`} data-testid="water-card">
+      <Card className={`bg-gradient-to-br from-amber-100 to-cyan-100 border-none p-6 transition-all duration-300 hover:from-amber-100 hover:to-cyan-200 shadow-lg hover:shadow-xl`} data-testid="water-card">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
-            <div className={`p-3 rounded-xl transition-all duration-300 border ${isGoalReached ? 'bg-gradient-to-br from-cyan-500 to-blue-600 border-cyan-400' : 'bg-cyan-500/30 border-cyan-300'}`}>
+            <div className={`p-3 rounded-xl transition-all duration-300 ${isGoalReached ? 'bg-gradient-to-br from-cyan-500 to-blue-600' : 'bg-cyan-500/30'}`}>
               <Droplets className={`w-6 h-6 transition-colors duration-300 ${isGoalReached ? 'text-white' : 'text-cyan-700'}`} />
             </div>
             <div>
@@ -1126,10 +1126,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             {Array.from({ length: dailyGoal }, (_, i) => (
               <div
                 key={i}
-                className={`w-4 h-6 rounded-sm border-2 transition-all duration-300 ${
+                className={`w-4 h-6 rounded-sm transition-all duration-300 ${
                   i < glasses 
-                    ? 'bg-cyan-400 border-cyan-400' 
-                    : 'bg-transparent border-gray-500'
+                    ? 'bg-cyan-400' 
+                    : 'bg-gray-300'
                 }`}
                 style={{
                   background: i < glasses 
@@ -1147,7 +1147,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               disabled={glasses <= 0}
               size="sm"
               variant="ghost"
-              className="h-8 w-8 p-0 text-cyan-600 hover:text-cyan-500 hover:bg-cyan-500/10 disabled:opacity-50 shadow-lg hover:shadow-xl transition-shadow duration-200 border border-cyan-500/50 hover:border-cyan-500/70"
+              className="h-8 w-8 p-0 text-cyan-600 hover:text-cyan-500 hover:bg-cyan-500/10 disabled:opacity-50 shadow-lg hover:shadow-xl transition-shadow duration-200"
               data-testid="button-decrement-water"
             >
               <Minus className="w-4 h-4" />
@@ -1198,7 +1198,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           <div className={`text-xl font-bold ${textColor} mb-2`}>
             {isNegative ? '+' : ''}{Math.abs(remaining)}g
           </div>
-          <div className="flex items-end space-x-px h-6 border border-amber-300 rounded bg-amber-100">
+          <div className="flex items-end space-x-px h-6 rounded bg-amber-100">
             {chartData.map((height, i) => (
               <div 
                 key={i}
@@ -1310,7 +1310,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   }
                 }}
                 size="lg"
-                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-yellow-100 font-black px-16 py-6 rounded-full text-2xl shadow-2xl hover:scale-105 transition-all duration-500 border-2 border-orange-400/30"
+                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-yellow-100 font-black px-16 py-6 rounded-full text-2xl shadow-2xl hover:scale-105 transition-all duration-500"
               >
                 {user ? 'Start Tracking' : 'Sign Up to Track'}
               </Button>
@@ -1328,7 +1328,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         <div className="space-y-3">
           {/* Welcome Banner for Tour */}
           {user && showWelcomeBanner && (
-            <div className="mb-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+            <div className="mb-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-2xl">🎯</span>
                 <h3 className="font-semibold text-lg text-white">Welcome to ByteWise!</h3>
@@ -1573,7 +1573,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             </div>
             
             {(!searchQuery && loggedMeals.length === 0) ? (
-              <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 p-6 border-2">
+              <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md p-6">
                 <div className="text-center text-gray-400">
                   <p className="text-lg mb-2">No meals logged today</p>
                   <p className="text-sm">Use the search bar above or nutrition calculator to start tracking</p>
@@ -1582,7 +1582,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             ) : searchQuery && weeklyMeals.filter(meal => 
               meal.name.toLowerCase().includes(searchQuery.toLowerCase())
             ).length === 0 ? (
-              <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 p-6 border-2">
+              <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md p-6">
                 <div className="text-center text-gray-400">
                   <p className="text-lg mb-2">No meals found</p>
                   <p className="text-sm">Try a different search term or add new meals to your log</p>
@@ -1603,7 +1603,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 })
                 .slice(0, 50) // Limit results for performance
                 .map((meal, index) => (
-              <Card key={`search-${meal.id || meal.name}-${meal.timestamp || index}`} className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 p-4 border-2">
+              <Card key={`search-${meal.id || meal.name}-${meal.timestamp || index}`} className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
                     <h4 className="text-white font-semibold">{meal.name}</h4>
@@ -1767,7 +1767,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             </div>
             
             {/* Weekly Progress Card */}
-            <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 p-4">
+            <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md p-4">
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h3 className="text-white font-semibold">Weekly Total</h3>
@@ -1818,7 +1818,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         {/* Goal Progress Cards */}
         <div className="space-y-4">
           {/* Daily Goals */}
-          <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 p-6">
+          <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-white font-semibold text-xl">Daily Goals</h3>
               <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
@@ -1845,13 +1845,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   <span className="text-white text-xs">✓</span>
                 </div>
               </div>
-              <div className="flex items-center justify-between p-3 bg-gradient-to-br from-amber-100 to-amber-200 rounded-xl border border-amber-300">
+              <div className="flex items-center justify-between p-3 bg-gradient-to-br from-amber-100 to-amber-200 rounded-xl">
                 <span className="text-gray-400">Track micronutrients</span>
                 <div className="w-6 h-6 bg-amber-300 rounded-full flex items-center justify-center">
                   <span className="text-gray-400 text-xs">○</span>
                 </div>
               </div>
-              <div className="flex items-center justify-between p-3 bg-gradient-to-br from-amber-100 to-amber-200 rounded-xl border border-amber-300">
+              <div className="flex items-center justify-between p-3 bg-gradient-to-br from-amber-100 to-amber-200 rounded-xl">
                 <span className="text-gray-400">Stay within carb limit</span>
                 <div className="w-6 h-6 bg-amber-300 rounded-full flex items-center justify-center">
                   <span className="text-gray-400 text-xs">○</span>
@@ -1861,7 +1861,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           </Card>
 
           {/* Weekly Goals */}
-          <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 p-6">
+          <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-white font-semibold text-xl">Weekly Goals</h3>
               <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
@@ -1882,13 +1882,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   <span className="text-white text-xs">✓</span>
                 </div>
               </div>
-              <div className="flex items-center justify-between p-3 bg-gradient-to-br from-amber-100 to-amber-200 rounded-xl border border-amber-300">
+              <div className="flex items-center justify-between p-3 bg-gradient-to-br from-amber-100 to-amber-200 rounded-xl">
                 <span className="text-gray-400">Hit protein goal 5 days</span>
                 <div className="w-6 h-6 bg-amber-300 rounded-full flex items-center justify-center">
                   <span className="text-gray-400 text-xs">3/5</span>
                 </div>
               </div>
-              <div className="flex items-center justify-between p-3 bg-gradient-to-br from-amber-100 to-amber-200 rounded-xl border border-amber-300">
+              <div className="flex items-center justify-between p-3 bg-gradient-to-br from-amber-100 to-amber-200 rounded-xl">
                 <span className="text-gray-400">Try 3 new foods</span>
                 <div className="w-6 h-6 bg-amber-300 rounded-full flex items-center justify-center">
                   <span className="text-gray-400 text-xs">1/3</span>
@@ -2100,7 +2100,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         {/* Content Section - Completely Separate and Underneath */}
         <div className="px-6 py-3 content-section">
           {/* Sign In Component */}
-          <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 p-6">
+          <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md p-6">
             <h3 className="text-2xl font-bold text-white mb-6 text-center">
               {isResetPassword ? 'Reset Password' : isSignUp ? 'Create Account' : 'Sign In'}
             </h3>
