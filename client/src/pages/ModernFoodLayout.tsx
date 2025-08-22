@@ -2668,9 +2668,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           >
             <div className="relative">
               {notifications.filter(n => !n.read).length > 0 ? (
-                <BellRing className="w-10 h-10 transition-all duration-300 group-hover:rotate-12 group-hover:text-gray-700" strokeWidth={2.5} aria-hidden="true" />
+                <BellRing className="w-12 h-12 transition-all duration-300 group-hover:rotate-12 group-hover:text-gray-700" strokeWidth={2.5} aria-hidden="true" />
               ) : (
-                <Bell className="w-10 h-10 transition-all duration-300 group-hover:rotate-6 group-hover:text-gray-700" strokeWidth={2.5} aria-hidden="true" />
+                <Bell className="w-12 h-12 transition-all duration-300 group-hover:rotate-6 group-hover:text-gray-700" strokeWidth={2.5} aria-hidden="true" />
               )}
             </div>
             
