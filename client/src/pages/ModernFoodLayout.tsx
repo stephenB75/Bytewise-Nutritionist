@@ -1500,7 +1500,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       />
 
       {/* Content Section - Completely Separate and Underneath */}
-      <div className="px-6 py-3 bg-black content-section">
+      <div className="px-6 py-3 content-section">
         {/* Food Search Bar - Moved Here */}
         <div className="mb-4 pb-2">
           <div className="relative">
@@ -1812,7 +1812,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       />
 
       {/* Content Section - Completely Separate and Underneath */}
-      <div className="px-6 py-3 bg-black content-section">
+      <div className="px-6 py-3 content-section">
         {/* Goal Progress Cards */}
         <div className="space-y-4">
           {/* Daily Goals */}
@@ -2212,7 +2212,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       />
 
       {/* Content Section - Completely Separate and Underneath */}
-      <div className="px-6 py-3 bg-black content-section">
+      <div className="px-6 py-3 content-section">
         {/* Food Search Bar - Enhanced with filtering */}
         <div className="space-y-4 mb-8">
           <div className="text-center">
@@ -2504,7 +2504,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       />
 
       {/* Content Section - Redesigned to match other pages */}
-      <div className="px-6 py-3 bg-black content-section">
+      <div className="px-6 py-3 content-section">
         {/* Profile Cards with Unified Accordion System */}
         {user ? (
           <Accordion 
