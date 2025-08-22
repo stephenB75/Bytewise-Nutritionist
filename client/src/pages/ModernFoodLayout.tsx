@@ -2659,7 +2659,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           <Button
             variant="ghost"
             size="lg"
-            className="group relative bg-white/5 backdrop-blur-xl text-white rounded-2xl p-4 transition-all duration-500 hover:scale-110 hover:bg-white/10 hover:shadow-2xl hover:shadow-blue-500/20"
+            className="group relative text-gray-900 p-3 transition-all duration-500 hover:scale-110"
             onClick={() => setShowNotificationDropdown(!showNotificationDropdown)}
             aria-label={`Notifications${notifications.filter(n => !n.read).length > 0 ? ` - ${notifications.filter(n => !n.read).length} unread` : ''}`}
             aria-expanded={showNotificationDropdown}
@@ -2668,13 +2668,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           >
             <div className="relative">
               {notifications.filter(n => !n.read).length > 0 ? (
-                <BellRing className="w-8 h-8 transition-all duration-300 group-hover:rotate-12 group-hover:text-blue-300" strokeWidth={2} aria-hidden="true" />
+                <BellRing className="w-10 h-10 transition-all duration-300 group-hover:rotate-12 group-hover:text-gray-700" strokeWidth={2.5} aria-hidden="true" />
               ) : (
-                <Bell className="w-8 h-8 transition-all duration-300 group-hover:rotate-6 group-hover:text-blue-300" strokeWidth={2} aria-hidden="true" />
+                <Bell className="w-10 h-10 transition-all duration-300 group-hover:rotate-6 group-hover:text-gray-700" strokeWidth={2.5} aria-hidden="true" />
               )}
-              
-              {/* Modern gradient glow effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
             </div>
             
             {notifications.filter(n => !n.read).length > 0 && (
