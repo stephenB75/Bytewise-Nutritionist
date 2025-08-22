@@ -1294,7 +1294,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               </h1>
             </div>
             
-            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl animate-fadeInUp [animation-delay:0.8s]">
+            <p className="text-2xl text-white font-light leading-relaxed max-w-xl mx-auto drop-shadow-2xl animate-fadeInUp [animation-delay:0.8s]" 
+               style={{ textShadow: '0 4px 8px rgba(0,0,0,0.8), 0 2px 4px rgba(0,0,0,0.6)' }}>
               Track nutrition with scientific precision using our comprehensive USDA database
             </p>
             
