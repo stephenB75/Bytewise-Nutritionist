@@ -21,7 +21,7 @@ The application uses PostgreSQL as the primary database with Drizzle ORM. Neon D
 Authentication is handled through Supabase Auth, utilizing JWT token-based session management. The system supports email/password authentication with required email verification, and OAuth providers (Google and GitHub). Security implementation includes Supabase for user management, server-side JWT token verification for protected routes, and secure session management.
 
 ### UI/UX Decisions
-The application employs a mobile-first responsive design using Tailwind CSS and shadcn/ui for a consistent and modern aesthetic. Key UI/UX features include a professional PDF viewer modal with inline preview and multi-method download options. The application aims for intuitive user flows and a visually appealing interface.
+The application employs a mobile-first responsive design using Tailwind CSS and shadcn/ui for a consistent and modern aesthetic. The application features a **yellow/amber gradient background theme** with comprehensive optimization for text readability and component compatibility. All major components have been updated to work seamlessly with the amber color scheme, using gradient backgrounds (from-amber-50 to-amber-100) and dark text (text-gray-900, text-gray-950) for optimal contrast. Key UI/UX features include a professional PDF viewer modal with inline preview and multi-method download options. The application aims for intuitive user flows and a visually appealing interface.
 
 ### Feature Specifications
 The application includes an enhanced fasting timer with detailed progress tracking and history display. It features an advanced food recognition system with a comprehensive global cuisine database, capable of accurate identification and nutrient calculation for complex ethnic and composite foods. It also includes editable daily calorie goals and a complete profile system.
@@ -50,3 +50,38 @@ The application includes an enhanced fasting timer with detailed progress tracki
 - **Service Worker**: Custom implementation for offline caching and background sync.
 - **React Query/TanStack Query**: Server state management and caching.
 - **Web App Manifest**: PWA configuration.
+
+## Recent Changes (August 2025)
+
+### Yellow Background Theme Optimization
+**Status**: ✅ **COMPLETED** - All major components optimized for yellow/amber background theme
+
+**Components Updated for Theme Compatibility:**
+- ✅ Dashboard metrics cards (ProgressCard, WaterCard, MacroCard, MicronutrientCard)
+- ✅ DataManagementPanel - Updated backgrounds and text colors
+- ✅ WeeklyCaloriesCard - Enhanced contrast with amber backgrounds
+- ✅ SignOnModule - Updated card backgrounds and form inputs
+- ✅ TourLauncher - Changed gradients to amber tones
+- ✅ CalorieCalculator - Updated all card backgrounds and styling
+- ✅ FoodSearchWithHistory - Fixed input backgrounds and hover states
+- ✅ MealTimeline - Updated main card and progress bar backgrounds
+- ✅ AwardsAchievements - Fixed light text colors for readability
+- ✅ UserProfile - Updated all backgrounds to amber gradient
+- ✅ PWAStatus - Changed card background and text colors
+- ✅ Dashboard layout - Fixed white text conflicts in small stat cards
+- ✅ Progress section headings and micronutrients section styling
+
+**Key Pattern Changes Applied:**
+- `bg-white/10`, `bg-white/90`, `bg-white` → `bg-gradient-to-br from-amber-50 to-amber-100`
+- `text-gray-300`, `text-white` → `text-gray-900`, `text-gray-950`
+- `border-white/20` → `border-amber-200/40`
+- `bg-gray-800/50` → `bg-gradient-to-br from-amber-100 to-amber-200`
+- Form inputs: `bg-white/80` with `border-amber-300`
+- Hover states: `hover:bg-amber-100/50`
+
+**CSS Conflicts Resolved:**
+- Fixed complex CSS override rules in index.css that were forcing white text
+- Updated dashboard page exclusions for metrics cards
+- Resolved text readability issues across all major UI components
+
+**Result**: Complete visual harmony with yellow background theme while maintaining excellent readability and accessibility standards.
