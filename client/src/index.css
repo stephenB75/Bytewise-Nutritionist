@@ -179,74 +179,121 @@ button.btn-hero-enhanced span,
   color: #ffffff !important; 
 }
 
-/* Dashboard page hero text - lighter for better visibility */
-[data-page="dashboard"] h1,
-[data-page="dashboard"] .text-white,
-[data-page="dashboard"] h1.text-white,
+/* Dashboard page hero text - darker for yellow background visibility */
+[data-page="dashboard"] h1:not(.hero-component *):not([data-hero="true"] *),
+[data-page="dashboard"] .text-white:not(.hero-component *):not([data-hero="true"] *),
+[data-page="dashboard"] h1.text-white:not(.hero-component *):not([data-hero="true"] *) { 
+  color: #111827 !important; 
+}
+
+/* Keep white text only in hero sections with dark overlay */
 [data-page="dashboard"] .hero-component h1.text-white,
-[data-page="dashboard"] .hero-component .text-white { 
+[data-page="dashboard"] .hero-component .text-white,
+[data-page="dashboard"] [data-hero="true"] h1.text-white,
+[data-page="dashboard"] [data-hero="true"] .text-white { 
   color: #ffffff !important; 
 }
 
-[data-page="dashboard"] p,
-[data-page="dashboard"] p.text-gray-100,
-[data-page="dashboard"] p.text-gray-200,
+/* Dashboard paragraphs - dark for yellow background, light for hero sections */
+[data-page="dashboard"] p:not(.hero-component *):not([data-hero="true"] *),
+[data-page="dashboard"] p.text-gray-100:not(.hero-component *):not([data-hero="true"] *),
+[data-page="dashboard"] p.text-gray-200:not(.hero-component *):not([data-hero="true"] *) { 
+  color: #374151 !important; 
+}
+
+/* Hero section paragraphs keep light colors for dark overlay */
 [data-page="dashboard"] .hero-component p.text-gray-100,
-[data-page="dashboard"] .hero-component p.text-gray-200 { 
+[data-page="dashboard"] .hero-component p.text-gray-200,
+[data-page="dashboard"] [data-hero="true"] p.text-gray-100,
+[data-page="dashboard"] [data-hero="true"] p.text-gray-200 { 
   color: #f3f4f6 !important; 
 }
 
-/* Override any dark text in dashboard hero - EXCLUDE metrics cards */
-[data-page="dashboard"] .text-black:not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
-[data-page="dashboard"] .text-gray-900:not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
-[data-page="dashboard"] .text-gray-800:not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
-[data-page="dashboard"] .text-gray-700:not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *) {
+/* Keep dark text colors on dashboard - they work well with yellow background */
+/* Remove the white color override - let dark text stay dark for good contrast */
+
+/* Dashboard hero overlay text fixes - keep white for dark overlay visibility */
+[data-page="dashboard"] .hero-component .absolute.inset-0 h1,
+[data-page="dashboard"] .hero-component .absolute.inset-0 p,
+[data-page="dashboard"] .hero-component .absolute.inset-0 span,
+[data-page="dashboard"] [data-hero="true"] .absolute.inset-0 h1,
+[data-page="dashboard"] [data-hero="true"] .absolute.inset-0 p,
+[data-page="dashboard"] [data-hero="true"] .absolute.inset-0 span {
   color: #ffffff !important;
 }
 
-/* Dashboard hero overlay text fixes */
-[data-page="dashboard"] .absolute.inset-0 h1,
-[data-page="dashboard"] .absolute.inset-0 p,
-[data-page="dashboard"] .absolute.inset-0 span {
-  color: #ffffff !important;
+/* Allow dark text colors on dashboard - they provide good contrast with yellow background */
+/* Removed forced white text override - dark colors work better with yellow background */
+
+/* Dashboard medium gray text - keep readable on yellow background */
+[data-page="dashboard"] .text-gray-400:not(.hero-component *):not([data-hero="true"] *) {
+  color: #6b7280 !important;
 }
 
-/* Comprehensive dark text fixes for entire dashboard page - EXCLUDE metrics cards */
-[data-page="dashboard"] .text-gray-900:not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
-[data-page="dashboard"] .text-gray-800:not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
-/* Dashboard page text override - EXCLUDE metrics cards */
-[data-page="dashboard"] .text-gray-700:not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
-[data-page="dashboard"] .text-gray-600:not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
-[data-page="dashboard"] .text-gray-500:not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
-[data-page="dashboard"] .text-black:not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *) {
-  color: #ffffff !important;
+[data-page="dashboard"] .text-gray-300:not(.hero-component *):not([data-hero="true"] *) {
+  color: #4b5563 !important;
 }
 
-[data-page="dashboard"] .text-gray-400 {
+/* Hero sections keep lighter colors for dark overlay */
+[data-page="dashboard"] .hero-component .text-gray-400,
+[data-page="dashboard"] [data-hero="true"] .text-gray-400 {
   color: #e5e7eb !important;
 }
 
-[data-page="dashboard"] .text-gray-300 {
+[data-page="dashboard"] .hero-component .text-gray-300,
+[data-page="dashboard"] [data-hero="true"] .text-gray-300 {
   color: #f3f4f6 !important;
 }
 
-/* Dashboard content text fixes */
-[data-page="dashboard"] h1,
-[data-page="dashboard"] h2,
-[data-page="dashboard"] h3,
-[data-page="dashboard"] h4,
-[data-page="dashboard"] h5,
-[data-page="dashboard"] h6 {
+/* Dashboard content headings - dark for yellow background, white for hero sections */
+[data-page="dashboard"] h1:not(.hero-component *):not([data-hero="true"] *),
+[data-page="dashboard"] h2:not(.hero-component *):not([data-hero="true"] *),
+[data-page="dashboard"] h3:not(.hero-component *):not([data-hero="true"] *),
+[data-page="dashboard"] h4:not(.hero-component *):not([data-hero="true"] *),
+[data-page="dashboard"] h5:not(.hero-component *):not([data-hero="true"] *),
+[data-page="dashboard"] h6:not(.hero-component *):not([data-hero="true"] *) {
+  color: #111827 !important;
+}
+
+/* Hero section headings keep white for dark overlay */
+[data-page="dashboard"] .hero-component h1,
+[data-page="dashboard"] .hero-component h2,
+[data-page="dashboard"] .hero-component h3,
+[data-page="dashboard"] .hero-component h4,
+[data-page="dashboard"] .hero-component h5,
+[data-page="dashboard"] .hero-component h6,
+[data-page="dashboard"] [data-hero="true"] h1,
+[data-page="dashboard"] [data-hero="true"] h2,
+[data-page="dashboard"] [data-hero="true"] h3,
+[data-page="dashboard"] [data-hero="true"] h4,
+[data-page="dashboard"] [data-hero="true"] h5,
+[data-page="dashboard"] [data-hero="true"] h6 {
   color: #ffffff !important;
 }
 
-[data-page="dashboard"] span,
-[data-page="dashboard"] div:not(.bg-gradient-to-r):not([class*="bg-"]) {
+/* Dashboard spans and divs - dark for yellow background, white for hero sections */
+[data-page="dashboard"] span:not(.hero-component *):not([data-hero="true"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
+[data-page="dashboard"] div:not(.bg-gradient-to-r):not([class*="bg-"]):not(.hero-component *):not([data-hero="true"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *) {
+  color: #111827 !important;
+}
+
+/* Hero section spans and divs keep white for dark overlay */
+[data-page="dashboard"] .hero-component span,
+[data-page="dashboard"] .hero-component div:not(.bg-gradient-to-r):not([class*="bg-"]),
+[data-page="dashboard"] [data-hero="true"] span,
+[data-page="dashboard"] [data-hero="true"] div:not(.bg-gradient-to-r):not([class*="bg-"]) {
   color: #ffffff !important;
 }
 
-/* Dashboard button and interactive text - EXCLUDE navigation buttons */
-[data-page="dashboard"] button:not(.bg-gradient-to-r):not([data-testid*="nav-"]) {
+/* Dashboard button text - dark for yellow background, white for hero buttons */
+[data-page="dashboard"] button:not(.bg-gradient-to-r):not([data-testid*="nav-"]):not(.hero-component *):not([data-hero="true"] *):not(.btn-hero-enhanced) {
+  color: #111827 !important;
+}
+
+/* Hero buttons and special buttons keep white text */
+[data-page="dashboard"] .hero-component button:not([data-testid*="nav-"]),
+[data-page="dashboard"] [data-hero="true"] button:not([data-testid*="nav-"]),
+[data-page="dashboard"] .btn-hero-enhanced {
   color: #ffffff !important;
 }
 
