@@ -801,17 +801,17 @@ export function FastingTracker() {
       </div>
 
       <Tabs defaultValue="tracker" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 h-12 bg-amber-100/50 border-none shadow-none">
-          <TabsTrigger value="tracker" data-testid="tab-tracker" className="flex items-center justify-center gap-1 text-xs sm:text-sm text-gray-900 border-none data-[state=active]:bg-amber-200 data-[state=active]:text-gray-900">
+        <TabsList className="grid w-full grid-cols-3 h-12 bg-transparent border-none shadow-none">
+          <TabsTrigger value="tracker" data-testid="tab-tracker" className="flex items-center justify-center gap-1 text-xs sm:text-sm text-gray-900 bg-transparent border-none shadow-none data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:shadow-none">
             <Target className="w-3 h-3 sm:w-4 sm:h-4 text-gray-900" />
             <span className="hidden xs:inline text-gray-900">Tracker</span>
             <span className="xs:hidden text-gray-900">Track</span>
           </TabsTrigger>
-          <TabsTrigger value="plans" data-testid="tab-plans" className="flex items-center justify-center gap-1 text-xs sm:text-sm text-gray-900 border-none data-[state=active]:bg-amber-200 data-[state=active]:text-gray-900">
+          <TabsTrigger value="plans" data-testid="tab-plans" className="flex items-center justify-center gap-1 text-xs sm:text-sm text-gray-900 bg-transparent border-none shadow-none data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:shadow-none">
             <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-gray-900" />
             Plans
           </TabsTrigger>
-          <TabsTrigger value="tips" data-testid="tab-tips" className="flex items-center justify-center gap-1 text-xs sm:text-sm text-gray-900 border-none data-[state=active]:bg-amber-200 data-[state=active]:text-gray-900">
+          <TabsTrigger value="tips" data-testid="tab-tips" className="flex items-center justify-center gap-1 text-xs sm:text-sm text-gray-900 bg-transparent border-none shadow-none data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:shadow-none">
             <Coffee className="w-3 h-3 sm:w-4 sm:h-4 text-gray-900" />
             Tips
           </TabsTrigger>
