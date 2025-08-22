@@ -208,13 +208,13 @@ export function WeeklyCaloriesCard() {
   const today = getLocalDateKey();
 
   return (
-    <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6">
+    <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 p-6">
       <div className="space-y-4">
         {/* Weekly Summary Header */}
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
             <Calendar className="w-5 h-5 text-blue-400" />
-            <h4 className="text-lg font-semibold text-white">Weekly Summary</h4>
+            <h4 className="text-lg font-semibold text-gray-950">Weekly Summary</h4>
           </div>
           <Badge className="bg-blue-600 text-white">
             <Flame className="w-3 h-3 mr-1" />
@@ -235,19 +235,19 @@ export function WeeklyCaloriesCard() {
                   isToday 
                     ? 'bg-orange-500/20 border-orange-400/30 shadow-lg' 
                     : hasMeals
-                    ? 'bg-white/5 border-white/10 hover:bg-white/10'
-                    : 'bg-gray-700/20 border-gray-600/20'
+                    ? 'bg-amber-100/70 border-amber-200/60 hover:bg-amber-200/70'
+                    : 'bg-amber-50/40 border-amber-200/30'
                 }`}
               >
                 <div className="flex items-center gap-3">
                   <div className="text-center min-w-[80px]">
                     <p className={`text-sm font-medium ${
-                      isToday ? 'text-orange-300' : 'text-gray-300'
+                      isToday ? 'text-orange-600' : 'text-gray-950'
                     }`}>
                       {dayData.day}
                     </p>
                     <p className={`text-xs ${
-                      isToday ? 'text-orange-400' : 'text-gray-400'
+                      isToday ? 'text-orange-500' : 'text-gray-900'
                     }`}>
                       {(() => {
                         // Force correct date display by parsing as UTC to prevent timezone shift
@@ -266,7 +266,7 @@ export function WeeklyCaloriesCard() {
                       <Badge className="bg-orange-500 text-white text-xs">Today</Badge>
                     )}
                     {dayData.mealCount > 0 && (
-                      <Badge variant="outline" className="text-xs text-gray-300 border-gray-400">
+                      <Badge variant="outline" className="text-xs text-gray-900 border-gray-500">
                         {dayData.mealCount} meal{dayData.mealCount !== 1 ? 's' : ''}
                       </Badge>
                     )}
@@ -280,18 +280,18 @@ export function WeeklyCaloriesCard() {
                         isToday ? 'text-orange-400' : 'text-orange-500'
                       }`} />
                       <span className={`font-bold text-lg ${
-                        isToday ? 'text-orange-300' : 'text-white'
+                        isToday ? 'text-orange-600' : 'text-gray-950'
                       }`}>
                         {dayData.calories}
                       </span>
                       <span className={`text-sm ${
-                        isToday ? 'text-orange-400' : 'text-gray-400'
+                        isToday ? 'text-orange-500' : 'text-gray-900'
                       }`}>
                         cal
                       </span>
                     </div>
                   ) : (
-                    <span className="text-gray-500 text-sm">No meals logged</span>
+                    <span className="text-gray-800 text-sm">No meals logged</span>
                   )}
                 </div>
               </div>
@@ -301,10 +301,10 @@ export function WeeklyCaloriesCard() {
 
         {/* Weekly Goal Progress (Optional) */}
         {totalWeeklyCalories > 0 && (
-          <div className="pt-3 border-t border-white/10">
+          <div className="pt-3 border-t border-amber-300/40">
             <div className="flex justify-between items-center text-sm">
-              <span className="text-gray-300">Weekly Average:</span>
-              <span className="text-white font-semibold">
+              <span className="text-gray-900">Weekly Average:</span>
+              <span className="text-gray-950 font-semibold">
                 {Math.round(totalWeeklyCalories / 7)} cal/day
               </span>
             </div>

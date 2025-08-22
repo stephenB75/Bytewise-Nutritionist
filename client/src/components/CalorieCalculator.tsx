@@ -402,7 +402,7 @@ function CalorieCalculator({
   // Compact view for smaller spaces
   if (isCompact) {
     return (
-      <Card className="p-4 bg-white/90 backdrop-blur-sm border-0 shadow-lg">
+      <Card className="p-4 bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-sm border-amber-200/40 shadow-lg">
         <div className="flex items-center gap-2 mb-3">
           <Calculator className="w-5 h-5 text-blue-600" />
           <h3 className="text-lg font-bold text-gray-900">Quick Calorie Calculator</h3>
@@ -448,13 +448,13 @@ function CalorieCalculator({
               }}
               onSearchChange={(query) => setIngredient(query)}
               placeholder="Search Meal's"
-              className="text-base bg-white border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg pr-4 py-3 text-gray-900 placeholder-gray-500"
+              className="text-base bg-white/80 border-2 border-amber-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg pr-4 py-3 text-gray-950 placeholder-gray-700"
             />
             <Input
               placeholder="Measurement (e.g., 1 cup, 100g, 1 medium)"
               value={measurement}
               onChange={(e) => setMeasurement(e.target.value)}
-              className="text-base bg-white border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-500"
+              className="text-base bg-white/80 border-2 border-amber-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg px-4 py-3 text-gray-950 placeholder-gray-700"
               data-testid="input-measurement-compact"
             />
           </div>
@@ -559,7 +559,7 @@ function CalorieCalculator({
       {/* Success Animation Modal */}
       {showLoggedAnimation && loggedData && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl p-8 mx-4 max-w-sm w-full shadow-2xl animate-in zoom-in-95 duration-500">
+          <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-2xl p-8 mx-4 max-w-sm w-full shadow-2xl animate-in zoom-in-95 duration-500">
             <div className="text-center space-y-4">
               <div className="relative">
                 <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto animate-pulse">
@@ -579,15 +579,15 @@ function CalorieCalculator({
               <div className="flex justify-around text-sm">
                 <div className="text-center">
                   <div className="text-green-600 font-bold">{loggedData.protein?.toFixed(1)}g</div>
-                  <div className="text-gray-500">Protein</div>
+                  <div className="text-gray-900">Protein</div>
                 </div>
                 <div className="text-center">
                   <div className="text-yellow-600 font-bold">{loggedData.carbs?.toFixed(1)}g</div>
-                  <div className="text-gray-500">Carbs</div>
+                  <div className="text-gray-900">Carbs</div>
                 </div>
                 <div className="text-center">
                   <div className="text-purple-600 font-bold">{loggedData.fat?.toFixed(1)}g</div>
-                  <div className="text-gray-500">Fat</div>
+                  <div className="text-gray-900">Fat</div>
                 </div>
               </div>
               
@@ -602,7 +602,7 @@ function CalorieCalculator({
       )}
 
       {/* User Guide Card - Moved Above */}
-      <Card className="p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg">
+      <Card className="p-6 bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-sm border-amber-200/40 shadow-lg">
         <h3 className="text-lg font-bold text-gray-900 mb-4">How to Use</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -629,7 +629,7 @@ function CalorieCalculator({
       </Card>
 
       {/* Main Calculator */}
-      <Card className="p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg" data-testid="calorie-calculator">
+      <Card className="p-6 bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-sm border-amber-200/40 shadow-lg" data-testid="calorie-calculator">
         <div className="flex items-center gap-3 mb-6">
           <div className="p-2 bg-blue-100 rounded-lg">
             <Calculator className="w-6 h-6 text-blue-600" />
@@ -707,10 +707,10 @@ function CalorieCalculator({
                   setIngredientSuggestions([]);
                 }}
                 placeholder="Search Meal's"
-                className="text-base bg-white border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg pr-4 py-3 text-gray-900 placeholder-gray-500"
+                className="text-base bg-white/80 border-2 border-amber-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg pr-4 py-3 text-gray-950 placeholder-gray-700"
               />
               
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-900 mt-1">
                 Search your meal history or enter new food items
               </p>
             </div>
@@ -724,10 +724,10 @@ function CalorieCalculator({
                 placeholder="e.g., 1 cup, 100g, 1 medium, 2 tablespoons, 1 slice"
                 value={measurement}
                 onChange={(e) => setMeasurement(e.target.value)}
-                className="text-base bg-white border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-500"
+                className="text-base bg-white/80 border-2 border-amber-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg px-4 py-3 text-gray-950 placeholder-gray-700"
                 data-testid="input-measurement"
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-900 mt-1">
                 Any measurement works - the system will provide the best estimate
               </p>
             </div>
@@ -789,7 +789,7 @@ function CalorieCalculator({
 
       {/* Results */}
       {recentAnalyses.length > 0 && (
-        <Card className="p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg">
+        <Card className="p-6 bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-sm border-amber-200/40 shadow-lg">
           <h3 className="text-lg font-bold text-gray-900 mb-4">Recent Analyses</h3>
           
           <div className="space-y-4">
@@ -805,7 +805,7 @@ function CalorieCalculator({
                       <Flame className="w-4 h-4 mr-1" />
                       {analysis.estimatedCalories} kcal
                     </Badge>
-                    <p className="text-xs text-gray-500">Total for this portion</p>
+                    <p className="text-xs text-gray-900">Total for this portion</p>
                   </div>
                 </div>
 
@@ -892,7 +892,7 @@ function CalorieCalculator({
 
                 {analysis.nutritionPer100g && (
                   <div className="mb-3">
-                    <p className="text-xs text-gray-500 mb-2 font-medium">Nutrition per 100g (for comparison):</p>
+                    <p className="text-xs text-gray-900 mb-2 font-medium">Nutrition per 100g (for comparison):</p>
                     <div className="grid grid-cols-3 gap-3">
                       <div className="text-center p-2 bg-gray-50 rounded">
                         <Beef className="w-4 h-4 mx-auto text-red-500 mb-1" />
@@ -1083,7 +1083,7 @@ function UserFoodTextSuggestions({ onSuggestionClick }: { onSuggestionClick: (fo
 
   return (
     <div className="mt-4 pt-3 border-t border-gray-200">
-      <p className="text-xs text-gray-500 mb-3">Quick suggestions (last 7 days):</p>
+      <p className="text-xs text-gray-900 mb-3">Quick suggestions (last 7 days):</p>
       <div className="space-y-3">
         {userFoods.map((food) => (
           <div key={food.name} className="text-sm border border-gray-200 rounded-lg p-3 hover:bg-gray-50 transition-colors">

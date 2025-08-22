@@ -193,14 +193,14 @@ export function TourLauncher({ onStartTour, isVisible = true }: TourLauncherProp
           </DialogHeader>
           
           <div className="space-y-4">
-            <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg p-4">
+            <div className="bg-gradient-to-r from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-900/20 rounded-lg p-4">
               <h3 className="font-semibold text-lg mb-2">🎯 What You'll Learn</h3>
-              <p className="text-gray-600 dark:text-gray-300 text-sm">
+              <p className="text-gray-950 dark:text-gray-950 text-sm">
                 This comprehensive 10-step tour covers all major features: food search, 
                 AI photo analysis, fasting timer, water tracking, meal journaling, 
                 achievements, and profile customization.
               </p>
-              <div className="flex items-center gap-4 mt-3 text-sm text-gray-500">
+              <div className="flex items-center gap-4 mt-3 text-sm text-gray-900">
                 <span className="flex items-center gap-1">
                   <Clock className="w-4 h-4" />
                   8-10 minutes
@@ -217,13 +217,13 @@ export function TourLauncher({ onStartTour, isVisible = true }: TourLauncherProp
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {TOUR_FEATURES.map((feature, index) => (
-                <Card key={index} className="border border-gray-200 dark:border-gray-700">
+                <Card key={index} className="border border-amber-300 dark:border-amber-400 bg-gradient-to-br from-amber-50 to-amber-100">
                   <CardContent className="p-4">
                     <div className="flex items-start gap-3">
                       {feature.icon}
                       <div className="flex-1 min-w-0">
                         <h4 className="font-medium text-sm mb-1">{feature.title}</h4>
-                        <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
+                        <p className="text-xs text-gray-950 dark:text-gray-950 mb-2">
                           {feature.description}
                         </p>
                         <Badge variant="outline" className="text-xs">
@@ -237,7 +237,7 @@ export function TourLauncher({ onStartTour, isVisible = true }: TourLauncherProp
             </div>
 
             <div className="flex items-center justify-between pt-4 border-t">
-              <div className="flex items-center gap-2 text-sm text-gray-500">
+              <div className="flex items-center gap-2 text-sm text-gray-900">
                 <Sparkles className="w-4 h-4" />
                 <span>Unlock your first achievement by completing the tour!</span>
               </div>
@@ -267,7 +267,7 @@ export function TourLauncher({ onStartTour, isVisible = true }: TourLauncherProp
 // Welcome Banner Component
 export function WelcomeBanner({ onStartTour, onDismiss }: { onStartTour: () => void; onDismiss: () => void }) {
   return (
-    <Card className="mb-6 border-2 border-blue-200 dark:border-blue-800 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20">
+    <Card className="mb-6 border-2 border-amber-300 dark:border-amber-400 bg-gradient-to-r from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-900/20">
       <CardContent className="p-4">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">

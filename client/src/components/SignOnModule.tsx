@@ -489,53 +489,53 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
           <div className="p-4 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl mb-4 inline-block">
             <User className="w-8 h-8 text-white" />
           </div>
-          <h2 className="text-3xl font-bold text-white mb-2" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+          <h2 className="text-3xl font-bold text-gray-950 mb-2" style={{ fontFamily: "'League Spartan', sans-serif" }}>
             {isSignUp ? 'Join bytewise nutritionist' : 'Welcome Back'}
           </h2>
-          <p className="text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>
+          <p className="text-gray-900" style={{ fontFamily: "'Work Sans', sans-serif" }}>
             {isSignUp ? 'Start your nutrition tracking journey today' : 'Access your nutrition tracking and progress'}
           </p>
         </div>
       </div>
 
       {/* Main Card */}
-      <Card className="bg-white/10 backdrop-blur-md border-white/20 p-8">
+      <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 p-8">
         <div className="space-y-6">
           {/* Benefits */}
           <div className="text-center mb-6">
-            <h3 className="text-xl font-bold text-white mb-2" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+            <h3 className="text-xl font-bold text-gray-950 mb-2" style={{ fontFamily: "'League Spartan', sans-serif" }}>
               Your <span className="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">Nutrition</span> Journey Awaits
             </h3>
           </div>
           
           <div className="grid grid-cols-1 gap-3 mb-6">
-            <div className="flex items-center gap-3 p-4 bg-white/5 rounded-xl border border-white/10">
+            <div className="flex items-center gap-3 p-4 bg-amber-100/50 rounded-xl border border-amber-200/40">
               <div className="p-2 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-lg">
                 <Zap className="w-4 h-4 text-white" />
               </div>
               <div>
-                <div className="font-semibold text-white text-sm">Track Your Progress</div>
-                <div className="text-xs text-gray-300">Monitor daily goals and achievements</div>
+                <div className="font-semibold text-gray-950 text-sm">Track Your Progress</div>
+                <div className="text-xs text-gray-900">Monitor daily goals and achievements</div>
               </div>
             </div>
             
-            <div className="flex items-center gap-3 p-4 bg-white/5 rounded-xl border border-white/10">
+            <div className="flex items-center gap-3 p-4 bg-amber-100/50 rounded-xl border border-amber-200/40">
               <div className="p-2 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg">
                 <Shield className="w-4 h-4 text-white" />
               </div>
               <div>
-                <div className="font-semibold text-white text-sm">Secure Data Sync</div>
-                <div className="text-xs text-gray-300">Your data stays safe across devices</div>
+                <div className="font-semibold text-gray-950 text-sm">Secure Data Sync</div>
+                <div className="text-xs text-gray-900">Your data stays safe across devices</div>
               </div>
             </div>
             
-            <div className="flex items-center gap-3 p-4 bg-white/5 rounded-xl border border-white/10">
+            <div className="flex items-center gap-3 p-4 bg-amber-100/50 rounded-xl border border-amber-200/40">
               <div className="p-2 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg">
                 <User className="w-4 h-4 text-white" />
               </div>
               <div>
-                <div className="font-semibold text-white text-sm">Personal Profile</div>
-                <div className="text-xs text-gray-300">Customize goals and preferences</div>
+                <div className="font-semibold text-gray-950 text-sm">Personal Profile</div>
+                <div className="text-xs text-gray-900">Customize goals and preferences</div>
               </div>
             </div>
           </div>
@@ -551,7 +551,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
           >
             <div className="space-y-4">
               <div>
-                <Label htmlFor="email" className="text-sm font-medium text-gray-300">Email</Label>
+                <Label htmlFor="email" className="text-sm font-medium text-gray-950">Email</Label>
                 <div className="relative mt-2">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <Input
@@ -560,7 +560,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your email"
-                    className="pl-10 bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-blue-400 focus:ring-blue-400"
+                    className="pl-10 bg-white/60 border-amber-300/60 text-gray-950 placeholder-gray-600 focus:border-blue-500 focus:ring-blue-500"
                     required
                   />
                 </div>
@@ -568,7 +568,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
               
               <div>
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="password" className="text-sm font-medium text-gray-300">
+                  <Label htmlFor="password" className="text-sm font-medium text-gray-950">
                     Password
                     {isSignUp && (
                       <span className="text-xs text-gray-400 ml-2">
@@ -594,7 +594,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
                     value={password}
                     onChange={(e) => handlePasswordChange(e.target.value)}
                     placeholder="Enter your password"
-                    className="pl-10 bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-blue-400 focus:ring-blue-400"
+                    className="pl-10 bg-white/60 border-amber-300/60 text-gray-950 placeholder-gray-600 focus:border-blue-500 focus:ring-blue-500"
                     required={!showResetPassword}
                   />
                 </div>
