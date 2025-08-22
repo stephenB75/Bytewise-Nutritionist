@@ -580,7 +580,11 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
             <span className="text-gray-900" style={{ fontFamily: "'Work Sans', sans-serif" }}>Overall Progress</span>
             <span className="text-gray-950 font-medium" style={{ fontFamily: "'Work Sans', sans-serif" }}>{Math.round(progressPercentage)}%</span>
           </div>
-          <Progress value={progressPercentage} className="h-3" />
+          <Progress 
+            value={progressPercentage} 
+            className="h-3 bg-blue-100" 
+            style={{ backgroundColor: '#dbeafe' }}
+          />
         </div>
 
         {/* Category Filter */}
@@ -672,7 +676,7 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
                     : 'bg-gray-100'
                 }`}>
                   {achievement.completed ? (
-                    <CheckCircle className="w-6 h-6 text-gray-950" />
+                    <CheckCircle className="w-6 h-6 text-white" />
                   ) : (
                     <span>{achievement.icon}</span>
                   )}
@@ -688,7 +692,7 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
                     </Badge>
                   </div>
                   
-                  <p className="text-sm text-gray-900 mb-3" style={{ fontFamily: "'Quicksand', sans-serif" }}>
+                  <p className="text-sm text-gray-800 mb-3" style={{ fontFamily: "'Quicksand', sans-serif" }}>
                     {achievement.description}
                   </p>
                   
@@ -697,7 +701,7 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
                       <span className="text-gray-900" style={{ fontFamily: "'Work Sans', sans-serif" }}>
                         Progress: {achievement.progress}/{achievement.target}
                       </span>
-                      <span className="text-[#faed39] font-medium" style={{ fontFamily: "'Work Sans', sans-serif" }}>
+                      <span className="text-blue-600 font-bold" style={{ fontFamily: "'Work Sans', sans-serif" }}>
                         {achievement.points} pts
                       </span>
                     </div>
@@ -705,7 +709,10 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
                     <div className="relative">
                       <Progress 
                         value={achievement.completed ? 100 : Math.min(100, (achievement.progress / achievement.target) * 100)} 
-                        className={`h-3 ${achievement.completed ? 'bg-[#45c73e]/20' : 'bg-gray-700'}`}
+                        className={`h-3 ${achievement.completed ? 'bg-green-100' : 'bg-blue-100'}`}
+                        style={{
+                          backgroundColor: achievement.completed ? '#dcfce7' : '#dbeafe'
+                        }}
                       />
                       {achievement.completed && (
                         <div className="absolute inset-0 bg-gradient-to-r from-[#45c73e] to-[#3ab82e] rounded-full h-3" />
@@ -715,8 +722,8 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
                   
                   {achievement.completed && achievement.completedDate && (
                     <div className="mt-3 flex items-center space-x-2">
-                      <CheckCircle className="w-4 h-4 text-[#45c73e]" />
-                      <span className="text-xs text-[#45c73e]" style={{ fontFamily: "'Work Sans', sans-serif" }}>
+                      <CheckCircle className="w-4 h-4 text-green-600" />
+                      <span className="text-xs text-green-600 font-medium" style={{ fontFamily: "'Work Sans', sans-serif" }}>
                         Completed {achievement.completedDate.toLocaleDateString()}
                       </span>
                     </div>
