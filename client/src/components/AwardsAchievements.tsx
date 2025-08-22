@@ -579,7 +579,7 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
         </div>
 
         {/* Category Filter */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 my-6">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 my-6">
           {categories.map((category) => {
             const IconComponent = category.icon;
             const isActive = selectedCategory === category.id;
@@ -589,20 +589,20 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
                 variant="outline"
                 size="lg"
                 onClick={() => setSelectedCategory(category.id)}
-                className={`h-24 w-full min-w-[140px] max-w-[140px] p-4 flex flex-col items-center justify-center space-y-2 transition-all duration-300 ${
+                className={`h-32 w-full min-w-[160px] max-w-[180px] p-6 flex flex-col items-center justify-center space-y-3 transition-all duration-300 ${
                   isActive
-                    ? 'bg-gradient-to-br from-blue-600 via-green-500 to-emerald-400 text-white shadow-2xl border-2 border-white/30 transform scale-105' 
-                    : 'bg-white/80 hover:bg-white/95 text-gray-800 border-2 border-gray-300/60 hover:border-blue-400 hover:shadow-lg hover:scale-102'
-                } rounded-2xl backdrop-blur-sm relative`}
+                    ? 'bg-gradient-to-br from-blue-600 via-green-500 to-emerald-400 text-white shadow-2xl border-3 border-white/40 transform scale-105 shadow-blue-500/25' 
+                    : 'bg-gradient-to-br from-white via-gray-50 to-white text-gray-800 border-3 border-gray-300/70 hover:border-blue-400 hover:shadow-xl hover:shadow-blue-200/30 hover:scale-102 shadow-lg shadow-gray-300/40'
+                } rounded-3xl backdrop-blur-sm relative`}
               >
-                <div className={`w-12 h-12 p-3 rounded-xl flex items-center justify-center ${isActive ? 'bg-white/25 border border-white/40' : 'bg-gray-100/80 border border-gray-200'}`}>
+                <div className={`w-16 h-16 p-4 rounded-2xl flex items-center justify-center ${isActive ? 'bg-white/25 border-2 border-white/40 shadow-lg shadow-black/20' : 'bg-gradient-to-br from-gray-100 to-gray-200 border-2 border-gray-300/50 shadow-inner shadow-gray-400/30'}`}>
                   <IconComponent 
-                    className={`w-6 h-6 ${isActive ? 'text-white' : 'text-gray-700'}`}
+                    className={`w-8 h-8 ${isActive ? 'text-white drop-shadow-sm' : 'text-gray-700'}`}
                     strokeWidth={2.5}
                   />
                 </div>
                 <div className="text-center">
-                  <div className={`text-sm font-bold ${isActive ? 'text-white' : 'text-gray-800'}`}>
+                  <div className={`text-base font-bold ${isActive ? 'text-white drop-shadow-sm' : 'text-gray-800'}`}>
                     {category.name}
                   </div>
                 </div>
