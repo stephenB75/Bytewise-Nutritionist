@@ -25,6 +25,7 @@ import {
 interface TourLauncherProps {
   isVisible?: boolean;
   onNavigateToFeature?: (tab: string) => void;
+  onCardInteraction?: () => void;
 }
 
 const TOUR_FEATURES = [
@@ -76,13 +77,25 @@ const TOUR_FEATURES = [
   }
 ];
 
-export function TourLauncher({ isVisible = true, onNavigateToFeature }: TourLauncherProps) {
+export function TourLauncher({ isVisible = true, onNavigateToFeature, onCardInteraction }: TourLauncherProps) {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [hasInteracted, setHasInteracted] = useState(() => {
+    return localStorage.getItem('tour-cards-interacted') === 'true';
+  });
 
-  if (!isVisible) return null;
+  if (!isVisible || hasInteracted) return null;
 
   const handleFeatureClick = (feature: any) => {
     setIsPreviewOpen(false);
+    
+    // Mark as interacted and hide button
+    setHasInteracted(true);
+    localStorage.setItem('tour-cards-interacted', 'true');
+    
+    // Notify parent about interaction
+    if (onCardInteraction) {
+      onCardInteraction();
+    }
     
     // Navigate to the feature's page/tab with mode information
     if (onNavigateToFeature) {
@@ -224,11 +237,14 @@ export function WelcomeBanner({ onDismiss }: { onDismiss: () => void }) {
 // Simple hook for tour visibility (without actual tour functionality)
 export function useAppTour() {
   const shouldShowTour = () => {
-    return localStorage.getItem('bytewise-tour-completed') !== 'true';
+    const tourNotCompleted = localStorage.getItem('bytewise-tour-completed') !== 'true';
+    const cardsNotInteracted = localStorage.getItem('tour-cards-interacted') !== 'true';
+    return tourNotCompleted && cardsNotInteracted;
   };
 
   const resetTour = () => {
     localStorage.removeItem('bytewise-tour-completed');
+    localStorage.removeItem('tour-cards-interacted');
   };
 
   const dismissTour = () => {
