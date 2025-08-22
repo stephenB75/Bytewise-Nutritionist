@@ -54,6 +54,17 @@ button[data-testid^="nav-"]:hover span,
   color: #ffffff !important;
 }
 
+/* Navigation icon click animation - pulse effect */
+@keyframes nav-icon-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1.1); }
+}
+
+.nav-icon-clicked {
+  animation: nav-icon-pulse 0.3s ease-out;
+}
+
 /* Force Light Theme */
 :root {
   --background: 255, 255, 255;
