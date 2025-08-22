@@ -229,58 +229,40 @@ button.btn-hero-enhanced span,
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
 
-/* MAXIMUM SPECIFICITY Hero Headlines - Override All Conflicts */
-.hero-component.relative.h-screen h1.text-6xl.text-optimized.font-black,
-.hero-component.relative.h-screen h1.text-7xl.text-optimized.font-black,
-.hero-component.relative.h-screen h1.text-8xl.text-optimized.font-black,
-.hero-component h1.text-white,
-.hero-component .text-white h1,
-[data-hero="true"] h1.text-white,
-[data-hero="true"] .text-white h1,
-[data-hero="true"] h1,
-.hero-component h1 { 
+/* PRECISE Hero Headlines Only - Inside Hero Component Container */
+.hero-component.relative.h-screen .absolute.inset-0.flex.flex-col h1.text-6xl.text-optimized.font-black,
+.hero-component.relative.h-screen .absolute.inset-0.flex.flex-col h1.text-7xl.text-optimized.font-black,
+.hero-component.relative.h-screen .absolute.inset-0.flex.flex-col h1.text-8xl.text-optimized.font-black,
+.hero-component.relative.h-screen .absolute.inset-0 h1,
+[data-hero="true"].relative.h-screen .absolute.inset-0 h1 { 
   color: #22d3ee !important; /* Bright cyan for primary headlines */
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
 
-.hero-component.relative.h-screen h2.text-6xl.text-optimized.font-black,
-.hero-component.relative.h-screen h2.text-7xl.text-optimized.font-black,
-.hero-component.relative.h-screen h2.text-8xl.text-optimized.font-black,
-.hero-component h2.text-white,
-.hero-component .text-white h2,
-[data-hero="true"] h2.text-white,
-[data-hero="true"] .text-white h2,
-[data-hero="true"] h2,
-.hero-component h2 { 
+.hero-component.relative.h-screen .absolute.inset-0.flex.flex-col h2.text-6xl.text-optimized.font-black,
+.hero-component.relative.h-screen .absolute.inset-0.flex.flex-col h2.text-7xl.text-optimized.font-black,
+.hero-component.relative.h-screen .absolute.inset-0.flex.flex-col h2.text-8xl.text-optimized.font-black,
+.hero-component.relative.h-screen .absolute.inset-0 h2,
+[data-hero="true"].relative.h-screen .absolute.inset-0 h2 { 
   color: #fbbf24 !important; /* Bright amber for secondary headlines */
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
 
-.hero-component.relative.h-screen h3.text-6xl.text-optimized.font-black,
-.hero-component.relative.h-screen h3.text-7xl.text-optimized.font-black,
-.hero-component.relative.h-screen h3.text-8xl.text-optimized.font-black,
-.hero-component h3.text-white,
-.hero-component .text-white h3,
-[data-hero="true"] h3.text-white,
-[data-hero="true"] .text-white h3,
-[data-hero="true"] h3,
-.hero-component h3 { 
+.hero-component.relative.h-screen .absolute.inset-0.flex.flex-col h3.text-6xl.text-optimized.font-black,
+.hero-component.relative.h-screen .absolute.inset-0.flex.flex-col h3.text-7xl.text-optimized.font-black,
+.hero-component.relative.h-screen .absolute.inset-0.flex.flex-col h3.text-8xl.text-optimized.font-black,
+.hero-component.relative.h-screen .absolute.inset-0 h3,
+[data-hero="true"].relative.h-screen .absolute.inset-0 h3 { 
   color: #10b981 !important; /* Bright emerald for tertiary headlines */
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
 
-.hero-component h4,
-.hero-component h5,
-.hero-component h6,
-.hero-component .text-white h4,
-.hero-component .text-white h5,
-.hero-component .text-white h6,
-[data-hero="true"] h4,
-[data-hero="true"] h5,
-[data-hero="true"] h6,
-[data-hero="true"] .text-white h4,
-[data-hero="true"] .text-white h5,
-[data-hero="true"] .text-white h6 { 
+.hero-component.relative.h-screen .absolute.inset-0 h4,
+.hero-component.relative.h-screen .absolute.inset-0 h5,
+.hero-component.relative.h-screen .absolute.inset-0 h6,
+[data-hero="true"].relative.h-screen .absolute.inset-0 h4,
+[data-hero="true"].relative.h-screen .absolute.inset-0 h5,
+[data-hero="true"].relative.h-screen .absolute.inset-0 h6 { 
   color: #a855f7 !important; /* Purple for smaller headlines */
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
