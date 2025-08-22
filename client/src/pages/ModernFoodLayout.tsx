@@ -1151,7 +1151,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     const isComplete = progressWidth >= 100;
     
     return (
-      <Card className="bg-amber-100 border-none p-5 transition-all duration-300 hover:bg-gradient-to-br hover:from-amber-100 hover:to-amber-200 shadow-lg hover:shadow-xl" data-testid="progress-card">
+      <Card className="bg-gradient-to-br from-amber-100 to-amber-200 border-none p-5 shadow-lg" data-testid="progress-card">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
             <div className={`p-2 bg-${color}-500/30 rounded-xl`}>
