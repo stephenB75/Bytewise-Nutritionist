@@ -2405,13 +2405,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           <div className="mb-6 text-center">
             <div className="bg-gradient-to-r from-blue-500/10 to-orange-500/10 border border-white/10 rounded-xl p-4 mb-4">
               <h3 className="font-semibold text-lg mb-3">Choose Your Nutrition Analysis Method</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-base">
                 <div className="bg-blue-500/5 border border-blue-500/20 rounded-lg p-3">
                   <div className="flex items-center gap-2 mb-2">
                     <Sparkles className="h-4 w-4 text-blue-400" />
                     <span className="font-medium text-blue-300">AI Photo Analysis</span>
                   </div>
-                  <p className="text-gray-300 text-xs">
+                  <p className="text-gray-300 text-sm">
                     Take a photo of your food and let AI identify it automatically. 
                     Perfect for quick logging of complete meals and dishes.
                   </p>
@@ -2421,16 +2421,16 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     <Target className="h-4 w-4 text-orange-400" />
                     <span className="font-medium text-orange-300">USDA Calculator</span>
                   </div>
-                  <p className="text-gray-300 text-xs">
+                  <p className="text-gray-300 text-sm">
                     Search and manually select foods from the USDA database. 
                     Ideal for precise nutrition tracking and portion control.
                   </p>
                 </div>
               </div>
-              <div className="mt-3 flex items-center justify-center text-xs text-gray-400">
-                <ArrowLeft className="h-3 w-3 mr-1" />
+              <div className="mt-3 flex items-center justify-center text-sm text-gray-400">
+                <ArrowLeft className="h-4 w-4 mr-1" />
                 <span>Slide left or right to switch between options</span>
-                <ArrowRight className="h-3 w-3 ml-1" />
+                <ArrowRight className="h-4 w-4 ml-1" />
               </div>
             </div>
           </div>
