@@ -4,6 +4,17 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Global border removal - no frames or borders anywhere */
+*, *::before, *::after {
+  border: none !important;
+}
+
+/* Allow only specific shadow effects for depth, not borders */
+.card, .bg-white, .bg-gray-50, .rounded, .rounded-lg, .rounded-xl, .rounded-2xl {
+  border: none !important;
+  outline: none !important;
+}
+
 /* MASTER NAVIGATION RESET - Single source of truth for navigation buttons */
 button[data-testid*="nav-"],
 button[data-testid^="nav-"],
@@ -98,8 +109,7 @@ html,
 [data-hero="true"] .text-gray-400 { color: #9ca3af !important; }
 .hero-component .text-gray-500,
 [data-hero="true"] .text-gray-500 { color: #6b7280 !important; }
-.border-gray-700 { border-color: #e5e7eb !important; }
-.border-gray-800 { border-color: #d1d5db !important; }
+.border-gray-700, .border-gray-800 { border: none !important; }
 
 /* Fix remaining light text colors - EXCLUDE hero components */
 .text-gray-100.font-light:not(.hero-component *):not([data-hero="true"] *),
@@ -482,6 +492,7 @@ button.btn-hero-enhanced span,
 .border-green-500\/30,
 .border-yellow-500\/30,
 .border-red-500\/30 {
+  border: none !important;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 4px 16px rgba(0, 0, 0, 0.05) !important;
 }
 
@@ -682,13 +693,8 @@ svg.w-4 {
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15)) !important;
 }
 
-/* Light theme border overrides for cards and components - EXCLUDE notification button */
-.border-white\/20:not([data-testid="button-notifications"]) { border-color: #d1d5db !important; }
-.border-white\/10:not([data-testid="button-notifications"]) { border-color: #e5e7eb !important; }
-.border-cyan-400\/20 { border-color: #67e8f9 !important; }
-.border-cyan-400\/30 { border-color: #22d3ee !important; }
-.border-blue-200 { border-color: #dbeafe !important; }
-.border-green-500\/30 { border-color: #22c55e !important; }
+/* Light theme border overrides - DISABLED - No borders on cards and components */
+.border-white\/20, .border-white\/10, .border-cyan-400\/20, .border-cyan-400\/30, .border-blue-200, .border-green-500\/30 { border: none !important; }
 
 /* Light theme background for white transparent elements */
 .bg-white\/10:not([data-testid*="progress"]):not([data-testid*="water"]):not([data-testid*="macro"]):not([data-testid*="micro"]) { 
@@ -698,22 +704,17 @@ svg.w-4 {
 /* Ensure metrics cards are visible */
 .bg-gray-50 {
   background-color: #f9fafb !important;
-  border-color: #d1d5db !important;
+  border: none !important;
 }
 
 /* Ensure white background cards maintain proper styling */
 .bg-white {
   background-color: #ffffff !important;
-  border-color: #d1d5db !important;
+  border: none !important;
 }
 
-/* Button border enhancements - EXCLUDE navigation buttons, mode toggle buttons, and tab buttons */
-button:not(.bg-orange-500):not([class*="bg-gradient"]):not(.bg-cyan-):not(.bg-red-):not([data-testid*="nav-"]):not([data-testid="button-ai-mode"]):not([data-testid="button-calculator-mode"]):not([data-testid*="tab-"]) {
-  border: 1px solid #e2e8f0 !important;
-}
-button:hover:not(.bg-orange-500):not([class*="bg-gradient"]):not(.bg-cyan-):not(.bg-red-):not([data-testid*="nav-"]):not([data-testid="button-ai-mode"]):not([data-testid="button-calculator-mode"]):not([data-testid*="tab-"]) {
-  border-color: #cbd5e1 !important;
-}
+/* Button border enhancements - DISABLED - No borders on any buttons */
+/* All buttons now borderless for clean appearance */
 
 /* Amber theme for blur backgrounds */
 .backdrop-blur-md:not([data-testid*="progress"]):not([data-testid*="water"]):not([data-testid*="macro"]):not([data-testid*="micro"]) {
@@ -866,7 +867,7 @@ button[data-testid="button-notifications"] svg {
 
 /* Navigation container styling */
 [data-testid="navigation-tabs"] {
-  border-top: 1px solid rgb(234 179 8 / 0.6) !important;
+  border: none !important;
 }
 
 /* Brand Style CSS Logo */
@@ -1696,7 +1697,7 @@ input {
 input:focus {
   background-color: #ffffff !important;
   color: #111827 !important;
-  border-color: #3b82f6;
+  border: none !important;
 }
 
 @custom-variant dark (&:is(.dark *));
@@ -4632,7 +4633,7 @@ input.text-xs {
 }
 
 .border-brand-blue {
-  border-color: var(--pastel-blue) !important;
+  border: none !important;
 }
 
 .border-brand-blue-dark {
@@ -4985,7 +4986,7 @@ input.text-xs {
   font-size: 16px !important;
   min-height: 44px !important;
   width: 100% !important;
-  border: 1px solid rgb(209 213 219) !important;
+  border: none !important;
   border-radius: 0.5rem !important;
 }
 
@@ -5023,7 +5024,7 @@ input.text-xs {
   padding: 0.75rem 1rem !important;
   font-size: 16px !important;
   min-height: 44px !important;
-  border: 1px solid rgb(209 213 219) !important;
+  border: none !important;
   border-radius: 0.5rem !important;
 }
 
@@ -5031,7 +5032,7 @@ input.text-xs {
 .profile-form-field select:focus,
 .profile-form-field textarea:focus {
   outline: none !important;
-  border-color: var(--pastel-blue) !important;
+  border: none !important;
   box-shadow: 0 0 0 1px var(--pastel-blue) !important;
 }
 
@@ -5054,15 +5055,15 @@ input.text-xs {
   padding: 0.875rem 1rem !important;
   font-size: 16px !important;
   min-height: 48px !important;
-  border: 2px solid rgb(229 231 235) !important;
+  border: none !important;
   border-radius: 0.75rem !important;
   font-family: 'Quicksand', sans-serif !important;
-  transition: border-color 0.2s ease !important;
+  /* Border transition removed - no borders */
 }
 
 .auth-form-field input:focus {
   outline: none !important;
-  border-color: var(--pastel-blue) !important;
+  border: none !important;
   box-shadow: 0 0 0 2px rgba(168, 218, 220, 0.2) !important;
 }
 
@@ -5222,14 +5223,14 @@ input.text-xs {
   font-size: 16px !important;
   min-height: 44px !important;
   padding: 0.75rem 1rem !important;
-  border: 1px solid rgb(209 213 219) !important;
+  border: none !important;
   border-radius: 0.5rem !important;
   font-family: 'Quicksand', sans-serif !important;
 }
 
 .override-component-input:focus {
   outline: none !important;
-  border-color: var(--pastel-blue) !important;
+  border: none !important;
   box-shadow: 0 0 0 1px var(--pastel-blue) !important;
 }
 
@@ -5361,7 +5362,7 @@ input[class*="pr-"] {
   color: #111827 !important;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
   border-radius: 16px !important;
-  border: 2px solid #e5e7eb !important;
+  border: none !important;
   max-width: 380px !important;
 }
 
@@ -5373,7 +5374,6 @@ input[class*="pr-"] {
 }
 
 .__floater__arrow {
-  border-color: transparent !important;
   border: none !important;
 }
 
@@ -5381,7 +5381,7 @@ input[class*="pr-"] {
 [data-testid="tooltip"] {
   background: white !important;
   color: #111827 !important;
-  border: 2px solid #e5e7eb !important;
+  border: none !important;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
 }
 
