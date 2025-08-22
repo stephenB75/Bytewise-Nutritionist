@@ -2758,7 +2758,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 className={`group ${
                   activeTab === tab.id
                     ? 'text-yellow-600'
-                    : 'text-gray-600 hover:text-gray-800 active:text-gray-900'
+                    : 'text-gray-600 hover:text-white active:text-gray-900'
                 }`}
               >
                 <IconComponent 
@@ -2766,14 +2766,14 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   className={`mb-0.5 transition-all duration-300 ease-out transform ${
                     activeTab === tab.id 
                       ? 'scale-110 drop-shadow-lg text-yellow-600' 
-                      : 'scale-100 hover:scale-105 active:scale-125 active:text-gray-900'
+                      : 'scale-100 hover:scale-105 hover:text-white active:scale-125 active:text-gray-900'
                   }`}
                   strokeWidth={activeTab === tab.id ? 2.5 : 2}
                 />
                 <span className={`text-[8px] font-semibold leading-tight text-center w-full transition-all duration-300 ease-out ${
                   activeTab === tab.id 
                     ? 'text-gray-900 transform scale-105 drop-shadow-md' 
-                    : 'text-gray-600 hover:text-gray-800 active:text-gray-900'
+                    : 'text-gray-600 hover:text-white active:text-gray-900'
                 }`}>{tab.label}</span>
               </button>
             )

@@ -35,6 +35,25 @@ button[data-testid^="nav-"],
   box-shadow: none !important;
 }
 
+/* Navigation button hover states */
+button[data-testid*="nav-"]:hover,
+button[data-testid^="nav-"]:hover,
+[data-testid*="nav-"] button:hover {
+  color: #ffffff !important;
+}
+
+button[data-testid*="nav-"]:hover svg,
+button[data-testid^="nav-"]:hover svg,
+[data-testid*="nav-"] button:hover svg {
+  color: #ffffff !important;
+}
+
+button[data-testid*="nav-"]:hover span,
+button[data-testid^="nav-"]:hover span,
+[data-testid*="nav-"] button:hover span {
+  color: #ffffff !important;
+}
+
 /* Force Light Theme */
 :root {
   --background: 255, 255, 255;
