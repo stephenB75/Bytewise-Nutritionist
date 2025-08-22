@@ -2615,7 +2615,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                           size="sm"
                           onClick={() => {
                             localStorage.removeItem('bytewise-tour-completed');
-                            localStorage.removeItem('tour-cards-interacted');
+                            localStorage.removeItem('tour-cards-clicked');
                             window.location.reload();
                           }}
                           className="text-gray-600 hover:text-gray-900 border-amber-300 hover:bg-amber-100"

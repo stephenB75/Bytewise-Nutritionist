@@ -79,22 +79,29 @@ const TOUR_FEATURES = [
 
 export function TourLauncher({ isVisible = true, onNavigateToFeature, onCardInteraction }: TourLauncherProps) {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const [hasInteracted, setHasInteracted] = useState(() => {
-    return localStorage.getItem('tour-cards-interacted') === 'true';
+  const [clickedCards, setClickedCards] = useState(() => {
+    const saved = localStorage.getItem('tour-cards-clicked');
+    return saved ? JSON.parse(saved) : [];
   });
+  
+  const hasClickedAllCards = clickedCards.length >= TOUR_FEATURES.length;
 
-  if (!isVisible || hasInteracted) return null;
+  if (!isVisible || hasClickedAllCards) return null;
 
   const handleFeatureClick = (feature: any) => {
     setIsPreviewOpen(false);
     
-    // Mark as interacted and hide button
-    setHasInteracted(true);
-    localStorage.setItem('tour-cards-interacted', 'true');
-    
-    // Notify parent about interaction
-    if (onCardInteraction) {
-      onCardInteraction();
+    // Track this specific card click
+    const cardId = feature.title;
+    if (!clickedCards.includes(cardId)) {
+      const newClickedCards = [...clickedCards, cardId];
+      setClickedCards(newClickedCards);
+      localStorage.setItem('tour-cards-clicked', JSON.stringify(newClickedCards));
+      
+      // Only notify parent when ALL cards have been clicked
+      if (newClickedCards.length >= TOUR_FEATURES.length && onCardInteraction) {
+        onCardInteraction();
+      }
     }
     
     // Navigate to the feature's page/tab with mode information
@@ -238,13 +245,15 @@ export function WelcomeBanner({ onDismiss }: { onDismiss: () => void }) {
 export function useAppTour() {
   const shouldShowTour = () => {
     const tourNotCompleted = localStorage.getItem('bytewise-tour-completed') !== 'true';
-    const cardsNotInteracted = localStorage.getItem('tour-cards-interacted') !== 'true';
-    return tourNotCompleted && cardsNotInteracted;
+    const savedCards = localStorage.getItem('tour-cards-clicked');
+    const clickedCardsList = savedCards ? JSON.parse(savedCards) : [];
+    const notAllCardsClicked = clickedCardsList.length < TOUR_FEATURES.length;
+    return tourNotCompleted && notAllCardsClicked;
   };
 
   const resetTour = () => {
     localStorage.removeItem('bytewise-tour-completed');
-    localStorage.removeItem('tour-cards-interacted');
+    localStorage.removeItem('tour-cards-clicked');
   };
 
   const dismissTour = () => {
