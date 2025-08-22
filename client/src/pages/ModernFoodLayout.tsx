@@ -969,7 +969,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         
         
         {/* Content Layer with Enhanced Typography */}
-        <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-6 z-20 text-gray-900">
+        <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-6 z-20 text-white">
           <div className="space-y-8 max-w-2xl">
             {/* Enhanced Title Section */}
             <div className="space-y-3 hero-optimized">
@@ -982,7 +982,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             </div>
             
             {/* Enhanced Description */}
-            <p className="text-2xl md:text-3xl font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl animate-fadeInUp [animation-delay:0.6s] font-work-sans text-gray-900">
+            <p className="text-2xl md:text-3xl font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl animate-fadeInUp [animation-delay:0.6s] font-work-sans text-gray-100">
               {description}
             </p>
             
@@ -1004,9 +1004,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         </div>
         
         {/* Enhanced Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 animate-bounce text-gray-900">
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 animate-bounce text-white">
           <div className="flex flex-col items-center gap-2">
-            <div className="w-px h-8 bg-gradient-to-b from-transparent to-gray-900" />
+            <div className="w-px h-8 bg-gradient-to-b from-transparent to-white" />
             <ChevronRight className="w-6 h-6 rotate-90 drop-shadow-lg" />
           </div>
         </div>
@@ -1029,7 +1029,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         <div className="text-8xl font-black leading-none text-sky-300 mb-2 lowercase tracking-tight drop-shadow-2xl group-hover:text-sky-200 transition-colors duration-300">
           bytewise
         </div>
-        <div className="text-2xl font-light text-gray-900/80 uppercase tracking-widest drop-shadow-lg group-hover:text-gray-900/90 transition-colors duration-300">
+        <div className="text-2xl font-light text-white/80 uppercase tracking-widest drop-shadow-lg group-hover:text-white/90 transition-colors duration-300">
           nutritionist
         </div>
       </div>
@@ -1057,8 +1057,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <Icon className={`w-5 h-5 text-${color}-700`} />
             </div>
             <div>
-              <h3 className="text-gray-900 font-bold">{title}</h3>
-              <p className="text-gray-900 text-sm font-medium">{value}/{goal}</p>
+              <h3 className="text-white font-bold">{title}</h3>
+              <p className="text-white text-sm font-medium">{value}/{goal}</p>
             </div>
           </div>
           <div className="text-right">
@@ -1097,8 +1097,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <Droplets className={`w-6 h-6 transition-colors duration-300 ${isGoalReached ? 'text-gray-900' : 'text-cyan-700'}`} />
             </div>
             <div>
-              <h3 className="text-gray-900 font-bold text-lg">Water Intake</h3>
-              <p className="text-gray-900 text-sm font-medium">{glasses}/{dailyGoal} glasses today</p>
+              <h3 className="text-white font-bold text-lg">Water Intake</h3>
+              <p className="text-white text-sm font-medium">{glasses}/{dailyGoal} glasses today</p>
             </div>
           </div>
           <div className="text-right">
@@ -1275,7 +1275,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         {/* CSS-controlled Overlay for consistent opacity */}
         <div className="hero-gradient-overlay" />
         
-        <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-gray-900 px-6 z-20">
+        <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-6 z-20">
           <div className="space-y-8 max-w-2xl">
             <div className="animate-fadeInUp [animation-delay:0.2s]">
               <div className="css-logo">
@@ -1294,7 +1294,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               </h1>
             </div>
             
-            <p className="text-2xl text-gray-900 font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl animate-fadeInUp [animation-delay:0.8s]">
+            <p className="text-2xl text-gray-200 font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl animate-fadeInUp [animation-delay:0.8s]">
               Track nutrition with scientific precision using our comprehensive USDA database
             </p>
             
@@ -1316,7 +1316,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           </div>
         </div>
         
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-gray-900/60 z-30 animate-bounce">
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/60 z-30 animate-bounce">
           <ChevronRight className="w-6 h-6 rotate-90 drop-shadow-lg" />
         </div>
       </div>
@@ -2141,7 +2141,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     <Button 
                       type="button"
                       variant="link" 
-                      className="text-gray-700 hover:text-gray-900 text-sm"
+                      className="text-gray-300 hover:text-white text-sm"
                       onClick={() => setIsResetPassword(true)}
                       disabled={isLoading}
                     >
@@ -2154,7 +2154,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   <Button 
                     type="button"
                     variant="link" 
-                    className="text-gray-700 hover:text-gray-900"
+                    className="text-gray-300 hover:text-white"
                     onClick={() => {
                       setIsSignUp(!isSignUp && !isResetPassword);
                       setIsResetPassword(false);
@@ -2172,7 +2172,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     <Button 
                       type="button"
                       variant="link" 
-                      className="text-gray-700 hover:text-gray-900 text-sm"
+                      className="text-gray-300 hover:text-white text-sm"
                       onClick={handleResendVerification}
                       disabled={isLoading || !email}
                     >
@@ -2184,7 +2184,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
               {isSignUp && (
                 <div className="mt-4 p-3 bg-blue-500/20 rounded-lg">
-                  <p className="text-xs text-gray-700 text-center">
+                  <p className="text-xs text-gray-200 text-center">
                     By creating an account, you must verify your email address before you can sign in.
                   </p>
                 </div>
@@ -2216,8 +2216,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         {/* Food Search Bar - Enhanced with filtering */}
         <div className="space-y-4 mb-8">
           <div className="text-center">
-            <h2 className="text-2xl font-bold mb-2">Food Search</h2>
-            <p className="text-gray-400">Find and log nutrition information</p>
+            <h2 className="text-2xl font-bold mb-2 text-gray-900">Food Search</h2>
+            <p className="text-gray-700">Find and log nutrition information</p>
           </div>
           <div className="relative">
             <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -2232,7 +2232,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <Button
                 variant="ghost"
                 size="sm"
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white shadow-md hover:shadow-lg transition-shadow duration-200 border border-gray-400/30 hover:border-gray-300/50"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-gray-900 shadow-md hover:shadow-lg transition-shadow duration-200 border border-gray-400/30 hover:border-gray-300/50"
                 onClick={() => setSearchQuery('')}
               >
                 <X className="w-5 h-5" />
@@ -2251,14 +2251,14 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         {/* Logged Foods - Real entries from calculator */}
         <div data-testid="meal-history" className="space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="text-xl font-bold">Logged Today</h3>
+            <h3 className="text-xl font-bold text-gray-900">Logged Today</h3>
             {loggedMeals.length === 0 && (
               <Badge className="bg-gray-600 text-gray-300">No meals logged</Badge>
             )}
           </div>
           {loggedMeals.length === 0 ? (
             <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 p-6 text-center">
-              <div className="text-gray-400">
+              <div className="text-gray-700">
                 <Calendar className="w-12 h-12 mx-auto mb-3 opacity-50" />
                 <p className="text-lg mb-2">No meals logged today</p>
                 <p className="text-sm">Use the nutrition calculator to start tracking your meals</p>
@@ -2273,7 +2273,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <div className="flex items-center justify-between">
                 <div className="flex-1">
                   <h4 className="text-gray-900 font-semibold">{meal.name}</h4>
-                  <p className="text-gray-400 text-sm">{meal.time} • {meal.mealType}</p>
+                  <p className="text-gray-700 text-sm">{meal.time} • {meal.mealType}</p>
                   <div className="flex space-x-4 mt-1">
                     <span className="text-xs text-green-400">P: {(meal.protein || 0).toFixed(1)}g</span>
                     <span className="text-xs text-yellow-400">C: {(meal.carbs || 0).toFixed(1)}g</span>
@@ -2373,7 +2373,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         {/* Weekly Calories Summary */}
         <div className="space-y-4 mt-8">
           <div className="flex justify-between items-center">
-            <h3 className="text-xl font-bold">This Week</h3>
+            <h3 className="text-xl font-bold text-gray-900">This Week</h3>
             <Badge className="bg-blue-600 text-white">Weekly Summary</Badge>
           </div>
           <WeeklyCaloriesCard />
@@ -2443,7 +2443,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                   nutritionMode === 'ai'
                     ? 'bg-blue-500 text-white shadow-lg'
-                    : 'text-gray-600 hover:text-gray-900'
+                    : 'text-gray-400 hover:text-white'
                 }`}
                 data-testid="button-ai-mode"
               >
@@ -2455,7 +2455,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                   nutritionMode === 'calculator'
                     ? 'bg-orange-500 text-white shadow-lg'
-                    : 'text-gray-600 hover:text-gray-900'
+                    : 'text-gray-400 hover:text-white'
                 }`}
                 data-testid="button-calculator-mode"
               >
@@ -2535,8 +2535,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                         <h3 className="text-lg sm:text-xl font-bold leading-tight" style={{ fontFamily: "'League Spartan', sans-serif" }}>
                           {user?.firstName || user?.email?.split('@')[0] || 'ByteWise User'}
                         </h3>
-                        <p className="text-gray-700 text-xs sm:text-sm truncate">{user?.email}</p>
-                        <div className="flex flex-wrap gap-x-2 sm:gap-x-3 gap-y-1 text-xs text-gray-700 mt-1">
+                        <p className="text-gray-300 text-xs sm:text-sm truncate">{user?.email}</p>
+                        <div className="flex flex-wrap gap-x-2 sm:gap-x-3 gap-y-1 text-xs text-gray-400 mt-1">
                           <span className="inline-flex items-center whitespace-nowrap">🏆 Level 1</span>
                           <span className="inline-flex items-center whitespace-nowrap">📊 {loggedMeals?.length || 0} meals</span>
                           <span className="inline-flex items-center whitespace-nowrap">🎯 {Math.round(dailyCalories)}/{goalCalories} cal</span>
@@ -2545,7 +2545,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     </div>
                     <div className="text-right flex-shrink-0 ml-2 sm:ml-3 min-w-[60px] sm:min-w-[80px]">
                       <div className="text-base sm:text-lg font-bold text-orange-400 leading-tight">{achievements?.length || 0}</div>
-                      <div className="text-xs text-gray-700 whitespace-nowrap leading-tight">Awards</div>
+                      <div className="text-xs text-gray-400 whitespace-nowrap leading-tight">Awards</div>
                     </div>
                   </div>
                 </AccordionTrigger>
@@ -2576,7 +2576,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                         <h3 className="text-xl font-semibold transition-colors" style={{ fontFamily: "'League Spartan', sans-serif" }}>
                           Awards
                         </h3>
-                        <p className="text-sm text-gray-700" style={{ fontFamily: "'Work Sans', sans-serif" }}>
+                        <p className="text-sm text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>
                           View your progress and goals
                         </p>
                       </div>
@@ -2601,7 +2601,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                         <h3 className="text-xl font-semibold transition-colors" style={{ fontFamily: "'League Spartan', sans-serif" }}>
                           Data
                         </h3>
-                        <p className="text-sm text-gray-700" style={{ fontFamily: "'Work Sans', sans-serif" }}>
+                        <p className="text-sm text-gray-300" style={{ fontFamily: "'Work Sans', sans-serif" }}>
                           Manage your nutrition data
                         </p>
                       </div>
