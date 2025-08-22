@@ -23,11 +23,7 @@ export async function mapSupabaseIdToDatabaseId(supabaseUserId: string): Promise
       const allUsers = await storage.getAllUsers();
       const userByEmail = allUsers.find(u => u.email === supabaseUser.user.email);
       if (userByEmail) {
-        console.log('📍 Mapped Supabase ID to database ID:', {
-          supabaseId: supabaseUserId.substring(0, 8) + '...',
-          databaseId: userByEmail.id.substring(0, 8) + '...',
-          email: supabaseUser.user.email
-        });
+        // Successfully mapped user
         return userByEmail.id;
       }
     }
@@ -35,7 +31,7 @@ export async function mapSupabaseIdToDatabaseId(supabaseUserId: string): Promise
     // If no mapping found, return original ID
     return supabaseUserId;
   } catch (error) {
-    console.log('⚠️ Failed to map user ID:', error);
+    // Failed to map user ID
     return supabaseUserId; // Fallback to original ID
   }
 }

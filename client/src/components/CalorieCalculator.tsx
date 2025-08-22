@@ -170,12 +170,8 @@ function CalorieCalculator({
       return response.json();
     },
     onSuccess: (data: IngredientAnalysis) => {
-      console.log('API Response:', data);
-      console.log('Portion Info:', data.portionInfo);
-      
       // Also set any API-provided portion warnings for display
       if (data.portionInfo?.warning && data.portionInfo.warning !== 'No warning') {
-        console.log('Setting portion warning from API:', data.portionInfo);
         // Don't reset form immediately if there's a warning to show
         setRecentAnalyses(prev => [data, ...prev.slice(0, 4)]);
       } else {
@@ -226,11 +222,8 @@ function CalorieCalculator({
     const grams = convertToGrams(cleanMeasurement, cleanIngredient);
     
     if (grams === 0) {
-      console.log(`Could not convert measurement "${cleanMeasurement}" to grams for validation`);
       return null; // Skip validation if we can't convert
     }
-    
-    console.log(`FDA Validation - Ingredient: "${cleanIngredient}", Measurement: "${cleanMeasurement}", Converted grams: ${grams}`);
     
     // Use FDA RACC database for validation
     const validation = validateFDAPortionSize(cleanIngredient, grams);
@@ -811,7 +804,6 @@ function CalorieCalculator({
 
                 {/* Portion Warning Display */}
                 {(() => {
-                  console.log(`Analysis ${index} portionInfo:`, analysis.portionInfo);
                   return analysis.portionInfo?.warning && (
                     <div className="mb-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                       <div className="flex items-start gap-2">
@@ -986,9 +978,6 @@ function UserFoodTextSuggestions({ onSuggestionClick }: { onSuggestionClick: (fo
         }
       }));
 
-      // Log successful copy
-      console.log(`📋 Food name copied to clipboard: ${food.name}`);
-
     } catch (error) {
       console.error('❌ Failed to copy food entry:', error);
       // Show error toast
@@ -1155,7 +1144,6 @@ function UserFoodTextSuggestions({ onSuggestionClick }: { onSuggestionClick: (fo
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  console.log('📋 Copy button clicked for:', food.name);
                   copyFoodInfo(food);
                 }}
                 className="ml-2 p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all duration-200"

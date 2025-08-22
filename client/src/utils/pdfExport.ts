@@ -286,8 +286,6 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     };
 
     // Create PDF directly using jsPDF
-    
-    console.log('jsPDF available:', typeof jsPDF);
     const pdf = new jsPDF('p', 'mm', 'a4');
     
     const pageWidth = 210;
@@ -319,7 +317,6 @@ export async function generateProgressReportPDF(): Promise<boolean> {
       yPosition += logoHeight + 5;
     } catch (logoError) {
       // If logo fails to load, continue without it
-      console.warn('Could not load ByteWise logo for PDF:', logoError);
     }
 
     // Report Title
@@ -676,7 +673,7 @@ export async function generateProgressReportPDF(): Promise<boolean> {
         <div style="background: white; padding: 20px; border-radius: 10px; max-width: 90%; max-height: 90%; display: flex; flex-direction: column; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #f0f0f0;">
             <h2 style="margin: 0; color: #1f4aa6; font-family: Arial, sans-serif;">PDF Generated Successfully!</h2>
-            <button onclick="console.log('🔄 PDF Modal: Close button clicked'); this.closest('[role=modal]').remove();" style="background: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-size: 16px;">✕</button>
+            <button onclick="this.closest('[role=modal]').remove();" style="background: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-size: 16px;">✕</button>
           </div>
           
           <div style="margin-bottom: 15px;">
@@ -685,26 +682,20 @@ export async function generateProgressReportPDF(): Promise<boolean> {
           
           <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
             <button onclick="
-              console.log('🔄 PDF Modal: Download button clicked for:', '${filename}'); 
               const link = document.createElement('a'); 
               link.href = '${pdfPreviewUrl}'; 
               link.download = '${filename}'; 
-              link.click(); 
-              console.log('✅ PDF Modal: Download link triggered');
+              link.click();
             " style="background: #45c757; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">📥 Download PDF</button>
             
             <button onclick="
-              console.log('🔄 PDF Modal: View in new tab button clicked'); 
               const newWindow = window.open('${pdfPreviewUrl}', '_blank'); 
-              if (newWindow) { 
-                console.log('✅ PDF Modal: New tab opened successfully'); 
-              } else { 
-                console.log('❌ PDF Modal: Popup blocked - trying alternative method'); 
+              if (!newWindow) { 
                 window.location.href = '${pdfPreviewUrl}'; 
               }
             " style="background: #1f4aa6; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">👀 View in New Tab</button>
             
-            <button onclick="console.log('🔄 PDF Modal: Copy button clicked, data length:', '${pdfDataUrl}'.length); navigator.clipboard.writeText('${pdfDataUrl}').then(() => { console.log('✅ PDF Modal: Data copied to clipboard successfully'); alert('PDF data copied! You can paste this into a file or share it.'); }).catch(err => { console.error('❌ PDF Modal: Copy to clipboard failed:', err); alert('Copy failed. Please try the download option instead.'); });" style="background: #ffd43b; color: black; padding: 10px 20px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">📋 Copy PDF Data</button>
+            <button onclick="navigator.clipboard.writeText('${pdfDataUrl}').then(() => { alert('PDF data copied! You can paste this into a file or share it.'); }).catch(err => { alert('Copy failed. Please try the download option instead.'); });" style="background: #ffd43b; color: black; padding: 10px 20px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">📋 Copy PDF Data</button>
           </div>
           
           <iframe src="${pdfPreviewUrl}" style="width: 100%; height: 400px; border: 1px solid #ddd; border-radius: 5px;"></iframe>
@@ -731,7 +722,6 @@ export async function generateProgressReportPDF(): Promise<boolean> {
       return true;
       
     } catch (downloadError) {
-      console.error('❌ PDF Generation: Download failed:', downloadError);
       throw downloadError;
     }
 

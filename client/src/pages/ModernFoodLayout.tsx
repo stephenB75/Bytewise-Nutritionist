@@ -272,10 +272,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             fat: dailyStats.totalFat
           });
         }
-        
-        console.log('✅ Manual health data sync completed');
       } catch (error) {
-        console.error('❌ Health data sync failed:', error);
+        // Silent error handling for health sync
       }
     }
   }, [dailyStats]);

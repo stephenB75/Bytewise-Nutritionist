@@ -184,7 +184,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           // Important: Create the user in local database so future updates work
           try {
-            console.log('💾 Creating user in local database from Supabase data (fallback)...');
             const databaseUser = await storage.upsertUser({
               id: userData.id,
               email: userData.email,
@@ -196,19 +195,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
             
             // CRITICAL: Use the database user's ID, not the Supabase ID  
             userData.id = databaseUser.id;
-            console.log('✅ User created/updated in local database (fallback), using database ID:', {
-              databaseId: databaseUser.id?.substring(0, 8) + '...',
-              email: databaseUser.email
-            });
           } catch (dbError) {
-            console.log('⚠️ Failed to create user in local database (fallback):', dbError);
+            // Failed to create user in local database (fallback)
           }
           
           res.json(userData);
           return;
         }
       } catch (fallbackError) {
-        console.log('❌ Supabase fallback failed:', fallbackError);
+        // Supabase fallback failed
       }
       res.json(null);
     }
@@ -220,10 +215,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { email: rawEmail, password } = req.body;
       const email = rawEmail?.toLowerCase().trim();
       
-      console.log('🔐 Sign-in attempt for:', email);
-      
       // Try authentication first - let Supabase tell us if user exists and credentials are valid
-      console.log('🔍 Attempting authentication with client...');
       try {
         const { data: signInData, error: signInError } = await serverSupabase.auth.signInWithPassword({
           email,
