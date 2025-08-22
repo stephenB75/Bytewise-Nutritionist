@@ -753,7 +753,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                     variant="outline"
                     size="sm"
                     onClick={() => setIsEditing(true)}
-                    className="border-white/30 text-gray-300 hover:border-white/50 hover:text-white"
+                    className="border-amber-300/60 text-amber-700 hover:border-amber-400 hover:text-amber-800 bg-white/70"
                   >
                     <Edit3 className="w-4 h-4 mr-2" />
                     Edit Profile
