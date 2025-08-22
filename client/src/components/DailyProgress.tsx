@@ -83,11 +83,11 @@ export function DailyProgress({
     <Card className="p-6 bg-gradient-to-br from-white via-green-50/20 to-blue-50/30 border-0 shadow-xl backdrop-blur-sm">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-xl font-bold text-gray-900 mb-1">Daily Progress</h3>
-          <p className="text-sm text-gray-600">Track your nutrition goals day by day</p>
+          <h3 className="text-3xl font-bold text-gray-900 mb-1">Daily Progress</h3>
+          <p className="text-lg text-gray-600">Track your nutrition goals day by day</p>
         </div>
-        <Badge variant="outline" className="text-purple-600 border-purple-200 bg-purple-50">
-          <Calendar className="w-3 h-3 mr-1" />
+        <Badge variant="outline" className="text-lg text-purple-600 border-purple-200 bg-purple-50">
+          <Calendar className="w-4 h-4 mr-1" />
           7 Days
         </Badge>
       </div>
@@ -119,7 +119,7 @@ export function DailyProgress({
               {/* Status Indicator */}
               <div className="absolute top-3 right-3">
                 <div className={`p-1.5 rounded-full ${getStatusColor(status)}`}>
-                  <StatusIcon className="w-3 h-3" />
+                  <StatusIcon className="w-4 h-4" />
                 </div>
               </div>
 

@@ -984,7 +984,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             </div>
             
             {/* Enhanced Description */}
-            <p className="text-xl md:text-2xl font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl animate-fadeInUp [animation-delay:0.6s] font-work-sans text-gray-100">
+            <p className="text-2xl md:text-3xl font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl animate-fadeInUp [animation-delay:0.6s] font-work-sans text-gray-100">
               {description}
             </p>
             
@@ -1028,10 +1028,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const BytewiseLogo = React.memo(() => (
     <div className="mb-8 cursor-pointer group transition-all duration-300 hover:scale-105" onClick={() => handleTabChange('home')}>
       <div className="text-center font-league-spartan">
-        <div className="text-7xl font-black leading-none text-sky-300 mb-2 lowercase tracking-tight drop-shadow-2xl group-hover:text-sky-200 transition-colors duration-300">
+        <div className="text-8xl font-black leading-none text-sky-300 mb-2 lowercase tracking-tight drop-shadow-2xl group-hover:text-sky-200 transition-colors duration-300">
           bytewise
         </div>
-        <div className="text-xl font-light text-white/80 uppercase tracking-widest drop-shadow-lg group-hover:text-white/90 transition-colors duration-300">
+        <div className="text-2xl font-light text-white/80 uppercase tracking-widest drop-shadow-lg group-hover:text-white/90 transition-colors duration-300">
           nutritionist
         </div>
       </div>
@@ -1360,7 +1360,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           )}
           
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-xl font-black text-gray-950">Today's Progress</h2>
+            <h2 className="text-3xl font-black text-gray-950">Today's Progress</h2>
             <div className="flex gap-2">
               <Button 
                 variant="ghost" 
@@ -1820,7 +1820,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           {/* Daily Goals */}
           <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-gray-900 font-semibold text-xl">Daily Goals</h3>
+              <h3 className="text-gray-900 font-semibold text-2xl">Daily Goals</h3>
               <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
                 <Target className="w-3 h-3 mr-1" />
                 3/5 Complete
@@ -1830,31 +1830,31 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <div className="flex items-center justify-between p-3 bg-green-500/20 rounded-xl border border-green-500/30">
                 <span className="text-gray-900">Hit calorie target</span>
                 <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                  <span className="text-white text-xs">✓</span>
+                  <span className="text-white text-sm">✓</span>
                 </div>
               </div>
               <div className="flex items-center justify-between p-3 bg-green-500/20 rounded-xl border border-green-500/30">
                 <span className="text-gray-900">Meet protein goal</span>
                 <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                  <span className="text-white text-xs">✓</span>
+                  <span className="text-white text-sm">✓</span>
                 </div>
               </div>
               <div className="flex items-center justify-between p-3 bg-green-500/20 rounded-xl border border-green-500/30">
                 <span className="text-gray-900">Log 3 meals</span>
                 <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                  <span className="text-white text-xs">✓</span>
+                  <span className="text-white text-sm">✓</span>
                 </div>
               </div>
               <div className="flex items-center justify-between p-3 bg-gradient-to-br from-amber-100 to-amber-200 rounded-xl">
                 <span className="text-gray-400">Track micronutrients</span>
                 <div className="w-6 h-6 bg-amber-300 rounded-full flex items-center justify-center">
-                  <span className="text-gray-400 text-xs">○</span>
+                  <span className="text-gray-400 text-sm">○</span>
                 </div>
               </div>
               <div className="flex items-center justify-between p-3 bg-gradient-to-br from-amber-100 to-amber-200 rounded-xl">
                 <span className="text-gray-400">Stay within carb limit</span>
                 <div className="w-6 h-6 bg-amber-300 rounded-full flex items-center justify-center">
-                  <span className="text-gray-400 text-xs">○</span>
+                  <span className="text-gray-400 text-sm">○</span>
                 </div>
               </div>
             </div>
@@ -1863,7 +1863,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           {/* Weekly Goals */}
           <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-gray-900 font-semibold text-xl">Weekly Goals</h3>
+              <h3 className="text-gray-900 font-semibold text-2xl">Weekly Goals</h3>
               <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
                 <Calendar className="w-3 h-3 mr-1" />
                 2/4 Complete
@@ -1873,13 +1873,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <div className="flex items-center justify-between p-3 bg-blue-500/20 rounded-xl border border-blue-500/30">
                 <span className="text-gray-900">Track 5+ days</span>
                 <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                  <span className="text-white text-xs">✓</span>
+                  <span className="text-white text-sm">✓</span>
                 </div>
               </div>
               <div className="flex items-center justify-between p-3 bg-blue-500/20 rounded-xl border border-blue-500/30">
                 <span className="text-gray-900">Average 2000+ cal/day</span>
                 <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                  <span className="text-white text-xs">✓</span>
+                  <span className="text-white text-sm">✓</span>
                 </div>
               </div>
               <div className="flex items-center justify-between p-3 bg-gradient-to-br from-amber-100 to-amber-200 rounded-xl">

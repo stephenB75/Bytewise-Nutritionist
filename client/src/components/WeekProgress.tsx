@@ -102,8 +102,8 @@ export function WeekProgress({
               <Flame className="w-4 h-4 text-amber-700" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-700">Total Calories</p>
-              <p className="text-xs text-gray-500">{totalCalories.toLocaleString()} / {weeklyGoal.toLocaleString()}</p>
+              <p className="text-base font-medium text-gray-700">Total Calories</p>
+              <p className="text-sm text-gray-500">{totalCalories.toLocaleString()} / {weeklyGoal.toLocaleString()}</p>
             </div>
           </div>
           <Progress value={weekProgress} className="h-2 bg-orange-100" />
@@ -115,8 +115,8 @@ export function WeekProgress({
               <Activity className="w-4 h-4 text-amber-700" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-700">Daily Average</p>
-              <p className="text-xs text-gray-500">{dailyAverage} / {dailyCalorieGoal} cal</p>
+              <p className="text-base font-medium text-gray-700">Daily Average</p>
+              <p className="text-sm text-gray-500">{dailyAverage} / {dailyCalorieGoal} cal</p>
             </div>
           </div>
           <Progress value={(dailyAverage / dailyCalorieGoal) * 100} className="h-2 bg-blue-100" />
@@ -128,8 +128,8 @@ export function WeekProgress({
               <Target className="w-4 h-4 text-amber-700" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-700">Meals Logged</p>
-              <p className="text-xs text-gray-500">{weeklyTotals.meals} this week</p>
+              <p className="text-base font-medium text-gray-700">Meals Logged</p>
+              <p className="text-sm text-gray-500">{weeklyTotals.meals} this week</p>
             </div>
           </div>
           <div className="flex items-center gap-1">
@@ -150,8 +150,8 @@ export function WeekProgress({
               <TrendingUp className="w-4 h-4 text-amber-700" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-700">Progress</p>
-              <p className="text-xs text-gray-500">
+              <p className="text-base font-medium text-gray-700">Progress</p>
+              <p className="text-sm text-gray-500">
                 {isGoalReached ? 'Goal Reached!' : isOnTrack ? 'On Track' : 'Keep Going'}
               </p>
             </div>

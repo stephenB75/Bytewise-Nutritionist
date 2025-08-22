@@ -41,24 +41,24 @@ export function MealCard({ meal, onClick }: MealCardProps) {
         
         <div className="flex-1 min-w-0">
           <div className="flex items-center space-x-2 mb-1">
-            <Badge className={`text-xs ${getMealTypeColor(meal.mealType)}`}>
+            <Badge className={`text-sm ${getMealTypeColor(meal.mealType)}`}>
               {meal.mealType}
             </Badge>
-            <div className="flex items-center text-xs text-muted-foreground">
+            <div className="flex items-center text-sm text-muted-foreground">
               <Clock size={12} className="mr-1" />
               {formatTime(meal.date)}
             </div>
           </div>
           
-          <h4 className="font-medium text-sm mb-1">
+          <h4 className="font-medium text-base mb-1">
             {meal.name || `${meal.mealType} Meal`}
           </h4>
           
-          <p className="text-xs text-muted-foreground mb-2">
+          <p className="text-sm text-muted-foreground mb-2">
             {meal.foods.length} item{meal.foods.length !== 1 ? 's' : ''}
           </p>
           
-          <div className="flex items-center space-x-4 text-xs">
+          <div className="flex items-center space-x-4 text-sm">
             <span className="font-medium">
               {Math.round(Number(meal.totalCalories))} cal
             </span>
@@ -75,7 +75,7 @@ export function MealCard({ meal, onClick }: MealCardProps) {
           <div className="text-lg font-bold text-primary">
             +{Math.round(Number(meal.totalCalories))}
           </div>
-          <div className="text-xs text-muted-foreground">calories</div>
+          <div className="text-sm text-muted-foreground">calories</div>
         </div>
       </div>
     </Card>

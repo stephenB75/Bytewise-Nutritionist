@@ -67,7 +67,7 @@ export function SessionStatus() {
     <Card className="p-4 bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-sm border-amber-200/40">
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-sm font-medium">
+          <div className="flex items-center gap-2 text-base font-medium">
             <Shield className="w-4 h-4 text-green-600" />
             <span className="text-gray-900">Session Status</span>
           </div>
@@ -79,11 +79,11 @@ export function SessionStatus() {
             className="h-7 px-2"
           >
             <RefreshCw className={`w-3 h-3 ${isRefreshing ? 'animate-spin' : ''}`} />
-            <span className="ml-1 text-xs">Refresh</span>
+            <span className="ml-1 text-sm">Refresh</span>
           </Button>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 text-xs">
+        <div className="grid grid-cols-2 gap-3 text-sm">
           <div className="space-y-1">
             <p className="text-gray-600">Session Started</p>
             <p className="font-medium text-gray-900">
@@ -118,7 +118,7 @@ export function SessionStatus() {
 
         {isExpiringSoon && (
           <div className="pt-2 border-t border-gray-300">
-            <p className="text-xs text-yellow-700 flex items-center gap-1">
+            <p className="text-sm text-yellow-700 flex items-center gap-1">
               <Clock className="w-3 h-3" />
               Session expiring soon. Any activity will extend it.
             </p>
@@ -126,7 +126,7 @@ export function SessionStatus() {
         )}
 
         <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
-          <p className="text-xs text-gray-600">
+          <p className="text-sm text-gray-600">
             Your session stays active for 24 hours. It automatically refreshes with your activity.
           </p>
         </div>

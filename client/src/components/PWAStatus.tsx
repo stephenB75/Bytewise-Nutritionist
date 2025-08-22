@@ -122,7 +122,7 @@ export function PWAStatus() {
             ) : (
               <AlertCircle className="w-4 h-4 text-yellow-600" />
             )}
-            <span className="text-sm text-gray-950">
+            <span className="text-base text-gray-950">
               Service Worker
             </span>
           </div>
@@ -135,7 +135,7 @@ export function PWAStatus() {
             ) : (
               <AlertCircle className="w-4 h-4 text-yellow-600" />
             )}
-            <span className="text-sm text-gray-950">
+            <span className="text-base text-gray-950">
               Cache
             </span>
           </div>
@@ -155,14 +155,14 @@ export function PWAStatus() {
         {isInstalled && (
           <div className="flex items-center gap-1 text-green-600">
             <Smartphone className="w-4 h-4" />
-            <span className="text-sm font-medium">App Mode</span>
+            <span className="text-base font-medium">App Mode</span>
           </div>
         )}
       </div>
 
       {!isOnline && (
         <div className="mt-3 p-3 bg-[#faed39]/10 rounded-lg border-l-4 border-[#faed39]">
-          <p className="text-sm text-[#faed39]">
+          <p className="text-base text-[#faed39]">
             You're offline, but the app will continue to work with cached data.
           </p>
         </div>
