@@ -230,7 +230,7 @@ export function AppleHealthIntegration({ onHealthDataSync }: AppleHealthIntegrat
               </Button>
             </div>
             
-            <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded-lg">
+            <div className="text-xs text-gray-500 bg-gradient-to-br from-amber-50 to-amber-100 p-3 rounded-lg">
               <strong>Privacy:</strong> Your health data is synced directly with Apple Health and never stored on our servers. 
               You can manage permissions in iOS Settings → Privacy & Security → Health → ByteWise Nutritionist.
             </div>

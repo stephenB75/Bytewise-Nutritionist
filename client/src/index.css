@@ -67,18 +67,13 @@ html,
   background: inherit !important;
 }
 
-/* Override ANY dark backgrounds with gradient - EXCLUDE navigation buttons */
+/* Override dark backgrounds with gradient - EXCLUDE navigation */
 .bg-black:not(.bg-black\/80):not(.bg-black\/50):not([data-testid*="nav-"]),
 .bg-gray-900:not([data-testid*="nav-"]):not([class*="navigation"]),
 .bg-gray-800:not(.bg-gray-800\/50):not([data-testid*="nav-"]),
-.bg-gray-700:not([data-testid*="nav-"]),
 .min-h-screen.bg-black,
 .min-h-screen.bg-gray-900,
-.min-h-screen.bg-gray-800,
-.min-h-screen.bg-gray-700,
-div[class*="bg-black"]:not([class*="bg-black/"]):not([class*="backdrop"]):not([data-testid*="navigation"]):not([data-testid*="nav-"]),
-div[class*="bg-gray-900"]:not([class*="bg-gray-900/"]):not([class*="backdrop"]):not([data-testid*="navigation"]):not([data-testid*="nav-"]),
-div[class*="bg-gray-800"]:not([class*="bg-gray-800/"]):not([class*="backdrop"]):not([data-testid*="navigation"]):not([data-testid*="nav-"]) {
+.min-h-screen.bg-gray-800 {
   background: linear-gradient(to top, #fbbf24 0%, #ffffff 100%) !important;
   background-attachment: fixed !important;
 }
@@ -542,14 +537,9 @@ svg.w-4 {
 .border-blue-200 { border-color: #dbeafe !important; }
 .border-green-500\/30 { border-color: #22c55e !important; }
 
-/* Enhanced borders and backgrounds for buttons and cards - EXCLUDE metrics cards */
+/* Light theme background for white transparent elements */
 .bg-white\/10:not([data-testid*="progress"]):not([data-testid*="water"]):not([data-testid*="macro"]):not([data-testid*="micro"]) { 
-  background-color: #f8fafc !important; 
-  border: 1px solid #e2e8f0 !important;
-}
-.bg-white\/15:not([data-testid*="progress"]):not([data-testid*="water"]):not([data-testid*="macro"]):not([data-testid*="micro"]) { 
-  background-color: #f1f5f9 !important; 
-  border-color: #cbd5e1 !important;
+  background: rgba(251, 191, 36, 0.1) !important; 
 }
 
 /* Ensure metrics cards are visible */
@@ -572,9 +562,9 @@ button:hover:not(.bg-orange-500):not([class*="bg-gradient"]):not(.bg-cyan-):not(
   border-color: #cbd5e1 !important;
 }
 
-/* Card background overrides for better contrast - EXCLUDE metrics cards */
+/* Amber theme for blur backgrounds */
 .backdrop-blur-md:not([data-testid*="progress"]):not([data-testid*="water"]):not([data-testid*="macro"]):not([data-testid*="micro"]) {
-  background-color: rgba(248, 250, 252, 0.95) !important;
+  background: rgba(252, 211, 77, 0.2) !important;
 }
 
 /* Gradient background fixes for light theme */

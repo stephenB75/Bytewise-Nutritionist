@@ -97,7 +97,7 @@ export function ProfileCompletionModal({ isOpen, onComplete }: ProfileCompletion
 
   return (
     <Dialog open={isOpen} onOpenChange={() => {}}>
-      <DialogContent className="sm:max-w-md bg-white dark:bg-gray-900">
+      <DialogContent className="sm:max-w-md bg-gradient-to-br from-amber-50 to-amber-100">
         <DialogHeader className="text-center pb-4">
           <div className="flex justify-center mb-4">
             <div className="relative">
@@ -133,7 +133,7 @@ export function ProfileCompletionModal({ isOpen, onComplete }: ProfileCompletion
                 value={formData.firstName}
                 onChange={(e) => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
                 placeholder="Enter your first name"
-                className="mt-1 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600"
+                className="mt-1 bg-white/80 border-amber-300"
                 data-testid="input-firstName"
                 required
               />
@@ -149,7 +149,7 @@ export function ProfileCompletionModal({ isOpen, onComplete }: ProfileCompletion
                 value={formData.lastName}
                 onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
                 placeholder="Enter your last name"
-                className="mt-1 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600"
+                className="mt-1 bg-white/80 border-amber-300"
                 data-testid="input-lastName"
                 required
               />

@@ -97,16 +97,16 @@ export function PWAUpdateNotification() {
 
   return (
     <div className="fixed bottom-20 left-4 right-4 md:left-auto md:right-4 md:w-96 z-50 animate-slide-up">
-      <Card className="p-4 bg-white dark:bg-gray-800 shadow-lg border-2 border-brand-yellow">
+      <Card className="p-4 bg-gradient-to-br from-amber-50 to-amber-100 shadow-lg border-2 border-brand-yellow">
         <div className="flex items-start justify-between">
           <div className="flex-1 pr-4">
             <div className="flex items-center gap-2 mb-2">
               <RefreshCw className="h-5 w-5 text-brand-yellow animate-spin-slow" />
-              <h3 className="font-semibold text-gray-900 dark:text-white">
+              <h3 className="font-semibold text-gray-900">
                 Update Available!
               </h3>
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
+            <p className="text-sm text-gray-600 mb-3">
               A new version of ByteWise is ready. Update now to get the latest features and improvements, including the new app icon.
             </p>
             <div className="flex gap-2">
@@ -128,7 +128,7 @@ export function PWAUpdateNotification() {
           </div>
           <button
             onClick={handleDismiss}
-            className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
+            className="text-gray-400 hover:text-gray-600"
           >
             <X className="h-5 w-5" />
           </button>
