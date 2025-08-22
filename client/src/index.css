@@ -229,19 +229,39 @@ button.btn-hero-enhanced span,
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
 
-/* CONSOLIDATED Hero headlines - vibrant colors for dark overlays - HIGHEST SPECIFICITY */
+/* CONSOLIDATED Hero headlines - vibrant colors for dark overlays - MAXIMUM SPECIFICITY */
 .hero-component h1,
 .hero-component h1.text-white,
 .hero-component .text-white h1,
+.hero-component h1.text-6xl,
+.hero-component h1.text-7xl,
+.hero-component h1.text-8xl,
+.hero-component h1.text-optimized,
+.hero-component h1.font-black,
 [data-hero="true"] h1,
 [data-hero="true"] h1.text-white,
 [data-hero="true"] .text-white h1,
+[data-hero="true"] h1.text-6xl,
+[data-hero="true"] h1.text-7xl,
+[data-hero="true"] h1.text-8xl,
+[data-hero="true"] h1.text-optimized,
+[data-hero="true"] h1.font-black,
 [data-page="dashboard"] .hero-component h1,
 [data-page="dashboard"] .hero-component h1.text-white,
 [data-page="dashboard"] .hero-component .text-white h1,
+[data-page="dashboard"] .hero-component h1.text-6xl,
+[data-page="dashboard"] .hero-component h1.text-7xl,
+[data-page="dashboard"] .hero-component h1.text-8xl,
+[data-page="dashboard"] .hero-component h1.text-optimized,
+[data-page="dashboard"] .hero-component h1.font-black,
 [data-page="dashboard"] [data-hero="true"] h1,
 [data-page="dashboard"] [data-hero="true"] h1.text-white,
-[data-page="dashboard"] [data-hero="true"] .text-white h1 { 
+[data-page="dashboard"] [data-hero="true"] .text-white h1,
+[data-page="dashboard"] [data-hero="true"] h1.text-6xl,
+[data-page="dashboard"] [data-hero="true"] h1.text-7xl,
+[data-page="dashboard"] [data-hero="true"] h1.text-8xl,
+[data-page="dashboard"] [data-hero="true"] h1.text-optimized,
+[data-page="dashboard"] [data-hero="true"] h1.font-black { 
   color: #22d3ee !important; /* Bright cyan for primary headlines */
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
@@ -347,19 +367,40 @@ button.btn-hero-enhanced span,
   color: #ffffff !important;
 }
 
-/* Dashboard hero overlay - FORCE vibrant colors for headlines, white for other text */
+/* Dashboard hero overlay - MAXIMUM SPECIFICITY - FORCE vibrant colors for headlines */
+[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col .text-white h1,
+[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col h1.text-6xl,
+[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col h1.text-7xl,
+[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col h1.text-8xl,
+[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col h1.text-optimized,
+[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col h1.font-black,
 [data-page="dashboard"] .absolute.inset-0 h1 {
   color: #22d3ee !important; /* Bright cyan for h1 */
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
+[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col .text-white h2,
+[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col h2.text-6xl,
+[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col h2.text-7xl,
+[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col h2.text-8xl,
+[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col h2.text-optimized,
+[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col h2.font-black,
 [data-page="dashboard"] .absolute.inset-0 h2 {
   color: #fbbf24 !important; /* Bright amber for h2 */
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
+[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col .text-white h3,
+[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col h3.text-6xl,
+[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col h3.text-7xl,
+[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col h3.text-8xl,
+[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col h3.text-optimized,
+[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col h3.font-black,
 [data-page="dashboard"] .absolute.inset-0 h3 {
   color: #10b981 !important; /* Bright emerald for h3 */
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
+[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col .text-white h4,
+[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col .text-white h5,
+[data-page="dashboard"] .hero-component .absolute.inset-0.flex.flex-col .text-white h6,
 [data-page="dashboard"] .absolute.inset-0 h4,
 [data-page="dashboard"] .absolute.inset-0 h5,
 [data-page="dashboard"] .absolute.inset-0 h6 {
