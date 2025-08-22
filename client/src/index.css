@@ -604,6 +604,22 @@ button[data-testid="button-notifications"] svg,
   stroke: currentColor !important;
 }
 
+/* Notification icon color shift animation for background transitions */
+@keyframes colorShift {
+  0% {
+    color: rgba(255, 255, 255, 0.9);
+    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.3));
+  }
+  50% {
+    color: rgba(75, 85, 99, 0.8);
+    filter: drop-shadow(0 0 2px rgba(75, 85, 99, 0.2));
+  }
+  100% {
+    color: rgb(17, 24, 39);
+    filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.1));
+  }
+}
+
 /* Enhanced notification badge styling */
 button[data-testid="button-notifications"] .animate-pulse {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
