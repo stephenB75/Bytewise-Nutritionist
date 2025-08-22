@@ -229,27 +229,51 @@ button.btn-hero-enhanced span,
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
 
-/* CONSOLIDATED Hero headlines - vibrant colors for dark overlays */
+/* CONSOLIDATED Hero headlines - vibrant colors for dark overlays - HIGHEST SPECIFICITY */
 .hero-component h1,
 .hero-component h1.text-white,
+.hero-component .text-white h1,
 [data-hero="true"] h1,
-[data-hero="true"] h1.text-white { 
+[data-hero="true"] h1.text-white,
+[data-hero="true"] .text-white h1,
+[data-page="dashboard"] .hero-component h1,
+[data-page="dashboard"] .hero-component h1.text-white,
+[data-page="dashboard"] .hero-component .text-white h1,
+[data-page="dashboard"] [data-hero="true"] h1,
+[data-page="dashboard"] [data-hero="true"] h1.text-white,
+[data-page="dashboard"] [data-hero="true"] .text-white h1 { 
   color: #22d3ee !important; /* Bright cyan for primary headlines */
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
 
 .hero-component h2,
 .hero-component h2.text-white,
+.hero-component .text-white h2,
 [data-hero="true"] h2,
-[data-hero="true"] h2.text-white { 
+[data-hero="true"] h2.text-white,
+[data-hero="true"] .text-white h2,
+[data-page="dashboard"] .hero-component h2,
+[data-page="dashboard"] .hero-component h2.text-white,
+[data-page="dashboard"] .hero-component .text-white h2,
+[data-page="dashboard"] [data-hero="true"] h2,
+[data-page="dashboard"] [data-hero="true"] h2.text-white,
+[data-page="dashboard"] [data-hero="true"] .text-white h2 { 
   color: #fbbf24 !important; /* Bright amber for secondary headlines */
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
 
 .hero-component h3,
 .hero-component h3.text-white,
+.hero-component .text-white h3,
 [data-hero="true"] h3,
-[data-hero="true"] h3.text-white { 
+[data-hero="true"] h3.text-white,
+[data-hero="true"] .text-white h3,
+[data-page="dashboard"] .hero-component h3,
+[data-page="dashboard"] .hero-component h3.text-white,
+[data-page="dashboard"] .hero-component .text-white h3,
+[data-page="dashboard"] [data-hero="true"] h3,
+[data-page="dashboard"] [data-hero="true"] h3.text-white,
+[data-page="dashboard"] [data-hero="true"] .text-white h3 { 
   color: #10b981 !important; /* Bright emerald for tertiary headlines */
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
@@ -257,9 +281,27 @@ button.btn-hero-enhanced span,
 .hero-component h4,
 .hero-component h5,
 .hero-component h6,
+.hero-component .text-white h4,
+.hero-component .text-white h5,
+.hero-component .text-white h6,
 [data-hero="true"] h4,
 [data-hero="true"] h5,
-[data-hero="true"] h6 { 
+[data-hero="true"] h6,
+[data-hero="true"] .text-white h4,
+[data-hero="true"] .text-white h5,
+[data-hero="true"] .text-white h6,
+[data-page="dashboard"] .hero-component h4,
+[data-page="dashboard"] .hero-component h5,
+[data-page="dashboard"] .hero-component h6,
+[data-page="dashboard"] .hero-component .text-white h4,
+[data-page="dashboard"] .hero-component .text-white h5,
+[data-page="dashboard"] .hero-component .text-white h6,
+[data-page="dashboard"] [data-hero="true"] h4,
+[data-page="dashboard"] [data-hero="true"] h5,
+[data-page="dashboard"] [data-hero="true"] h6,
+[data-page="dashboard"] [data-hero="true"] .text-white h4,
+[data-page="dashboard"] [data-hero="true"] .text-white h5,
+[data-page="dashboard"] [data-hero="true"] .text-white h6 { 
   color: #a855f7 !important; /* Purple for smaller headlines */
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
