@@ -180,7 +180,7 @@ html,
 .text-red-400 { color: #dc2626 !important; } /* Strong red */
 .text-red-300 { color: #dc2626 !important; } /* Strong red instead of light */
 .text-green-400 { color: #15803d !important; } /* Darker green */
-.text-blue-400 { color: #1d4ed8 !important; } /* Darker blue */
+.text-blue-400 { color: #ea580c !important; } /* Orange instead of blue */
 
 /* Additional light color fixes */
 .text-emerald-500 { color: #059669 !important; }
@@ -203,7 +203,7 @@ html,
 }
 
 .weekly-calories-card-wrapper .text-blue-400 {
-  color: #1d4ed8 !important; /* Dark blue for calendar icon */
+  color: #ea580c !important; /* Orange for calendar icon */
 }
 
 /* Badge icon color override - ensure Flame icon is light amber */
@@ -1152,7 +1152,7 @@ select[class*="bg-gray"] {
 button.text-orange-400,
 button.text-cyan-400,
 button.text-blue-400 {
-  color: inherit !important;
+  color: #ea580c !important;
 }
 
 /* Light Background Content Areas */

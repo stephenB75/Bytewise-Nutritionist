@@ -68,7 +68,7 @@ export function WeekProgress({
             variant="ghost"
             size="sm"
             onClick={() => onNavigateWeek('prev')}
-            className="h-9 w-9 p-0 hover:bg-blue-100 transition-colors"
+            className="h-9 w-9 p-0 hover:bg-orange-100 transition-colors"
           >
             <ChevronLeft className="w-4 h-4" />
           </Button>
@@ -76,7 +76,7 @@ export function WeekProgress({
             variant="ghost"
             size="sm"
             onClick={() => onNavigateWeek('next')}
-            className="h-9 w-9 p-0 hover:bg-blue-100 transition-colors"
+            className="h-9 w-9 p-0 hover:bg-orange-100 transition-colors"
           >
             <ChevronRight className="w-4 h-4" />
           </Button>
@@ -119,7 +119,7 @@ export function WeekProgress({
               <p className="text-sm text-gray-500">{dailyAverage} / {dailyCalorieGoal} cal</p>
             </div>
           </div>
-          <Progress value={(dailyAverage / dailyCalorieGoal) * 100} className="h-2 bg-blue-100" />
+          <Progress value={(dailyAverage / dailyCalorieGoal) * 100} className="h-2 bg-orange-100" />
         </div>
 
         <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-xl border border-green-100">

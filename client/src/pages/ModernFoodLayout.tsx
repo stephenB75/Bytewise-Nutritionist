@@ -814,7 +814,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const categories = [
     { id: 'popular', name: 'Popular', emoji: '🔥', color: 'bg-red-500' },
     { id: 'healthy', name: 'Healthy', emoji: '🥗', color: 'bg-green-500' },
-    { id: 'protein', name: 'Protein', emoji: '🥩', color: 'bg-blue-500' },
+    { id: 'protein', name: 'Protein', emoji: '🥩', color: 'bg-orange-500' },
     { id: 'carbs', name: 'Carbs', emoji: '🍞', color: 'bg-orange-500' },
     { id: 'snacks', name: 'Snacks', emoji: '🍿', color: 'bg-purple-500' },
   ];
