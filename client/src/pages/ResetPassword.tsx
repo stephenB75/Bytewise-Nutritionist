@@ -94,12 +94,12 @@ export function ResetPassword() {
       <Card className="w-full max-w-md bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40">
         <CardHeader className="text-center">
           <div className="mx-auto p-3 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full w-fit mb-4">
-            <Lock className="w-8 h-8 text-white" />
+            <Lock className="w-8 h-8 text-gray-900" />
           </div>
-          <CardTitle className="text-2xl font-bold text-gray-800">
+          <CardTitle className="text-2xl font-bold text-gray-900">
             Reset Your Password
           </CardTitle>
-          <CardDescription className="text-gray-600">
+          <CardDescription className="text-gray-700">
             Enter your new password below
           </CardDescription>
         </CardHeader>
@@ -119,10 +119,10 @@ export function ResetPassword() {
               <div className="mx-auto p-3 bg-green-500/20 rounded-full w-fit">
                 <CheckCircle className="w-12 h-12 text-green-400" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-800">
+              <h3 className="text-lg font-semibold text-gray-900">
                 Password Reset Successful!
               </h3>
-              <p className="text-gray-600">
+              <p className="text-gray-700">
                 Your password has been updated. Redirecting you to sign in...
               </p>
             </div>
@@ -133,7 +133,7 @@ export function ResetPassword() {
                   New Password
                 </Label>
                 <div className="relative mt-2">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-700" />
                   <Input
                     id="new-password"
                     type="password"
@@ -152,7 +152,7 @@ export function ResetPassword() {
                   Confirm New Password
                 </Label>
                 <div className="relative mt-2">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-700" />
                   <Input
                     id="confirm-password"
                     type="password"
@@ -169,7 +169,7 @@ export function ResetPassword() {
               <Button
                 type="submit"
                 disabled={loading || !newPassword || !confirmPassword}
-                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 py-3 text-sm font-semibold"
+                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-gray-900 shadow-lg hover:shadow-xl transition-all duration-300 py-3 text-sm font-semibold"
               >
                 {loading ? (
                   <div className="flex items-center justify-center">
@@ -188,7 +188,7 @@ export function ResetPassword() {
                 <button
                   type="button"
                   onClick={() => navigate('/')}
-                  className="text-sm text-gray-600 hover:text-gray-800 transition-colors"
+                  className="text-sm text-gray-700 hover:text-gray-900 transition-colors"
                 >
                   Back to Sign In
                 </button>

@@ -79,7 +79,7 @@ export function ProgressRing({
       {showAchievement && isComplete && (
         <div className="absolute -top-2 -right-2 animate-bounce">
           <div className={`${currentSize.badge} ${currentColor.bg} rounded-full flex items-center justify-center shadow-lg`}>
-            <Trophy className="w-3 h-3 text-white" />
+            <Trophy className="w-3 h-3 text-gray-900" />
           </div>
         </div>
       )}

@@ -40,12 +40,12 @@ export function ImageWithFallback({
   if (imageError) {
     return (
       <div 
-        className={`flex items-center justify-center bg-gray-100 ${fallbackClassName || className}`}
+        className={`flex items-center justify-center bg-gradient-to-br from-amber-50 to-amber-100 ${fallbackClassName || className}`}
         style={{ width, height }}
       >
         <div className="text-center">
-          <ImageOff className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-          <p className="text-xs text-gray-500">{alt}</p>
+          <ImageOff className="w-8 h-8 text-gray-700 mx-auto mb-2" />
+          <p className="text-xs text-gray-700">{alt}</p>
         </div>
       </div>
     );
@@ -55,7 +55,7 @@ export function ImageWithFallback({
     <div className="relative">
       {isLoading && (
         <div 
-          className={`absolute inset-0 flex items-center justify-center bg-gray-100 animate-pulse ${className}`}
+          className={`absolute inset-0 flex items-center justify-center bg-gradient-to-br from-amber-50 to-amber-100 animate-pulse ${className}`}
           style={{ width, height }}
         >
           <div className="w-6 h-6 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin" />

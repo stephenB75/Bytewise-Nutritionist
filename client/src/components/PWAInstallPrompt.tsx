@@ -94,7 +94,7 @@ export function PWAInstallPrompt() {
 
   return (
     <div className="fixed bottom-4 left-4 right-4 z-50 md:left-auto md:right-4 md:max-w-sm">
-      <Card className="p-4 bg-white shadow-lg border-0 animate-in slide-in-from-bottom-4">
+      <Card className="p-4 bg-gradient-to-br from-amber-50 to-amber-100 shadow-lg border-0 animate-in slide-in-from-bottom-4">
         <div className="flex items-start gap-3">
           <div className="p-2 bg-blue-50 rounded-lg flex-shrink-0">
             <Smartphone className="w-5 h-5 text-blue-600" />
@@ -160,7 +160,7 @@ export function IOSInstallInstructions() {
 
   return (
     <div className="fixed bottom-4 left-4 right-4 z-50">
-      <Card className="p-4 bg-white shadow-lg border-0 animate-in slide-in-from-bottom-4">
+      <Card className="p-4 bg-gradient-to-br from-amber-50 to-amber-100 shadow-lg border-0 animate-in slide-in-from-bottom-4">
         <div className="flex items-start gap-3">
           <div className="p-2 bg-green-50 rounded-lg flex-shrink-0">
             <Download className="w-5 h-5 text-green-600" />

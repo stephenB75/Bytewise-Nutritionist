@@ -129,9 +129,9 @@ export function UserFoodSuggestions({
 
   if (userFoods.length === 0) {
     return (
-      <Card className={`p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg ${className}`}>
+      <Card className={`p-6 bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-sm border-0 shadow-lg ${className}`}>
         <div className="text-center text-gray-500">
-          <User className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+          <User className="w-12 h-12 mx-auto mb-3 text-gray-700" />
           <h3 className="text-lg font-semibold mb-2">No Custom Foods Yet</h3>
           <p className="text-sm">Start adding your own food entries to see personalized suggestions here</p>
         </div>
@@ -140,7 +140,7 @@ export function UserFoodSuggestions({
   }
 
   return (
-    <Card className={`p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg ${className}`}>
+    <Card className={`p-6 bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-sm border-0 shadow-lg ${className}`}>
       <div className="flex items-center gap-3 mb-4">
         <div className="p-2 bg-purple-100 rounded-lg">
           <User className="w-5 h-5 text-purple-600" />
@@ -180,7 +180,7 @@ export function UserFoodSuggestions({
                       <span>F: {food.fat}g</span>
                     </div>
                   </div>
-                  <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-purple-600" />
+                  <ChevronRight className="h-4 w-4 text-gray-700 group-hover:text-purple-600" />
                 </div>
               </button>
             ))}
@@ -220,7 +220,7 @@ export function UserFoodSuggestions({
                     </Badge>
                   </div>
                 </div>
-                <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-blue-600" />
+                <ChevronRight className="h-4 w-4 text-gray-700 group-hover:text-blue-600" />
               </div>
             </button>
           ))}

@@ -56,9 +56,9 @@ export function DataSyncIndicator() {
     <div className="fixed bottom-20 right-4 z-50 animate-fade-in" data-testid="data-sync-indicator">
       <div className={`
         flex items-center gap-2 px-4 py-2 rounded-lg shadow-lg backdrop-blur-sm
-        ${syncStatus === 'syncing' ? 'bg-blue-500/90 text-white' : ''}
-        ${syncStatus === 'success' ? 'bg-green-500/90 text-white' : ''}
-        ${syncStatus === 'error' ? 'bg-red-500/90 text-white' : ''}
+        ${syncStatus === 'syncing' ? 'bg-gradient-to-br from-amber-100 to-amber-200 text-gray-900' : ''}
+        ${syncStatus === 'success' ? 'bg-gradient-to-br from-green-100 to-green-200 text-gray-900' : ''}
+        ${syncStatus === 'error' ? 'bg-gradient-to-br from-red-100 to-red-200 text-gray-900' : ''}
       `}>
         {syncStatus === 'syncing' && (
           <>

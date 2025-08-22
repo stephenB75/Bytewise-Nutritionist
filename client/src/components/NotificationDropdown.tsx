@@ -232,7 +232,7 @@ export function NotificationDropdown({
             <div className="text-center py-8 text-gray-500">
               <Bell className="w-8 h-8 mx-auto mb-2 opacity-50" aria-hidden="true" />
               <p className="text-sm">No notifications</p>
-              <p className="text-xs text-gray-400">You're all caught up!</p>
+              <p className="text-xs text-gray-700">You're all caught up!</p>
             </div>
           ) : (
             notifications.map((notification) => {
@@ -260,7 +260,7 @@ export function NotificationDropdown({
                           <p className="text-xs text-gray-600 leading-relaxed">
                             {notification.message}
                           </p>
-                          <p className="text-xs text-gray-400 mt-1">
+                          <p className="text-xs text-gray-700 mt-1">
                             {notification.timestamp.toLocaleTimeString()}
                           </p>
                         </div>

@@ -34,7 +34,7 @@ export const ProfileIcon: React.FC<ProfileIconProps> = ({
           // Fallback to showing initials if image fails to load
           const target = e.target as HTMLImageElement;
           target.style.display = 'none';
-          target.parentElement!.innerHTML = `<span class="text-white font-bold text-lg">${validIconNumber === 2 ? 'F' : 'M'}</span>`;
+          target.parentElement!.innerHTML = `<span class="text-gray-900 font-bold text-lg">${validIconNumber === 2 ? 'F' : 'M'}</span>`;
         }}
       />
     </div>

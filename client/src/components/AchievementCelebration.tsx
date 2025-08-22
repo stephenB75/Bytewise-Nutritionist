@@ -76,7 +76,7 @@ export function AchievementCelebration({ isOpen, onClose, achievement }: Achieve
       )}
 
       {/* Achievement Card */}
-      <Card className="relative max-w-sm mx-4 p-6 bg-white shadow-2xl animate-bounce">
+      <Card className="relative max-w-sm mx-4 p-6 bg-gradient-to-br from-amber-50 to-amber-100 shadow-2xl animate-bounce">
         {/* Close Button */}
         <Button
           variant="ghost"
@@ -90,7 +90,7 @@ export function AchievementCelebration({ isOpen, onClose, achievement }: Achieve
         {/* Trophy Icon */}
         <div className="text-center mb-4">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full mb-4 animate-pulse">
-            <Trophy className="w-10 h-10 text-white" />
+            <Trophy className="w-10 h-10 text-gray-900" />
           </div>
           
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
