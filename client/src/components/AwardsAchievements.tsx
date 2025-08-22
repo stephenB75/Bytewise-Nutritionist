@@ -247,10 +247,10 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
   const categories = [
     { id: 'all', name: 'All', icon: Trophy },
     { id: 'daily', name: 'Daily', icon: Calendar },
-    { id: 'weekly', name: 'Weekly', icon: Flame },
+    { id: 'weekly', name: 'Weekly', icon: TrendingUp },
     { id: 'monthly', name: 'Monthly', icon: Star },
     { id: 'milestone', name: 'Milestones', icon: Target },
-    { id: 'special', name: 'Special', icon: Gift }
+    { id: 'special', name: 'Special', icon: Award }
   ];
 
   const difficultyColors = {
@@ -591,18 +591,18 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
                 onClick={() => setSelectedCategory(category.id)}
                 className={`h-24 w-full min-w-[140px] max-w-[140px] p-4 flex flex-col items-center justify-center space-y-2 transition-all duration-300 ${
                   isActive
-                    ? 'bg-gradient-to-br from-[#1f4aa6] via-[#45c73e] to-[#faed39] text-gray-950 shadow-2xl border-2 border-transparent transform scale-105' 
-                    : 'bg-gradient-to-br from-amber-100 to-amber-200 hover:from-amber-200 hover:to-amber-300 text-gray-700 border-2 border-amber-300/40 hover:border-[#1f4aa6] hover:shadow-xl hover:scale-102'
+                    ? 'bg-gradient-to-br from-blue-600 via-green-500 to-emerald-400 text-white shadow-2xl border-2 border-white/30 transform scale-105' 
+                    : 'bg-white/80 hover:bg-white/95 text-gray-800 border-2 border-gray-300/60 hover:border-blue-400 hover:shadow-lg hover:scale-102'
                 } rounded-2xl backdrop-blur-sm relative`}
               >
-                <div className={`w-12 h-12 p-3 rounded-xl flex items-center justify-center ${isActive ? 'bg-white/20' : 'bg-amber-50/80 border border-amber-200'}`}>
+                <div className={`w-12 h-12 p-3 rounded-xl flex items-center justify-center ${isActive ? 'bg-white/25 border border-white/40' : 'bg-gray-100/80 border border-gray-200'}`}>
                   <IconComponent 
-                    className={`w-6 h-6 ${isActive ? 'text-gray-950' : 'text-[#1f4aa6]'}`}
+                    className={`w-6 h-6 ${isActive ? 'text-white' : 'text-gray-700'}`}
                     strokeWidth={2.5}
                   />
                 </div>
                 <div className="text-center">
-                  <div className={`text-sm font-bold ${isActive ? 'text-gray-950' : 'text-gray-900'}`}>
+                  <div className={`text-sm font-bold ${isActive ? 'text-white' : 'text-gray-800'}`}>
                     {category.name}
                   </div>
                 </div>
