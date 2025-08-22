@@ -5487,14 +5487,14 @@ input[class*="pr-"] {
   background-color: rgba(0, 0, 0, 0.4) !important;
 }
 
-/* Tour button override - override CSS custom properties and apply orange theme */
+/* Tour button override - completely override all Button styles */
 button.tour-button-override,
 .tour-button-override,
 button[class*="tour-button-override"] {
   --primary: 245, 158, 11 !important; /* Orange primary color */
   --primary-foreground: 255, 255, 255 !important; /* White text */
-  background: hsl(var(--primary)) !important;
-  color: hsl(var(--primary-foreground)) !important;
+  background: rgb(245, 158, 11) !important; /* Direct orange color */
+  color: rgb(255, 255, 255) !important; /* Direct white color */
   border-color: transparent !important;
 }
 
@@ -5504,35 +5504,35 @@ button.tour-button-override:hover,
 button[class*="tour-button-override"]:hover {
   --primary: 251, 191, 36 !important; /* Lighter orange on hover */
   --primary-foreground: 31, 41, 55 !important; /* Dark text on light background */
-  background: hsl(var(--primary)) !important;
-  color: hsl(var(--primary-foreground)) !important;
+  background: rgb(251, 191, 36) !important; /* Direct light orange color */
+  color: rgb(31, 41, 55) !important; /* Direct dark color */
   border-color: transparent !important;
 }
 
-/* More specific override for shadcn Button component with CSS custom properties */
+/* More specific override for shadcn Button component with direct colors */
 button.inline-flex.tour-button-override {
   --primary: 245, 158, 11 !important;
   --primary-foreground: 255, 255, 255 !important;
-  background: hsl(var(--primary)) !important;
-  color: hsl(var(--primary-foreground)) !important;
+  background: rgb(245, 158, 11) !important;
+  color: rgb(255, 255, 255) !important;
 }
 
 button.inline-flex.tour-button-override:hover {
   --primary: 251, 191, 36 !important;
   --primary-foreground: 31, 41, 55 !important;
-  background: hsl(var(--primary)) !important;
-  color: hsl(var(--primary-foreground)) !important;
+  background: rgb(251, 191, 36) !important;
+  color: rgb(31, 41, 55) !important;
 }
 
 /* Make sure all text inside tour buttons follows the color scheme */
 button.tour-button-override *,
 .tour-button-override *,
 button[class*="tour-button-override"] * {
-  color: hsl(var(--primary-foreground)) !important;
+  color: rgb(255, 255, 255) !important;
 }
 
 button.tour-button-override:hover *,
 .tour-button-override:hover *,
 button[class*="tour-button-override"]:hover * {
-  color: hsl(var(--primary-foreground)) !important;
+  color: rgb(31, 41, 55) !important;
 }
