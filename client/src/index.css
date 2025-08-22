@@ -229,39 +229,51 @@ button.btn-hero-enhanced span,
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
 
-/* ULTRA-PRECISE Hero Headlines Only - Exact Structure Match */
-.hero-component.relative.h-screen .absolute.inset-0.flex.flex-col.justify-center.items-center.text-center .space-y-8 .space-y-3.hero-optimized h1.text-6xl.text-optimized.font-black,
-.hero-component.relative.h-screen .absolute.inset-0.flex.flex-col.justify-center.items-center.text-center .space-y-8 .space-y-3.hero-optimized h1.text-7xl.text-optimized.font-black,
-.hero-component.relative.h-screen .absolute.inset-0.flex.flex-col.justify-center.items-center.text-center .space-y-8 .space-y-3.hero-optimized h1.text-8xl.text-optimized.font-black,
-[data-hero="true"].relative.h-screen .absolute.inset-0.flex.flex-col.justify-center.items-center.text-center .space-y-8 .space-y-3.hero-optimized h1 { 
+/* Dashboard Hero Headlines - Apply Same Pattern as Other Pages */
+[data-page="dashboard"] .hero-component h1.text-6xl,
+[data-page="dashboard"] .hero-component h1.text-7xl,
+[data-page="dashboard"] .hero-component h1.text-8xl,
+[data-page="dashboard"] [data-hero="true"] h1.text-6xl,
+[data-page="dashboard"] [data-hero="true"] h1.text-7xl,
+[data-page="dashboard"] [data-hero="true"] h1.text-8xl,
+[data-page="dashboard"] .hero-component h1,
+[data-page="dashboard"] [data-hero="true"] h1 { 
   color: #22d3ee !important; /* Bright cyan for primary headlines */
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+  text-shadow: 0 3px 6px rgba(0, 0, 0, 0.6) !important;
 }
 
-.hero-component.relative.h-screen .absolute.inset-0.flex.flex-col.justify-center.items-center.text-center .space-y-8 .space-y-3.hero-optimized h2.text-6xl.text-optimized.font-black,
-.hero-component.relative.h-screen .absolute.inset-0.flex.flex-col.justify-center.items-center.text-center .space-y-8 .space-y-3.hero-optimized h2.text-7xl.text-optimized.font-black,
-.hero-component.relative.h-screen .absolute.inset-0.flex.flex-col.justify-center.items-center.text-center .space-y-8 .space-y-3.hero-optimized h2.text-8xl.text-optimized.font-black,
-[data-hero="true"].relative.h-screen .absolute.inset-0.flex.flex-col.justify-center.items-center.text-center .space-y-8 .space-y-3.hero-optimized h2 { 
+[data-page="dashboard"] .hero-component h2.text-6xl,
+[data-page="dashboard"] .hero-component h2.text-7xl,
+[data-page="dashboard"] .hero-component h2.text-8xl,
+[data-page="dashboard"] [data-hero="true"] h2.text-6xl,
+[data-page="dashboard"] [data-hero="true"] h2.text-7xl,
+[data-page="dashboard"] [data-hero="true"] h2.text-8xl,
+[data-page="dashboard"] .hero-component h2,
+[data-page="dashboard"] [data-hero="true"] h2 { 
   color: #fbbf24 !important; /* Bright amber for secondary headlines */
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+  text-shadow: 0 3px 6px rgba(0, 0, 0, 0.6) !important;
 }
 
-.hero-component.relative.h-screen .absolute.inset-0.flex.flex-col.justify-center.items-center.text-center .space-y-8 .space-y-3.hero-optimized h3.text-6xl.text-optimized.font-black,
-.hero-component.relative.h-screen .absolute.inset-0.flex.flex-col.justify-center.items-center.text-center .space-y-8 .space-y-3.hero-optimized h3.text-7xl.text-optimized.font-black,
-.hero-component.relative.h-screen .absolute.inset-0.flex.flex-col.justify-center.items-center.text-center .space-y-8 .space-y-3.hero-optimized h3.text-8xl.text-optimized.font-black,
-[data-hero="true"].relative.h-screen .absolute.inset-0.flex.flex-col.justify-center.items-center.text-center .space-y-8 .space-y-3.hero-optimized h3 { 
+[data-page="dashboard"] .hero-component h3.text-6xl,
+[data-page="dashboard"] .hero-component h3.text-7xl,
+[data-page="dashboard"] .hero-component h3.text-8xl,
+[data-page="dashboard"] [data-hero="true"] h3.text-6xl,
+[data-page="dashboard"] [data-hero="true"] h3.text-7xl,
+[data-page="dashboard"] [data-hero="true"] h3.text-8xl,
+[data-page="dashboard"] .hero-component h3,
+[data-page="dashboard"] [data-hero="true"] h3 { 
   color: #10b981 !important; /* Bright emerald for tertiary headlines */
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+  text-shadow: 0 3px 6px rgba(0, 0, 0, 0.6) !important;
 }
 
-.hero-component.relative.h-screen .absolute.inset-0.flex.flex-col.justify-center.items-center.text-center .space-y-8 .space-y-3.hero-optimized h4,
-.hero-component.relative.h-screen .absolute.inset-0.flex.flex-col.justify-center.items-center.text-center .space-y-8 .space-y-3.hero-optimized h5,
-.hero-component.relative.h-screen .absolute.inset-0.flex.flex-col.justify-center.items-center.text-center .space-y-8 .space-y-3.hero-optimized h6,
-[data-hero="true"].relative.h-screen .absolute.inset-0.flex.flex-col.justify-center.items-center.text-center .space-y-8 .space-y-3.hero-optimized h4,
-[data-hero="true"].relative.h-screen .absolute.inset-0.flex.flex-col.justify-center.items-center.text-center .space-y-8 .space-y-3.hero-optimized h5,
-[data-hero="true"].relative.h-screen .absolute.inset-0.flex.flex-col.justify-center.items-center.text-center .space-y-8 .space-y-3.hero-optimized h6 { 
+[data-page="dashboard"] .hero-component h4,
+[data-page="dashboard"] .hero-component h5,
+[data-page="dashboard"] .hero-component h6,
+[data-page="dashboard"] [data-hero="true"] h4,
+[data-page="dashboard"] [data-hero="true"] h5,
+[data-page="dashboard"] [data-hero="true"] h6 { 
   color: #a855f7 !important; /* Purple for smaller headlines */
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+  text-shadow: 0 3px 6px rgba(0, 0, 0, 0.6) !important;
 }
 
 /* Dashboard hero text - vibrant headlines, white for other elements */
@@ -305,46 +317,6 @@ button.btn-hero-enhanced span,
   color: #ffffff !important;
 }
 
-/* Dashboard Hero Headlines - High Specificity Override */
-[data-page="dashboard"] .hero-component h1,
-[data-page="dashboard"] .hero-component .text-white h1,
-[data-page="dashboard"] [data-hero="true"] h1,
-[data-page="dashboard"] [data-hero="true"] .text-white h1 {
-  color: #22d3ee !important; /* Bright cyan for h1 */
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
-}
-
-[data-page="dashboard"] .hero-component h2,
-[data-page="dashboard"] .hero-component .text-white h2,
-[data-page="dashboard"] [data-hero="true"] h2,
-[data-page="dashboard"] [data-hero="true"] .text-white h2 {
-  color: #fbbf24 !important; /* Bright amber for h2 */
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
-}
-
-[data-page="dashboard"] .hero-component h3,
-[data-page="dashboard"] .hero-component .text-white h3,
-[data-page="dashboard"] [data-hero="true"] h3,
-[data-page="dashboard"] [data-hero="true"] .text-white h3 {
-  color: #10b981 !important; /* Bright emerald for h3 */
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
-}
-
-[data-page="dashboard"] .hero-component h4,
-[data-page="dashboard"] .hero-component h5,
-[data-page="dashboard"] .hero-component h6,
-[data-page="dashboard"] .hero-component .text-white h4,
-[data-page="dashboard"] .hero-component .text-white h5,
-[data-page="dashboard"] .hero-component .text-white h6,
-[data-page="dashboard"] [data-hero="true"] h4,
-[data-page="dashboard"] [data-hero="true"] h5,
-[data-page="dashboard"] [data-hero="true"] h6,
-[data-page="dashboard"] [data-hero="true"] .text-white h4,
-[data-page="dashboard"] [data-hero="true"] .text-white h5,
-[data-page="dashboard"] [data-hero="true"] .text-white h6 {
-  color: #a855f7 !important; /* Purple for smaller headlines */
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
-}
 /* Dashboard Hero Container - White Text for Non-Headlines */
 [data-page="dashboard"] .hero-component .absolute.inset-0 p,
 [data-page="dashboard"] .hero-component .absolute.inset-0 span,
