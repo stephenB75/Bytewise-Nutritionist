@@ -2437,7 +2437,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           
           {/* Mode Toggle */}
           <div className="mb-6">
-            <div className="flex items-center justify-center space-x-1 bg-gray-800/50 rounded-full p-1 max-w-sm mx-auto">
+            <div className="flex items-center justify-center space-x-1 rounded-full p-1 max-w-sm mx-auto">
               <button
                 onClick={() => setNutritionMode('ai')}
                 className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${

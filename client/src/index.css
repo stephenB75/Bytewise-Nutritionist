@@ -707,11 +707,11 @@ svg.w-4 {
   border-color: #d1d5db !important;
 }
 
-/* Button border enhancements - EXCLUDE navigation buttons */
-button:not(.bg-orange-500):not([class*="bg-gradient"]):not(.bg-cyan-):not(.bg-red-):not([data-testid*="nav-"]) {
+/* Button border enhancements - EXCLUDE navigation buttons and mode toggle buttons */
+button:not(.bg-orange-500):not([class*="bg-gradient"]):not(.bg-cyan-):not(.bg-red-):not([data-testid*="nav-"]):not([data-testid="button-ai-mode"]):not([data-testid="button-calculator-mode"]) {
   border: 1px solid #e2e8f0 !important;
 }
-button:hover:not(.bg-orange-500):not([class*="bg-gradient"]):not(.bg-cyan-):not(.bg-red-):not([data-testid*="nav-"]) {
+button:hover:not(.bg-orange-500):not([class*="bg-gradient"]):not(.bg-cyan-):not(.bg-red-):not([data-testid*="nav-"]):not([data-testid="button-ai-mode"]):not([data-testid="button-calculator-mode"]) {
   border-color: #cbd5e1 !important;
 }
 
