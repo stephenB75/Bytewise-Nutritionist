@@ -846,7 +846,7 @@ export function FastingTracker() {
                 </div>
                 <Progress 
                   value={getProgressPercentage()} 
-                  className="h-3"
+                  className="h-3 [&>div]:bg-blue-500"
                   data-testid="fasting-progress"
                 />
                 <p className="text-sm text-gray-700">
@@ -860,7 +860,7 @@ export function FastingTracker() {
                   <Button 
                     onClick={startFasting}
                     size="lg"
-                    className="gap-2 w-full sm:w-auto min-w-[140px] bg-primary hover:bg-primary/90 text-primary-foreground"
+                    className="gap-2 w-full sm:w-auto min-w-[140px] bg-blue-600 hover:bg-blue-700 text-white"
                     data-testid="button-start-fasting"
                     disabled={startFastingMutation.isPending}
                   >
@@ -873,7 +873,7 @@ export function FastingTracker() {
                       onClick={pauseFasting}
                       variant="outline"
                       size="lg"
-                      className="gap-2 w-full sm:w-auto min-w-[120px]"
+                      className="gap-2 w-full sm:w-auto min-w-[120px] bg-gray-800 hover:bg-gray-900 text-white border-gray-800"
                       data-testid="button-pause-fasting"
                     >
                       {isActive ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
