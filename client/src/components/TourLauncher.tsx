@@ -243,9 +243,8 @@ export function TourLauncher({ onStartTour, isVisible = true }: TourLauncherProp
               </div>
               <div className="flex gap-2">
                 <Button
-                  variant="outline"
                   onClick={() => setIsPreviewOpen(false)}
-                  className="border-white bg-transparent text-white hover:bg-white hover:text-gray-900 border-2"
+                  className="bg-white text-gray-900 hover:bg-gray-100 border-none"
                 >
                   Maybe Later
                 </Button>
@@ -290,10 +289,9 @@ export function WelcomeBanner({ onStartTour, onDismiss }: { onStartTour: () => v
                 Take Tour (10 min)
               </Button>
               <Button
-                variant="outline"
                 size="sm"
                 onClick={onDismiss}
-                className="border-white bg-transparent text-white hover:bg-white hover:text-gray-900 border-2"
+                className="bg-white text-gray-900 hover:bg-gray-100 border-none"
               >
                 Skip for now
               </Button>
