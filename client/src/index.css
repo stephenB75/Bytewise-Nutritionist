@@ -159,7 +159,7 @@ button.bg-blue-800:not([data-testid*="nav-"]):not([class*="nav-"]),
 
 button.bg-blue-900:hover:not([data-testid*="nav-"]):not([class*="nav-"]),
 button.bg-blue-800:hover:not([data-testid*="nav-"]):not([class*="nav-"]) {
-  background-color: #2563eb !important; /* Blue-600 for hover */
+  background-color: #3b82f6 !important; /* Blue-500 for hover - lighter than before */
   color: #ffffff !important;
 }
 
@@ -289,7 +289,7 @@ button:not([class*="bg-"]):not(.hero-component *):not([data-hero="true"] *):not(
 
 button:not([class*="bg-"]):hover:not(.hero-component *):not([data-hero="true"] *):not(.btn-hero-enhanced):not([data-testid*="nav-"]):not([class*="nav-"]) {
   background-color: #e5e7eb; /* Slightly darker gray on hover */
-  color: #1f2937; /* Darker text on hover */
+  color: #374151; /* Medium gray text on hover - better for yellow background */
 }
 
 /* Comprehensive catch-all for any remaining dark buttons */
@@ -925,7 +925,7 @@ svg.w-4 {
 
 /* Button and interactive element visibility */
 .hover\:text-cyan-300:hover { color: #0891b2 !important; }
-.hover\:text-white:hover:not([data-testid*="nav-"] *) { color: #1f2937 !important; }
+.hover\:text-white:hover:not([data-testid*="nav-"] *) { color: #ffffff !important; }
 .hover\:text-red-400:hover { color: #dc2626 !important; }
 
 /* Special cases for icon colors */
