@@ -1061,7 +1061,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         return `${baseClasses} hero-bg-loaded`;
       }
       if (imageLoaded && !animationsEnabled) {
-        return `${baseClasses} opacity-100`;
+        // Use transition fade-in during navigation changes
+        return `${baseClasses} hero-bg-transition`;
       }
       return baseClasses;
     }, [isLoading, imageLoaded, animationsEnabled]);
