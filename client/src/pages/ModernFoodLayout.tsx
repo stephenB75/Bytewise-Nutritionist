@@ -1002,7 +1002,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       backgroundSize: 'cover',
       backgroundPosition: 'center center', // Ensures food items are centered both horizontally and vertically
       backgroundRepeat: 'no-repeat',
-      backgroundColor: '#1f2937', // Dark fallback to prevent yellow flash
+      backgroundColor: '#0f172a', // Very dark fallback to prevent any color flash
       backgroundAttachment: 'scroll', // Better mobile performance
     }), [backgroundImage]);
     
@@ -1018,7 +1018,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     }, [imageLoaded, isLoading]);
 
     return (
-      <div className="relative h-screen overflow-hidden hero-component" data-hero="true">
+      <div className="relative h-screen overflow-hidden hero-component bg-slate-900" data-hero="true">
         {/* Optimized Background Layer with preloading and smooth transitions */}
         <div 
           className={backgroundClasses}
@@ -1032,12 +1032,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         {/* Content Layer with Enhanced Typography */}
         <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-6 z-20 text-white">
           <div className="space-y-8 max-w-2xl">
-            {/* Clean Title Section */}
+            {/* Animated Title Section */}
             <div className="space-y-3 hero-optimized">
-              <h1 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] drop-shadow-2xl font-league-spartan text-optimized opacity-100">
+              <h1 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] drop-shadow-2xl font-league-spartan text-optimized animate-slideUpH1">
                 {title}
               </h1>
-              <h2 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] font-league-spartan text-optimized opacity-100">
+              <h2 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] font-league-spartan text-optimized animate-slideUpH2">
                 {subtitle}
               </h2>
             </div>

@@ -1671,7 +1671,54 @@ html, body {
   }
 }
 
-/* Removed unused animation classes - hero animations are now inline */
+/* Hero slide up animations */
+@keyframes slideUpH1 {
+  0% {
+    opacity: 0;
+    transform: translateY(60px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUpH2 {
+  0% {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slideUpH1 {
+  animation: slideUpH1 0.8s ease-out forwards;
+  opacity: 0;
+}
+
+.animate-slideUpH2 {
+  animation: slideUpH2 0.6s ease-out forwards;
+  animation-delay: 0.2s;
+  opacity: 0;
+}
+
+/* Hero background with blur effect */
+.hero-bg-optimized {
+  transition: opacity 0.4s ease-out, filter 0.4s ease-out;
+}
+
+.hero-bg-loaded {
+  opacity: 1;
+  filter: blur(0.5px) brightness(0.85);
+}
+
+.hero-bg-hidden {
+  opacity: 0;
+  filter: blur(2px);
+}
 
 input[type="text"]::placeholder, 
 input[type="email"]::placeholder, 
