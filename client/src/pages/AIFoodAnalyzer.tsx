@@ -62,10 +62,8 @@ export default function AIFoodAnalyzer() {
     const loadWeeklyAnalyzedFoods = () => {
       try {
         const stored = localStorage.getItem('weeklyAnalyzedFoods');
-        console.log('📱 Loading analyzed foods from localStorage:', stored);
         if (stored) {
           const allAnalyzed: AnalysisResult[] = JSON.parse(stored);
-          console.log('📱 Parsed analyzed foods:', allAnalyzed);
           // Filter to current week only
           const oneWeekAgo = new Date();
           oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
@@ -74,10 +72,6 @@ export default function AIFoodAnalyzer() {
             new Date(analysis.analysisTime) >= oneWeekAgo
           );
           
-          console.log('📱 Current week analyzed foods:', currentWeekAnalyzed);
-          currentWeekAnalyzed.forEach((analysis, i) => {
-            console.log(`📱 Analysis ${i + 1} imageUrl:`, analysis.imageUrl);
-          });
           
           setWeeklyAnalyzedFoods(currentWeekAnalyzed);
           
@@ -97,12 +91,9 @@ export default function AIFoodAnalyzer() {
   // Save analyzed food to weekly history
   const saveAnalyzedFood = (analysis: AnalysisResult) => {
     try {
-      console.log('💾 Saving analyzed food to localStorage:', analysis);
-      console.log('💾 Analysis imageUrl:', analysis.imageUrl);
       const updatedHistory = [analysis, ...weeklyAnalyzedFoods];
       setWeeklyAnalyzedFoods(updatedHistory);
       localStorage.setItem('weeklyAnalyzedFoods', JSON.stringify(updatedHistory));
-      console.log('💾 Saved to localStorage successfully. Total saved:', updatedHistory.length);
     } catch (error) {
       console.error('Error saving analyzed food:', error);
     }
@@ -391,23 +382,49 @@ export default function AIFoodAnalyzer() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col items-center space-y-4">
-              <ObjectUploader
-                maxNumberOfFiles={1}
-                maxFileSize={10485760} // 10MB
-                onGetUploadParameters={handleGetUploadParameters}
-                onComplete={handleUploadComplete}
-                buttonClassName="w-full max-w-md h-16 text-lg bg-amber-500 hover:bg-amber-600 text-white border-amber-600"
-              >
-                <div className="flex items-center gap-3">
-                  <Camera className="h-6 w-6" />
-                  <span>Click to Upload Food Photo</span>
-                </div>
-              </ObjectUploader>
+            <div className="flex flex-col items-center space-y-6">
+              {/* Enhanced Upload Area */}
+              <div className="w-full max-w-md">
+                <ObjectUploader
+                  maxNumberOfFiles={1}
+                  maxFileSize={10485760} // 10MB
+                  onGetUploadParameters={handleGetUploadParameters}
+                  onComplete={handleUploadComplete}
+                  buttonClassName="w-full h-20 text-lg bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white border-2 border-amber-400 shadow-lg rounded-xl transition-all duration-200 transform hover:scale-105"
+                >
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="flex items-center gap-3">
+                      <Camera className="h-7 w-7" />
+                      <span className="font-semibold">Upload Food Photo</span>
+                    </div>
+                    <span className="text-amber-100 text-sm">Click here or drag & drop</span>
+                  </div>
+                </ObjectUploader>
+              </div>
               
-              <p className="text-gray-600 text-sm text-center max-w-md">
-                Click the button above or drag and drop your food photo directly into the upload area
-              </p>
+              {/* Visual Instructions */}
+              <div className="bg-gradient-to-br from-amber-50 to-yellow-50 border-2 border-dashed border-amber-300 rounded-lg p-4 w-full max-w-md">
+                <div className="flex flex-col items-center space-y-3 text-gray-700">
+                  <div className="flex items-center gap-4">
+                    <div className="flex flex-col items-center space-y-1">
+                      <div className="w-8 h-8 bg-amber-200 rounded-full flex items-center justify-center">
+                        <span className="text-lg">👆</span>
+                      </div>
+                      <span className="text-xs font-medium">Click to Browse</span>
+                    </div>
+                    <div className="text-amber-400 text-xl">or</div>
+                    <div className="flex flex-col items-center space-y-1">
+                      <div className="w-8 h-8 bg-amber-200 rounded-full flex items-center justify-center">
+                        <span className="text-lg">📸</span>
+                      </div>
+                      <span className="text-xs font-medium">Drag & Drop</span>
+                    </div>
+                  </div>
+                  <p className="text-center text-sm text-gray-600">
+                    Supports JPG, PNG, HEIC • Max 10MB
+                  </p>
+                </div>
+              </div>
               
               <Alert className="bg-amber-100/50 border-amber-300 text-gray-900">
                 <Eye className="h-4 w-4 text-gray-900" />

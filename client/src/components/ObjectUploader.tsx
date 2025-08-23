@@ -69,29 +69,30 @@ export function ObjectUploader({
       autoProceed: false,
       locale: {
         strings: {
-          dropPasteFiles: 'Click here or drag and drop your food photo',
-          dropPasteFolders: 'Click here or drag and drop your food photo',
-          browseFiles: 'browse',
-          dropHint: 'Drop your food photo here',
-          uploadComplete: 'Upload complete',
-          uploadPaused: 'Upload paused',
-          resumeUpload: 'Resume upload',
-          pauseUpload: 'Pause upload',
-          retryUpload: 'Retry upload',
+          dropPasteFiles: '📸 Drop your food photo here or click to browse',
+          dropPasteFolders: '📸 Drop your food photo here or click to browse',
+          browseFiles: 'browse files',
+          dropHint: '📸 Perfect! Drop your food photo here',
+          uploadComplete: '✅ Upload complete!',
+          uploadPaused: '⏸️ Upload paused',
+          resumeUpload: '▶️ Resume upload',
+          pauseUpload: '⏸️ Pause upload',
+          retryUpload: '🔄 Retry upload',
+          addMoreFiles: '+ Add more photos',
           xFilesSelected: {
-            0: '%{smart_count} photo selected',
-            1: '%{smart_count} photo selected',
-            2: '%{smart_count} photos selected'
+            0: '📸 %{smart_count} photo ready to upload',
+            1: '📸 %{smart_count} photo ready to upload',
+            2: '📸 %{smart_count} photos ready to upload'
           },
           uploadingXFiles: {
-            0: 'Uploading %{smart_count} photo',
-            1: 'Uploading %{smart_count} photo',
-            2: 'Uploading %{smart_count} photos'
+            0: '⬆️ Uploading %{smart_count} photo...',
+            1: '⬆️ Uploading %{smart_count} photo...',
+            2: '⬆️ Uploading %{smart_count} photos...'
           },
           processingXFiles: {
-            0: 'Processing %{smart_count} photo',
-            1: 'Processing %{smart_count} photo', 
-            2: 'Processing %{smart_count} photos'
+            0: '🔄 Processing %{smart_count} photo...',
+            1: '🔄 Processing %{smart_count} photo...',
+            2: '🔄 Processing %{smart_count} photos...'
           }
         },
         pluralize: (n: number) => n === 1 ? 0 : 1
