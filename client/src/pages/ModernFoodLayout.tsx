@@ -3137,7 +3137,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             
             {/* Fasting Content Section */}
             <div className="px-6 py-3 content-section">
-              <div data-testid="fasting-tracker" className="fasting-tracker bg-gray-900/80 backdrop-blur-md rounded-3xl border border-gray-700 p-6">
+              <div data-testid="fasting-tracker" className="fasting-tracker bg-white/90 backdrop-blur-md rounded-3xl border border-amber-200 p-6">
                 <FastingTracker />
               </div>
             </div>

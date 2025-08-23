@@ -291,6 +291,18 @@ button:not([class*="bg-"]):hover:not(.hero-component *):not([data-hero="true"] *
   background-color: #e5e7eb; /* Slightly darker gray on hover */
   color: #1f2937; /* Darker text on hover */
 }
+
+/* Comprehensive catch-all for any remaining dark buttons */
+button.bg-slate-900:not([data-testid*="nav-"]):not([class*="nav-"]),
+button.bg-slate-800:not([data-testid*="nav-"]):not([class*="nav-"]),
+button[class*="bg-slate-9"]:not([data-testid*="nav-"]):not([class*="nav-"]),
+button[style*="background-color: rgb(15"]:not([data-testid*="nav-"]):not([class*="nav-"]),
+button[style*="background-color: rgb(30"]:not([data-testid*="nav-"]):not([class*="nav-"]),
+.bg-slate-900:not([data-testid*="nav-"]):not([class*="nav-"]),
+.bg-slate-800:not([data-testid*="nav-"]):not([class*="nav-"]) {
+  background-color: #3b82f6 !important; /* Blue-500 for visibility */
+  color: #ffffff !important;
+}
 /* Light text colors optimized for yellow background - preserve hero components */
 .text-gray-100:not(.hero-component *):not([data-hero="true"] *) { color: #1f2937; }
 .text-gray-200:not(.hero-component *):not([data-hero="true"] *) { color: #374151; }

@@ -885,7 +885,7 @@ const FastingTracker = React.memo(function FastingTracker() {
                       onClick={pauseFasting}
                       variant="outline"
                       size="lg"
-                      className="gap-2 w-full sm:w-auto min-w-[120px] bg-gray-800 hover:bg-gray-900 text-white border-none"
+                      className="gap-2 w-full sm:w-auto min-w-[120px] bg-emerald-500 hover:bg-emerald-600 text-white border-none"
                       data-testid="button-pause-fasting"
                     >
                       {isActive ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
