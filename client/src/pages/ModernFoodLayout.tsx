@@ -31,6 +31,8 @@ import {
   Search, 
   Plus,
   ChevronRight,
+  ChevronUp,
+  ChevronDown,
   Flame,
   Target,
   Trophy,
@@ -1140,15 +1142,54 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     );
   });
 
-  // Enhanced Water Consumption Card Component
+  // Enhanced Water Consumption Card Component with Weekly Log
   const WaterCard = React.memo(({ glasses, onIncrement, onDecrement }: {
     glasses: number;
     onIncrement: () => void;
     onDecrement: () => void;
   }) => {
+    const [waterHistory, setWaterHistory] = React.useState<Array<{date: string, glasses: number}>>([]);
+    const [isLoadingHistory, setIsLoadingHistory] = React.useState(false);
+    const [showHistory, setShowHistory] = React.useState(false);
+    
     const dailyGoal = 8; // 8 glasses per day
     const percentage = Math.min((glasses / dailyGoal) * 100, 100);
     const isGoalReached = glasses >= dailyGoal;
+
+    // Fetch water intake history
+    const fetchWaterHistory = React.useCallback(async () => {
+      if (isLoadingHistory) return;
+      
+      setIsLoadingHistory(true);
+      try {
+        const response = await fetch('/api/water-history?days=30', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('supabase_auth_token')}`,
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        if (response.ok) {
+          const result = await response.json();
+          const formattedHistory = result.data.map((item: any) => ({
+            date: new Date(item.date).toISOString().split('T')[0],
+            glasses: item.glasses
+          }));
+          setWaterHistory(formattedHistory);
+        }
+      } catch (error) {
+        console.error('Failed to fetch water history:', error);
+      } finally {
+        setIsLoadingHistory(false);
+      }
+    }, [isLoadingHistory]);
+
+    // Fetch history when component mounts or when history is shown
+    React.useEffect(() => {
+      if (showHistory && waterHistory.length === 0) {
+        fetchWaterHistory();
+      }
+    }, [showHistory, waterHistory.length, fetchWaterHistory]);
     
     return (
       <Card className={`bg-gradient-to-br from-amber-100 to-cyan-100 border-none p-6 transition-all duration-300 hover:from-amber-100 hover:to-cyan-200 shadow-lg hover:shadow-xl`} data-testid="water-card">
@@ -1221,6 +1262,99 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <Plus className="w-4 h-4" />
             </Button>
           </div>
+        </div>
+
+        {/* Weekly History Toggle */}
+        <div className="mt-4 pt-4 border-t border-gray-400/20">
+          <Button
+            onClick={() => setShowHistory(!showHistory)}
+            variant="ghost"
+            size="sm"
+            className="w-full text-gray-700 hover:text-cyan-600 hover:bg-cyan-500/10 font-medium"
+            data-testid="button-toggle-water-history"
+          >
+            {showHistory ? 'Hide' : 'Show'} 30-Day Log
+            {showHistory ? <ChevronUp className="w-4 h-4 ml-2" /> : <ChevronDown className="w-4 h-4 ml-2" />}
+          </Button>
+          
+          {showHistory && (
+            <div className="mt-4 space-y-3">
+              {isLoadingHistory ? (
+                <div className="text-center py-4">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-cyan-600 mx-auto"></div>
+                  <p className="text-sm text-gray-600 mt-2">Loading water history...</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <h4 className="text-sm font-semibold text-gray-800 mb-3">Last 30 Days Water Intake</h4>
+                  
+                  {/* Weekly Grid View */}
+                  <div className="grid grid-cols-7 gap-1 text-xs">
+                    {/* Day headers */}
+                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                      <div key={day} className="text-center text-gray-500 font-medium py-1">
+                        {day}
+                      </div>
+                    ))}
+                    
+                    {/* Generate last 30 days in weekly grid */}
+                    {Array.from({ length: 30 }, (_, i) => {
+                      const date = new Date();
+                      date.setDate(date.getDate() - (29 - i));
+                      const dateStr = date.toISOString().split('T')[0];
+                      const dayData = waterHistory.find(h => h.date === dateStr);
+                      const glassesOnDay = dayData?.glasses || 0;
+                      const percentage = Math.min((glassesOnDay / dailyGoal) * 100, 100);
+                      const isToday = dateStr === new Date().toISOString().split('T')[0];
+                      
+                      return (
+                        <div
+                          key={dateStr}
+                          className={`aspect-square rounded-md flex flex-col items-center justify-center text-xs font-medium transition-all duration-200 ${
+                            isToday 
+                              ? 'ring-2 ring-cyan-500 bg-cyan-50' 
+                              : glassesOnDay >= dailyGoal 
+                                ? 'bg-gradient-to-br from-cyan-400 to-blue-500 text-white' 
+                                : glassesOnDay > 0 
+                                  ? 'bg-cyan-200 text-gray-800' 
+                                  : 'bg-gray-100 text-gray-400'
+                          }`}
+                          title={`${date.getDate()}/${date.getMonth() + 1}: ${glassesOnDay} glasses`}
+                        >
+                          <div className="text-xs">{date.getDate()}</div>
+                          <div className="text-xs font-bold">{glassesOnDay}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  
+                  {/* Summary Stats */}
+                  <div className="mt-4 p-3 bg-cyan-50 rounded-lg">
+                    <div className="grid grid-cols-3 gap-4 text-center">
+                      <div>
+                        <div className="text-lg font-bold text-cyan-700">
+                          {waterHistory.filter(h => h.glasses >= dailyGoal).length}
+                        </div>
+                        <div className="text-xs text-gray-600">Goal Days</div>
+                      </div>
+                      <div>
+                        <div className="text-lg font-bold text-cyan-700">
+                          {Math.round(waterHistory.reduce((sum, h) => sum + h.glasses, 0) / Math.max(waterHistory.length, 1))}
+                        </div>
+                        <div className="text-xs text-gray-600">Avg/Day</div>
+                      </div>
+                      <div>
+                        <div className="text-lg font-bold text-cyan-700">
+                          {waterHistory.reduce((sum, h) => sum + h.glasses, 0)}
+                        </div>
+                        <div className="text-xs text-gray-600">Total</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </Card>
     );

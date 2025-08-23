@@ -1859,6 +1859,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // GET endpoint for water intake history
+  app.get('/api/water-history', isAuthenticated, async (req: any, res: Response) => {
+    const userId = req.user?.id;
+    const days = req.query.days ? parseInt(req.query.days as string) : 30;
+
+    console.log('💧 Water history request:', { userId, days });
+
+    if (!userId) {
+      console.log('❌ Water history: User not found or unauthorized');
+      return res.status(401).json({ message: "User not found or unauthorized" });
+    }
+
+    try {
+      const waterHistory = await storage.getUserWaterIntakeHistory(userId, days);
+      
+      res.json({
+        success: true,
+        data: waterHistory,
+        totalDays: days
+      });
+    } catch (error: any) {
+      console.error('❌ Failed to fetch water history:', error.message, error.stack);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to fetch water history',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+  });
+
   // Daily stats API with fasting integration
   app.get('/api/users/:userId/daily-stats', isAuthenticated, async (req: any, res: Response) => {
     const userId = req.user?.id;

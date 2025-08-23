@@ -80,6 +80,7 @@ export interface IStorage {
 
   // Water intake operations
   getUserWaterIntake(userId: string, date: Date): Promise<WaterIntake | undefined>;
+  getUserWaterIntakeHistory(userId: string, days?: number): Promise<WaterIntake[]>;
   upsertWaterIntake(waterIntake: InsertWaterIntake): Promise<WaterIntake>;
 
   // Achievement operations
@@ -627,6 +628,24 @@ export class DatabaseStorage implements IStorage {
       );
 
     return intake;
+  }
+
+  async getUserWaterIntakeHistory(userId: string, days: number = 30): Promise<WaterIntake[]> {
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(endDate.getDate() - days);
+    
+    return await db
+      .select()
+      .from(waterIntake)
+      .where(
+        and(
+          eq(waterIntake.userId, userId),
+          gte(waterIntake.date, startDate),
+          lte(waterIntake.date, endDate)
+        )
+      )
+      .orderBy(desc(waterIntake.date));
   }
 
   async upsertWaterIntake(intake: InsertWaterIntake): Promise<WaterIntake> {
