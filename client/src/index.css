@@ -42,6 +42,27 @@ button[data-testid^="nav-"]:hover,
   color: #ffffff !important;
 }
 
+/* Global hover effects - prevent black hover states */
+button:hover,
+a:hover,
+.hover\:text-black:hover,
+.hover\:bg-black:hover {
+  color: #374151 !important; /* Dark gray instead of black */
+}
+
+/* Specific hover overrides for better contrast on yellow background */
+.hover\:text-gray-600:hover {
+  color: #d97706 !important; /* Amber instead of dark gray */
+}
+
+.hover\:text-gray-500:hover {
+  color: #f59e0b !important; /* Light amber */
+}
+
+.hover\:text-gray-400:hover {
+  color: #fbbf24 !important; /* Yellow */
+}
+
 button[data-testid*="nav-"]:hover svg,
 button[data-testid^="nav-"]:hover svg,
 [data-testid*="nav-"] button:hover svg {

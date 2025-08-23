@@ -112,7 +112,7 @@ export function PWAUpdateNotification() {
             <div className="flex gap-2">
               <Button
                 onClick={handleUpdate}
-                className="bg-brand-yellow hover:bg-yellow-500 text-black font-medium"
+                className="bg-amber-400 hover:bg-amber-300 text-gray-900 font-medium"
                 size="sm"
               >
                 Update Now
@@ -128,7 +128,7 @@ export function PWAUpdateNotification() {
           </div>
           <button
             onClick={handleDismiss}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-gray-500 hover:text-amber-600"
           >
             <X className="h-5 w-5" />
           </button>
