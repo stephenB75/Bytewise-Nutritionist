@@ -1023,8 +1023,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         // Complete transition (fade in new page)
         setTimeout(() => {
           setIsTransitioning(false);
-        }, 400);
-      }, 300); // Fade out duration
+        }, 800);
+      }, 600); // Fade out duration
     }
   };
 
@@ -1082,9 +1082,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <h1 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] drop-shadow-2xl animate-fadeInUp [animation-delay:2.8s] font-league-spartan text-optimized">
                 {title}
               </h1>
-              <h1 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] animate-appLaunchSlide [animation-delay:3.3s] font-league-spartan text-optimized">
+              <h2 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] animate-appLaunchSlide [animation-delay:3.3s] font-league-spartan text-optimized">
                 {subtitle}
-              </h1>
+              </h2>
             </div>
             
             {/* Enhanced Description */}
