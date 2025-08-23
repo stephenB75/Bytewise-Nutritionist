@@ -3258,6 +3258,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 setTimeout(() => window.location.reload(), 500);
               }}
             />
+            {/* Notify other components about tour visibility */}
+            {typeof window !== 'undefined' && (() => {
+              window.dispatchEvent(new CustomEvent('tour-visibility', {
+                detail: { visible: shouldShowTour() }
+              }));
+              return null;
+            })()}
           </div>
         ) : null;
       })()}

@@ -38,7 +38,7 @@ export function useDataPersistence({ key, data, syncToDatabase = true, debounceM
       return true;
     } catch (error) {
       // Handle quota exceeded errors gracefully
-      if (error.name === 'QuotaExceededError') {
+      if (error instanceof Error && error.name === 'QuotaExceededError') {
         console.warn('localStorage quota exceeded, skipping save for:', key);
       }
       return false;
@@ -80,7 +80,7 @@ export function useDataPersistence({ key, data, syncToDatabase = true, debounceM
     }
   });
 
-  // Debounced sync to database
+  // Debounced sync to database with performance optimization
   const syncToDb = useCallback((dataToSync: any) => {
     if (!syncToDatabase || !user) return;
 
@@ -89,13 +89,17 @@ export function useDataPersistence({ key, data, syncToDatabase = true, debounceM
       clearTimeout(timeoutRef.current);
     }
 
+    // Use variable debounce based on data size for performance
+    const dataSize = JSON.stringify(dataToSync).length;
+    const dynamicDebounce = dataSize > 10000 ? debounceMs + 500 : debounceMs;
+
     // Set new timeout for debounced sync
     timeoutRef.current = setTimeout(() => {
       syncMutation.mutate(dataToSync);
-    }, debounceMs);
+    }, dynamicDebounce);
   }, [syncToDatabase, user, debounceMs, syncMutation]);
 
-  // Auto-save effect
+  // Auto-save effect with enhanced cleanup
   useEffect(() => {
     if (data === undefined || data === null) return;
 
@@ -107,10 +111,16 @@ export function useDataPersistence({ key, data, syncToDatabase = true, debounceM
       syncToDb(data);
     }
 
-    // Cleanup timeout on unmount
+    // Enhanced cleanup on unmount
     return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
+        timeoutRef.current = undefined;
+      }
+      
+      // Force final save on cleanup if there's unsaved data
+      if (data !== undefined && data !== null) {
+        saveToLocalStorage(data);
       }
     };
   }, [data, saveToLocalStorage, syncToDb]);
@@ -191,12 +201,16 @@ export class DataPersistenceManager {
     });
   }
 
-  // Start auto-save interval
-  startAutoSave(intervalMs: number = 30000) {
+  // Start coordinated auto-save with longer interval to reduce conflicts
+  startAutoSave(intervalMs: number = 45000) {
     this.stopAutoSave();
-    this.syncInterval = setInterval(() => {
-      this.saveAllData();
-    }, intervalMs);
+    
+    // Stagger the timer to avoid conflicts with other systems
+    setTimeout(() => {
+      this.syncInterval = setInterval(() => {
+        this.saveAllData();
+      }, intervalMs);
+    }, 2000); // 2-second delay to let other systems initialize
 
     // Save on page unload
     window.addEventListener('beforeunload', this.handleBeforeUnload);
@@ -205,14 +219,19 @@ export class DataPersistenceManager {
     document.addEventListener('visibilitychange', this.handleVisibilityChange);
   }
 
-  // Stop auto-save
+  // Stop auto-save with complete cleanup
   stopAutoSave() {
     if (this.syncInterval) {
       clearInterval(this.syncInterval);
       this.syncInterval = null;
     }
+    
+    // Clean up event listeners
     window.removeEventListener('beforeunload', this.handleBeforeUnload);
     document.removeEventListener('visibilitychange', this.handleVisibilityChange);
+    
+    // Clear any pending saves
+    this.saveAllData();
   }
 
   private handleBeforeUnload = () => {
@@ -226,8 +245,33 @@ export class DataPersistenceManager {
   };
 }
 
-// Initialize auto-save on app load
+// Initialize auto-save with proper cleanup
+let globalManagerInstance: DataPersistenceManager | null = null;
+
 if (typeof window !== 'undefined') {
-  const manager = DataPersistenceManager.getInstance();
-  manager.startAutoSave();
+  // Cleanup any existing instance first
+  if (globalManagerInstance) {
+    globalManagerInstance.stopAutoSave();
+  }
+  
+  globalManagerInstance = DataPersistenceManager.getInstance();
+  globalManagerInstance.startAutoSave();
+  
+  // Cleanup on page unload
+  window.addEventListener('beforeunload', () => {
+    if (globalManagerInstance) {
+      globalManagerInstance.stopAutoSave();
+      globalManagerInstance = null;
+    }
+  });
+  
+  // Development hot-reload cleanup
+  if (import.meta.hot) {
+    import.meta.hot.dispose(() => {
+      if (globalManagerInstance) {
+        globalManagerInstance.stopAutoSave();
+        globalManagerInstance = null;
+      }
+    });
+  }
 }

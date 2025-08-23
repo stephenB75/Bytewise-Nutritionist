@@ -24,10 +24,10 @@ export function DataIntegrityManager() {
       window.addEventListener('data-changed', handleDataChange);
       window.addEventListener('storage', handleDataChange);
       
-      // Verify data integrity periodically
+      // Verify data integrity periodically (coordinated timing)
       const integrityInterval = setInterval(() => {
         verifyDataIntegrity();
-      }, 10 * 60 * 1000); // Check every 10 minutes
+      }, 12 * 60 * 1000); // Check every 12 minutes (offset from auto-save timing)
 
       return () => {
         window.removeEventListener('data-changed', handleDataChange);

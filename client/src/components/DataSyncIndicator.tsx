@@ -9,8 +9,14 @@ import { Cloud, CloudOff, Check } from 'lucide-react';
 export function DataSyncIndicator() {
   const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
+  const [tourVisible, setTourVisible] = useState(false);
 
   useEffect(() => {
+    // Listen for tour visibility changes to avoid overlaps
+    const handleTourVisibility = (event: CustomEvent) => {
+      setTourVisible(event.detail?.visible || false);
+    };
+
     // Listen for sync events
     const handleSyncStart = () => {
       setSyncStatus('syncing');
@@ -37,12 +43,14 @@ export function DataSyncIndicator() {
       }
     };
 
+    window.addEventListener('tour-visibility', handleTourVisibility as EventListener);
     window.addEventListener('sync-start', handleSyncStart);
     window.addEventListener('sync-success', handleSyncSuccess as EventListener);
     window.addEventListener('sync-error', handleSyncError);
     window.addEventListener('data-restored', handleDataRestored as EventListener);
 
     return () => {
+      window.removeEventListener('tour-visibility', handleTourVisibility as EventListener);
       window.removeEventListener('sync-start', handleSyncStart);
       window.removeEventListener('sync-success', handleSyncSuccess as EventListener);
       window.removeEventListener('sync-error', handleSyncError);
@@ -53,7 +61,9 @@ export function DataSyncIndicator() {
   if (syncStatus === 'idle') return null;
 
   return (
-    <div className="fixed bottom-20 right-4 z-50 animate-fade-in" data-testid="data-sync-indicator">
+    <div className={`fixed z-55 animate-fade-in ${
+      tourVisible ? 'bottom-20 left-4' : 'bottom-20 right-4'
+    }`} data-testid="data-sync-indicator">
       <div className={`
         flex items-center gap-2 px-4 py-2 rounded-lg shadow-lg backdrop-blur-sm
         ${syncStatus === 'syncing' ? 'bg-gradient-to-br from-amber-100 to-amber-200 text-gray-900' : ''}
