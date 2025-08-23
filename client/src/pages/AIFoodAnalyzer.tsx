@@ -160,6 +160,7 @@ export default function AIFoodAnalyzer() {
 
       const analysisResultWithTotals = {
         ...result,
+        imageUrl: uploadedImageUrl, // Ensure uploaded image URL is preserved
         totalNutrition
       };
 
@@ -573,11 +574,11 @@ export default function AIFoodAnalyzer() {
           </Card>
 
           {/* New Analysis Button */}
-          <Card>
+          <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200/40">
             <CardContent className="p-4">
               <Button 
                 variant="outline" 
-                className="w-full" 
+                className="w-full border-amber-300 text-gray-900 hover:bg-amber-100 hover:border-amber-400" 
                 onClick={() => {
                   setAnalysisResult(null);
                   setUploadedImageUrl('');
@@ -611,11 +612,25 @@ export default function AIFoodAnalyzer() {
                 >
                   {/* Photo */}
                   <div className="aspect-square rounded-lg overflow-hidden bg-gray-100">
-                    <img 
-                      src={analysis.imageUrl} 
-                      alt="Analyzed food photo" 
-                      className="w-full h-full object-cover"
-                    />
+                    {analysis.imageUrl ? (
+                      <img 
+                        src={analysis.imageUrl} 
+                        alt="Analyzed food photo" 
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          console.error('Image failed to load:', analysis.imageUrl);
+                          e.currentTarget.style.display = 'none';
+                          const parent = e.currentTarget.parentElement;
+                          if (parent) {
+                            parent.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-gray-200 text-gray-500 text-sm">Image not available</div>';
+                          }
+                        }}
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-500 text-sm">
+                        No image available
+                      </div>
+                    )}
                   </div>
                   
                   {/* Analysis Info */}
