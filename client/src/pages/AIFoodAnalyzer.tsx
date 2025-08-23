@@ -62,8 +62,10 @@ export default function AIFoodAnalyzer() {
     const loadWeeklyAnalyzedFoods = () => {
       try {
         const stored = localStorage.getItem('weeklyAnalyzedFoods');
+        console.log('📱 Loading analyzed foods from localStorage:', stored);
         if (stored) {
           const allAnalyzed: AnalysisResult[] = JSON.parse(stored);
+          console.log('📱 Parsed analyzed foods:', allAnalyzed);
           // Filter to current week only
           const oneWeekAgo = new Date();
           oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
@@ -71,6 +73,11 @@ export default function AIFoodAnalyzer() {
           const currentWeekAnalyzed = allAnalyzed.filter(analysis => 
             new Date(analysis.analysisTime) >= oneWeekAgo
           );
+          
+          console.log('📱 Current week analyzed foods:', currentWeekAnalyzed);
+          currentWeekAnalyzed.forEach((analysis, i) => {
+            console.log(`📱 Analysis ${i + 1} imageUrl:`, analysis.imageUrl);
+          });
           
           setWeeklyAnalyzedFoods(currentWeekAnalyzed);
           
@@ -90,9 +97,12 @@ export default function AIFoodAnalyzer() {
   // Save analyzed food to weekly history
   const saveAnalyzedFood = (analysis: AnalysisResult) => {
     try {
+      console.log('💾 Saving analyzed food to localStorage:', analysis);
+      console.log('💾 Analysis imageUrl:', analysis.imageUrl);
       const updatedHistory = [analysis, ...weeklyAnalyzedFoods];
       setWeeklyAnalyzedFoods(updatedHistory);
       localStorage.setItem('weeklyAnalyzedFoods', JSON.stringify(updatedHistory));
+      console.log('💾 Saved to localStorage successfully. Total saved:', updatedHistory.length);
     } catch (error) {
       console.error('Error saving analyzed food:', error);
     }
@@ -618,7 +628,30 @@ export default function AIFoodAnalyzer() {
                         alt="Analyzed food photo" 
                         className="w-full h-full object-cover"
                         onError={(e) => {
-                          console.error('Image failed to load:', analysis.imageUrl);
+                          console.error('❌ Image failed to load:', analysis.imageUrl);
+                          console.error('❌ Image error event:', e);
+                          
+                          // Try to access the image via proxy
+                          const originalSrc = analysis.imageUrl;
+                          console.log('🔄 Trying to proxy image URL:', originalSrc);
+                          
+                          // Convert storage URL to proxy URL
+                          try {
+                            const url = new URL(originalSrc);
+                            const pathParts = url.pathname.split('/');
+                            const bucketIndex = pathParts.findIndex(part => part.includes('replit-objstore-'));
+                            
+                            if (bucketIndex !== -1) {
+                              const objectPath = pathParts.slice(bucketIndex + 1).join('/');
+                              const proxyUrl = `/api/proxy-image/${objectPath}`;
+                              console.log('🔄 Trying proxy URL:', proxyUrl);
+                              e.currentTarget.src = proxyUrl;
+                              return; // Give proxy a chance to work
+                            }
+                          } catch (urlError) {
+                            console.error('❌ Could not parse URL for proxy:', urlError);
+                          }
+                          
                           e.currentTarget.style.display = 'none';
                           const parent = e.currentTarget.parentElement;
                           if (parent) {

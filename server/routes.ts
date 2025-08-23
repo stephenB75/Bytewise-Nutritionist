@@ -2029,6 +2029,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Image proxy route to serve images from object storage with proper headers
+  app.get('/api/proxy-image/:path(*)', async (req: Request, res: Response) => {
+    try {
+      const objectPath = req.params.path;
+      console.log('🖼️ Proxy request for image:', objectPath);
+      
+      // Get the bucket name from environment or use default
+      const bucketName = process.env.REPL_ID ? `repl-default-bucket-${process.env.REPL_ID}` : 'default-bucket';
+      
+      // Get the file from object storage
+      const bucket = objectStorageClient.bucket(bucketName);
+      const file = bucket.file(objectPath);
+      
+      // Check if file exists
+      const [exists] = await file.exists();
+      if (!exists) {
+        console.log('❌ Image not found in storage:', objectPath);
+        return res.status(404).json({ error: 'Image not found' });
+      }
+      
+      // Get file metadata to determine content type
+      const [metadata] = await file.getMetadata();
+      const contentType = metadata.contentType || 'image/jpeg';
+      
+      // Set appropriate headers
+      res.set({
+        'Content-Type': contentType,
+        'Cache-Control': 'public, max-age=86400', // Cache for 24 hours
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET',
+        'Access-Control-Allow-Headers': 'Content-Type'
+      });
+      
+      // Stream the file
+      const stream = file.createReadStream();
+      stream.pipe(res);
+      
+      stream.on('error', (error) => {
+        console.error('❌ Error streaming image:', error);
+        if (!res.headersSent) {
+          res.status(500).json({ error: 'Failed to serve image' });
+        }
+      });
+      
+      console.log('✅ Image served successfully:', objectPath);
+      
+    } catch (error: any) {
+      console.error('❌ Image proxy error:', error);
+      res.status(500).json({ error: 'Failed to proxy image' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
