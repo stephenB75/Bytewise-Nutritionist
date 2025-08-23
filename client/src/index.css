@@ -608,10 +608,6 @@ button.btn-hero-enhanced span,
   color: #ffffff !important;
 }
 
-/* Dashboard button colors optimized for yellow background */
-[data-page="dashboard"] button:not(.bg-gradient-to-r):not([data-testid*="nav-"]):not(.hero-component *):not([data-hero="true"] *):not(.btn-hero-enhanced):not(.tour-button-override) {
-  color: #111827;
-}
 
 /* Fasting tracker button color fixes - EXCLUDE navigation */
 [data-testid*="fasting"] button.bg-gray-800:not([data-testid*="nav-"]):not([class*="nav-"]),
