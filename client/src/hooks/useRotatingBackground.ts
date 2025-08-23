@@ -5,12 +5,15 @@
 
 import { useState, useEffect } from 'react';
 
-// Food image collection - meat items removed, all other foods included
+// Food image collection - only raw meats removed, all cooked foods included
 const foodImages = [
   new URL('@assets/apple-3313209_1920_1753859530078-BJW4vFlt.jpg', import.meta.url).href,
   new URL('@assets/blueberries-9450130_1920_1753859477806-DQeN0M4j.jpg', import.meta.url).href,
   new URL('@assets/bowl-1842294_1920_1753859477806-bRUsOvIC.jpg', import.meta.url).href,
   new URL('@assets/burgers-5590503_1920_1753859530083-I99DUxaH.jpg', import.meta.url).href,
+  new URL('@assets/chicken-2443901_1920_1753859530084-CTPERNUZ.jpg', import.meta.url).href,
+  new URL('@assets/chicken-762531_1920_1753859530086-BwBmOm1s.jpg', import.meta.url).href,
+  new URL('@assets/chicken-nuggets-1108_1920_1753859530084-DLWOOEId.jpg', import.meta.url).href,
   new URL('@assets/chocolate-1927921_1920_1753859477802-D-SPQY8I.jpg', import.meta.url).href,
   new URL('@assets/churros-2188871_1920_1753859477808-BGqrIj5F.jpg', import.meta.url).href,
   new URL('@assets/cupcakes-813078_1920_1753859477803-D9uLIWdp.jpg', import.meta.url).href,
@@ -29,6 +32,8 @@ const foodImages = [
   new URL('@assets/sandwich-6935938_1920_1753859794687-CXrSzbzE.jpg', import.meta.url).href,
   new URL('@assets/spaghetti-1392266_1920_1753859477805-HAisuHs3.jpg', import.meta.url).href,
   new URL('@assets/spaghetti-2931846_1920_1753859477804-BSrB8P7y.jpg', import.meta.url).href,
+  new URL('@assets/steak-6278031_1920_1753859530081-BukNuh5v.jpg', import.meta.url).href,
+  new URL('@assets/steak-7423231_1920_1753859530082-DBBrmAYH.jpg', import.meta.url).href,
   new URL('@assets/strawberry-7224875_1920_1753859477810-CXpGW8lN.jpg', import.meta.url).href,
   new URL('@assets/swedish-6053292_1920_1753859530083-CbbGYA9Y.jpg', import.meta.url).href,
   new URL('@assets/tomatoes-1238255_1920_1753859477803-BBxmQtT1.jpg', import.meta.url).href,
@@ -57,18 +62,18 @@ const foodImages = [
   new URL('@assets/pistachios-3223610_1280_1755903678482.jpg', import.meta.url).href, // 52
 ];
 
-// Food-themed page mappings for all foods (meat items excluded) - ALL 48 photos included
+// Food-themed page mappings for all foods (only raw meats excluded) - ALL 52 photos included
 const pageImageMap: Record<string, number[]> = {
-  'home': [0, 2, 10, 12, 18, 19, 24, 25, 26, 27, 32, 35, 36, 37, 39, 40, 41, 43, 44, 45], // Healthy foods and fresh produce
-  'nutrition': [3, 7, 8, 9, 13, 14, 15, 16, 19, 20, 21, 27, 28, 32, 33, 34, 42], // Proteins and main dishes (including seafood)
-  'daily': [3, 13, 14, 15, 16, 19, 28, 37, 38], // Daily meals and regular foods
-  'profile': [4, 5, 6, 11, 20, 21, 22, 32, 33, 34, 39, 40, 41], // Desserts, treats, and special foods
-  'tracking': [1, 10, 12, 14, 17, 18, 22, 24, 42, 45, 46], // Breakfast and healthy tracking options
-  'achievements': [0, 4, 5, 10, 11, 12, 17, 22, 24, 25, 26, 35, 36, 37, 39, 40, 41, 43, 44, 45], // Colorful fruits and celebration foods
-  'signin': [5, 12, 18, 19, 32, 33, 34, 42], // Welcoming foods
-  'calculator': [8, 11, 16, 37, 38, 46], // Cooking ingredients and prep
-  'search': [1, 2, 3, 4, 5, 6, 7, 10, 17, 27, 28, 31, 36], // Variety and discovery
-  'data': [4, 10, 11, 12, 13, 14, 15, 17, 18, 22, 24, 25, 26, 35, 36, 37, 39, 46] // Analytics and data visualization
+  'home': [0, 2, 13, 15, 21, 22, 27, 29, 30, 31, 35, 38, 39, 40, 42, 43, 44, 46, 47, 48], // Healthy foods and fresh produce
+  'nutrition': [3, 4, 5, 6, 10, 11, 12, 16, 17, 18, 22, 23, 24, 25, 26, 31, 35, 36, 37, 45], // Proteins and main dishes (including cooked meats)
+  'daily': [3, 4, 5, 6, 16, 17, 18, 19, 25, 26, 40, 41], // Daily meals and regular foods
+  'profile': [7, 8, 9, 14, 23, 24, 25, 35, 36, 37, 42, 43, 44], // Desserts, treats, and special foods
+  'tracking': [1, 13, 15, 17, 20, 21, 25, 27, 45, 48, 49], // Breakfast and healthy tracking options
+  'achievements': [0, 7, 8, 13, 14, 15, 20, 25, 27, 28, 29, 38, 39, 40, 42, 43, 44, 46, 47, 48], // Colorful fruits and celebration foods
+  'signin': [8, 15, 21, 22, 35, 36, 37, 45], // Welcoming foods
+  'calculator': [11, 14, 19, 40, 41, 49], // Cooking ingredients and prep
+  'search': [1, 2, 3, 4, 5, 6, 7, 8, 9, 13, 20, 30, 31, 34, 39], // Variety and discovery
+  'data': [7, 13, 14, 15, 16, 17, 18, 20, 21, 25, 27, 28, 29, 38, 39, 40, 42, 49] // Analytics and data visualization
 };
 
 export function useRotatingBackground(activeTab: string, navigationTrigger?: number) {
