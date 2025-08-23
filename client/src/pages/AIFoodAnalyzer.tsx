@@ -136,9 +136,28 @@ export default function AIFoodAnalyzer() {
       return response as unknown as AnalysisResult;
     },
     onSuccess: (result) => {
-      setAnalysisResult(result);
+      // Calculate total nutrition from identified foods
+      const totalNutrition = result.identifiedFoods.reduce(
+        (total, food) => ({
+          calories: total.calories + (food.calories || 0),
+          protein: total.protein + (food.protein || 0),
+          carbs: total.carbs + (food.carbs || 0),
+          fat: total.fat + (food.fat || 0),
+          fiber: total.fiber + (food.fiber || 0),
+          sugar: total.sugar + (food.sugar || 0),
+          sodium: total.sodium + (food.sodium || 0),
+        }),
+        { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0, sugar: 0, sodium: 0 }
+      );
+
+      const analysisResultWithTotals = {
+        ...result,
+        totalNutrition
+      };
+
+      setAnalysisResult(analysisResultWithTotals);
       // Save to weekly history
-      saveAnalyzedFood(result);
+      saveAnalyzedFood(analysisResultWithTotals);
       toast({
         title: "Analysis Complete!",
         description: `Identified ${result.identifiedFoods.length} food items`,
