@@ -1854,9 +1854,15 @@ input {
 
 /* Hero background stable state during transitions - no animations */
 .hero-bg-stable {
-  opacity: 1;
-  transition: none;
-  animation: none;
+  opacity: 1 !important;
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Hero background loading state - hidden until ready */
+.hero-bg-loading {
+  opacity: 0 !important;
+  transition: none !important;
 }
 
 /* Hero background fade-in during transitions - faster response */

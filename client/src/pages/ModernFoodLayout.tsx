@@ -1017,10 +1017,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         // Complete transition (fade in new page) - reduced total time
         setTimeout(() => {
           setIsTransitioning(false);
-          // Trigger background change AFTER transition completes to prevent flickering
+          // Wait longer before changing background to ensure page is fully loaded
           setTimeout(() => {
             setNavigationTrigger(prev => prev + 1);
-          }, 50);
+          }, 200);
         }, 500);
       }, 300); // Reduced fade out duration for faster response
     }
@@ -1060,12 +1060,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       }
       
       if (isLoading) {
-        return `${baseClasses} hero-bg-loading`;
+        return `${baseClasses} hero-bg-loading opacity-0`;
       }
       if (imageLoaded) {
         return `${baseClasses} hero-bg-loaded`;
       }
-      return baseClasses;
+      return `${baseClasses} opacity-0`;
     }, [isLoading, imageLoaded, isTransitioning]);
 
     return (
