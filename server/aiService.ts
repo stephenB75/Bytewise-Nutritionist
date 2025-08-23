@@ -302,44 +302,103 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
  * This integrates with the existing USDA search functionality
  */
 export async function getNutritionFromUSDA(foodName: string, grams: number = 100) {
-  // This will integrate with existing USDA search functionality
-  // For now, return a basic structure that matches the expected format
   try {
-    // Use the existing food search API endpoint
-    const response = await fetch(`${process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : ''}/api/foods/search?q=${encodeURIComponent(foodName)}&limit=1`);
+    // Import the USDA service for direct database access
+    const { usdaService } = await import('./services/usdaService.js');
     
-    if (!response.ok) {
-      throw new Error('USDA search failed');
+    // Preprocess food name for better USDA matching
+    const searchTerms = preprocessFoodNameForUSDA(foodName);
+    
+    let bestFood = null;
+    
+    // Try multiple search strategies
+    for (const searchTerm of searchTerms) {
+      console.log(`🔍 Looking up USDA data for: "${searchTerm}"`);
+      const foods = await usdaService.searchFoods(searchTerm, 3);
+      
+      if (foods && foods.length > 0) {
+        // Find the best match with complete nutrition data
+        bestFood = foods.find((food: any) => 
+          food && 
+          typeof food.calories === 'number' && 
+          food.calories > 0 &&
+          typeof food.protein === 'number' &&
+          typeof food.fat === 'number'
+        );
+        
+        if (bestFood) {
+          console.log(`✅ Found USDA data for "${searchTerm}": ${(bestFood as any).description || (bestFood as any).name}`);
+          break;
+        }
+      }
     }
     
-    const foods = await response.json();
-    
-    if (!foods || foods.length === 0) {
-      // Return estimated nutrition if no USDA match found
+    if (!bestFood) {
+      console.log(`⚠️ No USDA data found for: "${foodName}", using estimation`);
       return getEstimatedNutrition(foodName, grams);
     }
     
-    const food = foods[0];
-    
-    // Check if food object has the required nutritional data
-    if (!food || typeof food !== 'object') {
-      console.log('⚠️ Invalid food object from USDA, using estimation for:', foodName);
-      return getEstimatedNutrition(foodName, grams);
-    }
-    
-    const multiplier = grams / 100; // USDA data is typically per 100g
+    // Calculate nutrition based on grams (USDA data is per 100g)
+    const multiplier = grams / 100;
+    const food = bestFood as any;
     
     return {
       calories: Math.round((food.calories || 0) * multiplier),
       protein: Math.round((food.protein || 0) * multiplier * 10) / 10,
       carbs: Math.round((food.carbohydrates || food.carbs || 0) * multiplier * 10) / 10,
-      fat: Math.round((food.fat || 0) * multiplier * 10) / 10
+      fat: Math.round((food.fat || 0) * multiplier * 10) / 10,
+      fiber: Math.round((food.fiber || 0) * multiplier * 10) / 10,
+      sugar: Math.round((food.sugar || 0) * multiplier * 10) / 10,
+      sodium: Math.round((food.sodium || 0) * multiplier * 10) / 10
     };
     
   } catch (error) {
     console.log('⚠️ USDA lookup failed for', foodName, '- using estimation:', error);
     return getEstimatedNutrition(foodName, grams);
   }
+}
+
+/**
+ * Preprocess food names to improve USDA database matches
+ */
+function preprocessFoodNameForUSDA(foodName: string): string[] {
+  const name = foodName.toLowerCase().trim();
+  const searchTerms: string[] = [];
+  
+  // Add original name first
+  searchTerms.push(name);
+  
+  // Handle pizza specifically
+  if (name.includes('pizza')) {
+    searchTerms.push('pizza');
+    searchTerms.push('pizza, cheese');
+    if (name.includes('cheese')) {
+      searchTerms.push('pizza, cheese, regular crust');
+    }
+  }
+  
+  // Handle common composite foods
+  const compositeMap: { [key: string]: string[] } = {
+    'cheese pizza': ['pizza, cheese', 'pizza', 'cheese pizza'],
+    'tomato sauce': ['tomato sauce', 'sauce, tomato', 'marinara sauce'],
+    'chicken breast': ['chicken, breast', 'chicken breast', 'chicken'],
+    'ground beef': ['beef, ground', 'ground beef', 'beef'],
+    'french fries': ['potatoes, french fried', 'french fries', 'fries'],
+    'ice cream': ['ice cream', 'ice cream, vanilla'],
+    'apple pie': ['pie, apple', 'apple pie'],
+    'chocolate cake': ['cake, chocolate', 'chocolate cake'],
+  };
+  
+  // Check for known composite foods
+  for (const [key, alternatives] of Object.entries(compositeMap)) {
+    if (name.includes(key) || key.includes(name)) {
+      searchTerms.push(...alternatives);
+      break;
+    }
+  }
+  
+  // Remove duplicates and return
+  return Array.from(new Set(searchTerms));
 }
 
 /**
