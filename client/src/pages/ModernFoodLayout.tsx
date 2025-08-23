@@ -971,6 +971,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       // TRANSITION GUARD: Prevent simultaneous transitions
       setIsTransitioning(true);
       
+      // Hide background immediately and trigger new image loading
+      setNavigationTrigger(prev => prev + 1);
+      
       // Immediate state update for faster response
       setPreviousTab(activeTab);
       setActiveTab(newTab);
@@ -981,12 +984,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       document.documentElement.scrollTop = 0;
       document.body.scrollTop = 0;
       
-      // Complete transition quickly 
+      // Complete transition after image has time to load
       setTimeout(() => {
         setIsTransitioning(false);
-        // Trigger background change after transition
-        setNavigationTrigger(prev => prev + 1);
-      }, 150); // Much shorter transition time
+      }, 300); // Longer time to allow image preloading
     }
   };
 
