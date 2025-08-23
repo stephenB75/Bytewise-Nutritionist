@@ -1500,58 +1500,19 @@ body {
   background-color: #374151;
 }
 
-/* Loaded state for hero background - very fast fade-in */
+/* Hero background loaded state - clean, fast fade-in */
 .hero-bg-loaded {
   opacity: 1;
-  animation: heroImageFadeIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation: heroImageFadeIn 0.4s ease-out forwards;
 }
 
-/* Very fast, smooth fade-in animation for hero images */
+/* Clean hero image fade-in animation */
 @keyframes heroImageFadeIn {
   0% {
     opacity: 0;
-    transform: scale(1.01);
-    filter: blur(1px);
-  }
-  70% {
-    opacity: 0.9;
-    transform: scale(1.005);
-    filter: blur(0.2px);
   }
   100% {
     opacity: 1;
-    transform: scale(1);
-    filter: blur(0px);
-  }
-}
-
-/* Enhanced Animation Keyframes */
-@keyframes hero-fade-in {
-  0% {
-    opacity: 0;
-    transform: scale(1.05) translateZ(0);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1) translateZ(0);
-  }
-}
-
-@keyframes text-shimmer {
-  0%, 100% {
-    text-shadow: 0 0 20px rgba(251, 146, 60, 0.3);
-  }
-  50% {
-    text-shadow: 0 0 30px rgba(251, 146, 60, 0.6), 0 0 40px rgba(239, 68, 68, 0.3);
-  }
-}
-
-@keyframes button-glow {
-  0%, 100% {
-    box-shadow: 0 0 20px rgba(251, 146, 60, 0.4), 0 8px 32px rgba(0, 0, 0, 0.3);
-  }
-  50% {
-    box-shadow: 0 0 30px rgba(251, 146, 60, 0.6), 0 12px 40px rgba(0, 0, 0, 0.4);
   }
 }
 
@@ -1710,31 +1671,27 @@ html, body {
   }
 }
 
-/* Hardware accelerated animation classes */
+/* Clean animation classes */
 .animate-fadeInUp {
-  animation: appLaunchScale 1.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-  animation-fill-mode: both;
+  animation: appLaunchScale 0.8s ease-out forwards;
 }
 
 .animate-appLaunchSlide {
-  animation: appLaunchSlide 1.3s cubic-bezier(0.175, 0.885, 0.32, 1.175) forwards;
-  animation-fill-mode: both;
+  animation: appLaunchSlide 0.6s ease-out forwards;
 }
 
 .animate-appLaunchFade {
-  animation: appLaunchFade 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.075) forwards;
-  animation-fill-mode: both;
+  animation: appLaunchFade 0.4s ease-out forwards;
 }
 
 .animate-appLaunchButton {
-  animation: appLaunchButton 1.6s cubic-bezier(0.175, 0.885, 0.32, 1.375) forwards;
-  animation-fill-mode: both;
+  animation: appLaunchButton 0.5s ease-out forwards;
 }
 
-/* Page transition animations for navigation - Fade only */
+/* Clean page transitions */
 .page-transition-enter {
   opacity: 0;
-  transition: opacity 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: opacity 0.3s ease-out;
 }
 
 .page-transition-enter-active {
@@ -1826,37 +1783,6 @@ input {
   }
 }
 
-/* Non-conflicting hero photo fade for navigation transitions */
-@keyframes heroTransitionFadeIn {
-  0% {
-    opacity: 0;
-    filter: blur(2px);
-  }
-  100% {
-    opacity: 1;
-    filter: blur(0px);
-  }
-}
-
-/* Hero background image classes */
-.hero-bg-animated {
-  animation: heroImageFadeIn 0.8s ease-out forwards;
-  will-change: transform, opacity, filter;
-  backface-visibility: hidden;
-  transform-origin: center center;
-}
-
-.hero-bg-slide {
-  animation: heroImageSlideIn 0.6s ease-out forwards;
-  will-change: transform, opacity;
-  backface-visibility: hidden;
-}
-
-/* Hero background loaded state with faster fade-in */
-.hero-bg-loaded {
-  opacity: 1;
-  animation: heroImageFadeIn 0.4s ease-out forwards;
-}
 
 /* Hero background hidden state - completely invisible */
 .hero-bg-hidden {
@@ -1888,23 +1814,6 @@ input {
   backdrop-filter: blur(10px) !important;
 }
 
-/* Navigation icon click animation - isolated from hero animations */
-.nav-icon-clicked {
-  animation: navIconPulse 0.3s ease-out;
-  transform-origin: center;
-}
-
-@keyframes navIconPulse {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.15);
-  }
-  100% {
-    transform: scale(1.1);
-  }
-}
 
 input:focus {
   background-color: #ffffff !important;
