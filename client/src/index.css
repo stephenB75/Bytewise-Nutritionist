@@ -1871,7 +1871,7 @@ input {
   z-index: 0 !important;
 }
 
-/* Ensure navigation stays on top */
+/* Ensure navigation stays on top with optimized animations */
 .bottom-navigation {
   position: fixed !important;
   bottom: 0 !important;
@@ -1880,6 +1880,24 @@ input {
   z-index: 50 !important;
   background: rgba(0, 0, 0, 0.9) !important;
   backdrop-filter: blur(10px) !important;
+}
+
+/* Navigation icon click animation - isolated from hero animations */
+.nav-icon-clicked {
+  animation: navIconPulse 0.3s ease-out;
+  transform-origin: center;
+}
+
+@keyframes navIconPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1.1);
+  }
 }
 
 input:focus {
