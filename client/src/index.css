@@ -1671,54 +1671,7 @@ html, body {
   }
 }
 
-/* Clean animation classes */
-.animate-fadeInUp {
-  animation: appLaunchScale 0.8s ease-out forwards;
-}
-
-.animate-appLaunchSlide {
-  animation: appLaunchSlide 0.6s ease-out forwards;
-}
-
-.animate-appLaunchFade {
-  animation: appLaunchFade 0.4s ease-out forwards;
-}
-
-.animate-appLaunchButton {
-  animation: appLaunchButton 0.5s ease-out forwards;
-}
-
-/* Clean page transitions */
-.page-transition-enter {
-  opacity: 0;
-  transition: opacity 0.3s ease-out;
-}
-
-.page-transition-enter-active {
-  opacity: 1;
-}
-
-.page-transition-exit {
-  opacity: 1;
-  transition: opacity 0.4s cubic-bezier(0.55, 0.085, 0.68, 0.53);
-}
-
-.page-transition-exit-active {
-  opacity: 0;
-}
-
-/* Smooth page content transitions - Fade only */
-.page-content {
-  transition: opacity 0.8s ease-in-out;
-}
-
-.page-content-entering {
-  opacity: 0;
-}
-
-.page-content-entered {
-  opacity: 1;
-}
+/* Removed unused animation classes - hero animations are now inline */
 
 input[type="text"]::placeholder, 
 input[type="email"]::placeholder, 

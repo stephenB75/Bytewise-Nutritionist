@@ -994,8 +994,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     // Determine if current page is dashboard
     const isDashboard = activeTab === 'home';
     
-    // Enable animations always - no page transitions
-    const animationsEnabled = true;
+    // Animations are now directly in the components - no conditional logic needed
     
     // Memoize the background style optimized for mobile food composition
     const backgroundStyle = React.useMemo(() => ({
@@ -1033,41 +1032,41 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         {/* Content Layer with Enhanced Typography */}
         <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-6 z-20 text-white">
           <div className="space-y-8 max-w-2xl">
-            {/* Enhanced Title Section */}
+            {/* Clean Title Section */}
             <div className="space-y-3 hero-optimized">
-              <h1 className={`text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] drop-shadow-2xl font-league-spartan text-optimized ${animationsEnabled ? 'animate-fadeInUp [animation-delay:4.8s]' : 'opacity-100'}`}>
+              <h1 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] drop-shadow-2xl font-league-spartan text-optimized opacity-100">
                 {title}
               </h1>
-              <h2 className={`text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] font-league-spartan text-optimized ${animationsEnabled ? 'animate-appLaunchSlide [animation-delay:5.3s]' : 'opacity-100'}`}>
+              <h2 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] font-league-spartan text-optimized opacity-100">
                 {subtitle}
               </h2>
             </div>
             
-            {/* Enhanced Description */}
-            <p className={`text-2xl md:text-3xl font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl font-work-sans text-gray-100 ${animationsEnabled ? 'animate-appLaunchFade [animation-delay:5.8s]' : 'opacity-100'}`}>
+            {/* Clean Description */}
+            <p className="text-2xl md:text-3xl font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl font-work-sans text-gray-100 opacity-100">
               {description}
             </p>
             
-            {/* Enhanced Call-to-Action */}
-            <div className={`pt-8 ${animationsEnabled ? 'animate-appLaunchButton [animation-delay:6.3s]' : 'opacity-100'}`}>
+            {/* Clean Call-to-Action */}
+            <div className="pt-8 opacity-100">
               <Button 
                 onClick={onButtonClick}
                 size="lg"
-                className="group relative bg-gradient-to-r from-orange-400 to-red-400 hover:from-orange-500 hover:to-red-500 font-bold px-16 py-6 rounded-full text-xl md:text-2xl shadow-2xl transition-all duration-200 ease-out overflow-hidden btn-hero-enhanced transform hover:scale-105"
+                className="group relative bg-gradient-to-r from-orange-400 to-red-400 hover:from-orange-500 hover:to-red-500 font-bold px-16 py-6 rounded-full text-xl md:text-2xl shadow-2xl transition-all duration-200 ease-out overflow-hidden transform hover:scale-105"
                 style={{ color: '#ffffff !important' }}
               >
                 <span className="relative z-10 flex items-center gap-3" style={{ color: '#ffffff !important' }}>
                   {buttonText}
-                  <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
+                  <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-150" />
                 </span>
               </Button>
             </div>
           </div>
         </div>
         
-        {/* Enhanced Scroll Indicator */}
-        <div className={`absolute bottom-8 left-1/2 -translate-x-1/2 z-30 text-white ${animationsEnabled ? 'animate-appLaunchFade [animation-delay:6.8s]' : 'opacity-100'}`}>
-          <div className="flex flex-col items-center gap-2 animate-bounce">
+        {/* Clean Scroll Indicator */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 text-white opacity-100">
+          <div className="flex flex-col items-center gap-2">
             <div className="w-px h-8 bg-gradient-to-b from-transparent to-white opacity-70" />
             <ChevronRight className="w-6 h-6 rotate-90 drop-shadow-lg opacity-80" />
           </div>
@@ -1086,12 +1085,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   // Optimized ByteWise Logo Component
   const BytewiseLogo = React.memo(() => (
-    <div className="mb-8 cursor-pointer group transition-all duration-300 hover:scale-105" onClick={() => handleTabChange('home')}>
+    <div className="mb-8 cursor-pointer group transition-transform duration-200 hover:scale-105" onClick={() => handleTabChange('home')}>
       <div className="text-center font-league-spartan">
-        <div className="text-8xl font-black leading-none text-sky-300 mb-2 lowercase tracking-tight drop-shadow-2xl group-hover:text-sky-200 transition-colors duration-300">
+        <div className="text-8xl font-black leading-none text-sky-300 mb-2 lowercase tracking-tight drop-shadow-2xl group-hover:text-sky-200 transition-colors duration-200">
           bytewise
         </div>
-        <div className="text-2xl font-light text-white/80 uppercase tracking-widest drop-shadow-lg group-hover:text-white/90 transition-colors duration-300">
+        <div className="text-2xl font-light text-white/80 uppercase tracking-widest drop-shadow-lg group-hover:text-white/90 transition-colors duration-200">
           nutritionist
         </div>
       </div>
@@ -3147,14 +3146,14 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               >
                 <IconComponent 
                   size={20} 
-                  className={`mb-1.5 transition-transform duration-200 ease-out ${
+                  className={`mb-1.5 transition-transform duration-150 ease-out ${
                     activeTab === tab.id 
                       ? 'scale-110 drop-shadow-lg text-yellow-600' 
                       : 'scale-100 hover:scale-105 hover:text-white'
                   }`}
                   strokeWidth={activeTab === tab.id ? 2.5 : 2}
                 />
-                <span className={`text-[8px] font-semibold leading-tight text-center w-full transition-colors duration-200 ease-out ${
+                <span className={`text-[8px] font-semibold leading-tight text-center w-full transition-colors duration-150 ease-out ${
                   activeTab === tab.id 
                     ? 'text-white drop-shadow-md' 
                     : 'text-gray-600 hover:text-white active:text-gray-900'
