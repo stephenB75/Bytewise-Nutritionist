@@ -215,10 +215,32 @@ button.bg-blue-800:hover:not([data-testid*="nav-"]):not([class*="nav-"]) {
 /* Fix any remaining dark backgrounds in UI components */
 .bg-slate-700,
 .bg-slate-600,
+.bg-slate-800,
+.bg-slate-900,
 .hover\:bg-slate-800:hover,
 .hover\:bg-slate-900:hover {
   background-color: #6b7280 !important; /* Gray-500 for lighter appearance */
   color: #ffffff !important;
+}
+
+/* Aggressive dark background overrides for stubborn components */
+[class*="bg-gray-900"],
+[class*="bg-black"],
+[class*="bg-slate-9"],
+[class*="bg-gray-9"] {
+  background-color: #ffffff !important; /* White background for dialogs and overlays */
+  color: #111827 !important; /* Dark text for readability */
+  border: 1px solid #d1d5db !important; /* Light gray border */
+}
+
+/* Error modal and development overlay fixes */
+[data-runtime-error],
+.runtime-error-modal,
+[class*="error-modal"],
+[class*="error-overlay"] {
+  background-color: #fff8dc !important; /* Light cream background */
+  color: #8b4513 !important; /* Brown text for errors */
+  border: 2px solid #daa520 !important; /* Gold border */
 }
 
 /* Dialog and Modal Background Fixes for Yellow Theme */

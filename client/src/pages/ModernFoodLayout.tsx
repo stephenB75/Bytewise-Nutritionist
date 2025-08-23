@@ -1020,7 +1020,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     }, [imageLoaded, isLoading]);
 
     return (
-      <div className="relative h-screen overflow-hidden hero-component bg-slate-900" data-hero="true">
+      <div className="relative h-screen overflow-hidden hero-component bg-gradient-to-br from-amber-50 to-amber-100" data-hero="true">
         {/* Optimized Background Layer with preloading and smooth transitions */}
         <div 
           className={backgroundClasses}
@@ -3173,7 +3173,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
             {/* Content Section - Completely Separate and Underneath */}
             <div className="px-6 py-3 content-section">
-              <div className="bg-gray-900/80 backdrop-blur-md rounded-3xl border border-gray-700">
+              <div className="bg-white/90 backdrop-blur-md rounded-3xl border border-amber-200 shadow-lg">
                 <DataManagementPanel />
               </div>
             </div>
