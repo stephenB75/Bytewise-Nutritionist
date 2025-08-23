@@ -1155,9 +1155,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <div className="text-xs text-gray-900 font-normal">of goal</div>
           </div>
         </div>
-        <div className="relative h-3 bg-amber-200 rounded-full overflow-hidden mb-4 shadow-inner">
+        <div className="relative h-3 bg-gray-300/60 rounded-full overflow-hidden mb-4 shadow-inner border border-gray-400/20">
           <div 
-            className={`absolute left-0 top-0 h-full bg-gradient-to-r from-${color}-500 to-${color === 'orange' ? 'red' : 'cyan'}-600 rounded-full transition-all duration-1000 shadow-sm`}
+            className={`absolute left-0 top-0 h-full bg-gradient-to-r from-${color}-600 to-${color === 'orange' ? 'red' : 'cyan'}-700 rounded-full transition-all duration-1000 shadow-sm`}
             style={{ width: `${progressWidth}%` }}
           />
           {isComplete && (
@@ -1197,9 +1197,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         </div>
         
         {/* Progress bar */}
-        <div className="relative h-3 bg-amber-200 rounded-full overflow-hidden mb-4 shadow-inner">
+        <div className="relative h-3 bg-gray-300/60 rounded-full overflow-hidden mb-4 shadow-inner border border-gray-400/20">
           <div 
-            className="absolute left-0 top-0 h-full bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full transition-all duration-1000 shadow-sm"
+            className="absolute left-0 top-0 h-full bg-gradient-to-r from-cyan-600 to-blue-700 rounded-full transition-all duration-1000 shadow-sm"
             style={{ width: `${percentage}%` }}
           />
           {percentage >= 100 && (
@@ -1336,7 +1336,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         <div className={`text-sm font-medium ${textColor}`}>{name}</div>
         <div className="text-xs text-gray-900 font-normal">{displayValue}{unit} / {goal}{unit}</div>
       </div>
-      <div className="relative h-2 bg-amber-200 rounded-full overflow-hidden shadow-inner">
+      <div className="relative h-2 bg-gray-300/60 rounded-full overflow-hidden shadow-inner border border-gray-400/20">
         <div 
           className={`absolute left-0 top-0 h-full bg-gradient-to-r from-${gradientColors} rounded-full transition-all duration-1000 shadow-sm`} 
           style={{ width: `${percentage}%` }} 
