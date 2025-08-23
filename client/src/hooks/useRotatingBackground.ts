@@ -119,29 +119,40 @@ export function useRotatingBackground(activeTab: string) {
     // Preload the new image
     preloadImage(newImageSrc)
       .then(() => {
-        // Image is ready, update background
-        setCurrentImageIndex(randomPageImage);
-        setBackgroundImage(newImageSrc);
-        setAnimationKey(prev => prev + 1);
-        setImageLoaded(true);
-        setIsLoading(false);
+        // Small delay to ensure smooth transition
+        setTimeout(() => {
+          // Image is ready, update background
+          setCurrentImageIndex(randomPageImage);
+          setBackgroundImage(newImageSrc);
+          setAnimationKey(prev => prev + 1);
+          setIsLoading(false);
+          // Trigger fade-in after background is set
+          setTimeout(() => {
+            setImageLoaded(true);
+          }, 50);
+        }, 100);
       })
       .catch(() => {
         // If image fails to load, still update but with loading state
-        setCurrentImageIndex(randomPageImage);
-        setBackgroundImage(newImageSrc);
-        setAnimationKey(prev => prev + 1);
-        setIsLoading(false);
-        setImageLoaded(false);
+        setTimeout(() => {
+          setCurrentImageIndex(randomPageImage);
+          setBackgroundImage(newImageSrc);
+          setAnimationKey(prev => prev + 1);
+          setIsLoading(false);
+          setImageLoaded(false);
+        }, 100);
       });
   }, [activeTab]); // Remove currentImageIndex dependency to avoid infinite loops
   
-  // Preload initial image on mount
+  // Preload initial image on mount with smooth fade-in
   useEffect(() => {
     preloadImage(foodImages[0])
       .then(() => {
-        setImageLoaded(true);
         setIsLoading(false);
+        // Delay to allow for smooth initial fade-in
+        setTimeout(() => {
+          setImageLoaded(true);
+        }, 300);
       })
       .catch(() => {
         setIsLoading(false);
