@@ -53,6 +53,34 @@ The application includes an enhanced fasting timer with detailed progress tracki
 
 ## Recent Changes (August 2025)
 
+### BETA Version 1.1.0 Release - August 23, 2025
+**Status**: ✅ **COMPLETED** - Enhanced AI Photo Analysis with Automatic Food Logging
+
+**Major Features Added:**
+- ✅ **Automatic Food Logging**: AI analyzed foods now automatically log to daily tracker
+- ✅ **Enhanced Upload Interface**: Redesigned with clear visual indicators for click and drag & drop
+- ✅ **Seamless Integration**: Direct connection between AI photo analysis and daily calorie tracking
+- ✅ **Improved User Experience**: No manual "Add to Tracker" button - fully automated workflow
+- ✅ **Visual Upload Instructions**: Added emoji-based guidance showing both upload methods
+
+**Technical Improvements:**
+- ✅ Removed manual tracker button in favor of automatic logging
+- ✅ Enhanced Uppy modal messages with emojis and clearer language
+- ✅ Streamlined workflow from photo analysis to daily log entry
+- ✅ Cleaned up debugging console logs for production readiness
+- ✅ Optimized user interface with gradient upload button and scaling animations
+
+**User Experience Enhancements:**
+- ✅ Automatic toast notifications confirming successful food logging
+- ✅ Green checkmark indicator showing foods were automatically added
+- ✅ Immediate visibility in "Logged Today" and weekly summary sections
+- ✅ Clear file format and size information in upload interface
+- ✅ Consistent amber/yellow theme throughout upload components
+
+**Result**: Complete integration between AI photo analysis and daily food tracking, providing a seamless experience from photo upload to nutrition logging without manual intervention.
+
+## Previous Changes
+
 ### Notification System UI Polish - August 22, 2025
 **Status**: ✅ **COMPLETED** - Final notification icon and dialog theming
 
