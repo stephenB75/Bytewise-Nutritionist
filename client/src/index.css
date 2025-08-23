@@ -243,6 +243,51 @@ button.bg-blue-800:hover:not([data-testid*="nav-"]):not([class*="nav-"]) {
   border: 2px solid #daa520 !important; /* Gold border */
 }
 
+/* Fix white text on buttons that are hard to read on yellow background */
+button.text-orange-400,
+button.text-orange-300,
+[data-testid*="button"] button,
+.text-orange-400:hover,
+.hover\:text-orange-300:hover {
+  color: #ea580c !important; /* Orange-600 for better visibility on yellow */
+}
+
+/* Fix outline button text colors in dialogs and modals */
+button[class*="variant-outline"],
+.variant-outline,
+button.border,
+[data-radix-dialog-content] button:not([class*="bg-gradient"]):not([class*="bg-amber"]):not([class*="bg-orange"]) {
+  color: #374151 !important; /* Gray-700 for dark text */
+  background-color: #ffffff !important; /* White background */
+  border-color: #d1d5db !important; /* Light gray border */
+}
+
+/* Fix outline button hover states */
+button[class*="variant-outline"]:hover,
+.variant-outline:hover,
+button.border:hover,
+[data-radix-dialog-content] button:not([class*="bg-gradient"]):not([class*="bg-amber"]):not([class*="bg-orange"]):hover {
+  color: #111827 !important; /* Darker gray on hover */
+  background-color: #f9fafb !important; /* Very light gray background on hover */
+}
+
+/* Specific fixes for track food button and any ghost variant buttons */
+.bg-transparent,
+button[class*="variant-ghost"],
+.variant-ghost,
+button.bg-transparent {
+  color: #ea580c !important; /* Orange-600 for visibility on yellow background */
+  background-color: transparent !important;
+}
+
+.bg-transparent:hover,
+button[class*="variant-ghost"]:hover,
+.variant-ghost:hover,
+button.bg-transparent:hover {
+  color: #dc2626 !important; /* Red-600 for hover state */
+  background-color: rgba(234, 88, 12, 0.1) !important; /* Light orange background on hover */
+}
+
 /* Dialog and Modal Background Fixes for Yellow Theme */
 [data-radix-dialog-content],
 .dialog-content,
