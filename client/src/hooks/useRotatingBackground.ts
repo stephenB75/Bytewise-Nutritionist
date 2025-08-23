@@ -100,6 +100,11 @@ export function useRotatingBackground(activeTab: string, navigationTrigger?: num
     // Skip if no navigation trigger (initial load or programmatic changes)
     if (!navigationTrigger) return;
     
+    // IMMEDIATELY hide background on navigation - no delay
+    setImageLoaded(false);
+    setIsLoading(true);
+    setPendingImageReady(false);
+    
     const pageImages = pageImageMap[activeTab] || [0, 1, 2];
     
     // Ensure we get a different image by filtering out current one
@@ -115,10 +120,6 @@ export function useRotatingBackground(activeTab: string, navigationTrigger?: num
     
     const randomPageImage = availableImages[Math.floor(Math.random() * availableImages.length)];
     const newImageSrc = foodImages[randomPageImage];
-    
-    // Set loading state
-    setIsLoading(true);
-    setImageLoaded(false);
     
     // Preload the new image
     preloadImage(newImageSrc)

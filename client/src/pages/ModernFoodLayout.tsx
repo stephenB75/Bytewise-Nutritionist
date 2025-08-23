@@ -971,13 +971,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       // TRANSITION GUARD: Prevent simultaneous transitions
       setIsTransitioning(true);
       
-      // Hide background immediately and trigger new image loading
-      setNavigationTrigger(prev => prev + 1);
-      
       // Immediate state update for faster response
       setPreviousTab(activeTab);
       setActiveTab(newTab);
       setOpenCard(undefined);
+      
+      // Hide background immediately and trigger new image loading
+      setNavigationTrigger(prev => prev + 1);
       
       // Force scroll to top immediately
       window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
@@ -987,7 +987,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       // Complete transition after image has time to load
       setTimeout(() => {
         setIsTransitioning(false);
-      }, 300); // Longer time to allow image preloading
+      }, 400); // Longer time to ensure image is fully loaded
     }
   };
 
@@ -1015,15 +1015,16 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       backgroundAttachment: 'scroll', // Better mobile performance
     }), [backgroundImage]);
     
-    // Background classes with proper overlay coordination
+    // Background classes with strict visibility control
     const backgroundClasses = React.useMemo(() => {
       const baseClasses = 'absolute inset-0 z-10 hero-bg-optimized';
       
-      if (imageLoaded && !isTransitioning) {
+      // Only show if image is loaded AND no transition is happening AND not loading
+      if (imageLoaded && !isTransitioning && !isLoading) {
         return `${baseClasses} hero-bg-loaded`;
       }
       return `${baseClasses} hero-bg-hidden`;
-    }, [imageLoaded, isTransitioning]);
+    }, [imageLoaded, isTransitioning, isLoading]);
 
     return (
       <div className="relative h-screen overflow-hidden hero-component" data-hero="true">
