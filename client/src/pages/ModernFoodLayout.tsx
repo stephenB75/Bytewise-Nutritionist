@@ -1014,15 +1014,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       backgroundAttachment: 'scroll', // Better mobile performance
     }), [backgroundImage]);
     
-    // Simplified background classes - background image is now stable during transitions
+    // Background classes with proper overlay coordination
     const backgroundClasses = React.useMemo(() => {
       const baseClasses = 'absolute inset-0 z-10 hero-bg-optimized';
       
-      if (imageLoaded) {
+      if (imageLoaded && !isTransitioning) {
         return `${baseClasses} hero-bg-loaded`;
       }
-      return `${baseClasses} opacity-0`;
-    }, [imageLoaded]);
+      return `${baseClasses} hero-bg-hidden`;
+    }, [imageLoaded, isTransitioning]);
 
     return (
       <div className="relative h-screen overflow-hidden hero-component" data-hero="true">
@@ -1032,8 +1032,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           style={backgroundStyle}
         />
         
-        {/* CSS-controlled Overlay for consistent opacity */}
-        <div className="hero-gradient-overlay" style={{ zIndex: 11 }} />
+        {/* CSS-controlled Overlay for consistent opacity - always visible */}
+        <div className="hero-gradient-overlay opacity-100" style={{ zIndex: 11 }} />
         
         
         {/* Content Layer with Enhanced Typography */}

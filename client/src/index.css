@@ -1855,7 +1855,13 @@ input {
 /* Hero background loaded state with smooth fade-in */
 .hero-bg-loaded {
   opacity: 1;
-  animation: heroImageFadeIn 0.5s ease-out forwards;
+  animation: heroImageFadeIn 0.8s ease-out forwards;
+}
+
+/* Hero background hidden state - completely invisible */
+.hero-bg-hidden {
+  opacity: 0 !important;
+  visibility: hidden !important;
 }
 
 
