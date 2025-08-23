@@ -131,11 +131,69 @@ html,
   background-attachment: fixed;
 }
 
+/* Button color overrides for yellow background compatibility */
+button.bg-gray-800,
+button.bg-gray-900,
+button.bg-black:not(.bg-black\/80):not(.bg-black\/50),
+.bg-gray-800.hover\:bg-gray-900:hover,
+.bg-gray-900.hover\:bg-gray-800:hover {
+  background-color: #f59e0b !important; /* Amber-500 for good contrast */
+  color: #ffffff !important;
+}
+
+button.bg-gray-800:hover,
+button.bg-gray-900:hover,
+button.bg-black:hover:not(.bg-black\/80):not(.bg-black\/50) {
+  background-color: #d97706 !important; /* Amber-600 for hover state */
+  color: #ffffff !important;
+}
+
+/* Dark blue button overrides */
+button.bg-blue-900,
+button.bg-blue-800,
+.bg-blue-900,
+.bg-blue-800 {
+  background-color: #3b82f6 !important; /* Blue-500 instead of very dark blue */
+  color: #ffffff !important;
+}
+
+button.bg-blue-900:hover,
+button.bg-blue-800:hover {
+  background-color: #2563eb !important; /* Blue-600 for hover */
+  color: #ffffff !important;
+}
+
 /* Content sections inherit the natural yellow gradient background */
 
 /* Text color optimization for yellow/amber background */
 .text-white:not([data-testid*="nav-"] *):not([data-testid*="notification"] *):not(.btn-hero-enhanced *):not(.hero-component *):not([data-hero="true"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *):not(.weekly-calories-card-wrapper *) { 
   color: #111827; /* Dark for yellow background readability */
+}
+
+/* Button text color overrides for dark text on yellow background */
+button.text-black,
+button.text-gray-900,
+.text-black:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="card"] *),
+.text-gray-900:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="card"] *) {
+  color: #374151 !important; /* Medium gray for better readability on yellow */
+}
+
+/* Dark blue text overrides */
+button.text-blue-900,
+.text-blue-900 {
+  color: #1d4ed8 !important; /* Blue-700 instead of very dark blue */
+}
+
+/* Ensure button contrast on yellow background */
+button:not([class*="bg-"]):not(.hero-component *):not([data-hero="true"] *):not(.btn-hero-enhanced) {
+  background-color: #f3f4f6; /* Light gray background */
+  color: #374151; /* Dark gray text */
+  border: 1px solid #d1d5db; /* Light border */
+}
+
+button:not([class*="bg-"]):hover:not(.hero-component *):not([data-hero="true"] *):not(.btn-hero-enhanced) {
+  background-color: #e5e7eb; /* Slightly darker gray on hover */
+  color: #1f2937; /* Darker text on hover */
 }
 /* Light text colors optimized for yellow background - preserve hero components */
 .text-gray-100:not(.hero-component *):not([data-hero="true"] *) { color: #1f2937; }
@@ -457,6 +515,23 @@ button.btn-hero-enhanced span,
 /* Dashboard button colors optimized for yellow background */
 [data-page="dashboard"] button:not(.bg-gradient-to-r):not([data-testid*="nav-"]):not(.hero-component *):not([data-hero="true"] *):not(.btn-hero-enhanced):not(.tour-button-override) {
   color: #111827;
+}
+
+/* Fasting tracker button color fixes */
+[data-testid*="fasting"] button.bg-gray-800,
+[data-testid*="fasting"] button.bg-gray-900,
+button[class*="bg-gray-800"],
+button[class*="bg-gray-900"] {
+  background-color: #10b981 !important; /* Emerald-500 for fasting buttons */
+  color: #ffffff !important;
+}
+
+[data-testid*="fasting"] button.bg-gray-800:hover,
+[data-testid*="fasting"] button.bg-gray-900:hover,
+button[class*="bg-gray-800"]:hover,
+button[class*="bg-gray-900"]:hover {
+  background-color: #059669 !important; /* Emerald-600 for hover */
+  color: #ffffff !important;
 }
 
 /* Hero buttons maintain white text for dark overlays */
