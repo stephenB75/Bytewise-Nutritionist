@@ -823,10 +823,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     // Load existing data immediately
     loadExistingData();
     
-    // Update fasting status every minute
+    // Update fasting status every 2 minutes to reduce conflicts with FastingTracker
     const fastingInterval = setInterval(() => {
       checkFastingStatus();
-    }, 60000); // Check every minute
+    }, 120000); // Check every 2 minutes
 
     // Set up event listeners for future meal logging
     const handleMealLogged = (event?: any) => {
@@ -3010,7 +3010,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       case 'daily':
         return renderDailyWeekly();
       case 'fasting':
-        return (
+        return React.useMemo(() => (
           <div className="space-y-0">
             <HeroSection
               title="Intermittent"
@@ -3032,7 +3032,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               </div>
             </div>
           </div>
-        );
+        ), []);
       case 'profile':
         return renderProfile();
       case 'calculator':

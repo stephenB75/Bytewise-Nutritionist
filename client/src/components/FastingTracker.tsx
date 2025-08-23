@@ -3,7 +3,7 @@
  * Features: Popular fasting schedules, timer tracking, meal windows, and suggestions
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -121,7 +121,7 @@ const FASTING_MILESTONES_KEY = 'bytewise_fasting_milestones';
 // Fasting milestone hours (in hours)
 const MILESTONE_HOURS = [8, 12, 16, 18, 20, 24, 36, 48, 72];
 
-export function FastingTracker() {
+const FastingTracker = React.memo(function FastingTracker() {
   const [selectedPlan, setSelectedPlan] = useState<FastingPlan>(FASTING_PLANS[0]);
   const [currentSession, setCurrentSession] = useState<FastingSession | null>(null);
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
@@ -566,8 +566,10 @@ export function FastingTracker() {
         const elapsed = now - startTime;
         const remaining = currentSession.targetDuration - elapsed;
         
-        // Check for milestone achievements
-        checkMilestones(elapsed, completedMilestones);
+        // Only check milestones every 30 seconds to reduce performance impact
+        if (Math.floor(elapsed / 1000) % 30 === 0) {
+          checkMilestones(elapsed, completedMilestones);
+        }
         
         if (remaining <= 0) {
           // Fast complete - celebrate the final achievement
@@ -1086,4 +1088,7 @@ export function FastingTracker() {
       </Tabs>
     </div>
   );
-}
+});
+
+export { FastingTracker };
+export default FastingTracker;
