@@ -76,12 +76,14 @@ const pageImageMap: Record<string, number[]> = {
   'data': [7, 13, 14, 15, 16, 17, 18, 20, 21, 25, 27, 28, 29, 38, 39, 40, 42, 49] // Analytics and data visualization
 };
 
-export function useRotatingBackground(activeTab: string, navigationTrigger?: number) {
+export function useRotatingBackground(activeTab: string, navigationTrigger?: number, isTransitioning?: boolean) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [backgroundImage, setBackgroundImage] = useState(foodImages[0]);
+  const [nextBackgroundImage, setNextBackgroundImage] = useState(foodImages[0]);
   const [animationKey, setAnimationKey] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [pendingImageReady, setPendingImageReady] = useState(false);
   
   // Preload image function
   const preloadImage = (src: string): Promise<void> => {
@@ -121,23 +123,30 @@ export function useRotatingBackground(activeTab: string, navigationTrigger?: num
     // Preload the new image
     preloadImage(newImageSrc)
       .then(() => {
-        // Update background image only after preloading is complete
+        // Store the new image as pending but don't activate it yet
         setCurrentImageIndex(randomPageImage);
-        setBackgroundImage(newImageSrc);
-        setAnimationKey(prev => prev + 1);
+        setNextBackgroundImage(newImageSrc);
         setIsLoading(false);
-        // Immediate fade-in since image is already loaded
-        setImageLoaded(true);
+        setPendingImageReady(true);
       })
       .catch(() => {
-        // If image fails to load, still update immediately
+        // If image fails to load, still update pending image
         setCurrentImageIndex(randomPageImage);
-        setBackgroundImage(newImageSrc);
-        setAnimationKey(prev => prev + 1);
+        setNextBackgroundImage(newImageSrc);
         setIsLoading(false);
-        setImageLoaded(false);
+        setPendingImageReady(true);
       });
   }, [navigationTrigger, activeTab]); // Only trigger on navigation events
+  
+  // Switch to pending image when transition is complete
+  useEffect(() => {
+    if (!isTransitioning && pendingImageReady) {
+      setBackgroundImage(nextBackgroundImage);
+      setAnimationKey(prev => prev + 1);
+      setImageLoaded(true);
+      setPendingImageReady(false);
+    }
+  }, [isTransitioning, pendingImageReady, nextBackgroundImage]);
   
   // Preload initial image on mount with smooth fade-in
   useEffect(() => {

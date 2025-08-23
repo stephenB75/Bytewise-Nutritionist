@@ -104,12 +104,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const [previousTab, setPreviousTab] = useState('home');
   const [openCard, setOpenCard] = useState<string | undefined>(undefined);
   const [navigationTrigger, setNavigationTrigger] = useState(0);
-  const { backgroundImage, animationKey, isLoading, imageLoaded } = useRotatingBackground(activeTab, navigationTrigger);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const { backgroundImage, animationKey, isLoading, imageLoaded } = useRotatingBackground(activeTab, navigationTrigger, isTransitioning);
   const { data: achievements = [], isLoading: achievementsLoading } = useAchievements();
   const [searchQuery, setSearchQuery] = useState('');
   const [showAchievement, setShowAchievement] = useState(false);
   const [currentAchievement, setCurrentAchievement] = useState<Achievement | null>(null);
-  const [isTransitioning, setIsTransitioning] = useState(false);
   const [showConfettiCelebration, setShowConfettiCelebration] = useState(false);
   const [confettiAchievement, setConfettiAchievement] = useState<Achievement | null>(null);
   const [dailyCalories, setDailyCalories] = useState(0);
@@ -1050,23 +1050,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       backgroundAttachment: 'scroll', // Better mobile performance
     }), [backgroundImage]);
     
-    // Dynamic CSS classes based on loading state - prevent changes during transitions
+    // Simplified background classes - background image is now stable during transitions
     const backgroundClasses = React.useMemo(() => {
       const baseClasses = 'absolute inset-0 z-10 hero-bg-optimized';
       
-      // During transitions, maintain current state to prevent flickering
-      if (isTransitioning) {
-        return `${baseClasses} hero-bg-stable`;
-      }
-      
-      if (isLoading) {
-        return `${baseClasses} hero-bg-loading opacity-0`;
-      }
       if (imageLoaded) {
         return `${baseClasses} hero-bg-loaded`;
       }
       return `${baseClasses} opacity-0`;
-    }, [isLoading, imageLoaded, isTransitioning]);
+    }, [imageLoaded]);
 
     return (
       <div className="relative h-screen overflow-hidden hero-component" data-hero="true">
