@@ -1873,7 +1873,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     try {
       const waterHistory = await storage.getUserWaterIntakeHistory(userId, days);
-      console.log('💧 Water history retrieved:', waterHistory.length, 'records');
       
       res.json({
         success: true,

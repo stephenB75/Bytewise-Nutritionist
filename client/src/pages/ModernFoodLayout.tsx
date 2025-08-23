@@ -1161,7 +1161,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       if (isLoadingHistory) return;
       
       setIsLoadingHistory(true);
-      console.log('🔍 Fetching water history...');
       
       try {
         const response = await fetch('/api/water-history?days=30', {
@@ -1171,21 +1170,14 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           },
         });
         
-        console.log('📊 Water history response status:', response.status);
-        
         if (response.ok) {
           const result = await response.json();
-          console.log('📊 Water history result:', result);
-          
           const formattedHistory = result.data.map((item: any) => ({
             date: new Date(item.date).toISOString().split('T')[0],
             glasses: item.glasses
           }));
-          
-          console.log('📊 Formatted water history:', formattedHistory);
           setWaterHistory(formattedHistory);
         } else {
-          console.error('❌ Water history API error:', response.status, await response.text());
           // If no data available, generate some sample data for demonstration
           const sampleHistory = Array.from({ length: 30 }, (_, i) => {
             const date = new Date();
@@ -1198,7 +1190,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           setWaterHistory(sampleHistory);
         }
       } catch (error) {
-        console.error('❌ Failed to fetch water history:', error);
+        console.error('Failed to fetch water history:', error);
         // If error, generate some sample data for demonstration
         const sampleHistory = Array.from({ length: 30 }, (_, i) => {
           const date = new Date();
@@ -1296,44 +1288,16 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
         {/* Weekly History Toggle */}
         <div className="mt-4 pt-4 border-t border-gray-400/20">
-          <div className="flex gap-2 mb-2">
-            <Button
-              onClick={() => setShowHistory(!showHistory)}
-              variant="ghost"
-              size="sm"
-              className="flex-1 text-gray-700 hover:text-cyan-600 hover:bg-cyan-500/10 font-medium"
-              data-testid="button-toggle-water-history"
-            >
-              {showHistory ? 'Hide' : 'Show'} 30-Day Log
-              {showHistory ? <ChevronUp className="w-4 h-4 ml-2" /> : <ChevronDown className="w-4 h-4 ml-2" />}
-            </Button>
-            <Button
-              onClick={async () => {
-                try {
-                  const response = await fetch('/api/water-history/seed', {
-                    method: 'POST',
-                    headers: {
-                      'Authorization': `Bearer ${localStorage.getItem('supabase_auth_token')}`,
-                      'Content-Type': 'application/json',
-                    },
-                  });
-                  if (response.ok) {
-                    console.log('✅ Water history seeded successfully');
-                    // Refresh the history data
-                    setWaterHistory([]);
-                    fetchWaterHistory();
-                  }
-                } catch (error) {
-                  console.error('❌ Failed to seed water history:', error);
-                }
-              }}
-              variant="outline"
-              size="sm"
-              className="text-xs px-2 text-cyan-700 border-cyan-300 hover:bg-cyan-50"
-            >
-              Seed
-            </Button>
-          </div>
+          <Button
+            onClick={() => setShowHistory(!showHistory)}
+            variant="ghost"
+            size="sm"
+            className="w-full text-gray-700 hover:text-cyan-600 hover:bg-cyan-500/10 font-medium"
+            data-testid="button-toggle-water-history"
+          >
+            {showHistory ? 'Hide' : 'Show'} 30-Day Log
+            {showHistory ? <ChevronUp className="w-4 h-4 ml-2" /> : <ChevronDown className="w-4 h-4 ml-2" />}
+          </Button>
           
           {showHistory && (
             <div className="mt-4 space-y-3">
