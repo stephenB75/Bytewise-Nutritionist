@@ -143,16 +143,42 @@ export function ObjectUploader({
             {!selectedFile && !uploading && (
               <div className="text-center space-y-4">
                 <p className="text-sm text-gray-600">
-                  Select a photo from your device to analyze
+                  Choose a photo from your library or take a new one
                 </p>
                 
+                {/* Photo Library Button */}
                 <Button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="w-full h-16 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
+                  onClick={() => {
+                    // Set the input to allow photo library selection
+                    if (fileInputRef.current) {
+                      fileInputRef.current.removeAttribute('capture');
+                      fileInputRef.current.click();
+                    }
+                  }}
+                  className="w-full h-16 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white"
+                  data-testid="button-choose-photo-library"
                 >
                   <div className="flex items-center gap-3">
-                    <Camera className="h-6 w-6" />
-                    <span className="font-semibold">Choose Photo from Library</span>
+                    <Upload className="h-6 w-6" />
+                    <span className="font-semibold">📱 Choose from Photo Library</span>
+                  </div>
+                </Button>
+
+                {/* Camera Button */}
+                <Button
+                  onClick={() => {
+                    // Set the input to use camera
+                    if (fileInputRef.current) {
+                      fileInputRef.current.setAttribute('capture', 'environment');
+                      fileInputRef.current.click();
+                    }
+                  }}
+                  className="w-full h-14 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white"
+                  data-testid="button-take-photo"
+                >
+                  <div className="flex items-center gap-3">
+                    <Camera className="h-5 w-5" />
+                    <span className="font-medium">📸 Take New Photo</span>
                   </div>
                 </Button>
                 
@@ -162,11 +188,10 @@ export function ObjectUploader({
                   accept="image/*"
                   onChange={handleFileSelect}
                   className="hidden"
-                  capture="environment"
                 />
                 
                 <p className="text-xs text-gray-500">
-                  Supports JPG, PNG, HEIC • Max 10MB
+                  Supports JPG, PNG, HEIC, WEBP • Max 10MB
                 </p>
               </div>
             )}
