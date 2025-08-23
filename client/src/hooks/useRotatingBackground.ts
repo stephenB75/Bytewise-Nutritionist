@@ -139,15 +139,15 @@ export function useRotatingBackground(activeTab: string, navigationTrigger?: num
       });
   }, [navigationTrigger, activeTab]); // Only trigger on navigation events
   
-  // Switch to pending image when transition is complete
+  // Switch to pending image immediately when ready
   useEffect(() => {
-    if (!isTransitioning && pendingImageReady) {
+    if (pendingImageReady) {
       setBackgroundImage(nextBackgroundImage);
       setAnimationKey(prev => prev + 1);
       setImageLoaded(true);
       setPendingImageReady(false);
     }
-  }, [isTransitioning, pendingImageReady, nextBackgroundImage]);
+  }, [pendingImageReady, nextBackgroundImage]);
   
   // Preload initial image on mount with smooth fade-in
   useEffect(() => {

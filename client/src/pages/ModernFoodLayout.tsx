@@ -967,27 +967,19 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const [, setLocation] = useLocation();
 
   const handleTabChange = (newTab: string) => {
-    if (newTab !== activeTab && !isTransitioning) {
-      // TRANSITION GUARD: Prevent simultaneous transitions
-      setIsTransitioning(true);
-      
-      // Immediate state update for faster response
+    if (newTab !== activeTab) {
+      // Immediate state update - no transitions
       setPreviousTab(activeTab);
       setActiveTab(newTab);
       setOpenCard(undefined);
       
-      // Hide background immediately and trigger new image loading
+      // Trigger new background image loading
       setNavigationTrigger(prev => prev + 1);
       
       // Force scroll to top immediately
       window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
       document.documentElement.scrollTop = 0;
       document.body.scrollTop = 0;
-      
-      // Complete transition after image has time to load
-      setTimeout(() => {
-        setIsTransitioning(false);
-      }, 400); // Longer time to ensure image is fully loaded
     }
   };
 
@@ -1002,8 +994,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     // Determine if current page is dashboard
     const isDashboard = activeTab === 'home';
     
-    // TRANSITION GUARD: Disable animations during page transitions
-    const animationsEnabled = !isTransitioning;
+    // Enable animations always - no page transitions
+    const animationsEnabled = true;
     
     // Memoize the background style optimized for mobile food composition
     const backgroundStyle = React.useMemo(() => ({
@@ -1015,16 +1007,16 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       backgroundAttachment: 'scroll', // Better mobile performance
     }), [backgroundImage]);
     
-    // Background classes with strict visibility control
+    // Background classes - simple visibility control
     const backgroundClasses = React.useMemo(() => {
       const baseClasses = 'absolute inset-0 z-10 hero-bg-optimized';
       
-      // Only show if image is loaded AND no transition is happening AND not loading
-      if (imageLoaded && !isTransitioning && !isLoading) {
+      // Show when image is loaded and not loading
+      if (imageLoaded && !isLoading) {
         return `${baseClasses} hero-bg-loaded`;
       }
       return `${baseClasses} hero-bg-hidden`;
-    }, [imageLoaded, isTransitioning, isLoading]);
+    }, [imageLoaded, isLoading]);
 
     return (
       <div className="relative h-screen overflow-hidden hero-component" data-hero="true">
@@ -3136,8 +3128,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             const IconComponent = tab.icon;
             
             const handleClick = () => {
-              // TRANSITION GUARD: Prevent clicks during transitions
-              if (!isTransitioning && tab.id !== activeTab) {
+              // Direct navigation - no transition guards
+              if (tab.id !== activeTab) {
                 handleTabChange(tab.id);
               }
             };
@@ -3147,12 +3139,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 key={tab.id}
                 data-testid={tab.testId}
                 onClick={handleClick}
-                disabled={isTransitioning}
                 className={`group relative overflow-hidden ${
                   activeTab === tab.id
                     ? 'text-yellow-600'
                     : 'text-gray-600 hover:text-white active:text-gray-900'
-                } ${isTransitioning ? 'pointer-events-none opacity-75' : ''}`}
+                }`}
               >
                 <IconComponent 
                   size={20} 
