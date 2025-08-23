@@ -982,43 +982,34 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         setActiveTab(newTab);
         setOpenCard(undefined);
         
-        // Function to scroll to hero component
-        const scrollToHero = () => {
+        // Optimized scroll to top with proper timing
+        const performOptimizedScroll = () => {
+          // Force immediate scroll to top
           window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
           document.documentElement.scrollTop = 0;
           document.body.scrollTop = 0;
           
-          const heroElement = document.querySelector('.hero-component, .relative.h-screen, [data-hero]');
-          if (heroElement) {
-            heroElement.scrollIntoView({ 
-              behavior: 'auto',
-              block: 'start',
-              inline: 'nearest'
-            });
-          }
-          
-          setTimeout(() => {
+          // Use requestAnimationFrame for smooth DOM coordination
+          requestAnimationFrame(() => {
             window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-            document.documentElement.scrollTop = 0;
-            document.body.scrollTop = 0;
-          }, 0);
+            
+            // Final scroll after next repaint
+            requestAnimationFrame(() => {
+              window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+              document.documentElement.scrollTop = 0;
+              document.body.scrollTop = 0;
+              
+              // Restore scroll behavior after transitions complete
+              setTimeout(() => {
+                document.documentElement.style.scrollBehavior = originalScrollBehavior;
+                document.body.style.scrollBehavior = originalScrollBehavior;
+              }, 50);
+            });
+          });
         };
         
-        // Scroll attempts
-        scrollToHero();
-        setTimeout(scrollToHero, 0);
-        setTimeout(scrollToHero, 10);
-        
-        // Wait for content to render, then scroll to hero
-        setTimeout(() => {
-          scrollToHero();
-          
-          // Restore original scroll behavior after a delay
-          setTimeout(() => {
-            document.documentElement.style.scrollBehavior = originalScrollBehavior;
-            document.body.style.scrollBehavior = originalScrollBehavior;
-          }, 100);
-        }, 100);
+        // Execute optimized scroll
+        performOptimizedScroll();
         
         // Complete transition (fade in new page)
         setTimeout(() => {
