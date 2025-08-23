@@ -63,18 +63,18 @@ const foodImages = [
   new URL('@assets/pistachios-3223610_1280_1755903678482.jpg', import.meta.url).href, // 52
 ];
 
-// Food-themed page mappings for thematic consistency
+// Food-themed page mappings for thematic consistency - ALL 53 photos included
 const pageImageMap: Record<string, number[]> = {
-  'home': [0, 2, 10, 22, 31, 35, 40, 51], // Healthy foods (apple, bowl, food, salad, variety, cherries, blueberries, strawberries)
-  'nutrition': [3, 4, 5, 6, 11, 23, 33, 34, 36, 48], // Proteins and main dishes (burgers, chicken, sushi, pizza, bread, artisan loaf)
-  'daily': [3, 19, 26, 27, 34, 36, 43, 44], // Meals (burgers, pizza, steaks, pizza slice, bread, noodles, pasta)
-  'profile': [7, 9, 14, 28, 38, 39, 45, 46, 47], // Desserts and treats (chocolate, cupcakes, baked goods, cinnamon rolls, cookies, chocolates, white chocolate)
-  'tracking': [1, 12, 17, 21, 36, 40, 48, 51], // Breakfast and healthy options (blueberries, oatmeal, bread, blueberries, artisan bread, strawberries)
-  'achievements': [0, 8, 13, 15, 16, 20, 35, 40, 41, 49, 50, 51], // Fruits and colorful foods (apple, churros, grapes, mango, cherries, blueberries, pomegranates, mangoes, strawberries)
-  'signin': [18, 25, 31, 32, 36, 38, 39, 48], // Welcoming foods (pancakes, pasta, variety, bread, baked goods, cinnamon rolls, artisan loaf)
-  'calculator': [11, 24, 29, 43, 44, 52], // Cooking ingredients and prep (food, spaghetti, noodles, pasta, nuts)
-  'search': [2, 10, 22, 31, 33, 37, 42], // Variety and discovery (bowl, food, salad, variety, sushi, popcorn, pretzels)
-  'data': [13, 15, 16, 20, 30, 32, 35, 40, 41, 49, 50, 52] // Fresh produce and analytics (grapes, mangoes, cherries, blueberries, pomegranates, mangoes, nuts)
+  'home': [0, 2, 10, 22, 31, 32, 35, 40, 41, 49, 50, 51], // Healthy foods and fresh produce
+  'nutrition': [3, 4, 5, 6, 11, 21, 23, 26, 27, 33, 34, 36, 39, 48], // Proteins and main dishes
+  'daily': [3, 19, 26, 27, 29, 34, 36, 37, 43, 44], // Daily meals and regular foods
+  'profile': [7, 9, 14, 16, 24, 28, 38, 39, 42, 45, 46, 47], // Desserts, treats, and special foods
+  'tracking': [1, 12, 17, 18, 21, 30, 36, 40, 48, 51, 52], // Breakfast and healthy tracking options
+  'achievements': [0, 8, 13, 15, 16, 20, 25, 35, 40, 41, 49, 50, 51], // Colorful fruits and celebration foods
+  'signin': [18, 25, 31, 32, 36, 38, 39, 48], // Welcoming foods
+  'calculator': [11, 24, 29, 43, 44, 52], // Cooking ingredients and prep
+  'search': [1, 2, 4, 6, 8, 9, 10, 22, 30, 31, 33, 37, 42], // Variety and discovery
+  'data': [5, 13, 15, 16, 17, 19, 20, 30, 32, 35, 40, 41, 49, 50, 52] // Analytics and data visualization
 };
 
 export function useRotatingBackground(activeTab: string) {
