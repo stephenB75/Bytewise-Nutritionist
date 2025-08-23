@@ -971,58 +971,22 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       // TRANSITION GUARD: Prevent simultaneous transitions
       setIsTransitioning(true);
       
-      // Quick fade out current page (reduced from 600ms to 300ms)
+      // Immediate state update for faster response
+      setPreviousTab(activeTab);
+      setActiveTab(newTab);
+      setOpenCard(undefined);
+      
+      // Force scroll to top immediately
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      
+      // Complete transition quickly 
       setTimeout(() => {
-        // Temporarily disable smooth scrolling to force instant scroll
-        const originalScrollBehavior = document.documentElement.style.scrollBehavior;
-        document.documentElement.style.scrollBehavior = 'auto';
-        document.body.style.scrollBehavior = 'auto';
-        
-        // Update state
-        setPreviousTab(activeTab);
-        setActiveTab(newTab);
-        setOpenCard(undefined);
-        
-        // Background change will happen after transition completes
-        
-        // Optimized scroll to top with proper timing
-        const performOptimizedScroll = () => {
-          // Force immediate scroll to top
-          window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-          document.documentElement.scrollTop = 0;
-          document.body.scrollTop = 0;
-          
-          // Use requestAnimationFrame for smooth DOM coordination
-          requestAnimationFrame(() => {
-            window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-            
-            // Final scroll after next repaint
-            requestAnimationFrame(() => {
-              window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-              document.documentElement.scrollTop = 0;
-              document.body.scrollTop = 0;
-              
-              // Restore scroll behavior after transitions complete
-              setTimeout(() => {
-                document.documentElement.style.scrollBehavior = originalScrollBehavior;
-                document.body.style.scrollBehavior = originalScrollBehavior;
-              }, 50);
-            });
-          });
-        };
-        
-        // Execute optimized scroll
-        performOptimizedScroll();
-        
-        // Complete transition (fade in new page) - reduced total time
-        setTimeout(() => {
-          setIsTransitioning(false);
-          // Wait longer before changing background to ensure page is fully loaded
-          setTimeout(() => {
-            setNavigationTrigger(prev => prev + 1);
-          }, 200);
-        }, 500);
-      }, 300); // Reduced fade out duration for faster response
+        setIsTransitioning(false);
+        // Trigger background change after transition
+        setNavigationTrigger(prev => prev + 1);
+      }, 150); // Much shorter transition time
     }
   };
 
@@ -3168,13 +3132,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             { id: 'profile', label: 'Profile', icon: UserCircle, testId: 'nav-profile' }
           ].map((tab) => {
             const IconComponent = tab.icon;
-            const [isClicked, setIsClicked] = React.useState(false);
             
             const handleClick = () => {
               // TRANSITION GUARD: Prevent clicks during transitions
               if (!isTransitioning && tab.id !== activeTab) {
-                setIsClicked(true);
-                setTimeout(() => setIsClicked(false), 200); // Reduced timing to prevent conflicts
                 handleTabChange(tab.id);
               }
             };
@@ -3197,7 +3158,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     activeTab === tab.id 
                       ? 'scale-110 drop-shadow-lg text-yellow-600' 
                       : 'scale-100 hover:scale-105 hover:text-white'
-                  } ${isClicked ? 'nav-icon-clicked' : ''}`}
+                  }`}
                   strokeWidth={activeTab === tab.id ? 2.5 : 2}
                 />
                 <span className={`text-[8px] font-semibold leading-tight text-center w-full transition-colors duration-200 ease-out ${
