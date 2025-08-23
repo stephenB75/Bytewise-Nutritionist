@@ -192,11 +192,6 @@ button.bg-blue-800:hover:not([data-testid*="nav-"]):not([class*="nav-"]) {
   color: #ffffff !important;
 }
 
-/* Shadcn Dialog Component Specific Fixes */
-.fixed.inset-0.z-50.bg-black\/50,
-.fixed.inset-0.z-50.bg-background\/80 {
-  background-color: rgba(0, 0, 0, 0.3) !important; /* Lighter overlay */
-}
 
 /* Dialog content container */
 .relative.bg-background.border.border-border.shadow-lg.rounded-lg,
