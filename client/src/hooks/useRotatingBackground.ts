@@ -5,16 +5,18 @@
 
 import { useState, useEffect } from 'react';
 
-// Vegetarian food-only image collection - no meat products
+// Food image collection - meat items removed, all other foods included
 const foodImages = [
   new URL('@assets/apple-3313209_1920_1753859530078-BJW4vFlt.jpg', import.meta.url).href,
   new URL('@assets/blueberries-9450130_1920_1753859477806-DQeN0M4j.jpg', import.meta.url).href,
   new URL('@assets/bowl-1842294_1920_1753859477806-bRUsOvIC.jpg', import.meta.url).href,
+  new URL('@assets/burgers-5590503_1920_1753859530083-I99DUxaH.jpg', import.meta.url).href,
   new URL('@assets/chocolate-1927921_1920_1753859477802-D-SPQY8I.jpg', import.meta.url).href,
   new URL('@assets/churros-2188871_1920_1753859477808-BGqrIj5F.jpg', import.meta.url).href,
   new URL('@assets/cupcakes-813078_1920_1753859477803-D9uLIWdp.jpg', import.meta.url).href,
   new URL('@assets/food-3262796_1920_1753859530086-BeFn5V1r.jpg', import.meta.url).href,
   new URL('@assets/food-993457_1920_1753859794688-oWnyu60z.jpg', import.meta.url).href,
+  new URL('@assets/fried-prawn-1737593_1920_1753859794686-DkxziorZ.jpg', import.meta.url).href,
   new URL('@assets/grapes-2032838_1920_1753859477808-CXmP7soY.jpg', import.meta.url).href,
   new URL('@assets/macarons-2179198_1920_1753859477809-B5cbwbKS.jpg', import.meta.url).href,
   new URL('@assets/mango-1534061_1920_1753859530079-BEyrLl3D.jpg', import.meta.url).href,
@@ -55,18 +57,18 @@ const foodImages = [
   new URL('@assets/pistachios-3223610_1280_1755903678482.jpg', import.meta.url).href, // 52
 ];
 
-// Food-themed page mappings for vegetarian foods only - ALL 45 photos included
+// Food-themed page mappings for all foods (meat items excluded) - ALL 48 photos included
 const pageImageMap: Record<string, number[]> = {
-  'home': [0, 2, 8, 10, 16, 17, 22, 23, 24, 25, 30, 33, 34, 35, 37, 38, 39, 41, 42, 43], // Healthy foods and fresh produce
-  'nutrition': [6, 7, 11, 12, 13, 14, 17, 18, 19, 25, 26, 30, 31, 32, 40], // Plant-based proteins and main dishes
-  'daily': [11, 12, 13, 14, 17, 26, 35, 36], // Daily vegetarian meals and regular foods
-  'profile': [3, 4, 5, 9, 18, 19, 20, 30, 31, 32, 37, 38, 39], // Desserts, treats, and special foods
-  'tracking': [1, 8, 10, 12, 15, 16, 20, 22, 40, 43, 44], // Breakfast and healthy tracking options
-  'achievements': [0, 3, 4, 8, 9, 10, 15, 20, 22, 23, 24, 33, 34, 35, 37, 38, 39, 41, 42, 43], // Colorful fruits and celebration foods
-  'signin': [4, 10, 16, 17, 30, 31, 32, 40], // Welcoming foods
-  'calculator': [7, 9, 14, 35, 36, 44], // Cooking ingredients and prep
-  'search': [1, 2, 3, 4, 5, 6, 8, 15, 17, 25, 26, 29, 34], // Variety and discovery
-  'data': [3, 8, 9, 10, 11, 12, 13, 15, 16, 20, 22, 23, 24, 33, 34, 35, 37, 44] // Analytics and data visualization
+  'home': [0, 2, 10, 12, 18, 19, 24, 25, 26, 27, 32, 35, 36, 37, 39, 40, 41, 43, 44, 45], // Healthy foods and fresh produce
+  'nutrition': [3, 7, 8, 9, 13, 14, 15, 16, 19, 20, 21, 27, 28, 32, 33, 34, 42], // Proteins and main dishes (including seafood)
+  'daily': [3, 13, 14, 15, 16, 19, 28, 37, 38], // Daily meals and regular foods
+  'profile': [4, 5, 6, 11, 20, 21, 22, 32, 33, 34, 39, 40, 41], // Desserts, treats, and special foods
+  'tracking': [1, 10, 12, 14, 17, 18, 22, 24, 42, 45, 46], // Breakfast and healthy tracking options
+  'achievements': [0, 4, 5, 10, 11, 12, 17, 22, 24, 25, 26, 35, 36, 37, 39, 40, 41, 43, 44, 45], // Colorful fruits and celebration foods
+  'signin': [5, 12, 18, 19, 32, 33, 34, 42], // Welcoming foods
+  'calculator': [8, 11, 16, 37, 38, 46], // Cooking ingredients and prep
+  'search': [1, 2, 3, 4, 5, 6, 7, 10, 17, 27, 28, 31, 36], // Variety and discovery
+  'data': [4, 10, 11, 12, 13, 14, 15, 17, 18, 22, 24, 25, 26, 35, 36, 37, 39, 46] // Analytics and data visualization
 };
 
 export function useRotatingBackground(activeTab: string, navigationTrigger?: number) {
