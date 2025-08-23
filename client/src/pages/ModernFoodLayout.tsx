@@ -1077,18 +1077,18 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <h1 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] drop-shadow-2xl animate-fadeInUp [animation-delay:0.2s] font-league-spartan text-optimized">
                 {title}
               </h1>
-              <h1 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] animate-appLaunchSlide [animation-delay:0.4s] font-league-spartan text-optimized">
+              <h1 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] animate-appLaunchSlide [animation-delay:0.7s] font-league-spartan text-optimized">
                 {subtitle}
               </h1>
             </div>
             
             {/* Enhanced Description */}
-            <p className="text-2xl md:text-3xl font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl animate-appLaunchFade [animation-delay:0.6s] font-work-sans text-gray-100">
+            <p className="text-2xl md:text-3xl font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl animate-appLaunchFade [animation-delay:1.0s] font-work-sans text-gray-100">
               {description}
             </p>
             
             {/* Enhanced Call-to-Action */}
-            <div className="pt-8 animate-appLaunchButton [animation-delay:0.8s]">
+            <div className="pt-8 animate-appLaunchButton [animation-delay:1.3s]">
               <Button 
                 onClick={onButtonClick}
                 size="lg"
@@ -1105,7 +1105,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         </div>
         
         {/* Enhanced Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 animate-appLaunchFade [animation-delay:1.2s] text-white">
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 animate-appLaunchFade [animation-delay:1.6s] text-white">
           <div className="flex flex-col items-center gap-2 animate-bounce">
             <div className="w-px h-8 bg-gradient-to-b from-transparent to-white opacity-70" />
             <ChevronRight className="w-6 h-6 rotate-90 drop-shadow-lg opacity-80" />
