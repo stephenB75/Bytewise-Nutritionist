@@ -4,35 +4,34 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Global border removal - no frames or borders anywhere */
-*, *::before, *::after {
-  border: none !important;
+/* Selective border removal - preserve amber borders and essential borders */
+.card, .bg-white, .bg-gray-50 {
+  border: none;
+  outline: none;
 }
 
-/* Allow only specific shadow effects for depth, not borders */
-.card, .bg-white, .bg-gray-50, .rounded, .rounded-lg, .rounded-xl, .rounded-2xl {
-  border: none !important;
-  outline: none !important;
+/* Remove borders from rounded elements except when specifically needed */
+.rounded, .rounded-lg, .rounded-xl, .rounded-2xl {
+  border: none;
 }
 
-/* MASTER NAVIGATION RESET - Single source of truth for navigation buttons */
+/* Navigation button styling - less aggressive reset */
 button[data-testid*="nav-"],
 button[data-testid^="nav-"],
 [data-testid*="nav-"] button {
-  all: unset !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: center !important;
-  cursor: pointer !important;
-  padding: 0.375rem 0.125rem !important;
-  min-width: 50px !important;
-  flex: 1 !important;
-  transition: all 300ms ease-out !important;
-  background: transparent !important;
-  border: 0 !important;
-  outline: 0 !important;
-  box-shadow: none !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0.375rem 0.125rem;
+  min-width: 50px;
+  flex: 1;
+  transition: all 300ms ease-out;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  box-shadow: none;
 }
 
 /* Navigation button hover states */
@@ -42,25 +41,23 @@ button[data-testid^="nav-"]:hover,
   color: #ffffff !important;
 }
 
-/* Global hover effects - prevent black hover states */
-button:hover,
-a:hover,
-.hover\:text-black:hover,
-.hover\:bg-black:hover {
-  color: #374151 !important; /* Dark gray instead of black */
+/* Hover effects for yellow background compatibility */
+button:hover:not([data-testid*="nav-"]):not(.hero-component *):not(.btn-hero-enhanced),
+a:hover:not(.hero-component *) {
+  color: #374151; /* Dark gray instead of black */
 }
 
-/* Specific hover overrides for better contrast on yellow background */
+/* Specific hover colors for better contrast on yellow background */
 .hover\:text-gray-600:hover {
-  color: #d97706 !important; /* Amber instead of dark gray */
+  color: #d97706; /* Amber instead of dark gray */
 }
 
 .hover\:text-gray-500:hover {
-  color: #f59e0b !important; /* Light amber */
+  color: #f59e0b; /* Light amber */
 }
 
 .hover\:text-gray-400:hover {
-  color: #fbbf24 !important; /* Yellow */
+  color: #fbbf24; /* Yellow */
 }
 
 button[data-testid*="nav-"]:hover svg,
@@ -86,7 +83,7 @@ button[data-testid^="nav-"]:hover span,
   animation: nav-icon-pulse 0.3s ease-out;
 }
 
-/* Force Light Theme */
+/* Optimized theme variables for yellow/amber design */
 :root {
   --background: 255, 255, 255;
   --foreground: 0, 0, 0;
@@ -110,46 +107,42 @@ button[data-testid^="nav-"]:hover span,
   --radius: 0.5rem;
 }
 
-/* Override dark theme with gradient background */
+/* Yellow/amber gradient background theme */
 body,
 html,
-#root,
-.min-h-screen:not([class*="bg-gradient"]) {
-  background: linear-gradient(to top, #fbbf24 0%, #fbbf24 15%, #ffffff 85%) !important;
-  background-attachment: fixed !important;
-  color: rgb(var(--foreground)) !important;
-  min-height: 100vh !important;
+#root {
+  background: linear-gradient(to top, #fbbf24 0%, #fbbf24 15%, #ffffff 85%);
+  background-attachment: fixed;
+  color: rgb(var(--foreground));
+  min-height: 100vh;
 }
 
-/* Ensure page containers don't override gradient */
+/* Page containers inherit gradient background */
 .min-h-screen:not([class*="bg-"]),
-.min-h-screen:not([style*="background"]),
-.h-screen:not([class*="bg-"]),
-.h-screen:not([style*="background"]) {
-  background: inherit !important;
+.h-screen:not([class*="bg-"]) {
+  background: inherit;
 }
 
-/* Override dark backgrounds with gradient - EXCLUDE navigation and content sections */
+/* Override dark backgrounds with gradient - preserve navigation and content sections */
 .bg-black:not(.bg-black\/80):not(.bg-black\/50):not([data-testid*="nav-"]):not(.content-section):not(.content-section *),
-.bg-gray-900:not([data-testid*="nav-"]):not([class*="navigation"]):not(.content-section):not(.content-section *),
-.bg-gray-800:not(.bg-gray-800\/50):not([data-testid*="nav-"]):not(.content-section):not(.content-section *),
-.min-h-screen.bg-black:not(.content-section):not(.content-section *),
-.min-h-screen.bg-gray-900:not(.content-section):not(.content-section *),
-.min-h-screen.bg-gray-800:not(.content-section):not(.content-section *) {
-  background: linear-gradient(to top, #fbbf24 0%, #fbbf24 15%, #ffffff 85%) !important;
-  background-attachment: fixed !important;
+.bg-gray-900:not([data-testid*="nav-"]):not(.content-section):not(.content-section *),
+.bg-gray-800:not(.bg-gray-800\/50):not([data-testid*="nav-"]):not(.content-section):not(.content-section *) {
+  background: linear-gradient(to top, #fbbf24 0%, #fbbf24 15%, #ffffff 85%);
+  background-attachment: fixed;
 }
 
 /* Content sections inherit the natural yellow gradient background */
 
-/* Enhanced text color overrides for better contrast - EXCLUDE navigation, notifications, hero components, hero buttons, and metrics cards */
-.text-white:not([data-testid*="nav-"] *):not([data-testid*="nav-"]):not([data-testid*="notification"] *):not([aria-label*="notification"] *):not(.btn-hero-enhanced *):not(.btn-hero-enhanced):not(.hero-component *):not([data-hero="true"] *):not(.hero-component button *):not([data-hero="true"] button *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *):not(.weekly-calories-card-wrapper *) { color: #111827 !important; } /* Darker for maximum contrast */
-/* Light text color overrides - EXCLUDE hero components */
-.text-gray-100:not(.hero-component *):not([data-hero="true"] *) { color: #1f2937 !important; } /* Much darker */
-.text-gray-200:not(.hero-component *):not([data-hero="true"] *) { color: #374151 !important; } /* Darker */
-.text-gray-300:not(.hero-component *):not([data-hero="true"] *) { color: #4b5563 !important; } /* Darker gray */
-.text-gray-400:not(.hero-component *):not([data-hero="true"] *) { color: #6b7280 !important; } /* Medium gray */
-.text-gray-500:not(.hero-component *):not([data-hero="true"] *) { color: #4b5563 !important; } /* Darker */
+/* Text color optimization for yellow/amber background */
+.text-white:not([data-testid*="nav-"] *):not([data-testid*="notification"] *):not(.btn-hero-enhanced *):not(.hero-component *):not([data-hero="true"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *):not(.weekly-calories-card-wrapper *) { 
+  color: #111827; /* Dark for yellow background readability */
+}
+/* Light text colors optimized for yellow background - preserve hero components */
+.text-gray-100:not(.hero-component *):not([data-hero="true"] *) { color: #1f2937; }
+.text-gray-200:not(.hero-component *):not([data-hero="true"] *) { color: #374151; }
+.text-gray-300:not(.hero-component *):not([data-hero="true"] *) { color: #4b5563; }
+.text-gray-400:not(.hero-component *):not([data-hero="true"] *) { color: #6b7280; }
+.text-gray-500:not(.hero-component *):not([data-hero="true"] *) { color: #4b5563; }
 
 /* Hero components keep original light gray colors for dark overlays */
 .hero-component .text-gray-100,
@@ -162,7 +155,10 @@ html,
 [data-hero="true"] .text-gray-400 { color: #9ca3af !important; }
 .hero-component .text-gray-500,
 [data-hero="true"] .text-gray-500 { color: #6b7280 !important; }
-.border-gray-700, .border-gray-800 { border: none !important; }
+/* Allow essential borders while removing decorative ones */
+.border-gray-700, .border-gray-800 { 
+  border: none;
+}
 
 /* Fix remaining light text colors - EXCLUDE hero components */
 .text-gray-100.font-light:not(.hero-component *):not([data-hero="true"] *),
@@ -270,13 +266,10 @@ button.btn-hero-enhanced span,
 .text-gray-100.opacity-95 { color: #1f2937 !important; }
 .opacity-95 { opacity: 0.95 !important; } /* Maintain intended transparency */
 
-/* Fix ALL remaining white and light text - except hero components and metrics cards - EXCLUDE HEADLINES AND DASHBOARD HERO */
-.text-white.text-lg:not(.hero-component *):not([data-hero="true"] *):not([data-page="dashboard"] .hero-component *):not([data-page="dashboard"] [data-hero="true"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *):not(h1):not(h2):not(h3):not(h4):not(h5):not(h6) { color: #374151 !important; }
-.text-white.text-xl:not(.hero-component *):not([data-hero="true"] *):not([data-page="dashboard"] .hero-component *):not([data-page="dashboard"] [data-hero="true"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *):not(h1):not(h2):not(h3):not(h4):not(h5):not(h6) { color: #374151 !important; }
-.text-white.text-2xl:not(.hero-component *):not([data-hero="true"] *):not([data-page="dashboard"] .hero-component *):not([data-page="dashboard"] [data-hero="true"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *):not(h1):not(h2):not(h3):not(h4):not(h5):not(h6) { color: #374151 !important; }
-.text-white.text-6xl:not(.hero-component *):not([data-hero="true"] *):not([data-page="dashboard"] .hero-component *):not([data-page="dashboard"] [data-hero="true"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *):not(h1):not(h2):not(h3):not(h4):not(h5):not(h6) { color: #374151 !important; }
-.text-white.text-7xl:not(.hero-component *):not([data-hero="true"] *):not([data-page="dashboard"] .hero-component *):not([data-page="dashboard"] [data-hero="true"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *):not(h1):not(h2):not(h3):not(h4):not(h5):not(h6) { color: #374151 !important; }
-.text-white.text-8xl:not(.hero-component *):not([data-hero="true"] *):not([data-page="dashboard"] .hero-component *):not([data-page="dashboard"] [data-hero="true"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *):not(h1):not(h2):not(h3):not(h4):not(h5):not(h6) { color: #374151 !important; }
+/* Simplified text color overrides for yellow background */
+.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="card"] *):not(h1):not(h2):not(h3):not(h4):not(h5):not(h6) {
+  color: #374151;
+}
 
 /* Hero text sizes - vibrant colors for headlines, white for other text */
 .hero-component .text-white.text-lg:not(h1):not(h2):not(h3):not(h4):not(h5):not(h6),
@@ -461,27 +454,27 @@ button.btn-hero-enhanced span,
   color: #ffffff !important;
 }
 
-/* Dashboard buttons - dark for yellow background, EXCLUDE hero components and navigation */
+/* Dashboard button colors optimized for yellow background */
 [data-page="dashboard"] button:not(.bg-gradient-to-r):not([data-testid*="nav-"]):not(.hero-component *):not([data-hero="true"] *):not(.btn-hero-enhanced):not(.tour-button-override) {
-  color: #111827 !important; /* Dark for yellow background */
+  color: #111827;
 }
 
-/* Hero buttons keep white text for dark overlays */
+/* Hero buttons maintain white text for dark overlays */
 [data-page="dashboard"] .hero-component button:not([data-testid*="nav-"]),
 [data-page="dashboard"] [data-hero="true"] button:not([data-testid*="nav-"]),
 [data-page="dashboard"] .btn-hero-enhanced {
-  color: #ffffff !important;
+  color: #ffffff;
 }
 
-/* Dashboard content sections - dark for yellow background, EXCLUDE hero components and metrics cards */
-[data-page="dashboard"] .content-section *:not(.bg-gradient-to-r *):not([class*="bg-"] *):not(.hero-component *):not([data-hero="true"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *) {
-  color: #111827 !important; /* Dark for yellow background */
+/* Dashboard content sections optimized for yellow background */
+[data-page="dashboard"] .content-section *:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="card"] *) {
+  color: #111827;
 }
 
-/* Hero content sections keep white text for dark overlays */
-[data-page="dashboard"] .hero-component .content-section *:not(.bg-gradient-to-r *):not([class*="bg-"] *),
-[data-page="dashboard"] [data-hero="true"] .content-section *:not(.bg-gradient-to-r *):not([class*="bg-"] *) {
-  color: #ffffff !important;
+/* Hero content sections maintain white text for dark overlays */
+[data-page="dashboard"] .hero-component .content-section *,
+[data-page="dashboard"] [data-hero="true"] .content-section * {
+  color: #ffffff;
 }
 
 .hero-component p.text-gray-100,
@@ -574,55 +567,32 @@ button.btn-hero-enhanced span,
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 4px 16px rgba(0, 0, 0, 0.05) !important;
 }
 
-/* Notification icon fixes - solid and remove white frame */
+/* Clean notification styling */
 .lucide-bell,
 [data-testid*="notification"] svg,
-button[aria-label*="notification"] svg,
 button[data-testid*="notification"] svg,
-button[data-testid="button-notifications"] svg,
-svg[data-testid="icon-bell"] {
-  fill: currentColor !important;
-  stroke-width: 2 !important;
-  border: none !important;
-  background: none !important;
-  outline: none !important;
+button[data-testid="button-notifications"] svg {
+  fill: currentColor;
+  stroke-width: 2;
+  border: none;
+  background: none;
+  outline: none;
 }
 
-/* Modern notification button styling - preserves new design - NO BORDERS */
+/* Notification button styling */
 button[data-testid="button-notifications"] {
-  outline: none !important;
-  border: none !important;
-  box-shadow: none !important;
+  outline: none;
+  border: none;
+  box-shadow: none;
 }
 
-/* Ensure no borders on notification button at all levels */
-button[data-testid="button-notifications"],
+/* Notification button states */
 button[data-testid="button-notifications"]:hover,
 button[data-testid="button-notifications"]:focus,
 button[data-testid="button-notifications"]:active {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-/* Remove all focus styling that adds borders or outlines */
-button[data-testid="button-notifications"]:focus {
-  outline: none !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-
-/* Modern notification icons - Bell and BellRing - NO BORDERS */
-button[data-testid="button-notifications"] .lucide-bell,
-button[data-testid="button-notifications"] .lucide-bell-ring,
-button[data-testid="button-notifications"] svg,
-.lucide-bell,
-.lucide-bell-ring {
-  background: transparent !important;
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-  stroke: currentColor !important;
+  border: none;
+  outline: none;
+  box-shadow: none;
 }
 
 /* Notification icon color shift animation for background transitions */
@@ -682,14 +652,16 @@ button[data-testid="button-notifications"] .blur-lg {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 4px 16px rgba(0, 0, 0, 0.05) !important;
 }
 
-/* Comprehensive white text fixes for ALL remaining cases - except hero, navigation, and metrics cards */
-span.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *) { color: #374151 !important; }
-div.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *) { color: #374151 !important; }
-h1.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *), 
-h2.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *), 
-h3.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *), 
-h4.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *) { color: #374151 !important; }
-p.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *) { color: #374151 !important; }
+/* Clean text color rules for yellow background - simplified */
+span.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *):not([data-testid*="card"] *),
+div.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *):not([data-testid*="card"] *),
+h1.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *):not([data-testid*="card"] *),
+h2.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *):not([data-testid*="card"] *),
+h3.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *):not([data-testid*="card"] *),
+h4.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *):not([data-testid*="card"] *),
+p.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *):not([data-testid*="card"] *) {
+  color: #374151;
+}
 
 /* Hero white text elements - keep white for dark overlay visibility */
 .hero-component span.text-white,
@@ -748,16 +720,16 @@ button.bg-red-500 .text-white {
 .w-6.h-6.transition-colors { color: #0e7490 !important; }
 .lucide-icon, .lucide { color: inherit !important; border: none !important; }
 
-/* Complete navigation icon border removal */
+/* Navigation icon styling */
 [data-testid="navigation-tabs"] .lucide,
 [data-testid="navigation-tabs"] svg,
 button svg.lucide,
 svg.w-6,
 svg.w-5,
 svg.w-4 {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
+  border: none;
+  outline: none;
+  box-shadow: none;
 }
 
 /* Fix small navigation text */
@@ -787,8 +759,10 @@ svg.w-4 {
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15)) !important;
 }
 
-/* Light theme border overrides - DISABLED - No borders on cards and components */
-.border-white\/20, .border-white\/10, .border-cyan-400\/20, .border-cyan-400\/30, .border-blue-200, .border-green-500\/30 { border: none !important; }
+/* Remove decorative borders while preserving functional ones */
+.border-white\/20, .border-white\/10, .border-cyan-400\/20, .border-cyan-400\/30, .border-blue-200, .border-green-500\/30 { 
+  border: none;
+}
 
 /* Light theme background for white transparent elements - EXCLUDE meal journal components */
 .bg-white\/10:not([data-testid*="progress"]):not([data-testid*="water"]):not([data-testid*="macro"]):not([data-testid*="micro"]):not(.content-section *):not(.weekly-calories-card-wrapper *) { 
@@ -883,61 +857,38 @@ svg.w-4 {
 .hover\:text-cyan-300:hover { color: #0891b2 !important; }
 .text-red-300 { color: #dc2626 !important; }
 
-/* Remove any remaining icon borders */
+/* Icon styling standardization */
 .lucide-home, .lucide-utensils, .lucide-clock, 
 .lucide-bar-chart-3, .lucide-user-circle,
 .lucide-bell, .lucide-droplets, .lucide-target,
 .lucide-trophy, .lucide-calendar {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
+  border: none;
+  outline: none;
+  box-shadow: none;
 }
 
 /* Navigation styling fully controlled by Tailwind classes */
 
 /* Allow Tailwind styling on navigation buttons */
 
-/* ULTRA-COMPREHENSIVE navigation button reset - eliminate ALL frames */
-[data-testid="navigation-tabs"] button,
-[data-testid="navigation-tabs"] button *,
-[data-testid="navigation-tabs"] button:before,
-[data-testid="navigation-tabs"] button:after {
-  background: none !important;
-  background-color: transparent !important;
-  background-image: none !important;
-  border: none !important;
-  border-radius: 0 !important;
-  outline: none !important;
-  box-shadow: none !important;
-  -webkit-appearance: none !important;
-  -moz-appearance: none !important;
-  appearance: none !important;
-  -webkit-box-shadow: none !important;
-  -moz-box-shadow: none !important;
-  text-shadow: none !important;
-  filter: none !important;
-  -webkit-filter: none !important;
+/* Clean navigation button styling */
+[data-testid="navigation-tabs"] button {
+  background: transparent;
+  border: none;
+  outline: none;
+  box-shadow: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
 }
 
 [data-testid="navigation-tabs"] button:focus,
-[data-testid="navigation-tabs"] button:focus-visible,
-[data-testid="navigation-tabs"] button:focus-within,
-[data-testid="navigation-tabs"] button:active,
 [data-testid="navigation-tabs"] button:hover,
-[data-testid="navigation-tabs"] button:visited,
-[data-testid="navigation-tabs"] button:link {
-  background: none !important;
-  background-color: transparent !important;
-  background-image: none !important;
-  border: none !important;
-  border-radius: 0 !important;
-  outline: none !important;
-  box-shadow: none !important;
-  -webkit-box-shadow: none !important;
-  -moz-box-shadow: none !important;
-  text-shadow: none !important;
-  filter: none !important;
-  -webkit-filter: none !important;
+[data-testid="navigation-tabs"] button:active {
+  background: transparent;
+  border: none;
+  outline: none;
+  box-shadow: none;
 }
 
 /* Removed - consolidated into master reset above */
@@ -957,16 +908,13 @@ button[data-testid^="nav-"] .lucide {
   padding: 0 !important;
 }
 
-/* CRITICAL: Force white text for navigation and notifications - highest priority */
+/* Navigation and notification text colors */
 button[data-testid*="nav-"] .text-white,
-button[data-testid^="nav-"] .text-white,
 button[data-testid*="nav-"] span.text-white,
-button[data-testid^="nav-"] span.text-white,
 [data-testid*="nav-"] .text-white,
 button[data-testid*="notification"] .text-white,
-button[aria-label*="notification"] .text-white,
 button[data-testid="button-notifications"] .text-white {
-  color: #ffffff !important;
+  color: #ffffff;
 }
 
 /* Allow notification icon to use its own color (grey by default, white on hover) */
@@ -1347,15 +1295,10 @@ div[class*="min-h-screen"]:not([data-testid*="navigation"]),
 
 /* Removed unused .force-bottom-spacing class */
 
-/* Content section spacing to prevent footer overlap */
+/* Content section spacing for navigation clearance */
 .content-section {
-  padding-bottom: 7rem !important; /* 112px - generous clearance to prevent navigation overlap */
-  min-height: calc(100vh - 7rem) !important; /* Full viewport minus space for fixed navigation */
-}
-
-/* Ensure proper scrolling behavior for pages with content sections */
-.page-container {
-  padding-bottom: 0 !important; /* Remove any conflicting bottom padding */
+  padding-bottom: 7rem; /* Space for fixed navigation */
+  min-height: calc(100vh - 7rem);
 }
 
 /* Bottom navigation spacing and safe area handling */
@@ -1377,9 +1320,9 @@ div[class*="min-h-screen"]:not([data-testid*="navigation"]),
   }
 }
 
-/* Enhanced Accessibility - Increased text sizes throughout the app */
+/* Enhanced accessibility with improved text sizes */
 html {
-  font-size: 17px; /* Increased from 16px for better readability */
+  font-size: 17px; /* Improved readability */
 }
 
 /* Profile Component Styles - Clean and Consistent */
@@ -1420,10 +1363,8 @@ html {
   font-family: 'League Spartan', sans-serif;
 }
 
-/* Apply ByteWise brand colors to body and root */
+/* ByteWise brand styling with yellow/amber theme */
 body {
-  background-color: #0a0a00 !important;
-  color: #ffffff !important;
   margin: 0;
   padding: 0;
   min-height: 100vh;
@@ -1431,17 +1372,16 @@ body {
 }
 
 #root {
-  background-color: #0a0a00 !important;
   min-height: 100vh;
 }
 
-/* Dark mode body styling */
+/* Dark mode support */
 .dark body {
-  background-color: var(--background) !important;
+  background-color: var(--background);
 }
 
 .dark #root {
-  background-color: var(--background) !important;
+  background-color: var(--background);
 }
 
 /* Global text size improvements for accessibility */
@@ -1492,27 +1432,27 @@ body {
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
-/* Enhanced Input field text visibility fixes */
+/* Input field styling for yellow background theme */
 .input-with-icon {
-  @apply relative;
+  position: relative;
 }
 
 .input-with-icon input {
   position: relative;
   z-index: 1;
-  background-color: white !important;
-  color: #1f2937 !important;
+  background-color: white;
+  color: #1f2937;
   font-weight: 400;
 }
 
 .input-with-icon input::placeholder {
-  color: #9ca3af !important;
+  color: #9ca3af;
   opacity: 1;
 }
 
 .input-with-icon input:focus {
-  color: #1f2937 !important;
-  background-color: white !important;
+  color: #1f2937;
+  background-color: white;
 }
 
 .input-icon {
@@ -1594,41 +1534,41 @@ body {
   opacity: 1;
 }
 
-/* Global input text visibility improvements */
+/* Input field text styling for yellow background */
 input[type="text"], 
 input[type="email"], 
 input[type="password"], 
 input[type="number"], 
 input[type="search"],
 textarea {
-  color: #1f2937 !important;
-  font-weight: 400 !important;
-  text-align: center !important;
+  color: #1f2937;
+  font-weight: 400;
+  text-align: center;
 }
 
-/* Global scroll behavior fixes - prevent content from being hidden at bottom */
+/* Optimized scroll behavior and layout */
 body {
-  padding-bottom: 0 !important;
-  margin: 0 !important;
-  overflow-x: hidden !important;
+  padding-bottom: 0;
+  margin: 0;
+  overflow-x: hidden;
 }
 
-/* Main content containers need bottom padding to clear navigation */
+/* Main content containers with proper spacing */
 .main-content {
-  margin-bottom: 0 !important;
-  min-height: auto !important;
-  height: 100% !important;
-  overflow-y: auto !important;
+  margin-bottom: 0;
+  min-height: auto;
+  height: 100%;
+  overflow-y: auto;
 }
 
-/* Ensure all page containers have proper bottom spacing */
+/* Page containers with consistent layout */
 .page-container {
   height: 100vh;
   width: 100vw;
   position: relative;
   overflow-y: auto;
-  padding-bottom: 0 !important;
-  margin-bottom: 0 !important;
+  padding-bottom: 0;
+  margin-bottom: 0;
 }
 
 /* Removed conflicting content-section rule that was overriding footer clearance */
@@ -5470,52 +5410,35 @@ input[class*="pr-"] {
   background-color: rgba(0, 0, 0, 0.4) !important;
 }
 
-/* Tour button override - completely override all Button styles */
+/* Tour button styling for yellow background compatibility */
 button.tour-button-override,
 .tour-button-override,
 button[class*="tour-button-override"] {
-  --primary: 245, 158, 11 !important; /* Orange primary color */
-  --primary-foreground: 255, 255, 255 !important; /* White text */
-  background: rgb(245, 158, 11) !important; /* Direct orange color */
-  color: rgb(255, 255, 255) !important; /* Direct white color */
-  border-color: transparent !important;
+  --primary: 245, 158, 11;
+  --primary-foreground: 255, 255, 255;
+  background: rgb(245, 158, 11);
+  color: rgb(255, 255, 255);
+  border-color: transparent;
 }
 
-/* Tour button hover state with lighter orange */
+/* Tour button hover state - lighter orange per requirements */
 button.tour-button-override:hover,
 .tour-button-override:hover,
 button[class*="tour-button-override"]:hover {
-  --primary: 251, 191, 36 !important; /* Lighter orange on hover */
-  --primary-foreground: 31, 41, 55 !important; /* Dark text on light background */
-  background: rgb(251, 191, 36) !important; /* Direct light orange color */
-  color: rgb(31, 41, 55) !important; /* Direct dark color */
-  border-color: transparent !important;
+  --primary: 251, 191, 36;
+  --primary-foreground: 31, 41, 55;
+  background: rgb(251, 191, 36);
+  color: rgb(31, 41, 55);
+  border-color: transparent;
 }
 
-/* More specific override for shadcn Button component with direct colors */
-button.inline-flex.tour-button-override {
-  --primary: 245, 158, 11 !important;
-  --primary-foreground: 255, 255, 255 !important;
-  background: rgb(245, 158, 11) !important;
-  color: rgb(255, 255, 255) !important;
-}
-
-button.inline-flex.tour-button-override:hover {
-  --primary: 251, 191, 36 !important;
-  --primary-foreground: 31, 41, 55 !important;
-  background: rgb(251, 191, 36) !important;
-  color: rgb(31, 41, 55) !important;
-}
-
-/* Make sure all text inside tour buttons follows the color scheme */
+/* Tour button text color management */
 button.tour-button-override *,
-.tour-button-override *,
-button[class*="tour-button-override"] * {
-  color: rgb(255, 255, 255) !important;
+.tour-button-override * {
+  color: rgb(255, 255, 255);
 }
 
 button.tour-button-override:hover *,
-.tour-button-override:hover *,
-button[class*="tour-button-override"]:hover * {
-  color: rgb(31, 41, 55) !important;
+.tour-button-override:hover * {
+  color: rgb(31, 41, 55);
 }
