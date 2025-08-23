@@ -103,7 +103,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const [activeTab, setActiveTab] = useState('home');
   const [previousTab, setPreviousTab] = useState('home');
   const [openCard, setOpenCard] = useState<string | undefined>(undefined);
-  const { backgroundImage, animationKey, isLoading, imageLoaded } = useRotatingBackground(activeTab);
+  const [navigationTrigger, setNavigationTrigger] = useState(0);
+  const { backgroundImage, animationKey, isLoading, imageLoaded } = useRotatingBackground(activeTab, navigationTrigger);
   const { data: achievements = [], isLoading: achievementsLoading } = useAchievements();
   const [searchQuery, setSearchQuery] = useState('');
   const [showAchievement, setShowAchievement] = useState(false);
@@ -981,6 +982,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         setPreviousTab(activeTab);
         setActiveTab(newTab);
         setOpenCard(undefined);
+        
+        // Trigger background image rotation for nav button clicks
+        setNavigationTrigger(prev => prev + 1);
         
         // Optimized scroll to top with proper timing
         const performOptimizedScroll = () => {

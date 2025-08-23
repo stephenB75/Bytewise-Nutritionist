@@ -77,7 +77,7 @@ const pageImageMap: Record<string, number[]> = {
   'data': [5, 13, 15, 16, 17, 19, 20, 30, 32, 35, 40, 41, 49, 50, 52] // Analytics and data visualization
 };
 
-export function useRotatingBackground(activeTab: string) {
+export function useRotatingBackground(activeTab: string, navigationTrigger?: number) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [backgroundImage, setBackgroundImage] = useState(foodImages[0]);
   const [animationKey, setAnimationKey] = useState(0);
@@ -94,8 +94,11 @@ export function useRotatingBackground(activeTab: string) {
     });
   };
   
-  // Change background when page/tab changes
+  // Change background ONLY when user navigates via nav buttons
   useEffect(() => {
+    // Skip if no navigation trigger (initial load or programmatic changes)
+    if (!navigationTrigger) return;
+    
     const pageImages = pageImageMap[activeTab] || [0, 1, 2];
     
     // Ensure we get a different image by filtering out current one
@@ -142,7 +145,7 @@ export function useRotatingBackground(activeTab: string) {
           setImageLoaded(false);
         }, 100);
       });
-  }, [activeTab]); // Remove currentImageIndex dependency to avoid infinite loops
+  }, [navigationTrigger, activeTab]); // Only trigger on navigation events
   
   // Preload initial image on mount with smooth fade-in
   useEffect(() => {
