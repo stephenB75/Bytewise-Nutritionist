@@ -144,7 +144,7 @@ export default function AIFoodAnalyzer() {
       console.log('🔬 Parsed analysis result:', result);
       return result as AnalysisResult;
     },
-    onSuccess: (result) => {
+    onSuccess: async (result) => {
       // Calculate total nutrition from identified foods
       const totalNutrition = result.identifiedFoods.reduce(
         (total, food) => ({
@@ -168,9 +168,27 @@ export default function AIFoodAnalyzer() {
       setAnalysisResult(analysisResultWithTotals);
       // Save to weekly history
       saveAnalyzedFood(analysisResultWithTotals);
+      
+      // Automatically log to daily tracker
+      const mealName = result.identifiedFoods.length === 1 
+        ? result.identifiedFoods[0].name
+        : `Mixed Meal (${result.identifiedFoods.length} items)`;
+
+      await addCalculatedCalories({
+        name: mealName,
+        calories: totalNutrition.calories,
+        protein: totalNutrition.protein,
+        carbs: totalNutrition.carbs,
+        fat: totalNutrition.fat,
+        fiber: totalNutrition.fiber,
+        sugar: totalNutrition.sugar,
+        sodium: totalNutrition.sodium,
+        ingredients: result.identifiedFoods.map(f => f.name)
+      });
+      
       toast({
-        title: "Analysis Complete!",
-        description: `Identified ${result.identifiedFoods.length} food items`,
+        title: "Analysis Complete & Logged!",
+        description: `Found ${result.identifiedFoods.length} food items (${Math.round(totalNutrition.calories)} cal) and added to your daily log`,
       });
     },
     onError: (error: any) => {
@@ -328,35 +346,7 @@ export default function AIFoodAnalyzer() {
     });
   };
 
-  // Add to calorie tracker
-  const handleAddToTracker = async () => {
-    if (!analysisResult) return;
-
-    const mealName = analysisResult.identifiedFoods.length === 1 
-      ? analysisResult.identifiedFoods[0].name
-      : `Mixed Meal (${analysisResult.identifiedFoods.length} items)`;
-
-    await addCalculatedCalories({
-      name: mealName,
-      calories: analysisResult.totalNutrition.calories,
-      protein: analysisResult.totalNutrition.protein,
-      carbs: analysisResult.totalNutrition.carbs,
-      fat: analysisResult.totalNutrition.fat,
-      fiber: analysisResult.totalNutrition.fiber,
-      sugar: analysisResult.totalNutrition.sugar,
-      sodium: analysisResult.totalNutrition.sodium,
-      ingredients: analysisResult.identifiedFoods.map(f => f.name)
-    });
-
-    toast({
-      title: "Added to Tracker!",
-      description: `${mealName} (${analysisResult.totalNutrition.calories} cal) added to your daily log`,
-    });
-
-    // Clear analysis for next photo
-    setAnalysisResult(null);
-    setUploadedImageUrl('');
-  };
+  // Note: Automatic logging is now handled in analyzeFoodMutation.onSuccess
 
   return (
     <div className="min-h-screen">
@@ -522,15 +512,18 @@ export default function AIFoodAnalyzer() {
                 </div>
               </div>
               
-              <Button 
-                onClick={handleAddToTracker} 
-                className="w-full" 
-                size="lg"
-                data-testid="button-add-meal-to-tracker"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add Meal to Calorie Tracker
-              </Button>
+              {/* Auto-logged notification */}
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                    <span className="text-white text-sm">✓</span>
+                  </div>
+                  <span className="font-semibold text-green-800">Automatically Added to Daily Log</span>
+                </div>
+                <p className="text-sm text-green-700">
+                  This meal has been logged to "Logged Today" and will appear in your weekly summary
+                </p>
+              </div>
             </CardContent>
           </Card>
 
