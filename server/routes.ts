@@ -1873,6 +1873,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     try {
       const waterHistory = await storage.getUserWaterIntakeHistory(userId, days);
+      console.log('💧 Water history retrieved:', waterHistory.length, 'records');
       
       res.json({
         success: true,
@@ -1884,6 +1885,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({
         success: false,
         message: 'Failed to fetch water history',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+  });
+
+  // POST endpoint for manually seeding water history data
+  app.post('/api/water-history/seed', isAuthenticated, async (req: any, res: Response) => {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({ message: "User not found or unauthorized" });
+    }
+
+    try {
+      // Generate sample water intake data for the last 30 days
+      const waterIntakeData = [];
+      for (let i = 1; i <= 30; i++) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        const glasses = Math.floor(Math.random() * 8) + 2; // Random 2-9 glasses
+        
+        await storage.upsertWaterIntake({
+          userId,
+          date,
+          glasses
+        });
+        
+        waterIntakeData.push({ date: date.toISOString().split('T')[0], glasses });
+      }
+
+      console.log('💧 Seeded water history for user:', userId, 'with', waterIntakeData.length, 'records');
+
+      res.json({
+        success: true,
+        message: 'Water history seeded successfully',
+        data: waterIntakeData
+      });
+    } catch (error: any) {
+      console.error('❌ Failed to seed water history:', error.message, error.stack);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to seed water history',
         details: process.env.NODE_ENV === 'development' ? error.message : undefined
       });
     }
