@@ -1037,13 +1037,14 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     // TRANSITION GUARD: Disable animations during page transitions
     const animationsEnabled = !isTransitioning;
     
-    // Memoize the background style to prevent recalculation
+    // Memoize the background style optimized for mobile food composition
     const backgroundStyle = React.useMemo(() => ({
       backgroundImage: `url('${backgroundImage}')`,
       backgroundSize: 'cover',
-      backgroundPosition: 'center',
+      backgroundPosition: 'center center', // Ensures food items are centered both horizontally and vertically
       backgroundRepeat: 'no-repeat',
       backgroundColor: '#1f2937', // Dark fallback to prevent yellow flash
+      backgroundAttachment: 'scroll', // Better mobile performance
     }), [backgroundImage]);
     
     // Dynamic CSS classes based on loading state

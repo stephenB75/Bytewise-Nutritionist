@@ -1462,13 +1462,36 @@ body {
   color: #9ca3af;
 }
 
-/* Optimized Hero Background Animations */
+/* Optimized Hero Background Animations - Mobile food composition focused */
 .hero-bg-optimized {
   /* Dark fallback background to prevent yellow flash */
   background-color: #1f2937;
   /* Start with hidden state for smooth fade-in */
   opacity: 0;
   transition: opacity 1.2s ease-in-out;
+  /* Performance optimizations */
+  will-change: transform, opacity, filter;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  /* Ensure consistent background sizing and positioning */
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+}
+
+/* Mobile-specific hero background adjustments for food composition */
+@media (max-width: 768px) {
+  .hero-bg-optimized {
+    /* Center food items with slight bias toward bottom-center for mobile screens */
+    background-position: center 60% !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-bg-optimized {
+    /* Ensure food items are properly centered and sized for small screens */
+    background-position: center 55% !important;
+  }
 }
 
 /* Loading state for hero background */
