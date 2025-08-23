@@ -5,21 +5,16 @@
 
 import { useState, useEffect } from 'react';
 
-// Food-only image collection - using only actual food photographs
+// Vegetarian food-only image collection - no meat products
 const foodImages = [
   new URL('@assets/apple-3313209_1920_1753859530078-BJW4vFlt.jpg', import.meta.url).href,
   new URL('@assets/blueberries-9450130_1920_1753859477806-DQeN0M4j.jpg', import.meta.url).href,
   new URL('@assets/bowl-1842294_1920_1753859477806-bRUsOvIC.jpg', import.meta.url).href,
-  new URL('@assets/burgers-5590503_1920_1753859530083-I99DUxaH.jpg', import.meta.url).href,
-  new URL('@assets/chicken-2443901_1920_1753859530084-CTPERNUZ.jpg', import.meta.url).href,
-  new URL('@assets/chicken-762531_1920_1753859530086-BwBmOm1s.jpg', import.meta.url).href,
-  new URL('@assets/chicken-nuggets-1108_1920_1753859530084-DLWOOEId.jpg', import.meta.url).href,
   new URL('@assets/chocolate-1927921_1920_1753859477802-D-SPQY8I.jpg', import.meta.url).href,
   new URL('@assets/churros-2188871_1920_1753859477808-BGqrIj5F.jpg', import.meta.url).href,
   new URL('@assets/cupcakes-813078_1920_1753859477803-D9uLIWdp.jpg', import.meta.url).href,
   new URL('@assets/food-3262796_1920_1753859530086-BeFn5V1r.jpg', import.meta.url).href,
   new URL('@assets/food-993457_1920_1753859794688-oWnyu60z.jpg', import.meta.url).href,
-  new URL('@assets/fried-prawn-1737593_1920_1753859794686-DkxziorZ.jpg', import.meta.url).href,
   new URL('@assets/grapes-2032838_1920_1753859477808-CXmP7soY.jpg', import.meta.url).href,
   new URL('@assets/macarons-2179198_1920_1753859477809-B5cbwbKS.jpg', import.meta.url).href,
   new URL('@assets/mango-1534061_1920_1753859530079-BEyrLl3D.jpg', import.meta.url).href,
@@ -28,13 +23,10 @@ const foodImages = [
   new URL('@assets/pancakes-2291908_1920_1753859477805-FMeaELmV.jpg', import.meta.url).href,
   new URL('@assets/pizza-2068272_1920_1753859530080-DhVI5ZGb.jpg', import.meta.url).href,
   new URL('@assets/plums-1898196_1920_1753859477809-C44a7c3I.jpg', import.meta.url).href,
-  new URL('@assets/raw-chicken-6946604_1920_1753859530081-BqlbPNnB.jpg', import.meta.url).href,
   new URL('@assets/salad-6948004_1920_1753859530085-1zwSa4Vt.jpg', import.meta.url).href,
   new URL('@assets/sandwich-6935938_1920_1753859794687-CXrSzbzE.jpg', import.meta.url).href,
   new URL('@assets/spaghetti-1392266_1920_1753859477805-HAisuHs3.jpg', import.meta.url).href,
   new URL('@assets/spaghetti-2931846_1920_1753859477804-BSrB8P7y.jpg', import.meta.url).href,
-  new URL('@assets/steak-6278031_1920_1753859530081-BukNuh5v.jpg', import.meta.url).href,
-  new URL('@assets/steak-7423231_1920_1753859530082-DBBrmAYH.jpg', import.meta.url).href,
   new URL('@assets/strawberry-7224875_1920_1753859477810-CXpGW8lN.jpg', import.meta.url).href,
   new URL('@assets/swedish-6053292_1920_1753859530083-CbbGYA9Y.jpg', import.meta.url).href,
   new URL('@assets/tomatoes-1238255_1920_1753859477803-BBxmQtT1.jpg', import.meta.url).href,
@@ -63,18 +55,18 @@ const foodImages = [
   new URL('@assets/pistachios-3223610_1280_1755903678482.jpg', import.meta.url).href, // 52
 ];
 
-// Food-themed page mappings for thematic consistency - ALL 53 photos included
+// Food-themed page mappings for vegetarian foods only - ALL 45 photos included
 const pageImageMap: Record<string, number[]> = {
-  'home': [0, 2, 10, 22, 31, 32, 35, 40, 41, 49, 50, 51], // Healthy foods and fresh produce
-  'nutrition': [3, 4, 5, 6, 11, 21, 23, 26, 27, 33, 34, 36, 39, 48], // Proteins and main dishes
-  'daily': [3, 19, 26, 27, 29, 34, 36, 37, 43, 44], // Daily meals and regular foods
-  'profile': [7, 9, 14, 16, 24, 28, 38, 39, 42, 45, 46, 47], // Desserts, treats, and special foods
-  'tracking': [1, 12, 17, 18, 21, 30, 36, 40, 48, 51, 52], // Breakfast and healthy tracking options
-  'achievements': [0, 8, 13, 15, 16, 20, 25, 35, 40, 41, 49, 50, 51], // Colorful fruits and celebration foods
-  'signin': [18, 25, 31, 32, 36, 38, 39, 48], // Welcoming foods
-  'calculator': [11, 24, 29, 43, 44, 52], // Cooking ingredients and prep
-  'search': [1, 2, 4, 6, 8, 9, 10, 22, 30, 31, 33, 37, 42], // Variety and discovery
-  'data': [5, 13, 15, 16, 17, 19, 20, 30, 32, 35, 40, 41, 49, 50, 52] // Analytics and data visualization
+  'home': [0, 2, 8, 10, 16, 17, 22, 23, 24, 25, 30, 33, 34, 35, 37, 38, 39, 41, 42, 43], // Healthy foods and fresh produce
+  'nutrition': [6, 7, 11, 12, 13, 14, 17, 18, 19, 25, 26, 30, 31, 32, 40], // Plant-based proteins and main dishes
+  'daily': [11, 12, 13, 14, 17, 26, 35, 36], // Daily vegetarian meals and regular foods
+  'profile': [3, 4, 5, 9, 18, 19, 20, 30, 31, 32, 37, 38, 39], // Desserts, treats, and special foods
+  'tracking': [1, 8, 10, 12, 15, 16, 20, 22, 40, 43, 44], // Breakfast and healthy tracking options
+  'achievements': [0, 3, 4, 8, 9, 10, 15, 20, 22, 23, 24, 33, 34, 35, 37, 38, 39, 41, 42, 43], // Colorful fruits and celebration foods
+  'signin': [4, 10, 16, 17, 30, 31, 32, 40], // Welcoming foods
+  'calculator': [7, 9, 14, 35, 36, 44], // Cooking ingredients and prep
+  'search': [1, 2, 3, 4, 5, 6, 8, 15, 17, 25, 26, 29, 34], // Variety and discovery
+  'data': [3, 8, 9, 10, 11, 12, 13, 15, 16, 20, 22, 23, 24, 33, 34, 35, 37, 44] // Analytics and data visualization
 };
 
 export function useRotatingBackground(activeTab: string, navigationTrigger?: number) {
