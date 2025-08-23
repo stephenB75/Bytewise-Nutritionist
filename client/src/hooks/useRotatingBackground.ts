@@ -81,6 +81,18 @@ export function useRotatingBackground(activeTab: string) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [backgroundImage, setBackgroundImage] = useState(foodImages[0]);
   const [animationKey, setAnimationKey] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  
+  // Preload image function
+  const preloadImage = (src: string): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve();
+      img.onerror = () => reject();
+      img.src = src;
+    });
+  };
   
   // Change background when page/tab changes
   useEffect(() => {
@@ -98,14 +110,49 @@ export function useRotatingBackground(activeTab: string) {
     }
     
     const randomPageImage = availableImages[Math.floor(Math.random() * availableImages.length)];
+    const newImageSrc = foodImages[randomPageImage];
     
-    setCurrentImageIndex(randomPageImage);
-    setBackgroundImage(foodImages[randomPageImage]);
-    setAnimationKey(prev => prev + 1);
+    // Set loading state
+    setIsLoading(true);
+    setImageLoaded(false);
+    
+    // Preload the new image
+    preloadImage(newImageSrc)
+      .then(() => {
+        // Image is ready, update background
+        setCurrentImageIndex(randomPageImage);
+        setBackgroundImage(newImageSrc);
+        setAnimationKey(prev => prev + 1);
+        setImageLoaded(true);
+        setIsLoading(false);
+      })
+      .catch(() => {
+        // If image fails to load, still update but with loading state
+        setCurrentImageIndex(randomPageImage);
+        setBackgroundImage(newImageSrc);
+        setAnimationKey(prev => prev + 1);
+        setIsLoading(false);
+        setImageLoaded(false);
+      });
   }, [activeTab]); // Remove currentImageIndex dependency to avoid infinite loops
+  
+  // Preload initial image on mount
+  useEffect(() => {
+    preloadImage(foodImages[0])
+      .then(() => {
+        setImageLoaded(true);
+        setIsLoading(false);
+      })
+      .catch(() => {
+        setIsLoading(false);
+        setImageLoaded(false);
+      });
+  }, []);
 
   return {
     backgroundImage,
-    animationKey
+    animationKey,
+    isLoading,
+    imageLoaded
   };
 }

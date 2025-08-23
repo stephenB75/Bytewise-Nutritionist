@@ -103,7 +103,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const [activeTab, setActiveTab] = useState('home');
   const [previousTab, setPreviousTab] = useState('home');
   const [openCard, setOpenCard] = useState<string | undefined>(undefined);
-  const { backgroundImage, animationKey } = useRotatingBackground(activeTab);
+  const { backgroundImage, animationKey, isLoading, imageLoaded } = useRotatingBackground(activeTab);
   const { data: achievements = [], isLoading: achievementsLoading } = useAchievements();
   const [searchQuery, setSearchQuery] = useState('');
   const [showAchievement, setShowAchievement] = useState(false);
@@ -1042,13 +1042,26 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       backgroundRepeat: 'no-repeat',
       willChange: 'transform',
       transform: 'translateZ(0)', // Force GPU acceleration
+      backgroundColor: '#1f2937', // Dark fallback to prevent yellow flash
     }), [backgroundImage]);
+    
+    // Dynamic CSS classes based on loading state
+    const backgroundClasses = React.useMemo(() => {
+      const baseClasses = 'absolute inset-0 z-10 hero-bg-optimized';
+      if (isLoading) {
+        return `${baseClasses} hero-bg-loading`;
+      }
+      if (imageLoaded) {
+        return `${baseClasses} hero-bg-loaded`;
+      }
+      return baseClasses;
+    }, [isLoading, imageLoaded]);
 
     return (
       <div className="relative h-screen overflow-hidden hero-component" data-hero="true">
-        {/* Optimized Background Layer - removed key to prevent remounting */}
+        {/* Optimized Background Layer with preloading and smooth transitions */}
         <div 
-          className="absolute inset-0 z-10 hero-bg-optimized"
+          className={backgroundClasses}
           style={backgroundStyle}
         />
         
