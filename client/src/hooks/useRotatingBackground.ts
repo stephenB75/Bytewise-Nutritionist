@@ -121,15 +121,17 @@ export function useRotatingBackground(activeTab: string, navigationTrigger?: num
     // Preload the new image
     preloadImage(newImageSrc)
       .then(() => {
-        // Immediate update for faster response
-        setCurrentImageIndex(randomPageImage);
-        setBackgroundImage(newImageSrc);
-        setAnimationKey(prev => prev + 1);
-        setIsLoading(false);
-        // Quick fade-in trigger
-        requestAnimationFrame(() => {
-          setImageLoaded(true);
-        });
+        // Delayed update to prevent animation conflicts during navigation
+        setTimeout(() => {
+          setCurrentImageIndex(randomPageImage);
+          setBackgroundImage(newImageSrc);
+          setAnimationKey(prev => prev + 1);
+          setIsLoading(false);
+          // Quick fade-in trigger
+          requestAnimationFrame(() => {
+            setImageLoaded(true);
+          });
+        }, 50);
       })
       .catch(() => {
         // If image fails to load, still update immediately

@@ -983,8 +983,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         setActiveTab(newTab);
         setOpenCard(undefined);
         
-        // Trigger background image rotation for nav button clicks
-        setNavigationTrigger(prev => prev + 1);
+        // Delay background image change to prevent animation conflicts
+        setTimeout(() => {
+          setNavigationTrigger(prev => prev + 1);
+        }, 100);
         
         // Optimized scroll to top with proper timing
         const performOptimizedScroll = () => {

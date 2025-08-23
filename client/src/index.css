@@ -1854,8 +1854,8 @@ input {
 
 /* Hero background fade-in during transitions - faster response */
 .hero-bg-transition {
-  opacity: 0;
-  animation: heroTransitionFadeIn 1.0s ease-out forwards;
+  opacity: 1;
+  animation: heroTransitionFadeIn 0.8s ease-out forwards;
 }
 
 
