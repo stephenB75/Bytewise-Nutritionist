@@ -131,34 +131,34 @@ html,
   background-attachment: fixed;
 }
 
-/* Button color overrides for yellow background compatibility */
-button.bg-gray-800,
-button.bg-gray-900,
-button.bg-black:not(.bg-black\/80):not(.bg-black\/50),
-.bg-gray-800.hover\:bg-gray-900:hover,
-.bg-gray-900.hover\:bg-gray-800:hover {
+/* Button color overrides for yellow background compatibility - EXCLUDE navigation */
+button.bg-gray-800:not([data-testid*="nav-"]):not([class*="nav-"]),
+button.bg-gray-900:not([data-testid*="nav-"]):not([class*="nav-"]),
+button.bg-black:not(.bg-black\/80):not(.bg-black\/50):not([data-testid*="nav-"]):not([class*="nav-"]),
+.bg-gray-800.hover\:bg-gray-900:hover:not([data-testid*="nav-"]):not([class*="nav-"]),
+.bg-gray-900.hover\:bg-gray-800:hover:not([data-testid*="nav-"]):not([class*="nav-"]) {
   background-color: #f59e0b !important; /* Amber-500 for good contrast */
   color: #ffffff !important;
 }
 
-button.bg-gray-800:hover,
-button.bg-gray-900:hover,
-button.bg-black:hover:not(.bg-black\/80):not(.bg-black\/50) {
+button.bg-gray-800:hover:not([data-testid*="nav-"]):not([class*="nav-"]),
+button.bg-gray-900:hover:not([data-testid*="nav-"]):not([class*="nav-"]),
+button.bg-black:hover:not(.bg-black\/80):not(.bg-black\/50):not([data-testid*="nav-"]):not([class*="nav-"]) {
   background-color: #d97706 !important; /* Amber-600 for hover state */
   color: #ffffff !important;
 }
 
-/* Dark blue button overrides */
-button.bg-blue-900,
-button.bg-blue-800,
-.bg-blue-900,
-.bg-blue-800 {
+/* Dark blue button overrides - EXCLUDE navigation */
+button.bg-blue-900:not([data-testid*="nav-"]):not([class*="nav-"]),
+button.bg-blue-800:not([data-testid*="nav-"]):not([class*="nav-"]),
+.bg-blue-900:not([data-testid*="nav-"]):not([class*="nav-"]),
+.bg-blue-800:not([data-testid*="nav-"]):not([class*="nav-"]) {
   background-color: #3b82f6 !important; /* Blue-500 instead of very dark blue */
   color: #ffffff !important;
 }
 
-button.bg-blue-900:hover,
-button.bg-blue-800:hover {
+button.bg-blue-900:hover:not([data-testid*="nav-"]):not([class*="nav-"]),
+button.bg-blue-800:hover:not([data-testid*="nav-"]):not([class*="nav-"]) {
   background-color: #2563eb !important; /* Blue-600 for hover */
   color: #ffffff !important;
 }
@@ -170,28 +170,28 @@ button.bg-blue-800:hover {
   color: #111827; /* Dark for yellow background readability */
 }
 
-/* Button text color overrides for dark text on yellow background */
-button.text-black,
-button.text-gray-900,
-.text-black:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="card"] *),
-.text-gray-900:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="card"] *) {
+/* Button text color overrides for dark text on yellow background - EXCLUDE navigation */
+button.text-black:not([data-testid*="nav-"]):not([class*="nav-"]),
+button.text-gray-900:not([data-testid*="nav-"]):not([class*="nav-"]),
+.text-black:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="card"] *):not([data-testid*="nav-"]):not([class*="nav-"]),
+.text-gray-900:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="card"] *):not([data-testid*="nav-"]):not([class*="nav-"]) {
   color: #374151 !important; /* Medium gray for better readability on yellow */
 }
 
-/* Dark blue text overrides */
-button.text-blue-900,
-.text-blue-900 {
+/* Dark blue text overrides - EXCLUDE navigation */
+button.text-blue-900:not([data-testid*="nav-"]):not([class*="nav-"]),
+.text-blue-900:not([data-testid*="nav-"]):not([class*="nav-"]) {
   color: #1d4ed8 !important; /* Blue-700 instead of very dark blue */
 }
 
-/* Ensure button contrast on yellow background */
-button:not([class*="bg-"]):not(.hero-component *):not([data-hero="true"] *):not(.btn-hero-enhanced) {
+/* Ensure button contrast on yellow background - EXCLUDE navigation */
+button:not([class*="bg-"]):not(.hero-component *):not([data-hero="true"] *):not(.btn-hero-enhanced):not([data-testid*="nav-"]):not([class*="nav-"]) {
   background-color: #f3f4f6; /* Light gray background */
   color: #374151; /* Dark gray text */
   border: 1px solid #d1d5db; /* Light border */
 }
 
-button:not([class*="bg-"]):hover:not(.hero-component *):not([data-hero="true"] *):not(.btn-hero-enhanced) {
+button:not([class*="bg-"]):hover:not(.hero-component *):not([data-hero="true"] *):not(.btn-hero-enhanced):not([data-testid*="nav-"]):not([class*="nav-"]) {
   background-color: #e5e7eb; /* Slightly darker gray on hover */
   color: #1f2937; /* Darker text on hover */
 }
@@ -517,19 +517,19 @@ button.btn-hero-enhanced span,
   color: #111827;
 }
 
-/* Fasting tracker button color fixes */
-[data-testid*="fasting"] button.bg-gray-800,
-[data-testid*="fasting"] button.bg-gray-900,
-button[class*="bg-gray-800"],
-button[class*="bg-gray-900"] {
+/* Fasting tracker button color fixes - EXCLUDE navigation */
+[data-testid*="fasting"] button.bg-gray-800:not([data-testid*="nav-"]):not([class*="nav-"]),
+[data-testid*="fasting"] button.bg-gray-900:not([data-testid*="nav-"]):not([class*="nav-"]),
+button[class*="bg-gray-800"]:not([data-testid*="nav-"]):not([class*="nav-"]),
+button[class*="bg-gray-900"]:not([data-testid*="nav-"]):not([class*="nav-"]) {
   background-color: #10b981 !important; /* Emerald-500 for fasting buttons */
   color: #ffffff !important;
 }
 
-[data-testid*="fasting"] button.bg-gray-800:hover,
-[data-testid*="fasting"] button.bg-gray-900:hover,
-button[class*="bg-gray-800"]:hover,
-button[class*="bg-gray-900"]:hover {
+[data-testid*="fasting"] button.bg-gray-800:hover:not([data-testid*="nav-"]):not([class*="nav-"]),
+[data-testid*="fasting"] button.bg-gray-900:hover:not([data-testid*="nav-"]):not([class*="nav-"]),
+button[class*="bg-gray-800"]:hover:not([data-testid*="nav-"]):not([class*="nav-"]),
+button[class*="bg-gray-900"]:hover:not([data-testid*="nav-"]):not([class*="nav-"]) {
   background-color: #059669 !important; /* Emerald-600 for hover */
   color: #ffffff !important;
 }
