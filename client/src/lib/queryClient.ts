@@ -22,6 +22,7 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
         accessToken = parsedSession.access_token;
       }
     } catch (parseError) {
+      // Invalid JSON in localStorage, ignore
     }
   }
   
@@ -35,7 +36,6 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
   
   if (accessToken) {
     headers.Authorization = `Bearer ${accessToken}`;
-  } else {
   }
   
   return headers;
@@ -71,14 +71,10 @@ export const getQueryFn: <T>(options: {
   async ({ queryKey }) => {
     const authHeaders = await getAuthHeaders();
     const url = queryKey.join("/") as string;
-    
-    
     const res = await fetch(url, {
       headers: authHeaders,
       credentials: "include",
     });
-
-
     if (unauthorizedBehavior === "returnNull" && res.status === 401) {
       return null;
     }

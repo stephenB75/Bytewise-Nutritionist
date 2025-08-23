@@ -56,7 +56,6 @@ export function useAuth() {
         }
         
         if (!accessToken) {
-          console.log('❌ No valid session found (neither custom nor Supabase)');
           return null;
         }
         
@@ -67,34 +66,18 @@ export function useAuth() {
           },
         });
         
-        console.log('🔍 Backend user fetch response:', {
-          status: response.status,
-          ok: response.ok
-        });
         
         if (!response.ok) {
           // If unauthorized, return null instead of throwing
           if (response.status === 401) {
-            console.log('❌ Unauthorized - token may be invalid');
             return null;
           }
           throw new Error('Failed to fetch user');
         }
         
         const userData = await response.json();
-        console.log('✅ User data fetched successfully:', {
-          hasUserData: !!userData,
-          userEmail: userData?.email || 'none',
-          userId: userData?.id?.substring(0, 8) + '...' || 'none',
-          firstName: userData?.firstName || '(empty)',
-          lastName: userData?.lastName || '(empty)',
-          hasPersonalInfo: !!userData?.personalInfo,
-          dailyCalorieGoal: userData?.dailyCalorieGoal || 'none'
-        });
         return userData;
       } catch (error) {
-        console.log('❌ Auth query error:', error);
-        // Return null for any authentication errors
         return null;
       }
     },
@@ -112,26 +95,15 @@ export function useAuth() {
 
   const signOut = async () => {
     try {
-      console.log('🚪 Starting sign out process...');
-      
-      // Clear localStorage first
       localStorage.removeItem('supabase.auth.token');
-      console.log('✅ Cleared localStorage custom tokens');
       
       // Try to sign out from Supabase
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.log('⚠️ Supabase signOut error:', error);
-      } else {
-        console.log('✅ Supabase session cleared');
-      }
+      await supabase.auth.signOut();
       
       // Call backend signout endpoint
       try {
         await fetch('/api/auth/signout', { method: 'POST' });
-        console.log('✅ Backend signout called');
       } catch (fetchError) {
-        console.log('⚠️ Backend signout error:', fetchError);
       }
       
       // Force refresh auth state

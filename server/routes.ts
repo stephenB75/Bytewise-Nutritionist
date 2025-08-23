@@ -1039,10 +1039,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Object storage upload endpoint (no authentication required for AI analysis)
   app.post('/api/objects/upload', async (req: Request, res: Response) => {
     try {
-      console.log('🔄 Upload URL request received for AI Food Analysis');
       const objectStorageService = new ObjectStorageService();
       const uploadURL = await objectStorageService.getObjectEntityUploadURL();
-      console.log('✅ Generated upload URL:', uploadURL ? 'URL Generated' : 'No URL');
       res.json({ uploadURL });
     } catch (error: any) {
       console.error('❌ Error getting upload URL:', error.message, error.stack);
@@ -1058,7 +1056,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'Object path is required' });
       }
 
-      console.log('🖼️ Proxying private image for AI analysis:', objectPath);
       
       // Get the object file from private storage
       const objectStorageService = new ObjectStorageService();
@@ -1083,14 +1080,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       while (!exists && retryCount < maxRetries) {
         [exists] = await file.exists();
         if (!exists) {
-          console.log(`⏳ Image not found (attempt ${retryCount + 1}/${maxRetries}), retrying in 2 seconds...`);
           await new Promise(resolve => setTimeout(resolve, 2000)); // Longer delay between retries
           retryCount++;
         }
       }
       
       if (!exists) {
-        console.log('❌ Image not found in object storage after retries:', objectPath);
         // Return a more helpful error for the AI service
         return res.status(404).json({ 
           error: 'Image not found in storage',
@@ -1107,7 +1102,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         'Cache-Control': 'private, max-age=300' // 5 minutes cache
       });
       
-      console.log('✅ Streaming private image to AI service');
       
       // Stream the file data
       const stream = file.createReadStream();
@@ -1131,30 +1125,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // AI food analysis endpoint
   app.post('/api/ai/analyze-food', async (req: Request, res: Response) => {
     try {
-      console.log('🤖 AI Food Analysis request received');
       const { imageUrl } = req.body;
       
       if (!imageUrl) {
-        console.log('❌ AI Analysis failed: No image URL provided');
         return res.status(400).json({ error: 'Image URL is required' });
       }
 
-      console.log('🔍 Analyzing food image:', imageUrl);
 
       // With Gemini Vision, we pass the storage URL directly as it downloads the image internally
-      console.log('🔬 Starting Gemini Vision AI analysis with URL:', imageUrl);
       
       // Add validation for empty analysis results
       const aiResult = await analyzeFoodImage(imageUrl);
-      console.log('🔬 AI analysis result:', { 
-        success: true, 
-        foodsFound: aiResult.identifiedFoods?.length || 0,
-        analysisTime: aiResult.analysisTime 
-      });
 
       // Handle case where no foods are identified
       if (!aiResult.identifiedFoods || aiResult.identifiedFoods.length === 0) {
-        console.log('⚠️ No foods identified in the image');
         return res.json({
           imageUrl,
           identifiedFoods: [],
@@ -1193,10 +1177,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         analysisTime: aiResult.analysisTime
       };
 
-      console.log('✅ Food analysis complete:', {
-        foodsFound: identifiedFoods.length,
-        totalCalories: totalNutrition.calories
-      });
 
       res.json(result);
     } catch (error: any) {
@@ -2033,7 +2013,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/proxy-image/:path(*)', async (req: Request, res: Response) => {
     try {
       const objectPath = req.params.path;
-      console.log('🖼️ Proxy request for image:', objectPath);
       
       // Get the bucket name from environment or use default
       const bucketName = process.env.REPL_ID ? `repl-default-bucket-${process.env.REPL_ID}` : 'default-bucket';
@@ -2045,7 +2024,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if file exists
       const [exists] = await file.exists();
       if (!exists) {
-        console.log('❌ Image not found in storage:', objectPath);
         return res.status(404).json({ error: 'Image not found' });
       }
       
@@ -2073,7 +2051,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       });
       
-      console.log('✅ Image served successfully:', objectPath);
       
     } catch (error: any) {
       console.error('❌ Image proxy error:', error);

@@ -52,7 +52,6 @@ import {
   ArrowLeft,
   ArrowRight,
   PlayCircle,
-  MapPin,
   GraduationCap,
   Play,
   Camera

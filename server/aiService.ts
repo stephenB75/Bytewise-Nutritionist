@@ -32,7 +32,6 @@ export interface FoodAnalysisResult {
  */
 export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisResult> {
   try {
-    console.log('🔍 Starting Gemini Vision food analysis for image:', imageUrl);
 
     // Validate API credentials
     if (!GOOGLE_API_KEY) {
@@ -47,7 +46,6 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
     try {
       model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
     } catch (modelError) {
-      console.log('⚠️ Gemini 2.0 Flash not available, falling back to Gemini 1.5 Pro...');
       model = genAI.getGenerativeModel({ model: "gemini-1.5-pro-latest" });
     }
 
@@ -63,7 +61,6 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
       if (bucketIndex !== -1) {
         // Get everything after the bucket name as the object path
         const objectPath = pathParts.slice(bucketIndex + 1).join('/');
-        console.log('📁 Downloading image from storage:', objectPath);
         
         // Get the file from object storage
         const bucketName = pathParts[bucketIndex];
@@ -79,23 +76,18 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
           [exists] = await file.exists();
           if (!exists) {
             const waitTime = retryCount < 3 ? 2000 : 5000; // Longer waits for later attempts
-            console.log(`⏳ Waiting for upload completion (attempt ${retryCount + 1}/${maxRetries}), waiting ${waitTime}ms...`);
             await new Promise(resolve => setTimeout(resolve, waitTime));
             retryCount++;
           }
         }
         
         if (!exists) {
-          console.log('❌ File not found after all retries. Object path:', objectPath);
-          console.log('🔍 Bucket name:', bucketName);
-          console.log('📁 Full image URL:', imageUrl);
           throw new Error('UPLOAD_ERROR: Image not found in storage after upload. Please wait a moment and try again.');
         }
         
         // Download the image data
         const [fileData] = await file.download();
         imageBuffer = fileData;
-        console.log('✅ Image downloaded from storage:', imageBuffer.length, 'bytes');
         
       } else {
         throw new Error('INVALID_URL: Unable to parse storage URL');
@@ -132,14 +124,11 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
       }
     };
 
-    console.log('🤖 Calling Gemini Vision API...');
     try {
       const geminiResult = await model.generateContent([prompt, imagePart]);
       const response = await geminiResult.response;
       const text = response.text();
-      console.log('✅ Gemini API call successful');
 
-      console.log('🔍 Raw Gemini response:', text);
 
       // Parse the JSON response
       let foodItems: IdentifiedFood[] = [];
@@ -164,7 +153,6 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
               const nutrition = await getNutritionFromUSDA(foodItems[i].name, foodItems[i].estimatedGrams);
               foodItems[i] = { ...foodItems[i], ...nutrition };
             } catch (nutritionError) {
-              console.log(`⚠️ Could not get nutrition for ${foodItems[i].name}:`, nutritionError);
               // Add estimated nutrition if USDA lookup fails
               const estimatedNutrition = getEstimatedNutrition(foodItems[i].name, foodItems[i].estimatedGrams);
               foodItems[i] = { ...foodItems[i], ...estimatedNutrition };
@@ -172,7 +160,6 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
           }
         }
       } catch (parseError) {
-        console.log('⚠️ Could not parse Gemini response as JSON:', parseError);
         // Fallback: create a generic food item
         foodItems = [{
           name: 'Food Item',
@@ -200,7 +187,6 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
         analysisTime: new Date().toISOString()
       };
 
-      console.log('✅ Gemini Vision analysis completed:', analysisResult);
       return analysisResult;
 
     } catch (geminiError) {
@@ -213,7 +199,6 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
         geminiError.message.includes('RESOURCE_EXHAUSTED') ||
         geminiError.message.includes('quota exceeded')
       )) {
-        console.log('⚠️ Gemini API quota exceeded, providing fallback analysis...');
         return getFallbackAnalysis();
       }
       
@@ -224,7 +209,6 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
         geminiError.message.includes('blocked') ||
         geminiError.message.includes('unauthorized')
       )) {
-        console.log('⚠️ API access restricted, providing fallback analysis...');
         return getFallbackAnalysis();
       }
       
@@ -235,7 +219,6 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
         geminiError.message.includes('Bad Request') ||
         geminiError.message.includes('invalid image')
       )) {
-        console.log('⚠️ Image validation failed, providing fallback analysis...');
         return getFallbackAnalysis();
       }
       
