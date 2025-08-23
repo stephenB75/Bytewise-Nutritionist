@@ -966,8 +966,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const [, setLocation] = useLocation();
 
   const handleTabChange = (newTab: string) => {
-    if (newTab !== activeTab) {
-      // Start page transition
+    if (newTab !== activeTab && !isTransitioning) {
+      // TRANSITION GUARD: Prevent simultaneous transitions
       setIsTransitioning(true);
       
       // Fade out current page
@@ -1039,14 +1039,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     // Determine if current page is dashboard
     const isDashboard = activeTab === 'home';
     
+    // TRANSITION GUARD: Disable animations during page transitions
+    const animationsEnabled = !isTransitioning;
+    
     // Memoize the background style to prevent recalculation
     const backgroundStyle = React.useMemo(() => ({
       backgroundImage: `url('${backgroundImage}')`,
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       backgroundRepeat: 'no-repeat',
-      willChange: 'transform',
-      transform: 'translateZ(0)', // Force GPU acceleration
       backgroundColor: '#1f2937', // Dark fallback to prevent yellow flash
     }), [backgroundImage]);
     
@@ -1056,11 +1057,14 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       if (isLoading) {
         return `${baseClasses} hero-bg-loading`;
       }
-      if (imageLoaded) {
+      if (imageLoaded && animationsEnabled) {
         return `${baseClasses} hero-bg-loaded`;
       }
+      if (imageLoaded && !animationsEnabled) {
+        return `${baseClasses} opacity-100`;
+      }
       return baseClasses;
-    }, [isLoading, imageLoaded]);
+    }, [isLoading, imageLoaded, animationsEnabled]);
 
     return (
       <div className="relative h-screen overflow-hidden hero-component" data-hero="true">
@@ -1079,21 +1083,21 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           <div className="space-y-8 max-w-2xl">
             {/* Enhanced Title Section */}
             <div className="space-y-3 hero-optimized">
-              <h1 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] drop-shadow-2xl animate-fadeInUp [animation-delay:4.8s] font-league-spartan text-optimized">
+              <h1 className={`text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] drop-shadow-2xl font-league-spartan text-optimized ${animationsEnabled ? 'animate-fadeInUp [animation-delay:4.8s]' : 'opacity-100'}`}>
                 {title}
               </h1>
-              <h2 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] animate-appLaunchSlide [animation-delay:5.3s] font-league-spartan text-optimized">
+              <h2 className={`text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] font-league-spartan text-optimized ${animationsEnabled ? 'animate-appLaunchSlide [animation-delay:5.3s]' : 'opacity-100'}`}>
                 {subtitle}
               </h2>
             </div>
             
             {/* Enhanced Description */}
-            <p className="text-2xl md:text-3xl font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl animate-appLaunchFade [animation-delay:5.8s] font-work-sans text-gray-100">
+            <p className={`text-2xl md:text-3xl font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl font-work-sans text-gray-100 ${animationsEnabled ? 'animate-appLaunchFade [animation-delay:5.8s]' : 'opacity-100'}`}>
               {description}
             </p>
             
             {/* Enhanced Call-to-Action */}
-            <div className="pt-8 animate-appLaunchButton [animation-delay:6.3s]">
+            <div className={`pt-8 ${animationsEnabled ? 'animate-appLaunchButton [animation-delay:6.3s]' : 'opacity-100'}`}>
               <Button 
                 onClick={onButtonClick}
                 size="lg"
@@ -1110,7 +1114,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         </div>
         
         {/* Enhanced Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 animate-appLaunchFade [animation-delay:6.8s] text-white">
+        <div className={`absolute bottom-8 left-1/2 -translate-x-1/2 z-30 text-white ${animationsEnabled ? 'animate-appLaunchFade [animation-delay:6.8s]' : 'opacity-100'}`}>
           <div className="flex flex-col items-center gap-2 animate-bounce">
             <div className="w-px h-8 bg-gradient-to-b from-transparent to-white opacity-70" />
             <ChevronRight className="w-6 h-6 rotate-90 drop-shadow-lg opacity-80" />
@@ -3077,7 +3081,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   return (
     <div data-testid="app-container" className="h-screen w-screen">
       {/* Fixed Notification Header on all pages - Safe area positioning for iOS/Android */}
-      <div className="fixed top-safe right-4 z-50 safe-notification-position">
+      <div className="fixed top-safe right-4 z-60 safe-notification-position">
         <div className="relative">
           <Button
             variant="ghost"
@@ -3160,7 +3164,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       {renderContent()}
       
       {/* Bottom Navigation - High Resolution Icons */}
-      <div data-testid="navigation-tabs" className="fixed bottom-0 left-0 right-0 bg-yellow-400 border-t border-yellow-500/60 safe-area-pb z-50 shadow-lg">
+      <div data-testid="navigation-tabs" className="fixed bottom-0 left-0 right-0 bg-yellow-400 border-t border-yellow-500/60 safe-area-pb z-40 shadow-lg">
         <div className="flex items-center justify-around py-0.5 px-1 max-w-md mx-auto gap-0.5">
           {[
             { id: 'home', label: 'Dashboard', icon: Home, testId: 'nav-dashboard' },
@@ -3173,9 +3177,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             const [isClicked, setIsClicked] = React.useState(false);
             
             const handleClick = () => {
-              setIsClicked(true);
-              setTimeout(() => setIsClicked(false), 300);
-              handleTabChange(tab.id);
+              // TRANSITION GUARD: Prevent clicks during transitions
+              if (!isTransitioning) {
+                setIsClicked(true);
+                setTimeout(() => setIsClicked(false), 300);
+                handleTabChange(tab.id);
+              }
             };
             
             return (
@@ -3241,7 +3248,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         const profileCompleted = hasFirstName && hasLastName;
         
         return profileCompleted ? (
-          <div className="fixed bottom-20 right-6 z-50">
+          <div className="fixed bottom-20 right-6 z-45">
             <TourLauncher
               onNavigateToFeature={(tab) => setActiveTab(tab)}
               isVisible={shouldShowTour()}
