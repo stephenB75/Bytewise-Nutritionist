@@ -108,6 +108,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const [searchQuery, setSearchQuery] = useState('');
   const [showAchievement, setShowAchievement] = useState(false);
   const [currentAchievement, setCurrentAchievement] = useState<Achievement | null>(null);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [showConfettiCelebration, setShowConfettiCelebration] = useState(false);
   const [confettiAchievement, setConfettiAchievement] = useState<Achievement | null>(null);
   const [dailyCalories, setDailyCalories] = useState(0);
@@ -965,62 +966,66 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const [, setLocation] = useLocation();
 
   const handleTabChange = (newTab: string) => {
-    // Temporarily disable smooth scrolling to force instant scroll
-    const originalScrollBehavior = document.documentElement.style.scrollBehavior;
-    document.documentElement.style.scrollBehavior = 'auto';
-    document.body.style.scrollBehavior = 'auto';
-    
-    // Update state first
-    setPreviousTab(activeTab);
-    setActiveTab(newTab);
-    
-    // Function to scroll to hero component
-    const scrollToHero = () => {
-      // First, try to scroll to top immediately
-      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
+    if (newTab !== activeTab) {
+      // Start page transition
+      setIsTransitioning(true);
       
-      // Then look for hero component and scroll to it specifically
-      const heroElement = document.querySelector('.hero-component, .relative.h-screen, [data-hero]');
-      if (heroElement) {
-        heroElement.scrollIntoView({ 
-          behavior: 'auto',
-          block: 'start',
-          inline: 'nearest'
-        });
-      }
-      
-      // Final safety scroll to ensure we're at the very top
+      // Fade out current page
       setTimeout(() => {
-        window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-        document.documentElement.scrollTop = 0;
-        document.body.scrollTop = 0;
-      }, 0);
-    };
-    
-    // Immediate scroll attempt
-    scrollToHero();
-    
-    // Additional scroll attempts with different timing to ensure consistency
-    setTimeout(scrollToHero, 0);
-    setTimeout(scrollToHero, 10);
-    
-    // Wait for content to render, then scroll to hero
-    setTimeout(() => {
-      scrollToHero();
-      
-      // Restore smooth scrolling after hero scroll is complete
-      setTimeout(() => {
-        document.documentElement.style.scrollBehavior = originalScrollBehavior;
-        document.body.style.scrollBehavior = originalScrollBehavior;
-      }, 100);
-    }, 50);
-    
-    // Final scroll with requestAnimationFrame for next paint cycle
-    requestAnimationFrame(() => {
-      scrollToHero();
-    });
+        // Temporarily disable smooth scrolling to force instant scroll
+        const originalScrollBehavior = document.documentElement.style.scrollBehavior;
+        document.documentElement.style.scrollBehavior = 'auto';
+        document.body.style.scrollBehavior = 'auto';
+        
+        // Update state
+        setPreviousTab(activeTab);
+        setActiveTab(newTab);
+        setOpenCard(undefined);
+        
+        // Function to scroll to hero component
+        const scrollToHero = () => {
+          window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+          document.documentElement.scrollTop = 0;
+          document.body.scrollTop = 0;
+          
+          const heroElement = document.querySelector('.hero-component, .relative.h-screen, [data-hero]');
+          if (heroElement) {
+            heroElement.scrollIntoView({ 
+              behavior: 'auto',
+              block: 'start',
+              inline: 'nearest'
+            });
+          }
+          
+          setTimeout(() => {
+            window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
+          }, 0);
+        };
+        
+        // Scroll attempts
+        scrollToHero();
+        setTimeout(scrollToHero, 0);
+        setTimeout(scrollToHero, 10);
+        
+        // Wait for content to render, then scroll to hero
+        setTimeout(() => {
+          scrollToHero();
+          
+          // Restore original scroll behavior after a delay
+          setTimeout(() => {
+            document.documentElement.style.scrollBehavior = originalScrollBehavior;
+            document.body.style.scrollBehavior = originalScrollBehavior;
+          }, 100);
+        }, 100);
+        
+        // Complete transition (fade in new page)
+        setTimeout(() => {
+          setIsTransitioning(false);
+        }, 400);
+      }, 300); // Fade out duration
+    }
   };
 
   // Optimized Hero Section Component with enhanced performance and visuals
@@ -1074,21 +1079,21 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           <div className="space-y-8 max-w-2xl">
             {/* Enhanced Title Section */}
             <div className="space-y-3 hero-optimized">
-              <h1 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] drop-shadow-2xl animate-fadeInUp [animation-delay:0.2s] font-league-spartan text-optimized">
+              <h1 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] drop-shadow-2xl animate-fadeInUp [animation-delay:2.8s] font-league-spartan text-optimized">
                 {title}
               </h1>
-              <h1 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] animate-appLaunchSlide [animation-delay:0.7s] font-league-spartan text-optimized">
+              <h1 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] animate-appLaunchSlide [animation-delay:3.3s] font-league-spartan text-optimized">
                 {subtitle}
               </h1>
             </div>
             
             {/* Enhanced Description */}
-            <p className="text-2xl md:text-3xl font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl animate-appLaunchFade [animation-delay:1.0s] font-work-sans text-gray-100">
+            <p className="text-2xl md:text-3xl font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl animate-appLaunchFade [animation-delay:3.8s] font-work-sans text-gray-100">
               {description}
             </p>
             
             {/* Enhanced Call-to-Action */}
-            <div className="pt-8 animate-appLaunchButton [animation-delay:1.3s]">
+            <div className="pt-8 animate-appLaunchButton [animation-delay:4.3s]">
               <Button 
                 onClick={onButtonClick}
                 size="lg"
@@ -1105,7 +1110,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         </div>
         
         {/* Enhanced Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 animate-appLaunchFade [animation-delay:1.6s] text-white">
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 animate-appLaunchFade [animation-delay:4.8s] text-white">
           <div className="flex flex-col items-center gap-2 animate-bounce">
             <div className="w-px h-8 bg-gradient-to-b from-transparent to-white opacity-70" />
             <ChevronRight className="w-6 h-6 rotate-90 drop-shadow-lg opacity-80" />
