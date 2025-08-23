@@ -373,45 +373,33 @@ export default function AIFoodAnalyzer() {
           </CardHeader>
           <CardContent>
             <div className="flex flex-col items-center space-y-6">
-              {/* Enhanced Upload Area */}
-              <div className="w-full max-w-md">
+              {/* Mobile-Optimized Upload Button */}
+              <div className="w-full max-w-sm">
                 <ObjectUploader
                   maxNumberOfFiles={1}
                   maxFileSize={10485760} // 10MB
                   onGetUploadParameters={handleGetUploadParameters}
                   onComplete={handleUploadComplete}
-                  buttonClassName="w-full h-20 text-lg bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white border-2 border-amber-400 shadow-lg rounded-xl transition-all duration-200 transform hover:scale-105"
+                  buttonClassName="w-full h-16 text-lg bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white border-2 border-amber-400 shadow-lg rounded-xl transition-all duration-200 transform hover:scale-105"
                 >
-                  <div className="flex flex-col items-center gap-2">
-                    <div className="flex items-center gap-3">
-                      <Camera className="h-7 w-7" />
-                      <span className="font-semibold">Upload Food Photo</span>
-                    </div>
-                    <span className="text-amber-100 text-sm">Click here or drag & drop</span>
+                  <div className="flex items-center justify-center gap-3">
+                    <Camera className="h-6 w-6" />
+                    <span className="font-semibold">Take or Choose Photo</span>
                   </div>
                 </ObjectUploader>
               </div>
               
-              {/* Visual Instructions */}
-              <div className="bg-gradient-to-br from-amber-50 to-yellow-50 border-2 border-dashed border-amber-300 rounded-lg p-4 w-full max-w-md">
+              {/* Mobile-Friendly Instructions */}
+              <div className="bg-gradient-to-br from-amber-50 to-yellow-50 border-2 border-dashed border-amber-300 rounded-lg p-4 w-full max-w-sm">
                 <div className="flex flex-col items-center space-y-3 text-gray-700">
-                  <div className="flex items-center gap-4">
-                    <div className="flex flex-col items-center space-y-1">
-                      <div className="w-8 h-8 bg-amber-200 rounded-full flex items-center justify-center">
-                        <span className="text-lg">👆</span>
-                      </div>
-                      <span className="text-xs font-medium">Click to Browse</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-amber-200 rounded-full flex items-center justify-center">
+                      <span className="text-lg">📸</span>
                     </div>
-                    <div className="text-amber-400 text-xl">or</div>
-                    <div className="flex flex-col items-center space-y-1">
-                      <div className="w-8 h-8 bg-amber-200 rounded-full flex items-center justify-center">
-                        <span className="text-lg">📸</span>
-                      </div>
-                      <span className="text-xs font-medium">Drag & Drop</span>
-                    </div>
+                    <span className="text-sm font-medium">Select from Photo Library</span>
                   </div>
                   <p className="text-center text-sm text-gray-600">
-                    Supports JPG, PNG, HEIC • Max 10MB
+                    Best results with good lighting and clear food visibility
                   </p>
                 </div>
               </div>

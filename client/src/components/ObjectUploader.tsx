@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import type { ReactNode } from "react";
 import Uppy from "@uppy/core";
-import { DashboardModal } from "@uppy/react";
 import "@uppy/core/dist/style.min.css";
-import "@uppy/dashboard/dist/style.min.css";
 import AwsS3 from "@uppy/aws-s3";
 import type { UploadResult } from "@uppy/core";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Progress } from "@/components/ui/progress";
+import { Camera, Upload, X } from "lucide-react";
 
 interface ObjectUploaderProps {
   maxNumberOfFiles?: number;
@@ -59,6 +60,11 @@ export function ObjectUploader({
   children,
 }: ObjectUploaderProps) {
   const [showModal, setShowModal] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [uppy] = useState(() =>
     new Uppy({
       restrictions: {
@@ -67,46 +73,56 @@ export function ObjectUploader({
         allowedFileTypes: ['image/*'], // Only allow images for food analysis
       },
       autoProceed: false,
-      locale: {
-        strings: {
-          dropPasteFiles: '📸 Drop your food photo here or click to browse',
-          dropPasteFolders: '📸 Drop your food photo here or click to browse',
-          browseFiles: 'browse files',
-          dropHint: '📸 Perfect! Drop your food photo here',
-          uploadComplete: '✅ Upload complete!',
-          uploadPaused: '⏸️ Upload paused',
-          resumeUpload: '▶️ Resume upload',
-          pauseUpload: '⏸️ Pause upload',
-          retryUpload: '🔄 Retry upload',
-          addMoreFiles: '+ Add more photos',
-          xFilesSelected: {
-            0: '📸 %{smart_count} photo ready to upload',
-            1: '📸 %{smart_count} photo ready to upload',
-            2: '📸 %{smart_count} photos ready to upload'
-          },
-          uploadingXFiles: {
-            0: '⬆️ Uploading %{smart_count} photo...',
-            1: '⬆️ Uploading %{smart_count} photo...',
-            2: '⬆️ Uploading %{smart_count} photos...'
-          },
-          processingXFiles: {
-            0: '🔄 Processing %{smart_count} photo...',
-            1: '🔄 Processing %{smart_count} photo...',
-            2: '🔄 Processing %{smart_count} photos...'
-          }
-        },
-        pluralize: (n: number) => n === 1 ? 0 : 1
-      }
     })
       .use(AwsS3, {
         shouldUseMultipart: false,
         getUploadParameters: onGetUploadParameters,
       })
+      .on("upload-progress", (file, progress) => {
+        if (progress.bytesTotal) {
+          setUploadProgress(Math.round((progress.bytesUploaded / progress.bytesTotal) * 100));
+        }
+      })
       .on("complete", (result) => {
+        setUploading(false);
         onComplete?.(result);
         setShowModal(false);
+        setSelectedFile(null);
+        setUploadProgress(0);
       })
   );
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+    }
+  };
+
+  const handleUpload = async () => {
+    if (!selectedFile) return;
+    
+    setUploading(true);
+    try {
+      uppy.addFile({
+        name: selectedFile.name,
+        type: selectedFile.type,
+        data: selectedFile,
+      });
+      uppy.upload();
+    } catch (error) {
+      setUploading(false);
+      console.error('Upload failed:', error);
+    }
+  };
+
+  const handleCancel = () => {
+    setShowModal(false);
+    setSelectedFile(null);
+    setUploadProgress(0);
+    setUploading(false);
+    uppy.cancelAll();
+  };
 
   return (
     <div>
@@ -114,12 +130,101 @@ export function ObjectUploader({
         {children}
       </Button>
 
-      <DashboardModal
-        uppy={uppy}
-        open={showModal}
-        onRequestClose={() => setShowModal(false)}
-        proudlyDisplayPoweredByUppy={false}
-      />
+      <Dialog open={showModal} onOpenChange={setShowModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Camera className="h-5 w-5" />
+              Upload Food Photo
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            {!selectedFile && !uploading && (
+              <div className="text-center space-y-4">
+                <p className="text-sm text-gray-600">
+                  Select a photo from your device to analyze
+                </p>
+                
+                <Button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-full h-16 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
+                >
+                  <div className="flex items-center gap-3">
+                    <Camera className="h-6 w-6" />
+                    <span className="font-semibold">Choose Photo from Library</span>
+                  </div>
+                </Button>
+                
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                  capture="environment"
+                />
+                
+                <p className="text-xs text-gray-500">
+                  Supports JPG, PNG, HEIC • Max 10MB
+                </p>
+              </div>
+            )}
+
+            {selectedFile && !uploading && (
+              <div className="space-y-4">
+                <div className="text-center">
+                  <p className="text-sm font-medium">Selected: {selectedFile.name}</p>
+                  <p className="text-xs text-gray-500">
+                    {(selectedFile.size / 1024 / 1024).toFixed(1)} MB
+                  </p>
+                </div>
+                
+                <div className="flex gap-2">
+                  <Button
+                    onClick={handleCancel}
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleUpload}
+                    className="flex-1 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
+                  >
+                    <Upload className="h-4 w-4 mr-2" />
+                    Upload & Analyze
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {uploading && (
+              <div className="space-y-4">
+                <div className="text-center">
+                  <p className="text-sm font-medium">Uploading...</p>
+                  <p className="text-xs text-gray-500">{selectedFile?.name}</p>
+                </div>
+                
+                <Progress value={uploadProgress} className="w-full" />
+                
+                <div className="text-center">
+                  <p className="text-sm text-gray-600">{uploadProgress}% complete</p>
+                </div>
+                
+                <Button
+                  onClick={handleCancel}
+                  variant="outline"
+                  className="w-full"
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Cancel Upload
+                </Button>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
