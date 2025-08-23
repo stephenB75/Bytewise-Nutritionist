@@ -233,14 +233,40 @@ button.bg-blue-800:hover:not([data-testid*="nav-"]):not([class*="nav-"]) {
   border: 1px solid #d1d5db !important; /* Light gray border */
 }
 
-/* Error modal and development overlay fixes */
+/* Comprehensive error modal and development overlay fixes */
 [data-runtime-error],
 .runtime-error-modal,
 [class*="error-modal"],
-[class*="error-overlay"] {
+[class*="error-overlay"],
+[id*="runtime-error"],
+[class*="react-error"],
+.vite-dev-error-overlay,
+#vite-plugin-checker-container,
+.__vite_plugin_checker_error,
+[data-vite-dev-error] {
   background-color: #fff8dc !important; /* Light cream background */
   color: #8b4513 !important; /* Brown text for errors */
   border: 2px solid #daa520 !important; /* Gold border */
+}
+
+/* Fix error overlay backgrounds specifically */
+.vite-dev-error-overlay > div,
+#vite-plugin-checker-container > div,
+[data-vite-dev-error] > div {
+  background-color: #fff8dc !important;
+  color: #8b4513 !important;
+}
+
+/* Fix error overlay text elements */
+.vite-dev-error-overlay pre,
+.vite-dev-error-overlay code,
+#vite-plugin-checker-container pre,
+#vite-plugin-checker-container code,
+[data-vite-dev-error] pre,
+[data-vite-dev-error] code {
+  background-color: #f5f5dc !important; /* Beige background for code */
+  color: #654321 !important; /* Dark brown text */
+  border: 1px solid #daa520 !important;
 }
 
 /* Fix white text on buttons that are hard to read on yellow background */
@@ -271,11 +297,12 @@ button.border:hover,
   background-color: #f9fafb !important; /* Very light gray background on hover */
 }
 
-/* Specific fixes for track food button and any ghost variant buttons */
+/* Comprehensive button fixes for yellow theme compatibility */
 .bg-transparent,
 button[class*="variant-ghost"],
 .variant-ghost,
-button.bg-transparent {
+button.bg-transparent,
+button[class*="ghost"] {
   color: #ea580c !important; /* Orange-600 for visibility on yellow background */
   background-color: transparent !important;
 }
@@ -283,9 +310,31 @@ button.bg-transparent {
 .bg-transparent:hover,
 button[class*="variant-ghost"]:hover,
 .variant-ghost:hover,
-button.bg-transparent:hover {
+button.bg-transparent:hover,
+button[class*="ghost"]:hover {
   color: #dc2626 !important; /* Red-600 for hover state */
   background-color: rgba(234, 88, 12, 0.1) !important; /* Light orange background on hover */
+}
+
+/* Fix any remaining dark button states */
+button[class*="bg-slate"],
+button[class*="bg-gray-9"],
+button[class*="bg-black"],
+.bg-slate-900,
+.bg-gray-900,
+.bg-black {
+  background-color: #f59e0b !important; /* Amber-500 */
+  color: #111827 !important; /* Gray-900 text */
+}
+
+button[class*="bg-slate"]:hover,
+button[class*="bg-gray-9"]:hover,
+button[class*="bg-black"]:hover,
+.bg-slate-900:hover,
+.bg-gray-900:hover,
+.bg-black:hover {
+  background-color: #d97706 !important; /* Amber-600 on hover */
+  color: #111827 !important; /* Keep dark text */
 }
 
 /* Dialog and Modal Background Fixes for Yellow Theme */
