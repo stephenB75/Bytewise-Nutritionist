@@ -133,7 +133,15 @@ export default function AIFoodAnalyzer() {
         imageUrl
       });
       console.log('🔬 AI analysis response received:', response.status, response.statusText);
-      return response as unknown as AnalysisResult;
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Analysis failed');
+      }
+      
+      const result = await response.json();
+      console.log('🔬 Parsed analysis result:', result);
+      return result as AnalysisResult;
     },
     onSuccess: (result) => {
       // Calculate total nutrition from identified foods
