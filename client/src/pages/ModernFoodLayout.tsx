@@ -3010,7 +3010,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       case 'daily':
         return renderDailyWeekly();
       case 'fasting':
-        return React.useMemo(() => (
+        return (
           <div className="space-y-0">
             <HeroSection
               title="Intermittent"
@@ -3032,7 +3032,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               </div>
             </div>
           </div>
-        ), []);
+        );
       case 'profile':
         return renderProfile();
       case 'calculator':
