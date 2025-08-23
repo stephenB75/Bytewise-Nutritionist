@@ -67,6 +67,35 @@ export function ObjectUploader({
         allowedFileTypes: ['image/*'], // Only allow images for food analysis
       },
       autoProceed: false,
+      locale: {
+        strings: {
+          dropPasteFiles: 'Click here or drag and drop your food photo',
+          dropPasteFolders: 'Click here or drag and drop your food photo',
+          browseFiles: 'browse',
+          dropHint: 'Drop your food photo here',
+          uploadComplete: 'Upload complete',
+          uploadPaused: 'Upload paused',
+          resumeUpload: 'Resume upload',
+          pauseUpload: 'Pause upload',
+          retryUpload: 'Retry upload',
+          xFilesSelected: {
+            0: '%{smart_count} photo selected',
+            1: '%{smart_count} photo selected',
+            2: '%{smart_count} photos selected'
+          },
+          uploadingXFiles: {
+            0: 'Uploading %{smart_count} photo',
+            1: 'Uploading %{smart_count} photo',
+            2: 'Uploading %{smart_count} photos'
+          },
+          processingXFiles: {
+            0: 'Processing %{smart_count} photo',
+            1: 'Processing %{smart_count} photo', 
+            2: 'Processing %{smart_count} photos'
+          }
+        },
+        pluralize: (n: number) => n === 1 ? 0 : 1
+      }
     })
       .use(AwsS3, {
         shouldUseMultipart: false,

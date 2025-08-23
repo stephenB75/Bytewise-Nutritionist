@@ -390,9 +390,13 @@ export default function AIFoodAnalyzer() {
               >
                 <div className="flex items-center gap-3">
                   <Camera className="h-6 w-6" />
-                  <span>Take or Upload Food Photo</span>
+                  <span>Click to Upload Food Photo</span>
                 </div>
               </ObjectUploader>
+              
+              <p className="text-gray-600 text-sm text-center max-w-md">
+                Click the button above or drag and drop your food photo directly into the upload area
+              </p>
               
               <Alert className="bg-amber-100/50 border-amber-300 text-gray-900">
                 <Eye className="h-4 w-4 text-gray-900" />
