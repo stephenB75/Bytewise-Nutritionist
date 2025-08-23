@@ -999,8 +999,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     // Memoize the background style optimized for mobile food composition
     const backgroundStyle = React.useMemo(() => ({
       backgroundImage: `url('${backgroundImage}')`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center center', // Ensures food items are centered both horizontally and vertically
+      backgroundSize: '85%', // Zoom out to show more of the food photo
+      backgroundPosition: 'center center', // Center the food items in viewport
       backgroundRepeat: 'no-repeat',
       backgroundColor: '#0f172a', // Very dark fallback to prevent any color flash
       backgroundAttachment: 'scroll', // Better mobile performance
