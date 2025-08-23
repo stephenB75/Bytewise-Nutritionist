@@ -122,28 +122,23 @@ export function useRotatingBackground(activeTab: string, navigationTrigger?: num
     // Preload the new image
     preloadImage(newImageSrc)
       .then(() => {
-        // Small delay to ensure smooth transition
-        setTimeout(() => {
-          // Image is ready, update background
-          setCurrentImageIndex(randomPageImage);
-          setBackgroundImage(newImageSrc);
-          setAnimationKey(prev => prev + 1);
-          setIsLoading(false);
-          // Trigger fade-in after background is set
-          setTimeout(() => {
-            setImageLoaded(true);
-          }, 50);
-        }, 100);
+        // Immediate update for faster response
+        setCurrentImageIndex(randomPageImage);
+        setBackgroundImage(newImageSrc);
+        setAnimationKey(prev => prev + 1);
+        setIsLoading(false);
+        // Quick fade-in trigger
+        requestAnimationFrame(() => {
+          setImageLoaded(true);
+        });
       })
       .catch(() => {
-        // If image fails to load, still update but with loading state
-        setTimeout(() => {
-          setCurrentImageIndex(randomPageImage);
-          setBackgroundImage(newImageSrc);
-          setAnimationKey(prev => prev + 1);
-          setIsLoading(false);
-          setImageLoaded(false);
-        }, 100);
+        // If image fails to load, still update immediately
+        setCurrentImageIndex(randomPageImage);
+        setBackgroundImage(newImageSrc);
+        setAnimationKey(prev => prev + 1);
+        setIsLoading(false);
+        setImageLoaded(false);
       });
   }, [navigationTrigger, activeTab]); // Only trigger on navigation events
   

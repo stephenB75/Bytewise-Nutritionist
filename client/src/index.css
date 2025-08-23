@@ -1834,10 +1834,10 @@ input {
   backface-visibility: hidden;
 }
 
-/* Hero background fade-in during transitions - non-conflicting */
+/* Hero background fade-in during transitions - faster response */
 .hero-bg-transition {
   opacity: 0;
-  animation: heroTransitionFadeIn 2.0s ease-out forwards;
+  animation: heroTransitionFadeIn 1.0s ease-out forwards;
 }
 
 

@@ -971,7 +971,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       // TRANSITION GUARD: Prevent simultaneous transitions
       setIsTransitioning(true);
       
-      // Fade out current page
+      // Quick fade out current page (reduced from 600ms to 300ms)
       setTimeout(() => {
         // Temporarily disable smooth scrolling to force instant scroll
         const originalScrollBehavior = document.documentElement.style.scrollBehavior;
@@ -1015,11 +1015,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         // Execute optimized scroll
         performOptimizedScroll();
         
-        // Complete transition (fade in new page)
+        // Complete transition (fade in new page) - reduced total time
         setTimeout(() => {
           setIsTransitioning(false);
-        }, 800);
-      }, 600); // Fade out duration
+        }, 500);
+      }, 300); // Reduced fade out duration for faster response
     }
   };
 
