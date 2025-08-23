@@ -983,10 +983,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         setActiveTab(newTab);
         setOpenCard(undefined);
         
-        // Delay background image change to prevent animation conflicts
-        setTimeout(() => {
-          setNavigationTrigger(prev => prev + 1);
-        }, 100);
+        // Background change will happen after transition completes
         
         // Optimized scroll to top with proper timing
         const performOptimizedScroll = () => {
@@ -1020,6 +1017,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         // Complete transition (fade in new page) - reduced total time
         setTimeout(() => {
           setIsTransitioning(false);
+          // Trigger background change AFTER transition completes to prevent flickering
+          setTimeout(() => {
+            setNavigationTrigger(prev => prev + 1);
+          }, 50);
         }, 500);
       }, 300); // Reduced fade out duration for faster response
     }
@@ -1049,21 +1050,23 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       backgroundAttachment: 'scroll', // Better mobile performance
     }), [backgroundImage]);
     
-    // Dynamic CSS classes based on loading state
+    // Dynamic CSS classes based on loading state - prevent changes during transitions
     const backgroundClasses = React.useMemo(() => {
       const baseClasses = 'absolute inset-0 z-10 hero-bg-optimized';
+      
+      // During transitions, maintain current state to prevent flickering
+      if (isTransitioning) {
+        return `${baseClasses} hero-bg-stable`;
+      }
+      
       if (isLoading) {
         return `${baseClasses} hero-bg-loading`;
       }
-      if (imageLoaded && animationsEnabled) {
+      if (imageLoaded) {
         return `${baseClasses} hero-bg-loaded`;
       }
-      if (imageLoaded && !animationsEnabled) {
-        // Use transition fade-in during navigation changes
-        return `${baseClasses} hero-bg-transition`;
-      }
       return baseClasses;
-    }, [isLoading, imageLoaded, animationsEnabled]);
+    }, [isLoading, imageLoaded, isTransitioning]);
 
     return (
       <div className="relative h-screen overflow-hidden hero-component" data-hero="true">

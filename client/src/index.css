@@ -1852,6 +1852,13 @@ input {
   backface-visibility: hidden;
 }
 
+/* Hero background stable state during transitions - no animations */
+.hero-bg-stable {
+  opacity: 1;
+  transition: none;
+  animation: none;
+}
+
 /* Hero background fade-in during transitions - faster response */
 .hero-bg-transition {
   opacity: 1;
