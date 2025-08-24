@@ -739,6 +739,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     
     try {
+      // Debug: Log what frontend is sending
+      console.log('💾 Frontend sending meal data:', {
+        name: req.body.name,
+        calories: req.body.totalCalories,
+        iron: req.body.iron,
+        calcium: req.body.calcium,
+        vitaminC: req.body.vitaminC
+      });
+      
       // Create meal entry with micronutrients
       const meal = await storage.createMeal({
         userId,
