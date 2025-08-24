@@ -2560,9 +2560,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   <h4 className="text-gray-900 font-semibold">{meal.name}</h4>
                   <p className="text-gray-700 text-sm">{meal.time} • {meal.mealType}</p>
                   <div className="flex space-x-4 mt-1">
-                    <span className="text-xs text-green-600">P: {(meal.totalProtein || meal.protein || 0).toFixed(1)}g</span>
-                    <span className="text-xs text-yellow-600">C: {(meal.totalCarbs || meal.carbs || 0).toFixed(1)}g</span>
-                    <span className="text-xs text-purple-600">F: {(meal.totalFat || meal.fat || 0).toFixed(1)}g</span>
+                    <span className="text-xs text-green-600">P: {Number(meal.totalProtein || meal.protein || 0).toFixed(1)}g</span>
+                    <span className="text-xs text-yellow-600">C: {Number(meal.totalCarbs || meal.carbs || 0).toFixed(1)}g</span>
+                    <span className="text-xs text-purple-600">F: {Number(meal.totalFat || meal.fat || 0).toFixed(1)}g</span>
                   </div>
                 </div>
                 <div className="text-right">
