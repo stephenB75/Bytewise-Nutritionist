@@ -603,19 +603,19 @@ export default function AIFoodAnalyzer() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-orange-600">{analysisResult.totalNutrition.calories}</div>
-                  <div className="text-sm text-muted-foreground">Calories</div>
+                  <div className="text-sm text-gray-700 dark:text-gray-300">Calories</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-blue-600">{analysisResult.totalNutrition.protein}g</div>
-                  <div className="text-sm text-muted-foreground">Protein</div>
+                  <div className="text-sm text-gray-700 dark:text-gray-300">Protein</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-green-600">{analysisResult.totalNutrition.carbs}g</div>
-                  <div className="text-sm text-muted-foreground">Carbs</div>
+                  <div className="text-sm text-gray-700 dark:text-gray-300">Carbs</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-purple-600">{analysisResult.totalNutrition.fat}g</div>
-                  <div className="text-sm text-muted-foreground">Fat</div>
+                  <div className="text-sm text-gray-700 dark:text-gray-300">Fat</div>
                 </div>
               </div>
               
@@ -671,27 +671,27 @@ export default function AIFoodAnalyzer() {
                     <div className="grid grid-cols-3 md:grid-cols-6 gap-3 text-sm">
                       <div>
                         <div className="font-medium text-orange-600">{food.calories}</div>
-                        <div className="text-muted-foreground">cal</div>
+                        <div className="text-gray-700 dark:text-gray-300">cal</div>
                       </div>
                       <div>
                         <div className="font-medium">{food.protein}g</div>
-                        <div className="text-muted-foreground">protein</div>
+                        <div className="text-gray-700 dark:text-gray-300">protein</div>
                       </div>
                       <div>
                         <div className="font-medium">{food.carbs}g</div>
-                        <div className="text-muted-foreground">carbs</div>
+                        <div className="text-gray-700 dark:text-gray-300">carbs</div>
                       </div>
                       <div>
                         <div className="font-medium">{food.fat}g</div>
-                        <div className="text-muted-foreground">fat</div>
+                        <div className="text-gray-700 dark:text-gray-300">fat</div>
                       </div>
                       <div>
                         <div className="font-medium">{food.fiber}g</div>
-                        <div className="text-muted-foreground">fiber</div>
+                        <div className="text-gray-700 dark:text-gray-300">fiber</div>
                       </div>
                       <div>
                         <div className="font-medium">{food.sodium}mg</div>
-                        <div className="text-muted-foreground">sodium</div>
+                        <div className="text-gray-700 dark:text-gray-300">sodium</div>
                       </div>
                     </div>
                   </div>

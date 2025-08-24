@@ -458,12 +458,31 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     }
     
     try {
-      const response = await apiRequest('GET', `/api/users/${user.id}/daily-stats`);
+      // Use the correct working endpoint for daily stats
+      const response = await apiRequest('POST', '/api/daily-stats', {
+        userId: user.id,
+        date: new Date().toISOString()
+      });
+      
       if (!response.ok) {
         throw new Error(`Failed to fetch daily stats: ${response.status}`);
       }
-      const stats = await response.json();
+      const data = await response.json();
+      
+      // Extract stats from response
+      const stats = {
+        totalCalories: data.totalCalories || 0,
+        totalProtein: data.totalProtein || 0,
+        totalCarbs: data.totalCarbs || 0,
+        totalFat: data.totalFat || 0,
+        waterGlasses: data.waterGlasses || 0,
+        fastingStatus: data.fastingStatus
+      };
+      
+      console.log('✅ Daily stats fetched successfully:', stats);
       setDailyStats(stats);
+      setDailyCalories(stats.totalCalories);
+      
     } catch (error) {
       console.error('❌ Daily stats fetch error for authenticated user:', error);
       // Set default stats to prevent UI issues

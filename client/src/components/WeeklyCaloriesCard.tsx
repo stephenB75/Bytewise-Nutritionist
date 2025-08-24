@@ -11,6 +11,8 @@ import { Badge } from '@/components/ui/badge';
 import { Calendar, Flame } from 'lucide-react';
 
 import { useCheckAchievements } from '@/hooks/useAchievements';
+import { useAuth } from '@/hooks/useAuth';
+import { apiRequest } from '@/lib/queryClient';
 import { getWeekDates, getLocalDateKey } from '@/utils/dateUtils';
 import { checkMealDateMismatches } from '@/utils/mealDateFixer';
 import { debounce, getCachedLocalStorage } from '@/utils/performanceUtils';
@@ -28,7 +30,8 @@ export function WeeklyCaloriesCard() {
   const [totalWeeklyCalories, setTotalWeeklyCalories] = useState(0);
   // Removed date override state to fix date display issues
 
-  // Achievement system hook
+  // Authentication and achievement hooks
+  const { user } = useAuth();
   const checkAchievements = useCheckAchievements();
 
 
@@ -53,12 +56,34 @@ export function WeeklyCaloriesCard() {
   };
 
   // Calculate weekly calories from stored meal data (optimized)
-  const calculateWeeklyCalories = () => {
+  const calculateWeeklyCalories = async () => {
     try {
       const weekDates = getCurrentWeekDates();
+      let storedMeals: any[] = [];
       
-      // Load meals with caching for better performance - Force fresh load
-      const storedMeals = getCachedLocalStorage('weeklyMeals', 0) || []; // 0 = no cache
+      // For authenticated users, try to load from database first
+      if (user) {
+        try {
+          const response = await apiRequest('GET', '/api/meals/logged');
+          if (response.ok) {
+            const databaseMeals = await response.json();
+            storedMeals = Array.isArray(databaseMeals) ? databaseMeals : [];
+            console.log('✅ Weekly meals loaded from database:', storedMeals.length, 'meals');
+            
+            // Also sync to localStorage for offline capability
+            localStorage.setItem('weeklyMeals', JSON.stringify(storedMeals));
+          } else {
+            throw new Error('Database fetch failed');
+          }
+        } catch (error) {
+          console.log('⚠️ Could not load meals from database, falling back to localStorage:', error);
+          // Fall back to localStorage
+          storedMeals = getCachedLocalStorage('weeklyMeals', 0) || [];
+        }
+      } else {
+        // For unauthenticated users, load from localStorage
+        storedMeals = getCachedLocalStorage('weeklyMeals', 0) || [];
+      }
 
       
       // Fix meals with missing calories and save back to localStorage
