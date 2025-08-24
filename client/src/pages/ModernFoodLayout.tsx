@@ -27,6 +27,7 @@ import { useAchievements, getAchievementIcon, formatAchievementDate } from '@/ho
 import { ProfileIcon } from '@/components/ProfileIcon';
 import { TourLauncher, useAppTour, WelcomeBanner } from '@/components/TourLauncher';
 import { apiRequest } from '@/lib/queryClient';
+import logoImage from '@assets/BWN_Logo_1756056440683.png';
 import { 
   Search, 
   Plus,
@@ -1684,6 +1685,16 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               </div>
             </div>
           )}
+          
+          {/* ByteWise Logo */}
+          <div className="flex justify-center mb-6">
+            <img 
+              src={logoImage} 
+              alt="ByteWise Nutritionist Logo" 
+              className="h-16 w-auto object-contain"
+              data-testid="bytewise-logo"
+            />
+          </div>
           
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-3xl font-semibold text-gray-900">Today's Progress</h2>
