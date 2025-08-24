@@ -74,7 +74,7 @@ export function AuthPopupNotification({ notification, onClose }: AuthPopupNotifi
       case 'info':
         return 'bg-blue-50 border-blue-200';
       default:
-        return 'bg-gray-50 border-gray-200';
+        return 'bg-amber-50 border-amber-200';
     }
   };
 
@@ -86,7 +86,7 @@ export function AuthPopupNotification({ notification, onClose }: AuthPopupNotifi
       onClick={handleClose}
     >
       <div
-        className={`relative mx-4 max-w-md w-full bg-white rounded-xl shadow-2xl border-2 transform transition-all duration-300 ${
+        className={`relative mx-4 max-w-md w-full bg-amber-50 rounded-xl shadow-2xl border-2 transform transition-all duration-300 ${
           isVisible ? 'scale-100 translate-y-0' : 'scale-95 translate-y-4'
         } ${getBackgroundColor()}`}
         onClick={(e) => e.stopPropagation()}
@@ -96,7 +96,7 @@ export function AuthPopupNotification({ notification, onClose }: AuthPopupNotifi
         <Button
           variant="ghost"
           size="sm"
-          className="absolute top-2 right-2 w-8 h-8 p-0 rounded-full hover:bg-gray-200/50"
+          className="absolute top-2 right-2 w-8 h-8 p-0 rounded-full hover:bg-amber-200/50"
           onClick={handleClose}
           data-testid="button-close-notification"
         >

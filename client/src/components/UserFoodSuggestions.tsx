@@ -199,7 +199,7 @@ export function UserFoodSuggestions({
             <button
               key={food.id}
               onClick={() => handleSelectFood(food)}
-              className="w-full text-left p-3 hover:bg-gray-50 rounded-lg transition-colors group border border-gray-100"
+              className="w-full text-left p-3 hover:bg-amber-50/60 rounded-lg transition-colors group border border-gray-100"
             >
               <div className="flex items-center justify-between">
                 <div className="flex-1">

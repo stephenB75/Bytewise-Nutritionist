@@ -448,7 +448,7 @@ function CalorieCalculator({
               }}
               onSearchChange={(query) => setIngredient(query)}
               placeholder="Search Meal's"
-              className="text-base bg-white/80 border-2 border-amber-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg pr-4 py-3 text-gray-950 placeholder-gray-700"
+              className="text-base bg-amber-50/90 border-2 border-amber-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg pr-4 py-3 text-gray-950 placeholder-gray-700"
             />
             <Input
               placeholder="Measurement (e.g., 1 cup, 100g, 1 medium)"
@@ -707,7 +707,7 @@ function CalorieCalculator({
                   setIngredientSuggestions([]);
                 }}
                 placeholder="Search Meal's"
-                className="text-base bg-white/80 border-2 border-amber-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg pr-4 py-3 text-gray-950 placeholder-gray-700"
+                className="text-base bg-amber-50/90 border-2 border-amber-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg pr-4 py-3 text-gray-950 placeholder-gray-700"
               />
               
               <p className="text-xs text-gray-900 mt-1">
