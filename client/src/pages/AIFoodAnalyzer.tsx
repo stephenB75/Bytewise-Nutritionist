@@ -5,7 +5,7 @@
  * Uses GPT-4 Vision to identify foods and cross-references with USDA database
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -20,6 +20,72 @@ import { useCalorieTracking } from '@/hooks/useCalorieTracking';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { UploadResult } from '@uppy/core';
+
+// Photo Display Component with proper error handling and proxy fallback
+interface PhotoDisplayProps {
+  imageUrl: string;
+  alt: string;
+  className?: string;
+}
+
+function PhotoDisplay({ imageUrl, alt, className }: PhotoDisplayProps) {
+  const [imageSrc, setImageSrc] = useState<string>(imageUrl);
+  const [imageError, setImageError] = useState<boolean>(false);
+  const [hasTriedProxy, setHasTriedProxy] = useState<boolean>(false);
+
+  // Reset error state when imageUrl changes
+  useEffect(() => {
+    setImageSrc(imageUrl);
+    setImageError(false);
+    setHasTriedProxy(false);
+  }, [imageUrl]);
+
+  const handleImageError = useCallback(() => {
+    // Don't try proxy if we've already tried it or if it's not a Google Storage URL
+    if (hasTriedProxy || !imageUrl.includes('storage.googleapis.com')) {
+      setImageError(true);
+      return;
+    }
+
+    // Try to construct proxy URL
+    try {
+      const url = new URL(imageUrl);
+      const pathParts = url.pathname.split('/');
+      const bucketIndex = pathParts.findIndex(part => part.includes('replit-objstore-'));
+      
+      if (bucketIndex !== -1) {
+        const objectPath = pathParts.slice(bucketIndex + 1).join('/');
+        const proxyUrl = `/api/proxy-image/${objectPath}`;
+        setImageSrc(proxyUrl);
+        setHasTriedProxy(true);
+        return;
+      }
+    } catch (error) {
+      // Silently handle URL parsing errors
+    }
+    
+    setImageError(true);
+  }, [imageUrl, hasTriedProxy]);
+
+  if (imageError) {
+    return (
+      <div className={`${className} flex items-center justify-center bg-gray-200 text-gray-500 text-sm`}>
+        🖼️ Image preview unavailable
+      </div>
+    );
+  }
+
+  return (
+    <img 
+      src={imageSrc}
+      alt={alt}
+      className={className}
+      crossOrigin="anonymous"
+      onError={handleImageError}
+      loading="lazy"
+    />
+  );
+}
 
 interface IdentifiedFood {
   name: string;
@@ -619,47 +685,12 @@ export default function AIFoodAnalyzer() {
                   data-testid={`analyzed-photo-${index}`}
                 >
                   {/* Photo */}
-                  <div className="aspect-square rounded-lg overflow-hidden bg-gray-100">
+                  <div className="aspect-square rounded-lg overflow-hidden bg-gray-100 relative">
                     {analysis.imageUrl ? (
-                      <img 
-                        src={analysis.imageUrl} 
-                        alt="Analyzed food photo" 
+                      <PhotoDisplay 
+                        imageUrl={analysis.imageUrl}
+                        alt="Analyzed food photo"
                         className="w-full h-full object-cover"
-                        crossOrigin="anonymous"
-                        onError={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          
-                          // Handle image loading errors gracefully
-                          const target = e.currentTarget as HTMLImageElement;
-                          const currentSrc = target.src;
-                          
-                          // Try proxy approach if not already attempted
-                          if (!currentSrc.includes('/api/proxy-image/') && analysis.imageUrl.includes('storage.googleapis.com')) {
-                            try {
-                              const url = new URL(analysis.imageUrl);
-                              const pathParts = url.pathname.split('/');
-                              const bucketIndex = pathParts.findIndex(part => part.includes('replit-objstore-'));
-                              
-                              if (bucketIndex !== -1) {
-                                const objectPath = pathParts.slice(bucketIndex + 1).join('/');
-                                const proxyUrl = `/api/proxy-image/${objectPath}`;
-                                target.src = proxyUrl;
-                                return;
-                              }
-                            } catch {}
-                          }
-                          
-                          // Show fallback gracefully
-                          target.style.display = 'none';
-                          const parent = target.parentElement;
-                          if (parent && !parent.querySelector('.fallback-message')) {
-                            const fallback = document.createElement('div');
-                            fallback.className = 'fallback-message w-full h-full flex items-center justify-center bg-gray-200 text-gray-500 text-sm';
-                            fallback.textContent = 'Image preview unavailable';
-                            parent.appendChild(fallback);
-                          }
-                        }}
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-500 text-sm">
