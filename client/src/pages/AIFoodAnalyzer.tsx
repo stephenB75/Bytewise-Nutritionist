@@ -279,6 +279,31 @@ export default function AIFoodAnalyzer() {
         sodium: totalNutrition.sodium,
         ingredients: result.identifiedFoods.map(f => f.name)
       });
+
+      // Save meal to database for authenticated users
+      try {
+        const mealData = {
+          name: mealName,
+          totalCalories: totalNutrition.calories,
+          totalProtein: totalNutrition.protein,
+          totalCarbs: totalNutrition.carbs,
+          totalFat: totalNutrition.fat,
+          date: new Date().toISOString(),
+          mealType: 'meal'
+        };
+        
+        console.log('💾 Saving analyzed meal to database:', mealData);
+        const response = await apiRequest('POST', '/api/meals/logged', mealData);
+        
+        if (response.ok) {
+          console.log('✅ Meal saved to database successfully');
+        } else {
+          throw new Error(`Database save failed: ${response.status}`);
+        }
+      } catch (error) {
+        console.log('⚠️ Could not save meal to database (user may not be logged in):', error);
+        // Don't show error to user as the meal is still saved in localStorage
+      }
       
       toast({
         title: "Analysis Complete & Logged!",
