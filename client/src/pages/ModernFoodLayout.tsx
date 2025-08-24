@@ -3226,7 +3226,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   return (
     <div data-testid="app-container" className="h-screen w-screen">
       {/* Fixed Notification Header on all pages - Safe area positioning for iOS/Android */}
-      <div className="fixed top-safe right-4 z-60 safe-notification-position">
+      <div className="fixed top-safe right-4 z-[9999] safe-notification-position">
         <div className="relative">
           <Button
             variant="ghost"
