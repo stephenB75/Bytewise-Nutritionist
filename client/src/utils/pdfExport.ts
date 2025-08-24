@@ -1387,152 +1387,16 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     yPosition += 5;
     pdf.text('Your comprehensive 30-day nutrition analysis!', pageWidth / 2, yPosition, { align: 'center' });
 
-    // Save the comprehensive PDF with proper download functionality
+    // Save the comprehensive PDF with single download method
     const filename = `bytewise-30day-nutrition-report-${new Date().toISOString().split('T')[0]}.pdf`;
     
     console.log('💾 Saving PDF with filename:', filename);
     
     try {
-      // Create PDF blob first for better control
-      const pdfBlob = pdf.output('blob');
-      console.log('📦 PDF blob created, size:', pdfBlob.size, 'bytes');
-      
-      if (pdfBlob.size === 0) {
-        throw new Error('PDF blob is empty');
-      }
-      
-      // Method 1: Direct jsPDF save (most reliable)
-      console.log('💾 Attempting direct PDF save...');
+      // Use direct jsPDF save - single, reliable method
+      console.log('💾 Generating and downloading PDF...');
       pdf.save(filename);
-      
-      
-      // Method 2: Blob download with user gesture (more compatible)
-      
-      const url = URL.createObjectURL(pdfBlob);
-      
-      // Create download link with proper attributes
-      const downloadLink = document.createElement('a');
-      downloadLink.href = url;
-      downloadLink.download = filename;
-      downloadLink.target = '_blank';
-      downloadLink.style.position = 'absolute';
-      downloadLink.style.left = '-9999px';
-      downloadLink.setAttribute('role', 'button');
-      downloadLink.setAttribute('aria-label', 'Download PDF Report');
-      
-      // Add to DOM and trigger
-      document.body.appendChild(downloadLink);
-      
-      // Use both click methods for maximum compatibility
-      downloadLink.dispatchEvent(new MouseEvent('click', {
-        bubbles: true,
-        cancelable: true,
-        view: window
-      }));
-      downloadLink.click();
-      
-      // Clean up after delay
-      setTimeout(() => {
-        document.body.removeChild(downloadLink);
-        URL.revokeObjectURL(url);
-        
-      }, 1000);
-      
-      
-      
-      // Method 3: Create data URL for manual access
-      
-      const pdfDataUrl = pdf.output('datauristring');
-      
-      
-      // Method 4: Try forcing download with window.location
-      
-      try {
-        const tempUrl = URL.createObjectURL(pdfBlob);
-        window.location.href = tempUrl;
-        
-        setTimeout(() => URL.revokeObjectURL(tempUrl), 2000);
-      } catch (locationError) {
-        
-      }
-      
-      // Method 5: Show PDF inline in current page
-      
-      
-      // Create a popup modal with PDF preview and download options
-      const pdfPreviewUrl = URL.createObjectURL(pdfBlob);
-      const modal = document.createElement('div');
-      modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.8);
-        z-index: 10000;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-        box-sizing: border-box;
-      `;
-      
-      modal.innerHTML = `
-        <div style="background: white; padding: 20px; border-radius: 10px; max-width: 90%; max-height: 90%; display: flex; flex-direction: column; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #f0f0f0;">
-            <h2 style="margin: 0; color: #1f4aa6; font-family: Arial, sans-serif;">PDF Generated Successfully!</h2>
-            <button onclick="console.log('🔄 PDF Modal: Close button clicked'); this.closest('[role=modal]').remove();" style="background: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-size: 16px;">✕</button>
-          </div>
-          
-          <div style="margin-bottom: 15px;">
-            <p style="margin: 0 0 10px 0; color: #333; font-family: Arial, sans-serif;">Your ByteWise Nutrition Report is ready! Choose how to access it:</p>
-          </div>
-          
-          <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
-            <button onclick="
-              console.log('🔄 PDF Modal: Download button clicked for:', '${filename}'); 
-              const link = document.createElement('a'); 
-              link.href = '${pdfPreviewUrl}'; 
-              link.download = '${filename}'; 
-              link.click(); 
-              console.log('✅ PDF Modal: Download link triggered');
-            " style="background: #45c757; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">📥 Download PDF</button>
-            
-            <button onclick="
-              console.log('🔄 PDF Modal: View in new tab button clicked'); 
-              const newWindow = window.open('${pdfPreviewUrl}', '_blank'); 
-              if (newWindow) { 
-                console.log('✅ PDF Modal: New tab opened successfully'); 
-              } else { 
-                console.log('❌ PDF Modal: Popup blocked - trying alternative method'); 
-                window.location.href = '${pdfPreviewUrl}'; 
-              }
-            " style="background: #1f4aa6; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">👀 View in New Tab</button>
-            
-            <button onclick="console.log('🔄 PDF Modal: Copy button clicked, data length:', '${pdfDataUrl}'.length); navigator.clipboard.writeText('${pdfDataUrl}').then(() => { console.log('✅ PDF Modal: Data copied to clipboard successfully'); alert('PDF data copied! You can paste this into a file or share it.'); }).catch(err => { console.error('❌ PDF Modal: Copy to clipboard failed:', err); alert('Copy failed. Please try the download option instead.'); });" style="background: #ffd43b; color: black; padding: 10px 20px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">📋 Copy PDF Data</button>
-          </div>
-          
-          <iframe src="${pdfPreviewUrl}" style="width: 100%; height: 400px; border: 1px solid #ddd; border-radius: 5px;"></iframe>
-          
-          <p style="margin: 10px 0 0 0; font-size: 12px; color: #666; text-align: center;">
-            Report generated: ${new Date().toLocaleString()} | File: ${filename}
-          </p>
-        </div>
-      `;
-      
-      modal.setAttribute('role', 'modal');
-      document.body.appendChild(modal);
-      
-      
-      // Auto-cleanup after 5 minutes
-      setTimeout(() => {
-        if (modal.parentNode) {
-          modal.remove();
-        }
-        URL.revokeObjectURL(pdfPreviewUrl);
-        
-      }, 300000);
+      console.log('✅ PDF download initiated successfully');
       
       return true;
       
