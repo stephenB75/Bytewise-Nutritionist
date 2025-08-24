@@ -59,6 +59,7 @@ import {
   Play,
   Camera
 } from 'lucide-react';
+import { House, ForkKnife, Timer, ChartBar, User } from 'phosphor-react';
 import { NotificationDropdown } from '@/components/NotificationDropdown';
 import { WeeklyCaloriesCard } from '@/components/WeeklyCaloriesCard';
 import { Toaster } from '@/components/ui/toaster';
@@ -3359,15 +3360,34 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       <div data-testid="navigation-tabs" className="fixed bottom-0 left-0 right-0 bg-yellow-400 border-t border-yellow-500/60 safe-area-pb z-40 shadow-lg">
         <div className="flex items-center justify-around py-0.5 px-1 max-w-md mx-auto gap-0.5">
           {[
-            { id: 'home', label: 'Dashboard', icon: Home, testId: 'nav-dashboard' },
-            { id: 'nutrition', label: 'Calorie Tracker', icon: Utensils, testId: 'nav-calculator' },
-            { id: 'fasting', label: 'Fasting', icon: Clock, testId: 'nav-fasting' },
-            { id: 'daily', label: 'Meal Journal', icon: BarChart3, testId: 'nav-journal' },
-            { id: 'profile', label: 'Profile', icon: UserCircle, testId: 'nav-profile' }
+            { id: 'home', label: 'Dashboard', icon: House, testId: 'nav-dashboard' },
+            { id: 'nutrition', label: 'Calorie Tracker', icon: ForkKnife, testId: 'nav-calculator' },
+            { id: 'fasting', label: 'Fasting', icon: Timer, testId: 'nav-fasting' },
+            { id: 'daily', label: 'Meal Journal', icon: ChartBar, testId: 'nav-journal' },
+            { id: 'profile', label: 'Profile', icon: User, testId: 'nav-profile' }
           ].map((tab) => {
             const IconComponent = tab.icon;
             
             const handleClick = () => {
+              // Add pronounced animation on click
+              const button = document.querySelector(`[data-testid="${tab.testId}"]`);
+              const icon = button?.querySelector('svg');
+              const text = button?.querySelector('span');
+              
+              if (icon) {
+                icon.classList.remove('nav-icon-clicked');
+                void (icon as any).offsetHeight; // Force reflow
+                icon.classList.add('nav-icon-clicked');
+                setTimeout(() => icon.classList.remove('nav-icon-clicked'), 600);
+              }
+              
+              if (text) {
+                text.classList.remove('nav-text-clicked');
+                void (text as any).offsetHeight; // Force reflow
+                text.classList.add('nav-text-clicked');
+                setTimeout(() => text.classList.remove('nav-text-clicked'), 400);
+              }
+
               // Direct navigation - no transition guards
               if (tab.id !== activeTab) {
                 handleTabChange(tab.id);
@@ -3386,13 +3406,14 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 }`}
               >
                 <IconComponent 
-                  size={24} 
-                  className={`mb-1.5 transition-all duration-150 ease-out ${
+                  size={24}
+                  weight={activeTab === tab.id ? "fill" : "regular"}
+                  className={`mb-1.5 transition-all duration-300 ease-out transform ${
                     activeTab === tab.id 
-                      ? 'scale-110 drop-shadow-lg text-white' 
-                      : 'scale-100 hover:scale-105 hover:text-white'
+                      ? 'scale-110 drop-shadow-lg text-white nav-icon-active' 
+                      : 'scale-100 hover:scale-110 hover:text-white hover:rotate-3'
                   }`}
-                  strokeWidth={activeTab === tab.id ? 2.5 : 2}
+                  style={{ strokeWidth: activeTab === tab.id ? 2.5 : 2 }}
                 />
                 <span className={`text-[8px] font-semibold leading-tight text-center w-full transition-colors duration-150 ease-out ${
                   activeTab === tab.id 
