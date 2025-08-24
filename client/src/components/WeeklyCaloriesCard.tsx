@@ -125,45 +125,27 @@ export function WeeklyCaloriesCard() {
             ? mealDateStr.split('T')[0] 
             : mealDateStr;
           
-          // Direct date match (most common case)
+          // Debug: Log date matching
           if (normalizedMealDate === dayData.date) {
+            console.log(`📅 Matching meal for ${dayData.day}: ${meal.name} (${meal.calories} cal) - ${normalizedMealDate} === ${dayData.date}`);
             return true;
           }
           
-          // No other matching strategies to prevent duplicates
-          // If there's a date override, we don't try to match meals to multiple days
           return false;
         });
         
-        const dayCalories = dayMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
+        const dayCalories = dayMeals.reduce((sum: number, meal: any) => {
+          const mealCalories = Number(meal.calories) || Number(meal.totalCalories) || 0;
+          return sum + mealCalories;
+        }, 0);
         
-        // Debug and fix calorie data
+        // Debug and log meal data
         if (dayMeals.length > 0) {
+          console.log(`📊 ${dayData.day} (${dayData.date}): ${dayMeals.length} meals, ${dayCalories} calories`);
           dayMeals.forEach((meal: any, index: number) => {
             const mealName = meal.name ? meal.name.substring(0, 20) : 'Unknown';
-            
-            // Debug calorie values
-            if (meal.calories === 0 || meal.calories === undefined || meal.calories === null) {
-              console.log(`    ⚠️ ZERO CALORIES: ${mealName} has calories=${meal.calories} (${typeof meal.calories})`);
-              
-              // Try to fix missing calories based on meal name patterns
-              if (meal.name) {
-                let estimatedCalories = 0;
-                const name = meal.name.toLowerCase();
-                
-                if (name.includes('empanada')) estimatedCalories = 250;
-                else if (name.includes('apple')) estimatedCalories = 95;
-                else if (name.includes('water')) estimatedCalories = 0;
-                else if (name.includes('chicken')) estimatedCalories = 300;
-                else if (name.includes('popcycle') || name.includes('popsicle')) estimatedCalories = 150;
-                else estimatedCalories = 100; // Default estimate
-                
-                meal.calories = estimatedCalories;
-                console.log(`    🔧 FIXED: Set ${mealName} calories to ${estimatedCalories}`);
-              }
-            }
-            
-            console.log(`  ${index + 1}. ${mealName} - ${meal.calories || 0} cal (${meal.date})`);
+            const mealCalories = Number(meal.calories) || Number(meal.totalCalories) || 0;
+            console.log(`  ${index + 1}. ${mealName}: ${mealCalories} cal`);
           });
         }
         
@@ -174,8 +156,9 @@ export function WeeklyCaloriesCard() {
         };
       });
 
+      // Calculate total weekly calories
       const totalCalories = weeklyData.reduce((sum, day) => sum + day.calories, 0);
-      const weeklyAverage = Math.round(totalCalories / 7);
+      console.log(`🗓️ Weekly Summary: ${totalCalories} total calories across ${weeklyData.length} days`);
       
       setWeeklyData(weeklyData);
       setTotalWeeklyCalories(totalCalories);
