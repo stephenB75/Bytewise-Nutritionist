@@ -681,18 +681,35 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   }, [user, fetchDailyStats]);
 
 
-  // Refresh micronutrients when tab changes or on mount
+  // Refresh micronutrients when tab changes, meals change, or on mount
   useEffect(() => {
-    // Always refresh micronutrients from localStorage
-    const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-    const today = new Date().toISOString().split('T')[0];
-    const todayMeals = stored.filter((meal: any) => meal.date === today);
+    // Use logged meals from state first (database), fallback to localStorage
+    let todayMeals = loggedMeals;
+    
+    // If no meals in state, fallback to localStorage
+    if (todayMeals.length === 0) {
+      const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
+      const today = new Date().toISOString().split('T')[0];
+      todayMeals = stored.filter((meal: any) => meal.date === today);
+    }
     
     if (todayMeals.length > 0) {
       const micronutrients = calculateMicronutrients(todayMeals);
       setDailyMicronutrients(micronutrients);
+    } else {
+      // Reset micronutrients if no meals
+      setDailyMicronutrients({
+        vitaminC: 0,
+        vitaminD: 0,
+        vitaminB12: 0,
+        folate: 0,
+        iron: 0,
+        calcium: 0,
+        zinc: 0,
+        magnesium: 0
+      });
     }
-  }, [activeTab, calculateMicronutrients]);
+  }, [activeTab, calculateMicronutrients, loggedMeals]);
   
   // Check if tour should be shown after successful authentication
   useEffect(() => {
