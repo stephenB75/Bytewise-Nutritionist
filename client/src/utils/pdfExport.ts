@@ -1,10 +1,13 @@
 /**
- * Enhanced PDF Export Utility
+ * ByteWise Nutritionist PDF Export Utility
  * 
- * Creates comprehensive PDF reports with 30-day daily/weekly nutrition breakdowns
+ * Creates comprehensive PDF reports with nutrition data, achievements, 
+ * fasting sessions, water intake, and personal progress insights
+ * Features yellow/amber styling to match app branding
  */
 
 import { jsPDF } from 'jspdf';
+import { apiRequest } from '@/lib/queryClient';
 
 interface DailyNutritionData {
   date: string;
@@ -48,48 +51,114 @@ interface WeeklyNutritionData {
 }
 
 interface UserProgressData {
+  // Nutrition Data
   totalMealsLogged: number;
   averageDailyCalories: number;
   streakRecord: number;
   goalCompletionRate: number;
-  achievements: number;
   dailyBreakdown: DailyNutritionData[];
   weeklyBreakdown: WeeklyNutritionData[];
+  
+  // Comprehensive User Data
+  achievements: Array<{
+    title: string;
+    description: string;
+    earnedAt: string;
+    achievementType: string;
+  }>;
+  fastingSessions: Array<{
+    planName: string;
+    startTime: string;
+    endTime: string | null;
+    status: string;
+    actualDuration: number | null;
+  }>;
+  waterIntakeData: Array<{
+    date: string;
+    glasses: number;
+  }>;
+  recipes: Array<{
+    name: string;
+    servings: number;
+    totalCalories: number;
+    createdAt: string;
+  }>;
+  userProfile: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    dailyCalorieGoal: number;
+    dailyWaterGoal: number;
+    createdAt: string;
+  };
   monthlyBreakdown: Array<{
     month: string;
     calories: number;
     meals: number;
     goals: number;
+    waterGlasses: number;
+    fastingSessions: number;
   }>;
 }
 
 export async function generateProgressReportPDF(): Promise<boolean> {
   try {
-    // Fetch actual user data from local storage and API
-    const storedMeals = localStorage.getItem('weeklyMeals'); // Use weeklyMeals for comprehensive data
-    const storedCalorieGoal = localStorage.getItem('calorieGoal');
-    const storedUserProfile = localStorage.getItem('userProfile');
+    console.log('🔄 Starting comprehensive PDF report generation...');
     
-    // Parse stored data
-    const meals = storedMeals ? JSON.parse(storedMeals) : [];
-    const calorieGoal = storedCalorieGoal ? parseInt(storedCalorieGoal) : 2000;
-    const userProfile = storedUserProfile ? JSON.parse(storedUserProfile) : {};
+    // Fetch comprehensive user data from database APIs
+    const [
+      mealsResponse,
+      achievementsResponse, 
+      fastingResponse,
+      waterResponse,
+      recipesResponse,
+      userResponse,
+      dailyStatsResponse
+    ] = await Promise.all([
+      apiRequest('/api/meals/logged'),
+      apiRequest('/api/achievements'), 
+      apiRequest('/api/fasting/sessions'),
+      apiRequest('/api/water-intake?days=90'), // Get 3 months of water data
+      apiRequest('/api/recipes'),
+      apiRequest('/api/user/profile'),
+      apiRequest('/api/daily-stats')
+    ]);
     
-    // Calculate real statistics from stored meals for 30-day period
+    const meals = mealsResponse || [];
+    const achievements = achievementsResponse?.achievements || [];
+    const fastingSessions = fastingResponse?.sessions || [];
+    const waterData = waterResponse?.waterIntake || [];
+    const recipes = recipesResponse?.recipes || [];
+    const userProfile = userResponse || {};
+    const dailyStats = dailyStatsResponse || {};
+    
+    console.log('📊 Data fetched:', { 
+      meals: meals.length, 
+      achievements: achievements.length,
+      fastingSessions: fastingSessions.length,
+      waterData: waterData.length,
+      recipes: recipes.length 
+    });
+    
+    // Calculate comprehensive statistics for 30-day period
     const now = new Date();
     const thirtyDaysAgo = new Date(now);
     thirtyDaysAgo.setDate(now.getDate() - 30);
     
-    // Filter meals from last 30 days
+    // Filter recent data from last 30 days
     const recentMeals = meals.filter((meal: any) => {
-      let mealDate;
-      // Handle both date formats: "YYYY-MM-DD" and "YYYY-MM-DDTHH:mm:ss.sssZ"
-      if (meal.date && meal.date.includes('T')) {
-        mealDate = new Date(meal.date);
-      } else {
-        mealDate = new Date(meal.date);
-      }
+      const mealDate = new Date(meal.date || meal.createdAt);
       return mealDate >= thirtyDaysAgo && mealDate <= now;
+    });
+    
+    const recentWaterData = waterData.filter((water: any) => {
+      const waterDate = new Date(water.date);
+      return waterDate >= thirtyDaysAgo && waterDate <= now;
+    });
+    
+    const recentFastingSessions = fastingSessions.filter((session: any) => {
+      const sessionDate = new Date(session.startTime);
+      return sessionDate >= thirtyDaysAgo && sessionDate <= now;
     });
 
     // Generate daily nutrition breakdowns for 30 days
@@ -110,23 +179,24 @@ export async function generateProgressReportPDF(): Promise<boolean> {
         return mealDateKey === dateKey;
       });
       
-      // Calculate daily totals
+      // Calculate daily totals with proper micronutrient handling
       const dailyData: DailyNutritionData = {
         date: dateKey,
-        calories: dayMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0),
-        protein: dayMeals.reduce((sum: number, meal: any) => sum + (meal.protein || 0), 0),
-        carbs: dayMeals.reduce((sum: number, meal: any) => sum + (meal.carbs || 0), 0),
-        fat: dayMeals.reduce((sum: number, meal: any) => sum + (meal.fat || 0), 0),
-        fiber: dayMeals.reduce((sum: number, meal: any) => sum + (meal.fiber || 0), 0),
-        sodium: dayMeals.reduce((sum: number, meal: any) => sum + (meal.sodium || 0), 0),
-        vitaminC: dayMeals.reduce((sum: number, meal: any) => sum + (meal.vitaminC || 0), 0),
-        vitaminD: dayMeals.reduce((sum: number, meal: any) => sum + (meal.vitaminD || 0), 0),
-        vitaminB12: dayMeals.reduce((sum: number, meal: any) => sum + (meal.vitaminB12 || 0), 0),
-        folate: dayMeals.reduce((sum: number, meal: any) => sum + (meal.folate || 0), 0),
-        iron: dayMeals.reduce((sum: number, meal: any) => sum + (meal.iron || 0), 0),
-        calcium: dayMeals.reduce((sum: number, meal: any) => sum + (meal.calcium || 0), 0),
-        zinc: dayMeals.reduce((sum: number, meal: any) => sum + (meal.zinc || 0), 0),
-        magnesium: dayMeals.reduce((sum: number, meal: any) => sum + (meal.magnesium || 0), 0),
+        calories: dayMeals.reduce((sum: number, meal: any) => sum + (parseFloat(meal.totalCalories || meal.calories) || 0), 0),
+        protein: dayMeals.reduce((sum: number, meal: any) => sum + (parseFloat(meal.totalProtein || meal.protein) || 0), 0),
+        carbs: dayMeals.reduce((sum: number, meal: any) => sum + (parseFloat(meal.totalCarbs || meal.carbs) || 0), 0),
+        fat: dayMeals.reduce((sum: number, meal: any) => sum + (parseFloat(meal.totalFat || meal.fat) || 0), 0),
+        fiber: dayMeals.reduce((sum: number, meal: any) => sum + (parseFloat(meal.fiber) || 0), 0),
+        sodium: dayMeals.reduce((sum: number, meal: any) => sum + (parseFloat(meal.sodium) || 0), 0),
+        // Handle both camelCase and snake_case micronutrient properties
+        vitaminC: dayMeals.reduce((sum: number, meal: any) => sum + (parseFloat(meal.vitaminC || meal.vitamin_c) || 0), 0),
+        vitaminD: dayMeals.reduce((sum: number, meal: any) => sum + (parseFloat(meal.vitaminD || meal.vitamin_d) || 0), 0),
+        vitaminB12: dayMeals.reduce((sum: number, meal: any) => sum + (parseFloat(meal.vitaminB12 || meal.vitamin_b12) || 0), 0),
+        folate: dayMeals.reduce((sum: number, meal: any) => sum + (parseFloat(meal.folate) || 0), 0),
+        iron: dayMeals.reduce((sum: number, meal: any) => sum + (parseFloat(meal.iron) || 0), 0),
+        calcium: dayMeals.reduce((sum: number, meal: any) => sum + (parseFloat(meal.calcium) || 0), 0),
+        zinc: dayMeals.reduce((sum: number, meal: any) => sum + (parseFloat(meal.zinc) || 0), 0),
+        magnesium: dayMeals.reduce((sum: number, meal: any) => sum + (parseFloat(meal.magnesium) || 0), 0),
         mealsCount: dayMeals.length
       };
       
@@ -178,11 +248,11 @@ export async function generateProgressReportPDF(): Promise<boolean> {
       }
     }
     
-    // Calculate monthly breakdown
+    // Calculate comprehensive monthly breakdown with all user data
     const monthlyData = new Map();
     const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     
-    // Initialize months
+    // Initialize months with comprehensive tracking
     for (let i = 0; i < 6; i++) {
       const monthDate = new Date(now);
       monthDate.setMonth(now.getMonth() - i);
@@ -192,52 +262,68 @@ export async function generateProgressReportPDF(): Promise<boolean> {
         year: monthDate.getFullYear(),
         calories: 0,
         meals: 0,
-        goals: 0
+        goals: 0,
+        waterGlasses: 0,
+        fastingSessions: 0
       });
     }
     
-    // Process meals data
+    // Process comprehensive monthly data
     recentMeals.forEach((meal: any) => {
-      const mealDate = new Date(meal.date);
+      const mealDate = new Date(meal.date || meal.createdAt);
       const monthKey = `${mealDate.getFullYear()}-${mealDate.getMonth()}`;
       
       if (monthlyData.has(monthKey)) {
         const monthStats = monthlyData.get(monthKey);
-        monthStats.calories += meal.calories || 0;
+        monthStats.calories += parseFloat(meal.totalCalories || meal.calories) || 0;
         monthStats.meals += 1;
-        
-        // Check if daily goal was met
-        const dayKey = meal.date;
-        const dayCalories = recentMeals
-          .filter((m: any) => m.date === dayKey)
-          .reduce((sum: number, m: any) => sum + (m.calories || 0), 0);
-        
-        if (dayCalories >= calorieGoal * 0.9 && dayCalories <= calorieGoal * 1.1) {
-          monthStats.goals += 1;
-        }
       }
     });
     
-    // Convert to array and sort by month
+    // Process water intake data
+    recentWaterData.forEach((water: any) => {
+      const waterDate = new Date(water.date);
+      const monthKey = `${waterDate.getFullYear()}-${waterDate.getMonth()}`;
+      
+      if (monthlyData.has(monthKey)) {
+        const monthStats = monthlyData.get(monthKey);
+        monthStats.waterGlasses += water.glasses || 0;
+      }
+    });
+    
+    // Process fasting sessions
+    recentFastingSessions.forEach((session: any) => {
+      const sessionDate = new Date(session.startTime);
+      const monthKey = `${sessionDate.getFullYear()}-${sessionDate.getMonth()}`;
+      
+      if (monthlyData.has(monthKey)) {
+        const monthStats = monthlyData.get(monthKey);
+        monthStats.fastingSessions += 1;
+      }
+    });
+    
+    // Convert to array and sort by month with comprehensive data
     const monthlyBreakdown = Array.from(monthlyData.values())
       .reverse()
-      .map(month => ({
+      .map((month: any) => ({
         month: `${month.month} ${month.year}`,
         calories: month.calories,
         meals: month.meals,
-        goals: month.goals
+        goals: month.goals,
+        waterGlasses: month.waterGlasses,
+        fastingSessions: month.fastingSessions
       }));
     
-    // Calculate overall statistics
+    // Calculate comprehensive overall statistics
     const totalMealsLogged = recentMeals.length;
-    const totalCalories = recentMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
-    const daysWithMeals = new Set(recentMeals.map((meal: any) => meal.date)).size;
+    const totalCalories = recentMeals.reduce((sum: number, meal: any) => sum + (parseFloat(meal.totalCalories || meal.calories) || 0), 0);
+    const daysWithMeals = new Set(recentMeals.map((meal: any) => meal.date || meal.createdAt?.split('T')[0])).size;
     const averageDailyCalories = daysWithMeals > 0 ? Math.round(totalCalories / daysWithMeals) : 0;
     
     // Calculate streak (simplified)
     let currentStreak = 0;
     let maxStreak = 0;
-    const sortedDates = Array.from(new Set(recentMeals.map((meal: any) => meal.date))).sort();
+    const sortedDates = Array.from(new Set(recentMeals.map((meal: any) => meal.date || meal.createdAt?.split('T')[0]))).sort();
     
     for (let i = 0; i < sortedDates.length; i++) {
       if (i === 0) {
@@ -257,31 +343,58 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     }
     maxStreak = Math.max(maxStreak, currentStreak);
     
-    // Calculate goal completion rate
-    const daysWithGoalMet = recentMeals.reduce((count: number, meal: any) => {
-      const dayCalories = recentMeals
-        .filter((m: any) => m.date === meal.date)
-        .reduce((sum: number, m: any) => sum + (m.calories || 0), 0);
-      
-      return dayCalories >= calorieGoal * 0.9 && dayCalories <= calorieGoal * 1.1 ? count + 1 : count;
-    }, 0);
+    // Calculate goal completion rate using user's actual calorie goal
+    const userCalorieGoal = userProfile.dailyCalorieGoal || 2000;
+    const daysWithGoalMet = dailyBreakdown.filter(day => 
+      day.calories >= userCalorieGoal * 0.9 && day.calories <= userCalorieGoal * 1.1 && day.mealsCount > 0
+    ).length;
     
     const goalCompletionRate = daysWithMeals > 0 ? Math.round((daysWithGoalMet / daysWithMeals) * 100) : 0;
     
-    // Count achievements (simplified)
-    const achievements = Math.floor(totalMealsLogged / 10); // 1 achievement per 10 meals
-    
-    // Gather comprehensive user progress data
+    // Gather comprehensive user progress data with all app areas
     const progressData: UserProgressData = {
+      // Nutrition Data
       totalMealsLogged,
       averageDailyCalories,
       streakRecord: maxStreak,
       goalCompletionRate,
-      achievements,
       dailyBreakdown,
       weeklyBreakdown,
+      
+      // Comprehensive User Data
+      achievements: achievements.map((achievement: any) => ({
+        title: achievement.title || 'Achievement Unlocked',
+        description: achievement.description || '',
+        earnedAt: achievement.earnedAt || achievement.createdAt,
+        achievementType: achievement.achievementType || 'general'
+      })),
+      fastingSessions: recentFastingSessions.map((session: any) => ({
+        planName: session.planName || 'Intermittent Fasting',
+        startTime: session.startTime,
+        endTime: session.endTime,
+        status: session.status || 'completed',
+        actualDuration: session.actualDuration
+      })),
+      waterIntakeData: recentWaterData.map((water: any) => ({
+        date: water.date,
+        glasses: water.glasses || 0
+      })),
+      recipes: recipes.map((recipe: any) => ({
+        name: recipe.name || 'Custom Recipe',
+        servings: recipe.servings || 1,
+        totalCalories: recipe.totalCalories || 0,
+        createdAt: recipe.createdAt || ''
+      })),
+      userProfile: {
+        firstName: userProfile.firstName || 'ByteWise',
+        lastName: userProfile.lastName || 'User',
+        email: userProfile.email || '',
+        dailyCalorieGoal: userProfile.dailyCalorieGoal || 2000,
+        dailyWaterGoal: userProfile.dailyWaterGoal || 8,
+        createdAt: userProfile.createdAt || ''
+      },
       monthlyBreakdown: monthlyBreakdown.length > 0 ? monthlyBreakdown : [
-        { month: 'No data yet', calories: 0, meals: 0, goals: 0 }
+        { month: 'No data yet', calories: 0, meals: 0, goals: 0, waterGlasses: 0, fastingSessions: 0 }
       ]
     };
 
@@ -338,9 +451,9 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     pdf.setFontSize(10);
     pdf.text(`Report Period: ${thirtyDaysAgo.toLocaleDateString()} - ${now.toLocaleDateString()}`, pageWidth / 2, yPosition, { align: 'center' });
     
-    // Add a decorative line
+    // Add a decorative line - updated to amber theme
     yPosition += 10;
-    pdf.setDrawColor(250, 237, 57); // ByteWise yellow
+    pdf.setDrawColor(245, 158, 11); // Amber-500 color
     pdf.setLineWidth(0.5);
     pdf.line(40, yPosition, pageWidth - 40, yPosition);
     
@@ -349,21 +462,21 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     // Reset text color to black for content
     pdf.setTextColor(0, 0, 0);
 
-    // Statistics Grid
+    // Statistics Grid - Updated with amber theme
     pdf.setFontSize(16);
     pdf.setFont('helvetica', 'bold');
-    pdf.setTextColor(31, 74, 166); // Blue for section headers
+    pdf.setTextColor(146, 64, 14); // Amber-800 for section headers
     pdf.text('Nutrition Summary', 20, yPosition);
     pdf.setTextColor(0, 0, 0); // Reset to black
     yPosition += 15;
 
     const stats = [
-      { label: 'Total Meals Logged', value: progressData.totalMealsLogged.toString(), color: [69, 199, 62] }, // Green
-      { label: 'Average Daily Calories', value: progressData.averageDailyCalories.toString(), color: [31, 74, 166] }, // Blue
-      { label: 'Best Streak (days)', value: progressData.streakRecord.toString(), color: [250, 237, 57] }, // Yellow
-      { label: 'Goal Completion Rate', value: `${progressData.goalCompletionRate}%`, color: [69, 199, 62] }, // Green
-      { label: 'Achievements Earned', value: progressData.achievements.toString(), color: [31, 74, 166] }, // Blue
-      { label: 'Total Calories Tracked', value: `${Math.round(progressData.monthlyBreakdown.reduce((sum, m) => sum + m.calories, 0) / 1000)}k`, color: [250, 237, 57] } // Yellow
+      { label: 'Total Meals Logged', value: progressData.totalMealsLogged.toString(), color: [245, 158, 11] }, // Amber-500
+      { label: 'Average Daily Calories', value: progressData.averageDailyCalories.toString(), color: [217, 119, 6] }, // Amber-600
+      { label: 'Best Streak (days)', value: progressData.streakRecord.toString(), color: [251, 191, 36] }, // Amber-400
+      { label: 'Goal Completion Rate', value: `${progressData.goalCompletionRate}%`, color: [245, 158, 11] }, // Amber-500
+      { label: 'Achievements Earned', value: progressData.achievements.length.toString(), color: [217, 119, 6] }, // Amber-600
+      { label: 'Total Calories Tracked', value: `${Math.round(progressData.monthlyBreakdown.reduce((sum, m) => sum + m.calories, 0) / 1000)}k`, color: [251, 191, 36] } // Amber-400
     ];
 
     pdf.setFontSize(12);
@@ -408,10 +521,10 @@ export async function generateProgressReportPDF(): Promise<boolean> {
       yPosition = 25;
     }
 
-    // Weekly Nutrition Summary
+    // Weekly Nutrition Summary - Updated with amber theme
     pdf.setFontSize(16);
     pdf.setFont('helvetica', 'bold');
-    pdf.setTextColor(31, 74, 166); // Blue for section headers
+    pdf.setTextColor(146, 64, 14); // Amber-800 for section headers
     pdf.text('Weekly Nutrition Averages (Last 30 Days)', 20, yPosition);
     pdf.setTextColor(0, 0, 0);
     yPosition += 15;
@@ -426,7 +539,7 @@ export async function generateProgressReportPDF(): Promise<boolean> {
         
         pdf.setFontSize(12);
         pdf.setFont('helvetica', 'bold');
-        pdf.setTextColor(31, 74, 166);
+        pdf.setTextColor(146, 64, 14); // Amber-800 for week headers
         const weekStartDate = new Date(week.weekStart);
         const weekEndDate = new Date(week.weekEnd);
         pdf.text(`Week ${week.weekNumber}: ${weekStartDate.toLocaleDateString()} - ${weekEndDate.toLocaleDateString()}`, 20, yPosition);
@@ -482,10 +595,10 @@ export async function generateProgressReportPDF(): Promise<boolean> {
       yPosition = 25;
     }
 
-    // Daily Nutrition Breakdown
+    // Daily Nutrition Breakdown - Updated with amber theme
     pdf.setFontSize(16);
     pdf.setFont('helvetica', 'bold');
-    pdf.setTextColor(31, 74, 166);
+    pdf.setTextColor(146, 64, 14); // Amber-800 for section headers
     pdf.text('Daily Nutrition Details (Last 30 Days)', 20, yPosition);
     pdf.setTextColor(0, 0, 0);
     yPosition += 15;
@@ -509,7 +622,7 @@ export async function generateProgressReportPDF(): Promise<boolean> {
         
         pdf.setFontSize(11);
         pdf.setFont('helvetica', 'bold');
-        pdf.setTextColor(31, 74, 166);
+        pdf.setTextColor(146, 64, 14); // Amber-800 for day headers
         const dayDate = new Date(day.date);
         pdf.text(`${dayDate.toLocaleDateString()} (${day.mealsCount} meals)`, 20, yPosition);
         
@@ -552,24 +665,164 @@ export async function generateProgressReportPDF(): Promise<boolean> {
 
     yPosition += 20;
 
+    // Add comprehensive user data sections
+    if (yPosition > 200) {
+      pdf.addPage();
+      yPosition = 25;
+    }
+
+    // Achievements Section
+    if (progressData.achievements.length > 0) {
+      pdf.setFontSize(16);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(146, 64, 14); // Amber-800 for section headers
+      pdf.text('Achievements Earned', 20, yPosition);
+      pdf.setTextColor(0, 0, 0);
+      yPosition += 15;
+
+      progressData.achievements.slice(0, 5).forEach((achievement, idx) => {
+        pdf.setFontSize(11);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(217, 119, 6); // Amber-600
+        pdf.text(`🏆 ${achievement.title}`, 25, yPosition);
+        
+        yPosition += 6;
+        pdf.setFontSize(9);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setTextColor(0, 0, 0);
+        
+        if (achievement.description && achievement.description.length > 0) {
+          pdf.text(achievement.description.substring(0, 80) + (achievement.description.length > 80 ? '...' : ''), 30, yPosition);
+          yPosition += 5;
+        }
+        
+        const earnedDate = new Date(achievement.earnedAt);
+        pdf.setTextColor(100, 100, 100);
+        pdf.text(`Earned: ${earnedDate.toLocaleDateString()}`, 30, yPosition);
+        yPosition += 10;
+        
+        if (yPosition > 250) {
+          pdf.addPage();
+          yPosition = 25;
+        }
+      });
+
+      if (progressData.achievements.length > 5) {
+        pdf.setFontSize(10);
+        pdf.setTextColor(100, 100, 100);
+        pdf.text(`... and ${progressData.achievements.length - 5} more achievements!`, 25, yPosition);
+        yPosition += 15;
+      }
+    }
+
+    // Water Intake Section
+    if (progressData.waterIntakeData.length > 0 && yPosition < 220) {
+      yPosition += 10;
+      pdf.setFontSize(16);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(146, 64, 14); // Amber-800 for section headers
+      pdf.text('Water Intake Summary', 20, yPosition);
+      pdf.setTextColor(0, 0, 0);
+      yPosition += 15;
+
+      const totalWaterGlasses = progressData.waterIntakeData.reduce((sum, day) => sum + day.glasses, 0);
+      const avgDailyWater = Math.round(totalWaterGlasses / Math.max(1, progressData.waterIntakeData.length));
+      const goalWater = progressData.userProfile.dailyWaterGoal || 8;
+
+      pdf.setFontSize(12);
+      pdf.text(`💧 Total Water: ${totalWaterGlasses} glasses`, 25, yPosition);
+      yPosition += 8;
+      pdf.text(`📊 Daily Average: ${avgDailyWater} glasses (Goal: ${goalWater})`, 25, yPosition);
+      yPosition += 8;
+      
+      const waterGoalRate = Math.round((avgDailyWater / goalWater) * 100);
+      pdf.text(`🎯 Goal Achievement: ${waterGoalRate}%`, 25, yPosition);
+      yPosition += 15;
+    }
+
+    // Fasting Sessions Section
+    if (progressData.fastingSessions.length > 0 && yPosition < 200) {
+      pdf.setFontSize(16);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(146, 64, 14); // Amber-800 for section headers
+      pdf.text('Intermittent Fasting', 20, yPosition);
+      pdf.setTextColor(0, 0, 0);
+      yPosition += 15;
+
+      const completedSessions = progressData.fastingSessions.filter(s => s.status === 'completed');
+      const totalFastingHours = completedSessions.reduce((sum, session) => {
+        return sum + (session.actualDuration ? Math.round(session.actualDuration / (1000 * 60 * 60)) : 0);
+      }, 0);
+
+      pdf.setFontSize(12);
+      pdf.text(`⏰ Total Sessions: ${progressData.fastingSessions.length}`, 25, yPosition);
+      yPosition += 8;
+      pdf.text(`✅ Completed: ${completedSessions.length}`, 25, yPosition);
+      yPosition += 8;
+      pdf.text(`🕐 Total Fasting Time: ${totalFastingHours} hours`, 25, yPosition);
+      yPosition += 15;
+    }
+
+    // Custom Recipes Section
+    if (progressData.recipes.length > 0 && yPosition < 180) {
+      pdf.setFontSize(16);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(146, 64, 14); // Amber-800 for section headers
+      pdf.text('Custom Recipes', 20, yPosition);
+      pdf.setTextColor(0, 0, 0);
+      yPosition += 15;
+
+      pdf.setFontSize(12);
+      pdf.text(`🍳 Total Recipes Created: ${progressData.recipes.length}`, 25, yPosition);
+      yPosition += 10;
+
+      // Show top 3 recipes
+      progressData.recipes.slice(0, 3).forEach((recipe, idx) => {
+        if (yPosition > 250) {
+          pdf.addPage();
+          yPosition = 25;
+        }
+        
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(217, 119, 6); // Amber-600
+        pdf.text(`${idx + 1}. ${recipe.name}`, 30, yPosition);
+        
+        yPosition += 5;
+        pdf.setFont('helvetica', 'normal');
+        pdf.setTextColor(0, 0, 0);
+        pdf.text(`${recipe.totalCalories} cal • ${recipe.servings} servings`, 35, yPosition);
+        yPosition += 8;
+      });
+
+      if (progressData.recipes.length > 3) {
+        pdf.setFontSize(9);
+        pdf.setTextColor(100, 100, 100);
+        pdf.text(`... and ${progressData.recipes.length - 3} more recipes`, 30, yPosition);
+        yPosition += 10;
+      }
+    }
+
+    yPosition += 20;
+
     // Footer with branding
     yPosition = pageHeight - 30;
     
-    // Add footer line
-    pdf.setDrawColor(250, 237, 57); // ByteWise yellow
+    // Add footer line with amber theme
+    pdf.setDrawColor(245, 158, 11); // Amber-500 
     pdf.setLineWidth(0.3);
     pdf.line(40, yPosition, pageWidth - 40, yPosition);
     
     yPosition += 8;
     
-    // Footer text with brand colors
+    // Footer text with amber brand colors
     pdf.setFontSize(11);
     pdf.setFont('helvetica', 'bold');
-    pdf.setTextColor(31, 74, 166); // Blue
+    pdf.setTextColor(146, 64, 14); // Amber-800
     pdf.text('ByteWise', pageWidth / 2 - 20, yPosition, { align: 'center' });
     
     pdf.setFont('helvetica', 'normal');
-    pdf.setTextColor(69, 199, 62); // Green
+    pdf.setTextColor(217, 119, 6); // Amber-600
     pdf.text('Nutritionist', pageWidth / 2 + 20, yPosition, { align: 'center' });
     
     yPosition += 6;
