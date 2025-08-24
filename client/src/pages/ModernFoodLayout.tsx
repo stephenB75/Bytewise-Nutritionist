@@ -2566,7 +2566,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-orange-600 font-bold text-lg">{Math.round(meal.calories || 0)} cal</p>
+                  <p className="text-orange-600 font-bold text-lg">{Math.round(Number(meal.totalCalories || meal.calories || 0))} cal</p>
                   <Button 
                     size="sm" 
                     variant="ghost" 
