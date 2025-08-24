@@ -3260,7 +3260,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           
           {/* Notification Dropdown */}
           {showNotificationDropdown && (
-            <div className="absolute top-full right-0 mt-2 w-80 bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border border-amber-200/60 rounded-2xl shadow-2xl overflow-hidden z-40">
+            <div className="absolute top-full right-0 mt-2 w-80 bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border border-amber-200/60 rounded-2xl shadow-2xl overflow-hidden z-[9999]">
               <div className="p-4 border-b border-amber-200/40">
                 <div className="flex items-center justify-between">
                   <h3 className="font-semibold text-gray-900">Notifications</h3>
