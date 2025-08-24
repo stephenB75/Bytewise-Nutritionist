@@ -748,6 +748,20 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               const databaseMeals = await response.json();
               stored = Array.isArray(databaseMeals) ? databaseMeals : [];
               console.log('✅ Meals loaded from database:', stored.length, 'meals');
+              
+              // Debug: Log meal data to check micronutrients
+              stored.forEach((meal: any, index: number) => {
+                console.log(`📊 Meal ${index + 1}:`, {
+                  name: meal.name,
+                  calories: meal.calories || meal.totalCalories,
+                  protein: meal.protein,
+                  vitaminC: meal.vitaminC,
+                  vitaminD: meal.vitaminD,
+                  iron: meal.iron,
+                  calcium: meal.calcium,
+                  date: meal.date
+                });
+              });
             } else {
               console.error('Failed to load meals from database');
               stored = [];
@@ -791,12 +805,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           return mealDate >= oneMonthAgoDateKey;
         });
         
+        console.log(`🗓️ Today's date: ${today}, Filtered meals for today:`, todayMeals.length);
+        
         setLoggedMeals(todayMeals);
         setWeeklyMeals(monthlyMeals); // Store last month's meals for comprehensive search functionality
         
         // Calculate daily calories from existing logged meals
-        const dailyTotal = todayMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
+        const dailyTotal = todayMeals.reduce((sum: number, meal: any) => sum + (meal.calories || meal.totalCalories || 0), 0);
         setDailyCalories(dailyTotal);
+        console.log(`💰 Daily total calories from loggedMeals: ${dailyTotal}`);
         
         // Calculate daily macros from today's meals
         const dailyMacroTotals = todayMeals.reduce((totals: any, meal: any) => ({
@@ -807,7 +824,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         setDailyMacros(dailyMacroTotals);
         
         // Calculate micronutrients from today's meals
+        console.log('🧪 Calculating micronutrients for', todayMeals.length, 'meals');
         const micronutrients = calculateMicronutrients(todayMeals);
+        console.log('🧪 Calculated micronutrients:', micronutrients);
         
         // Update micronutrients state
         setDailyMicronutrients({
