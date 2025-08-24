@@ -147,7 +147,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const [showWelcomeBanner, setShowWelcomeBanner] = useState(() => shouldShowTour());
   
   // Nutrition aggregation state
-  const [dailyMacros, setDailyMacros] = useState({ protein: 0, carbs: 0, fat: 0 });
+  // Note: Macro nutrients now come from server via dailyStats
   const [dailyMicronutrients, setDailyMicronutrients] = useState({
     vitaminC: 0,
     vitaminD: 0,
@@ -815,13 +815,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         setDailyCalories(dailyTotal);
         console.log(`💰 Daily total calories from loggedMeals: ${dailyTotal}`);
         
-        // Calculate daily macros from today's meals with database values
-        const dailyMacroTotals = todayMeals.reduce((totals: any, meal: any) => ({
-          protein: totals.protein + (Number(meal.protein) || Number(meal.totalProtein) || 0),
-          carbs: totals.carbs + (Number(meal.carbs) || Number(meal.totalCarbs) || 0),
-          fat: totals.fat + (Number(meal.fat) || Number(meal.totalFat) || 0)
-        }), { protein: 0, carbs: 0, fat: 0 });
-        setDailyMacros(dailyMacroTotals);
+        // Macro nutrients are now calculated server-side and available via dailyStats
+        // No need for separate frontend calculation
         
         // Calculate micronutrients from today's meals
         console.log('🧪 Calculating micronutrients for', todayMeals.length, 'meals');
@@ -1770,19 +1765,19 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           <div className="grid grid-cols-3 gap-4 mb-4">
             <MacroCard 
               name="Protein" 
-              value={Math.round(dailyMacros.protein)} 
+              value={Math.round(dailyStats?.totalProtein || 0)} 
               goal={user?.dailyProteinGoal || 180} 
               color="green" 
             />
             <MacroCard 
               name="Carbs" 
-              value={Math.round(dailyMacros.carbs)} 
+              value={Math.round(dailyStats?.totalCarbs || 0)} 
               goal={user?.dailyCarbGoal || 200} 
               color="yellow" 
             />
             <MacroCard 
               name="Fat" 
-              value={Math.round(dailyMacros.fat)} 
+              value={Math.round(dailyStats?.totalFat || 0)} 
               goal={user?.dailyFatGoal || 70} 
               color="purple" 
             />
