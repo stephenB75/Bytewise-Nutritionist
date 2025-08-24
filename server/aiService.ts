@@ -388,6 +388,15 @@ export async function getNutritionFromUSDA(foodName: string, grams: number = 100
       fiber: Math.round((food.fiber || 0) * multiplier * 10) / 10,
       sugar: Math.round((food.sugar || 0) * multiplier * 10) / 10,
       sodium: Math.round((food.sodium || 0) * multiplier * 10) / 10,
+      // Add micronutrients from USDA data
+      iron: Math.round((food.iron || 0) * multiplier * 10) / 10,
+      calcium: Math.round((food.calcium || 0) * multiplier * 10) / 10,
+      zinc: Math.round((food.zinc || 0) * multiplier * 10) / 10,
+      magnesium: Math.round((food.magnesium || 0) * multiplier * 10) / 10,
+      vitaminC: Math.round((food.vitaminC || food.vitamin_c || 0) * multiplier * 10) / 10,
+      vitaminD: Math.round((food.vitaminD || food.vitamin_d || 0) * multiplier * 10) / 10,
+      vitaminB12: Math.round((food.vitaminB12 || food.vitamin_b12 || 0) * multiplier * 10) / 10,
+      folate: Math.round((food.folate || food.folic_acid || 0) * multiplier * 10) / 10,
       dataSource: 'USDA',
       dataQuality: bestFood.qualityScore,
       description: food.description || food.name
@@ -552,10 +561,13 @@ function getFallbackAnalysis(): FoodAnalysisResult {
 function getEstimatedNutrition(foodName: string, grams: number = 100) {
   const name = foodName.toLowerCase();
   
-  // Enhanced nutrition estimates per 100g with more detailed categories
+  // Enhanced nutrition estimates per 100g with more detailed categories including micronutrients
   let baseNutrition = { 
     calories: 150, protein: 5, carbs: 20, fat: 5, 
-    fiber: 2, sugar: 8, sodium: 50 
+    fiber: 2, sugar: 8, sodium: 50,
+    // Add estimated micronutrients
+    iron: 1.5, calcium: 40, zinc: 0.8, magnesium: 25,
+    vitaminC: 5, vitaminD: 0.1, vitaminB12: 0.2, folate: 15
   };
   
   // Fruits (fresh)
@@ -674,6 +686,15 @@ function getEstimatedNutrition(foodName: string, grams: number = 100) {
     fat: Math.round(baseNutrition.fat * multiplier * 10) / 10,
     fiber: Math.round(baseNutrition.fiber * multiplier * 10) / 10,
     sugar: Math.round(baseNutrition.sugar * multiplier * 10) / 10,
-    sodium: Math.round(baseNutrition.sodium * multiplier * 10) / 10
+    sodium: Math.round(baseNutrition.sodium * multiplier * 10) / 10,
+    // Include micronutrients in estimation return
+    iron: Math.round(baseNutrition.iron * multiplier * 10) / 10,
+    calcium: Math.round(baseNutrition.calcium * multiplier * 10) / 10,
+    zinc: Math.round(baseNutrition.zinc * multiplier * 10) / 10,
+    magnesium: Math.round(baseNutrition.magnesium * multiplier * 10) / 10,
+    vitaminC: Math.round(baseNutrition.vitaminC * multiplier * 10) / 10,
+    vitaminD: Math.round(baseNutrition.vitaminD * multiplier * 10) / 10,
+    vitaminB12: Math.round(baseNutrition.vitaminB12 * multiplier * 10) / 10,
+    folate: Math.round(baseNutrition.folate * multiplier * 10) / 10
   };
 }

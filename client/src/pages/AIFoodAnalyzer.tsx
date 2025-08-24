@@ -260,9 +260,9 @@ export default function AIFoodAnalyzer() {
       return result as AnalysisResult;
     },
     onSuccess: async (result) => {
-      // Calculate total nutrition from identified foods
+      // Calculate total nutrition from identified foods including micronutrients
       const totalNutrition = result.identifiedFoods.reduce(
-        (total, food) => ({
+        (total, food: any) => ({
           calories: total.calories + (food.calories || 0),
           protein: total.protein + (food.protein || 0),
           carbs: total.carbs + (food.carbs || 0),
@@ -270,8 +270,20 @@ export default function AIFoodAnalyzer() {
           fiber: total.fiber + (food.fiber || 0),
           sugar: total.sugar + (food.sugar || 0),
           sodium: total.sodium + (food.sodium || 0),
+          // Add micronutrient aggregation
+          iron: total.iron + (food.iron || 0),
+          calcium: total.calcium + (food.calcium || 0),
+          zinc: total.zinc + (food.zinc || 0),
+          magnesium: total.magnesium + (food.magnesium || 0),
+          vitaminC: total.vitaminC + (food.vitaminC || 0),
+          vitaminD: total.vitaminD + (food.vitaminD || 0),
+          vitaminB12: total.vitaminB12 + (food.vitaminB12 || 0),
+          folate: total.folate + (food.folate || 0),
         }),
-        { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0, sugar: 0, sodium: 0 }
+        { 
+          calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0, sugar: 0, sodium: 0,
+          iron: 0, calcium: 0, zinc: 0, magnesium: 0, vitaminC: 0, vitaminD: 0, vitaminB12: 0, folate: 0
+        }
       );
 
       const analysisResultWithTotals = {
@@ -309,15 +321,15 @@ export default function AIFoodAnalyzer() {
           totalProtein: totalNutrition.protein,
           totalCarbs: totalNutrition.carbs,
           totalFat: totalNutrition.fat,
-          // Add micronutrients with defaults for AI analyzer (safe access)
-          iron: (totalNutrition as any).iron || 0,
-          calcium: (totalNutrition as any).calcium || 0,
-          zinc: (totalNutrition as any).zinc || 0,
-          magnesium: (totalNutrition as any).magnesium || 0,
-          vitaminC: (totalNutrition as any).vitaminC || 0,
-          vitaminD: (totalNutrition as any).vitaminD || 0,
-          vitaminB12: (totalNutrition as any).vitaminB12 || 0,
-          folate: (totalNutrition as any).folate || 0,
+          // Include micronutrients from aggregated totalNutrition
+          iron: totalNutrition.iron || 0,
+          calcium: totalNutrition.calcium || 0,
+          zinc: totalNutrition.zinc || 0,
+          magnesium: totalNutrition.magnesium || 0,
+          vitaminC: totalNutrition.vitaminC || 0,
+          vitaminD: totalNutrition.vitaminD || 0,
+          vitaminB12: totalNutrition.vitaminB12 || 0,
+          folate: totalNutrition.folate || 0,
           date: new Date().toISOString(),
           mealType: 'meal'
         };
