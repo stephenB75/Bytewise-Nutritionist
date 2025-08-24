@@ -562,17 +562,39 @@ function preprocessFoodNameForUSDA(foodName: string): string[] {
 function getFallbackAnalysis(): FoodAnalysisResult {
   console.log('🔄 Providing fallback AI analysis due to API limitations');
   
+  // Include comprehensive nutrition including micronutrients
+  const fallbackFood = {
+    name: 'Food Item',
+    confidence: 0.6,
+    portion: '1 serving',
+    estimatedGrams: 150,
+    calories: 200,
+    protein: 8,
+    carbs: 25,
+    fat: 6,
+    fiber: 3,
+    sugar: 5,
+    sodium: 50,
+    // Add micronutrients to fallback analysis
+    iron: 2.5,
+    calcium: 60,
+    zinc: 1.2,
+    magnesium: 30,
+    vitaminC: 8,
+    vitaminD: 0.2,
+    vitaminB12: 0.3,
+    folate: 20
+  };
+
+  console.log('🔬 Fallback analysis result with micronutrients:', {
+    name: fallbackFood.name,
+    iron: fallbackFood.iron,
+    calcium: fallbackFood.calcium,
+    vitaminC: fallbackFood.vitaminC
+  });
+  
   return {
-    identifiedFoods: [{
-      name: 'Food Item',
-      confidence: 0.6,
-      portion: '1 serving',
-      estimatedGrams: 150,
-      calories: 200,
-      protein: 8,
-      carbs: 25,
-      fat: 6
-    }],
+    identifiedFoods: [fallbackFood],
     analysisTime: new Date().toISOString()
   };
 }
