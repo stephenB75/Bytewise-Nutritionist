@@ -484,14 +484,23 @@ export default function AIFoodAnalyzer() {
           fiber: Math.round(food.fiber * multiplier * 10) / 10,
           sugar: Math.round(food.sugar * multiplier * 10) / 10,
           sodium: Math.round(food.sodium * multiplier * 10) / 10,
+          // Include micronutrients in portion adjustment
+          iron: Math.round((food.iron || 0) * multiplier * 10) / 10,
+          calcium: Math.round((food.calcium || 0) * multiplier * 10) / 10,
+          zinc: Math.round((food.zinc || 0) * multiplier * 10) / 10,
+          magnesium: Math.round((food.magnesium || 0) * multiplier * 10) / 10,
+          vitaminC: Math.round((food.vitaminC || 0) * multiplier * 10) / 10,
+          vitaminD: Math.round((food.vitaminD || 0) * multiplier * 10) / 10,
+          vitaminB12: Math.round((food.vitaminB12 || 0) * multiplier * 10) / 10,
+          folate: Math.round((food.folate || 0) * multiplier * 10) / 10,
         };
       }
       return food;
     });
 
-    // Recalculate total nutrition
+    // Recalculate total nutrition including micronutrients
     const totalNutrition = updatedFoods.reduce(
-      (total, food) => ({
+      (total, food: any) => ({
         calories: total.calories + food.calories,
         protein: total.protein + food.protein,
         carbs: total.carbs + food.carbs,
@@ -499,8 +508,20 @@ export default function AIFoodAnalyzer() {
         fiber: total.fiber + food.fiber,
         sugar: total.sugar + food.sugar,
         sodium: total.sodium + food.sodium,
+        // Include micronutrients in recalculation
+        iron: total.iron + (food.iron || 0),
+        calcium: total.calcium + (food.calcium || 0),
+        zinc: total.zinc + (food.zinc || 0),
+        magnesium: total.magnesium + (food.magnesium || 0),
+        vitaminC: total.vitaminC + (food.vitaminC || 0),
+        vitaminD: total.vitaminD + (food.vitaminD || 0),
+        vitaminB12: total.vitaminB12 + (food.vitaminB12 || 0),
+        folate: total.folate + (food.folate || 0),
       }),
-      { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0, sugar: 0, sodium: 0 }
+      { 
+        calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0, sugar: 0, sodium: 0,
+        iron: 0, calcium: 0, zinc: 0, magnesium: 0, vitaminC: 0, vitaminD: 0, vitaminB12: 0, folate: 0
+      }
     );
 
     setAnalysisResult({
