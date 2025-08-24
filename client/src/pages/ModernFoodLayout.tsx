@@ -3379,10 +3379,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 key={tab.id}
                 data-testid={tab.testId}
                 onClick={handleClick}
-                className={`group relative overflow-hidden rounded-lg px-2 py-1 transition-all duration-150 ${
+                className={`group relative overflow-hidden transition-colors duration-150 ${
                   activeTab === tab.id
-                    ? 'text-gray-900 bg-white/20 backdrop-blur-sm shadow-inner'
-                    : 'text-gray-600 hover:text-gray-900 active:text-gray-900 hover:bg-white/10'
+                    ? 'text-gray-900'
+                    : 'text-gray-600 hover:text-gray-800 active:text-gray-800'
                 }`}
               >
                 <IconComponent 
