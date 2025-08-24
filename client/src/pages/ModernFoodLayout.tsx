@@ -1177,7 +1177,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <h1 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] drop-shadow-2xl font-league-spartan text-optimized animate-slideUpH1">
                 {title}
               </h1>
-              <h2 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] font-league-spartan text-white drop-shadow-2xl animate-slideUpH2">
+              <h2 className={`text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] font-league-spartan ${showLogo ? 'text-white' : 'text-optimized'} drop-shadow-2xl animate-slideUpH2`}>
                 {subtitle}
               </h2>
             </div>
