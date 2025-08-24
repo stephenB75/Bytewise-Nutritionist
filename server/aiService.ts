@@ -686,37 +686,52 @@ function getEstimatedNutrition(foodName: string, grams: number = 100) {
   
   // Processed foods
   } else if (name.includes('pizza')) {
-    baseNutrition = { calories: 266, protein: 11, carbs: 33, fat: 10, fiber: 2.3, sugar: 3.6, sodium: 598 };
+    baseNutrition = { calories: 266, protein: 11, carbs: 33, fat: 10, fiber: 2.3, sugar: 3.6, sodium: 598,
+      iron: 2.4, calcium: 144, zinc: 1.4, magnesium: 20, vitaminC: 0.2, vitaminD: 0.1, vitaminB12: 0.3, folate: 8 };
   } else if (name.includes('french fries') || name.includes('fries')) {
-    baseNutrition = { calories: 365, protein: 4, carbs: 63, fat: 17, fiber: 3.8, sugar: 0.3, sodium: 246 };
+    baseNutrition = { calories: 365, protein: 4, carbs: 63, fat: 17, fiber: 3.8, sugar: 0.3, sodium: 246,
+      iron: 0.8, calcium: 15, zinc: 0.3, magnesium: 25, vitaminC: 9.7, vitaminD: 0, vitaminB12: 0, folate: 15 };
   } else if (name.includes('burger') || name.includes('hamburger')) {
-    baseNutrition = { calories: 295, protein: 17, carbs: 22, fat: 15, fiber: 2, sugar: 3, sodium: 396 };
+    baseNutrition = { calories: 295, protein: 17, carbs: 22, fat: 15, fiber: 2, sugar: 3, sodium: 396,
+      iron: 2.1, calcium: 54, zinc: 2.9, magnesium: 20, vitaminC: 0.6, vitaminD: 0.1, vitaminB12: 1.3, folate: 8 };
   
   // Desserts and sweets
   } else if (name.includes('ice cream')) {
-    baseNutrition = { calories: 207, protein: 3.5, carbs: 24, fat: 11, fiber: 0.7, sugar: 21, sodium: 80 };
+    baseNutrition = { calories: 207, protein: 3.5, carbs: 24, fat: 11, fiber: 0.7, sugar: 21, sodium: 80,
+      iron: 0.09, calcium: 128, zinc: 0.3, magnesium: 14, vitaminC: 0.6, vitaminD: 0.1, vitaminB12: 0.3, folate: 5 };
   } else if (name.includes('cake') || name.includes('chocolate cake')) {
-    baseNutrition = { calories: 352, protein: 5, carbs: 56, fat: 14, fiber: 1.8, sugar: 40, sodium: 299 };
+    baseNutrition = { calories: 352, protein: 5, carbs: 56, fat: 14, fiber: 1.8, sugar: 40, sodium: 299,
+      iron: 1.8, calcium: 73, zinc: 0.5, magnesium: 22, vitaminC: 0.1, vitaminD: 0.6, vitaminB12: 0.1, folate: 8 };
   } else if (name.includes('cookie')) {
-    baseNutrition = { calories: 502, protein: 5.9, carbs: 64, fat: 25, fiber: 2.4, sugar: 38, sodium: 363 };
+    baseNutrition = { calories: 502, protein: 5.9, carbs: 64, fat: 25, fiber: 2.4, sugar: 38, sodium: 363,
+      iron: 3.0, calcium: 73, zinc: 0.5, magnesium: 30, vitaminC: 0, vitaminD: 0.5, vitaminB12: 0.1, folate: 15 };
+  } else if (name.includes('donut') || name.includes('doughnut')) {
+    baseNutrition = { calories: 452, protein: 4.9, carbs: 51, fat: 25, fiber: 1.4, sugar: 10, sodium: 373,
+      iron: 1.5, calcium: 89, zinc: 0.4, magnesium: 13, vitaminC: 0.1, vitaminD: 0.4, vitaminB12: 0.1, folate: 47 };
   } else if (name.includes('chocolate')) {
-    baseNutrition = { calories: 546, protein: 4.9, carbs: 61, fat: 31, fiber: 7, sugar: 48, sodium: 24 };
+    baseNutrition = { calories: 546, protein: 4.9, carbs: 61, fat: 31, fiber: 7, sugar: 48, sodium: 24,
+      iron: 2.3, calcium: 65, zinc: 0.9, magnesium: 63, vitaminC: 0, vitaminD: 0, vitaminB12: 0.3, folate: 12 };
   
   // Fats and oils
   } else if (name.includes('oil') || name.includes('olive oil')) {
-    baseNutrition = { calories: 884, protein: 0, carbs: 0, fat: 100, fiber: 0, sugar: 0, sodium: 2 };
+    baseNutrition = { calories: 884, protein: 0, carbs: 0, fat: 100, fiber: 0, sugar: 0, sodium: 2,
+      iron: 0.56, calcium: 1, zinc: 0, magnesium: 0, vitaminC: 0, vitaminD: 0, vitaminB12: 0, folate: 0 };
   } else if (name.includes('butter')) {
-    baseNutrition = { calories: 717, protein: 0.9, carbs: 0.1, fat: 81, fiber: 0, sugar: 0.1, sodium: 11 };
+    baseNutrition = { calories: 717, protein: 0.9, carbs: 0.1, fat: 81, fiber: 0, sugar: 0.1, sodium: 11,
+      iron: 0.02, calcium: 24, zinc: 0.09, magnesium: 2, vitaminC: 0, vitaminD: 1.5, vitaminB12: 0.17, folate: 3 };
   
   // Nuts and seeds
   } else if (name.includes('almond') || name.includes('nuts')) {
-    baseNutrition = { calories: 579, protein: 21, carbs: 22, fat: 50, fiber: 12, sugar: 4.4, sodium: 1 };
+    baseNutrition = { calories: 579, protein: 21, carbs: 22, fat: 50, fiber: 12, sugar: 4.4, sodium: 1,
+      iron: 3.7, calcium: 269, zinc: 3.1, magnesium: 270, vitaminC: 0, vitaminD: 0, vitaminB12: 0, folate: 44 };
   
   // Beverages
   } else if (name.includes('soda') || name.includes('cola')) {
-    baseNutrition = { calories: 42, protein: 0, carbs: 11, fat: 0, fiber: 0, sugar: 11, sodium: 2 };
+    baseNutrition = { calories: 42, protein: 0, carbs: 11, fat: 0, fiber: 0, sugar: 11, sodium: 2,
+      iron: 0.11, calcium: 2, zinc: 0.04, magnesium: 1, vitaminC: 0, vitaminD: 0, vitaminB12: 0, folate: 0 };
   } else if (name.includes('juice') && name.includes('orange')) {
-    baseNutrition = { calories: 45, protein: 0.7, carbs: 10, fat: 0.2, fiber: 0.2, sugar: 8.1, sodium: 1 };
+    baseNutrition = { calories: 45, protein: 0.7, carbs: 10, fat: 0.2, fiber: 0.2, sugar: 8.1, sodium: 1,
+      iron: 0.2, calcium: 11, zinc: 0.1, magnesium: 11, vitaminC: 50, vitaminD: 0, vitaminB12: 0, folate: 30 };
   }
   
   const multiplier = grams / 100;

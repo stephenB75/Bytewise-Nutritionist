@@ -266,12 +266,6 @@ export default function AIFoodAnalyzer() {
       
       const result = await response.json();
       console.log('🔬 Parsed analysis result:', result);
-      console.log('🔬 Individual foods with micronutrients:', result.identifiedFoods?.map((food: any) => ({
-        name: food.name,
-        iron: food.iron,
-        calcium: food.calcium,
-        vitaminC: food.vitaminC
-      })));
       return result as AnalysisResult;
     },
     onSuccess: async (result) => {
@@ -300,13 +294,6 @@ export default function AIFoodAnalyzer() {
           iron: 0, calcium: 0, zinc: 0, magnesium: 0, vitaminC: 0, vitaminD: 0, vitaminB12: 0, folate: 0
         }
       );
-
-      console.log('🔬 Calculated totalNutrition with micronutrients:', {
-        calories: totalNutrition.calories,
-        iron: totalNutrition.iron,
-        calcium: totalNutrition.calcium,
-        vitaminC: totalNutrition.vitaminC
-      });
 
       const analysisResultWithTotals = {
         ...result,
