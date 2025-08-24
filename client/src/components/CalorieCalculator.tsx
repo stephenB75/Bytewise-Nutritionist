@@ -513,7 +513,7 @@ function CalorieCalculator({
           <div className="mt-4 space-y-2">
             <h4 className="text-sm font-medium text-gray-700">Recent Analysis</h4>
             {recentAnalyses.slice(0, 2).map((analysis, index) => (
-              <div key={index} className="p-3 bg-gray-50 rounded-lg">
+              <div key={index} className="p-3 bg-amber-50/60 rounded-lg">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <p className="font-medium text-gray-900">{analysis.ingredient}</p>
@@ -894,17 +894,17 @@ function CalorieCalculator({
                   <div className="mb-3">
                     <p className="text-xs text-gray-900 mb-2 font-medium">Nutrition per 100g (for comparison):</p>
                     <div className="grid grid-cols-3 gap-3">
-                      <div className="text-center p-2 bg-gray-50 rounded">
+                      <div className="text-center p-2 bg-amber-50/60 rounded">
                         <Beef className="w-4 h-4 mx-auto text-red-500 mb-1" />
                         <p className="text-xs text-gray-600">Protein</p>
                         <p className="font-bold text-gray-900">{Math.round(analysis.nutritionPer100g.protein)}g</p>
                       </div>
-                      <div className="text-center p-2 bg-gray-50 rounded">
+                      <div className="text-center p-2 bg-amber-50/60 rounded">
                         <Wheat className="w-4 h-4 mx-auto text-[#faed39] mb-1" />
                         <p className="text-xs text-gray-600">Carbs</p>
                         <p className="font-bold text-gray-900">{Math.round(analysis.nutritionPer100g.carbs)}g</p>
                       </div>
-                      <div className="text-center p-2 bg-gray-50 rounded">
+                      <div className="text-center p-2 bg-amber-50/60 rounded">
                         <Droplets className="w-4 h-4 mx-auto text-[#1f4aa6] mb-1" />
                         <p className="text-xs text-gray-600">Fat</p>
                         <p className="font-bold text-gray-900">{Math.round(analysis.nutritionPer100g.fat)}g</p>
@@ -1086,7 +1086,7 @@ function UserFoodTextSuggestions({ onSuggestionClick }: { onSuggestionClick: (fo
       <p className="text-xs text-gray-900 mb-3">Quick suggestions (last 7 days):</p>
       <div className="space-y-3">
         {userFoods.map((food) => (
-          <div key={food.name} className="text-sm border border-gray-200 rounded-lg p-3 hover:bg-gray-50 transition-colors">
+          <div key={food.name} className="text-sm border border-gray-200 rounded-lg p-3 hover:bg-amber-50/60 transition-colors">
             <div className="flex items-start justify-between">
               <button
                 onClick={() => onSuggestionClick(food.name)}

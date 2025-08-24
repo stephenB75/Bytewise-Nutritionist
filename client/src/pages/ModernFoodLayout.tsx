@@ -2287,7 +2287,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="h-12 bg-white/80 border-amber-300 text-gray-900 placeholder-gray-500"
+                className="h-12 bg-amber-50/90 border-amber-400 text-gray-900 placeholder-gray-600"
                 required
                 disabled={isLoading}
               />
@@ -2405,7 +2405,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               placeholder="Search weekly food entries..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-28 pr-16 h-16 bg-white/90 border-amber-300 text-gray-900 placeholder-gray-600 rounded-2xl text-xl font-medium text-center"
+              className="pl-28 pr-16 h-16 bg-amber-50/90 border-amber-400 text-gray-900 placeholder-gray-600 rounded-2xl text-xl font-medium text-center"
             />
             {searchQuery && (
               <Button
@@ -3102,7 +3102,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             
             {/* Fasting Content Section */}
             <div className="px-6 py-3 content-section">
-              <div data-testid="fasting-tracker" className="fasting-tracker bg-white/90 backdrop-blur-md rounded-3xl border border-amber-200 p-6">
+              <div data-testid="fasting-tracker" className="fasting-tracker bg-amber-50/90 backdrop-blur-md rounded-3xl border border-amber-200 p-6">
                 <FastingTracker />
               </div>
             </div>
@@ -3138,7 +3138,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
             {/* Content Section - Completely Separate and Underneath */}
             <div className="px-6 py-3 content-section">
-              <div className="bg-white/90 backdrop-blur-md rounded-3xl border border-amber-200 shadow-lg">
+              <div className="bg-amber-50/90 backdrop-blur-md rounded-3xl border border-amber-200 shadow-lg">
                 <DataManagementPanel />
               </div>
             </div>

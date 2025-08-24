@@ -738,7 +738,7 @@ export default function AIFoodAnalyzer() {
                 return (
                   <div 
                     key={`${analysis.analysisTime}-${index}`} 
-                    className="bg-white/80 border border-amber-200 rounded-lg p-4 space-y-3"
+                    className="bg-amber-50/80 border border-amber-200 rounded-lg p-4 space-y-3"
                     data-testid={`analyzed-photo-${index}`}
                   >
                     {/* Photo */}

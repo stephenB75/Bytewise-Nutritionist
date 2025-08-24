@@ -140,7 +140,7 @@ export function ResetPassword() {
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="Enter new password (min 6 characters)"
-                    className="pl-10 bg-white/80 border-amber-300 text-gray-900 placeholder-gray-500 focus:border-amber-400 focus:ring-amber-400"
+                    className="pl-10 bg-amber-50/90 border-amber-400 text-gray-900 placeholder-gray-600 focus:border-amber-500 focus:ring-amber-500"
                     required
                     minLength={6}
                   />
@@ -159,7 +159,7 @@ export function ResetPassword() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Re-enter new password"
-                    className="pl-10 bg-white/80 border-amber-300 text-gray-900 placeholder-gray-500 focus:border-amber-400 focus:ring-amber-400"
+                    className="pl-10 bg-amber-50/90 border-amber-400 text-gray-900 placeholder-gray-600 focus:border-amber-500 focus:ring-amber-500"
                     required
                     minLength={6}
                   />
