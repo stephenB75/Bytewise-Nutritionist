@@ -288,6 +288,15 @@ export default function AIFoodAnalyzer() {
           totalProtein: totalNutrition.protein,
           totalCarbs: totalNutrition.carbs,
           totalFat: totalNutrition.fat,
+          // Add micronutrients with defaults for AI analyzer (safe access)
+          iron: (totalNutrition as any).iron || 0,
+          calcium: (totalNutrition as any).calcium || 0,
+          zinc: (totalNutrition as any).zinc || 0,
+          magnesium: (totalNutrition as any).magnesium || 0,
+          vitaminC: (totalNutrition as any).vitaminC || 0,
+          vitaminD: (totalNutrition as any).vitaminD || 0,
+          vitaminB12: (totalNutrition as any).vitaminB12 || 0,
+          folate: (totalNutrition as any).folate || 0,
           date: new Date().toISOString(),
           mealType: 'meal'
         };

@@ -739,7 +739,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     
     try {
-      // Create meal entry
+      // Create meal entry with micronutrients
       const meal = await storage.createMeal({
         userId,
         date: new Date(req.body.date || new Date()),
@@ -748,7 +748,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         totalCalories: req.body.totalCalories ? req.body.totalCalories.toString() : '0',
         totalProtein: req.body.totalProtein ? req.body.totalProtein.toString() : '0',
         totalCarbs: req.body.totalCarbs ? req.body.totalCarbs.toString() : '0',
-        totalFat: req.body.totalFat ? req.body.totalFat.toString() : '0'
+        totalFat: req.body.totalFat ? req.body.totalFat.toString() : '0',
+        // Include micronutrients from CalorieCalculator
+        iron: req.body.iron ? req.body.iron.toString() : '0',
+        calcium: req.body.calcium ? req.body.calcium.toString() : '0',
+        zinc: req.body.zinc ? req.body.zinc.toString() : '0',
+        magnesium: req.body.magnesium ? req.body.magnesium.toString() : '0',
+        vitaminC: req.body.vitaminC ? req.body.vitaminC.toString() : '0',
+        vitaminD: req.body.vitaminD ? req.body.vitaminD.toString() : '0',
+        vitaminB12: req.body.vitaminB12 ? req.body.vitaminB12.toString() : '0',
+        folate: req.body.folate ? req.body.folate.toString() : '0'
       });
 
       // Check for new achievements after meal logging

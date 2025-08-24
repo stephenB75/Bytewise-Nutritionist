@@ -122,6 +122,15 @@ export const meals = pgTable("meals", {
   totalProtein: decimal("total_protein", { precision: 8, scale: 2 }).default('0'),
   totalCarbs: decimal("total_carbs", { precision: 8, scale: 2 }).default('0'),
   totalFat: decimal("total_fat", { precision: 8, scale: 2 }).default('0'),
+  // Micronutrients from USDA database
+  iron: decimal("iron", { precision: 8, scale: 2 }).default('0'),
+  calcium: decimal("calcium", { precision: 8, scale: 2 }).default('0'),
+  zinc: decimal("zinc", { precision: 8, scale: 2 }).default('0'),
+  magnesium: decimal("magnesium", { precision: 8, scale: 2 }).default('0'),
+  vitaminC: decimal("vitamin_c", { precision: 8, scale: 2 }).default('0'),
+  vitaminD: decimal("vitamin_d", { precision: 8, scale: 2 }).default('0'),
+  vitaminB12: decimal("vitamin_b12", { precision: 8, scale: 2 }).default('0'),
+  folate: decimal("folate", { precision: 8, scale: 2 }).default('0'),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
