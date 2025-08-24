@@ -131,36 +131,32 @@ html,
   background-attachment: fixed;
 }
 
-/* Button color overrides for yellow background compatibility - EXCLUDE navigation */
-button.bg-gray-800:not([data-testid*="nav-"]):not([class*="nav-"]),
-button.bg-gray-900:not([data-testid*="nav-"]):not([class*="nav-"]),
-button.bg-black:not(.bg-black\/80):not(.bg-black\/50):not([data-testid*="nav-"]):not([class*="nav-"]),
-.bg-gray-800.hover\:bg-gray-900:hover:not([data-testid*="nav-"]):not([class*="nav-"]),
-.bg-gray-900.hover\:bg-gray-800:hover:not([data-testid*="nav-"]):not([class*="nav-"]) {
-  background-color: #f59e0b !important; /* Amber-500 for good contrast */
-  color: #ffffff !important;
+/* Gentle button color suggestions for yellow background compatibility - EXCLUDE navigation */
+button.bg-gray-800:not([data-testid*="nav-"]):not([class*="nav-"]):not(.badge):not([class*="badge"]),
+button.bg-gray-900:not([data-testid*="nav-"]):not([class*="nav-"]):not(.badge):not([class*="badge"]),
+button.bg-black:not(.bg-black\/80):not(.bg-black\/50):not([data-testid*="nav-"]):not([class*="nav-"]):not(.badge):not([class*="badge"]) {
+  background-color: #f59e0b; /* Amber-500 for good contrast */
+  color: #ffffff;
 }
 
-button.bg-gray-800:hover:not([data-testid*="nav-"]):not([class*="nav-"]),
-button.bg-gray-900:hover:not([data-testid*="nav-"]):not([class*="nav-"]),
-button.bg-black:hover:not(.bg-black\/80):not(.bg-black\/50):not([data-testid*="nav-"]):not([class*="nav-"]) {
-  background-color: #d97706 !important; /* Amber-600 for hover state */
-  color: #ffffff !important;
+button.bg-gray-800:hover:not([data-testid*="nav-"]):not([class*="nav-"]):not(.badge):not([class*="badge"]),
+button.bg-gray-900:hover:not([data-testid*="nav-"]):not([class*="nav-"]):not(.badge):not([class*="badge"]),
+button.bg-black:hover:not(.bg-black\/80):not(.bg-black\/50):not([data-testid*="nav-"]):not([class*="nav-"]):not(.badge):not([class*="badge"]) {
+  background-color: #d97706; /* Amber-600 for hover state */
+  color: #ffffff;
 }
 
-/* Dark blue button overrides - EXCLUDE navigation */
-button.bg-blue-900:not([data-testid*="nav-"]):not([class*="nav-"]),
-button.bg-blue-800:not([data-testid*="nav-"]):not([class*="nav-"]),
-.bg-blue-900:not([data-testid*="nav-"]):not([class*="nav-"]),
-.bg-blue-800:not([data-testid*="nav-"]):not([class*="nav-"]) {
-  background-color: #3b82f6 !important; /* Blue-500 instead of very dark blue */
-  color: #ffffff !important;
+/* Dark blue button suggestions - EXCLUDE navigation and badges */
+button.bg-blue-900:not([data-testid*="nav-"]):not([class*="nav-"]):not(.badge):not([class*="badge"]),
+button.bg-blue-800:not([data-testid*="nav-"]):not([class*="nav-"]):not(.badge):not([class*="badge"]) {
+  background-color: #3b82f6; /* Blue-500 instead of very dark blue */
+  color: #ffffff;
 }
 
-button.bg-blue-900:hover:not([data-testid*="nav-"]):not([class*="nav-"]),
-button.bg-blue-800:hover:not([data-testid*="nav-"]):not([class*="nav-"]) {
-  background-color: #3b82f6 !important; /* Blue-500 for hover - lighter than before */
-  color: #ffffff !important;
+button.bg-blue-900:hover:not([data-testid*="nav-"]):not([class*="nav-"]):not(.badge):not([class*="badge"]),
+button.bg-blue-800:hover:not([data-testid*="nav-"]):not([class*="nav-"]):not(.badge):not([class*="badge"]) {
+  background-color: #2563eb; /* Blue-600 for hover - darker for better UX */
+  color: #ffffff;
 }
 
 /* Tooltip, popover, and rollover element color fixes */
@@ -316,25 +312,19 @@ button[class*="ghost"]:hover {
   background-color: rgba(234, 88, 12, 0.1) !important; /* Light orange background on hover */
 }
 
-/* Fix any remaining dark button states */
-button[class*="bg-slate"],
-button[class*="bg-gray-9"],
-button[class*="bg-black"],
-.bg-slate-900,
-.bg-gray-900,
-.bg-black {
-  background-color: #f59e0b !important; /* Amber-500 */
-  color: #111827 !important; /* Gray-900 text */
+/* Gentle button state suggestions - EXCLUDE badges and navigation */
+button[class*="bg-slate"]:not(.badge):not([class*="badge"]):not([data-testid*="nav-"]),
+button[class*="bg-gray-9"]:not(.badge):not([class*="badge"]):not([data-testid*="nav-"]),
+button[class*="bg-black"]:not(.badge):not([class*="badge"]):not([data-testid*="nav-"]) {
+  background-color: #f59e0b; /* Amber-500 */
+  color: #ffffff; /* White text for better contrast */
 }
 
-button[class*="bg-slate"]:hover,
-button[class*="bg-gray-9"]:hover,
-button[class*="bg-black"]:hover,
-.bg-slate-900:hover,
-.bg-gray-900:hover,
-.bg-black:hover {
-  background-color: #d97706 !important; /* Amber-600 on hover */
-  color: #111827 !important; /* Keep dark text */
+button[class*="bg-slate"]:hover:not(.badge):not([class*="badge"]):not([data-testid*="nav-"]),
+button[class*="bg-gray-9"]:hover:not(.badge):not([class*="badge"]):not([data-testid*="nav-"]),
+button[class*="bg-black"]:hover:not(.badge):not([class*="badge"]):not([data-testid*="nav-"]) {
+  background-color: #d97706; /* Amber-600 on hover */
+  color: #ffffff; /* Keep white text */
 }
 
 /* Dialog and Modal Background Fixes for Yellow Theme */

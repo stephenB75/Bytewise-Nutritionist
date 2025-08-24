@@ -975,7 +975,7 @@ const FastingTracker = React.memo(function FastingTracker() {
                             </div>
                           </div>
                           <div className="text-right">
-                            <Badge variant={wasCompleted ? "secondary" : "outline"} className={wasCompleted ? "bg-amber-200 text-gray-900" : "bg-orange-100 text-orange-700 border-none"}>
+                            <Badge variant={wasCompleted ? "secondary" : "outline"} className={wasCompleted ? "bg-green-600 text-white" : "bg-orange-100 text-orange-700 border-none"}>
                               {formatHours(actualHours)} {wasCompleted ? 'completed' : 'fasted'}
                             </Badge>
                             {!wasCompleted && (
@@ -1043,7 +1043,7 @@ const FastingTracker = React.memo(function FastingTracker() {
                       <p className="text-sm font-medium mb-2 text-gray-900">Benefits:</p>
                       <div className="flex flex-wrap gap-1">
                         {plan.benefits.map((benefit, index) => (
-                          <Badge key={index} variant="outline" className="text-xs bg-amber-200 text-gray-900 border-none">
+                          <Badge key={index} variant="outline" className="text-xs bg-blue-600 text-white border-none">
                             {benefit}
                           </Badge>
                         ))}

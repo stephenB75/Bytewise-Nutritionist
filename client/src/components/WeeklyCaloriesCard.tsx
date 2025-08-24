@@ -274,10 +274,10 @@ export function WeeklyCaloriesCard() {
                   
                   <div className="flex items-center gap-2">
                     {isToday && (
-                      <Badge className="bg-orange-500 text-gray-900 text-xs">Today</Badge>
+                      <Badge className="bg-orange-600 text-white text-xs">Today</Badge>
                     )}
                     {dayData.mealCount > 0 && (
-                      <Badge variant="outline" className="text-xs text-gray-900 border-gray-500">
+                      <Badge variant="outline" className="text-xs text-orange-600 border-orange-400 bg-white/80">
                         {dayData.mealCount} meal{dayData.mealCount !== 1 ? 's' : ''}
                       </Badge>
                     )}

@@ -156,7 +156,7 @@ export function TourLauncher({ isVisible = true, onNavigateToFeature, onCardInte
                   <Target className="w-4 h-4" />
                   6 key features
                 </span>
-                <Badge variant="secondary" className="text-xs text-gray-900 bg-gray-100">
+                <Badge variant="secondary" className="text-xs text-white bg-orange-600">
                   Click to explore
                 </Badge>
               </div>
@@ -178,7 +178,7 @@ export function TourLauncher({ isVisible = true, onNavigateToFeature, onCardInte
                           {feature.description}
                         </p>
                         <div className="flex items-center justify-between">
-                          <Badge variant="outline" className="text-xs text-gray-900 border-gray-400">
+                          <Badge variant="outline" className="text-xs text-blue-600 border-blue-400 bg-white/80">
                             {feature.category}
                           </Badge>
                           <span className="text-xs text-orange-600 font-medium">Go to feature →</span>
