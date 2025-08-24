@@ -1161,6 +1161,16 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         {/* Content Layer with Enhanced Typography */}
         <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-6 z-20 text-white">
           <div className="space-y-8 max-w-2xl">
+            {/* ByteWise Logo */}
+            <div className="mb-6">
+              <img 
+                src={logoImage} 
+                alt="ByteWise Nutritionist Logo" 
+                className="h-20 w-auto object-contain mx-auto drop-shadow-2xl"
+                data-testid="bytewise-hero-logo"
+              />
+            </div>
+            
             {/* Animated Title Section */}
             <div className="space-y-3 hero-optimized">
               <h1 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] drop-shadow-2xl font-league-spartan text-optimized animate-slideUpH1">
@@ -1685,16 +1695,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               </div>
             </div>
           )}
-          
-          {/* ByteWise Logo */}
-          <div className="flex justify-center mb-6">
-            <img 
-              src={logoImage} 
-              alt="ByteWise Nutritionist Logo" 
-              className="h-16 w-auto object-contain"
-              data-testid="bytewise-logo"
-            />
-          </div>
           
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-3xl font-semibold text-gray-900">Today's Progress</h2>
