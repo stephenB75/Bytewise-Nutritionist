@@ -625,35 +625,39 @@ export default function AIFoodAnalyzer() {
                         src={analysis.imageUrl} 
                         alt="Analyzed food photo" 
                         className="w-full h-full object-cover"
+                        crossOrigin="anonymous"
                         onError={(e) => {
-                          console.error('❌ Image failed to load:', analysis.imageUrl);
-                          console.error('❌ Image error event:', e);
+                          e.preventDefault();
+                          e.stopPropagation();
                           
-                          // Try to access the image via proxy
-                          const originalSrc = analysis.imageUrl;
-                          console.log('🔄 Trying to proxy image URL:', originalSrc);
+                          // Handle image loading errors gracefully
+                          const target = e.currentTarget as HTMLImageElement;
+                          const currentSrc = target.src;
                           
-                          // Convert storage URL to proxy URL
-                          try {
-                            const url = new URL(originalSrc);
-                            const pathParts = url.pathname.split('/');
-                            const bucketIndex = pathParts.findIndex(part => part.includes('replit-objstore-'));
-                            
-                            if (bucketIndex !== -1) {
-                              const objectPath = pathParts.slice(bucketIndex + 1).join('/');
-                              const proxyUrl = `/api/proxy-image/${objectPath}`;
-                              console.log('🔄 Trying proxy URL:', proxyUrl);
-                              e.currentTarget.src = proxyUrl;
-                              return; // Give proxy a chance to work
-                            }
-                          } catch (urlError) {
-                            console.error('❌ Could not parse URL for proxy:', urlError);
+                          // Try proxy approach if not already attempted
+                          if (!currentSrc.includes('/api/proxy-image/') && analysis.imageUrl.includes('storage.googleapis.com')) {
+                            try {
+                              const url = new URL(analysis.imageUrl);
+                              const pathParts = url.pathname.split('/');
+                              const bucketIndex = pathParts.findIndex(part => part.includes('replit-objstore-'));
+                              
+                              if (bucketIndex !== -1) {
+                                const objectPath = pathParts.slice(bucketIndex + 1).join('/');
+                                const proxyUrl = `/api/proxy-image/${objectPath}`;
+                                target.src = proxyUrl;
+                                return;
+                              }
+                            } catch {}
                           }
                           
-                          e.currentTarget.style.display = 'none';
-                          const parent = e.currentTarget.parentElement;
-                          if (parent) {
-                            parent.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-gray-200 text-gray-500 text-sm">Image not available</div>';
+                          // Show fallback gracefully
+                          target.style.display = 'none';
+                          const parent = target.parentElement;
+                          if (parent && !parent.querySelector('.fallback-message')) {
+                            const fallback = document.createElement('div');
+                            fallback.className = 'fallback-message w-full h-full flex items-center justify-center bg-gray-200 text-gray-500 text-sm';
+                            fallback.textContent = 'Image preview unavailable';
+                            parent.appendChild(fallback);
                           }
                         }}
                       />

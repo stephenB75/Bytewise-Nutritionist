@@ -110,7 +110,7 @@ function AppContent() {
     }
   };
 
-  // Add global notification event listeners
+  // Add global notification event listeners and error handling
   useEffect(() => {
     const handleShowNotifications = () => {
       setShowNotifications(true);
@@ -133,12 +133,38 @@ function AppContent() {
       }
     };
 
+    // Global error handler to suppress cross-origin errors
+    const handleGlobalError = (event: ErrorEvent) => {
+      if (event.message && (
+        event.message.includes('cross-origin') ||
+        event.message.includes('Script error') ||
+        event.message.includes('CORS')
+      )) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        return false;
+      }
+    };
+
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      if (event.reason && typeof event.reason === 'string' && (
+        event.reason.includes('cross-origin') ||
+        event.reason.includes('CORS')
+      )) {
+        event.preventDefault();
+      }
+    };
+
+    window.addEventListener('error', handleGlobalError);
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
     window.addEventListener('show-notifications', handleShowNotifications);
     window.addEventListener('update-notification-count', handleUpdateNotificationCount as EventListener);
     window.addEventListener('show-toast', handleToast as EventListener);
     window.addEventListener('calories-logged', handleCaloriesLogged as EventListener);
     
     return () => {
+      window.removeEventListener('error', handleGlobalError);
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
       window.removeEventListener('show-notifications', handleShowNotifications);
       window.removeEventListener('update-notification-count', handleUpdateNotificationCount as EventListener);
       window.removeEventListener('show-toast', handleToast as EventListener);

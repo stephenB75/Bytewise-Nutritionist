@@ -256,14 +256,16 @@ let globalManagerInstance: DataPersistenceManager | null = null;
 if (typeof window !== 'undefined') {
   try {
     // Cleanup any existing instance first
-    if (globalManagerInstance && typeof globalManagerInstance.cleanup === 'function') {
-      globalManagerInstance.cleanup();
+    if (globalManagerInstance) {
+      try {
+        (globalManagerInstance as any).cleanup?.();
+      } catch {}
     }
     
     globalManagerInstance = DataPersistenceManager.getInstance();
-    if (globalManagerInstance && typeof globalManagerInstance.startAutoSave === 'function') {
-      globalManagerInstance.startAutoSave();
-    }
+    try {
+      (globalManagerInstance as any).startAutoSave?.();
+    } catch {}
   } catch (error) {
     console.warn('Failed to initialize auto-save:', error);
   }
@@ -272,13 +274,13 @@ if (typeof window !== 'undefined') {
   window.addEventListener('beforeunload', () => {
     try {
       const instance = globalManagerInstance;
-      if (instance && typeof instance.cleanup === 'function') {
-        instance.cleanup();
+      if (instance) {
+        try {
+          (instance as any).cleanup?.();
+        } catch {}
         globalManagerInstance = null;
       }
-    } catch (error) {
-      console.warn('Cleanup error on unload:', error);
-    }
+    } catch {}
   });
   
   // Development hot-reload cleanup
@@ -286,13 +288,13 @@ if (typeof window !== 'undefined') {
     import.meta.hot.dispose(() => {
       try {
         const instance = globalManagerInstance;
-        if (instance && typeof instance.cleanup === 'function') {
-          instance.cleanup();
+        if (instance) {
+          try {
+            (instance as any).cleanup?.();
+          } catch {}
           globalManagerInstance = null;
         }
-      } catch (error) {
-        console.warn('Cleanup error on hot reload:', error);
-      }
+      } catch {}
     });
   }
 }
