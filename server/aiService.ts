@@ -215,6 +215,12 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
         analysisTime: new Date().toISOString()
       };
 
+      // Log final nutrition data before sending to frontend
+      console.log('🔬 Final AI analysis result with micronutrients:');
+      analysisResult.identifiedFoods.forEach((food, index) => {
+        console.log(`  Food ${index + 1}: ${food.name} - Iron: ${food.iron}mg, Calcium: ${food.calcium}mg, Vitamin C: ${food.vitaminC}mg`);
+      });
+
       return analysisResult;
 
     } catch (geminiError) {
