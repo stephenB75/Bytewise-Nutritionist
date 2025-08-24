@@ -681,17 +681,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   }, [user, fetchDailyStats]);
 
 
-  // Refresh micronutrients when tab changes, meals change, or on mount
+  // Refresh micronutrients when tab changes or meals change - Database-first
   useEffect(() => {
-    // Use logged meals from state first (database), fallback to localStorage
-    let todayMeals = loggedMeals;
-    
-    // If no meals in state, fallback to localStorage
-    if (todayMeals.length === 0) {
-      const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-      const today = new Date().toISOString().split('T')[0];
-      todayMeals = stored.filter((meal: any) => meal.date === today);
-    }
+    // Use logged meals from database state only
+    const todayMeals = loggedMeals;
     
     if (todayMeals.length > 0) {
       const micronutrients = calculateMicronutrients(todayMeals);
@@ -742,33 +735,31 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   // Load existing meal data and set up tracking
   useEffect(() => {
-    // Load existing meal data on component mount
+    // Load existing meal data on component mount - Database-first approach
     const loadExistingData = async () => {
       try {
         let stored: any[] = [];
         
-        // For authenticated users, try to load from database first
+        // For authenticated users, load from database only
         if (user) {
           try {
             const response = await apiRequest('GET', '/api/meals/logged');
             if (response.ok) {
               const databaseMeals = await response.json();
               stored = Array.isArray(databaseMeals) ? databaseMeals : [];
-              console.log('✅ Meals loaded from database for timeline:', stored.length, 'meals');
-              
-              // Also sync to localStorage for offline capability
-              localStorage.setItem('weeklyMeals', JSON.stringify(stored));
+              console.log('✅ Meals loaded from database:', stored.length, 'meals');
             } else {
-              throw new Error('Database fetch failed');
+              console.error('Failed to load meals from database');
+              stored = [];
             }
           } catch (error) {
-            console.log('⚠️ Could not load meals from database, falling back to localStorage:', error);
-            // Fall back to localStorage
-            stored = getCachedLocalStorage('weeklyMeals', 5000) || [];
+            console.error('Database error:', error);
+            stored = [];
           }
         } else {
-          // For unauthenticated users, load from localStorage
-          stored = getCachedLocalStorage('weeklyMeals', 5000) || [];
+          // For unauthenticated users, use empty array (require authentication)
+          stored = [];
+          console.log('🔐 Authentication required for meal data');
         }
         
         // Simple date matching - use today's actual date without correction
@@ -880,6 +871,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     // Load existing data immediately
     loadExistingData();
     
+    // Listen for meal data reload events (e.g., after meal deletion)
+    const handleReloadMealData = () => {
+      loadExistingData();
+    };
+    
+    window.addEventListener('reload-meal-data', handleReloadMealData);
+    
     // Update fasting status every 2 minutes to reduce conflicts with FastingTracker
     const fastingInterval = setInterval(() => {
       checkFastingStatus();
@@ -963,6 +961,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         window.removeEventListener(type, handler);
       });
       window.removeEventListener('storage', loadExistingData);
+      window.removeEventListener('reload-meal-data', handleReloadMealData);
       clearInterval(fastingInterval);
     };
   }, [user, fetchDailyStats, calculateMicronutrients, checkFastingStatus]);
@@ -1887,79 +1886,32 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                       variant="ghost" 
                       className="text-gray-400 hover:text-red-400 p-2 shadow-md hover:shadow-lg transition-shadow duration-200 border border-gray-400/30 hover:border-red-400/50"
                       data-testid={`button-delete-meal-${index}`}
-                      onClick={() => {
-                        // Delete meal action
-                        // Remove meal from storage using robust identification
-                        const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-                        
-                        // Find the exact meal to remove using multiple criteria
-                        const mealIndex = stored.findIndex((m: any, idx: number) => {
-                          // Try multiple ways to identify the meal for robust deletion
-                          if (meal.id && m.id === meal.id) return true;
-                          if (m.name === meal.name && m.time === meal.time && m.date === meal.date) return true;
-                          if (idx === index && m.name === meal.name && Math.abs(m.calories - meal.calories) < 1) return true;
-                          return false;
-                        });
-                        
-                        if (mealIndex === -1) {
-                          return;
-                        }
-                        
-                        // Remove the specific meal
-                        const updated = [...stored];
-                        updated.splice(mealIndex, 1);
-                        localStorage.setItem('weeklyMeals', JSON.stringify(updated));
-                        
-                        // Refresh meal list using today's actual date
-                        const today = getLocalDateKey();
-                        
-                        const todayMeals = updated.filter((m: any) => {
-                          // Handle timestamp format dates
-                          const mealDate = m.date && m.date.includes('T') 
-                            ? m.date.split('T')[0] 
-                            : m.date;
-                          
-                          return mealDate === today;
-                        });
-                        // Update all meal-related states  
-                        setLoggedMeals(todayMeals);
-                        setWeeklyMeals(updated); // Update weekly meals state too
-                        
-                        // Update daily calories and nutrition
-                        const totalCalories = todayMeals.reduce((sum: number, m: any) => sum + (m.calories || 0), 0);
-                        setDailyCalories(totalCalories);
-                        
-                        // Recalculate macros and micronutrients after deletion
-                        const updatedMacros = todayMeals.reduce((totals: any, meal: any) => ({
-                          protein: totals.protein + (meal.protein || 0),
-                          carbs: totals.carbs + (meal.carbs || 0),
-                          fat: totals.fat + (meal.fat || 0)
-                        }), { protein: 0, carbs: 0, fat: 0 });
-                        setDailyMacros(updatedMacros);
-                        
-                        const updatedMicronutrients = calculateMicronutrients(todayMeals);
-                        setDailyMicronutrients(updatedMicronutrients);
-                        
-                        // Force immediate re-render with React state update
-                        // Use functional state update to ensure latest state
-                        setWeeklyMeals(prevWeeklyMeals => {
-                          return [...updated]; // Force new array reference
-                        });
-                        
-                        setLoggedMeals(prevLoggedMeals => {
-                          return [...todayMeals]; // Force new array reference
-                        });
-                        
-                        // Dispatch events
-                        window.dispatchEvent(new CustomEvent('refresh-weekly-data'));
-                        
-                        // Show success message
-                        window.dispatchEvent(new CustomEvent('show-toast', {
-                          detail: { 
-                            message: `✅ Deleted ${meal.name}`,
-                            type: 'success'
+                      onClick={async () => {
+                        try {
+                          if (!user || !meal.id) {
+                            console.error('Cannot delete meal: missing user or meal ID');
+                            addNotification('info', 'Delete Failed', 'Cannot delete meal: missing authentication or meal ID');
+                            return;
                           }
-                        }));
+                          
+                          // Delete from database
+                          const response = await apiRequest('DELETE', `/api/meals/${meal.id}`);
+                          if (!response.ok) {
+                            throw new Error('Failed to delete meal from database');
+                          }
+                          
+                          // Trigger data refresh by dispatching a refresh event
+                          window.dispatchEvent(new CustomEvent('reload-meal-data'));
+                          
+                          // Show success feedback
+                          addNotification('success', 'Meal Deleted', `Removed ${meal.name} from your log`);
+                          
+                          // Dispatch refresh event for other components
+                          window.dispatchEvent(new CustomEvent('refresh-meals'));
+                        } catch (error) {
+                          console.error('Error deleting meal:', error);
+                          addNotification('info', 'Delete Failed', 'Could not delete meal. Please try again.');
+                        }
                       }}
                       title="Delete meal entry"
                     >
@@ -2513,75 +2465,31 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     variant="ghost" 
                     className="text-gray-600 hover:text-red-600 p-2"
                     data-testid={`button-delete-logged-meal-${index}`}
-                    onClick={() => {
-                      // Remove meal from storage using index and multiple identifiers for safety
-                      const stored = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-                      
-                      // Find the exact meal to remove using multiple criteria
-                      const mealIndex = stored.findIndex((m: any, idx: number) => {
-                        // Try multiple ways to identify the meal for robust deletion
-                        if (meal.id && m.id === meal.id) return true;
-                        if (m.name === meal.name && m.time === meal.time && m.date === meal.date) return true;
-                        if (idx === index && m.name === meal.name && Math.abs(m.calories - meal.calories) < 1) return true;
-                        return false;
-                      });
-                      
-                      if (mealIndex !== -1) {
-                        // Remove the specific meal
-                        const updated = [...stored];
-                        updated.splice(mealIndex, 1);
-                        localStorage.setItem('weeklyMeals', JSON.stringify(updated));
+                    onClick={async () => {
+                      try {
+                        if (!user || !meal.id) {
+                          console.error('Cannot delete meal: missing user or meal ID');
+                          addNotification('info', 'Delete Failed', 'Cannot delete meal: missing authentication or meal ID');
+                          return;
+                        }
                         
-                        // Refresh meal list using today's actual date
-                        const today = getLocalDateKey();
+                        // Delete from database
+                        const response = await apiRequest('DELETE', `/api/meals/${meal.id}`);
+                        if (!response.ok) {
+                          throw new Error('Failed to delete meal from database');
+                        }
                         
-                        const todayMeals = updated.filter((m: any) => {
-                          // Handle timestamp format dates
-                          const mealDate = m.date && m.date.includes('T') 
-                            ? m.date.split('T')[0] 
-                            : m.date;
-                          
-                          return mealDate === today;
-                        });
-                        // Update all meal-related states
-                        setLoggedMeals(todayMeals);
-                        setWeeklyMeals(updated); // Update weekly meals state too
+                        // Trigger data refresh by dispatching a refresh event
+                        window.dispatchEvent(new CustomEvent('reload-meal-data'));
                         
-                        // Update daily calories and nutrition  
-                        const totalCalories = todayMeals.reduce((sum: number, m: any) => sum + (m.calories || 0), 0);
-                        setDailyCalories(totalCalories);
+                        // Show success feedback
+                        addNotification('success', 'Meal Deleted', `Removed ${meal.name} from your meals`);
                         
-                        // Recalculate macros and micronutrients after deletion
-                        const updatedMacros = todayMeals.reduce((totals: any, meal: any) => ({
-                          protein: totals.protein + (meal.protein || 0),
-                          carbs: totals.carbs + (meal.carbs || 0),
-                          fat: totals.fat + (meal.fat || 0)
-                        }), { protein: 0, carbs: 0, fat: 0 });
-                        setDailyMacros(updatedMacros);
-                        
-                        const updatedMicronutrients = calculateMicronutrients(todayMeals);
-                        setDailyMicronutrients(updatedMicronutrients);
-                        
-                        // Force immediate re-render with React state update
-                        // Use functional state update to ensure latest state
-                        setWeeklyMeals(prevWeeklyMeals => {
-                          return [...updated]; // Force new array reference
-                        });
-                        
-                        setLoggedMeals(prevLoggedMeals => {
-                          return [...todayMeals]; // Force new array reference
-                        });
-                        
-                        // Dispatch events
-                        window.dispatchEvent(new CustomEvent('refresh-weekly-data'));
-                        
-                        // Show success message
-                        window.dispatchEvent(new CustomEvent('show-toast', {
-                          detail: { 
-                            message: `✅ Deleted ${meal.name}`,
-                            type: 'success'
-                          }
-                        }));
+                        // Dispatch refresh event to update other components
+                        window.dispatchEvent(new CustomEvent('refresh-meals'));
+                      } catch (error) {
+                        console.error('Error deleting meal:', error);
+                        addNotification('info', 'Delete Failed', 'Could not delete meal. Please try again.');
                       }
                     }}
                     title="Delete meal entry"

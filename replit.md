@@ -50,3 +50,15 @@ The application includes an enhanced fasting timer with detailed progress tracki
 - **Service Worker**: Custom implementation for offline caching and background sync.
 - **React Query/TanStack Query**: Server state management and caching.
 - **Web App Manifest**: PWA configuration.
+
+## Recent Changes
+
+### August 24, 2025 - Database-First Architecture Migration
+- **Completed**: Transitioned from localStorage+database hybrid to database-first approach for meal data
+- **Simplified Data Flow**: Removed complex localStorage fallback logic that was causing sync issues and quota errors  
+- **Enhanced Meal Deletion**: Implemented database-first meal deletion with proper error handling and new server DELETE endpoint (/api/meals/:id)
+- **Improved Performance**: Using React Query caching instead of localStorage for better performance and consistency
+- **Fixed UI Issues**: Resolved notification icon z-index layering issues with z-[9999] positioning
+- **Data Integrity**: Eliminated localStorage quota errors and sync inconsistencies between client and database
+- **Event-Driven Updates**: Implemented reload-meal-data events for real-time UI updates after database operations
+- **Architecture Improvement**: Database now serves as single source of truth for all meal data, removing localStorage complexity

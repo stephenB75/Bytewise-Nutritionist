@@ -1462,6 +1462,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Delete individual meal endpoint
+  app.delete('/api/meals/:id', isAuthenticated, async (req: any, res: Response) => {
+    const userId = req.user?.id;
+    const mealId = req.params.id;
+    
+    if (!userId) {
+      res.status(401).json({ message: "User not found" });
+      return;
+    }
+    
+    if (!mealId) {
+      res.status(400).json({ message: "Meal ID required" });
+      return;
+    }
+    
+    try {
+      console.log(`🗑️ Deleting meal ID: ${mealId} for user: ${userId.substring(0, 8)}...`);
+      await storage.deleteMeal(parseInt(mealId));
+      console.log(`✅ Meal ${mealId} deleted successfully`);
+      res.json({ success: true, message: "Meal deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting meal:", error);
+      res.status(500).json({ success: false, message: "Failed to delete meal" });
+    }
+  });
+
   // User data deletion endpoint
   app.delete('/api/user/delete-data', isAuthenticated, async (req: any, res: Response) => {
     const userId = req.user?.id;
