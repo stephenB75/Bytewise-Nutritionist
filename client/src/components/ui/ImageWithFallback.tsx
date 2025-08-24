@@ -50,7 +50,7 @@ export function ImageWithFallback(props: React.ImgHTMLAttributes<HTMLImageElemen
         {...rest}
       >
         {/* Optional: Add a simple icon or text */}
-        <div className="text-white/70 font-medium text-sm">
+        <div className="text-gray-900 font-medium text-sm drop-shadow-sm">
           {alt?.substring(0, 2)?.toUpperCase() || '🍽'}
         </div>
       </div>

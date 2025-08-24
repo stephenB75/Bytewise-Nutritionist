@@ -2216,7 +2216,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <Card className="bg-gradient-to-br from-amber-100 to-amber-200 backdrop-blur-md border-amber-300 p-6">
               <div className="text-center">
                 <Trophy className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                <h4 className="text-white font-semibold mb-2">No Achievements Yet</h4>
+                <h4 className="text-gray-900 font-semibold mb-2">No Achievements Yet</h4>
                 <p className="text-gray-400 text-sm">Start tracking your nutrition to unlock achievements!</p>
               </div>
             </Card>
@@ -3276,9 +3276,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           >
             <div className="relative">
               {notifications.filter(n => !n.read).length > 0 ? (
-                <BellRing className="w-12 h-12 text-gray-600 transition-all duration-700 ease-in-out group-hover:rotate-12 group-hover:text-white animate-[colorShift_0.7s_ease-in-out]" strokeWidth={2.5} aria-hidden="true" />
+                <BellRing className="w-12 h-12 text-gray-600 transition-all duration-700 ease-in-out group-hover:rotate-12 group-hover:text-orange-600 animate-[colorShift_0.7s_ease-in-out]" strokeWidth={2.5} aria-hidden="true" />
               ) : (
-                <Bell className="w-12 h-12 text-gray-600 transition-all duration-700 ease-in-out group-hover:rotate-6 group-hover:text-white animate-[colorShift_0.7s_ease-in-out]" strokeWidth={2.5} aria-hidden="true" />
+                <Bell className="w-12 h-12 text-gray-600 transition-all duration-700 ease-in-out group-hover:rotate-6 group-hover:text-orange-600 animate-[colorShift_0.7s_ease-in-out]" strokeWidth={2.5} aria-hidden="true" />
               )}
             </div>
             
