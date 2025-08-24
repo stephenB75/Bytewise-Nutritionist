@@ -266,6 +266,13 @@ export default function AIFoodAnalyzer() {
       
       const result = await response.json();
       console.log('🔬 Parsed analysis result:', result);
+      console.log('🔬 Individual foods from AI service:', result.identifiedFoods?.map((food: any) => ({
+        name: food.name,
+        calories: food.calories,
+        iron: food.iron,
+        calcium: food.calcium,
+        vitaminC: food.vitaminC
+      })));
       return result as AnalysisResult;
     },
     onSuccess: async (result) => {
@@ -343,6 +350,12 @@ export default function AIFoodAnalyzer() {
           mealType: 'meal'
         };
         
+        console.log('💾 Aggregated totalNutrition before save:', {
+          calories: totalNutrition.calories,
+          iron: totalNutrition.iron,
+          calcium: totalNutrition.calcium,
+          vitaminC: totalNutrition.vitaminC
+        });
         console.log('💾 Saving analyzed meal to database:', mealData);
         const response = await apiRequest('POST', '/api/meals/logged', mealData);
         
