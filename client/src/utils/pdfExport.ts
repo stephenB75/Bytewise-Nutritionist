@@ -8,7 +8,10 @@
 
 import { jsPDF } from 'jspdf';
 import { apiRequest } from '@/lib/queryClient';
-import { ChartJSNodeCanvas } from 'chartjs-node-canvas';
+import { Chart, ChartConfiguration, registerables } from 'chart.js';
+
+// Register Chart.js components
+Chart.register(...registerables);
 
 interface DailyNutritionData {
   date: string;
@@ -102,239 +105,291 @@ interface UserProgressData {
   }>;
 }
 
-// Chart generation utilities with amber theme
-const chartConfig = {
-  width: 600,
-  height: 400,
-  backgroundColor: 'white',
-  plugins: {
-    legend: {
-      labels: {
-        color: '#92400e', // amber-800
-        font: {
-          size: 12,
-          family: 'Arial'
-        }
-      }
-    }
-  }
-};
+// Client-side chart generation using Chart.js
+function createChartCanvas(width: number = 600, height: number = 400): HTMLCanvasElement {
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  canvas.style.backgroundColor = 'white';
+  return canvas;
+}
 
 async function generateWeeklyCaloriesChart(weeklyData: any[]): Promise<string> {
-  const canvas = new ChartJSNodeCanvas({ width: 600, height: 400, backgroundColour: 'white' });
-  
-  const configuration = {
-    type: 'bar' as const,
-    data: {
-      labels: weeklyData.map(d => `Week ${d.week}`),
-      datasets: [{
-        label: 'Average Daily Calories',
-        data: weeklyData.map(d => d.avgCalories),
-        backgroundColor: 'rgba(251, 191, 36, 0.8)', // amber-400 with opacity
-        borderColor: '#f59e0b', // amber-500
-        borderWidth: 2,
-        borderRadius: 8,
-        borderSkipped: false,
-      }]
-    },
-    options: {
-      responsive: false,
-      plugins: {
-        legend: {
-          labels: {
-            color: '#92400e',
-            font: { size: 14, family: 'Arial' }
+  return new Promise((resolve, reject) => {
+    try {
+      const canvas = createChartCanvas(600, 400);
+      
+      const chart = new Chart(canvas, {
+        type: 'bar',
+        data: {
+          labels: weeklyData.map(d => `Week ${d.week}`),
+          datasets: [{
+            label: 'Average Daily Calories',
+            data: weeklyData.map(d => d.avgCalories),
+            backgroundColor: 'rgba(251, 191, 36, 0.8)', // amber-400 with opacity
+            borderColor: '#f59e0b', // amber-500
+            borderWidth: 2,
+            borderRadius: 8,
+            borderSkipped: false,
+          }]
+        },
+        options: {
+          responsive: false,
+          animation: false,
+          plugins: {
+            legend: {
+              labels: {
+                color: '#92400e',
+                font: { size: 14, family: 'Arial' }
+              }
+            },
+            title: {
+              display: true,
+              text: 'Weekly Calorie Intake Progress',
+              color: '#78350f',
+              font: { size: 18, weight: 'bold', family: 'Arial' }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { color: '#92400e' },
+              grid: { color: 'rgba(146, 64, 14, 0.1)' }
+            },
+            x: {
+              ticks: { color: '#92400e' },
+              grid: { color: 'rgba(146, 64, 14, 0.1)' }
+            }
           }
-        },
-        title: {
-          display: true,
-          text: 'Weekly Calorie Intake Progress',
-          color: '#78350f',
-          font: { size: 18, weight: 'bold' as const, family: 'Arial' }
         }
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: { color: '#92400e' },
-          grid: { color: 'rgba(146, 64, 14, 0.1)' }
-        },
-        x: {
-          ticks: { color: '#92400e' },
-          grid: { color: 'rgba(146, 64, 14, 0.1)' }
+      });
+
+      // Wait for chart to render, then convert to base64
+      setTimeout(() => {
+        try {
+          const dataUrl = canvas.toDataURL('image/png');
+          chart.destroy(); // Clean up
+          resolve(dataUrl);
+        } catch (error) {
+          chart.destroy();
+          reject(error);
         }
-      }
+      }, 500);
+    } catch (error) {
+      reject(error);
     }
-  };
-  
-  const buffer = await canvas.renderToBuffer(configuration);
-  return `data:image/png;base64,${buffer.toString('base64')}`;
+  });
 }
 
 async function generateMacronutrientPieChart(macroData: {carbs: number, protein: number, fat: number}): Promise<string> {
-  const canvas = new ChartJSNodeCanvas({ width: 500, height: 400, backgroundColour: 'white' });
-  
-  const configuration = {
-    type: 'pie' as const,
-    data: {
-      labels: ['Carbohydrates', 'Protein', 'Fat'],
-      datasets: [{
-        data: [macroData.carbs, macroData.protein, macroData.fat],
-        backgroundColor: [
-          '#fbbf24', // amber-400
-          '#f59e0b', // amber-500
-          '#d97706', // amber-600
-        ],
-        borderColor: '#92400e',
-        borderWidth: 2
-      }]
-    },
-    options: {
-      responsive: false,
-      plugins: {
-        legend: {
-          position: 'right' as const,
-          labels: {
-            color: '#92400e',
-            font: { size: 14, family: 'Arial' },
-            usePointStyle: true,
-            padding: 20
-          }
+  return new Promise((resolve, reject) => {
+    try {
+      const canvas = createChartCanvas(500, 400);
+      
+      const chart = new Chart(canvas, {
+        type: 'pie',
+        data: {
+          labels: ['Carbohydrates', 'Protein', 'Fat'],
+          datasets: [{
+            data: [macroData.carbs, macroData.protein, macroData.fat],
+            backgroundColor: [
+              '#fbbf24', // amber-400
+              '#f59e0b', // amber-500
+              '#d97706', // amber-600
+            ],
+            borderColor: '#92400e',
+            borderWidth: 2
+          }]
         },
-        title: {
-          display: true,
-          text: 'Average Daily Macronutrient Breakdown',
-          color: '#78350f',
-          font: { size: 18, weight: 'bold' as const, family: 'Arial' }
+        options: {
+          responsive: false,
+          animation: false,
+          plugins: {
+            legend: {
+              position: 'right',
+              labels: {
+                color: '#92400e',
+                font: { size: 14, family: 'Arial' },
+                usePointStyle: true,
+                padding: 20
+              }
+            },
+            title: {
+              display: true,
+              text: 'Average Daily Macronutrient Breakdown',
+              color: '#78350f',
+              font: { size: 18, weight: 'bold', family: 'Arial' }
+            }
+          }
         }
-      }
+      });
+
+      setTimeout(() => {
+        try {
+          const dataUrl = canvas.toDataURL('image/png');
+          chart.destroy();
+          resolve(dataUrl);
+        } catch (error) {
+          chart.destroy();
+          reject(error);
+        }
+      }, 500);
+    } catch (error) {
+      reject(error);
     }
-  };
-  
-  const buffer = await canvas.renderToBuffer(configuration);
-  return `data:image/png;base64,${buffer.toString('base64')}`;
+  });
 }
 
 async function generateWeightProgressChart(progressData: any[]): Promise<string> {
-  const canvas = new ChartJSNodeCanvas({ width: 600, height: 400, backgroundColour: 'white' });
-  
-  const configuration = {
-    type: 'line' as const,
-    data: {
-      labels: progressData.map(d => d.date),
-      datasets: [{
-        label: 'Calorie Intake Trend',
-        data: progressData.map(d => d.calories),
-        borderColor: '#f59e0b',
-        backgroundColor: 'rgba(251, 191, 36, 0.1)',
-        borderWidth: 3,
-        fill: true,
-        tension: 0.4,
-        pointBackgroundColor: '#d97706',
-        pointBorderColor: '#92400e',
-        pointBorderWidth: 2,
-        pointRadius: 6
-      }]
-    },
-    options: {
-      responsive: false,
-      plugins: {
-        legend: {
-          labels: {
-            color: '#92400e',
-            font: { size: 14, family: 'Arial' }
-          }
+  return new Promise((resolve, reject) => {
+    try {
+      const canvas = createChartCanvas(600, 400);
+      
+      const chart = new Chart(canvas, {
+        type: 'line',
+        data: {
+          labels: progressData.map(d => d.date),
+          datasets: [{
+            label: 'Calorie Intake Trend',
+            data: progressData.map(d => d.calories),
+            borderColor: '#f59e0b',
+            backgroundColor: 'rgba(251, 191, 36, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: '#d97706',
+            pointBorderColor: '#92400e',
+            pointBorderWidth: 2,
+            pointRadius: 6
+          }]
         },
-        title: {
-          display: true,
-          text: '30-Day Calorie Intake Trend',
-          color: '#78350f',
-          font: { size: 18, weight: 'bold' as const, family: 'Arial' }
-        }
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: { color: '#92400e' },
-          grid: { color: 'rgba(146, 64, 14, 0.1)' },
-          title: {
-            display: true,
-            text: 'Calories',
-            color: '#92400e',
-            font: { size: 12, family: 'Arial' }
+        options: {
+          responsive: false,
+          animation: false,
+          plugins: {
+            legend: {
+              labels: {
+                color: '#92400e',
+                font: { size: 14, family: 'Arial' }
+              }
+            },
+            title: {
+              display: true,
+              text: '30-Day Calorie Intake Trend',
+              color: '#78350f',
+              font: { size: 18, weight: 'bold', family: 'Arial' }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { color: '#92400e' },
+              grid: { color: 'rgba(146, 64, 14, 0.1)' },
+              title: {
+                display: true,
+                text: 'Calories',
+                color: '#92400e',
+                font: { size: 12, family: 'Arial' }
+              }
+            },
+            x: {
+              ticks: { color: '#92400e' },
+              grid: { color: 'rgba(146, 64, 14, 0.1)' },
+              title: {
+                display: true,
+                text: 'Date',
+                color: '#92400e',
+                font: { size: 12, family: 'Arial' }
+              }
+            }
           }
-        },
-        x: {
-          ticks: { color: '#92400e' },
-          grid: { color: 'rgba(146, 64, 14, 0.1)' },
-          title: {
-            display: true,
-            text: 'Date',
-            color: '#92400e',
-            font: { size: 12, family: 'Arial' }
-          }
         }
-      }
+      });
+
+      setTimeout(() => {
+        try {
+          const dataUrl = canvas.toDataURL('image/png');
+          chart.destroy();
+          resolve(dataUrl);
+        } catch (error) {
+          chart.destroy();
+          reject(error);
+        }
+      }, 500);
+    } catch (error) {
+      reject(error);
     }
-  };
-  
-  const buffer = await canvas.renderToBuffer(configuration);
-  return `data:image/png;base64,${buffer.toString('base64')}`;
+  });
 }
 
 async function generateWaterIntakeChart(waterData: any[]): Promise<string> {
-  const canvas = new ChartJSNodeCanvas({ width: 600, height: 400, backgroundColour: 'white' });
-  
-  const configuration = {
-    type: 'bar' as const,
-    data: {
-      labels: waterData.map(d => new Date(d.date).toLocaleDateString()),
-      datasets: [{
-        label: 'Water Intake (Glasses)',
-        data: waterData.map(d => d.glasses || d.amount || 0),
-        backgroundColor: 'rgba(59, 130, 246, 0.7)', // blue for water
-        borderColor: '#3b82f6',
-        borderWidth: 2,
-        borderRadius: 6,
-      }]
-    },
-    options: {
-      responsive: false,
-      plugins: {
-        legend: {
-          labels: {
-            color: '#92400e',
-            font: { size: 14, family: 'Arial' }
-          }
+  return new Promise((resolve, reject) => {
+    try {
+      const canvas = createChartCanvas(600, 400);
+      
+      const chart = new Chart(canvas, {
+        type: 'bar',
+        data: {
+          labels: waterData.map(d => new Date(d.date).toLocaleDateString()),
+          datasets: [{
+            label: 'Water Intake (Glasses)',
+            data: waterData.map(d => d.glasses || d.amount || 0),
+            backgroundColor: 'rgba(59, 130, 246, 0.7)', // blue for water
+            borderColor: '#3b82f6',
+            borderWidth: 2,
+            borderRadius: 6,
+          }]
         },
-        title: {
-          display: true,
-          text: 'Weekly Water Intake',
-          color: '#78350f',
-          font: { size: 18, weight: 'bold' as const, family: 'Arial' }
-        }
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: { color: '#92400e' },
-          grid: { color: 'rgba(146, 64, 14, 0.1)' },
-          title: {
-            display: true,
-            text: 'Glasses per Day',
-            color: '#92400e'
+        options: {
+          responsive: false,
+          animation: false,
+          plugins: {
+            legend: {
+              labels: {
+                color: '#92400e',
+                font: { size: 14, family: 'Arial' }
+              }
+            },
+            title: {
+              display: true,
+              text: 'Weekly Water Intake',
+              color: '#78350f',
+              font: { size: 18, weight: 'bold', family: 'Arial' }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { color: '#92400e' },
+              grid: { color: 'rgba(146, 64, 14, 0.1)' },
+              title: {
+                display: true,
+                text: 'Glasses per Day',
+                color: '#92400e'
+              }
+            },
+            x: {
+              ticks: { color: '#92400e', maxRotation: 45 },
+              grid: { color: 'rgba(146, 64, 14, 0.1)' }
+            }
           }
-        },
-        x: {
-          ticks: { color: '#92400e', maxRotation: 45 },
-          grid: { color: 'rgba(146, 64, 14, 0.1)' }
         }
-      }
+      });
+
+      setTimeout(() => {
+        try {
+          const dataUrl = canvas.toDataURL('image/png');
+          chart.destroy();
+          resolve(dataUrl);
+        } catch (error) {
+          chart.destroy();
+          reject(error);
+        }
+      }, 500);
+    } catch (error) {
+      reject(error);
     }
-  };
-  
-  const buffer = await canvas.renderToBuffer(configuration);
-  return `data:image/png;base64,${buffer.toString('base64')}`;
+  });
 }
 
 export async function generateProgressReportPDF(): Promise<boolean> {
