@@ -754,21 +754,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             }
           } catch (error) {
             console.error('Database error:', error);
-            // Fall back to localStorage when database fails
-            console.log('⚠️ Could not load meals from database, falling back to localStorage:', error);
-            try {
-              const localMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-              stored = Array.isArray(localMeals) ? localMeals : [];
-              console.log('✅ Loaded', stored.length, 'meals from localStorage as fallback');
-              // Log meal details for debugging
-              stored.forEach((meal, index) => {
-                const mealDate = meal.date || meal.timestamp || '(no date)';
-                console.log(`  ${index + 1}. ${meal.name} - ${meal.calories || 0} cal (${mealDate})`);
-              });
-            } catch (localError) {
-              console.error('❌ Failed to load from localStorage:', localError);
-              stored = [];
-            }
+            stored = [];
           }
         } else {
           // For unauthenticated users, use empty array (require authentication)

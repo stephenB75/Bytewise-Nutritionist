@@ -872,16 +872,47 @@ export class DatabaseStorage implements IStorage {
       const endOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
 
       // Get meals for the day
-      const dayMeals = await db
-        .select()
-        .from(meals)
-        .where(
-          and(
-            eq(meals.userId, userId),
-            gte(meals.date, startOfDay),
-            lte(meals.date, endOfDay)
-          )
-        );
+      let dayMeals;
+      try {
+        dayMeals = await db
+          .select()
+          .from(meals)
+          .where(
+            and(
+              eq(meals.userId, userId),
+              gte(meals.date, startOfDay),
+              lte(meals.date, endOfDay)
+            )
+          );
+      } catch (error: any) {
+        // Handle missing micronutrient columns
+        if (error.code === '42703' && error.message?.includes('iron')) {
+          console.log('🔧 Adding missing micronutrient columns to meals table...');
+          await db.execute(sql`ALTER TABLE meals ADD COLUMN IF NOT EXISTS iron DECIMAL(8,2) DEFAULT '0'`);
+          await db.execute(sql`ALTER TABLE meals ADD COLUMN IF NOT EXISTS calcium DECIMAL(8,2) DEFAULT '0'`);
+          await db.execute(sql`ALTER TABLE meals ADD COLUMN IF NOT EXISTS zinc DECIMAL(8,2) DEFAULT '0'`);
+          await db.execute(sql`ALTER TABLE meals ADD COLUMN IF NOT EXISTS magnesium DECIMAL(8,2) DEFAULT '0'`);
+          await db.execute(sql`ALTER TABLE meals ADD COLUMN IF NOT EXISTS vitamin_c DECIMAL(8,2) DEFAULT '0'`);
+          await db.execute(sql`ALTER TABLE meals ADD COLUMN IF NOT EXISTS vitamin_d DECIMAL(8,2) DEFAULT '0'`);
+          await db.execute(sql`ALTER TABLE meals ADD COLUMN IF NOT EXISTS vitamin_b12 DECIMAL(8,2) DEFAULT '0'`);
+          await db.execute(sql`ALTER TABLE meals ADD COLUMN IF NOT EXISTS folate DECIMAL(8,2) DEFAULT '0'`);
+          console.log('✅ Micronutrient columns added successfully');
+          
+          // Retry the query
+          dayMeals = await db
+            .select()
+            .from(meals)
+            .where(
+              and(
+                eq(meals.userId, userId),
+                gte(meals.date, startOfDay),
+                lte(meals.date, endOfDay)
+              )
+            );
+        } else {
+          throw error;
+        }
+      }
 
       // Sum up nutrition from all meals
       const totals = dayMeals.reduce((acc, meal) => ({
