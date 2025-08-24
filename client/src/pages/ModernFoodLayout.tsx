@@ -829,7 +829,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         console.log('🧪 Calculated micronutrients:', micronutrients);
         
         // Update micronutrients state
-        setDailyMicronutrients({
+        const updatedMicronutrients = {
           vitaminC: micronutrients.vitaminC || 0,
           vitaminD: micronutrients.vitaminD || 0,
           vitaminB12: micronutrients.vitaminB12 || 0,
@@ -838,7 +838,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           calcium: micronutrients.calcium || 0,
           zinc: micronutrients.zinc || 0,
           magnesium: micronutrients.magnesium || 0
-        });
+        };
+        console.log('🔄 Updating dailyMicronutrients state:', updatedMicronutrients);
+        setDailyMicronutrients(updatedMicronutrients);
         
         // Fetch daily stats including fasting status
         if (user) {
@@ -1722,6 +1724,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <MicronutrientCard name="Calcium" value={dailyMicronutrients.calcium} goal={1000} unit="mg" color="white" />
               <MicronutrientCard name="Zinc" value={dailyMicronutrients.zinc} goal={11} unit="mg" color="amber" />
               <MicronutrientCard name="Magnesium" value={dailyMicronutrients.magnesium} goal={400} unit="mg" color="rose" />
+            </div>
+            
+            {/* Debug micronutrient state */}
+            <div className="text-xs text-gray-500 mt-2">
+              Debug: VitD={dailyMicronutrients.vitaminD}, Iron={dailyMicronutrients.iron}, Cal={dailyMicronutrients.calcium}
             </div>
           </div>
         </div>
