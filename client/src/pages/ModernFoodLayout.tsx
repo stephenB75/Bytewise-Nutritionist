@@ -3381,23 +3381,23 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 onClick={handleClick}
                 className={`group relative overflow-hidden transition-colors duration-150 ${
                   activeTab === tab.id
-                    ? 'text-blue-800'
-                    : 'text-gray-600 hover:text-gray-800 active:text-gray-800'
+                    ? 'text-orange-500'
+                    : 'text-black hover:text-white active:text-white'
                 }`}
               >
                 <IconComponent 
                   size={24} 
                   className={`mb-1.5 transition-all duration-150 ease-out ${
                     activeTab === tab.id 
-                      ? 'scale-110 drop-shadow-lg text-blue-800' 
-                      : 'scale-100 hover:scale-105 hover:text-gray-800'
+                      ? 'scale-110 drop-shadow-lg text-orange-500' 
+                      : 'scale-100 hover:scale-105 hover:text-white'
                   }`}
                   strokeWidth={activeTab === tab.id ? 2.5 : 2}
                 />
                 <span className={`text-[8px] font-semibold leading-tight text-center w-full transition-colors duration-150 ease-out ${
                   activeTab === tab.id 
-                    ? 'text-blue-800 drop-shadow-sm font-bold' 
-                    : 'text-gray-600 hover:text-gray-800 active:text-gray-800'
+                    ? 'text-orange-500 drop-shadow-sm font-bold' 
+                    : 'text-black hover:text-white active:text-white'
                 }`}>{tab.label}</span>
               </button>
             )
