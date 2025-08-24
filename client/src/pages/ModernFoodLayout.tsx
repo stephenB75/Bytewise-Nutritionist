@@ -1735,7 +1735,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               placeholder="Search last month's food entries..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-12 pl-10 bg-white/80 border-amber-300 text-gray-900 placeholder-gray-500"
+              className="h-12 pl-10 bg-amber-50/90 border-amber-400 text-gray-900 placeholder-gray-600"
             />
           </div>
           <div className="mt-2 text-center">
@@ -1846,14 +1846,14 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     </div>
                     {/* Display micronutrients if available */}
                     {(meal.iron > 0 || meal.calcium > 0 || meal.vitaminC > 0 || meal.zinc > 0) && (
-                      <div className="flex flex-wrap gap-2 mt-1 pt-1 border-t border-white/10">
+                      <div className="flex flex-wrap gap-2 mt-1 pt-1 border-t border-gray-400/30">
                         {meal.iron > 0 && (
-                          <span className="text-xs bg-slate-500/20 px-2 py-0.5 rounded-full text-slate-300">
+                          <span className="text-xs bg-slate-500/20 px-2 py-0.5 rounded-full text-gray-800">
                             Iron: {meal.iron.toFixed(1)}mg
                           </span>
                         )}
                         {meal.calcium > 0 && (
-                          <span className="text-xs bg-gray-500/20 px-2 py-0.5 rounded-full text-gray-300">
+                          <span className="text-xs bg-gray-500/20 px-2 py-0.5 rounded-full text-gray-800">
                             Calcium: {Math.round(meal.calcium)}mg
                           </span>
                         )}
@@ -2297,7 +2297,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   placeholder="Password (min 6 characters)"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="h-12 bg-white/80 border-amber-300 text-gray-900 placeholder-gray-500"
+                  className="h-12 bg-amber-50/90 border-amber-400 text-gray-900 placeholder-gray-600"
                   required
                   disabled={isLoading}
                   minLength={6}
@@ -2320,7 +2320,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     <Button 
                       type="button"
                       variant="link" 
-                      className="text-gray-300 hover:text-white text-sm"
+                      className="text-gray-600 hover:text-gray-900 text-sm"
                       onClick={() => setIsResetPassword(true)}
                       disabled={isLoading}
                     >
@@ -2333,7 +2333,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   <Button 
                     type="button"
                     variant="link" 
-                    className="text-gray-300 hover:text-white"
+                    className="text-gray-600 hover:text-gray-900"
                     onClick={() => {
                       setIsSignUp(!isSignUp && !isResetPassword);
                       setIsResetPassword(false);
@@ -2351,7 +2351,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     <Button 
                       type="button"
                       variant="link" 
-                      className="text-gray-300 hover:text-white text-sm"
+                      className="text-gray-600 hover:text-gray-900 text-sm"
                       onClick={handleResendVerification}
                       disabled={isLoading || !email}
                     >
@@ -2538,7 +2538,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         <div className="px-6 py-3 content-section">
           {/* Instructions Section */}
           <div className="mb-6 text-center">
-            <div className="bg-gradient-to-r from-blue-500/10 to-orange-500/10 border border-white/10 rounded-xl p-4 mb-4">
+            <div className="bg-gradient-to-r from-blue-500/10 to-orange-500/10 border border-gray-400/20 rounded-xl p-4 mb-4">
               <h3 className="font-semibold text-lg mb-3">Choose Your Nutrition Analysis Method</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-base">
                 <div className="bg-blue-500/5 border border-blue-500/20 rounded-lg p-3">
@@ -2546,7 +2546,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     <Sparkles className="h-4 w-4 text-amber-500" />
                     <span className="font-medium text-amber-100">AI Photo Analysis</span>
                   </div>
-                  <p className="text-gray-300 text-sm">
+                  <p className="text-gray-700 text-sm">
                     Take a photo of your food and let AI identify it automatically. 
                     Perfect for quick logging of complete meals and dishes.
                   </p>
@@ -2556,7 +2556,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     <Target className="h-4 w-4 text-orange-400" />
                     <span className="font-medium text-orange-300">USDA Calculator</span>
                   </div>
-                  <p className="text-gray-300 text-sm">
+                  <p className="text-gray-700 text-sm">
                     Search and manually select foods from the USDA database. 
                     Ideal for precise nutrition tracking and portion control.
                   </p>
