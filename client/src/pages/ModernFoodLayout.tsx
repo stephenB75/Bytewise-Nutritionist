@@ -2007,19 +2007,19 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <div className="flex items-center justify-between p-3 bg-green-500/20 rounded-xl border border-green-500/30">
                 <span className="text-gray-900">Hit calorie target</span>
                 <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm">✓</span>
+                  <span className="text-gray-900 text-sm">✓</span>
                 </div>
               </div>
               <div className="flex items-center justify-between p-3 bg-green-500/20 rounded-xl border border-green-500/30">
                 <span className="text-gray-900">Meet protein goal</span>
                 <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm">✓</span>
+                  <span className="text-gray-900 text-sm">✓</span>
                 </div>
               </div>
               <div className="flex items-center justify-between p-3 bg-green-500/20 rounded-xl border border-green-500/30">
                 <span className="text-gray-900">Log 3 meals</span>
                 <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm">✓</span>
+                  <span className="text-gray-900 text-sm">✓</span>
                 </div>
               </div>
               <div className="flex items-center justify-between p-3 bg-gradient-to-br from-amber-100 to-amber-200 rounded-xl">
@@ -2040,7 +2040,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           {/* Weekly Goals */}
           <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-white font-semibold text-2xl">Weekly Goals</h3>
+              <h3 className="text-gray-900 font-semibold text-2xl">Weekly Goals</h3>
               <Badge className="bg-amber-200/50 text-amber-700 border-amber-300/50">
                 <Calendar className="w-3 h-3 mr-1" />
                 2/4 Complete
@@ -2050,13 +2050,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <div className="flex items-center justify-between p-3 bg-amber-200/40 rounded-xl border border-amber-300/50">
                 <span className="text-gray-900">Track 5+ days</span>
                 <div className="w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm">✓</span>
+                  <span className="text-gray-900 text-sm">✓</span>
                 </div>
               </div>
               <div className="flex items-center justify-between p-3 bg-amber-200/40 rounded-xl border border-amber-300/50">
                 <span className="text-gray-900">Average 2000+ cal/day</span>
                 <div className="w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm">✓</span>
+                  <span className="text-gray-900 text-sm">✓</span>
                 </div>
               </div>
               <div className="flex items-center justify-between p-3 bg-gradient-to-br from-amber-100 to-amber-200 rounded-xl">
@@ -2096,7 +2096,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 <Card key={achievement.id} className={`${achievement.colorClass || 'bg-blue-500/20 border-blue-500/30'} backdrop-blur-md p-4`}>
                   <div className="text-center">
                     <div className="text-3xl mb-2">{getAchievementIcon(achievement.iconName)}</div>
-                    <h4 className="text-white font-semibold text-sm">{achievement.title}</h4>
+                    <h4 className="text-gray-900 font-semibold text-sm">{achievement.title}</h4>
                     <p className="text-gray-400 text-xs">{formatAchievementDate(achievement.earnedAt)}</p>
                   </div>
                 </Card>
@@ -2578,7 +2578,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                   nutritionMode === 'ai'
                     ? 'bg-amber-500 text-white shadow-lg'
-                    : 'text-gray-400 hover:text-white'
+                    : 'text-gray-400 hover:text-gray-900'
                 }`}
                 data-testid="button-ai-mode"
               >
@@ -2590,7 +2590,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                   nutritionMode === 'calculator'
                     ? 'bg-orange-500 text-white shadow-lg'
-                    : 'text-gray-400 hover:text-white'
+                    : 'text-gray-400 hover:text-gray-900'
                 }`}
                 data-testid="button-calculator-mode"
               >
@@ -3177,7 +3177,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 className="absolute -top-1 -right-1 min-w-6 h-6 bg-gradient-to-r from-red-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg animate-pulse"
                 aria-hidden="true"
               >
-                <span className="text-xs text-white font-bold px-1">
+                <span className="text-xs text-gray-900 font-bold px-1">
                   {notifications.filter(n => !n.read).length > 9 ? '9+' : notifications.filter(n => !n.read).length}
                 </span>
               </div>
