@@ -807,7 +807,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           return mealDate >= oneMonthAgoDateKey;
         });
         
-        console.log(`🗓️ Today's date: ${today}, Filtered meals for today:`, todayMeals.length);
+        // Today's meals filtered
         
         setLoggedMeals(todayMeals);
         setWeeklyMeals(monthlyMeals); // Store last month's meals for comprehensive search functionality
@@ -815,15 +815,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         // Calculate daily calories from existing logged meals
         const dailyTotal = todayMeals.reduce((sum: number, meal: any) => sum + (meal.calories || meal.totalCalories || 0), 0);
         setDailyCalories(dailyTotal);
-        console.log(`💰 Daily total calories from loggedMeals: ${dailyTotal}`);
+        // Daily total calories calculated
         
         // Macro nutrients are now calculated server-side and available via dailyStats
         // No need for separate frontend calculation
         
         // Calculate micronutrients from today's meals
-        console.log('🧪 Calculating micronutrients for', todayMeals.length, 'meals');
+        // Calculating micronutrients
         const micronutrients = calculateMicronutrients(todayMeals);
-        console.log('🧪 Calculated micronutrients:', micronutrients);
+        // Calculated micronutrients
         
         // Update micronutrients state
         const updatedMicronutrients = {
@@ -836,7 +836,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           zinc: micronutrients.zinc || 0,
           magnesium: micronutrients.magnesium || 0
         };
-        console.log('🔄 Updating dailyMicronutrients state:', updatedMicronutrients);
+        // Updating dailyMicronutrients state
         setDailyMicronutrients(updatedMicronutrients);
         
         // Fetch daily stats including fasting status

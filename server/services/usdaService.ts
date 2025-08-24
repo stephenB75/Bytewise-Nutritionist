@@ -1666,7 +1666,7 @@ export class USDAService {
     availableConversions: { [key: string]: number }
   ): { isRealistic: boolean; warning?: string; suggestion?: string; servingName?: string } | undefined {
     
-    console.log(`🍭 Portion warning check: "${ingredient}" -> ${actualGrams}g (unit: ${unit})`);
+    // Portion warning check
     
     // FDA RACC (Reference Amounts Customarily Consumed) standards
     const fdaServings: { [key: string]: { standardUnit: string; standardGrams: number; category: string } } = {
@@ -1684,7 +1684,7 @@ export class USDAService {
     
     // Normalize ingredient name for lookup
     const normalizedIngredient = ingredient.toLowerCase().trim();
-    console.log(`🍭 Looking up FDA data for: "${normalizedIngredient}"`);
+    // Looking up FDA data
     
     let fdaInfo = fdaServings[normalizedIngredient];
     
@@ -1693,18 +1693,18 @@ export class USDAService {
       for (const [key, info] of Object.entries(fdaServings)) {
         if (normalizedIngredient.includes(key) || key.includes(normalizedIngredient)) {
           fdaInfo = info;
-          console.log(`🍭 Found partial match: "${key}" for "${normalizedIngredient}"`);
+          // Found partial match in FDA data
           break;
         }
       }
     }
     
     if (!fdaInfo) {
-      console.log(`🍭 No FDA data found for: "${normalizedIngredient}"`);
+      // No FDA data found
       return { isRealistic: true };
     }
     
-    console.log(`🍭 FDA comparison: ${actualGrams}g vs ${fdaInfo.standardGrams}g (${fdaInfo.standardUnit})`);
+    // FDA portion comparison
     
     // Warning if user measurement is significantly different from FDA standard
     const percentDifference = Math.abs(actualGrams - fdaInfo.standardGrams) / fdaInfo.standardGrams;

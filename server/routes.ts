@@ -797,11 +797,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(401).json({ message: "Unauthorized" });
     }
     
-    console.log('🏆 Getting achievements for user:', userId.substring(0, 8) + '...');
+    // Getting achievements for user
     
     try {
       const achievements = await storage.getUserAchievements(userId);
-      console.log('🏆 Found', achievements.length, 'achievements');
+      // Found user achievements
       res.json({ achievements });
     } catch (error: any) {
       console.error('Failed to retrieve achievements:', error);
@@ -815,11 +815,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(401).json({ message: "Unauthorized" });
     }
     
-    console.log('🏆 Checking achievements for user:', userId.substring(0, 8) + '...');
+    // Checking achievements for user
     
     try {
       const newAchievements = await storage.checkAndCreateAchievements(userId);
-      console.log('🏆 Created', newAchievements.length, 'new achievements');
+      // Created new achievements
       res.json({ 
         newAchievements,
         message: newAchievements.length > 0 ? 'New achievements unlocked!' : 'No new achievements'
@@ -837,7 +837,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(401).json({ message: "Unauthorized" });
     }
     
-    console.log('📊 Getting user statistics for:', userId.substring(0, 8) + '...');
+    // Getting user statistics
     
     try {
       const achievements = await storage.getUserAchievements(userId);
@@ -869,7 +869,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         recentMeals.map((meal: any) => meal.date.toISOString().split('T')[0])
       ).size;
 
-      console.log('📊 User stats:', { totalPoints, achievementsCount: achievements.length, streak: daysWithMeals });
+      // User stats calculated
 
       res.json({
         totalPoints,
@@ -1974,19 +1974,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const userId = req.user?.id;
     const requestedUserId = req.params.userId;
     
-    console.log('📊 Daily stats request:', { userId, requestedUserId });
+    // Daily stats request
     
     if (!userId || userId !== requestedUserId) {
-      console.log('❌ Daily stats: User not found or unauthorized');
+      // Daily stats: User not found or unauthorized
       return res.status(401).json({ message: "User not found or unauthorized" });
     }
 
     try {
       const today = new Date();
-      console.log('📊 Getting daily stats for user:', userId, 'date:', today.toISOString());
+      // Getting daily stats for user
       
       const stats = await storage.getUserDailyStats(userId, today);
-      console.log('✅ Daily stats retrieved successfully:', stats);
+      // Daily stats retrieved successfully
       
       res.json(stats);
     } catch (error: any) {

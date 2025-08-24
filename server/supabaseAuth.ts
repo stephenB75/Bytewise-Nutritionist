@@ -123,14 +123,14 @@ export const optionalAuth: AuthMiddleware = async (
       const token = authHeader.substring(7);
       
       // For our custom tokens, we need to extract the user ID differently
-      console.log('🔍 Validating token:', token.substring(0, 20) + '...', 'Length:', token.length);
+      // Validating authentication token
       
       if (token.startsWith('verified_')) {
         // Parse verified_userId_timestamp format
         const parts = token.split('_');
         if (parts.length >= 2) {
           const supabaseUserId = parts[1];
-          console.log('🔍 Extracting user ID from custom token:', supabaseUserId.substring(0, 8) + '...');
+          // Extracting user ID from custom token
           
           // CRITICAL: Map Supabase user ID to database user ID
           const { mapSupabaseIdToDatabaseId } = await import('./userMapping');
@@ -142,7 +142,7 @@ export const optionalAuth: AuthMiddleware = async (
             email: null, // Will be populated by user endpoint
             claims: { sub: actualUserId },
           };
-          console.log('✅ Custom token validated, user ID set:', actualUserId.substring(0, 8) + '...');
+          // Custom token validated successfully
         }
       } else {
         // Try as standard Supabase token or generated token
@@ -155,12 +155,12 @@ export const optionalAuth: AuthMiddleware = async (
               email: user.email,
               claims: { sub: user.id },
             };
-            console.log('✅ Supabase token validated for user:', user.email);
+            // Supabase token validated successfully
           } else {
             console.log('⚠️ Token validation failed:', error?.message);
             // If it's a 56-char token from our generateLink, try to extract from recent users
             if (token.length === 56) {
-              console.log('🔍 Attempting recovery token lookup...');
+              // Attempting token recovery
               // For now, we'll skip this complex lookup
             }
           }

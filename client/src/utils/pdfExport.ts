@@ -394,8 +394,8 @@ async function generateWaterIntakeChart(waterData: any[]): Promise<string> {
 
 export async function generateProgressReportPDF(): Promise<boolean> {
   try {
-    console.log('🔄 Starting comprehensive PDF report generation...');
-    console.log('⏰ Current time:', new Date().toISOString());
+    // Starting PDF report generation
+    // PDF generation started
     
     // Fetch comprehensive user data from database APIs with proper error handling
     let meals: any[] = [];
@@ -467,20 +467,14 @@ export async function generateProgressReportPDF(): Promise<boolean> {
       console.warn('Failed to fetch user profile:', error);
     }
     
-    console.log('📊 Data fetched:', { 
-      meals: meals.length, 
-      achievements: achievements.length,
-      fastingSessions: fastingSessions.length,
-      waterData: waterData.length,
-      userProfile: userProfile.email ? 'loaded' : 'empty'
-    });
+    // Data fetched for PDF generation
     
     // Log sample data to verify structure
     if (meals.length > 0) {
-      console.log('🍽️ Sample meal data:', meals[0]);
+      // Sample meal data available
     }
     if (achievements.length > 0) {
-      console.log('🏆 Sample achievement:', achievements[0]);
+      // Sample achievement data available
     }
     
     // Calculate comprehensive statistics for 30-day period
@@ -488,7 +482,7 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     const thirtyDaysAgo = new Date(now);
     thirtyDaysAgo.setDate(now.getDate() - 30);
 
-    console.log('📊 Generating charts for data visualization...');
+    // Generating charts for data visualization
 
     // Process data for chart generation
     const weeklyCalorieData = [];
@@ -545,7 +539,7 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     }
 
     // Generate chart images
-    console.log('🎨 Rendering charts with data...');
+    // Rendering charts with data
     let weeklyCaloriesChart = '';
     let macronutrientChart = '';
     let progressChart = '';
@@ -554,22 +548,22 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     try {
       if (weeklyCalorieData.length > 0) {
         weeklyCaloriesChart = await generateWeeklyCaloriesChart(weeklyCalorieData);
-        console.log('📊 Weekly calories chart generated');
+        // Weekly calories chart generated
       }
       
       if (macronutrientTotals.carbs + macronutrientTotals.protein + macronutrientTotals.fat > 0) {
         macronutrientChart = await generateMacronutrientPieChart(macronutrientTotals);
-        console.log('🥧 Macronutrient pie chart generated');
+        // Macronutrient pie chart generated
       }
       
       if (dailyCalorieProgress.length > 0) {
         progressChart = await generateWeightProgressChart(dailyCalorieProgress);
-        console.log('📈 Progress line chart generated');
+        // Progress line chart generated
       }
       
       if (chartWaterData.length > 0) {
         waterChart = await generateWaterIntakeChart(chartWaterData);
-        console.log('💧 Water intake chart generated');
+        // Water intake chart generated
       }
     } catch (chartError) {
       console.warn('⚠️ Chart generation failed, continuing without charts:', chartError);
@@ -834,7 +828,7 @@ export async function generateProgressReportPDF(): Promise<boolean> {
 
     // Create PDF directly using jsPDF
     
-    console.log('jsPDF available:', typeof jsPDF);
+    // jsPDF library loaded
     const pdf = new jsPDF('p', 'mm', 'a4');
     
     const pageWidth = 210;
@@ -1243,7 +1237,7 @@ export async function generateProgressReportPDF(): Promise<boolean> {
 
     // Data Visualization Section - Charts
     if (weeklyCaloriesChart || macronutrientChart || progressChart || waterChart) {
-      console.log('📊 Adding charts to PDF...');
+      // Adding charts to PDF
       
       // Add new page for charts
       pdf.addPage();
@@ -1279,7 +1273,7 @@ export async function generateProgressReportPDF(): Promise<boolean> {
           );
           yPosition += chartHeight + 15;
           
-          console.log('✅ Weekly calories chart added');
+          // Weekly calories chart added
         } catch (chartImageError) {
           console.warn('Failed to add weekly calories chart:', chartImageError);
         }
@@ -1301,7 +1295,7 @@ export async function generateProgressReportPDF(): Promise<boolean> {
           );
           yPosition += chartHeight + 15;
           
-          console.log('✅ Macronutrient pie chart added');
+          // Macronutrient pie chart added
         } catch (chartImageError) {
           console.warn('Failed to add macronutrient chart:', chartImageError);
         }

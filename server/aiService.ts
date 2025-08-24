@@ -345,7 +345,7 @@ export async function getNutritionFromUSDA(foodName: string, grams: number = 100
     // Try multiple search strategies with enhanced validation
     for (const searchTerm of searchTerms) {
       searchStats.termsSearched++;
-      console.log(`🔍 USDA Search ${searchStats.termsSearched}/${searchTerms.length}: "${searchTerm}"`);
+      // USDA search in progress
       
       const foods = await usdaService.searchFoods(searchTerm, 5); // Increased results for better matching
       
@@ -393,8 +393,8 @@ export async function getNutritionFromUSDA(foodName: string, grams: number = 100
           
           if (bestFood) {
             searchStats.usdaDataFound = true;
-            console.log(`✅ Found high-quality USDA data for "${searchTerm}"`);
-            console.log(`📊 Quality score: ${bestFood.qualityScore}, Description: ${bestFood.description || bestFood.name}`);
+            // Found high-quality USDA data
+            // Quality score calculated
             break;
           }
         }
@@ -402,7 +402,7 @@ export async function getNutritionFromUSDA(foodName: string, grams: number = 100
     }
     
     if (!bestFood) {
-      console.log(`❌ No valid USDA data found after ${searchStats.termsSearched} searches (${searchStats.totalResults} total results)`);
+      // No valid USDA data found after search
       console.log(`🔄 Falling back to estimation for: "${foodName}"`);
       const estimation = getEstimatedNutrition(foodName, grams);
       return { ...estimation, dataSource: 'Estimation (USDA not found)' };
@@ -434,18 +434,11 @@ export async function getNutritionFromUSDA(foodName: string, grams: number = 100
       description: food.description || food.name
     };
     
-    console.log(`✅ USDA nutrition for ${grams}g ${foodName}:`, {
-      calories: nutrition.calories,
-      protein: nutrition.protein,
-      carbs: nutrition.carbs,
-      fat: nutrition.fat,
-      source: nutrition.dataSource,
-      quality: nutrition.dataQuality
-    });
+    // USDA nutrition calculated successfully
     return nutrition;
     
   } catch (error) {
-    console.log('⚠️ USDA lookup error for', foodName, '- using estimation:', error);
+    // USDA lookup error, using estimation
     const estimation = getEstimatedNutrition(foodName, grams);
     return { ...estimation, dataSource: 'Estimation' };
   }

@@ -119,7 +119,7 @@ export class DatabaseStorage implements IStorage {
       const allUsers = await db.select().from(users);
       return allUsers;
     } catch (error) {
-      console.log('❌ Failed to get all users:', error);
+      // Failed to get all users
       return [];
     }
   }
@@ -149,13 +149,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
-    console.log('💾 Storage: upsertUser called with:', {
-      id: userData.id?.substring(0, 8) + '...',
-      email: userData.email,
-      firstName: userData.firstName || '(empty)',
-      lastName: userData.lastName || '(empty)',
-      profileIcon: userData.profileIcon || 'not provided'
-    });
+    // Storage: upsertUser called with user data
     
     // First check if user exists by email
     if (userData.email) {
@@ -165,22 +159,10 @@ export class DatabaseStorage implements IStorage {
         .where(eq(users.email, userData.email))
         .limit(1);
       
-      console.log('💾 Storage: Email check result:', {
-        email: userData.email,
-        foundByEmail: existingUserByEmail.length > 0,
-        existingUser: existingUserByEmail.length > 0 ? {
-          id: existingUserByEmail[0].id?.substring(0, 8) + '...',
-          email: existingUserByEmail[0].email
-        } : 'none'
-      });
+      // Storage: Email check completed
       
       if (existingUserByEmail.length > 0) {
         // User exists by email - keep existing ID but update other fields
-        console.log('💾 Storage: Found existing user by email, keeping existing ID:', {
-          existingId: existingUserByEmail[0].id?.substring(0, 8) + '...',
-          supabaseId: userData.id?.substring(0, 8) + '...',
-          email: userData.email
-        });
         
         try {
           const [updatedUser] = await db
@@ -195,13 +177,10 @@ export class DatabaseStorage implements IStorage {
             .where(eq(users.email, userData.email))
             .returning();
             
-          console.log('✅ Storage: User updated by email successfully (kept existing ID):', {
-            existingId: updatedUser.id?.substring(0, 8) + '...',
-            email: updatedUser.email
-          });
+          // Storage: User updated by email successfully
           return updatedUser;
         } catch (updateError) {
-          console.log('❌ Storage: Failed to update user by email:', updateError);
+          // Storage: Failed to update user by email
           throw updateError;
         }
       }
@@ -216,10 +195,7 @@ export class DatabaseStorage implements IStorage {
     
     if (existingUserById.length > 0) {
       // User exists by ID - just update non-ID fields
-      console.log('💾 Storage: Updating existing user by ID:', {
-        id: userData.id?.substring(0, 8) + '...',
-        email: userData.email
-      });
+      // Storage: Updating existing user by ID
       
       try {
         const [updatedUser] = await db
@@ -234,14 +210,11 @@ export class DatabaseStorage implements IStorage {
           .where(sql`id = ${userData.id}`)
           .returning();
         
-        console.log('✅ Storage: User updated by ID successfully:', {
-          id: updatedUser.id?.substring(0, 8) + '...',
-          email: updatedUser.email
-        });
+        // Storage: User updated by ID successfully
         
         return updatedUser;
       } catch (updateError) {
-        console.log('❌ Storage: Failed to update user by ID:', updateError);
+        // Storage: Failed to update user by ID
         throw updateError;
       }
     }
@@ -253,14 +226,7 @@ export class DatabaseStorage implements IStorage {
       emailVerified: true, // They've signed in, so mark as verified
     };
     
-    console.log('💾 Storage: Creating new user with data:', {
-      id: userDataWithIcon.id?.substring(0, 8) + '...',
-      email: userDataWithIcon.email,
-      firstName: userDataWithIcon.firstName || '(empty)',
-      lastName: userDataWithIcon.lastName || '(empty)',
-      profileIcon: userDataWithIcon.profileIcon,
-      emailVerified: userDataWithIcon.emailVerified
-    });
+    // Storage: Creating new user with data
     
     try {
       const [newUser] = await db
@@ -268,26 +234,17 @@ export class DatabaseStorage implements IStorage {
         .values(userDataWithIcon)
         .returning();
       
-      console.log('✅ Storage: User created successfully:', {
-        id: newUser.id?.substring(0, 8) + '...',
-        email: newUser.email,
-        firstName: newUser.firstName || '(empty)',
-        lastName: newUser.lastName || '(empty)'
-      });
+      // Storage: User created successfully
       
       return newUser;
     } catch (insertError) {
-      console.log('❌ Storage: Failed to insert user:', insertError);
+      // Storage: Failed to insert user
       throw insertError;
     }
   }
 
   async updateUserGoals(userId: string, goals: Partial<Pick<User, 'dailyCalorieGoal' | 'dailyProteinGoal' | 'dailyCarbGoal' | 'dailyFatGoal' | 'dailyWaterGoal'>>): Promise<User> {
-    console.log('📊 Storage: updateUserGoals called:', {
-      userId: userId.substring(0, 8) + '...',
-      goals: goals,
-      goalCount: Object.keys(goals).length
-    });
+    // Storage: updateUserGoals called
     
     const [user] = await db
       .update(users)
@@ -295,11 +252,7 @@ export class DatabaseStorage implements IStorage {
       .where(eq(users.id, userId))
       .returning();
       
-    console.log('📊 Storage: updateUserGoals result:', {
-      hasUser: !!user,
-      userId: user?.id?.substring(0, 8) + '...' || 'none',
-      updatedFields: Object.keys(goals)
-    });
+    // Storage: updateUserGoals completed
     
     return user;
   }

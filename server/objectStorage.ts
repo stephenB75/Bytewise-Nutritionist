@@ -121,28 +121,28 @@ export class ObjectStorageService {
 
   // Gets the upload URL for an object entity.
   async getObjectEntityUploadURL(): Promise<string> {
-    console.log('🔄 Starting upload URL generation...');
+    // Starting upload URL generation
     
     const privateObjectDir = this.getPrivateObjectDir();
-    console.log('📁 Private object dir:', privateObjectDir);
+    // Private object directory configured
     
     if (!privateObjectDir) {
       const error = new Error(
         "PRIVATE_OBJECT_DIR not set. Create a bucket in 'Object Storage' " +
           "tool and set PRIVATE_OBJECT_DIR env var."
       );
-      console.error('❌ Private object dir not set:', error);
+      console.error('Private object dir not set:', error);
       throw error;
     }
 
     const objectId = randomUUID();
     const fullPath = `${privateObjectDir}/uploads/${objectId}`;
-    console.log('🆔 Generated object ID:', objectId);
-    console.log('📍 Full path:', fullPath);
+    // Generated object ID
+    // Processing upload path
 
     const { bucketName, objectName } = parseObjectPath(fullPath);
-    console.log('🪣 Bucket:', bucketName);
-    console.log('📄 Object name:', objectName);
+    // Bucket configured
+    // Object name processed
 
     try {
       // Sign URL for PUT method with TTL
@@ -152,10 +152,10 @@ export class ObjectStorageService {
         method: "PUT",
         ttlSec: 900,
       });
-      console.log('✅ Upload URL generated successfully');
+      // Upload URL generated
       return signedUrl;
     } catch (error) {
-      console.error('❌ Failed to sign upload URL:', error);
+      console.error('Failed to sign upload URL:', error);
       throw error;
     }
   }
@@ -252,7 +252,7 @@ export async function signObjectURL({
     method,
     expires_at: new Date(Date.now() + ttlSec * 1000).toISOString(),
   };
-  console.log('📦 Signing request:', request);
+  // Signing object storage request
   
   const response = await fetch(
     `${REPLIT_SIDECAR_ENDPOINT}/object-storage/signed-object-url`,
@@ -265,11 +265,11 @@ export async function signObjectURL({
     }
   );
   
-  console.log('📡 Sidecar response status:', response.status);
+  // Sidecar response received
   
   if (!response.ok) {
     const errorText = await response.text();
-    console.error('❌ Sidecar error response:', errorText);
+    console.error('Sidecar error response:', errorText);
     throw new Error(
       `Failed to sign object URL, errorcode: ${response.status}, ` +
         `response: ${errorText}, make sure you're running on Replit`
@@ -277,7 +277,7 @@ export async function signObjectURL({
   }
 
   const responseData = await response.json();
-  console.log('✅ Sidecar success response:', responseData);
+  // Sidecar request completed
   const { signed_url: signedURL } = responseData;
   return signedURL;
 }
