@@ -104,41 +104,93 @@ interface UserProgressData {
 export async function generateProgressReportPDF(): Promise<boolean> {
   try {
     console.log('🔄 Starting comprehensive PDF report generation...');
+    console.log('⏰ Current time:', new Date().toISOString());
     
-    // Fetch comprehensive user data from database APIs
-    const [
-      mealsResponse,
-      achievementsResponse, 
-      fastingResponse,
-      waterResponse,
-      recipesResponse,
-      userResponse,
-      dailyStatsResponse
-    ] = await Promise.all([
-      apiRequest('/api/meals/logged'),
-      apiRequest('/api/achievements'), 
-      apiRequest('/api/fasting/sessions'),
-      apiRequest('/api/water-intake?days=90'), // Get 3 months of water data
-      apiRequest('/api/recipes'),
-      apiRequest('/api/user/profile'),
-      apiRequest('/api/daily-stats')
-    ]);
+    // Fetch comprehensive user data from database APIs with proper error handling
+    let meals: any[] = [];
+    let achievements: any[] = [];
+    let fastingSessions: any[] = [];
+    let waterData: any[] = [];
+    let userProfile: any = {};
+    const recipes: any[] = []; // No recipe endpoint available, use empty array
     
-    const meals = mealsResponse || [];
-    const achievements = achievementsResponse?.achievements || [];
-    const fastingSessions = fastingResponse?.sessions || [];
-    const waterData = waterResponse?.waterIntake || [];
-    const recipes = recipesResponse?.recipes || [];
-    const userProfile = userResponse || {};
-    const dailyStats = dailyStatsResponse || {};
+    try {
+      // Fetch meals data - using credentials for session-based auth
+      const mealsResponse = await fetch('/api/meals/logged', {
+        credentials: 'include'
+      });
+      if (mealsResponse.ok) {
+        meals = await mealsResponse.json() || [];
+      }
+    } catch (error) {
+      console.warn('Failed to fetch meals:', error);
+    }
+    
+    try {
+      // Fetch achievements data
+      const achievementsResponse = await fetch('/api/achievements', {
+        credentials: 'include'
+      });
+      if (achievementsResponse.ok) {
+        const achievementsData = await achievementsResponse.json();
+        achievements = achievementsData?.achievements || [];
+      }
+    } catch (error) {
+      console.warn('Failed to fetch achievements:', error);
+    }
+    
+    try {
+      // Fetch fasting data
+      const fastingResponse = await fetch('/api/fasting/history', {
+        credentials: 'include'
+      });
+      if (fastingResponse.ok) {
+        const fastingData = await fastingResponse.json();
+        fastingSessions = fastingData?.sessions || [];
+      }
+    } catch (error) {
+      console.warn('Failed to fetch fasting data:', error);
+    }
+    
+    try {
+      // Fetch water data
+      const waterResponse = await fetch('/api/water-history?days=90', {
+        credentials: 'include'
+      });
+      if (waterResponse.ok) {
+        waterData = await waterResponse.json() || [];
+      }
+    } catch (error) {
+      console.warn('Failed to fetch water data:', error);
+    }
+    
+    try {
+      // Fetch user profile
+      const userResponse = await fetch('/api/auth/user', {
+        credentials: 'include'
+      });
+      if (userResponse.ok) {
+        userProfile = await userResponse.json() || {};
+      }
+    } catch (error) {
+      console.warn('Failed to fetch user profile:', error);
+    }
     
     console.log('📊 Data fetched:', { 
       meals: meals.length, 
       achievements: achievements.length,
       fastingSessions: fastingSessions.length,
       waterData: waterData.length,
-      recipes: recipes.length 
+      userProfile: userProfile.email ? 'loaded' : 'empty'
     });
+    
+    // Log sample data to verify structure
+    if (meals.length > 0) {
+      console.log('🍽️ Sample meal data:', meals[0]);
+    }
+    if (achievements.length > 0) {
+      console.log('🏆 Sample achievement:', achievements[0]);
+    }
     
     // Calculate comprehensive statistics for 30-day period
     const now = new Date();
@@ -280,27 +332,31 @@ export async function generateProgressReportPDF(): Promise<boolean> {
       }
     });
     
-    // Process water intake data
-    recentWaterData.forEach((water: any) => {
-      const waterDate = new Date(water.date);
-      const monthKey = `${waterDate.getFullYear()}-${waterDate.getMonth()}`;
-      
-      if (monthlyData.has(monthKey)) {
-        const monthStats = monthlyData.get(monthKey);
-        monthStats.waterGlasses += water.glasses || 0;
-      }
-    });
+    // Process water intake data - handle different possible response formats
+    if (Array.isArray(waterData)) {
+      waterData.forEach((water: any) => {
+        const waterDate = new Date(water.date);
+        const monthKey = `${waterDate.getFullYear()}-${waterDate.getMonth()}`;
+        
+        if (monthlyData.has(monthKey)) {
+          const monthStats = monthlyData.get(monthKey);
+          monthStats.waterGlasses += water.glasses || water.amount || 0;
+        }
+      });
+    }
     
-    // Process fasting sessions
-    recentFastingSessions.forEach((session: any) => {
-      const sessionDate = new Date(session.startTime);
-      const monthKey = `${sessionDate.getFullYear()}-${sessionDate.getMonth()}`;
-      
-      if (monthlyData.has(monthKey)) {
-        const monthStats = monthlyData.get(monthKey);
-        monthStats.fastingSessions += 1;
-      }
-    });
+    // Process fasting sessions - handle different possible response formats
+    if (Array.isArray(fastingSessions)) {
+      fastingSessions.forEach((session: any) => {
+        const sessionDate = new Date(session.startTime || session.createdAt);
+        const monthKey = `${sessionDate.getFullYear()}-${sessionDate.getMonth()}`;
+        
+        if (monthlyData.has(monthKey)) {
+          const monthStats = monthlyData.get(monthKey);
+          monthStats.fastingSessions += 1;
+        }
+      });
+    }
     
     // Convert to array and sort by month with comprehensive data
     const monthlyBreakdown = Array.from(monthlyData.values())
@@ -837,19 +893,19 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     // Save the comprehensive PDF with proper download functionality
     const filename = `bytewise-30day-nutrition-report-${new Date().toISOString().split('T')[0]}.pdf`;
     
-    
+    console.log('💾 Saving PDF with filename:', filename);
     
     try {
       // Create PDF blob first for better control
       const pdfBlob = pdf.output('blob');
-      
+      console.log('📦 PDF blob created, size:', pdfBlob.size, 'bytes');
       
       if (pdfBlob.size === 0) {
         throw new Error('PDF blob is empty');
       }
       
       // Method 1: Direct jsPDF save (most reliable)
-      
+      console.log('💾 Attempting direct PDF save...');
       pdf.save(filename);
       
       
@@ -988,9 +1044,13 @@ export async function generateProgressReportPDF(): Promise<boolean> {
       throw downloadError;
     }
 
-  } catch (error) {
-    console.error('PDF generation failed:', error);
-    // PDF generation error logged for debugging
-    return false;
+  } catch (error: any) {
+    console.error('💥 PDF generation failed:', error);
+    console.error('📋 Error details:', {
+      name: error.name,
+      message: error.message,
+      stack: error.stack?.substring(0, 500)
+    });
+    throw error; // Re-throw to let the UI handle the error display
   }
 }

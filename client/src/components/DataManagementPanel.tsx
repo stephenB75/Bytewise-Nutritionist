@@ -31,13 +31,17 @@ export function DataManagementPanel() {
 
 
   const handleExportData = async () => {
+    console.log('🚀 PDF Export button clicked - starting process...');
     setIsExporting(true);
     
     try {
       // Import and use the PDF export utility
+      console.log('📦 Importing PDF export utility...');
       const { generateProgressReportPDF } = await import('@/utils/pdfExport');
       
+      console.log('🔄 Starting PDF generation...');
       const success = await generateProgressReportPDF();
+      console.log('📄 PDF generation result:', success);
       
       if (success) {
         toast({
@@ -45,26 +49,22 @@ export function DataManagementPanel() {
           description: "Your nutrition report has been downloaded. Check your Downloads folder for the PDF file.",
         });
         
-        // Additional helpful information
-        setTimeout(() => {
-          toast({
-            title: "Report Ready",
-            description: "Your ByteWise Nutrition Report PDF has been saved to your device. You can open it from your Downloads folder.",
-          });
-        }, 2000);
+        console.log('✅ PDF export completed successfully');
       } else {
-        throw new Error('PDF generation failed');
+        throw new Error('PDF generation returned false');
       }
     } catch (error: any) {
+      console.error('❌ PDF export failed:', error);
       
-      // Log error for debugging but don't clutter console in production
+      // Show detailed error information
       toast({
-        title: "Export failed",
-        description: `There was an error exporting your data: ${error.message || 'Unknown error'}. Please try again.`,
+        title: "Export Failed",
+        description: `Unable to generate PDF report: ${error.message || 'Unknown error'}. Please check your internet connection and try again.`,
         variant: "destructive",
       });
     } finally {
       setIsExporting(false);
+      console.log('🏁 PDF export process finished');
     }
   };
 
