@@ -172,6 +172,11 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
               } else {
                 console.log(`⚠️ No USDA data found for ${foodItems[i].name}, using estimates`);
                 const estimatedNutrition = getEstimatedNutrition(foodItems[i].name, foodItems[i].estimatedGrams);
+                console.log(`🔬 Estimated nutrition for "${foodItems[i].name}":`, {
+                  iron: estimatedNutrition.iron,
+                  calcium: estimatedNutrition.calcium,
+                  vitaminC: estimatedNutrition.vitaminC
+                });
                 foodItems[i] = { ...foodItems[i], ...estimatedNutrition };
               }
             } catch (nutritionError) {
