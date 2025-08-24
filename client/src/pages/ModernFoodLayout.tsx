@@ -1333,7 +1333,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     }, [isLoadingHistory]);
 
     // Fetch history when component mounts or when history is shown
-    React.useEffect(() => {
+    useEffect(() => {
       if (showHistory && waterHistory.length === 0) {
         fetchWaterHistory();
       }
