@@ -1162,7 +1162,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-6 z-20 text-white">
           <div className="space-y-8 max-w-2xl">
             {/* ByteWise Logo */}
-            <div className="mb-8">
+            <div className="mb-12 -mt-16">
               <img 
                 src={logoImage} 
                 alt="ByteWise Nutritionist Logo" 
