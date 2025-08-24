@@ -966,35 +966,20 @@ button[data-testid="button-notifications"] .blur-lg {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 4px 16px rgba(0, 0, 0, 0.05) !important;
 }
 
-/* Clean text color rules for yellow background - enhanced with hero component exceptions */
-span.text-white:not(.hero-component *):not([data-hero="true"] *):not(.hero-component h2):not([data-hero="true"] h2):not([data-testid*="nav-"] *):not([data-testid*="card"] *):not(.btn-hero-enhanced *),
-div.text-white:not(.hero-component *):not([data-hero="true"] *):not(.hero-component h2):not([data-hero="true"] h2):not([data-testid*="nav-"] *):not([data-testid*="card"] *):not(.btn-hero-enhanced *),
-h1.text-white:not(.hero-component *):not([data-hero="true"] *):not(.hero-component h2):not([data-hero="true"] h2):not([data-testid*="nav-"] *):not([data-testid*="card"] *):not(.btn-hero-enhanced *),
-h2.text-white:not(.hero-component *):not(.hero-component h2):not([data-hero="true"] *):not([data-hero="true"] h2):not([data-testid*="nav-"] *):not([data-testid*="card"] *):not(.btn-hero-enhanced *),
-h3.text-white:not(.hero-component *):not([data-hero="true"] *):not(.hero-component h2):not([data-hero="true"] h2):not([data-testid*="nav-"] *):not([data-testid*="card"] *):not(.btn-hero-enhanced *),
-h4.text-white:not(.hero-component *):not([data-hero="true"] *):not(.hero-component h2):not([data-hero="true"] h2):not([data-testid*="nav-"] *):not([data-testid*="card"] *):not(.btn-hero-enhanced *),
-p.text-white:not(.hero-component *):not([data-hero="true"] *):not(.hero-component h2):not([data-hero="true"] h2):not([data-testid*="nav-"] *):not([data-testid*="card"] *):not(.btn-hero-enhanced *) {
+/* Clean text color rules for yellow background - simplified with proper exceptions */
+span.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *):not([data-testid*="card"] *):not(.btn-hero-enhanced *),
+div.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *):not([data-testid*="card"] *):not(.btn-hero-enhanced *),
+h1.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *):not([data-testid*="card"] *):not(.btn-hero-enhanced *),
+h2.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *):not([data-testid*="card"] *):not(.btn-hero-enhanced *),
+h3.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *):not([data-testid*="card"] *):not(.btn-hero-enhanced *),
+h4.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *):not([data-testid*="card"] *):not(.btn-hero-enhanced *),
+p.text-white:not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav-"] *):not([data-testid*="card"] *):not(.btn-hero-enhanced *) {
   color: #1f2937 !important;
 }
 
-/* Hero white text elements - keep white for dark overlay visibility including H2 exceptions */
-.hero-component span.text-white,
-.hero-component div.text-white,
-.hero-component h2.text-white,
-/* Hero elements with specific colors - headlines get vibrant colors, others stay white */
-.hero-component h4.text-white,
-.hero-component h5.text-white,
-.hero-component h6.text-white,
-.hero-component p.text-white,
-.hero-component span.text-white,
-.hero-component div.text-white,
-[data-hero="true"] h2.text-white,
-[data-hero="true"] h4.text-white,
-[data-hero="true"] h5.text-white,
-[data-hero="true"] h6.text-white,
-[data-hero="true"] p.text-white,
-[data-hero="true"] span.text-white,
-[data-hero="true"] div.text-white { 
+/* Hero white text elements - keep white for dark overlay visibility */
+.hero-component .text-white,
+[data-hero="true"] .text-white { 
   color: #ffffff !important; 
 }
 
