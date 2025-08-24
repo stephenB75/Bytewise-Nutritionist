@@ -162,6 +162,11 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
           // Get nutrition data for each food item with enhanced USDA integration
           for (let i = 0; i < foodItems.length; i++) {
             console.log(`🔍 Looking up nutrition for: ${foodItems[i].name} (${foodItems[i].estimatedGrams}g)`);
+            console.log(`🔍 Food before enhancement:`, { 
+              name: foodItems[i].name, 
+              hasCalories: !!(foodItems[i] as any).calories,
+              hasMicronutrients: !!(foodItems[i] as any).iron 
+            });
             try {
               const nutrition = await getNutritionFromUSDA(foodItems[i].name, foodItems[i].estimatedGrams);
               
