@@ -493,6 +493,30 @@ button[style*="background-color: rgb(30"]:not([data-testid*="nav-"]):not([class*
   color: #030712 !important; /* Very dark gray/black for maximum contrast */
 }
 
+/* Fix Badge text colors in weekly card - prevent white text on amber background */
+.weekly-calories-card-wrapper .bg-amber-800 {
+  background: linear-gradient(135deg, #d97706, #b45309) !important; /* Darker amber gradient */
+  color: #ffffff !important; /* White text on dark amber */
+}
+
+/* Fix Badge outline variant in weekly card */
+.weekly-calories-card-wrapper .border-gray-500 {
+  border-color: #6b7280 !important;
+  background-color: rgba(251, 191, 36, 0.2) !important; /* Light amber background */
+}
+
+/* Fix white text conflicts in weekly card */
+.weekly-calories-card-wrapper .text-white {
+  color: #030712 !important; /* Force dark text */
+}
+
+/* Ensure macro cards remain unaffected by weekly card changes */
+[data-testid="macro-card"] .text-gray-900,
+[data-testid="macro-card"] .text-gray-950,
+[data-testid="macro-card"] .text-gray-800 {
+  color: #111827 !important; /* Dark text for macro cards on amber background */
+}
+
 .weekly-calories-card-wrapper .text-orange-600 {
   color: #ea580c !important; /* Darker orange for better contrast */
 }
