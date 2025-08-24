@@ -2006,8 +2006,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(401).json({ message: "User not found or unauthorized" });
     }
 
-    if (typeof waterGlasses !== 'number' || waterGlasses < 0) {
-      return res.status(400).json({ message: "Invalid water glasses count" });
+    if (typeof waterGlasses !== 'number' || waterGlasses < 0 || waterGlasses > 8) {
+      return res.status(400).json({ message: "Invalid water glasses count. Must be between 0 and 8." });
     }
 
     try {

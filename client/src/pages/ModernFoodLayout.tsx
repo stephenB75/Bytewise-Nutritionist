@@ -162,13 +162,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
 
   // Utility function to add notifications - using useCallback for stable reference
-  // Water consumption update function
+  // Water consumption update function with 8-glass daily limit
   const updateWaterConsumption = useCallback(async (change: number) => {
     if (!user) {
       // Update localStorage for unauthenticated users
       const localStats = JSON.parse(localStorage.getItem('dailyStats') || '{}');
       const currentGlasses = (localStats.waterGlasses || 0) + change;
-      const newGlasses = Math.max(0, currentGlasses);
+      const newGlasses = Math.max(0, Math.min(8, currentGlasses)); // Limit to 0-8 glasses
       
       // Update localStorage
       const updatedStats = { ...localStats, waterGlasses: newGlasses };
@@ -205,7 +205,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     
     try {
       const currentGlasses = (dailyStats?.waterGlasses || 0) + change;
-      const newGlasses = Math.max(0, currentGlasses); // Prevent negative values
+      const newGlasses = Math.max(0, Math.min(8, currentGlasses)); // Limit to 0-8 glasses
       
       // Optimistic update
       setDailyStats((prev: any) => prev ? { ...prev, waterGlasses: newGlasses } : null);
@@ -1239,7 +1239,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             date.setDate(date.getDate() - (29 - i));
             return {
               date: date.toISOString().split('T')[0],
-              glasses: Math.floor(Math.random() * 8) + 2 // Random 2-9 glasses
+              glasses: Math.floor(Math.random() * 7) + 1 // Random 1-8 glasses
             };
           });
           setWaterHistory(sampleHistory);
@@ -1252,7 +1252,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           date.setDate(date.getDate() - (29 - i));
           return {
             date: date.toISOString().split('T')[0],
-            glasses: Math.floor(Math.random() * 8) + 2 // Random 2-9 glasses
+            glasses: Math.floor(Math.random() * 7) + 1 // Random 1-8 glasses
           };
         });
         setWaterHistory(sampleHistory);
@@ -1331,9 +1331,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             </Button>
             <Button
               onClick={onIncrement}
+              disabled={glasses >= dailyGoal}
               size="sm"
               variant="ghost"
-              className="h-8 w-8 p-0 text-cyan-600 hover:text-cyan-500 hover:bg-cyan-500/10 shadow-lg hover:shadow-xl transition-shadow duration-200 border border-cyan-500/50 hover:border-cyan-500/70"
+              className="h-8 w-8 p-0 text-cyan-600 hover:text-cyan-500 hover:bg-cyan-500/10 disabled:opacity-50 shadow-lg hover:shadow-xl transition-shadow duration-200 border border-cyan-500/50 hover:border-cyan-500/70 disabled:hover:bg-transparent"
               data-testid="button-increment-water"
             >
               <Plus className="w-4 h-4" />
