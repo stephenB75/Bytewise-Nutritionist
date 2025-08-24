@@ -8,6 +8,7 @@
 
 import { jsPDF } from 'jspdf';
 import { apiRequest } from '@/lib/queryClient';
+import { ChartJSNodeCanvas } from 'chartjs-node-canvas';
 
 interface DailyNutritionData {
   date: string;
@@ -99,6 +100,241 @@ interface UserProgressData {
     waterGlasses: number;
     fastingSessions: number;
   }>;
+}
+
+// Chart generation utilities with amber theme
+const chartConfig = {
+  width: 600,
+  height: 400,
+  backgroundColor: 'white',
+  plugins: {
+    legend: {
+      labels: {
+        color: '#92400e', // amber-800
+        font: {
+          size: 12,
+          family: 'Arial'
+        }
+      }
+    }
+  }
+};
+
+async function generateWeeklyCaloriesChart(weeklyData: any[]): Promise<string> {
+  const canvas = new ChartJSNodeCanvas({ width: 600, height: 400, backgroundColour: 'white' });
+  
+  const configuration = {
+    type: 'bar' as const,
+    data: {
+      labels: weeklyData.map(d => `Week ${d.week}`),
+      datasets: [{
+        label: 'Average Daily Calories',
+        data: weeklyData.map(d => d.avgCalories),
+        backgroundColor: 'rgba(251, 191, 36, 0.8)', // amber-400 with opacity
+        borderColor: '#f59e0b', // amber-500
+        borderWidth: 2,
+        borderRadius: 8,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      responsive: false,
+      plugins: {
+        legend: {
+          labels: {
+            color: '#92400e',
+            font: { size: 14, family: 'Arial' }
+          }
+        },
+        title: {
+          display: true,
+          text: 'Weekly Calorie Intake Progress',
+          color: '#78350f',
+          font: { size: 18, weight: 'bold' as const, family: 'Arial' }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { color: '#92400e' },
+          grid: { color: 'rgba(146, 64, 14, 0.1)' }
+        },
+        x: {
+          ticks: { color: '#92400e' },
+          grid: { color: 'rgba(146, 64, 14, 0.1)' }
+        }
+      }
+    }
+  };
+  
+  const buffer = await canvas.renderToBuffer(configuration);
+  return `data:image/png;base64,${buffer.toString('base64')}`;
+}
+
+async function generateMacronutrientPieChart(macroData: {carbs: number, protein: number, fat: number}): Promise<string> {
+  const canvas = new ChartJSNodeCanvas({ width: 500, height: 400, backgroundColour: 'white' });
+  
+  const configuration = {
+    type: 'pie' as const,
+    data: {
+      labels: ['Carbohydrates', 'Protein', 'Fat'],
+      datasets: [{
+        data: [macroData.carbs, macroData.protein, macroData.fat],
+        backgroundColor: [
+          '#fbbf24', // amber-400
+          '#f59e0b', // amber-500
+          '#d97706', // amber-600
+        ],
+        borderColor: '#92400e',
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: false,
+      plugins: {
+        legend: {
+          position: 'right' as const,
+          labels: {
+            color: '#92400e',
+            font: { size: 14, family: 'Arial' },
+            usePointStyle: true,
+            padding: 20
+          }
+        },
+        title: {
+          display: true,
+          text: 'Average Daily Macronutrient Breakdown',
+          color: '#78350f',
+          font: { size: 18, weight: 'bold' as const, family: 'Arial' }
+        }
+      }
+    }
+  };
+  
+  const buffer = await canvas.renderToBuffer(configuration);
+  return `data:image/png;base64,${buffer.toString('base64')}`;
+}
+
+async function generateWeightProgressChart(progressData: any[]): Promise<string> {
+  const canvas = new ChartJSNodeCanvas({ width: 600, height: 400, backgroundColour: 'white' });
+  
+  const configuration = {
+    type: 'line' as const,
+    data: {
+      labels: progressData.map(d => d.date),
+      datasets: [{
+        label: 'Calorie Intake Trend',
+        data: progressData.map(d => d.calories),
+        borderColor: '#f59e0b',
+        backgroundColor: 'rgba(251, 191, 36, 0.1)',
+        borderWidth: 3,
+        fill: true,
+        tension: 0.4,
+        pointBackgroundColor: '#d97706',
+        pointBorderColor: '#92400e',
+        pointBorderWidth: 2,
+        pointRadius: 6
+      }]
+    },
+    options: {
+      responsive: false,
+      plugins: {
+        legend: {
+          labels: {
+            color: '#92400e',
+            font: { size: 14, family: 'Arial' }
+          }
+        },
+        title: {
+          display: true,
+          text: '30-Day Calorie Intake Trend',
+          color: '#78350f',
+          font: { size: 18, weight: 'bold' as const, family: 'Arial' }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { color: '#92400e' },
+          grid: { color: 'rgba(146, 64, 14, 0.1)' },
+          title: {
+            display: true,
+            text: 'Calories',
+            color: '#92400e',
+            font: { size: 12, family: 'Arial' }
+          }
+        },
+        x: {
+          ticks: { color: '#92400e' },
+          grid: { color: 'rgba(146, 64, 14, 0.1)' },
+          title: {
+            display: true,
+            text: 'Date',
+            color: '#92400e',
+            font: { size: 12, family: 'Arial' }
+          }
+        }
+      }
+    }
+  };
+  
+  const buffer = await canvas.renderToBuffer(configuration);
+  return `data:image/png;base64,${buffer.toString('base64')}`;
+}
+
+async function generateWaterIntakeChart(waterData: any[]): Promise<string> {
+  const canvas = new ChartJSNodeCanvas({ width: 600, height: 400, backgroundColour: 'white' });
+  
+  const configuration = {
+    type: 'bar' as const,
+    data: {
+      labels: waterData.map(d => new Date(d.date).toLocaleDateString()),
+      datasets: [{
+        label: 'Water Intake (Glasses)',
+        data: waterData.map(d => d.glasses || d.amount || 0),
+        backgroundColor: 'rgba(59, 130, 246, 0.7)', // blue for water
+        borderColor: '#3b82f6',
+        borderWidth: 2,
+        borderRadius: 6,
+      }]
+    },
+    options: {
+      responsive: false,
+      plugins: {
+        legend: {
+          labels: {
+            color: '#92400e',
+            font: { size: 14, family: 'Arial' }
+          }
+        },
+        title: {
+          display: true,
+          text: 'Weekly Water Intake',
+          color: '#78350f',
+          font: { size: 18, weight: 'bold' as const, family: 'Arial' }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { color: '#92400e' },
+          grid: { color: 'rgba(146, 64, 14, 0.1)' },
+          title: {
+            display: true,
+            text: 'Glasses per Day',
+            color: '#92400e'
+          }
+        },
+        x: {
+          ticks: { color: '#92400e', maxRotation: 45 },
+          grid: { color: 'rgba(146, 64, 14, 0.1)' }
+        }
+      }
+    }
+  };
+  
+  const buffer = await canvas.renderToBuffer(configuration);
+  return `data:image/png;base64,${buffer.toString('base64')}`;
 }
 
 export async function generateProgressReportPDF(): Promise<boolean> {
@@ -196,6 +432,93 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     const now = new Date();
     const thirtyDaysAgo = new Date(now);
     thirtyDaysAgo.setDate(now.getDate() - 30);
+
+    console.log('📊 Generating charts for data visualization...');
+
+    // Process data for chart generation
+    const weeklyCalorieData = [];
+    const macronutrientTotals = { carbs: 0, protein: 0, fat: 0 };
+    const dailyCalorieProgress = [];
+    const chartWaterData = waterData.slice(-14); // Last 2 weeks for water chart
+    
+    // Calculate weekly calorie averages for bar chart
+    for (let week = 0; week < 4; week++) {
+      const weekStart = new Date(now);
+      weekStart.setDate(now.getDate() - (7 * (week + 1)));
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 7);
+      
+      const weekMeals = meals.filter((meal: any) => {
+        const mealDate = new Date(meal.date || meal.createdAt);
+        return mealDate >= weekStart && mealDate < weekEnd;
+      });
+      
+      const avgCalories = weekMeals.length > 0 
+        ? weekMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0) / Math.max(1, weekMeals.length)
+        : 0;
+      
+      weeklyCalorieData.push({
+        week: 4 - week,
+        avgCalories: Math.round(avgCalories)
+      });
+    }
+    
+    // Calculate macronutrient totals for pie chart
+    meals.forEach((meal: any) => {
+      macronutrientTotals.carbs += meal.carbs || 0;
+      macronutrientTotals.protein += meal.protein || 0;
+      macronutrientTotals.fat += meal.fat || 0;
+    });
+    
+    // Create daily progress data for line chart
+    for (let day = 29; day >= 0; day--) {
+      const date = new Date(now);
+      date.setDate(now.getDate() - day);
+      const dateStr = date.toISOString().split('T')[0];
+      
+      const dayMeals = meals.filter((meal: any) => {
+        const mealDate = new Date(meal.date || meal.createdAt);
+        return mealDate.toISOString().split('T')[0] === dateStr;
+      });
+      
+      const totalCalories = dayMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
+      
+      dailyCalorieProgress.push({
+        date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        calories: totalCalories
+      });
+    }
+
+    // Generate chart images
+    console.log('🎨 Rendering charts with data...');
+    let weeklyCaloriesChart = '';
+    let macronutrientChart = '';
+    let progressChart = '';
+    let waterChart = '';
+    
+    try {
+      if (weeklyCalorieData.length > 0) {
+        weeklyCaloriesChart = await generateWeeklyCaloriesChart(weeklyCalorieData);
+        console.log('📊 Weekly calories chart generated');
+      }
+      
+      if (macronutrientTotals.carbs + macronutrientTotals.protein + macronutrientTotals.fat > 0) {
+        macronutrientChart = await generateMacronutrientPieChart(macronutrientTotals);
+        console.log('🥧 Macronutrient pie chart generated');
+      }
+      
+      if (dailyCalorieProgress.length > 0) {
+        progressChart = await generateWeightProgressChart(dailyCalorieProgress);
+        console.log('📈 Progress line chart generated');
+      }
+      
+      if (chartWaterData.length > 0) {
+        waterChart = await generateWaterIntakeChart(chartWaterData);
+        console.log('💧 Water intake chart generated');
+      }
+    } catch (chartError) {
+      console.warn('⚠️ Chart generation failed, continuing without charts:', chartError);
+    }
     
     // Filter recent data from last 30 days
     const recentMeals = meals.filter((meal: any) => {
@@ -857,6 +1180,125 @@ export async function generateProgressReportPDF(): Promise<boolean> {
         pdf.text(`... and ${progressData.recipes.length - 3} more recipes`, 30, yPosition);
         yPosition += 10;
       }
+    }
+
+    // Data Visualization Section - Charts
+    if (weeklyCaloriesChart || macronutrientChart || progressChart || waterChart) {
+      console.log('📊 Adding charts to PDF...');
+      
+      // Add new page for charts
+      pdf.addPage();
+      yPosition = 20;
+      
+      // Charts section header
+      pdf.setFontSize(18);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(120, 53, 15); // amber-800
+      pdf.text('Weekly Progress Analytics', pageWidth / 2, yPosition, { align: 'center' });
+      
+      yPosition += 10;
+      pdf.setFontSize(11);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(146, 64, 14); // amber-700
+      pdf.text('Visual analysis of your nutrition and health data', pageWidth / 2, yPosition, { align: 'center' });
+      
+      yPosition += 20;
+      
+      // Weekly Calories Bar Chart
+      if (weeklyCaloriesChart) {
+        try {
+          const chartWidth = 160;
+          const chartHeight = 106;
+          
+          pdf.addImage(
+            weeklyCaloriesChart, 
+            'PNG', 
+            (pageWidth - chartWidth) / 2, 
+            yPosition, 
+            chartWidth, 
+            chartHeight
+          );
+          yPosition += chartHeight + 15;
+          
+          console.log('✅ Weekly calories chart added');
+        } catch (chartImageError) {
+          console.warn('Failed to add weekly calories chart:', chartImageError);
+        }
+      }
+      
+      // Macronutrient Pie Chart
+      if (macronutrientChart && yPosition < 200) {
+        try {
+          const chartWidth = 133;
+          const chartHeight = 106;
+          
+          pdf.addImage(
+            macronutrientChart, 
+            'PNG', 
+            (pageWidth - chartWidth) / 2, 
+            yPosition, 
+            chartWidth, 
+            chartHeight
+          );
+          yPosition += chartHeight + 15;
+          
+          console.log('✅ Macronutrient pie chart added');
+        } catch (chartImageError) {
+          console.warn('Failed to add macronutrient chart:', chartImageError);
+        }
+      }
+      
+      // Add new page if needed for remaining charts
+      if (yPosition > 180 && (progressChart || waterChart)) {
+        pdf.addPage();
+        yPosition = 20;
+      }
+      
+      // Progress Line Chart
+      if (progressChart) {
+        try {
+          const chartWidth = 160;
+          const chartHeight = 106;
+          
+          pdf.addImage(
+            progressChart, 
+            'PNG', 
+            (pageWidth - chartWidth) / 2, 
+            yPosition, 
+            chartWidth, 
+            chartHeight
+          );
+          yPosition += chartHeight + 15;
+          
+          console.log('✅ Progress line chart added');
+        } catch (chartImageError) {
+          console.warn('Failed to add progress chart:', chartImageError);
+        }
+      }
+      
+      // Water Intake Chart
+      if (waterChart && yPosition < 200) {
+        try {
+          const chartWidth = 160;
+          const chartHeight = 106;
+          
+          pdf.addImage(
+            waterChart, 
+            'PNG', 
+            (pageWidth - chartWidth) / 2, 
+            yPosition, 
+            chartWidth, 
+            chartHeight
+          );
+          yPosition += chartHeight + 10;
+          
+          console.log('✅ Water intake chart added');
+        } catch (chartImageError) {
+          console.warn('Failed to add water intake chart:', chartImageError);
+        }
+      }
+      
+      console.log('📊 All charts added to PDF successfully');
     }
 
     yPosition += 20;
