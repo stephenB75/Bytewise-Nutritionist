@@ -72,6 +72,22 @@ button[data-testid^="nav-"]:hover span,
   color: #ffffff !important;
 }
 
+/* Navigation button default states - allow black text when not active */
+button[data-testid*="nav-"]:not(:hover):not(.text-white),
+button[data-testid^="nav-"]:not(:hover):not(.text-white) {
+  color: #000000 !important;
+}
+
+button[data-testid*="nav-"]:not(:hover):not(.text-white) svg,
+button[data-testid^="nav-"]:not(:hover):not(.text-white) svg {
+  color: #000000 !important;
+}
+
+button[data-testid*="nav-"]:not(:hover):not(.text-white) span,
+button[data-testid^="nav-"]:not(:hover):not(.text-white) span {
+  color: #000000 !important;
+}
+
 /* Navigation icon click animation - pulse effect */
 @keyframes nav-icon-pulse {
   0% { transform: scale(1); }
