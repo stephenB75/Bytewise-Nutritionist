@@ -234,6 +234,11 @@ export class DataPersistenceManager {
     this.saveAllData();
   }
 
+  // Complete cleanup method
+  cleanup() {
+    this.stopAutoSave();
+  }
+
   private handleBeforeUnload = () => {
     this.saveAllData();
   };
@@ -251,7 +256,7 @@ let globalManagerInstance: DataPersistenceManager | null = null;
 if (typeof window !== 'undefined') {
   // Cleanup any existing instance first
   if (globalManagerInstance) {
-    globalManagerInstance.stopAutoSave();
+    globalManagerInstance.cleanup();
   }
   
   globalManagerInstance = DataPersistenceManager.getInstance();
@@ -260,7 +265,7 @@ if (typeof window !== 'undefined') {
   // Cleanup on page unload
   window.addEventListener('beforeunload', () => {
     if (globalManagerInstance) {
-      globalManagerInstance.stopAutoSave();
+      globalManagerInstance.cleanup();
       globalManagerInstance = null;
     }
   });
@@ -269,7 +274,7 @@ if (typeof window !== 'undefined') {
   if (import.meta.hot) {
     import.meta.hot.dispose(() => {
       if (globalManagerInstance) {
-        globalManagerInstance.stopAutoSave();
+        globalManagerInstance.cleanup();
         globalManagerInstance = null;
       }
     });

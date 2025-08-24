@@ -10,36 +10,56 @@ export function DataSyncIndicator() {
   const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
   const [tourVisible, setTourVisible] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    // Set mounted flag after component is fully initialized
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    // Only add event listeners after component is fully mounted
+    if (!isMounted) return;
+
     // Listen for tour visibility changes to avoid overlaps
     const handleTourVisibility = (event: CustomEvent) => {
-      setTourVisible(event.detail?.visible || false);
+      // Use requestAnimationFrame to defer state updates
+      requestAnimationFrame(() => {
+        setTourVisible(event.detail?.visible || false);
+      });
     };
 
-    // Listen for sync events
+    // Listen for sync events with deferred state updates
     const handleSyncStart = () => {
-      setSyncStatus('syncing');
-      setMessage('Saving your data...');
+      requestAnimationFrame(() => {
+        setSyncStatus('syncing');
+        setMessage('Saving your data...');
+      });
     };
 
     const handleSyncSuccess = (event: CustomEvent) => {
-      setSyncStatus('success');
-      setMessage(event.detail?.message || 'Data saved');
-      setTimeout(() => setSyncStatus('idle'), 3000);
+      requestAnimationFrame(() => {
+        setSyncStatus('success');
+        setMessage(event.detail?.message || 'Data saved');
+        setTimeout(() => setSyncStatus('idle'), 3000);
+      });
     };
 
     const handleSyncError = () => {
-      setSyncStatus('error');
-      setMessage('Failed to sync data');
-      setTimeout(() => setSyncStatus('idle'), 5000);
+      requestAnimationFrame(() => {
+        setSyncStatus('error');
+        setMessage('Failed to sync data');
+        setTimeout(() => setSyncStatus('idle'), 5000);
+      });
     };
 
     const handleDataRestored = (event: CustomEvent) => {
       if (event.detail?.itemsRestored > 0) {
-        setSyncStatus('success');
-        setMessage(`Restored ${event.detail.itemsRestored} items`);
-        setTimeout(() => setSyncStatus('idle'), 4000);
+        requestAnimationFrame(() => {
+          setSyncStatus('success');
+          setMessage(`Restored ${event.detail.itemsRestored} items`);
+          setTimeout(() => setSyncStatus('idle'), 4000);
+        });
       }
     };
 
@@ -56,7 +76,7 @@ export function DataSyncIndicator() {
       window.removeEventListener('sync-error', handleSyncError);
       window.removeEventListener('data-restored', handleDataRestored as EventListener);
     };
-  }, []);
+  }, [isMounted]);
 
   if (syncStatus === 'idle') return null;
 
