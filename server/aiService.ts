@@ -18,6 +18,18 @@ export interface IdentifiedFood {
   protein?: number;
   carbs?: number;
   fat?: number;
+  fiber?: number;
+  sugar?: number;
+  sodium?: number;
+  // Add micronutrient properties
+  iron?: number;
+  calcium?: number;
+  zinc?: number;
+  magnesium?: number;
+  vitaminC?: number;
+  vitaminD?: number;
+  vitaminB12?: number;
+  folate?: number;
 }
 
 export interface FoodAnalysisResult {
@@ -572,11 +584,14 @@ function getEstimatedNutrition(foodName: string, grams: number = 100) {
   
   // Fruits (fresh)
   if (name.includes('apple') || name.includes('orange') || name.includes('pear')) {
-    baseNutrition = { calories: 52, protein: 0.3, carbs: 14, fat: 0.2, fiber: 2.4, sugar: 10, sodium: 1 };
+    baseNutrition = { calories: 52, protein: 0.3, carbs: 14, fat: 0.2, fiber: 2.4, sugar: 10, sodium: 1,
+      iron: 0.12, calcium: 6, zinc: 0.04, magnesium: 5, vitaminC: 53, vitaminD: 0, vitaminB12: 0, folate: 3 };
   } else if (name.includes('banana')) {
-    baseNutrition = { calories: 89, protein: 1.1, carbs: 23, fat: 0.3, fiber: 2.6, sugar: 12, sodium: 1 };
+    baseNutrition = { calories: 89, protein: 1.1, carbs: 23, fat: 0.3, fiber: 2.6, sugar: 12, sodium: 1,
+      iron: 0.26, calcium: 5, zinc: 0.15, magnesium: 27, vitaminC: 8.7, vitaminD: 0, vitaminB12: 0, folate: 20 };
   } else if (name.includes('strawberr') || name.includes('berr')) {
-    baseNutrition = { calories: 32, protein: 0.7, carbs: 8, fat: 0.3, fiber: 2, sugar: 4.9, sodium: 1 };
+    baseNutrition = { calories: 32, protein: 0.7, carbs: 8, fat: 0.3, fiber: 2, sugar: 4.9, sodium: 1,
+      iron: 0.41, calcium: 16, zinc: 0.14, magnesium: 13, vitaminC: 58.8, vitaminD: 0, vitaminB12: 0, folate: 24 };
   } else if (name.includes('grape')) {
     baseNutrition = { calories: 69, protein: 0.7, carbs: 18, fat: 0.2, fiber: 0.9, sugar: 16, sodium: 2 };
   } else if (name.includes('fruit')) {
@@ -586,7 +601,8 @@ function getEstimatedNutrition(foodName: string, grams: number = 100) {
   } else if (name.includes('lettuce') || name.includes('spinach')) {
     baseNutrition = { calories: 15, protein: 1.4, carbs: 3, fat: 0.2, fiber: 1.3, sugar: 1.2, sodium: 28 };
   } else if (name.includes('broccoli')) {
-    baseNutrition = { calories: 34, protein: 2.8, carbs: 7, fat: 0.4, fiber: 2.6, sugar: 1.5, sodium: 33 };
+    baseNutrition = { calories: 34, protein: 2.8, carbs: 7, fat: 0.4, fiber: 2.6, sugar: 1.5, sodium: 33,
+      iron: 0.73, calcium: 47, zinc: 0.41, magnesium: 21, vitaminC: 89.2, vitaminD: 0, vitaminB12: 0, folate: 63 };
   } else if (name.includes('carrot')) {
     baseNutrition = { calories: 41, protein: 0.9, carbs: 10, fat: 0.2, fiber: 2.8, sugar: 4.7, sodium: 69 };
   } else if (name.includes('tomato')) {
@@ -600,11 +616,13 @@ function getEstimatedNutrition(foodName: string, grams: number = 100) {
   } else if (name.includes('chicken breast')) {
     baseNutrition = { calories: 165, protein: 31, carbs: 0, fat: 3.6, fiber: 0, sugar: 0, sodium: 74 };
   } else if (name.includes('chicken') && !name.includes('fried')) {
-    baseNutrition = { calories: 180, protein: 25, carbs: 0, fat: 8, fiber: 0, sugar: 0, sodium: 80 };
+    baseNutrition = { calories: 180, protein: 25, carbs: 0, fat: 8, fiber: 0, sugar: 0, sodium: 80,
+      iron: 0.9, calcium: 15, zinc: 1.3, magnesium: 25, vitaminC: 0, vitaminD: 0.1, vitaminB12: 0.3, folate: 4 };
   } else if (name.includes('beef') && name.includes('ground')) {
     baseNutrition = { calories: 250, protein: 26, carbs: 0, fat: 15, fiber: 0, sugar: 0, sodium: 75 };
   } else if (name.includes('beef')) {
-    baseNutrition = { calories: 250, protein: 26, carbs: 0, fat: 15, fiber: 0, sugar: 0, sodium: 60 };
+    baseNutrition = { calories: 250, protein: 26, carbs: 0, fat: 15, fiber: 0, sugar: 0, sodium: 60,
+      iron: 2.6, calcium: 18, zinc: 4.8, magnesium: 21, vitaminC: 0, vitaminD: 0.1, vitaminB12: 2.6, folate: 6 };
   } else if (name.includes('pork')) {
     baseNutrition = { calories: 242, protein: 27, carbs: 0, fat: 14, fiber: 0, sugar: 0, sodium: 62 };
   } else if (name.includes('meat')) {
@@ -687,14 +705,14 @@ function getEstimatedNutrition(foodName: string, grams: number = 100) {
     fiber: Math.round(baseNutrition.fiber * multiplier * 10) / 10,
     sugar: Math.round(baseNutrition.sugar * multiplier * 10) / 10,
     sodium: Math.round(baseNutrition.sodium * multiplier * 10) / 10,
-    // Include micronutrients in estimation return
-    iron: Math.round(baseNutrition.iron * multiplier * 10) / 10,
-    calcium: Math.round(baseNutrition.calcium * multiplier * 10) / 10,
-    zinc: Math.round(baseNutrition.zinc * multiplier * 10) / 10,
-    magnesium: Math.round(baseNutrition.magnesium * multiplier * 10) / 10,
-    vitaminC: Math.round(baseNutrition.vitaminC * multiplier * 10) / 10,
-    vitaminD: Math.round(baseNutrition.vitaminD * multiplier * 10) / 10,
-    vitaminB12: Math.round(baseNutrition.vitaminB12 * multiplier * 10) / 10,
-    folate: Math.round(baseNutrition.folate * multiplier * 10) / 10
+    // Include all micronutrients in estimation return
+    iron: Math.round((baseNutrition.iron || 0) * multiplier * 10) / 10,
+    calcium: Math.round((baseNutrition.calcium || 0) * multiplier * 10) / 10,
+    zinc: Math.round((baseNutrition.zinc || 0) * multiplier * 10) / 10,
+    magnesium: Math.round((baseNutrition.magnesium || 0) * multiplier * 10) / 10,
+    vitaminC: Math.round((baseNutrition.vitaminC || 0) * multiplier * 10) / 10,
+    vitaminD: Math.round((baseNutrition.vitaminD || 0) * multiplier * 10) / 10,
+    vitaminB12: Math.round((baseNutrition.vitaminB12 || 0) * multiplier * 10) / 10,
+    folate: Math.round((baseNutrition.folate || 0) * multiplier * 10) / 10
   };
 }
