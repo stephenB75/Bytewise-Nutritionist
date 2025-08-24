@@ -270,52 +270,31 @@ export default function AIFoodAnalyzer() {
     },
     onSuccess: async (result) => {
 
-      // Debug: Log individual foods before aggregation
-      console.log('🔬 Foods received from backend:', result.identifiedFoods.map((food: any) => ({
-        name: food.name,
-        calories: food.calories,
-        iron: food.iron,
-        calcium: food.calcium,
-        vitaminC: food.vitaminC
-      })));
-
       // Calculate total nutrition from identified foods including micronutrients
       const totalNutrition = result.identifiedFoods.reduce(
-        (total, food: any) => {
-          const newTotal = {
-            calories: total.calories + (food.calories || 0),
-            protein: total.protein + (food.protein || 0),
-            carbs: total.carbs + (food.carbs || 0),
-            fat: total.fat + (food.fat || 0),
-            fiber: total.fiber + (food.fiber || 0),
-            sugar: total.sugar + (food.sugar || 0),
-            sodium: total.sodium + (food.sodium || 0),
-            // Add micronutrient aggregation
-            iron: total.iron + (food.iron || 0),
-            calcium: total.calcium + (food.calcium || 0),
-            zinc: total.zinc + (food.zinc || 0),
-            magnesium: total.magnesium + (food.magnesium || 0),
-            vitaminC: total.vitaminC + (food.vitaminC || 0),
-            vitaminD: total.vitaminD + (food.vitaminD || 0),
-            vitaminB12: total.vitaminB12 + (food.vitaminB12 || 0),
-            folate: total.folate + (food.folate || 0),
-          };
-          
-          console.log(`🧮 Adding ${food.name}: iron=${food.iron || 0}, calcium=${food.calcium || 0} → Total: iron=${newTotal.iron}, calcium=${newTotal.calcium}`);
-          return newTotal;
-        },
+        (total, food: any) => ({
+          calories: total.calories + (food.calories || 0),
+          protein: total.protein + (food.protein || 0),
+          carbs: total.carbs + (food.carbs || 0),
+          fat: total.fat + (food.fat || 0),
+          fiber: total.fiber + (food.fiber || 0),
+          sugar: total.sugar + (food.sugar || 0),
+          sodium: total.sodium + (food.sodium || 0),
+          // Add micronutrient aggregation
+          iron: total.iron + (food.iron || 0),
+          calcium: total.calcium + (food.calcium || 0),
+          zinc: total.zinc + (food.zinc || 0),
+          magnesium: total.magnesium + (food.magnesium || 0),
+          vitaminC: total.vitaminC + (food.vitaminC || 0),
+          vitaminD: total.vitaminD + (food.vitaminD || 0),
+          vitaminB12: total.vitaminB12 + (food.vitaminB12 || 0),
+          folate: total.folate + (food.folate || 0),
+        }),
         { 
           calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0, sugar: 0, sodium: 0,
           iron: 0, calcium: 0, zinc: 0, magnesium: 0, vitaminC: 0, vitaminD: 0, vitaminB12: 0, folate: 0
         }
       );
-      
-      console.log('🎯 Final totalNutrition:', {
-        calories: totalNutrition.calories,
-        iron: totalNutrition.iron,
-        calcium: totalNutrition.calcium,
-        vitaminC: totalNutrition.vitaminC
-      });
 
       const analysisResultWithTotals = {
         ...result,

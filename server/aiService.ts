@@ -161,23 +161,14 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
           
           // Get nutrition data for each food item with enhanced USDA integration
           for (let i = 0; i < foodItems.length; i++) {
-            console.log(`🔍 Looking up nutrition for: ${foodItems[i].name} (${foodItems[i].estimatedGrams}g)`);
-            
             try {
               const nutrition = await getNutritionFromUSDA(foodItems[i].name, foodItems[i].estimatedGrams);
               
               // Verify we got real USDA data, not just estimates
               if (nutrition && (nutrition as any).dataSource === 'USDA') {
-                console.log(`✅ USDA data found for ${foodItems[i].name}:`, nutrition);
                 foodItems[i] = { ...foodItems[i], ...nutrition };
               } else {
-                console.log(`⚠️ No USDA data found for ${foodItems[i].name}, using estimates`);
                 const estimatedNutrition = getEstimatedNutrition(foodItems[i].name, foodItems[i].estimatedGrams);
-                console.log(`🔬 Estimated nutrition for "${foodItems[i].name}":`, {
-                  iron: estimatedNutrition.iron,
-                  calcium: estimatedNutrition.calcium,
-                  vitaminC: estimatedNutrition.vitaminC
-                });
                 
                 // Always preserve Gemini's macronutrients but add our micronutrients
                 foodItems[i] = { 
@@ -194,11 +185,6 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
               console.error(`❌ Nutrition lookup failed for ${foodItems[i].name}:`, nutritionError);
               // Add estimated nutrition if USDA lookup fails
               const estimatedNutrition = getEstimatedNutrition(foodItems[i].name, foodItems[i].estimatedGrams);
-              console.log(`🔬 Fallback estimated nutrition for "${foodItems[i].name}":`, {
-                iron: estimatedNutrition.iron,
-                calcium: estimatedNutrition.calcium,
-                vitaminC: estimatedNutrition.vitaminC
-              });
               
               // Always preserve Gemini's macronutrients but add our micronutrients
               foodItems[i] = { 
@@ -214,38 +200,35 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
           }
         }
       } catch (parseError) {
-        // Fallback: create a generic food item
+        // Fallback: create a generic food item WITH micronutrients
+        const fallbackNutrition = getEstimatedNutrition('Food Item', 150);
         foodItems = [{
           name: 'Food Item',
           confidence: 0.6,
           portion: '1 serving',
           estimatedGrams: 150,
-          calories: 150,
-          protein: 5,
-          carbs: 20,
-          fat: 5
+          ...fallbackNutrition
         }];
       }
 
-      const analysisResult: FoodAnalysisResult = {
-        identifiedFoods: foodItems.length > 0 ? foodItems : [{
+      // Ensure default fallback also has micronutrients
+      const defaultFallback = foodItems.length > 0 ? foodItems : (() => {
+        const fallbackNutrition = getEstimatedNutrition('Food Item', 150);
+        return [{
           name: 'Food Item',
           confidence: 0.5,
           portion: '1 serving',
           estimatedGrams: 150,
-          calories: 150,
-          protein: 5,
-          carbs: 20,
-          fat: 5
-        }],
+          ...fallbackNutrition
+        }];
+      })();
+
+      const analysisResult: FoodAnalysisResult = {
+        identifiedFoods: defaultFallback,
         analysisTime: new Date().toISOString()
       };
 
-      // Log final nutrition data before sending to frontend
-      console.log('🔬 Final AI analysis result with micronutrients:');
-      analysisResult.identifiedFoods.forEach((food, index) => {
-        console.log(`  Food ${index + 1}: ${food.name} - Iron: ${food.iron}mg, Calcium: ${food.calcium}mg, Vitamin C: ${food.vitaminC}mg`);
-      });
+      // Ensure micronutrients are included in final result
 
       return analysisResult;
 
