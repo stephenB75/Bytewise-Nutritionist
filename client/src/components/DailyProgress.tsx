@@ -74,8 +74,8 @@ export function DailyProgress({
       case 'complete': return 'text-[#45c73e] bg-[#45c73e]/10 border-[#45c73e]/20';
       case 'good': return 'text-[#1f4aa6] bg-[#1f4aa6]/10 border-[#1f4aa6]/20';
       case 'started': return 'text-[#faed39] bg-[#faed39]/10 border-[#faed39]/20';
-      case 'future': return 'text-gray-400 bg-gray-50 border-gray-200';
-      default: return 'text-gray-600 bg-gray-50 border-gray-200';
+      case 'future': return 'text-gray-400 bg-amber-50/60 border-gray-200';
+      default: return 'text-gray-600 bg-amber-50/60 border-gray-200';
     }
   };
 
@@ -207,7 +207,7 @@ export function DailyProgress({
                     status === 'complete' ? 'bg-[#45c73e]/10 text-[#45c73e]' :
                     status === 'good' ? 'bg-[#1f4aa6]/10 text-[#1f4aa6]' :
                     status === 'started' ? 'bg-[#faed39]/10 text-[#faed39]' :
-                    'bg-gray-100 text-gray-700'
+                    'bg-amber-50/80 text-gray-700'
                   }`}>
                     <Zap className="w-3 h-3" />
                     {status === 'complete' ? 'Goal!' :

@@ -2874,7 +2874,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                                       ? 'bg-green-100 border-green-300 shadow-md' // Already clicked
                                       : index === tourProgress.suggestedNext
                                       ? 'bg-gradient-to-br from-blue-50 to-blue-100 border-blue-300 shadow-lg ring-2 ring-blue-200 hover:ring-blue-300' // Suggested next
-                                      : 'bg-white border-gray-200 hover:border-gray-300 hover:bg-gray-50 hover:shadow-md' // Default
+                                      : 'bg-amber-50/60 border-gray-200 hover:border-gray-300 hover:bg-amber-100/60 hover:shadow-md' // Default
                                   }`}
                                   onClick={() => {
                                     // Track this card click

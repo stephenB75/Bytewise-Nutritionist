@@ -1085,13 +1085,13 @@ svg.w-4 {
 
 /* Ensure metrics cards are visible */
 .bg-gray-50 {
-  background-color: #f9fafb !important;
+  background-color: rgba(254, 243, 199, 0.6) !important;
   border: none !important;
 }
 
 /* Ensure white background cards maintain proper styling */
 .bg-white {
-  background-color: #ffffff !important;
+  background-color: rgba(254, 243, 199, 0.8) !important;
   border: none !important;
 }
 
@@ -1110,7 +1110,7 @@ svg.w-4 {
 
 /* Hover state improvements - EXCLUDE metrics cards */
 .hover\:bg-white\/15:hover:not([data-testid*="progress"]):not([data-testid*="water"]):not([data-testid*="macro"]):not([data-testid*="micro"]) {
-  background-color: #f1f5f9 !important;
+  background-color: rgba(254, 243, 199, 0.4) !important;
 }
 
 /* Specific font weight and styling fixes */

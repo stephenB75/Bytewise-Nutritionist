@@ -226,7 +226,7 @@ export function MealTimeline({
                     variant="ghost"
                     size="sm"
                     onClick={() => onNavigate('calculator')}
-                    className={`${colors.text} hover:bg-white/50`}
+                    className={`${colors.text} hover:bg-amber-100/50`}
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     Add {mealType}
@@ -237,7 +237,7 @@ export function MealTimeline({
                   {meals.map((meal, index) => (
                     <div
                       key={meal.id}
-                      className="bg-white/70 backdrop-blur-sm p-4 rounded-xl border border-white/50 transition-all duration-300 hover:bg-white/90 hover:shadow-lg hover:scale-[1.02] transform"
+                      className="bg-amber-50/70 backdrop-blur-sm p-4 rounded-xl border border-amber-100/50 transition-all duration-300 hover:bg-amber-100/90 hover:shadow-lg hover:scale-[1.02] transform"
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex-1">

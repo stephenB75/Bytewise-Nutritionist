@@ -619,7 +619,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                     variant="outline"
                     size="sm"
                     onClick={() => setShowPasswordChange(true)}
-                    className="border-amber-300/60 text-amber-600 hover:bg-amber-200/30 hover:text-amber-700 hover:border-amber-400 bg-white/70"
+                    className="border-amber-300/60 text-amber-600 hover:bg-amber-200/30 hover:text-amber-700 hover:border-amber-400 bg-amber-50/70"
                   >
                     <Lock className="w-4 h-4 mr-2" />
                     Change Password

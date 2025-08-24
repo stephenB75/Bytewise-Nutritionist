@@ -197,7 +197,7 @@ export function TourLauncher({ isVisible = true, onNavigateToFeature, onCardInte
               </div>
               <Button
                 onClick={() => setIsPreviewOpen(false)}
-                className="bg-white text-gray-900 hover:bg-gray-100 border-none"
+                className="bg-amber-50 text-gray-900 hover:bg-amber-100 border-none"
               >
                 Close
               </Button>
@@ -229,7 +229,7 @@ export function WelcomeBanner({ onDismiss }: { onDismiss: () => void }) {
               <Button
                 size="sm"
                 onClick={onDismiss}
-                className="bg-white text-gray-900 hover:bg-gray-100 border-none"
+                className="bg-amber-50 text-gray-900 hover:bg-amber-100 border-none"
               >
                 Dismiss
               </Button>
