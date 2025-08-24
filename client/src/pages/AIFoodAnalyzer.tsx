@@ -91,8 +91,14 @@ function PhotoDisplay({ imageUrl, alt, className }: PhotoDisplayProps) {
 
   if (imageError) {
     return (
-      <div className={`${className} flex items-center justify-center bg-gray-200 text-gray-500 text-sm`}>
-        📸 Photo no longer available
+      <div className={`${className} flex flex-col items-center justify-center bg-gradient-to-br from-amber-50 to-amber-100 text-gray-600 text-sm border-2 border-dashed border-amber-300 rounded-lg`}>
+        <div className="text-3xl mb-2">📸</div>
+        <div className="text-center px-2 font-medium">
+          Photo no longer available
+        </div>
+        <div className="text-xs text-gray-500 mt-1 text-center px-2">
+          Upload a new photo to see it here
+        </div>
       </div>
     );
   }

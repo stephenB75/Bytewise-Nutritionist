@@ -2085,18 +2085,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/proxy-image/:path(*)', async (req: Request, res: Response) => {
     try {
       const objectPath = req.params.path;
+      console.log(`🖼️ Proxy request for: ${objectPath}`);
       
-      // Get the bucket name from environment or use default
-      const bucketName = process.env.REPL_ID ? `repl-default-bucket-${process.env.REPL_ID}` : 'default-bucket';
+      // Try multiple bucket naming patterns to find the image
+      const possibleBuckets = [
+        process.env.REPL_ID ? `replit-objstore-${process.env.REPL_ID}` : null,
+        process.env.REPL_ID ? `repl-default-bucket-${process.env.REPL_ID}` : null,
+        'replit-objstore-facf6a44-9c9a-4829-af20-98d0adc9b95d', // The bucket from failed URLs
+      ].filter(Boolean);
       
-      // Get the file from object storage
-      const bucket = objectStorageClient.bucket(bucketName);
-      const file = bucket.file(objectPath);
+      let foundBucket = null;
+      let file = null;
       
-      // Check if file exists
-      const [exists] = await file.exists();
-      if (!exists) {
-        return res.status(404).json({ error: 'Image not found' });
+      // Try each possible bucket until we find the file
+      for (const bucketName of possibleBuckets) {
+        if (!bucketName) continue;
+        console.log(`🖼️ Trying bucket: ${bucketName}`);
+        try {
+          const bucket = objectStorageClient.bucket(bucketName);
+          const testFile = bucket.file(objectPath);
+          const [exists] = await testFile.exists();
+          
+          if (exists) {
+            console.log(`✅ Found file in bucket: ${bucketName}`);
+            foundBucket = bucketName;
+            file = testFile;
+            break;
+          }
+        } catch (bucketError: any) {
+          console.log(`⚠️ Error checking bucket ${bucketName}:`, bucketError?.message || bucketError);
+        }
+      }
+      
+      if (!file || !foundBucket) {
+        console.log(`❌ Image not found in any bucket: ${objectPath}`);
+        console.log(`📋 Tried buckets:`, possibleBuckets);
+        return res.status(404).json({ error: 'Image not found in any storage bucket' });
       }
       
       // Get file metadata to determine content type
