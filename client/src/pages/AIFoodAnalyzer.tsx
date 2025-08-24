@@ -41,8 +41,11 @@ function PhotoDisplay({ imageUrl, alt, className }: PhotoDisplayProps) {
   }, [imageUrl]);
 
   const handleImageError = useCallback(() => {
+    console.log('🖼️ PhotoDisplay: Image failed to load:', imageUrl);
+    
     // Don't try proxy if we've already tried it or if it's not a Google Storage URL
     if (hasTriedProxy || !imageUrl.includes('storage.googleapis.com')) {
+      console.log('🖼️ PhotoDisplay: No proxy available or already tried, showing error state');
       setImageError(true);
       return;
     }
@@ -56,12 +59,31 @@ function PhotoDisplay({ imageUrl, alt, className }: PhotoDisplayProps) {
       if (bucketIndex !== -1) {
         const objectPath = pathParts.slice(bucketIndex + 1).join('/');
         const proxyUrl = `/api/proxy-image/${objectPath}`;
-        setImageSrc(proxyUrl);
+        console.log('🖼️ PhotoDisplay: Trying proxy URL:', proxyUrl);
+        
+        // Test the proxy URL and provide feedback
+        fetch(proxyUrl)
+          .then(response => {
+            if (response.ok) {
+              console.log('✅ PhotoDisplay: Proxy URL works, updating image source');
+              setImageSrc(proxyUrl);
+            } else {
+              console.log('❌ PhotoDisplay: Proxy URL failed with status:', response.status);
+              setImageError(true);
+            }
+          })
+          .catch(error => {
+            console.log('❌ PhotoDisplay: Proxy URL fetch error:', error);
+            setImageError(true);
+          });
+          
         setHasTriedProxy(true);
         return;
+      } else {
+        console.log('🖼️ PhotoDisplay: Could not find bucket in URL path');
       }
     } catch (error) {
-      // Silently handle URL parsing errors
+      console.log('🖼️ PhotoDisplay: URL parsing error:', error);
     }
     
     setImageError(true);
@@ -70,7 +92,7 @@ function PhotoDisplay({ imageUrl, alt, className }: PhotoDisplayProps) {
   if (imageError) {
     return (
       <div className={`${className} flex items-center justify-center bg-gray-200 text-gray-500 text-sm`}>
-        🖼️ Image preview unavailable
+        📸 Photo no longer available
       </div>
     );
   }
@@ -678,62 +700,64 @@ export default function AIFoodAnalyzer() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {weeklyAnalyzedFoods.map((analysis, index) => (
-                <div 
-                  key={`${analysis.analysisTime}-${index}`} 
-                  className="bg-white/80 border border-amber-200 rounded-lg p-4 space-y-3"
-                  data-testid={`analyzed-photo-${index}`}
-                >
-                  {/* Photo */}
-                  <div className="aspect-square rounded-lg overflow-hidden bg-gray-100 relative">
-                    {analysis.imageUrl ? (
-                      <PhotoDisplay 
-                        imageUrl={analysis.imageUrl}
-                        alt="Analyzed food photo"
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-500 text-sm">
-                        No image available
+              {weeklyAnalyzedFoods.map((analysis, index) => {                
+                return (
+                  <div 
+                    key={`${analysis.analysisTime}-${index}`} 
+                    className="bg-white/80 border border-amber-200 rounded-lg p-4 space-y-3"
+                    data-testid={`analyzed-photo-${index}`}
+                  >
+                    {/* Photo */}
+                    <div className="aspect-square rounded-lg overflow-hidden bg-gray-100 relative">
+                      {analysis.imageUrl ? (
+                        <PhotoDisplay 
+                          imageUrl={analysis.imageUrl}
+                          alt="Analyzed food photo"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-500 text-sm">
+                          📸 Photo no longer available
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Analysis Info */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-gray-900">
+                          {analysis.identifiedFoods.length} item{analysis.identifiedFoods.length !== 1 ? 's' : ''}
+                        </span>
+                        <span className="text-xs text-gray-600">
+                          {new Date(analysis.analysisTime).toLocaleDateString()}
+                        </span>
                       </div>
-                    )}
-                  </div>
-                  
-                  {/* Analysis Info */}
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-900">
-                        {analysis.identifiedFoods.length} item{analysis.identifiedFoods.length !== 1 ? 's' : ''}
-                      </span>
-                      <span className="text-xs text-gray-600">
-                        {new Date(analysis.analysisTime).toLocaleDateString()}
-                      </span>
-                    </div>
-                    
-                    {/* Food Names */}
-                    <div className="text-sm text-gray-800">
-                      {analysis.identifiedFoods.slice(0, 2).map(food => food.name).join(', ')}
-                      {analysis.identifiedFoods.length > 2 && ` +${analysis.identifiedFoods.length - 2} more`}
-                    </div>
-                    
-                    {/* Total Nutrition */}
-                    <div className="flex justify-between text-xs bg-amber-100/50 rounded px-2 py-1">
-                      <span className="font-medium text-orange-600">
-                        {Math.round(analysis.totalNutrition.calories)} cal
-                      </span>
-                      <span className="text-gray-700">
-                        P: {Math.round(analysis.totalNutrition.protein)}g
-                      </span>
-                      <span className="text-gray-700">
-                        C: {Math.round(analysis.totalNutrition.carbs)}g
-                      </span>
-                      <span className="text-gray-700">
-                        F: {Math.round(analysis.totalNutrition.fat)}g
-                      </span>
+                      
+                      {/* Food Names */}
+                      <div className="text-sm text-gray-800">
+                        {analysis.identifiedFoods.slice(0, 2).map(food => food.name).join(', ')}
+                        {analysis.identifiedFoods.length > 2 && ` +${analysis.identifiedFoods.length - 2} more`}
+                      </div>
+                      
+                      {/* Total Nutrition */}
+                      <div className="flex justify-between text-xs bg-amber-100/50 rounded px-2 py-1">
+                        <span className="font-medium text-orange-600">
+                          {Math.round(analysis.totalNutrition.calories)} cal
+                        </span>
+                        <span className="text-gray-700">
+                          P: {Math.round(analysis.totalNutrition.protein)}g
+                        </span>
+                        <span className="text-gray-700">
+                          C: {Math.round(analysis.totalNutrition.carbs)}g
+                        </span>
+                        <span className="text-gray-700">
+                          F: {Math.round(analysis.totalNutrition.fat)}g
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </CardContent>
         </Card>
