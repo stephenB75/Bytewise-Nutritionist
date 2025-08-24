@@ -458,11 +458,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     }
     
     try {
-      // Use the correct working endpoint for daily stats
-      const response = await apiRequest('POST', '/api/daily-stats', {
-        userId: user.id,
-        date: new Date().toISOString()
-      });
+      // Use the correct GET endpoint for daily stats
+      const response = await apiRequest('GET', `/api/users/${user.id}/daily-stats`);
       
       if (!response.ok) {
         throw new Error(`Failed to fetch daily stats: ${response.status}`);
@@ -729,11 +726,33 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   // Load existing meal data and set up tracking
   useEffect(() => {
     // Load existing meal data on component mount
-    const loadExistingData = () => {
+    const loadExistingData = async () => {
       try {
-        // DISABLED: Automatic meal date fixing to prevent meals moving between days
-        // Use cached localStorage for better performance
-        const stored = getCachedLocalStorage('weeklyMeals', 5000) || [];
+        let stored: any[] = [];
+        
+        // For authenticated users, try to load from database first
+        if (user) {
+          try {
+            const response = await apiRequest('GET', '/api/meals/logged');
+            if (response.ok) {
+              const databaseMeals = await response.json();
+              stored = Array.isArray(databaseMeals) ? databaseMeals : [];
+              console.log('✅ Meals loaded from database for timeline:', stored.length, 'meals');
+              
+              // Also sync to localStorage for offline capability
+              localStorage.setItem('weeklyMeals', JSON.stringify(stored));
+            } else {
+              throw new Error('Database fetch failed');
+            }
+          } catch (error) {
+            console.log('⚠️ Could not load meals from database, falling back to localStorage:', error);
+            // Fall back to localStorage
+            stored = getCachedLocalStorage('weeklyMeals', 5000) || [];
+          }
+        } else {
+          // For unauthenticated users, load from localStorage
+          stored = getCachedLocalStorage('weeklyMeals', 5000) || [];
+        }
         
         // Simple date matching - use today's actual date without correction
         const today = getLocalDateKey();
@@ -909,6 +928,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     const eventsToAdd = [
       { type: 'calories-logged', handler: handleMealLogged },
       { type: 'meal-logged-success', handler: handleMealLogged },
+      { type: 'refresh-meals', handler: handleMealLogged }, // AI analyzer meal refresh
       { type: 'navigate-to-tab', handler: handleTourNavigation },
       { type: 'fasting-completed', handler: handleFastingCompleted },
       { type: 'fasting-milestone', handler: handleFastingMilestone }

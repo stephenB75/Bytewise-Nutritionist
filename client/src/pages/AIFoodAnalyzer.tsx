@@ -297,6 +297,9 @@ export default function AIFoodAnalyzer() {
         
         if (response.ok) {
           console.log('✅ Meal saved to database successfully');
+          
+          // Dispatch refresh event for meal timeline and other components
+          window.dispatchEvent(new CustomEvent('refresh-meals'));
         } else {
           throw new Error(`Database save failed: ${response.status}`);
         }
