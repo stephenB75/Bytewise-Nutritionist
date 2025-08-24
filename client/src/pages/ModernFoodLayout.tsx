@@ -815,11 +815,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         setDailyCalories(dailyTotal);
         console.log(`💰 Daily total calories from loggedMeals: ${dailyTotal}`);
         
-        // Calculate daily macros from today's meals
+        // Calculate daily macros from today's meals with database values
         const dailyMacroTotals = todayMeals.reduce((totals: any, meal: any) => ({
-          protein: totals.protein + (meal.protein || 0),
-          carbs: totals.carbs + (meal.carbs || 0),
-          fat: totals.fat + (meal.fat || 0)
+          protein: totals.protein + (Number(meal.protein) || Number(meal.totalProtein) || 0),
+          carbs: totals.carbs + (Number(meal.carbs) || Number(meal.totalCarbs) || 0),
+          fat: totals.fat + (Number(meal.fat) || Number(meal.totalFat) || 0)
         }), { protein: 0, carbs: 0, fat: 0 });
         setDailyMacros(dailyMacroTotals);
         
