@@ -3455,6 +3455,34 @@ select {
   color: white !important;
 }
 
+/* Force progress cards to maintain dark text regardless of parent containers */
+[data-testid="progress-card"] .text-gray-900,
+[data-testid="progress-card"] .text-gray-800,
+[data-testid="progress-card"] .text-gray-700,
+[data-testid="progress-card"] h3,
+[data-testid="progress-card"] p,
+[data-testid="progress-card"] div,
+[data-testid="water-card"] .text-gray-900,
+[data-testid="water-card"] .text-gray-800,
+[data-testid="water-card"] .text-gray-700,
+[data-testid="water-card"] h3,
+[data-testid="water-card"] p,
+[data-testid="water-card"] div,
+[data-testid="macro-card"] .text-gray-900,
+[data-testid="macro-card"] .text-gray-800,
+[data-testid="macro-card"] .text-gray-700,
+[data-testid="macro-card"] h3,
+[data-testid="macro-card"] p,
+[data-testid="macro-card"] div,
+[data-testid="micro-card"] .text-gray-900,
+[data-testid="micro-card"] .text-gray-800,
+[data-testid="micro-card"] .text-gray-700,
+[data-testid="micro-card"] h3,
+[data-testid="micro-card"] p,
+[data-testid="micro-card"] div {
+  color: #111827 !important; /* Force dark text on metrics cards */
+}
+
 /* Hero headlines defined above - no duplicate rules needed */
 
 /* Force all buttons in hero components to have white text - HIGHEST PRIORITY */
