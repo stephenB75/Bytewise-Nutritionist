@@ -922,24 +922,28 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     stats.forEach((stat, index) => {
       const xPos = startX + (col * colWidth);
       
-      // Draw a small colored rectangle as background
+      // Draw a clean rectangular background with rounded corners effect
+      pdf.setFillColor(250, 250, 250); // Light gray background
+      pdf.rect(xPos - 2, yPosition - 6, 85, 14, 'F');
+      
+      // Add colored accent bar
       pdf.setFillColor(stat.color[0], stat.color[1], stat.color[2]);
-      pdf.rect(xPos - 2, yPosition - 5, 40, 12, 'F');
+      pdf.rect(xPos - 2, yPosition - 6, 3, 14, 'F');
       
-      // Value in white on colored background
+      // Value in dark color
       pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(255, 255, 255);
-      pdf.text(stat.value, xPos + 18, yPosition, { align: 'center' });
+      pdf.setTextColor(stat.color[0], stat.color[1], stat.color[2]);
+      pdf.text(stat.value, xPos + 5, yPosition);
       
-      // Label in gray below
+      // Label in clean dark text
       pdf.setFont('helvetica', 'normal');
-      pdf.setTextColor(80, 80, 80);
-      pdf.text(stat.label, xPos, yPosition + 10);
+      pdf.setTextColor(60, 60, 60);
+      pdf.text(stat.label, xPos + 5, yPosition + 10);
       
       col++;
       if (col >= 2) {
         col = 0;
-        yPosition += 25;
+        yPosition += 26;
       }
     });
 
@@ -1118,7 +1122,7 @@ export async function generateProgressReportPDF(): Promise<boolean> {
         pdf.setFontSize(11);
         pdf.setFont('helvetica', 'bold');
         pdf.setTextColor(217, 119, 6); // Amber-600
-        pdf.text(`🏆 ${achievement.title}`, 25, yPosition);
+        pdf.text(`Achievement: ${achievement.title}`, 25, yPosition);
         
         yPosition += 6;
         pdf.setFontSize(9);
