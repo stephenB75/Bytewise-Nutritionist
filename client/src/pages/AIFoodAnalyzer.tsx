@@ -11,14 +11,14 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { ObjectUploader } from '@/components/ObjectUploader';
 import { Camera, Loader2, Sparkles, Plus, Eye, Utensils, AlertTriangle, Trash2 } from 'lucide-react';
 import { useMutation } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { useCalorieTracking } from '@/hooks/useCalorieTracking';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import type { UploadResult } from '@uppy/core';
 
 // Photo Display Component with proper error handling and proxy fallback
@@ -676,59 +676,72 @@ export default function AIFoodAnalyzer() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-orange-600">{analysisResult.totalNutrition.calories}</div>
-                  <div className="text-sm text-gray-900">Calories</div>
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-6 mb-6">
+                <div className="text-center bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-4 border border-orange-200">
+                  <div className="text-2xl font-bold text-orange-700">
+                    {Math.round(analysisResult.totalNutrition.calories || 0)}
+                  </div>
+                  <div className="text-sm font-medium text-gray-800">Calories</div>
                 </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600">{analysisResult.totalNutrition.protein}g</div>
-                  <div className="text-sm text-gray-900">Protein</div>
+                <div className="text-center bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
+                  <div className="text-2xl font-bold text-blue-700">
+                    {Math.round((analysisResult.totalNutrition.protein || 0) * 10) / 10}g
+                  </div>
+                  <div className="text-sm font-medium text-gray-800">Protein</div>
                 </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600">{analysisResult.totalNutrition.carbs}g</div>
-                  <div className="text-sm text-gray-900">Carbs</div>
+                <div className="text-center bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
+                  <div className="text-2xl font-bold text-green-700">
+                    {Math.round((analysisResult.totalNutrition.carbs || 0) * 10) / 10}g
+                  </div>
+                  <div className="text-sm font-medium text-gray-800">Carbs</div>
                 </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-purple-600">{analysisResult.totalNutrition.fat}g</div>
-                  <div className="text-sm text-gray-900">Fat</div>
+                <div className="text-center bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
+                  <div className="text-2xl font-bold text-purple-700">
+                    {Math.round((analysisResult.totalNutrition.fat || 0) * 10) / 10}g
+                  </div>
+                  <div className="text-sm font-medium text-gray-800">Fat</div>
                 </div>
               </div>
               
               {/* Auto-logged notification */}
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200/60 rounded-xl p-4 text-center shadow-sm">
                 <div className="flex items-center justify-center gap-2 mb-2">
-                  <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                    <span className="text-white text-sm">✓</span>
+                  <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center shadow-sm">
+                    <span className="text-white text-sm font-bold">✓</span>
                   </div>
                   <span className="font-semibold text-green-800">Automatically Added to Daily Log</span>
                 </div>
-                <p className="text-sm text-green-700">
-                  This meal has been logged to "Logged Today" and will appear in your weekly summary
+                <p className="text-sm text-green-700 font-medium">
+                  This meal has been logged and will appear in your weekly summary
                 </p>
               </div>
             </CardContent>
           </Card>
 
           {/* Individual Food Items */}
-          <Card>
+          <Card className="bg-gradient-to-br from-white to-amber-50/30 border-amber-200/40">
             <CardHeader>
-              <CardTitle>Identified Foods ({analysisResult.identifiedFoods.length} items)</CardTitle>
+              <CardTitle className="flex items-center gap-2 text-gray-900">
+                <Utensils className="h-5 w-5 text-amber-600" />
+                Identified Foods ({analysisResult.identifiedFoods.length} items)
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {analysisResult.identifiedFoods.map((food, index) => (
-                  <div key={index} className="border rounded-lg p-4 space-y-3" data-testid={`food-item-${index}`}>
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-medium text-lg">{food.name}</h4>
-                      <Badge variant="secondary" data-testid={`confidence-${index}`}>
-                        {Math.round(food.confidence * 100)}% confidence
+                  <div key={index} className="bg-white border border-amber-200 rounded-xl p-4 space-y-4 shadow-sm" data-testid={`food-item-${index}`}>
+                    <div className="flex items-center justify-between flex-wrap gap-2">
+                      <h4 className="font-semibold text-lg text-gray-900">{food.name}</h4>
+                      <Badge variant="secondary" className="bg-amber-100 text-amber-800 font-medium" data-testid={`confidence-${index}`}>
+                        {Math.round((food.confidence || 0) * 100)}% confidence
                       </Badge>
                     </div>
                     
                     {/* Portion Adjustment */}
-                    <div className="flex items-center gap-2">
-                      <Label htmlFor={`portion-${index}`}>Portion Size (grams):</Label>
+                    <div className="flex items-center gap-3 bg-amber-50/50 rounded-lg p-3">
+                      <Label htmlFor={`portion-${index}`} className="text-sm font-medium text-gray-800 whitespace-nowrap">
+                        Portion Size (grams):
+                      </Label>
                       <Input
                         id={`portion-${index}`}
                         type="number"
@@ -736,38 +749,38 @@ export default function AIFoodAnalyzer() {
                         max="1000"
                         defaultValue={food.adjustedPortion || 100}
                         onChange={(e) => handlePortionAdjustment(index, parseInt(e.target.value) || 100)}
-                        className="w-24"
+                        className="w-20 border-amber-200 focus:border-amber-400 focus:ring-amber-200"
                         data-testid={`input-portion-${index}`}
                       />
                     </div>
 
-                    <Separator />
+                    <Separator className="bg-amber-200/60" />
                     
                     {/* Nutrition Details */}
-                    <div className="grid grid-cols-3 md:grid-cols-6 gap-3 text-sm">
-                      <div>
-                        <div className="font-medium text-orange-600">{food.calories}</div>
-                        <div className="text-gray-900">cal</div>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                      <div className="text-center bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-3 border border-orange-200">
+                        <div className="font-bold text-orange-700">{Math.round(food.calories || 0)}</div>
+                        <div className="text-xs text-gray-700 font-medium">calories</div>
                       </div>
-                      <div>
-                        <div className="font-medium">{food.protein}g</div>
-                        <div className="text-gray-900">protein</div>
+                      <div className="text-center bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-3 border border-blue-200">
+                        <div className="font-bold text-blue-700">{Math.round((food.protein || 0) * 10) / 10}g</div>
+                        <div className="text-xs text-gray-700 font-medium">protein</div>
                       </div>
-                      <div>
-                        <div className="font-medium">{food.carbs}g</div>
-                        <div className="text-gray-900">carbs</div>
+                      <div className="text-center bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-3 border border-green-200">
+                        <div className="font-bold text-green-700">{Math.round((food.carbs || 0) * 10) / 10}g</div>
+                        <div className="text-xs text-gray-700 font-medium">carbs</div>
                       </div>
-                      <div>
-                        <div className="font-medium">{food.fat}g</div>
-                        <div className="text-gray-900">fat</div>
+                      <div className="text-center bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-3 border border-purple-200">
+                        <div className="font-bold text-purple-700">{Math.round((food.fat || 0) * 10) / 10}g</div>
+                        <div className="text-xs text-gray-700 font-medium">fat</div>
                       </div>
-                      <div>
-                        <div className="font-medium">{food.fiber}g</div>
-                        <div className="text-gray-900">fiber</div>
+                      <div className="text-center bg-gradient-to-br from-amber-50 to-amber-100 rounded-lg p-3 border border-amber-200">
+                        <div className="font-bold text-amber-700">{Math.round((food.fiber || 0) * 10) / 10}g</div>
+                        <div className="text-xs text-gray-700 font-medium">fiber</div>
                       </div>
-                      <div>
-                        <div className="font-medium">{food.sodium}mg</div>
-                        <div className="text-gray-900">sodium</div>
+                      <div className="text-center bg-gradient-to-br from-red-50 to-red-100 rounded-lg p-3 border border-red-200">
+                        <div className="font-bold text-red-700">{Math.round(food.sodium || 0)}mg</div>
+                        <div className="text-xs text-gray-700 font-medium">sodium</div>
                       </div>
                     </div>
                   </div>
