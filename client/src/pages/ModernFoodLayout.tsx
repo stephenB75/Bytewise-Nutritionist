@@ -295,11 +295,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const calculateMicronutrients = useCallback((meals: any[]) => {
     // First, try to aggregate real micronutrient data from meals
     const realMicronutrients = meals.reduce((totals, meal) => {
+      // Handle both camelCase and snake_case property names from database
       // Convert string values from database to numbers for proper addition
       return {
-        vitaminC: totals.vitaminC + (parseFloat(meal.vitaminC) || 0),
-        vitaminD: totals.vitaminD + (parseFloat(meal.vitaminD) || 0),
-        vitaminB12: totals.vitaminB12 + (parseFloat(meal.vitaminB12) || 0),
+        vitaminC: totals.vitaminC + (parseFloat(meal.vitaminC || meal.vitamin_c) || 0),
+        vitaminD: totals.vitaminD + (parseFloat(meal.vitaminD || meal.vitamin_d) || 0),
+        vitaminB12: totals.vitaminB12 + (parseFloat(meal.vitaminB12 || meal.vitamin_b12) || 0),
         folate: totals.folate + (parseFloat(meal.folate) || 0),
         iron: totals.iron + (parseFloat(meal.iron) || 0),
         calcium: totals.calcium + (parseFloat(meal.calcium) || 0),
@@ -1950,37 +1951,38 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                       <span className="text-xs text-orange-700 font-medium">C: {(meal.carbs || 0).toFixed(1)}g</span>
                       <span className="text-xs text-purple-700 font-medium">F: {(meal.fat || 0).toFixed(1)}g</span>
                     </div>
-                    {/* Display micronutrients if available */}
-                    {(meal.iron > 0 || meal.calcium > 0 || meal.vitaminC > 0 || meal.zinc > 0) && (
+                    {/* Display micronutrients if available - handle both camelCase and snake_case */}
+                    {((meal.iron || meal.iron > 0) || (meal.calcium || meal.calcium > 0) || 
+                      (meal.vitaminC || meal.vitamin_c) > 0 || (meal.zinc || meal.zinc > 0)) && (
                       <div className="flex flex-wrap gap-2 mt-1 pt-1 border-t border-gray-400/30">
-                        {meal.iron > 0 && (
+                        {(meal.iron > 0) && (
                           <span className="text-xs bg-slate-500/20 px-2 py-0.5 rounded-full text-gray-800">
-                            Iron: {meal.iron.toFixed(1)}mg
+                            Iron: {(meal.iron).toFixed(1)}mg
                           </span>
                         )}
-                        {meal.calcium > 0 && (
+                        {(meal.calcium > 0) && (
                           <span className="text-xs bg-gray-500/20 px-2 py-0.5 rounded-full text-gray-800">
                             Calcium: {Math.round(meal.calcium)}mg
                           </span>
                         )}
-                        {meal.vitaminC > 0 && (
+                        {((meal.vitaminC || meal.vitamin_c) > 0) && (
                           <span className="text-xs bg-cyan-500/20 px-2 py-0.5 rounded-full text-cyan-800">
-                            Vit C: {Math.round(meal.vitaminC)}mg
+                            Vit C: {Math.round(meal.vitaminC || meal.vitamin_c)}mg
                           </span>
                         )}
-                        {meal.zinc > 0 && (
+                        {(meal.zinc > 0) && (
                           <span className="text-xs bg-amber-500/30 px-2 py-0.5 rounded-full text-amber-800">
-                            Zinc: {meal.zinc.toFixed(1)}mg
+                            Zinc: {(meal.zinc).toFixed(1)}mg
                           </span>
                         )}
-                        {meal.magnesium > 0 && (
+                        {(meal.magnesium > 0) && (
                           <span className="text-xs bg-rose-500/20 px-2 py-0.5 rounded-full text-rose-800">
                             Mg: {Math.round(meal.magnesium)}mg
                           </span>
                         )}
-                        {meal.vitaminD > 0 && (
+                        {((meal.vitaminD || meal.vitamin_d) > 0) && (
                           <span className="text-xs bg-orange-500/20 px-2 py-0.5 rounded-full text-orange-800">
-                            Vit D: {meal.vitaminD.toFixed(1)}μg
+                            Vit D: {(meal.vitaminD || meal.vitamin_d).toFixed(1)}μg
                           </span>
                         )}
                       </div>
