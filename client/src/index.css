@@ -5857,3 +5857,16 @@ button.tour-button-override:hover *,
 .tour-button-override:hover * {
   color: rgb(31, 41, 55);
 }
+
+/* Fix white text in AI Food Analyzer identified food cards - highest priority */
+[data-testid*="food-item-"] .font-medium,
+[data-testid*="food-item-"] .text-sm,
+[data-testid*="food-item-"] div:not([class*="bg-"]):not([class*="text-orange"]):not([class*="text-blue"]):not([class*="text-green"]):not([class*="text-purple"]) {
+  color: #111827 !important; /* Force dark text in food identification cards */
+}
+
+/* Specific override for food card nutrition labels that appear white */
+[data-testid*="food-item-"] div[class*="font-medium"],
+[data-testid*="food-item-"] div[class*="text-sm"] {
+  color: #111827 !important; /* Dark text for all food card content */
+}
