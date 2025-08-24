@@ -593,72 +593,96 @@ function getEstimatedNutrition(foodName: string, grams: number = 100) {
     baseNutrition = { calories: 32, protein: 0.7, carbs: 8, fat: 0.3, fiber: 2, sugar: 4.9, sodium: 1,
       iron: 0.41, calcium: 16, zinc: 0.14, magnesium: 13, vitaminC: 58.8, vitaminD: 0, vitaminB12: 0, folate: 24 };
   } else if (name.includes('grape')) {
-    baseNutrition = { calories: 69, protein: 0.7, carbs: 18, fat: 0.2, fiber: 0.9, sugar: 16, sodium: 2 };
+    baseNutrition = { calories: 69, protein: 0.7, carbs: 18, fat: 0.2, fiber: 0.9, sugar: 16, sodium: 2,
+      iron: 0.36, calcium: 10, zinc: 0.07, magnesium: 7, vitaminC: 3.2, vitaminD: 0, vitaminB12: 0, folate: 2 };
   } else if (name.includes('fruit')) {
-    baseNutrition = { calories: 60, protein: 1, carbs: 15, fat: 0.2, fiber: 2, sugar: 10, sodium: 1 };
+    baseNutrition = { calories: 60, protein: 1, carbs: 15, fat: 0.2, fiber: 2, sugar: 10, sodium: 1,
+      iron: 0.3, calcium: 15, zinc: 0.1, magnesium: 10, vitaminC: 30, vitaminD: 0, vitaminB12: 0, folate: 10 };
   
   // Vegetables
   } else if (name.includes('lettuce') || name.includes('spinach')) {
-    baseNutrition = { calories: 15, protein: 1.4, carbs: 3, fat: 0.2, fiber: 1.3, sugar: 1.2, sodium: 28 };
+    baseNutrition = { calories: 15, protein: 1.4, carbs: 3, fat: 0.2, fiber: 1.3, sugar: 1.2, sodium: 28,
+      iron: 2.71, calcium: 99, zinc: 0.53, magnesium: 79, vitaminC: 28.1, vitaminD: 0, vitaminB12: 0, folate: 194 };
   } else if (name.includes('broccoli')) {
     baseNutrition = { calories: 34, protein: 2.8, carbs: 7, fat: 0.4, fiber: 2.6, sugar: 1.5, sodium: 33,
       iron: 0.73, calcium: 47, zinc: 0.41, magnesium: 21, vitaminC: 89.2, vitaminD: 0, vitaminB12: 0, folate: 63 };
   } else if (name.includes('carrot')) {
-    baseNutrition = { calories: 41, protein: 0.9, carbs: 10, fat: 0.2, fiber: 2.8, sugar: 4.7, sodium: 69 };
+    baseNutrition = { calories: 41, protein: 0.9, carbs: 10, fat: 0.2, fiber: 2.8, sugar: 4.7, sodium: 69,
+      iron: 0.3, calcium: 33, zinc: 0.24, magnesium: 12, vitaminC: 5.9, vitaminD: 0, vitaminB12: 0, folate: 19 };
   } else if (name.includes('tomato')) {
-    baseNutrition = { calories: 18, protein: 0.9, carbs: 4, fat: 0.2, fiber: 1.2, sugar: 2.6, sodium: 5 };
+    baseNutrition = { calories: 18, protein: 0.9, carbs: 4, fat: 0.2, fiber: 1.2, sugar: 2.6, sodium: 5,
+      iron: 0.27, calcium: 10, zinc: 0.17, magnesium: 11, vitaminC: 13.7, vitaminD: 0, vitaminB12: 0, folate: 15 };
   } else if (name.includes('potato') && !name.includes('fries') && !name.includes('chip')) {
-    baseNutrition = { calories: 77, protein: 2, carbs: 17, fat: 0.1, fiber: 2.2, sugar: 0.8, sodium: 6 };
+    baseNutrition = { calories: 77, protein: 2, carbs: 17, fat: 0.1, fiber: 2.2, sugar: 0.8, sodium: 6,
+      iron: 0.81, calcium: 12, zinc: 0.3, magnesium: 23, vitaminC: 19.7, vitaminD: 0, vitaminB12: 0, folate: 15 };
   } else if (name.includes('vegetable') || name.includes('salad')) {
-    baseNutrition = { calories: 25, protein: 2, carbs: 5, fat: 0.3, fiber: 2, sugar: 3, sodium: 20 };
+    baseNutrition = { calories: 25, protein: 2, carbs: 5, fat: 0.3, fiber: 2, sugar: 3, sodium: 20,
+      iron: 1.0, calcium: 40, zinc: 0.4, magnesium: 15, vitaminC: 15, vitaminD: 0, vitaminB12: 0, folate: 30 };
   
   // Proteins - Meat
   } else if (name.includes('chicken breast')) {
-    baseNutrition = { calories: 165, protein: 31, carbs: 0, fat: 3.6, fiber: 0, sugar: 0, sodium: 74 };
+    baseNutrition = { calories: 165, protein: 31, carbs: 0, fat: 3.6, fiber: 0, sugar: 0, sodium: 74,
+      iron: 1.04, calcium: 15, zinc: 1.0, magnesium: 29, vitaminC: 0, vitaminD: 0.1, vitaminB12: 0.34, folate: 4 };
   } else if (name.includes('chicken') && !name.includes('fried')) {
     baseNutrition = { calories: 180, protein: 25, carbs: 0, fat: 8, fiber: 0, sugar: 0, sodium: 80,
       iron: 0.9, calcium: 15, zinc: 1.3, magnesium: 25, vitaminC: 0, vitaminD: 0.1, vitaminB12: 0.3, folate: 4 };
   } else if (name.includes('beef') && name.includes('ground')) {
-    baseNutrition = { calories: 250, protein: 26, carbs: 0, fat: 15, fiber: 0, sugar: 0, sodium: 75 };
+    baseNutrition = { calories: 250, protein: 26, carbs: 0, fat: 15, fiber: 0, sugar: 0, sodium: 75,
+      iron: 2.7, calcium: 18, zinc: 5.3, magnesium: 21, vitaminC: 0, vitaminD: 0.1, vitaminB12: 2.6, folate: 7 };
   } else if (name.includes('beef')) {
     baseNutrition = { calories: 250, protein: 26, carbs: 0, fat: 15, fiber: 0, sugar: 0, sodium: 60,
       iron: 2.6, calcium: 18, zinc: 4.8, magnesium: 21, vitaminC: 0, vitaminD: 0.1, vitaminB12: 2.6, folate: 6 };
   } else if (name.includes('pork')) {
-    baseNutrition = { calories: 242, protein: 27, carbs: 0, fat: 14, fiber: 0, sugar: 0, sodium: 62 };
+    baseNutrition = { calories: 242, protein: 27, carbs: 0, fat: 14, fiber: 0, sugar: 0, sodium: 62,
+      iron: 0.9, calcium: 19, zinc: 2.4, magnesium: 26, vitaminC: 0, vitaminD: 0.6, vitaminB12: 0.7, folate: 5 };
   } else if (name.includes('meat')) {
-    baseNutrition = { calories: 250, protein: 25, carbs: 0, fat: 15, fiber: 0, sugar: 0, sodium: 70 };
+    baseNutrition = { calories: 250, protein: 25, carbs: 0, fat: 15, fiber: 0, sugar: 0, sodium: 70,
+      iron: 2.5, calcium: 15, zinc: 4.0, magnesium: 20, vitaminC: 0, vitaminD: 0.1, vitaminB12: 2.0, folate: 5 };
   
   // Proteins - Fish
   } else if (name.includes('salmon')) {
-    baseNutrition = { calories: 208, protein: 22, carbs: 0, fat: 12, fiber: 0, sugar: 0, sodium: 59 };
+    baseNutrition = { calories: 208, protein: 22, carbs: 0, fat: 12, fiber: 0, sugar: 0, sodium: 59,
+      iron: 0.8, calcium: 12, zinc: 0.6, magnesium: 29, vitaminC: 0, vitaminD: 11.0, vitaminB12: 3.2, folate: 25 };
   } else if (name.includes('tuna')) {
-    baseNutrition = { calories: 144, protein: 30, carbs: 0, fat: 1, fiber: 0, sugar: 0, sodium: 39 };
+    baseNutrition = { calories: 144, protein: 30, carbs: 0, fat: 1, fiber: 0, sugar: 0, sodium: 39,
+      iron: 1.3, calcium: 8, zinc: 0.6, magnesium: 27, vitaminC: 0, vitaminD: 3.7, vitaminB12: 4.9, folate: 5 };
   } else if (name.includes('fish')) {
-    baseNutrition = { calories: 180, protein: 25, carbs: 0, fat: 8, fiber: 0, sugar: 0, sodium: 50 };
+    baseNutrition = { calories: 180, protein: 25, carbs: 0, fat: 8, fiber: 0, sugar: 0, sodium: 50,
+      iron: 0.7, calcium: 15, zinc: 0.5, magnesium: 25, vitaminC: 0, vitaminD: 5.0, vitaminB12: 2.0, folate: 15 };
   
   // Carbohydrates
   } else if (name.includes('rice') && name.includes('brown')) {
-    baseNutrition = { calories: 123, protein: 2.6, carbs: 23, fat: 0.9, fiber: 1.8, sugar: 0.4, sodium: 5 };
+    baseNutrition = { calories: 123, protein: 2.6, carbs: 23, fat: 0.9, fiber: 1.8, sugar: 0.4, sodium: 5,
+      iron: 0.82, calcium: 23, zinc: 1.2, magnesium: 43, vitaminC: 0, vitaminD: 0, vitaminB12: 0, folate: 7 };
   } else if (name.includes('rice')) {
-    baseNutrition = { calories: 130, protein: 2.7, carbs: 28, fat: 0.3, fiber: 0.4, sugar: 0.1, sodium: 1 };
+    baseNutrition = { calories: 130, protein: 2.7, carbs: 28, fat: 0.3, fiber: 0.4, sugar: 0.1, sodium: 1,
+      iron: 0.8, calcium: 28, zinc: 1.09, magnesium: 25, vitaminC: 0, vitaminD: 0, vitaminB12: 0, folate: 8 };
   } else if (name.includes('pasta')) {
-    baseNutrition = { calories: 131, protein: 5, carbs: 25, fat: 1.1, fiber: 1.8, sugar: 0.6, sodium: 6 };
+    baseNutrition = { calories: 131, protein: 5, carbs: 25, fat: 1.1, fiber: 1.8, sugar: 0.6, sodium: 6,
+      iron: 0.9, calcium: 7, zinc: 0.5, magnesium: 18, vitaminC: 0, vitaminD: 0, vitaminB12: 0, folate: 18 };
   } else if (name.includes('bread') && name.includes('whole')) {
-    baseNutrition = { calories: 247, protein: 13, carbs: 41, fat: 4.2, fiber: 7, sugar: 6, sodium: 491 };
+    baseNutrition = { calories: 247, protein: 13, carbs: 41, fat: 4.2, fiber: 7, sugar: 6, sodium: 491,
+      iron: 2.5, calcium: 107, zinc: 1.8, magnesium: 107, vitaminC: 0, vitaminD: 0, vitaminB12: 0, folate: 44 };
   } else if (name.includes('bread')) {
-    baseNutrition = { calories: 265, protein: 9, carbs: 49, fat: 3.2, fiber: 2.7, sugar: 5, sodium: 681 };
+    baseNutrition = { calories: 265, protein: 9, carbs: 49, fat: 3.2, fiber: 2.7, sugar: 5, sodium: 681,
+      iron: 3.6, calcium: 147, zinc: 0.7, magnesium: 22, vitaminC: 0, vitaminD: 0, vitaminB12: 0, folate: 43 };
   
   // Dairy
   } else if (name.includes('milk') && name.includes('whole')) {
-    baseNutrition = { calories: 61, protein: 3.2, carbs: 4.8, fat: 3.3, fiber: 0, sugar: 5.1, sodium: 40 };
+    baseNutrition = { calories: 61, protein: 3.2, carbs: 4.8, fat: 3.3, fiber: 0, sugar: 5.1, sodium: 40,
+      iron: 0.05, calcium: 113, zinc: 0.4, magnesium: 10, vitaminC: 0, vitaminD: 1.3, vitaminB12: 0.5, folate: 5 };
   } else if (name.includes('milk')) {
-    baseNutrition = { calories: 50, protein: 3.4, carbs: 5, fat: 2, fiber: 0, sugar: 5, sodium: 44 };
+    baseNutrition = { calories: 50, protein: 3.4, carbs: 5, fat: 2, fiber: 0, sugar: 5, sodium: 44,
+      iron: 0.03, calcium: 113, zinc: 0.4, magnesium: 10, vitaminC: 0, vitaminD: 1.3, vitaminB12: 0.5, folate: 5 };
   } else if (name.includes('cheese') && name.includes('cheddar')) {
-    baseNutrition = { calories: 403, protein: 25, carbs: 1.3, fat: 33, fiber: 0, sugar: 0.5, sodium: 621 };
+    baseNutrition = { calories: 403, protein: 25, carbs: 1.3, fat: 33, fiber: 0, sugar: 0.5, sodium: 621,
+      iron: 0.7, calcium: 721, zinc: 3.1, magnesium: 28, vitaminC: 0, vitaminD: 0.6, vitaminB12: 0.8, folate: 18 };
   } else if (name.includes('cheese')) {
-    baseNutrition = { calories: 300, protein: 20, carbs: 5, fat: 25, fiber: 0, sugar: 3, sodium: 500 };
+    baseNutrition = { calories: 300, protein: 20, carbs: 5, fat: 25, fiber: 0, sugar: 3, sodium: 500,
+      iron: 0.7, calcium: 700, zinc: 3.0, magnesium: 22, vitaminC: 0, vitaminD: 0.6, vitaminB12: 1.1, folate: 18 };
   } else if (name.includes('yogurt')) {
-    baseNutrition = { calories: 59, protein: 10, carbs: 3.6, fat: 0.4, fiber: 0, sugar: 3.2, sodium: 36 };
+    baseNutrition = { calories: 59, protein: 10, carbs: 3.6, fat: 0.4, fiber: 0, sugar: 3.2, sodium: 36,
+      iron: 0.1, calcium: 110, zinc: 0.6, magnesium: 11, vitaminC: 0.5, vitaminD: 0, vitaminB12: 0.5, folate: 7 };
   
   // Processed foods
   } else if (name.includes('pizza')) {
