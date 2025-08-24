@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ObjectUploader } from '@/components/ObjectUploader';
-import { Camera, Loader2, Sparkles, Plus, Eye, Utensils, AlertTriangle } from 'lucide-react';
+import { Camera, Loader2, Sparkles, Plus, Eye, Utensils, AlertTriangle, Trash2 } from 'lucide-react';
 import { useMutation } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
@@ -190,6 +190,27 @@ export default function AIFoodAnalyzer() {
       localStorage.setItem('weeklyAnalyzedFoods', JSON.stringify(updatedHistory));
     } catch (error) {
       console.error('Error saving analyzed food:', error);
+    }
+  };
+
+  // Delete analyzed food from weekly history
+  const deleteAnalyzedFood = (indexToDelete: number) => {
+    try {
+      const updatedHistory = weeklyAnalyzedFoods.filter((_, index) => index !== indexToDelete);
+      setWeeklyAnalyzedFoods(updatedHistory);
+      localStorage.setItem('weeklyAnalyzedFoods', JSON.stringify(updatedHistory));
+      
+      toast({
+        title: "Analysis Deleted",
+        description: "The food analysis has been removed from your history",
+      });
+    } catch (error) {
+      console.error('Error deleting analyzed food:', error);
+      toast({
+        title: "Delete Failed",
+        description: "Could not delete the analysis. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -763,6 +784,18 @@ export default function AIFoodAnalyzer() {
                           📸 Photo no longer available
                         </div>
                       )}
+                      
+                      {/* Delete Button */}
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        className="absolute top-2 right-2 h-8 w-8 p-0 bg-red-500/80 hover:bg-red-600/90 shadow-lg"
+                        onClick={() => deleteAnalyzedFood(index)}
+                        data-testid={`button-delete-analysis-${index}`}
+                        title="Delete this analysis"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </div>
                     
                     {/* Analysis Info */}
