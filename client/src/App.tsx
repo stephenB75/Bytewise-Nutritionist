@@ -14,7 +14,6 @@ import VerifyEmail from './pages/VerifyEmail';
 import { ResetPassword } from './pages/ResetPassword';
 import AIFoodAnalyzer from './pages/AIFoodAnalyzer';
 import { useDataRestoration } from '@/hooks/useDataRestoration';
-import { DataSyncIndicator } from '@/components/DataSyncIndicator';
 import { DataIntegrityManager } from '@/components/DataIntegrityManager';
 import { useSessionManager } from '@/hooks/useSessionManager';
 import { PWAUpdateNotification } from '@/components/PWAUpdateNotification';
@@ -192,7 +191,6 @@ function AppContent() {
             <Route>{renderCurrentPage()}</Route>
           </Switch>
         </main>
-        <DataSyncIndicator />
         <DataIntegrityManager />
         <PWAUpdateNotification />
         <Toaster />
