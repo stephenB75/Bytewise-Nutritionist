@@ -1175,8 +1175,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <Icon className={`w-5 h-5 text-${color}-700`} />
             </div>
             <div>
-              <h3 className="text-white font-medium">{title}</h3>
-              <p className="text-white text-sm font-medium">{value}/{goal}</p>
+              <h3 className="text-gray-900 font-medium">{title}</h3>
+              <p className="text-gray-900 text-sm font-medium">{value}/{goal}</p>
             </div>
           </div>
           <div className="text-right">
@@ -1276,8 +1276,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <Droplets className={`w-6 h-6 transition-colors duration-300 ${isGoalReached ? 'text-gray-900' : 'text-cyan-700'}`} />
             </div>
             <div>
-              <h3 className="text-white font-medium text-lg">Water Intake</h3>
-              <p className="text-white text-sm font-medium">{glasses}/{dailyGoal} glasses today</p>
+              <h3 className="text-gray-900 font-medium text-lg">Water Intake</h3>
+              <p className="text-gray-900 text-sm font-medium">{glasses}/{dailyGoal} glasses today</p>
             </div>
           </div>
           <div className="text-right">
@@ -1566,7 +1566,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     setShowWelcomeBanner(false);
                     // Future tour functionality
                   }}
-                  className="px-4 py-2 bg-amber-400 text-white rounded-lg text-sm font-medium hover:bg-amber-500 transition-colors"
+                  className="px-4 py-2 bg-amber-400 text-gray-900 rounded-lg text-sm font-medium hover:bg-amber-500 transition-colors"
                 >
                   Take Tour
                 </button>
@@ -3261,7 +3261,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 className={`group relative overflow-hidden ${
                   activeTab === tab.id
                     ? 'text-yellow-600'
-                    : 'text-gray-600 hover:text-white active:text-gray-900'
+                    : 'text-gray-600 hover:text-gray-900 active:text-gray-900'
                 }`}
               >
                 <IconComponent 
@@ -3269,14 +3269,14 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   className={`mb-1.5 transition-transform duration-150 ease-out ${
                     activeTab === tab.id 
                       ? 'scale-110 drop-shadow-lg text-yellow-600' 
-                      : 'scale-100 hover:scale-105 hover:text-white'
+                      : 'scale-100 hover:scale-105 hover:text-gray-900'
                   }`}
                   strokeWidth={activeTab === tab.id ? 2.5 : 2}
                 />
                 <span className={`text-[8px] font-semibold leading-tight text-center w-full transition-colors duration-150 ease-out ${
                   activeTab === tab.id 
-                    ? 'text-white drop-shadow-md' 
-                    : 'text-gray-600 hover:text-white active:text-gray-900'
+                    ? 'text-gray-900 drop-shadow-md' 
+                    : 'text-gray-600 hover:text-gray-900 active:text-gray-900'
                 }`}>{tab.label}</span>
               </button>
             )
