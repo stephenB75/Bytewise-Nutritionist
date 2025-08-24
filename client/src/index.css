@@ -619,15 +619,22 @@ button.btn-hero-enhanced span,
   text-shadow: 0 3px 6px rgba(0, 0, 0, 0.6) !important;
 }
 
-[data-page="dashboard"] .hero-component h2.text-6xl,
-[data-page="dashboard"] .hero-component h2.text-7xl,
-[data-page="dashboard"] .hero-component h2.text-8xl,
-[data-page="dashboard"] [data-hero="true"] h2.text-6xl,
-[data-page="dashboard"] [data-hero="true"] h2.text-7xl,
-[data-page="dashboard"] [data-hero="true"] h2.text-8xl,
-[data-page="dashboard"] .hero-component h2,
-[data-page="dashboard"] [data-hero="true"] h2 { 
+[data-page="dashboard"] .hero-component h2.text-6xl:not(.text-white),
+[data-page="dashboard"] .hero-component h2.text-7xl:not(.text-white),
+[data-page="dashboard"] .hero-component h2.text-8xl:not(.text-white),
+[data-page="dashboard"] [data-hero="true"] h2.text-6xl:not(.text-white),
+[data-page="dashboard"] [data-hero="true"] h2.text-7xl:not(.text-white),
+[data-page="dashboard"] [data-hero="true"] h2.text-8xl:not(.text-white),
+[data-page="dashboard"] .hero-component h2:not(.text-white),
+[data-page="dashboard"] [data-hero="true"] h2:not(.text-white) { 
   color: #fbbf24 !important; /* Bright amber for secondary headlines */
+  text-shadow: 0 3px 6px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Allow text-white H2 elements in dashboard hero to be white */
+[data-page="dashboard"] .hero-component h2.text-white,
+[data-page="dashboard"] [data-hero="true"] h2.text-white { 
+  color: #ffffff !important; /* Force white for text-white class */
   text-shadow: 0 3px 6px rgba(0, 0, 0, 0.6) !important;
 }
 
