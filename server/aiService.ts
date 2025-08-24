@@ -162,11 +162,7 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
           // Get nutrition data for each food item with enhanced USDA integration
           for (let i = 0; i < foodItems.length; i++) {
             console.log(`🔍 Looking up nutrition for: ${foodItems[i].name} (${foodItems[i].estimatedGrams}g)`);
-            console.log(`🔍 Food before enhancement:`, { 
-              name: foodItems[i].name, 
-              hasCalories: !!(foodItems[i] as any).calories,
-              hasMicronutrients: !!(foodItems[i] as any).iron 
-            });
+            
             try {
               const nutrition = await getNutritionFromUSDA(foodItems[i].name, foodItems[i].estimatedGrams);
               
@@ -182,13 +178,38 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
                   calcium: estimatedNutrition.calcium,
                   vitaminC: estimatedNutrition.vitaminC
                 });
-                foodItems[i] = { ...foodItems[i], ...estimatedNutrition };
+                
+                // Always preserve Gemini's macronutrients but add our micronutrients
+                foodItems[i] = { 
+                  ...foodItems[i], 
+                  ...estimatedNutrition,
+                  // Preserve Gemini's macronutrients if they exist
+                  calories: (foodItems[i] as any).calories || estimatedNutrition.calories,
+                  protein: (foodItems[i] as any).protein || estimatedNutrition.protein,
+                  carbs: (foodItems[i] as any).carbs || estimatedNutrition.carbs,
+                  fat: (foodItems[i] as any).fat || estimatedNutrition.fat
+                };
               }
             } catch (nutritionError) {
               console.error(`❌ Nutrition lookup failed for ${foodItems[i].name}:`, nutritionError);
               // Add estimated nutrition if USDA lookup fails
               const estimatedNutrition = getEstimatedNutrition(foodItems[i].name, foodItems[i].estimatedGrams);
-              foodItems[i] = { ...foodItems[i], ...estimatedNutrition };
+              console.log(`🔬 Fallback estimated nutrition for "${foodItems[i].name}":`, {
+                iron: estimatedNutrition.iron,
+                calcium: estimatedNutrition.calcium,
+                vitaminC: estimatedNutrition.vitaminC
+              });
+              
+              // Always preserve Gemini's macronutrients but add our micronutrients
+              foodItems[i] = { 
+                ...foodItems[i], 
+                ...estimatedNutrition,
+                // Preserve Gemini's macronutrients if they exist
+                calories: (foodItems[i] as any).calories || estimatedNutrition.calories,
+                protein: (foodItems[i] as any).protein || estimatedNutrition.protein,
+                carbs: (foodItems[i] as any).carbs || estimatedNutrition.carbs,
+                fat: (foodItems[i] as any).fat || estimatedNutrition.fat
+              };
             }
           }
         }
