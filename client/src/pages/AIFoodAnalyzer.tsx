@@ -269,6 +269,18 @@ export default function AIFoodAnalyzer() {
       return result as AnalysisResult;
     },
     onSuccess: async (result) => {
+      // Debug: Log individual foods before aggregation
+      console.log('🔬 Individual foods received from backend:');
+      result.identifiedFoods.forEach((food: any, index: number) => {
+        console.log(`  Food ${index + 1}: ${food.name}`, {
+          calories: food.calories,
+          iron: food.iron,
+          calcium: food.calcium,
+          vitaminC: food.vitaminC,
+          hasAllMicronutrients: !!(food.iron && food.calcium && food.vitaminC)
+        });
+      });
+
       // Calculate total nutrition from identified foods including micronutrients
       const totalNutrition = result.identifiedFoods.reduce(
         (total, food: any) => ({
