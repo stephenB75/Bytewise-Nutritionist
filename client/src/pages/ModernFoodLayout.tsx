@@ -1513,6 +1513,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     unit: string;
     color: string;
   }) => {
+    // Debug: Log what each card receives
+    console.log(`🎯 MicronutrientCard ${name}:`, { value, goal, unit, type: typeof value });
+    
     const percentage = Math.min(Math.round((value / goal) * 100), 100);
     const displayValue = value.toFixed(value < 10 ? 1 : 0);
     
