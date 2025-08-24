@@ -1513,29 +1513,55 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     unit: string;
     color: string;
   }) => {
-    // Debug: Log what each card receives
-    console.log(`🎯 MicronutrientCard ${name}:`, { value, goal, unit, type: typeof value });
+    // Debug: Log what each card receives (remove when working)
+    // console.log(`🎯 MicronutrientCard ${name}:`, { value, goal, unit, type: typeof value });
     
     const percentage = Math.min(Math.round((value / goal) * 100), 100);
     const displayValue = value.toFixed(value < 10 ? 1 : 0);
     
-    // Use consistent color classes optimized for light theme
+    // Use consistent color classes optimized for light theme with explicit gradients
     const getColorClasses = () => {
       switch(color) {
-        case 'cyan': return 'text-cyan-600 from-cyan-400 to-blue-500';
-        case 'orange': return 'text-orange-600 from-orange-400 to-yellow-500';
-        case 'red': return 'text-red-600 from-red-400 to-pink-500';
-        case 'green': return 'text-green-600 from-green-400 to-emerald-500';
-        case 'slate': return 'text-slate-600 from-slate-400 to-gray-500';
-        case 'white': return 'text-gray-900 from-white to-gray-300';
-        case 'amber': return 'text-amber-600 from-amber-400 to-yellow-500';
-        case 'rose': return 'text-rose-600 from-rose-400 to-pink-500';
-        default: return 'text-gray-600 from-gray-400 to-gray-500';
+        case 'cyan': return {
+          textColor: 'text-cyan-600',
+          gradientClass: 'bg-gradient-to-r from-cyan-400 to-blue-500'
+        };
+        case 'orange': return {
+          textColor: 'text-orange-600', 
+          gradientClass: 'bg-gradient-to-r from-orange-400 to-yellow-500'
+        };
+        case 'red': return {
+          textColor: 'text-red-600',
+          gradientClass: 'bg-gradient-to-r from-red-400 to-pink-500'
+        };
+        case 'green': return {
+          textColor: 'text-green-600',
+          gradientClass: 'bg-gradient-to-r from-green-400 to-emerald-500'
+        };
+        case 'slate': return {
+          textColor: 'text-slate-600',
+          gradientClass: 'bg-gradient-to-r from-slate-400 to-gray-500'
+        };
+        case 'white': return {
+          textColor: 'text-gray-900',
+          gradientClass: 'bg-gradient-to-r from-white to-gray-300'
+        };
+        case 'amber': return {
+          textColor: 'text-amber-600',
+          gradientClass: 'bg-gradient-to-r from-amber-400 to-yellow-500'
+        };
+        case 'rose': return {
+          textColor: 'text-rose-600',
+          gradientClass: 'bg-gradient-to-r from-rose-400 to-pink-500'
+        };
+        default: return {
+          textColor: 'text-gray-600',
+          gradientClass: 'bg-gradient-to-r from-gray-400 to-gray-500'
+        };
       }
     };
     
-    const colorClasses = getColorClasses();
-    const [textColor, gradientColors] = colorClasses.split(' from-');
+    const { textColor, gradientClass } = getColorClasses();
     
     return (
     <Card className="bg-amber-100 border-none p-3 shadow-lg hover:shadow-xl transition-all duration-300 hover:bg-gradient-to-br hover:from-amber-100 hover:to-amber-200" data-testid="micro-card">
@@ -1545,11 +1571,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       </div>
       <div className="relative h-2 bg-gray-300/60 rounded-full overflow-hidden shadow-inner border border-gray-400/20">
         <div 
-          className={`absolute left-0 top-0 h-full bg-gradient-to-r from-${gradientColors} rounded-full transition-all duration-1000 shadow-sm`} 
+          className={`absolute left-0 top-0 h-full ${gradientClass} rounded-full transition-all duration-1000 shadow-sm`} 
           style={{ width: `${percentage}%` }} 
         />
       </div>
-      <div className="text-xs text-gray-900 font-normal mt-1">{percentage}% Daily Value</div>
+      <div className="text-xs text-gray-900 font-normal mt-1">
+        {percentage}% Daily Value ({displayValue}{unit})
+      </div>
     </Card>
     );
   };
@@ -1729,10 +1757,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <MicronutrientCard name="Magnesium" value={dailyMicronutrients.magnesium} goal={400} unit="mg" color="rose" />
             </div>
             
-            {/* Debug micronutrient state */}
-            <div className="text-xs text-gray-500 mt-2">
+            {/* Debug micronutrient state - Remove when confirmed working */}
+            {/* <div className="text-xs text-gray-500 mt-2">
               Debug: VitD={dailyMicronutrients.vitaminD}, Iron={dailyMicronutrients.iron}, Cal={dailyMicronutrients.calcium}
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
