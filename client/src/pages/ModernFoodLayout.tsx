@@ -3379,24 +3379,24 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 key={tab.id}
                 data-testid={tab.testId}
                 onClick={handleClick}
-                className={`group relative overflow-hidden ${
+                className={`group relative overflow-hidden rounded-lg px-2 py-1 transition-all duration-150 ${
                   activeTab === tab.id
-                    ? 'text-yellow-600'
-                    : 'text-gray-600 hover:text-gray-900 active:text-gray-900'
+                    ? 'text-gray-900 bg-white/20 backdrop-blur-sm shadow-inner'
+                    : 'text-gray-600 hover:text-gray-900 active:text-gray-900 hover:bg-white/10'
                 }`}
               >
                 <IconComponent 
                   size={20} 
-                  className={`mb-1.5 transition-transform duration-150 ease-out ${
+                  className={`mb-1.5 transition-all duration-150 ease-out ${
                     activeTab === tab.id 
-                      ? 'scale-110 drop-shadow-lg text-yellow-600' 
+                      ? 'scale-110 drop-shadow-lg text-gray-900' 
                       : 'scale-100 hover:scale-105 hover:text-gray-900'
                   }`}
                   strokeWidth={activeTab === tab.id ? 2.5 : 2}
                 />
                 <span className={`text-[8px] font-semibold leading-tight text-center w-full transition-colors duration-150 ease-out ${
                   activeTab === tab.id 
-                    ? 'text-gray-900 drop-shadow-md' 
+                    ? 'text-gray-900 drop-shadow-sm font-bold' 
                     : 'text-gray-600 hover:text-gray-900 active:text-gray-900'
                 }`}>{tab.label}</span>
               </button>
