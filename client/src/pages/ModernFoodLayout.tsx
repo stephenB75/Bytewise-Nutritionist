@@ -2040,7 +2040,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           <div className="space-y-4">
             <div className="mb-4">
               <h2 className="text-2xl font-bold text-gray-900">This Week's Progress</h2>
-              <p className="text-sm text-gray-400 mt-1">
+              <p className="text-sm text-gray-900 mt-1">
                 {(() => {
                   const weekDates = getWeekDates(); // Use actual current week dates
                   const startDate = new Date(weekDates[0]);
@@ -2048,7 +2048,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   return `${startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
                 })()}
               </p>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-900 mt-1">
                 Today: {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
               </p>
             </div>
@@ -2058,11 +2058,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h3 className="text-gray-900 font-semibold">Weekly Total</h3>
-                  <p className="text-gray-400 text-sm">{Math.round(weeklyCalories)}/{weeklyGoal} kcal</p>
+                  <p className="text-gray-900 text-sm">{Math.round(weeklyCalories)}/{weeklyGoal} kcal</p>
                 </div>
                 <div className="text-right">
                   <div className="text-2xl font-bold text-amber-600">{Math.round((weeklyCalories/weeklyGoal)*100)}%</div>
-                  <div className="text-xs text-gray-400">completed</div>
+                  <div className="text-xs text-gray-900">completed</div>
                 </div>
               </div>
               <div className="relative h-3 bg-amber-200 rounded-full overflow-hidden">
