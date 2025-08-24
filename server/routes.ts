@@ -1488,8 +1488,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     try {
       console.log(`🗑️ Deleting meal ID: ${mealId} for user: ${userId.substring(0, 8)}...`);
-      await storage.deleteMeal(parseInt(mealId));
-      console.log(`✅ Meal ${mealId} deleted successfully`);
+      
+      // Pass userId for security verification
+      await storage.deleteMeal(parseInt(mealId), userId);
+      
+      console.log(`✅ Meal ${mealId} deleted successfully for user: ${userId.substring(0, 8)}...`);
       res.json({ success: true, message: "Meal deleted successfully" });
     } catch (error) {
       console.error("Error deleting meal:", error);

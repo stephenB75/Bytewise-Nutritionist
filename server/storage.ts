@@ -74,7 +74,7 @@ export interface IStorage {
   getMealById(id: number): Promise<MealWithFoods | undefined>;
   createMeal(meal: InsertMeal): Promise<Meal>;
   updateMeal(id: number, meal: Partial<InsertMeal>): Promise<Meal>;
-  deleteMeal(id: number): Promise<void>;
+  deleteMeal(id: number, userId?: string): Promise<void>;
   addMealFood(mealFood: InsertMealFood): Promise<MealFood>;
   removeMealFood(mealId: number, foodId?: number, recipeId?: number): Promise<void>;
 
@@ -588,8 +588,14 @@ export class DatabaseStorage implements IStorage {
     return updatedMeal;
   }
 
-  async deleteMeal(id: number): Promise<void> {
-    await db.delete(meals).where(eq(meals.id, id));
+  async deleteMeal(id: number, userId?: string): Promise<void> {
+    if (userId) {
+      // Verify meal belongs to user before deleting (security fix)
+      await db.delete(meals).where(and(eq(meals.id, id), eq(meals.userId, userId)));
+    } else {
+      // Fallback for backward compatibility (admin operations)
+      await db.delete(meals).where(eq(meals.id, id));
+    }
   }
 
   async addMealFood(mealFood: InsertMealFood): Promise<MealFood> {
