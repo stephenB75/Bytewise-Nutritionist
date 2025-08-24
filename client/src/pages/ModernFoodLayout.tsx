@@ -1113,15 +1113,14 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   };
 
   // Optimized Hero Section Component with enhanced performance and visuals
-  const HeroSection = React.memo(({ title, subtitle, description, buttonText, onButtonClick }: {
+  const HeroSection = React.memo(({ title, subtitle, description, buttonText, onButtonClick, showLogo = false }: {
     title: string;
     subtitle: string; 
     description: string;
     buttonText: string;
     onButtonClick: () => void;
+    showLogo?: boolean;
   }) => {
-    // Determine if current page is dashboard
-    const isDashboard = activeTab === 'home';
     
     // Animations are now directly in the components - no conditional logic needed
     
@@ -1161,15 +1160,17 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         {/* Content Layer with Enhanced Typography */}
         <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-6 z-20 text-white">
           <div className="space-y-8 max-w-2xl">
-            {/* ByteWise Logo */}
-            <div className="mb-12 -mt-16">
-              <img 
-                src={logoImage} 
-                alt="ByteWise Nutritionist Logo" 
-                className="h-20 w-auto object-contain mx-auto drop-shadow-2xl"
-                data-testid="bytewise-hero-logo"
-              />
-            </div>
+            {/* ByteWise Logo - Only shown on dashboard */}
+            {showLogo && (
+              <div className="mb-12 -mt-16">
+                <img 
+                  src={logoImage} 
+                  alt="ByteWise Nutritionist Logo" 
+                  className="h-20 w-auto object-contain mx-auto drop-shadow-2xl"
+                  data-testid="bytewise-hero-logo"
+                />
+              </div>
+            )}
             
             {/* Animated Title Section */}
             <div className="space-y-3 hero-optimized">
@@ -1658,6 +1659,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             handleTabChange('profile');
           }
         }}
+        showLogo={true}
       />
 
       {/* Content Section - Completely Separate and Underneath */}
