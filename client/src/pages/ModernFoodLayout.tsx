@@ -295,15 +295,16 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const calculateMicronutrients = useCallback((meals: any[]) => {
     // First, try to aggregate real micronutrient data from meals
     const realMicronutrients = meals.reduce((totals, meal) => {
+      // Convert string values from database to numbers for proper addition
       return {
-        vitaminC: totals.vitaminC + (meal.vitaminC || 0),
-        vitaminD: totals.vitaminD + (meal.vitaminD || 0),
-        vitaminB12: totals.vitaminB12 + (meal.vitaminB12 || 0),
-        folate: totals.folate + (meal.folate || 0),
-        iron: totals.iron + (meal.iron || 0),
-        calcium: totals.calcium + (meal.calcium || 0),
-        zinc: totals.zinc + (meal.zinc || 0),
-        magnesium: totals.magnesium + (meal.magnesium || 0)
+        vitaminC: totals.vitaminC + (parseFloat(meal.vitaminC) || 0),
+        vitaminD: totals.vitaminD + (parseFloat(meal.vitaminD) || 0),
+        vitaminB12: totals.vitaminB12 + (parseFloat(meal.vitaminB12) || 0),
+        folate: totals.folate + (parseFloat(meal.folate) || 0),
+        iron: totals.iron + (parseFloat(meal.iron) || 0),
+        calcium: totals.calcium + (parseFloat(meal.calcium) || 0),
+        zinc: totals.zinc + (parseFloat(meal.zinc) || 0),
+        magnesium: totals.magnesium + (parseFloat(meal.magnesium) || 0)
       };
     }, {
       vitaminC: 0,
