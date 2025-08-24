@@ -850,26 +850,79 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         // Check fasting status from localStorage
         checkFastingStatus();
         
-        // Calculate weekly calories from current week's meals only
-        const currentWeekDates = getWeekDates(); // Use actual current week
-        const weekDateKeys = currentWeekDates.map(date => getLocalDateKey(date));
-        
-        // Filter meals to only include those from the current week with timestamp parsing
-        const currentWeekMeals = stored.filter((meal: any) => {
-          // Direct exact match
-          if (weekDateKeys.includes(meal.date)) return true;
-          
-          // Timestamp parsing for ISO format dates
-          if (meal.date && meal.date.includes('T')) {
-            const extractedDate = meal.date.split('T')[0];
-            return weekDateKeys.includes(extractedDate);
+        // Calculate weekly calories from database data (matching WeeklyCaloriesCard logic)
+        if (user) {
+          try {
+            // Load weekly data from database for accurate calculation
+            const response = await apiRequest('GET', '/api/meals/logged');
+            if (response.ok) {
+              const databaseMeals = await response.json();
+              const currentWeekDates = getWeekDates();
+              const weekDateKeys = currentWeekDates.map(date => getLocalDateKey(date));
+              
+              // Filter meals to current week with same logic as WeeklyCaloriesCard
+              const currentWeekMeals = databaseMeals.filter((meal: any) => {
+                if (!meal.date) return false;
+                const normalizedMealDate = meal.date.includes('T') 
+                  ? meal.date.split('T')[0] 
+                  : meal.date;
+                return weekDateKeys.includes(normalizedMealDate);
+              });
+              
+              // Calculate with proper number parsing
+              const weeklyTotal = currentWeekMeals.reduce((sum: number, meal: any) => {
+                const mealCalories = Number(meal.calories) || Number(meal.totalCalories) || 0;
+                return sum + mealCalories;
+              }, 0);
+              
+              console.log(`📊 Dashboard weekly calculation: ${weeklyTotal} calories from ${currentWeekMeals.length} meals`);
+              setWeeklyCalories(weeklyTotal);
+            } else {
+              // Fallback to localStorage calculation
+              const currentWeekDates = getWeekDates();
+              const weekDateKeys = currentWeekDates.map(date => getLocalDateKey(date));
+              const currentWeekMeals = stored.filter((meal: any) => {
+                if (weekDateKeys.includes(meal.date)) return true;
+                if (meal.date && meal.date.includes('T')) {
+                  const extractedDate = meal.date.split('T')[0];
+                  return weekDateKeys.includes(extractedDate);
+                }
+                return false;
+              });
+              const weeklyTotal = currentWeekMeals.reduce((sum: number, meal: any) => sum + (Number(meal.calories) || 0), 0);
+              setWeeklyCalories(weeklyTotal);
+            }
+          } catch (error) {
+            console.log('⚠️ Database weekly calculation failed, using localStorage:', error);
+            // Fallback to localStorage calculation with improved parsing
+            const currentWeekDates = getWeekDates();
+            const weekDateKeys = currentWeekDates.map(date => getLocalDateKey(date));
+            const currentWeekMeals = stored.filter((meal: any) => {
+              if (weekDateKeys.includes(meal.date)) return true;
+              if (meal.date && meal.date.includes('T')) {
+                const extractedDate = meal.date.split('T')[0];
+                return weekDateKeys.includes(extractedDate);
+              }
+              return false;
+            });
+            const weeklyTotal = currentWeekMeals.reduce((sum: number, meal: any) => sum + (Number(meal.calories) || 0), 0);
+            setWeeklyCalories(weeklyTotal);
           }
-          
-          return false;
-        });
-        
-        const weeklyTotal = currentWeekMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
-        setWeeklyCalories(weeklyTotal);
+        } else {
+          // For non-authenticated users, use localStorage
+          const currentWeekDates = getWeekDates();
+          const weekDateKeys = currentWeekDates.map(date => getLocalDateKey(date));
+          const currentWeekMeals = stored.filter((meal: any) => {
+            if (weekDateKeys.includes(meal.date)) return true;
+            if (meal.date && meal.date.includes('T')) {
+              const extractedDate = meal.date.split('T')[0];
+              return weekDateKeys.includes(extractedDate);
+            }
+            return false;
+          });
+          const weeklyTotal = currentWeekMeals.reduce((sum: number, meal: any) => sum + (Number(meal.calories) || 0), 0);
+          setWeeklyCalories(weeklyTotal);
+        }
         
       } catch (error) {
         // Reset to safe state on error
