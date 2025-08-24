@@ -1,10 +1,10 @@
-import React, { useEffect } from 'react';
+import * as React from 'react';
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from '@/lib/supabase';
 
 export function useAuth() {
   // Always call useEffect first to maintain hook order
-  useEffect(() => {
+  React.useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         
@@ -87,7 +87,7 @@ export function useAuth() {
   });
 
   // Listen for auth state changes to refetch
-  useEffect(() => {
+  React.useEffect(() => {
     const handleAuthChange = () => refetch();
     window.addEventListener('auth-state-change', handleAuthChange);
     return () => window.removeEventListener('auth-state-change', handleAuthChange);
