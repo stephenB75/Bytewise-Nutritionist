@@ -1917,7 +1917,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               meal.name.toLowerCase().includes(searchQuery.toLowerCase())
             ).length === 0 ? (
               <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md p-6">
-                <div className="text-center text-gray-400">
+                <div className="text-center text-gray-700">
                   <p className="text-lg mb-2">No meals found</p>
                   <p className="text-sm">Try a different search term or add new meals to your log</p>
                 </div>
@@ -1941,7 +1941,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
                     <h4 className="text-gray-900 font-semibold">{meal.name}</h4>
-                    <p className="text-gray-400 text-sm">
+                    <p className="text-gray-600 text-sm">
                       {meal.time} • {meal.mealType}
                       {searchQuery && (
                         <span className="ml-2 text-amber-600">
@@ -1950,9 +1950,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                       )}
                     </p>
                     <div className="flex flex-wrap gap-3 mt-1">
-                      <span className="text-xs text-green-400">P: {(meal.protein || 0).toFixed(1)}g</span>
-                      <span className="text-xs text-yellow-400">C: {(meal.carbs || 0).toFixed(1)}g</span>
-                      <span className="text-xs text-purple-400">F: {(meal.fat || 0).toFixed(1)}g</span>
+                      <span className="text-xs text-green-700 font-medium">P: {(meal.protein || 0).toFixed(1)}g</span>
+                      <span className="text-xs text-orange-700 font-medium">C: {(meal.carbs || 0).toFixed(1)}g</span>
+                      <span className="text-xs text-purple-700 font-medium">F: {(meal.fat || 0).toFixed(1)}g</span>
                     </div>
                     {/* Display micronutrients if available */}
                     {(meal.iron > 0 || meal.calcium > 0 || meal.vitaminC > 0 || meal.zinc > 0) && (
@@ -1968,22 +1968,22 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                           </span>
                         )}
                         {meal.vitaminC > 0 && (
-                          <span className="text-xs bg-cyan-500/20 px-2 py-0.5 rounded-full text-cyan-300">
+                          <span className="text-xs bg-cyan-500/20 px-2 py-0.5 rounded-full text-cyan-800">
                             Vit C: {Math.round(meal.vitaminC)}mg
                           </span>
                         )}
                         {meal.zinc > 0 && (
-                          <span className="text-xs bg-amber-500/20 px-2 py-0.5 rounded-full text-amber-300">
+                          <span className="text-xs bg-amber-500/30 px-2 py-0.5 rounded-full text-amber-800">
                             Zinc: {meal.zinc.toFixed(1)}mg
                           </span>
                         )}
                         {meal.magnesium > 0 && (
-                          <span className="text-xs bg-rose-500/20 px-2 py-0.5 rounded-full text-rose-300">
+                          <span className="text-xs bg-rose-500/20 px-2 py-0.5 rounded-full text-rose-800">
                             Mg: {Math.round(meal.magnesium)}mg
                           </span>
                         )}
                         {meal.vitaminD > 0 && (
-                          <span className="text-xs bg-orange-500/20 px-2 py-0.5 rounded-full text-orange-300">
+                          <span className="text-xs bg-orange-500/20 px-2 py-0.5 rounded-full text-orange-800">
                             Vit D: {meal.vitaminD.toFixed(1)}μg
                           </span>
                         )}
@@ -2133,15 +2133,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 </div>
               </div>
               <div className="flex items-center justify-between p-3 bg-gradient-to-br from-amber-100 to-amber-200 rounded-xl">
-                <span className="text-gray-400">Track micronutrients</span>
+                <span className="text-gray-900">Track micronutrients</span>
                 <div className="w-6 h-6 bg-amber-300 rounded-full flex items-center justify-center">
-                  <span className="text-gray-400 text-sm">○</span>
+                  <span className="text-gray-700 text-sm">○</span>
                 </div>
               </div>
               <div className="flex items-center justify-between p-3 bg-gradient-to-br from-amber-100 to-amber-200 rounded-xl">
-                <span className="text-gray-400">Stay within carb limit</span>
+                <span className="text-gray-900">Stay within carb limit</span>
                 <div className="w-6 h-6 bg-amber-300 rounded-full flex items-center justify-center">
-                  <span className="text-gray-400 text-sm">○</span>
+                  <span className="text-gray-700 text-sm">○</span>
                 </div>
               </div>
             </div>
