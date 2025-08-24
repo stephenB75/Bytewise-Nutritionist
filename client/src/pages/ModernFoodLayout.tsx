@@ -2649,7 +2649,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 <div className="bg-blue-500/5 border border-blue-500/20 rounded-lg p-3">
                   <div className="flex items-center gap-2 mb-2">
                     <Sparkles className="h-4 w-4 text-amber-500" />
-                    <span className="font-medium text-amber-100">AI Photo Analysis</span>
+                    <span className="font-medium text-gray-900">AI Photo Analysis</span>
                   </div>
                   <p className="text-gray-700 text-sm">
                     Take a photo of your food and let AI identify it automatically. 
@@ -2659,7 +2659,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 <div className="bg-orange-500/5 border border-orange-500/20 rounded-lg p-3">
                   <div className="flex items-center gap-2 mb-2">
                     <Target className="h-4 w-4 text-orange-400" />
-                    <span className="font-medium text-orange-300">USDA Calculator</span>
+                    <span className="font-medium text-gray-900">USDA Calculator</span>
                   </div>
                   <p className="text-gray-700 text-sm">
                     Search and manually select foods from the USDA database. 

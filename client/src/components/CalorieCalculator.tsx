@@ -539,7 +539,7 @@ function CalorieCalculator({
                   <Button
                     size="sm"
                     onClick={() => logToWeeklyTracker(analysis)}
-                    className="w-full text-white"
+                    className="w-full bg-orange-600 hover:bg-orange-700 text-white"
                   >
                     <Plus className="w-3 h-3 mr-1" />
                     Log to Weekly Tracker
@@ -801,7 +801,7 @@ function CalorieCalculator({
                     <p className="text-gray-600 text-sm">{analysis.measurement}</p>
                   </div>
                   <div className="text-right">
-                    <Badge variant="default" className="bg-orange-500 text-white text-lg px-3 py-1 mb-1">
+                    <Badge variant="default" className="bg-orange-600 text-white text-lg px-3 py-1 mb-1">
                       <Flame className="w-4 h-4 mr-1" />
                       {analysis.estimatedCalories} kcal
                     </Badge>
@@ -926,7 +926,7 @@ function CalorieCalculator({
                   {onAddToMeal && (
                     <Button
                       onClick={() => onAddToMeal(analysis)}
-                      className="w-full bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
+                      className="w-full bg-green-700 hover:bg-green-800 text-white shadow-lg hover:shadow-xl transition-all duration-200"
                     >
                       <CheckCircle className="w-4 h-4 mr-2" />
                       Add to Current Meal
@@ -934,7 +934,7 @@ function CalorieCalculator({
                   )}
                   <Button
                     onClick={() => logToWeeklyTracker(analysis)}
-                    className="w-full bg-gradient-to-r from-purple-400 to-blue-400 hover:from-purple-500 hover:to-blue-500 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
+                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
                   >
                     <Calendar className="w-5 h-5 mr-2" />
                     Log to Weekly Tracker

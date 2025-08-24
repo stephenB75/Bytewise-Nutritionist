@@ -574,7 +574,7 @@ export default function AIFoodAnalyzer() {
             <div className="flex flex-col items-center space-y-4">
               <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
               <h3 className="text-lg font-medium">Analyzing Your Food...</h3>
-              <p className="text-muted-foreground text-center">
+              <p className="text-gray-700 text-center">
                 AI is identifying ingredients and calculating nutrition information
               </p>
             </div>
@@ -591,7 +591,7 @@ export default function AIFoodAnalyzer() {
                 <AlertTriangle className="h-8 w-8" />
               </div>
               <h3 className="text-lg font-medium text-red-600">Analysis Failed</h3>
-              <p className="text-muted-foreground text-center max-w-md">
+              <p className="text-gray-700 text-center max-w-md">
                 {analyzeFoodMutation.error?.message.includes('quota') 
                   ? 'OpenAI quota exceeded. Please try again later or contact support for a new API key.'
                   : 'Unable to analyze the image. Please try uploading a clearer photo with better lighting.'
@@ -636,19 +636,19 @@ export default function AIFoodAnalyzer() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-orange-600">{analysisResult.totalNutrition.calories}</div>
-                  <div className="text-sm text-gray-700 dark:text-gray-300">Calories</div>
+                  <div className="text-sm text-gray-900">Calories</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-blue-600">{analysisResult.totalNutrition.protein}g</div>
-                  <div className="text-sm text-gray-700 dark:text-gray-300">Protein</div>
+                  <div className="text-sm text-gray-900">Protein</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-green-600">{analysisResult.totalNutrition.carbs}g</div>
-                  <div className="text-sm text-gray-700 dark:text-gray-300">Carbs</div>
+                  <div className="text-sm text-gray-900">Carbs</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-purple-600">{analysisResult.totalNutrition.fat}g</div>
-                  <div className="text-sm text-gray-700 dark:text-gray-300">Fat</div>
+                  <div className="text-sm text-gray-900">Fat</div>
                 </div>
               </div>
               
@@ -704,27 +704,27 @@ export default function AIFoodAnalyzer() {
                     <div className="grid grid-cols-3 md:grid-cols-6 gap-3 text-sm">
                       <div>
                         <div className="font-medium text-orange-600">{food.calories}</div>
-                        <div className="text-gray-700 dark:text-gray-300">cal</div>
+                        <div className="text-gray-900">cal</div>
                       </div>
                       <div>
                         <div className="font-medium">{food.protein}g</div>
-                        <div className="text-gray-700 dark:text-gray-300">protein</div>
+                        <div className="text-gray-900">protein</div>
                       </div>
                       <div>
                         <div className="font-medium">{food.carbs}g</div>
-                        <div className="text-gray-700 dark:text-gray-300">carbs</div>
+                        <div className="text-gray-900">carbs</div>
                       </div>
                       <div>
                         <div className="font-medium">{food.fat}g</div>
-                        <div className="text-gray-700 dark:text-gray-300">fat</div>
+                        <div className="text-gray-900">fat</div>
                       </div>
                       <div>
                         <div className="font-medium">{food.fiber}g</div>
-                        <div className="text-gray-700 dark:text-gray-300">fiber</div>
+                        <div className="text-gray-900">fiber</div>
                       </div>
                       <div>
                         <div className="font-medium">{food.sodium}mg</div>
-                        <div className="text-gray-700 dark:text-gray-300">sodium</div>
+                        <div className="text-gray-900">sodium</div>
                       </div>
                     </div>
                   </div>
