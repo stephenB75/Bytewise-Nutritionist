@@ -90,19 +90,28 @@ export const isAuthenticated: AuthMiddleware = async (
       }
     }
     
-    // Try as standard Supabase JWT token
-    const { data: { user }, error } = await supabase.auth.getUser(token);
-    
-    if (error || !user) {
+    // Try as standard Supabase JWT token - use proper server-side verification
+    try {
+      // For server-side, we need to verify the JWT token directly
+      const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
+      
+      if (error || !user) {
+        console.log('🔐 Auth verification failed:', error?.message || 'No user found');
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+
+      console.log('✅ User authenticated:', user.id);
+      
+      // Add user info to request
+      req.user = {
+        id: user.id,
+        email: user.email,
+        claims: { sub: user.id },
+      };
+    } catch (tokenError) {
+      console.log('❌ Token verification error:', tokenError);
       return res.status(401).json({ message: 'Unauthorized' });
     }
-
-    // Add user info to request
-    req.user = {
-      id: user.id,
-      email: user.email,
-      claims: { sub: user.id },
-    };
 
     next();
   } catch (error) {
@@ -147,7 +156,7 @@ export const optionalAuth: AuthMiddleware = async (
       } else {
         // Try as standard Supabase token or generated token
         try {
-          const { data: { user }, error } = await supabase.auth.getUser(token);
+          const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
           
           if (!error && user) {
             req.user = {
@@ -157,7 +166,7 @@ export const optionalAuth: AuthMiddleware = async (
             };
             // Supabase token validated successfully
           } else {
-            console.log('⚠️ Token validation failed:', error?.message);
+            console.log('⚠️ Optional auth token validation failed:', error?.message);
             // If it's a 56-char token from our generateLink, try to extract from recent users
             if (token.length === 56) {
               // Attempting token recovery
@@ -165,7 +174,7 @@ export const optionalAuth: AuthMiddleware = async (
             }
           }
         } catch (tokenError) {
-          console.log('⚠️ Token validation threw error:', tokenError);
+          console.log('⚠️ Optional auth token validation threw error:', tokenError);
         }
       }
     }
