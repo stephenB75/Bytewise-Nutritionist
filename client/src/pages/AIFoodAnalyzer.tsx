@@ -307,13 +307,10 @@ export default function AIFoodAnalyzer() {
         console.log('🧪 Saving test meal to database:', mealData);
         const response = await apiRequest('POST', '/api/meals/logged', mealData);
         
-        if (response.ok) {
-          console.log('✅ Test meal saved to database successfully');
-          window.dispatchEvent(new CustomEvent('refresh-meals'));
-          window.dispatchEvent(new CustomEvent('reload-meal-data'));
-        } else {
-          throw new Error(`Database save failed: ${response.status}`);
-        }
+        // apiRequest returns JSON data on success, throws on error
+        console.log('✅ Test meal saved to database successfully:', response);
+        window.dispatchEvent(new CustomEvent('refresh-meals'));
+        window.dispatchEvent(new CustomEvent('reload-meal-data'));
       } catch (error) {
         console.log('⚠️ Could not save test meal to database:', error);
       }
