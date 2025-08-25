@@ -71,3 +71,12 @@ The application includes an enhanced fasting timer with detailed progress tracki
 - **Improved UX Feedback**: Active navigation buttons now show filled icons with white glow and pronounced scaling
 - **Color Optimization**: Fixed CSS conflicts ensuring proper black/white color states for navigation elements
 - **Performance Optimization**: 600ms click animations with staggered timing for icons and text elements
+
+### August 25, 2025 - Date Alignment and Timezone Accuracy Fix (Version 3.5)
+- **Fixed Weekly Summary Date Alignment**: Resolved misalignment where August 24th was showing as "Sunday" when it should be "Saturday"
+- **Dynamic Day Name Calculation**: Replaced hardcoded day name arrays with dynamic date-based day name calculation using `toLocaleDateString`
+- **Enhanced Timezone Handling**: Confirmed all meal logging uses user's correct local timezone via browser APIs and Intl.DateTimeFormat
+- **Date Storage Optimization**: Fixed meal date saving from ISO timestamps to local date keys (YYYY-MM-DD) for consistent server processing
+- **Server-Side Date Processing**: Modified server to parse dates as noon UTC to prevent timezone drift during database operations
+- **Cross-Timezone Verification**: Tested and validated accurate date handling for users in different global timezones
+- **Meal Display Accuracy**: Weekly calendar now correctly matches meal dates with their proper calendar days
