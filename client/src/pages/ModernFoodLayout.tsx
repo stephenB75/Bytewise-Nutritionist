@@ -1821,10 +1821,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <MicronutrientCard name="Magnesium" value={dailyMicronutrients.magnesium} goal={400} unit="mg" color="rose" />
             </div>
             
-            {/* Debug micronutrient state - Remove when confirmed working */}
-            {/* <div className="text-xs text-gray-500 mt-2">
-              Debug: VitD={dailyMicronutrients.vitaminD}, Iron={dailyMicronutrients.iron}, Cal={dailyMicronutrients.calcium}
-            </div> */}
+            {/* Debug micronutrient state - Temporarily enabled to verify values */}
+            <div className="text-xs text-gray-500 mt-2 p-2 bg-gray-100 rounded">
+              🔍 Debug: VitC={dailyMicronutrients.vitaminC}mg, VitD={dailyMicronutrients.vitaminD}μg, Iron={dailyMicronutrients.iron}mg, Cal={dailyMicronutrients.calcium}mg
+            </div>
           </div>
         </div>
       </div>

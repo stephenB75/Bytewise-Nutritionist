@@ -1166,17 +1166,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
         protein: food.protein || 0,
         carbs: food.carbs || 0,
         fat: food.fat || 0,
+        // Include micronutrients from AI analysis
+        iron: food.iron || 0,
+        calcium: food.calcium || 0,
+        zinc: food.zinc || 0,
+        magnesium: food.magnesium || 0,
+        vitaminC: food.vitaminC || 0,
+        vitaminD: food.vitaminD || 0,
+        vitaminB12: food.vitaminB12 || 0,
+        folate: food.folate || 0,
       }));
 
-      // Calculate total nutrition
+      // Calculate total nutrition including micronutrients
       const totalNutrition = identifiedFoods.reduce(
         (total, food) => ({
           calories: total.calories + food.calories,
           protein: total.protein + food.protein,
           carbs: total.carbs + food.carbs,
           fat: total.fat + food.fat,
+          // Aggregate micronutrients
+          iron: total.iron + food.iron,
+          calcium: total.calcium + food.calcium,
+          zinc: total.zinc + food.zinc,
+          magnesium: total.magnesium + food.magnesium,
+          vitaminC: total.vitaminC + food.vitaminC,
+          vitaminD: total.vitaminD + food.vitaminD,
+          vitaminB12: total.vitaminB12 + food.vitaminB12,
+          folate: total.folate + food.folate,
         }),
-        { calories: 0, protein: 0, carbs: 0, fat: 0 }
+        { 
+          calories: 0, protein: 0, carbs: 0, fat: 0,
+          iron: 0, calcium: 0, zinc: 0, magnesium: 0,
+          vitaminC: 0, vitaminD: 0, vitaminB12: 0, folate: 0
+        }
       );
 
       const result = {
