@@ -8,12 +8,10 @@ export function migrateWeeklyMealsToTracker(): boolean {
     // Get the stored weeklyMeals data
     const weeklyMealsStr = localStorage.getItem('weeklyMeals');
     if (!weeklyMealsStr) {
-      console.log('No weeklyMeals data to migrate');
       return false;
     }
 
     const weeklyMeals = JSON.parse(weeklyMealsStr);
-    console.log(`Found ${weeklyMeals.length} meals to migrate`);
 
     // Group meals by week and date
     const weeklyData: any[] = [];
@@ -80,7 +78,6 @@ export function migrateWeeklyMealsToTracker(): boolean {
 
     // Save migrated data
     localStorage.setItem('weeklyTrackerData', JSON.stringify(weeklyData));
-    console.log(`Migrated data to weeklyTrackerData: ${weeklyData.length} weeks`);
 
     // Also migrate to calculatedCalories format
     const calculatedCalories = weeklyMeals.map((meal: any) => ({
@@ -96,17 +93,14 @@ export function migrateWeeklyMealsToTracker(): boolean {
     }));
 
     localStorage.setItem('calculatedCalories', JSON.stringify(calculatedCalories));
-    console.log(`Migrated ${calculatedCalories.length} entries to calculatedCalories`);
 
     return true;
   } catch (error) {
-    console.error('Migration failed:', error);
     return false;
   }
 }
 
 export function runDataMigration(): boolean {
-  console.log('=== Starting Data Migration ===');
   
   // Check if migration is needed
   const hasWeeklyMeals = localStorage.getItem('weeklyMeals');
@@ -114,12 +108,9 @@ export function runDataMigration(): boolean {
   const hasCalculatedCalories = localStorage.getItem('calculatedCalories');
 
   if (hasWeeklyMeals && (!hasWeeklyTrackerData || !hasCalculatedCalories)) {
-    console.log('Migration needed - weeklyMeals exists but tracker data is missing');
     const success = migrateWeeklyMealsToTracker();
-    console.log(`Migration ${success ? 'completed successfully' : 'failed'}`);
     return success;
   } else {
-    console.log('No migration needed');
     return false;
   }
 }
@@ -129,7 +120,6 @@ if (typeof window !== 'undefined') {
   setTimeout(() => {
     const migrated = runDataMigration();
     if (migrated) {
-      console.log('Data migration completed - page refresh recommended');
     }
   }, 1000);
 }

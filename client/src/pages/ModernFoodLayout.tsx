@@ -401,7 +401,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             accessToken = parsedSession.access_token;
           }
         } catch (parseError) {
-          console.log('Failed to parse stored session:', parseError);
         }
       }
       
@@ -1569,8 +1568,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     unit: string;
     color: string;
   }) => {
-    // Debug: Log what each card receives (remove when working)
-    // console.log(`🎯 MicronutrientCard ${name}:`, { value, goal, unit, type: typeof value });
     
     const percentage = Math.min(Math.round((value / goal) * 100), 100);
     const displayValue = value.toFixed(value < 10 ? 1 : 0);
@@ -1814,10 +1811,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <MicronutrientCard name="Magnesium" value={dailyMicronutrients.magnesium} goal={400} unit="mg" color="rose" />
             </div>
             
-            {/* Debug micronutrient state - Temporarily enabled to verify values */}
-            <div className="text-xs text-gray-500 mt-2 p-2 bg-gray-100 rounded" data-testid="debug-micronutrients">
-              🔍 Debug: VitC={dailyMicronutrients.vitaminC}mg, VitD={dailyMicronutrients.vitaminD}μg, Iron={dailyMicronutrients.iron}mg, Cal={dailyMicronutrients.calcium}mg, Zinc={dailyMicronutrients.zinc}mg, Folate={dailyMicronutrients.folate}μg
-            </div>
           </div>
         </div>
       </div>
