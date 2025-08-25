@@ -162,6 +162,169 @@ export default function AIFoodAnalyzer() {
   const { addCalculatedCalories } = useCalorieTracking();
   const { user } = useAuth();
 
+  // Test function to simulate AI analysis with micronutrients
+  const runTestAnalysis = useCallback(async () => {
+    console.log('🧪 Running test AI analysis...');
+    
+    // Create test analysis result with realistic mixed meal data
+    const identifiedFoods = [
+        {
+          name: 'Grilled Chicken Breast',
+          confidence: 0.95,
+          portion: '6 oz',
+          calories: 280,
+          protein: 53,
+          carbs: 0,
+          fat: 6,
+          fiber: 0,
+          sugar: 0,
+          sodium: 130,
+          iron: 1.2,
+          calcium: 15,
+          zinc: 1.8,
+          magnesium: 28,
+          vitaminC: 0,
+          vitaminD: 0.1,
+          vitaminB12: 0.3,
+          folate: 4
+        },
+        {
+          name: 'Steamed Broccoli',
+          confidence: 0.92,
+          portion: '1 cup',
+          calories: 55,
+          protein: 4,
+          carbs: 11,
+          fat: 0.5,
+          fiber: 5,
+          sugar: 2,
+          sodium: 64,
+          iron: 1.4,
+          calcium: 62,
+          zinc: 0.6,
+          magnesium: 33,
+          vitaminC: 132,
+          vitaminD: 0,
+          vitaminB12: 0,
+          folate: 168
+        },
+        {
+          name: 'Brown Rice',
+          confidence: 0.88,
+          portion: '1/2 cup cooked',
+          calories: 110,
+          protein: 3,
+          carbs: 23,
+          fat: 1,
+          fiber: 2,
+          sugar: 0,
+          sodium: 5,
+          iron: 0.8,
+          calcium: 10,
+          zinc: 0.6,
+          magnesium: 42,
+          vitaminC: 0,
+          vitaminD: 0,
+          vitaminB12: 0,
+          folate: 4
+        }
+      ];
+
+    // Calculate total nutrition including micronutrients
+    const totalNutrition = identifiedFoods.reduce(
+      (total, food) => ({
+        calories: total.calories + (food.calories || 0),
+        protein: total.protein + (food.protein || 0),
+        carbs: total.carbs + (food.carbs || 0),
+        fat: total.fat + (food.fat || 0),
+        fiber: total.fiber + (food.fiber || 0),
+        sugar: total.sugar + (food.sugar || 0),
+        sodium: total.sodium + (food.sodium || 0),
+        iron: total.iron + (food.iron || 0),
+        calcium: total.calcium + (food.calcium || 0),
+        zinc: total.zinc + (food.zinc || 0),
+        magnesium: total.magnesium + (food.magnesium || 0),
+        vitaminC: total.vitaminC + (food.vitaminC || 0),
+        vitaminD: total.vitaminD + (food.vitaminD || 0),
+        vitaminB12: total.vitaminB12 + (food.vitaminB12 || 0),
+        folate: total.folate + (food.folate || 0)
+      }),
+      { 
+        calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0, sugar: 0, sodium: 0,
+        iron: 0, calcium: 0, zinc: 0, magnesium: 0, vitaminC: 0, vitaminD: 0, vitaminB12: 0, folate: 0
+      }
+    );
+
+    // Create complete test result
+    const testResult: AnalysisResult = {
+      imageUrl: '/test-meal-image.jpg',
+      identifiedFoods,
+      totalNutrition,
+      analysisTime: new Date().toISOString()
+    };
+
+    console.log('🧪 Test analysis result with micronutrients:', testResult);
+
+    setAnalysisResult(testResult);
+    saveAnalyzedFood(testResult);
+    
+    // Log to daily tracker
+    const mealName = `Test Mixed Meal (${testResult.identifiedFoods.length} items)`;
+
+    await addCalculatedCalories({
+      name: mealName,
+      calories: totalNutrition.calories,
+      protein: totalNutrition.protein,
+      carbs: totalNutrition.carbs,
+      fat: totalNutrition.fat,
+      fiber: totalNutrition.fiber,
+      sugar: totalNutrition.sugar,
+      sodium: totalNutrition.sodium,
+      ingredients: testResult.identifiedFoods.map(f => f.name)
+    });
+
+    // Save to database if user is authenticated
+    if (user) {
+      try {
+        const mealData = {
+          name: mealName,
+          totalCalories: totalNutrition.calories,
+          totalProtein: totalNutrition.protein,
+          totalCarbs: totalNutrition.carbs,
+          totalFat: totalNutrition.fat,
+          iron: totalNutrition.iron,
+          calcium: totalNutrition.calcium,
+          zinc: totalNutrition.zinc,
+          magnesium: totalNutrition.magnesium,
+          vitaminC: totalNutrition.vitaminC,
+          vitaminD: totalNutrition.vitaminD,
+          vitaminB12: totalNutrition.vitaminB12,
+          folate: totalNutrition.folate,
+          date: new Date().toISOString(),
+          mealType: 'meal'
+        };
+        
+        console.log('🧪 Saving test meal to database:', mealData);
+        const response = await apiRequest('POST', '/api/meals/logged', mealData);
+        
+        if (response.ok) {
+          console.log('✅ Test meal saved to database successfully');
+          window.dispatchEvent(new CustomEvent('refresh-meals'));
+          window.dispatchEvent(new CustomEvent('reload-meal-data'));
+        } else {
+          throw new Error(`Database save failed: ${response.status}`);
+        }
+      } catch (error) {
+        console.log('⚠️ Could not save test meal to database:', error);
+      }
+    }
+    
+    toast({
+      title: "🧪 Test Analysis Complete!",
+      description: `Test meal logged with ${Math.round(totalNutrition.calories)} calories and micronutrients`,
+    });
+  }, [user, addCalculatedCalories, toast]);
+
   // Load weekly analyzed foods from localStorage on component mount
   useEffect(() => {
     const loadWeeklyAnalyzedFoods = () => {
@@ -562,6 +725,19 @@ export default function AIFoodAnalyzer() {
         <p className="text-gray-600 max-w-2xl mx-auto">
           Take a photo of your food and let AI identify ingredients and calculate nutrition information using the USDA database
         </p>
+
+        {/* Test Button for Development */}
+        {process.env.NODE_ENV === 'development' && (
+          <Button 
+            variant="outline" 
+            size="sm"
+            className="mt-4 border-green-300 text-green-700 hover:bg-green-50"
+            onClick={runTestAnalysis}
+            data-testid="button-test-analysis"
+          >
+            🧪 Test AI Analysis (Dev)
+          </Button>
+        )}
       </div>
 
       {/* Upload Section */}

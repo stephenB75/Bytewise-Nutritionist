@@ -1822,8 +1822,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             </div>
             
             {/* Debug micronutrient state - Temporarily enabled to verify values */}
-            <div className="text-xs text-gray-500 mt-2 p-2 bg-gray-100 rounded">
-              🔍 Debug: VitC={dailyMicronutrients.vitaminC}mg, VitD={dailyMicronutrients.vitaminD}μg, Iron={dailyMicronutrients.iron}mg, Cal={dailyMicronutrients.calcium}mg
+            <div className="text-xs text-gray-500 mt-2 p-2 bg-gray-100 rounded" data-testid="debug-micronutrients">
+              🔍 Debug: VitC={dailyMicronutrients.vitaminC}mg, VitD={dailyMicronutrients.vitaminD}μg, Iron={dailyMicronutrients.iron}mg, Cal={dailyMicronutrients.calcium}mg, Zinc={dailyMicronutrients.zinc}mg, Folate={dailyMicronutrients.folate}μg
             </div>
           </div>
         </div>
