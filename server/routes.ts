@@ -741,6 +741,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     
     try {
+      console.log('🔧 Creating meal with data:', {
+        userId,
+        date: req.body.date ? new Date(req.body.date + 'T12:00:00.000Z') : new Date(),
+        name: req.body.name,
+        totalCalories: req.body.totalCalories
+      });
+      
       // Create meal entry with micronutrients
       const meal = await storage.createMeal({
         userId,
@@ -771,6 +778,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         newAchievements: newAchievements.length > 0 ? newAchievements : undefined
       });
     } catch (error: any) {
+      console.log('❌ MEALS API: Error creating meal:', error.message, error.stack);
       // Meal logging error handled by response
       res.status(500).json({ message: "Failed to log meal" });
     }
