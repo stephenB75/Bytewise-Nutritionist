@@ -31,7 +31,6 @@ export function useDataIntegrity() {
     if (!user) return;
 
     try {
-      console.log('🔍 Verifying data integrity...');
       const issues: string[] = [];
 
       // Check user profile in database
@@ -69,7 +68,6 @@ export function useDataIntegrity() {
 
       // Show warning if data is at risk
       if (issues.length > 0) {
-        console.warn('⚠️ Data integrity issues found:', issues);
         toast({
           title: 'Data Backup Recommended',
           description: `${issues.length} data sync issue(s) detected. Your data is being protected.`,
@@ -78,7 +76,6 @@ export function useDataIntegrity() {
       }
 
     } catch (error) {
-      console.error('❌ Data integrity verification failed:', error);
       setStatus(prev => ({
         ...prev,
         dataHealth: 'degraded',
@@ -92,11 +89,9 @@ export function useDataIntegrity() {
     if (!user) return;
 
     try {
-      console.log('💾 Starting critical data backup...');
       let itemsBackedUp = 0;
 
       // Skip localStorage backup to avoid quota errors - data is already in database
-      console.log('Skipping localStorage backup to prevent quota errors');
 
       // Backup user goals
       const goals = {
@@ -112,7 +107,7 @@ export function useDataIntegrity() {
           await apiRequest('POST', '/api/user/goals', goals);
           itemsBackedUp++;
         } catch (error) {
-          console.warn('Failed to backup user goals');
+          // Failed to backup user goals
         }
       }
 
@@ -120,7 +115,6 @@ export function useDataIntegrity() {
       localStorage.setItem('lastDataBackup', new Date().toISOString());
       localStorage.setItem('itemsBackedUp', itemsBackedUp.toString());
 
-      console.log(`✅ Backed up ${itemsBackedUp} data items`);
       
       toast({
         title: 'Data Backup Complete',
@@ -130,7 +124,6 @@ export function useDataIntegrity() {
 
       return itemsBackedUp;
     } catch (error) {
-      console.error('❌ Critical data backup failed:', error);
       throw error;
     }
   }, [user, toast]);
@@ -140,7 +133,6 @@ export function useDataIntegrity() {
     if (!user) return;
 
     try {
-      console.log('🔄 Checking for data to restore...');
       
       // Check if localStorage is empty but user has database data
       const localMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
@@ -166,7 +158,6 @@ export function useDataIntegrity() {
 
             localStorage.setItem('weeklyMeals', JSON.stringify(restoredMeals));
             
-            console.log(`✅ Restored ${restoredMeals.length} meals from database`);
             
             toast({
               title: 'Data Restored',
@@ -178,11 +169,9 @@ export function useDataIntegrity() {
             window.dispatchEvent(new CustomEvent('data-restored'));
           }
         } catch (error) {
-          console.warn('Could not restore meal data:', error);
         }
       }
     } catch (error) {
-      console.error('❌ Data restoration failed:', error);
     }
   }, [user, toast]);
 

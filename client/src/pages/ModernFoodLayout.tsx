@@ -278,7 +278,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           });
         }
         
-        console.log('✅ Manual health data sync completed');
       } catch (error) {
         console.error('❌ Health data sync failed:', error);
       }
@@ -295,7 +294,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   // Function to calculate micronutrients from meals - uses real data when available
   const calculateMicronutrients = useCallback((meals: any[]) => {
-    console.log('🔬 calculateMicronutrients received meals:', meals.length, 'meals');
     
     // First, try to aggregate real micronutrient data from meals
     const realMicronutrients = meals.reduce((totals, meal) => {
@@ -312,7 +310,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         magnesium: parseFloat(meal.magnesium) || 0
       };
       
-      console.log(`📊 Meal "${meal.name}" micronutrients:`, mealMicronutrients);
       
       return {
         vitaminC: totals.vitaminC + mealMicronutrients.vitaminC,
@@ -335,7 +332,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       magnesium: 0
     });
     
-    console.log('🔢 Total aggregated micronutrients:', realMicronutrients);
     
     // Check if we have real data (any micronutrient value > 0)
     const hasRealData = Object.values(realMicronutrients).some((value) => (value as number) > 0);
@@ -442,10 +438,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       // Close the modal and refresh user data
       setShowProfileCompletion(false);
       await refetchUser();
-      
-      console.log('✅ Profile completion successful:', profileData);
     } catch (error) {
-      console.error('❌ Profile completion failed:', error);
       throw error; // Re-throw to let the modal handle the error
     }
   };
@@ -497,7 +490,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         fastingStatus: data.fastingStatus
       };
       
-      console.log('✅ Daily stats fetched successfully:', stats);
       setDailyStats(stats);
       setDailyCalories(stats.totalCalories);
       
@@ -707,29 +699,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     // Use logged meals from database state only
     const todayMeals = loggedMeals;
     
-    console.log('🔍 Database → Cards verification:', {
-      mealCount: todayMeals.length,
-      meals: todayMeals.map(m => ({
-        name: m.name,
-        // MACRO DATA VERIFICATION
-        totalCalories: m.totalCalories,
-        totalProtein: m.totalProtein,
-        totalCarbs: m.totalCarbs,
-        totalFat: m.totalFat,
-        // MICRO DATA VERIFICATION
-        iron: m.iron,
-        calcium: m.calcium,
-        vitaminC: m.vitaminC,
-        vitaminD: m.vitaminD
-      }))
-    });
     
     if (todayMeals.length > 0) {
       const micronutrients = calculateMicronutrients(todayMeals);
-      console.log('🧮 Calculated micronutrients for cards:', micronutrients);
       setDailyMicronutrients(micronutrients);
     } else {
-      console.log('⚠️ No meals found - resetting micronutrient cards to zero');
       // Reset micronutrients if no meals
       setDailyMicronutrients({
         vitaminC: 0,
@@ -787,21 +761,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             if (response.ok) {
               const databaseMeals = await response.json();
               stored = Array.isArray(databaseMeals) ? databaseMeals : [];
-              console.log('✅ Meals loaded from database:', stored.length, 'meals');
               
-              // Debug: Log meal data to check micronutrients
-              stored.forEach((meal: any, index: number) => {
-                console.log(`📊 Meal ${index + 1}:`, {
-                  name: meal.name,
-                  calories: meal.calories || meal.totalCalories,
-                  protein: meal.protein,
-                  vitaminC: meal.vitaminC,
-                  vitaminD: meal.vitaminD,
-                  iron: meal.iron,
-                  calcium: meal.calcium,
-                  date: meal.date
-                });
-              });
             } else {
               console.error('Failed to load meals from database');
               stored = [];
@@ -813,8 +773,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         } else {
           // For unauthenticated users, use empty array (require authentication)
           stored = [];
-          console.log('🔐 Authentication required for meal data');
-        }
+            }
         
         // Simple date matching - use today's actual date without correction
         const today = getLocalDateKey();
@@ -910,7 +869,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 return sum + mealCalories;
               }, 0);
               
-              console.log(`📊 Dashboard weekly calculation: ${weeklyTotal} calories from ${currentWeekMeals.length} meals`);
               setWeeklyCalories(weeklyTotal);
             } else {
               // Fallback to localStorage calculation
@@ -928,7 +886,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               setWeeklyCalories(weeklyTotal);
             }
           } catch (error) {
-            console.log('⚠️ Database weekly calculation failed, using localStorage:', error);
             // Fallback to localStorage calculation with improved parsing
             const currentWeekDates = getWeekDates();
             const weekDateKeys = currentWeekDates.map(date => getLocalDateKey(date));

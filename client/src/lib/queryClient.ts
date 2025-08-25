@@ -17,13 +17,8 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
   const { data: { session } } = await supabase.auth.getSession();
   if (session?.access_token) {
     accessToken = session.access_token;
-    console.log('🔐 Using Supabase JWT token, length:', accessToken.length);
-    
     // Validate it looks like a proper JWT (3 parts separated by dots)
-    if (accessToken.split('.').length === 3) {
-      console.log('✅ Valid JWT format detected');
-    } else {
-      console.log('⚠️ Token does not appear to be a valid JWT');
+    if (accessToken.split('.').length !== 3) {
       accessToken = null;
     }
   }
@@ -36,19 +31,15 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
         const parsedSession = JSON.parse(storedSession);
         if (parsedSession.access_token) {
           accessToken = parsedSession.access_token;
-          console.log('🔄 Falling back to stored custom token, length:', accessToken.length);
         }
       } catch (parseError) {
-        console.log('⚠️ Failed to parse stored session:', parseError);
       }
     }
   }
   
   if (accessToken) {
     headers.Authorization = `Bearer ${accessToken}`;
-    console.log('✅ Authentication header set for API request');
   } else {
-    console.log('❌ No valid authentication token found for API request');
   }
   
   return headers;

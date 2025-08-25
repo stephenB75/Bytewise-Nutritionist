@@ -72,7 +72,6 @@ export function WeeklyCaloriesCard() {
           if (response.ok) {
             const databaseMeals = await response.json();
             storedMeals = Array.isArray(databaseMeals) ? databaseMeals : [];
-            console.log('✅ Weekly meals loaded from database:', storedMeals.length, 'meals');
             
             // Also sync to localStorage for offline capability
             localStorage.setItem('weeklyMeals', JSON.stringify(storedMeals));
@@ -80,7 +79,6 @@ export function WeeklyCaloriesCard() {
             throw new Error('Database fetch failed');
           }
         } catch (error) {
-          console.log('⚠️ Could not load meals from database, falling back to localStorage:', error);
           // Fall back to localStorage
           storedMeals = getCachedLocalStorage('weeklyMeals', 0) || [];
         }
@@ -139,7 +137,6 @@ export function WeeklyCaloriesCard() {
           
           // Debug: Log date matching
           if (normalizedMealDate === dayData.date) {
-            console.log(`📅 Matching meal for ${dayData.day}: ${meal.name} (${meal.calories} cal) - ${normalizedMealDate} === ${dayData.date}`);
             return true;
           }
           
@@ -151,15 +148,6 @@ export function WeeklyCaloriesCard() {
           return sum + mealCalories;
         }, 0);
         
-        // Debug and log meal data
-        if (dayMeals.length > 0) {
-          console.log(`📊 ${dayData.day} (${dayData.date}): ${dayMeals.length} meals, ${dayCalories} calories`);
-          dayMeals.forEach((meal: any, index: number) => {
-            const mealName = meal.name ? meal.name.substring(0, 20) : 'Unknown';
-            const mealCalories = Number(meal.calories) || Number(meal.totalCalories) || 0;
-            console.log(`  ${index + 1}. ${mealName}: ${mealCalories} cal`);
-          });
-        }
         
         return {
           ...dayData,
@@ -170,7 +158,6 @@ export function WeeklyCaloriesCard() {
 
       // Calculate total weekly calories
       const totalCalories = weeklyData.reduce((sum, day) => sum + day.calories, 0);
-      console.log(`🗓️ Weekly Summary: ${totalCalories} total calories across ${weeklyData.length} days`);
       
       setWeeklyData(weeklyData);
       setTotalWeeklyCalories(totalCalories);
