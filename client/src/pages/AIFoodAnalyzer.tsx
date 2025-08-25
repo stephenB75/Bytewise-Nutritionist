@@ -19,6 +19,7 @@ import { useMutation } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { useCalorieTracking } from '@/hooks/useCalorieTracking';
+import { useAuth } from '@/hooks/useAuth';
 import type { UploadResult } from '@uppy/core';
 
 // Photo Display Component with proper error handling and proxy fallback
@@ -159,6 +160,7 @@ export default function AIFoodAnalyzer() {
   const [weeklyAnalyzedFoods, setWeeklyAnalyzedFoods] = useState<AnalysisResult[]>([]);
   const { toast } = useToast();
   const { addCalculatedCalories } = useCalorieTracking();
+  const { user } = useAuth();
 
   // Load weekly analyzed foods from localStorage on component mount
   useEffect(() => {
@@ -323,41 +325,46 @@ export default function AIFoodAnalyzer() {
         ingredients: result.identifiedFoods.map(f => f.name)
       });
 
-      // Save meal to database for authenticated users
-      try {
-        const mealData = {
-          name: mealName,
-          totalCalories: totalNutrition.calories,
-          totalProtein: totalNutrition.protein,
-          totalCarbs: totalNutrition.carbs,
-          totalFat: totalNutrition.fat,
-          // Include micronutrients from aggregated totalNutrition
-          iron: totalNutrition.iron || 0,
-          calcium: totalNutrition.calcium || 0,
-          zinc: totalNutrition.zinc || 0,
-          magnesium: totalNutrition.magnesium || 0,
-          vitaminC: totalNutrition.vitaminC || 0,
-          vitaminD: totalNutrition.vitaminD || 0,
-          vitaminB12: totalNutrition.vitaminB12 || 0,
-          folate: totalNutrition.folate || 0,
-          date: new Date().toISOString(),
-          mealType: 'meal'
-        };
-        
-        console.log('💾 Saving analyzed meal to database:', mealData);
-        const response = await apiRequest('POST', '/api/meals/logged', mealData);
-        
-        if (response.ok) {
-          console.log('✅ Meal saved to database successfully');
+      // Save meal to database for authenticated users only
+      if (user) {
+        try {
+          const mealData = {
+            name: mealName,
+            totalCalories: totalNutrition.calories,
+            totalProtein: totalNutrition.protein,
+            totalCarbs: totalNutrition.carbs,
+            totalFat: totalNutrition.fat,
+            // Include micronutrients from aggregated totalNutrition
+            iron: totalNutrition.iron || 0,
+            calcium: totalNutrition.calcium || 0,
+            zinc: totalNutrition.zinc || 0,
+            magnesium: totalNutrition.magnesium || 0,
+            vitaminC: totalNutrition.vitaminC || 0,
+            vitaminD: totalNutrition.vitaminD || 0,
+            vitaminB12: totalNutrition.vitaminB12 || 0,
+            folate: totalNutrition.folate || 0,
+            date: new Date().toISOString(),
+            mealType: 'meal'
+          };
           
-          // Dispatch refresh event for meal timeline and other components
-          window.dispatchEvent(new CustomEvent('refresh-meals'));
-        } else {
-          throw new Error(`Database save failed: ${response.status}`);
+          console.log('💾 Saving analyzed meal to database:', mealData);
+          const response = await apiRequest('POST', '/api/meals/logged', mealData);
+          
+          if (response.ok) {
+            console.log('✅ Meal saved to database successfully');
+            
+            // Dispatch refresh event for meal timeline and other components
+            window.dispatchEvent(new CustomEvent('refresh-meals'));
+            window.dispatchEvent(new CustomEvent('reload-meal-data'));
+          } else {
+            throw new Error(`Database save failed: ${response.status}`);
+          }
+        } catch (error) {
+          console.log('⚠️ Could not save meal to database:', error);
+          // Don't show error to user as the meal is still saved in localStorage
         }
-      } catch (error) {
-        console.log('⚠️ Could not save meal to database (user may not be logged in):', error);
-        // Don't show error to user as the meal is still saved in localStorage
+      } else {
+        console.log('📝 User not authenticated, meal saved to localStorage only');
       }
       
       toast({
