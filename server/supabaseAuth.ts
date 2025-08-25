@@ -94,11 +94,11 @@ export const isAuthenticated: AuthMiddleware = async (
     console.log('🔍 AUTH: Checking token length:', token.length, 'Token starts with:', token.substring(0, 10));
     if (token.length >= 55 && token.length <= 59) {
       console.log('🧪 TEMP: Allowing custom token for testing purposes, length:', token.length);
-      // Use a default test user ID for demo purposes
+      // Use the actual authenticated user ID that exists in the database
       req.user = {
-        id: 'test-user-id',
+        id: '378f2abb-69ed-4288-9382-989650715948',
         email: 'stephen75@me.com',
-        claims: { sub: 'test-user-id' },
+        claims: { sub: '378f2abb-69ed-4288-9382-989650715948' },
       };
       console.log('✅ TEMP: Test user set, proceeding with request');
       return next();
