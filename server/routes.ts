@@ -732,8 +732,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Meals API for logger
   app.post('/api/meals/logged', isAuthenticated, async (req: any, res: Response) => {
+    console.log('🍽️ MEALS API: Request received, user:', req.user?.id);
     const userId = req.user?.id;
     if (!userId) {
+      console.log('❌ MEALS API: No user ID found');
       res.status(401).json({ message: "User not found" });
       return;
     }
