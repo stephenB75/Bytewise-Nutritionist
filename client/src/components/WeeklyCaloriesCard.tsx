@@ -41,14 +41,18 @@ export function WeeklyCaloriesCard() {
     // Use current date without any date override to fix the offset issue
     const currentDate = new Date();
     const weekDatesArray = getWeekDates(currentDate); // Use actual calendar dates
-    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     
-    const weekDates = weekDatesArray.map((date, index) => ({
-      day: dayNames[index],
-      date: getLocalDateKey(date),
-      calories: 0,
-      mealCount: 0
-    }));
+    const weekDates = weekDatesArray.map((date) => {
+      // Get the actual day name for this date instead of using hardcoded array
+      const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
+      
+      return {
+        day: dayName,
+        date: getLocalDateKey(date),
+        calories: 0,
+        mealCount: 0
+      };
+    });
 
     const todayKey = getLocalDateKey(currentDate);
     
