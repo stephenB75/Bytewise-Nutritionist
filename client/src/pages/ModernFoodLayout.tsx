@@ -711,7 +711,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       mealCount: todayMeals.length,
       meals: todayMeals.map(m => ({
         name: m.name,
-        calories: m.calories,
+        // MACRO DATA VERIFICATION
+        totalCalories: m.totalCalories,
+        totalProtein: m.totalProtein,
+        totalCarbs: m.totalCarbs,
+        totalFat: m.totalFat,
+        // MICRO DATA VERIFICATION
         iron: m.iron,
         calcium: m.calcium,
         vitaminC: m.vitaminC,
