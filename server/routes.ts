@@ -732,21 +732,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Meals API for logger
   app.post('/api/meals/logged', isAuthenticated, async (req: any, res: Response) => {
-    console.log('🍽️ MEALS API: Request received, user:', req.user?.id);
     const userId = req.user?.id;
     if (!userId) {
-      console.log('❌ MEALS API: No user ID found');
       res.status(401).json({ message: "User not found" });
       return;
     }
     
     try {
-      console.log('🔧 Creating meal with data:', {
-        userId,
-        date: req.body.date ? new Date(req.body.date) : new Date(),
-        name: req.body.name,
-        totalCalories: req.body.totalCalories
-      });
       
       // Create meal entry with micronutrients
       const meal = await storage.createMeal({
@@ -778,8 +770,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         newAchievements: newAchievements.length > 0 ? newAchievements : undefined
       });
     } catch (error: any) {
-      console.log('❌ MEALS API: Error creating meal:', error.message, error.stack);
-      // Meal logging error handled by response
       res.status(500).json({ message: "Failed to log meal" });
     }
   });
