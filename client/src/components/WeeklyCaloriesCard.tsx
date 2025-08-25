@@ -126,10 +126,16 @@ export function WeeklyCaloriesCard() {
           
           const mealDateStr = meal.date;
           
-          // Handle timestamp format dates - extract date part first
-          const normalizedMealDate = mealDateStr.includes('T') 
+          // Handle timestamp format dates - extract date part and normalize
+          let normalizedMealDate = mealDateStr.includes('T') 
             ? mealDateStr.split('T')[0] 
             : mealDateStr;
+            
+          // If the meal date is an ISO string, parse it properly to get the local date
+          if (mealDateStr.includes('T') || mealDateStr.includes('Z')) {
+            const mealDate = new Date(mealDateStr);
+            normalizedMealDate = getLocalDateKey(mealDate);
+          }
           
           // Debug: Log date matching
           if (normalizedMealDate === dayData.date) {

@@ -742,7 +742,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create meal entry with micronutrients
       const meal = await storage.createMeal({
         userId,
-        date: new Date(req.body.date || new Date()),
+        date: req.body.date ? new Date(req.body.date + 'T12:00:00.000Z') : new Date(), // Parse date as noon UTC to avoid timezone shifts
         mealType: req.body.mealType || 'meal',
         name: req.body.name,
         totalCalories: req.body.totalCalories ? req.body.totalCalories.toString() : '0',

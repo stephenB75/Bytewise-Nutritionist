@@ -310,7 +310,7 @@ function CalorieCalculator({
     try {
       const response = await apiRequest('POST', '/api/meals/logged', {
         name: mealData.name,
-        date: mealData.timestamp, // Use ISO timestamp for proper date handling
+        date: mealData.date, // Use local date key (YYYY-MM-DD) for proper date handling
         mealType: mealData.mealType,
         totalCalories: mealData.calories,
         totalProtein: mealData.protein,
