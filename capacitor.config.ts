@@ -4,7 +4,7 @@ const config: CapacitorConfig = {
   appId: 'com.bytewise.nutritionist',
   appName: 'ByteWise Nutritionist',
   webDir: 'dist/public',
-  backgroundColor: '#0a0a00',
+  backgroundColor: '#fef3c7',
   
   // iOS-specific configuration optimized for App Store
   ios: {
@@ -29,7 +29,7 @@ const config: CapacitorConfig = {
     SplashScreen: {
       launchShowDuration: 2000,
       launchAutoHide: true,
-      backgroundColor: '#0a0a00',
+      backgroundColor: '#fef3c7',
       androidSplashResourceName: 'splash',
       androidScaleType: 'CENTER_CROP',
       showSpinner: false,
@@ -41,7 +41,7 @@ const config: CapacitorConfig = {
     
     StatusBar: {
       style: 'light',
-      backgroundColor: '#0a0a00',
+      backgroundColor: '#fef3c7',
       overlaysWebView: false
     },
     
