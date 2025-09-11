@@ -1108,42 +1108,42 @@ function UserFoodTextSuggestions({ onSuggestionClick }: { onSuggestionClick: (fo
                 {((food.iron || 0) > 0 || (food.calcium || 0) > 0 || (food.vitaminC || 0) > 0 || (food.zinc || 0) > 0 || (food.magnesium || 0) > 0 || (food.vitaminD || 0) > 0) && (
                   <div className="flex flex-wrap gap-2 text-xs">
                     {(food.iron || 0) > 0 && (
-                      <span className="bg-white/80 border border-gray-300 px-2 py-0.5 rounded text-gray-800 font-medium">
+                      <span className="bg-gray-800 text-white px-2 py-0.5 rounded font-medium shadow-sm">
                         Iron: {(food.iron || 0).toFixed(1)}mg
                       </span>
                     )}
                     {(food.calcium || 0) > 0 && (
-                      <span className="bg-white/80 border border-gray-300 px-2 py-0.5 rounded text-gray-800 font-medium">
+                      <span className="bg-gray-700 text-white px-2 py-0.5 rounded font-medium shadow-sm">
                         Ca: {Math.round(food.calcium || 0)}mg
                       </span>
                     )}
                     {(food.vitaminC || 0) > 0 && (
-                      <span className="bg-white/80 border border-blue-300 px-2 py-0.5 rounded text-blue-800 font-medium">
+                      <span className="bg-blue-600 text-white px-2 py-0.5 rounded font-medium shadow-sm">
                         Vit C: {Math.round(food.vitaminC || 0)}mg
                       </span>
                     )}
                     {(food.zinc || 0) > 0 && (
-                      <span className="bg-white/80 border border-purple-300 px-2 py-0.5 rounded text-purple-800 font-medium">
+                      <span className="bg-purple-600 text-white px-2 py-0.5 rounded font-medium shadow-sm">
                         Zn: {(food.zinc || 0).toFixed(1)}mg
                       </span>
                     )}
                     {(food.magnesium || 0) > 0 && (
-                      <span className="bg-white/80 border border-green-300 px-2 py-0.5 rounded text-green-800 font-medium">
+                      <span className="bg-green-600 text-white px-2 py-0.5 rounded font-medium shadow-sm">
                         Mg: {Math.round(food.magnesium || 0)}mg
                       </span>
                     )}
                     {(food.vitaminD || 0) > 0 && (
-                      <span className="bg-white/80 border border-orange-300 px-2 py-0.5 rounded text-orange-800 font-medium">
+                      <span className="bg-orange-600 text-white px-2 py-0.5 rounded font-medium shadow-sm">
                         Vit D: {(food.vitaminD || 0).toFixed(1)}μg
                       </span>
                     )}
                     {(food.vitaminB12 || 0) > 0 && (
-                      <span className="bg-white/80 border border-red-300 px-2 py-0.5 rounded text-red-800 font-medium">
+                      <span className="bg-red-600 text-white px-2 py-0.5 rounded font-medium shadow-sm">
                         B12: {(food.vitaminB12 || 0).toFixed(1)}μg
                       </span>
                     )}
                     {(food.folate || 0) > 0 && (
-                      <span className="bg-white/80 border border-emerald-300 px-2 py-0.5 rounded text-emerald-800 font-medium">
+                      <span className="bg-emerald-600 text-white px-2 py-0.5 rounded font-medium shadow-sm">
                         Folate: {Math.round(food.folate || 0)}μg
                       </span>
                     )}
