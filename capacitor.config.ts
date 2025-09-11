@@ -76,25 +76,6 @@ const config: CapacitorConfig = {
       }
     },
     
-    // Apple Health integration configuration
-    HealthKit: {
-      permissions: {
-        read: [
-          'HKQuantityTypeIdentifierDietaryWater',
-          'HKQuantityTypeIdentifierDietaryEnergyConsumed',
-          'HKQuantityTypeIdentifierDietaryProtein',
-          'HKQuantityTypeIdentifierDietaryCarbohydrates',
-          'HKQuantityTypeIdentifierDietaryFatTotal'
-        ],
-        write: [
-          'HKQuantityTypeIdentifierDietaryWater',
-          'HKQuantityTypeIdentifierDietaryEnergyConsumed',
-          'HKQuantityTypeIdentifierDietaryProtein',
-          'HKQuantityTypeIdentifierDietaryCarbohydrates',
-          'HKQuantityTypeIdentifierDietaryFatTotal'
-        ]
-      }
-    }
   }
 };
 
