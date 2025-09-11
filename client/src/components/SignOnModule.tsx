@@ -786,7 +786,8 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
             <button
               type="button"
               onClick={() => setIsSignUp(!isSignUp)}
-              className="text-sm text-blue-400 hover:text-blue-300 font-medium"
+              className="text-sm text-blue-400 hover:text-blue-300 font-medium transition-colors duration-200 underline-offset-4 hover:underline"
+              data-testid="button-toggle-signup"
             >
               {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
             </button>
