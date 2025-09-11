@@ -6,7 +6,7 @@ const config: CapacitorConfig = {
   webDir: 'dist/public',
   backgroundColor: '#fef3c7',
   
-  // iOS-specific configuration optimized for App Store
+  // iOS-specific configuration optimized for App Store with Swift Package Manager
   ios: {
     scheme: 'bytewise-nutritionist',
     path: 'ios',
