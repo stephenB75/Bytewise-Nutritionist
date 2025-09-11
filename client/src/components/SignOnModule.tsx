@@ -577,13 +577,17 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
                     )}
                   </Label>
                   {!isSignUp && !showResetPassword && (
-                    <button
-                      type="button"
-                      onClick={() => setShowResetPassword(true)}
-                      className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                    <a
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setShowResetPassword(true);
+                      }}
+                      className="text-xs text-blue-400 hover:text-blue-300 transition-colors underline-offset-4 hover:underline cursor-pointer"
+                      data-testid="link-forgot-password"
                     >
                       Forgot password?
-                    </button>
+                    </a>
                   )}
                 </div>
                 <div className="relative mt-2">
