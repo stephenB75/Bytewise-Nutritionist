@@ -72,6 +72,8 @@ import { useLocation } from 'wouter';
 import AIFoodAnalyzer from './AIFoodAnalyzer';
 import { AppleHealthIntegration } from '../components/AppleHealthIntegration';
 import { healthKitService } from '../services/healthKit';
+import { PremiumFeatureGate } from '@/components/PremiumFeatureGate';
+import { useSubscription } from '@/hooks/useSubscription';
 
 
 // Types
@@ -104,6 +106,7 @@ type TrackingView = 'daily' | 'weekly';
 
 export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) {
   const { user, isLoading: authLoading, refetch: refetchUser } = useAuth();
+  const { isPremium, isLoading: subscriptionLoading } = useSubscription();
   const [activeTab, setActiveTab] = useState('home');
   const [previousTab, setPreviousTab] = useState('home');
   const [openCard, setOpenCard] = useState<string | undefined>(undefined);
@@ -2710,7 +2713,14 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
           <div className="main-content">
             {nutritionMode === 'ai' ? (
-              <AIFoodAnalyzer />
+              <PremiumFeatureGate
+                feature="premium"
+                featureName="AI Photo Analysis"
+                description="Unlimited AI-powered food photo analysis with advanced nutrition breakdown"
+                className="min-h-[300px]"
+              >
+                <AIFoodAnalyzer />
+              </PremiumFeatureGate>
             ) : (
               <CalorieCalculator 
                 onNavigate={onNavigate}
