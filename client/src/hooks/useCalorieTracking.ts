@@ -3,7 +3,7 @@
  * Manages daily calorie tracking and communication between calculator and logger
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useDataPersistence } from './useDataPersistence';
 import { getLocalDateKey, formatLocalTime, getMealTypeByTime } from '@/utils/dateUtils';
@@ -31,6 +31,7 @@ export function useCalorieTracking() {
   const [dailyTotal, setDailyTotal] = useState(0);
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const currentDateRef = useRef(getLocalDateKey());
   
   // Use data persistence for automatic saving (limited to avoid quota errors)
   useDataPersistence({
@@ -40,20 +41,96 @@ export function useCalorieTracking() {
     debounceMs: 2000
   });
   
-  // Load persisted data on mount with quota error handling
+  // Clear yesterday's logged meals when a new day starts
+  const clearYesterdaysEntries = useCallback(() => {
+    const today = getLocalDateKey();
+    console.log('🔄 Daily reset: keeping only today\'s entries for new day:', today);
+    
+    // Keep only today's entries from calculatedCalories (clears all previous days)
+    setCalculatedCalories(prev => {
+      const todaysEntries = prev.filter(entry => entry.date === today);
+      
+      // Recalculate daily total from filtered entries
+      const newDailyTotal = todaysEntries.reduce((sum, entry) => sum + entry.calories, 0);
+      setDailyTotal(newDailyTotal);
+      
+      return todaysEntries;
+    });
+    
+    // Update localStorage to keep only today's entries
+    try {
+      const stored = localStorage.getItem('calculatedCalories');
+      if (stored) {
+        const existing = JSON.parse(stored);
+        const todaysEntries = existing.filter((entry: CalculatedCalories) => entry.date === today);
+        localStorage.setItem('calculatedCalories', JSON.stringify(todaysEntries));
+        console.log(`🧹 Cleaned storage: kept ${todaysEntries.length} entries for ${today}`);
+      }
+    } catch (error) {
+      console.warn('Failed to clear yesterday\'s entries from localStorage:', error);
+    }
+    
+    // Dispatch event for any components listening for meal data updates
+    window.dispatchEvent(new CustomEvent('dailyMealsReset', { 
+      detail: { date: today } 
+    }));
+  }, []);
+
+  // Set up daily reset timer - checks every minute for date change
+  useEffect(() => {
+    const checkForDateChange = () => {
+      const today = getLocalDateKey();
+      if (today !== currentDateRef.current) {
+        console.log('🌅 New day detected, resetting logged meals:', {
+          previousDate: currentDateRef.current,
+          newDate: today
+        });
+        currentDateRef.current = today;
+        clearYesterdaysEntries();
+      }
+    };
+
+    // Check immediately on mount
+    checkForDateChange();
+    
+    // Set up interval to check every minute (60000ms)
+    const interval = setInterval(checkForDateChange, 60000);
+    
+    return () => clearInterval(interval);
+  }, [clearYesterdaysEntries]);
+
+  // Load persisted data on mount with quota error handling and auto-prune old entries
   useEffect(() => {
     try {
       const stored = localStorage.getItem('calculatedCalories');
       if (stored) {
         const loaded = JSON.parse(stored);
         if (loaded && Array.isArray(loaded)) {
-          setCalculatedCalories(loaded);
-          // Calculate daily total from loaded data using local date
           const today = getLocalDateKey();
-          const todaysTotal = loaded
-            .filter((entry: CalculatedCalories) => entry.date === today)
-            .reduce((sum: number, entry: CalculatedCalories) => sum + entry.calories, 0);
+          
+          // Filter to only today's entries on cold start (auto-prune old entries)
+          const todaysEntries = loaded.filter((entry: CalculatedCalories) => entry.date === today);
+          
+          // Update state with only today's entries
+          setCalculatedCalories(todaysEntries);
+          
+          // Calculate daily total from today's entries
+          const todaysTotal = todaysEntries.reduce((sum: number, entry: CalculatedCalories) => sum + entry.calories, 0);
           setDailyTotal(todaysTotal);
+          
+          // If we pruned any entries, update localStorage to remove old entries
+          if (todaysEntries.length !== loaded.length) {
+            localStorage.setItem('calculatedCalories', JSON.stringify(todaysEntries));
+            console.log(`🧹 Cold start cleanup: pruned ${loaded.length - todaysEntries.length} old entries, kept ${todaysEntries.length} for ${today}`);
+            
+            // Dispatch event to notify other components of the cleanup
+            window.dispatchEvent(new CustomEvent('dailyMealsReset', { 
+              detail: { date: today, coldStart: true } 
+            }));
+          }
+          
+          // Update the current date ref to prevent immediate re-check
+          currentDateRef.current = today;
         }
       }
     } catch (error) {
