@@ -1086,7 +1086,7 @@ function UserFoodTextSuggestions({ onSuggestionClick }: { onSuggestionClick: (fo
       <p className="text-xs text-gray-900 mb-3">Quick suggestions (last 7 days):</p>
       <div className="space-y-3">
         {userFoods.map((food) => (
-          <div key={food.name} className="text-sm border border-gray-200 rounded-lg p-3 hover:bg-amber-50/60 transition-colors">
+          <div key={food.name} className="text-sm border border-gray-200 rounded-lg p-3">
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="font-medium text-gray-900 mb-1">
