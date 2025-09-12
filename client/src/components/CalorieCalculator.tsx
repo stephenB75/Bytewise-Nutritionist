@@ -1082,11 +1082,11 @@ function UserFoodTextSuggestions({ onSuggestionClick }: { onSuggestionClick: (fo
   if (userFoods.length === 0) return null;
 
   return (
-    <div className="mt-4 pt-3 border-t border-gray-200">
+    <div className="mt-4 pt-3 border-t border-amber-200">
       <p className="text-xs text-gray-900 mb-3">Quick suggestions (last 7 days):</p>
       <div className="space-y-3">
         {userFoods.map((food) => (
-          <div key={food.name} className="text-sm border border-gray-200 rounded-lg p-3">
+          <div key={food.name} className="text-sm bg-amber-50/80 border border-amber-200 rounded-lg p-3 shadow-sm">
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="font-medium text-gray-900 mb-1">
