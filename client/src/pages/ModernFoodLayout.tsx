@@ -2534,7 +2534,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         <div className="flex space-x-4 mb-6">
           <div className="bg-orange-500 text-white font-semibold px-6 py-3 rounded-xl shadow-lg border border-orange-400/50 flex items-center" data-testid="text-current-date">
             <Calendar className="w-4 h-4 mr-2" />
-            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
+            {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
           </div>
         </div>
 
