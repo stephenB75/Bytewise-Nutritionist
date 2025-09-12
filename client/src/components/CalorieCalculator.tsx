@@ -971,6 +971,7 @@ interface UserFoodData {
 
 function UserFoodTextSuggestions({ onSuggestionClick }: { onSuggestionClick: (foodName: string) => void }) {
   const [userFoods, setUserFoods] = useState<UserFoodData[]>([]);
+  const [copiedFood, setCopiedFood] = useState<string | null>(null);
 
   // Add food directly to meal log
   const addFoodToMeal = (food: UserFoodData) => {
@@ -1024,6 +1025,9 @@ function UserFoodTextSuggestions({ onSuggestionClick }: { onSuggestionClick: (fo
   // Copy food name to clipboard
   const copyFoodInfo = async (food: UserFoodData) => {
     try {
+      // Set visual feedback immediately
+      setCopiedFood(food.name);
+      
       // Copy only the food name
       await navigator.clipboard.writeText(food.name);
       
@@ -1038,8 +1042,15 @@ function UserFoodTextSuggestions({ onSuggestionClick }: { onSuggestionClick: (fo
       // Log successful copy
       console.log(`📋 Food name copied to clipboard: ${food.name}`);
 
+      // Reset visual feedback after 2 seconds
+      setTimeout(() => {
+        setCopiedFood(null);
+      }, 2000);
+
     } catch (error) {
       console.error('❌ Failed to copy food entry:', error);
+      setCopiedFood(null);
+      
       // Show error toast
       window.dispatchEvent(new CustomEvent('show-toast', {
         detail: { 
@@ -1231,11 +1242,19 @@ function UserFoodTextSuggestions({ onSuggestionClick }: { onSuggestionClick: (fo
                   console.log('📋 Copy button clicked for:', food.name);
                   copyFoodInfo(food);
                 }}
-                className="ml-2 p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all duration-200"
-                title={`Copy food name: ${food.name}`}
+                className={`ml-2 p-1.5 rounded-md transition-all duration-200 ${
+                  copiedFood === food.name 
+                    ? 'text-green-600 bg-green-50 hover:bg-green-100' 
+                    : 'text-gray-400 hover:text-blue-600 hover:bg-blue-50'
+                }`}
+                title={copiedFood === food.name ? 'Copied to clipboard!' : `Copy food name: ${food.name}`}
                 data-testid={`button-copy-food-${food.name.toLowerCase().replace(/\s+/g, '-')}`}
               >
-                <Copy className="w-4 h-4" />
+                {copiedFood === food.name ? (
+                  <CheckCircle className="w-4 h-4" />
+                ) : (
+                  <Copy className="w-4 h-4" />
+                )}
               </button>
             </div>
           </div>
