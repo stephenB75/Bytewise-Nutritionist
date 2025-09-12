@@ -1088,11 +1088,8 @@ function UserFoodTextSuggestions({ onSuggestionClick }: { onSuggestionClick: (fo
         {userFoods.map((food) => (
           <div key={food.name} className="text-sm border border-gray-200 rounded-lg p-3 hover:bg-amber-50/60 transition-colors">
             <div className="flex items-start justify-between">
-              <button
-                onClick={() => onSuggestionClick(food.name)}
-                className="flex-1 text-left"
-              >
-                <div className="font-medium text-blue-600 hover:text-blue-800 mb-1">
+              <div className="flex-1">
+                <div className="font-medium text-gray-900 mb-1">
                   {food.name}
                 </div>
                 
@@ -1166,6 +1163,16 @@ function UserFoodTextSuggestions({ onSuggestionClick }: { onSuggestionClick: (fo
                     )}
                   </div>
                 )}
+              </div>
+              
+              {/* Add Button */}
+              <button
+                onClick={() => onSuggestionClick(food.name)}
+                className="ml-3 px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-md hover:bg-blue-700 transition-colors"
+                title={`Add ${food.name} to meal`}
+                data-testid={`button-add-food-${food.name.toLowerCase().replace(/\s+/g, '-')}`}
+              >
+                Add
               </button>
               
               {/* Copy Button */}
