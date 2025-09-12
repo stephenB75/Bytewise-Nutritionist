@@ -826,7 +826,25 @@ button.btn-hero-enhanced span,
 }
 
 /* Micronutrient badge overrides - ensure transparent backgrounds work */
-span.inline-flex[class*="bg-transparent"] {
+span.inline-flex[class*="bg-transparent"],
+span.inline-flex.rounded-full[class*="border-"],
+span[class*="text-slate-700"],
+span[class*="text-stone-700"],
+span[class*="text-gray-700"],
+span[class*="text-neutral-700"],
+span[class*="text-orange-700"],
+span[class*="text-amber-700"],
+span[class*="text-red-700"],
+span[class*="text-green-700"] {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* Override all span rules for micronutrient badges - MAXIMUM SPECIFICITY */
+.bg-white span.inline-flex[class*="bg-transparent"],
+.bg-white\/10 span.inline-flex[class*="bg-transparent"],
+.bg-gray-50 span.inline-flex[class*="bg-transparent"],
+span.inline-flex.items-center.px-2\.5.py-1.rounded-full[class*="bg-transparent"] {
   background: transparent !important;
   background-color: transparent !important;
 }
