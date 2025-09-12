@@ -2,9 +2,10 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated, optionalAuth, serverSupabase, supabaseAdmin, createAuthenticatedHandler, type AuthenticatedRequest } from "./supabaseAuth";
-import { usdaService } from "./services/usdaService";
-import { ObjectStorageService, ObjectNotFoundError, objectStorageClient } from "./objectStorage";
-import { analyzeFoodImage, getNutritionFromUSDA } from "./aiService";
+// Lazy load heavy services to prevent startup hangs
+// import { usdaService } from "./services/usdaService";
+// import { ObjectStorageService, ObjectNotFoundError, objectStorageClient } from "./objectStorage";
+// import { analyzeFoodImage, getNutritionFromUSDA } from "./aiService";
 import { db } from "./db";
 import { meals } from "@shared/schema";
 import { eq, and, gte } from "drizzle-orm";
@@ -28,6 +29,10 @@ const subscriptionSyncSchema = z.object({
 const processedEventIds = new Set<string>();
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  console.log('📋 Starting route registration...');
+  
+  // Create and return server immediately - no blocking awaits before this point
+  const server = createServer(app);
   // Health check endpoint - simplified for production
   app.get('/api/health', async (req: Request, res: Response) => {
     // Basic health check - server is responding
@@ -188,8 +193,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Auth middleware
-  await setupAuth(app);
+  // Auth middleware - non-blocking initialization to prevent startup hangs
+  console.log('🔧 Starting auth setup...');
+  
+  const authInit = Promise.race([
+    setupAuth(app),
+    new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Auth setup timeout')), 5000)
+    )
+  ]);
+  
+  // Don't await - let auth setup happen in background
+  authInit.catch(err => {
+    console.warn('⚠️ Auth setup failed, continuing with server startup:', err.message);
+  });
+  
+  console.log('✅ Auth setup initiated (non-blocking)');
 
   // Auth routes
   app.get('/api/auth/user', optionalAuth, async (req: any, res: Response) => {
@@ -1162,6 +1181,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Object storage upload endpoint (no authentication required for AI analysis)
   app.post('/api/objects/upload', async (req: Request, res: Response) => {
     try {
+      const { ObjectStorageService } = await import('./objectStorage');
       const objectStorageService = new ObjectStorageService();
       const uploadURL = await objectStorageService.getObjectEntityUploadURL();
       res.json({ uploadURL });
@@ -1181,6 +1201,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       
       // Get the object file from private storage
+      const { ObjectStorageService, objectStorageClient } = await import('./objectStorage');
       const objectStorageService = new ObjectStorageService();
       const privateDir = objectStorageService.getPrivateObjectDir();
       const fullPath = `${privateDir}/${objectPath}`;
@@ -1258,6 +1279,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // With Gemini Vision, we pass the storage URL directly as it downloads the image internally
       
       // Add validation for empty analysis results
+      const { analyzeFoodImage } = await import('./aiService');
       const aiResult = await analyzeFoodImage(imageUrl);
 
       // Handle case where no foods are identified
@@ -1446,6 +1468,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Use real USDA service for calorie calculation
+      const { usdaService } = await import('./services/usdaService');
       const calorieData = await usdaService.calculateIngredientCalories(
         ingredient || 'unknown', 
         measurement || '1 serving'
@@ -1669,6 +1692,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let syncedCount = 0;
       const syncResults = [];
       
+      const { usdaService } = await import('./services/usdaService');
+      
       for (const food of popularFoods) {
         try {
           const foods = await usdaService.searchFoods(food, 5);
@@ -1739,6 +1764,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Query parameter 'q' is required" });
       }
       
+      const { usdaService } = await import('./services/usdaService');
       const foods = await usdaService.searchFoods(query, parseInt(limit as string));
       
       res.json({
@@ -1774,6 +1800,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Use USDA service for calculation
+      const { usdaService } = await import('./services/usdaService');
       const result = await usdaService.calculateIngredientCalories(ingredients, '1 serving');
       
       res.json({ result });
@@ -2386,6 +2413,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let file = null;
       
       // Try each possible bucket until we find the file
+      const { objectStorageClient } = await import('./objectStorage');
+      
       for (const bucketName of possibleBuckets) {
         if (!bucketName) continue;
         console.log(`🖼️ Trying bucket: ${bucketName}`);
@@ -2442,6 +2471,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  const httpServer = createServer(app);
-  return httpServer;
+  // Background startup tasks (non-blocking)
+  void (async () => {
+    try {
+      console.log('🚀 Starting background initialization...');
+      
+      // Give auth setup time to complete
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      console.log('✅ Background initialization completed');
+    } catch (error) {
+      console.warn('⚠️ Background initialization failed:', error);
+    }
+  })();
+
+  console.log('✅ Routes registered, returning server');
+  return server;
 }

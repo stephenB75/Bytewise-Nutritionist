@@ -3,7 +3,7 @@
  * Uses Google Gemini Vision API for food recognition and USDA database for nutrition data
  */
 
-import { objectStorageClient } from './objectStorage.js';
+import { objectStorageClient } from './objectStorage';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Initialize Gemini AI client with proper credentials
