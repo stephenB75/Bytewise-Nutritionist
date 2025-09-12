@@ -2713,14 +2713,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
           <div className="main-content">
             {nutritionMode === 'ai' ? (
-              <PremiumFeatureGate
-                feature="premium"
-                featureName="AI Photo Analysis"
-                description="Unlimited AI-powered food photo analysis with advanced nutrition breakdown"
-                className="min-h-[300px]"
-              >
-                <AIFoodAnalyzer />
-              </PremiumFeatureGate>
+              <AIFoodAnalyzer />
             ) : (
               <CalorieCalculator 
                 onNavigate={onNavigate}
