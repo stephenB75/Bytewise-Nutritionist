@@ -111,6 +111,37 @@ class SubscriptionService {
 
   async getSubscriptionStatus(): Promise<SubscriptionStatus> {
     try {
+      // If on web platform, fetch from backend API
+      if (!Capacitor.isNativePlatform()) {
+        try {
+          const response = await fetch('/api/subscription/status', {
+            credentials: 'include' // Include auth cookies
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            return {
+              isActive: data.isActive,
+              tier: data.tier,
+              willRenew: data.willRenew || false,
+              isInGracePeriod: false,
+              expiresAt: data.expiresAt ? new Date(data.expiresAt) : undefined,
+              productId: data.productId
+            };
+          }
+        } catch (webError) {
+          console.warn('⚠️ Failed to fetch subscription status from web API:', webError);
+        }
+        
+        // Return free tier for web if API fails
+        return {
+          isActive: false,
+          tier: 'free',
+          willRenew: false,
+          isInGracePeriod: false
+        };
+      }
+
       if (!this.isInitialized) {
         return {
           isActive: false,

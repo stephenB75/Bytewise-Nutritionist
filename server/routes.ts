@@ -1,7 +1,7 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated, optionalAuth, serverSupabase, supabaseAdmin, type AuthenticatedRequest } from "./supabaseAuth";
+import { setupAuth, isAuthenticated, optionalAuth, serverSupabase, supabaseAdmin, createAuthenticatedHandler, type AuthenticatedRequest } from "./supabaseAuth";
 import { usdaService } from "./services/usdaService";
 import { ObjectStorageService, ObjectNotFoundError, objectStorageClient } from "./objectStorage";
 import { analyzeFoodImage, getNutritionFromUSDA } from "./aiService";
@@ -24,14 +24,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // RevenueCat webhook endpoint for subscription events
   app.post('/api/webhooks/revenuecat', async (req: Request, res: Response) => {
     try {
-      console.log('🔔 Received RevenueCat webhook:', req.headers, req.body);
+      console.log('🔔 Received RevenueCat webhook:', req.headers['x-revenuecat-signature'] ? '[SIGNED]' : '[UNSIGNED]');
 
-      // Verify webhook authenticity (optional but recommended)
+      // Verify webhook authenticity - CRITICAL for security
       const webhookSecret = process.env.REVENUECAT_WEBHOOK_SECRET;
+      const signature = req.headers['x-revenuecat-signature'] as string;
+      
       if (webhookSecret) {
-        const signature = req.headers['x-revenuecat-signature'] as string;
-        // TODO: Implement signature verification for production
-        // This would involve HMAC SHA256 verification with the webhook secret
+        if (!signature) {
+          console.error('❌ Missing webhook signature');
+          return res.status(401).json({ error: 'Missing signature' });
+        }
+
+        // Verify HMAC SHA256 signature
+        const crypto = await import('crypto');
+        const expectedSignature = crypto
+          .createHmac('sha256', webhookSecret)
+          .update(JSON.stringify(req.body))
+          .digest('hex');
+        
+        const receivedSignature = signature.replace('sha256=', '');
+        
+        if (!crypto.timingSafeEqual(Buffer.from(expectedSignature), Buffer.from(receivedSignature))) {
+          console.error('❌ Invalid webhook signature');
+          return res.status(401).json({ error: 'Invalid signature' });
+        }
+        
+        console.log('✅ Webhook signature verified');
+      } else {
+        console.warn('⚠️ No webhook secret configured - accepting unsigned webhook (development only)');
+      }
+
+      // Basic idempotency check for duplicate events
+      const eventId = req.body.event?.id;
+      if (eventId) {
+        // TODO: Store processed event IDs in database to prevent duplicates
+        // For now, just log the event ID
+        console.log(`📋 Processing event ID: ${eventId}`);
       }
 
       // Process the webhook data
@@ -40,7 +69,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Respond to RevenueCat that webhook was processed successfully
       res.status(200).json({ 
         status: 'success',
-        message: 'Webhook processed successfully'
+        message: 'Webhook processed successfully',
+        eventId
       });
 
     } catch (error) {
@@ -2173,9 +2203,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Subscription API routes
-  app.get('/api/subscription/status', isAuthenticated, async (req: AuthenticatedRequest, res: Response) => {
+  app.get('/api/subscription/status', isAuthenticated, createAuthenticatedHandler(async (req, res) => {
+    const userId = (req as AuthenticatedRequest).user?.id;
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
     try {
-      const subscription = await storage.getUserSubscription(req.userId);
+      const subscription = await storage.getUserSubscription(userId);
       
       if (!subscription) {
         return res.json({
@@ -2201,9 +2236,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error('❌ Failed to get subscription status:', error);
       res.status(500).json({ error: 'Failed to get subscription status' });
     }
-  });
+  }));
 
-  app.post('/api/subscription/sync', isAuthenticated, async (req: AuthenticatedRequest, res: Response) => {
+  app.post('/api/subscription/sync', isAuthenticated, createAuthenticatedHandler(async (req, res) => {
+    const userId = (req as AuthenticatedRequest).user?.id;
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
     try {
       const { revenueCatUserId, customerInfo } = req.body;
 
@@ -2212,7 +2252,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Find or create subscription based on customer info
-      let subscription = await storage.getUserSubscription(req.userId);
+      let subscription = await storage.getUserSubscription(userId);
       
       // Parse customer info from RevenueCat
       const entitlements = customerInfo.entitlements;
@@ -2239,7 +2279,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (subscription) {
         // Update existing subscription
-        await storage.updateSubscription(req.userId, {
+        await storage.updateSubscription(userId, {
           revenueCatUserId,
           status,
           tier,
@@ -2249,7 +2289,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else {
         // Create new subscription
         await storage.createSubscription({
-          userId: req.userId,
+          userId,
           revenueCatUserId,
           productId: productId || 'unknown',
           entitlementId: tier,
@@ -2265,7 +2305,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error('❌ Failed to sync subscription:', error);
       res.status(500).json({ error: 'Failed to sync subscription' });
     }
-  });
+  }));
 
   // Image proxy route to serve images from object storage with proper headers
   app.get('/api/proxy-image/:path(*)', async (req: Request, res: Response) => {
