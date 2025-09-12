@@ -1103,6 +1103,69 @@ function UserFoodTextSuggestions({ onSuggestionClick }: { onSuggestionClick: (fo
                   <span className="text-yellow-600">C: {(food.carbs || 0).toFixed(1)}g</span>
                   <span className="text-purple-600">F: {(food.fat || 0).toFixed(1)}g</span>
                 </div>
+                
+                {/* Micronutrients - organized by category */}
+                {((food.iron || 0) > 0 || (food.calcium || 0) > 0 || (food.vitaminC || 0) > 0 || (food.zinc || 0) > 0 || (food.magnesium || 0) > 0 || (food.vitaminD || 0) > 0) && (
+                  <div className="mt-2 space-y-2">
+                    {/* Minerals Section */}
+                    {((food.iron || 0) > 0 || (food.calcium || 0) > 0 || (food.zinc || 0) > 0 || (food.magnesium || 0) > 0) && (
+                      <div className="space-y-1">
+                        <div className="text-xs font-medium text-gray-600 uppercase tracking-wide">Minerals</div>
+                        <div className="flex flex-wrap gap-1.5">
+                          {(food.iron || 0) > 0 && (
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-800 border border-slate-300 hover:bg-slate-200 transition-colors">
+                              Fe {(food.iron || 0).toFixed(1)}mg
+                            </span>
+                          )}
+                          {(food.calcium || 0) > 0 && (
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-stone-100 text-stone-800 border border-stone-300 hover:bg-stone-200 transition-colors">
+                              Ca {Math.round(food.calcium || 0)}mg
+                            </span>
+                          )}
+                          {(food.zinc || 0) > 0 && (
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 border border-gray-300 hover:bg-gray-200 transition-colors">
+                              Zn {(food.zinc || 0).toFixed(1)}mg
+                            </span>
+                          )}
+                          {(food.magnesium || 0) > 0 && (
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-neutral-100 text-neutral-800 border border-neutral-300 hover:bg-neutral-200 transition-colors">
+                              Mg {Math.round(food.magnesium || 0)}mg
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Vitamins Section */}
+                    {((food.vitaminC || 0) > 0 || (food.vitaminD || 0) > 0 || (food.vitaminB12 || 0) > 0 || (food.folate || 0) > 0) && (
+                      <div className="space-y-1">
+                        <div className="text-xs font-medium text-gray-600 uppercase tracking-wide">Vitamins</div>
+                        <div className="flex flex-wrap gap-1.5">
+                          {(food.vitaminC || 0) > 0 && (
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800 border border-orange-300 hover:bg-orange-200 transition-colors">
+                              C {Math.round(food.vitaminC || 0)}mg
+                            </span>
+                          )}
+                          {(food.vitaminD || 0) > 0 && (
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 border border-yellow-300 hover:bg-yellow-200 transition-colors">
+                              D {(food.vitaminD || 0).toFixed(1)}μg
+                            </span>
+                          )}
+                          {(food.vitaminB12 || 0) > 0 && (
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-300 hover:bg-red-200 transition-colors">
+                              B12 {(food.vitaminB12 || 0).toFixed(1)}μg
+                            </span>
+                          )}
+                          {(food.folate || 0) > 0 && (
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-300 hover:bg-green-200 transition-colors">
+                              Folate {Math.round(food.folate || 0)}μg
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </button>
               
               {/* Copy Button */}
