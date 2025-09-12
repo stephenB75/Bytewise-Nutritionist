@@ -185,6 +185,71 @@ export const fastingSessions = pgTable('fasting_sessions', {
   completedAt: timestamp('completed_at')
 });
 
+// User subscriptions table for Apple subscription tracking
+export const subscriptions = pgTable("subscriptions", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  
+  // RevenueCat / Apple subscription data
+  revenueCatUserId: varchar("revenue_cat_user_id"),
+  originalTransactionId: varchar("original_transaction_id"), // Apple's original transaction ID
+  productId: varchar("product_id").notNull(), // Apple product ID (e.g., premium_monthly, premium_yearly)
+  entitlementId: varchar("entitlement_id").notNull(), // RevenueCat entitlement ID
+  
+  // Subscription status
+  status: varchar("status", { length: 50 }).notNull().default('inactive'), // active, expired, cancelled, grace_period, billing_retry
+  tier: varchar("tier", { length: 50 }).notNull().default('free'), // free, premium, pro
+  
+  // Subscription timing
+  purchasedAt: timestamp("purchased_at"),
+  expiresAt: timestamp("expires_at"),
+  renewsAt: timestamp("renews_at"),
+  cancelledAt: timestamp("cancelled_at"),
+  
+  // Apple/RevenueCat specific fields
+  environment: varchar("environment", { length: 20 }).default('production'), // sandbox, production
+  willRenew: boolean("will_renew").default(true),
+  gracePeriodExpiresAt: timestamp("grace_period_expires_at"),
+  
+  // Tracking
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Subscription transactions for purchase history and webhook events
+export const subscriptionTransactions = pgTable("subscription_transactions", {
+  id: serial("id").primaryKey(),
+  subscriptionId: integer("subscription_id").notNull().references(() => subscriptions.id, { onDelete: 'cascade' }),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  
+  // Apple/RevenueCat transaction data
+  transactionId: varchar("transaction_id").notNull(), // Apple transaction ID
+  originalTransactionId: varchar("original_transaction_id"), // Apple original transaction ID
+  webOrderLineItemId: varchar("web_order_line_item_id"), // Apple web order line item ID
+  productId: varchar("product_id").notNull(),
+  
+  // Transaction details
+  eventType: varchar("event_type", { length: 100 }).notNull(), // INITIAL_PURCHASE, RENEWAL, CANCELLATION, etc.
+  revenueInUsd: decimal("revenue_in_usd", { precision: 10, scale: 2 }),
+  priceInPurchasedCurrency: decimal("price_in_purchased_currency", { precision: 10, scale: 2 }),
+  currency: varchar("currency", { length: 10 }).default('USD'),
+  
+  // RevenueCat webhook data
+  webhookEventId: varchar("webhook_event_id"), // RevenueCat event ID for deduplication
+  rawWebhookData: jsonb("raw_webhook_data"), // Complete webhook payload for debugging
+  
+  // Timing
+  purchasedAt: timestamp("purchased_at").notNull(),
+  expiresAt: timestamp("expires_at"),
+  
+  // Tracking
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  transactionIdIdx: index("subscription_transactions_transaction_id_idx").on(table.transactionId),
+  userIdIdx: index("subscription_transactions_user_id_idx").on(table.userId),
+  webhookEventIdIdx: index("subscription_transactions_webhook_event_id_idx").on(table.webhookEventId),
+}));
+
 // Food suggestions based on user habits
 export const foodSuggestions = pgTable("food_suggestions", {
   id: serial("id").primaryKey(),
@@ -230,6 +295,27 @@ export const usersRelations = relations(users, ({ many }) => ({
   waterIntake: many(waterIntake),
   achievements: many(achievements),
   foodSuggestions: many(foodSuggestions),
+  subscriptions: many(subscriptions),
+  subscriptionTransactions: many(subscriptionTransactions),
+}));
+
+export const subscriptionsRelations = relations(subscriptions, ({ one, many }) => ({
+  user: one(users, {
+    fields: [subscriptions.userId],
+    references: [users.id],
+  }),
+  transactions: many(subscriptionTransactions),
+}));
+
+export const subscriptionTransactionsRelations = relations(subscriptionTransactions, ({ one }) => ({
+  subscription: one(subscriptions, {
+    fields: [subscriptionTransactions.subscriptionId],
+    references: [subscriptions.id],
+  }),
+  user: one(users, {
+    fields: [subscriptionTransactions.userId],
+    references: [users.id],
+  }),
 }));
 
 export const achievementsRelations = relations(achievements, ({ one }) => ({
@@ -354,6 +440,17 @@ export const insertUsdaFoodCacheSchema = createInsertSchema(usdaFoodCache).omit(
   lastUpdated: true,
 });
 
+export const insertSubscriptionSchema = createInsertSchema(subscriptions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertSubscriptionTransactionSchema = createInsertSchema(subscriptionTransactions).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -377,6 +474,10 @@ export type UsdaFoodCache = typeof usdaFoodCache.$inferSelect;
 export type InsertUsdaFoodCache = z.infer<typeof insertUsdaFoodCacheSchema>;
 export type FastingSession = typeof fastingSessions.$inferSelect;
 export type InsertFastingSession = typeof fastingSessions.$inferInsert;
+export type Subscription = typeof subscriptions.$inferSelect;
+export type InsertSubscription = z.infer<typeof insertSubscriptionSchema>;
+export type SubscriptionTransaction = typeof subscriptionTransactions.$inferSelect;
+export type InsertSubscriptionTransaction = z.infer<typeof insertSubscriptionTransactionSchema>;
 
 // Extended types for API responses
 export type RecipeWithIngredients = Recipe & {
