@@ -291,10 +291,10 @@ button.bg-blue-800:hover:not([data-testid*="nav-"]):not([class*="nav-"]):not(.ba
 }
 
 /* Aggressive dark background overrides for stubborn components */
-[class*="bg-gray-900"],
-[class*="bg-black"],
-[class*="bg-slate-9"],
-[class*="bg-gray-9"] {
+[class*="bg-gray-900"]:not(span):not([class*="micronutrient"]),
+[class*="bg-black"]:not(span):not([class*="micronutrient"]),
+[class*="bg-slate-9"]:not(span):not([class*="micronutrient"]),
+[class*="bg-gray-9"]:not(span):not([class*="micronutrient"]) {
   background-color: #ffffff !important; /* White background for dialogs and overlays */
   color: #111827 !important; /* Dark text for readability */
   border: 1px solid #d1d5db !important; /* Light gray border */
