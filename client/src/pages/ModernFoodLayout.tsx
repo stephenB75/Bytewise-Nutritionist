@@ -2532,10 +2532,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         </div>
         {/* Daily Header */}
         <div className="flex space-x-4 mb-6">
-          <Button className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-200 border border-orange-400/50 hover:border-orange-300/70 btn-hero-enhanced">
+          <div className="bg-orange-500 text-white font-semibold px-6 py-3 rounded-xl shadow-lg border border-orange-400/50 flex items-center">
             <Calendar className="w-4 h-4 mr-2" />
-            Today
-          </Button>
+            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
+          </div>
         </div>
 
         {/* Logged Foods - Real entries from calculator */}
