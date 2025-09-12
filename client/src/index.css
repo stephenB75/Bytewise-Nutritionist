@@ -820,9 +820,15 @@ button.btn-hero-enhanced span,
 /* Dashboard hero headings inherit global hero colors - no override needed */
 
 /* Dashboard spans and divs - dark for yellow background, EXCLUDE hero components and metrics cards */
-[data-page="dashboard"] span:not(.hero-component *):not([data-hero="true"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *),
+[data-page="dashboard"] span:not(.hero-component *):not([data-hero="true"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *):not(.inline-flex):not([class*="micronutrient"]),
 [data-page="dashboard"] div:not(.bg-gradient-to-r):not([class*="bg-"]):not(.hero-component *):not([data-hero="true"] *):not([data-testid="progress-card"] *):not([data-testid="water-card"] *):not([data-testid="macro-card"] *):not([data-testid="micro-card"] *) {
   color: #111827 !important; /* Dark for yellow background */
+}
+
+/* Micronutrient badge overrides - ensure transparent backgrounds work */
+span.inline-flex[class*="bg-transparent"] {
+  background: transparent !important;
+  background-color: transparent !important;
 }
 
 /* Hero spans and divs keep white text for dark overlays */
