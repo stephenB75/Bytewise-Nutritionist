@@ -972,6 +972,55 @@ interface UserFoodData {
 function UserFoodTextSuggestions({ onSuggestionClick }: { onSuggestionClick: (foodName: string) => void }) {
   const [userFoods, setUserFoods] = useState<UserFoodData[]>([]);
 
+  // Add food directly to meal log
+  const addFoodToMeal = (food: UserFoodData) => {
+    try {
+      // Get current meal type based on time
+      const mealType = getMealTypeByTime(new Date());
+      
+      // Dispatch calories-logged event to add to meal tracker
+      window.dispatchEvent(new CustomEvent('calories-logged', {
+        detail: {
+          source: 'calculator',
+          name: food.name,
+          calories: food.calories,
+          protein: food.protein,
+          carbs: food.carbs,
+          fat: food.fat,
+          mealType: mealType,
+          timestamp: new Date().toISOString(),
+          // Include micronutrients
+          iron: food.iron || 0,
+          calcium: food.calcium || 0,
+          zinc: food.zinc || 0,
+          magnesium: food.magnesium || 0,
+          vitaminC: food.vitaminC || 0,
+          vitaminD: food.vitaminD || 0,
+          vitaminB12: food.vitaminB12 || 0,
+          folate: food.folate || 0
+        }
+      }));
+
+      // Show success toast
+      window.dispatchEvent(new CustomEvent('show-toast', {
+        detail: { 
+          message: `✅ Added "${food.name}" to ${mealType}`,
+          type: 'success'
+        }
+      }));
+
+      console.log(`🍽️ Added food to meal: ${food.name}`);
+    } catch (error) {
+      console.error('❌ Failed to add food to meal:', error);
+      window.dispatchEvent(new CustomEvent('show-toast', {
+        detail: { 
+          message: `❌ Failed to add ${food.name}`,
+          type: 'error'
+        }
+      }));
+    }
+  };
+
   // Copy food name to clipboard
   const copyFoodInfo = async (food: UserFoodData) => {
     try {
@@ -1167,7 +1216,7 @@ function UserFoodTextSuggestions({ onSuggestionClick }: { onSuggestionClick: (fo
               
               {/* Add Button */}
               <button
-                onClick={() => onSuggestionClick(food.name)}
+                onClick={() => addFoodToMeal(food)}
                 className="ml-3 px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-md hover:bg-blue-700 transition-colors"
                 title={`Add ${food.name} to meal`}
                 data-testid={`button-add-food-${food.name.toLowerCase().replace(/\s+/g, '-')}`}
