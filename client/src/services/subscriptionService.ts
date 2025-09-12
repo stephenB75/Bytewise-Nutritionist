@@ -1,5 +1,33 @@
-import { Purchases, LOG_LEVEL, CustomerInfo, PurchasesEntitlementInfo, PurchasesOffering } from '@revenuecat/purchases-capacitor';
 import { Capacitor } from '@capacitor/core';
+
+// Dynamic import for RevenueCat to avoid build issues on web
+let Purchases: any;
+let LOG_LEVEL: any;
+
+// Type definitions for RevenueCat (to avoid import issues on web)
+interface PurchasesOffering {
+  identifier: string;
+  availablePackages?: PurchasesPackage[];
+}
+
+interface PurchasesPackage {
+  identifier: string;
+  packageType?: string;
+}
+
+interface CustomerInfo {
+  entitlements?: {
+    active?: Record<string, PurchasesEntitlementInfo>;
+  };
+}
+
+interface PurchasesEntitlementInfo {
+  isActive: boolean;
+  productIdentifier?: string;
+  expirationDate?: string;
+  willRenew?: boolean;
+  periodType?: string;
+}
 
 export type SubscriptionTier = 'free' | 'premium' | 'pro';
 
@@ -42,8 +70,14 @@ class SubscriptionService {
         return;
       }
 
+      // Dynamic import RevenueCat only on native platforms
+      if (!Purchases || !LOG_LEVEL) {
+        const revenuecat = await import('@revenuecat/purchases-capacitor');
+        Purchases = revenuecat.Purchases;
+        LOG_LEVEL = revenuecat.LOG_LEVEL;
+      }
+
       // Configure RevenueCat with API key
-      // TODO: Add RevenueCat API key to environment variables
       const apiKey = import.meta.env.VITE_REVENUECAT_API_KEY;
       
       if (!apiKey) {
@@ -176,7 +210,7 @@ class SubscriptionService {
       for (const offering of this.currentOfferings) {
         if (offering.availablePackages) {
           targetPackage = offering.availablePackages.find(
-            pkg => pkg.identifier === productId
+            (pkg: PurchasesPackage) => pkg.identifier === productId
           );
           if (targetPackage) break;
         }

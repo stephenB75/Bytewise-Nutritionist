@@ -4,7 +4,18 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
-app.use(express.json());
+
+// Apply JSON parsing to all routes except RevenueCat webhooks (which need raw body for signature verification)
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api/webhooks/revenuecat')) {
+    // Skip JSON parsing for webhook routes - they use express.raw()
+    next();
+  } else {
+    // Apply JSON parsing for all other routes
+    express.json()(req, res, next);
+  }
+});
+
 app.use(express.urlencoded({ extended: false }));
 
 // Production-ready CORS configuration

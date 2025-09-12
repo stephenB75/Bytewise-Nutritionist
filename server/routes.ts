@@ -8,6 +8,24 @@ import { analyzeFoodImage, getNutritionFromUSDA } from "./aiService";
 import { db } from "./db";
 import { meals } from "@shared/schema";
 import { eq, and, gte } from "drizzle-orm";
+import { z } from "zod";
+import express from "express";
+
+// Zod schemas for request validation
+const subscriptionSyncSchema = z.object({
+  revenueCatUserId: z.string().min(1, "RevenueCat user ID is required"),
+  customerInfo: z.object({
+    entitlements: z.object({
+      active: z.record(z.object({
+        productIdentifier: z.string(),
+        expirationDate: z.string().optional()
+      })).optional()
+    }).optional()
+  })
+});
+
+// Store processed webhook event IDs to prevent duplicates
+const processedEventIds = new Set<string>();
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Health check endpoint - simplified for production
@@ -21,14 +39,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  // RevenueCat webhook endpoint for subscription events
-  app.post('/api/webhooks/revenuecat', async (req: Request, res: Response) => {
+  // RevenueCat webhook endpoint - capture raw body for signature verification
+  app.post('/api/webhooks/revenuecat', 
+    express.raw({ type: 'application/json' }), 
+    async (req: Request, res: Response) => {
     try {
       console.log('🔔 Received RevenueCat webhook:', req.headers['x-revenuecat-signature'] ? '[SIGNED]' : '[UNSIGNED]');
 
       // Verify webhook authenticity - CRITICAL for security
       const webhookSecret = process.env.REVENUECAT_WEBHOOK_SECRET;
       const signature = req.headers['x-revenuecat-signature'] as string;
+      const rawBody = req.body; // Raw bytes from express.raw middleware
+      
+      // Enforce webhook secret in production
+      if (process.env.NODE_ENV === 'production' && !webhookSecret) {
+        console.error('❌ REVENUECAT_WEBHOOK_SECRET required in production');
+        return res.status(500).json({ error: 'Webhook secret not configured' });
+      }
       
       if (webhookSecret) {
         if (!signature) {
@@ -36,16 +63,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(401).json({ error: 'Missing signature' });
         }
 
-        // Verify HMAC SHA256 signature
+        // Verify HMAC SHA256 signature over raw body
         const crypto = await import('crypto');
         const expectedSignature = crypto
           .createHmac('sha256', webhookSecret)
-          .update(JSON.stringify(req.body))
+          .update(rawBody)
           .digest('hex');
         
-        const receivedSignature = signature.replace('sha256=', '');
+        const receivedSignature = signature.replace(/^sha256=/, '');
         
-        if (!crypto.timingSafeEqual(Buffer.from(expectedSignature), Buffer.from(receivedSignature))) {
+        // Validate buffer lengths before comparison
+        if (expectedSignature.length !== receivedSignature.length) {
+          console.error('❌ Invalid signature length');
+          return res.status(401).json({ error: 'Invalid signature' });
+        }
+        
+        if (!crypto.timingSafeEqual(Buffer.from(expectedSignature, 'hex'), Buffer.from(receivedSignature, 'hex'))) {
           console.error('❌ Invalid webhook signature');
           return res.status(401).json({ error: 'Invalid signature' });
         }
@@ -55,16 +88,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.warn('⚠️ No webhook secret configured - accepting unsigned webhook (development only)');
       }
 
-      // Basic idempotency check for duplicate events
-      const eventId = req.body.event?.id;
+      // Parse the JSON body now that signature is verified
+      const webhookData = JSON.parse(rawBody.toString());
+      const eventId = webhookData.event?.id;
+      
+      // Idempotency check for duplicate events
       if (eventId) {
-        // TODO: Store processed event IDs in database to prevent duplicates
-        // For now, just log the event ID
-        console.log(`📋 Processing event ID: ${eventId}`);
+        if (processedEventIds.has(eventId)) {
+          console.log(`📋 Event ${eventId} already processed, skipping`);
+          return res.status(200).json({ 
+            status: 'success',
+            message: 'Event already processed',
+            eventId
+          });
+        }
+        
+        // Mark as processed
+        processedEventIds.add(eventId);
+        
+        // Clean up old event IDs (keep last 1000 to prevent memory growth)
+        if (processedEventIds.size > 1000) {
+          const entries = Array.from(processedEventIds);
+          const toDelete = entries.slice(0, entries.length - 1000);
+          toDelete.forEach(id => processedEventIds.delete(id));
+        }
+        
+        console.log(`📋 Processing new event ID: ${eventId}`);
       }
 
       // Process the webhook data
-      await storage.updateSubscriptionFromWebhook(req.body);
+      await storage.updateSubscriptionFromWebhook(webhookData);
 
       // Respond to RevenueCat that webhook was processed successfully
       res.status(200).json({ 
@@ -2206,18 +2259,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/subscription/status', isAuthenticated, createAuthenticatedHandler(async (req, res) => {
     const userId = (req as AuthenticatedRequest).user?.id;
     if (!userId) {
-      return res.status(401).json({ error: 'Unauthorized' });
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
     }
 
     try {
       const subscription = await storage.getUserSubscription(userId);
       
       if (!subscription) {
-        return res.json({
+        res.json({
           isActive: false,
           tier: 'free',
           status: 'inactive'
         });
+        return;
       }
 
       // Check if subscription is still active
@@ -2241,15 +2296,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/subscription/sync', isAuthenticated, createAuthenticatedHandler(async (req, res) => {
     const userId = (req as AuthenticatedRequest).user?.id;
     if (!userId) {
-      return res.status(401).json({ error: 'Unauthorized' });
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
     }
 
     try {
-      const { revenueCatUserId, customerInfo } = req.body;
-
-      if (!revenueCatUserId || !customerInfo) {
-        return res.status(400).json({ error: 'Missing revenueCatUserId or customerInfo' });
+      // Validate request body with Zod schema
+      const validationResult = subscriptionSyncSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        res.status(400).json({ 
+          error: 'Invalid request body',
+          details: validationResult.error.errors
+        });
+        return;
       }
+
+      const { revenueCatUserId, customerInfo } = validationResult.data;
 
       // Find or create subscription based on customer info
       let subscription = await storage.getUserSubscription(userId);
