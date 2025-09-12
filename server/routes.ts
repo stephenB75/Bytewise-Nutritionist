@@ -21,6 +21,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
+  // RevenueCat webhook endpoint for subscription events
+  app.post('/api/webhooks/revenuecat', async (req: Request, res: Response) => {
+    try {
+      console.log('🔔 Received RevenueCat webhook:', req.headers, req.body);
+
+      // Verify webhook authenticity (optional but recommended)
+      const webhookSecret = process.env.REVENUECAT_WEBHOOK_SECRET;
+      if (webhookSecret) {
+        const signature = req.headers['x-revenuecat-signature'] as string;
+        // TODO: Implement signature verification for production
+        // This would involve HMAC SHA256 verification with the webhook secret
+      }
+
+      // Process the webhook data
+      await storage.updateSubscriptionFromWebhook(req.body);
+
+      // Respond to RevenueCat that webhook was processed successfully
+      res.status(200).json({ 
+        status: 'success',
+        message: 'Webhook processed successfully'
+      });
+
+    } catch (error) {
+      console.error('❌ RevenueCat webhook processing failed:', error);
+      res.status(500).json({ 
+        status: 'error',
+        message: 'Failed to process webhook'
+      });
+    }
+  });
+
   // Detailed health check endpoint for monitoring
   app.get('/api/health/detailed', async (req: Request, res: Response) => {
     const healthStatus = {
@@ -2138,6 +2169,101 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       res.status(500).json({ message: "Failed to get user statistics" });
+    }
+  });
+
+  // Subscription API routes
+  app.get('/api/subscription/status', isAuthenticated, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const subscription = await storage.getUserSubscription(req.userId);
+      
+      if (!subscription) {
+        return res.json({
+          isActive: false,
+          tier: 'free',
+          status: 'inactive'
+        });
+      }
+
+      // Check if subscription is still active
+      const now = new Date();
+      const isExpired = subscription.expiresAt && subscription.expiresAt < now;
+      
+      res.json({
+        isActive: !isExpired && subscription.status === 'active',
+        tier: isExpired ? 'free' : subscription.tier,
+        status: isExpired ? 'expired' : subscription.status,
+        productId: subscription.productId,
+        expiresAt: subscription.expiresAt,
+        willRenew: subscription.willRenew
+      });
+    } catch (error) {
+      console.error('❌ Failed to get subscription status:', error);
+      res.status(500).json({ error: 'Failed to get subscription status' });
+    }
+  });
+
+  app.post('/api/subscription/sync', isAuthenticated, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const { revenueCatUserId, customerInfo } = req.body;
+
+      if (!revenueCatUserId || !customerInfo) {
+        return res.status(400).json({ error: 'Missing revenueCatUserId or customerInfo' });
+      }
+
+      // Find or create subscription based on customer info
+      let subscription = await storage.getUserSubscription(req.userId);
+      
+      // Parse customer info from RevenueCat
+      const entitlements = customerInfo.entitlements;
+      let tier = 'free';
+      let status = 'inactive';
+      let productId = '';
+      let expiresAt = null;
+
+      if (entitlements && entitlements.active) {
+        if (entitlements.active['pro']) {
+          tier = 'pro';
+          status = 'active';
+          const entitlement = entitlements.active['pro'];
+          productId = entitlement.productIdentifier;
+          expiresAt = entitlement.expirationDate ? new Date(entitlement.expirationDate) : null;
+        } else if (entitlements.active['premium']) {
+          tier = 'premium';
+          status = 'active';
+          const entitlement = entitlements.active['premium'];
+          productId = entitlement.productIdentifier;
+          expiresAt = entitlement.expirationDate ? new Date(entitlement.expirationDate) : null;
+        }
+      }
+
+      if (subscription) {
+        // Update existing subscription
+        await storage.updateSubscription(req.userId, {
+          revenueCatUserId,
+          status,
+          tier,
+          productId,
+          expiresAt
+        });
+      } else {
+        // Create new subscription
+        await storage.createSubscription({
+          userId: req.userId,
+          revenueCatUserId,
+          productId: productId || 'unknown',
+          entitlementId: tier,
+          status,
+          tier,
+          expiresAt,
+          environment: 'production'
+        });
+      }
+
+      res.json({ success: true, tier, status });
+    } catch (error) {
+      console.error('❌ Failed to sync subscription:', error);
+      res.status(500).json({ error: 'Failed to sync subscription' });
     }
   });
 

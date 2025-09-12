@@ -8,6 +8,8 @@ import {
   waterIntake,
   achievements,
   fastingSessions,
+  subscriptions,
+  subscriptionTransactions,
   type User,
   type UpsertUser,
   type Food,
@@ -26,6 +28,10 @@ import {
   type InsertFastingSession,
   type Achievement,
   type InsertAchievement,
+  type Subscription,
+  type InsertSubscription,
+  type SubscriptionTransaction,
+  type InsertSubscriptionTransaction,
   type RecipeWithIngredients,
   type MealWithFoods,
 } from "@shared/schema";
@@ -110,6 +116,14 @@ export interface IStorage {
   completeFastingSession(id: string): Promise<FastingSession>;
   getUserActiveFastingSession(userId: string): Promise<FastingSession | null>;
   getAllUsers(): Promise<User[]>;
+  
+  // Subscription operations
+  getUserSubscription(userId: string): Promise<Subscription | undefined>;
+  createSubscription(subscription: InsertSubscription): Promise<Subscription>;
+  updateSubscription(userId: string, updates: Partial<InsertSubscription>): Promise<Subscription>;
+  createSubscriptionTransaction(transaction: InsertSubscriptionTransaction): Promise<SubscriptionTransaction>;
+  getSubscriptionByRevenueCatUserId(revenueCatUserId: string): Promise<Subscription | undefined>;
+  updateSubscriptionFromWebhook(webhookData: any): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1026,6 +1040,150 @@ export class DatabaseStorage implements IStorage {
     // Return current water intake if no updates
     const waterRecord = await this.getUserWaterIntake(userId, date);
     return { waterGlasses: waterRecord?.glasses || 0 };
+  }
+
+  // Subscription operations
+  async getUserSubscription(userId: string): Promise<Subscription | undefined> {
+    try {
+      const [subscription] = await db
+        .select()
+        .from(subscriptions)
+        .where(eq(subscriptions.userId, userId))
+        .orderBy(desc(subscriptions.createdAt))
+        .limit(1);
+      return subscription;
+    } catch (error) {
+      console.error('Failed to get user subscription:', error);
+      return undefined;
+    }
+  }
+
+  async createSubscription(subscription: InsertSubscription): Promise<Subscription> {
+    const [created] = await db
+      .insert(subscriptions)
+      .values(subscription)
+      .returning();
+    return created;
+  }
+
+  async updateSubscription(userId: string, updates: Partial<InsertSubscription>): Promise<Subscription> {
+    const [updated] = await db
+      .update(subscriptions)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(subscriptions.userId, userId))
+      .returning();
+    return updated;
+  }
+
+  async createSubscriptionTransaction(transaction: InsertSubscriptionTransaction): Promise<SubscriptionTransaction> {
+    const [created] = await db
+      .insert(subscriptionTransactions)
+      .values(transaction)
+      .returning();
+    return created;
+  }
+
+  async getSubscriptionByRevenueCatUserId(revenueCatUserId: string): Promise<Subscription | undefined> {
+    try {
+      const [subscription] = await db
+        .select()
+        .from(subscriptions)
+        .where(eq(subscriptions.revenueCatUserId, revenueCatUserId))
+        .limit(1);
+      return subscription;
+    } catch (error) {
+      console.error('Failed to get subscription by RevenueCat user ID:', error);
+      return undefined;
+    }
+  }
+
+  async updateSubscriptionFromWebhook(webhookData: any): Promise<void> {
+    try {
+      // Extract relevant data from RevenueCat webhook
+      const appUserId = webhookData.event?.app_user_id;
+      const eventType = webhookData.event?.type;
+      const productId = webhookData.event?.product_id;
+      const purchasedAt = webhookData.event?.purchased_at ? new Date(webhookData.event.purchased_at) : new Date();
+      const expiresAt = webhookData.event?.expiration_at ? new Date(webhookData.event.expiration_at) : null;
+      
+      if (!appUserId) {
+        console.error('No app_user_id found in webhook data');
+        return;
+      }
+
+      // Find or create subscription record
+      let subscription = await this.getSubscriptionByRevenueCatUserId(appUserId);
+      
+      if (!subscription) {
+        // Try to find by user ID instead (if appUserId matches our user ID)
+        subscription = await this.getUserSubscription(appUserId);
+      }
+
+      // Determine subscription status and tier based on event type
+      let status = 'inactive';
+      let tier = 'free';
+      
+      if (eventType === 'INITIAL_PURCHASE' || eventType === 'RENEWAL' || eventType === 'PRODUCT_CHANGE') {
+        status = 'active';
+        tier = productId?.includes('pro') ? 'pro' : 'premium';
+      } else if (eventType === 'CANCELLATION') {
+        status = 'cancelled';
+      } else if (eventType === 'EXPIRATION') {
+        status = 'expired';
+        tier = 'free';
+      }
+
+      if (subscription) {
+        // Update existing subscription
+        await db
+          .update(subscriptions)
+          .set({
+            status,
+            tier,
+            productId,
+            purchasedAt,
+            expiresAt,
+            updatedAt: new Date(),
+            ...(eventType === 'CANCELLATION' && { cancelledAt: new Date() })
+          })
+          .where(eq(subscriptions.id, subscription.id));
+      } else if (appUserId) {
+        // Create new subscription if we have enough info
+        await this.createSubscription({
+          userId: appUserId,
+          revenueCatUserId: appUserId,
+          productId: productId || 'unknown',
+          entitlementId: tier,
+          status,
+          tier,
+          purchasedAt,
+          expiresAt,
+          environment: 'production'
+        });
+      }
+
+      // Create transaction record
+      if (subscription || appUserId) {
+        await this.createSubscriptionTransaction({
+          subscriptionId: subscription?.id || 0, // Will need to be handled better
+          userId: appUserId,
+          transactionId: webhookData.event?.transaction_id || 'unknown',
+          originalTransactionId: webhookData.event?.original_transaction_id,
+          productId: productId || 'unknown',
+          eventType,
+          purchasedAt,
+          expiresAt,
+          webhookEventId: webhookData.event?.id,
+          rawWebhookData: webhookData
+        });
+      }
+
+      console.log(`✅ Processed subscription webhook: ${eventType} for user ${appUserId}`);
+
+    } catch (error) {
+      console.error('❌ Failed to process subscription webhook:', error);
+      throw error;
+    }
   }
 }
 
