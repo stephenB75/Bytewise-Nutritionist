@@ -53,6 +53,12 @@ flyctl secrets set LOG_LEVEL="info"
 flyctl apps create bytewise-nutritionist
 ```
 
+**If the app name is already taken, try:**
+```bash
+flyctl apps create bytewise-nutritionist-[your-suffix]
+```
+Then update the `app` field in `fly.toml` to match.
+
 2. Deploy:
 ```bash
 flyctl deploy
