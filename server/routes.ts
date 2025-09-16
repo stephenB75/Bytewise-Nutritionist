@@ -1643,12 +1643,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     
     try {
-      // Delete all user data but keep the user account
-      // This would delete meals, recipes, water intake, etc.
-
+      console.log(`🗑️ Delete all data request from user: ${userId.substring(0, 8)}...`);
       
-      res.json({ success: true, message: "All data deleted successfully" });
+      // Delete all user data but keep the user account
+      const result = await storage.deleteAllUserData(userId);
+      
+      const totalDeleted = Object.values(result.counts).reduce((sum, count) => sum + count, 0);
+      
+      console.log(`✅ Successfully processed delete request for user: ${userId.substring(0, 8)}...`);
+      console.log(`📊 Final deletion counts:`, result.counts);
+      
+      res.json({ 
+        success: true, 
+        message: `All data deleted successfully. Removed ${totalDeleted} records.`,
+        counts: result.counts
+      });
     } catch (error) {
+      console.error(`❌ Failed to delete user data:`, error);
       res.status(500).json({ message: "Failed to delete data" });
     }
   });

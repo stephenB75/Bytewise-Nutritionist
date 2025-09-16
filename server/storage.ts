@@ -36,7 +36,7 @@ import {
   type MealWithFoods,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, and, gte, lte, like, sql } from "drizzle-orm";
+import { eq, desc, and, gte, lte, like, sql, inArray } from "drizzle-orm";
 
 export interface IStorage {
   // User operations
@@ -122,6 +122,9 @@ export interface IStorage {
   createSubscription(subscription: InsertSubscription): Promise<Subscription>;
   updateSubscription(userId: string, updates: Partial<InsertSubscription>): Promise<Subscription>;
   createSubscriptionTransaction(transaction: InsertSubscriptionTransaction): Promise<SubscriptionTransaction>;
+  
+  // Data management
+  deleteAllUserData(userId: string): Promise<{counts: Record<string, number>}>;
   getSubscriptionByRevenueCatUserId(revenueCatUserId: string): Promise<Subscription | undefined>;
   updateSubscriptionFromWebhook(webhookData: any): Promise<void>;
 }
@@ -1203,6 +1206,109 @@ export class DatabaseStorage implements IStorage {
       console.error('❌ Failed to process subscription webhook:', error);
       throw error;
     }
+  }
+
+  async deleteAllUserData(userId: string): Promise<{counts: Record<string, number>}> {
+    console.log(`🗑️ Starting complete data deletion for user: ${userId.substring(0, 8)}...`);
+    
+    const counts: Record<string, number> = {};
+    
+    // Use transaction to ensure atomicity - all or nothing
+    return await db.transaction(async (tx) => {
+      try {
+        // 1. Delete subscription transactions (child of subscriptions)
+        const deletedSubTransactions = await tx
+          .delete(subscriptionTransactions)
+          .where(eq(subscriptionTransactions.userId, userId))
+          .returning({ id: subscriptionTransactions.id });
+        counts.subscriptionTransactions = deletedSubTransactions.length;
+
+        // 2. Delete achievements
+        const deletedAchievements = await tx
+          .delete(achievements)
+          .where(eq(achievements.userId, userId))
+          .returning({ id: achievements.id });
+        counts.achievements = deletedAchievements.length;
+
+        // 3. Delete water intake records
+        const deletedWaterIntake = await tx
+          .delete(waterIntake)
+          .where(eq(waterIntake.userId, userId))
+          .returning({ id: waterIntake.id });
+        counts.waterIntake = deletedWaterIntake.length;
+
+        // 4. Delete fasting sessions
+        const deletedFastingSessions = await tx
+          .delete(fastingSessions)
+          .where(eq(fastingSessions.userId, userId))
+          .returning({ id: fastingSessions.id });
+        counts.fastingSessions = deletedFastingSessions.length;
+
+        // 5. Delete meal foods (child of meals) for user's meals
+        const userMealIds = await tx
+          .select({ id: meals.id })
+          .from(meals)
+          .where(eq(meals.userId, userId));
+        
+        if (userMealIds.length > 0) {
+          const deletedMealFoods = await tx
+            .delete(mealFoods)
+            .where(inArray(mealFoods.mealId, userMealIds.map(m => m.id)))
+            .returning({ id: mealFoods.id });
+          counts.mealFoods = deletedMealFoods.length;
+        } else {
+          counts.mealFoods = 0;
+        }
+
+        // 6. Delete recipe ingredients (child of recipes) for user's recipes
+        const userRecipeIds = await tx
+          .select({ id: recipes.id })
+          .from(recipes)
+          .where(eq(recipes.userId, userId));
+        
+        if (userRecipeIds.length > 0) {
+          const deletedRecipeIngredients = await tx
+            .delete(recipeIngredients)
+            .where(inArray(recipeIngredients.recipeId, userRecipeIds.map(r => r.id)))
+            .returning({ id: recipeIngredients.id });
+          counts.recipeIngredients = deletedRecipeIngredients.length;
+        } else {
+          counts.recipeIngredients = 0;
+        }
+
+        // 7. Delete meals
+        const deletedMeals = await tx
+          .delete(meals)
+          .where(eq(meals.userId, userId))
+          .returning({ id: meals.id });
+        counts.meals = deletedMeals.length;
+
+        // 8. Delete recipes
+        const deletedRecipes = await tx
+          .delete(recipes)
+          .where(eq(recipes.userId, userId))
+          .returning({ id: recipes.id });
+        counts.recipes = deletedRecipes.length;
+
+        // 9. Delete subscriptions
+        const deletedSubscriptions = await tx
+          .delete(subscriptions)
+          .where(eq(subscriptions.userId, userId))
+          .returning({ id: subscriptions.id });
+        counts.subscriptions = deletedSubscriptions.length;
+
+        const totalDeleted = Object.values(counts).reduce((sum, count) => sum + count, 0);
+        console.log(`✅ Successfully deleted all user data for ${userId.substring(0, 8)}...`);
+        console.log(`📊 Deletion summary:`, counts);
+        console.log(`🔢 Total records deleted: ${totalDeleted}`);
+        
+        return { counts };
+
+      } catch (error) {
+        console.error(`❌ Error during data deletion for user ${userId.substring(0, 8)}...`, error);
+        throw error;
+      }
+    });
   }
 }
 
