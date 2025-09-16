@@ -1,16 +1,14 @@
 # Build stage
-FROM node:20-alpine AS builder
+FROM node:20 AS builder
 
 WORKDIR /app
-
-# Install build dependencies for native modules
-RUN apk add --no-cache python3 make g++
 
 # Copy package files
 COPY package*.json ./
 
-# Install all dependencies (including dev dependencies for build)
-RUN npm ci
+# Clean npm cache and install dependencies
+RUN npm cache clean --force
+RUN npm install
 
 # Copy source code
 COPY . .
@@ -22,18 +20,16 @@ RUN npm run build
 RUN mkdir -p server/public && cp -r client/dist/* server/public/
 
 # Production stage
-FROM node:20-alpine
+FROM node:20
 
 WORKDIR /app
-
-# Install runtime dependencies for native modules
-RUN apk add --no-cache python3 make g++
 
 # Copy package files
 COPY package*.json ./
 
-# Install only production dependencies
-RUN npm ci --omit=dev
+# Clean npm cache and install production dependencies
+RUN npm cache clean --force
+RUN npm install --omit=dev
 
 # Copy built application from builder stage
 COPY --from=builder /app/dist ./dist
