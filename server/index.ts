@@ -171,7 +171,7 @@ app.use((req, res, next) => {
     
     // Startup verification
     if (isProduction) {
-      log(`🚀 Production deployment ready for Replit Autoscale`);
+      log(`🚀 Production deployment ready for cloud hosting`);
     } else {
       log(`🔧 Development server ready`);
     }
