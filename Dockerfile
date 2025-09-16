@@ -27,20 +27,20 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install only production dependencies
-RUN npm ci --only=production
+RUN npm ci --omit=dev
 
 # Copy built application from builder stage
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/client/dist ./client/dist
 
-# Copy the built client files to where the server expects them (server/public)
-COPY --from=builder /app/client/dist ./server/public
-
-# Copy other necessary files
+# Copy other necessary files first
 COPY server ./server
 COPY shared ./shared
 COPY supabase ./supabase
 COPY public ./public
+
+# Copy the built client files LAST to ensure they don't get overwritten
+COPY --from=builder /app/client/dist ./server/public
 
 # Expose port
 EXPOSE 3000

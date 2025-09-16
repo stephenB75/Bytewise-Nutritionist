@@ -1,6 +1,6 @@
 /**
  * Production Configuration for ByteWise Nutritionist
- * Railway deployment settings
+ * Fly.io deployment settings
  */
 
 export const productionConfig = {

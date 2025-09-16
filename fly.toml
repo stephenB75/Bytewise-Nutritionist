@@ -28,6 +28,5 @@ primary_region = "iad"
   cpus = 1
   memory_mb = 512
 
-[[statics]]
-  guest_path = "/app/client/dist"
-  url_prefix = "/"
+# Static files are served by Express server from server/public
+# Express handles SPA fallback routing for deep links

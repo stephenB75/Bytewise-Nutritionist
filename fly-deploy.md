@@ -73,7 +73,7 @@ After deployment, your app will be available at:
 ## Important Notes
 
 - The app serves both frontend and backend from the same container
-- Static files are served from `/app/client/dist`
+- Static files are served from `server/public` with SPA fallback routing
 - All API routes are available at `/api/*`
 - HTTPS is enforced automatically
 - Health checks monitor `/api/health` endpoint
