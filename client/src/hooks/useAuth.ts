@@ -31,27 +31,30 @@ export function useAuth() {
     queryKey: ["/api/auth/user"],
     queryFn: async () => {
       try {
-        // Check for locally stored custom tokens first
-        const storedSession = localStorage.getItem('supabase.auth.token');
         let accessToken = null;
         
-        if (storedSession) {
-          try {
-            const parsedSession = JSON.parse(storedSession);
-            if (parsedSession.access_token) {
-              accessToken = parsedSession.access_token;
-            }
-          } catch (parseError) {
+        // PRIORITIZE Supabase session tokens (proper JWTs) over custom tokens
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.access_token) {
+          // Validate it looks like a proper JWT (3 parts separated by dots)
+          if (session.access_token.split('.').length === 3) {
+            accessToken = session.access_token;
           }
         }
         
-        // If no custom token, check Supabase session
+        // Only fall back to custom tokens if no valid Supabase session
         if (!accessToken) {
-          const { data: { session } } = await supabase.auth.getSession();
-          
-          
-          if (session?.access_token) {
-            accessToken = session.access_token;
+          const storedSession = localStorage.getItem('supabase.auth.token');
+          if (storedSession) {
+            try {
+              const parsedSession = JSON.parse(storedSession);
+              if (parsedSession.access_token && parsedSession.access_token.split('.').length === 3) {
+                accessToken = parsedSession.access_token;
+              }
+            } catch (parseError) {
+              // Invalid stored session, clear it
+              localStorage.removeItem('supabase.auth.token');
+            }
           }
         }
         
@@ -65,7 +68,6 @@ export function useAuth() {
             'Authorization': `Bearer ${accessToken}`,
           },
         });
-        
         
         if (!response.ok) {
           // If unauthorized, return null instead of throwing

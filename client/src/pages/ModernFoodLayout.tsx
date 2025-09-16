@@ -1297,11 +1297,19 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       setIsLoadingHistory(true);
       
       try {
+        // Use proper auth headers from queryClient
+        const { supabase } = await import('@/lib/supabase');
+        const { data: { session } } = await supabase.auth.getSession();
+        const headers: Record<string, string> = {
+          'Content-Type': 'application/json',
+        };
+        
+        if (session?.access_token && session.access_token.split('.').length === 3) {
+          headers.Authorization = `Bearer ${session.access_token}`;
+        }
+        
         const response = await fetch('/api/water-history?days=30', {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('supabase_auth_token')}`,
-            'Content-Type': 'application/json',
-          },
+          headers,
         });
         
         if (response.ok) {
