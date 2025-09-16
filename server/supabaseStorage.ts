@@ -96,7 +96,7 @@ export class SupabaseStorageService {
   // Check if object exists
   async objectExists(objectPath: string): Promise<boolean> {
     try {
-      // Split path into directory and filename
+      // Method 1: Try listing files in directory
       const pathParts = objectPath.split('/');
       const fileName = pathParts.pop(); // Get the filename
       const directory = pathParts.join('/'); // Get the directory path
@@ -106,13 +106,31 @@ export class SupabaseStorageService {
         .from(this.bucketName)
         .list(directory || ''); // List files in directory (empty string for root)
 
-      if (error) {
-        console.error('❌ Error checking object existence:', error);
-        return false;
+      if (!error && data && data.some(file => file.name === fileName)) {
+        return true;
       }
 
-      // Check if the filename exists in the list
-      return data && data.some(file => file.name === fileName);
+      // Method 2: If list fails or file not found, try direct download attempt
+      // This is more reliable for recently uploaded files
+      console.log(`🔍 List check failed for ${objectPath}, trying direct download check...`);
+      
+      try {
+        const { data: downloadData, error: downloadError } = await supabase
+          .storage
+          .from(this.bucketName)
+          .download(objectPath);
+
+        if (!downloadError && downloadData) {
+          console.log(`✅ File ${objectPath} exists (confirmed via download)`);
+          return true;
+        }
+      } catch (downloadError) {
+        // Download failed, file doesn't exist
+      }
+
+      console.log(`❌ File ${objectPath} not found via both list and download methods`);
+      return false;
+      
     } catch (error) {
       console.error('❌ Error checking object existence:', error);
       return false;
