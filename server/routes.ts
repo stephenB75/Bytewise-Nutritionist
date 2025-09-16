@@ -768,9 +768,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
             if (Array.isArray(data)) {
               for (const meal of data) {
                 try {
+                  // Fix date handling for migration: Parse date string as noon UTC to prevent timezone drift
+                  let mealDate;
+                  if (meal.date) {
+                    if (typeof meal.date === 'string' && meal.date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                      mealDate = new Date(`${meal.date}T12:00:00.000Z`);
+                    } else {
+                      mealDate = new Date(meal.date);
+                    }
+                  } else {
+                    mealDate = new Date();
+                  }
+                  
                   await storage.createMeal({
                     userId,
-                    date: new Date(meal.date || new Date()),
+                    date: mealDate,
                     mealType: meal.mealType || 'meal',
                     name: meal.name || 'Unnamed meal',
                     totalCalories: meal.calories?.toString() || '0',
@@ -881,9 +893,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       
       // Create meal entry with micronutrients
+      // Fix date handling: Parse date string as noon UTC to prevent timezone drift
+      let mealDate;
+      if (req.body.date) {
+        // If date is in YYYY-MM-DD format, parse as noon UTC to prevent timezone drift
+        if (typeof req.body.date === 'string' && req.body.date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+          mealDate = new Date(`${req.body.date}T12:00:00.000Z`);
+        } else {
+          mealDate = new Date(req.body.date);
+        }
+      } else {
+        mealDate = new Date();
+      }
+      
+      console.log(`🍽️ Creating meal with date: ${req.body.date} → ${mealDate.toISOString()}`);
+      
       const meal = await storage.createMeal({
         userId,
-        date: req.body.date ? new Date(req.body.date) : new Date(), // Use date as-is
+        date: mealDate,
         mealType: req.body.mealType || 'meal',
         name: req.body.name,
         totalCalories: req.body.totalCalories ? req.body.totalCalories.toString() : '0',
