@@ -719,7 +719,9 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
             )}
           </form>
 
-          {/* OAuth Providers - Completely separated from form */}
+          {/* OAuth Providers - Hidden on iOS for App Store compliance */}
+          {/* Apple requires Sign in with Apple when other social logins are present */}
+          {typeof window !== 'undefined' && !window.location.href.includes('capacitor://') && (
           <div className="space-y-3" onClick={(e) => e.stopPropagation()}>
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
@@ -772,6 +774,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
               </Button>
             </div>
           </div>
+          )}
 
           {/* Toggle Sign In / Sign Up */}
           <div className="text-center">
