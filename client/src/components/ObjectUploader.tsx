@@ -73,15 +73,29 @@ export function ObjectUploader({
         allowedFileTypes: ['image/*'], // Only allow images for food analysis
       },
       autoProceed: false,
+      debug: true, // Enable debug mode to help identify issues
     })
       .use(AwsS3, {
         shouldUseMultipart: false,
         getUploadParameters: onGetUploadParameters,
+        limit: 1, // Only upload one file at a time
       })
       .on("upload-progress", (file, progress) => {
         if (progress.bytesTotal) {
           setUploadProgress(Math.round((progress.bytesUploaded / progress.bytesTotal) * 100));
         }
+      })
+      .on("upload-error", (file, error) => {
+        console.error('Upload error:', error);
+        setUploading(false);
+        setUploadProgress(0);
+        // Reset file to allow retry
+        if (file) {
+          uppy.removeFile(file.id);
+        }
+      })
+      .on("upload-retry", (fileID) => {
+        console.log('Retrying upload for file:', fileID);
       })
       .on("complete", (result) => {
         setUploading(false);
