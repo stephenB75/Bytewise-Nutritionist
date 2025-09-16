@@ -5,7 +5,7 @@ import "@uppy/core/dist/style.min.css";
 import AwsS3 from "@uppy/aws-s3";
 import type { UploadResult } from "@uppy/core";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 import { Camera, Upload, X } from "lucide-react";
 
@@ -151,6 +151,9 @@ export function ObjectUploader({
               <Camera className="h-5 w-5 text-gray-900" />
               Upload Food Photo
             </DialogTitle>
+            <DialogDescription className="text-gray-600">
+              Select a photo from your device to analyze food items and get nutritional information
+            </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4">
