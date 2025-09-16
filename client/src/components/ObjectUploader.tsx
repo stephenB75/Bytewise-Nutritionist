@@ -8,7 +8,7 @@ import { Camera, Upload, X } from "lucide-react";
 interface ObjectUploaderProps {
   maxNumberOfFiles?: number;
   maxFileSize?: number;
-  onGetUploadParameters: () => Promise<{
+  onGetUploadParameters: (file: File) => Promise<{
     method: "PUT";
     url: string;
   }>;
@@ -88,7 +88,7 @@ export function ObjectUploader({
     
     try {
       // Get upload parameters from parent component
-      const { url, method } = await onGetUploadParameters();
+      const { url, method } = await onGetUploadParameters(selectedFile);
       
       // Create XMLHttpRequest for progress tracking
       const xhr = new XMLHttpRequest();

@@ -1213,8 +1213,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Object storage upload endpoint (no authentication required for AI analysis)
   app.post('/api/objects/upload', async (req: Request, res: Response) => {
     try {
+      const { contentType } = req.body;
       const { supabaseStorageService } = await import('./supabaseStorage');
-      const uploadURL = await supabaseStorageService.getObjectEntityUploadURL();
+      const uploadURL = await supabaseStorageService.getObjectEntityUploadURL(contentType);
       res.json({ uploadURL });
     } catch (error: any) {
       console.error('❌ Error getting upload URL:', error.message, error.stack);

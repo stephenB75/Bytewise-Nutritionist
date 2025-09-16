@@ -147,6 +147,7 @@ interface AnalysisResult {
 export default function AIFoodAnalyzer() {
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string>('');
+  const [currentUploadUrl, setCurrentUploadUrl] = useState<string | null>(null);
   const [weeklyAnalyzedFoods, setWeeklyAnalyzedFoods] = useState<AnalysisResult[]>([]);
   const { toast } = useToast();
   const { addCalculatedCalories } = useCalorieTracking();
@@ -218,8 +219,8 @@ export default function AIFoodAnalyzer() {
 
   // Get upload URL mutation (works without authentication)
   const getUploadUrlMutation = useMutation({
-    mutationFn: async () => {
-      const response = await apiRequest('POST', '/api/objects/upload');
+    mutationFn: async (contentType: string) => {
+      const response = await apiRequest('POST', '/api/objects/upload', { contentType });
       if (!response.ok) {
         throw new Error(`Upload preparation failed: ${response.status} ${response.statusText}`);
       }
@@ -381,13 +382,16 @@ export default function AIFoodAnalyzer() {
   });
 
   // Handle photo upload (works without authentication)
-  const handleGetUploadParameters = async () => {
+  const handleGetUploadParameters = async (file: File) => {
     try {
-      const result = await getUploadUrlMutation.mutateAsync();
+      const result = await getUploadUrlMutation.mutateAsync(file.type);
       
       if (!result?.uploadURL) {
         throw new Error('No upload URL received from server');
       }
+      
+      // Store the upload URL for later use in constructing the final URL
+      setCurrentUploadUrl(result.uploadURL);
       
       return {
         method: 'PUT' as const,
@@ -405,13 +409,14 @@ export default function AIFoodAnalyzer() {
 
   const handleUploadComplete = async (result: { successful: boolean; file?: File }) => {
     if (result.successful && result.file) {
-      // For direct uploads, we need to construct the final image URL from the upload URL
+      // For direct uploads, we need to construct the final image URL from the stored upload URL
       try {
-        // Get a fresh upload URL to derive the final image URL structure
-        const uploadParams = await handleGetUploadParameters();
+        if (!currentUploadUrl) {
+          throw new Error('No upload URL available');
+        }
         
         // Clean the URL - remove query parameters and convert from upload URL to final storage URL
-        const url = new URL(uploadParams.url);
+        const url = new URL(currentUploadUrl);
         let pathname = url.pathname;
         
         // Convert from upload URL format to final storage URL format

@@ -33,11 +33,12 @@ export class SupabaseStorageService {
   constructor() {}
 
   // Get upload URL for file uploads
-  async getObjectEntityUploadURL(): Promise<string> {
+  async getObjectEntityUploadURL(contentType: string = 'application/octet-stream'): Promise<string> {
     try {
       const fileName = `uploads/${randomUUID()}`;
       
       // Create signed URL for upload (valid for 60 minutes)
+      // IMPORTANT: contentType must match exactly what's sent in the upload request
       const { data, error } = await supabase
         .storage
         .from(this.bucketName)
@@ -50,7 +51,7 @@ export class SupabaseStorageService {
         throw new SupabaseStorageError(`Failed to create upload URL: ${error.message}`);
       }
 
-      console.log('✅ Created Supabase Storage upload URL:', data.signedUrl);
+      console.log(`✅ Created Supabase Storage upload URL for ${contentType}:`, data.signedUrl);
       return data.signedUrl;
     } catch (error: any) {
       console.error('❌ Error creating upload URL:', error);
