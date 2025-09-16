@@ -307,8 +307,27 @@ export class DatabaseStorage implements IStorage {
     });
     
     if (existingUser.length === 0) {
-      console.log('❌ Storage: User not found for update, userId:', userId);
-      throw new Error(`User not found: ${userId}`);
+      console.log('⚠️ Storage: User not found for update, creating user record first');
+      
+      // Auto-create user record if it doesn't exist (happens when user signs in before sync)
+      try {
+        const [newUser] = await db
+          .insert(users)
+          .values({
+            id: userId,
+            email: '', // Will be populated from auth system
+            firstName: profileData.firstName || '',
+            lastName: profileData.lastName || '',
+            profileIcon: profileData.profileIcon || 1,
+            emailVerified: true,
+          })
+          .returning();
+        
+        console.log('✅ Storage: Auto-created user record for profile update');
+      } catch (createError) {
+        console.log('❌ Storage: Failed to auto-create user:', createError);
+        throw new Error(`User not found and could not create: ${userId}`);
+      }
     }
     
     const [user] = await db
