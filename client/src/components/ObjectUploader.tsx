@@ -1,9 +1,5 @@
 import { useState, useRef } from "react";
 import type { ReactNode } from "react";
-import Uppy from "@uppy/core";
-import "@uppy/core/dist/style.min.css";
-import AwsS3 from "@uppy/aws-s3";
-import type { UploadResult } from "@uppy/core";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
@@ -16,9 +12,7 @@ interface ObjectUploaderProps {
     method: "PUT";
     url: string;
   }>;
-  onComplete?: (
-    result: UploadResult<Record<string, unknown>, Record<string, unknown>>
-  ) => void;
+  onComplete?: (result: { successful: boolean; file?: File }) => void;
   buttonClassName?: string;
   children: ReactNode;
 }
@@ -35,8 +29,8 @@ interface ObjectUploaderProps {
  *   - Upload progress tracking
  *   - Upload status display
  * 
- * The component uses Uppy under the hood to handle all file upload functionality.
- * All file management features are automatically handled by the Uppy dashboard modal.
+ * The component uses a direct XMLHttpRequest approach for file upload functionality.
+ * All file management features are handled through a custom modal interface.
  * 
  * @param props - Component props
  * @param props.maxNumberOfFiles - Maximum number of files allowed to be uploaded
@@ -63,75 +57,26 @@ export function ObjectUploader({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const [uppy] = useState(() =>
-    new Uppy({
-      restrictions: {
-        maxNumberOfFiles,
-        maxFileSize,
-        allowedFileTypes: ['image/*'], // Only allow images for food analysis
-      },
-      autoProceed: false,
-      debug: true, // Enable debug mode to help identify issues
-    })
-      .use(AwsS3, {
-        shouldUseMultipart: false,
-        getUploadParameters: onGetUploadParameters,
-        limit: 1, // Only upload one file at a time
-        // Ignore CORS errors for ETag header when using Supabase Storage
-        allowedMetaFields: [],
-      })
-      .on("upload-progress", (file, progress) => {
-        if (progress.bytesTotal) {
-          setUploadProgress(Math.round((progress.bytesUploaded / progress.bytesTotal) * 100));
-        }
-      })
-      .on("upload-error", (file, error) => {
-        console.error('Upload error:', error);
-        
-        // Check if it's the ETag CORS error we can ignore
-        if (error.message && error.message.includes('ETag')) {
-          console.warn('ETag header not accessible due to CORS, but upload may have succeeded');
-          // Check if the upload actually succeeded despite the ETag error
-          const uploadedFile = file;
-          if (uploadedFile && uploadedFile.progress && uploadedFile.progress.uploadComplete) {
-            // Upload actually succeeded, treat as success
-            setUploading(false);
-            onComplete?.({
-              successful: [uploadedFile],
-              failed: []
-            } as any);
-            setShowModal(false);
-            setSelectedFile(null);
-            setUploadProgress(0);
-            return;
-          }
-        }
-        
-        setUploading(false);
-        setUploadProgress(0);
-        // Reset file to allow retry
-        if (file) {
-          uppy.removeFile(file.id);
-        }
-      })
-      .on("upload-retry", (fileID) => {
-        console.log('Retrying upload for file:', fileID);
-      })
-      .on("complete", (result) => {
-        setUploading(false);
-        onComplete?.(result);
-        setShowModal(false);
-        setSelectedFile(null);
-        setUploadProgress(0);
-      })
-  );
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      // Validate file size
+      if (file.size > maxFileSize) {
+        setUploadError(`File size (${(file.size / 1024 / 1024).toFixed(1)} MB) exceeds maximum allowed size (${(maxFileSize / 1024 / 1024).toFixed(1)} MB)`);
+        return;
+      }
+      
+      // Validate file type (images only)
+      if (!file.type.startsWith('image/')) {
+        setUploadError('Please select an image file (JPG, PNG, HEIC, WEBP)');
+        return;
+      }
+      
       setSelectedFile(file);
+      setUploadError(null);
     }
   };
 
@@ -139,16 +84,55 @@ export function ObjectUploader({
     if (!selectedFile) return;
     
     setUploading(true);
+    setUploadError(null);
+    
     try {
-      uppy.addFile({
-        name: selectedFile.name,
-        type: selectedFile.type,
-        data: selectedFile,
+      // Get upload parameters from parent component
+      const { url, method } = await onGetUploadParameters();
+      
+      // Create XMLHttpRequest for progress tracking
+      const xhr = new XMLHttpRequest();
+      
+      // Set up progress tracking
+      xhr.upload.addEventListener('progress', (event) => {
+        if (event.lengthComputable) {
+          const progress = Math.round((event.loaded / event.total) * 100);
+          setUploadProgress(progress);
+        }
       });
-      uppy.upload();
-    } catch (error) {
+      
+      // Upload the file
+      await new Promise<void>((resolve, reject) => {
+        xhr.onreadystatechange = () => {
+          if (xhr.readyState === XMLHttpRequest.DONE) {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              resolve();
+            } else {
+              reject(new Error(`Upload failed with status ${xhr.status}: ${xhr.statusText}`));
+            }
+          }
+        };
+        
+        xhr.onerror = () => reject(new Error('Upload failed due to network error'));
+        xhr.onabort = () => reject(new Error('Upload was cancelled'));
+        
+        xhr.open(method, url);
+        xhr.setRequestHeader('Content-Type', selectedFile.type);
+        xhr.send(selectedFile);
+      });
+      
+      // Upload successful
       setUploading(false);
+      onComplete?.({ successful: true, file: selectedFile });
+      setShowModal(false);
+      setSelectedFile(null);
+      setUploadProgress(0);
+      
+    } catch (error) {
       console.error('Upload failed:', error);
+      setUploading(false);
+      setUploadProgress(0);
+      setUploadError(error instanceof Error ? error.message : 'Upload failed');
     }
   };
 
@@ -157,7 +141,7 @@ export function ObjectUploader({
     setSelectedFile(null);
     setUploadProgress(0);
     setUploading(false);
-    uppy.cancelAll();
+    setUploadError(null);
   };
 
   return (
@@ -179,6 +163,20 @@ export function ObjectUploader({
           </DialogHeader>
           
           <div className="space-y-4">
+            {uploadError && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+                <p className="text-sm text-red-600">{uploadError}</p>
+                <Button
+                  onClick={() => setUploadError(null)}
+                  variant="outline"
+                  size="sm"
+                  className="mt-2 text-xs"
+                >
+                  Dismiss
+                </Button>
+              </div>
+            )}
+            
             {!selectedFile && !uploading && (
               <div className="text-center space-y-4">
                 <p className="text-sm text-gray-600">

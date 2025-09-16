@@ -20,7 +20,6 @@ import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { useCalorieTracking } from '@/hooks/useCalorieTracking';
 import { useAuth } from '@/hooks/useAuth';
-import type { UploadResult } from '@uppy/core';
 
 // Photo Display Component with proper error handling and proxy fallback
 interface PhotoDisplayProps {
@@ -404,41 +403,37 @@ export default function AIFoodAnalyzer() {
     }
   };
 
-  const handleUploadComplete = async (result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
-    if (result.successful && result.successful.length > 0) {
-      const uploadedFile = result.successful[0];
-      let imageUrl = uploadedFile.uploadURL;
-      
-      if (imageUrl) {
-        // Clean the URL - remove query parameters to get the clean storage URL
-        try {
-          const url = new URL(imageUrl);
-          const cleanUrl = `${url.protocol}//${url.host}${url.pathname}`;
-          imageUrl = cleanUrl;
-        } catch (urlError) {
-          // Could not clean URL, using original
-        }
+  const handleUploadComplete = async (result: { successful: boolean; file?: File }) => {
+    if (result.successful && result.file) {
+      // For direct uploads, we need to construct the final image URL from the upload URL
+      try {
+        // Get a fresh upload URL to derive the final image URL structure
+        const uploadParams = await handleGetUploadParameters();
         
-        setUploadedImageUrl(imageUrl);
+        // Clean the URL - remove query parameters to get the clean storage URL
+        const url = new URL(uploadParams.url);
+        const cleanUrl = `${url.protocol}//${url.host}${url.pathname}`;
+        
+        setUploadedImageUrl(cleanUrl);
         
         // Wait for upload to fully complete before starting analysis
-        const finalImageUrl = imageUrl; // Capture in closure to ensure type safety
         setTimeout(() => {
-          analyzeFoodMutation.mutate(finalImageUrl);
-        }, 5000);
+          analyzeFoodMutation.mutate(cleanUrl);
+        }, 2000); // Reduced timeout since we know upload completed
         
-      } else {
+      } catch (error) {
+        console.error('Failed to construct image URL:', error);
         toast({
           title: "Upload Error",
-          description: "Upload completed but no URL was returned. Please try again.",
+          description: "Upload completed but failed to process the image URL. Please try again.",
           variant: "destructive",
         });
       }
     } else {
-      console.error('❌ Upload failed or no successful uploads:', result);
+      console.error('❌ Upload failed:', result);
       toast({
         title: "Upload Failed", 
-        description: `Upload failed: ${result.failed?.map(f => f.error).join(', ') || 'Unknown error'}`,
+        description: "File upload failed. Please try again.",
         variant: "destructive",
       });
     }
