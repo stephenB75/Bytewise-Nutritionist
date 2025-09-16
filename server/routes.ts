@@ -27,6 +27,13 @@ const subscriptionSyncSchema = z.object({
 // Store processed webhook event IDs to prevent duplicates
 const processedEventIds = new Set<string>();
 
+// Security: Safe redirect helper to prevent open redirect attacks
+function getSafeRedirectUrl(targetPath: string = ''): string {
+  const baseUrl = process.env.APP_URL || 'https://www.bytewisenutritionist.com';
+  return `${baseUrl}${targetPath}`;
+}
+
+
 export async function registerRoutes(app: Express): Promise<Server> {
   console.log('📋 Starting route registration...');
   
@@ -492,7 +499,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         email,
         password,
         options: {
-          emailRedirectTo: `${req.headers.origin || 'http://localhost:5000'}/api/auth/verify-email`
+          emailRedirectTo: getSafeRedirectUrl('/api/auth/verify-email')
         }
       });
       
@@ -538,7 +545,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         if (error) {
           console.log('❌ Email verification failed:', error.message);
-          return res.redirect(`${req.headers.origin || 'http://localhost:5000'}?verified=false&error=${encodeURIComponent(error.message)}`);
+          return res.redirect(getSafeRedirectUrl(`?verified=false&error=${encodeURIComponent(error.message)}`));
         }
         
         if (data.user) {
@@ -557,7 +564,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
         
-        return res.redirect(`${req.headers.origin || 'http://localhost:5000'}?verified=true&message=Email verified successfully! You can now sign in.`);
+        return res.redirect(getSafeRedirectUrl('?verified=true&message=Email verified successfully! You can now sign in.'));
       }
       
       // Handle generic email confirmation (fallback)
@@ -581,7 +588,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             } catch (dbError) {
               console.log('💥 Error storing user:', dbError);
             }
-            return res.redirect(`${req.headers.origin || 'http://localhost:5000'}?verified=true&message=Email verified successfully!`);
+            return res.redirect(getSafeRedirectUrl('?verified=true&message=Email verified successfully!'));
           }
         } catch (fallbackError) {
           console.log('⚠️ Generic verification also failed:', fallbackError);
@@ -589,10 +596,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       console.log('❌ No valid verification parameters found');
-      res.redirect(`${req.headers.origin || 'http://localhost:5000'}?verified=false&error=Invalid verification link`);
+      res.redirect(getSafeRedirectUrl('?verified=false&error=Invalid verification link'));
     } catch (error) {
       console.log('💥 Verification callback error:', error);
-      res.redirect(`${req.headers.origin || 'http://localhost:5000'}?verified=false&error=Verification failed`);
+      res.redirect(getSafeRedirectUrl('?verified=false&error=Verification failed'));
     }
   });
 
@@ -616,7 +623,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const { error } = await serverSupabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${process.env.VITE_APP_URL || 'http://localhost:5000'}/reset-password`,
+        redirectTo: `${process.env.VITE_APP_URL || process.env.APP_URL || 'https://www.bytewisenutritionist.com'}/reset-password`,
       });
       
       if (error) {
