@@ -2373,9 +2373,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Try multiple bucket naming patterns to find the image
       const possibleBuckets = [
-        process.env.REPL_ID ? `replit-objstore-${process.env.REPL_ID}` : null,
-        process.env.REPL_ID ? `repl-default-bucket-${process.env.REPL_ID}` : null,
-        'replit-objstore-facf6a44-9c9a-4829-af20-98d0adc9b95d', // The bucket from failed URLs
+        // Legacy Replit Object Storage buckets (migrated to Supabase Storage)
+        // These are kept for backward compatibility with existing URLs only
       ].filter(Boolean);
       
       let foundBucket = null;
