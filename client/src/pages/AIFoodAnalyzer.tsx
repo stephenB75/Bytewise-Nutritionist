@@ -410,16 +410,22 @@ export default function AIFoodAnalyzer() {
         // Get a fresh upload URL to derive the final image URL structure
         const uploadParams = await handleGetUploadParameters();
         
-        // Clean the URL - remove query parameters to get the clean storage URL
+        // Clean the URL - remove query parameters and convert from upload URL to final storage URL
         const url = new URL(uploadParams.url);
-        const cleanUrl = `${url.protocol}//${url.host}${url.pathname}`;
+        let pathname = url.pathname;
         
-        setUploadedImageUrl(cleanUrl);
+        // Convert from upload URL format to final storage URL format
+        // From: /storage/v1/object/upload/sign/bytewise-storage/uploads/filename
+        // To:   /storage/v1/object/sign/bytewise-storage/uploads/filename
+        pathname = pathname.replace('/upload/sign/', '/sign/');
+        
+        const finalImageUrl = `${url.protocol}//${url.host}${pathname}`;
+        setUploadedImageUrl(finalImageUrl);
         
         // Wait for upload to fully complete before starting analysis
         setTimeout(() => {
-          analyzeFoodMutation.mutate(cleanUrl);
-        }, 2000); // Reduced timeout since we know upload completed
+          analyzeFoodMutation.mutate(finalImageUrl);
+        }, 3000); // Increased timeout to ensure upload is fully processed
         
       } catch (error) {
         console.error('Failed to construct image URL:', error);
