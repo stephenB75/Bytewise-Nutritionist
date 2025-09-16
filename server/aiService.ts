@@ -3,7 +3,7 @@
  * Uses Google Gemini Vision API for food recognition and USDA database for nutrition data
  */
 
-import { objectStorageClient } from './objectStorage';
+// Legacy: import { objectStorageClient } from './objectStorage';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Initialize Gemini AI client with proper credentials
@@ -65,19 +65,39 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
     let imageBuffer: Buffer;
     
     try {
-      // Extract object path from the clean URL
+      // Extract object path from the Supabase Storage URL
       const url = new URL(imageUrl);
       const pathParts = url.pathname.split('/');
-      const bucketIndex = pathParts.findIndex(part => part.includes('replit-objstore-'));
       
-      if (bucketIndex !== -1) {
-        // Get everything after the bucket name as the object path
-        const objectPath = pathParts.slice(bucketIndex + 1).join('/');
+      // For Supabase Storage URLs, find the object path
+      let objectPath: string;
+      
+      if (imageUrl.includes('supabase')) {
+        // Supabase Storage URL format: /storage/v1/object/public/bucket/path or /storage/v1/object/sign/bucket/path
+        const storageIndex = pathParts.findIndex(part => part === 'storage');
+        if (storageIndex !== -1 && pathParts.length > storageIndex + 4) {
+          // Extract bucket and object path correctly
+          // Format: ["", "storage", "v1", "object", "public|sign", "bucket-name", ...object-path]
+          const bucketName = pathParts[storageIndex + 4]; // Fixed: was +5, now +4
+          objectPath = pathParts.slice(storageIndex + 5).join('/'); // Fixed: now +5 for object path
+          console.log(`🔍 Parsed Supabase URL - Bucket: ${bucketName}, Path: ${objectPath}`);
+        } else {
+          objectPath = pathParts.slice(-1)[0]; // Just the filename as fallback
+        }
+      } else {
+        // Legacy Replit format for backward compatibility
+        const bucketIndex = pathParts.findIndex(part => part.includes('replit-objstore-'));
+        if (bucketIndex !== -1) {
+          objectPath = pathParts.slice(bucketIndex + 1).join('/');
+        } else {
+          objectPath = pathParts.slice(-1)[0];
+        }
+      }
+      
+      if (objectPath) {
         
-        // Get the file from object storage
-        const bucketName = pathParts[bucketIndex];
-        const bucket = objectStorageClient.bucket(bucketName);
-        const file = bucket.file(objectPath);
+        // Get the file from Supabase Storage
+        const { supabaseStorageService } = await import('./supabaseStorage');
         
         // Check if file exists with retries - longer wait for upload completion
         let exists = false;
@@ -85,7 +105,7 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
         const maxRetries = 8; // Increased retries
         
         while (!exists && retryCount < maxRetries) {
-          [exists] = await file.exists();
+          exists = await supabaseStorageService.objectExists(objectPath);
           if (!exists) {
             const waitTime = retryCount < 3 ? 2000 : 5000; // Longer waits for later attempts
             await new Promise(resolve => setTimeout(resolve, waitTime));
@@ -97,9 +117,17 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
           throw new Error('UPLOAD_ERROR: Image not found in storage after upload. Please wait a moment and try again.');
         }
         
-        // Download the image data
-        const [fileData] = await file.download();
-        imageBuffer = fileData;
+        // Download the image data using service method (cleaner encapsulation)
+        const { data, error } = await supabaseStorageService.supabase
+          .storage
+          .from(supabaseStorageService.bucketName)
+          .download(objectPath);
+          
+        if (error || !data) {
+          throw new Error(`DOWNLOAD_ERROR: Failed to download image: ${error?.message}`);
+        }
+        
+        imageBuffer = Buffer.from(await data.arrayBuffer());
         
       } else {
         throw new Error('INVALID_URL: Unable to parse storage URL');

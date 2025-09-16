@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { setupAuth, isAuthenticated, optionalAuth, serverSupabase, supabaseAdmin, createAuthenticatedHandler, type AuthenticatedRequest } from "./supabaseAuth";
 // Lazy load heavy services to prevent startup hangs
 // import { usdaService } from "./services/usdaService";
+// Legacy Replit object storage (replaced with Supabase Storage)
 // import { ObjectStorageService, ObjectNotFoundError, objectStorageClient } from "./objectStorage";
 // import { analyzeFoodImage, getNutritionFromUSDA } from "./aiService";
 import { db } from "./db";
@@ -1181,9 +1182,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Object storage upload endpoint (no authentication required for AI analysis)
   app.post('/api/objects/upload', async (req: Request, res: Response) => {
     try {
-      const { ObjectStorageService } = await import('./objectStorage');
-      const objectStorageService = new ObjectStorageService();
-      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      const { supabaseStorageService } = await import('./supabaseStorage');
+      const uploadURL = await supabaseStorageService.getObjectEntityUploadURL();
       res.json({ uploadURL });
     } catch (error: any) {
       console.error('❌ Error getting upload URL:', error.message, error.stack);
@@ -1200,37 +1200,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       
-      // Get the object file from private storage
-      const { ObjectStorageService, objectStorageClient } = await import('./objectStorage');
-      const objectStorageService = new ObjectStorageService();
-      const privateDir = objectStorageService.getPrivateObjectDir();
-      const fullPath = `${privateDir}/${objectPath}`;
-      
-      // Parse the path to get bucket and object name
-      const pathParts = fullPath.split("/").filter(p => p);
-      if (pathParts.length < 2) {
-        return res.status(400).json({ error: 'Invalid object path' });
-      }
-      const bucketName = pathParts[0]; 
-      const objectName = pathParts.slice(1).join("/");
-      const bucket = objectStorageClient.bucket(bucketName);
-      const file = bucket.file(objectName);
+      // Get the object file from Supabase Storage
+      const { supabaseStorageService } = await import('./supabaseStorage');
       
       // Check if file exists with retries for recent uploads
       let exists = false;
       let retryCount = 0;
-      const maxRetries = 5; // Increased retry count
+      const maxRetries = 5;
       
       while (!exists && retryCount < maxRetries) {
-        [exists] = await file.exists();
+        exists = await supabaseStorageService.objectExists(objectPath);
         if (!exists) {
-          await new Promise(resolve => setTimeout(resolve, 2000)); // Longer delay between retries
+          await new Promise(resolve => setTimeout(resolve, 2000));
           retryCount++;
         }
       }
       
       if (!exists) {
-        // Return a more helpful error for the AI service
         return res.status(404).json({ 
           error: 'Image not found in storage',
           details: 'The image may still be uploading or the upload may have failed. Please try uploading again.',
@@ -1238,25 +1224,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      // Get file metadata to set proper content type
-      const [metadata] = await file.getMetadata();
-      res.set({
-        'Content-Type': metadata.contentType || 'image/jpeg',
-        'Content-Length': metadata.size,
-        'Cache-Control': 'private, max-age=300' // 5 minutes cache
-      });
-      
-      
-      // Stream the file data
-      const stream = file.createReadStream();
-      stream.pipe(res);
-      
-      stream.on('error', (err: any) => {
-        console.error('❌ Stream error:', err);
-        if (!res.headersSent) {
-          res.status(500).json({ error: 'Error streaming image' });
-        }
-      });
+      // Stream the file using Supabase Storage
+      await supabaseStorageService.downloadObject(objectPath, res);
       
     } catch (error: any) {
       console.error('❌ Error proxying image:', error);
@@ -2412,57 +2381,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let foundBucket = null;
       let file = null;
       
-      // Try each possible bucket until we find the file
-      const { objectStorageClient } = await import('./objectStorage');
+      // Use Supabase Storage instead of trying multiple buckets
+      const { supabaseStorageService } = await import('./supabaseStorage');
       
-      for (const bucketName of possibleBuckets) {
-        if (!bucketName) continue;
-        console.log(`🖼️ Trying bucket: ${bucketName}`);
-        try {
-          const bucket = objectStorageClient.bucket(bucketName);
-          const testFile = bucket.file(objectPath);
-          const [exists] = await testFile.exists();
+      console.log(`🖼️ Checking Supabase Storage for: ${objectPath}`);
+      try {
+        const exists = await supabaseStorageService.objectExists(objectPath);
+        
+        if (exists) {
+          console.log(`✅ Found file in Supabase Storage: ${objectPath}`);
           
-          if (exists) {
-            console.log(`✅ Found file in bucket: ${bucketName}`);
-            foundBucket = bucketName;
-            file = testFile;
-            break;
-          }
-        } catch (bucketError: any) {
-          console.log(`⚠️ Error checking bucket ${bucketName}:`, bucketError?.message || bucketError);
+          // Set CORS headers for AI analysis
+          res.set({
+            'Cache-Control': 'public, max-age=86400', // Cache for 24 hours
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET',
+            'Access-Control-Allow-Headers': 'Content-Type'
+          });
+          
+          // Stream the file using Supabase Storage
+          await supabaseStorageService.downloadObject(objectPath, res);
+          return;
+        } else {
+          console.log(`❌ Image not found in Supabase Storage: ${objectPath}`);
+          return res.status(404).json({ error: 'Image not found in storage' });
         }
+      } catch (storageError: any) {
+        console.log(`⚠️ Error checking Supabase Storage:`, storageError?.message || storageError);
+        return res.status(500).json({ error: 'Storage access error' });
       }
-      
-      if (!file || !foundBucket) {
-        console.log(`❌ Image not found in any bucket: ${objectPath}`);
-        console.log(`📋 Tried buckets:`, possibleBuckets);
-        return res.status(404).json({ error: 'Image not found in any storage bucket' });
-      }
-      
-      // Get file metadata to determine content type
-      const [metadata] = await file.getMetadata();
-      const contentType = metadata.contentType || 'image/jpeg';
-      
-      // Set appropriate headers
-      res.set({
-        'Content-Type': contentType,
-        'Cache-Control': 'public, max-age=86400', // Cache for 24 hours
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET',
-        'Access-Control-Allow-Headers': 'Content-Type'
-      });
-      
-      // Stream the file
-      const stream = file.createReadStream();
-      stream.pipe(res);
-      
-      stream.on('error', (error) => {
-        console.error('❌ Error streaming image:', error);
-        if (!res.headersSent) {
-          res.status(500).json({ error: 'Failed to serve image' });
-        }
-      });
       
       
     } catch (error: any) {
@@ -2478,6 +2425,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Give auth setup time to complete
       await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Initialize Supabase Storage bucket (best effort)
+      try {
+        const { supabaseStorageService } = await import('./supabaseStorage');
+        await supabaseStorageService.initializeBucket();
+        console.log('✅ Supabase Storage bucket initialized');
+      } catch (storageError) {
+        console.warn('⚠️ Storage bucket initialization failed (non-critical):', storageError);
+      }
       
       console.log('✅ Background initialization completed');
     } catch (error) {
