@@ -4,8 +4,6 @@ import { storage } from "./storage";
 import { setupAuth, isAuthenticated, optionalAuth, serverSupabase, supabaseAdmin, createAuthenticatedHandler, type AuthenticatedRequest } from "./supabaseAuth";
 // Lazy load heavy services to prevent startup hangs
 // import { usdaService } from "./services/usdaService";
-// Legacy Replit object storage (replaced with Supabase Storage)
-// import { ObjectStorageService, ObjectNotFoundError, objectStorageClient } from "./objectStorage";
 // import { analyzeFoodImage, getNutritionFromUSDA } from "./aiService";
 import { db } from "./db";
 import { meals } from "@shared/schema";
@@ -2417,8 +2415,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Try multiple bucket naming patterns to find the image
       const possibleBuckets = [
-        // Legacy Replit Object Storage buckets (migrated to Supabase Storage)
-        // These are kept for backward compatibility with existing URLs only
+        // Cloud storage buckets
       ].filter(Boolean);
       
       let foundBucket = null;

@@ -1,6 +1,6 @@
 /**
  * Supabase Storage Service
- * Cloud-agnostic replacement for Replit Object Storage
+ * Cloud-native object storage solution
  */
 
 import { createClient } from '@supabase/supabase-js';
@@ -211,5 +211,5 @@ export class SupabaseStorageService {
 // Export singleton instance
 export const supabaseStorageService = new SupabaseStorageService();
 
-// Legacy compatibility - maintain same interface as objectStorage.ts
+// Export singleton instance
 export { supabaseStorageService as objectStorageClient };

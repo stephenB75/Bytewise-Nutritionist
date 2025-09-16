@@ -153,7 +153,7 @@ export const optionalAuth: AuthMiddleware = async (
   next();
 };
 
-// Setup function (replaces Replit auth setup)
+// Setup function for Supabase authentication
 export async function setupAuth(app: any) {
   
   // Test Supabase connection

@@ -6,8 +6,7 @@
 // Environment detection - updated for better URL handling
 const isDev = typeof window !== 'undefined' && 
   (window.location.hostname === 'localhost' || 
-   window.location.hostname.includes('replit.dev') ||
-   window.location.hostname.includes('replit.app'));
+   window.location.port === '5000');
 const isGitHubPages = typeof window !== 'undefined' && 
   (window.location.hostname.includes('github.io') || 
    window.location.hostname.includes('bytewise-nutritionist'));

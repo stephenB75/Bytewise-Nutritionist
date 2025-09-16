@@ -3,7 +3,6 @@
  * Uses Google Gemini Vision API for food recognition and USDA database for nutrition data
  */
 
-// Legacy: import { objectStorageClient } from './objectStorage';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Initialize Gemini AI client with proper credentials
@@ -85,11 +84,8 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
           objectPath = pathParts.slice(-1)[0]; // Just the filename as fallback
         }
       } else {
-        // Legacy Replit format for backward compatibility
-        const bucketIndex = pathParts.findIndex(part => part.includes('replit-objstore-'));
-        if (bucketIndex !== -1) {
-          objectPath = pathParts.slice(bucketIndex + 1).join('/');
-        } else {
+        // Default storage format
+        {
           objectPath = pathParts.slice(-1)[0];
         }
       }

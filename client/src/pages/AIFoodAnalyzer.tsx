@@ -52,7 +52,7 @@ function PhotoDisplay({ imageUrl, alt, className }: PhotoDisplayProps) {
     try {
       const url = new URL(imageUrl);
       const pathParts = url.pathname.split('/');
-      const bucketIndex = pathParts.findIndex(part => part.includes('replit-objstore-'));
+      const bucketIndex = pathParts.findIndex(part => part.includes('objstore-'));
       
       if (bucketIndex !== -1) {
         const objectPath = pathParts.slice(bucketIndex + 1).join('/');
