@@ -438,6 +438,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.log('✅ Authentication successful for:', signInData.user.email);
           console.log('✅ Returning real Supabase session with JWT tokens');
           
+          // Ensure user exists in our database (create if doesn't exist)
+          try {
+            await storage.upsertUser({
+              id: signInData.user.id,
+              email: signInData.user.email || '',
+              firstName: signInData.user.user_metadata?.firstName || '',
+              lastName: signInData.user.user_metadata?.lastName || ''
+            });
+            console.log('✅ User record synchronized to database');
+          } catch (dbError) {
+            console.log('⚠️ Database sync error (non-critical):', dbError);
+            // Continue even if DB sync fails - user can still use the app
+          }
+          
           // Return the actual Supabase session with proper JWT tokens
           return res.json({
             user: signInData.user,
