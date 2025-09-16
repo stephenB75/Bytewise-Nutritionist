@@ -424,7 +424,39 @@ export default function AIFoodAnalyzer() {
         // To:   /storage/v1/object/sign/bytewise-storage/uploads/filename
         pathname = pathname.replace('/upload/sign/', '/sign/');
         
+        // Extract storage path from the upload URL for tracking
+        // From: /storage/v1/object/upload/sign/bucket-name/path/to/file
+        const pathParts = pathname.split('/');
+        let storagePath = '';
+        
+        // Find the storage path after the bucket name
+        const storageIndex = pathParts.findIndex(part => part === 'storage');
+        if (storageIndex !== -1 && pathParts.length > storageIndex + 4) {
+          // Skip ["", "storage", "v1", "object", "sign", "bucket-name"] and get the rest
+          storagePath = pathParts.slice(storageIndex + 5).join('/');
+        } else {
+          // Fallback: use filename
+          storagePath = `uploads/${result.file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+        }
+        
         const finalImageUrl = `${url.protocol}//${url.host}${pathname}`;
+        
+        // Track the photo upload in database (only for authenticated users)
+        try {
+          await apiRequest('POST', '/api/objects/track-upload', {
+            fileName: result.file.name,
+            storagePath: storagePath,
+            storageUrl: finalImageUrl,
+            mimeType: result.file.type,
+            fileSize: result.file.size,
+            analysisId: null // Will be set later if analysis is performed
+          });
+          console.log('✅ Photo upload tracked in database for deletion compliance');
+        } catch (trackingError) {
+          console.warn('⚠️ Photo tracking failed (user may not be logged in):', trackingError);
+          // Don't block upload flow if tracking fails - user might not be authenticated
+        }
+        
         setUploadedImageUrl(finalImageUrl);
         
         // Wait for upload to fully complete before starting analysis

@@ -33,9 +33,28 @@ import {
   ChevronUp,
   Target,
   Lock,
-  Shield
+  Shield,
+  Camera,
+  Trash2,
+  AlertTriangle
 } from 'lucide-react';
 import { SessionStatus } from './SessionStatus';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
+
+// Type definitions for photo management
+interface UserPhoto {
+  id: number;
+  fileName: string;
+  uploadedAt: string;
+  fileSize: number | null;
+  analysisId: string | null;
+}
+
+interface PhotosResponse {
+  success: boolean;
+  photos: UserPhoto[];
+}
 
 interface UserSettingsManagerProps {
   onClose?: () => void;
@@ -55,6 +74,70 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [changingPassword, setChangingPassword] = useState(false);
+
+  // Photo management states
+  const [showPhotos, setShowPhotos] = useState(false);
+  const [selectedPhotos, setSelectedPhotos] = useState<number[]>([]);
+  
+  const queryClient = useQueryClient();
+
+  // Photo management queries and mutations
+  const photosQuery = useQuery<PhotosResponse>({
+    queryKey: ['/api/user/photos'],
+    enabled: showPhotos, // Only fetch when photos section is open
+  });
+
+  const deletePhotoMutation = useMutation({
+    mutationFn: async (photoId: number) => {
+      const response = await apiRequest('DELETE', `/api/user/photos/${photoId}`);
+      if (!response.ok) {
+        throw new Error('Failed to delete photo');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/user/photos'] });
+      toast({
+        title: "Photo Deleted",
+        description: "Photo has been permanently deleted from your account.",
+      });
+      setSelectedPhotos(prev => prev.filter(id => !selectedPhotos.includes(id)));
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Delete Failed",
+        description: error.message || "Failed to delete photo. Please try again.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const batchDeleteMutation = useMutation({
+    mutationFn: async (photoIds: number[]) => {
+      const response = await apiRequest('DELETE', '/api/user/photos', { 
+        photoIds 
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete photos');
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['/api/user/photos'] });
+      toast({
+        title: "Photos Deleted",
+        description: `Successfully deleted ${data.deletedCount || selectedPhotos.length} photos from your account.`,
+      });
+      setSelectedPhotos([]);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Batch Delete Failed", 
+        description: error.message || "Failed to delete photos. Please try again.",
+        variant: "destructive",
+      });
+    }
+  });
 
 
   // User information state - consolidated from both components
@@ -701,6 +784,136 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                         </>
                       )}
                     </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Photo Management Section - Privacy Compliance */}
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <h4 className="profile-section-title">
+                  Privacy & Data Management
+                </h4>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowPhotos(!showPhotos)}
+                  className="border-amber-400/60 text-gray-700 hover:border-blue-400 hover:text-blue-600 bg-white/90 hover:bg-blue-50/80"
+                  data-testid="button-manage-photos"
+                >
+                  <Camera className="w-4 h-4 mr-2" />
+                  {showPhotos ? 'Hide' : 'Manage'} Uploaded Photos
+                </Button>
+              </div>
+              
+              {showPhotos && (
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-100 border border-blue-200/40 rounded-lg p-4">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm text-gray-700">
+                        View and delete photos you've uploaded for AI analysis to maintain your privacy.
+                      </p>
+                      {selectedPhotos.length > 0 && (
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => batchDeleteMutation.mutate(selectedPhotos)}
+                          disabled={batchDeleteMutation.isPending}
+                          className="bg-red-500 hover:bg-red-600"
+                          data-testid="button-batch-delete"
+                        >
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Delete Selected ({selectedPhotos.length})
+                        </Button>
+                      )}
+                    </div>
+                    
+                    {photosQuery.isLoading && (
+                      <div className="text-center py-8">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+                        <p className="mt-2 text-gray-600">Loading your photos...</p>
+                      </div>
+                    )}
+                    
+                    {photosQuery.error && (
+                      <div className="text-center py-8">
+                        <AlertTriangle className="w-8 h-8 text-red-500 mx-auto mb-2" />
+                        <p className="text-red-600">Failed to load photos. Please try again.</p>
+                      </div>
+                    )}
+                    
+                    {photosQuery.data && (photosQuery.data as any)?.photos && (
+                      <div className="space-y-2">
+                        {((photosQuery.data as any)?.photos?.length === 0) ? (
+                          <div className="text-center py-8">
+                            <Camera className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                            <p className="text-gray-600">No uploaded photos found.</p>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="text-sm text-gray-700 mb-2">
+                              Found {((photosQuery.data as any)?.photos?.length || 0)} uploaded photo(s)
+                            </div>
+                            <div className="max-h-64 overflow-y-auto space-y-2">
+                              {((photosQuery.data as any)?.photos || []).map((photo: any) => (
+                                <div
+                                  key={photo.id}
+                                  className="flex items-center justify-between p-3 bg-white/70 rounded-lg border border-blue-200/30"
+                                  data-testid={`photo-item-${photo.id}`}
+                                >
+                                  <div className="flex items-center space-x-3">
+                                    <input
+                                      type="checkbox"
+                                      checked={selectedPhotos.includes(photo.id)}
+                                      onChange={(e) => {
+                                        if (e.target.checked) {
+                                          setSelectedPhotos(prev => [...prev, photo.id]);
+                                        } else {
+                                          setSelectedPhotos(prev => prev.filter(id => id !== photo.id));
+                                        }
+                                      }}
+                                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                      data-testid={`checkbox-photo-${photo.id}`}
+                                    />
+                                    <Camera className="w-4 h-4 text-gray-500" />
+                                    <div>
+                                      <p className="text-sm font-medium text-gray-900" data-testid={`text-filename-${photo.id}`}>
+                                        {photo.fileName}
+                                      </p>
+                                      <p className="text-xs text-gray-500" data-testid={`text-upload-date-${photo.id}`}>
+                                        Uploaded: {new Date(photo.uploadedAt).toLocaleDateString()}
+                                      </p>
+                                      {photo.fileSize && (
+                                        <p className="text-xs text-gray-500">
+                                          Size: {(photo.fileSize / 1024 / 1024).toFixed(2)} MB
+                                        </p>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => deletePhotoMutation.mutate(photo.id)}
+                                    disabled={deletePhotoMutation.isPending}
+                                    className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400"
+                                    data-testid={`button-delete-${photo.id}`}
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                </div>
+                              ))}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    )}
+                    
+                    <div className="border-t pt-3 mt-4">
+                      <p className="text-xs text-gray-600">
+                        <strong>Privacy Notice:</strong> Deleting photos will permanently remove them from our servers. This action cannot be undone.
+                      </p>
+                    </div>
                   </div>
                 </div>
               )}

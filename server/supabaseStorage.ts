@@ -192,6 +192,106 @@ export class SupabaseStorageService {
     }
   }
 
+  // Delete object from storage (Critical for App Store privacy compliance)
+  async deleteObject(objectPath: string): Promise<boolean> {
+    try {
+      console.log(`🗑️ Attempting to delete object: ${objectPath}`);
+
+      // Check if object exists before attempting deletion
+      const exists = await this.objectExists(objectPath);
+      if (!exists) {
+        console.log(`⚠️ Object ${objectPath} does not exist, considering deletion successful`);
+        return true; // Return true as the desired state is achieved
+      }
+
+      const { data, error } = await supabase
+        .storage
+        .from(this.bucketName)
+        .remove([objectPath]);
+
+      if (error) {
+        console.error('❌ Supabase Storage deletion error:', error);
+        throw new SupabaseStorageError(`Failed to delete object: ${error.message}`);
+      }
+
+      // Verify deletion was successful
+      const deletedFiles = data || [];
+      const wasDeleted = deletedFiles.some(file => file.name === objectPath);
+      
+      if (wasDeleted) {
+        console.log(`✅ Successfully deleted object: ${objectPath}`);
+        return true;
+      } else {
+        console.warn(`⚠️ Deletion response unclear for: ${objectPath}`);
+        // Double-check by verifying file no longer exists
+        const stillExists = await this.objectExists(objectPath);
+        if (!stillExists) {
+          console.log(`✅ Object ${objectPath} confirmed deleted (verified by existence check)`);
+          return true;
+        } else {
+          throw new SupabaseStorageError(`Deletion verification failed - object still exists: ${objectPath}`);
+        }
+      }
+    } catch (error: any) {
+      console.error('❌ Error deleting object:', error);
+      throw error;
+    }
+  }
+
+  // Delete multiple objects at once (batch deletion for efficiency)
+  async deleteObjects(objectPaths: string[]): Promise<{ successful: string[], failed: string[] }> {
+    const results = {
+      successful: [] as string[],
+      failed: [] as string[]
+    };
+
+    try {
+      console.log(`🗑️ Attempting to delete ${objectPaths.length} objects`);
+
+      const { data, error } = await supabase
+        .storage
+        .from(this.bucketName)
+        .remove(objectPaths);
+
+      if (error) {
+        console.error('❌ Batch deletion error:', error);
+        // If batch deletion fails, mark all as failed
+        results.failed = [...objectPaths];
+        return results;
+      }
+
+      // Process results - check which files were successfully deleted
+      const deletedFiles = data || [];
+      
+      for (const objectPath of objectPaths) {
+        const wasDeleted = deletedFiles.some(file => file.name === objectPath);
+        if (wasDeleted) {
+          results.successful.push(objectPath);
+        } else {
+          // Verify by checking existence
+          try {
+            const exists = await this.objectExists(objectPath);
+            if (!exists) {
+              results.successful.push(objectPath);
+            } else {
+              results.failed.push(objectPath);
+            }
+          } catch (checkError) {
+            results.failed.push(objectPath);
+          }
+        }
+      }
+
+      console.log(`✅ Batch deletion completed: ${results.successful.length} successful, ${results.failed.length} failed`);
+      return results;
+    } catch (error: any) {
+      console.error('❌ Error in batch deletion:', error);
+      // If there's an error, mark all as failed
+      results.failed = [...objectPaths];
+      return results;
+    }
+  }
+
   // Initialize bucket (create if doesn't exist)
   async initializeBucket(): Promise<void> {
     try {

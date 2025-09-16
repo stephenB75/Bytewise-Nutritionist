@@ -6,9 +6,10 @@ import { setupAuth, isAuthenticated, optionalAuth, serverSupabase, supabaseAdmin
 // import { usdaService } from "./services/usdaService";
 // import { analyzeFoodImage, getNutritionFromUSDA } from "./aiService";
 import { db } from "./db";
-import { meals } from "@shared/schema";
-import { eq, and, gte } from "drizzle-orm";
+import { meals, userPhotos } from "@shared/schema";
+import { eq, and, gte, desc, inArray } from "drizzle-orm";
 import { z } from "zod";
+import { supabaseStorageService } from "./supabaseStorage";
 import express from "express";
 
 // Zod schemas for request validation
@@ -1230,6 +1231,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Track successful photo uploads (requires authentication for privacy compliance)
+  app.post('/api/objects/track-upload', isAuthenticated, async (req: any, res: Response) => {
+    const userId = req.user?.id;
+    
+    if (!userId) {
+      res.status(401).json({ message: "User not found" });
+      return;
+    }
+
+    try {
+      const { fileName, storagePath, storageUrl, mimeType, fileSize, analysisId } = req.body;
+      
+      if (!fileName || !storagePath || !storageUrl || !mimeType) {
+        res.status(400).json({ 
+          success: false,
+          message: "fileName, storagePath, storageUrl, and mimeType are required" 
+        });
+        return;
+      }
+
+      console.log(`📸 Tracking photo upload for user: ${userId.substring(0, 8)}... - ${fileName}`);
+      
+      // Insert photo record into database for tracking and future deletion
+      const [photoRecord] = await db
+        .insert(userPhotos)
+        .values({
+          userId,
+          fileName,
+          storagePath,
+          storageUrl,
+          mimeType,
+          fileSize: fileSize || null,
+          analysisId: analysisId || null,
+          uploadedAt: new Date()
+        })
+        .returning();
+      
+      console.log(`✅ Photo tracked successfully: ID ${photoRecord.id}, File: ${fileName}`);
+      
+      res.json({
+        success: true,
+        message: "Photo upload tracked successfully",
+        photoRecord: {
+          id: photoRecord.id,
+          fileName: photoRecord.fileName,
+          uploadedAt: photoRecord.uploadedAt
+        }
+      });
+    } catch (error) {
+      console.error("❌ Error tracking photo upload:", error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Failed to track photo upload" 
+      });
+    }
+  });
+
   // Image proxy endpoint for AI analysis
   app.get('/api/ai/proxy-image', async (req: Request, res: Response) => {
     try {
@@ -1664,6 +1722,217 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting meal:", error);
       res.status(500).json({ success: false, message: "Failed to delete meal" });
+    }
+  });
+
+  // Photo management routes - Critical for App Store privacy compliance
+  
+  // List user's uploaded photos
+  app.get('/api/user/photos', isAuthenticated, async (req: any, res: Response) => {
+    const userId = req.user?.id;
+    if (!userId) {
+      res.status(401).json({ message: "User not found" });
+      return;
+    }
+
+    try {
+      console.log(`📸 Fetching photos for user: ${userId.substring(0, 8)}...`);
+      
+      // Get photos from database, ordered by most recent first
+      const photos = await db
+        .select()
+        .from(userPhotos)
+        .where(eq(userPhotos.userId, userId))
+        .orderBy(desc(userPhotos.uploadedAt))
+        .limit(100); // Limit to recent 100 photos for performance
+      
+      console.log(`✅ Found ${photos.length} photos for user: ${userId.substring(0, 8)}...`);
+      
+      res.json({ 
+        success: true, 
+        photos: photos.map(photo => ({
+          id: photo.id,
+          fileName: photo.fileName,
+          uploadedAt: photo.uploadedAt,
+          fileSize: photo.fileSize,
+          analysisId: photo.analysisId
+          // Note: Don't expose storage URLs/paths for security
+        }))
+      });
+    } catch (error) {
+      console.error("❌ Error fetching user photos:", error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Failed to fetch photos" 
+      });
+    }
+  });
+
+  // Delete a specific photo
+  app.delete('/api/user/photos/:photoId', isAuthenticated, async (req: any, res: Response) => {
+    const userId = req.user?.id;
+    const photoId = req.params.photoId;
+    
+    if (!userId) {
+      res.status(401).json({ message: "User not found" });
+      return;
+    }
+    
+    if (!photoId || isNaN(parseInt(photoId))) {
+      res.status(400).json({ message: "Valid photo ID required" });
+      return;
+    }
+
+    try {
+      console.log(`🗑️ Deleting photo ID: ${photoId} for user: ${userId.substring(0, 8)}...`);
+      
+      // First, get the photo record to verify ownership and get storage path
+      const photo = await db
+        .select()
+        .from(userPhotos)
+        .where(and(
+          eq(userPhotos.id, parseInt(photoId)),
+          eq(userPhotos.userId, userId) // Ensure user owns this photo
+        ))
+        .limit(1);
+
+      if (!photo || photo.length === 0) {
+        res.status(404).json({ 
+          success: false, 
+          message: "Photo not found or access denied" 
+        });
+        return;
+      }
+
+      const photoRecord = photo[0];
+      
+      // Delete from storage first
+      try {
+        await supabaseStorageService.deleteObject(photoRecord.storagePath);
+        console.log(`✅ Photo deleted from storage: ${photoRecord.storagePath}`);
+      } catch (storageError) {
+        console.warn(`⚠️ Storage deletion failed for ${photoRecord.storagePath}:`, storageError);
+        // Continue with database deletion even if storage deletion fails
+        // (file might already be deleted or storage might be unavailable)
+      }
+      
+      // Delete from database
+      await db
+        .delete(userPhotos)
+        .where(and(
+          eq(userPhotos.id, parseInt(photoId)),
+          eq(userPhotos.userId, userId)
+        ));
+      
+      console.log(`✅ Photo ${photoId} deleted successfully for user: ${userId.substring(0, 8)}...`);
+      res.json({ 
+        success: true, 
+        message: "Photo deleted successfully",
+        deletedPhoto: {
+          id: photoRecord.id,
+          fileName: photoRecord.fileName
+        }
+      });
+    } catch (error) {
+      console.error("❌ Error deleting photo:", error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Failed to delete photo" 
+      });
+    }
+  });
+
+  // Delete multiple photos (batch deletion for privacy compliance)
+  app.delete('/api/user/photos', isAuthenticated, async (req: any, res: Response) => {
+    const userId = req.user?.id;
+    const { photoIds } = req.body;
+    
+    if (!userId) {
+      res.status(401).json({ message: "User not found" });
+      return;
+    }
+    
+    if (!Array.isArray(photoIds) || photoIds.length === 0) {
+      res.status(400).json({ 
+        message: "Array of photo IDs required" 
+      });
+      return;
+    }
+
+    // Validate all IDs are numbers
+    const validIds = photoIds.filter(id => !isNaN(parseInt(id))).map(id => parseInt(id));
+    if (validIds.length !== photoIds.length) {
+      res.status(400).json({ 
+        message: "All photo IDs must be valid numbers" 
+      });
+      return;
+    }
+
+    try {
+      console.log(`🗑️ Batch deleting ${validIds.length} photos for user: ${userId.substring(0, 8)}...`);
+      
+      // Get all photos to verify ownership and get storage paths
+      const photos = await db
+        .select()
+        .from(userPhotos)
+        .where(and(
+          eq(userPhotos.userId, userId), // Ensure user owns these photos
+          inArray(userPhotos.id, validIds) // Use drizzle inArray for multiple IDs
+        ));
+
+      if (photos.length === 0) {
+        res.status(404).json({ 
+          success: false, 
+          message: "No photos found or access denied" 
+        });
+        return;
+      }
+
+      console.log(`📋 Found ${photos.length} photos to delete out of ${validIds.length} requested`);
+      
+      // Delete from storage (batch operation)
+      const storagePaths = photos.map(photo => photo.storagePath);
+      
+      let storageResults = { successful: [] as string[], failed: [] as string[] };
+      try {
+        storageResults = await supabaseStorageService.deleteObjects(storagePaths);
+        console.log(`✅ Storage deletion completed: ${storageResults.successful.length} successful, ${storageResults.failed.length} failed`);
+      } catch (storageError) {
+        console.warn(`⚠️ Batch storage deletion encountered issues:`, storageError);
+        // Continue with database deletion even if storage deletion fails partially
+      }
+      
+      // Delete from database (all photos user owns from the requested list)
+      const photoIdsToDelete = photos.map(photo => photo.id);
+      
+      await db
+        .delete(userPhotos)
+        .where(and(
+          eq(userPhotos.userId, userId),
+          inArray(userPhotos.id, photoIdsToDelete)
+        ));
+      
+      console.log(`✅ Batch deletion completed for user: ${userId.substring(0, 8)}... - ${photos.length} photos deleted`);
+      
+      res.json({ 
+        success: true, 
+        message: `Successfully deleted ${photos.length} photos`,
+        deletedCount: photos.length,
+        storageResults: {
+          successful: storageResults.successful.length,
+          failed: storageResults.failed.length
+        },
+        deletedPhotos: photos.map(photo => ({
+          id: photo.id,
+          fileName: photo.fileName
+        }))
+      });
+    } catch (error) {
+      console.error("❌ Error in batch photo deletion:", error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Failed to delete photos" 
+      });
     }
   });
 

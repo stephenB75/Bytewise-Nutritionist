@@ -50,6 +50,26 @@ export const users = pgTable("users", {
   dailyWaterGoal: integer("daily_water_goal").default(8), // glasses
 });
 
+// User uploaded photos - Track for deletion functionality (App Store privacy compliance)
+export const userPhotos = pgTable("user_photos", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  fileName: varchar("file_name").notNull(), // Original filename
+  storagePath: varchar("storage_path").notNull(), // Path in storage (uploads/uuid)
+  storageUrl: varchar("storage_url").notNull(), // Full Supabase storage URL
+  mimeType: varchar("mime_type").notNull(), // image/jpeg, image/png, etc.
+  fileSize: integer("file_size"), // File size in bytes
+  uploadedAt: timestamp("uploaded_at").defaultNow(),
+  // Optional: track if photo was used for AI analysis
+  analysisId: varchar("analysis_id"), // Link to AI analysis session if applicable
+  // Metadata for better photo management
+  photoMetadata: jsonb("photo_metadata"), // EXIF data, dimensions, etc.
+}, (table) => ({
+  userIdIdx: index("user_photos_user_id_idx").on(table.userId),
+  uploadedAtIdx: index("user_photos_uploaded_at_idx").on(table.uploadedAt),
+  storagePathIdx: index("user_photos_storage_path_idx").on(table.storagePath),
+}));
+
 // Food database - Enhanced with USDA integration
 export const foods = pgTable("foods", {
   id: serial("id").primaryKey(),
@@ -381,6 +401,13 @@ export const waterIntakeRelations = relations(waterIntake, ({ one }) => ({
   }),
 }));
 
+export const userPhotosRelations = relations(userPhotos, ({ one }) => ({
+  user: one(users, {
+    fields: [userPhotos.userId],
+    references: [users.id],
+  }),
+}));
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -451,6 +478,11 @@ export const insertSubscriptionTransactionSchema = createInsertSchema(subscripti
   createdAt: true,
 });
 
+export const insertUserPhotoSchema = createInsertSchema(userPhotos).omit({
+  id: true,
+  uploadedAt: true,
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -478,6 +510,8 @@ export type Subscription = typeof subscriptions.$inferSelect;
 export type InsertSubscription = z.infer<typeof insertSubscriptionSchema>;
 export type SubscriptionTransaction = typeof subscriptionTransactions.$inferSelect;
 export type InsertSubscriptionTransaction = z.infer<typeof insertSubscriptionTransactionSchema>;
+export type UserPhoto = typeof userPhotos.$inferSelect;
+export type InsertUserPhoto = z.infer<typeof insertUserPhotoSchema>;
 
 // Extended types for API responses
 export type RecipeWithIngredients = Recipe & {
