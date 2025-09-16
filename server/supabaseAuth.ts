@@ -6,10 +6,14 @@
 import type { Request, Response, NextFunction } from 'express';
 import { createClient } from '@supabase/supabase-js';
 
-// Environment variables with fallbacks for production
-const SUPABASE_URL = process.env.SUPABASE_URL || 'https://ykgqcftrfvjblmqzbqvr.supabase.co';
-const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrZ3FjZnRyZnZqYmxtcXpicXZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU3ODcxNjQsImV4cCI6MjA1MTM2MzE2NH0.x7kMQbFJevYhYe4LvBTIb3VjcL6H6M7AQwvR8IbgAY4';
+// Environment variables - NO fallbacks for security
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
+
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  throw new Error('SUPABASE_URL and SUPABASE_ANON_KEY environment variables are required');
+}
 
 // Create Supabase client for regular operations
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -69,40 +73,9 @@ export const isAuthenticated: AuthMiddleware = async (
 
     const token = authHeader.substring(7); // Remove 'Bearer ' prefix
     
-    // Check if it's a custom verified token first
-    if (token.startsWith('verified_')) {
-      // Parse verified_userId_timestamp format
-      const parts = token.split('_');
-      if (parts.length >= 2) {
-        const supabaseUserId = parts[1];
-        
-        // CRITICAL: Map Supabase user ID to database user ID for required auth
-        const { mapSupabaseIdToDatabaseId } = await import('./userMapping');
-        const actualUserId = await mapSupabaseIdToDatabaseId(supabaseUserId);
-        
-        // Set user directly since we trust our own verified tokens
-        req.user = {
-          id: actualUserId,
-          email: null, // Will be populated by endpoints that need it
-          claims: { sub: actualUserId },
-        };
-        return next();
-      }
-    }
+    // SECURITY: Removed insecure "verified_" token bypass - use proper JWT tokens only
     
-    // TEMPORARY: Allow 55-59 character tokens for testing (will be removed after fix)
-    console.log('🔍 AUTH: Checking token length:', token.length, 'Token starts with:', token.substring(0, 10));
-    if (token.length >= 55 && token.length <= 59) {
-      console.log('🧪 TEMP: Allowing custom token for testing purposes, length:', token.length);
-      // Use the actual authenticated user ID that exists in the database
-      req.user = {
-        id: '378f2abb-69ed-4288-9382-989650715948',
-        email: 'stephen75@me.com',
-        claims: { sub: '378f2abb-69ed-4288-9382-989650715948' },
-      };
-      console.log('✅ TEMP: Test user set, proceeding with request');
-      return next();
-    }
+    // SECURITY: Removed insecure test token bypass for production safety
     
     // Try as standard Supabase JWT token - use proper server-side verification
     // ONLY if it looks like a valid JWT (3 parts separated by dots)
@@ -152,59 +125,19 @@ export const optionalAuth: AuthMiddleware = async (
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.substring(7);
       
-      // For our custom tokens, we need to extract the user ID differently
-      // Validating authentication token
-      
-      if (token.startsWith('verified_')) {
-        // Parse verified_userId_timestamp format
-        const parts = token.split('_');
-        if (parts.length >= 2) {
-          const supabaseUserId = parts[1];
-          // Extracting user ID from custom token
-          
-          // CRITICAL: Map Supabase user ID to database user ID
-          const { mapSupabaseIdToDatabaseId } = await import('./userMapping');
-          const actualUserId = await mapSupabaseIdToDatabaseId(supabaseUserId);
-          
-          // Set user with the correct ID (either original or mapped)
+      // SECURITY: Only accept proper Supabase JWT tokens
+      try {
+        const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
+        
+        if (!error && user) {
           req.user = {
-            id: actualUserId,
-            email: null, // Will be populated by user endpoint
-            claims: { sub: actualUserId },
+            id: user.id,
+            email: user.email,
+            claims: { sub: user.id },
           };
-          // Custom token validated successfully
         }
-      } else if (token.length === 59) {
-        // TEMPORARY: Allow 59-character tokens for testing
-        console.log('🧪 TEMP: Allowing 59-char token in optional auth');
-        req.user = {
-          id: 'test-user-id',
-          email: 'stephen75@me.com',
-          claims: { sub: 'test-user-id' },
-        };
-      } else {
-        // Try as standard Supabase token or generated token
-        try {
-          const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
-          
-          if (!error && user) {
-            req.user = {
-              id: user.id,
-              email: user.email,
-              claims: { sub: user.id },
-            };
-            // Supabase token validated successfully
-          } else {
-            console.log('⚠️ Optional auth token validation failed:', error?.message);
-            // If it's a 56-char token from our generateLink, try to extract from recent users
-            if (token.length === 56) {
-              // Attempting token recovery
-              // For now, we'll skip this complex lookup
-            }
-          }
-        } catch (tokenError) {
-          console.log('⚠️ Optional auth token validation threw error:', tokenError);
-        }
+      } catch (tokenError) {
+        // Silently fail for optional auth - no user context set
       }
     }
   } catch (error) {
