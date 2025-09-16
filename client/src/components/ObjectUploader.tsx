@@ -5,7 +5,7 @@ import "@uppy/core/dist/style.min.css";
 import AwsS3 from "@uppy/aws-s3";
 import type { UploadResult } from "@uppy/core";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogOverlay, DialogPortal } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 import { Camera, Upload, X } from "lucide-react";
 
@@ -131,15 +131,13 @@ export function ObjectUploader({
       </Button>
 
       <Dialog open={showModal} onOpenChange={setShowModal}>
-        <DialogPortal>
-          <DialogOverlay className="backdrop-blur-sm bg-black/30" />
-          <DialogContent className="sm:max-w-md bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2 text-gray-900">
-                <Camera className="h-5 w-5 text-gray-900" />
-                Upload Food Photo
-              </DialogTitle>
-            </DialogHeader>
+        <DialogContent className="sm:max-w-md bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-gray-900">
+              <Camera className="h-5 w-5 text-gray-900" />
+              Upload Food Photo
+            </DialogTitle>
+          </DialogHeader>
           
           <div className="space-y-4">
             {!selectedFile && !uploading && (
@@ -251,8 +249,7 @@ export function ObjectUploader({
             )}
           </div>
         </DialogContent>
-      </DialogPortal>
-    </Dialog>
+      </Dialog>
     </div>
   );
 }
