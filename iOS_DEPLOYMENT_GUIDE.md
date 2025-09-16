@@ -25,18 +25,17 @@
 
 ### Required on macOS:
 1. **Xcode 16.0+** (for iOS 18 compatibility)
-2. **CocoaPods 1.6+** (dependency manager)
+2. **Swift Package Manager** (built into Xcode - no separate installation needed)
 3. **iOS Simulator** or physical iOS device
 4. **Apple Developer Account** (for App Store deployment)
 
-### Installation Commands:
+### Setup Commands:
 ```bash
-# Install CocoaPods (on macOS)
-sudo gem install cocoapods
+# Build web assets
+npm run build
 
-# Install iOS dependencies
-cd ios/App
-pod install
+# Sync to iOS (automatically handles SPM dependencies)
+npx cap sync ios
 
 # Open in Xcode
 npx cap open ios
@@ -49,11 +48,8 @@ npx cap open ios
 # Build web assets
 npm run build
 
-# Sync to iOS
+# Sync to iOS (automatically resolves SPM dependencies)
 npx cap sync ios
-
-# Install CocoaPods dependencies (macOS only)
-cd ios/App && pod install
 
 # Open in Xcode
 npx cap open ios
@@ -68,9 +64,7 @@ npx cap open ios
 ### 3. Privacy Permissions Configured
 - ✅ Camera usage for meal photography
 - ✅ Photo library access for image selection
-- ✅ Photo library saving for PDF exports
-- ✅ Location access for restaurant data
-- ✅ User tracking for personalized recommendations
+- ✅ File system access for app data storage
 
 ## 📋 App Store Requirements Met
 
@@ -103,15 +97,15 @@ npx cap open ios
 
 ## ⚠️ Development Notes
 
-### Known Limitations:
-- CocoaPods not available in current development environment
+### Development Notes:
+- Swift Package Manager (SPM) used for dependency management
 - Xcode required for final testing and deployment
-- Physical iOS device recommended for camera/health features
+- Physical iOS device recommended for camera functionality testing
 - App Store review process typically 24-48 hours
 
 ### Next Steps for Production:
 1. Transfer project to macOS development environment
-2. Install Xcode and CocoaPods dependencies
+2. Open project in Xcode and configure signing
 3. Configure Apple Developer Account and certificates
 4. Test on physical iOS devices
 5. Submit to App Store Connect for review
@@ -124,11 +118,11 @@ npx cap open ios
 - Local data encryption where applicable
 - Privacy-compliant analytics
 
-### Apple Health Integration:
-- HealthKit permissions configured
-- Nutrition data sync capabilities
-- Dietary tracking integration
-- User consent management
+### Core App Features:
+- AI-powered food recognition
+- Comprehensive nutrition tracking
+- Secure user authentication
+- Cross-platform data synchronization
 
 ---
 
