@@ -249,10 +249,10 @@ export function ObjectUploader({
                 </Button>
               </div>
             )}
-            </div>
-          </DialogContent>
-        </DialogPortal>
-      </Dialog>
+          </div>
+        </DialogContent>
+      </DialogPortal>
+    </Dialog>
     </div>
   );
 }
