@@ -3,6 +3,9 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# Install build dependencies for native modules
+RUN apk add --no-cache python3 make g++
+
 # Copy package files
 COPY package*.json ./
 
@@ -22,6 +25,9 @@ RUN mkdir -p server/public && cp -r client/dist/* server/public/
 FROM node:20-alpine
 
 WORKDIR /app
+
+# Install runtime dependencies for native modules
+RUN apk add --no-cache python3 make g++
 
 # Copy package files
 COPY package*.json ./
