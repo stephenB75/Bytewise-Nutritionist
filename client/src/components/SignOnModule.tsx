@@ -149,30 +149,18 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
           // Successfully signed in with verified email
           
           try {
-            // Check if this is a custom token or standard Supabase JWT
-            const isCustomToken = data.session.access_token.startsWith('verified_');
+            // Always use proper Supabase session setting (no more custom tokens)
+            const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
+              access_token: data.session.access_token,
+              refresh_token: data.session.refresh_token,
+            });
             
-            if (isCustomToken) {
-              // For custom tokens, store session data locally
-              localStorage.setItem('supabase.auth.token', JSON.stringify({
-                access_token: data.session.access_token,
-                refresh_token: data.session.refresh_token,
-                expires_in: data.session.expires_in,
-                user: data.user
-              }));
-              
-            } else {
-              const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
-                access_token: data.session.access_token,
-                refresh_token: data.session.refresh_token,
-              });
-              
-              if (sessionError) {
-                console.error('Session setting error:', sessionError);
-                throw sessionError;
-              }
-              
+            if (sessionError) {
+              console.error('❌ Session setting error:', sessionError);
+              throw sessionError;
             }
+            
+            console.log('✅ Supabase session set successfully');
             
             // Verify session was set by checking current session
             const { data: currentSession } = await supabase.auth.getSession();

@@ -73,6 +73,12 @@ export const isAuthenticated: AuthMiddleware = async (
 
     const token = authHeader.substring(7); // Remove 'Bearer ' prefix
     
+    // Reject legacy verified_ tokens (should no longer occur after migration)
+    if (token.startsWith('verified_')) {
+      console.log('❌ Rejecting legacy verified_ token - use proper Supabase JWT');
+      return res.status(401).json({ message: 'Legacy token format not supported' });
+    }
+    
     // SECURITY: Removed insecure "verified_" token bypass - use proper JWT tokens only
     
     // SECURITY: Removed insecure test token bypass for production safety

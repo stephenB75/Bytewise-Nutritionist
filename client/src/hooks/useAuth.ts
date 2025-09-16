@@ -33,8 +33,9 @@ export function useAuth() {
       try {
         let accessToken = null;
         
-        // PRIORITIZE Supabase session tokens (proper JWTs) over custom tokens
+        // Get current Supabase session - this is the only source of truth
         const { data: { session } } = await supabase.auth.getSession();
+        
         if (session?.access_token) {
           // Validate it looks like a proper JWT (3 parts separated by dots)
           if (session.access_token.split('.').length === 3) {
@@ -42,21 +43,8 @@ export function useAuth() {
           }
         }
         
-        // Only fall back to custom tokens if no valid Supabase session
-        if (!accessToken) {
-          const storedSession = localStorage.getItem('supabase.auth.token');
-          if (storedSession) {
-            try {
-              const parsedSession = JSON.parse(storedSession);
-              if (parsedSession.access_token && parsedSession.access_token.split('.').length === 3) {
-                accessToken = parsedSession.access_token;
-              }
-            } catch (parseError) {
-              // Invalid stored session, clear it
-              localStorage.removeItem('supabase.auth.token');
-            }
-          }
-        }
+        // Clear any legacy tokens from localStorage
+        localStorage.removeItem('supabase.auth.token');
         
         if (!accessToken) {
           return null;

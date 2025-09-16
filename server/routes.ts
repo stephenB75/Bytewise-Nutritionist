@@ -433,24 +433,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
         }
 
-        // Success - user authenticated
-        if (signInData?.user) {
+        // Success - user authenticated with real Supabase session
+        if (signInData?.user && signInData?.session) {
           console.log('✅ Authentication successful for:', signInData.user.email);
+          console.log('✅ Returning real Supabase session with JWT tokens');
           
-          // Create custom session token for our app
-          const fallbackSession = {
+          // Return the actual Supabase session with proper JWT tokens
+          return res.json({
             user: signInData.user,
-            session: {
-              access_token: `verified_${signInData.user.id}_${Date.now()}`,
-              refresh_token: `refresh_${signInData.user.id}_${Date.now()}`,
-              expires_in: 3600,
-              token_type: 'bearer',
-              user: signInData.user
-            }
-          };
-          
-          console.log('✅ Created session for authenticated user');
-          return res.json(fallbackSession);
+            session: signInData.session
+          });
         }
       } catch (authError) {
         console.log('❌ Authentication service error:', authError);
