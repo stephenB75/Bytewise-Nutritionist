@@ -1,0 +1,40 @@
+chunk-276SZO74.js?v=076c2175:521 Warning: Function components cannot be given refs. Attempts to access this ref will fail. Did you mean to use React.forwardRef()?
+
+Check the render method of `Primitive.div.SlotClone`.
+    at DialogOverlay (https://fad43cfb-8f6f-430e-8487-3dbe63d5ada8-00-2nde95asc8gzx.janeway.replit.dev/src/components/ui/dialog.tsx:62:3)
+    at https://fad43cfb-8f6f-430e-8487-3dbe63d5ada8-00-2nde95asc8gzx.janeway.repli…unner/workspace/node_modules/.vite/deps/chunk-FIJ6GG2M.js?v=076c2175:79:13
+    at https://fad43cfb-8f6f-430e-8487-3dbe63d5ada8-00-2nde95asc8gzx.janeway.repli…unner/workspace/node_modules/.vite/deps/chunk-FIJ6GG2M.js?v=076c2175:56:13
+    at https://fad43cfb-8f6f-430e-8487-3dbe63d5ada8-00-2nde95asc8gzx.janeway.repli…unner/workspace/node_modules/.vite/deps/chunk-IRJHF246.js?v=076c2175:43:13
+    at https://fad43cfb-8f6f-430e-8487-3dbe63d5ada8-00-2nde95asc8gzx.janeway.repli…kspace/node_modules/.vite/deps/@radix-ui_react-dialog.js?v=076c2175:479:22
+    at Presence (https://fad43cfb-8f6f-430e-8487-3dbe63d5ada8-00-2nde95asc8gzx.janeway.repli…unner/workspace/node_modules/.vite/deps/chunk-EWJHFVIX.js?v=076c2175:24:11)
+    at Provider (https://fad43cfb-8f6f-430e-8487-3dbe63d5ada8-00-2nde95asc8gzx.janeway.repli…unner/workspace/node_modules/.vite/deps/chunk-EOR5FEKM.js?v=076c2175:48:15)
+    at DialogPortal (https://fad43cfb-8f6f-430e-8487-3dbe63d5ada8-00-2nde95asc8gzx.janeway.repli…space/node_modules/.vite/deps/@radix-ui_react-dialog.js?v=076c2175:1427:11)
+    at DialogPortal (https://fad43cfb-8f6f-430e-8487-3dbe63d5ada8-00-2nde95asc8gzx.janeway.replit.dev/src/components/ui/dialog.tsx:42:6)
+    at DialogContent (https://fad43cfb-8f6f-430e-8487-3dbe63d5ada8-00-2nde95asc8gzx.janeway.replit.dev/src/components/ui/dialog.tsx:89:3)
+    at Provider (https://fad43cfb-8f6f-430e-8487-3dbe63d5ada8-00-2nde95asc8gzx.janeway.repli…unner/workspace/node_modules/.vite/deps/chunk-EOR5FEKM.js?v=076c2175:48:15)
+    at Dialog (https://fad43cfb-8f6f-430e-8487-3dbe63d5ada8-00-2nde95asc8gzx.janeway.repli…kspace/node_modules/.vite/deps/@radix-ui_react-dialog.js?v=076c2175:1367:5)
+    at Dialog (https://fad43cfb-8f6f-430e-8487-3dbe63d5ada8-00-2nde95asc8gzx.janeway.replit.dev/src/components/ui/dialog.tsx:22:6)
+    at div
+    at ObjectUploader (https://fad43cfb-8f6f-430e-8487-3dbe63d5ada8-00-2nde95asc8gzx.janeway.replit.dev/src/components/ObjectUploader.tsx:27:3)
+    at div
+    at div
+    at div
+    at CardContent (https://fad43cfb-8f6f-430e-8487-3dbe63d5ada8-00-2nde95asc8gzx.janeway.replit.dev/src/components/ui/card.tsx:132:24)
+    at div
+    at Card (https://fad43cfb-8f6f-430e-8487-3dbe63d5ada8-00-2nde95asc8gzx.janeway.replit.dev/src/components/ui/card.tsx:18:17)
+    at div
+    at div
+    at AIFoodAnalyzer (https://fad43cfb-8f6f-430e-8487-3dbe63d5ada8-00-2nde95asc8gzx.janeway.replit.dev/src/pages/AIFoodAnalyzer.tsx:120:47)
+    at div
+    at div
+    at div
+    at div
+    at ModernFoodLayout (https://fad43cfb-8f6f-430e-8487-3dbe63d5ada8-00-2nde95asc8gzx.janeway.replit.dev/src/pages/ModernFoodLayout.tsx:83:44)
+    at Route (https://fad43cfb-8f6f-430e-8487-3dbe63d5ada8-00-2nde95asc8gzx.janeway.repli…/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=076c2175:280:16)
+    at Switch (https://fad43cfb-8f6f-430e-8487-3dbe63d5ada8-00-2nde95asc8gzx.janeway.repli…/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=076c2175:336:17)
+    at main
+    at div
+    at Router (https://fad43cfb-8f6f-430e-8487-3dbe63d5ada8-00-2nde95asc8gzx.janeway.repli…/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=076c2175:235:17)
+    at AppContent (https://fad43cfb-8f6f-430e-8487-3dbe63d5ada8-00-2nde95asc8gzx.janeway.replit.dev/src/App.tsx?v=a_FGUwhZftYE5r_bZD2Q8:34:37)
+    at QueryClientProvider (https://fad43cfb-8f6f-430e-8487-3dbe63d5ada8-00-2nde95asc8gzx.janeway.repli…rkspace/node_modules/.vite/deps/@tanstack_react-query.js?v=076c2175:2934:3)
+    at App
