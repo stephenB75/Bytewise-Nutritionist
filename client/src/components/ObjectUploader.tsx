@@ -87,6 +87,26 @@ export function ObjectUploader({
       })
       .on("upload-error", (file, error) => {
         console.error('Upload error:', error);
+        
+        // Check if it's the ETag CORS error we can ignore
+        if (error.message && error.message.includes('ETag')) {
+          console.warn('ETag header not accessible due to CORS, but upload may have succeeded');
+          // Check if the upload actually succeeded despite the ETag error
+          const uploadedFile = file;
+          if (uploadedFile && uploadedFile.progress && uploadedFile.progress.uploadComplete) {
+            // Upload actually succeeded, treat as success
+            setUploading(false);
+            onComplete?.({
+              successful: [uploadedFile],
+              failed: []
+            } as any);
+            setShowModal(false);
+            setSelectedFile(null);
+            setUploadProgress(0);
+            return;
+          }
+        }
+        
         setUploading(false);
         setUploadProgress(0);
         // Reset file to allow retry
