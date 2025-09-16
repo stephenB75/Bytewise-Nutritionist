@@ -79,6 +79,8 @@ export function ObjectUploader({
         shouldUseMultipart: false,
         getUploadParameters: onGetUploadParameters,
         limit: 1, // Only upload one file at a time
+        // Ignore CORS errors for ETag header when using Supabase Storage
+        allowedMetaFields: [],
       })
       .on("upload-progress", (file, progress) => {
         if (progress.bytesTotal) {
