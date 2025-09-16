@@ -40,6 +40,7 @@ export const productionConfig = {
       'https://www.bytewisenutritionist.com',
       'https://bytewisenutritionist.com',
       'https://bytewise-nutritionist.railway.app',
+      'https://bytewise-nutritionist.fly.dev',
     ],
     credentials: true,
   },

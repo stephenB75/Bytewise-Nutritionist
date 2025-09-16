@@ -29,3 +29,10 @@ docs
 *.sh
 test-*
 check-*
+fly.toml
+.replit
+replit.nix
+.config
+tmp
+temp
+.tmp
