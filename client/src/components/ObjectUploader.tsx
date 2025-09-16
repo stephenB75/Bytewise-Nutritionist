@@ -131,10 +131,10 @@ export function ObjectUploader({
       </Button>
 
       <Dialog open={showModal} onOpenChange={setShowModal}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Camera className="h-5 w-5" />
+            <DialogTitle className="flex items-center gap-2 text-gray-900">
+              <Camera className="h-5 w-5 text-gray-900" />
               Upload Food Photo
             </DialogTitle>
           </DialogHeader>
