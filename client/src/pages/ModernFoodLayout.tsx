@@ -1656,7 +1656,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         buttonText={user ? 'Start Tracking' : 'Sign Up to Track'}
         onButtonClick={() => {
           if (user) {
-            handleTabChange('calculator');
+            handleTabChange('nutrition');
           } else {
             handleTabChange('profile');
           }
@@ -1706,7 +1706,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <Button 
                 variant="ghost" 
                 className="text-orange-400 hover:text-orange-300"
-                onClick={() => handleTabChange(user ? 'calculator' : 'profile')}
+                onClick={() => handleTabChange(user ? 'nutrition' : 'profile')}
               >
                 {user ? 'Track Food' : 'Sign Up to Track'}
               </Button>
@@ -1864,7 +1864,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           <Button 
             onClick={() => {
               if (user) {
-                handleTabChange('calculator');
+                handleTabChange('nutrition');
               } else {
                 handleTabChange('profile');
               }
