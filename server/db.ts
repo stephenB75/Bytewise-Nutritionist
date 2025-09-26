@@ -2,33 +2,24 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import * as schema from "@shared/schema";
 
-// Construct DATABASE_URL from individual components if it's corrupted
-let databaseUrl = process.env.DATABASE_URL;
-console.log('🔍 DATABASE_URL from env:', databaseUrl ? 'exists' : 'missing');
-console.log('🔍 DATABASE_URL value:', databaseUrl?.substring(0, 20) + '...' || 'undefined');
+// Use Replit PostgreSQL database environment variables
+const { PGHOST, PGUSER, PGPASSWORD, PGDATABASE, PGPORT } = process.env;
 
-// Use Railway DATABASE_URL or fallback to environment construction
+let databaseUrl = process.env.DATABASE_URL;
+
+// If DATABASE_URL is invalid, construct from Replit PG environment variables
 if (!databaseUrl || (!databaseUrl.startsWith('postgres://') && !databaseUrl.startsWith('postgresql://'))) {
-  // Check for Railway connection URL first
-  const railwayUrl = process.env.DATABASE_URL || process.env.RAILWAY_DATABASE_URL;
-  
-  if (railwayUrl && (railwayUrl.startsWith('postgres://') || railwayUrl.startsWith('postgresql://'))) {
-    databaseUrl = railwayUrl;
-    console.log('✅ Using Railway DATABASE_URL:', databaseUrl.replace(/:([^@]+)@/, ':***@'));
+  if (PGHOST && PGUSER && PGPASSWORD && PGDATABASE && PGPORT) {
+    databaseUrl = `postgresql://${PGUSER}:${encodeURIComponent(PGPASSWORD)}@${PGHOST}:${PGPORT}/${PGDATABASE}`;
+    console.log('✅ Using Replit PostgreSQL database:', databaseUrl.replace(/:([^@]+)@/, ':***@'));
   } else {
-    console.error('❌ DATABASE_URL Error Details:');
-    console.error('   Current DATABASE_URL:', databaseUrl ? databaseUrl.substring(0, 30) + '...' : 'undefined');
-    console.error('   Expected format: postgresql://postgres:password@host:5432/database');
-    console.error('   Current starts with:', databaseUrl ? databaseUrl.substring(0, 10) : 'N/A');
-    console.error('');
-    console.error('🚂 TO FIX: Get Railway PostgreSQL URL from Railway.app dashboard:');
-    console.error('   1. Go to Railway.app → Your PostgreSQL service');
-    console.error('   2. Click "Connect" tab → Copy "Postgres Connection URL"');
-    console.error('   3. In Replit: Secrets → Edit DATABASE_URL → Paste Railway URL');
-    console.error('');
-    throw new Error(
-      "DATABASE_URL must be a PostgreSQL connection string from Railway (starts with postgresql://)",
-    );
+    console.error('❌ PostgreSQL environment variables missing');
+    console.error('   PGHOST:', PGHOST ? 'exists' : 'missing');
+    console.error('   PGUSER:', PGUSER ? 'exists' : 'missing');
+    console.error('   PGPASSWORD:', PGPASSWORD ? 'exists' : 'missing');
+    console.error('   PGDATABASE:', PGDATABASE ? 'exists' : 'missing');
+    console.error('   PGPORT:', PGPORT ? 'exists' : 'missing');
+    throw new Error("PostgreSQL database not configured. Please set up a database.");
   }
 } else {
   console.log('✅ Using provided DATABASE_URL:', databaseUrl.replace(/:([^@]+)@/, ':***@'));
