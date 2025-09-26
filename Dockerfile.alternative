@@ -1,0 +1,44 @@
+# Build stage with better isolation
+FROM node:20 AS deps
+
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --omit=dev --cache /tmp/.npm
+RUN npm ci --include=dev --cache /tmp/.npm
+
+FROM node:20 AS builder
+WORKDIR /app
+
+# Copy dependencies from deps stage
+COPY --from=deps /app/node_modules ./node_modules
+COPY package*.json ./
+
+# Copy source
+COPY client ./client
+COPY server ./server
+COPY shared ./shared
+COPY vite.config.ts tsconfig.json ./
+
+# Set build-time environment variables
+ENV VITE_SUPABASE_URL="https://bcfilsryfjwemqytwbvr.supabase.co"
+ENV VITE_SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJjZmlsc3J5Zmp3ZW1xeXR3YnZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQwMzU5MTksImV4cCI6MjA2OTYxMTkxOX0.9AJ51rynZVDSINfVWYsh9s2cjpUvz75BR7FiA_TqNvk"
+ENV VITE_USDA_API_KEY="DEMO_KEY"
+ENV NODE_ENV="production"
+
+# Build with more memory and better error handling
+RUN NODE_OPTIONS="--max-old-space-size=6144" npm run build || (echo "Build failed" && exit 1)
+
+# Production stage
+FROM node:20
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci --omit=dev
+
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/client/dist ./server/public
+COPY server ./server
+COPY shared ./shared
+
+EXPOSE 3000
+CMD ["npm", "start"]

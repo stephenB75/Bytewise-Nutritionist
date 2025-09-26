@@ -18,8 +18,8 @@ RUN apt-get update && apt-get install -y \
 # Copy package files first for better caching
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci --include=dev
+# Install dependencies with verbose output
+RUN npm ci --include=dev --verbose
 
 # Set build-time environment variables with defaults
 ENV VITE_SUPABASE_URL="https://bcfilsryfjwemqytwbvr.supabase.co"
@@ -41,8 +41,15 @@ COPY tsconfig.json ./
 # Create assets directory (files handled by .dockerignore)
 RUN mkdir -p attached_assets
 
-# Build with memory optimization
-RUN NODE_OPTIONS="--max-old-space-size=4096" npm run build
+# Debug: Show environment and run build with verbose output
+RUN echo "=== Build Environment ===" && \
+    node --version && \
+    npm --version && \
+    echo "NODE_ENV: $NODE_ENV" && \
+    echo "VITE_SUPABASE_URL: $VITE_SUPABASE_URL" && \
+    ls -la && \
+    echo "=== Starting Build ===" && \
+    NODE_OPTIONS="--max-old-space-size=4096" npm run build
 
 # Ensure build output exists and copy to server/public
 RUN ls -la client/dist/ || echo "No client dist found"
