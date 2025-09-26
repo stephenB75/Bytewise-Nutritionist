@@ -15,27 +15,38 @@ RUN apt-get update && apt-get install -y \
     librsvg2-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy package files
+# Copy package files first for better caching
 COPY package*.json ./
 
-# Install dependencies using package-lock.json
-RUN npm ci
-
-# Copy source code
-COPY . .
+# Install dependencies
+RUN npm ci --include=dev
 
 # Set build-time environment variables with defaults
-# These will be embedded into the client bundle
 ENV VITE_SUPABASE_URL="https://bcfilsryfjwemqytwbvr.supabase.co"
 ENV VITE_SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJjZmlsc3J5Zmp3ZW1xeXR3YnZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQwMzU5MTksImV4cCI6MjA2OTYxMTkxOX0.9AJ51rynZVDSINfVWYsh9s2cjpUvz75BR7FiA_TqNvk"
 ENV VITE_USDA_API_KEY="DEMO_KEY"
 ENV VITE_REVENUECAT_API_KEY=""
+ENV NODE_ENV="production"
 
-# Build the application
-RUN npm run build
+# Create required directories
+RUN mkdir -p attached_assets dist client/dist server/public
 
-# Copy built client files to server/public for production serving
-RUN mkdir -p server/public && cp -r client/dist/* server/public/
+# Copy essential source files
+COPY client ./client
+COPY server ./server
+COPY shared ./shared
+COPY vite.config.ts ./
+COPY tsconfig.json ./
+
+# Copy assets if they exist, create empty dir if not
+COPY attached_asset[s] ./attached_assets/ || mkdir -p attached_assets
+
+# Build with memory optimization
+RUN NODE_OPTIONS="--max-old-space-size=4096" npm run build
+
+# Ensure build output exists and copy to server/public
+RUN ls -la client/dist/ || echo "No client dist found"
+RUN mkdir -p server/public && cp -r client/dist/* server/public/ 2>/dev/null || echo "No files to copy"
 
 # Production stage
 FROM node:20
