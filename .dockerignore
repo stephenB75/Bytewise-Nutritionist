@@ -21,8 +21,8 @@ coverage
 *.pid.lock
 android
 ios
-capacitor.config.ts
-attached_assets
+# capacitor.config.ts
+# attached_assets
 archive
 docs
 *.md

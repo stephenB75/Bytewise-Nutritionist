@@ -38,8 +38,8 @@ COPY shared ./shared
 COPY vite.config.ts ./
 COPY tsconfig.json ./
 
-# Copy assets if they exist, create empty dir if not
-COPY attached_asset[s] ./attached_assets/ || mkdir -p attached_assets
+# Create assets directory (files handled by .dockerignore)
+RUN mkdir -p attached_assets
 
 # Build with memory optimization
 RUN NODE_OPTIONS="--max-old-space-size=4096" npm run build
@@ -76,8 +76,6 @@ COPY --from=builder /app/client/dist ./client/dist
 # Copy other necessary files first
 COPY server ./server
 COPY shared ./shared
-COPY supabase ./supabase
-COPY public ./public
 
 # Copy the built client files LAST to ensure they don't get overwritten
 COPY --from=builder /app/client/dist ./server/public
