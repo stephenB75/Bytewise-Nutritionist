@@ -1196,18 +1196,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     
     try {
-      // Test with direct DATABASE_URL connection
+      // Test Railway database connection
       const { Pool } = await import('pg');
-      const databaseUrl = process.env.DATABASE_URL || process.env.RAILWAY_DATABASE_URL;
+      const databaseUrl = process.env.DATABASE_URL;
       
       if (!databaseUrl) {
-        throw new Error('DATABASE_URL not found');
+        throw new Error('Railway DATABASE_URL not found');
       }
       
-      const isLocalhost = databaseUrl.includes('localhost') || databaseUrl.includes('127.0.0.1');
+      if (!databaseUrl.startsWith('postgres://') && !databaseUrl.startsWith('postgresql://')) {
+        throw new Error(`Invalid DATABASE_URL format from Railway: ${databaseUrl.substring(0, 20)}...`);
+      }
+      
       const testPool = new Pool({
         connectionString: databaseUrl,
-        ssl: isLocalhost ? false : { rejectUnauthorized: false },
+        ssl: { rejectUnauthorized: false }, // Railway requires SSL
         max: 1,
       });
       
