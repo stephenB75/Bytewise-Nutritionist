@@ -20,16 +20,18 @@ const projectRef = supabaseUrl.replace('https://', '').replace('.supabase.co', '
 databaseUrl = `postgresql://postgres.${projectRef}:${encodeURIComponent(supabasePassword)}@aws-0-us-east-1.pooler.supabase.com:6543/postgres`;
 console.log('✅ Constructed Supabase DATABASE_URL:', databaseUrl.replace(/:([^@]+)@/, ':***@'));
 
-// Create PostgreSQL client for Supabase 
+// Create PostgreSQL client for Supabase using recommended configuration
 const pool = new Pool({
   connectionString: databaseUrl,
-  ssl: false, // Temporarily disable SSL for development debugging
+  ssl: {
+    rejectUnauthorized: false // Required for Supabase as per documentation
+  },
   max: 1,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
 });
 
-console.log('🔒 Database SSL mode: disabled for debugging');
+console.log('🔒 Database SSL mode: enabled with rejectUnauthorized: false (Supabase recommended)');
 
 // Test connection on startup
 pool.on('error', (err) => {

@@ -1204,7 +1204,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         host: 'aws-0-us-east-1.pooler.supabase.com',
         port: 6543,
         database: 'postgres',
-        ssl: false,
+        ssl: {
+          rejectUnauthorized: false // Supabase recommended SSL config
+        },
         max: 1,
       });
       
