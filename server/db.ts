@@ -16,8 +16,18 @@ if (!databaseUrl || (!databaseUrl.startsWith('postgres://') && !databaseUrl.star
     databaseUrl = railwayUrl;
     console.log('✅ Using Railway DATABASE_URL:', databaseUrl.replace(/:([^@]+)@/, ':***@'));
   } else {
+    console.error('❌ DATABASE_URL Error Details:');
+    console.error('   Current DATABASE_URL:', databaseUrl ? databaseUrl.substring(0, 30) + '...' : 'undefined');
+    console.error('   Expected format: postgresql://postgres:password@host:5432/database');
+    console.error('   Current starts with:', databaseUrl ? databaseUrl.substring(0, 10) : 'N/A');
+    console.error('');
+    console.error('🚂 TO FIX: Get Railway PostgreSQL URL from Railway.app dashboard:');
+    console.error('   1. Go to Railway.app → Your PostgreSQL service');
+    console.error('   2. Click "Connect" tab → Copy "Postgres Connection URL"');
+    console.error('   3. In Replit: Secrets → Edit DATABASE_URL → Paste Railway URL');
+    console.error('');
     throw new Error(
-      "DATABASE_URL is missing. Please provide a valid PostgreSQL connection URL from Railway.",
+      "DATABASE_URL must be a PostgreSQL connection string from Railway (starts with postgresql://)",
     );
   }
 } else {
