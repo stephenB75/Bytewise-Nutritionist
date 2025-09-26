@@ -4,6 +4,8 @@ import * as schema from "@shared/schema";
 
 // Construct DATABASE_URL from individual components if it's corrupted
 let databaseUrl = process.env.DATABASE_URL;
+console.log('🔍 DATABASE_URL from env:', databaseUrl ? 'exists' : 'missing');
+console.log('🔍 DATABASE_URL value:', databaseUrl?.substring(0, 20) + '...' || 'undefined');
 
 // Use Railway DATABASE_URL or fallback to environment construction
 if (!databaseUrl || (!databaseUrl.startsWith('postgres://') && !databaseUrl.startsWith('postgresql://'))) {
