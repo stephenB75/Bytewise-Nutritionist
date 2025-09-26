@@ -5,33 +5,34 @@ import * as schema from "@shared/schema";
 // Construct DATABASE_URL from individual components if it's corrupted
 let databaseUrl = process.env.DATABASE_URL;
 
-// Always build Supabase DATABASE_URL from environment variables to ensure proper format
-const supabasePassword = process.env.SUPABASE_DB_PASSWORD;
-const supabaseUrl = process.env.VITE_SUPABASE_URL;
-
-if (!supabasePassword || !supabaseUrl) {
-  throw new Error(
-    "Supabase credentials are missing. Please provide SUPABASE_DB_PASSWORD and VITE_SUPABASE_URL.",
-  );
+// Use Railway DATABASE_URL or fallback to environment construction
+if (!databaseUrl || (!databaseUrl.startsWith('postgres://') && !databaseUrl.startsWith('postgresql://'))) {
+  // Check for Railway connection URL first
+  const railwayUrl = process.env.DATABASE_URL || process.env.RAILWAY_DATABASE_URL;
+  
+  if (railwayUrl && (railwayUrl.startsWith('postgres://') || railwayUrl.startsWith('postgresql://'))) {
+    databaseUrl = railwayUrl;
+    console.log('✅ Using Railway DATABASE_URL:', databaseUrl.replace(/:([^@]+)@/, ':***@'));
+  } else {
+    throw new Error(
+      "DATABASE_URL is missing. Please provide a valid PostgreSQL connection URL from Railway.",
+    );
+  }
+} else {
+  console.log('✅ Using provided DATABASE_URL:', databaseUrl.replace(/:([^@]+)@/, ':***@'));
 }
 
-// Extract project reference from Supabase URL
-const projectRef = supabaseUrl.replace('https://', '').replace('.supabase.co', '');
-databaseUrl = `postgresql://postgres.${projectRef}:${encodeURIComponent(supabasePassword)}@aws-0-us-east-1.pooler.supabase.com:6543/postgres`;
-console.log('✅ Constructed Supabase DATABASE_URL:', databaseUrl.replace(/:([^@]+)@/, ':***@'));
-
-// Create PostgreSQL client for Supabase using recommended configuration
+// Create PostgreSQL client with flexible SSL configuration
+const isLocalhost = databaseUrl.includes('localhost') || databaseUrl.includes('127.0.0.1');
 const pool = new Pool({
   connectionString: databaseUrl,
-  ssl: {
-    rejectUnauthorized: false // Required for Supabase as per documentation
-  },
+  ssl: isLocalhost ? false : { rejectUnauthorized: false }, // SSL for production, none for localhost
   max: 1,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
 });
 
-console.log('🔒 Database SSL mode: enabled with rejectUnauthorized: false (Supabase recommended)');
+console.log('🔒 Database SSL mode:', isLocalhost ? 'disabled (localhost)' : 'enabled with rejectUnauthorized: false');
 
 // Test connection on startup
 pool.on('error', (err) => {

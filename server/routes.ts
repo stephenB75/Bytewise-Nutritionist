@@ -1196,17 +1196,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     
     try {
-      // Test with raw pg client to isolate issue
+      // Test with direct DATABASE_URL connection
       const { Pool } = await import('pg');
+      const databaseUrl = process.env.DATABASE_URL || process.env.RAILWAY_DATABASE_URL;
+      
+      if (!databaseUrl) {
+        throw new Error('DATABASE_URL not found');
+      }
+      
+      const isLocalhost = databaseUrl.includes('localhost') || databaseUrl.includes('127.0.0.1');
       const testPool = new Pool({
-        user: `postgres.bcfilsryfjwemqytwbvr`,
-        password: process.env.SUPABASE_DB_PASSWORD,
-        host: 'aws-0-us-east-1.pooler.supabase.com',
-        port: 6543,
-        database: 'postgres',
-        ssl: {
-          rejectUnauthorized: false // Supabase recommended SSL config
-        },
+        connectionString: databaseUrl,
+        ssl: isLocalhost ? false : { rejectUnauthorized: false },
         max: 1,
       });
       
