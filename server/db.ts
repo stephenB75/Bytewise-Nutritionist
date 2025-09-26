@@ -1,9 +1,6 @@
-import { neon, neonConfig } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-http';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { Pool } from 'pg';
 import * as schema from "@shared/schema";
-
-// Configure Neon to use HTTP instead of WebSocket
-neonConfig.fetchConnectionCache = true;
 
 // Construct DATABASE_URL from individual components if it's corrupted
 let databaseUrl = process.env.DATABASE_URL;
@@ -23,6 +20,10 @@ if (!databaseUrl || (!databaseUrl.startsWith('postgres://') && !databaseUrl.star
   console.log('Constructed DATABASE_URL from individual environment variables');
 }
 
-// Create HTTP client for Neon database
-const sql = neon(databaseUrl);
-export const db = drizzle(sql, { schema });
+// Create PostgreSQL client for Supabase
+const pool = new Pool({
+  connectionString: databaseUrl,
+  ssl: { rejectUnauthorized: false }, // Required for Supabase
+  max: 1 // Maximum number of connections
+});
+export const db = drizzle(pool, { schema });
