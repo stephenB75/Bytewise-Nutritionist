@@ -24,6 +24,13 @@ RUN npm ci
 # Copy source code
 COPY . .
 
+# Set build-time environment variables with defaults
+# These will be embedded into the client bundle
+ENV VITE_SUPABASE_URL="https://bcfilsryfjwemqytwbvr.supabase.co"
+ENV VITE_SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJjZmlsc3J5Zmp3ZW1xeXR3YnZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQwMzU5MTksImV4cCI6MjA2OTYxMTkxOX0.9AJ51rynZVDSINfVWYsh9s2cjpUvz75BR7FiA_TqNvk"
+ENV VITE_USDA_API_KEY="DEMO_KEY"
+ENV VITE_REVENUECAT_API_KEY=""
+
 # Build the application
 RUN npm run build
 
