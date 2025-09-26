@@ -64,8 +64,20 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
     let imageBuffer: Buffer;
     
     try {
+      // Validate URL format before processing
+      if (!imageUrl || typeof imageUrl !== 'string') {
+        throw new Error('INVALID_INPUT: Image URL is required and must be a string');
+      }
+
+      // Check if it's a valid URL
+      let url: URL;
+      try {
+        url = new URL(imageUrl);
+      } catch (urlError) {
+        throw new Error(`INVALID_URL: The provided image URL is not valid. Expected format: https://example.com/path/to/image.jpg, got: ${imageUrl}`);
+      }
+
       // Extract object path from the Supabase Storage URL
-      const url = new URL(imageUrl);
       const pathParts = url.pathname.split('/');
       
       // For Supabase Storage URLs, find the object path

@@ -1360,7 +1360,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { imageUrl } = req.body;
       
       if (!imageUrl) {
-        return res.status(400).json({ error: 'Image URL is required' });
+        return res.status(400).json({ 
+          error: 'MISSING_IMAGE_URL',
+          message: 'Image URL is required. Please upload an image first.',
+          details: 'Expected: { "imageUrl": "https://..." }'
+        });
       }
 
 
