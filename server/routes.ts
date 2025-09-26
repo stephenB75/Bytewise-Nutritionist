@@ -1189,23 +1189,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Simple database test endpoint
+  // Simple database test endpoint  
   app.get('/api/test/db-status', async (req: Request, res: Response) => {
     if (process.env.NODE_ENV === 'production') {
       return res.status(403).json({ message: 'Not available in production' });
     }
     
     try {
-      // Direct database connection test
-      const { db } = await import('./db');
-      const { sql } = await import('drizzle-orm');
-      const result = await db.execute(sql`SELECT 1 as test`);
+      // Test with raw pg client to isolate issue
+      const { Pool } = await import('pg');
+      const testPool = new Pool({
+        user: `postgres.bcfilsryfjwemqytwbvr`,
+        password: process.env.SUPABASE_DB_PASSWORD,
+        host: 'aws-0-us-east-1.pooler.supabase.com',
+        port: 6543,
+        database: 'postgres',
+        ssl: false,
+        max: 1,
+      });
+      
+      const client = await testPool.connect();
+      const result = await client.query('SELECT 1 as test');
+      client.release();
+      await testPool.end();
       
       res.json({
         success: true,
-        message: 'Database is connected and operational',
+        message: 'Raw PostgreSQL connection successful',
         testResults: {
-          directConnection: 'success',
+          rawConnection: 'success',
           testQuery: result.rows[0] || 'no result'
         },
         timestamp: new Date().toISOString()
@@ -1215,7 +1227,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: false,
         message: 'Database test failed',
         error: error.message,
-        stack: error.stack?.split('\n').slice(0, 5).join('\n')
+        errorCode: error.code || 'unknown',
+        stack: error.stack?.split('\n').slice(0, 3).join('\n')
       });
     }
   });

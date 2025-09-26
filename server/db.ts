@@ -17,17 +17,19 @@ if (!supabasePassword || !supabaseUrl) {
 
 // Extract project reference from Supabase URL
 const projectRef = supabaseUrl.replace('https://', '').replace('.supabase.co', '');
-databaseUrl = `postgresql://postgres.${projectRef}:${encodeURIComponent(supabasePassword)}@aws-0-us-east-1.pooler.supabase.com:6543/postgres?sslmode=require`;
+databaseUrl = `postgresql://postgres.${projectRef}:${encodeURIComponent(supabasePassword)}@aws-0-us-east-1.pooler.supabase.com:6543/postgres`;
 console.log('✅ Constructed Supabase DATABASE_URL:', databaseUrl.replace(/:([^@]+)@/, ':***@'));
 
-// Create PostgreSQL client for Supabase
+// Create PostgreSQL client for Supabase 
 const pool = new Pool({
   connectionString: databaseUrl,
-  ssl: { rejectUnauthorized: false }, // Required SSL config for Supabase
-  max: 1, // Maximum number of connections
+  ssl: false, // Temporarily disable SSL for development debugging
+  max: 1,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
 });
+
+console.log('🔒 Database SSL mode: disabled for debugging');
 
 // Test connection on startup
 pool.on('error', (err) => {
