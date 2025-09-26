@@ -2,27 +2,22 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import * as schema from "@shared/schema";
 
-// Use Replit PostgreSQL database environment variables
+// Database connection setup
 const { PGHOST, PGUSER, PGPASSWORD, PGDATABASE, PGPORT } = process.env;
-
 let databaseUrl = process.env.DATABASE_URL;
 
-// If DATABASE_URL is invalid, construct from Replit PG environment variables
+// Construct from PG environment variables if needed
 if (!databaseUrl || (!databaseUrl.startsWith('postgres://') && !databaseUrl.startsWith('postgresql://'))) {
   if (PGHOST && PGUSER && PGPASSWORD && PGDATABASE && PGPORT) {
     databaseUrl = `postgresql://${PGUSER}:${encodeURIComponent(PGPASSWORD)}@${PGHOST}:${PGPORT}/${PGDATABASE}`;
-    console.log('✅ Using Replit PostgreSQL database:', databaseUrl.replace(/:([^@]+)@/, ':***@'));
+    console.log('✅ Using constructed DATABASE_URL from PG environment variables');
   } else {
-    console.error('❌ PostgreSQL environment variables missing');
-    console.error('   PGHOST:', PGHOST ? 'exists' : 'missing');
-    console.error('   PGUSER:', PGUSER ? 'exists' : 'missing');
-    console.error('   PGPASSWORD:', PGPASSWORD ? 'exists' : 'missing');
-    console.error('   PGDATABASE:', PGDATABASE ? 'exists' : 'missing');
-    console.error('   PGPORT:', PGPORT ? 'exists' : 'missing');
-    throw new Error("PostgreSQL database not configured. Please set up a database.");
+    throw new Error("DATABASE_URL not configured. Please set up a PostgreSQL database.");
   }
-} else {
-  console.log('✅ Using provided DATABASE_URL:', databaseUrl.replace(/:([^@]+)@/, ':***@'));
+}
+
+if (!databaseUrl) {
+  throw new Error("DATABASE_URL must be set. Did you forget to provision a database?");
 }
 
 // Create PostgreSQL client with flexible SSL configuration
