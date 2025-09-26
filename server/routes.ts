@@ -1196,15 +1196,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     
     try {
-      // Test basic database operations
-      const popularFoods = await storage.getPopularFoods(1);
+      // Direct database connection test
+      const { db } = await import('./db');
+      const { sql } = await import('drizzle-orm');
+      const result = await db.execute(sql`SELECT 1 as test`);
       
       res.json({
         success: true,
         message: 'Database is connected and operational',
         testResults: {
-          popularFoodsQuery: 'success',
-          recordCount: popularFoods.length
+          directConnection: 'success',
+          testQuery: result.rows[0] || 'no result'
         },
         timestamp: new Date().toISOString()
       });
@@ -1212,7 +1214,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ 
         success: false,
         message: 'Database test failed',
-        error: error.message
+        error: error.message,
+        stack: error.stack?.split('\n').slice(0, 5).join('\n')
       });
     }
   });
