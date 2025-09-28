@@ -9,6 +9,19 @@ if (!databaseUrl) {
   throw new Error("DATABASE_URL is missing. Please provide the Railway PostgreSQL connection URL.");
 }
 
+// Handle Railway's different DATABASE_URL formats
+if (databaseUrl.startsWith('[Railway PostgreSQL')) {
+  // In production, Railway might provide a reference format
+  // Fall back to constructing from individual environment variables
+  const { PGHOST, PGPORT, PGUSER, PGPASSWORD, PGDATABASE } = process.env;
+  if (PGHOST && PGPORT && PGUSER && PGPASSWORD && PGDATABASE) {
+    databaseUrl = `postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}`;
+    console.log('🔧 Constructed DATABASE_URL from Railway environment variables');
+  } else {
+    throw new Error("Railway environment variables incomplete. Missing PGHOST, PGPORT, PGUSER, PGPASSWORD, or PGDATABASE.");
+  }
+}
+
 // Validate it's a proper PostgreSQL connection string  
 if (!databaseUrl.startsWith('postgres://') && !databaseUrl.startsWith('postgresql://')) {
   throw new Error(
