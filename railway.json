@@ -2,7 +2,7 @@
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "vite build && esbuild server/prod-index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
+    "buildCommand": "vite build && esbuild server/prod-index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist && cp -r dist/public server/",
     "watchPatterns": [
       "server/**",
       "client/**",
@@ -21,7 +21,7 @@
   "environments": {
     "production": {
       "build": {
-        "buildCommand": "vite build && esbuild server/prod-index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist"
+        "buildCommand": "vite build && esbuild server/prod-index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist && cp -r dist/public server/"
       },
       "deploy": {
         "startCommand": "node dist/prod-index.js"
