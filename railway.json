@@ -21,10 +21,10 @@
   "environments": {
     "production": {
       "build": {
-        "buildCommand": "npm run build"
+        "buildCommand": "vite build && esbuild server/prod-index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist"
       },
       "deploy": {
-        "startCommand": "npm run start"
+        "startCommand": "NODE_ENV=production node dist/prod-index.js"
       }
     }
   }
