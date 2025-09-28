@@ -51,9 +51,9 @@ RUN echo "=== Build Environment ===" && \
     echo "=== Starting Build ===" && \
     NODE_OPTIONS="--max-old-space-size=4096" npm run build
 
-# Ensure build output exists and copy to server/public
-RUN ls -la client/dist/ || echo "No client dist found"
-RUN mkdir -p server/public && cp -r client/dist/* server/public/ 2>/dev/null || echo "No files to copy"
+# Ensure build output exists and copy to client/dist for Railway compatibility
+RUN ls -la dist/public/ || echo "No dist/public found"
+RUN mkdir -p client/dist && cp -r dist/public/* client/dist/ 2>/dev/null || echo "No files to copy from dist/public"
 
 # Production stage
 FROM node:20
@@ -88,11 +88,11 @@ COPY shared ./shared
 COPY --from=builder /app/client/dist ./server/public
 
 # Expose port
-EXPOSE 3000
+EXPOSE 5000
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3000/api/health', (r) => {r.statusCode === 200 ? process.exit(0) : process.exit(1)})"
+HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:5000/health', (r) => {r.statusCode === 200 ? process.exit(0) : process.exit(1)})"
 
 # Start the application
-CMD ["npm", "run", "start"]
+CMD ["node", "dist/prod-index.js"]
