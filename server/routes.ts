@@ -43,11 +43,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Health check endpoint - simplified for production
   app.get('/api/health', async (req: Request, res: Response) => {
     // Basic health check - server is responding
-    res.json({
+    res.status(200).json({
       status: 'healthy',
       timestamp: new Date().toISOString(),
       environment: process.env.NODE_ENV || 'development',
       version: 'BETA 3.0'
+    });
+  });
+
+  // Additional health check at root for Railway compatibility
+  app.get('/health', async (req: Request, res: Response) => {
+    res.status(200).json({
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || 'development',
+      version: 'BETA 3.0'
+    });
+  });
+
+  // Ready endpoint for k8s-style health checks
+  app.get('/ready', async (req: Request, res: Response) => {
+    res.status(200).json({
+      status: 'ready',
+      timestamp: new Date().toISOString()
     });
   });
 
