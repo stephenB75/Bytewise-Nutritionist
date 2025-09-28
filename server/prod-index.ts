@@ -1,17 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import path from "path";
 import { registerRoutes } from "./routes";
-
-// Simple logging function
-function log(message: string) {
-  const formattedTime = new Date().toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: true,
-  });
-  console.log(`[${formattedTime}] ${message}`);
-}
+import { serveStatic, log } from "./production";
 
 const app = express();
 
@@ -83,29 +73,40 @@ app.use((req, res, next) => {
       
   res.header('Content-Security-Policy', cspPolicy);
   
-  // Handle preflight requests
-  if (req.method === 'OPTIONS') {
+  if (req.method === "OPTIONS") {
     res.sendStatus(200);
-  } else {
-    next();
+    return;
   }
+  next();
 });
 
-app.use((req, res, next) => {
+// Logging middleware for API requests
+app.use((req: Request, res: Response, next: NextFunction) => {
+  const { pathname } = new URL(req.url, `http://${req.headers.host}`);
   const start = Date.now();
-  const path = req.path;
-  let capturedJsonResponse: Record<string, any> | undefined = undefined;
 
-  const originalResJson = res.json;
-  res.json = function (bodyJson, ...args) {
-    capturedJsonResponse = bodyJson;
-    return originalResJson.apply(res, [bodyJson, ...args]);
+  let capturedJsonResponse: any = undefined;
+
+  const originalSend = res.send;
+  res.send = function (this: Response, body?: any) {
+    try {
+      const parsedBody = JSON.parse(body);
+      if (Array.isArray(parsedBody)) {
+        capturedJsonResponse = parsedBody.slice(0, 2);
+      } else if (typeof parsedBody === "object") {
+        capturedJsonResponse = parsedBody;
+      }
+    } catch {
+      // Not JSON, ignore
+    }
+
+    return originalSend.call(this, body);
   };
 
   res.on("finish", () => {
     const duration = Date.now() - start;
-    if (path.startsWith("/api")) {
-      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
+    if (pathname.startsWith("/api")) {
+      let logLine = `${req.method} ${pathname} ${res.statusCode} in ${duration}ms`;
       if (capturedJsonResponse) {
         logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
       }
@@ -132,37 +133,8 @@ app.use((req, res, next) => {
     throw err;
   });
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
-  if (app.get("env") === "development") {
-    // Dynamically import Vite setup only in development
-    const { setupVite } = await import("./vite");
-    
-    // In development, serve static files from public directory before Vite
-    const publicPath = path.resolve(import.meta.dirname, "../public");
-    app.use(express.static(publicPath, {
-      maxAge: '1d',
-      etag: true,
-      lastModified: true,
-      setHeaders: (res, path) => {
-        if (path.endsWith('.png') || path.endsWith('.jpg') || path.endsWith('.jpeg')) {
-          res.setHeader('Content-Type', 'image/png');
-        } else if (path.endsWith('.json')) {
-          res.setHeader('Content-Type', 'application/json');
-        } else if (path.endsWith('.css')) {
-          res.setHeader('Content-Type', 'text/css');
-        } else if (path.endsWith('.js')) {
-          res.setHeader('Content-Type', 'application/javascript');
-        }
-      }
-    }));
-    await setupVite(app, server);
-  } else {
-    // Use production-only static serving (no Vite dependencies)
-    const { serveStatic } = await import("./production");
-    serveStatic(app);
-  }
+  // Production static serving
+  serveStatic(app);
 
   // ALWAYS serve the app on the port specified in the environment variable PORT
   // Other ports are firewalled. Default to 5000 if not specified.
@@ -214,4 +186,7 @@ app.use((req, res, next) => {
     });
   });
 
+  process.on('unhandledRejection', (reason, promise) => {
+    log(`Unhandled Rejection at: ${promise}, reason: ${reason}`);
+  });
 })();
