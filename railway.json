@@ -1,7 +1,8 @@
 {
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
-    "builder": "DOCKERFILE",
+    "builder": "NIXPACKS",
+    "buildCommand": "npm run build",
     "watchPatterns": [
       "server/**",
       "client/**",
@@ -9,7 +10,7 @@
     ]
   },
   "deploy": {
-    "startCommand": "node dist/prod-index.js",
+    "startCommand": "npm start",
     "healthcheckPath": "/health",
     "healthcheckTimeout": 30,
     "restartPolicyType": "ON_FAILURE",
@@ -20,10 +21,10 @@
   "environments": {
     "production": {
       "build": {
-        "buildCommand": "vite build && esbuild server/prod-index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist && mkdir -p client/dist && cp -r dist/public/* client/dist/"
+        "buildCommand": "npm run build"
       },
       "deploy": {
-        "startCommand": "node dist/prod-index.js"
+        "startCommand": "npm start"
       }
     }
   }
