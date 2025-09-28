@@ -1,7 +1,17 @@
 import express, { type Request, Response, NextFunction } from "express";
 import path from "path";
 import { registerRoutes } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
+
+// Simple logging function
+function log(message: string) {
+  const formattedTime = new Date().toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  });
+  console.log(`[${formattedTime}] ${message}`);
+}
 
 const app = express();
 
@@ -126,6 +136,9 @@ app.use((req, res, next) => {
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
   if (app.get("env") === "development") {
+    // Dynamically import Vite setup only in development
+    const { setupVite } = await import("./vite");
+    
     // In development, serve static files from public directory before Vite
     const publicPath = path.resolve(import.meta.dirname, "../public");
     app.use(express.static(publicPath, {
@@ -146,6 +159,8 @@ app.use((req, res, next) => {
     }));
     await setupVite(app, server);
   } else {
+    // Dynamically import static serving only in production
+    const { serveStatic } = await import("./vite");
     serveStatic(app);
   }
 
