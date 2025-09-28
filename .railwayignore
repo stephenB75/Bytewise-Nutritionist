@@ -22,7 +22,7 @@ archive/
 *.old
 
 # Large assets (if not needed for production)
-attached_assets/
+# attached_assets/
 
 # Logs and temporary files
 logs/
