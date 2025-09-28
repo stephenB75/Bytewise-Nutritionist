@@ -27,7 +27,7 @@ import { useAchievements, getAchievementIcon, formatAchievementDate } from '@/ho
 import { ProfileIcon } from '@/components/ProfileIcon';
 import { TourLauncher, useAppTour, WelcomeBanner } from '@/components/TourLauncher';
 import { apiRequest } from '@/lib/queryClient';
-import logoImage from '@assets/BWN_Logo_1756056440683.png';
+const logoImage = '/BWN_Logo.png';
 import { 
   Search, 
   Plus,
