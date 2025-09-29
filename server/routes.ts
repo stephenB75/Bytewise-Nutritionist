@@ -11,6 +11,7 @@ import { eq, and, gte, desc, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { supabaseStorageService } from "./supabaseStorage";
 import express from "express";
+import { getUncachableGitHubClient } from "./github-client";
 
 // Zod schemas for request validation
 const subscriptionSyncSchema = z.object({
@@ -67,6 +68,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
       status: 'ready',
       timestamp: new Date().toISOString()
     });
+  });
+
+  // GitHub connection verification endpoint
+  app.get('/api/github/status', async (req: Request, res: Response) => {
+    try {
+      const github = await getUncachableGitHubClient();
+      const { data: user } = await github.rest.users.getAuthenticated();
+      
+      console.log('✅ GitHub connection verified:', user.login);
+      
+      res.status(200).json({
+        connected: true,
+        user: {
+          login: user.login,
+          name: user.name,
+          email: user.email
+        },
+        timestamp: new Date().toISOString()
+      });
+    } catch (error: any) {
+      console.error('❌ GitHub connection failed:', error.message);
+      res.status(500).json({
+        connected: false,
+        error: error.message,
+        timestamp: new Date().toISOString()
+      });
+    }
   });
 
   // RevenueCat webhook endpoint - capture raw body for signature verification
