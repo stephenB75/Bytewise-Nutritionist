@@ -2,83 +2,60 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import * as schema from "@shared/schema";
 
-// Railway PostgreSQL database connection
-let databaseUrl = process.env.DATABASE_URL;
+// Supabase PostgreSQL database connection
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabasePassword = process.env.SUPABASE_DB_PASSWORD;
 
-if (!databaseUrl) {
-  throw new Error("DATABASE_URL is missing. Please provide the Railway PostgreSQL connection URL.");
+if (!supabaseUrl || !supabasePassword) {
+  throw new Error("Missing Supabase database configuration. SUPABASE_URL and SUPABASE_DB_PASSWORD are required.");
 }
 
-// Handle Railway's different DATABASE_URL formats
-if (databaseUrl.startsWith('[Railway PostgreSQL')) {
-  // In production, Railway might provide a reference format
-  // Fall back to constructing from individual environment variables
-  const { PGHOST, PGPORT, PGUSER, PGPASSWORD, PGDATABASE } = process.env;
-  if (PGHOST && PGPORT && PGUSER && PGPASSWORD && PGDATABASE) {
-    databaseUrl = `postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}`;
-    console.log('🔧 Constructed DATABASE_URL from Railway environment variables');
-  } else {
-    throw new Error("Railway environment variables incomplete. Missing PGHOST, PGPORT, PGUSER, PGPASSWORD, or PGDATABASE.");
-  }
-}
+// Extract project ID from Supabase URL for database connection
+// Supabase URL format: https://PROJECT_ID.supabase.co
+const supabaseProject = supabaseUrl.replace('https://', '').split('.')[0];
+const databaseUrl = `postgresql://postgres:${supabasePassword}@db.${supabaseProject}.supabase.co:5432/postgres`;
 
-// Validate it's a proper PostgreSQL connection string  
-if (!databaseUrl.startsWith('postgres://') && !databaseUrl.startsWith('postgresql://')) {
-  throw new Error(
-    `Invalid DATABASE_URL format. Expected PostgreSQL connection string from Railway (starts with postgresql://), got: ${databaseUrl.substring(0, 20)}...`
-  );
-}
+console.log('✅ Using Supabase PostgreSQL database:', `postgresql://postgres:***@db.${supabaseProject}.supabase.co:5432/postgres`);
 
-console.log('✅ Using Railway DATABASE_URL:', databaseUrl.replace(/:([^@]+)@/, ':***@'));
-
-// Create PostgreSQL client for Railway with robust connection settings
+// Create PostgreSQL client for Supabase with optimized connection settings
 const pool = new Pool({
   connectionString: databaseUrl,
-  ssl: { rejectUnauthorized: false }, // Railway requires SSL
-  max: 10, // Increase pool size for Railway
-  min: 2, // Keep at least 2 connections open
-  idleTimeoutMillis: 30000, // Shorter idle timeout to prevent stale connections
-  connectionTimeoutMillis: 30000, // Longer connection timeout for Railway
-  statement_timeout: 60000, // 60 second statement timeout
+  ssl: { rejectUnauthorized: false }, // Supabase requires SSL
+  max: 20, // Supabase supports higher concurrency
+  min: 5, // Keep more connections open for better performance
+  idleTimeoutMillis: 300000, // 5 minutes - Supabase handles longer idle times well
+  connectionTimeoutMillis: 20000, // 20 second connection timeout
+  statement_timeout: 30000, // 30 second statement timeout
   keepAlive: true, // Enable TCP keep-alive
-  keepAliveInitialDelayMillis: 0, // Start keep-alive immediately
-  // Additional Railway-specific settings
+  keepAliveInitialDelayMillis: 10000, // Wait 10s before first keep-alive probe
+  // Supabase-specific settings
   application_name: 'bytewise-nutritionist',
 });
 
-console.log('🔒 Railway database SSL mode: enabled with rejectUnauthorized: false');
+console.log('🔒 Supabase database SSL mode: enabled with rejectUnauthorized: false');
 
-// Enhanced error handling and recovery for Railway PostgreSQL
+// Enhanced error handling and recovery for Supabase PostgreSQL
 pool.on('error', (err) => {
-  console.error('❌ Database pool error:', err);
+  console.error('❌ Supabase database pool error:', err);
   console.error('🔧 Connection will be automatically recreated on next request');
-  
-  // Force cleanup of stale connections
-  setTimeout(() => {
-    console.log('🔄 Cleaning up stale database connections...');
-    // End all idle connections to force fresh connections
-    pool.end().catch(() => {}).then(() => {
-      console.log('🔄 Database pool reset, new connections will be created');
-    });
-  }, 5000);
 });
 
 pool.on('connect', (client) => {
-  console.log('✅ New database connection established');
+  console.log('✅ New Supabase database connection established');
   
-  // Set connection-specific settings for Railway
+  // Set connection-specific settings for Supabase
   client.query(`
-    SET statement_timeout = '60s';
-    SET lock_timeout = '30s';
-    SET idle_in_transaction_session_timeout = '30s';
+    SET statement_timeout = '30s';
+    SET lock_timeout = '10s';
+    SET idle_in_transaction_session_timeout = '60s';
   `).catch(err => console.log('⚠️ Could not set connection parameters:', err.message));
 });
 
 pool.on('remove', (client) => {
-  console.log('🔄 Database connection removed from pool');
+  console.log('🔄 Supabase database connection removed from pool');
 });
 
-// Add connection health check
+// Add connection health check for Supabase
 const isConnectionHealthy = async (): Promise<boolean> => {
   try {
     const client = await pool.connect();
@@ -120,8 +97,8 @@ const testConnection = async () => {
 // Test connection asynchronously
 testConnection();
 
-// Enhanced retry wrapper for Railway database operations
-const withRetry = async <T>(operation: () => Promise<T>, maxRetries = 5): Promise<T> => {
+// Simplified retry wrapper for Supabase database operations
+const withRetry = async <T>(operation: () => Promise<T>, maxRetries = 3): Promise<T> => {
   let lastError: Error;
   
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -136,17 +113,14 @@ const withRetry = async <T>(operation: () => Promise<T>, maxRetries = 5): Promis
         error.code === 'ENOTFOUND' ||
         error.code === 'ETIMEDOUT' ||
         error.code === 'ECONNREFUSED' ||
-        error.code === 'EPIPE' ||
         error.message?.includes('Connection terminated') ||
         error.message?.includes('connect ECONNREFUSED') ||
-        error.message?.includes('read ECONNRESET') ||
-        error.message?.includes('write EPIPE') ||
         error.message?.includes('Connection lost') ||
         error.message?.includes('server closed the connection')
       );
       
       if (!isRetryableError || attempt === maxRetries) {
-        console.log(`❌ Database operation failed after ${attempt} attempts:`, {
+        console.log(`❌ Supabase database operation failed after ${attempt} attempts:`, {
           error: error.message,
           code: error.code,
           attempt: attempt,
@@ -156,10 +130,10 @@ const withRetry = async <T>(operation: () => Promise<T>, maxRetries = 5): Promis
         throw error;
       }
       
-      const waitTime = Math.min(Math.pow(2, attempt) * 1000, 10000); // Cap at 10 seconds
-      console.log(`🔄 Database operation failed (attempt ${attempt}/${maxRetries}), retrying in ${waitTime}ms...`);
+      const waitTime = Math.min(Math.pow(2, attempt) * 500, 3000); // Cap at 3 seconds for Supabase
+      console.log(`🔄 Supabase database operation failed (attempt ${attempt}/${maxRetries}), retrying in ${waitTime}ms...`);
       
-      // Wait before retry with exponential backoff (capped at 10s)
+      // Wait before retry with exponential backoff (capped at 3s)
       await new Promise(resolve => setTimeout(resolve, waitTime));
     }
   }
