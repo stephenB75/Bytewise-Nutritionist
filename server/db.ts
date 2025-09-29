@@ -2,48 +2,41 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import * as schema from "@shared/schema";
 
-// Supabase PostgreSQL database connection
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabasePassword = process.env.SUPABASE_DB_PASSWORD;
+// Database connection - Use provided DATABASE_URL (from Supabase)
+let databaseUrl = process.env.DATABASE_URL;
 
-if (!supabaseUrl || !supabasePassword) {
-  throw new Error("Missing Supabase database configuration. SUPABASE_URL and SUPABASE_DB_PASSWORD are required.");
+if (!databaseUrl) {
+  throw new Error("DATABASE_URL is missing. Please provide the Supabase PostgreSQL connection URL.");
 }
 
-// Extract project ID from Supabase URL for database connection
-// Supabase URL format: https://PROJECT_ID.supabase.co
-const supabaseProject = supabaseUrl.replace('https://', '').split('.')[0];
-const databaseUrl = `postgresql://postgres:${supabasePassword}@db.${supabaseProject}.supabase.co:5432/postgres`;
+console.log('✅ Using database connection:', databaseUrl.replace(/:([^@]+)@/, ':***@'));
 
-console.log('✅ Using Supabase PostgreSQL database:', `postgresql://postgres:***@db.${supabaseProject}.supabase.co:5432/postgres`);
-
-// Create PostgreSQL client for Supabase with optimized connection settings
+// Create PostgreSQL client with optimized connection settings
 const pool = new Pool({
   connectionString: databaseUrl,
-  ssl: { rejectUnauthorized: false }, // Supabase requires SSL
-  max: 20, // Supabase supports higher concurrency
-  min: 5, // Keep more connections open for better performance
-  idleTimeoutMillis: 300000, // 5 minutes - Supabase handles longer idle times well
+  ssl: { rejectUnauthorized: false }, // Database requires SSL
+  max: 20, // Support higher concurrency 
+  min: 2, // Keep minimal connections open
+  idleTimeoutMillis: 300000, // 5 minutes idle timeout
   connectionTimeoutMillis: 20000, // 20 second connection timeout
   statement_timeout: 30000, // 30 second statement timeout
   keepAlive: true, // Enable TCP keep-alive
   keepAliveInitialDelayMillis: 10000, // Wait 10s before first keep-alive probe
-  // Supabase-specific settings
   application_name: 'bytewise-nutritionist',
 });
 
-console.log('🔒 Supabase database SSL mode: enabled with rejectUnauthorized: false');
+console.log('🔒 Database SSL mode: enabled with rejectUnauthorized: false');
 
-// Enhanced error handling and recovery for Supabase PostgreSQL
+// Enhanced error handling and recovery for PostgreSQL
 pool.on('error', (err) => {
-  console.error('❌ Supabase database pool error:', err);
+  console.error('❌ Database pool error:', err);
   console.error('🔧 Connection will be automatically recreated on next request');
 });
 
 pool.on('connect', (client) => {
-  console.log('✅ New Supabase database connection established');
+  console.log('✅ New database connection established');
   
-  // Set connection-specific settings for Supabase
+  // Set connection-specific settings
   client.query(`
     SET statement_timeout = '30s';
     SET lock_timeout = '10s';
@@ -52,10 +45,10 @@ pool.on('connect', (client) => {
 });
 
 pool.on('remove', (client) => {
-  console.log('🔄 Supabase database connection removed from pool');
+  console.log('🔄 Database connection removed from pool');
 });
 
-// Add connection health check for Supabase
+// Add connection health check
 const isConnectionHealthy = async (): Promise<boolean> => {
   try {
     const client = await pool.connect();
@@ -97,7 +90,7 @@ const testConnection = async () => {
 // Test connection asynchronously
 testConnection();
 
-// Simplified retry wrapper for Supabase database operations
+// Retry wrapper for database operations
 const withRetry = async <T>(operation: () => Promise<T>, maxRetries = 3): Promise<T> => {
   let lastError: Error;
   
@@ -120,7 +113,7 @@ const withRetry = async <T>(operation: () => Promise<T>, maxRetries = 3): Promis
       );
       
       if (!isRetryableError || attempt === maxRetries) {
-        console.log(`❌ Supabase database operation failed after ${attempt} attempts:`, {
+        console.log(`❌ Database operation failed after ${attempt} attempts:`, {
           error: error.message,
           code: error.code,
           attempt: attempt,
@@ -130,8 +123,8 @@ const withRetry = async <T>(operation: () => Promise<T>, maxRetries = 3): Promis
         throw error;
       }
       
-      const waitTime = Math.min(Math.pow(2, attempt) * 500, 3000); // Cap at 3 seconds for Supabase
-      console.log(`🔄 Supabase database operation failed (attempt ${attempt}/${maxRetries}), retrying in ${waitTime}ms...`);
+      const waitTime = Math.min(Math.pow(2, attempt) * 500, 3000); // Cap at 3 seconds
+      console.log(`🔄 Database operation failed (attempt ${attempt}/${maxRetries}), retrying in ${waitTime}ms...`);
       
       // Wait before retry with exponential backoff (capped at 3s)
       await new Promise(resolve => setTimeout(resolve, waitTime));
