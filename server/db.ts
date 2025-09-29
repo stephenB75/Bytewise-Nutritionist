@@ -31,16 +31,19 @@ if (!databaseUrl.startsWith('postgres://') && !databaseUrl.startsWith('postgresq
 
 console.log('✅ Using Railway DATABASE_URL:', databaseUrl.replace(/:([^@]+)@/, ':***@'));
 
-// Create PostgreSQL client for Railway with optimized settings
+// Create PostgreSQL client for Railway with robust connection settings
 const pool = new Pool({
   connectionString: databaseUrl,
   ssl: { rejectUnauthorized: false }, // Railway requires SSL
-  max: 3, // Allow up to 3 concurrent connections
-  min: 1, // Keep at least 1 connection open
-  idleTimeoutMillis: 60000, // Keep connections alive for 60 seconds
-  connectionTimeoutMillis: 10000, // 10 second connection timeout for Railway latency
+  max: 10, // Increase pool size for Railway
+  min: 2, // Keep at least 2 connections open
+  idleTimeoutMillis: 30000, // Shorter idle timeout to prevent stale connections
+  connectionTimeoutMillis: 30000, // Longer connection timeout for Railway
+  statement_timeout: 60000, // 60 second statement timeout
   keepAlive: true, // Enable TCP keep-alive
-  keepAliveInitialDelayMillis: 10000, // Wait 10s before first keep-alive probe
+  keepAliveInitialDelayMillis: 0, // Start keep-alive immediately
+  // Additional Railway-specific settings
+  application_name: 'bytewise-nutritionist',
 });
 
 console.log('🔒 Railway database SSL mode: enabled with rejectUnauthorized: false');
@@ -49,15 +52,43 @@ console.log('🔒 Railway database SSL mode: enabled with rejectUnauthorized: fa
 pool.on('error', (err) => {
   console.error('❌ Database pool error:', err);
   console.error('🔧 Connection will be automatically recreated on next request');
+  
+  // Force cleanup of stale connections
+  setTimeout(() => {
+    console.log('🔄 Cleaning up stale database connections...');
+    // End all idle connections to force fresh connections
+    pool.end().catch(() => {}).then(() => {
+      console.log('🔄 Database pool reset, new connections will be created');
+    });
+  }, 5000);
 });
 
 pool.on('connect', (client) => {
   console.log('✅ New database connection established');
+  
+  // Set connection-specific settings for Railway
+  client.query(`
+    SET statement_timeout = '60s';
+    SET lock_timeout = '30s';
+    SET idle_in_transaction_session_timeout = '30s';
+  `).catch(err => console.log('⚠️ Could not set connection parameters:', err.message));
 });
 
 pool.on('remove', (client) => {
   console.log('🔄 Database connection removed from pool');
 });
+
+// Add connection health check
+const isConnectionHealthy = async (): Promise<boolean> => {
+  try {
+    const client = await pool.connect();
+    await client.query('SELECT 1');
+    client.release();
+    return true;
+  } catch {
+    return false;
+  }
+};
 
 // Test connection on startup with retry logic
 const testConnection = async () => {
@@ -89,8 +120,8 @@ const testConnection = async () => {
 // Test connection asynchronously
 testConnection();
 
-// Retry wrapper for database operations
-const withRetry = async <T>(operation: () => Promise<T>, maxRetries = 3): Promise<T> => {
+// Enhanced retry wrapper for Railway database operations
+const withRetry = async <T>(operation: () => Promise<T>, maxRetries = 5): Promise<T> => {
   let lastError: Error;
   
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -104,18 +135,32 @@ const withRetry = async <T>(operation: () => Promise<T>, maxRetries = 3): Promis
         error.code === 'ECONNRESET' ||
         error.code === 'ENOTFOUND' ||
         error.code === 'ETIMEDOUT' ||
+        error.code === 'ECONNREFUSED' ||
+        error.code === 'EPIPE' ||
         error.message?.includes('Connection terminated') ||
         error.message?.includes('connect ECONNREFUSED') ||
-        error.message?.includes('read ECONNRESET')
+        error.message?.includes('read ECONNRESET') ||
+        error.message?.includes('write EPIPE') ||
+        error.message?.includes('Connection lost') ||
+        error.message?.includes('server closed the connection')
       );
       
       if (!isRetryableError || attempt === maxRetries) {
+        console.log(`❌ Database operation failed after ${attempt} attempts:`, {
+          error: error.message,
+          code: error.code,
+          attempt: attempt,
+          maxRetries: maxRetries,
+          isRetryable: isRetryableError
+        });
         throw error;
       }
       
-      console.log(`🔄 Database operation failed (attempt ${attempt}/${maxRetries}), retrying...`);
-      // Wait before retry with exponential backoff
-      await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000));
+      const waitTime = Math.min(Math.pow(2, attempt) * 1000, 10000); // Cap at 10 seconds
+      console.log(`🔄 Database operation failed (attempt ${attempt}/${maxRetries}), retrying in ${waitTime}ms...`);
+      
+      // Wait before retry with exponential backoff (capped at 10s)
+      await new Promise(resolve => setTimeout(resolve, waitTime));
     }
   }
   
