@@ -2,7 +2,7 @@
 nixPkgs = ["nodejs_20"]
 
 [phases.install]
-cmds = ["npm ci --only=production --silent"]
+cmds = ["npm ci --silent"]
 
 [phases.build]
 cmds = ["CI=false npm run build"]
@@ -19,6 +19,6 @@ NPM_CONFIG_AUDIT = "false"
 
 [deploy]
 healthcheckPath = "/health"
-healthcheckTimeout = 30
-restartPolicyType = "on-failure"
+healthcheckTimeout = 120
+restartPolicyType = "always"
 restartPolicyMaxRetries = 5
