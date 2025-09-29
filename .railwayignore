@@ -22,7 +22,24 @@ archive/
 *.old
 
 # Large assets (if not needed for production)
-# attached_assets/
+attached_assets/
+docs/
+TOUR_*.md
+*_GUIDE.md
+*.html
+fly.toml
+fly-deploy.md
+Dockerfile.alternative
+client/src/assets/
+CHANGELOG.md
+VERSION
+postbuild.js
+drizzle.config.ts
+capacitor.config.ts
+components.json
+postcss.config.js
+README.md
+.env.example
 
 # Logs and temporary files
 logs/
