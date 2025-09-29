@@ -35,7 +35,7 @@ import {
   type RecipeWithIngredients,
   type MealWithFoods,
 } from "@shared/schema";
-import { db } from "./db";
+import { db, withRetry } from "./db";
 import { eq, desc, and, gte, lte, like, sql, inArray } from "drizzle-orm";
 
 export interface IStorage {
@@ -292,12 +292,14 @@ export class DatabaseStorage implements IStorage {
       personalInfoKeys: profileData.personalInfo ? Object.keys(profileData.personalInfo) : 'none'
     });
     
-    // First check if user exists
-    const existingUser = await db
-      .select()
-      .from(users)
-      .where(eq(users.id, userId))
-      .limit(1);
+    // First check if user exists (with retry)
+    const existingUser = await withRetry(async () => {
+      return await db
+        .select()
+        .from(users)
+        .where(eq(users.id, userId))
+        .limit(1);
+    });
     
     console.log('👤 Storage: User existence check:', {
       userExists: existingUser.length > 0,
@@ -314,17 +316,19 @@ export class DatabaseStorage implements IStorage {
       
       // Auto-create user record if it doesn't exist (happens when user signs in before sync)
       try {
-        const [newUser] = await db
-          .insert(users)
-          .values({
-            id: userId,
-            email: '', // Will be populated from auth system
-            firstName: profileData.firstName || '',
-            lastName: profileData.lastName || '',
-            profileIcon: profileData.profileIcon || 1,
-            emailVerified: true,
-          })
-          .returning();
+        const [newUser] = await withRetry(async () => {
+          return await db
+            .insert(users)
+            .values({
+              id: userId,
+              email: '', // Will be populated from auth system
+              firstName: profileData.firstName || '',
+              lastName: profileData.lastName || '',
+              profileIcon: profileData.profileIcon || 1,
+              emailVerified: true,
+            })
+            .returning();
+        });
         
         console.log('✅ Storage: Auto-created user record for profile update');
       } catch (createError) {
@@ -333,14 +337,16 @@ export class DatabaseStorage implements IStorage {
       }
     }
     
-    const [user] = await db
-      .update(users)
-      .set({
-        ...profileData,
-        updatedAt: new Date(),
-      })
-      .where(eq(users.id, userId))
-      .returning();
+    const [user] = await withRetry(async () => {
+      return await db
+        .update(users)
+        .set({
+          ...profileData,
+          updatedAt: new Date(),
+        })
+        .where(eq(users.id, userId))
+        .returning();
+    });
       
     console.log('👤 Storage: updateUserProfile result:', {
       hasUser: !!user,
