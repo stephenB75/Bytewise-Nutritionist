@@ -2500,7 +2500,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         title="Daily &"
         subtitle="Weekly"
         description="Track your calorie intake and search for foods to log"
-        buttonText="Start Logging"
+        buttonText="Search Meals Logged"
         onButtonClick={() => {
           const searchInput = document.querySelector('input[placeholder="Search weekly food entries..."]') as HTMLInputElement;
           if (searchInput) {
