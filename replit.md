@@ -55,6 +55,15 @@ The application includes an enhanced fasting timer with detailed progress tracki
 
 ## Recent Changes
 
+### September 30, 2025 - Railway Production Deployment Complete (Version 4.2)
+- **Static File Path Resolution**: Fixed production server to correctly locate frontend build files at `/app/dist/public` instead of `/app/server/public`
+- **Environment Variable Configuration**: Successfully configured all required Railway environment variables (DATABASE_URL, SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY)
+- **Server-Side vs Frontend Variables**: Clarified distinction between backend environment variables and VITE_ prefixed frontend build variables
+- **IPv6 Binding**: Confirmed server binding to `::` (IPv6) for Railway custom domain health checks instead of `0.0.0.0` (IPv4 only)
+- **Old Build Artifacts Cleanup**: Removed obsolete bundled server files (dist/index.js, dist/prod-index.js) preventing deployment conflicts
+- **Production Verification**: Successfully deployed to Railway with health checks passing and app accessible at https://bytewisenutritionist.com
+- **Code Safety Review**: Verified production path changes are isolated and don't affect development environment or other application functionality
+
 ### September 30, 2025 - Railway Deployment & Data Flow Fixes (Version 4.1)
 - **Dockerfile Migration**: Replaced Alpine Linux with Debian-based Node.js (node:20-bookworm-slim) for reliable native module compilation and successful Railway builds
 - **Server Runtime Update**: Changed from esbuild-bundled server to running TypeScript directly with tsx, eliminating vite import errors in production
