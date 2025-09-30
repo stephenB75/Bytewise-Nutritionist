@@ -4,14 +4,7 @@ FROM node:20-alpine AS base
 # Set working directory
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
-
-# Install dependencies
-FROM base AS deps
-RUN npm ci --only=production --silent
-
-# Build stage
+# Build stage - install all dependencies and build
 FROM base AS builder
 COPY package*.json ./
 RUN npm ci --silent
@@ -19,13 +12,16 @@ COPY . .
 ENV CI=false
 RUN npm run build
 
+# Remove dev dependencies after build
+RUN npm prune --production
+
 # Production stage
 FROM node:20-alpine AS runner
 WORKDIR /app
 
-# Copy built application
+# Copy built application and production dependencies
 COPY --from=builder /app/dist ./dist
-COPY --from=deps /app/node_modules ./node_modules
+COPY --from=builder /app/node_modules ./node_modules
 COPY package*.json ./
 
 # Set environment variables
