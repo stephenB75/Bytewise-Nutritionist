@@ -39,6 +39,8 @@ The application includes an enhanced fasting timer with detailed progress tracki
 - **Vite**: Frontend build tool and development server.
 - **Drizzle Kit**: Database migration and schema management.
 - **Capacitor**: Mobile app framework for iOS and Android deployment.
+- **Railway**: Cloud deployment platform (Dockerfile-based) with custom domain support.
+- **tsx**: TypeScript execution engine for running server code in production without compilation.
 
 ### UI and Styling Libraries
 - **Radix UI**: Accessible component primitives.
@@ -52,6 +54,18 @@ The application includes an enhanced fasting timer with detailed progress tracki
 - **Web App Manifest**: PWA configuration.
 
 ## Recent Changes
+
+### September 30, 2025 - Railway Deployment & Data Flow Fixes (Version 4.1)
+- **Dockerfile Migration**: Replaced Alpine Linux with Debian-based Node.js (node:20-bookworm-slim) for reliable native module compilation and successful Railway builds
+- **Server Runtime Update**: Changed from esbuild-bundled server to running TypeScript directly with tsx, eliminating vite import errors in production
+- **React Query Cache Fix**: Aligned cache invalidation keys with actual API endpoints (['/api/daily-stats'], ['/api/stats/daily'], [`/api/users/${userId}/daily-stats`]) to ensure metrics cards refresh properly
+- **Health Check Optimization**: Removed redundant Dockerfile HEALTHCHECK in favor of Railway's built-in health monitoring via railway.json
+- **Meal Logging Database Integration**: Fixed useCalorieTracking hook to save meals to database (was localStorage only), ensuring data persistence across devices
+- **Data Flow Verification**: Confirmed meals are saving to PostgreSQL (meal id: 9) and metrics pipeline is functional
+- **Dependency Management**: Kept all node_modules (including dev dependencies) in production to support dynamic vite imports
+- **Domain Configuration**: Identified Replit domain limitation (A/TXT/MX records only, no CNAME support) affecting Railway custom domain setup
+- **Build Process**: Simplified build command to `vite build` (frontend only) with tsx runtime for server execution
+- **Deployment Strategy**: Configured Railway with Dockerfile builder, 120s health check timeout, and proper environment variable setup
 
 ### September 11, 2025 - iOS Swift Package Manager Migration (Version 4.0)
 - **Complete CocoaPods to SPM Migration**: Successfully transitioned iOS development from CocoaPods to Swift Package Manager, eliminating Ruby dependency issues
