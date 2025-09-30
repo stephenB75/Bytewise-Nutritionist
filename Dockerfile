@@ -24,20 +24,20 @@ COPY . .
 ENV CI=false
 RUN npm run build
 
-# Remove dev dependencies after build
-RUN npm prune --omit=dev
-
 # Production stage
 FROM node:20-bookworm-slim AS runner
 
 # Set working directory
 WORKDIR /app
 
-# Copy built application and production dependencies
+# Copy built application, server source, and ALL dependencies (including dev for tsx/vite)
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/server ./server
+COPY --from=builder /app/shared ./shared
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/tsconfig.json ./
+COPY --from=builder /app/vite.config.ts ./
 
 # Set environment variables
 ENV NODE_ENV=production
