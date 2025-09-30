@@ -191,7 +191,12 @@ export function useCalorieTracking() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['weeklyMeals'] });
       queryClient.invalidateQueries({ queryKey: ['/api/meals/logged'] });
-      queryClient.invalidateQueries({ queryKey: ['dailyStats'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/daily-stats'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/stats/daily'] });
+      // Force refetch of user stats
+      if (user?.id) {
+        queryClient.invalidateQueries({ queryKey: [`/api/users/${user.id}/daily-stats`] });
+      }
     },
   });
 
@@ -255,7 +260,11 @@ export function useCalorieTracking() {
             date: getLocalDateKey()
           });
           console.log('✅ Water consumption synced to database');
-          queryClient.invalidateQueries({ queryKey: ['dailyStats'] });
+          queryClient.invalidateQueries({ queryKey: ['/api/daily-stats'] });
+          queryClient.invalidateQueries({ queryKey: ['/api/stats/daily'] });
+          if (user?.id) {
+            queryClient.invalidateQueries({ queryKey: [`/api/users/${user.id}/daily-stats`] });
+          }
         } catch (error) {
           console.warn('⚠️ Failed to sync water to database (will retry later):', error);
         }
