@@ -138,11 +138,9 @@ export function useCalorieTracking() {
     }
   }, []);
 
-  // Log calories to meals (for weekly logger) - simplified without auth requirement
+  // Log calories to meals (for weekly logger) - save to database and localStorage
   const logCaloriesMutation = useMutation({
     mutationFn: async (calorieEntry: CalculatedCalories) => {
-      // Store in localStorage instead of requiring authentication
-      const weeklyMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
       const mealEntry = {
         name: calorieEntry.name,
         calories: calorieEntry.calories,
@@ -157,16 +155,43 @@ export function useCalorieTracking() {
         mealType: getMealTypeByTime()
       };
       
+      // Store in localStorage for instant feedback
+      const weeklyMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
       weeklyMeals.push(mealEntry);
       localStorage.setItem('weeklyMeals', JSON.stringify(weeklyMeals));
       
-      // Calories logged successfully
+      // Save to database if authenticated
+      if (user?.id) {
+        try {
+          const response = await apiRequest('POST', '/api/meals/logged', {
+            name: calorieEntry.name,
+            mealType: getMealTypeByTime(),
+            date: calorieEntry.date,
+            totalCalories: calorieEntry.calories,
+            totalProtein: calorieEntry.protein,
+            totalCarbs: calorieEntry.carbs,
+            totalFat: calorieEntry.fat,
+            fiber: calorieEntry.fiber || 0,
+            sugar: calorieEntry.sugar || 0,
+            sodium: calorieEntry.sodium || 0
+          });
+          console.log('✅ Meal synced to database:', response);
+          
+          // Fire event for meal data reload
+          window.dispatchEvent(new CustomEvent('reload-meal-data'));
+        } catch (error) {
+          console.warn('⚠️ Failed to sync meal to database (saved locally):', error);
+        }
+      } else {
+        console.log('ℹ️ Meal saved locally (user not authenticated)');
+      }
       
       return mealEntry;
     },
     onSuccess: () => {
-      // No need to invalidate API queries since we're using localStorage
       queryClient.invalidateQueries({ queryKey: ['weeklyMeals'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/meals/logged'] });
+      queryClient.invalidateQueries({ queryKey: ['dailyStats'] });
     },
   });
 
