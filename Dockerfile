@@ -24,6 +24,9 @@ COPY . .
 ENV CI=false
 RUN npm run build
 
+# Make startup script executable
+RUN chmod +x start.sh
+
 # Production stage
 FROM node:20-bookworm-slim AS runner
 
@@ -38,10 +41,13 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/tsconfig.json ./
 COPY --from=builder /app/vite.config.ts ./
-COPY --from=builder /app/start.sh ./
+COPY --from=builder /app/start.sh ./start.sh
 
 # Install tsx globally for production
 RUN npm install -g tsx
+
+# Make startup script executable
+RUN chmod +x start.sh
 
 # Set environment variables
 ENV NODE_ENV=production
