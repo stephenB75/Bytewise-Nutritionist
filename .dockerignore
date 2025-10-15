@@ -27,6 +27,7 @@ archive
 docs
 *.md
 *.sh
+!start.sh  # Allow start.sh specifically
 test-*
 check-*
 fly.toml
