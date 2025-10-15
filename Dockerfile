@@ -24,9 +24,6 @@ COPY . .
 ENV CI=false
 RUN npm run build
 
-# Make startup script executable
-RUN chmod +x start.sh
-
 # Production stage
 FROM node:20-bookworm-slim AS runner
 
@@ -46,8 +43,8 @@ COPY --from=builder /app/start.sh ./start.sh
 # Install tsx globally for production
 RUN npm install -g tsx
 
-# Make startup script executable
-RUN chmod +x start.sh
+# Make startup script executable (after copying)
+RUN chmod +x ./start.sh
 
 # Set environment variables
 ENV NODE_ENV=production
