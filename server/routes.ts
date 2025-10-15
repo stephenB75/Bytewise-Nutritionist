@@ -62,8 +62,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         version: 'BETA 4.2',
         uptime: process.uptime(),
         memory: process.memoryUsage(),
-        port: process.env.PORT || '5000'
+        port: process.env.PORT || '5000',
+        host: process.env.HOST || '0.0.0.0'
       };
+      
+      // Set cache headers to prevent caching
+      res.set({
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      });
       
       res.status(200).json(healthData);
     } catch (error) {

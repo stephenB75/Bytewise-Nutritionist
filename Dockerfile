@@ -38,6 +38,7 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/tsconfig.json ./
 COPY --from=builder /app/vite.config.ts ./
+COPY --from=builder /app/start.sh ./
 
 # Install tsx globally for production
 RUN npm install -g tsx
@@ -53,9 +54,9 @@ EXPOSE 5000
 # Install curl for health check
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
-# Add health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-  CMD curl -f http://localhost:5000/health || exit 1
+# Add health check - use PORT environment variable for Railway compatibility
+HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=5 \
+  CMD curl -f http://localhost:${PORT:-5000}/health || exit 1
 
-# Start the application using tsx to run TypeScript server directly
-CMD ["tsx", "server/index.ts"]
+# Start the application using the startup script
+CMD ["./start.sh"]
