@@ -45,20 +45,9 @@ RUN npm install -g tsx
 # Create startup script directly in production stage
 RUN echo '#!/bin/bash' > start.sh && \
     echo 'echo "🚀 Starting ByteWise Nutritionist on Railway..."' >> start.sh && \
-    echo 'export NODE_ENV=${NODE_ENV:-production}' >> start.sh && \
-    echo 'export HOST=${HOST:-0.0.0.0}' >> start.sh && \
-    echo 'export PORT=${PORT:-5000}' >> start.sh && \
-    echo 'echo "📊 Environment: $NODE_ENV"' >> start.sh && \
-    echo 'echo "🌐 Host: $HOST"' >> start.sh && \
-    echo 'echo "🔌 Port: $PORT"' >> start.sh && \
-    echo 'if [ ! -f "server/index.ts" ]; then' >> start.sh && \
-    echo '    echo "❌ Error: server/index.ts not found"' >> start.sh && \
-    echo '    exit 1' >> start.sh && \
-    echo 'fi' >> start.sh && \
-    echo 'if [ ! -d "dist/public" ]; then' >> start.sh && \
-    echo '    echo "❌ Error: dist/public directory not found"' >> start.sh && \
-    echo '    exit 1' >> start.sh && \
-    echo 'fi' >> start.sh && \
+    echo 'echo "📊 Environment: ${NODE_ENV:-production}"' >> start.sh && \
+    echo 'echo "🌐 Host: ${HOST:-0.0.0.0}"' >> start.sh && \
+    echo 'echo "🔌 Port: ${PORT:-5000}"' >> start.sh && \
     echo 'echo "🎯 Starting server with tsx..."' >> start.sh && \
     echo 'exec tsx server/index.ts' >> start.sh && \
     chmod +x start.sh

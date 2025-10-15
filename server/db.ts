@@ -6,24 +6,33 @@ import * as schema from "@shared/schema";
 let databaseUrl = process.env.DATABASE_URL;
 
 if (!databaseUrl) {
-  throw new Error("DATABASE_URL is missing. Please provide the Supabase PostgreSQL connection URL.");
+  console.warn("⚠️  DATABASE_URL is missing. App will run in mock mode.");
+  console.warn("   To enable database features, set DATABASE_URL in Railway environment variables.");
+  // Don't throw error - let app run in mock mode
+  databaseUrl = "mock://database";
 }
 
 console.log('✅ Using database connection:', databaseUrl.replace(/:([^@]+)@/, ':***@'));
 
 // Create PostgreSQL client with optimized connection settings
-const pool = new Pool({
-  connectionString: databaseUrl,
-  ssl: { rejectUnauthorized: false }, // Database requires SSL
-  max: 20, // Support higher concurrency 
-  min: 2, // Keep minimal connections open
-  idleTimeoutMillis: 300000, // 5 minutes idle timeout
-  connectionTimeoutMillis: 20000, // 20 second connection timeout
-  statement_timeout: 30000, // 30 second statement timeout
-  keepAlive: true, // Enable TCP keep-alive
-  keepAliveInitialDelayMillis: 10000, // Wait 10s before first keep-alive probe
-  application_name: 'bytewise-nutritionist',
-});
+let pool: Pool | null = null;
+
+if (databaseUrl !== "mock://database") {
+  pool = new Pool({
+    connectionString: databaseUrl,
+    ssl: { rejectUnauthorized: false }, // Database requires SSL
+    max: 20, // Support higher concurrency 
+    min: 2, // Keep minimal connections open
+    idleTimeoutMillis: 300000, // 5 minutes idle timeout
+    connectionTimeoutMillis: 20000, // 20 second connection timeout
+    statement_timeout: 30000, // 30 second statement timeout
+    keepAlive: true, // Enable TCP keep-alive
+    keepAliveInitialDelayMillis: 10000, // Wait 10s before first keep-alive probe
+    application_name: 'bytewise-nutritionist',
+  });
+} else {
+  console.log("🔧 Running in mock database mode - database features disabled");
+}
 
 console.log('🔒 Database SSL mode: enabled with rejectUnauthorized: false');
 
@@ -135,7 +144,7 @@ const withRetry = async <T>(operation: () => Promise<T>, maxRetries = 3): Promis
 };
 
 // Create db instance with retry wrapper
-export const db = drizzle(pool, { schema });
+export const db = pool ? drizzle(pool, { schema }) : null;
 
 // Export retry wrapper for use in storage operations
 export { withRetry };
