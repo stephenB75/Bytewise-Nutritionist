@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Auth Test</title>
+</head>
+<body>
+    <h1>Authentication Test</h1>
+    <div id="status">Loading...</div>
+    <button onclick="clearAuth()">Clear Auth</button>
+    <button onclick="testLogin()">Test Login</button>
+    
+    <script>
+        function clearAuth() {
+            localStorage.clear();
+            location.reload();
+        }
+        
+        async function testLogin() {
+            try {
+                const response = await fetch('/api/auth/signin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: 'test@example.com', password: 'password123' })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('auth_token', data.session.access_token);
+                    localStorage.setItem('refresh_token', data.session.refresh_token);
+                    localStorage.setItem('expires_at', data.session.expires_at.toString());
+                    document.getElementById('status').innerHTML = 'Login successful! Token saved.';
+                } else {
+                    document.getElementById('status').innerHTML = 'Login failed: ' + response.status;
+                }
+            } catch (error) {
+                document.getElementById('status').innerHTML = 'Error: ' + error.message;
+            }
+        }
+        
+        // Check current auth state
+        const token = localStorage.getItem('auth_token');
+        document.getElementById('status').innerHTML = token ? 'Token exists: ' + token.substring(0, 20) + '...' : 'No token found';
+    </script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Fixes</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 4px; }
+        .success { background: #d4edda; border-color: #c3e6cb; }
+        .error { background: #f8d7da; border-color: #f5c6cb; }
+        .info { background: #d1ecf1; border-color: #bee5eb; }
+        button { background: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin: 5px; }
+        button:hover { background: #0056b3; }
+        .clear-btn { background: #dc3545; }
+        .clear-btn:hover { background: #c82333; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Test Error Fixes</h1>
+        
+        <div class="section info">
+            <h3>Issues Fixed:</h3>
+            <ul>
+                <li>✅ Service Worker URL validation (chrome-extension URLs)</li>
+                <li>✅ Authentication token validation</li>
+                <li>✅ Error handling improvements</li>
+                <li>✅ Cache validation for invalid URLs</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h3>Test Actions</h3>
+            <button onclick="clearAll()" class="clear-btn">Clear All Data & Test</button>
+            <button onclick="testAuth()">Test Authentication</button>
+            <button onclick="goToApp()">Go to Main App</button>
+        </div>
+        
+        <div class="section">
+            <h3>Current State</h3>
+            <div id="currentState">Loading...</div>
+        </div>
+        
+        <div class="section">
+            <h3>Console Logs</h3>
+            <div id="consoleLogs">
+                <p>Check browser console for detailed logs...</p>
+                <p>Look for these messages:</p>
+                <ul>
+                    <li>🔍 Checking authentication state...</li>
+                    <li>🔓 No token found, user not authenticated</li>
+                    <li>✅ User authenticated: [email]</li>
+                    <li>❌ Token invalid, clearing authentication</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function updateCurrentState() {
+            const token = localStorage.getItem('auth_token');
+            const refreshToken = localStorage.getItem('refresh_token');
+            const expiresAt = localStorage.getItem('expires_at');
+            
+            const state = document.getElementById('currentState');
+            state.innerHTML = `
+                <div><strong>Token:</strong> ${token ? 'EXISTS (' + token.substring(0, 20) + '...)' : 'NONE'}</div>
+                <div><strong>Refresh Token:</strong> ${refreshToken ? 'EXISTS' : 'NONE'}</div>
+                <div><strong>Expires At:</strong> ${expiresAt || 'NONE'}</div>
+                <div><strong>Status:</strong> ${token ? 'AUTHENTICATED' : 'NOT AUTHENTICATED'}</div>
+                <div><strong>Expected:</strong> ${token ? 'Should show main app' : 'Should show login screen'}</div>
+            `;
+        }
+        
+        function clearAll() {
+            console.log('🧹 Clearing all data...');
+            localStorage.clear();
+            sessionStorage.clear();
+            
+            // Clear cookies
+            document.cookie.split(";").forEach(function(c) { 
+                document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+            });
+            
+            updateCurrentState();
+            console.log('✅ All data cleared');
+        }
+        
+        async function testAuth() {
+            try {
+                console.log('🧪 Testing authentication...');
+                const response = await fetch('/api/auth/signin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: 'test@example.com', password: 'password123' })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('✅ Login successful:', data);
+                    localStorage.setItem('auth_token', data.session.access_token);
+                    localStorage.setItem('refresh_token', data.session.refresh_token);
+                    localStorage.setItem('expires_at', data.session.expires_at.toString());
+                    updateCurrentState();
+                } else {
+                    console.log('❌ Login failed:', response.status);
+                }
+            } catch (error) {
+                console.error('❌ Login error:', error);
+            }
+        }
+        
+        function goToApp() {
+            window.location.href = '/';
+        }
+        
+        // Initialize
+        updateCurrentState();
+        
+        // Auto-update every 2 seconds
+        setInterval(updateCurrentState, 2000);
+        
+        // Log when page loads
+        console.log('🔧 Test Fixes page loaded');
+        console.log('📱 Current URL:', window.location.href);
+        console.log('🌐 User Agent:', navigator.userAgent);
+    </script>
+</body>
+</html>

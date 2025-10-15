@@ -1,0 +1,167 @@
+{
+  "id": "com.bytewise.nutritionist",
+  "name": "bytewise nutritionist",
+  "short_name": "bytewise",
+  "description": "Professional nutrition tracking app with USDA database integration, meal planning, and progress analytics",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#7dd3fc",
+  "background_color": "#ffffff",
+  "categories": ["health", "lifestyle", "food"],
+  "lang": "en-US",
+  "dir": "ltr",
+  "scope": "/",
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "icons": [
+    {
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Log Meal",
+      "short_name": "Log Meal",
+      "description": "Quick meal logging",
+      "url": "/calculator",
+      "icons": [
+        {
+          "src": "/icons/shortcut-meal.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "View Dashboard",
+      "short_name": "Dashboard",
+      "description": "View nutrition dashboard",
+      "url": "/dashboard",
+      "icons": [
+        {
+          "src": "/icons/shortcut-dashboard.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Weekly Progress",
+      "short_name": "Progress",
+      "description": "Check weekly progress",
+      "url": "/weekly",
+      "icons": [
+        {
+          "src": "/icons/shortcut-progress.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/dashboard-mobile.png",
+      "sizes": "1024x1792",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "bytewise Dashboard"
+    },
+    {
+      "src": "/screenshots/calculator-mobile.png", 
+      "sizes": "1024x1792",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Calorie Calculator"
+    },
+    {
+      "src": "/screenshots/profile-mobile.png",
+      "sizes": "1024x1792", 
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "User Profile"
+    }
+  ],
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "file_handlers": [
+    {
+      "action": "/import-data",
+      "accept": {
+        "application/json": [".json"],
+        "text/csv": [".csv"]
+      }
+    }
+  ],
+  "protocol_handlers": [
+    {
+      "protocol": "web+bytewise",
+      "url": "/app?action=%s"
+    }
+  ],
+  "iarc_rating_id": "e58c174a-81d2-5c3c-32cc-34b8de4a52e9",
+  "scope_extensions": [
+    {
+      "origin": "https://api.nal.usda.gov"
+    }
+  ]
+}
