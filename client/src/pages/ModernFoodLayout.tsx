@@ -57,7 +57,8 @@ import {
   PlayCircle,
   GraduationCap,
   Play,
-  Camera
+  Camera,
+  Crown
 } from 'lucide-react';
 import { House, ForkKnife, Timer, ChartBar, User } from 'phosphor-react';
 // import { NotificationDropdown } from '@/components/NotificationDropdown';
@@ -72,8 +73,9 @@ import { useLocation } from 'wouter';
 import AIFoodAnalyzer from './AIFoodAnalyzer';
 // import { AppleHealthIntegration } from '../components/AppleHealthIntegration';
 // import { healthKitService } from '../services/healthKit';
-// import { PremiumFeatureGate } from '@/components/PremiumFeatureGate';
-// import { useSubscription } from '@/hooks/useSubscription';
+import { PremiumFeatureGate } from '@/components/PremiumFeatureGate';
+import { useSubscription } from '@/hooks/useSubscription';
+import { SubscriptionManager } from '@/components/SubscriptionManager';
 
 
 // Types
@@ -106,7 +108,7 @@ type TrackingView = 'daily' | 'weekly';
 
 export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) {
   const { user, isLoading: authLoading, refetch: refetchUser } = useAuth();
-  // const { isPremium, isLoading: subscriptionLoading } = useSubscription();
+  const { isPremium, isLoading: subscriptionLoading } = useSubscription();
   const [activeTab, setActiveTab] = useState('home');
   const [previousTab, setPreviousTab] = useState('home');
   const [openCard, setOpenCard] = useState<string | undefined>(undefined);
@@ -2686,7 +2688,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
           <div className="main-content">
             {nutritionMode === 'ai' ? (
-              <AIFoodAnalyzer />
+              <PremiumFeatureGate
+                feature="AI Food Recognition"
+                description="Unlimited AI-powered food analysis with photo recognition"
+              >
+                <AIFoodAnalyzer />
+              </PremiumFeatureGate>
             ) : (
               <CalorieCalculator 
                 onNavigate={onNavigate}
@@ -3147,6 +3154,37 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 
                 <AccordionContent className="px-6 pb-6 pt-0">
                   <DataManagementPanel />
+                </AccordionContent>
+              </Card>
+            </AccordionItem>
+            
+            {/* Subscription Card */}
+            <AccordionItem value="subscription" className="border-none">
+              <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 overflow-hidden rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:from-amber-100 hover:to-amber-200 hover:border-amber-300/50">
+                <AccordionTrigger className="px-6 py-6 hover:bg-amber-200/30 hover:no-underline [&[data-state=open]>div]:text-[#faed39] [&[data-state=open]]:bg-amber-200/30">
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center space-x-3">
+                      <Crown className="w-6 h-6 text-[#faed39]" />
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900">Subscription</h3>
+                        <p className="text-sm text-gray-600">Manage your premium features</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      {isPremium ? (
+                        <Badge className="bg-green-100 text-green-800 border-green-200">
+                          Premium Active
+                        </Badge>
+                      ) : (
+                        <Badge className="bg-gray-100 text-gray-800 border-gray-200">
+                          Free Plan
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-6 pt-0">
+                  <SubscriptionManager />
                 </AccordionContent>
               </Card>
             </AccordionItem>
