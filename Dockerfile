@@ -39,13 +39,20 @@ COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/tsconfig.json ./
 COPY --from=builder /app/vite.config.ts ./
 
+# Install tsx globally for production
+RUN npm install -g tsx
+
 # Set environment variables
 ENV NODE_ENV=production
-ENV HOST=::
+ENV HOST=0.0.0.0
 ENV PORT=5000
 
 # Expose port
 EXPOSE 5000
 
+# Add health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD curl -f http://localhost:5000/health || exit 1
+
 # Start the application using tsx to run TypeScript server directly
-CMD ["npx", "tsx", "server/index.ts"]
+CMD ["tsx", "server/index.ts"]
