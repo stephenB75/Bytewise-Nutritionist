@@ -1,0 +1,68 @@
+#!/bin/bash
+
+echo "🚀 ByteWise Nutritionist - GitHub Setup Script"
+echo "=============================================="
+echo ""
+
+# Check if GitHub CLI is installed
+if command -v gh &> /dev/null; then
+    echo "✅ GitHub CLI found"
+    echo ""
+    echo "🔧 Option 1: Using GitHub CLI (Recommended)"
+    echo "------------------------------------------"
+    echo "1. Authenticate with GitHub:"
+    echo "   gh auth login"
+    echo ""
+    echo "2. Create repository:"
+    echo "   gh repo create Bytewise-Nutritionist --public --description 'AI-powered nutrition tracking app with iOS deployment target fixes'"
+    echo ""
+    echo "3. Push code:"
+    echo "   git remote set-url origin https://github.com/\$(gh api user --jq .login)/Bytewise-Nutritionist.git"
+    echo "   git push -u origin main"
+    echo ""
+else
+    echo "❌ GitHub CLI not found"
+    echo ""
+    echo "🔧 Option 2: Manual Setup"
+    echo "-------------------------"
+    echo "1. Go to https://github.com/new"
+    echo "2. Create repository:"
+    echo "   - Name: Bytewise-Nutritionist"
+    echo "   - Description: AI-powered nutrition tracking app with iOS deployment target fixes"
+    echo "   - Visibility: Public (or Private)"
+    echo "   - DO NOT initialize with README, .gitignore, or license"
+    echo ""
+    echo "3. After creating, run these commands:"
+    echo "   git remote set-url origin https://github.com/YOUR_USERNAME/Bytewise-Nutritionist.git"
+    echo "   git push -u origin main"
+    echo ""
+fi
+
+echo "📋 Current Repository Status:"
+echo "----------------------------"
+echo "✅ Local repository: Ready"
+echo "✅ All files committed: $(git rev-list --count HEAD) commits"
+echo "✅ Branch: $(git branch --show-current)"
+echo "✅ Remote: $(git remote get-url origin 2>/dev/null || echo 'Not set')"
+echo ""
+
+echo "🎯 Next Steps:"
+echo "-------------"
+echo "1. Create GitHub repository (using one of the options above)"
+echo "2. Update remote URL with your actual GitHub username"
+echo "3. Push code to GitHub"
+echo "4. Verify all files are uploaded correctly"
+echo ""
+
+echo "📱 After GitHub Setup:"
+echo "---------------------"
+echo "1. Test iOS build: cd ios && ./fix-ios-deployment-target.sh"
+echo "2. Open in Xcode: open ios/App/App.xcodeproj"
+echo "3. Build and test on iOS simulator"
+echo ""
+
+echo "🔗 Repository will be available at:"
+echo "https://github.com/YOUR_USERNAME/Bytewise-Nutritionist"
+echo ""
+
+echo "✨ Setup complete! Follow the steps above to push to GitHub."
