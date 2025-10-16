@@ -37,28 +37,35 @@ if (databaseUrl !== "mock://database") {
 console.log('🔒 Database SSL mode: enabled with rejectUnauthorized: false');
 
 // Enhanced error handling and recovery for PostgreSQL
-pool.on('error', (err) => {
-  console.error('❌ Database pool error:', err);
-  console.error('🔧 Connection will be automatically recreated on next request');
-});
+if (pool) {
+  pool.on('error', (err) => {
+    console.error('❌ Database pool error:', err);
+    console.error('🔧 Connection will be automatically recreated on next request');
+  });
+}
 
-pool.on('connect', (client) => {
-  console.log('✅ New database connection established');
-  
-  // Set connection-specific settings
-  client.query(`
-    SET statement_timeout = '30s';
-    SET lock_timeout = '10s';
-    SET idle_in_transaction_session_timeout = '60s';
-  `).catch(err => console.log('⚠️ Could not set connection parameters:', err.message));
-});
+if (pool) {
+  pool.on('connect', (client) => {
+    console.log('✅ New database connection established');
+    
+    // Set connection-specific settings
+    client.query(`
+      SET statement_timeout = '30s';
+      SET lock_timeout = '10s';
+      SET idle_in_transaction_session_timeout = '60s';
+    `).catch(err => console.log('⚠️ Could not set connection parameters:', err.message));
+  });
 
-pool.on('remove', (client) => {
-  console.log('🔄 Database connection removed from pool');
-});
+  pool.on('remove', (client) => {
+    console.log('🔄 Database connection removed from pool');
+  });
+}
 
 // Add connection health check
 const isConnectionHealthy = async (): Promise<boolean> => {
+  if (!pool) {
+    return true; // Mock mode is always "healthy"
+  }
   try {
     const client = await pool.connect();
     await client.query('SELECT 1');
@@ -71,6 +78,11 @@ const isConnectionHealthy = async (): Promise<boolean> => {
 
 // Test connection on startup with retry logic
 const testConnection = async () => {
+  if (!pool) {
+    console.log('✅ Mock database mode - skipping connection test');
+    return;
+  }
+  
   let attempts = 0;
   const maxAttempts = 3;
   
