@@ -37,6 +37,7 @@ import {
   Flame,
   Target,
   Trophy,
+  Crown,
   Calendar,
   Download,
   Bell,
@@ -72,8 +73,9 @@ import { useLocation } from 'wouter';
 import AIFoodAnalyzer from './AIFoodAnalyzer';
 // import { AppleHealthIntegration } from '../components/AppleHealthIntegration';
 // import { healthKitService } from '../services/healthKit';
-// import { PremiumFeatureGate } from '@/components/PremiumFeatureGate';
-// import { useSubscription } from '@/hooks/useSubscription';
+import { PremiumFeatureGate } from '@/components/PremiumFeatureGate';
+import { useSubscription } from '@/hooks/useSubscription';
+import { SubscriptionManager } from '@/components/SubscriptionManager';
 
 
 // Types
@@ -106,7 +108,7 @@ type TrackingView = 'daily' | 'weekly';
 
 export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) {
   const { user, isLoading: authLoading, refetch: refetchUser } = useAuth();
-  // const { isPremium, isLoading: subscriptionLoading } = useSubscription();
+  const { isPremium, isLoading: subscriptionLoading } = useSubscription();
   const [activeTab, setActiveTab] = useState('home');
   const [previousTab, setPreviousTab] = useState('home');
   const [openCard, setOpenCard] = useState<string | undefined>(undefined);
@@ -2686,7 +2688,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
           <div className="main-content">
             {nutritionMode === 'ai' ? (
-              <AIFoodAnalyzer />
+              <PremiumFeatureGate 
+                feature="AI Food Analysis"
+                description="Analyze food photos with advanced AI technology"
+              >
+                <AIFoodAnalyzer />
+              </PremiumFeatureGate>
             ) : (
               <CalorieCalculator 
                 onNavigate={onNavigate}
@@ -3147,6 +3154,36 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 
                 <AccordionContent className="px-6 pb-6 pt-0">
                   <DataManagementPanel />
+                </AccordionContent>
+              </Card>
+            </AccordionItem>
+
+            {/* Subscription Management Card */}
+            <AccordionItem value="subscription" className="border-none">
+              <Card className="bg-gradient-to-br from-purple-50 to-purple-100 backdrop-blur-md border-purple-200/40 overflow-hidden rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:from-purple-100 hover:to-purple-200 hover:border-purple-300/50">
+                <AccordionTrigger className="px-6 py-6 hover:bg-purple-200/30 hover:no-underline [&[data-state=open]>div]:text-purple-600 [&[data-state=open]]:bg-purple-200/30">
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center space-x-3">
+                      <Crown className="w-6 h-6 text-purple-600" />
+                      <div>
+                        <h3 className="text-xl font-semibold transition-colors" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                          Subscription & Premium
+                        </h3>
+                        <p className="text-sm text-gray-700" style={{ fontFamily: "'Work Sans', sans-serif" }}>
+                          Manage your subscription and unlock premium features
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right flex-shrink-0 ml-3">
+                      <div className="text-xs text-gray-600">
+                        {isPremium ? 'Premium Active' : 'Free Plan'}
+                      </div>
+                    </div>
+                  </div>
+                </AccordionTrigger>
+                
+                <AccordionContent className="px-6 pb-6 pt-0">
+                  <SubscriptionManager />
                 </AccordionContent>
               </Card>
             </AccordionItem>
