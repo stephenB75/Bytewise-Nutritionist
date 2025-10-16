@@ -47,7 +47,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       status: 'healthy',
       timestamp: new Date().toISOString(),
       environment: process.env.NODE_ENV || 'development',
-      version: 'BETA 4.2'
+      version: 'BETA 4.3'
     });
   });
 
@@ -59,7 +59,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: 'healthy',
         timestamp: new Date().toISOString(),
         environment: process.env.NODE_ENV || 'development',
-        version: 'BETA 4.2',
+        version: 'BETA 4.3',
         uptime: process.uptime(),
         memory: process.memoryUsage(),
         port: process.env.PORT || '5000',
