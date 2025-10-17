@@ -109,6 +109,12 @@ export function useSubscription() {
       try {
         setSubscriptionState(prev => ({ ...prev, isLoading: true, error: null }));
         
+        // Skip RevenueCat initialization in web environment
+        if (typeof window === 'undefined') {
+          setSubscriptionState(prev => ({ ...prev, isLoading: false }));
+          return;
+        }
+
         // Configure RevenueCat (you'll need to add your API key)
         await Purchases.configure({
           apiKey: process.env.REACT_APP_REVENUECAT_API_KEY || 'your_revenuecat_api_key',
@@ -128,16 +134,40 @@ export function useSubscription() {
         }));
 
       } catch (error) {
-        console.error('RevenueCat initialization error:', error);
+        console.warn('RevenueCat initialization error (expected in web mode):', error);
         setSubscriptionState(prev => ({
           ...prev,
-          error: 'Failed to initialize subscription service',
+          error: null, // Don't show error in web mode
           isLoading: false
         }));
       }
     };
 
     initializeRevenueCat();
+    
+    // Also fetch subscription status from API as fallback
+    fetchSubscriptionFromAPI();
+  }, []);
+
+  // Fetch subscription status from API
+  const fetchSubscriptionFromAPI = useCallback(async () => {
+    try {
+      const response = await fetch('/api/subscription/status');
+      if (response.ok) {
+        const data = await response.json();
+        setSubscriptionState(prev => ({
+          ...prev,
+          isPremium: data.isPremium || false,
+          isPro: data.isPro || false,
+          tier: data.tier || 'free',
+          status: data.status || 'inactive',
+          expiresAt: data.expiresAt ? new Date(data.expiresAt) : null,
+          isLoading: false
+        }));
+      }
+    } catch (error) {
+      console.warn('Failed to fetch subscription from API:', error);
+    }
   }, []);
 
   // Handle customer info updates

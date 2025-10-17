@@ -2677,10 +2677,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Subscription API routes
-  app.get('/api/subscription/status', isAuthenticated, createAuthenticatedHandler(async (req, res) => {
+  app.get('/api/subscription/status', async (req, res) => {
     const userId = (req as AuthenticatedRequest).user?.id;
+    
+    // Return default free tier for unauthenticated users
     if (!userId) {
-      res.status(401).json({ error: 'Unauthorized' });
+      res.json({
+        isActive: false,
+        tier: 'free',
+        status: 'inactive',
+        isPremium: false,
+        isPro: false
+      });
       return;
     }
 
@@ -2691,7 +2699,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.json({
           isActive: false,
           tier: 'free',
-          status: 'inactive'
+          status: 'inactive',
+          isPremium: false,
+          isPro: false
         });
         return;
       }
@@ -2700,19 +2710,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const now = new Date();
       const isExpired = subscription.expiresAt && subscription.expiresAt < now;
       
+      const currentTier = isExpired ? 'free' : subscription.tier;
       res.json({
         isActive: !isExpired && subscription.status === 'active',
-        tier: isExpired ? 'free' : subscription.tier,
+        tier: currentTier,
         status: isExpired ? 'expired' : subscription.status,
         productId: subscription.productId,
         expiresAt: subscription.expiresAt,
-        willRenew: subscription.willRenew
+        willRenew: subscription.willRenew,
+        isPremium: currentTier === 'premium' || currentTier === 'pro',
+        isPro: currentTier === 'pro'
       });
     } catch (error) {
       console.error('❌ Failed to get subscription status:', error);
       res.status(500).json({ error: 'Failed to get subscription status' });
     }
-  }));
+  });
 
   app.post('/api/subscription/sync', isAuthenticated, createAuthenticatedHandler(async (req, res) => {
     const userId = (req as AuthenticatedRequest).user?.id;

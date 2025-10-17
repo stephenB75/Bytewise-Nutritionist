@@ -171,11 +171,19 @@ async function handleApiRequest(request) {
 
 // Stale-while-revalidate strategy for dynamic content
 async function handleDynamicRequest(request) {
+  // Skip caching for non-http requests (chrome-extension, etc.)
+  if (!request.url.startsWith('http')) {
+    return fetch(request);
+  }
+  
   const cache = await caches.open(DYNAMIC_CACHE);
   const cachedResponse = await cache.match(request);
   
   const fetchPromise = fetch(request).then(networkResponse => {
-    cache.put(request, networkResponse.clone());
+    // Only cache successful responses
+    if (networkResponse.ok) {
+      cache.put(request, networkResponse.clone());
+    }
     return networkResponse;
   }).catch(() => cachedResponse);
   
