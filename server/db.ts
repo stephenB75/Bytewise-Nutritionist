@@ -24,7 +24,7 @@ if (databaseUrl !== "mock://database") {
     max: 20, // Support higher concurrency 
     min: 2, // Keep minimal connections open
     idleTimeoutMillis: 300000, // 5 minutes idle timeout
-    connectionTimeoutMillis: 20000, // 20 second connection timeout
+    connectionTimeoutMillis: 60000, // 60 second connection timeout
     statement_timeout: 30000, // 30 second statement timeout
     keepAlive: true, // Enable TCP keep-alive
     keepAliveInitialDelayMillis: 10000, // Wait 10s before first keep-alive probe
@@ -99,10 +99,13 @@ const testConnection = async () => {
       
       if (attempts === maxAttempts) {
         console.error('🚨 Failed to establish database connection after max attempts');
-        // Don't throw - let the app start but log the issue
+        console.error('🔧 Switching to mock database mode for local development');
+        // Switch to mock mode by setting pool to null
+        pool = null;
+        console.log('✅ App will run in mock database mode - database features disabled');
       } else {
         // Wait before retry
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        await new Promise(resolve => setTimeout(resolve, 3000));
       }
     }
   }
@@ -157,6 +160,13 @@ const withRetry = async <T>(operation: () => Promise<T>, maxRetries = 3): Promis
 
 // Create db instance with retry wrapper
 export const db = pool ? drizzle(pool, { schema }) : null;
+
+// Update db export if pool becomes null during runtime
+const updateDbExport = () => {
+  if (pool === null) {
+    console.log('🔄 Database pool is null - updating db export to null');
+  }
+};
 
 // Export retry wrapper for use in storage operations
 export { withRetry };

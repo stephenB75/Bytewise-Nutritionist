@@ -2846,6 +2846,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       console.log('🚀 Starting background initialization...');
       
+      // Set a timeout for background initialization
+      const initTimeout = setTimeout(() => {
+        console.warn('⚠️ Background initialization timed out after 30 seconds');
+      }, 30000);
+      
       // Give auth setup time to complete
       await new Promise(resolve => setTimeout(resolve, 2000));
       
@@ -2858,6 +2863,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.warn('⚠️ Storage bucket initialization failed (non-critical):', storageError);
       }
       
+      clearTimeout(initTimeout);
       console.log('✅ Background initialization completed');
     } catch (error) {
       console.warn('⚠️ Background initialization failed:', error);

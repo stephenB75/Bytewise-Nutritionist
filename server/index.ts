@@ -172,6 +172,35 @@ app.use((req, res, next) => {
   const port = parseInt(process.env.PORT || '5000', 10);
   const host = process.env.HOST || "0.0.0.0";
   
+  // Add error handling for server startup
+  server.on('error', (err: any) => {
+    if (err.code === 'EADDRINUSE') {
+      log(`❌ Port ${port} is already in use. Trying port ${port + 1}...`);
+      server.listen(port + 1, host, () => {
+        const appUrl = isProduction 
+          ? 'https://www.bytewisenutritionist.com'
+          : `http://${host}:${port + 1}`;
+        
+        log(`✅ Server successfully started on port ${port + 1}`);
+        log(`🌐 Host: ${host}`);
+        log(`🔌 Port: ${port + 1}`);
+        log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+        log(`🔗 URL: ${appUrl}`);
+        log(`💓 Health check: ${appUrl}/health`);
+        log(`✅ Ready check: ${appUrl}/ready`);
+        
+        if (isProduction) {
+          log(`🚀 Production deployment ready for cloud hosting`);
+        } else {
+          log(`🔧 Development server ready`);
+        }
+      });
+    } else {
+      log(`❌ Server error: ${err.message}`);
+      process.exit(1);
+    }
+  });
+  
   server.listen(port, host, () => {
     const appUrl = isProduction 
       ? 'https://www.bytewisenutritionist.com'

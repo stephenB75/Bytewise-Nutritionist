@@ -302,9 +302,14 @@ export class SupabaseStorageService {
 
   // Initialize bucket (create if doesn't exist)
   async initializeBucket(): Promise<void> {
+    if (!this.supabase) {
+      console.log('⚠️  Supabase client not available - skipping bucket initialization');
+      return;
+    }
+    
     try {
       // Check if bucket exists
-      const { data: buckets, error: listError } = await supabase.storage.listBuckets();
+      const { data: buckets, error: listError } = await this.supabase.storage.listBuckets();
       
       if (listError) {
         console.error('❌ Error listing buckets:', listError);
@@ -315,7 +320,7 @@ export class SupabaseStorageService {
       
       if (!bucketExists) {
         console.log('🪣 Creating Supabase Storage bucket...');
-        const { error: createError } = await supabase.storage.createBucket(this.bucketName, {
+        const { error: createError } = await this.supabase.storage.createBucket(this.bucketName, {
           public: false, // Files are private by default, access via signed URLs
           allowedMimeTypes: ['image/*', 'application/*'],
           fileSizeLimit: 50 * 1024 * 1024 // 50MB limit
