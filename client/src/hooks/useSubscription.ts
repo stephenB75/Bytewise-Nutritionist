@@ -4,7 +4,35 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Purchases, CustomerInfo, PurchasesOffering } from '@revenuecat/purchases-capacitor';
+
+// Web-compatible types (mock for now)
+interface CustomerInfo {
+  activeSubscriptions: string[];
+  allPurchaseDates: { [key: string]: string };
+  entitlements: { [key: string]: any };
+}
+
+interface PurchasesOffering {
+  identifier: string;
+  serverDescription: string;
+  metadata: { [key: string]: any };
+  availablePackages: any[];
+}
+
+// Mock RevenueCat for web environment
+const Purchases = {
+  configure: async () => {},
+  getCustomerInfo: async (): Promise<CustomerInfo> => ({
+    activeSubscriptions: [],
+    allPurchaseDates: {},
+    entitlements: {}
+  }),
+  getOfferings: async (): Promise<{ current: PurchasesOffering | null }> => ({
+    current: null
+  }),
+  purchasePackage: async () => ({ customerInfo: {} as CustomerInfo }),
+  restorePurchases: async () => ({ customerInfo: {} as CustomerInfo })
+};
 
 export interface SubscriptionTier {
   id: string;
@@ -26,6 +54,7 @@ export interface SubscriptionState {
   error: string | null;
   offerings: PurchasesOffering[];
   currentOffering: PurchasesOffering | null;
+  subscriptionTiers: SubscriptionTier[];
 }
 
 const SUBSCRIPTION_TIERS: SubscriptionTier[] = [
@@ -70,7 +99,8 @@ export function useSubscription() {
     isLoading: true,
     error: null,
     offerings: [],
-    currentOffering: null
+    currentOffering: null,
+    subscriptionTiers: SUBSCRIPTION_TIERS
   });
 
   // Initialize RevenueCat
