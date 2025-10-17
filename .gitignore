@@ -88,3 +88,19 @@ temp/
 # Replit specific
 .replit
 replit.nix
+# Temporary debug files
+*.html
+*.log
+
+# Setup scripts (temporary)
+*setup*.sh
+*push*.sh
+*test*.sh
+
+# Backup files
+*.backup
+*_backup
+
+# System files
+.DS_Store
+Thumbs.db
