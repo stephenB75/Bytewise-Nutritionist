@@ -2,22 +2,13 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
 import { fileURLToPath, URL } from "node:url";
-import checker from "vite-plugin-checker";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   plugins: [
     react(),
-    process.env.NODE_ENV === "development" &&
-      checker({
-        typescript: true,
-        overlay: {
-          initialIsOpen: false,
-          position: "br",
-        },
-      }),
-  ].filter(Boolean),
+  ],
   
   resolve: {
     alias: {
