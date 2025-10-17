@@ -11,12 +11,16 @@ import { randomUUID } from 'crypto';
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
-  throw new Error('SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required for storage operations');
+if (!SUPABASE_URL) {
+  throw new Error('SUPABASE_URL is required for storage operations');
+}
+
+if (!SUPABASE_SERVICE_KEY) {
+  console.warn('⚠️  SUPABASE_SERVICE_ROLE_KEY is missing. Storage operations will be disabled.');
 }
 
 // Create Supabase client with service role for storage operations
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+const supabase = SUPABASE_SERVICE_KEY ? createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY) : null;
 
 export class SupabaseStorageError extends Error {
   constructor(message: string) {
@@ -34,6 +38,10 @@ export class SupabaseStorageService {
 
   // Get upload URL for file uploads
   async getObjectEntityUploadURL(contentType: string = 'application/octet-stream'): Promise<string> {
+    if (!supabase) {
+      throw new SupabaseStorageError('Storage service is not available - SUPABASE_SERVICE_ROLE_KEY is missing');
+    }
+    
     try {
       const fileName = `uploads/${randomUUID()}`;
       
