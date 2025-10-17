@@ -25,33 +25,10 @@ export function useGoalAchievements() {
   }, []);
 
   const checkGoalAchievements = useCallback(async () => {
-    // Mock goal achievements for demo
-    const mockAchievements: GoalAchievement[] = [
-      {
-        id: 'first-meal',
-        title: 'First Meal Logged',
-        description: 'You logged your first meal!',
-        icon: '🍽️',
-        achieved: true,
-        achievedAt: new Date().toISOString(),
-      },
-      {
-        id: 'calorie-goal',
-        title: 'Calorie Goal Met',
-        description: 'You met your daily calorie goal!',
-        icon: '🎯',
-        achieved: false,
-      },
-      {
-        id: 'protein-goal',
-        title: 'Protein Goal Met',
-        description: 'You met your daily protein goal!',
-        icon: '💪',
-        achieved: false,
-      },
-    ];
-
-    setAchievements(mockAchievements);
+    // TODO: Implement real goal achievement checking
+    // This should check against actual user data and goals
+    const achievements: GoalAchievement[] = [];
+    setAchievements(achievements);
   }, []);
 
   return {

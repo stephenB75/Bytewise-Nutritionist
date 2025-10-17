@@ -7,7 +7,7 @@ import { setupAuth, isAuthenticated, optionalAuth, serverSupabase, supabaseAdmin
 // import { analyzeFoodImage, getNutritionFromUSDA } from "./aiService";
 import { db } from "./db";
 import { meals, userPhotos } from "@shared/schema";
-import { eq, and, gte, desc, inArray } from "drizzle-orm";
+import { eq, and, gte, desc, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 import { supabaseStorageService } from "./supabaseStorage";
 import express from "express";
@@ -42,24 +42,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const server = createServer(app);
   // Health check endpoint - simplified for production
   app.get('/api/health', async (req: Request, res: Response) => {
-    // Basic health check - server is responding
-    res.status(200).json({
-      status: 'healthy',
-      timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV || 'development',
-      version: 'BETA 4.3'
-    });
+    try {
+      // Check database connection status
+      let databaseStatus = 'disconnected';
+      if (db) {
+        try {
+          await db.execute(sql`SELECT 1`);
+          databaseStatus = 'connected';
+        } catch (error) {
+          databaseStatus = 'error';
+        }
+      } else {
+        databaseStatus = 'mock';
+      }
+
+      res.status(200).json({
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'development',
+        version: 'BETA 4.3',
+        database: databaseStatus
+      });
+    } catch (error) {
+      res.status(503).json({
+        status: 'unhealthy',
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'development',
+        version: 'BETA 4.3',
+        error: 'Health check failed'
+      });
+    }
   });
 
   // Additional health check at root for Railway compatibility
   app.get('/health', async (req: Request, res: Response) => {
     try {
-      // Basic health check - server is responding
+      // Check database connection status
+      let databaseStatus = 'disconnected';
+      if (db) {
+        try {
+          await db.execute(sql`SELECT 1`);
+          databaseStatus = 'connected';
+        } catch (error) {
+          databaseStatus = 'error';
+        }
+      } else {
+        databaseStatus = 'mock';
+      }
+
       const healthData = {
         status: 'healthy',
         timestamp: new Date().toISOString(),
         environment: process.env.NODE_ENV || 'development',
         version: 'BETA 4.3',
+        database: databaseStatus,
         uptime: process.uptime(),
         memory: process.memoryUsage(),
         port: process.env.PORT || '5000',
@@ -79,6 +115,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(503).json({
         status: 'unhealthy',
         timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'development',
+        version: 'BETA 4.3',
         error: 'Health check failed'
       });
     }
