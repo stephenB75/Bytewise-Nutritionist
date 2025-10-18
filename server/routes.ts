@@ -60,7 +60,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: 'healthy',
         timestamp: new Date().toISOString(),
         environment: process.env.NODE_ENV || 'development',
-        version: 'BETA 4.4',
+        version: 'BETA 4.5',
         database: databaseStatus
       });
     } catch (error) {
@@ -68,7 +68,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: 'unhealthy',
         timestamp: new Date().toISOString(),
         environment: process.env.NODE_ENV || 'development',
-        version: 'BETA 4.4',
+        version: 'BETA 4.5',
         error: 'Health check failed'
       });
     }
@@ -94,7 +94,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: 'healthy',
         timestamp: new Date().toISOString(),
         environment: process.env.NODE_ENV || 'development',
-        version: 'BETA 4.4',
+        version: 'BETA 4.5',
         database: databaseStatus,
         uptime: process.uptime(),
         memory: process.memoryUsage(),
@@ -116,7 +116,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: 'unhealthy',
         timestamp: new Date().toISOString(),
         environment: process.env.NODE_ENV || 'development',
-        version: 'BETA 4.4',
+        version: 'BETA 4.5',
         error: 'Health check failed'
       });
     }
