@@ -68,6 +68,14 @@ self.addEventListener('fetch', event => {
   const { request } = event;
   const url = new URL(request.url);
   
+  // Skip chrome-extension and other browser extension requests
+  if (url.protocol === 'chrome-extension:' || 
+      url.protocol === 'moz-extension:' ||
+      url.protocol === 'safari-extension:' ||
+      url.protocol === 'ms-browser-extension:') {
+    return;
+  }
+  
   // Skip non-GET requests
   if (request.method !== 'GET') {
     return;
@@ -171,8 +179,12 @@ async function handleApiRequest(request) {
 
 // Stale-while-revalidate strategy for dynamic content
 async function handleDynamicRequest(request) {
-  // Skip caching for non-http requests (chrome-extension, etc.)
-  if (!request.url.startsWith('http')) {
+  // Skip caching for non-http requests and browser extension URLs
+  if (!request.url.startsWith('http') || 
+      request.url.startsWith('chrome-extension:') ||
+      request.url.startsWith('moz-extension:') ||
+      request.url.startsWith('safari-extension:') ||
+      request.url.startsWith('ms-browser-extension:')) {
     return fetch(request);
   }
   
@@ -180,9 +192,13 @@ async function handleDynamicRequest(request) {
   const cachedResponse = await cache.match(request);
   
   const fetchPromise = fetch(request).then(networkResponse => {
-    // Only cache successful responses
-    if (networkResponse.ok) {
-      cache.put(request, networkResponse.clone());
+    // Only cache successful responses and avoid caching extension requests
+    if (networkResponse.ok && !request.url.includes('chrome-extension')) {
+      try {
+        cache.put(request, networkResponse.clone());
+      } catch (error) {
+        console.warn('Failed to cache request:', request.url, error);
+      }
     }
     return networkResponse;
   }).catch(() => cachedResponse);
