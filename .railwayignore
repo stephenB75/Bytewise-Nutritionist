@@ -1,0 +1,51 @@
+# Railway ignore file - exclude unnecessary files from deployment
+
+# Android build files (large)
+android/
+*.apk
+*.aab
+*.gradle
+gradle/
+
+# iOS build files (large)
+ios/
+*.ipa
+*.xcarchive
+*.xcodeproj
+*.xcworkspace
+
+# Archive and old builds
+archive/
+old-builds/
+
+# Build logs
+*.log
+build_test*.log
+
+# Git files
+.git/
+.gitignore
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Config files
+.config/
+.local/
+
+# Large image assets (keep only dist/public assets)
+dist/public/assets/*.jpg
+!dist/public/assets/icon*.jpg
+!dist/public/assets/logo*.jpg
+
+# Only deploy essential files
+# Railway will use GitHub integration which is more efficient
+
