@@ -1,0 +1,91 @@
+
+> rest-express@1.0.0 build
+> vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+
+vite v5.4.19 building for production...
+transforming...
+✓ 3565 modules transformed.
+rendering chunks...
+warnings when minifying css:
+▲ [WARNING] Unexpected "*" [css-syntax-error]
+
+    <stdin>:516:30:
+      516 │ .relative.bg-background.border*.shadow-lg.rounded-lg,
+          ╵                               ^
+
+
+[plugin:vite:reporter] [plugin vite:reporter] 
+(!) /home/runner/workspace/client/src/lib/supabase.ts is dynamically imported by /home/runner/workspace/client/src/pages/ModernFoodLayout.tsx but also statically imported by /home/runner/workspace/client/src/hooks/useAuth.ts, /home/runner/workspace/client/src/hooks/useSessionManager.ts, /home/runner/workspace/client/src/lib/queryClient.ts, /home/runner/workspace/client/src/pages/ModernFoodLayout.tsx, dynamic import will not move module into another chunk.
+
+computing gzip size...
+../dist/public/index.html                                                                6.15 kB │ gzip:   1.93 kB
+../dist/public/assets/white-chocolate-380702_1280_1755903678479-QgZS3qOa.jpg           153.92 kB
+../dist/public/assets/mango-1534061_1280_1755903678481-Dh03zmsC.jpg                    154.83 kB
+../dist/public/assets/pizza-1317699_1280_1755903678471-B1I-UVTx.jpg                    160.93 kB
+../dist/public/assets/cinnamon-roll-4719023_1280_1755903678474-BlTtcxxN.jpg            183.27 kB
+../dist/public/assets/fresh-pasta-5154248_1280_1755903678477-C_RN9w9-.jpg              197.08 kB
+../dist/public/assets/macarons-2179198_1920_1753859477809-B5cbwbKS-B5cbwbKS.jpg        222.71 kB
+../dist/public/assets/baked-goods-1846460_1280_1755903678474-CbhcPSou.jpg              224.69 kB
+../dist/public/assets/popcorn-4885565_1280_1755903678473-BcpVLdgj.jpg                  232.07 kB
+../dist/public/assets/chocolate-1927921_1920_1753859477802-D-SPQY8I-D-SPQY8I.jpg       235.66 kB
+../dist/public/assets/cookies-8668140_1280_1755903678478-nrk4P9Fo.jpg                  239.15 kB
+../dist/public/assets/variety-5044809_1920_1753859530087-C7xAS9wM-C7xAS9wM.jpg         239.72 kB
+../dist/public/assets/mango-2360551_1280_1755903678481-BxUfCL9M.jpg                    241.83 kB
+../dist/public/assets/strawberries-823782_1280_1755903678482-DYxIs75x.jpg              243.07 kB
+../dist/public/assets/pistachios-3223610_1280_1755903678482-DpM2TKw9.jpg               245.41 kB
+../dist/public/assets/tomatoes-1238255_1920_1753859477803-BBxmQtT1-BBxmQtT1.jpg        248.28 kB
+../dist/public/assets/sushi-5885530_1280_1755903678470-BX1Zd5E4.jpg                    252.48 kB
+../dist/public/assets/cherries-1845053_1280_1755903678472-uVVb5fFi.jpg                 265.70 kB
+../dist/public/assets/blueberries-9450130_1920_1753859477806-DQeN0M4j-DQeN0M4j.jpg     296.99 kB
+../dist/public/assets/bowl-1842294_1920_1753859477806-bRUsOvIC-bRUsOvIC.jpg            311.38 kB
+../dist/public/assets/spaghetti-1392266_1920_1753859477805-HAisuHs3-HAisuHs3.jpg       325.59 kB
+../dist/public/assets/pretzels-3379552_1280_1755903678476-DZVzUK4b.jpg                 326.71 kB
+../dist/public/assets/noodles-2150181_1280_1755903678477-CkuZBl4t.jpg                  331.02 kB
+../dist/public/assets/chocolates-1737503_1280_1755903678479-CpNmK8DA.jpg               347.62 kB
+../dist/public/assets/grapes-2032838_1920_1753859477808-CXmP7soY-CXmP7soY.jpg          348.69 kB
+../dist/public/assets/loaf-4957679_1280_1755903678480-C8kdEOfV.jpg                     349.97 kB
+../dist/public/assets/blueberry-3357568_1280_1755903678475-CiWUVi60.jpg                358.70 kB
+../dist/public/assets/spaghetti-2931846_1920_1753859477804-BSrB8P7y-BSrB8P7y.jpg       372.17 kB
+../dist/public/assets/vegetable-2924245_1920_1753859477807-CZELXr6Z-CZELXr6Z.jpg       376.36 kB
+../dist/public/assets/bread-1836411_1280_1755903678472-DZ3_1WEe.jpg                    381.61 kB
+../dist/public/assets/mango-1534061_1920_1753859530079-BEyrLl3D-BEyrLl3D.jpg           382.54 kB
+../dist/public/assets/sandwich-6935938_1920_1753859794687-CXrSzbzE-CXrSzbzE.jpg        399.55 kB
+../dist/public/assets/oatmeal-1839515_1920_1753859530080-Cf--RV4v-Cf--RV4v.jpg         401.25 kB
+../dist/public/assets/pomegranates-7859172_1280_1755903678476-DtS_dvmi.jpg             460.09 kB
+../dist/public/assets/apple-3313209_1920_1753859530078-BJW4vFlt-BJW4vFlt.jpg           463.93 kB
+../dist/public/assets/strawberry-7224875_1920_1753859477810-CXpGW8lN-CXpGW8lN.jpg      487.84 kB
+../dist/public/assets/chicken-762531_1920_1753859530086-BwBmOm1s-BwBmOm1s.jpg          518.27 kB
+../dist/public/assets/new-years-eve-518032_1920_1753859794689-DPPW0W6m-DPPW0W6m.jpg    522.03 kB
+../dist/public/assets/burgers-5590503_1920_1753859530083-I99DUxaH-I99DUxaH.jpg         545.97 kB
+../dist/public/assets/steak-6278031_1920_1753859530081-BukNuh5v-BukNuh5v.jpg           591.80 kB
+../dist/public/assets/food-993457_1920_1753859794688-oWnyu60z-oWnyu60z.jpg             624.75 kB
+../dist/public/assets/steak-7423231_1920_1753859530082-DBBrmAYH-DBBrmAYH.jpg           636.78 kB
+../dist/public/assets/salad-6948004_1920_1753859530085-1zwSa4Vt-1zwSa4Vt.jpg           644.24 kB
+../dist/public/assets/chicken-nuggets-1108_1920_1753859530084-DLWOOEId-DLWOOEId.jpg    652.24 kB
+../dist/public/assets/chicken-2443901_1920_1753859530084-CTPERNUZ-CTPERNUZ.jpg         664.46 kB
+../dist/public/assets/fried-prawn-1737593_1920_1753859794686-DkxziorZ-DkxziorZ.jpg     671.96 kB
+../dist/public/assets/food-3262796_1920_1753859530086-BeFn5V1r-BeFn5V1r.jpg            683.62 kB
+../dist/public/assets/swedish-6053292_1920_1753859530083-CbbGYA9Y-CbbGYA9Y.jpg         697.46 kB
+../dist/public/assets/pancakes-2291908_1920_1753859477805-FMeaELmV-FMeaELmV.jpg        710.95 kB
+../dist/public/assets/churros-2188871_1920_1753859477808-BGqrIj5F-BGqrIj5F.jpg         923.33 kB
+../dist/public/assets/cupcakes-813078_1920_1753859477803-D9uLIWdp-D9uLIWdp.jpg       1,005.97 kB
+../dist/public/assets/plums-1898196_1920_1753859477809-C44a7c3I-C44a7c3I.jpg         1,034.91 kB
+../dist/public/assets/pizza-2068272_1920_1753859530080-DhVI5ZGb-DhVI5ZGb.jpg         1,150.65 kB
+../dist/public/assets/index-CPyXuePX.css                                               276.49 kB │ gzip:  39.27 kB
+../dist/public/assets/index-BvQyDi3a.js                                                  6.44 kB │ gzip:   2.44 kB
+../dist/public/assets/web-BAMOc7dz.js                                                    9.77 kB │ gzip:   2.00 kB
+../dist/public/assets/purify.es-CQJ0hv7W.js                                             21.82 kB │ gzip:   8.54 kB
+../dist/public/assets/index.es-BKjxHK-w.js                                             150.45 kB │ gzip:  51.23 kB
+../dist/public/assets/html2canvas.esm-CBrSDip1.js                                      201.42 kB │ gzip:  47.70 kB
+../dist/public/assets/pdfExport-CYb1XqB7.js                                            585.83 kB │ gzip: 192.88 kB
+../dist/public/assets/index-Dh6P0K1I.js                                                813.21 kB │ gzip: 223.79 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 20.09s
+
+  dist/index.js  362.6kb
+
+⚡ Done in 48ms
