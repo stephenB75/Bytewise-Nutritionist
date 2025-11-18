@@ -92,3 +92,9 @@ replit.nix
 # Local config directories
 .config/
 .local/
+
+# Archive directories (old builds)
+archive/
+
+# Attached assets (large media files - 93MB+)
+attached_assets/
