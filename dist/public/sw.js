@@ -16,11 +16,15 @@ const STATIC_ASSETS = [
 ];
 
 // API endpoints to cache for offline functionality
+// Note: These should point to Supabase Edge Functions or Supabase REST API
 const API_ENDPOINTS = [
   '/api/auth/user',
   '/api/version',
   '/api/foods',
-  '/api/usda/search'
+  '/api/usda/search',
+  '/api/meals/logged',
+  '/api/user/photos',
+  '/api/user/sync-data'
 ];
 
 // Install event - cache static assets

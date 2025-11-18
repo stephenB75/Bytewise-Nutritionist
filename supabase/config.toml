@@ -1,0 +1,43 @@
+# Supabase configuration file
+
+[project]
+# Your Supabase project reference ID
+# Get this from your Supabase dashboard: Settings > API
+reference_id = "bcfilsryfjwemqytwbvr"
+
+[auth]
+# Enable email authentication
+enable_signup = true
+
+[api]
+# API port
+port = 54321
+# Schema to expose
+schemas = ["public", "storage", "graphql_public"]
+# Extra schemas to expose
+extra_search_path = ["public", "extensions"]
+# Maximum number of rows returned from a view, table, or stored procedure
+max_rows = 1000
+
+[db]
+# Database port
+port = 54322
+# Database major version
+major_version = 15
+
+[studio]
+# Studio port
+port = 54323
+# Enable Studio
+enabled = true
+
+[functions]
+# Functions port
+port = 54324
+
+[storage]
+# Storage port
+port = 54325
+# Storage file size limit (in bytes)
+file_size_limit = 52428800
+
