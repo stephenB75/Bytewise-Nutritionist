@@ -1,0 +1,21 @@
+{
+  "allowedDomains": [
+    "bytewisenutritionist.com",
+    "www.bytewisenutritionist.com",
+    "bytewisenutirtionist.com",
+    "www.bytewisenutirtionist.com"
+  ],
+  "allowedSubdomains": [
+    "app.bytewisenutritionist.com",
+    "staging.bytewisenutritionist.com"
+  ],
+  "developmentDomains": [
+    "localhost",
+    "127.0.0.1",
+    "0.0.0.0"
+  ],
+  "validationMode": "warning",
+  "strictMode": false,
+  "logValidation": true
+}
+
