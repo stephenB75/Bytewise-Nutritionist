@@ -51,16 +51,32 @@
      */
     async loadConfig() {
       try {
-        const response = await fetch('/domain-config.json');
+        const response = await fetch('/domain-config.json', {
+          cache: 'no-cache',
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
         if (!response.ok) {
           throw new Error(`Failed to load domain config: ${response.status}`);
         }
         this.config = await response.json();
+        
+        // Validate config structure
+        if (!this.config.allowedDomains) {
+          this.config.allowedDomains = [];
+        }
+        if (!this.config.allowedSubdomains) {
+          this.config.allowedSubdomains = [];
+        }
+        if (!this.config.developmentDomains) {
+          this.config.developmentDomains = ['localhost', '127.0.0.1', '0.0.0.0'];
+        }
       } catch (error) {
-        console.warn('[DomainValidator] Could not load domain-config.json, using defaults');
-        // Fallback to default configuration
+        console.warn('[DomainValidator] Could not load domain-config.json, using permissive defaults:', error);
+        // Fallback to permissive configuration that allows all domains
         this.config = {
-          allowedDomains: [],
+          allowedDomains: ['bytewisenutritionist.com', 'www.bytewisenutritionist.com'],
           allowedSubdomains: [],
           developmentDomains: ['localhost', '127.0.0.1', '0.0.0.0'],
           validationMode: 'warning',
@@ -300,13 +316,36 @@
     }
   };
 
-  // Initialize on DOM ready
+  // Initialize on DOM ready with error handling
+  const initValidator = () => {
+    try {
+      DomainValidator.init().catch(error => {
+        console.warn('[DomainValidator] Initialization failed, allowing app to continue:', error);
+        // Don't block the app if validation fails
+        window.__DOMAIN_VALIDATION__ = {
+          isValid: true, // Default to valid to not block app
+          error: error.message,
+          currentDomain: window.location.hostname,
+          validationFailed: true
+        };
+      });
+    } catch (error) {
+      console.warn('[DomainValidator] Critical error, allowing app to continue:', error);
+      // Ensure app can still load even if validator fails
+      window.__DOMAIN_VALIDATION__ = {
+        isValid: true,
+        error: error.message,
+        currentDomain: window.location.hostname,
+        validationFailed: true
+      };
+    }
+  };
+
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      DomainValidator.init();
-    });
+    document.addEventListener('DOMContentLoaded', initValidator);
   } else {
-    DomainValidator.init();
+    // Use setTimeout to ensure it doesn't block page load
+    setTimeout(initValidator, 0);
   }
 
   // Expose to window for app access
