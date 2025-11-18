@@ -174,7 +174,7 @@ app.use((req, res, next) => {
   server.listen(port, host, () => {
     const appUrl = isProduction 
       ? 'https://www.bytewisenutritionist.com'
-      : `http://${host}:${port}`;
+      : `http://${host === '::' ? 'localhost' : host}:${port}`;
     
     log(`✅ Server successfully started`);
     log(`🌐 Host: ${host}`);
@@ -189,6 +189,18 @@ app.use((req, res, next) => {
       log(`🚀 Production deployment ready for cloud hosting`);
     } else {
       log(`🔧 Development server ready`);
+    }
+  });
+
+  // Handle server errors (e.g., port already in use)
+  server.on('error', (err: NodeJS.ErrnoException) => {
+    if (err.code === 'EADDRINUSE') {
+      log(`❌ Port ${port} is already in use. Please free the port or use a different PORT.`);
+      log(`💡 Try: lsof -ti:${port} | xargs kill -9`);
+      process.exit(1);
+    } else {
+      log(`❌ Server error: ${err.message}`);
+      throw err;
     }
   });
 
