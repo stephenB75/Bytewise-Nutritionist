@@ -98,3 +98,6 @@ archive/
 
 # Attached assets (large media files - 93MB+)
 attached_assets/
+
+# Build assets (large image files)
+assets/
