@@ -1,0 +1,23 @@
+{
+  "name": "bytewise-nutritionist",
+  "version": "1.0.0",
+  "description": "Professional nutrition tracking app with USDA database integration",
+  "scripts": {
+    "start": "npx serve -s dist/public -l $PORT",
+    "serve": "npx serve -s dist/public -l 3000",
+    "deploy": "echo 'Static site - ready to deploy'"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "keywords": [
+    "nutrition",
+    "tracking",
+    "pwa",
+    "health"
+  ],
+  "author": "bytewise Team",
+  "license": "MIT"
+}
+

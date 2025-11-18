@@ -1,0 +1,12 @@
+[phases.setup]
+nixPkgs = ["nodejs-18_x", "npm"]
+
+[phases.install]
+cmds = ["npm install -g serve"]
+
+[phases.build]
+cmds = ["echo 'Static site - no build step required'"]
+
+[start]
+cmd = "serve -s dist/public -l $PORT"
+
