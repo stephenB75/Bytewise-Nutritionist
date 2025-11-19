@@ -3,9 +3,14 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main
-      - Cursor-Main
+      - Cursor-Main  # Primary deployment branch
+      - main         # Fallback branch
   workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to deploy'
+        required: false
+        default: 'Cursor-Main'
 
 permissions:
   contents: read
