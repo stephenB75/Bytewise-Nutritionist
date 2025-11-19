@@ -145,6 +145,35 @@ async function handleStaticRequest(request) {
 // Network-first strategy for API requests with fallback
 async function handleApiRequest(request) {
   try {
+    // The request URL may already be proxied by supabase-api-config.js
+    // If it's still a relative /api/* URL, it needs to be proxied
+    const url = new URL(request.url);
+    
+    // If it's a relative API call, proxy to Supabase Edge Function
+    if (url.pathname.startsWith('/api/') && !url.hostname.includes('supabase.co')) {
+      const supabaseUrl = 'https://bcfilsryfjwemqytwbvr.supabase.co';
+      const proxyUrl = `${supabaseUrl}/functions/v1/api-proxy${url.pathname}${url.search}`;
+      
+      // Create new request with Supabase URL
+      const proxyRequest = new Request(proxyUrl, {
+        method: request.method,
+        headers: request.headers,
+        body: request.body,
+        mode: 'cors'
+      });
+      
+      const networkResponse = await fetch(proxyRequest);
+      
+      // Cache successful API responses
+      if (networkResponse.ok) {
+        const cache = await caches.open(API_CACHE);
+        cache.put(request, networkResponse.clone());
+      }
+      
+      return networkResponse;
+    }
+    
+    // For already-proxied requests or non-API requests, use original fetch
     const networkResponse = await fetch(request);
     
     // Cache successful API responses
@@ -164,7 +193,7 @@ async function handleApiRequest(request) {
     
     // Return offline indicator for critical API calls
     if (request.url.includes('/api/auth/user')) {
-      return new Response(JSON.stringify({ offline: true }), {
+      return new Response(JSON.stringify({ offline: true, user: null }), {
         headers: { 'Content-Type': 'application/json' }
       });
     }
