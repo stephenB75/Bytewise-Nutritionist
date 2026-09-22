@@ -189,8 +189,8 @@ html,
 }
 
 /* Page containers inherit gradient background */
-.min-h-screen:not([class*="bg-"]),
-.h-screen:not([class*="bg-"]) {
+.min-h-screen:not([class*="bg-"]):not([data-hero="true"]):not(.hero-component),
+.h-screen:not([class*="bg-"]):not([data-hero="true"]):not(.hero-component) {
   background: inherit;
 }
 
@@ -1599,13 +1599,20 @@ body div:not([class*="text-"]):not(.text-white):not(.hero-component *):not([data
 }
 
 /* Force gradient background on main container elements - EXCLUDE navigation */
-.min-h-screen:not([data-testid*="navigation"]),
-.h-screen:not([data-testid*="navigation"]),
+.min-h-screen:not([data-testid*="navigation"]):not([data-hero="true"]):not(.hero-component),
+.h-screen:not([data-testid*="navigation"]):not([data-hero="true"]):not(.hero-component),
 main:not([data-testid*="navigation"]),
-div[class*="min-h-screen"]:not([data-testid*="navigation"]),
+div[class*="min-h-screen"]:not([data-testid*="navigation"]):not([data-hero="true"]):not(.hero-component),
 [data-page]:not([data-testid*="navigation"]),
 .page-container:not([data-testid*="navigation"]) {
   background: inherit !important;
+}
+
+[data-hero="true"].hero-component {
+  height: 100vh !important;
+  min-height: 100vh !important;
+  width: 100% !important;
+  background-color: #0f172a !important;
 }
 
 /* Navigation elements use standard Tailwind styling */
@@ -1992,10 +1999,12 @@ body {
 
 /* Page containers with consistent layout */
 .page-container {
-  min-height: 100%;
+  height: 100vh;
   width: 100%;
   position: relative;
-  overflow: visible;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
   padding-bottom: 0;
   margin-bottom: 0;
 }

@@ -128,7 +128,7 @@ const HeroSection = React.memo(function HeroSection({
   backgroundImage: string;
 }) {
   return (
-    <div className="relative min-h-[62svh] md:h-screen overflow-hidden hero-component bg-[#0f172a]" data-hero="true">
+    <div className="relative h-screen w-full overflow-hidden hero-component bg-[#0f172a]" data-hero="true">
       <img
         src={backgroundImage}
         alt=""
@@ -137,40 +137,40 @@ const HeroSection = React.memo(function HeroSection({
       />
       <div className="hero-gradient-overlay opacity-100" style={{ zIndex: 11 }} />
 
-      <div className="relative z-20 flex min-h-[62svh] md:absolute md:inset-0 flex-col justify-center items-center text-center px-5 py-16 md:px-6 md:py-0 text-white">
-        <div className="space-y-4 md:space-y-8 max-w-2xl w-full">
+      <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-6 z-20 text-white">
+        <div className="space-y-8 max-w-2xl w-full">
           {showLogo && (
-            <div className="mb-4 md:mb-12 md:-mt-16">
+            <div className="mb-12 -mt-16">
               <img
                 src={logoImage}
                 alt="ByteWise Nutritionist Logo"
-                className="h-12 md:h-20 w-auto object-contain mx-auto drop-shadow-2xl"
+                className="h-20 w-auto object-contain mx-auto drop-shadow-2xl"
                 data-testid="bytewise-hero-logo"
               />
             </div>
           )}
 
-          <div className="space-y-2 md:space-y-3 hero-optimized">
-            <h1 className="hero-title text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black tracking-tight md:tracking-tighter leading-[1.05] md:leading-[0.85] drop-shadow-2xl font-league-spartan text-optimized opacity-100">
+          <div className="space-y-3 hero-optimized">
+            <h1 className="hero-title text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] drop-shadow-2xl font-league-spartan text-optimized opacity-100">
               {title}
             </h1>
-            <h2 className={`hero-title text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black tracking-tight md:tracking-tighter leading-[1.05] md:leading-[0.85] font-league-spartan ${showLogo ? 'text-white' : 'text-optimized'} drop-shadow-2xl opacity-100`}>
+            <h2 className={`hero-title text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] font-league-spartan ${showLogo ? 'text-white' : 'text-optimized'} drop-shadow-2xl opacity-100`}>
               {subtitle}
             </h2>
           </div>
 
-          <p className="text-base sm:text-xl md:text-3xl font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl font-work-sans text-gray-100 opacity-100">
+          <p className="text-2xl md:text-3xl font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl font-work-sans text-gray-100 opacity-100">
             {description}
           </p>
 
-          <div className="pt-4 md:pt-8 opacity-100">
+          <div className="pt-8 opacity-100">
             <Button
               onClick={onButtonClick}
               size="lg"
-              className="group relative bg-gradient-to-r from-orange-400 to-red-400 hover:from-orange-500 hover:to-red-500 font-bold px-8 py-3.5 sm:px-16 sm:py-6 rounded-full text-base sm:text-xl md:text-2xl shadow-2xl transition-all duration-200 ease-out overflow-hidden transform hover:scale-105"
+              className="group relative bg-gradient-to-r from-orange-400 to-red-400 hover:from-orange-500 hover:to-red-500 font-bold px-16 py-6 rounded-full text-xl md:text-2xl shadow-2xl transition-all duration-200 ease-out overflow-hidden transform hover:scale-105"
               style={{ color: '#ffffff !important' }}
             >
-              <span className="relative z-10 flex items-center gap-2 sm:gap-3" style={{ color: '#ffffff !important' }}>
+              <span className="relative z-10 flex items-center gap-3" style={{ color: '#ffffff !important' }}>
                 {buttonText}
                 <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-150" />
               </span>
@@ -179,7 +179,7 @@ const HeroSection = React.memo(function HeroSection({
         </div>
       </div>
 
-      <div className="absolute bottom-20 md:bottom-8 left-1/2 -translate-x-1/2 z-20 text-white opacity-100 pointer-events-none">
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 text-white opacity-100 pointer-events-none">
         <div className="flex flex-col items-center gap-2">
           <div className="w-px h-8 bg-gradient-to-b from-transparent to-white opacity-70" />
           <ChevronRight className="w-6 h-6 rotate-90 drop-shadow-lg opacity-80" />
@@ -3147,7 +3147,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   };
 
   return (
-    <div data-testid="app-container" className="min-h-dvh w-full overflow-x-hidden">
+    <div data-testid="app-container" className="h-screen w-screen overflow-hidden">
       {/* Fixed Notification Header on all pages - Safe area positioning for iOS/Android */}
       <div className="fixed top-safe right-4 z-[9999] safe-notification-position">
         <div className="relative">
