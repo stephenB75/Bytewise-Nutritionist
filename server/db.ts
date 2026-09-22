@@ -6,7 +6,8 @@ import * as schema from "@shared/schema";
 let databaseUrl = process.env.DATABASE_URL;
 
 if (!databaseUrl) {
-  throw new Error("DATABASE_URL is missing. Please provide the Supabase PostgreSQL connection URL.");
+  console.error("DATABASE_URL is missing. The server will start; database routes will fail until it is set.");
+  databaseUrl = "postgresql://127.0.0.1:5432/postgres";
 }
 
 console.log('✅ Using database connection:', databaseUrl.replace(/:([^@]+)@/, ':***@'));

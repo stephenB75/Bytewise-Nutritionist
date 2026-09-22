@@ -12,11 +12,14 @@ const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
 
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-  throw new Error('SUPABASE_URL and SUPABASE_ANON_KEY environment variables are required');
+  console.error('SUPABASE_URL and SUPABASE_ANON_KEY are missing. Auth routes will fail until they are set.');
 }
 
 // Create Supabase client for regular operations
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabase = createClient(
+  SUPABASE_URL || 'https://placeholder.supabase.co',
+  SUPABASE_ANON_KEY || 'placeholder-anon-key'
+);
 
 // Create admin client for server-side operations (email verification, etc.)
 const supabaseAdmin = SUPABASE_SERVICE_KEY 

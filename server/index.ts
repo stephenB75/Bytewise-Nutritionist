@@ -128,8 +128,10 @@ app.use((req, res, next) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
 
-    res.status(status).json({ message });
-    throw err;
+    if (!res.headersSent) {
+      res.status(status).json({ message });
+    }
+    console.error('Request error:', message);
   });
 
   // importantly only setup vite in development and after
@@ -169,8 +171,14 @@ app.use((req, res, next) => {
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
   const port = parseInt(process.env.PORT || '5000', 10);
-  const host = process.env.HOST || "::";
-  
+  // Railway healthchecks use IPv4. Binding only to :: makes the proxy return 502.
+  const host = process.env.HOST === "::" || !process.env.HOST ? "0.0.0.0" : process.env.HOST;
+
+  server.on("error", (err) => {
+    console.error("Listen error:", err);
+    process.exit(1);
+  });
+
   server.listen(port, host, () => {
     const appUrl = isProduction 
       ? 'https://www.bytewisenutritionist.com'

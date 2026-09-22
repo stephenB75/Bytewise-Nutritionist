@@ -9,14 +9,18 @@ import { randomUUID } from 'crypto';
 
 // Use existing Supabase configuration
 const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const SUPABASE_SERVICE_KEY =
+  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY;
 
 if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
-  throw new Error('SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required for storage operations');
+  console.error('SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (or SUPABASE_SERVICE_KEY) are missing. Storage routes will fail until they are set.');
 }
 
 // Create Supabase client with service role for storage operations
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+const supabase = createClient(
+  SUPABASE_URL || 'https://placeholder.supabase.co',
+  SUPABASE_SERVICE_KEY || 'placeholder-service-key'
+);
 
 export class SupabaseStorageError extends Error {
   constructor(message: string) {

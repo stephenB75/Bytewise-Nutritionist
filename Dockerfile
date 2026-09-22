@@ -41,7 +41,7 @@ COPY --from=builder /app/vite.config.ts ./
 
 # Set environment variables
 ENV NODE_ENV=production
-ENV HOST=::
+ENV HOST=0.0.0.0
 ENV PORT=5000
 
 # Expose port
