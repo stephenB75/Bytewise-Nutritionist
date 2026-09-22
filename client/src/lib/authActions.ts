@@ -52,6 +52,20 @@ function mapAuthError(error: { message?: string; code?: string } | null, email: 
   return { ok: false, code: 'AUTH_ERROR', message, email };
 }
 
+const PROFILE_COMPLETION_KEY = 'profile-completion-pending';
+
+export function markNewSignupForProfile() {
+  localStorage.setItem(PROFILE_COMPLETION_KEY, 'true');
+}
+
+export function clearProfileCompletionPrompt() {
+  localStorage.removeItem(PROFILE_COMPLETION_KEY);
+}
+
+export function shouldShowProfileCompletion() {
+  return localStorage.getItem(PROFILE_COMPLETION_KEY) === 'true';
+}
+
 async function finishSignedIn(): Promise<AuthActionResult> {
   await ensureUserProfile();
   window.dispatchEvent(new CustomEvent('auth-state-change'));
@@ -80,6 +94,8 @@ export async function signUpWithEmail(email: string, password: string): Promise<
       email: normalized,
     };
   }
+
+  markNewSignupForProfile();
 
   if (data.session && data.user?.email_confirmed_at) {
     return finishSignedIn();

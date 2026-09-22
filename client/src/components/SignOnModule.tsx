@@ -13,8 +13,6 @@ import {
   LogIn, 
   User, 
   Shield, 
-  Github, 
-  Chrome,
   Zap,
   Mail,
   Lock,
@@ -278,92 +276,6 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
       });
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleGoogleSignIn = async () => {
-    if (loading) return; // Prevent double clicks
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}`,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          },
-        },
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      // OAuth will redirect automatically, so we don't need to do anything else here
-      showNotification({
-        type: 'info',
-        title: "Redirecting to Google",
-        description: "You'll be redirected to Google to complete sign-in.",
-        duration: 3000
-      });
-    } catch (error: any) {
-      setLoading(false);
-      let errorMessage = error.message;
-      
-      if (error.message.includes('fetch')) {
-        errorMessage = 'Unable to connect to Google authentication. Please try again.';
-      } else if (error.message.includes('oauth')) {
-        errorMessage = 'Google authentication is not properly configured. Please contact support.';
-      }
-      
-      showNotification({
-        type: 'error',
-        title: "Google Sign-In Failed",
-        description: errorMessage,
-        duration: 6000
-      });
-    }
-  };
-
-  const handleGitHubSignIn = async () => {
-    if (loading) return; // Prevent double clicks
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'github',
-        options: {
-          redirectTo: `${window.location.origin}`,
-        },
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      // OAuth will redirect automatically, so we don't need to do anything else here
-      showNotification({
-        type: 'info',
-        title: "Redirecting to GitHub",
-        description: "You'll be redirected to GitHub to complete sign-in.",
-        duration: 3000
-      });
-    } catch (error: any) {
-      setLoading(false);
-      let errorMessage = error.message;
-      
-      if (error.message.includes('fetch')) {
-        errorMessage = 'Unable to connect to GitHub authentication. Please try again.';
-      } else if (error.message.includes('oauth')) {
-        errorMessage = 'GitHub authentication is not properly configured. Please contact support.';
-      }
-      
-      showNotification({
-        type: 'error',
-        title: "GitHub Sign-In Failed",
-        description: errorMessage,
-        duration: 6000
-      });
     }
   };
 
@@ -657,63 +569,6 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
               </Button>
             )}
           </form>
-
-          {/* OAuth Providers - Hidden on iOS for App Store compliance */}
-          {/* Apple requires Sign in with Apple when other social logins are present */}
-          {typeof window !== 'undefined' && !window.location.href.includes('capacitor://') && (
-          <div className="space-y-3" onClick={(e) => e.stopPropagation()}>
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-white/20" />
-              </div>
-              <div className="relative flex justify-center text-xs">
-                <span className="px-2 bg-white/10 text-gray-300">Or continue with</span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleGoogleSignIn();
-                }}
-                disabled={loading}
-                className="flex items-center justify-center py-2 px-4 border border-white/20 bg-white/5 text-sm font-medium text-gray-300 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
-                data-testid="button-google-signin"
-              >
-                {loading ? (
-                  <div className="w-4 h-4 border-2 border-gray-300/30 border-t-gray-300 rounded-full animate-spin mr-2" />
-                ) : (
-                  <Chrome className="w-4 h-4 mr-2" />
-                )}
-                Google
-              </Button>
-              
-              <Button
-                type="button"
-                variant="outline"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleGitHubSignIn();
-                }}
-                disabled={loading}
-                className="flex items-center justify-center py-2 px-4 border border-white/20 bg-white/5 text-sm font-medium text-gray-300 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
-                data-testid="button-github-signin"
-              >
-                {loading ? (
-                  <div className="w-4 h-4 border-2 border-gray-300/30 border-t-gray-300 rounded-full animate-spin mr-2" />
-                ) : (
-                  <Github className="w-4 h-4 mr-2" />
-                )}
-                GitHub
-              </Button>
-            </div>
-          </div>
-          )}
 
           {/* Toggle Sign In / Sign Up */}
           <div className="text-center">

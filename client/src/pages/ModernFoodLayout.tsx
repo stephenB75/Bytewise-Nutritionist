@@ -70,7 +70,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
 import { listLoggedMeals, saveUserProfile } from '@/lib/mealsApi';
-import { resendVerificationEmail, resetPasswordForEmail, signInWithEmail, signUpWithEmail } from '@/lib/authActions';
+import { clearProfileCompletionPrompt, resendVerificationEmail, resetPasswordForEmail, shouldShowProfileCompletion, signInWithEmail, signUpWithEmail } from '@/lib/authActions';
 import { getWeekDates, getLocalDateKey, getMealTypeByTime, formatLocalTime } from '@/utils/dateUtils';
 import { fixMealDateMismatches } from '@/utils/mealDateFixer';
 import { getCachedLocalStorage, debounce } from '@/utils/performanceUtils';
@@ -375,19 +375,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     }
   }, []);
 
-  // Check if profile completion is required
+  // Only after a new signup — never on later sign-ins
   useEffect(() => {
     if (user && !authLoading) {
-      const userData = user as any;
-      const hasFirstName = userData?.firstName && userData.firstName.trim() !== '';
-      const hasLastName = userData?.lastName && userData.lastName.trim() !== '';
-      const dismissed = localStorage.getItem('profile-completion-dismissed') === 'true';
-
-      if ((!hasFirstName || !hasLastName) && !dismissed) {
-        setShowProfileCompletion(true);
-      } else {
-        setShowProfileCompletion(false);
-      }
+      setShowProfileCompletion(shouldShowProfileCompletion());
     }
   }, [user, authLoading]);
 
@@ -404,7 +395,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         lastName: profileData.lastName,
         profileIcon: profileData.profileIcon,
       });
-      localStorage.removeItem('profile-completion-dismissed');
+      clearProfileCompletionPrompt();
       setShowProfileCompletion(false);
       await refetchUser();
     } catch (error) {
@@ -3389,7 +3380,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         isOpen={showProfileCompletion}
         onComplete={handleProfileCompletion}
         onDismiss={() => {
-          localStorage.setItem('profile-completion-dismissed', 'true');
+          clearProfileCompletionPrompt();
           setShowProfileCompletion(false);
         }}
       />
