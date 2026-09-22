@@ -1549,8 +1549,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         title="Track Your"
         subtitle="Nutrition"
         description="Track nutrition with scientific precision using our comprehensive USDA database"
-        buttonText="Start Tracking"
-        onButtonClick={() => handleTabChange('nutrition')}
+        buttonText="View Progress"
+        onButtonClick={() => scrollToTestId('progress-section')}
         showLogo={true}
       />
 
@@ -1602,7 +1602,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               </button>
             </div>
           )}
-          <div className="flex flex-col gap-1 mb-3 sm:flex-row sm:items-center sm:justify-between">
+          <div data-testid="progress-section" className="flex flex-col gap-1 mb-3 sm:flex-row sm:items-center sm:justify-between">
             <h2 className="text-2xl sm:text-3xl font-semibold text-gray-900">Today's Progress</h2>
             <div className="flex gap-2">
               <Button 
