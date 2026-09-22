@@ -130,24 +130,37 @@ const HeroSection = React.memo(function HeroSection({
   showLogo?: boolean;
   backgroundImage: string;
 }) {
-  const [activeImage, setActiveImage] = React.useState(backgroundImage);
-  const [previousImage, setPreviousImage] = React.useState<string | null>(null);
+  const [visibleSrc, setVisibleSrc] = React.useState(backgroundImage);
+  const [underlaySrc, setUnderlaySrc] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-    if (backgroundImage === activeImage) return;
+    if (backgroundImage === visibleSrc) return;
 
-    setPreviousImage(activeImage);
-    setActiveImage(backgroundImage);
+    let cancelled = false;
+    const img = new Image();
+    img.onload = () => {
+      if (cancelled) return;
+      setUnderlaySrc(visibleSrc);
+      setVisibleSrc(backgroundImage);
+      window.setTimeout(() => {
+        if (!cancelled) setUnderlaySrc(null);
+      }, 700);
+    };
+    img.onerror = () => {
+      if (!cancelled) setVisibleSrc(backgroundImage);
+    };
+    img.src = backgroundImage;
 
-    const timer = window.setTimeout(() => setPreviousImage(null), 700);
-    return () => window.clearTimeout(timer);
-  }, [backgroundImage, activeImage]);
+    return () => {
+      cancelled = true;
+    };
+  }, [backgroundImage, visibleSrc]);
 
   return (
-    <div className="relative h-screen w-full overflow-hidden hero-component bg-[#0f172a]" data-hero="true">
-      {previousImage && (
+    <div className="relative min-h-[100svh] md:min-h-screen w-full overflow-hidden hero-component bg-[#0f172a]" data-hero="true">
+      {underlaySrc && (
         <img
-          src={previousImage}
+          src={underlaySrc}
           alt=""
           aria-hidden
           className="absolute inset-0 z-[9] h-full w-full object-cover brightness-[0.85]"
@@ -155,11 +168,11 @@ const HeroSection = React.memo(function HeroSection({
         />
       )}
       <img
-        key={activeImage}
-        src={activeImage}
+        src={visibleSrc}
         alt=""
         className="hero-bg-optimized hero-bg-loaded absolute inset-0 z-10 h-full w-full object-cover brightness-[0.85]"
         decoding="async"
+        fetchPriority="high"
       />
       <div className="hero-gradient-overlay opacity-100" style={{ zIndex: 11 }} />
 
@@ -3029,7 +3042,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   };
 
   return (
-    <div data-testid="app-container" className="h-screen w-screen overflow-hidden">
+    <div data-testid="app-container" className="min-h-[100dvh] w-full overflow-x-hidden">
       {/* Fixed notification control — safe area aware (status bar / Dynamic Island) */}
       <div className="app-notification-anchor">
         <div className="relative">

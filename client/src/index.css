@@ -186,6 +186,16 @@ html,
   background-attachment: fixed;
   color: rgb(var(--foreground));
   min-height: 100vh;
+  min-height: 100dvh;
+}
+
+@media (max-width: 768px) {
+  body,
+  html,
+  #root {
+    /* iOS Safari breaks fixed backgrounds and shows white gaps while scrolling */
+    background-attachment: scroll;
+  }
 }
 
 /* Page containers inherit gradient background */
@@ -1622,10 +1632,17 @@ div[class*="min-h-screen"]:not([data-testid*="navigation"]):not([data-hero="true
 }
 
 [data-hero="true"].hero-component {
-  height: 100vh !important;
-  min-height: 100vh !important;
+  height: 100svh !important;
+  min-height: 100svh !important;
   width: 100% !important;
   background-color: #0f172a !important;
+}
+
+@media (min-width: 768px) {
+  [data-hero="true"].hero-component {
+    height: 100vh !important;
+    min-height: 100vh !important;
+  }
 }
 
 /* Navigation elements use standard Tailwind styling */
@@ -2010,14 +2027,12 @@ body {
   overflow-y: auto;
 }
 
-/* Page containers with consistent layout */
+/* Page containers — document scroll (nested overflow breaks on iOS) */
 .page-container {
-  height: 100vh;
+  min-height: 100dvh;
   width: 100%;
   position: relative;
-  overflow-y: auto;
   overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
   padding-bottom: 0;
   margin-bottom: 0;
 }
@@ -2027,7 +2042,9 @@ body {
 /* Simplified and optimized spacing system */
 html, body {
   overflow-x: hidden;
+  overflow-y: auto;
   scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Modern App Opening Animation System - Smooth and native-like */
@@ -2210,7 +2227,7 @@ input {
 }
 
 .hero-bg-loaded {
-  animation: heroCrossfade 0.7s ease-out;
+  animation: none;
 }
 
 /* Hero image entrance animations - unused on the photo layer to avoid remount flicker */
