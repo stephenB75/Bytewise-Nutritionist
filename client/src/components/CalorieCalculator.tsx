@@ -158,17 +158,18 @@ function CalorieCalculator({
   // Calculate calories mutation
   const calculateCalories = useMutation({
     mutationFn: async ({ ingredient, measurement }: { ingredient: string; measurement: string }) => {
-      const response = await fetch('/api/calculate-calories', {
+      const response = await fetch('/api/foods/calculate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ingredient, measurement }),
+        body: JSON.stringify({ ingredients: ingredient, measurement }),
       });
       
       if (!response.ok) {
         throw new Error('Failed to calculate calories');
       }
-      
-      return response.json();
+
+      const data = await response.json();
+      return data.result || data;
     },
     onSuccess: (data: IngredientAnalysis) => {
       console.log('API Response:', data);

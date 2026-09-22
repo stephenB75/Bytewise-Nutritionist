@@ -7,10 +7,10 @@ import { createClient } from '@supabase/supabase-js';
 import { Response } from 'express';
 import { randomUUID } from 'crypto';
 
-// Use existing Supabase configuration
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_SERVICE_KEY =
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY;
+import { getSupabaseServiceKey, getSupabaseUrl } from './env';
+
+const SUPABASE_URL = getSupabaseUrl();
+const SUPABASE_SERVICE_KEY = getSupabaseServiceKey();
 
 if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
   console.error('SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (or SUPABASE_SERVICE_KEY) are missing. Storage routes will fail until they are set.');

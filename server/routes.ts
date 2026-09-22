@@ -42,15 +42,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const server = createServer(app);
   // Health check endpoint - simplified for production
   app.get('/api/health', async (req: Request, res: Response) => {
-    const supabaseUrl =
-      process.env.SUPABASE_URL ||
-      process.env.VITE_SUPABASE_URL ||
-      'https://bcfilsryfjwemqytwbvr.supabase.co';
+    const { getDatabaseUrl, getSupabaseServiceKey, getSupabaseUrl, getUsdaApiKey } = await import('./env');
+    const supabaseUrl = getSupabaseUrl();
     res.status(200).json({
       status: 'healthy',
       timestamp: new Date().toISOString(),
       environment: process.env.NODE_ENV || 'development',
-      version: 'BETA 4.2',
+      version: 'BETA 4.3',
       supabaseHost: (() => {
         try {
           return new URL(supabaseUrl).host;
@@ -58,6 +56,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return null;
         }
       })(),
+      databaseConfigured: !!getDatabaseUrl(),
+      serviceRoleConfigured: !!getSupabaseServiceKey(),
+      usdaKeyConfigured: getUsdaApiKey() !== 'DEMO_KEY',
     });
   });
 

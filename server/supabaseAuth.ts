@@ -5,20 +5,14 @@
 
 import type { Request, Response, NextFunction } from 'express';
 import { createClient } from '@supabase/supabase-js';
+import { getSupabaseAnonKey, getSupabaseServiceKey, getSupabaseUrl } from './env';
 
-const SUPABASE_URL =
-  process.env.SUPABASE_URL ||
-  process.env.VITE_SUPABASE_URL ||
-  'https://bcfilsryfjwemqytwbvr.supabase.co';
-const SUPABASE_ANON_KEY =
-  process.env.SUPABASE_ANON_KEY ||
-  process.env.VITE_SUPABASE_ANON_KEY ||
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJjZmlsc3J5Zmp3ZW1xeXR3YnZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQwMzU5MTksImV4cCI6MjA2OTYxMTkxOX0.9AJ51rynZVDSINfVWYsh9s2cjpUvz75BR7FiA_TqNvk';
-const SUPABASE_SERVICE_KEY =
-  process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+const SUPABASE_URL = getSupabaseUrl();
+const SUPABASE_ANON_KEY = getSupabaseAnonKey();
+const SUPABASE_SERVICE_KEY = getSupabaseServiceKey();
 
-if (!process.env.SUPABASE_URL && !process.env.VITE_SUPABASE_URL) {
-  console.warn('Using built-in Supabase project URL. Set SUPABASE_URL on Railway to override.');
+if (!getSupabaseServiceKey()) {
+  console.warn('SUPABASE_SERVICE_ROLE_KEY is missing or still a placeholder. Set it on Railway runtime.');
 }
 
 // Create Supabase client for regular operations

@@ -1,9 +1,10 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import * as schema from "@shared/schema";
+import { getDatabaseUrl } from './env';
 
 // Database connection - Use provided DATABASE_URL (from Supabase)
-let databaseUrl = process.env.DATABASE_URL;
+let databaseUrl = getDatabaseUrl();
 
 if (!databaseUrl) {
   console.error("DATABASE_URL is missing. The server will start; database routes will fail until it is set.");

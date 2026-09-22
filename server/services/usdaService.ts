@@ -10,6 +10,7 @@ import { usdaFoodCache } from '@shared/schema';
 import { eq, like, desc, asc, sql, or } from 'drizzle-orm';
 import { getPortionWeight, parseMeasurement } from '../data/portionData.js';
 import { findCandyNutrition, calculateCandyNutrition } from '../data/candyNutritionDatabase.js';
+import { getUsdaApiKey } from '../env';
 
 interface USDANutrient {
   id: number;
@@ -76,7 +77,7 @@ export class USDAService {
   private popularFoodsCache: Map<string, number> = new Map(); // Track popular foods for priority caching
 
   constructor() {
-    this.apiKey = process.env.USDA_API_KEY || process.env.VITE_USDA_API_KEY || 'DEMO_KEY';
+    this.apiKey = getUsdaApiKey();
     if (this.apiKey === 'DEMO_KEY') {
       console.warn('⚠️  Using DEMO_KEY for USDA API - limited requests available');
     }
