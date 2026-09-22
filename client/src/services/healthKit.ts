@@ -1,193 +1,276 @@
 import { Capacitor } from '@capacitor/core';
 
 export interface HealthData {
-  waterIntake?: number; // in milliliters
+  waterIntake?: number;
   calories?: number;
-  protein?: number; // in grams
-  carbohydrates?: number; // in grams
-  fat?: number; // in grams
+  protein?: number;
+  carbohydrates?: number;
+  fat?: number;
 }
 
-export interface HealthKitPermissions {
-  read: string[];
-  write: string[];
+export interface HealthMealSync {
+  id?: number | string;
+  calories?: number;
+  totalCalories?: number;
+  date?: string;
+  name?: string;
+}
+
+const CONNECTED_KEY = 'appleHealthConnected';
+const AUTO_SYNC_KEY = 'appleHealthAutoSync';
+const SYNCED_MEALS_KEY = 'appleHealthSyncedMealIds';
+const SYNCED_WATER_KEY = 'appleHealthSyncedWater';
+const PENDING_KEY = 'pendingHealthKitSync';
+
+const WRITE_TYPES = ['dietaryWater', 'dietaryEnergyConsumed'] as const;
+
+type HealthBridge = {
+  isAvailable: () => Promise<{ available: boolean; platform?: string; reason?: string }>;
+  requestAuthorization: (options: { read: string[]; write: string[] }) => Promise<{
+    writeAuthorized?: string[];
+    writeDenied?: string[];
+  }>;
+  checkAuthorization: (options: { read: string[]; write: string[] }) => Promise<{
+    writeAuthorized?: string[];
+    writeDenied?: string[];
+  }>;
+  saveSample: (options: {
+    dataType: string;
+    value: number;
+    unit?: string;
+    startDate?: string;
+    endDate?: string;
+  }) => Promise<void>;
+};
+
+function isNativeIos() {
+  return Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios';
+}
+
+function toNumber(value: unknown): number {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function readJson<T>(key: string, fallback: T): T {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) as T : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+async function getHealth(): Promise<HealthBridge | null> {
+  if (!isNativeIos()) {
+    return null;
+  }
+
+  try {
+    const mod = await import('@capgo/capacitor-health');
+    return mod.Health as HealthBridge;
+  } catch (error) {
+    console.warn('Apple Health plugin is not available:', error);
+    return null;
+  }
 }
 
 export class HealthKitService {
   private isAvailable = false;
-  private isAuthorized = false;
+  private isAuthorized = localStorage.getItem(CONNECTED_KEY) === 'true';
+  private ready: Promise<void>;
 
   constructor() {
-    this.checkAvailability();
+    this.ready = this.checkAvailability();
   }
 
   private async checkAvailability(): Promise<void> {
-    if (!Capacitor.isNativePlatform() || Capacitor.getPlatform() !== 'ios') {
+    if (!isNativeIos()) {
       this.isAvailable = false;
       return;
     }
 
     try {
-      // HealthKit is available on all iOS devices, just check if we're on iOS
-      this.isAvailable = true;
+      const health = await getHealth();
+      if (!health) {
+        this.isAvailable = true;
+        return;
+      }
+
+      const status = await health.isAvailable();
+      this.isAvailable = !!status.available;
+
+      if (this.isAvailable && this.isAuthorized) {
+        const auth = await health.checkAuthorization({
+          read: [...WRITE_TYPES],
+          write: [...WRITE_TYPES],
+        });
+        this.isAuthorized = (auth.writeAuthorized || []).length > 0;
+        localStorage.setItem(CONNECTED_KEY, this.isAuthorized ? 'true' : 'false');
+      }
     } catch (error) {
       console.warn('HealthKit availability check failed:', error);
-      this.isAvailable = false;
+      this.isAvailable = isNativeIos();
     }
   }
 
+  async initialize(): Promise<void> {
+    await this.ready;
+  }
+
   async requestPermissions(): Promise<boolean> {
+    await this.ready;
     if (!this.isAvailable) {
       return false;
     }
 
     try {
-      // For now, simulate permission request - this will be implemented with native HealthKit
-      console.log('HealthKit permissions would be requested here in the native iOS app');
-      this.isAuthorized = true;
-      return true;
+      const health = await getHealth();
+      if (!health) {
+        return false;
+      }
+
+      const status = await health.requestAuthorization({
+        read: [...WRITE_TYPES],
+        write: [...WRITE_TYPES],
+      });
+      const deniedAll = WRITE_TYPES.every((type) => (status.writeDenied || []).includes(type));
+      this.isAuthorized = !deniedAll;
+      localStorage.setItem(CONNECTED_KEY, this.isAuthorized ? 'true' : 'false');
+      if (this.isAuthorized && localStorage.getItem(AUTO_SYNC_KEY) === null) {
+        localStorage.setItem(AUTO_SYNC_KEY, 'true');
+      }
+      return this.isAuthorized;
     } catch (error) {
       console.error('HealthKit permission request failed:', error);
       this.isAuthorized = false;
+      localStorage.setItem(CONNECTED_KEY, 'false');
       return false;
     }
   }
 
   async syncWaterIntake(glasses: number, date?: Date): Promise<boolean> {
+    await this.ready;
     if (!this.isAvailable || !this.isAuthorized) {
       return false;
     }
 
+    const nextGlasses = Math.max(0, toNumber(glasses));
+    const lastGlasses = toNumber(localStorage.getItem(SYNCED_WATER_KEY));
+    const delta = nextGlasses - lastGlasses;
+    if (delta <= 0) {
+      localStorage.setItem(SYNCED_WATER_KEY, String(nextGlasses));
+      return true;
+    }
+
+    const liters = delta * 0.24;
+    const syncDate = (date || new Date()).toISOString();
+
     try {
-      // Convert glasses to milliliters (assuming 8 oz = 240ml per glass)
-      const milliliters = glasses * 240;
-      const syncDate = date || new Date();
+      const health = await getHealth();
+      if (health) {
+        await health.saveSample({
+          dataType: 'dietaryWater',
+          value: liters,
+          unit: 'liter',
+          startDate: syncDate,
+          endDate: syncDate,
+        });
+      } else {
+        this.queuePending({
+          type: 'dietaryWater',
+          value: liters,
+          unit: 'l',
+          date: syncDate,
+          glasses: delta,
+        });
+      }
 
-      // Store data for native iOS app integration
-      const healthData = {
-        type: 'dietaryWater',
-        value: milliliters,
-        unit: 'ml',
-        date: syncDate.toISOString(),
-        glasses: glasses
-      };
-      
-      // Save to localStorage for native app to sync later
-      const existingData = JSON.parse(localStorage.getItem('pendingHealthKitSync') || '[]');
-      existingData.push(healthData);
-      localStorage.setItem('pendingHealthKitSync', JSON.stringify(existingData));
-
-      console.log('✅ Water intake prepared for Apple Health sync:', { glasses, milliliters, date: syncDate });
+      localStorage.setItem(SYNCED_WATER_KEY, String(nextGlasses));
       return true;
     } catch (error) {
-      console.error('❌ Failed to prepare water intake for Apple Health sync:', error);
+      console.error('Failed to sync water intake to Apple Health:', error);
       return false;
     }
   }
 
   async syncNutritionData(nutrition: HealthData, date?: Date): Promise<boolean> {
+    const calories = toNumber(nutrition.calories);
+    if (calories <= 0) {
+      return false;
+    }
+    return this.syncMeal({ calories }, date);
+  }
+
+  async syncMeal(meal: HealthMealSync, date?: Date): Promise<boolean> {
+    await this.ready;
     if (!this.isAvailable || !this.isAuthorized) {
       return false;
     }
 
+    const calories = toNumber(meal.calories ?? meal.totalCalories);
+    if (calories <= 0) {
+      return false;
+    }
+
+    const mealId = meal.id != null ? String(meal.id) : '';
+    const synced = new Set(readJson<string[]>(SYNCED_MEALS_KEY, []));
+    if (mealId && synced.has(mealId)) {
+      return true;
+    }
+
+    const syncDate = meal.date && /^\d{4}-\d{2}-\d{2}$/.test(meal.date)
+      ? new Date(`${meal.date}T12:00:00`).toISOString()
+      : (date || new Date()).toISOString();
+
     try {
-      const syncDate = date || new Date();
-      const promises: Promise<any>[] = [];
-
-      const existingData = JSON.parse(localStorage.getItem('pendingHealthKitSync') || '[]');
-
-      if (nutrition.calories !== undefined) {
-        existingData.push({
+      const health = await getHealth();
+      if (health) {
+        await health.saveSample({
+          dataType: 'dietaryEnergyConsumed',
+          value: calories,
+          unit: 'kilocalorie',
+          startDate: syncDate,
+          endDate: syncDate,
+        });
+      } else {
+        this.queuePending({
           type: 'dietaryEnergyConsumed',
-          value: nutrition.calories,
+          value: calories,
           unit: 'kcal',
-          date: syncDate.toISOString()
+          date: syncDate,
+          name: meal.name,
+          mealId,
         });
       }
 
-      if (nutrition.protein !== undefined) {
-        existingData.push({
-          type: 'dietaryProtein',
-          value: nutrition.protein,
-          unit: 'g',
-          date: syncDate.toISOString()
-        });
+      if (mealId) {
+        synced.add(mealId);
+        localStorage.setItem(SYNCED_MEALS_KEY, JSON.stringify([...synced]));
       }
-
-      if (nutrition.carbohydrates !== undefined) {
-        existingData.push({
-          type: 'dietaryCarbohydrates',
-          value: nutrition.carbohydrates,
-          unit: 'g',
-          date: syncDate.toISOString()
-        });
-      }
-
-      if (nutrition.fat !== undefined) {
-        existingData.push({
-          type: 'dietaryFatTotal',
-          value: nutrition.fat,
-          unit: 'g',
-          date: syncDate.toISOString()
-        });
-      }
-
-      localStorage.setItem('pendingHealthKitSync', JSON.stringify(existingData));
-
-      // Removed promises array as we're now using localStorage
-      // await Promise.all(promises);
-      console.log('✅ Nutrition data synced to Apple Health:', nutrition);
       return true;
     } catch (error) {
-      console.error('❌ Failed to sync nutrition data to Apple Health:', error);
+      console.error('Failed to sync nutrition data to Apple Health:', error);
       return false;
     }
   }
 
-  async readWaterIntake(date?: Date): Promise<number | null> {
-    if (!this.isAvailable || !this.isAuthorized) {
-      return null;
+  async syncMeals(meals: HealthMealSync[]): Promise<number> {
+    let saved = 0;
+    for (const meal of meals) {
+      if (await this.syncMeal(meal)) {
+        saved += 1;
+      }
     }
-
-    try {
-      const targetDate = date || new Date();
-      const startOfDay = new Date(targetDate);
-      startOfDay.setHours(0, 0, 0, 0);
-      
-      const endOfDay = new Date(targetDate);
-      endOfDay.setHours(23, 59, 59, 999);
-
-      // For now, return null to indicate HealthKit data reading is not available in web version
-      // The native iOS app will implement actual HealthKit reading
-      console.log('HealthKit data reading would be implemented in the native iOS app');
-      return null;
-    } catch (error) {
-      console.error('❌ Failed to read water intake from Apple Health:', error);
-      return null;
-    }
+    return saved;
   }
 
-  async readNutritionData(date?: Date): Promise<HealthData | null> {
-    if (!this.isAvailable || !this.isAuthorized) {
-      return null;
-    }
+  async readWaterIntake(_date?: Date): Promise<number | null> {
+    return null;
+  }
 
-    try {
-      const targetDate = date || new Date();
-      const startOfDay = new Date(targetDate);
-      startOfDay.setHours(0, 0, 0, 0);
-      
-      const endOfDay = new Date(targetDate);
-      endOfDay.setHours(23, 59, 59, 999);
-
-      // For now, return null to indicate HealthKit data reading is not available in web version
-      // The native iOS app will implement actual HealthKit reading
-      console.log('HealthKit nutrition data reading would be implemented in the native iOS app');
-      return null;
-    } catch (error) {
-      console.error('❌ Failed to read nutrition data from Apple Health:', error);
-      return null;
-    }
+  async readNutritionData(_date?: Date): Promise<HealthData | null> {
+    return null;
   }
 
   getAvailability(): boolean {
@@ -198,14 +281,24 @@ export class HealthKitService {
     return this.isAuthorized;
   }
 
+  isAutoSyncEnabled(): boolean {
+    return localStorage.getItem(AUTO_SYNC_KEY) === 'true' && this.isAuthorized;
+  }
+
   async disconnect(): Promise<void> {
-    // Reset authorization status
     this.isAuthorized = false;
-    // Clear any pending sync data
-    localStorage.removeItem('pendingHealthKitSync');
-    console.log('Apple Health disconnected');
+    localStorage.removeItem(CONNECTED_KEY);
+    localStorage.removeItem(AUTO_SYNC_KEY);
+    localStorage.removeItem(SYNCED_MEALS_KEY);
+    localStorage.removeItem(SYNCED_WATER_KEY);
+    localStorage.removeItem(PENDING_KEY);
+  }
+
+  private queuePending(entry: Record<string, unknown>) {
+    const existing = readJson<Record<string, unknown>[]>(PENDING_KEY, []);
+    existing.push(entry);
+    localStorage.setItem(PENDING_KEY, JSON.stringify(existing));
   }
 }
 
-// Export singleton instance
 export const healthKitService = new HealthKitService();

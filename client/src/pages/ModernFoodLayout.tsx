@@ -61,7 +61,8 @@ import {
   PlayCircle,
   GraduationCap,
   Play,
-  Camera
+  Camera,
+  Heart
 } from 'lucide-react';
 import { House, ForkKnife, Timer, ChartBar, User } from 'phosphor-react';
 import { NotificationDropdown } from '@/components/NotificationDropdown';
@@ -208,8 +209,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         addNotification('info', 'Halfway There! 💧', 'You\'ve had 4 glasses of water today. Keep going!');
       }
       
-      // Auto-sync to Apple Health if enabled
-      syncHealthDataIfEnabled().catch(console.error);
+      syncHealthDataIfEnabled({ waterGlasses: newGlasses }).catch(console.error);
       
       return;
     }
@@ -254,8 +254,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         addNotification('info', 'Halfway There! 💧', 'You\'ve had 4 glasses of water today. Keep going!');
       }
       
-      // Auto-sync to Apple Health if enabled
-      syncHealthDataIfEnabled().catch(console.error);
+      syncHealthDataIfEnabled({ waterGlasses: newGlasses }).catch(console.error);
       
     } catch (error) {
       // Revert optimistic update
@@ -268,37 +267,34 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     }
   }, [user, dailyStats?.waterGlasses, toast]);
 
-  // Apple Health sync function
   const handleHealthDataSync = useCallback(async (data: any) => {
-    if (data.type === 'manual_sync') {
-      try {
-        // Sync current day's water intake
-        if (dailyStats?.waterGlasses) {
-          await healthKitService.syncWaterIntake(dailyStats.waterGlasses);
-        }
-        
-        // Sync current day's nutrition data
-        if (dailyStats) {
-          await healthKitService.syncNutritionData({
-            calories: dailyStats.totalCalories,
-            protein: dailyStats.totalProtein,
-            carbohydrates: dailyStats.totalCarbs,
-            fat: dailyStats.totalFat
-          });
-        }
-        
-      } catch (error) {
-        console.error('❌ Health data sync failed:', error);
+    try {
+      if (data?.meal) {
+        await healthKitService.syncMeal(data.meal);
+        return;
       }
-    }
-  }, [dailyStats]);
 
-  // Auto-sync health data when enabled
-  const syncHealthDataIfEnabled = useCallback(async () => {
-    const autoSyncEnabled = localStorage.getItem('appleHealthAutoSync') === 'true';
-    if (autoSyncEnabled && healthKitService.getAuthorizationStatus()) {
-      await handleHealthDataSync({ type: 'auto_sync' });
+      if (data?.waterGlasses != null) {
+        await healthKitService.syncWaterIntake(Number(data.waterGlasses) || 0);
+        return;
+      }
+
+      const meals = Array.isArray(loggedMeals) && loggedMeals.length > 0
+        ? loggedMeals
+        : await listLoggedMeals();
+      await healthKitService.syncMeals(meals);
+      await healthKitService.syncWaterIntake(dailyStats?.waterGlasses || 0);
+    } catch (error) {
+      console.error('Health data sync failed:', error);
+      throw error;
     }
+  }, [dailyStats, loggedMeals]);
+
+  const syncHealthDataIfEnabled = useCallback(async (payload?: any) => {
+    if (!healthKitService.isAutoSyncEnabled()) {
+      return;
+    }
+    await handleHealthDataSync(payload || { type: 'auto_sync' });
   }, [handleHealthDataSync]);
 
   // Function to calculate micronutrients from meals - uses real data when available
@@ -887,12 +883,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         
         // Add notification for meal logging
         if (event?.detail) {
-          const { foodName, calories, mealType, protein } = event.detail;
+          const { foodName, name, calories, mealType, protein } = event.detail;
           addNotification(
             'success', 
             'Meal Logged! 🍽️', 
-            `Added ${foodName || 'food item'} (${calories || 0} cal${protein ? `, ${protein}g protein` : ''}) to ${mealType || 'your meals'}`
+            `Added ${foodName || name || 'food item'} (${calories || 0} cal${protein ? `, ${protein}g protein` : ''}) to ${mealType || 'your meals'}`
           );
+          syncHealthDataIfEnabled({ meal: event.detail }).catch(console.error);
         } else {
           // Generic meal logged notification when no details available
           addNotification('success', 'Meal Updated! 🍽️', 'Your nutrition data has been updated');
@@ -961,7 +958,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       window.removeEventListener('reload-meal-data', handleReloadMealData);
       clearInterval(fastingInterval);
     };
-  }, [user, fetchDailyStats, calculateMicronutrients, checkFastingStatus]);
+  }, [user, fetchDailyStats, calculateMicronutrients, checkFastingStatus, syncHealthDataIfEnabled]);
 
   // Food categories inspired by Deliveroo
   const categories = [
@@ -2717,13 +2714,30 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   <div className="border-t border-amber-300/30 pt-6 mt-2">
                     <UserSettingsManager />
                     
-                    {/* Apple Health Integration */}
-                    <div className="mt-6 pt-4 border-t border-amber-300/30">
-                      <AppleHealthIntegration onHealthDataSync={handleHealthDataSync} />
-                    </div>
-                    
-
                   </div>
+                </AccordionContent>
+              </Card>
+            </AccordionItem>
+
+            <AccordionItem value="apple-health" className="border-none">
+              <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 overflow-hidden rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:from-amber-100 hover:to-amber-200 hover:border-amber-300/50">
+                <AccordionTrigger className="px-6 py-6 hover:bg-amber-200/30 hover:no-underline [&[data-state=open]>div]:text-[#faed39] [&[data-state=open]]:bg-amber-200/30">
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center space-x-3">
+                      <Heart className="w-6 h-6 text-red-500" />
+                      <div>
+                        <h3 className="text-xl font-semibold transition-colors" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                          Apple Health
+                        </h3>
+                        <p className="text-sm text-gray-700" style={{ fontFamily: "'Work Sans', sans-serif" }}>
+                          Sync meals and water with the Health app
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-6 pt-0">
+                  <AppleHealthIntegration onHealthDataSync={handleHealthDataSync} />
                 </AccordionContent>
               </Card>
             </AccordionItem>
@@ -3121,9 +3135,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             </AccordionItem>
           </Accordion>
         ) : (
-          <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 p-8">
-            <SignOnModule />
-          </Card>
+          <div className="space-y-6">
+            <AppleHealthIntegration onHealthDataSync={handleHealthDataSync} />
+            <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 p-8">
+              <SignOnModule />
+            </Card>
+          </div>
         )}
       </div>
     </div>

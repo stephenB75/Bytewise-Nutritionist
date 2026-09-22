@@ -75,7 +75,11 @@ const config: CapacitorConfig = {
         publicStorage: 'ByteWise uses device storage to save meal photos, export nutrition reports, and cache data for offline use.'
       }
     },
-    
+
+    Health: {
+      read: ['dietaryWater', 'dietaryEnergyConsumed'],
+      write: ['dietaryWater', 'dietaryEnergyConsumed']
+    }
   }
 };
 
