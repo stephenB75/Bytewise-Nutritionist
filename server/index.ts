@@ -122,6 +122,7 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  try {
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
@@ -174,8 +175,11 @@ app.use((req, res, next) => {
   // Railway healthchecks use IPv4. Binding only to :: makes the proxy return 502.
   const host = process.env.HOST === "::" || !process.env.HOST ? "0.0.0.0" : process.env.HOST;
 
-  server.on("error", (err) => {
+  server.on("error", (err: NodeJS.ErrnoException) => {
     console.error("Listen error:", err);
+    if (err.code === 'EADDRINUSE') {
+      console.error('Port in use — retry or set PORT to a free port.');
+    }
     process.exit(1);
   });
 
@@ -222,4 +226,8 @@ app.use((req, res, next) => {
     });
   });
 
+  } catch (startupError) {
+    console.error('💥 Fatal startup error:', startupError);
+    process.exit(1);
+  }
 })();

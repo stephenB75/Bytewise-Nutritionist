@@ -16,9 +16,18 @@ export function serveStatic(app: Express) {
   const distPath = path.resolve(process.cwd(), "dist", "public");
 
   if (!fs.existsSync(distPath)) {
-    throw new Error(
-      `Could not find the build directory: ${distPath}, make sure to build the client first`,
+    console.error(
+      `Could not find the build directory: ${distPath}. API routes still work; rebuild the client for the web UI.`
     );
+    app.get('*', (_req, res) => {
+      res
+        .status(503)
+        .type('text/html')
+        .send(
+          '<h1>Bytewise Nutritionist</h1><p>The app UI is rebuilding. API health: <a href="/api/health">/api/health</a></p>'
+        );
+    });
+    return;
   }
 
   app.use(express.static(distPath));

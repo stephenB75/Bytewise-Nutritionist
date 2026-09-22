@@ -35,7 +35,7 @@ import {
   type RecipeWithIngredients,
   type MealWithFoods,
 } from "@shared/schema";
-import { db, withRetry } from "./db";
+import { db, isDbReady, withRetry } from "./db";
 import { eq, desc, and, gte, lte, like, sql, inArray } from "drizzle-orm";
 import { getDatabaseUrl } from "./env";
 import {
@@ -153,7 +153,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUser(id: string): Promise<User | undefined> {
-    if (!getDatabaseUrl()) {
+    if (!getDatabaseUrl() || !isDbReady()) {
       try {
         return (await getUserViaSupabase(id)) as User | undefined;
       } catch {
@@ -189,7 +189,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
-    if (!getDatabaseUrl()) {
+    if (!getDatabaseUrl() || !isDbReady()) {
       return (await upsertUserViaSupabase(userData)) as User;
     }
     try {
@@ -430,12 +430,19 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getPopularFoods(limit = 10): Promise<Food[]> {
-    return await db
-      .select()
-      .from(foods)
-      .where(eq(foods.verified, true))
-      .orderBy(foods.name)
-      .limit(limit);
+    if (!getDatabaseUrl() || !db) {
+      return [];
+    }
+    try {
+      return await db
+        .select()
+        .from(foods)
+        .where(eq(foods.verified, true))
+        .orderBy(foods.name)
+        .limit(limit);
+    } catch {
+      return [];
+    }
   }
 
   // Recipe operations

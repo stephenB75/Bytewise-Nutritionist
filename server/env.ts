@@ -14,6 +14,8 @@ function isPlaceholder(value?: string | null): boolean {
     normalized.includes('changeme') ||
     normalized.includes('your-supabase') ||
     normalized.includes('your_password') ||
+    normalized.includes('[your-password]') ||
+    normalized.includes('your-password') ||
     normalized.includes('your-usda') ||
     normalized === 'demo_key'
   );
@@ -35,8 +37,21 @@ export function getSupabaseServiceKey(): string | undefined {
   return firstReal(process.env.SUPABASE_SERVICE_ROLE_KEY, process.env.SUPABASE_SERVICE_KEY);
 }
 
+function sanitizeDatabaseUrl(raw?: string): string | undefined {
+  if (!raw) return undefined;
+  let value = raw.trim();
+  if (
+    (value.startsWith('"') && value.endsWith('"')) ||
+    (value.startsWith("'") && value.endsWith("'"))
+  ) {
+    value = value.slice(1, -1).trim();
+  }
+  return value || undefined;
+}
+
 export function getDatabaseUrl(): string | undefined {
-  return firstReal(process.env.DATABASE_URL);
+  const sanitized = sanitizeDatabaseUrl(process.env.DATABASE_URL);
+  return firstReal(sanitized);
 }
 
 export function isDatabaseConfigured(): boolean {
