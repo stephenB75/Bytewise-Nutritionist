@@ -58,7 +58,9 @@ function mapAuthError(error: { message?: string; code?: string } | null, email: 
     lower.includes('failed to fetch') ||
     lower.includes('networkerror') ||
     lower.includes('fetch failed') ||
-    lower.includes('connection')
+    lower.includes('connection') ||
+    lower.includes('database error') ||
+    lower.includes('schema cache')
   ) {
     return {
       ok: false,

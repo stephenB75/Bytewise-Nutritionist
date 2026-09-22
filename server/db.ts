@@ -1,20 +1,24 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import * as schema from "@shared/schema";
-import { getDatabaseUrl } from './env';
+import { getDatabaseUrl, isDatabaseConfigured } from './env';
 
-// Database connection - Use provided DATABASE_URL (from Supabase)
-let databaseUrl = getDatabaseUrl();
+export { isDatabaseConfigured };
+
+// Database connection - Use provided DATABASE_URL (from Supabase Postgres)
+const databaseUrl = getDatabaseUrl();
 
 if (!databaseUrl) {
-  console.error("DATABASE_URL is missing. The server will start; database routes will fail until it is set.");
-  databaseUrl = "postgresql://127.0.0.1:5432/postgres";
+  console.error(
+    'DATABASE_URL is missing on Railway. Auth still works via Supabase; set DATABASE_URL to your Supabase Postgres URI for meals/water persistence.'
+  );
+} else {
+  console.log('✅ Using database connection:', databaseUrl.replace(/:([^@]+)@/, ':***@'));
 }
 
-console.log('✅ Using database connection:', databaseUrl.replace(/:([^@]+)@/, ':***@'));
-
-// Create PostgreSQL client with optimized connection settings
-const pool = new Pool({
+// Create PostgreSQL client with optimized connection settings (skip fake localhost — it caused 20s auth hangs)
+const pool = databaseUrl
+  ? new Pool({
   connectionString: databaseUrl,
   ssl: { rejectUnauthorized: false }, // Database requires SSL
   max: 20, // Support higher concurrency 
@@ -25,17 +29,20 @@ const pool = new Pool({
   keepAlive: true, // Enable TCP keep-alive
   keepAliveInitialDelayMillis: 10000, // Wait 10s before first keep-alive probe
   application_name: 'bytewise-nutritionist',
-});
+})
+  : null;
 
-console.log('🔒 Database SSL mode: enabled with rejectUnauthorized: false');
+if (pool) {
+  console.log('🔒 Database SSL mode: enabled with rejectUnauthorized: false');
+}
 
 // Enhanced error handling and recovery for PostgreSQL
-pool.on('error', (err) => {
+pool?.on('error', (err) => {
   console.error('❌ Database pool error:', err);
   console.error('🔧 Connection will be automatically recreated on next request');
 });
 
-pool.on('connect', (client) => {
+pool?.on('connect', (client) => {
   console.log('✅ New database connection established');
   
   // Set connection-specific settings
@@ -46,12 +53,13 @@ pool.on('connect', (client) => {
   `).catch(err => console.log('⚠️ Could not set connection parameters:', err.message));
 });
 
-pool.on('remove', (client) => {
+pool?.on('remove', (client) => {
   console.log('🔄 Database connection removed from pool');
 });
 
 // Add connection health check
 const isConnectionHealthy = async (): Promise<boolean> => {
+  if (!pool) return false;
   try {
     const client = await pool.connect();
     await client.query('SELECT 1');
@@ -64,6 +72,9 @@ const isConnectionHealthy = async (): Promise<boolean> => {
 
 // Test connection on startup with retry logic
 const testConnection = async () => {
+  if (!pool) {
+    return;
+  }
   let attempts = 0;
   const maxAttempts = 3;
   
@@ -137,7 +148,7 @@ const withRetry = async <T>(operation: () => Promise<T>, maxRetries = 3): Promis
 };
 
 // Create db instance with retry wrapper
-export const db = drizzle(pool, { schema });
+export const db = pool ? drizzle(pool, { schema }) : (null as unknown as ReturnType<typeof drizzle>);
 
 // Export retry wrapper for use in storage operations
 export { withRetry };

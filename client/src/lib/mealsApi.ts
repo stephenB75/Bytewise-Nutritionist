@@ -128,21 +128,23 @@ function writeGuestMeals(meals: LoggedMeal[]) {
 export async function ensureUserProfile(): Promise<string | null> {
   const { data: { session } } = await supabase.auth.getSession();
   const user = session?.user;
-  if (!user?.id) {
+  if (!user?.id || !session.access_token) {
     return null;
   }
 
-  const { error } = await supabase.from('users').upsert({
-    id: user.id,
-    email: user.email,
-    email_verified: !!user.email_confirmed_at,
-    first_name: user.user_metadata?.first_name || user.user_metadata?.firstName || null,
-    last_name: user.user_metadata?.last_name || user.user_metadata?.lastName || null,
-    updated_at: new Date().toISOString(),
-  }, { onConflict: 'id' });
-
-  if (error) {
-    console.warn('Failed to ensure user profile:', error.message);
+  try {
+    const response = await apiFetch('/api/auth/ensure-profile', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
+    });
+    if (!response.ok) {
+      const body = (await response.json().catch(() => ({}))) as { message?: string };
+      console.warn('Failed to ensure user profile via API:', body.message || response.status);
+    }
+  } catch (error) {
+    console.warn('Failed to ensure user profile via API:', error);
   }
 
   return user.id;

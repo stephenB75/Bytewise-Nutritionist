@@ -39,6 +39,10 @@ export function getDatabaseUrl(): string | undefined {
   return firstReal(process.env.DATABASE_URL);
 }
 
+export function isDatabaseConfigured(): boolean {
+  return Boolean(getDatabaseUrl());
+}
+
 export function getUsdaApiKey(): string {
   return firstReal(process.env.USDA_API_KEY, process.env.VITE_USDA_API_KEY) || 'DEMO_KEY';
 }

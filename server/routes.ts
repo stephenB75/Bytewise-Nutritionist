@@ -527,7 +527,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       console.log('✅ User created:', data.user?.email, 'Confirmed:', !!data.user?.email_confirmed_at);
-      
+
+      if (data.user?.id) {
+        try {
+          const { upsertUserViaSupabase } = await import('./supabaseData');
+          await upsertUserViaSupabase({
+            id: data.user.id,
+            email: data.user.email,
+            emailVerified: !!data.user.email_confirmed_at,
+          });
+        } catch (profileError) {
+          console.warn('Signup profile sync (non-blocking):', profileError);
+        }
+      }
+
       console.log('📧 User created successfully, email verification required');
       
       // Always return verification required for admin-created users
@@ -628,6 +641,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Signed out successfully" });
     } catch (error) {
       res.status(500).json({ message: "Sign out failed" });
+    }
+  });
+
+  app.post('/api/auth/ensure-profile', isAuthenticated, async (req: any, res: Response) => {
+    try {
+      const userId = req.user?.id as string;
+      const email = req.user?.email as string | undefined;
+      if (!userId) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+
+      const { upsertUserViaSupabase } = await import('./supabaseData');
+      const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(userId);
+      const meta = authUser?.user?.user_metadata || {};
+
+      await upsertUserViaSupabase({
+        id: userId,
+        email: email || authUser?.user?.email,
+        firstName: meta.first_name || meta.firstName || null,
+        lastName: meta.last_name || meta.lastName || null,
+        emailVerified: !!authUser?.user?.email_confirmed_at,
+      });
+
+      res.json({ ok: true });
+    } catch (error: any) {
+      console.error('ensure-profile failed:', error?.message || error);
+      res.status(500).json({
+        message: error?.message || 'Could not sync profile to database',
+        code: 'SERVICE_ERROR',
+      });
     }
   });
 

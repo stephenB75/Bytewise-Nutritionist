@@ -153,6 +153,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUser(id: string): Promise<User | undefined> {
+    if (!getDatabaseUrl()) {
+      try {
+        return (await getUserViaSupabase(id)) as User | undefined;
+      } catch {
+        return undefined;
+      }
+    }
+
     try {
       const [user] = await db.select().from(users).where(eq(users.id, id));
       return user;
@@ -181,10 +189,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
+    if (!getDatabaseUrl()) {
+      return (await upsertUserViaSupabase(userData)) as User;
+    }
     try {
       return await this.upsertUserInDatabase(userData);
     } catch (error) {
-      return await upsertUserViaSupabase(userData) as any;
+      console.warn('Database upsertUser failed, using Supabase admin:', error);
+      return (await upsertUserViaSupabase(userData)) as User;
     }
   }
 
