@@ -94,12 +94,34 @@ function mapMeal(row: Record<string, unknown>): LoggedMeal {
   };
 }
 
-async function getSessionUser() {
+const GUEST_MEALS_KEY = 'guestMeals';
+
+async function getSessionUserOrNull() {
   const { data: { session } } = await supabase.auth.getSession();
-  if (!session?.user?.id) {
-    throw new Error('Sign in to log food');
+  return session?.user ?? null;
+}
+
+async function getSessionUser() {
+  const user = await getSessionUserOrNull();
+  if (!user?.id) {
+    throw new Error('Sign in to save food to your account');
   }
-  return session.user;
+  return user;
+}
+
+function readGuestMeals(): LoggedMeal[] {
+  try {
+    const raw = localStorage.getItem(GUEST_MEALS_KEY) || localStorage.getItem('weeklyMeals') || '[]';
+    const parsed = JSON.parse(raw);
+    return (Array.isArray(parsed) ? parsed : []).map((row) => mapMeal(row as Record<string, unknown>));
+  } catch {
+    return [];
+  }
+}
+
+function writeGuestMeals(meals: LoggedMeal[]) {
+  localStorage.setItem(GUEST_MEALS_KEY, JSON.stringify(meals));
+  localStorage.setItem('weeklyMeals', JSON.stringify(meals));
 }
 
 export async function ensureUserProfile(): Promise<string | null> {
@@ -164,13 +186,55 @@ export async function saveUserProfile(profile: {
 }
 
 export async function listLoggedMeals(): Promise<LoggedMeal[]> {
-  const response = await apiRequest('GET', '/api/meals/logged');
-  const data = await response.json();
-  return (Array.isArray(data) ? data : []).map((row) => mapMeal(row as Record<string, unknown>));
+  const user = await getSessionUserOrNull();
+  if (!user) {
+    return readGuestMeals();
+  }
+
+  try {
+    const response = await apiRequest('GET', '/api/meals/logged');
+    const data = await response.json();
+    return (Array.isArray(data) ? data : []).map((row) => mapMeal(row as Record<string, unknown>));
+  } catch {
+    return readGuestMeals();
+  }
 }
 
 export async function logMeal(input: LogMealInput): Promise<LoggedMeal> {
-  await getSessionUser();
+  const user = await getSessionUserOrNull();
+  const localMeal: LoggedMeal = {
+    id: Date.now(),
+    userId: user?.id || 'guest',
+    name: input.name,
+    date: toDateKey(input.date),
+    mealType: input.mealType || 'meal',
+    calories: toNumber(input.totalCalories),
+    totalCalories: toNumber(input.totalCalories),
+    protein: toNumber(input.totalProtein),
+    totalProtein: toNumber(input.totalProtein),
+    carbs: toNumber(input.totalCarbs),
+    totalCarbs: toNumber(input.totalCarbs),
+    fat: toNumber(input.totalFat),
+    totalFat: toNumber(input.totalFat),
+    iron: toNumber(input.iron),
+    calcium: toNumber(input.calcium),
+    zinc: toNumber(input.zinc),
+    magnesium: toNumber(input.magnesium),
+    vitaminC: toNumber(input.vitaminC),
+    vitaminD: toNumber(input.vitaminD),
+    vitaminB12: toNumber(input.vitaminB12),
+    folate: toNumber(input.folate),
+  };
+
+  if (!user) {
+    const meals = readGuestMeals();
+    meals.unshift(localMeal);
+    writeGuestMeals(meals);
+    window.dispatchEvent(new CustomEvent('reload-meal-data', { detail: localMeal }));
+    window.dispatchEvent(new CustomEvent('calories-logged', { detail: localMeal }));
+    return localMeal;
+  }
+
   await ensureUserProfile();
 
   const response = await apiRequest('POST', '/api/meals/logged', {
@@ -195,6 +259,63 @@ export async function logMeal(input: LogMealInput): Promise<LoggedMeal> {
   window.dispatchEvent(new CustomEvent('reload-meal-data', { detail: meal }));
   window.dispatchEvent(new CustomEvent('calories-logged', { detail: meal }));
   return meal;
+}
+
+export async function syncGuestMeals(): Promise<number> {
+  const user = await getSessionUserOrNull();
+  const guestMeals = readGuestMeals();
+  if (!user || guestMeals.length === 0) {
+    return 0;
+  }
+
+  let saved = 0;
+  const remaining: LoggedMeal[] = [];
+  for (const meal of guestMeals) {
+    try {
+      await apiRequest('POST', '/api/meals/logged', {
+        name: meal.name,
+        date: meal.date,
+        mealType: meal.mealType,
+        totalCalories: meal.totalCalories,
+        totalProtein: meal.totalProtein,
+        totalCarbs: meal.totalCarbs,
+        totalFat: meal.totalFat,
+        iron: meal.iron,
+        calcium: meal.calcium,
+        zinc: meal.zinc,
+        magnesium: meal.magnesium,
+        vitaminC: meal.vitaminC,
+        vitaminD: meal.vitaminD,
+        vitaminB12: meal.vitaminB12,
+        folate: meal.folate,
+      });
+      saved += 1;
+    } catch {
+      remaining.push(meal);
+    }
+  }
+
+  writeGuestMeals(remaining);
+  if (remaining.length === 0) {
+    localStorage.removeItem(GUEST_MEALS_KEY);
+  }
+  window.dispatchEvent(new CustomEvent('reload-meal-data'));
+  return saved;
+}
+
+export async function deleteLoggedMeal(mealId: number): Promise<void> {
+  const user = await getSessionUserOrNull();
+  if (!user) {
+    writeGuestMeals(readGuestMeals().filter((meal) => meal.id !== mealId));
+    window.dispatchEvent(new CustomEvent('reload-meal-data'));
+    return;
+  }
+
+  const response = await apiRequest('DELETE', `/api/meals/${mealId}`);
+  if (!response.ok) {
+    throw new Error('Failed to delete meal');
+  }
+  window.dispatchEvent(new CustomEvent('reload-meal-data'));
 }
 
 export async function calculateFood(body: {

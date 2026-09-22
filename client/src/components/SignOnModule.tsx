@@ -332,7 +332,9 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
             {isSignUp ? 'Join bytewise nutritionist' : 'Welcome Back'}
           </h2>
           <p className="text-gray-900" style={{ fontFamily: "'Work Sans', sans-serif" }}>
-            {isSignUp ? 'Start your nutrition tracking journey today' : 'Access your nutrition tracking and progress'}
+            {isSignUp
+              ? 'Create an account to save meals and keep them after you leave this device'
+              : 'Sign in to save and sync the meals you already tracked'}
           </p>
         </div>
       </div>
@@ -363,8 +365,8 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
                 <Shield className="w-4 h-4 text-white" />
               </div>
               <div>
-                <div className="font-semibold text-gray-950 text-sm">Secure Data Sync</div>
-                <div className="text-xs text-gray-900">Your data stays safe across devices</div>
+                <div className="font-semibold text-gray-950 text-sm">Save Your Entries</div>
+                <div className="text-xs text-gray-900">An account keeps meals after you leave this device</div>
               </div>
             </div>
             

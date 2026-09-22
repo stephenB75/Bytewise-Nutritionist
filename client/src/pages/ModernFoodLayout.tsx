@@ -69,7 +69,7 @@ import { WeeklyCaloriesCard } from '@/components/WeeklyCaloriesCard';
 import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
-import { listLoggedMeals, saveUserProfile } from '@/lib/mealsApi';
+import { deleteLoggedMeal, listLoggedMeals, saveUserProfile } from '@/lib/mealsApi';
 import { clearProfileCompletionPrompt, resendVerificationEmail, resetPasswordForEmail, shouldShowProfileCompletion, signInWithEmail, signUpWithEmail } from '@/lib/authActions';
 import { getWeekDates, getLocalDateKey, getMealTypeByTime, formatLocalTime } from '@/utils/dateUtils';
 import { fixMealDateMismatches } from '@/utils/mealDateFixer';
@@ -133,7 +133,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const [weeklyMeals, setWeeklyMeals] = useState<any[]>([]);
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
   const [trackingView, setTrackingView] = useState<TrackingView>('daily');
-  const [nutritionMode, setNutritionMode] = useState<'ai' | 'calculator'>('ai');
+  const [nutritionMode, setNutritionMode] = useState<'ai' | 'calculator'>('calculator');
 
   const [notifications, setNotifications] = useState<Notification[]>([]);
   
@@ -417,17 +417,26 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   // Fetch daily stats including fasting status
   const fetchDailyStats = useCallback(async () => {
     if (!user) {
-      // For unauthenticated users, load from localStorage
       const localStats = JSON.parse(localStorage.getItem('dailyStats') || '{}');
-      
-      setDailyStats({
-        totalCalories: 0,
-        totalProtein: 0,
-        totalCarbs: 0,
-        totalFat: 0,
-        waterGlasses: localStats.waterGlasses || 0,
-        fastingStatus: undefined
+      const meals = await listLoggedMeals();
+      const today = getLocalDateKey();
+      const todayMeals = meals.filter((meal) => {
+        const mealDate = meal.date?.includes('T') ? meal.date.split('T')[0] : meal.date;
+        return mealDate === today;
       });
+      const totals = todayMeals.reduce((acc, meal) => ({
+        totalCalories: acc.totalCalories + (meal.calories || meal.totalCalories || 0),
+        totalProtein: acc.totalProtein + (meal.protein || meal.totalProtein || 0),
+        totalCarbs: acc.totalCarbs + (meal.carbs || meal.totalCarbs || 0),
+        totalFat: acc.totalFat + (meal.fat || meal.totalFat || 0),
+      }), { totalCalories: 0, totalProtein: 0, totalCarbs: 0, totalFat: 0 });
+
+      setDailyStats({
+        ...totals,
+        waterGlasses: localStats.waterGlasses || 0,
+        fastingStatus: undefined,
+      });
+      setDailyCalories(totals.totalCalories);
       return;
     }
     
@@ -781,10 +790,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         // Updating dailyMicronutrients state
         setDailyMicronutrients(updatedMicronutrients);
         
-        // Fetch daily stats including fasting status
-        if (user) {
-          fetchDailyStats();
-        }
+        await fetchDailyStats();
         
         // Check fasting status from localStorage
         checkFastingStatus();
@@ -1556,14 +1562,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         title="Track Your"
         subtitle="Nutrition"
         description="Track nutrition with scientific precision using our comprehensive USDA database"
-        buttonText={user ? 'Start Tracking' : 'Sign Up to Track'}
-        onButtonClick={() => {
-          if (user) {
-            handleTabChange('nutrition');
-          } else {
-            handleTabChange('profile');
-          }
-        }}
+        buttonText="Start Tracking"
+        onButtonClick={() => handleTabChange('nutrition')}
         showLogo={true}
       />
 
@@ -1603,15 +1603,27 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             </div>
           )}
           
+          {!user && (
+            <div className="mb-3 p-3 rounded-xl bg-amber-50 border border-amber-200 text-sm text-gray-800">
+              You can track meals now. Create an account on Profile to save your entries.
+              <button
+                type="button"
+                onClick={() => handleTabChange('profile')}
+                className="ml-2 font-semibold text-orange-600 underline"
+              >
+                Create account
+              </button>
+            </div>
+          )}
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-3xl font-semibold text-gray-900">Today's Progress</h2>
             <div className="flex gap-2">
               <Button 
                 variant="ghost" 
                 className="text-orange-400 hover:text-orange-300"
-                onClick={() => handleTabChange(user ? 'nutrition' : 'profile')}
+                onClick={() => handleTabChange('nutrition')}
               >
-                {user ? 'Track Food' : 'Sign Up to Track'}
+                Track Food
               </Button>
             </div>
           </div>
@@ -1748,6 +1760,18 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
       {/* Content Section - Completely Separate and Underneath */}
       <div className="px-6 py-3 content-section">
+        {!user && (
+          <div className="mb-4 p-3 rounded-xl bg-amber-50 border border-amber-200 text-sm text-gray-800">
+            Entries on this device stay here until you create an account.
+            <button
+              type="button"
+              onClick={() => handleTabChange('profile')}
+              className="ml-2 font-semibold text-orange-600 underline"
+            >
+              Save with an account
+            </button>
+          </div>
+        )}
         {/* Food Search Bar - Moved Here */}
         <div className="mb-4 pb-2">
           <div className="relative">
@@ -1765,17 +1789,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             </p>
           </div>
           <Button 
-            onClick={() => {
-              if (user) {
-                handleTabChange('nutrition');
-              } else {
-                handleTabChange('profile');
-              }
-            }}
+            onClick={() => handleTabChange('nutrition')}
             className="w-full mt-3 bg-orange-600 hover:bg-orange-700 text-white font-bold h-12 rounded-xl btn-hero-enhanced"
           >
             <Plus className="w-4 h-4 mr-2" />
-            {user ? 'Log Food with Calculator' : 'Sign Up to Log Food'}
+            Log Food with Calculator
           </Button>
         </div>
 
@@ -1911,22 +1929,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                       data-testid={`button-delete-meal-${index}`}
                       onClick={async () => {
                         try {
-                          if (!user || !meal.id) {
-                            console.error('Cannot delete meal: missing user or meal ID');
-                            addNotification('info', 'Delete Failed', 'Cannot delete meal: missing authentication or meal ID');
+                          if (!meal.id) {
+                            addNotification('info', 'Delete Failed', 'Cannot delete meal: missing meal ID');
                             return;
                           }
-                          
-                          // Delete from database
-                          const response = await apiRequest('DELETE', `/api/meals/${meal.id}`);
-                          if (!response.ok) {
-                            throw new Error('Failed to delete meal from database');
-                          }
-                          
-                          // Trigger data refresh by dispatching a refresh event
-                          window.dispatchEvent(new CustomEvent('reload-meal-data'));
-                          
-                          // Show success feedback
+
+                          await deleteLoggedMeal(meal.id);
                           addNotification('success', 'Meal Deleted', `Removed ${meal.name} from your log`);
                           
                           // Dispatch refresh event for other components
@@ -2258,7 +2266,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         <HeroSection
           title="Welcome to"
           subtitle="Nutrition"
-          description="Sign in to start tracking your nutrition journey"
+          description="Create an account to save your meals and keep them after you leave"
           buttonText="Get Started"
           onButtonClick={() => {
             const signInCard = document.querySelector('.bg-white\\/10');
@@ -2470,22 +2478,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                     data-testid={`button-delete-logged-meal-${index}`}
                     onClick={async () => {
                       try {
-                        if (!user || !meal.id) {
-                          console.error('Cannot delete meal: missing user or meal ID');
-                          addNotification('info', 'Delete Failed', 'Cannot delete meal: missing authentication or meal ID');
+                        if (!meal.id) {
+                          addNotification('info', 'Delete Failed', 'Cannot delete meal: missing meal ID');
                           return;
                         }
-                        
-                        // Delete from database
-                        const response = await apiRequest('DELETE', `/api/meals/${meal.id}`);
-                        if (!response.ok) {
-                          throw new Error('Failed to delete meal from database');
-                        }
-                        
-                        // Trigger data refresh by dispatching a refresh event
-                        window.dispatchEvent(new CustomEvent('reload-meal-data'));
-                        
-                        // Show success feedback
+
+                        await deleteLoggedMeal(meal.id);
                         addNotification('success', 'Meal Deleted', `Removed ${meal.name} from your meals`);
                         
                         // Dispatch refresh event to update other components
@@ -2648,8 +2646,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       <HeroSection
         title="Your"
         subtitle="Profile"
-        description="Manage your account, view achievements, and track your progress"
-        buttonText={user ? "Manage Profile" : "Sign Up"}
+        description={user
+          ? "Manage your account, view achievements, and track your progress"
+          : "Create an account to save your meals and keep them after you leave this device"}
+        buttonText={user ? "Manage Profile" : "Create Account"}
         onButtonClick={() => {
           if (user) {
             const profileCards = document.querySelector('.space-y-6');

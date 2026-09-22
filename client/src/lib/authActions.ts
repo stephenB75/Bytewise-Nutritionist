@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import { ensureUserProfile } from '@/lib/mealsApi';
+import { ensureUserProfile, syncGuestMeals } from '@/lib/mealsApi';
 
 export type AuthCode =
   | 'VERIFICATION_REQUIRED'
@@ -68,6 +68,7 @@ export function shouldShowProfileCompletion() {
 
 async function finishSignedIn(): Promise<AuthActionResult> {
   await ensureUserProfile();
+  await syncGuestMeals();
   window.dispatchEvent(new CustomEvent('auth-state-change'));
   return { ok: true, kind: 'signed_in' };
 }

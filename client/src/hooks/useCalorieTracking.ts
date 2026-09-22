@@ -156,33 +156,15 @@ export function useCalorieTracking() {
         mealType: getMealTypeByTime()
       };
       
-      // Store in localStorage for instant feedback
-      const weeklyMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-      weeklyMeals.push(mealEntry);
-      localStorage.setItem('weeklyMeals', JSON.stringify(weeklyMeals));
-      
-      // Save to database if authenticated
-      if (user?.id) {
-        try {
-          const response = await logMeal({
-            name: calorieEntry.name,
-            mealType: getMealTypeByTime(),
-            date: calorieEntry.date,
-            totalCalories: calorieEntry.calories,
-            totalProtein: calorieEntry.protein,
-            totalCarbs: calorieEntry.carbs,
-            totalFat: calorieEntry.fat
-          });
-          console.log('✅ Meal synced to database:', response);
-          
-          // Fire event for meal data reload
-          window.dispatchEvent(new CustomEvent('reload-meal-data'));
-        } catch (error) {
-          console.warn('⚠️ Failed to sync meal to database (saved locally):', error);
-        }
-      } else {
-        console.log('ℹ️ Meal saved locally (user not authenticated)');
-      }
+      await logMeal({
+        name: calorieEntry.name,
+        mealType: getMealTypeByTime(),
+        date: calorieEntry.date,
+        totalCalories: calorieEntry.calories,
+        totalProtein: calorieEntry.protein,
+        totalCarbs: calorieEntry.carbs,
+        totalFat: calorieEntry.fat
+      });
       
       return mealEntry;
     },
