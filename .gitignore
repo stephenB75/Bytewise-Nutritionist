@@ -88,3 +88,6 @@ temp/
 # Replit specific
 .replit
 replit.nix
+# Local tool / agent state
+.config/
+.local/
