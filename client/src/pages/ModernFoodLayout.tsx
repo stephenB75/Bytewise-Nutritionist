@@ -1301,8 +1301,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       setIsLoadingHistory(true);
       
       try {
-        // Use proper auth headers from queryClient
-        const { supabase } = await import('@/lib/supabase');
         const { data: { session } } = await supabase.auth.getSession();
         const headers: Record<string, string> = {
           'Content-Type': 'application/json',

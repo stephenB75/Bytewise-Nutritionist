@@ -260,9 +260,10 @@ button.bg-blue-800:hover:not([data-testid*="nav-"]):not([class*="nav-"]):not(.ba
 }
 
 
-/* Dialog content container */
-.relative.bg-background.border.border-border.shadow-lg.rounded-lg,
-.bg-background.border.border-border {
+/* Dialog content container.
+   Do not chain .border.border-border — Vite's CSS minifier
+   rewrites that to the invalid selector border*. */
+[class~="bg-background"][class~="border-border"] {
   background-color: #ffffff !important;
   border-color: #d1d5db !important;
   color: #111827 !important;
