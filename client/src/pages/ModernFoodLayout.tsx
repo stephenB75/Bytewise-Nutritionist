@@ -2929,36 +2929,32 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   return (
     <div data-testid="app-container" className="h-screen w-screen overflow-hidden">
-      {/* Fixed Notification Header on all pages - Safe area positioning for iOS/Android */}
-      <div className="fixed top-safe right-4 z-[9999] safe-notification-position">
+      {/* Fixed notification control — safe area aware (status bar / Dynamic Island) */}
+      <div className="app-notification-anchor">
         <div className="relative">
           <Button
             variant="ghost"
-            size="lg"
-            className="group relative text-gray-600 p-2 md:p-3 transition-all duration-500 hover:scale-110 active:text-gray-100 focus:text-gray-100 active:bg-gray-700/30 focus:bg-gray-700/30"
+            size="icon"
+            className="app-notification-button group relative shrink-0 rounded-full border border-white/25 bg-black/25 text-white shadow-lg backdrop-blur-md transition-colors hover:bg-black/40 hover:text-white focus-visible:ring-white/40"
             onClick={() => setShowNotificationDropdown(!showNotificationDropdown)}
             aria-label={`Notifications${notifications.filter(n => !n.read).length > 0 ? ` - ${notifications.filter(n => !n.read).length} unread` : ''}`}
             aria-expanded={showNotificationDropdown}
             aria-haspopup="dialog"
             data-testid="button-notifications"
           >
-            <div className="relative">
-              {notifications.filter(n => !n.read).length > 0 ? (
-                <BellRing className="w-7 h-7 md:w-12 md:h-12 text-gray-600 transition-all duration-700 ease-in-out group-hover:rotate-12 group-hover:text-orange-600 animate-[colorShift_0.7s_ease-in-out]" strokeWidth={2.5} aria-hidden="true" />
-              ) : (
-                <Bell className="w-7 h-7 md:w-12 md:h-12 text-gray-600 transition-all duration-700 ease-in-out group-hover:rotate-6 group-hover:text-orange-600 animate-[colorShift_0.7s_ease-in-out]" strokeWidth={2.5} aria-hidden="true" />
-              )}
-            </div>
-            
+            {notifications.filter(n => !n.read).length > 0 ? (
+              <BellRing className="h-5 w-5 transition-transform duration-200 group-hover:rotate-12" strokeWidth={2.25} aria-hidden="true" />
+            ) : (
+              <Bell className="h-5 w-5 transition-transform duration-200 group-hover:rotate-6" strokeWidth={2.25} aria-hidden="true" />
+            )}
+
             {notifications.filter(n => !n.read).length > 0 && (
-              <div 
-                className="absolute -top-1 -right-1 min-w-6 h-6 bg-gradient-to-r from-red-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg animate-pulse"
+              <span
+                className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-gradient-to-r from-red-500 to-pink-500 px-1 text-[10px] font-bold leading-none text-white shadow-md"
                 aria-hidden="true"
               >
-                <span className="text-xs text-gray-900 font-bold px-1">
-                  {notifications.filter(n => !n.read).length > 9 ? '9+' : notifications.filter(n => !n.read).length}
-                </span>
-              </div>
+                {notifications.filter(n => !n.read).length > 9 ? '9+' : notifications.filter(n => !n.read).length}
+              </span>
             )}
           </Button>
           

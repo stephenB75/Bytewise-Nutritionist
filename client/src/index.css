@@ -1024,17 +1024,12 @@ button[data-testid="button-notifications"] svg {
 /* Notification button styling */
 button[data-testid="button-notifications"] {
   outline: none;
-  border: none;
-  box-shadow: none;
 }
 
-/* Notification button states */
 button[data-testid="button-notifications"]:hover,
-button[data-testid="button-notifications"]:focus,
+button[data-testid="button-notifications"]:focus-visible,
 button[data-testid="button-notifications"]:active {
-  border: none;
   outline: none;
-  box-shadow: none;
 }
 
 /* Notification icon color shift animation for background transitions */
@@ -1677,51 +1672,51 @@ div[class*="min-h-screen"]:not([data-testid*="navigation"]):not([data-hero="true
   }
 }
 
-/* Notification positioning with enhanced mobile safe area support */
+/* Notification bell — top-right, below status bar / Dynamic Island */
+.app-notification-anchor {
+  position: fixed;
+  z-index: 9999;
+  top: max(calc(env(safe-area-inset-top, 0px) + 0.625rem), 0.625rem);
+  right: calc(env(safe-area-inset-right, 0px) + max(0.75rem, 3vw));
+  pointer-events: none;
+}
+
+@media screen and (max-width: 767px) {
+  .app-notification-anchor {
+    /* Clear status bar / Dynamic Island when safe-area env is unavailable */
+    top: max(calc(env(safe-area-inset-top, 0px) + 0.5rem), 2.75rem);
+  }
+}
+
+.app-notification-anchor > * {
+  pointer-events: auto;
+}
+
+.app-notification-button {
+  height: 2.75rem !important;
+  width: 2.75rem !important;
+  min-height: 2.75rem !important;
+  min-width: 2.75rem !important;
+  padding: 0 !important;
+}
+
+@media screen and (min-width: 768px) {
+  .app-notification-anchor {
+    top: calc(env(safe-area-inset-top, 0px) + 1rem);
+    right: calc(env(safe-area-inset-right, 0px) + 1rem);
+  }
+
+  .app-notification-button {
+    height: 3rem !important;
+    width: 3rem !important;
+    min-height: 3rem !important;
+    min-width: 3rem !important;
+  }
+}
+
+/* Legacy hooks kept for older markup */
 .safe-notification-position {
-  /* For iOS devices with notch/Dynamic Island */
-  @supports (padding: max(0px)) {
-    padding-top: max(0.75rem, env(safe-area-inset-top)) !important;
-  }
-}
-
-/* Enhanced mobile notification positioning */
-@media screen and (max-width: 768px) {
-  .safe-notification-position {
-    padding-top: 0.75rem !important; /* 12px base padding */
-  }
-  
-  /* iPhone 14 Pro and newer with Dynamic Island */
-  @media screen and (min-height: 852px) {
-    .safe-notification-position {
-      padding-top: 1.25rem !important; /* 20px for Dynamic Island */
-    }
-  }
-  
-  /* iPhone with notch */
-  @media screen and (min-height: 812px) and (max-height: 851px) {
-    .safe-notification-position {
-      padding-top: 1rem !important; /* 16px for notch */
-    }
-  }
-}
-
-/* Android specific adjustments */
-@media screen and (max-width: 768px) and (-webkit-min-device-pixel-ratio: 2) {
-  .safe-notification-position {
-    padding-top: 1rem !important; /* 16px for Android status bar */
-  }
-}
-
-/* Desktop/tablet fallback */
-@media screen and (min-width: 769px) {
-  .safe-notification-position {
-    padding-top: 0 !important; /* No extra padding needed on desktop */
-  }
-  
-  .top-safe {
-    top: 1rem !important; /* Standard desktop spacing */
-  }
+  padding-top: 0 !important;
 }
 
 /* Critical: Override any conflicting styles */
