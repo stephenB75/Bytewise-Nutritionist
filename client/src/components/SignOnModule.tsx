@@ -17,7 +17,9 @@ import {
   Mail,
   Lock,
   UserPlus,
-  CheckCircle2
+  CheckCircle2,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
@@ -32,6 +34,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
   const [isSignUp, setIsSignUp] = useState(() => sessionStorage.getItem('open-signup') === 'true');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [confirmingEmail, setConfirmingEmail] = useState(false);
   const [showResetPassword, setShowResetPassword] = useState(false);
@@ -450,13 +453,27 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <Input
                     id="password"
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => handlePasswordChange(e.target.value)}
                     placeholder="Enter your password"
-                    className="pl-10 bg-white/60 border-amber-300/60 text-gray-950 placeholder-gray-600 focus:border-blue-500 focus:ring-blue-500"
+                    className="pl-10 pr-10 bg-white/60 border-amber-300/60 text-gray-950 placeholder-gray-600 focus:border-blue-500 focus:ring-blue-500"
                     required={!showResetPassword}
+                    autoComplete={isSignUp ? 'new-password' : 'current-password'}
                   />
+                  <button
+                    type="button"
+                    className="guest-inline-link absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-800"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    data-testid="button-toggle-password-visibility"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" aria-hidden="true" />
+                    ) : (
+                      <Eye className="h-4 w-4" aria-hidden="true" />
+                    )}
+                  </button>
                 </div>
                 {/* Password requirements indicator */}
                 {isSignUp && password && (

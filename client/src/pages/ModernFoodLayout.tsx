@@ -59,7 +59,9 @@ import {
   PlayCircle,
   GraduationCap,
   Play,
-  Camera
+  Camera,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import { House, ForkKnife, Timer, ChartBar, User } from 'phosphor-react';
 import { NotificationDropdown } from '@/components/NotificationDropdown';
@@ -1937,6 +1939,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const renderSignIn = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [isSignUp, setIsSignUp] = useState(false);
     const [isResetPassword, setIsResetPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -2078,16 +2081,33 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 disabled={isLoading}
               />
               {!isResetPassword && (
-                <Input
-                  type="password"
-                  placeholder="Password (min 6 characters)"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="h-12 bg-amber-50/90 border-amber-400 text-gray-900 placeholder-gray-600"
-                  required
-                  disabled={isLoading}
-                  minLength={6}
-                />
+                <div className="relative">
+                  <Input
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Password (min 6 characters)"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="h-12 pr-11 bg-amber-50/90 border-amber-400 text-gray-900 placeholder-gray-600"
+                    required
+                    disabled={isLoading}
+                    minLength={6}
+                    autoComplete={isSignUp ? 'new-password' : 'current-password'}
+                  />
+                  <button
+                    type="button"
+                    className="guest-inline-link absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-900"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    disabled={isLoading}
+                    data-testid="button-toggle-password-visibility"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5" aria-hidden="true" />
+                    ) : (
+                      <Eye className="h-5 w-5" aria-hidden="true" />
+                    )}
+                  </button>
+                </div>
               )}
               <Button 
                 type="submit"
