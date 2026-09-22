@@ -33,6 +33,7 @@ fly.toml
 .replit
 replit.nix
 .config
+.local
 tmp
 temp
 .tmp
