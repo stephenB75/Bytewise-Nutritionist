@@ -7,9 +7,12 @@ import { createClient } from '@supabase/supabase-js';
 import type { Database } from '../types/database';
 import { config } from './config';
 
-// Use configuration with safe fallbacks
 const finalUrl = config.supabase.url;
 const finalKey = config.supabase.anonKey;
+
+if (!finalUrl || !finalKey) {
+  console.error('Supabase is not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.');
+}
 
 // Singleton pattern to prevent multiple client instances
 let supabaseInstance: ReturnType<typeof createClient<Database>> | null = null;

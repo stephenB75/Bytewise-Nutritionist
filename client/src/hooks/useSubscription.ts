@@ -14,10 +14,18 @@ export function useSubscription() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Initialize RevenueCat when user is available
+  // Initialize RevenueCat when user is available; guests stay on the free tier
   useEffect(() => {
     if (user) {
       initializeSubscription();
+    } else {
+      setSubscriptionStatus({
+        isActive: false,
+        tier: 'free',
+        willRenew: false,
+        isInGracePeriod: false
+      });
+      setIsLoading(false);
     }
   }, [user]);
 

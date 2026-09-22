@@ -1,0 +1,1337 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#7DD3FC">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Bytewise">
+    
+    <title>Bytewise Nutritionist - Mobile PWA</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon-180.png">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#7DD3FC',
+                        'primary-dark': '#0EA5E9',
+                        'secondary': '#FEF08A',
+                        'secondary-dark': '#EAB308',
+                        'success': '#10B981',
+                        'warning': '#F59E0B',
+                        'error': '#EF4444',
+                        'surface': '#FFFFFF',
+                        'background': '#FAFAFA',
+                        'on-surface': '#1F2937',
+                        'on-background': '#374151',
+                        'outline': '#E5E7EB'
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif']
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.3s ease-in-out',
+                        'slide-up': 'slideUp 0.3s ease-out',
+                        'bounce-gentle': 'bounceGentle 0.6s ease-in-out',
+                        'pulse-gentle': 'pulseGentle 2s infinite'
+                    }
+                }
+            }
+        };
+    </script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes bounceGentle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+        
+        @keyframes pulseGentle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            touch-action: manipulation;
+            overscroll-behavior: none;
+        }
+        
+        .touch-target {
+            min-height: 44px;
+            min-width: 44px;
+        }
+        
+        .safe-area-bottom {
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        
+        .safe-area-top {
+            padding-top: env(safe-area-inset-top, 0px);
+        }
+        
+        .draggable {
+            cursor: grab;
+            transition: transform 0.2s ease;
+        }
+        
+        .draggable:active {
+            cursor: grabbing;
+            transform: scale(1.05);
+        }
+        
+        .drop-zone {
+            transition: all 0.2s ease;
+        }
+        
+        .drop-zone.drag-over {
+            border-color: #7DD3FC;
+            background-color: rgba(125, 211, 252, 0.1);
+        }
+        
+        .glass-effect {
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        
+        /* Hide scrollbar for mobile */
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        
+        /* Custom shadows for mobile */
+        .card-shadow {
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+        }
+        
+        .card-shadow-lg {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background overflow-x-hidden">
+    <!-- @COMPONENT: PWAInstallPrompt -->
+    <div id="install-prompt" class="fixed top-0 left-0 right-0 z-50 bg-primary text-white p-4 transform -translate-y-full transition-transform duration-300">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                    <span class="text-xs font-bold">📱</span>
+                </div>
+                <div>
+                    <p class="font-semibold text-sm">Install Bytewise</p>
+                    <p class="text-xs opacity-90">Add to home screen for quick access</p>
+                </div>
+            </div>
+            <div class="flex space-x-2">
+                <button class="px-3 py-1 bg-white/20 rounded-lg text-xs font-medium" onclick="dismissInstallPrompt()">Later</button>
+                <button class="px-3 py-1 bg-white text-primary rounded-lg text-xs font-medium" onclick="installPWA()">Install</button>
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: PWAInstallPrompt -->
+
+    <!-- @COMPONENT: MobileApp -->
+    <div class="min-h-screen flex flex-col">
+        
+        <!-- @COMPONENT: AuthScreen [default screen] -->
+        <div id="auth-screen" class="flex-1 flex items-center justify-center p-6 bg-gradient-to-br from-primary/10 to-secondary/10">
+            <div class="w-full max-w-sm space-y-8 animate-fade-in">
+                <!-- Brand Logo -->
+                <div class="text-center space-y-4">
+                    <div class="w-20 h-20 mx-auto bg-primary rounded-2xl flex items-center justify-center shadow-lg">
+                        <!-- Bytewise logo with modern design -->
+                        <img src="https://images.unsplash.com/photo-1490818387583-1baba5e638af?ixlib=rb-4.0.3&auto=format&fit=crop&w=80&h=80&q=80" alt="Bytewise Logo" class="w-12 h-12 rounded-lg object-cover" />
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-bold text-primary">bytewise</h1>
+                        <p class="text-sm text-on-background/70 font-medium">Nutritionist</p>
+                        <p class="text-xs text-on-background/50 mt-2">Track. Plan. Thrive.</p>
+                    </div>
+                </div>
+
+                <!-- Auth Tabs -->
+                <div class="bg-surface rounded-2xl p-6 card-shadow-lg">
+                    <div class="flex bg-background rounded-xl p-1 mb-6">
+                        <button class="flex-1 py-2 px-4 rounded-lg bg-primary text-white text-sm font-medium transition-all">Sign In</button>
+                        <button class="flex-1 py-2 px-4 rounded-lg text-on-background/70 text-sm font-medium transition-all">Sign Up</button>
+                    </div>
+
+                    <!-- Sign In Form -->
+                    <div class="space-y-4">
+                        <div>
+                            <input type="email" placeholder="Email address" class="w-full px-4 py-3 bg-background border border-outline rounded-xl text-sm focus:border-primary focus:outline-none touch-target" />
+                        </div>
+                        <div>
+                            <input type="password" placeholder="Password" class="w-full px-4 py-3 bg-background border border-outline rounded-xl text-sm focus:border-primary focus:outline-none touch-target" />
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" class="rounded border-outline">
+                                <span class="text-on-background/70">Remember me</span>
+                            </label>
+                            <button class="text-primary font-medium">Forgot password?</button>
+                        </div>
+                        <button onclick="showDashboard()" class="w-full py-3 bg-primary text-white rounded-xl font-medium touch-target transition-all active:scale-95">
+                            Sign In
+                        </button>
+                    </div>
+
+                    <div class="mt-6 text-center">
+                        <div class="flex items-center space-x-4">
+                            <div class="flex-1 h-px bg-outline"></div>
+                            <span class="text-xs text-on-background/50">or continue with</span>
+                            <div class="flex-1 h-px bg-outline"></div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 mt-4">
+                            <button class="flex items-center justify-center space-x-2 py-3 bg-background border border-outline rounded-xl touch-target transition-all active:scale-95">
+                                <span class="text-lg">🍎</span>
+                                <span class="text-sm font-medium">Apple</span>
+                            </button>
+                            <button class="flex items-center justify-center space-x-2 py-3 bg-background border border-outline rounded-xl touch-target transition-all active:scale-95">
+                                <span class="text-lg">🔍</span>
+                                <span class="text-sm font-medium">Google</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: AuthScreen -->
+
+        <!-- @COMPONENT: DashboardScreen [hidden by default] -->
+        <div id="dashboard-screen" class="hidden flex-1">
+            <!-- Status Bar -->
+            <div class="safe-area-top bg-primary text-white px-4 py-2">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                            <span class="text-xs font-bold">B</span>
+                        </div>
+                        <div>
+                            <p class="text-xs font-medium">Good morning, Sarah</p>
+                            <p class="text-xs opacity-80">Ready to track your nutrition?</p>
+                        </div>
+                    </div>
+                    <button class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center touch-target">
+                        <span class="text-lg">🔔</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Scrollable Content -->
+            <div class="flex-1 overflow-y-auto hide-scrollbar">
+                <div class="p-4 space-y-6">
+                    
+                    <!-- Daily Progress Card -->
+                    <div class="bg-surface rounded-2xl p-6 card-shadow">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-lg font-semibold">Today's Progress</h2>
+                            <div class="bg-success/10 text-success px-3 py-1 rounded-full text-xs font-medium">
+                                On Track
+                            </div>
+                        </div>
+                        
+                        <!-- Circular Progress -->
+                        <div class="flex items-center justify-center mb-6">
+                            <div class="relative w-32 h-32">
+                                <svg class="w-32 h-32 transform -rotate-90" viewBox="0 0 120 120">
+                                    <circle cx="60" cy="60" r="54" fill="none" stroke="#E5E7EB" stroke-width="8"/>
+                                    <circle cx="60" cy="60" r="54" fill="none" stroke="#7DD3FC" stroke-width="8" 
+                                            stroke-dasharray="339.29" stroke-dashoffset="101.79" stroke-linecap="round"/>
+                                </svg>
+                                <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                    <span class="text-2xl font-bold text-primary">1,420</span>
+                                    <span class="text-xs text-on-background/70">of 2000 cal</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Macro Breakdown -->
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="text-center">
+                                <div class="w-full bg-background rounded-full h-2 mb-2">
+                                    <div class="bg-success h-2 rounded-full" style="width: 85%"></div>
+                                </div>
+                                <p class="text-sm font-medium">Protein</p>
+                                <p class="text-xs text-on-background/70">85g / 100g</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="w-full bg-background rounded-full h-2 mb-2">
+                                    <div class="bg-secondary-dark h-2 rounded-full" style="width: 60%"></div>
+                                </div>
+                                <p class="text-sm font-medium">Carbs</p>
+                                <p class="text-xs text-on-background/70">120g / 200g</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="w-full bg-background rounded-full h-2 mb-2">
+                                    <div class="bg-warning h-2 rounded-full" style="width: 70%"></div>
+                                </div>
+                                <p class="text-sm font-medium">Fat</p>
+                                <p class="text-xs text-on-background/70">49g / 70g</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="bg-surface rounded-2xl p-4 card-shadow">
+                        <h3 class="text-lg font-semibold mb-4">Quick Actions</h3>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="showMeals()" class="flex items-center space-x-3 p-4 bg-primary/10 rounded-xl touch-target transition-all active:scale-95">
+                                <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
+                                    <span class="text-white font-bold">🍽️</span>
+                                </div>
+                                <div class="flex-1 text-left">
+                                    <p class="font-medium text-sm">Log Meal</p>
+                                    <p class="text-xs text-on-background/70">Add food to diary</p>
+                                </div>
+                            </button>
+                            <button onclick="showRecipeBuilder()" class="flex items-center space-x-3 p-4 bg-secondary/10 rounded-xl touch-target transition-all active:scale-95">
+                                <div class="w-10 h-10 bg-secondary-dark rounded-xl flex items-center justify-center">
+                                    <span class="text-white font-bold">🧑‍🍳</span>
+                                </div>
+                                <div class="flex-1 text-left">
+                                    <p class="font-medium text-sm">Create Recipe</p>
+                                    <p class="text-xs text-on-background/70">Build & analyze</p>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Recent Meals -->
+                    <div class="bg-surface rounded-2xl p-4 card-shadow">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold">Recent Meals</h3>
+                            <button class="text-primary text-sm font-medium">View All</button>
+                        </div>
+                        <div class="space-y-3">
+                            <!-- A healthy breakfast bowl with granola and berries -->
+                            <div class="flex items-center space-x-3 p-3 bg-background rounded-xl">
+                                <img src="https://images.unsplash.com/photo-1511690743698-d9d85f2fbf38?ixlib=rb-4.0.3&auto=format&fit=crop&w=60&h=60&q=80" alt="Overnight oats with berries" class="w-12 h-12 rounded-lg object-cover">
+                                <div class="flex-1">
+                                    <p class="font-medium text-sm">Overnight Oats</p>
+                                    <p class="text-xs text-on-background/70">Breakfast • 380 cal</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm font-medium text-success">+380</p>
+                                    <p class="text-xs text-on-background/70">8:30 AM</p>
+                                </div>
+                            </div>
+                            <!-- Grilled chicken with vegetables -->
+                            <div class="flex items-center space-x-3 p-3 bg-background rounded-xl">
+                                <img src="https://images.unsplash.com/photo-1532550907401-a500c9a57435?ixlib=rb-4.0.3&auto=format&fit=crop&w=60&h=60&q=80" alt="Grilled chicken with vegetables" class="w-12 h-12 rounded-lg object-cover">
+                                <div class="flex-1">
+                                    <p class="font-medium text-sm">Grilled Chicken Bowl</p>
+                                    <p class="text-xs text-on-background/70">Lunch • 520 cal</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm font-medium text-success">+520</p>
+                                    <p class="text-xs text-on-background/70">12:45 PM</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nutrition Tips -->
+                    <div class="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl p-4">
+                        <div class="flex items-start space-x-3">
+                            <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+                                <span class="text-white font-bold">💡</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-sm mb-1">Today's Tip</h4>
+                                <p class="text-xs text-on-background/70">Try adding more colorful vegetables to your meals for a wider range of nutrients and antioxidants.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Spacing for Navigation -->
+                    <div class="h-20"></div>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: DashboardScreen -->
+
+        <!-- @COMPONENT: MealsScreen [hidden by default] -->
+        <div id="meals-screen" class="hidden flex-1">
+            <!-- Header with Search -->
+            <div class="bg-surface p-4 card-shadow">
+                <div class="flex items-center space-x-3 mb-4">
+                    <button onclick="showDashboard()" class="w-10 h-10 bg-background rounded-full flex items-center justify-center touch-target">
+                        <span class="text-lg">←</span>
+                    </button>
+                    <h1 class="text-xl font-bold flex-1">Find Food</h1>
+                    <button class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center touch-target">
+                        <span class="text-lg">📷</span>
+                    </button>
+                </div>
+                
+                <!-- Search Bar -->
+                <div class="relative">
+                    <input type="text" placeholder="Search foods, recipes, brands..." 
+                           class="w-full pl-12 pr-4 py-3 bg-background border border-outline rounded-xl text-sm focus:border-primary focus:outline-none">
+                    <div class="absolute left-4 top-1/2 transform -translate-y-1/2">
+                        <span class="text-on-background/50">🔍</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="flex-1 overflow-y-auto hide-scrollbar">
+                <div class="p-4 space-y-6">
+                    
+                    <!-- Quick Add Pills -->
+                    <div class="space-y-3">
+                        <h2 class="text-lg font-semibold">Quick Add</h2>
+                        <div class="flex flex-wrap gap-2">
+                            <button class="flex items-center space-x-2 px-4 py-2 bg-primary/10 border border-primary/20 rounded-full text-sm font-medium touch-target transition-all active:scale-95">
+                                <span>💧</span>
+                                <span class="text-primary">Water</span>
+                                <span class="text-xs text-on-background/70">(0 cal)</span>
+                            </button>
+                            <button class="flex items-center space-x-2 px-4 py-2 bg-secondary/10 border border-secondary/20 rounded-full text-sm font-medium touch-target transition-all active:scale-95">
+                                <span>☕</span>
+                                <span class="text-secondary-dark">Coffee</span>
+                                <span class="text-xs text-on-background/70">(5 cal)</span>
+                            </button>
+                            <button class="flex items-center space-x-2 px-4 py-2 bg-success/10 border border-success/20 rounded-full text-sm font-medium touch-target transition-all active:scale-95">
+                                <span>🍌</span>
+                                <span class="text-success">Banana</span>
+                                <span class="text-xs text-on-background/70">(105 cal)</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Featured Today -->
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-lg font-semibold">Featured Today</h2>
+                            <div class="bg-error/10 text-error px-3 py-1 rounded-full text-xs font-medium">
+                                🔥 Trending
+                            </div>
+                        </div>
+                        
+                        <!-- A colorful buddha bowl with quinoa and vegetables -->
+                        <div class="bg-surface rounded-2xl overflow-hidden card-shadow">
+                            <div class="relative h-40">
+                                <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=160&q=80" alt="Rainbow Buddha Bowl with quinoa and vegetables" class="w-full h-full object-cover">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                                <div class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 flex items-center space-x-1">
+                                    <span class="text-yellow-500">⭐</span>
+                                    <span class="text-xs font-semibold">4.9</span>
+                                </div>
+                                <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1">
+                                    <span class="text-xs font-medium">25 min</span>
+                                </div>
+                                <div class="absolute bottom-3 left-3 text-white">
+                                    <h3 class="font-bold">Rainbow Buddha Bowl</h3>
+                                    <p class="text-xs opacity-90">Quinoa, roasted vegetables, tahini</p>
+                                </div>
+                            </div>
+                            
+                            <div class="p-4 space-y-4">
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="bg-success/10 text-success px-2 py-1 rounded-full text-xs font-medium">Vegan</span>
+                                    <span class="bg-primary/10 text-primary px-2 py-1 rounded-full text-xs font-medium">High Protein</span>
+                                    <span class="bg-secondary/10 text-secondary-dark px-2 py-1 rounded-full text-xs font-medium">Gluten Free</span>
+                                </div>
+                                
+                                <div class="grid grid-cols-4 gap-3 text-center text-xs">
+                                    <div>
+                                        <div class="font-bold text-primary">485</div>
+                                        <div class="text-on-background/70">calories</div>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-success">18g</div>
+                                        <div class="text-on-background/70">protein</div>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-secondary-dark">52g</div>
+                                        <div class="text-on-background/70">carbs</div>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-warning">22g</div>
+                                        <div class="text-on-background/70">fat</div>
+                                    </div>
+                                </div>
+                                
+                                <button class="w-full py-3 bg-primary text-white rounded-xl font-medium touch-target transition-all active:scale-95">
+                                    <span class="mr-2">+</span>Add to Meal
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Foods -->
+                    <div class="space-y-4">
+                        <h2 class="text-lg font-semibold">Recently Used</h2>
+                        <div class="space-y-3">
+                            <!-- Greek yogurt with berries -->
+                            <div class="flex items-center space-x-3 p-3 bg-surface rounded-xl card-shadow touch-target transition-all active:scale-95">
+                                <img src="https://images.unsplash.com/photo-1488477181946-6428a0291777?ixlib=rb-4.0.3&auto=format&fit=crop&w=60&h=60&q=80" alt="Greek yogurt with berries" class="w-12 h-12 rounded-lg object-cover">
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-2">
+                                        <p class="font-medium text-sm">Greek Yogurt Plain</p>
+                                        <span class="bg-success/10 text-success text-xs px-1 rounded">✓</span>
+                                    </div>
+                                    <p class="text-xs text-on-background/70">Chobani • 170g serving</p>
+                                    <p class="text-xs text-on-background/50">Used yesterday</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm font-medium">100 cal</p>
+                                    <p class="text-xs text-success">17g protein</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Fresh avocado -->
+                            <div class="flex items-center space-x-3 p-3 bg-surface rounded-xl card-shadow touch-target transition-all active:scale-95">
+                                <img src="https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?ixlib=rb-4.0.3&auto=format&fit=crop&w=60&h=60&q=80" alt="Fresh ripe avocado" class="w-12 h-12 rounded-lg object-cover">
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-2">
+                                        <p class="font-medium text-sm">Avocado Medium</p>
+                                        <span class="bg-success/10 text-success text-xs px-1 rounded">✓</span>
+                                    </div>
+                                    <p class="text-xs text-on-background/70">Fresh Market • 1 whole</p>
+                                    <p class="text-xs text-on-background/50">Used 3 days ago</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm font-medium">234 cal</p>
+                                    <p class="text-xs text-warning">21g fat</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Spacing -->
+                    <div class="h-20"></div>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: MealsScreen -->
+
+        <!-- @COMPONENT: RecipeBuilderScreen [hidden by default] -->
+        <div id="recipe-builder-screen" class="hidden flex-1">
+            <!-- Header -->
+            <div class="bg-surface p-4 card-shadow">
+                <div class="flex items-center space-x-3">
+                    <button onclick="showDashboard()" class="w-10 h-10 bg-background rounded-full flex items-center justify-center touch-target">
+                        <span class="text-lg">←</span>
+                    </button>
+                    <h1 class="text-xl font-bold flex-1">Recipe Builder</h1>
+                    <button class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center touch-target">
+                        <span class="text-lg">💾</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="flex-1 overflow-y-auto hide-scrollbar">
+                <div class="p-4 space-y-6">
+                    
+                    <!-- Recipe Info -->
+                    <div class="bg-surface rounded-2xl p-4 card-shadow">
+                        <h2 class="text-lg font-semibold mb-4">Recipe Details</h2>
+                        <div class="space-y-3">
+                            <input type="text" placeholder="Recipe name..." class="w-full px-4 py-3 bg-background border border-outline rounded-xl text-sm focus:border-primary focus:outline-none" value="My Protein Bowl">
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="text-xs text-on-background/70 block mb-1">Servings</label>
+                                    <input type="number" value="2" class="w-full px-4 py-3 bg-background border border-outline rounded-xl text-sm focus:border-primary focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-on-background/70 block mb-1">Prep Time</label>
+                                    <input type="text" placeholder="15 min" class="w-full px-4 py-3 bg-background border border-outline rounded-xl text-sm focus:border-primary focus:outline-none">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Drag & Drop Area -->
+                    <div class="bg-surface rounded-2xl p-4 card-shadow">
+                        <h2 class="text-lg font-semibold mb-4">Ingredients</h2>
+                        
+                        <!-- Drop Zone -->
+                        <div class="drop-zone border-2 border-dashed border-outline rounded-xl p-6 mb-4 text-center">
+                            <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <span class="text-2xl">📥</span>
+                            </div>
+                            <p class="text-sm font-medium mb-1">Drop ingredients here</p>
+                            <p class="text-xs text-on-background/70">Or tap to add manually</p>
+                        </div>
+
+                        <!-- Current Ingredients -->
+                        <div class="space-y-3">
+                            <h3 class="font-medium text-sm">Added Ingredients</h3>
+                            
+                            <!-- Chicken breast ingredient -->
+                            <div class="flex items-center space-x-3 p-3 bg-background rounded-xl">
+                                <div class="w-2 h-8 bg-success rounded-full"></div>
+                                <div class="flex-1">
+                                    <p class="font-medium text-sm">Grilled Chicken Breast</p>
+                                    <div class="flex items-center space-x-4 text-xs text-on-background/70">
+                                        <span>200g</span>
+                                        <span>330 cal</span>
+                                        <span>62g protein</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <button class="w-8 h-8 bg-background border border-outline rounded-lg flex items-center justify-center touch-target">
+                                        <span class="text-xs">✏️</span>
+                                    </button>
+                                    <button class="w-8 h-8 bg-error/10 border border-error/20 text-error rounded-lg flex items-center justify-center touch-target">
+                                        <span class="text-xs">🗑️</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Quinoa ingredient -->
+                            <div class="flex items-center space-x-3 p-3 bg-background rounded-xl">
+                                <div class="w-2 h-8 bg-secondary-dark rounded-full"></div>
+                                <div class="flex-1">
+                                    <p class="font-medium text-sm">Cooked Quinoa</p>
+                                    <div class="flex items-center space-x-4 text-xs text-on-background/70">
+                                        <span>150g</span>
+                                        <span>185 cal</span>
+                                        <span>6.6g protein</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <button class="w-8 h-8 bg-background border border-outline rounded-lg flex items-center justify-center touch-target">
+                                        <span class="text-xs">✏️</span>
+                                    </button>
+                                    <button class="w-8 h-8 bg-error/10 border border-error/20 text-error rounded-lg flex items-center justify-center touch-target">
+                                        <span class="text-xs">🗑️</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Avocado ingredient -->
+                            <div class="flex items-center space-x-3 p-3 bg-background rounded-xl">
+                                <div class="w-2 h-8 bg-warning rounded-full"></div>
+                                <div class="flex-1">
+                                    <p class="font-medium text-sm">Fresh Avocado</p>
+                                    <div class="flex items-center space-x-4 text-xs text-on-background/70">
+                                        <span>100g</span>
+                                        <span>160 cal</span>
+                                        <span>14.7g fat</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <button class="w-8 h-8 bg-background border border-outline rounded-lg flex items-center justify-center touch-target">
+                                        <span class="text-xs">✏️</span>
+                                    </button>
+                                    <button class="w-8 h-8 bg-error/10 border border-error/20 text-error rounded-lg flex items-center justify-center touch-target">
+                                        <span class="text-xs">🗑️</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button class="w-full py-3 bg-primary/10 text-primary border border-primary/20 rounded-xl font-medium touch-target mt-4 transition-all active:scale-95">
+                            <span class="mr-2">+</span>Add More Ingredients
+                        </button>
+                    </div>
+
+                    <!-- Nutrition Summary -->
+                    <div class="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl p-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-semibold">Recipe Nutrition</h3>
+                            <div class="bg-surface px-3 py-1 rounded-full text-xs font-medium">
+                                Per Serving (2 total)
+                            </div>
+                        </div>
+                        
+                        <div class="bg-surface rounded-xl p-4">
+                            <div class="text-center mb-4">
+                                <div class="text-3xl font-bold text-primary mb-1">338</div>
+                                <div class="text-xs text-on-background/70">Total Calories</div>
+                            </div>
+                            
+                            <div class="grid grid-cols-3 gap-4 text-center">
+                                <div>
+                                    <div class="flex items-center justify-center mb-1">
+                                        <span class="text-xs text-success mr-1">❤️</span>
+                                        <span class="font-semibold text-success">34g</span>
+                                    </div>
+                                    <div class="text-xs text-on-background/70">Protein</div>
+                                    <div class="text-xs font-medium text-success">45%</div>
+                                </div>
+                                <div>
+                                    <div class="flex items-center justify-center mb-1">
+                                        <span class="text-xs text-secondary-dark mr-1">⚡</span>
+                                        <span class="font-semibold text-secondary-dark">23g</span>
+                                    </div>
+                                    <div class="text-xs text-on-background/70">Carbs</div>
+                                    <div class="text-xs font-medium text-secondary-dark">28%</div>
+                                </div>
+                                <div>
+                                    <div class="flex items-center justify-center mb-1">
+                                        <span class="text-xs text-warning mr-1">🥑</span>
+                                        <span class="font-semibold text-warning">10g</span>
+                                    </div>
+                                    <div class="text-xs text-on-background/70">Fat</div>
+                                    <div class="text-xs font-medium text-warning">27%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Save Actions -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <button class="py-3 bg-surface border border-outline text-on-background rounded-xl font-medium touch-target transition-all active:scale-95">
+                            Save Draft
+                        </button>
+                        <button class="py-3 bg-primary text-white rounded-xl font-medium touch-target transition-all active:scale-95">
+                            Save Recipe
+                        </button>
+                    </div>
+
+                    <!-- Bottom Spacing -->
+                    <div class="h-20"></div>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: RecipeBuilderScreen -->
+
+        <!-- @COMPONENT: CalendarScreen [hidden by default] -->
+        <div id="calendar-screen" class="hidden flex-1">
+            <!-- Header -->
+            <div class="bg-surface p-4 card-shadow">
+                <div class="flex items-center justify-between mb-4">
+                    <h1 class="text-xl font-bold">Meal Calendar</h1>
+                    <button class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center touch-target">
+                        <span class="text-lg">📅</span>
+                    </button>
+                </div>
+                
+                <!-- Month Navigation -->
+                <div class="flex items-center justify-between">
+                    <button class="w-10 h-10 bg-background rounded-full flex items-center justify-center touch-target">
+                        <span class="text-lg">←</span>
+                    </button>
+                    <h2 class="text-lg font-semibold">January 2025</h2>
+                    <button class="w-10 h-10 bg-background rounded-full flex items-center justify-center touch-target">
+                        <span class="text-lg">→</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="flex-1 overflow-y-auto hide-scrollbar">
+                <div class="p-4 space-y-6">
+                    
+                    <!-- Calendar Grid -->
+                    <div class="bg-surface rounded-2xl p-4 card-shadow">
+                        <!-- Days of Week -->
+                        <div class="grid grid-cols-7 gap-1 mb-2">
+                            <div class="text-center text-xs font-medium text-on-background/70 py-2">Sun</div>
+                            <div class="text-center text-xs font-medium text-on-background/70 py-2">Mon</div>
+                            <div class="text-center text-xs font-medium text-on-background/70 py-2">Tue</div>
+                            <div class="text-center text-xs font-medium text-on-background/70 py-2">Wed</div>
+                            <div class="text-center text-xs font-medium text-on-background/70 py-2">Thu</div>
+                            <div class="text-center text-xs font-medium text-on-background/70 py-2">Fri</div>
+                            <div class="text-center text-xs font-medium text-on-background/70 py-2">Sat</div>
+                        </div>
+                        
+                        <!-- Calendar Days -->
+                        <div class="grid grid-cols-7 gap-1">
+                            <!-- Empty cells for month start -->
+                            <div class="aspect-square"></div>
+                            <div class="aspect-square"></div>
+                            <div class="aspect-square"></div>
+                            
+                            <!-- January days -->
+                            <button class="aspect-square relative rounded-lg hover:bg-background transition-all touch-target">
+                                <span class="text-sm">1</span>
+                            </button>
+                            <button class="aspect-square relative rounded-lg hover:bg-background transition-all touch-target">
+                                <span class="text-sm">2</span>
+                            </button>
+                            <button class="aspect-square relative rounded-lg hover:bg-background transition-all touch-target">
+                                <span class="text-sm">3</span>
+                            </button>
+                            <button class="aspect-square relative rounded-lg hover:bg-background transition-all touch-target">
+                                <span class="text-sm">4</span>
+                            </button>
+                            
+                            <!-- Week 2 -->
+                            <button class="aspect-square relative rounded-lg hover:bg-background transition-all touch-target">
+                                <span class="text-sm">5</span>
+                            </button>
+                            <button class="aspect-square relative rounded-lg hover:bg-background transition-all touch-target">
+                                <span class="text-sm">6</span>
+                            </button>
+                            <button class="aspect-square relative rounded-lg hover:bg-background transition-all touch-target">
+                                <span class="text-sm">7</span>
+                            </button>
+                            <button class="aspect-square relative rounded-lg hover:bg-background transition-all touch-target">
+                                <span class="text-sm">8</span>
+                            </button>
+                            <button class="aspect-square relative rounded-lg hover:bg-background transition-all touch-target">
+                                <span class="text-sm">9</span>
+                            </button>
+                            <button class="aspect-square relative rounded-lg hover:bg-background transition-all touch-target">
+                                <span class="text-sm">10</span>
+                            </button>
+                            <button class="aspect-square relative rounded-lg hover:bg-background transition-all touch-target">
+                                <span class="text-sm">11</span>
+                            </button>
+                            
+                            <!-- Week 3 -->
+                            <button class="aspect-square relative rounded-lg hover:bg-background transition-all touch-target">
+                                <span class="text-sm">12</span>
+                            </button>
+                            <button class="aspect-square relative rounded-lg hover:bg-background transition-all touch-target">
+                                <span class="text-sm">13</span>
+                            </button>
+                            <button class="aspect-square relative rounded-lg hover:bg-background transition-all touch-target">
+                                <span class="text-sm">14</span>
+                            </button>
+                            <button class="aspect-square relative rounded-lg hover:bg-background transition-all touch-target">
+                                <span class="text-sm">15</span>
+                            </button>
+                            <button class="aspect-square relative rounded-lg hover:bg-background transition-all touch-target">
+                                <span class="text-sm">16</span>
+                            </button>
+                            <button class="aspect-square relative rounded-lg hover:bg-background transition-all touch-target">
+                                <span class="text-sm">17</span>
+                            </button>
+                            <button class="aspect-square relative rounded-lg hover:bg-background transition-all touch-target">
+                                <span class="text-sm">18</span>
+                            </button>
+                            
+                            <!-- Week 4 -->
+                            <button class="aspect-square relative rounded-lg hover:bg-background transition-all touch-target">
+                                <span class="text-sm">19</span>
+                            </button>
+                            <button class="aspect-square relative rounded-lg hover:bg-background transition-all touch-target">
+                                <span class="text-sm">20</span>
+                            </button>
+                            <button class="aspect-square relative rounded-lg hover:bg-background transition-all touch-target">
+                                <span class="text-sm">21</span>
+                            </button>
+                            <button class="aspect-square relative rounded-lg hover:bg-background transition-all touch-target">
+                                <span class="text-sm">22</span>
+                            </button>
+                            <button class="aspect-square relative rounded-lg hover:bg-background transition-all touch-target">
+                                <span class="text-sm">23</span>
+                            </button>
+                            <button class="aspect-square relative rounded-lg hover:bg-background transition-all touch-target">
+                                <span class="text-sm">24</span>
+                                <div class="absolute bottom-0.5 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-success rounded-full"></div>
+                            </button>
+                            <button class="aspect-square relative rounded-lg bg-primary text-white transition-all touch-target">
+                                <span class="text-sm font-medium">25</span>
+                                <div class="absolute bottom-0.5 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-white rounded-full"></div>
+                            </button>
+                            
+                            <!-- Week 5 -->
+                            <button class="aspect-square relative rounded-lg hover:bg-background transition-all touch-target">
+                                <span class="text-sm">26</span>
+                                <div class="absolute bottom-0.5 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-success rounded-full"></div>
+                            </button>
+                            <button class="aspect-square relative rounded-lg hover:bg-background transition-all touch-target">
+                                <span class="text-sm">27</span>
+                            </button>  
+                            <button class="aspect-square relative rounded-lg hover:bg-background transition-all touch-target">
+                                <span class="text-sm">28</span>
+                            </button>
+                            <button class="aspect-square relative rounded-lg hover:bg-background transition-all touch-target">
+                                <span class="text-sm">29</span>
+                            </button>
+                            <button class="aspect-square relative rounded-lg hover:bg-background transition-all touch-target">
+                                <span class="text-sm">30</span>
+                            </button>
+                            <button class="aspect-square relative rounded-lg hover:bg-background transition-all touch-target">
+                                <span class="text-sm">31</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Selected Date Details -->
+                    <div class="bg-surface rounded-2xl p-4 card-shadow">
+                        <div class="flex items-start space-x-3">
+                            <!-- A healthy meal with varied ingredients -->
+                            <div class="w-16 h-16 flex-shrink-0 overflow-hidden bg-background rounded-xl">
+                                <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&auto=format&fit=crop&w=64&h=64&q=80" alt="Today's planned meals" class="w-full h-full object-cover">
+                            </div>
+                            
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between mb-2">
+                                    <h3 class="font-semibold">Saturday, Jan 25</h3>
+                                    <span class="text-xs px-2 py-1 bg-success/10 text-success rounded-full font-medium">
+                                        Complete
+                                    </span>
+                                </div>
+                                
+                                <div class="space-y-1 text-sm text-on-background/70">
+                                    <div class="flex justify-between">
+                                        <span>Meals logged:</span>
+                                        <span class="font-medium text-on-background">3</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Total calories:</span>
+                                        <span class="font-medium text-on-background">1,950</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button class="w-full mt-4 py-2 bg-background border border-outline text-on-background rounded-xl text-sm font-medium touch-target transition-all active:scale-95">
+                            View Details
+                        </button>
+                    </div>
+
+                    <!-- Weekly Stats -->
+                    <div class="bg-surface rounded-2xl p-4 card-shadow">
+                        <div class="flex items-center mb-3">
+                            <span class="text-primary mr-2">📊</span>
+                            <h3 class="font-semibold">This Week</h3>
+                        </div>
+                        <div class="grid grid-cols-3 gap-4 text-center">
+                            <div>
+                                <div class="text-lg font-bold text-on-background">12</div>
+                                <div class="text-xs text-on-background/70">Meals</div>
+                            </div>
+                            <div>
+                                <div class="text-lg font-bold text-on-background">1,847</div>
+                                <div class="text-xs text-on-background/70">Avg Calories</div>
+                            </div>
+                            <div>
+                                <div class="text-lg font-bold text-on-background">85%</div>
+                                <div class="text-xs text-on-background/70">Goal Met</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Spacing -->
+                    <div class="h-20"></div>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: CalendarScreen -->
+
+        <!-- @COMPONENT: ProfileScreen [hidden by default] -->
+        <div id="profile-screen" class="hidden flex-1">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-primary to-primary-dark text-white p-4">
+                <div class="flex items-center space-x-4 mb-4">
+                    <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
+                        <!-- Profile photo of a smiling person -->
+                        <img src="https://pixabay.com/get/g858a4c351285dcb1d37c6868dcb55695be4b00b56a90c0aa3d7d38e7e66fa8b32da2c97b94e324e0852414f663bcc2ef478855efdbce195be36922487cbde3d1_1280.jpg" alt="User profile photo" class="w-14 h-14 rounded-full object-cover">
+                    </div>
+                    <div class="flex-1">
+                        <h1 class="text-xl font-bold">Sarah Johnson</h1>
+                        <p class="text-sm opacity-90">Nutrition enthusiast</p>
+                        <p class="text-xs opacity-75">Member since Jan 2024</p>
+                    </div>
+                    <button class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center touch-target">
+                        <span class="text-lg">⚙️</span>
+                    </button>
+                </div>
+                
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center">
+                        <div class="text-lg font-bold">47</div>
+                        <div class="text-xs opacity-80">Days Active</div>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center">
+                        <div class="text-lg font-bold">23</div>
+                        <div class="text-xs opacity-80">Recipes Created</div>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center">
+                        <div class="text-lg font-bold">92%</div>
+                        <div class="text-xs opacity-80">Goals Hit</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="flex-1 overflow-y-auto hide-scrollbar">
+                <div class="p-4 space-y-6">
+                    
+                    <!-- Nutrition Goals -->
+                    <div class="bg-surface rounded-2xl p-4 card-shadow">
+                        <h2 class="text-lg font-semibold mb-4">Daily Goals</h2>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium text-sm">Calories</p>
+                                    <p class="text-xs text-on-background/70">Target: 2,000 cal</p>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-20 bg-background rounded-full h-2">
+                                        <div class="bg-primary h-2 rounded-full" style="width: 71%"></div>
+                                    </div>
+                                    <span class="text-sm font-medium">71%</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium text-sm">Protein</p>
+                                    <p class="text-xs text-on-background/70">Target: 150g</p>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-20 bg-background rounded-full h-2">
+                                        <div class="bg-success h-2 rounded-full" style="width: 85%"></div>
+                                    </div>
+                                    <span class="text-sm font-medium">85%</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium text-sm">Water</p>
+                                    <p class="text-xs text-on-background/70">Target: 8 glasses</p>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-20 bg-background rounded-full h-2">
+                                        <div class="bg-blue-500 h-2 rounded-full" style="width: 62%"></div>
+                                    </div>
+                                    <span class="text-sm font-medium">62%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Achievements -->
+                    <div class="bg-surface rounded-2xl p-4 card-shadow">
+                        <h2 class="text-lg font-semibold mb-4">Recent Achievements</h2>
+                        <div class="space-y-3">
+                            <div class="flex items-center space-x-3 p-3 bg-gradient-to-r from-secondary/10 to-secondary/5 rounded-xl">
+                                <div class="w-10 h-10 bg-secondary-dark rounded-full flex items-center justify-center">
+                                    <span class="text-white font-bold">🔥</span>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-medium text-sm">7-Day Streak</p>
+                                    <p class="text-xs text-on-background/70">Logged meals for 7 consecutive days</p>
+                                </div>
+                                <div class="text-xs text-secondary-dark font-medium">New!</div>
+                            </div>
+                            
+                            <div class="flex items-center space-x-3 p-3 bg-gradient-to-r from-success/10 to-success/5 rounded-xl">
+                                <div class="w-10 h-10 bg-success rounded-full flex items-center justify-center">
+                                    <span class="text-white font-bold">🎯</span>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-medium text-sm">Protein Master</p>
+                                    <p class="text-xs text-on-background/70">Hit protein goal 20 times</p>
+                                </div>
+                                <div class="text-xs text-success font-medium">5 days ago</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Menu Options -->
+                    <div class="bg-surface rounded-2xl p-4 card-shadow">
+                        <h2 class="text-lg font-semibold mb-4">Settings</h2>
+                        <div class="space-y-2">
+                            <button class="w-full flex items-center justify-between p-3 hover:bg-background rounded-xl touch-target transition-all">
+                                <div class="flex items-center space-x-3">
+                                    <span class="text-lg">🔔</span>
+                                    <span class="font-medium text-sm">Notifications</span>
+                                </div>
+                                <span class="text-lg">→</span>
+                            </button>
+                            
+                            <button class="w-full flex items-center justify-between p-3 hover:bg-background rounded-xl touch-target transition-all">
+                                <div class="flex items-center space-x-3">
+                                    <span class="text-lg">🌙</span>
+                                    <span class="font-medium text-sm">Dark Mode</span>
+                                </div>
+                                <div class="w-12 h-6 bg-primary rounded-full relative">
+                                    <div class="w-5 h-5 bg-white rounded-full absolute top-0.5 right-0.5 transition-all"></div>
+                                </div>
+                            </button>
+                            
+                            <button class="w-full flex items-center justify-between p-3 hover:bg-background rounded-xl touch-target transition-all">
+                                <div class="flex items-center space-x-3">
+                                    <span class="text-lg">📊</span>
+                                    <span class="font-medium text-sm">Export Data</span>
+                                </div>
+                                <span class="text-lg">→</span>
+                            </button>
+                            
+                            <button class="w-full flex items-center justify-between p-3 hover:bg-background rounded-xl touch-target transition-all">
+                                <div class="flex items-center space-x-3">
+                                    <span class="text-lg">❓</span>
+                                    <span class="font-medium text-sm">Help & Support</span>
+                                </div>
+                                <span class="text-lg">→</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- App Info -->
+                    <div class="bg-surface rounded-2xl p-4 card-shadow text-center">
+                        <div class="w-12 h-12 bg-primary rounded-xl flex items-center justify-center mx-auto mb-3">
+                            <span class="text-white font-bold text-lg">B</span>
+                        </div>
+                        <h3 class="font-semibold mb-1">Bytewise Nutritionist</h3>
+                        <p class="text-xs text-on-background/70 mb-2">Version 1.0.0</p>
+                        <p class="text-xs text-on-background/50">Made with ❤️ for your health journey</p>
+                    </div>
+
+                    <!-- Bottom Spacing -->
+                    <div class="h-20"></div>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: ProfileScreen -->
+
+        <!-- @COMPONENT: BottomNavigation -->
+        <div class="fixed bottom-0 left-0 right-0 bg-surface border-t border-outline safe-area-bottom z-40">
+            <div class="flex">
+                <button onclick="showDashboard()" class="flex-1 flex flex-col items-center justify-center py-2 touch-target transition-all active:scale-95" id="nav-home">
+                    <div class="w-6 h-6 mb-1 flex items-center justify-center">
+                        <span class="text-lg">🏠</span>
+                    </div>
+                    <span class="text-xs font-medium text-primary">Home</span>
+                </button>
+                
+                <button onclick="showMeals()" class="flex-1 flex flex-col items-center justify-center py-2 touch-target transition-all active:scale-95" id="nav-meals">
+                    <div class="w-6 h-6 mb-1 flex items-center justify-center">
+                        <span class="text-lg">🍽️</span>
+                    </div>
+                    <span class="text-xs font-medium text-on-background/70">Meals</span>
+                </button>
+                
+                <button onclick="showRecipeBuilder()" class="flex-1 flex flex-col items-center justify-center py-2 touch-target transition-all active:scale-95" id="nav-recipes">
+                    <div class="w-6 h-6 mb-1 flex items-center justify-center">
+                        <span class="text-lg">🧑‍🍳</span>
+                    </div>
+                    <span class="text-xs font-medium text-on-background/70">Recipes</span>
+                </button>
+                
+                <button onclick="showCalendar()" class="flex-1 flex flex-col items-center justify-center py-2 touch-target transition-all active:scale-95" id="nav-calendar">
+                    <div class="w-6 h-6 mb-1 flex items-center justify-center">
+                        <span class="text-lg">📅</span>
+                    </div>
+                    <span class="text-xs font-medium text-on-background/70">Calendar</span>
+                </button>
+                
+                <button onclick="showProfile()" class="flex-1 flex flex-col items-center justify-center py-2 touch-target transition-all active:scale-95" id="nav-profile">
+                    <div class="w-6 h-6 mb-1 flex items-center justify-center">
+                        <span class="text-lg">👤</span>
+                    </div>
+                    <span class="text-xs font-medium text-on-background/70">Profile</span>
+                </button>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: BottomNavigation -->
+
+        <!-- @COMPONENT: FloatingActionButton -->
+        <button id="fab" onclick="showRecipeBuilder()" class="fixed bottom-20 right-4 w-14 h-14 bg-primary text-white rounded-full shadow-lg flex items-center justify-center z-30 touch-target transition-all active:scale-95 animate-bounce-gentle">
+            <span class="text-2xl">+</span>
+        </button>
+        <!-- @END_COMPONENT: FloatingActionButton -->
+
+    </div>
+    <!-- @END_COMPONENT: MobileApp -->
+
+    <script>
+        // @FUNCTIONALITY: PWA installation and navigation management
+        (function() {
+            let deferredPrompt;
+            
+            // PWA Installation
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                showInstallPrompt();
+            });
+
+            function showInstallPrompt() {
+                const prompt = document.getElementById('install-prompt');
+                prompt.style.transform = 'translateY(0)';
+            }
+
+            window.dismissInstallPrompt = function() {
+                const prompt = document.getElementById('install-prompt');
+                prompt.style.transform = 'translateY(-100%)';
+            }
+
+            window.installPWA = async function() {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    if (outcome === 'accepted') {
+                        console.log('PWA installed');
+                    }
+                    deferredPrompt = null;
+                    dismissInstallPrompt();
+                }
+            }
+
+            // Navigation Management
+            const screens = {
+                'auth': document.getElementById('auth-screen'),
+                'dashboard': document.getElementById('dashboard-screen'),
+                'meals': document.getElementById('meals-screen'),
+                'recipe-builder': document.getElementById('recipe-builder-screen'),
+                'calendar': document.getElementById('calendar-screen'),
+                'profile': document.getElementById('profile-screen')
+            };
+
+            const navButtons = {
+                'dashboard': document.getElementById('nav-home'),
+                'meals': document.getElementById('nav-meals'),
+                'recipe-builder': document.getElementById('nav-recipes'),
+                'calendar': document.getElementById('nav-calendar'),
+                'profile': document.getElementById('nav-profile')
+            };
+
+            function showScreen(screenName) {
+                // Hide all screens
+                Object.values(screens).forEach(screen => {
+                    screen.classList.add('hidden');
+                });
+                
+                // Show selected screen
+                if (screens[screenName]) {
+                    screens[screenName].classList.remove('hidden');
+                }
+
+                // Update navigation
+                Object.values(navButtons).forEach(btn => {
+                    if (btn) {
+                        const span = btn.querySelector('span');
+                        span.classList.remove('text-primary');
+                        span.classList.add('text-on-background/70');
+                    }
+                });
+
+                if (navButtons[screenName]) {
+                    const span = navButtons[screenName].querySelector('span');
+                    span.classList.remove('text-on-background/70');
+                    span.classList.add('text-primary');
+                }
+
+                // Hide/show FAB based on screen
+                const fab = document.getElementById('fab');
+                if (screenName === 'auth') {
+                    fab.style.display = 'none';
+                } else {
+                    fab.style.display = 'flex';
+                }
+            }
+
+            // Global navigation functions
+            window.showDashboard = () => showScreen('dashboard');
+            window.showMeals = () => showScreen('meals');
+            window.showRecipeBuilder = () => showScreen('recipe-builder');
+            window.showCalendar = () => showScreen('calendar');
+            window.showProfile = () => showScreen('profile');
+
+            // Service Worker Registration
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/sw.js')
+                        .then((registration) => {
+                            console.log('SW registered: ', registration);
+                        })
+                        .catch((registrationError) => {
+                            console.log('SW registration failed: ', registrationError);
+                        });
+                });
+            }
+
+            // Touch gesture enhancements
+            let touchStartX = 0;
+            let touchStartY = 0;
+
+            document.addEventListener('touchstart', (e) => {
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+            });
+
+            document.addEventListener('touchend', (e) => {
+                const touchEndX = e.changedTouches[0].clientX;
+                const touchEndY = e.changedTouches[0].clientY;
+                const deltaX = touchEndX - touchStartX;
+                const deltaY = touchEndY - touchStartY;
+
+                // Simple swipe detection for navigation
+                if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+                    if (deltaX > 0) {
+                        // Swipe right - could implement back navigation
+                        console.log('Swipe right detected');
+                    } else {
+                        // Swipe left - could implement forward navigation
+                        console.log('Swipe left detected');
+                    }
+                }
+            });
+
+            // Drag and drop for recipe builder
+            let draggedElement = null;
+
+            document.addEventListener('dragstart', (e) => {
+                if (e.target.classList.contains('draggable')) {
+                    draggedElement = e.target;
+                    e.target.style.opacity = '0.5';
+                }
+            });
+
+            document.addEventListener('dragend', (e) => {
+                if (e.target.classList.contains('draggable')) {
+                    e.target.style.opacity = '';
+                    draggedElement = null;
+                }
+            });
+
+            document.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                if (e.target.classList.contains('drop-zone')) {
+                    e.target.classList.add('drag-over');
+                }
+            });
+
+            document.addEventListener('dragleave', (e) => {
+                if (e.target.classList.contains('drop-zone')) {
+                    e.target.classList.remove('drag-over');
+                }
+            });
+
+            document.addEventListener('drop', (e) => {
+                e.preventDefault();
+                if (e.target.classList.contains('drop-zone')) {
+                    e.target.classList.remove('drag-over');
+                    if (draggedElement) {
+                        // TODO: Implement ingredient addition logic
+                        console.log('Ingredient dropped:', draggedElement.textContent);
+                    }
+                }
+            });
+
+            // Initialize app
+            showScreen('auth');
+        })();
+    </script>
+</body>
+</html>

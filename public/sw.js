@@ -5,10 +5,10 @@
  * Optimized for iOS PWA installation
  */
 
-const CACHE_NAME = 'bytewise-v1.2.4';
-const STATIC_CACHE = 'bytewise-static-v1.2.4';
-const DYNAMIC_CACHE = 'bytewise-dynamic-v1.2.4';
-const API_CACHE = 'bytewise-api-v1.2.4';
+const CACHE_NAME = 'bytewise-v1.2.5';
+const STATIC_CACHE = 'bytewise-static-v1.2.5';
+const DYNAMIC_CACHE = 'bytewise-dynamic-v1.2.5';
+const API_CACHE = 'bytewise-api-v1.2.5';
 
 // Files to cache for offline use
 const STATIC_FILES = [
@@ -268,6 +268,10 @@ async function networkFirstWithFallback(request, cacheName) {
     const response = await fetch(request);
     
     if (response.ok && isValidCacheableRequest(request)) {
+      const contentType = response.headers.get('content-type') || '';
+      if (contentType.includes('text/html')) {
+        return response;
+      }
       const cache = await caches.open(cacheName);
       try {
         cache.put(request, response.clone());

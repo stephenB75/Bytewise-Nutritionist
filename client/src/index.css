@@ -1700,8 +1700,16 @@ div[class*="min-h-screen"]:not([data-testid*="navigation"]),
 
 /* Content section spacing for navigation clearance */
 .content-section {
-  padding-bottom: 7rem; /* Space for fixed navigation */
-  min-height: calc(100vh - 7rem);
+  padding-bottom: 10rem; /* Space for fixed navigation so controls stay clickable */
+  min-height: calc(100vh - 10rem);
+  scroll-padding-bottom: 10rem;
+}
+
+[data-testid="water-card"] button,
+[data-testid="button-increment-water"],
+[data-testid="button-decrement-water"] {
+  position: relative;
+  z-index: 30;
 }
 
 /* Bottom navigation spacing and safe area handling */
