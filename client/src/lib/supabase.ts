@@ -11,16 +11,20 @@ const finalUrl = config.supabase.url;
 const finalKey = config.supabase.anonKey;
 
 if (!finalUrl || !finalKey) {
-  console.error('Supabase is not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.');
+  console.error('Supabase is not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY as Railway build variables.');
 }
 
 // Singleton pattern to prevent multiple client instances
 let supabaseInstance: ReturnType<typeof createClient<Database>> | null = null;
 
+// createClient throws on empty url/key and blanks the whole app
+const clientUrl = finalUrl || 'https://placeholder.supabase.co';
+const clientKey = finalKey || 'placeholder-anon-key';
+
 // Create Supabase client with singleton pattern
 export const supabase = (() => {
   if (!supabaseInstance) {
-    supabaseInstance = createClient<Database>(finalUrl, finalKey, {
+    supabaseInstance = createClient<Database>(clientUrl, clientKey, {
       auth: {
         autoRefreshToken: true,
         persistSession: true,

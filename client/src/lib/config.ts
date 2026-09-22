@@ -6,8 +6,7 @@ const isDev = typeof window !== 'undefined' &&
   (window.location.hostname === 'localhost' ||
    window.location.port === '5000');
 const isGitHubPages = typeof window !== 'undefined' &&
-  (window.location.hostname.includes('github.io') ||
-   window.location.hostname.includes('bytewise-nutritionist'));
+  window.location.hostname.includes('github.io');
 const isProd = !isDev && !isGitHubPages;
 
 function getEnvVar(key: string): string {
