@@ -49,6 +49,20 @@ export function useAuth() {
         if (!accessToken) {
           return null;
         }
+
+        const sessionUser = session?.user ? {
+          id: session.user.id,
+          email: session.user.email,
+          emailVerified: !!session.user.email_confirmed_at,
+          firstName: session.user.user_metadata?.first_name || session.user.user_metadata?.firstName || null,
+          lastName: session.user.user_metadata?.last_name || session.user.user_metadata?.lastName || null,
+          profileImageUrl: session.user.user_metadata?.avatar_url || null,
+          dailyCalorieGoal: session.user.user_metadata?.calorie_goal || 2000,
+          dailyProteinGoal: 150,
+          dailyCarbGoal: 200,
+          dailyFatGoal: 70,
+          dailyWaterGoal: 8,
+        } : null;
         
         // Use the token to get user data from our backend
         const response = await fetch('/api/auth/user', {
@@ -58,17 +72,23 @@ export function useAuth() {
         });
         
         if (!response.ok) {
-          // If unauthorized, return null instead of throwing
-          if (response.status === 401) {
-            return null;
-          }
-          throw new Error('Failed to fetch user');
+          return sessionUser;
         }
         
         const userData = await response.json();
-        return userData;
+        return userData || sessionUser;
       } catch (error) {
-        return null;
+        const { data: { session: fallbackSession } } = await supabase.auth.getSession();
+        if (!fallbackSession?.user) {
+          return null;
+        }
+        return {
+          id: fallbackSession.user.id,
+          email: fallbackSession.user.email,
+          emailVerified: !!fallbackSession.user.email_confirmed_at,
+          firstName: fallbackSession.user.user_metadata?.first_name || null,
+          lastName: fallbackSession.user.user_metadata?.last_name || null,
+        };
       }
     },
     retry: false,

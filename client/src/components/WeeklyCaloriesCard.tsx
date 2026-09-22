@@ -12,7 +12,7 @@ import { Calendar, Flame } from 'lucide-react';
 
 import { useCheckAchievements } from '@/hooks/useAchievements';
 import { useAuth } from '@/hooks/useAuth';
-import { apiRequest } from '@/lib/queryClient';
+import { listLoggedMeals } from '@/lib/mealsApi';
 import { getWeekDates, getLocalDateKey } from '@/utils/dateUtils';
 import { checkMealDateMismatches } from '@/utils/mealDateFixer';
 import { debounce, getCachedLocalStorage } from '@/utils/performanceUtils';
@@ -68,16 +68,8 @@ export function WeeklyCaloriesCard() {
       // For authenticated users, try to load from database first
       if (user) {
         try {
-          const response = await apiRequest('GET', '/api/meals/logged');
-          if (response.ok) {
-            const databaseMeals = await response.json();
-            storedMeals = Array.isArray(databaseMeals) ? databaseMeals : [];
-            
-            // Also sync to localStorage for offline capability
-            localStorage.setItem('weeklyMeals', JSON.stringify(storedMeals));
-          } else {
-            throw new Error('Database fetch failed');
-          }
+          storedMeals = await listLoggedMeals();
+          localStorage.setItem('weeklyMeals', JSON.stringify(storedMeals));
         } catch (error) {
           // Fall back to localStorage
           storedMeals = getCachedLocalStorage('weeklyMeals', 0) || [];

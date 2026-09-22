@@ -9,6 +9,7 @@ import { useDataPersistence } from './useDataPersistence';
 import { getLocalDateKey, formatLocalTime, getMealTypeByTime } from '@/utils/dateUtils';
 import { apiRequest } from '@/lib/queryClient';
 import { useAuth } from './useAuth';
+import { logMeal } from '@/lib/mealsApi';
 
 interface CalculatedCalories {
   id: string;
@@ -163,17 +164,14 @@ export function useCalorieTracking() {
       // Save to database if authenticated
       if (user?.id) {
         try {
-          const response = await apiRequest('POST', '/api/meals/logged', {
+          const response = await logMeal({
             name: calorieEntry.name,
             mealType: getMealTypeByTime(),
             date: calorieEntry.date,
             totalCalories: calorieEntry.calories,
             totalProtein: calorieEntry.protein,
             totalCarbs: calorieEntry.carbs,
-            totalFat: calorieEntry.fat,
-            fiber: calorieEntry.fiber || 0,
-            sugar: calorieEntry.sugar || 0,
-            sodium: calorieEntry.sodium || 0
+            totalFat: calorieEntry.fat
           });
           console.log('✅ Meal synced to database:', response);
           

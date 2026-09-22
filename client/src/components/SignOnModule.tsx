@@ -24,6 +24,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { AuthPopupNotification, useAuthPopupNotification } from './AuthPopupNotification';
+import { resendVerificationEmail, signInWithEmail, signUpWithEmail } from '@/lib/authActions';
 
 interface SignOnModuleProps {
   onClose?: () => void;
@@ -114,22 +115,11 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
     setLoading(true);
     
     try {
-      const endpoint = isSignUp ? '/api/auth/signup' : '/api/auth/signin';
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      const data = isSignUp
+        ? await signUpWithEmail(email, password)
+        : await signInWithEmail(email, password);
 
-      const data = await response.json();
-      
-
-
-      if (response.ok) {
-        // Check if email verification is required
-        if (data.requiresVerification) {
+      if (data.ok && data.kind === 'verification_required') {
           setVerificationRequired(true);
           setVerificationEmail(data.email || email);
           setConfirmingEmail(false);
@@ -137,7 +127,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
           showNotification({
             type: 'info',
             title: isSignUp ? "Account Created!" : "Email Verification Required",
-            description: data.message || "Please check your email and click the verification link to activate your account.",
+            description: "Please check your email and click the verification link to activate your account.",
             duration: 10000
           });
           if (isSignUp) {
@@ -145,78 +135,26 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
             setIsSignUp(false);
             setPassword(''); // Clear password for security
           }
-        } else if (data.session) {
-          // Successfully signed in with verified email
-          
-          try {
-            // Always use proper Supabase session setting (no more custom tokens)
-            const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
-              access_token: data.session.access_token,
-              refresh_token: data.session.refresh_token,
-            });
-            
-            if (sessionError) {
-              console.error('❌ Session setting error:', sessionError);
-              throw sessionError;
-            }
-            
-            console.log('✅ Supabase session set successfully');
-            
-            // Verify session was set by checking current session
-            const { data: currentSession } = await supabase.auth.getSession();
-            
-            console.log('🔄 Refreshing auth state...');
-            
-            // Force refresh the auth state
-            await refetch();
-            
-            // Trigger custom event for auth state change
-            window.dispatchEvent(new CustomEvent('auth-state-change'));
-            
-            // Wait for state propagation
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            showNotification({
-              type: 'success',
-              title: "Welcome back!",
-              description: "You've been signed in successfully.",
-              duration: 4000
-            });
-            
-            console.log('🚪 Closing modal after successful sign-in');
-            
-            // Close modal after successful authentication
-            if (onClose) {
-              console.log('🚪 Closing authentication modal');
-              onClose();
-            } else {
-              console.log('⚠️ No onClose function provided');
-            }
-            
-          } catch (err) {
-            console.log('❌ Session setting failed, using page reload fallback:', err);
-            // Fallback to page reload if session setting fails
-            showNotification({
-              type: 'info',
-              title: "Signing in...",
-              description: "Refreshing page to complete sign-in.",
-              duration: 3000
-            });
-            setTimeout(() => {
-              window.location.reload();
-            }, 1000);
+      } else if (data.ok && data.kind === 'signed_in') {
+          await refetch();
+          window.dispatchEvent(new CustomEvent('auth-state-change'));
+          await new Promise(resolve => setTimeout(resolve, 300));
+
+          showNotification({
+            type: 'success',
+            title: "Welcome back!",
+            description: "You've been signed in successfully.",
+            duration: 4000
+          });
+
+          if (onClose) {
+            onClose();
           }
-        }
-      } else {
-        // Handle different types of authentication errors with specific prompts
-        console.log('🚨 ENTERING ERROR HANDLING BRANCH');
+      } else if (!data.ok) {
         const errorCode = data.code;
         const errorMessage = data.message || "Please try again.";
         
-        console.log('🔍 Handling authentication error:', { errorCode, errorMessage, isSignUp });
-        console.log('🔍 Full error response data:', data);
-        
-        if (data.requiresVerification || errorCode === 'EMAIL_NOT_VERIFIED') {
+        if (data.code === 'EMAIL_NOT_VERIFIED' || data.code === 'VERIFICATION_REQUIRED') {
           // Email verification required
           setVerificationRequired(true);
           setVerificationEmail(data.email || email);
@@ -226,6 +164,14 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
             description: errorMessage,
             duration: 12000
           });
+        } else if (errorCode === 'ACCOUNT_EXISTS') {
+          showNotification({
+            type: 'warning',
+            title: "Account Exists",
+            description: errorMessage,
+            duration: 8000
+          });
+          setIsSignUp(false);
         } else if (errorCode === 'ACCOUNT_NOT_FOUND') {
           // No account found - suggest signing up
           console.log('🔥 Showing ACCOUNT_NOT_FOUND popup notification');
@@ -312,16 +258,9 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
     setLoading(true);
     
     try {
-      const { error } = await supabase.auth.resend({
-        type: 'signup',
-        email: verificationEmail,
-        options: {
-          emailRedirectTo: `${window.location.origin}/api/auth/verify-email`
-        }
-      });
-
-      if (error) {
-        throw error;
+      const result = await resendVerificationEmail(verificationEmail);
+      if (!result.ok) {
+        throw new Error(result.message);
       }
 
       showNotification({

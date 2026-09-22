@@ -9,7 +9,7 @@ import { useState, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { Card } from '@/components/ui/card';
 import { useCheckAchievements } from '@/hooks/useAchievements';
-import { apiRequest } from '@/lib/queryClient';
+import { logMeal } from '@/lib/mealsApi';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -309,7 +309,7 @@ function CalorieCalculator({
     
     // CRITICAL FIX: Also save meal to database for achievement system
     try {
-      const response = await apiRequest('POST', '/api/meals/logged', {
+      const result = await logMeal({
         name: mealData.name,
         date: mealData.date, // Use local date key (YYYY-MM-DD) for proper date handling
         mealType: mealData.mealType,
@@ -327,8 +327,6 @@ function CalorieCalculator({
         vitaminB12: mealData.vitaminB12,
         folate: mealData.folate
       });
-      
-      const result = await response.json();
       
       // If achievements were earned from the database call, trigger UI notifications
       if (result.newAchievements && result.newAchievements.length > 0) {
@@ -677,7 +675,7 @@ function CalorieCalculator({
                   
                   // Save to database
                   try {
-                    await apiRequest('POST', '/api/meals/logged', {
+                    await logMeal({
                       name: mealData.name,
                       date: mealData.timestamp,
                       mealType: mealData.mealType,

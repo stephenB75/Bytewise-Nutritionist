@@ -76,7 +76,7 @@ export class USDAService {
   private popularFoodsCache: Map<string, number> = new Map(); // Track popular foods for priority caching
 
   constructor() {
-    this.apiKey = process.env.USDA_API_KEY || 'DEMO_KEY';
+    this.apiKey = process.env.USDA_API_KEY || process.env.VITE_USDA_API_KEY || 'DEMO_KEY';
     if (this.apiKey === 'DEMO_KEY') {
       console.warn('⚠️  Using DEMO_KEY for USDA API - limited requests available');
     }

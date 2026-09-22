@@ -37,6 +37,12 @@ import {
 } from "@shared/schema";
 import { db, withRetry } from "./db";
 import { eq, desc, and, gte, lte, like, sql, inArray } from "drizzle-orm";
+import {
+  createMealViaSupabase,
+  getUserMealsViaSupabase,
+  getUserViaSupabase,
+  upsertUserViaSupabase,
+} from "./supabaseData";
 
 export interface IStorage {
   // User operations
@@ -161,11 +167,23 @@ export class DatabaseStorage implements IStorage {
           return result.rows?.[0] as any;
         }
       }
-      throw error;
+      try {
+        return await getUserViaSupabase(id) as any;
+      } catch {
+        throw error;
+      }
     }
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
+    try {
+      return await this.upsertUserInDatabase(userData);
+    } catch (error) {
+      return await upsertUserViaSupabase(userData) as any;
+    }
+  }
+
+  private async upsertUserInDatabase(userData: UpsertUser): Promise<User> {
     // Storage: upsertUser called with user data
     
     // First check if user exists by email
@@ -255,8 +273,7 @@ export class DatabaseStorage implements IStorage {
       
       return newUser;
     } catch (insertError) {
-      // Storage: Failed to insert user
-      throw insertError;
+      return await upsertUserViaSupabase(userDataWithIcon) as any;
     }
   }
 
@@ -493,11 +510,16 @@ export class DatabaseStorage implements IStorage {
       )!;
     }
 
-    const userMeals = await db
-      .select()
-      .from(meals)
-      .where(whereClause)
-      .orderBy(desc(meals.date));
+    let userMeals;
+    try {
+      userMeals = await db
+        .select()
+        .from(meals)
+        .where(whereClause)
+        .orderBy(desc(meals.date));
+    } catch (error) {
+      return await getUserMealsViaSupabase(userId, startDate, endDate) as any;
+    }
 
     const mealsWithFoods = await Promise.all(
       userMeals.map(async (meal) => {
@@ -570,8 +592,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createMeal(meal: InsertMeal): Promise<Meal> {
-    const [newMeal] = await db.insert(meals).values(meal).returning();
-    return newMeal;
+    try {
+      const [newMeal] = await db.insert(meals).values(meal).returning();
+      return newMeal;
+    } catch (error) {
+      return await createMealViaSupabase(meal) as any;
+    }
   }
 
   async updateMeal(id: number, meal: Partial<InsertMeal>): Promise<Meal> {

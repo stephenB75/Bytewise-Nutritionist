@@ -2254,21 +2254,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Alternative endpoint for calculator (for compatibility)
+  // Unified food calculation: { fdcId, grams } or { ingredients|query, serving }
   app.post('/api/foods/calculate', async (req, res) => {
     try {
-      const { ingredients } = req.body;
-      
-      if (!ingredients) {
-        return res.status(400).json({ 
-          error: 'Missing required field: ingredients' 
+      const {
+        fdcId,
+        grams,
+        ingredients,
+        ingredient,
+        query,
+        serving,
+        measurement,
+      } = req.body || {};
+
+      const { usdaService } = await import('./services/usdaService');
+      const portion = serving || measurement || (grams ? `${grams}g` : '1 serving');
+
+      if (fdcId) {
+        const food = await usdaService.getFoodDetails(Number(fdcId));
+        const name = food?.description || query || ingredients || ingredient || 'food';
+        const weight = Number(grams) > 0 ? Number(grams) : 100;
+        const result = await usdaService.calculateIngredientCalories(name, `${weight}g`);
+        return res.json({
+          result,
+          food: {
+            fdcId: Number(fdcId),
+            description: name,
+            grams: weight,
+          },
         });
       }
-      
-      // Use USDA service for calculation
-      const { usdaService } = await import('./services/usdaService');
-      const result = await usdaService.calculateIngredientCalories(ingredients, '1 serving');
-      
+
+      const name = ingredients || ingredient || query;
+      if (!name || typeof name !== 'string') {
+        return res.status(400).json({
+          error: 'Provide fdcId+grams or ingredients',
+        });
+      }
+
+      const result = await usdaService.calculateIngredientCalories(name, portion);
       res.json({ result });
     } catch (error: any) {
       console.error('Calculator API error:', error);

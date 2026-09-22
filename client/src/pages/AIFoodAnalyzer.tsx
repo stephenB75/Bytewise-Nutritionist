@@ -17,6 +17,7 @@ import { ObjectUploader } from '@/components/ObjectUploader';
 import { Camera, Loader2, Sparkles, Plus, Eye, Utensils, AlertTriangle, Trash2 } from 'lucide-react';
 import { useMutation } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
+import { logMeal } from '@/lib/mealsApi';
 import { useToast } from '@/hooks/use-toast';
 import { useCalorieTracking } from '@/hooks/useCalorieTracking';
 import { useAuth } from '@/hooks/useAuth';
@@ -330,15 +331,9 @@ export default function AIFoodAnalyzer() {
             mealType: 'meal'
           };
           
-          const response = await apiRequest('POST', '/api/meals/logged', mealData);
-          
-          if (response.ok) {
-            // Dispatch refresh event for meal timeline and other components
-            window.dispatchEvent(new CustomEvent('refresh-meals'));
-            window.dispatchEvent(new CustomEvent('reload-meal-data'));
-          } else {
-            throw new Error(`Database save failed: ${response.status}`);
-          }
+          await logMeal(mealData);
+          window.dispatchEvent(new CustomEvent('refresh-meals'));
+          window.dispatchEvent(new CustomEvent('reload-meal-data'));
         } catch (error) {
           // Don't show error to user as the meal is still saved in localStorage
         }

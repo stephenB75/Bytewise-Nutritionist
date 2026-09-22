@@ -69,6 +69,8 @@ import { WeeklyCaloriesCard } from '@/components/WeeklyCaloriesCard';
 import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
+import { listLoggedMeals } from '@/lib/mealsApi';
+import { resendVerificationEmail, resetPasswordForEmail, signInWithEmail, signUpWithEmail } from '@/lib/authActions';
 import { getWeekDates, getLocalDateKey, getMealTypeByTime, formatLocalTime } from '@/utils/dateUtils';
 import { fixMealDateMismatches } from '@/utils/mealDateFixer';
 import { getCachedLocalStorage, debounce } from '@/utils/performanceUtils';
@@ -763,15 +765,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         // For authenticated users, load from database only
         if (user) {
           try {
-            const response = await apiRequest('GET', '/api/meals/logged');
-            if (response.ok) {
-              const databaseMeals = await response.json();
-              stored = Array.isArray(databaseMeals) ? databaseMeals : [];
-              
-            } else {
-              console.error('Failed to load meals from database');
-              stored = [];
-            }
+            stored = await listLoggedMeals();
           } catch (error) {
             console.error('Database error:', error);
             stored = [];
@@ -854,43 +848,24 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         if (user) {
           try {
             // Load weekly data from database for accurate calculation
-            const response = await apiRequest('GET', '/api/meals/logged');
-            if (response.ok) {
-              const databaseMeals = await response.json();
-              const currentWeekDates = getWeekDates();
-              const weekDateKeys = currentWeekDates.map(date => getLocalDateKey(date));
-              
-              // Filter meals to current week with same logic as WeeklyCaloriesCard
-              const currentWeekMeals = databaseMeals.filter((meal: any) => {
-                if (!meal.date) return false;
-                const normalizedMealDate = meal.date.includes('T') 
-                  ? meal.date.split('T')[0] 
-                  : meal.date;
-                return weekDateKeys.includes(normalizedMealDate);
-              });
-              
-              // Calculate with proper number parsing
-              const weeklyTotal = currentWeekMeals.reduce((sum: number, meal: any) => {
-                const mealCalories = Number(meal.calories) || Number(meal.totalCalories) || 0;
-                return sum + mealCalories;
-              }, 0);
-              
-              setWeeklyCalories(weeklyTotal);
-            } else {
-              // Fallback to localStorage calculation
-              const currentWeekDates = getWeekDates();
-              const weekDateKeys = currentWeekDates.map(date => getLocalDateKey(date));
-              const currentWeekMeals = stored.filter((meal: any) => {
-                if (weekDateKeys.includes(meal.date)) return true;
-                if (meal.date && meal.date.includes('T')) {
-                  const extractedDate = meal.date.split('T')[0];
-                  return weekDateKeys.includes(extractedDate);
-                }
-                return false;
-              });
-              const weeklyTotal = currentWeekMeals.reduce((sum: number, meal: any) => sum + (Number(meal.calories) || 0), 0);
-              setWeeklyCalories(weeklyTotal);
-            }
+            const databaseMeals = await listLoggedMeals();
+            const currentWeekDates = getWeekDates();
+            const weekDateKeys = currentWeekDates.map(date => getLocalDateKey(date));
+            
+            const currentWeekMeals = databaseMeals.filter((meal: any) => {
+              if (!meal.date) return false;
+              const normalizedMealDate = meal.date.includes('T') 
+                ? meal.date.split('T')[0] 
+                : meal.date;
+              return weekDateKeys.includes(normalizedMealDate);
+            });
+            
+            const weeklyTotal = currentWeekMeals.reduce((sum: number, meal: any) => {
+              const mealCalories = Number(meal.calories) || Number(meal.totalCalories) || 0;
+              return sum + mealCalories;
+            }, 0);
+            
+            setWeeklyCalories(weeklyTotal);
           } catch (error) {
             // Fallback to localStorage calculation with improved parsing
             const currentWeekDates = getWeekDates();
@@ -2234,12 +2209,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
       try {
         if (isResetPassword) {
-          // Password reset flow
-          const { error } = await supabase.auth.resetPasswordForEmail(email, {
-            redirectTo: `${window.location.origin}/reset-password`,
-          });
-
-          if (error) throw error;
+          const result = await resetPasswordForEmail(email);
+          if (!result.ok) throw new Error(result.message);
 
           toast({
             title: "Check your email",
@@ -2247,28 +2218,21 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           });
           setIsResetPassword(false);
         } else if (isSignUp) {
-          // Sign up flow with email verification requirement
-          const { data, error } = await supabase.auth.signUp({
-            email,
-            password,
-            options: {
-              emailRedirectTo: window.location.origin,
-              data: {
-                email_verified: false
-              }
+          const result = await signUpWithEmail(email, password);
+          if (!result.ok) {
+            if (result.code === 'ACCOUNT_EXISTS') {
+              toast({
+                title: "Account exists",
+                description: result.message,
+                variant: "destructive",
+              });
+              setIsSignUp(false);
+              return;
             }
-          });
+            throw new Error(result.message);
+          }
 
-          if (error) throw error;
-
-          if (data?.user?.identities?.length === 0) {
-            toast({
-              title: "Account exists",
-              description: "An account with this email already exists. Please sign in instead.",
-              variant: "destructive",
-            });
-            setIsSignUp(false);
-          } else {
+          if (result.kind === 'verification_required') {
             toast({
               title: "Verify your email",
               description: "We've sent you a verification link. You must verify your email before you can sign in.",
@@ -2276,36 +2240,25 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             setIsSignUp(false);
             setEmail('');
             setPassword('');
+          } else {
+            toast({
+              title: "Welcome back!",
+              description: "You've successfully signed in.",
+            });
+            await refetch();
           }
         } else {
-          // Sign in flow with email verification check
-          const { data, error } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-          });
-
-          if (error) {
-            // Check if error is due to unverified email
-            if (error.message.includes('Email not confirmed') || error.message.includes('email_not_confirmed')) {
+          const result = await signInWithEmail(email, password);
+          if (!result.ok) {
+            if (result.code === 'EMAIL_NOT_VERIFIED') {
               toast({
                 title: "Email not verified",
-                description: "Please verify your email before signing in. Check your inbox for the verification link.",
+                description: result.message,
                 variant: "destructive",
               });
               return;
             }
-            throw error;
-          }
-
-          // Additional check for email verification
-          if (data?.user && !data.user.email_confirmed_at) {
-            await supabase.auth.signOut();
-            toast({
-              title: "Email not verified",
-              description: "Please verify your email before signing in. Check your inbox for the verification link.",
-              variant: "destructive",
-            });
-            return;
+            throw new Error(result.message);
           }
 
           toast({
@@ -2313,9 +2266,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             description: "You've successfully signed in.",
           });
 
-          // Refetch user data and reload
           await refetch();
-          window.location.reload();
         }
       } catch (error: any) {
         toast({
@@ -2340,12 +2291,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
       setIsLoading(true);
       try {
-        const { error } = await supabase.auth.resend({
-          type: 'signup',
-          email: email,
-        });
-
-        if (error) throw error;
+        const result = await resendVerificationEmail(email);
+        if (!result.ok) throw new Error(result.message);
 
         toast({
           title: "Verification email sent",
