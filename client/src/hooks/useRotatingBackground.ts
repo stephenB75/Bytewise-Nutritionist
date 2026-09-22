@@ -1,11 +1,12 @@
 /**
  * Rotating Food Background Hook
- * Uses local assets for instant image switching with thematic page mapping
+ * Cycles themed food photos for the active tab with preloading.
  */
 
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
-// Food image collection - only raw meats removed, all cooked foods included
+const ROTATION_MS = 8000;
+
 const foodImages = [
   new URL('@assets/apple-3313209_1920_1753859530078-BJW4vFlt.jpg', import.meta.url).href,
   new URL('@assets/blueberries-9450130_1920_1753859477806-DQeN0M4j.jpg', import.meta.url).href,
@@ -39,58 +40,77 @@ const foodImages = [
   new URL('@assets/tomatoes-1238255_1920_1753859477803-BBxmQtT1.jpg', import.meta.url).href,
   new URL('@assets/variety-5044809_1920_1753859530087-C7xAS9wM.jpg', import.meta.url).href,
   new URL('@assets/vegetable-2924245_1920_1753859477807-CZELXr6Z.jpg', import.meta.url).href,
-  // New delicious food photos added
-  new URL('@assets/sushi-5885530_1280_1755903678470.jpg', import.meta.url).href, // 33
-  new URL('@assets/pizza-1317699_1280_1755903678471.jpg', import.meta.url).href, // 34
-  new URL('@assets/cherries-1845053_1280_1755903678472.jpg', import.meta.url).href, // 35
-  new URL('@assets/bread-1836411_1280_1755903678472.jpg', import.meta.url).href, // 36
-  new URL('@assets/popcorn-4885565_1280_1755903678473.jpg', import.meta.url).href, // 37
-  new URL('@assets/baked-goods-1846460_1280_1755903678474.jpg', import.meta.url).href, // 38
-  new URL('@assets/cinnamon-roll-4719023_1280_1755903678474.jpg', import.meta.url).href, // 39
-  new URL('@assets/blueberry-3357568_1280_1755903678475.jpg', import.meta.url).href, // 40
-  new URL('@assets/pomegranates-7859172_1280_1755903678476.jpg', import.meta.url).href, // 41
-  new URL('@assets/pretzels-3379552_1280_1755903678476.jpg', import.meta.url).href, // 42
-  new URL('@assets/noodles-2150181_1280_1755903678477.jpg', import.meta.url).href, // 43
-  new URL('@assets/fresh-pasta-5154248_1280_1755903678477.jpg', import.meta.url).href, // 44
-  new URL('@assets/cookies-8668140_1280_1755903678478.jpg', import.meta.url).href, // 45
-  new URL('@assets/chocolates-1737503_1280_1755903678479.jpg', import.meta.url).href, // 46
-  new URL('@assets/white-chocolate-380702_1280_1755903678479.jpg', import.meta.url).href, // 47
-  new URL('@assets/loaf-4957679_1280_1755903678480.jpg', import.meta.url).href, // 48
-  new URL('@assets/mango-2360551_1280_1755903678481.jpg', import.meta.url).href, // 49
-  new URL('@assets/mango-1534061_1280_1755903678481.jpg', import.meta.url).href, // 50
-  new URL('@assets/strawberries-823782_1280_1755903678482.jpg', import.meta.url).href, // 51
-  new URL('@assets/pistachios-3223610_1280_1755903678482.jpg', import.meta.url).href, // 52
+  new URL('@assets/sushi-5885530_1280_1755903678470.jpg', import.meta.url).href,
+  new URL('@assets/pizza-1317699_1280_1755903678471.jpg', import.meta.url).href,
+  new URL('@assets/cherries-1845053_1280_1755903678472.jpg', import.meta.url).href,
+  new URL('@assets/bread-1836411_1280_1755903678472.jpg', import.meta.url).href,
+  new URL('@assets/popcorn-4885565_1280_1755903678473.jpg', import.meta.url).href,
+  new URL('@assets/baked-goods-1846460_1280_1755903678474.jpg', import.meta.url).href,
+  new URL('@assets/cinnamon-roll-4719023_1280_1755903678474.jpg', import.meta.url).href,
+  new URL('@assets/blueberry-3357568_1280_1755903678475.jpg', import.meta.url).href,
+  new URL('@assets/pomegranates-7859172_1280_1755903678476.jpg', import.meta.url).href,
+  new URL('@assets/pretzels-3379552_1280_1755903678476.jpg', import.meta.url).href,
+  new URL('@assets/noodles-2150181_1280_1755903678477.jpg', import.meta.url).href,
+  new URL('@assets/fresh-pasta-5154248_1280_1755903678477.jpg', import.meta.url).href,
+  new URL('@assets/cookies-8668140_1280_1755903678478.jpg', import.meta.url).href,
+  new URL('@assets/chocolates-1737503_1280_1755903678479.jpg', import.meta.url).href,
+  new URL('@assets/white-chocolate-380702_1280_1755903678479.jpg', import.meta.url).href,
+  new URL('@assets/loaf-4957679_1280_1755903678480.jpg', import.meta.url).href,
+  new URL('@assets/mango-2360551_1280_1755903678481.jpg', import.meta.url).href,
+  new URL('@assets/mango-1534061_1280_1755903678481.jpg', import.meta.url).href,
+  new URL('@assets/strawberries-823782_1280_1755903678482.jpg', import.meta.url).href,
+  new URL('@assets/pistachios-3223610_1280_1755903678482.jpg', import.meta.url).href,
 ];
 
-// Food-themed page mappings for all foods (only raw meats excluded) - ALL 52 photos included
 const pageImageMap: Record<string, number[]> = {
-  'home': [0, 2, 13, 15, 21, 22, 27, 29, 30, 31, 35, 38, 39, 40, 42, 43, 44, 46, 47, 48], // Healthy foods and fresh produce
-  'nutrition': [3, 4, 5, 6, 10, 11, 12, 16, 17, 18, 22, 23, 24, 25, 26, 31, 35, 36, 37, 45], // Proteins and main dishes (including cooked meats)
-  'daily': [3, 4, 5, 6, 16, 17, 18, 19, 25, 26, 40, 41], // Daily meals and regular foods
-  'profile': [7, 8, 9, 14, 23, 24, 25, 35, 36, 37, 42, 43, 44], // Desserts, treats, and special foods
-  'tracking': [1, 13, 15, 17, 20, 21, 25, 27, 45, 48, 49], // Breakfast and healthy tracking options
-  'achievements': [0, 7, 8, 13, 14, 15, 20, 25, 27, 28, 29, 38, 39, 40, 42, 43, 44, 46, 47, 48], // Colorful fruits and celebration foods
-  'signin': [8, 15, 21, 22, 35, 36, 37, 45], // Welcoming foods
-  'calculator': [11, 14, 19, 40, 41, 49], // Cooking ingredients and prep
-  'search': [1, 2, 3, 4, 5, 6, 7, 8, 9, 13, 20, 30, 31, 34, 39], // Variety and discovery
-  'fasting': [3, 4, 5, 16, 25, 26],
-  'data': [7, 13, 14, 15, 16, 17, 18, 20, 21, 25, 27, 28, 29, 38, 39, 40, 42, 49]
+  home: [0, 2, 13, 15, 21, 22, 27, 29, 30, 31, 35, 38, 39, 40, 42, 43, 44, 46, 47, 48],
+  nutrition: [3, 4, 5, 6, 10, 11, 12, 16, 17, 18, 22, 23, 24, 25, 26, 31, 35, 36, 37, 45],
+  daily: [3, 4, 5, 6, 16, 17, 18, 19, 25, 26, 40, 41],
+  profile: [7, 8, 9, 14, 23, 24, 25, 35, 36, 37, 42, 43, 44],
+  tracking: [1, 13, 15, 17, 20, 21, 25, 27, 45, 48, 49],
+  achievements: [0, 7, 8, 13, 14, 15, 20, 25, 27, 28, 29, 38, 39, 40, 42, 43, 44, 46, 47, 48],
+  signin: [8, 15, 21, 22, 35, 36, 37, 45],
+  calculator: [11, 14, 19, 40, 41, 49],
+  search: [1, 2, 3, 4, 5, 6, 7, 8, 9, 13, 20, 30, 31, 34, 39],
+  fasting: [3, 4, 5, 16, 25, 26],
+  data: [7, 13, 14, 15, 16, 17, 18, 20, 21, 25, 27, 28, 29, 38, 39, 40, 42, 49],
 };
 
-const tabBackgrounds: Record<string, string> = Object.fromEntries(
-  Object.entries(pageImageMap).map(([tab, ids]) => [tab, foodImages[ids[0]]])
-);
+function getTabImages(activeTab: string): string[] {
+  const ids = pageImageMap[activeTab] || pageImageMap.home;
+  return ids.map((id) => foodImages[id]).filter(Boolean);
+}
 
-if (typeof window !== 'undefined') {
-  Object.values(tabBackgrounds).forEach((src) => {
-    const img = new Image();
-    img.src = src;
-  });
+function preloadImage(src: string) {
+  const img = new Image();
+  img.src = src;
 }
 
 export function useRotatingBackground(activeTab: string) {
-  return useMemo(
-    () => ({ backgroundImage: tabBackgrounds[activeTab] || foodImages[0] }),
-    [activeTab]
-  );
+  const images = useMemo(() => getTabImages(activeTab), [activeTab]);
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    setIndex(0);
+    images.forEach(preloadImage);
+  }, [images]);
+
+  useEffect(() => {
+    if (images.length <= 1) return undefined;
+
+    const timer = window.setInterval(() => {
+      setIndex((current) => (current + 1) % images.length);
+    }, ROTATION_MS);
+
+    return () => window.clearInterval(timer);
+  }, [images]);
+
+  useEffect(() => {
+    const next = images[(index + 1) % images.length];
+    if (next) preloadImage(next);
+  }, [index, images]);
+
+  const backgroundImage = images[index] || foodImages[0];
+
+  return { backgroundImage };
 }

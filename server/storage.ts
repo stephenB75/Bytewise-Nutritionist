@@ -37,12 +37,16 @@ import {
 } from "@shared/schema";
 import { db, withRetry } from "./db";
 import { eq, desc, and, gte, lte, like, sql, inArray } from "drizzle-orm";
+import { getDatabaseUrl } from "./env";
 import {
   createMealViaSupabase,
   getUserMealsViaSupabase,
   getUserViaSupabase,
+  getUserWaterHistoryViaSupabase,
+  getUserWaterIntakeViaSupabase,
   updateUserProfileViaSupabase,
   upsertUserViaSupabase,
+  upsertWaterIntakeViaSupabase,
 } from "./supabaseData";
 
 export interface IStorage {
@@ -656,54 +660,86 @@ export class DatabaseStorage implements IStorage {
 
   // Water intake operations
   async getUserWaterIntake(userId: string, date: Date): Promise<WaterIntake | undefined> {
-    const startOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-    const endOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
+    const fetchFromDb = async () => {
+      const startOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      const endOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
 
-    const [intake] = await db
-      .select()
-      .from(waterIntake)
-      .where(
-        and(
-          eq(waterIntake.userId, userId),
-          gte(waterIntake.date, startOfDay),
-          lte(waterIntake.date, endOfDay)
-        )
-      );
+      const [intake] = await db
+        .select()
+        .from(waterIntake)
+        .where(
+          and(
+            eq(waterIntake.userId, userId),
+            gte(waterIntake.date, startOfDay),
+            lte(waterIntake.date, endOfDay)
+          )
+        );
 
-    return intake;
+      return intake;
+    };
+
+    if (!getDatabaseUrl()) {
+      return await getUserWaterIntakeViaSupabase(userId, date) as any;
+    }
+
+    try {
+      return await fetchFromDb();
+    } catch {
+      return await getUserWaterIntakeViaSupabase(userId, date) as any;
+    }
   }
 
   async getUserWaterIntakeHistory(userId: string, days: number = 30): Promise<WaterIntake[]> {
-    const endDate = new Date();
-    const startDate = new Date();
-    startDate.setDate(endDate.getDate() - days);
-    
-    return await db
-      .select()
-      .from(waterIntake)
-      .where(
-        and(
-          eq(waterIntake.userId, userId),
-          gte(waterIntake.date, startDate),
-          lte(waterIntake.date, endDate)
+    const fetchFromDb = async () => {
+      const endDate = new Date();
+      const startDate = new Date();
+      startDate.setDate(endDate.getDate() - days);
+
+      return await db
+        .select()
+        .from(waterIntake)
+        .where(
+          and(
+            eq(waterIntake.userId, userId),
+            gte(waterIntake.date, startDate),
+            lte(waterIntake.date, endDate)
+          )
         )
-      )
-      .orderBy(desc(waterIntake.date));
+        .orderBy(desc(waterIntake.date));
+    };
+
+    if (!getDatabaseUrl()) {
+      return await getUserWaterHistoryViaSupabase(userId, days) as any;
+    }
+
+    try {
+      return await fetchFromDb();
+    } catch {
+      return await getUserWaterHistoryViaSupabase(userId, days) as any;
+    }
   }
 
   async upsertWaterIntake(intake: InsertWaterIntake): Promise<WaterIntake> {
-    const existing = await this.getUserWaterIntake(intake.userId, intake.date);
-    
-    if (existing) {
-      const [updated] = await db
-        .update(waterIntake)
-        .set({ glasses: intake.glasses })
-        .where(eq(waterIntake.id, existing.id))
-        .returning();
-      return updated;
-    } else {
-      const [newIntake] = await db.insert(waterIntake).values(intake).returning();
-      return newIntake;
+    if (!getDatabaseUrl()) {
+      return await upsertWaterIntakeViaSupabase(intake.userId, intake.date, intake.glasses ?? 0) as any;
+    }
+
+    try {
+      const existing = await this.getUserWaterIntake(intake.userId, intake.date);
+
+      if (existing) {
+        const [updated] = await db
+          .update(waterIntake)
+          .set({ glasses: intake.glasses })
+          .where(eq(waterIntake.id, existing.id))
+          .returning();
+        return updated;
+      } else {
+        const [newIntake] = await db.insert(waterIntake).values(intake).returning();
+        return newIntake;
+      }
+    } catch {
+      return await upsertWaterIntakeViaSupabase(intake.userId, intake.date, intake.glasses ?? 0) as any;
     }
   }
 
@@ -1064,30 +1100,33 @@ export class DatabaseStorage implements IStorage {
 
   // Water intake management
   async updateWaterIntake(userId: string, date: Date, glasses: number): Promise<WaterIntake> {
-    const startOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-    
-    // Check if record exists for today
-    const [existing] = await db
-      .select()
-      .from(waterIntake)
-      .where(
-        and(
-          eq(waterIntake.userId, userId),
-          gte(waterIntake.date, startOfDay),
-          lte(waterIntake.date, new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1))
-        )
-      );
+    if (!getDatabaseUrl()) {
+      return await upsertWaterIntakeViaSupabase(userId, date, glasses) as any;
+    }
 
-    if (existing) {
-      // Update existing record
-      const [updated] = await db
-        .update(waterIntake)
-        .set({ glasses })
-        .where(eq(waterIntake.id, existing.id))
-        .returning();
-      return updated;
-    } else {
-      // Create new record
+    try {
+      const startOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+      const [existing] = await db
+        .select()
+        .from(waterIntake)
+        .where(
+          and(
+            eq(waterIntake.userId, userId),
+            gte(waterIntake.date, startOfDay),
+            lte(waterIntake.date, new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1))
+          )
+        );
+
+      if (existing) {
+        const [updated] = await db
+          .update(waterIntake)
+          .set({ glasses })
+          .where(eq(waterIntake.id, existing.id))
+          .returning();
+        return updated;
+      }
+
       const [created] = await db
         .insert(waterIntake)
         .values({
@@ -1097,6 +1136,8 @@ export class DatabaseStorage implements IStorage {
         })
         .returning();
       return created;
+    } catch {
+      return await upsertWaterIntakeViaSupabase(userId, date, glasses) as any;
     }
   }
 

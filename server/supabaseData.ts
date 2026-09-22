@@ -210,3 +210,92 @@ export async function getUserMealsViaSupabase(userId: string, startDate?: Date, 
     foods: [],
   }));
 }
+
+function mapWaterIntake(row: any) {
+  return {
+    id: row.id,
+    userId: row.user_id,
+    date: row.date ? new Date(row.date) : new Date(),
+    glasses: toNumber(row.glasses),
+    createdAt: row.created_at ? new Date(row.created_at) : new Date(),
+  };
+}
+
+function startOfUtcDay(date: Date): Date {
+  return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+}
+
+export async function getUserWaterIntakeViaSupabase(userId: string, date: Date) {
+  const start = startOfUtcDay(date);
+  const end = new Date(start.getTime() + 24 * 60 * 60 * 1000);
+
+  const { data, error } = await supabaseAdmin
+    .from('water_intake')
+    .select('*')
+    .eq('user_id', userId)
+    .gte('date', start.toISOString())
+    .lt('date', end.toISOString())
+    .order('date', { ascending: false })
+    .limit(1);
+
+  if (error) {
+    throw error;
+  }
+
+  return data?.[0] ? mapWaterIntake(data[0]) : undefined;
+}
+
+export async function getUserWaterHistoryViaSupabase(userId: string, days: number = 30) {
+  const endDate = new Date();
+  const startDate = new Date();
+  startDate.setDate(endDate.getDate() - days);
+
+  const { data, error } = await supabaseAdmin
+    .from('water_intake')
+    .select('*')
+    .eq('user_id', userId)
+    .gte('date', startDate.toISOString())
+    .lte('date', endDate.toISOString())
+    .order('date', { ascending: false });
+
+  if (error) {
+    throw error;
+  }
+
+  return (data || []).map(mapWaterIntake);
+}
+
+export async function upsertWaterIntakeViaSupabase(userId: string, date: Date, glasses: number) {
+  const existing = await getUserWaterIntakeViaSupabase(userId, date);
+
+  if (existing) {
+    const { data, error } = await supabaseAdmin
+      .from('water_intake')
+      .update({ glasses })
+      .eq('id', existing.id)
+      .select('*')
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    return mapWaterIntake(data);
+  }
+
+  const { data, error } = await supabaseAdmin
+    .from('water_intake')
+    .insert({
+      user_id: userId,
+      date: startOfUtcDay(date).toISOString(),
+      glasses,
+    })
+    .select('*')
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return mapWaterIntake(data);
+}

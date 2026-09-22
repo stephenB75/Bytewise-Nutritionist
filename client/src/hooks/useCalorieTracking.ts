@@ -10,6 +10,7 @@ import { getLocalDateKey, formatLocalTime, getMealTypeByTime } from '@/utils/dat
 import { apiRequest } from '@/lib/queryClient';
 import { useAuth } from './useAuth';
 import { logMeal } from '@/lib/mealsApi';
+import { writeLocalWaterGlasses } from '@/components/WaterCard';
 
 interface CalculatedCalories {
   id: string;
@@ -221,6 +222,7 @@ export function useCalorieTracking() {
         ...currentStats,
         waterGlasses: newWaterTotal
       }));
+      writeLocalWaterGlasses(newWaterTotal);
       
       console.log('💧 Water updated in localStorage:', {
         added: waterGlasses,

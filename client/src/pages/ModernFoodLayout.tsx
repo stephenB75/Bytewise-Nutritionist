@@ -37,8 +37,6 @@ import {
   Search, 
   Plus,
   ChevronRight,
-  ChevronUp,
-  ChevronDown,
   Flame,
   Target,
   Trophy,
@@ -55,7 +53,6 @@ import {
   CheckCircle2,
   Sparkles,
   Droplets,
-  Minus,
   Trash2,
   ArrowLeft,
   ArrowRight,
@@ -67,6 +64,8 @@ import {
 import { House, ForkKnife, Timer, ChartBar, User } from 'phosphor-react';
 import { NotificationDropdown } from '@/components/NotificationDropdown';
 import { WeeklyCaloriesCard } from '@/components/WeeklyCaloriesCard';
+import { WaterCard, writeLocalWaterGlasses } from '@/components/WaterCard';
+import { GuestSaveHint } from '@/components/GuestSaveHint';
 import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
@@ -127,12 +126,35 @@ const HeroSection = React.memo(function HeroSection({
   showLogo?: boolean;
   backgroundImage: string;
 }) {
+  const [activeImage, setActiveImage] = React.useState(backgroundImage);
+  const [previousImage, setPreviousImage] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (backgroundImage === activeImage) return;
+
+    setPreviousImage(activeImage);
+    setActiveImage(backgroundImage);
+
+    const timer = window.setTimeout(() => setPreviousImage(null), 700);
+    return () => window.clearTimeout(timer);
+  }, [backgroundImage, activeImage]);
+
   return (
     <div className="relative h-screen w-full overflow-hidden hero-component bg-[#0f172a]" data-hero="true">
+      {previousImage && (
+        <img
+          src={previousImage}
+          alt=""
+          aria-hidden
+          className="absolute inset-0 z-[9] h-full w-full object-cover brightness-[0.85]"
+          decoding="async"
+        />
+      )}
       <img
-        src={backgroundImage}
+        key={activeImage}
+        src={activeImage}
         alt=""
-        className="absolute inset-0 z-10 h-full w-full object-cover brightness-[0.85]"
+        className="hero-bg-optimized hero-bg-loaded absolute inset-0 z-10 h-full w-full object-cover brightness-[0.85]"
         decoding="async"
       />
       <div className="hero-gradient-overlay opacity-100" style={{ zIndex: 11 }} />
@@ -264,6 +286,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       // Update localStorage
       const updatedStats = { ...localStats, waterGlasses: newGlasses };
       localStorage.setItem('dailyStats', JSON.stringify(updatedStats));
+      writeLocalWaterGlasses(newGlasses);
       
       // Update component state
       setDailyStats((prev: any) => prev ? { ...prev, waterGlasses: newGlasses } : { 
@@ -301,9 +324,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       setDailyStats((prev: any) => prev ? { ...prev, waterGlasses: newGlasses } : null);
       
       // Update in database with proper authentication
+      writeLocalWaterGlasses(newGlasses);
       const response = await apiRequest('POST', '/api/daily-stats', {
         waterGlasses: newGlasses,
-        date: new Date().toISOString()
+        date: getLocalDateKey()
       });
       
       if (!response.ok) {
@@ -1191,234 +1215,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     );
   });
 
-  // Enhanced Water Consumption Card Component with Weekly Log
-  const WaterCard = React.memo(({ glasses, onIncrement, onDecrement }: {
-    glasses: number;
-    onIncrement: () => void;
-    onDecrement: () => void;
-  }) => {
-    const [waterHistory, setWaterHistory] = React.useState<Array<{date: string, glasses: number}>>([]);
-    const [isLoadingHistory, setIsLoadingHistory] = React.useState(false);
-    const [showHistory, setShowHistory] = React.useState(false);
-    
-    const dailyGoal = 8; // 8 glasses per day
-    const percentage = Math.min((glasses / dailyGoal) * 100, 100);
-    const isGoalReached = glasses >= dailyGoal;
-
-    // Fetch water intake history
-    const fetchWaterHistory = React.useCallback(async () => {
-      if (isLoadingHistory) return;
-      
-      setIsLoadingHistory(true);
-      
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        const headers: Record<string, string> = {
-          'Content-Type': 'application/json',
-        };
-        
-        if (session?.access_token && session.access_token.split('.').length === 3) {
-          headers.Authorization = `Bearer ${session.access_token}`;
-        }
-        
-        const response = await fetch('/api/water-history?days=30', {
-          headers,
-        });
-        
-        if (response.ok) {
-          const result = await response.json();
-          const formattedHistory = (result.data || []).map((item: any) => ({
-            date: new Date(item.date).toISOString().split('T')[0],
-            glasses: item.glasses
-          }));
-          setWaterHistory(formattedHistory);
-        } else {
-          setWaterHistory([]);
-        }
-      } catch (error) {
-        console.error('Failed to fetch water history:', error);
-        setWaterHistory([]);
-      } finally {
-        setIsLoadingHistory(false);
-      }
-    }, [isLoadingHistory]);
-
-    // Fetch history when component mounts or when history is shown
-    useEffect(() => {
-      if (showHistory) {
-        fetchWaterHistory();
-      }
-    }, [showHistory]);
-    
-    return (
-      <Card className={`bg-gradient-to-br from-amber-100 to-cyan-100 border-none p-6 transition-all duration-300 hover:from-amber-100 hover:to-cyan-200 shadow-lg hover:shadow-xl`} data-testid="water-card">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center space-x-3">
-            <div className={`p-3 rounded-xl transition-all duration-300 ${isGoalReached ? 'bg-gradient-to-br from-cyan-500 to-blue-600' : 'bg-cyan-500/30'}`}>
-              <Droplets className={`w-6 h-6 transition-colors duration-300 ${isGoalReached ? 'text-gray-900' : 'text-cyan-700'}`} />
-            </div>
-            <div>
-              <h3 className="text-gray-900 font-medium text-lg">Water Intake</h3>
-              <p className="text-gray-900 text-sm font-medium">{glasses}/{dailyGoal} glasses today</p>
-            </div>
-          </div>
-          <div className="text-right">
-            <div className="text-2xl font-medium text-gray-900">{Math.round(percentage)}%</div>
-            <div className="text-xs text-gray-900 font-normal">of goal</div>
-          </div>
-        </div>
-        
-        {/* Progress bar */}
-        <div className="relative h-3 bg-gray-300/60 rounded-full overflow-hidden mb-4 shadow-inner border border-gray-400/20">
-          <div 
-            className="absolute left-0 top-0 h-full bg-gradient-to-r from-cyan-600 to-blue-700 rounded-full transition-all duration-1000 shadow-sm"
-            style={{ width: `${percentage}%` }}
-          />
-          {percentage >= 100 && (
-            <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full animate-pulse shadow-sm" />
-          )}
-        </div>
-        
-        {/* Water glass visualization */}
-        <div className="flex items-center justify-between">
-          <div className="flex space-x-1">
-            {Array.from({ length: dailyGoal }, (_, i) => (
-              <div
-                key={i}
-                className={`w-4 h-6 rounded-sm transition-all duration-300 ${
-                  i < glasses 
-                    ? 'bg-cyan-400' 
-                    : 'bg-gray-300'
-                }`}
-                style={{
-                  background: i < glasses 
-                    ? 'linear-gradient(to top, #06b6d4 0%, #0891b2 100%)' 
-                    : 'transparent'
-                }}
-              />
-            ))}
-          </div>
-          
-          {/* Control buttons */}
-          <div className="flex items-center space-x-2">
-            <Button
-              onClick={onDecrement}
-              disabled={glasses <= 0}
-              size="sm"
-              variant="ghost"
-              className="h-8 w-8 p-0 text-cyan-600 hover:text-cyan-500 hover:bg-cyan-500/10 disabled:opacity-50 shadow-lg hover:shadow-xl transition-shadow duration-200"
-              data-testid="button-decrement-water"
-            >
-              <Minus className="w-4 h-4" />
-            </Button>
-            <Button
-              onClick={onIncrement}
-              disabled={glasses >= dailyGoal}
-              size="sm"
-              variant="ghost"
-              className="h-8 w-8 p-0 text-cyan-600 hover:text-cyan-500 hover:bg-cyan-500/10 disabled:opacity-50 shadow-lg hover:shadow-xl transition-shadow duration-200 border border-cyan-500/50 hover:border-cyan-500/70 disabled:hover:bg-transparent"
-              data-testid="button-increment-water"
-            >
-              <Plus className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-
-        {/* Weekly History Toggle */}
-        <div className="mt-4 pt-4 border-t border-gray-400/20">
-          <Button
-            onClick={() => setShowHistory(!showHistory)}
-            variant="ghost"
-            size="sm"
-            className="w-full text-gray-700 hover:text-cyan-600 hover:bg-cyan-500/10 font-medium"
-            data-testid="button-toggle-water-history"
-          >
-            {showHistory ? 'Hide' : 'Show'} 30-Day Log
-            {showHistory ? <ChevronUp className="w-4 h-4 ml-2" /> : <ChevronDown className="w-4 h-4 ml-2" />}
-          </Button>
-          
-          {showHistory && (
-            <div className="mt-4 space-y-3">
-              {isLoadingHistory ? (
-                <div className="text-center py-4">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-cyan-600 mx-auto"></div>
-                  <p className="text-sm text-gray-600 mt-2">Loading water history...</p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  <h4 className="text-sm font-semibold text-gray-800 mb-3">Last 30 Days Water Intake</h4>
-                  
-                  {/* Weekly Grid View */}
-                  <div className="grid grid-cols-7 gap-1 text-xs">
-                    {/* Day headers */}
-                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                      <div key={day} className="text-center text-gray-500 font-medium py-1">
-                        {day}
-                      </div>
-                    ))}
-                    
-                    {/* Generate last 30 days in weekly grid */}
-                    {Array.from({ length: 30 }, (_, i) => {
-                      const date = new Date();
-                      date.setDate(date.getDate() - (29 - i));
-                      const dateStr = date.toISOString().split('T')[0];
-                      const dayData = waterHistory.find(h => h.date === dateStr);
-                      const glassesOnDay = dayData?.glasses || 0;
-                      const isToday = dateStr === new Date().toISOString().split('T')[0];
-                      
-                      return (
-                        <div
-                          key={dateStr}
-                          className={`aspect-square rounded-md flex flex-col items-center justify-center text-xs font-medium transition-all duration-200 min-h-[40px] ${
-                            isToday 
-                              ? 'ring-2 ring-cyan-500 bg-cyan-50 text-cyan-900' 
-                              : glassesOnDay >= dailyGoal 
-                                ? 'bg-gradient-to-br from-cyan-400 to-blue-500 text-white' 
-                                : glassesOnDay > 0 
-                                  ? 'bg-cyan-200 text-gray-800' 
-                                  : 'bg-gray-100 text-gray-400'
-                          }`}
-                          title={`${date.getDate()}/${date.getMonth() + 1}: ${glassesOnDay} glasses`}
-                        >
-                          <div className="text-xs">{date.getDate()}</div>
-                          <div className="text-xs font-bold">{glassesOnDay}</div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                  
-                  {/* Summary Stats */}
-                  <div className="mt-4 p-3 bg-cyan-50 rounded-lg">
-                    <div className="grid grid-cols-3 gap-4 text-center">
-                      <div>
-                        <div className="text-lg font-bold text-cyan-700">
-                          {waterHistory.filter(h => h.glasses >= dailyGoal).length}
-                        </div>
-                        <div className="text-xs text-gray-600">Goal Days</div>
-                      </div>
-                      <div>
-                        <div className="text-lg font-bold text-cyan-700">
-                          {Math.round(waterHistory.reduce((sum, h) => sum + h.glasses, 0) / Math.max(waterHistory.length, 1))}
-                        </div>
-                        <div className="text-xs text-gray-600">Avg/Day</div>
-                      </div>
-                      <div>
-                        <div className="text-lg font-bold text-cyan-700">
-                          {waterHistory.reduce((sum, h) => sum + h.glasses, 0)}
-                        </div>
-                        <div className="text-xs text-gray-600">Total</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </Card>
-    );
-  });
-
   // Enhanced Macro Card Component - Shows Remaining Values with Negative Color Coding
   const MacroCard = React.memo(({ name, value, goal, color, data = [0, 0, 0, 0, 0] }: {
     name: string;
@@ -1591,16 +1387,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           )}
           
           {!user && (
-            <div className="mb-3 p-3 rounded-xl bg-amber-50 border border-amber-200 text-sm text-gray-800">
-              You can track meals now. Create an account on Profile to save your entries.
-              <button
-                type="button"
-                onClick={() => handleTabChange('profile')}
-                className="mt-1 font-semibold text-orange-600 underline"
-              >
-                Create account
-              </button>
-            </div>
+            <GuestSaveHint onCreateAccount={() => handleTabChange('profile')} />
           )}
           <div data-testid="progress-section" className="flex flex-col gap-1 mb-3 sm:flex-row sm:items-center sm:justify-between">
             <h2 className="text-2xl sm:text-3xl font-semibold text-gray-900">Today's Progress</h2>
@@ -1744,16 +1531,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       {/* Content Section - Completely Separate and Underneath */}
       <div className="px-4 sm:px-6 py-3 content-section">
         {!user && (
-          <div className="mb-4 p-3 rounded-xl bg-amber-50 border border-amber-200 text-sm text-gray-800">
-            Entries on this device stay here until you create an account.
-            <button
-              type="button"
-              onClick={() => handleTabChange('profile')}
-              className="ml-2 font-semibold text-orange-600 underline"
-            >
-              Save with an account
-            </button>
-          </div>
+          <GuestSaveHint
+            variant="journal"
+            onCreateAccount={() => handleTabChange('profile')}
+          />
         )}
         {/* Food Search Bar - Moved Here */}
         <div className="mb-4 pb-2">

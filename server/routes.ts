@@ -2677,8 +2677,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     try {
-      // Update daily stats with new water consumption
-      const targetDate = date ? new Date(date) : new Date();
+      const targetDate = typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date)
+        ? new Date(`${date}T12:00:00.000Z`)
+        : (date ? new Date(date) : new Date());
       console.log('💧 Updating water glasses for user:', userId, 'date:', targetDate.toISOString(), 'glasses:', waterGlasses);
       
       const updatedStats = await storage.updateUserDailyStats(userId, targetDate, { waterGlasses });
