@@ -35,6 +35,7 @@ import {
   Copy
 } from 'lucide-react';
 import { FoodSearchWithHistory } from '@/components/FoodSearchWithHistory';
+import { UserFoodSuggestions } from '@/components/UserFoodSuggestions';
 
 
 interface IngredientAnalysis {
@@ -713,6 +714,13 @@ function CalorieCalculator({
               <p className="text-xs text-gray-900 mt-1">
                 Search your meal history or enter new food items
               </p>
+              <UserFoodSuggestions
+                className="mt-4"
+                onSelectFood={(food) => {
+                  setIngredient(food.name);
+                  setMeasurement('1 serving');
+                }}
+              />
             </div>
             
             {/* Measurement Input - Simplified */}

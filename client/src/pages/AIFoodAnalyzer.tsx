@@ -20,6 +20,7 @@ import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { useCalorieTracking } from '@/hooks/useCalorieTracking';
 import { useAuth } from '@/hooks/useAuth';
+import { incrementUsage } from '@/lib/usageLimits';
 
 // Photo Display Component with proper error handling and proxy fallback
 interface PhotoDisplayProps {
@@ -286,6 +287,7 @@ export default function AIFoodAnalyzer() {
       };
 
       setAnalysisResult(analysisResultWithTotals);
+      incrementUsage('ai', (user as any)?.id);
       // Save to weekly history
       saveAnalyzedFood(analysisResultWithTotals);
       

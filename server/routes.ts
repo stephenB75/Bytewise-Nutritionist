@@ -1258,9 +1258,132 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Recipe library
+  app.get('/api/recipes', isAuthenticated, async (req: any, res: Response) => {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ message: 'User not found' });
+    }
+    try {
+      const userRecipes = await storage.getUserRecipes(userId);
+      res.json({ recipes: userRecipes });
+    } catch (error: any) {
+      res.status(500).json({ message: 'Failed to load recipes', error: error.message });
+    }
+  });
+
+  app.get('/api/recipes/:id', isAuthenticated, async (req: any, res: Response) => {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ message: 'User not found' });
+    }
+    try {
+      const recipe = await storage.getRecipeById(Number(req.params.id));
+      if (!recipe || recipe.userId !== userId) {
+        return res.status(404).json({ message: 'Recipe not found' });
+      }
+      res.json(recipe);
+    } catch (error: any) {
+      res.status(500).json({ message: 'Failed to load recipe', error: error.message });
+    }
+  });
+
+  app.post('/api/recipes', isAuthenticated, async (req: any, res: Response) => {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ message: 'User not found' });
+    }
+    try {
+      const subscription = await storage.getUserSubscription(userId);
+      const isPremium = subscription?.status === 'active' &&
+        (subscription.tier === 'premium' || subscription.tier === 'pro');
+      const existing = await storage.getUserRecipes(userId);
+      if (!isPremium && existing.length >= 5) {
+        return res.status(402).json({
+          error: 'RECIPE_LIMIT',
+          message: 'Free accounts can save 5 recipes. Upgrade for unlimited recipes.',
+        });
+      }
+
+      const recipe = await storage.createRecipe({
+        userId,
+        name: req.body.name,
+        description: req.body.description || '',
+        servings: Number(req.body.servings) || 1,
+        instructions: req.body.instructions || '',
+      });
+
+      if (req.body.totalCalories || req.body.totalProtein || req.body.totalCarbs || req.body.totalFat) {
+        await storage.updateRecipeNutrition(recipe.id, {
+          totalCalories: String(req.body.totalCalories || 0),
+          totalProtein: String(req.body.totalProtein || 0),
+          totalCarbs: String(req.body.totalCarbs || 0),
+          totalFat: String(req.body.totalFat || 0),
+          totalFiber: String(req.body.totalFiber || 0),
+          totalSugar: String(req.body.totalSugar || 0),
+          totalSodium: String(req.body.totalSodium || 0),
+        });
+      }
+
+      const saved = await storage.getRecipeById(recipe.id);
+      res.json({ success: true, recipe: saved || recipe });
+    } catch (error: any) {
+      res.status(500).json({ message: 'Failed to create recipe', error: error.message });
+    }
+  });
+
+  app.delete('/api/recipes/:id', isAuthenticated, async (req: any, res: Response) => {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ message: 'User not found' });
+    }
+    try {
+      const recipe = await storage.getRecipeById(Number(req.params.id));
+      if (!recipe || recipe.userId !== userId) {
+        return res.status(404).json({ message: 'Recipe not found' });
+      }
+      await storage.deleteRecipe(recipe.id);
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ message: 'Failed to delete recipe', error: error.message });
+    }
+  });
+
+  app.post('/api/recipes/:id/log', isAuthenticated, async (req: any, res: Response) => {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ message: 'User not found' });
+    }
+    try {
+      const recipe = await storage.getRecipeById(Number(req.params.id));
+      if (!recipe || recipe.userId !== userId) {
+        return res.status(404).json({ message: 'Recipe not found' });
+      }
+
+      let mealDate = new Date();
+      if (typeof req.body.date === 'string' && req.body.date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        mealDate = new Date(`${req.body.date}T12:00:00.000Z`);
+      }
+
+      const meal = await storage.createMeal({
+        userId,
+        date: mealDate,
+        mealType: req.body.mealType || 'meal',
+        name: recipe.name,
+        totalCalories: recipe.totalCalories || '0',
+        totalProtein: recipe.totalProtein || '0',
+        totalCarbs: recipe.totalCarbs || '0',
+        totalFat: recipe.totalFat || '0',
+      });
+
+      res.json({ success: true, meal });
+    } catch (error: any) {
+      res.status(500).json({ message: 'Failed to log recipe', error: error.message });
+    }
+  });
+
   // AI Food Analysis Routes
-  // Object storage upload endpoint (no authentication required for AI analysis)
-  app.post('/api/objects/upload', async (req: Request, res: Response) => {
+  app.post('/api/objects/upload', isAuthenticated, async (req: Request, res: Response) => {
     try {
       const { contentType } = req.body;
       const { supabaseStorageService } = await import('./supabaseStorage');
@@ -1374,7 +1497,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // AI food analysis endpoint
-  app.post('/api/ai/analyze-food', async (req: Request, res: Response) => {
+  app.post('/api/ai/analyze-food', isAuthenticated, async (req: Request, res: Response) => {
     try {
       const { imageUrl } = req.body;
       

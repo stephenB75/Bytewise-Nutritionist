@@ -16,6 +16,9 @@ import {
 } from '@/components/ui/accordion';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { useSubscription } from '@/hooks/useSubscription';
+import { PremiumFeatureGate } from '@/components/PremiumFeatureGate';
+import { getFeatureAllowance, incrementUsage } from '@/lib/usageLimits';
 import { 
   Download,
   RefreshCw,
@@ -27,10 +30,20 @@ import {
 export function DataManagementPanel() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { isPremium } = useSubscription();
   const [isExporting, setIsExporting] = useState(false);
+  const pdfAllowance = getFeatureAllowance('pdf', isPremium, (user as any)?.id);
 
 
   const handleExportData = async () => {
+    if (!pdfAllowance.allowed) {
+      toast({
+        title: 'Weekly PDF limit reached',
+        description: 'Free accounts can export one report per week. Upgrade for unlimited exports.',
+        variant: 'destructive',
+      });
+      return;
+    }
     console.log('🚀 PDF Export button clicked - starting process...');
     setIsExporting(true);
     
@@ -44,6 +57,7 @@ export function DataManagementPanel() {
       console.log('📄 PDF generation result:', success);
       
       if (success) {
+        incrementUsage('pdf', (user as any)?.id);
         toast({
           title: "PDF Report Downloaded ✅",
           description: "Your nutrition report has been downloaded. Check your Downloads folder for the PDF file.",
@@ -167,6 +181,13 @@ export function DataManagementPanel() {
                           PDF Format
                         </Badge>
                       </div>
+                      {!pdfAllowance.allowed && !isPremium ? (
+                        <PremiumFeatureGate
+                          feature="premium"
+                          featureName="Unlimited PDF Reports"
+                          description="Free accounts can export one nutrition report per week."
+                        />
+                      ) : (
                       <Button
                         onClick={handleExportData}
                         disabled={isExporting}
@@ -186,6 +207,7 @@ export function DataManagementPanel() {
                           </>
                         )}
                       </Button>
+                      )}
                     </div>
                   </div>
 

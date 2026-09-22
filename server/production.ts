@@ -23,8 +23,19 @@ export function serveStatic(app: Express) {
 
   app.use(express.static(distPath));
 
-  // fall through to index.html if the file doesn't exist
-  app.use("*", (_req, res) => {
+  // Never serve the SPA shell for API or health probes
+  app.use((req, res, next) => {
+    const pathName = req.path || '';
+    if (pathName.startsWith('/api') || pathName === '/health' || pathName === '/ready') {
+      return res.status(404).json({
+        error: 'Not found',
+        path: pathName,
+      });
+    }
+    next();
+  });
+
+  app.use((_req, res) => {
     res.sendFile(path.resolve(distPath, "index.html"));
   });
 }

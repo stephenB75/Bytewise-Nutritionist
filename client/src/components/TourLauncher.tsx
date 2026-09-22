@@ -1,6 +1,6 @@
 /**
  * Tour Launcher Component
- * Visual tour launcher without actual tour functionality
+ * Feature cards plus the guided Joyride tour
  */
 
 import React, { useState } from 'react';
@@ -225,6 +225,16 @@ export function WelcomeBanner({ onDismiss }: { onDismiss: () => void }) {
               analyze foods with AI, manage fasting, and achieve your health goals!
             </p>
             <div className="flex flex-wrap gap-2">
+              <Button
+                size="sm"
+                onClick={() => {
+                  localStorage.removeItem('bytewise-tour-completed');
+                  window.dispatchEvent(new CustomEvent('start-app-tour'));
+                }}
+                className="bg-amber-500 text-gray-900 hover:bg-amber-600 border-none"
+              >
+                Take Tour
+              </Button>
               <TourLauncher isVisible={true} />
               <Button
                 size="sm"
@@ -241,7 +251,6 @@ export function WelcomeBanner({ onDismiss }: { onDismiss: () => void }) {
   );
 }
 
-// Simple hook for tour visibility (without actual tour functionality)
 export function useAppTour() {
   const shouldShowTour = () => {
     const tourNotCompleted = localStorage.getItem('bytewise-tour-completed') !== 'true';
@@ -256,6 +265,11 @@ export function useAppTour() {
     localStorage.removeItem('tour-cards-clicked');
   };
 
+  const startTour = () => {
+    localStorage.removeItem('bytewise-tour-completed');
+    window.dispatchEvent(new CustomEvent('start-app-tour'));
+  };
+
   const dismissTour = () => {
     localStorage.setItem('bytewise-tour-completed', 'true');
   };
@@ -263,6 +277,7 @@ export function useAppTour() {
   return {
     shouldShowTour,
     resetTour,
+    startTour,
     dismissTour
   };
 }

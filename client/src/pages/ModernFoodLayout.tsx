@@ -26,6 +26,10 @@ import { useRotatingBackground } from '@/hooks/useRotatingBackground';
 import { useAchievements, getAchievementIcon, formatAchievementDate } from '@/hooks/useAchievements';
 import { ProfileIcon } from '@/components/ProfileIcon';
 import { TourLauncher, useAppTour, WelcomeBanner } from '@/components/TourLauncher';
+import { AppTour } from '@/components/AppTour';
+import { RecipeManager } from '@/components/RecipeManager';
+import { UserFoodSuggestions } from '@/components/UserFoodSuggestions';
+import { getFeatureAllowance } from '@/lib/usageLimits';
 import { apiRequest } from '@/lib/queryClient';
 const logoImage = '/BWN_Logo.png';
 import { 
@@ -148,7 +152,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const [showProfileCompletion, setShowProfileCompletion] = useState(false);
   
   // App tour state
-  const { shouldShowTour, dismissTour } = useAppTour();
+  const { shouldShowTour, dismissTour, startTour } = useAppTour();
   const [showWelcomeBanner, setShowWelcomeBanner] = useState(() => shouldShowTour());
   
   // Nutrition aggregation state
@@ -1201,7 +1205,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         </div>
         
         {/* Clean Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 text-white opacity-100">
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 text-white opacity-100 pointer-events-none">
           <div className="flex flex-col items-center gap-2">
             <div className="w-px h-8 bg-gradient-to-b from-transparent to-white opacity-70" />
             <ChevronRight className="w-6 h-6 rotate-90 drop-shadow-lg opacity-80" />
@@ -1314,35 +1318,17 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         
         if (response.ok) {
           const result = await response.json();
-          const formattedHistory = result.data.map((item: any) => ({
+          const formattedHistory = (result.data || []).map((item: any) => ({
             date: new Date(item.date).toISOString().split('T')[0],
             glasses: item.glasses
           }));
           setWaterHistory(formattedHistory);
         } else {
-          // If no data available, generate some sample data for demonstration
-          const sampleHistory = Array.from({ length: 30 }, (_, i) => {
-            const date = new Date();
-            date.setDate(date.getDate() - (29 - i));
-            return {
-              date: date.toISOString().split('T')[0],
-              glasses: Math.floor(Math.random() * 7) + 1 // Random 1-8 glasses
-            };
-          });
-          setWaterHistory(sampleHistory);
+          setWaterHistory([]);
         }
       } catch (error) {
         console.error('Failed to fetch water history:', error);
-        // If error, generate some sample data for demonstration
-        const sampleHistory = Array.from({ length: 30 }, (_, i) => {
-          const date = new Date();
-          date.setDate(date.getDate() - (29 - i));
-          return {
-            date: date.toISOString().split('T')[0],
-            glasses: Math.floor(Math.random() * 7) + 1 // Random 1-8 glasses
-          };
-        });
-        setWaterHistory(sampleHistory);
+        setWaterHistory([]);
       } finally {
         setIsLoadingHistory(false);
       }
@@ -1350,10 +1336,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
     // Fetch history when component mounts or when history is shown
     useEffect(() => {
-      if (showHistory && waterHistory.length === 0) {
+      if (showHistory) {
         fetchWaterHistory();
       }
-    }, [showHistory, waterHistory.length, fetchWaterHistory]);
+    }, [showHistory]);
     
     return (
       <Card className={`bg-gradient-to-br from-amber-100 to-cyan-100 border-none p-6 transition-all duration-300 hover:from-amber-100 hover:to-cyan-200 shadow-lg hover:shadow-xl`} data-testid="water-card">
@@ -1681,7 +1667,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 <button
                   onClick={() => {
                     setShowWelcomeBanner(false);
-                    // Future tour functionality
+                    startTour();
                   }}
                   className="px-4 py-2 bg-amber-400 text-gray-900 rounded-lg text-sm font-medium hover:bg-amber-500 transition-colors"
                 >
@@ -2538,6 +2524,14 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             )}
           </div>
         </div>
+        <UserFoodSuggestions
+          className="mb-6"
+          onSelectFood={(food) => {
+            setSearchQuery(food.name);
+            handleTabChange('nutrition');
+            setNutritionMode('calculator');
+          }}
+        />
         {/* Daily Header */}
         <div className="flex space-x-4 mb-6">
           <div className="bg-orange-500 text-white font-semibold px-6 py-3 rounded-xl shadow-lg border border-orange-400/50 flex items-center" data-testid="text-current-date">
@@ -2728,7 +2722,26 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
           <div className="main-content">
             {nutritionMode === 'ai' ? (
-              <AIFoodAnalyzer />
+              !user ? (
+                <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200 p-8 text-center">
+                  <Sparkles className="w-10 h-10 mx-auto mb-3 text-amber-600" />
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Sign in for AI Photo Analysis</h3>
+                  <p className="text-sm text-gray-700 mb-4">
+                    Photo analysis requires an account. Free users get 10 analyses each month.
+                  </p>
+                  <Button onClick={() => handleTabChange('profile')} className="bg-amber-600 hover:bg-amber-700 text-white">
+                    Sign In
+                  </Button>
+                </Card>
+              ) : getFeatureAllowance('ai', isPremium, (user as any)?.id).allowed ? (
+                <AIFoodAnalyzer />
+              ) : (
+                <PremiumFeatureGate
+                  feature="premium"
+                  featureName="Unlimited AI Food Analysis"
+                  description="You've used this month's 10 free photo analyses. Upgrade for unlimited AI logging."
+                />
+              )
             ) : (
               <CalorieCalculator 
                 onNavigate={onNavigate}
@@ -3167,6 +3180,31 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 </AccordionContent>
               </Card>
             </AccordionItem>
+
+            {/* Recipe Library */}
+            <AccordionItem value="recipes" className="border-none">
+              <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 overflow-hidden rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:from-amber-100 hover:to-amber-200 hover:border-amber-300/50">
+                <AccordionTrigger className="px-6 py-6 hover:bg-amber-200/30 hover:no-underline [&[data-state=open]>div]:text-[#faed39] [&[data-state=open]]:bg-amber-200/30">
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center space-x-3">
+                      <Utensils className="w-6 h-6 text-[#faed39]" />
+                      <div>
+                        <h3 className="text-xl font-semibold transition-colors" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                          Recipes
+                        </h3>
+                        <p className="text-sm text-gray-700" style={{ fontFamily: "'Work Sans', sans-serif" }}>
+                          Save meals and log them in one tap
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </AccordionTrigger>
+                
+                <AccordionContent className="px-6 pb-6 pt-0">
+                  <RecipeManager />
+                </AccordionContent>
+              </Card>
+            </AccordionItem>
             
             {/* Data Management Card */}
             <AccordionItem value="data" className="border-none">
@@ -3486,7 +3524,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       
 
       
-      {/* Toast Notifications */}
+      <AppTour />
       <Toaster />
     </div>
   );
