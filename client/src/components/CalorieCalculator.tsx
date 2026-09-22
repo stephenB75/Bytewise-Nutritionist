@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { Card } from '@/components/ui/card';
 import { useCheckAchievements } from '@/hooks/useAchievements';
+import { useAuth } from '@/hooks/useAuth';
 import { logMeal } from '@/lib/mealsApi';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -132,6 +133,19 @@ function CalorieCalculator({
 
   // Achievement system hook
   const checkAchievements = useCheckAchievements();
+  const { user } = useAuth();
+
+  const promptGuestToCreateAccount = () => {
+    window.dispatchEvent(
+      new CustomEvent('show-toast', {
+        detail: {
+          message: 'Create an account on Profile to save meals from the tracker.',
+          type: 'info',
+        },
+      })
+    );
+    window.dispatchEvent(new CustomEvent('guest-save-prompt'));
+  };
 
   // Search ingredients as user types
   useEffect(() => {
@@ -267,6 +281,11 @@ function CalorieCalculator({
   };
 
   const logToWeeklyTracker = async (analysis: IngredientAnalysis) => {
+    if (!user) {
+      promptGuestToCreateAccount();
+      return;
+    }
+
     const now = new Date(); // Use actual current date
     const mealType = getMealTypeByTime(now);
 
@@ -358,8 +377,6 @@ function CalorieCalculator({
     window.dispatchEvent(new CustomEvent('calories-logged', { detail: mealData }));
     window.dispatchEvent(new CustomEvent('meal-logged-success', { detail: mealData }));
     window.dispatchEvent(new CustomEvent('refresh-weekly-data'));
-    window.dispatchEvent(new CustomEvent('guest-save-prompt', { detail: mealData }));
-    
     // Show success animation
     setLoggedData({
       name: mealData.name,
@@ -417,6 +434,11 @@ function CalorieCalculator({
                 const now = new Date(); // Use actual current date
                 const mealType = getMealTypeByTime(now);
                 
+                if (!user) {
+                  promptGuestToCreateAccount();
+                  return;
+                }
+
                 const mealData: LoggedMealData = {
                   id: `relogged-${Date.now()}`,
                   name: food.name,
@@ -606,7 +628,7 @@ function CalorieCalculator({
       <Card className="p-6 bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-sm border-amber-200/40 shadow-lg">
         <h3 className="text-lg font-bold text-gray-900 mb-4">How to Use</h3>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4">
           <div className="space-y-3">
             <h4 className="font-medium text-gray-700">Food Entry</h4>
             <div className="space-y-2 text-sm text-gray-600">
@@ -650,7 +672,11 @@ function CalorieCalculator({
               </label>
               <FoodSearchWithHistory
                 onSelectFood={async (food) => {
-                  // For historical meals, we can directly log them
+                  if (!user) {
+                    promptGuestToCreateAccount();
+                    return;
+                  }
+
                   const now = new Date(); // Use actual current date
                   const mealType = getMealTypeByTime(now);
                   
@@ -695,7 +721,6 @@ function CalorieCalculator({
                     // Dispatch events for other components
                     window.dispatchEvent(new CustomEvent('calories-logged'));
                     window.dispatchEvent(new CustomEvent('meals-updated'));
-                    window.dispatchEvent(new CustomEvent('guest-save-prompt', { detail: mealData }));
                     
                     // Check achievements
                     checkAchievements.mutate();

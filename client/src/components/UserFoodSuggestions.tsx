@@ -35,11 +35,17 @@ interface UserFood {
 interface UserFoodSuggestionsProps {
   onSelectFood: (food: UserFood) => void;
   className?: string;
+  /** When provided, suggestions come from app state (e.g. API) instead of localStorage only */
+  meals?: UserFood[];
 }
+
+const formatMacro = (value: number) =>
+  Number.isFinite(value) ? (Math.round(value * 10) / 10).toFixed(1) : '0';
 
 export function UserFoodSuggestions({
   onSelectFood,
-  className = ""
+  className = "",
+  meals,
 }: UserFoodSuggestionsProps) {
   const [userFoods, setUserFoods] = useState<UserFood[]>([]);
 
@@ -47,7 +53,7 @@ export function UserFoodSuggestions({
   useEffect(() => {
     const loadUserFoods = () => {
       try {
-        const storedMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
+        const storedMeals = meals ?? JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
         
         // Filter to only user-entered foods (not from USDA database)
         const userEnteredFoods = storedMeals.filter((meal: UserFood) => 
@@ -79,7 +85,7 @@ export function UserFoodSuggestions({
       window.removeEventListener('meals-updated', handleRefresh);
       window.removeEventListener('calories-logged', handleRefresh);
     };
-  }, []);
+  }, [meals]);
 
   // Get unique foods and popular items
   const { uniqueFoods, popularFoods } = useMemo(() => {
@@ -175,9 +181,9 @@ export function UserFoodSuggestions({
                         <Utensils className="h-3 w-3" />
                         {food.calories} cal
                       </span>
-                      <span>P: {food.protein}g</span>
-                      <span>C: {food.carbs}g</span>
-                      <span>F: {food.fat}g</span>
+                      <span>P: {formatMacro(food.protein)}g</span>
+                      <span>C: {formatMacro(food.carbs)}g</span>
+                      <span>F: {formatMacro(food.fat)}g</span>
                     </div>
                   </div>
                   <ChevronRight className="h-4 w-4 text-gray-700 group-hover:text-purple-600" />

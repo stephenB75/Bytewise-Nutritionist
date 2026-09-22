@@ -1350,6 +1350,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         showLogo={true}
       />
 
+      {!user && (
+        <div className="px-4 sm:px-6 py-2 text-center">
+          <GuestSaveHint onCreateAccount={() => handleTabChange('profile')} />
+        </div>
+      )}
+
       {/* Content Section - Completely Separate and Underneath */}
       <div className="px-4 sm:px-6 py-3 content-section">
         <div className="space-y-3">
@@ -1384,10 +1390,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 </button>
               </div>
             </div>
-          )}
-          
-          {!user && (
-            <GuestSaveHint onCreateAccount={() => handleTabChange('profile')} />
           )}
           <div data-testid="progress-section" className="flex flex-col gap-1 mb-3 sm:flex-row sm:items-center sm:justify-between">
             <h2 className="text-2xl sm:text-3xl font-semibold text-gray-900">Today's Progress</h2>
@@ -2176,6 +2178,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         </div>
         <UserFoodSuggestions
           className="mb-6"
+          meals={weeklyMeals}
           onSelectFood={(food) => {
             setSearchQuery(food.name);
             handleTabChange('nutrition');
@@ -2198,7 +2201,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <Badge className="bg-amber-800 text-amber-100 border border-amber-700">No meals logged</Badge>
             )}
           </div>
-          {loggedMeals.length === 0 ? (
+          {!searchQuery && loggedMeals.length === 0 ? (
             <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 p-6 text-center">
               <div className="text-gray-700">
                 <Calendar className="w-12 h-12 mx-auto mb-3 opacity-50" />
@@ -2212,11 +2215,24 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 </Button>
               </div>
             </Card>
-          ) : (
-            weeklyMeals.filter(meal => 
-              !searchQuery || 
+          ) : searchQuery && weeklyMeals.filter(meal =>
               meal.name.toLowerCase().includes(searchQuery.toLowerCase())
-            ).map((meal, index) => (
+            ).length === 0 ? (
+            <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 p-6 text-center">
+              <p className="text-gray-900">No meals match your search.</p>
+            </Card>
+          ) : (
+            (searchQuery ? weeklyMeals : loggedMeals)
+              .filter(meal =>
+                !searchQuery ||
+                meal.name.toLowerCase().includes(searchQuery.toLowerCase())
+              )
+              .sort((a, b) => {
+                const dateA = new Date(a.timestamp || `${a.date} ${a.time}`);
+                const dateB = new Date(b.timestamp || `${b.date} ${b.time}`);
+                return dateB.getTime() - dateA.getTime();
+              })
+              .map((meal, index) => (
             <Card key={`meal-${meal.id || meal.name}-${meal.timestamp || index}`} className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 p-4">
               <div className="flex items-center justify-between">
                 <div className="flex-1">
@@ -2259,10 +2275,50 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 </div>
               </div>
             </Card>
-          )))}
+              ))
+          )}
         </div>
 
+        {!searchQuery && (() => {
+          const todayKey = getLocalDateKey();
+          const recentMeals = weeklyMeals
+            .filter((meal) => {
+              const mealDateKey = meal.date?.includes('T') ? meal.date.split('T')[0] : meal.date;
+              return mealDateKey !== todayKey;
+            })
+            .sort((a, b) => {
+              const dateA = new Date(a.timestamp || `${a.date} ${a.time}`);
+              const dateB = new Date(b.timestamp || `${b.date} ${b.time}`);
+              return dateB.getTime() - dateA.getTime();
+            })
+            .slice(0, 25);
 
+          if (recentMeals.length === 0) return null;
+
+          return (
+            <div data-testid="recent-meal-history" className="space-y-4 mt-8">
+              <h3 className="text-xl font-bold text-gray-900">Recent Entries</h3>
+              {recentMeals.map((meal, index) => (
+                <Card key={`recent-${meal.id || meal.name}-${meal.timestamp || index}`} className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <h4 className="text-gray-900 font-semibold">{meal.name}</h4>
+                      <p className="text-gray-700 text-sm">
+                        {new Date(meal.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} • {meal.time} • {meal.mealType}
+                      </p>
+                      <div className="flex flex-wrap gap-3 mt-1">
+                        <span className="text-orange-600 font-bold">{Math.round(meal.calories || 0)} cal</span>
+                        <span className="text-xs text-green-700 font-medium">P: {(meal.protein || 0).toFixed(1)}g</span>
+                        <span className="text-xs text-orange-700 font-medium">C: {(meal.carbs || 0).toFixed(1)}g</span>
+                        <span className="text-xs text-purple-700 font-medium">F: {(meal.fat || 0).toFixed(1)}g</span>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          );
+        })()}
 
         {/* Weekly Calories Summary */}
         <div className="space-y-4 mt-8">
@@ -2935,7 +2991,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           <Button
             variant="ghost"
             size="icon"
-            className="app-notification-button group relative shrink-0 rounded-full border border-white/25 bg-black/25 text-white shadow-lg backdrop-blur-md transition-colors hover:bg-black/40 hover:text-white focus-visible:ring-white/40"
+            className="app-notification-button group relative shrink-0 bg-transparent text-white shadow-none hover:bg-transparent hover:text-white focus-visible:ring-white/30"
             onClick={() => setShowNotificationDropdown(!showNotificationDropdown)}
             aria-label={`Notifications${notifications.filter(n => !n.read).length > 0 ? ` - ${notifications.filter(n => !n.read).length} unread` : ''}`}
             aria-expanded={showNotificationDropdown}
@@ -2943,9 +2999,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             data-testid="button-notifications"
           >
             {notifications.filter(n => !n.read).length > 0 ? (
-              <BellRing className="h-5 w-5 transition-transform duration-200 group-hover:rotate-12" strokeWidth={2.25} aria-hidden="true" />
+              <BellRing className="h-6 w-6 drop-shadow-md transition-transform duration-200 group-hover:rotate-12" strokeWidth={2.25} aria-hidden="true" />
             ) : (
-              <Bell className="h-5 w-5 transition-transform duration-200 group-hover:rotate-6" strokeWidth={2.25} aria-hidden="true" />
+              <Bell className="h-6 w-6 drop-shadow-md transition-transform duration-200 group-hover:rotate-6" strokeWidth={2.25} aria-hidden="true" />
             )}
 
             {notifications.filter(n => !n.read).length > 0 && (
