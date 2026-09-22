@@ -3392,9 +3392,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         isOpen={showSaveAccountPrompt}
         onCreateAccount={() => {
           sessionStorage.setItem('guest-save-prompt-dismissed', 'true');
+          sessionStorage.setItem('open-signup', 'true');
           setShowSaveAccountPrompt(false);
-          window.dispatchEvent(new CustomEvent('open-signup'));
           handleTabChange('profile');
+          window.setTimeout(() => {
+            window.dispatchEvent(new CustomEvent('open-signup'));
+          }, 50);
         }}
         onKeepLocal={() => {
           sessionStorage.setItem('guest-save-prompt-dismissed', 'true');

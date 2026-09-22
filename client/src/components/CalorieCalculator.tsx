@@ -358,6 +358,7 @@ function CalorieCalculator({
     window.dispatchEvent(new CustomEvent('calories-logged', { detail: mealData }));
     window.dispatchEvent(new CustomEvent('meal-logged-success', { detail: mealData }));
     window.dispatchEvent(new CustomEvent('refresh-weekly-data'));
+    window.dispatchEvent(new CustomEvent('guest-save-prompt', { detail: mealData }));
     
     // Show success animation
     setLoggedData({
@@ -694,6 +695,7 @@ function CalorieCalculator({
                     // Dispatch events for other components
                     window.dispatchEvent(new CustomEvent('calories-logged'));
                     window.dispatchEvent(new CustomEvent('meals-updated'));
+                    window.dispatchEvent(new CustomEvent('guest-save-prompt', { detail: mealData }));
                     
                     // Check achievements
                     checkAchievements.mutate();

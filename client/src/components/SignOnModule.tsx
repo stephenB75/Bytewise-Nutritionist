@@ -29,7 +29,7 @@ interface SignOnModuleProps {
 }
 
 export function SignOnModule({ onClose }: SignOnModuleProps) {
-  const [isSignUp, setIsSignUp] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(() => sessionStorage.getItem('open-signup') === 'true');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -44,9 +44,15 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
   const { notification, showNotification, closeNotification } = useAuthPopupNotification();
 
   React.useEffect(() => {
+    if (sessionStorage.getItem('open-signup') === 'true') {
+      setIsSignUp(true);
+      setShowResetPassword(false);
+      sessionStorage.removeItem('open-signup');
+    }
     const openSignup = () => {
       setShowResetPassword(false);
       setIsSignUp(true);
+      sessionStorage.removeItem('open-signup');
     };
     window.addEventListener('open-signup', openSignup);
     return () => window.removeEventListener('open-signup', openSignup);
