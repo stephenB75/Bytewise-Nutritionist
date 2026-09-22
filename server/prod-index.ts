@@ -140,8 +140,9 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   // Other ports are firewalled. Default to 5000 if not specified.
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
+  const { getListenHost } = await import("./listenHost");
   const port = parseInt(process.env.PORT || '5000', 10);
-  const host = process.env.HOST || "0.0.0.0";
+  const host = getListenHost();
   
   server.listen(port, host, () => {
     const appUrl = isProduction 

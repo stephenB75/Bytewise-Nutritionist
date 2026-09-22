@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import path from "path";
 import { registerRoutes } from "./routes";
+import { getListenHost } from "./listenHost";
 
 // Simple logging function
 function log(message: string) {
@@ -172,8 +173,7 @@ app.use((req, res, next) => {
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
   const port = parseInt(process.env.PORT || '5000', 10);
-  // Railway healthchecks use IPv4. Binding only to :: makes the proxy return 502.
-  const host = process.env.HOST === "::" || !process.env.HOST ? "0.0.0.0" : process.env.HOST;
+  const host = getListenHost();
 
   server.on("error", (err: NodeJS.ErrnoException) => {
     console.error("Listen error:", err);

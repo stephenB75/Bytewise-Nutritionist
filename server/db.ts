@@ -1,7 +1,11 @@
+import dns from 'node:dns';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import * as schema from "@shared/schema";
 import { getDatabaseUrl, isDatabaseConfigured } from './env';
+
+// Railway/containers often lack IPv6 egress; Supabase direct host prefers AAAA records.
+dns.setDefaultResultOrder('ipv4first');
 
 export { isDatabaseConfigured };
 
@@ -13,6 +17,11 @@ if (!databaseUrl) {
   );
 } else {
   console.log('✅ Using database connection:', databaseUrl.replace(/:([^@]+)@/, ':***@'));
+  if (/db\.[^/]+\.supabase\.co:5432/.test(databaseUrl)) {
+    console.warn(
+      '⚠️ Direct Supabase DB (:5432) may use IPv6 and fail on Railway. Use Session pooler :6543 (postgres.PROJECT_REF@aws-0-REGION.pooler.supabase.com).'
+    );
+  }
 }
 
 function createPool(): Pool | null {
