@@ -2,6 +2,8 @@
  * Client configuration. Secrets come from Vite env vars only.
  */
 
+import { getApiOrigin } from './apiUrl';
+
 const isDev = typeof window !== 'undefined' &&
   (window.location.hostname === 'localhost' ||
    window.location.port === '5000');
@@ -33,9 +35,7 @@ export const config = {
   isGitHubPages,
   apiMode: isGitHubPages ? 'direct' : 'proxy',
   baseUrl: isGitHubPages ? '/Bytewise-Nutritionist' : '',
-  apiBaseUrl: typeof window === 'undefined'
-    ? '/api'
-    : `${window.location.protocol}//${window.location.host}/api`,
+  apiBaseUrl: typeof window === 'undefined' ? '/api' : `${getApiOrigin()}/api`,
   supabase: {
     url: supabaseUrl,
     anonKey: supabaseAnonKey,

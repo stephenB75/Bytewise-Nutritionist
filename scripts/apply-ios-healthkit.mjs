@@ -10,7 +10,8 @@ const pbxprojPath = join(root, 'ios/App/App.xcodeproj/project.pbxproj');
 
 const shareKey = 'NSHealthShareUsageDescription';
 const updateKey = 'NSHealthUpdateUsageDescription';
-const shareText = 'ByteWise reads water and nutrition from Apple Health so your daily totals stay complete.';
+const shareText =
+  'ByteWise reads Activity (steps, move, exercise) and nutrition from Apple Health so your dashboard stays complete.';
 const updateText = 'ByteWise writes meals and water you log so they appear in the Apple Health app.';
 
 if (!existsSync(plistPath)) {

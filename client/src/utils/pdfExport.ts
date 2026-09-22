@@ -8,6 +8,7 @@
 
 import { jsPDF } from 'jspdf';
 import { apiRequest } from '@/lib/queryClient';
+import { apiFetch } from '@/lib/apiUrl';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 
 // Register Chart.js components
@@ -407,7 +408,7 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     
     try {
       // Fetch meals data - using credentials for session-based auth
-      const mealsResponse = await fetch('/api/meals/logged', {
+      const mealsResponse = await apiFetch('/api/meals/logged', {
         credentials: 'include'
       });
       if (mealsResponse.ok) {
@@ -419,7 +420,7 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     
     try {
       // Fetch achievements data
-      const achievementsResponse = await fetch('/api/achievements', {
+      const achievementsResponse = await apiFetch('/api/achievements', {
         credentials: 'include'
       });
       if (achievementsResponse.ok) {
@@ -432,7 +433,7 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     
     try {
       // Fetch fasting data
-      const fastingResponse = await fetch('/api/fasting/history', {
+      const fastingResponse = await apiFetch('/api/fasting/history', {
         credentials: 'include'
       });
       if (fastingResponse.ok) {
@@ -445,7 +446,7 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     
     try {
       // Fetch water data
-      const waterResponse = await fetch('/api/water-history?days=90', {
+      const waterResponse = await apiFetch('/api/water-history?days=90', {
         credentials: 'include'
       });
       if (waterResponse.ok) {
@@ -457,7 +458,7 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     
     try {
       // Fetch user profile
-      const userResponse = await fetch('/api/auth/user', {
+      const userResponse = await apiFetch('/api/auth/user', {
         credentials: 'include'
       });
       if (userResponse.ok) {

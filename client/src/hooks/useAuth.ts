@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from '@/lib/supabase';
+import { apiFetch } from '@/lib/apiUrl';
 
 export function useAuth() {
   // Always call useEffect first to maintain hook order
@@ -65,7 +66,7 @@ export function useAuth() {
         } : null;
         
         // Use the token to get user data from our backend
-        const response = await fetch('/api/auth/user', {
+        const response = await apiFetch('/api/auth/user', {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
           },
@@ -129,7 +130,7 @@ export function useAuth() {
       
       // Call backend signout endpoint
       try {
-        await fetch('/api/auth/signout', { method: 'POST' });
+        await apiFetch('/api/auth/signout', { method: 'POST' });
       } catch (fetchError) {
       }
       

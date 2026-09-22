@@ -260,7 +260,7 @@ export class HealthKitService {
 
       if (mealId) {
         synced.add(mealId);
-        localStorage.setItem(SYNCED_MEALS_KEY, JSON.stringify([...synced]));
+        localStorage.setItem(SYNCED_MEALS_KEY, JSON.stringify(Array.from(synced)));
       }
       return true;
     } catch (error) {

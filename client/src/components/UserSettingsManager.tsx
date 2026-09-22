@@ -41,6 +41,7 @@ import {
 import { SessionStatus } from './SessionStatus';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
+import { apiFetch } from '@/lib/apiUrl';
 
 // Type definitions for photo management
 interface UserPhoto {
@@ -265,7 +266,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
       }
       
       // Update user profile via backend API (database) instead of Supabase metadata
-      const response = await fetch('/api/user/profile', {
+      const response = await apiFetch('/api/user/profile', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -281,7 +282,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
       }
 
       // Update calorie goal separately via goals endpoint
-      const goalsResponse = await fetch('/api/user/goals', {
+      const goalsResponse = await apiFetch('/api/user/goals', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -467,7 +468,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
       
       // Call backend signout endpoint
       try {
-        await fetch('/api/auth/signout', { method: 'POST' });
+        await apiFetch('/api/auth/signout', { method: 'POST' });
         console.log('✅ Backend signout called');
       } catch (fetchError) {
         console.log('⚠️ Backend signout error:', fetchError);

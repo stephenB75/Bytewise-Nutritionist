@@ -27,6 +27,7 @@ import {
   Cloud
 } from 'lucide-react';
 import { AppleHealthIntegration } from '@/components/AppleHealthIntegration';
+import { apiFetch } from '@/lib/apiUrl';
 
 interface DataManagementPanelProps {
   onHealthDataSync?: (data: any) => void;
@@ -90,7 +91,7 @@ export function DataManagementPanel({ onHealthDataSync }: DataManagementPanelPro
   const handleDeleteAllData = async () => {
     if (confirm("Are you sure you want to delete all your data? This action cannot be undone.")) {
       try {
-        const response = await fetch('/api/user/delete-data', {
+        const response = await apiFetch('/api/user/delete-data', {
           method: 'DELETE',
         });
         

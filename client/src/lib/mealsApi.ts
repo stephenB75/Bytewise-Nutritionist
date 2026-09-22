@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import { apiRequest } from '@/lib/queryClient';
 import { clearGuestNutritionStorage } from '@/lib/guestStorage';
+import { apiFetch } from '@/lib/apiUrl';
 
 export type LogMealInput = {
   name: string;
@@ -325,7 +326,7 @@ export async function calculateFood(body: {
   serving?: string;
   measurement?: string;
 }) {
-  const response = await fetch('/api/foods/calculate', {
+  const response = await apiFetch('/api/foods/calculate', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),

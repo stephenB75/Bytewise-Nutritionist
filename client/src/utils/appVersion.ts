@@ -3,6 +3,8 @@
  * Handles version checking, updates, and changelog display
  */
 
+import { apiFetch } from '@/lib/apiUrl';
+
 export interface AppVersion {
   version: string;
   buildDate: string;
@@ -31,7 +33,7 @@ export const getCurrentVersion = (): AppVersion => ({
 export const checkForUpdates = async (): Promise<AppVersion | null> => {
   try {
     // Simulate API call to check for updates
-    const response = await fetch('/api/version/check', {
+    const response = await apiFetch('/api/version/check', {
       method: 'GET',
       credentials: 'include'
     });

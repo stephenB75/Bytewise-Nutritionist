@@ -1,8 +1,11 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
+import { initNativeApp } from "./capacitor/initNativeApp";
 
 import "./index.css";
+
+void initNativeApp();
 
 // Production ready ByteWise Nutrition Tracker
 

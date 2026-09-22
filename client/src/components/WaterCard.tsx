@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronUp, Droplets, Minus, Plus } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { getLocalDateKey } from '@/utils/dateUtils';
+import { apiFetch } from '@/lib/apiUrl';
 
 const WATER_HISTORY_KEY = 'waterHistoryByDate';
 const DAILY_GOAL = 8;
@@ -104,7 +105,7 @@ async function fetchWaterHistoryFromApi(token: string): Promise<WaterDay[]> {
   const timeout = window.setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
   try {
-    const response = await fetch(`/api/water-history?days=${HISTORY_DAYS}`, {
+    const response = await apiFetch(`/api/water-history?days=${HISTORY_DAYS}`, {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,

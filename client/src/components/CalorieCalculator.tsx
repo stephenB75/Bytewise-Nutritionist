@@ -37,6 +37,7 @@ import {
 } from 'lucide-react';
 import { FoodSearchWithHistory } from '@/components/FoodSearchWithHistory';
 import { UserFoodSuggestions } from '@/components/UserFoodSuggestions';
+import { apiFetch } from '@/lib/apiUrl';
 
 
 interface IngredientAnalysis {
@@ -172,7 +173,7 @@ function CalorieCalculator({
   // Calculate calories mutation
   const calculateCalories = useMutation({
     mutationFn: async ({ ingredient, measurement }: { ingredient: string; measurement: string }) => {
-      const response = await fetch('/api/foods/calculate', {
+      const response = await apiFetch('/api/foods/calculate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ingredients: ingredient, measurement }),

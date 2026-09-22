@@ -1,5 +1,6 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 import { supabase } from './supabase';
+import { resolveApiUrl } from './apiUrl';
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
@@ -56,7 +57,7 @@ export async function apiRequest(
     ...(data ? { "Content-Type": "application/json" } : {}),
   };
 
-  const res = await fetch(url, {
+  const res = await fetch(resolveApiUrl(url), {
     method,
     headers,
     body: data ? JSON.stringify(data) : undefined,
@@ -75,7 +76,7 @@ export const getQueryFn: <T>(options: {
   async ({ queryKey }) => {
     const authHeaders = await getAuthHeaders();
     const url = queryKey.join("/") as string;
-    const res = await fetch(url, {
+    const res = await fetch(resolveApiUrl(url), {
       headers: authHeaders,
       credentials: "include",
     });

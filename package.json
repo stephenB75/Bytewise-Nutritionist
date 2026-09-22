@@ -9,7 +9,10 @@
     "start": "NODE_ENV=production npx tsx server/index.ts",
     "check": "tsc",
     "db:push": "drizzle-kit push",
-    "cap:sync": "npx cap sync && node scripts/apply-ios-healthkit.mjs"
+    "cap:sync": "npx cap sync && node scripts/apply-ios-healthkit.mjs",
+    "ios:add": "npx cap add ios && node scripts/apply-ios-healthkit.mjs",
+    "ios:prepare": "node scripts/ios-prepare.mjs",
+    "ios:open": "npx cap open ios"
   },
   "dependencies": {
     "@capacitor/android": "^7.4.3",

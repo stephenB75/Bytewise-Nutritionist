@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { apiFetch } from '@/lib/apiUrl';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -327,7 +328,7 @@ const FastingTracker = React.memo(function FastingTracker() {
       queryClient.invalidateQueries({ queryKey: ['/api/fasting/active'] });
       
       // Check for new achievements after completing fast
-      fetch('/api/achievements/check', { method: 'POST' })
+      apiFetch('/api/achievements/check', { method: 'POST' })
         .then(res => res.json())
         .then(data => {
           if (data.newAchievements && data.newAchievements.length > 0) {
@@ -583,7 +584,7 @@ const FastingTracker = React.memo(function FastingTracker() {
     }));
 
     // Check for achievements
-    fetch('/api/achievements/check', { method: 'POST' })
+    apiFetch('/api/achievements/check', { method: 'POST' })
       .then(res => res.json())
       .then(data => {
         if (data.newAchievements && data.newAchievements.length > 0) {

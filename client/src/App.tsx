@@ -20,6 +20,7 @@ import { PWAUpdateNotification } from '@/components/PWAUpdateNotification';
 
 import { runDataMigration } from '@/utils/dataMigration';
 import { toast } from '@/hooks/use-toast';
+import { apiFetch } from '@/lib/apiUrl';
 import { Toaster } from '@/components/ui/toaster';
 
 function AppContent() {
@@ -94,7 +95,7 @@ function AppContent() {
       localStorage.removeItem('supabase.auth.token');
       
       // Call backend signout endpoint
-      await fetch('/api/auth/signout', { method: 'POST' });
+      await apiFetch('/api/auth/signout', { method: 'POST' });
       
       // Clear all app data
       localStorage.clear();
