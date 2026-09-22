@@ -53,7 +53,10 @@ export function UserFoodSuggestions({
   useEffect(() => {
     const loadUserFoods = () => {
       try {
-        const storedMeals = meals ?? JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
+        const storedMeals =
+          meals !== undefined
+            ? meals
+            : JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
         
         // Filter to only user-entered foods (not from USDA database)
         const userEnteredFoods = storedMeals.filter((meal: UserFood) => 

@@ -23,6 +23,14 @@ const SYNCED_WATER_KEY = 'appleHealthSyncedWater';
 const PENDING_KEY = 'pendingHealthKitSync';
 
 const WRITE_TYPES = ['dietaryWater', 'dietaryEnergyConsumed'] as const;
+const FITNESS_READ_TYPES = ['steps', 'calories', 'exerciseTime', 'distance'] as const;
+
+export type AppleFitnessSummary = {
+  steps: number;
+  activeCalories: number;
+  exerciseMinutes: number;
+  distanceMiles: number;
+};
 
 type HealthBridge = {
   isAvailable: () => Promise<{ available: boolean; platform?: string; reason?: string }>;
@@ -41,6 +49,12 @@ type HealthBridge = {
     startDate?: string;
     endDate?: string;
   }) => Promise<void>;
+  readSamples?: (options: {
+    dataType: string;
+    startDate?: string;
+    endDate?: string;
+    limit?: number;
+  }) => Promise<{ samples?: Array<{ value?: number; quantity?: number }> }>;
 };
 
 function isNativeIos() {
@@ -102,7 +116,7 @@ export class HealthKitService {
 
       if (this.isAvailable && this.isAuthorized) {
         const auth = await health.checkAuthorization({
-          read: [...WRITE_TYPES],
+          read: [...WRITE_TYPES, ...FITNESS_READ_TYPES],
           write: [...WRITE_TYPES],
         });
         this.isAuthorized = (auth.writeAuthorized || []).length > 0;
@@ -131,7 +145,7 @@ export class HealthKitService {
       }
 
       const status = await health.requestAuthorization({
-        read: [...WRITE_TYPES],
+        read: [...WRITE_TYPES, ...FITNESS_READ_TYPES],
         write: [...WRITE_TYPES],
       });
       const deniedAll = WRITE_TYPES.every((type) => (status.writeDenied || []).includes(type));
@@ -271,6 +285,61 @@ export class HealthKitService {
 
   async readNutritionData(_date?: Date): Promise<HealthData | null> {
     return null;
+  }
+
+  private async sumSamplesForDay(dataType: string, date: Date = new Date()): Promise<number> {
+    await this.ready;
+    if (!this.isAvailable || !this.isAuthorized) {
+      return 0;
+    }
+
+    const health = await getHealth();
+    if (!health?.readSamples) {
+      return 0;
+    }
+
+    const start = new Date(date);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(date);
+    end.setHours(23, 59, 59, 999);
+
+    try {
+      const { samples } = await health.readSamples({
+        dataType,
+        startDate: start.toISOString(),
+        endDate: end.toISOString(),
+        limit: 500,
+      });
+
+      return (samples || []).reduce(
+        (sum, sample) => sum + toNumber(sample.value ?? sample.quantity),
+        0
+      );
+    } catch (error) {
+      console.warn(`Failed to read ${dataType} from Apple Health:`, error);
+      return 0;
+    }
+  }
+
+  async readTodayFitnessSummary(): Promise<AppleFitnessSummary | null> {
+    await this.ready;
+    if (!this.isAvailable || !this.isAuthorized) {
+      return null;
+    }
+
+    const [steps, activeCalories, exerciseMinutes, distanceMeters] = await Promise.all([
+      this.sumSamplesForDay('steps'),
+      this.sumSamplesForDay('calories'),
+      this.sumSamplesForDay('exerciseTime'),
+      this.sumSamplesForDay('distance'),
+    ]);
+
+    return {
+      steps: Math.round(steps),
+      activeCalories: Math.round(activeCalories),
+      exerciseMinutes: Math.round(exerciseMinutes),
+      distanceMiles: Math.round((distanceMeters / 1609.34) * 10) / 10,
+    };
   }
 
   getAvailability(): boolean {

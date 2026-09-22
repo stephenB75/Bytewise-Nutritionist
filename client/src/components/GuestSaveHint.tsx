@@ -3,13 +3,14 @@ import React from 'react';
 type GuestSaveHintProps = {
   onCreateAccount: () => void;
   variant?: 'dashboard' | 'journal';
+  className?: string;
 };
 
-export function GuestSaveHint({ onCreateAccount, variant = 'dashboard' }: GuestSaveHintProps) {
+export function GuestSaveHint({ onCreateAccount, variant = 'dashboard', className = '' }: GuestSaveHintProps) {
   if (variant === 'journal') {
     return (
-      <p className="mb-4 text-sm leading-relaxed text-gray-800/90">
-        Entries on this device stay here until you{' '}
+      <p className={`mb-4 text-sm leading-relaxed text-gray-900 ${className}`}>
+        Meal history is saved to your account only.{' '}
         <button
           type="button"
           onClick={onCreateAccount}
@@ -24,8 +25,8 @@ export function GuestSaveHint({ onCreateAccount, variant = 'dashboard' }: GuestS
   }
 
   return (
-    <p className="text-sm leading-relaxed text-gray-800/90">
-      You can track meals now.{' '}
+    <p className={`text-sm leading-relaxed text-gray-900 ${className}`}>
+      Explore the app—{' '}
       <button
         type="button"
         onClick={onCreateAccount}

@@ -44,9 +44,10 @@ export function AppleHealthIntegration({ onHealthDataSync }: AppleHealthIntegrat
       if (success) {
         setIsConnected(true);
         setAutoSync(localStorage.getItem('appleHealthAutoSync') === 'true');
+        window.dispatchEvent(new CustomEvent('apple-health-changed'));
         toast({
           title: 'Apple Health Connected',
-          description: 'Meals and water you log will appear in Apple Health.',
+          description: 'Your Activity data can display on Home, and meals and water write to Apple Health.',
           duration: 3000,
         });
         if (onHealthDataSync) {
@@ -78,6 +79,7 @@ export function AppleHealthIntegration({ onHealthDataSync }: AppleHealthIntegrat
       await healthKitService.disconnect();
       setIsConnected(false);
       setAutoSync(false);
+      window.dispatchEvent(new CustomEvent('apple-health-changed'));
 
       toast({
         title: 'Apple Health Disconnected',

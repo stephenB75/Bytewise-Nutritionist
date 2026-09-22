@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import { apiRequest } from '@/lib/queryClient';
+import { clearGuestNutritionStorage } from '@/lib/guestStorage';
 
 export type LogMealInput = {
   name: string;
@@ -111,7 +112,7 @@ async function getSessionUser() {
 
 function readGuestMeals(): LoggedMeal[] {
   try {
-    const raw = localStorage.getItem(GUEST_MEALS_KEY) || localStorage.getItem('weeklyMeals') || '[]';
+    const raw = localStorage.getItem(GUEST_MEALS_KEY) || '[]';
     const parsed = JSON.parse(raw);
     return (Array.isArray(parsed) ? parsed : []).map((row) => mapMeal(row as Record<string, unknown>));
   } catch {
@@ -121,7 +122,6 @@ function readGuestMeals(): LoggedMeal[] {
 
 function writeGuestMeals(meals: LoggedMeal[]) {
   localStorage.setItem(GUEST_MEALS_KEY, JSON.stringify(meals));
-  localStorage.setItem('weeklyMeals', JSON.stringify(meals));
 }
 
 export async function ensureUserProfile(): Promise<string | null> {
@@ -188,7 +188,8 @@ export async function saveUserProfile(profile: {
 export async function listLoggedMeals(): Promise<LoggedMeal[]> {
   const user = await getSessionUserOrNull();
   if (!user) {
-    return readGuestMeals();
+    clearGuestNutritionStorage();
+    return [];
   }
 
   try {
@@ -196,7 +197,7 @@ export async function listLoggedMeals(): Promise<LoggedMeal[]> {
     const data = await response.json();
     return (Array.isArray(data) ? data : []).map((row) => mapMeal(row as Record<string, unknown>));
   } catch {
-    return readGuestMeals();
+    return [];
   }
 }
 
@@ -227,13 +228,9 @@ export async function logMeal(input: LogMealInput): Promise<LoggedMeal> {
   };
 
   if (!user) {
-    const meals = readGuestMeals();
-    meals.unshift(localMeal);
-    writeGuestMeals(meals);
-    window.dispatchEvent(new CustomEvent('reload-meal-data', { detail: localMeal }));
-    window.dispatchEvent(new CustomEvent('calories-logged', { detail: localMeal }));
-    window.dispatchEvent(new CustomEvent('guest-save-prompt', { detail: localMeal }));
-    return localMeal;
+    clearGuestNutritionStorage();
+    window.dispatchEvent(new CustomEvent('guest-save-prompt'));
+    throw new Error('Sign in to save food to your account');
   }
 
   await ensureUserProfile();

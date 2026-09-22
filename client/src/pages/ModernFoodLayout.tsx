@@ -72,6 +72,8 @@ import { supabase } from '@/lib/supabase';
 import { deleteLoggedMeal, listLoggedMeals, saveUserProfile } from '@/lib/mealsApi';
 import { clearProfileCompletionPrompt, resendVerificationEmail, resetPasswordForEmail, shouldShowProfileCompletion, signInWithEmail, signUpWithEmail } from '@/lib/authActions';
 import { getWeekDates, getLocalDateKey, getMealTypeByTime, formatLocalTime } from '@/utils/dateUtils';
+import { clearGuestNutritionStorage } from '@/lib/guestStorage';
+import { AppleFitnessCard } from '@/components/AppleFitnessCard';
 import { fixMealDateMismatches } from '@/utils/mealDateFixer';
 import { getCachedLocalStorage, debounce } from '@/utils/performanceUtils';
 import { useLocation } from 'wouter';
@@ -827,10 +829,30 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     };
   }, [user, shouldShowTour]);
 
+  // Signed-out users must not keep or display persisted meal data on this device
+  useEffect(() => {
+    if (user) {
+      return;
+    }
+    clearGuestNutritionStorage();
+    setLoggedMeals([]);
+    setWeeklyMeals([]);
+    setDailyCalories(0);
+    setWeeklyCalories(0);
+  }, [user]);
+
   // Load existing meal data and set up tracking
   useEffect(() => {
     // Load existing meal data on component mount - Database-first approach
     const loadExistingData = async () => {
+      if (!user) {
+        clearGuestNutritionStorage();
+        setLoggedMeals([]);
+        setWeeklyMeals([]);
+        setDailyCalories(0);
+        return;
+      }
+
       try {
         let stored: any[] = [];
         
@@ -1350,15 +1372,14 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         showLogo={true}
       />
 
-      {!user && (
-        <div className="px-4 sm:px-6 py-2 text-center">
-          <GuestSaveHint onCreateAccount={() => handleTabChange('profile')} />
-        </div>
-      )}
-
       {/* Content Section - Completely Separate and Underneath */}
       <div className="px-4 sm:px-6 py-3 content-section">
         <div className="space-y-3">
+          {!user && (
+            <div className="guest-hint-banner rounded-xl border border-amber-300/50 bg-amber-100/95 px-4 py-2.5 text-center shadow-sm">
+              <GuestSaveHint onCreateAccount={() => handleTabChange('profile')} />
+            </div>
+          )}
           {/* Welcome Banner for Tour */}
           {user && showWelcomeBanner && (
             <div className="mb-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg">
@@ -1433,6 +1454,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           {/* Fasting Status */}
           <div className="mb-4">
             <FastingStatusCard fastingStatus={fastingStatus || dailyStats?.fastingStatus} />
+          </div>
+
+          <div className="mb-4">
+            <AppleFitnessCard onConnect={() => handleTabChange('profile')} />
           </div>
 
           {/* Water Consumption */}
@@ -2178,7 +2203,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         </div>
         <UserFoodSuggestions
           className="mb-6"
-          meals={weeklyMeals}
+          meals={user ? weeklyMeals : []}
           onSelectFood={(food) => {
             setSearchQuery(food.name);
             handleTabChange('nutrition');

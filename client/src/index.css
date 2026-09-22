@@ -470,6 +470,11 @@ button:not([class*="bg-"]):hover:not(.guest-inline-link):not(.hero-component *):
   color: #374151; /* Medium gray text on hover - better for yellow background */
 }
 
+.guest-hint-banner,
+.guest-hint-banner p {
+  color: #111827 !important;
+}
+
 button.guest-inline-link,
 button[data-testid="guest-create-account-link"] {
   background: transparent !important;

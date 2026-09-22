@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { format, subDays, subWeeks, subMonths, isToday, isYesterday, differenceInDays } from 'date-fns';
 import { getLocalDateKey } from '@/utils/dateUtils';
+import { useAuth } from '@/hooks/useAuth';
 
 interface LoggedFood {
   id: string;
@@ -53,6 +54,7 @@ export function FoodSearchWithHistory({
   placeholder = "Search Meal's",
   className = ""
 }: FoodSearchWithHistoryProps) {
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [historicalMeals, setHistoricalMeals] = useState<LoggedFood[]>([]);
   const [showResults, setShowResults] = useState(false);
@@ -60,6 +62,11 @@ export function FoodSearchWithHistory({
   // Load historical meals from localStorage
   useEffect(() => {
     const loadHistoricalMeals = () => {
+      if (!user) {
+        setHistoricalMeals([]);
+        return;
+      }
+
       try {
         let storedMeals = [];
         try {
@@ -93,7 +100,7 @@ export function FoodSearchWithHistory({
       window.removeEventListener('meals-updated', handleRefresh);
       window.removeEventListener('calories-logged', handleRefresh);
     };
-  }, []);
+  }, [user]);
 
   // Filter meals based on search query only
   const filteredMeals = useMemo(() => {
