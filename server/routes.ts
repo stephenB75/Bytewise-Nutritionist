@@ -654,7 +654,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const { error } = await serverSupabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${process.env.VITE_APP_URL || process.env.APP_URL || 'https://www.bytewisenutritionist.com'}/reset-password`,
+        redirectTo: `${process.env.VITE_APP_URL || process.env.APP_URL || 'https://www.bytewisenutritionist.com'}/auth/confirm`,
       });
       
       if (error) {

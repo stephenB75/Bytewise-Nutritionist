@@ -24,7 +24,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { AuthPopupNotification, useAuthPopupNotification } from './AuthPopupNotification';
-import { resendVerificationEmail, signInWithEmail, signUpWithEmail } from '@/lib/authActions';
+import { resendVerificationEmail, resetPasswordForEmail, signInWithEmail, signUpWithEmail } from '@/lib/authActions';
 
 interface SignOnModuleProps {
   onClose?: () => void;
@@ -313,11 +313,10 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
     setLoading(true);
     
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      });
-
-      if (error) throw error;
+      const result = await resetPasswordForEmail(email);
+      if (!result.ok) {
+        throw new Error(result.message);
+      }
 
       setResetEmailSent(true);
       showNotification({

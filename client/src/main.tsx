@@ -2,9 +2,11 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import { initNativeApp } from "./capacitor/initNativeApp";
+import { routeAuthCallbackPath } from "./lib/authLinkParams";
 
 import "./index.css";
 
+routeAuthCallbackPath();
 void initNativeApp();
 
 // Production ready ByteWise Nutrition Tracker

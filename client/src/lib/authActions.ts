@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import { ensureUserProfile, syncGuestMeals } from '@/lib/mealsApi';
+import { getAuthRedirectUrl } from '@/lib/authRedirect';
 
 export type AuthCode =
   | 'VERIFICATION_REQUIRED'
@@ -79,7 +80,7 @@ export async function signUpWithEmail(email: string, password: string): Promise<
     email: normalized,
     password,
     options: {
-      emailRedirectTo: window.location.origin,
+      emailRedirectTo: getAuthRedirectUrl('/auth/confirm'),
     },
   });
 
@@ -136,7 +137,7 @@ export async function signInWithEmail(email: string, password: string): Promise<
 export async function resetPasswordForEmail(email: string): Promise<AuthActionResult> {
   const normalized = normalizeEmail(email);
   const { error } = await supabase.auth.resetPasswordForEmail(normalized, {
-    redirectTo: `${window.location.origin}/reset-password`,
+    redirectTo: getAuthRedirectUrl('/auth/confirm'),
   });
 
   if (error) {
