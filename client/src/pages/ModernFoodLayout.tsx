@@ -69,7 +69,7 @@ import { WeeklyCaloriesCard } from '@/components/WeeklyCaloriesCard';
 import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
-import { listLoggedMeals } from '@/lib/mealsApi';
+import { listLoggedMeals, saveUserProfile } from '@/lib/mealsApi';
 import { resendVerificationEmail, resetPasswordForEmail, signInWithEmail, signUpWithEmail } from '@/lib/authActions';
 import { getWeekDates, getLocalDateKey, getMealTypeByTime, formatLocalTime } from '@/utils/dateUtils';
 import { fixMealDateMismatches } from '@/utils/mealDateFixer';
@@ -381,11 +381,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       const userData = user as any;
       const hasFirstName = userData?.firstName && userData.firstName.trim() !== '';
       const hasLastName = userData?.lastName && userData.lastName.trim() !== '';
-      
-      // Show profile completion modal if user is missing required profile info
-      if (!hasFirstName || !hasLastName) {
-        // Profile incomplete - showing completion modal
+      const dismissed = localStorage.getItem('profile-completion-dismissed') === 'true';
+
+      if ((!hasFirstName || !hasLastName) && !dismissed) {
         setShowProfileCompletion(true);
+      } else {
+        setShowProfileCompletion(false);
       }
     }
   }, [user, authLoading]);
@@ -398,56 +399,16 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     profileIcon: number;
   }) => {
     try {
-      // Get the current access token (same logic as useAuth.ts)
-      let accessToken = null;
-      
-      // Check for locally stored custom tokens first
-      const storedSession = localStorage.getItem('supabase.auth.token');
-      if (storedSession) {
-        try {
-          const parsedSession = JSON.parse(storedSession);
-          if (parsedSession.access_token) {
-            accessToken = parsedSession.access_token;
-          }
-        } catch (parseError) {
-        }
-      }
-      
-      // If no custom token, check Supabase session
-      if (!accessToken) {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.access_token) {
-          accessToken = session.access_token;
-        }
-      }
-      
-      if (!accessToken) {
-        throw new Error('No authentication token available');
-      }
-
-      // Update user profile with required information and profile icon
-      const response = await fetch('/api/user/profile', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({
-          firstName: profileData.firstName,
-          lastName: profileData.lastName,
-          profileIcon: profileData.profileIcon
-        })
+      await saveUserProfile({
+        firstName: profileData.firstName,
+        lastName: profileData.lastName,
+        profileIcon: profileData.profileIcon,
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to update profile');
-      }
-
-      // Close the modal and refresh user data
+      localStorage.removeItem('profile-completion-dismissed');
       setShowProfileCompletion(false);
       await refetchUser();
     } catch (error) {
-      throw error; // Re-throw to let the modal handle the error
+      throw error;
     }
   };
 
@@ -3427,6 +3388,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       <ProfileCompletionModal
         isOpen={showProfileCompletion}
         onComplete={handleProfileCompletion}
+        onDismiss={() => {
+          localStorage.setItem('profile-completion-dismissed', 'true');
+          setShowProfileCompletion(false);
+        }}
       />
       
       {/* Tour Launcher - Fixed position, available on all pages */}

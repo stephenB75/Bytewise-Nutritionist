@@ -41,6 +41,7 @@ import {
   createMealViaSupabase,
   getUserMealsViaSupabase,
   getUserViaSupabase,
+  updateUserProfileViaSupabase,
   upsertUserViaSupabase,
 } from "./supabaseData";
 
@@ -291,7 +292,7 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async updateUserProfile(userId: string, profileData: {
+  private async updateUserProfileInDatabase(userId: string, profileData: {
     firstName?: string;
     lastName?: string;
     personalInfo?: any;
@@ -375,6 +376,21 @@ export class DatabaseStorage implements IStorage {
     });
     
     return user;
+  }
+
+  async updateUserProfile(userId: string, profileData: {
+    firstName?: string;
+    lastName?: string;
+    personalInfo?: any;
+    notificationSettings?: any;
+    privacySettings?: any;
+    profileIcon?: number;
+  }): Promise<User> {
+    try {
+      return await this.updateUserProfileInDatabase(userId, profileData);
+    } catch (error) {
+      return await updateUserProfileViaSupabase(userId, profileData) as any;
+    }
   }
 
   // Food operations

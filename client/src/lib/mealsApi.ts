@@ -125,6 +125,44 @@ export async function ensureUserProfile(): Promise<string | null> {
   return user.id;
 }
 
+export async function saveUserProfile(profile: {
+  firstName: string;
+  lastName: string;
+  profileIcon?: number;
+}) {
+  const user = await getSessionUser();
+
+  await supabase.auth.updateUser({
+    data: {
+      first_name: profile.firstName,
+      last_name: profile.lastName,
+      firstName: profile.firstName,
+      lastName: profile.lastName,
+    },
+  });
+
+  const { error } = await supabase.from('users').upsert({
+    id: user.id,
+    email: user.email,
+    first_name: profile.firstName,
+    last_name: profile.lastName,
+    profile_icon: profile.profileIcon || 1,
+    updated_at: new Date().toISOString(),
+  }, { onConflict: 'id' });
+
+  if (error) {
+    throw new Error(error.message || 'Failed to save profile');
+  }
+
+  try {
+    await apiRequest('PUT', '/api/user/profile', profile);
+  } catch {
+    // Express is optional; Supabase already has the name.
+  }
+
+  return { id: user.id, ...profile };
+}
+
 export async function listLoggedMeals(): Promise<LoggedMeal[]> {
   const response = await apiRequest('GET', '/api/meals/logged');
   const data = await response.json();

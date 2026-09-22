@@ -76,7 +76,24 @@ export function useAuth() {
         }
         
         const userData = await response.json();
-        return userData || sessionUser;
+        const merged = userData || sessionUser;
+        const missingName = !merged?.firstName || !merged?.lastName;
+        if (merged?.id && missingName) {
+          const { data: profile } = await supabase
+            .from('users')
+            .select('first_name, last_name, profile_icon')
+            .eq('id', merged.id)
+            .maybeSingle();
+          if (profile) {
+            return {
+              ...merged,
+              firstName: merged.firstName || profile.first_name,
+              lastName: merged.lastName || profile.last_name,
+              profileIcon: merged.profileIcon || profile.profile_icon,
+            };
+          }
+        }
+        return merged;
       } catch (error) {
         const { data: { session: fallbackSession } } = await supabase.auth.getSession();
         if (!fallbackSession?.user) {

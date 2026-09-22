@@ -20,9 +20,10 @@ interface ProfileCompletionModalProps {
     gender: 'male' | 'female';
     profileIcon: number;
   }) => void;
+  onDismiss?: () => void;
 }
 
-export function ProfileCompletionModal({ isOpen, onComplete }: ProfileCompletionModalProps) {
+export function ProfileCompletionModal({ isOpen, onComplete, onDismiss }: ProfileCompletionModalProps) {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -96,7 +97,7 @@ export function ProfileCompletionModal({ isOpen, onComplete }: ProfileCompletion
   const selectedIcon = formData.gender ? (formData.gender === 'female' ? 2 : 1) : 1;
 
   return (
-    <Dialog open={isOpen} onOpenChange={() => {}}>
+    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onDismiss?.(); }}>
       <DialogContent className="sm:max-w-md bg-gradient-to-br from-amber-50 to-amber-100">
         <DialogHeader className="text-center pb-4">
           <div className="flex justify-center mb-4">
@@ -215,7 +216,17 @@ export function ProfileCompletionModal({ isOpen, onComplete }: ProfileCompletion
           </Button>
         </form>
 
-        <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-4">
+        {onDismiss && (
+          <button
+            type="button"
+            onClick={onDismiss}
+            className="w-full text-sm text-gray-500 hover:text-gray-700 py-2"
+          >
+            Skip for now
+          </button>
+        )}
+
+        <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-2">
           * Required fields
         </p>
       </DialogContent>

@@ -54,6 +54,39 @@ export async function upsertUserViaSupabase(user: {
   };
 }
 
+export async function updateUserProfileViaSupabase(userId: string, profile: {
+  firstName?: string | null;
+  lastName?: string | null;
+  profileIcon?: number | null;
+}) {
+  const { data, error } = await supabaseAdmin
+    .from('users')
+    .upsert({
+      id: userId,
+      first_name: profile.firstName ?? null,
+      last_name: profile.lastName ?? null,
+      profile_icon: profile.profileIcon || 1,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'id' })
+    .select('*')
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return {
+    id: data.id,
+    email: data.email,
+    firstName: data.first_name,
+    lastName: data.last_name,
+    emailVerified: data.email_verified,
+    profileIcon: data.profile_icon,
+    createdAt: data.created_at,
+    updatedAt: data.updated_at,
+  };
+}
+
 export async function getUserViaSupabase(userId: string) {
   const { data, error } = await supabaseAdmin
     .from('users')
