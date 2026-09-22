@@ -9,6 +9,8 @@ export type AuthCode =
   | 'ACCOUNT_EXISTS'
   | 'INVALID_CREDENTIALS'
   | 'ACCOUNT_NOT_FOUND'
+  | 'SERVICE_ERROR'
+  | 'NETWORK_ERROR'
   | 'AUTH_ERROR';
 
 export type AuthActionResult =
@@ -20,9 +22,52 @@ function normalizeEmail(email: string): string {
   return email.trim().toLowerCase();
 }
 
+function isNetworkFailure(error: unknown): boolean {
+  if (error instanceof TypeError) return true;
+  const message = error instanceof Error ? error.message : String(error ?? '');
+  const lower = message.toLowerCase();
+  return (
+    lower.includes('failed to fetch') ||
+    lower.includes('networkerror') ||
+    lower.includes('load failed') ||
+    lower.includes('network request failed')
+  );
+}
+
+function mapApiErrorBody(body: { message?: string; code?: string }, email: string): AuthActionResult {
+  const message = body.message || 'Authentication failed. Please try again.';
+  switch (body.code) {
+    case 'EMAIL_NOT_VERIFIED':
+      return { ok: false, code: 'EMAIL_NOT_VERIFIED', message, email };
+    case 'INVALID_CREDENTIALS':
+      return { ok: false, code: 'INVALID_CREDENTIALS', message, email };
+    case 'ACCOUNT_NOT_FOUND':
+      return { ok: false, code: 'ACCOUNT_NOT_FOUND', message, email };
+    case 'SERVICE_ERROR':
+      return { ok: false, code: 'SERVICE_ERROR', message, email };
+    default:
+      return mapAuthError({ message, code: body.code }, email);
+  }
+}
+
 function mapAuthError(error: { message?: string; code?: string } | null, email: string): AuthActionResult {
   const message = error?.message || 'Authentication failed. Please try again.';
   const lower = message.toLowerCase();
+
+  if (
+    lower.includes('failed to fetch') ||
+    lower.includes('networkerror') ||
+    lower.includes('fetch failed') ||
+    lower.includes('connection')
+  ) {
+    return {
+      ok: false,
+      code: 'NETWORK_ERROR',
+      message:
+        'Could not reach the authentication service. Check your connection, then try again. If this continues, refresh the page.',
+      email,
+    };
+  }
 
   if (lower.includes('email not confirmed') || lower.includes('email_not_confirmed')) {
     return {
@@ -94,8 +139,56 @@ async function finishSignedIn(): Promise<AuthActionResult> {
   return { ok: true, kind: 'signed_in' };
 }
 
+async function applyServerSession(session: {
+  access_token: string;
+  refresh_token: string;
+}): Promise<AuthActionResult | null> {
+  const { error } = await supabase.auth.setSession({
+    access_token: session.access_token,
+    refresh_token: session.refresh_token,
+  });
+  if (error) {
+    return mapAuthError(error, '');
+  }
+  return finishSignedIn();
+}
+
 export async function signUpWithEmail(email: string, password: string): Promise<AuthActionResult> {
   const normalized = normalizeEmail(email);
+
+  try {
+    const response = await apiFetch('/api/auth/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: normalized, password }),
+    });
+
+    const body = (await response.json().catch(() => ({}))) as {
+      message?: string;
+      code?: string;
+      requiresVerification?: boolean;
+    };
+
+    if (response.ok) {
+      markNewSignupForProfile();
+      return {
+        ok: true,
+        kind: 'verification_required',
+        email: normalized,
+      };
+    }
+
+    if (response.status >= 500) {
+      return mapApiErrorBody({ ...body, code: body.code || 'SERVICE_ERROR' }, normalized);
+    }
+
+    return mapApiErrorBody(body, normalized);
+  } catch (error) {
+    if (!isNetworkFailure(error)) {
+      console.warn('Signup API failed, falling back to Supabase client:', error);
+    }
+  }
+
   const { data, error } = await supabase.auth.signUp({
     email: normalized,
     password,
@@ -132,6 +225,44 @@ export async function signUpWithEmail(email: string, password: string): Promise<
 
 export async function signInWithEmail(email: string, password: string): Promise<AuthActionResult> {
   const normalized = normalizeEmail(email);
+
+  try {
+    const response = await apiFetch('/api/auth/signin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: normalized, password }),
+    });
+
+    const body = (await response.json().catch(() => ({}))) as {
+      message?: string;
+      code?: string;
+      session?: { access_token: string; refresh_token: string };
+    };
+
+    if (response.ok && body.session?.access_token && body.session?.refresh_token) {
+      const applied = await applyServerSession(body.session);
+      return applied ?? { ok: false, code: 'AUTH_ERROR', message: 'Could not start session.', email: normalized };
+    }
+
+    if (!response.ok) {
+      if (response.status >= 500) {
+        return mapApiErrorBody({ ...body, code: body.code || 'SERVICE_ERROR' }, normalized);
+      }
+      return mapApiErrorBody(body, normalized);
+    }
+  } catch (error) {
+    if (isNetworkFailure(error)) {
+      return {
+        ok: false,
+        code: 'NETWORK_ERROR',
+        message:
+          'Could not reach the sign-in service. Check your connection, then try again.',
+        email: normalized,
+      };
+    }
+    console.warn('Sign-in API failed, falling back to Supabase client:', error);
+  }
+
   const { data, error } = await supabase.auth.signInWithPassword({
     email: normalized,
     password,
@@ -172,8 +303,16 @@ export async function resetPasswordForEmail(email: string): Promise<AuthActionRe
 
     const body = (await response.json().catch(() => ({}))) as { message?: string };
     const serverMessage = body.message || `Password reset failed (${response.status})`;
-    return mapAuthError({ message: serverMessage }, normalized);
-  } catch {
+    return mapAuthError({ message: serverMessage, code: body.code }, normalized);
+  } catch (error) {
+    if (isNetworkFailure(error)) {
+      return {
+        ok: false,
+        code: 'NETWORK_ERROR',
+        message: 'Could not reach the server to send a reset email. Check your connection and try again.',
+        email: normalized,
+      };
+    }
     // Fall back to direct Supabase when API is unreachable (e.g. local dev without server)
   }
 
@@ -188,9 +327,37 @@ export async function resetPasswordForEmail(email: string): Promise<AuthActionRe
 
 export async function resendVerificationEmail(email: string): Promise<AuthActionResult> {
   const normalized = normalizeEmail(email);
+
+  try {
+    const response = await apiFetch('/api/auth/resend-verification', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: normalized }),
+    });
+
+    if (response.ok) {
+      return { ok: true, kind: 'verification_required', email: normalized };
+    }
+
+    const body = (await response.json().catch(() => ({}))) as { message?: string; code?: string };
+    return mapApiErrorBody(body, normalized);
+  } catch (error) {
+    if (isNetworkFailure(error)) {
+      return {
+        ok: false,
+        code: 'NETWORK_ERROR',
+        message: 'Could not resend verification email. Check your connection and try again.',
+        email: normalized,
+      };
+    }
+  }
+
   const { error } = await supabase.auth.resend({
     type: 'signup',
     email: normalized,
+    options: {
+      emailRedirectTo: getAuthRedirectUrl('/auth/confirm'),
+    },
   });
 
   if (error) {

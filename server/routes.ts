@@ -34,6 +34,23 @@ function getSafeRedirectUrl(targetPath: string = ''): string {
   return `${baseUrl}${targetPath}`;
 }
 
+function getAllowedAuthOrigins(): string[] {
+  const candidates = [
+    process.env.APP_URL,
+    process.env.VITE_APP_URL,
+    'https://www.bytewisenutritionist.com',
+    'https://bytewisenutritionist.com',
+  ];
+  return [...new Set(candidates.filter(Boolean).map((url) => String(url).replace(/\/$/, '')))];
+}
+
+function isAllowedAuthRedirect(url: string): boolean {
+  if (!url || !/^https:\/\//i.test(url)) {
+    return false;
+  }
+  return getAllowedAuthOrigins().some((origin) => url.startsWith(origin));
+}
+
 
 export async function registerRoutes(app: Express): Promise<Server> {
   console.log('📋 Starting route registration...');
@@ -530,13 +547,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         email,
         password,
         options: {
-          emailRedirectTo: getSafeRedirectUrl('/api/auth/verify-email')
-        }
+          emailRedirectTo: getSafeRedirectUrl('/auth/confirm'),
+        },
       });
       
       if (error) {
         console.log('❌ Sign-up error:', error.message);
-        return res.status(400).json({ message: error.message });
+        const lower = error.message.toLowerCase();
+        const code =
+          lower.includes('already registered') || lower.includes('user already exists')
+            ? 'ACCOUNT_EXISTS'
+            : 'AUTH_ERROR';
+        return res.status(400).json({ message: error.message, code });
       }
       
       console.log('✅ User created:', data.user?.email, 'Confirmed:', !!data.user?.email_confirmed_at);
@@ -644,6 +666,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post('/api/auth/resend-verification', async (req: Request, res: Response) => {
+    try {
+      const email = req.body?.email?.toLowerCase?.().trim();
+
+      if (!email) {
+        return res.status(400).json({ message: 'Email is required' });
+      }
+
+      const { error } = await supabaseAdmin.auth.resend({
+        type: 'signup',
+        email,
+        options: {
+          emailRedirectTo: getSafeRedirectUrl('/auth/confirm'),
+        },
+      });
+
+      if (error) {
+        console.error('Resend verification error:', error.message);
+        return res.status(400).json({ message: error.message });
+      }
+
+      res.json({ message: 'Verification email sent' });
+    } catch (error) {
+      console.error('Resend verification failed:', error);
+      res.status(500).json({ message: 'Failed to resend verification email', code: 'SERVICE_ERROR' });
+    }
+  });
+
   // Password reset endpoint
   app.post('/api/auth/reset-password', async (req: Request, res: Response) => {
     try {
@@ -658,9 +708,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Email is required" });
       }
 
-      const allowedBase = process.env.APP_URL || process.env.VITE_APP_URL || 'https://www.bytewisenutritionist.com';
       const redirectTo =
-        typeof clientRedirect === 'string' && clientRedirect.startsWith(allowedBase.replace(/\/$/, ''))
+        typeof clientRedirect === 'string' && isAllowedAuthRedirect(clientRedirect)
           ? clientRedirect
           : getSafeRedirectUrl('/auth/confirm');
 

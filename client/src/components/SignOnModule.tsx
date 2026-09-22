@@ -232,6 +232,13 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
             description: errorMessage,
             duration: 6000
           });
+        } else if (errorCode === 'NETWORK_ERROR') {
+          showNotification({
+            type: 'error',
+            title: "Connection Problem",
+            description: errorMessage,
+            duration: 8000
+          });
         } else {
           // Handle password validation errors and general errors
           let displayMessage = errorMessage;
