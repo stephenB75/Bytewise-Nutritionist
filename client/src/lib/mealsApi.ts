@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import { apiRequest } from '@/lib/queryClient';
 
 export type LogMealInput = {
   name: string;
@@ -59,10 +60,6 @@ function toDateKey(value: unknown): string {
     return new Date().toISOString().split('T')[0];
   }
   return date.toISOString().split('T')[0];
-}
-
-function toNoonUtc(dateKey: string): string {
-  return `${toDateKey(dateKey)}T12:00:00.000Z`;
 }
 
 function mapMeal(row: Record<string, unknown>): LoggedMeal {
@@ -129,55 +126,35 @@ export async function ensureUserProfile(): Promise<string | null> {
 }
 
 export async function listLoggedMeals(): Promise<LoggedMeal[]> {
-  const user = await getSessionUser();
-  const { data, error } = await supabase
-    .from('meals')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('date', { ascending: false });
-
-  if (error) {
-    throw new Error(error.message || 'Failed to load meals');
-  }
-
-  return (data || []).map((row) => mapMeal(row as Record<string, unknown>));
+  await getSessionUser();
+  const response = await apiRequest('GET', '/api/meals/logged');
+  const data = await response.json();
+  return (Array.isArray(data) ? data : []).map((row) => mapMeal(row as Record<string, unknown>));
 }
 
 export async function logMeal(input: LogMealInput): Promise<LoggedMeal> {
-  const user = await getSessionUser();
+  await getSessionUser();
   await ensureUserProfile();
 
-  const dateKey = toDateKey(input.date);
-  const payload = {
-    user_id: user.id,
+  const response = await apiRequest('POST', '/api/meals/logged', {
     name: input.name,
-    meal_type: input.mealType || 'meal',
-    date: toNoonUtc(dateKey),
-    total_calories: toNumber(input.totalCalories),
-    total_protein: toNumber(input.totalProtein),
-    total_carbs: toNumber(input.totalCarbs),
-    total_fat: toNumber(input.totalFat),
+    date: toDateKey(input.date),
+    mealType: input.mealType || 'meal',
+    totalCalories: toNumber(input.totalCalories),
+    totalProtein: toNumber(input.totalProtein),
+    totalCarbs: toNumber(input.totalCarbs),
+    totalFat: toNumber(input.totalFat),
     iron: toNumber(input.iron),
     calcium: toNumber(input.calcium),
     zinc: toNumber(input.zinc),
     magnesium: toNumber(input.magnesium),
-    vitamin_c: toNumber(input.vitaminC),
-    vitamin_d: toNumber(input.vitaminD),
-    vitamin_b12: toNumber(input.vitaminB12),
+    vitaminC: toNumber(input.vitaminC),
+    vitaminD: toNumber(input.vitaminD),
+    vitaminB12: toNumber(input.vitaminB12),
     folate: toNumber(input.folate),
-  };
-
-  const { data, error } = await supabase
-    .from('meals')
-    .insert(payload as never)
-    .select('*')
-    .single();
-
-  if (error || !data) {
-    throw new Error(error?.message || 'Failed to log meal');
-  }
-
-  const meal = mapMeal(data as Record<string, unknown>);
+  });
+  const result = await response.json();
+  const meal = mapMeal((result?.meal || result) as Record<string, unknown>);
   window.dispatchEvent(new CustomEvent('reload-meal-data', { detail: meal }));
   window.dispatchEvent(new CustomEvent('calories-logged', { detail: meal }));
   return meal;
