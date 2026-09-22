@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import { ensureUserProfile, syncGuestMeals } from '@/lib/mealsApi';
 import { getAuthRedirectUrl } from '@/lib/authRedirect';
+import { apiFetch } from '@/lib/apiUrl';
 
 export type AuthCode =
   | 'VERIFICATION_REQUIRED'
@@ -46,6 +47,25 @@ function mapAuthError(error: { message?: string; code?: string } | null, email: 
       ok: false,
       code: 'INVALID_CREDENTIALS',
       message: 'Email or password is incorrect.',
+      email,
+    };
+  }
+
+  if (lower.includes('redirect') || lower.includes('redirect_to')) {
+    return {
+      ok: false,
+      code: 'AUTH_ERROR',
+      message:
+        'Password reset could not be started because the redirect URL is not allowed in Supabase. Add /auth/confirm to Auth redirect URLs.',
+      email,
+    };
+  }
+
+  if (lower.includes('rate limit') || lower.includes('too many')) {
+    return {
+      ok: false,
+      code: 'AUTH_ERROR',
+      message: 'Too many reset attempts. Please wait a few minutes and try again.',
       email,
     };
   }
@@ -136,9 +156,28 @@ export async function signInWithEmail(email: string, password: string): Promise<
 
 export async function resetPasswordForEmail(email: string): Promise<AuthActionResult> {
   const normalized = normalizeEmail(email);
-  const { error } = await supabase.auth.resetPasswordForEmail(normalized, {
-    redirectTo: getAuthRedirectUrl('/auth/confirm'),
-  });
+  const redirectTo = getAuthRedirectUrl('/auth/confirm');
+
+  // Server uses APP_URL + service role — avoids browser redirect/CORS issues
+  try {
+    const response = await apiFetch('/api/auth/reset-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: normalized, redirectTo }),
+    });
+
+    if (response.ok) {
+      return { ok: true, kind: 'verification_required', email: normalized };
+    }
+
+    const body = (await response.json().catch(() => ({}))) as { message?: string };
+    const serverMessage = body.message || `Password reset failed (${response.status})`;
+    return mapAuthError({ message: serverMessage }, normalized);
+  } catch {
+    // Fall back to direct Supabase when API is unreachable (e.g. local dev without server)
+  }
+
+  const { error } = await supabase.auth.resetPasswordForEmail(normalized, { redirectTo });
 
   if (error) {
     return mapAuthError(error, normalized);

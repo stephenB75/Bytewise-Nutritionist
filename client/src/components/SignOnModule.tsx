@@ -297,8 +297,8 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
     }
   };
 
-  const handlePasswordReset = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handlePasswordReset = async (e?: React.FormEvent | React.MouseEvent) => {
+    e?.preventDefault?.();
     
     if (!email) {
       showNotification({
@@ -403,6 +403,10 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
             onSubmit={(e) => {
               e.preventDefault();
               e.stopPropagation();
+              if (showResetPassword) {
+                void handlePasswordReset(e);
+                return;
+              }
               handleEmailAuth(e);
             }}
             className="space-y-4"
@@ -424,6 +428,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
                 </div>
               </div>
               
+              {!showResetPassword && (
               <div>
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password" className="text-sm font-medium text-gray-950">
@@ -434,12 +439,13 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
                       </span>
                     )}
                   </Label>
-                  {!isSignUp && !showResetPassword && (
+                  {!isSignUp && (
                     <a
                       href="#"
                       onClick={(e) => {
                         e.preventDefault();
                         setShowResetPassword(true);
+                        setPassword('');
                       }}
                       className="text-xs text-blue-400 hover:text-blue-300 transition-colors underline-offset-4 hover:underline cursor-pointer"
                       data-testid="link-forgot-password"
@@ -457,7 +463,7 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
                     onChange={(e) => handlePasswordChange(e.target.value)}
                     placeholder="Enter your password"
                     className="pl-10 pr-10 bg-white/60 border-amber-300/60 text-gray-950 placeholder-gray-600 focus:border-blue-500 focus:ring-blue-500"
-                    required={!showResetPassword}
+                    required
                     autoComplete={isSignUp ? 'new-password' : 'current-password'}
                   />
                   <button
@@ -495,6 +501,13 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
                   </div>
                 )}
               </div>
+              )}
+
+              {showResetPassword && (
+                <p className="text-sm text-gray-700">
+                  Enter the email for your account. We&apos;ll send a reset link to your inbox (check spam).
+                </p>
+              )}
             </div>
 
             {verificationRequired ? (

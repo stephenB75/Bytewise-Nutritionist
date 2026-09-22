@@ -647,22 +647,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Password reset endpoint
   app.post('/api/auth/reset-password', async (req: Request, res: Response) => {
     try {
-      const { email } = req.body;
-      
+      const { email: rawEmail, redirectTo: clientRedirect } = req.body as {
+        email?: string;
+        redirectTo?: string;
+      };
+
+      const email = rawEmail?.toLowerCase().trim();
+
       if (!email) {
         return res.status(400).json({ message: "Email is required" });
       }
-      
-      const { error } = await serverSupabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${process.env.VITE_APP_URL || process.env.APP_URL || 'https://www.bytewisenutritionist.com'}/auth/confirm`,
+
+      const allowedBase = process.env.APP_URL || process.env.VITE_APP_URL || 'https://www.bytewisenutritionist.com';
+      const redirectTo =
+        typeof clientRedirect === 'string' && clientRedirect.startsWith(allowedBase.replace(/\/$/, ''))
+          ? clientRedirect
+          : getSafeRedirectUrl('/auth/confirm');
+
+      const { error } = await supabaseAdmin.auth.resetPasswordForEmail(email, {
+        redirectTo,
       });
-      
+
       if (error) {
+        console.error('Password reset email error:', error.message);
         return res.status(400).json({ message: error.message });
       }
-      
+
       res.json({ message: "Password reset email sent successfully" });
     } catch (error) {
+      console.error('Password reset failed:', error);
       res.status(500).json({ message: "Password reset failed" });
     }
   });
