@@ -119,7 +119,7 @@ export function DataManagementPanel({ onHealthDataSync }: DataManagementPanelPro
   };
 
   return (
-    <div className="min-h-screen px-6 py-3">
+    <div className="min-h-screen px-6 py-3" data-testid="data-management-panel">
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">

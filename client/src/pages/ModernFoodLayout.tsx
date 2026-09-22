@@ -1029,6 +1029,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   // Enhanced tab change handler with hero component scroll reset
   const [, setLocation] = useLocation();
 
+  const scrollToTestId = (testId: string, options?: { focus?: boolean }) => {
+    const el = document.querySelector(`[data-testid="${testId}"]`) as HTMLElement | null;
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (options?.focus) {
+      el.focus();
+    }
+  };
+
   const handleTabChange = (newTab: string) => {
     if (newTab !== activeTab) {
       // Immediate state update - no transitions
@@ -1759,12 +1768,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         subtitle="Weekly"
         description="Track your nutrition progress and log meals"
         buttonText="Start Tracking"
-        onButtonClick={() => {
-          const searchInput = document.querySelector('input[placeholder="Search weekly food entries..."]') as HTMLInputElement;
-          if (searchInput) {
-            searchInput.focus();
-          }
-        }}
+        onButtonClick={() => scrollToTestId('journal-search', { focus: true })}
       />
 
       {/* Content Section - Completely Separate and Underneath */}
@@ -1786,6 +1790,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <Input
+              data-testid="journal-search"
               placeholder="Search last month's food entries..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -2021,18 +2026,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         subtitle="Goals"
         description="Track daily and weekly nutrition goals to unlock achievements"
         buttonText="View Goals"
-        onButtonClick={() => {
-          const goalsSection = document.querySelector('.space-y-4');
-          if (goalsSection) {
-            goalsSection.scrollIntoView({ behavior: 'smooth' });
-          }
-        }}
+        onButtonClick={() => scrollToTestId('goals-section')}
       />
 
       {/* Content Section - Completely Separate and Underneath */}
       <div className="px-6 py-3 content-section">
         {/* Goal Progress Cards */}
-        <div className="space-y-4">
+        <div className="space-y-4" data-testid="goals-section">
           {/* Daily Goals */}
           <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md p-6">
             <div className="flex items-center justify-between mb-4">
@@ -2277,18 +2277,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           subtitle="Nutrition"
           description="Create an account to save your meals and keep them after you leave"
           buttonText="Get Started"
-          onButtonClick={() => {
-            const signInCard = document.querySelector('.bg-white\\/10');
-            if (signInCard) {
-              signInCard.scrollIntoView({ behavior: 'smooth' });
-            }
-          }}
+          onButtonClick={() => scrollToTestId('signin-form')}
         />
 
         {/* Content Section - Completely Separate and Underneath */}
         <div className="px-6 py-3 content-section">
           {/* Sign In Component */}
-          <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md p-6">
+          <Card data-testid="signin-form" className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md p-6">
             <h3 className="text-2xl font-bold mb-6 text-center">
               {isResetPassword ? 'Reset Password' : isSignUp ? 'Create Account' : 'Sign In'}
             </h3>
@@ -2393,12 +2388,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         subtitle="Weekly"
         description="Track your calorie intake and search for foods to log"
         buttonText="Search Meals Logged"
-        onButtonClick={() => {
-          const searchInput = document.querySelector('input[placeholder="Search weekly food entries..."]') as HTMLInputElement;
-          if (searchInput) {
-            searchInput.focus();
-          }
-        }}
+        onButtonClick={() => scrollToTestId('main-food-search', { focus: true })}
       />
 
       {/* Content Section - Completely Separate and Underneath */}
@@ -2459,7 +2449,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <div className="text-gray-700">
                 <Calendar className="w-12 h-12 mx-auto mb-3 opacity-50" />
                 <p className="text-lg mb-2 text-gray-900">No meals logged today</p>
-                <p className="text-sm text-gray-700">Use the nutrition calculator to start tracking your meals</p>
+                <p className="text-sm text-gray-700 mb-4">Use the nutrition calculator to start tracking your meals</p>
+                <Button
+                  onClick={() => handleTabChange('nutrition')}
+                  className="bg-orange-600 hover:bg-orange-700 text-white"
+                >
+                  Log Food
+                </Button>
               </div>
             </Card>
           ) : (
@@ -2535,25 +2531,14 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           subtitle="Nutrition"
           description="AI-powered food analysis or precise USDA database calculator"
           buttonText="Choose Analysis Method"
-          onButtonClick={() => {
-            // Scroll to the choice section and highlight it
-            const choiceSection = document.querySelector('.bg-gradient-to-r.from-blue-500\\/10.to-orange-500\\/10');
-            if (choiceSection) {
-              choiceSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-              // Add a brief highlight effect
-              choiceSection.classList.add('ring-4', 'ring-amber-400', 'ring-opacity-75');
-              setTimeout(() => {
-                choiceSection.classList.remove('ring-4', 'ring-amber-400', 'ring-opacity-75');
-              }, 2000);
-            }
-          }}
+          onButtonClick={() => scrollToTestId('analysis-method-choice')}
         />
         
         {/* Content Section - Completely Separate and Underneath */}
         <div className="px-6 py-3 content-section">
           {/* Instructions Section */}
           <div className="mb-6 text-center">
-            <div className="bg-gradient-to-r from-blue-500/10 to-orange-500/10 border border-gray-400/20 rounded-xl p-4 mb-4 transition-all duration-300">
+            <div data-testid="analysis-method-choice" className="bg-gradient-to-r from-blue-500/10 to-orange-500/10 border border-gray-400/20 rounded-xl p-4 mb-4 transition-all duration-300">
               <h3 className="font-semibold text-lg mb-3 text-center">🔍 Choose Your Nutrition Analysis Method</h3>
               <p className="text-center text-gray-600 text-sm mb-4">Select your preferred method below, then use the toggle buttons to switch between options:</p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-base">
@@ -2659,24 +2644,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           ? "Manage your account, view achievements, and track your progress"
           : "Create an account to save your meals and keep them after you leave this device"}
         buttonText={user ? "Manage Profile" : "Create Account"}
-        onButtonClick={() => {
-          if (user) {
-            const profileCards = document.querySelector('.space-y-6');
-            if (profileCards) {
-              profileCards.scrollIntoView({ behavior: 'smooth' });
-            }
-          } else {
-            // Scroll to the sign-in form
-            const signInForm = document.querySelector('.space-y-6');
-            if (signInForm) {
-              signInForm.scrollIntoView({ behavior: 'smooth' });
-            }
-          }
-        }}
+        onButtonClick={() => scrollToTestId('profile-content')}
       />
 
       {/* Content Section - Redesigned to match other pages */}
-      <div className="px-6 py-3 content-section">
+      <div className="px-6 py-3 content-section" data-testid="profile-content">
         {/* Profile Cards with Unified Accordion System */}
         {user ? (
           <Accordion 
@@ -3148,12 +3120,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               subtitle="Fasting"
               description="Track your fasting journey with professional IF schedules and real-time progress monitoring"
               buttonText="Start Fasting"
-              onButtonClick={() => {
-                const fastingPanel = document.querySelector('.fasting-tracker');
-                if (fastingPanel) {
-                  fastingPanel.scrollIntoView({ behavior: 'smooth' });
-                }
-              }}
+              onButtonClick={() => scrollToTestId('fasting-tracker')}
             />
             
             {/* Fasting Content Section */}
@@ -3184,17 +3151,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               subtitle="Management"
               description="Export, sync, and manage your nutrition tracking data"
               buttonText="Manage Data"
-              onButtonClick={() => {
-                const dataPanel = document.querySelector('.bg-gray-900\\/80');
-                if (dataPanel) {
-                  dataPanel.scrollIntoView({ behavior: 'smooth' });
-                }
-              }}
+              onButtonClick={() => scrollToTestId('data-management-panel')}
             />
 
             {/* Content Section - Completely Separate and Underneath */}
             <div className="px-6 py-3 content-section">
-              <div className="bg-amber-50/90 backdrop-blur-md rounded-3xl border border-amber-200 shadow-lg">
+              <div data-testid="data-management-panel" className="bg-amber-50/90 backdrop-blur-md rounded-3xl border border-amber-200 shadow-lg">
                 <DataManagementPanel onHealthDataSync={handleHealthDataSync} />
               </div>
             </div>
