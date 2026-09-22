@@ -43,6 +43,15 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
   const { supabase, refetch } = useAuth();
   const { notification, showNotification, closeNotification } = useAuthPopupNotification();
 
+  React.useEffect(() => {
+    const openSignup = () => {
+      setShowResetPassword(false);
+      setIsSignUp(true);
+    };
+    window.addEventListener('open-signup', openSignup);
+    return () => window.removeEventListener('open-signup', openSignup);
+  }, []);
+
   // Password validation function
   const validatePassword = (password: string): string[] => {
     const errors = [];

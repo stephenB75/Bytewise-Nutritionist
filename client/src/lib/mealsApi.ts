@@ -232,6 +232,7 @@ export async function logMeal(input: LogMealInput): Promise<LoggedMeal> {
     writeGuestMeals(meals);
     window.dispatchEvent(new CustomEvent('reload-meal-data', { detail: localMeal }));
     window.dispatchEvent(new CustomEvent('calories-logged', { detail: localMeal }));
+    window.dispatchEvent(new CustomEvent('guest-save-prompt', { detail: localMeal }));
     return localMeal;
   }
 

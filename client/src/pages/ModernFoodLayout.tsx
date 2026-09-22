@@ -19,6 +19,7 @@ import { AchievementCelebration } from '@/components/AchievementCelebration';
 import { AwardsAchievements } from '@/components/AwardsAchievements';
 import { ConfettiCelebration } from '@/components/ConfettiCelebration';
 import { ProfileCompletionModal } from '@/components/ProfileCompletionModal';
+import { SaveAccountPrompt } from '@/components/SaveAccountPrompt';
 import { FastingTracker } from '@/components/FastingTracker';
 import { FastingStatusCard } from '@/components/FastingStatusCard';
 import { useGoalAchievements } from '@/hooks/useGoalAchievements';
@@ -151,6 +152,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   
   // Profile completion state
   const [showProfileCompletion, setShowProfileCompletion] = useState(false);
+  const [showSaveAccountPrompt, setShowSaveAccountPrompt] = useState(false);
   
   // App tour state
   const { shouldShowTour, dismissTour, startTour } = useAppTour();
@@ -681,6 +683,18 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     }
   }, [activeTab, calculateMicronutrients, loggedMeals]);
   
+  useEffect(() => {
+    const handleGuestSavePrompt = () => {
+      if (user || sessionStorage.getItem('guest-save-prompt-dismissed') === 'true') {
+        return;
+      }
+      setShowSaveAccountPrompt(true);
+    };
+
+    window.addEventListener('guest-save-prompt', handleGuestSavePrompt);
+    return () => window.removeEventListener('guest-save-prompt', handleGuestSavePrompt);
+  }, [user]);
+
   // Check if tour should be shown after successful authentication
   useEffect(() => {
     const handleAuthStateChange = () => {
@@ -3371,6 +3385,20 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         onDismiss={() => {
           clearProfileCompletionPrompt();
           setShowProfileCompletion(false);
+        }}
+      />
+
+      <SaveAccountPrompt
+        isOpen={showSaveAccountPrompt}
+        onCreateAccount={() => {
+          sessionStorage.setItem('guest-save-prompt-dismissed', 'true');
+          setShowSaveAccountPrompt(false);
+          window.dispatchEvent(new CustomEvent('open-signup'));
+          handleTabChange('profile');
+        }}
+        onKeepLocal={() => {
+          sessionStorage.setItem('guest-save-prompt-dismissed', 'true');
+          setShowSaveAccountPrompt(false);
         }}
       />
       
