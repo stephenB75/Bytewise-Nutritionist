@@ -3,7 +3,7 @@
  * Uses local assets for instant image switching with thematic page mapping
  */
 
-import { useState, useEffect } from 'react';
+import { useMemo } from 'react';
 
 // Food image collection - only raw meats removed, all cooked foods included
 const foodImages = [
@@ -73,102 +73,24 @@ const pageImageMap: Record<string, number[]> = {
   'signin': [8, 15, 21, 22, 35, 36, 37, 45], // Welcoming foods
   'calculator': [11, 14, 19, 40, 41, 49], // Cooking ingredients and prep
   'search': [1, 2, 3, 4, 5, 6, 7, 8, 9, 13, 20, 30, 31, 34, 39], // Variety and discovery
-  'data': [7, 13, 14, 15, 16, 17, 18, 20, 21, 25, 27, 28, 29, 38, 39, 40, 42, 49] // Analytics and data visualization
+  'fasting': [3, 4, 5, 16, 25, 26],
+  'data': [7, 13, 14, 15, 16, 17, 18, 20, 21, 25, 27, 28, 29, 38, 39, 40, 42, 49]
 };
 
-export function useRotatingBackground(activeTab: string, navigationTrigger?: number, isTransitioning?: boolean) {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [backgroundImage, setBackgroundImage] = useState(foodImages[0]);
-  const [nextBackgroundImage, setNextBackgroundImage] = useState(foodImages[0]);
-  const [animationKey, setAnimationKey] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const [imageLoaded, setImageLoaded] = useState(false);
-  const [pendingImageReady, setPendingImageReady] = useState(false);
-  
-  // Preload image function
-  const preloadImage = (src: string): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => resolve();
-      img.onerror = () => reject();
-      img.src = src;
-    });
-  };
-  
-  // Change background ONLY when user navigates via nav buttons
-  useEffect(() => {
-    // Skip if no navigation trigger (initial load or programmatic changes)
-    if (!navigationTrigger) return;
-    
-    // IMMEDIATELY hide background on navigation - no delay
-    setImageLoaded(false);
-    setIsLoading(true);
-    setPendingImageReady(false);
-    
-    const pageImages = pageImageMap[activeTab] || [0, 1, 2];
-    
-    // Ensure we get a different image by filtering out current one
-    let availableImages = pageImages;
-    if (pageImages.length > 1) {
-      availableImages = pageImages.filter(index => index !== currentImageIndex);
-    }
-    
-    // If no different images available, use all page images
-    if (availableImages.length === 0) {
-      availableImages = pageImages;
-    }
-    
-    const randomPageImage = availableImages[Math.floor(Math.random() * availableImages.length)];
-    const newImageSrc = foodImages[randomPageImage];
-    
-    // Preload the new image
-    preloadImage(newImageSrc)
-      .then(() => {
-        // Store the new image as pending but don't activate it yet
-        setCurrentImageIndex(randomPageImage);
-        setNextBackgroundImage(newImageSrc);
-        setIsLoading(false);
-        setPendingImageReady(true);
-      })
-      .catch(() => {
-        // If image fails to load, still update pending image
-        setCurrentImageIndex(randomPageImage);
-        setNextBackgroundImage(newImageSrc);
-        setIsLoading(false);
-        setPendingImageReady(true);
-      });
-  }, [navigationTrigger, activeTab]); // Only trigger on navigation events
-  
-  // Switch to pending image immediately when ready
-  useEffect(() => {
-    if (pendingImageReady) {
-      setBackgroundImage(nextBackgroundImage);
-      setAnimationKey(prev => prev + 1);
-      setImageLoaded(true);
-      setPendingImageReady(false);
-    }
-  }, [pendingImageReady, nextBackgroundImage]);
-  
-  // Preload initial image on mount with smooth fade-in
-  useEffect(() => {
-    preloadImage(foodImages[0])
-      .then(() => {
-        setIsLoading(false);
-        // Delay to allow for smooth initial fade-in
-        setTimeout(() => {
-          setImageLoaded(true);
-        }, 300);
-      })
-      .catch(() => {
-        setIsLoading(false);
-        setImageLoaded(false);
-      });
-  }, []);
+const tabBackgrounds: Record<string, string> = Object.fromEntries(
+  Object.entries(pageImageMap).map(([tab, ids]) => [tab, foodImages[ids[0]]])
+);
 
-  return {
-    backgroundImage,
-    animationKey,
-    isLoading,
-    imageLoaded
-  };
+if (typeof window !== 'undefined') {
+  Object.values(tabBackgrounds).forEach((src) => {
+    const img = new Image();
+    img.src = src;
+  });
+}
+
+export function useRotatingBackground(activeTab: string) {
+  return useMemo(
+    () => ({ backgroundImage: tabBackgrounds[activeTab] || foodImages[0] }),
+    [activeTab]
+  );
 }

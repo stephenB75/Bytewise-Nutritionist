@@ -10,7 +10,7 @@ interface SaveAccountPromptProps {
 export function SaveAccountPrompt({ isOpen, onCreateAccount, onKeepLocal }: SaveAccountPromptProps) {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onKeepLocal(); }}>
-      <DialogContent className="max-w-md bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200">
+      <DialogContent className="max-w-[calc(100vw-1.5rem)] sm:max-w-md bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200">
         <DialogHeader>
           <DialogTitle
             className="text-2xl text-gray-950"

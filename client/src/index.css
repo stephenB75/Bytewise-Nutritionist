@@ -647,17 +647,29 @@ button.btn-hero-enhanced span,
   color: #ffffff !important; 
 }
 
-/* Large hero headlines with vibrant colors */
+.hero-component h1.hero-title,
+.hero-component h2.hero-title,
+[data-hero="true"] h1.hero-title,
+[data-hero="true"] h2.hero-title {
+  opacity: 1 !important;
+}
+.hero-component h1.hero-title,
 .hero-component h1.text-2xl,
+.hero-component h1.text-4xl,
+.hero-component h1.text-5xl,
 .hero-component h1.text-6xl,
 .hero-component h1.text-7xl,
 .hero-component h1.text-8xl,
+[data-hero="true"] h1.hero-title,
 [data-hero="true"] h1.text-2xl,
+[data-hero="true"] h1.text-4xl,
+[data-hero="true"] h1.text-5xl,
 [data-hero="true"] h1.text-6xl,
 [data-hero="true"] h1.text-7xl,
 [data-hero="true"] h1.text-8xl { 
   color: #22d3ee !important; /* Bright cyan for large h1 */
   text-shadow: 0 3px 6px rgba(0, 0, 0, 0.6) !important;
+  opacity: 1 !important;
 }
 
 .hero-component h2.text-lg,
@@ -679,9 +691,15 @@ button.btn-hero-enhanced span,
 }
 
 /* Dashboard Hero Headlines - Apply Same Pattern as Other Pages */
+[data-page="dashboard"] .hero-component h1.hero-title,
+[data-page="dashboard"] .hero-component h1.text-4xl,
+[data-page="dashboard"] .hero-component h1.text-5xl,
 [data-page="dashboard"] .hero-component h1.text-6xl,
 [data-page="dashboard"] .hero-component h1.text-7xl,
 [data-page="dashboard"] .hero-component h1.text-8xl,
+[data-page="dashboard"] [data-hero="true"] h1.hero-title,
+[data-page="dashboard"] [data-hero="true"] h1.text-4xl,
+[data-page="dashboard"] [data-hero="true"] h1.text-5xl,
 [data-page="dashboard"] [data-hero="true"] h1.text-6xl,
 [data-page="dashboard"] [data-hero="true"] h1.text-7xl,
 [data-page="dashboard"] [data-hero="true"] h1.text-8xl,
@@ -691,9 +709,15 @@ button.btn-hero-enhanced span,
   text-shadow: 0 3px 6px rgba(0, 0, 0, 0.6) !important;
 }
 
+[data-page="dashboard"] .hero-component h2.hero-title:not(.text-white),
+[data-page="dashboard"] .hero-component h2.text-4xl:not(.text-white),
+[data-page="dashboard"] .hero-component h2.text-5xl:not(.text-white),
 [data-page="dashboard"] .hero-component h2.text-6xl:not(.text-white),
 [data-page="dashboard"] .hero-component h2.text-7xl:not(.text-white),
 [data-page="dashboard"] .hero-component h2.text-8xl:not(.text-white),
+[data-page="dashboard"] [data-hero="true"] h2.hero-title:not(.text-white),
+[data-page="dashboard"] [data-hero="true"] h2.text-4xl:not(.text-white),
+[data-page="dashboard"] [data-hero="true"] h2.text-5xl:not(.text-white),
 [data-page="dashboard"] [data-hero="true"] h2.text-6xl:not(.text-white),
 [data-page="dashboard"] [data-hero="true"] h2.text-7xl:not(.text-white),
 [data-page="dashboard"] [data-hero="true"] h2.text-8xl:not(.text-white),
@@ -708,6 +732,7 @@ button.btn-hero-enhanced span,
 [data-page="dashboard"] [data-hero="true"] h2.text-white { 
   color: #ffffff !important; /* Force white for text-white class */
   text-shadow: 0 3px 6px rgba(0, 0, 0, 0.6) !important;
+  opacity: 1 !important;
 }
 
 [data-page="dashboard"] .hero-component h3.text-6xl,
@@ -1701,9 +1726,9 @@ div[class*="min-h-screen"]:not([data-testid*="navigation"]),
 
 /* Content section spacing for navigation clearance */
 .content-section {
-  padding-bottom: 10rem; /* Space for fixed navigation so controls stay clickable */
-  min-height: calc(100vh - 10rem);
-  scroll-padding-bottom: 10rem;
+  padding-bottom: 7rem; /* Space for fixed navigation so controls stay clickable */
+  min-height: 0;
+  scroll-padding-bottom: 7rem;
 }
 
 [data-testid="water-card"] button,
@@ -1876,61 +1901,39 @@ body {
 
 /* Optimized Hero Background Animations - Mobile food composition focused */
 .hero-bg-optimized {
-  /* Dark fallback background to prevent yellow flash */
-  background-color: #1f2937;
-  /* Start with hidden state for fast fade-in */
-  opacity: 0;
-  transition: opacity 0.6s ease-in-out;
-  /* Performance optimizations */
-  will-change: transform, opacity, filter;
-  backface-visibility: hidden;
-  transform: translateZ(0);
-  /* Ensure consistent background sizing and positioning */
+  background-color: #0f172a;
+  opacity: 1;
   background-size: cover !important;
   background-position: center center !important;
   background-repeat: no-repeat !important;
+  filter: brightness(0.85);
 }
 
 /* Mobile-specific hero background adjustments for food composition */
 @media (max-width: 768px) {
   .hero-bg-optimized {
-    /* Center food items with slight bias toward bottom-center for mobile screens */
     background-position: center 60% !important;
   }
 }
 
 @media (max-width: 480px) {
   .hero-bg-optimized {
-    /* Ensure food items are properly centered and sized for small screens */
     background-position: center 55% !important;
   }
 }
 
-/* Loading state for hero background */
-.hero-bg-loading {
-  opacity: 0;
-  background-color: #374151;
-}
-
-/* Hero background loaded state - clean, fast fade-in */
+/* Keep loaded photos visible; do not replay fade-in on remount */
 .hero-bg-loaded {
   opacity: 1;
-  animation: heroImageFadeIn 0.4s ease-out forwards;
 }
 
-/* Clean hero image fade-in animation */
-@keyframes heroImageFadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
+.hero-bg-hidden {
+  opacity: 1;
 }
 
 /* Performance Optimized Classes */
 .hero-optimized {
-  contain: layout style paint;
+  contain: style;
 }
 
 .text-optimized {
@@ -1989,10 +1992,10 @@ body {
 
 /* Page containers with consistent layout */
 .page-container {
-  height: 100vh;
-  width: 100vw;
+  min-height: 100%;
+  width: 100%;
   position: relative;
-  overflow-y: auto;
+  overflow: visible;
   padding-bottom: 0;
   margin-bottom: 0;
 }
@@ -2107,29 +2110,34 @@ html, body {
 }
 
 .animate-slideUpH1 {
-  animation: slideUpH1 0.8s ease-out forwards;
-  opacity: 0;
+  animation: slideUpH1 0.8s ease-out both;
 }
 
 .animate-slideUpH2 {
-  animation: slideUpH2 0.6s ease-out forwards;
-  animation-delay: 0.2s;
-  opacity: 0;
+  animation: slideUpH2 0.6s ease-out 0.2s both;
 }
 
-/* Hero background with blur effect */
+@media (prefers-reduced-motion: reduce) {
+  .animate-slideUpH1,
+  .animate-slideUpH2 {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Hero background stays visible when the hero remounts */
 .hero-bg-optimized {
-  transition: opacity 0.4s ease-out, filter 0.4s ease-out;
+  opacity: 1;
 }
 
 .hero-bg-loaded {
   opacity: 1;
-  filter: blur(0.5px) brightness(0.85);
+  filter: brightness(0.85);
 }
 
 .hero-bg-hidden {
-  opacity: 0;
-  filter: blur(2px);
+  opacity: 1;
 }
 
 input[type="text"]::placeholder, 
@@ -2170,24 +2178,20 @@ input {
   border: 1px solid #d1d5db;
 }
 
-/* Hero image entrance animations - smoother */
+/* Hero image entrance animations - unused on the photo layer to avoid remount flicker */
 @keyframes heroImageFadeIn {
   0% {
-    opacity: 0;
-    transform: scale(1.02) translateY(10px);
-    filter: blur(1px);
+    opacity: 1;
   }
   100% {
     opacity: 1;
-    transform: scale(1) translateY(0);
-    filter: blur(0);
   }
 }
 
 @keyframes heroImageSlideIn {
   0% {
-    opacity: 0;
-    transform: scale(1.1) translateX(-30px);
+    opacity: 1;
+    transform: scale(1) translateX(0);
   }
   100% {
     opacity: 1;
@@ -2196,10 +2200,9 @@ input {
 }
 
 
-/* Hero background hidden state - completely invisible */
+/* Keep background photos on-screen while a new image preloads */
 .hero-bg-hidden {
-  opacity: 0 !important;
-  visibility: hidden !important;
+  opacity: 1;
 }
 
 

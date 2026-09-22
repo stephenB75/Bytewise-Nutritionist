@@ -234,7 +234,7 @@ export function WeeklyCaloriesCard() {
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className="text-center min-w-[80px]">
+                  <div className="text-center min-w-[64px] sm:min-w-[80px]">
                     <p className={`text-sm font-medium ${
                       isToday ? 'text-orange-600' : 'text-gray-950'
                     }`}>

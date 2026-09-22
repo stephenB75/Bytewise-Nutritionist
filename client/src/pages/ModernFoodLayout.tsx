@@ -110,6 +110,85 @@ interface Achievement {
 
 type TrackingView = 'daily' | 'weekly';
 
+const HeroSection = React.memo(function HeroSection({
+  title,
+  subtitle,
+  description,
+  buttonText,
+  onButtonClick,
+  showLogo = false,
+  backgroundImage,
+}: {
+  title: string;
+  subtitle: string;
+  description: string;
+  buttonText: string;
+  onButtonClick: () => void;
+  showLogo?: boolean;
+  backgroundImage: string;
+}) {
+  return (
+    <div className="relative min-h-[62svh] md:h-screen overflow-hidden hero-component bg-[#0f172a]" data-hero="true">
+      <img
+        src={backgroundImage}
+        alt=""
+        className="absolute inset-0 z-10 h-full w-full object-cover brightness-[0.85]"
+        decoding="async"
+      />
+      <div className="hero-gradient-overlay opacity-100" style={{ zIndex: 11 }} />
+
+      <div className="relative z-20 flex min-h-[62svh] md:absolute md:inset-0 flex-col justify-center items-center text-center px-5 py-16 md:px-6 md:py-0 text-white">
+        <div className="space-y-4 md:space-y-8 max-w-2xl w-full">
+          {showLogo && (
+            <div className="mb-4 md:mb-12 md:-mt-16">
+              <img
+                src={logoImage}
+                alt="ByteWise Nutritionist Logo"
+                className="h-12 md:h-20 w-auto object-contain mx-auto drop-shadow-2xl"
+                data-testid="bytewise-hero-logo"
+              />
+            </div>
+          )}
+
+          <div className="space-y-2 md:space-y-3 hero-optimized">
+            <h1 className="hero-title text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black tracking-tight md:tracking-tighter leading-[1.05] md:leading-[0.85] drop-shadow-2xl font-league-spartan text-optimized opacity-100">
+              {title}
+            </h1>
+            <h2 className={`hero-title text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black tracking-tight md:tracking-tighter leading-[1.05] md:leading-[0.85] font-league-spartan ${showLogo ? 'text-white' : 'text-optimized'} drop-shadow-2xl opacity-100`}>
+              {subtitle}
+            </h2>
+          </div>
+
+          <p className="text-base sm:text-xl md:text-3xl font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl font-work-sans text-gray-100 opacity-100">
+            {description}
+          </p>
+
+          <div className="pt-4 md:pt-8 opacity-100">
+            <Button
+              onClick={onButtonClick}
+              size="lg"
+              className="group relative bg-gradient-to-r from-orange-400 to-red-400 hover:from-orange-500 hover:to-red-500 font-bold px-8 py-3.5 sm:px-16 sm:py-6 rounded-full text-base sm:text-xl md:text-2xl shadow-2xl transition-all duration-200 ease-out overflow-hidden transform hover:scale-105"
+              style={{ color: '#ffffff !important' }}
+            >
+              <span className="relative z-10 flex items-center gap-2 sm:gap-3" style={{ color: '#ffffff !important' }}>
+                {buttonText}
+                <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-150" />
+              </span>
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      <div className="absolute bottom-20 md:bottom-8 left-1/2 -translate-x-1/2 z-20 text-white opacity-100 pointer-events-none">
+        <div className="flex flex-col items-center gap-2">
+          <div className="w-px h-8 bg-gradient-to-b from-transparent to-white opacity-70" />
+          <ChevronRight className="w-6 h-6 rotate-90 drop-shadow-lg opacity-80" />
+        </div>
+      </div>
+    </div>
+  );
+});
+
 export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) {
   const { user, isLoading: authLoading, refetch: refetchUser } = useAuth();
   const { isPremium, isLoading: subscriptionLoading } = useSubscription();
@@ -118,7 +197,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const [openCard, setOpenCard] = useState<string | undefined>(undefined);
   const [navigationTrigger, setNavigationTrigger] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const { backgroundImage, animationKey, isLoading, imageLoaded } = useRotatingBackground(activeTab, navigationTrigger, isTransitioning);
+  const { backgroundImage } = useRotatingBackground(activeTab);
   const { data: achievements = [], isLoading: achievementsLoading } = useAchievements();
   const [searchQuery, setSearchQuery] = useState('');
   const [showAchievement, setShowAchievement] = useState(false);
@@ -1055,117 +1134,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     }
   };
 
-  // Optimized Hero Section Component with enhanced performance and visuals
-  const HeroSection = React.memo(({ title, subtitle, description, buttonText, onButtonClick, showLogo = false }: {
-    title: string;
-    subtitle: string; 
-    description: string;
-    buttonText: string;
-    onButtonClick: () => void;
-    showLogo?: boolean;
-  }) => {
-    
-    // Animations are now directly in the components - no conditional logic needed
-    
-    // Memoize the background style optimized for mobile food composition
-    const backgroundStyle = React.useMemo(() => ({
-      backgroundImage: `url('${backgroundImage}')`,
-      backgroundSize: '75%', // Zoom out to show more of the food photo
-      backgroundPosition: 'center center', // Center the food items in viewport
-      backgroundRepeat: 'no-repeat',
-      backgroundColor: '#0f172a', // Very dark fallback to prevent any color flash
-      backgroundAttachment: 'scroll', // Better mobile performance
-    }), [backgroundImage]);
-    
-    // Background classes - simple visibility control
-    const backgroundClasses = React.useMemo(() => {
-      const baseClasses = 'absolute inset-0 z-10 hero-bg-optimized';
-      
-      // Show when image is loaded and not loading
-      if (imageLoaded && !isLoading) {
-        return `${baseClasses} hero-bg-loaded`;
-      }
-      return `${baseClasses} hero-bg-hidden`;
-    }, [imageLoaded, isLoading]);
-
-    return (
-      <div className="relative h-screen overflow-hidden hero-component bg-gradient-to-br from-amber-50 to-amber-100" data-hero="true">
-        {/* Optimized Background Layer with preloading and smooth transitions */}
-        <div 
-          className={backgroundClasses}
-          style={backgroundStyle}
-        />
-        
-        {/* CSS-controlled Overlay for consistent opacity - always visible */}
-        <div className="hero-gradient-overlay opacity-100" style={{ zIndex: 11 }} />
-        
-        
-        {/* Content Layer with Enhanced Typography */}
-        <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-6 z-20 text-white">
-          <div className="space-y-8 max-w-2xl">
-            {/* ByteWise Logo - Only shown on dashboard */}
-            {showLogo && (
-              <div className="mb-12 -mt-16">
-                <img 
-                  src={logoImage} 
-                  alt="ByteWise Nutritionist Logo" 
-                  className="h-20 w-auto object-contain mx-auto drop-shadow-2xl"
-                  data-testid="bytewise-hero-logo"
-                />
-              </div>
-            )}
-            
-            {/* Animated Title Section */}
-            <div className="space-y-3 hero-optimized">
-              <h1 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] drop-shadow-2xl font-league-spartan text-optimized animate-slideUpH1">
-                {title}
-              </h1>
-              <h2 className={`text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] font-league-spartan ${showLogo ? 'text-white' : 'text-optimized'} drop-shadow-2xl animate-slideUpH2`}>
-                {subtitle}
-              </h2>
-            </div>
-            
-            {/* Clean Description */}
-            <p className="text-2xl md:text-3xl font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl font-work-sans text-gray-100 opacity-100">
-              {description}
-            </p>
-            
-            {/* Clean Call-to-Action */}
-            <div className="pt-8 opacity-100">
-              <Button 
-                onClick={onButtonClick}
-                size="lg"
-                className="group relative bg-gradient-to-r from-orange-400 to-red-400 hover:from-orange-500 hover:to-red-500 font-bold px-16 py-6 rounded-full text-xl md:text-2xl shadow-2xl transition-all duration-200 ease-out overflow-hidden transform hover:scale-105"
-                style={{ color: '#ffffff !important' }}
-              >
-                <span className="relative z-10 flex items-center gap-3" style={{ color: '#ffffff !important' }}>
-                  {buttonText}
-                  <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-150" />
-                </span>
-              </Button>
-            </div>
-          </div>
-        </div>
-        
-        {/* Clean Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 text-white opacity-100 pointer-events-none">
-          <div className="flex flex-col items-center gap-2">
-            <div className="w-px h-8 bg-gradient-to-b from-transparent to-white opacity-70" />
-            <ChevronRight className="w-6 h-6 rotate-90 drop-shadow-lg opacity-80" />
-          </div>
-        </div>
-      </div>
-    );
-  }, (prevProps, nextProps) => {
-    // Custom comparison for better performance - include activeTab for overlay changes
-    return (
-      prevProps.title === nextProps.title &&
-      prevProps.subtitle === nextProps.subtitle &&
-      prevProps.description === nextProps.description &&
-      prevProps.buttonText === nextProps.buttonText
-    );
-  });
-
   // Optimized ByteWise Logo Component
   const BytewiseLogo = React.memo(() => (
     <div className="mb-8 cursor-pointer group transition-transform duration-200 hover:scale-105" onClick={() => handleTabChange('home')}>
@@ -1577,6 +1545,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const renderHome = () => (
     <div className="space-y-0 page-container" data-page="dashboard">
       <HeroSection
+        backgroundImage={backgroundImage}
         title="Track Your"
         subtitle="Nutrition"
         description="Track nutrition with scientific precision using our comprehensive USDA database"
@@ -1586,7 +1555,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       />
 
       {/* Content Section - Completely Separate and Underneath */}
-      <div className="px-6 py-3 content-section">
+      <div className="px-4 sm:px-6 py-3 content-section">
         <div className="space-y-3">
           {/* Welcome Banner for Tour */}
           {user && showWelcomeBanner && (
@@ -1627,14 +1596,14 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <button
                 type="button"
                 onClick={() => handleTabChange('profile')}
-                className="ml-2 font-semibold text-orange-600 underline"
+                className="mt-1 font-semibold text-orange-600 underline"
               >
                 Create account
               </button>
             </div>
           )}
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-3xl font-semibold text-gray-900">Today's Progress</h2>
+          <div className="flex flex-col gap-1 mb-3 sm:flex-row sm:items-center sm:justify-between">
+            <h2 className="text-2xl sm:text-3xl font-semibold text-gray-900">Today's Progress</h2>
             <div className="flex gap-2">
               <Button 
                 variant="ghost" 
@@ -1764,6 +1733,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const renderTracking = () => (
     <div className="space-y-0 page-container">
       <HeroSection
+        backgroundImage={backgroundImage}
         title="Daily &"
         subtitle="Weekly"
         description="Track your nutrition progress and log meals"
@@ -1772,7 +1742,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       />
 
       {/* Content Section - Completely Separate and Underneath */}
-      <div className="px-6 py-3 content-section">
+      <div className="px-4 sm:px-6 py-3 content-section">
         {!user && (
           <div className="mb-4 p-3 rounded-xl bg-amber-50 border border-amber-200 text-sm text-gray-800">
             Entries on this device stay here until you create an account.
@@ -2020,8 +1990,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   );
 
   const renderAchievements = () => (
-    <div className="space-y-0">
+    <div className="space-y-0 page-container">
       <HeroSection
+        backgroundImage={backgroundImage}
         title="Your"
         subtitle="Goals"
         description="Track daily and weekly nutrition goals to unlock achievements"
@@ -2030,7 +2001,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       />
 
       {/* Content Section - Completely Separate and Underneath */}
-      <div className="px-6 py-3 content-section">
+      <div className="px-4 sm:px-6 py-3 content-section">
         {/* Goal Progress Cards */}
         <div className="space-y-4" data-testid="goals-section">
           {/* Daily Goals */}
@@ -2271,8 +2242,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     };
 
     return (
-      <div className="space-y-0">
+      <div className="space-y-0 page-container">
         <HeroSection
+          backgroundImage={backgroundImage}
           title="Welcome to"
           subtitle="Nutrition"
           description="Create an account to save your meals and keep them after you leave"
@@ -2281,7 +2253,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         />
 
         {/* Content Section - Completely Separate and Underneath */}
-        <div className="px-6 py-3 content-section">
+        <div className="px-4 sm:px-6 py-3 content-section">
           {/* Sign In Component */}
           <Card data-testid="signin-form" className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md p-6">
             <h3 className="text-2xl font-bold mb-6 text-center">
@@ -2384,6 +2356,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const renderDailyWeekly = () => (
     <div className="space-y-0">
       <HeroSection
+        backgroundImage={backgroundImage}
         title="Daily &"
         subtitle="Weekly"
         description="Track your calorie intake and search for foods to log"
@@ -2392,7 +2365,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       />
 
       {/* Content Section - Completely Separate and Underneath */}
-      <div className="px-6 py-3 content-section">
+      <div className="px-4 sm:px-6 py-3 content-section">
         {/* Food Search Bar - Enhanced with filtering */}
         <div className="space-y-4 mb-8">
           <div className="text-center">
@@ -2400,13 +2373,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <p className="text-gray-700">Find and log nutrition information</p>
           </div>
           <div className="relative">
-            <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-600 w-5 h-5" />
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-600 w-5 h-5" />
             <Input
               data-testid="main-food-search"
               placeholder="Search weekly food entries..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-28 pr-16 h-16 bg-amber-50/90 border-amber-400 text-gray-900 placeholder-gray-600 rounded-2xl text-xl font-medium text-center"
+              className="pl-12 pr-12 h-12 sm:h-14 md:h-16 bg-amber-50/90 border-amber-400 text-gray-900 placeholder-gray-600 rounded-2xl text-base md:text-xl font-medium text-center"
             />
             {searchQuery && (
               <Button
@@ -2527,6 +2500,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     return (
       <div className="space-y-0 page-container">
         <HeroSection
+          backgroundImage={backgroundImage}
           title="Smart"
           subtitle="Nutrition"
           description="AI-powered food analysis or precise USDA database calculator"
@@ -2535,11 +2509,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         />
         
         {/* Content Section - Completely Separate and Underneath */}
-        <div className="px-6 py-3 content-section">
+        <div className="px-4 sm:px-6 py-3 content-section">
           {/* Instructions Section */}
           <div className="mb-6 text-center">
             <div data-testid="analysis-method-choice" className="bg-gradient-to-r from-blue-500/10 to-orange-500/10 border border-gray-400/20 rounded-xl p-4 mb-4 transition-all duration-300">
-              <h3 className="font-semibold text-lg mb-3 text-center">🔍 Choose Your Nutrition Analysis Method</h3>
+              <h3 className="font-semibold text-base sm:text-lg mb-3 text-center">🔍 Choose Your Nutrition Analysis Method</h3>
               <p className="text-center text-gray-600 text-sm mb-4">Select your preferred method below, then use the toggle buttons to switch between options:</p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-base">
                 <div className="bg-blue-500/5 border border-blue-500/20 rounded-lg p-3">
@@ -2573,10 +2547,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           
           {/* Mode Toggle */}
           <div className="mb-6">
-            <div className="flex items-center justify-center space-x-1 rounded-full p-1 max-w-sm mx-auto">
+            <div className="flex flex-wrap items-center justify-center gap-1 rounded-full p-1 max-w-md mx-auto">
               <button
                 onClick={() => setNutritionMode('ai')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                className={`flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ${
                   nutritionMode === 'ai'
                     ? 'bg-amber-500 text-white shadow-lg'
                     : 'text-gray-400 hover:text-gray-900'
@@ -2584,11 +2558,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 data-testid="button-ai-mode"
               >
                 <Sparkles className="h-4 w-4" />
-                AI Photo Analysis
+                <span className="sm:hidden">AI Photo</span>
+                <span className="hidden sm:inline">AI Photo Analysis</span>
               </button>
               <button
                 onClick={() => setNutritionMode('calculator')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                className={`flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ${
                   nutritionMode === 'calculator'
                     ? 'bg-orange-500 text-white shadow-lg'
                     : 'text-gray-400 hover:text-gray-900'
@@ -2596,7 +2571,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 data-testid="button-calculator-mode"
               >
                 <Target className="h-4 w-4" />
-                USDA Calculator
+                <span className="sm:hidden">USDA</span>
+                <span className="hidden sm:inline">USDA Calculator</span>
               </button>
             </div>
           </div>
@@ -2638,6 +2614,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const renderProfile = () => (
     <div className="space-y-0 page-container">
       <HeroSection
+        backgroundImage={backgroundImage}
         title="Your"
         subtitle="Profile"
         description={user
@@ -2648,7 +2625,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       />
 
       {/* Content Section - Redesigned to match other pages */}
-      <div className="px-6 py-3 content-section" data-testid="profile-content">
+      <div className="px-4 sm:px-6 py-3 content-section" data-testid="profile-content">
         {/* Profile Cards with Unified Accordion System */}
         {user ? (
           <Accordion 
@@ -3114,8 +3091,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         return renderDailyWeekly();
       case 'fasting':
         return (
-          <div className="space-y-0">
+          <div className="space-y-0 page-container">
             <HeroSection
+              backgroundImage={backgroundImage}
               title="Intermittent"
               subtitle="Fasting"
               description="Track your fasting journey with professional IF schedules and real-time progress monitoring"
@@ -3124,8 +3102,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             />
             
             {/* Fasting Content Section */}
-            <div className="px-6 py-3 content-section">
-              <div data-testid="fasting-tracker" className="fasting-tracker bg-amber-50/90 backdrop-blur-md rounded-3xl border border-amber-200 p-6">
+            <div className="px-4 sm:px-6 py-3 content-section">
+              <div data-testid="fasting-tracker" className="fasting-tracker bg-amber-50/90 backdrop-blur-md rounded-3xl border border-amber-200 p-4 sm:p-6">
                 <FastingTracker />
               </div>
             </div>
@@ -3145,8 +3123,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         return renderDailyWeekly();
       case 'data':
         return (
-          <div className="space-y-0">
+          <div className="space-y-0 page-container">
             <HeroSection
+              backgroundImage={backgroundImage}
               title="Data"
               subtitle="Management"
               description="Export, sync, and manage your nutrition tracking data"
@@ -3155,7 +3134,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             />
 
             {/* Content Section - Completely Separate and Underneath */}
-            <div className="px-6 py-3 content-section">
+            <div className="px-4 sm:px-6 py-3 content-section">
               <div data-testid="data-management-panel" className="bg-amber-50/90 backdrop-blur-md rounded-3xl border border-amber-200 shadow-lg">
                 <DataManagementPanel onHealthDataSync={handleHealthDataSync} />
               </div>
@@ -3168,14 +3147,14 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   };
 
   return (
-    <div data-testid="app-container" className="h-screen w-screen">
+    <div data-testid="app-container" className="min-h-dvh w-full overflow-x-hidden">
       {/* Fixed Notification Header on all pages - Safe area positioning for iOS/Android */}
       <div className="fixed top-safe right-4 z-[9999] safe-notification-position">
         <div className="relative">
           <Button
             variant="ghost"
             size="lg"
-            className="group relative text-gray-600 p-3 transition-all duration-500 hover:scale-110 active:text-gray-100 focus:text-gray-100 active:bg-gray-700/30 focus:bg-gray-700/30"
+            className="group relative text-gray-600 p-2 md:p-3 transition-all duration-500 hover:scale-110 active:text-gray-100 focus:text-gray-100 active:bg-gray-700/30 focus:bg-gray-700/30"
             onClick={() => setShowNotificationDropdown(!showNotificationDropdown)}
             aria-label={`Notifications${notifications.filter(n => !n.read).length > 0 ? ` - ${notifications.filter(n => !n.read).length} unread` : ''}`}
             aria-expanded={showNotificationDropdown}
@@ -3184,9 +3163,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           >
             <div className="relative">
               {notifications.filter(n => !n.read).length > 0 ? (
-                <BellRing className="w-12 h-12 text-gray-600 transition-all duration-700 ease-in-out group-hover:rotate-12 group-hover:text-orange-600 animate-[colorShift_0.7s_ease-in-out]" strokeWidth={2.5} aria-hidden="true" />
+                <BellRing className="w-7 h-7 md:w-12 md:h-12 text-gray-600 transition-all duration-700 ease-in-out group-hover:rotate-12 group-hover:text-orange-600 animate-[colorShift_0.7s_ease-in-out]" strokeWidth={2.5} aria-hidden="true" />
               ) : (
-                <Bell className="w-12 h-12 text-gray-600 transition-all duration-700 ease-in-out group-hover:rotate-6 group-hover:text-orange-600 animate-[colorShift_0.7s_ease-in-out]" strokeWidth={2.5} aria-hidden="true" />
+                <Bell className="w-7 h-7 md:w-12 md:h-12 text-gray-600 transition-all duration-700 ease-in-out group-hover:rotate-6 group-hover:text-orange-600 animate-[colorShift_0.7s_ease-in-out]" strokeWidth={2.5} aria-hidden="true" />
               )}
             </div>
             
@@ -3204,7 +3183,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           
           {/* Notification Dropdown */}
           {showNotificationDropdown && (
-            <div className="absolute top-full right-0 mt-2 w-80 bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border border-amber-200/60 rounded-2xl shadow-2xl overflow-hidden z-[9999]">
+            <div className="absolute top-full right-0 mt-2 w-[min(20rem,calc(100vw-1.25rem))] bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border border-amber-200/60 rounded-2xl shadow-2xl overflow-hidden z-[9999]">
               <div className="p-4 border-b border-amber-200/40">
                 <div className="flex items-center justify-between">
                   <h3 className="font-semibold text-gray-900">Notifications</h3>
@@ -3254,12 +3233,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       
       {/* Bottom Navigation - High Resolution Icons */}
       <div data-testid="navigation-tabs" className="fixed bottom-0 left-0 right-0 bg-yellow-400 border-t border-yellow-500/60 safe-area-pb z-40 shadow-lg">
-        <div className="flex items-center justify-around py-0.5 px-1 max-w-md mx-auto gap-0.5">
+        <div className="flex items-stretch justify-around py-1 px-1 max-w-lg mx-auto gap-0.5">
           {[
             { id: 'home', label: 'Dashboard', icon: House, testId: 'nav-dashboard' },
-            { id: 'nutrition', label: 'Calorie Tracker', icon: ForkKnife, testId: 'nav-calculator' },
+            { id: 'nutrition', label: 'Tracker', icon: ForkKnife, testId: 'nav-calculator' },
             { id: 'fasting', label: 'Fasting', icon: Timer, testId: 'nav-fasting' },
-            { id: 'daily', label: 'Meal Journal', icon: ChartBar, testId: 'nav-journal' },
+            { id: 'daily', label: 'Journal', icon: ChartBar, testId: 'nav-journal' },
             { id: 'profile', label: 'Profile', icon: User, testId: 'nav-profile' }
           ].map((tab) => {
             const IconComponent = tab.icon;
@@ -3295,23 +3274,23 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 key={tab.id}
                 data-testid={tab.testId}
                 onClick={handleClick}
-                className={`group relative overflow-hidden transition-colors duration-150 ${
+                className={`group relative flex flex-1 min-w-0 flex-col items-center justify-center px-0.5 py-1 transition-colors duration-150 ${
                   activeTab === tab.id
                     ? 'text-white'
                     : 'text-black hover:text-white active:text-white'
                 }`}
               >
                 <IconComponent 
-                  size={24}
+                  size={22}
                   weight={activeTab === tab.id ? "fill" : "regular"}
-                  className={`mb-1.5 transition-all duration-300 ease-out transform ${
+                  className={`mb-1 transition-all duration-300 ease-out transform ${
                     activeTab === tab.id 
                       ? 'scale-110 drop-shadow-lg text-white nav-icon-active' 
                       : 'scale-100 hover:scale-110 hover:text-white hover:rotate-3'
                   }`}
                   style={{ strokeWidth: activeTab === tab.id ? 2.5 : 2 }}
                 />
-                <span className={`text-[8px] font-semibold leading-tight text-center w-full transition-colors duration-150 ease-out ${
+                <span className={`text-[10px] font-semibold leading-tight text-center w-full px-0.5 transition-colors duration-150 ease-out ${
                   activeTab === tab.id 
                     ? 'text-white drop-shadow-sm font-bold' 
                     : 'text-black hover:text-white active:text-white'
