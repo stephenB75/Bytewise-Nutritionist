@@ -6,20 +6,23 @@
 import type { Request, Response, NextFunction } from 'express';
 import { createClient } from '@supabase/supabase-js';
 
-// Environment variables - NO fallbacks for security
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
-const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
+const SUPABASE_URL =
+  process.env.SUPABASE_URL ||
+  process.env.VITE_SUPABASE_URL ||
+  'https://bcfilsryfjwemqytwbvr.supabase.co';
+const SUPABASE_ANON_KEY =
+  process.env.SUPABASE_ANON_KEY ||
+  process.env.VITE_SUPABASE_ANON_KEY ||
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJjZmlsc3J5Zmp3ZW1xeXR3YnZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQwMzU5MTksImV4cCI6MjA2OTYxMTkxOX0.9AJ51rynZVDSINfVWYsh9s2cjpUvz75BR7FiA_TqNvk';
+const SUPABASE_SERVICE_KEY =
+  process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-  console.error('SUPABASE_URL and SUPABASE_ANON_KEY are missing. Auth routes will fail until they are set.');
+if (!process.env.SUPABASE_URL && !process.env.VITE_SUPABASE_URL) {
+  console.warn('Using built-in Supabase project URL. Set SUPABASE_URL on Railway to override.');
 }
 
 // Create Supabase client for regular operations
-const supabase = createClient(
-  SUPABASE_URL || 'https://placeholder.supabase.co',
-  SUPABASE_ANON_KEY || 'placeholder-anon-key'
-);
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Create admin client for server-side operations (email verification, etc.)
 const supabaseAdmin = SUPABASE_SERVICE_KEY 

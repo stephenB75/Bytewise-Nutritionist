@@ -20,9 +20,12 @@ function getEnvVar(key: string): string {
   return '';
 }
 
-const supabaseUrl = getEnvVar('VITE_SUPABASE_URL');
-const supabaseAnonKey = getEnvVar('VITE_SUPABASE_ANON_KEY');
-const usdaApiKey = getEnvVar('VITE_USDA_API_KEY');
+const supabaseUrl =
+  getEnvVar('VITE_SUPABASE_URL') || 'https://bcfilsryfjwemqytwbvr.supabase.co';
+const supabaseAnonKey =
+  getEnvVar('VITE_SUPABASE_ANON_KEY') ||
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJjZmlsc3J5Zmp3ZW1xeXR3YnZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQwMzU5MTksImV4cCI6MjA2OTYxMTkxOX0.9AJ51rynZVDSINfVWYsh9s2cjpUvz75BR7FiA_TqNvk';
+const usdaApiKey = getEnvVar('VITE_USDA_API_KEY') || 'DEMO_KEY';
 
 export const config = {
   isDev,
