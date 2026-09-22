@@ -28,6 +28,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 
 interface FastingPlan {
   id: string;
@@ -121,6 +122,44 @@ const FASTING_MILESTONES_KEY = 'bytewise_fasting_milestones';
 // Fasting milestone hours (in hours)
 const MILESTONE_HOURS = [8, 12, 16, 18, 20, 24, 36, 48, 72];
 
+function readLocalFastingHistory(): any[] {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(FASTING_HISTORY_KEY) || '[]');
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function normalizeFastingSession(session: any) {
+  if (!session || typeof session !== 'object') return session;
+
+  const targetDuration = Number(session.targetDuration ?? session.target_duration ?? 0);
+  const actualDuration = Number(session.actualDuration ?? session.actual_duration ?? 0);
+
+  return {
+    ...session,
+    id: session.id,
+    planId: session.planId ?? session.plan_id,
+    planName: session.planName ?? session.plan_name,
+    startTime: session.startTime ?? session.start_time,
+    endTime: session.endTime ?? session.end_time,
+    completedAt: session.completedAt ?? session.completed_at ?? session.endTime ?? session.end_time,
+    createdAt: session.createdAt ?? session.created_at,
+    status: session.status,
+    targetDuration,
+    actualDuration,
+    targetHours: session.targetHours ?? (targetDuration ? targetDuration / (1000 * 60 * 60) : undefined),
+    actualHoursFasted: session.actualHoursFasted ?? (actualDuration ? actualDuration / (1000 * 60 * 60) : undefined),
+    wasCompleted: session.wasCompleted ?? session.status === 'completed',
+  };
+}
+
+function isPastFastingSession(session: any): boolean {
+  const status = String(session?.status ?? '').toLowerCase();
+  return status !== 'active';
+}
+
 const FastingTracker = React.memo(function FastingTracker() {
   const [selectedPlan, setSelectedPlan] = useState<FastingPlan>(FASTING_PLANS[0]);
   const [currentSession, setCurrentSession] = useState<FastingSession | null>(null);
@@ -131,67 +170,69 @@ const FastingTracker = React.memo(function FastingTracker() {
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const [localHistory, setLocalHistory] = useState<any[]>(() => readLocalFastingHistory());
 
+  const refreshLocalHistory = useCallback(() => {
+    setLocalHistory(readLocalFastingHistory());
+  }, []);
 
-
-  // Get user's fasting history (combine server and local)
-  const { data: serverHistory, isLoading, error: historyError } = useQuery({
+  const { data: serverHistory, isFetching: isSyncingHistory } = useQuery({
     queryKey: ['/api/fasting/history'],
-    queryFn: () => apiRequest('GET', '/api/fasting/history').then(res => res.json()),
-    retry: 1,
-    staleTime: 30000 // Cache for 30 seconds
+    enabled: !!user,
+    retry: false,
+    staleTime: 30000,
+    queryFn: async () => {
+      try {
+        const response = await apiRequest('GET', '/api/fasting/history');
+        return await response.json();
+      } catch {
+        return [];
+      }
+    },
   });
   
-  // Merge server history with local history
   const fastingHistory = useMemo(() => {
-    let localHistory: any[] = [];
-    try {
-      localHistory = JSON.parse(localStorage.getItem(FASTING_HISTORY_KEY) || '[]');
-      } catch (e) {
-      // Failed to parse local fasting history, using empty array
-      localHistory = [];
-    }
-    
-    const serverData = Array.isArray(serverHistory) ? serverHistory : [];
+    const serverData = (Array.isArray(serverHistory) ? serverHistory : []).map(normalizeFastingSession);
+    const localData = localHistory.map(normalizeFastingSession);
 
-    
-    // Combine and deduplicate by id
-    const combined = [...localHistory, ...serverData];
-    const seen = new Set();
+    const combined = [...localData, ...serverData];
+    const seen = new Set<string>();
+
     const unique = combined.filter((session: any) => {
-      // Handle sessions without IDs (local sessions)
-      if (!session.id) {
-        // Create a temporary unique identifier for deduplication
-        const tempId = `${session.planId}_${session.startTime}_${session.status}`;
-        if (seen.has(tempId)) return false;
-        seen.add(tempId);
-        return true;
-      }
-      
-      // Handle sessions with IDs (server sessions)
-      if (seen.has(session.id)) return false;
-      seen.add(session.id);
+      const key = session.id
+        ? String(session.id)
+        : `${session.planId}_${session.startTime}_${session.status}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
       return true;
     });
-    
-    // Sort by date (most recent first)
-    const sorted = unique.sort((a: any, b: any) => {
-      const dateA = new Date(a.completedAt || a.endTime || a.createdAt || 0).getTime();
-      const dateB = new Date(b.completedAt || b.endTime || b.createdAt || 0).getTime();
+
+    return unique.sort((a: any, b: any) => {
+      const dateA = new Date(a.completedAt || a.endTime || a.createdAt || a.startTime || 0).getTime();
+      const dateB = new Date(b.completedAt || b.endTime || b.createdAt || b.startTime || 0).getTime();
       return dateB - dateA;
     });
-    
+  }, [serverHistory, localHistory]);
 
-    return sorted;
-  }, [serverHistory]);
+  const pastSessions = useMemo(
+    () => fastingHistory.filter(isPastFastingSession).slice(0, 8),
+    [fastingHistory],
+  );
 
-  // Get active fasting session from server on mount
   const { data: activeFastingSession } = useQuery({
     queryKey: ['/api/fasting/active'],
-    queryFn: () => apiRequest('GET', '/api/fasting/active').then(res => res.json()),
-    enabled: !currentSession, // Only fetch if we don't have a local session
-    retry: 1,
-    staleTime: 10000 // Cache for 10 seconds
+    enabled: !!user && !currentSession,
+    retry: false,
+    staleTime: 10000,
+    queryFn: async () => {
+      try {
+        const response = await apiRequest('GET', '/api/fasting/active');
+        return await response.json();
+      } catch {
+        return null;
+      }
+    },
   });
 
   // Start fasting session mutation
@@ -263,6 +304,7 @@ const FastingTracker = React.memo(function FastingTracker() {
           // Keep only last 10 sessions in local storage
           const finalHistory = filteredHistory.slice(0, 10);
           localStorage.setItem(FASTING_HISTORY_KEY, JSON.stringify(finalHistory));
+          refreshLocalHistory();
         } catch (e) {
           // Failed to save to localStorage
         }
@@ -336,6 +378,7 @@ const FastingTracker = React.memo(function FastingTracker() {
           filteredHistory.unshift(completedSession);
           const finalHistory = filteredHistory.slice(0, 10);
           localStorage.setItem(FASTING_HISTORY_KEY, JSON.stringify(finalHistory));
+          refreshLocalHistory();
         } catch (e) {
           // Failed to save to localStorage
         }
@@ -721,6 +764,7 @@ const FastingTracker = React.memo(function FastingTracker() {
         const existingHistory = JSON.parse(localStorage.getItem(FASTING_HISTORY_KEY) || '[]');
         existingHistory.unshift(sessionSummary);
         localStorage.setItem(FASTING_HISTORY_KEY, JSON.stringify(existingHistory.slice(0, 20))); // Keep last 20 sessions
+        refreshLocalHistory();
       } catch (e) {
         // Failed to store session in history
       }
@@ -774,7 +818,7 @@ const FastingTracker = React.memo(function FastingTracker() {
       completeFastingMutation.mutate(currentSession.id);
     }
     
-    // Invalidate queries to refresh history
+    refreshLocalHistory();
     queryClient.invalidateQueries({ queryKey: ['/api/fasting/history'] });
   };
 
@@ -925,17 +969,12 @@ const FastingTracker = React.memo(function FastingTracker() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {isLoading ? (
-                <div className="text-center py-4">
-                  <p className="text-sm text-gray-700">Loading history...</p>
-                </div>
-              ) : fastingHistory && Array.isArray(fastingHistory) && fastingHistory.length > 0 ? (
+              {isSyncingHistory && user && (
+                <p className="mb-3 text-center text-xs text-gray-600">Syncing sessions…</p>
+              )}
+              {pastSessions.length > 0 ? (
                 <div className="space-y-4">
-
-                  {fastingHistory
-                    .filter((session: any) => session.status === 'completed' || session.status === 'stopped')
-                    .slice(0, 8)
-                    .map((session: any, index: number) => {
+                  {pastSessions.map((session: any, index: number) => {
                       const duration = session.actualDuration || session.targetDuration || 0;
                       const actualHours = session.actualHoursFasted || (duration / (1000 * 60 * 60));
                       const targetHours = session.targetHours || session.targetDuration / (1000 * 60 * 60) || 16; // fallback to 16h
@@ -975,7 +1014,10 @@ const FastingTracker = React.memo(function FastingTracker() {
                             </div>
                           </div>
                           <div className="text-right">
-                            <Badge variant={wasCompleted ? "secondary" : "outline"} className={wasCompleted ? "bg-green-600 text-white" : "bg-orange-100 text-orange-700 border-none"}>
+                            <Badge
+                              variant="outline"
+                              className={wasCompleted ? 'border-none bg-green-100 text-green-900' : 'border-none bg-orange-100 text-orange-900'}
+                            >
                               {formatHours(actualHours)} {wasCompleted ? 'completed' : 'fasted'}
                             </Badge>
                             {!wasCompleted && (
@@ -987,19 +1029,12 @@ const FastingTracker = React.memo(function FastingTracker() {
                         </div>
                       );
                     })}
-                  {fastingHistory.filter((session: any) => session.status === 'completed' || session.status === 'stopped').length === 0 && (
-                    <div className="text-center py-6">
-                      <Coffee className="w-8 h-8 mx-auto text-gray-700 mb-2" />
-                      <p className="text-sm text-gray-700">No fasting sessions yet</p>
-                      <p className="text-xs text-gray-700 mt-1">Start your first fast to see it here!</p>
-                    </div>
-                  )}
                 </div>
               ) : (
                 <div className="text-center py-6">
                   <Coffee className="w-8 h-8 mx-auto text-gray-700 mb-2" />
-                  <p className="text-sm text-gray-700">No fasting history yet</p>
-                  <p className="text-xs text-gray-700 mt-1">Start your first fast to build your history!</p>
+                  <p className="text-sm text-gray-900">No fasting sessions yet</p>
+                  <p className="text-xs text-gray-700 mt-1">Start your first fast to see it here!</p>
                 </div>
               )}
             </CardContent>
@@ -1028,13 +1063,13 @@ const FastingTracker = React.memo(function FastingTracker() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    <div className="flex items-center gap-4 text-sm">
+                    <div className="flex items-center gap-4 text-sm text-gray-900">
                       <div className="flex items-center gap-1">
-                        <Moon className="w-4 h-4 text-blue-500" />
+                        <Moon className="w-4 h-4 text-blue-600" />
                         <span>{plan.fastingHours}h fast</span>
                       </div>
                       <div className="flex items-center gap-1">
-                        <Utensils className="w-4 h-4 text-green-500" />
+                        <Utensils className="w-4 h-4 text-green-700" />
                         <span>{plan.eatingHours}h eating</span>
                       </div>
                     </div>
@@ -1043,7 +1078,11 @@ const FastingTracker = React.memo(function FastingTracker() {
                       <p className="text-sm font-medium mb-2 text-gray-900">Benefits:</p>
                       <div className="flex flex-wrap gap-1">
                         {plan.benefits.map((benefit, index) => (
-                          <Badge key={index} variant="outline" className="text-xs bg-blue-600 text-white border-none">
+                          <Badge
+                            key={index}
+                            variant="outline"
+                            className="text-xs border border-blue-200 bg-blue-100 text-blue-900"
+                          >
                             {benefit}
                           </Badge>
                         ))}

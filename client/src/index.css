@@ -440,7 +440,7 @@ button[class*="bg-black"]:hover:not(.badge):not([class*="badge"]):not([data-test
 /* Content sections inherit the natural yellow gradient background */
 
 /* Simplified text color optimization for yellow/amber background */
-.text-white:not(.btn-hero-enhanced *):not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav"] *):not([class*="badge"]):not(.badge):not([class*="progress"]):not([class*="water"]):not([class*="macro"]):not([class*="micro"]):not([class*="notification"]) { 
+.text-white:not(.btn-hero-enhanced *):not(.hero-component *):not([data-hero="true"] *):not([data-testid*="nav"] *):not([class*="badge"]):not(.badge):not([class*="progress"]):not([class*="water"]):not([class*="macro"]):not([class*="micro"]):not([class*="notification"]):not([data-testid="fasting-tracker"] *) { 
   color: #111827 !important; /* Dark for yellow background readability */
 }
 
