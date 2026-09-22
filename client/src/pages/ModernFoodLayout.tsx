@@ -762,18 +762,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       try {
         let stored: any[] = [];
         
-        // For authenticated users, load from database only
-        if (user) {
-          try {
-            stored = await listLoggedMeals();
-          } catch (error) {
-            console.error('Database error:', error);
-            stored = [];
-          }
-        } else {
-          // For unauthenticated users, use empty array (require authentication)
+        try {
+          stored = await listLoggedMeals();
+        } catch (error) {
           stored = [];
-            }
+        }
         
         // Simple date matching - use today's actual date without correction
         const today = getLocalDateKey();
@@ -845,10 +838,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         checkFastingStatus();
         
         // Calculate weekly calories from database data (matching WeeklyCaloriesCard logic)
-        if (user) {
+        if (stored.length) {
           try {
-            // Load weekly data from database for accurate calculation
-            const databaseMeals = await listLoggedMeals();
+            const databaseMeals = stored;
             const currentWeekDates = getWeekDates();
             const weekDateKeys = currentWeekDates.map(date => getLocalDateKey(date));
             

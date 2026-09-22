@@ -126,7 +126,6 @@ export async function ensureUserProfile(): Promise<string | null> {
 }
 
 export async function listLoggedMeals(): Promise<LoggedMeal[]> {
-  await getSessionUser();
   const response = await apiRequest('GET', '/api/meals/logged');
   const data = await response.json();
   return (Array.isArray(data) ? data : []).map((row) => mapMeal(row as Record<string, unknown>));
