@@ -26,8 +26,13 @@ import {
   Database,
   Cloud
 } from 'lucide-react';
+import { AppleHealthIntegration } from '@/components/AppleHealthIntegration';
 
-export function DataManagementPanel() {
+interface DataManagementPanelProps {
+  onHealthDataSync?: (data: any) => void;
+}
+
+export function DataManagementPanel({ onHealthDataSync }: DataManagementPanelProps) {
   const { user } = useAuth();
   const { toast } = useToast();
   const { isPremium } = useSubscription();
@@ -164,6 +169,8 @@ export function DataManagementPanel() {
 
         {/* Data Management Content */}
         <div className="space-y-6">
+          <AppleHealthIntegration onHealthDataSync={onHealthDataSync} />
+
           {/* Export Section */}
                   <div className="p-6 bg-gradient-to-br from-[#1f4aa6]/10 to-[#1f4aa6]/5 rounded-2xl border border-[#1f4aa6]/20 backdrop-blur-md">
                     <div className="flex flex-col items-center text-center space-y-4">

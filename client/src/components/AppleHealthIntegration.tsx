@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Heart, Smartphone, Settings, CheckCircle, AlertCircle } from 'lucide-react';
+import { Heart, Settings, CheckCircle } from 'lucide-react';
 import { healthKitService } from '@/services/healthKit';
 import { toast } from '@/hooks/use-toast';
 
@@ -132,27 +132,17 @@ export function AppleHealthIntegration({ onHealthDataSync }: AppleHealthIntegrat
 
   if (!isAvailable) {
     return (
-      <Card className="w-full bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200/40">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-gray-950">
-            <Heart className="h-5 w-5 text-red-500" />
-            Apple Health
-          </CardTitle>
-          <CardDescription className="text-gray-700">
-            Save meals and water to Apple Health from the ByteWise iOS app.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-3 text-sm text-gray-700">
-          <div className="flex items-start gap-2">
-            <Smartphone className="h-4 w-4 mt-0.5 text-orange-600" />
-            <span>On iPhone, open ByteWise and connect Apple Health here. Logged calories and water then appear in the Health app.</span>
+      <div className="p-4 rounded-2xl border border-amber-200/40 bg-white/50">
+        <div className="flex items-start gap-3">
+          <Heart className="h-5 w-5 text-red-500 mt-0.5 shrink-0" />
+          <div className="space-y-1" style={{ fontFamily: "'Work Sans', sans-serif" }}>
+            <p className="font-semibold text-gray-950">Apple Health</p>
+            <p className="text-sm text-gray-700 leading-relaxed">
+              Connect this on the ByteWise iPhone app to send logged meals and water to the Health app.
+            </p>
           </div>
-          <div className="flex items-start gap-2">
-            <AlertCircle className="h-4 w-4 mt-0.5 text-amber-600" />
-            <span>Safari and the website cannot write to Apple Health. Use the iOS app for this sync.</span>
-          </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     );
   }
 

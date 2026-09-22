@@ -61,8 +61,7 @@ import {
   PlayCircle,
   GraduationCap,
   Play,
-  Camera,
-  Heart
+  Camera
 } from 'lucide-react';
 import { House, ForkKnife, Timer, ChartBar, User } from 'phosphor-react';
 import { NotificationDropdown } from '@/components/NotificationDropdown';
@@ -77,7 +76,6 @@ import { fixMealDateMismatches } from '@/utils/mealDateFixer';
 import { getCachedLocalStorage, debounce } from '@/utils/performanceUtils';
 import { useLocation } from 'wouter';
 import AIFoodAnalyzer from './AIFoodAnalyzer';
-import { AppleHealthIntegration } from '../components/AppleHealthIntegration';
 import { healthKitService } from '../services/healthKit';
 import { PremiumFeatureGate } from '@/components/PremiumFeatureGate';
 import { useSubscription } from '@/hooks/useSubscription';
@@ -2719,29 +2717,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               </Card>
             </AccordionItem>
 
-            <AccordionItem value="apple-health" className="border-none">
-              <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 overflow-hidden rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:from-amber-100 hover:to-amber-200 hover:border-amber-300/50">
-                <AccordionTrigger className="px-6 py-6 hover:bg-amber-200/30 hover:no-underline [&[data-state=open]>div]:text-[#faed39] [&[data-state=open]]:bg-amber-200/30">
-                  <div className="flex items-center justify-between w-full">
-                    <div className="flex items-center space-x-3">
-                      <Heart className="w-6 h-6 text-red-500" />
-                      <div>
-                        <h3 className="text-xl font-semibold transition-colors" style={{ fontFamily: "'League Spartan', sans-serif" }}>
-                          Apple Health
-                        </h3>
-                        <p className="text-sm text-gray-700" style={{ fontFamily: "'Work Sans', sans-serif" }}>
-                          Sync meals and water with the Health app
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className="px-6 pb-6 pt-0">
-                  <AppleHealthIntegration onHealthDataSync={handleHealthDataSync} />
-                </AccordionContent>
-              </Card>
-            </AccordionItem>
-
             {/* App Tour Launcher Card */}
             <AccordionItem value="tour" className="border-none">
               <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 overflow-hidden rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:from-amber-100 hover:to-amber-200 hover:border-amber-300/50">
@@ -3129,18 +3104,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 </AccordionTrigger>
                 
                 <AccordionContent className="px-6 pb-6 pt-0">
-                  <DataManagementPanel />
+                  <DataManagementPanel onHealthDataSync={handleHealthDataSync} />
                 </AccordionContent>
               </Card>
             </AccordionItem>
           </Accordion>
         ) : (
-          <div className="space-y-6">
-            <AppleHealthIntegration onHealthDataSync={handleHealthDataSync} />
-            <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 p-8">
-              <SignOnModule />
-            </Card>
-          </div>
+          <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 p-8">
+            <SignOnModule />
+          </Card>
         )}
       </div>
     </div>
@@ -3209,7 +3181,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             {/* Content Section - Completely Separate and Underneath */}
             <div className="px-6 py-3 content-section">
               <div className="bg-amber-50/90 backdrop-blur-md rounded-3xl border border-amber-200 shadow-lg">
-                <DataManagementPanel />
+                <DataManagementPanel onHealthDataSync={handleHealthDataSync} />
               </div>
             </div>
           </div>
