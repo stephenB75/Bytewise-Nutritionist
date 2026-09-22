@@ -419,70 +419,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         if (signInError) {
           console.log('❌ Authentication failed:', signInError.message);
-          
-          // Now check if user exists to provide specific error messages
-          if (signInError.message.includes('Invalid login credentials')) {
-            console.log('🔍 Checking if user exists for better error message...');
-            
-            // Try to find user in admin list (with pagination handling)
-            let existingUser = null;
-            let nextPage: string = '';
-            let attempts = 0;
-            const maxAttempts = 5; // Prevent infinite loops
-            
-            while (!existingUser && attempts < maxAttempts) {
-              const listOptions: any = { perPage: 1000 };
-              if (nextPage) listOptions.page = nextPage;
-              
-              const { data: users, error: listError } = await supabaseAdmin.auth.admin.listUsers(listOptions);
-              
-              if (listError) {
-                console.log('❌ Failed to list users:', listError.message);
-                break;
-              }
-              
-              existingUser = users?.users?.find(u => u.email?.toLowerCase() === email);
-              nextPage = String(users?.nextPage || '');
-              attempts++;
-              
-              console.log(`📄 Searched page ${attempts}, found ${users?.users?.length} users, nextPage: ${!!nextPage}`);
-              console.log('👥 Users found:', users?.users?.map(u => ({ email: u.email, verified: !!u.email_confirmed_at })));
-              
-              if (!nextPage || existingUser) break;
-            }
-            
-            if (existingUser && !existingUser.email_confirmed_at) {
-              console.log('❌ User found but email not verified');
-              return res.status(400).json({ 
-                message: "Please verify your email address before signing in. Check your email for a verification link.",
-                code: "EMAIL_NOT_VERIFIED",
-                requiresVerification: true
-              });
-            } else if (existingUser) {
-              console.log('❌ User found but wrong password');
-              return res.status(400).json({ 
-                message: "Invalid email or password. Please check your credentials and try again.",
-                code: "INVALID_CREDENTIALS"
-              });
-            } else {
-              console.log('❌ User account not found after searching all pages');
-              return res.status(400).json({ 
-                message: "No account found with this email address. Please sign up first or check your email address.",
-                code: "ACCOUNT_NOT_FOUND"
-              });
-            }
-          } else if (signInError.message.includes('Email not confirmed')) {
-            console.log('❌ Email not confirmed error');
-            return res.status(400).json({ 
-              message: "Please verify your email address before signing in. Check your email for a verification link.",
-              code: "EMAIL_NOT_VERIFIED",
-              requiresVerification: true
+          const msg = signInError.message || '';
+          const lower = msg.toLowerCase();
+
+          if (
+            lower.includes('email not confirmed') ||
+            lower.includes('email_not_confirmed')
+          ) {
+            return res.status(400).json({
+              message:
+                'Please verify your email address before signing in. Check your email for the verification link.',
+              code: 'EMAIL_NOT_VERIFIED',
+              requiresVerification: true,
             });
           }
-          
-          return res.status(400).json({ 
-            message: "Sign in failed. Please try again.",
-            code: "SIGNIN_FAILED"
+
+          if (
+            lower.includes('invalid login credentials') ||
+            lower.includes('invalid_credentials')
+          ) {
+            return res.status(400).json({
+              message:
+                'Email or password is incorrect. If you just signed up, verify your email first, or use Forgot password.',
+              code: 'INVALID_CREDENTIALS',
+            });
+          }
+
+          return res.status(400).json({
+            message: msg || 'Sign in failed. Please try again.',
+            code: 'SIGNIN_FAILED',
           });
         }
 

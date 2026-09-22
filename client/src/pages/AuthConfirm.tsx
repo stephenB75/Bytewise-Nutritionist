@@ -42,8 +42,20 @@ export default function AuthConfirm() {
           navigate(`/?auth_error=${encodeURIComponent(error.message)}`);
           return;
         }
-        if (params.type === 'signup' || params.type === 'email') {
-          navigate('/verify-email');
+
+        await supabase.auth.getSession();
+        window.dispatchEvent(new CustomEvent('auth-state-change'));
+
+        if (
+          params.type === 'signup' ||
+          params.type === 'email' ||
+          params.type === 'email_change' ||
+          params.type === 'invite'
+        ) {
+          navigate(
+            '/?verified=true&message=' +
+              encodeURIComponent('Email verified! You are signed in.')
+          );
           return;
         }
       }
@@ -55,7 +67,8 @@ export default function AuthConfirm() {
           navigate(`/?auth_error=${encodeURIComponent(error.message)}`);
           return;
         }
-        navigate('/');
+        window.dispatchEvent(new CustomEvent('auth-state-change'));
+        navigate('/?verified=true');
         return;
       }
 

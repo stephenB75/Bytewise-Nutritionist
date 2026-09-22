@@ -133,8 +133,16 @@ export function shouldShowProfileCompletion() {
 }
 
 async function finishSignedIn(): Promise<AuthActionResult> {
-  await ensureUserProfile();
-  await syncGuestMeals();
+  try {
+    await ensureUserProfile();
+  } catch (error) {
+    console.warn('ensureUserProfile after sign-in:', error);
+  }
+  try {
+    await syncGuestMeals();
+  } catch (error) {
+    console.warn('syncGuestMeals after sign-in:', error);
+  }
   window.dispatchEvent(new CustomEvent('auth-state-change'));
   return { ok: true, kind: 'signed_in' };
 }
@@ -223,6 +231,33 @@ export async function signUpWithEmail(email: string, password: string): Promise<
   };
 }
 
+async function signInWithSupabaseClient(
+  normalized: string,
+  password: string
+): Promise<AuthActionResult> {
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: normalized,
+    password,
+  });
+
+  if (error) {
+    return mapAuthError(error, normalized);
+  }
+
+  if (data?.user && !data.user.email_confirmed_at) {
+    await supabase.auth.signOut();
+    return {
+      ok: false,
+      code: 'EMAIL_NOT_VERIFIED',
+      message:
+        'Please verify your email before signing in. Check your inbox for the verification link.',
+      email: normalized,
+    };
+  }
+
+  return finishSignedIn();
+}
+
 export async function signInWithEmail(email: string, password: string): Promise<AuthActionResult> {
   const normalized = normalizeEmail(email);
 
@@ -241,48 +276,44 @@ export async function signInWithEmail(email: string, password: string): Promise<
 
     if (response.ok && body.session?.access_token && body.session?.refresh_token) {
       const applied = await applyServerSession(body.session);
-      return applied ?? { ok: false, code: 'AUTH_ERROR', message: 'Could not start session.', email: normalized };
+      if (applied?.ok) {
+        return applied;
+      }
+      console.warn('Server session could not be applied, trying direct sign-in');
     }
 
-    if (!response.ok) {
-      if (response.status >= 500) {
-        return mapApiErrorBody({ ...body, code: body.code || 'SERVICE_ERROR' }, normalized);
+    if (response.ok && !body.session?.access_token) {
+      console.warn('Sign-in API returned 200 without session');
+    }
+
+    if (!response.ok && response.status < 500) {
+      const code = body.code;
+      if (code === 'EMAIL_NOT_VERIFIED') {
+        return mapApiErrorBody(body, normalized);
       }
-      return mapApiErrorBody(body, normalized);
+      if (code === 'INVALID_CREDENTIALS' || code === 'SIGNIN_FAILED') {
+        const clientResult = await signInWithSupabaseClient(normalized, password);
+        if (clientResult.ok || clientResult.code === 'EMAIL_NOT_VERIFIED') {
+          return clientResult;
+        }
+        return mapApiErrorBody(body, normalized);
+      }
+      if (code !== 'ACCOUNT_NOT_FOUND') {
+        return mapApiErrorBody(body, normalized);
+      }
+    }
+
+    if (!response.ok && response.status >= 500) {
+      return mapApiErrorBody({ ...body, code: body.code || 'SERVICE_ERROR' }, normalized);
     }
   } catch (error) {
     if (isNetworkFailure(error)) {
-      return {
-        ok: false,
-        code: 'NETWORK_ERROR',
-        message:
-          'Could not reach the sign-in service. Check your connection, then try again.',
-        email: normalized,
-      };
+      return signInWithSupabaseClient(normalized, password);
     }
     console.warn('Sign-in API failed, falling back to Supabase client:', error);
   }
 
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email: normalized,
-    password,
-  });
-
-  if (error) {
-    return mapAuthError(error, normalized);
-  }
-
-  if (data?.user && !data.user.email_confirmed_at) {
-    await supabase.auth.signOut();
-    return {
-      ok: false,
-      code: 'EMAIL_NOT_VERIFIED',
-      message: 'Please verify your email before signing in. Check your inbox for the verification link.',
-      email: normalized,
-    };
-  }
-
-  return finishSignedIn();
+  return signInWithSupabaseClient(normalized, password);
 }
 
 export async function resetPasswordForEmail(email: string): Promise<AuthActionResult> {
