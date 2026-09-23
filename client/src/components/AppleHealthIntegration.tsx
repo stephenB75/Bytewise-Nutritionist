@@ -1,17 +1,26 @@
 import React, { useState, useEffect } from 'react';
+import { Capacitor } from '@capacitor/core';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Heart, Settings, CheckCircle } from 'lucide-react';
+import { Heart, CheckCircle, Footprints, Flame, Activity, Smartphone, Loader2 } from 'lucide-react';
 import { healthKitService } from '@/services/healthKit';
 import { toast } from '@/hooks/use-toast';
 
+const READ_ITEMS = [
+  { icon: Footprints, label: 'Steps', color: 'text-blue-600' },
+  { icon: Flame, label: 'Move calories', color: 'text-orange-600' },
+  { icon: Activity, label: 'Walking & running distance', color: 'text-purple-600' },
+];
+
 export function AppleHealthIntegration() {
+  const isNativeIos = Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios';
   const [isAvailable, setIsAvailable] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
+  const [isChecking, setIsChecking] = useState(isNativeIos);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    if (!isNativeIos) return;
     let cancelled = false;
 
     const load = async () => {
@@ -19,13 +28,14 @@ export function AppleHealthIntegration() {
       if (cancelled) return;
       setIsAvailable(healthKitService.getAvailability());
       setIsConnected(healthKitService.getAuthorizationStatus());
+      setIsChecking(false);
     };
 
     load();
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [isNativeIos]);
 
   const handleConnect = async () => {
     setIsLoading(true);
@@ -38,13 +48,13 @@ export function AppleHealthIntegration() {
         window.dispatchEvent(new CustomEvent('apple-health-changed'));
         toast({
           title: 'Apple Health Connected',
-          description: "Today's steps, move calories, and distance now show on Home.",
+          description: "Today's steps, move calories, and distance now show on your Dashboard.",
           duration: 3000,
         });
       } else {
         toast({
           title: 'Connection Failed',
-          description: 'Allow ByteWise in the Apple Health permission sheet, then try again.',
+          description: 'Allow Bytewise in the Apple Health permission sheet, then try again.',
           variant: 'destructive',
           duration: 4000,
         });
@@ -53,7 +63,7 @@ export function AppleHealthIntegration() {
       console.error('Apple Health connection error:', error);
       toast({
         title: 'Connection Error',
-        description: 'Apple Health could not be opened. Try again from the iOS app.',
+        description: 'Apple Health could not be opened. Please try again.',
         variant: 'destructive',
         duration: 3000,
       });
@@ -78,79 +88,84 @@ export function AppleHealthIntegration() {
     }
   };
 
-  if (!isAvailable) {
-    return (
-      <div className="p-4 rounded-2xl border border-amber-200/40 bg-white/50">
-        <div className="flex items-start gap-3">
-          <Heart className="h-5 w-5 text-red-500 mt-0.5 shrink-0" />
-          <div className="space-y-1" style={{ fontFamily: "'Work Sans', sans-serif" }}>
+  const unavailableReason = !isNativeIos
+    ? 'Open the Bytewise app on your iPhone to connect Apple Health.'
+    : !isChecking && !isAvailable
+      ? "Apple Health isn't available on this device."
+      : null;
+
+  return (
+    <div className="space-y-4" data-testid="apple-health-section" style={{ fontFamily: "'Work Sans', sans-serif" }}>
+      <div className="flex items-center justify-between gap-3 rounded-xl bg-white/70 border border-amber-200/60 p-4">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-rose-100">
+            <Heart className="h-5 w-5 text-rose-600" />
+          </div>
+          <div className="min-w-0">
             <p className="font-semibold text-gray-950">Apple Health</p>
-            <p className="text-sm text-gray-700 leading-relaxed">
-              Connect this on the ByteWise iPhone app to show your daily activity next to your nutrition.
+            <p className="text-sm text-gray-700">
+              {isConnected ? 'Showing your activity on the Dashboard' : 'Not connected'}
             </p>
           </div>
         </div>
-      </div>
-    );
-  }
-
-  return (
-    <Card className="w-full bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200/40">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-gray-950">
-          <Heart className="h-5 w-5 text-red-500" />
-          Apple Health
-          {isConnected && (
-            <Badge variant="secondary" className="bg-green-100 text-green-800">
-              <CheckCircle className="h-3 w-3 mr-1" />
-              Connected
-            </Badge>
-          )}
-        </CardTitle>
-        <CardDescription className="text-gray-700">
-          Show your daily activity from the Health app alongside your nutrition.
-        </CardDescription>
-      </CardHeader>
-
-      <CardContent className="space-y-4">
-        {!isConnected ? (
-          <div className="space-y-4">
-            <div className="text-sm text-gray-700">
-              <p className="mb-2">Connecting lets ByteWise read:</p>
-              <ul className="list-disc list-inside space-y-1">
-                <li>Steps</li>
-                <li>Active (move) calories</li>
-                <li>Walking and running distance</li>
-              </ul>
-              <p className="mt-2">This data stays on your iPhone and isn't stored on our servers.</p>
-            </div>
-
-            <Button
-              onClick={handleConnect}
-              disabled={isLoading}
-              className="w-full bg-amber-600 hover:bg-amber-700 text-white"
-            >
-              {isLoading ? 'Connecting...' : 'Connect Apple Health'}
-            </Button>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <Button
-              variant="outline"
-              onClick={handleDisconnect}
-              className="w-full"
-            >
-              <Settings className="h-4 w-4 mr-2" />
-              Disconnect
-            </Button>
-
-            <div className="text-xs text-gray-600 bg-white/60 p-3 rounded-lg">
-              <strong>Privacy:</strong> Activity is read from Apple Health on this iPhone and isn't stored on our servers.
-              If steps or calories show 0, turn them on in iOS Settings → Privacy & Security → Health → ByteWise Nutritionist.
-            </div>
-          </div>
+        {isConnected && (
+          <Badge variant="secondary" className="shrink-0 bg-green-100 text-green-800">
+            <CheckCircle className="h-3 w-3 mr-1" />
+            Connected
+          </Badge>
         )}
-      </CardContent>
-    </Card>
+      </div>
+
+      <div>
+        <p className="mb-2 text-sm font-medium text-gray-900">Bytewise reads from Apple Health:</p>
+        <ul className="grid gap-2 sm:grid-cols-3">
+          {READ_ITEMS.map(({ icon: Icon, label, color }) => (
+            <li key={label} className="flex items-center gap-2 rounded-lg bg-white/60 border border-amber-200/50 px-3 py-2 text-sm text-gray-800">
+              <Icon className={`h-4 w-4 shrink-0 ${color}`} />
+              {label}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {isConnected ? (
+        <div className="space-y-3">
+          <p className="text-xs text-gray-600 bg-white/60 p-3 rounded-lg">
+            If a number shows 0, turn it on in iOS Settings → Privacy &amp; Security → Health → Bytewise.
+            Your activity stays on your iPhone and isn't stored on our servers.
+          </p>
+          <Button variant="outline" onClick={handleDisconnect} className="w-full">
+            Disconnect
+          </Button>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          <Button
+            id="apple-health-connect"
+            onClick={handleConnect}
+            disabled={!!unavailableReason || isChecking || isLoading}
+            className="w-full h-12 bg-rose-600 hover:bg-rose-700 text-base font-semibold disabled:opacity-60"
+            data-testid="button-connect-apple-health"
+          >
+            {isLoading || isChecking ? (
+              <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+            ) : (
+              <Heart className="h-5 w-5 mr-2" />
+            )}
+            {isLoading ? 'Connecting…' : 'Connect Apple Health'}
+          </Button>
+          {unavailableReason ? (
+            <p className="flex items-center justify-center gap-1.5 text-center text-sm text-gray-700">
+              <Smartphone className="h-4 w-4 shrink-0" />
+              {unavailableReason}
+            </p>
+          ) : (
+            <p className="text-center text-xs text-gray-600">
+              Apple will ask which data to share. Your activity stays on your iPhone.
+            </p>
+          )}
+        </div>
+      )}
+    </div>
   );
 }

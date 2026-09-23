@@ -1376,6 +1376,14 @@ button[data-testid="button-notifications"] .text-white {
   color: #ffffff;
 }
 
+/* White label on the rose Apple Health buttons; the ids outrank the global dark-text overrides */
+#apple-health-connect,
+#apple-health-connect *,
+#apple-fitness-connect,
+#apple-fitness-connect * {
+  color: #ffffff !important;
+}
+
 /* Notification bell is always red; beats the ghost-button orange override */
 .app-notification-anchor button.app-notification-button,
 .app-notification-anchor button.app-notification-button:hover {

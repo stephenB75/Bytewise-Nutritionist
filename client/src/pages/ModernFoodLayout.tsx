@@ -34,6 +34,7 @@ import {
   Flame,
   Target,
   Trophy,
+  HeartPulse,
   Calendar,
   Download,
   Bell,
@@ -70,6 +71,7 @@ import { clearProfileCompletionPrompt, resendVerificationEmail, resetPasswordFor
 import { getWeekDates, getLocalDateKey, getMealTypeByTime, formatLocalTime } from '@/utils/dateUtils';
 import { clearGuestNutritionStorage } from '@/lib/guestStorage';
 import { AppleFitnessCard } from '@/components/AppleFitnessCard';
+import { AppleHealthIntegration } from '@/components/AppleHealthIntegration';
 import { fixMealDateMismatches } from '@/utils/mealDateFixer';
 import { getCachedLocalStorage, debounce } from '@/utils/performanceUtils';
 import { useLocation } from 'wouter';
@@ -1477,7 +1479,16 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           </div>
 
           <div className="mb-4">
-            <AppleFitnessCard onConnect={() => handleTabChange('profile')} />
+            <AppleFitnessCard
+              onConnect={() => {
+                handleTabChange('profile');
+                // After the tab switch renders (it closes any open section), open Apple Health.
+                setTimeout(() => {
+                  setOpenCard('apple-health');
+                  setTimeout(() => scrollToTestId('apple-health-card'), 250);
+                }, 100);
+              }}
+            />
           </div>
 
           {/* Water Consumption */}
@@ -2972,6 +2983,31 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 
                 <AccordionContent className="px-6 pb-6 pt-0">
                   <DataManagementPanel />
+                </AccordionContent>
+              </Card>
+            </AccordionItem>
+
+            {/* Apple Health Card */}
+            <AccordionItem value="apple-health" className="border-none" data-testid="apple-health-card">
+              <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 overflow-hidden rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:from-amber-100 hover:to-amber-200 hover:border-amber-300/50">
+                <AccordionTrigger className="px-6 py-6 hover:bg-amber-200/30 hover:no-underline [&[data-state=open]]:bg-amber-200/30">
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center space-x-3 text-left">
+                      <HeartPulse className="w-6 h-6 text-rose-600" />
+                      <div>
+                        <h3 className="text-xl font-semibold transition-colors" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                          Apple Health
+                        </h3>
+                        <p className="text-sm text-gray-700" style={{ fontFamily: "'Work Sans', sans-serif" }}>
+                          Show your steps, move calories, and distance
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </AccordionTrigger>
+
+                <AccordionContent className="px-6 pb-6 pt-0">
+                  <AppleHealthIntegration />
                 </AccordionContent>
               </Card>
             </AccordionItem>

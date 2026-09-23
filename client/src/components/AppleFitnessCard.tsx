@@ -63,7 +63,7 @@ export function AppleFitnessCard({ onConnect }: AppleFitnessCardProps) {
         <p className="text-sm text-gray-600">Loading activity…</p>
       ) : !isNativeIos ? (
         <p className="text-sm text-gray-700">
-          Open the ByteWise iOS app and connect Apple Health in Profile to see steps, move calories, and distance here.
+          Open the Bytewise iPhone app and connect Apple Health in Profile to see steps, move calories, and distance here.
         </p>
       ) : !available ? (
         <p className="text-sm text-gray-700">Apple Health is not available on this device.</p>
@@ -74,12 +74,13 @@ export function AppleFitnessCard({ onConnect }: AppleFitnessCardProps) {
           </p>
           {onConnect && (
             <Button
+              id="apple-fitness-connect"
               type="button"
               size="sm"
-              className="bg-rose-600 hover:bg-rose-700 text-white"
+              className="bg-rose-600 hover:bg-rose-700"
               onClick={onConnect}
             >
-              Connect in Profile
+              Connect Apple Health
             </Button>
           )}
         </div>
