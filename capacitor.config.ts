@@ -10,7 +10,9 @@ const config: CapacitorConfig = {
   ios: {
     scheme: 'bytewise-nutritionist',
     path: 'ios',
-    contentInset: 'automatic',
+    // CSS handles safe areas via env(safe-area-inset-*); 'automatic' adds a second native inset
+    // that shifts the fixed bottom nav while scrolling.
+    contentInset: 'never',
     scrollEnabled: true,
     allowsLinkPreview: false
   },

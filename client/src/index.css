@@ -198,6 +198,13 @@ html,
   }
 }
 
+/* Anything painted past the end of the page (e.g. under the bottom nav) matches the nav's yellow
+   instead of the gradient repeating from its white top. */
+html {
+  background-color: #fbbf24;
+  background-repeat: no-repeat;
+}
+
 /* Page containers inherit gradient background */
 .min-h-screen:not([class*="bg-"]):not([data-hero="true"]):not(.hero-component),
 .h-screen:not([class*="bg-"]):not([data-hero="true"]):not(.hero-component) {
@@ -2032,7 +2039,6 @@ textarea {
 body {
   padding-bottom: 0;
   margin: 0;
-  overflow-x: hidden;
 }
 
 /* Main content containers with proper spacing */
@@ -2055,12 +2061,12 @@ body {
 
 /* Removed conflicting content-section rule that was overriding footer clearance */
 
-/* Simplified and optimized spacing system */
+/* Only the document scrolls: a second scroller on body makes the fixed bottom nav jitter on iOS.
+   overscroll-behavior stops the rubber-band bounce that drags the nav up and exposes the canvas. */
 html, body {
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow-x: clip;
   scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: none;
 }
 
 /* Modern App Opening Animation System - Smooth and native-like */
