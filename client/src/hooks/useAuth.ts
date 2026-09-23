@@ -28,7 +28,7 @@ export function useAuth() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const { data: user, isLoading, refetch } = useQuery({
+  const { data: user, isLoading, isFetching, refetch } = useQuery({
     queryKey: ["/api/auth/user"],
     queryFn: async () => {
       try {
@@ -157,7 +157,7 @@ export function useAuth() {
 
   return {
     user,
-    isLoading,
+    isLoading: isLoading || isFetching,
     isAuthenticated: !!user,
     refetch,
     supabase,

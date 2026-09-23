@@ -45,9 +45,11 @@ function AppContent() {
     const message = urlParams.get('message');
     
     if (verified === 'true') {
+      window.dispatchEvent(new CustomEvent('auth-state-change'));
       toast({
         title: "Email Verified!",
-        description: message || "Your email has been verified successfully. You can now sign in.",
+        description:
+          message || 'Your email is verified. You are signed in — open Profile to continue.',
         duration: 8000,
       });
       // Clean up URL

@@ -2,6 +2,7 @@ import { supabase } from '@/lib/supabase';
 import { ensureUserProfile, syncGuestMeals } from '@/lib/mealsApi';
 import { getAuthRedirectUrl } from '@/lib/authRedirect';
 import { apiFetch } from '@/lib/apiUrl';
+import { queryClient } from '@/lib/queryClient';
 
 export type AuthCode =
   | 'VERIFICATION_REQUIRED'
@@ -210,15 +211,34 @@ export function shouldShowProfileCompletion() {
   return localStorage.getItem(PROFILE_COMPLETION_KEY) === 'true';
 }
 
+function sessionToAppUser(session: NonNullable<Awaited<ReturnType<typeof supabase.auth.getSession>>['data']['session']>) {
+  const u = session.user;
+  return {
+    id: u.id,
+    email: u.email,
+    emailVerified: !!u.email_confirmed_at,
+    firstName: u.user_metadata?.first_name || u.user_metadata?.firstName || null,
+    lastName: u.user_metadata?.last_name || u.user_metadata?.lastName || null,
+    profileImageUrl: u.user_metadata?.avatar_url || null,
+    dailyCalorieGoal: u.user_metadata?.calorie_goal || 2000,
+    dailyProteinGoal: 150,
+    dailyCarbGoal: 200,
+    dailyFatGoal: 70,
+    dailyWaterGoal: 8,
+  };
+}
+
 async function finishSignedIn(): Promise<AuthActionResult> {
   const { data: { session } } = await supabase.auth.getSession();
-  if (!session?.access_token) {
+  if (!session?.access_token || !session.user?.id) {
     return {
       ok: false,
       code: 'AUTH_ERROR',
       message: 'Sign-in succeeded but no session was saved. Try again or refresh the page.',
     };
   }
+
+  queryClient.setQueryData(['/api/auth/user'], sessionToAppUser(session));
 
   try {
     await ensureUserProfile();
@@ -230,22 +250,10 @@ async function finishSignedIn(): Promise<AuthActionResult> {
   } catch (error) {
     console.warn('syncGuestMeals after sign-in:', error);
   }
+
+  void queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
   window.dispatchEvent(new CustomEvent('auth-state-change'));
   return { ok: true, kind: 'signed_in' };
-}
-
-async function applyServerSession(session: {
-  access_token: string;
-  refresh_token: string;
-}): Promise<AuthActionResult | null> {
-  const { error } = await supabase.auth.setSession({
-    access_token: session.access_token,
-    refresh_token: session.refresh_token,
-  });
-  if (error) {
-    return mapAuthError(error, '');
-  }
-  return finishSignedIn();
 }
 
 export async function signUpWithEmail(email: string, password: string): Promise<AuthActionResult> {
@@ -354,67 +362,7 @@ async function signInWithSupabaseClient(
 
 export async function signInWithEmail(email: string, password: string): Promise<AuthActionResult> {
   const normalized = normalizeEmail(email);
-
-  try {
-    const response = await apiFetch('/api/auth/signin', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: normalized, password }),
-    });
-
-    const body = (await response.json().catch(() => ({}))) as {
-      message?: string;
-      code?: string;
-      session?: { access_token: string; refresh_token: string };
-    };
-
-    if (response.ok && body.session?.access_token && body.session?.refresh_token) {
-      const applied = await applyServerSession(body.session);
-      if (applied?.ok) {
-        return applied;
-      }
-      console.warn('Server session could not be applied, trying direct sign-in');
-    }
-
-    if (response.ok && !body.session?.access_token) {
-      console.warn('Sign-in API returned 200 without session');
-    }
-
-    if (response.status === 429 || body.code === 'RATE_LIMIT') {
-      return mapApiErrorBody({ ...body, code: 'RATE_LIMIT' }, normalized, 'signin');
-    }
-
-    if (!response.ok && response.status < 500) {
-      const code = body.code;
-      if (code === 'EMAIL_NOT_VERIFIED') {
-        return mapApiErrorBody(body, normalized, 'signin');
-      }
-      if (code === 'RATE_LIMIT') {
-        return mapApiErrorBody(body, normalized, 'signin');
-      }
-      if (code === 'INVALID_CREDENTIALS' || code === 'SIGNIN_FAILED') {
-        const clientResult = await signInWithSupabaseClient(normalized, password);
-        if (clientResult.ok || clientResult.code === 'EMAIL_NOT_VERIFIED') {
-          return clientResult;
-        }
-        return mapApiErrorBody(body, normalized, 'signin');
-      }
-      if (code !== 'ACCOUNT_NOT_FOUND') {
-        return mapApiErrorBody(body, normalized, 'signin');
-      }
-    }
-
-    if (!response.ok && response.status >= 500) {
-      console.warn('Sign-in API unavailable, falling back to Supabase client');
-      return signInWithSupabaseClient(normalized, password);
-    }
-  } catch (error) {
-    if (isNetworkFailure(error)) {
-      return signInWithSupabaseClient(normalized, password);
-    }
-    console.warn('Sign-in API failed, falling back to Supabase client:', error);
-  }
-
+  // Sign in directly with Supabase (session in browser). Server /api/auth/signin is not required.
   return signInWithSupabaseClient(normalized, password);
 }
 

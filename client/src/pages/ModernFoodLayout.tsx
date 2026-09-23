@@ -846,7 +846,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   // Signed-out users must not keep or display persisted meal data on this device
   useEffect(() => {
-    if (user) {
+    if (authLoading || user) {
       return;
     }
     clearGuestNutritionStorage();
@@ -854,13 +854,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     setWeeklyMeals([]);
     setDailyCalories(0);
     setWeeklyCalories(0);
-  }, [user]);
+  }, [user, authLoading]);
 
   // Load existing meal data and set up tracking
   useEffect(() => {
     // Load existing meal data on component mount - Database-first approach
     const loadExistingData = async () => {
-      if (!user) {
+      if (authLoading || !user) {
         clearGuestNutritionStorage();
         setLoggedMeals([]);
         setWeeklyMeals([]);
@@ -1110,7 +1110,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       window.removeEventListener('reload-meal-data', handleReloadMealData);
       clearInterval(fastingInterval);
     };
-  }, [user, fetchDailyStats, calculateMicronutrients, checkFastingStatus, syncHealthDataIfEnabled]);
+  }, [user, authLoading, fetchDailyStats, calculateMicronutrients, checkFastingStatus, syncHealthDataIfEnabled]);
 
   // Food categories inspired by Deliveroo
   const categories = [
