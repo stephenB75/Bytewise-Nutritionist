@@ -283,19 +283,14 @@ export async function signUpWithEmail(email: string, password: string): Promise<
 
     return mapApiErrorBody(body, normalized, 'signup');
   } catch (error) {
-    if (!isNetworkFailure(error)) {
-      console.warn('Signup API unreachable:', error);
-      return {
-        ok: false,
-        code: 'NETWORK_ERROR',
-        message:
-          'Could not reach the server to create your account. Check your connection and try again.',
-        email: normalized,
-      };
+    // Fetch threw (unreachable server, CORS, etc.) — 4xx/5xx responses are handled above.
+    if (isNetworkFailure(error)) {
+      console.warn('Signup API unreachable, falling back to Supabase client:', error);
+    } else {
+      console.warn('Signup API failed, falling back to Supabase client:', error);
     }
   }
 
-  // Network-only fallback (avoids doubling Supabase signUp calls after API errors).
   const { data, error } = await supabase.auth.signUp({
     email: normalized,
     password,
