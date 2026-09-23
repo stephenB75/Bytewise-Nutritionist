@@ -214,22 +214,34 @@ export class DatabaseStorage implements IStorage {
       // Storage: Email check completed
       
       if (existingUserByEmail.length > 0) {
-        // User exists by email - keep existing ID but update other fields
-        
+        const existing = existingUserByEmail[0];
+        if (userData.id && existing.id !== userData.id) {
+          console.warn(
+            'Profile row email matches but id differs from Supabase auth — syncing via Supabase REST for auth id:',
+            userData.email
+          );
+          return (await upsertUserViaSupabase({
+            id: userData.id,
+            email: userData.email,
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            emailVerified: userData.emailVerified,
+            profileIcon: userData.profileIcon,
+          })) as User;
+        }
+
         try {
           const [updatedUser] = await db
             .update(users)
             .set({
-              // DO NOT update ID - keep existing to avoid foreign key violations
               firstName: userData.firstName,
               lastName: userData.lastName,
-              emailVerified: true,
+              emailVerified: userData.emailVerified ?? true,
               updatedAt: new Date(),
             })
             .where(eq(users.email, userData.email))
             .returning();
-            
-          // Storage: User updated by email successfully
+
           return updatedUser;
         } catch (updateError) {
           // Storage: Failed to update user by email

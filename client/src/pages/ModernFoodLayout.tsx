@@ -2522,7 +2522,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       {/* Content Section - Redesigned to match other pages */}
       <div className="px-4 sm:px-6 py-3 content-section" data-testid="profile-content">
         {/* Profile Cards with Unified Accordion System */}
-        {user ? (
+        {authLoading ? (
+          <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 p-8 text-center text-gray-700">
+            Checking your session…
+          </Card>
+        ) : user ? (
           <Accordion 
             type="single" 
             collapsible 

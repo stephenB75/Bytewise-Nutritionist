@@ -47,12 +47,14 @@ export function useAuth() {
         // Clear any legacy tokens from localStorage
         localStorage.removeItem('supabase.auth.token');
         
-        if (!accessToken) {
+        if (!accessToken || !session?.user?.id) {
           return null;
         }
 
+        const authUserId = session.user.id;
+
         const sessionUser = session?.user ? {
-          id: session.user.id,
+          id: authUserId,
           email: session.user.email,
           emailVerified: !!session.user.email_confirmed_at,
           firstName: session.user.user_metadata?.first_name || session.user.user_metadata?.firstName || null,
@@ -78,23 +80,24 @@ export function useAuth() {
         
         const userData = await response.json();
         const merged = userData || sessionUser;
-        const missingName = !merged?.firstName || !merged?.lastName;
-        if (merged?.id && missingName) {
+        const withAuthId = merged ? { ...merged, id: authUserId } : sessionUser;
+        const missingName = !withAuthId?.firstName || !withAuthId?.lastName;
+        if (withAuthId?.id && missingName) {
           const { data: profile } = await supabase
             .from('users')
             .select('first_name, last_name, profile_icon')
-            .eq('id', merged.id)
+            .eq('id', authUserId)
             .maybeSingle();
           if (profile) {
             return {
-              ...merged,
-              firstName: merged.firstName || profile.first_name,
-              lastName: merged.lastName || profile.last_name,
-              profileIcon: merged.profileIcon || profile.profile_icon,
+              ...withAuthId,
+              firstName: withAuthId.firstName || profile.first_name,
+              lastName: withAuthId.lastName || profile.last_name,
+              profileIcon: withAuthId.profileIcon || profile.profile_icon,
             };
           }
         }
-        return merged;
+        return withAuthId;
       } catch (error) {
         const { data: { session: fallbackSession } } = await supabase.auth.getSession();
         if (!fallbackSession?.user) {

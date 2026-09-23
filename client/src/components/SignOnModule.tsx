@@ -152,9 +152,9 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
             setPassword(''); // Clear password for security
           }
       } else if (data.ok && data.kind === 'signed_in') {
-          await refetch();
           window.dispatchEvent(new CustomEvent('auth-state-change'));
-          await new Promise(resolve => setTimeout(resolve, 300));
+          await refetch();
+          await new Promise(resolve => setTimeout(resolve, 150));
 
           showNotification({
             type: 'success',

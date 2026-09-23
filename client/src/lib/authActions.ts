@@ -58,9 +58,8 @@ function mapAuthError(error: { message?: string; code?: string } | null, email: 
     lower.includes('failed to fetch') ||
     lower.includes('networkerror') ||
     lower.includes('fetch failed') ||
-    lower.includes('connection') ||
-    lower.includes('database error') ||
-    lower.includes('schema cache')
+    lower.includes('network request failed') ||
+    lower.includes('load failed')
   ) {
     return {
       ok: false,
@@ -135,6 +134,15 @@ export function shouldShowProfileCompletion() {
 }
 
 async function finishSignedIn(): Promise<AuthActionResult> {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.access_token) {
+    return {
+      ok: false,
+      code: 'AUTH_ERROR',
+      message: 'Sign-in succeeded but no session was saved. Try again or refresh the page.',
+    };
+  }
+
   try {
     await ensureUserProfile();
   } catch (error) {
@@ -306,7 +314,8 @@ export async function signInWithEmail(email: string, password: string): Promise<
     }
 
     if (!response.ok && response.status >= 500) {
-      return mapApiErrorBody({ ...body, code: body.code || 'SERVICE_ERROR' }, normalized);
+      console.warn('Sign-in API unavailable, falling back to Supabase client');
+      return signInWithSupabaseClient(normalized, password);
     }
   } catch (error) {
     if (isNetworkFailure(error)) {

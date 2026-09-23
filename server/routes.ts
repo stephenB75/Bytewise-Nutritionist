@@ -277,9 +277,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const user = await storage.getUser(userId);
       
-      // If user exists in database, return it
+      // If user exists in database, return it (id must match the authenticated Supabase user).
       if (user) {
-        res.json(user);
+        res.json({ ...user, id: userId });
         return;
       }
       
@@ -320,7 +320,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           // Important: Create/update user in local database so future updates work
           try {
-            const databaseUser = await storage.upsertUser({
+            await storage.upsertUser({
               id: userData.id,
               email: userData.email,
               firstName: userData.firstName || '',
@@ -328,13 +328,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
               emailVerified: userData.emailVerified,
               profileIcon: userData.profileIcon
             });
-            
-            // CRITICAL: Use the database user's ID, not the Supabase ID
-            userData.id = databaseUser.id;
           } catch (dbError) {
             // Continue anyway - we can still return the Supabase data
           }
-          
+
+          // Auth JWT subject is always the canonical user id (never a legacy DB row id).
+          userData.id = userId;
           res.json(userData);
           return;
         } else {
@@ -372,7 +371,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Important: Create the user in local database so future updates work
           try {
             console.log('💾 Creating user in local database from Supabase data (fallback)...');
-            const databaseUser = await storage.upsertUser({
+            await storage.upsertUser({
               id: userData.id,
               email: userData.email,
               firstName: userData.firstName || '',
@@ -380,17 +379,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
               emailVerified: userData.emailVerified,
               profileIcon: userData.profileIcon
             });
-            
-            // CRITICAL: Use the database user's ID, not the Supabase ID  
-            userData.id = databaseUser.id;
-            console.log('✅ User created/updated in local database (fallback), using database ID:', {
-              databaseId: databaseUser.id?.substring(0, 8) + '...',
-              email: databaseUser.email
-            });
           } catch (dbError) {
             console.log('⚠️ Failed to create user in local database (fallback):', dbError);
           }
-          
+
+          userData.id = userId;
           res.json(userData);
           return;
         }
@@ -451,11 +444,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
         }
 
-        // Success - user authenticated with real Supabase session
         if (signInData?.user && signInData?.session) {
+          if (!signInData.user.email_confirmed_at) {
+            return res.status(400).json({
+              message:
+                'Please verify your email address before signing in. Check your inbox for the verification link.',
+              code: 'EMAIL_NOT_VERIFIED',
+              requiresVerification: true,
+            });
+          }
+
           console.log('✅ Authentication successful for:', signInData.user.email);
           console.log('✅ Returning real Supabase session with JWT tokens');
-          
+
           // Ensure user exists in our database (create if doesn't exist)
           try {
             await storage.upsertUser({
