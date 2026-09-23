@@ -73,7 +73,6 @@ import { AppleFitnessCard } from '@/components/AppleFitnessCard';
 import { fixMealDateMismatches } from '@/utils/mealDateFixer';
 import { getCachedLocalStorage, debounce } from '@/utils/performanceUtils';
 import { useLocation } from 'wouter';
-import { healthKitService } from '../services/healthKit';
 import { PremiumFeatureGate } from '@/components/PremiumFeatureGate';
 import { useSubscription } from '@/hooks/useSubscription';
 
@@ -387,8 +386,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     if (newGlasses === 4 && previousGlasses < 4) {
       addNotification('info', 'Halfway There! 💧', 'You\'ve had 4 glasses of water today. Keep going!');
     }
-    syncHealthDataIfEnabled({ waterGlasses: newGlasses }).catch(console.error);
-
     if (!user) return;
 
     // Saves run one at a time so a slow earlier request can't overwrite a newer count.
@@ -413,41 +410,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       }
     });
   }, [user, toast]);
-
-  const handleHealthDataSync = useCallback(async (data: any) => {
-    try {
-      if (data?.meal) {
-        await healthKitService.syncMeal(data.meal);
-        return;
-      }
-
-      if (data?.waterGlasses != null) {
-        await healthKitService.syncWaterIntake(Number(data.waterGlasses) || 0);
-        return;
-      }
-
-      const meals = Array.isArray(loggedMeals) && loggedMeals.length > 0
-        ? loggedMeals
-        : await listLoggedMeals();
-      await healthKitService.syncMeals(meals);
-      await healthKitService.syncWaterIntake(dailyStats?.waterGlasses || 0);
-    } catch (error) {
-      console.error('Health data sync failed:', error);
-      throw error;
-    }
-  }, [dailyStats, loggedMeals]);
-
-  const syncHealthDataIfEnabled = useCallback(async (payload?: any) => {
-    if (!healthKitService.isAutoSyncEnabled()) {
-      return;
-    }
-    await handleHealthDataSync(payload || { type: 'auto_sync' });
-  }, [handleHealthDataSync]);
-
-  // syncHealthDataIfEnabled changes whenever meals/stats load; the meal-loading effect
-  // reads it through a ref so reloading data doesn't re-run that effect in a loop.
-  const syncHealthDataRef = React.useRef(syncHealthDataIfEnabled);
-  syncHealthDataRef.current = syncHealthDataIfEnabled;
 
   // Function to calculate micronutrients from meals - uses real data when available
   const calculateMicronutrients = useCallback((meals: any[]) => {
@@ -1087,7 +1049,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             'Meal Logged! 🍽️', 
             `Added ${foodName || name || 'food item'} (${calories || 0} cal${protein ? `, ${protein}g protein` : ''}) to ${mealType || 'your meals'}`
           );
-          syncHealthDataRef.current({ meal: event.detail }).catch(console.error);
         } else {
           // Generic meal logged notification when no details available
           addNotification('success', 'Meal Updated! 🍽️', 'Your nutrition data has been updated');
@@ -3010,7 +2971,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 </AccordionTrigger>
                 
                 <AccordionContent className="px-6 pb-6 pt-0">
-                  <DataManagementPanel onHealthDataSync={handleHealthDataSync} />
+                  <DataManagementPanel />
                 </AccordionContent>
               </Card>
             </AccordionItem>
@@ -3079,7 +3040,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             {/* Content Section - Completely Separate and Underneath */}
             <div className="px-4 sm:px-6 py-3 content-section">
               <div data-testid="data-management-panel" className="bg-amber-50/90 backdrop-blur-md rounded-3xl border border-amber-200 shadow-lg">
-                <DataManagementPanel onHealthDataSync={handleHealthDataSync} />
+                <DataManagementPanel />
               </div>
             </div>
           </div>

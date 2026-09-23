@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
-import { Activity, Flame, Footprints, Timer, HeartPulse } from 'lucide-react';
+import { Activity, Flame, Footprints, HeartPulse } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { healthKitService, type AppleFitnessSummary } from '@/services/healthKit';
@@ -63,14 +63,14 @@ export function AppleFitnessCard({ onConnect }: AppleFitnessCardProps) {
         <p className="text-sm text-gray-600">Loading activity…</p>
       ) : !isNativeIos ? (
         <p className="text-sm text-gray-700">
-          Open the ByteWise iOS app and connect Apple Health in Profile to see steps, move calories, and exercise minutes here.
+          Open the ByteWise iOS app and connect Apple Health in Profile to see steps, move calories, and distance here.
         </p>
       ) : !available ? (
         <p className="text-sm text-gray-700">Apple Health is not available on this device.</p>
       ) : !connected ? (
         <div className="space-y-2">
           <p className="text-sm text-gray-700">
-            Connect Apple Health to show your Activity rings data alongside nutrition.
+            Connect Apple Health to show today's steps, move calories, and distance alongside nutrition.
           </p>
           {onConnect && (
             <Button
@@ -84,7 +84,7 @@ export function AppleFitnessCard({ onConnect }: AppleFitnessCardProps) {
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-3 gap-2">
           <div className="rounded-lg bg-white/70 p-3 border border-amber-200/50">
             <div className="flex items-center gap-1.5 text-xs text-gray-600 mb-1">
               <Footprints className="h-3.5 w-3.5 text-blue-600" />
@@ -98,13 +98,6 @@ export function AppleFitnessCard({ onConnect }: AppleFitnessCardProps) {
               Move (kcal)
             </div>
             <p className="text-lg font-bold text-gray-900">{summary?.activeCalories ?? 0}</p>
-          </div>
-          <div className="rounded-lg bg-white/70 p-3 border border-amber-200/50">
-            <div className="flex items-center gap-1.5 text-xs text-gray-600 mb-1">
-              <Timer className="h-3.5 w-3.5 text-green-600" />
-              Exercise
-            </div>
-            <p className="text-lg font-bold text-gray-900">{summary?.exerciseMinutes ?? 0} min</p>
           </div>
           <div className="rounded-lg bg-white/70 p-3 border border-amber-200/50">
             <div className="flex items-center gap-1.5 text-xs text-gray-600 mb-1">

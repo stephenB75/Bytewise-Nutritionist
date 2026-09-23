@@ -8,23 +8,29 @@ const entitlementsPath = join(root, 'ios/App/App/App.entitlements');
 const entitlementsSource = join(root, 'native/healthkit/App.entitlements');
 const pbxprojPath = join(root, 'ios/App/App.xcodeproj/project.pbxproj');
 
+// The app only reads steps, active calories and distance (all @capgo/capacitor-health 7.x supports),
+// so there is no write/update permission; reviewers check this text against what the app does.
 const shareKey = 'NSHealthShareUsageDescription';
 const updateKey = 'NSHealthUpdateUsageDescription';
 const shareText =
-  'ByteWise reads Activity (steps, move, exercise) and nutrition from Apple Health so your dashboard stays complete.';
-const updateText = 'ByteWise writes meals and water you log so they appear in the Apple Health app.';
+  'ByteWise reads your steps, active calories, and walking distance from Apple Health to show your daily activity next to your nutrition.';
 
 if (!existsSync(plistPath)) {
   process.exit(0);
 }
 
 let plist = readFileSync(plistPath, 'utf8');
-if (!plist.includes(shareKey)) {
+plist = plist.replace(new RegExp(`\\s*<key>${updateKey}</key>\\s*<string>[^<]*</string>`), '');
+if (plist.includes(shareKey)) {
+  plist = plist.replace(
+    new RegExp(`(<key>${shareKey}</key>\\s*<string>)[^<]*(</string>)`),
+    `$1${shareText}$2`,
+  );
+} else {
   plist = plist.replace(
     '</dict>\n</plist>',
-    `        <key>${shareKey}</key>\n        <string>${shareText}</string>\n        <key>${updateKey}</key>\n        <string>${updateText}</string>\n</dict>\n</plist>`,
+    `        <key>${shareKey}</key>\n        <string>${shareText}</string>\n</dict>\n</plist>`,
   );
-  writeFileSync(plistPath, plist);
 }
 
 // App Store settings: 64-bit only, and HTTPS-only encryption skips the export compliance prompt.

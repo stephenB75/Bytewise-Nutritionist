@@ -1,22 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Heart, Settings, CheckCircle } from 'lucide-react';
 import { healthKitService } from '@/services/healthKit';
 import { toast } from '@/hooks/use-toast';
 
-interface AppleHealthIntegrationProps {
-  onHealthDataSync?: (data: any) => void;
-}
-
-export function AppleHealthIntegration({ onHealthDataSync }: AppleHealthIntegrationProps) {
+export function AppleHealthIntegration() {
   const [isAvailable, setIsAvailable] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [autoSync, setAutoSync] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -26,7 +19,6 @@ export function AppleHealthIntegration({ onHealthDataSync }: AppleHealthIntegrat
       if (cancelled) return;
       setIsAvailable(healthKitService.getAvailability());
       setIsConnected(healthKitService.getAuthorizationStatus());
-      setAutoSync(localStorage.getItem('appleHealthAutoSync') === 'true');
     };
 
     load();
@@ -43,16 +35,12 @@ export function AppleHealthIntegration({ onHealthDataSync }: AppleHealthIntegrat
 
       if (success) {
         setIsConnected(true);
-        setAutoSync(localStorage.getItem('appleHealthAutoSync') === 'true');
         window.dispatchEvent(new CustomEvent('apple-health-changed'));
         toast({
           title: 'Apple Health Connected',
-          description: 'Your Activity data can display on Home, and meals and water write to Apple Health.',
+          description: "Today's steps, move calories, and distance now show on Home.",
           duration: 3000,
         });
-        if (onHealthDataSync) {
-          onHealthDataSync({ type: 'manual_sync' });
-        }
       } else {
         toast({
           title: 'Connection Failed',
@@ -78,7 +66,6 @@ export function AppleHealthIntegration({ onHealthDataSync }: AppleHealthIntegrat
     try {
       await healthKitService.disconnect();
       setIsConnected(false);
-      setAutoSync(false);
       window.dispatchEvent(new CustomEvent('apple-health-changed'));
 
       toast({
@@ -91,47 +78,6 @@ export function AppleHealthIntegration({ onHealthDataSync }: AppleHealthIntegrat
     }
   };
 
-  const handleAutoSyncToggle = (enabled: boolean) => {
-    setAutoSync(enabled);
-    localStorage.setItem('appleHealthAutoSync', enabled.toString());
-
-    toast({
-      title: enabled ? 'Auto-sync Enabled' : 'Auto-sync Disabled',
-      description: enabled
-        ? 'Logged meals and water will write to Apple Health.'
-        : 'You can still sync from this screen.',
-      duration: 2000,
-    });
-  };
-
-  const handleManualSync = async () => {
-    if (!isConnected) return;
-
-    setIsLoading(true);
-
-    try {
-      if (onHealthDataSync) {
-        await onHealthDataSync({ type: 'manual_sync' });
-      }
-
-      toast({
-        title: 'Sync Complete',
-        description: 'Today’s meals and water were sent to Apple Health.',
-        duration: 2000,
-      });
-    } catch (error) {
-      console.error('Manual sync error:', error);
-      toast({
-        title: 'Sync Failed',
-        description: 'Unable to sync data to Apple Health.',
-        variant: 'destructive',
-        duration: 3000,
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   if (!isAvailable) {
     return (
       <div className="p-4 rounded-2xl border border-amber-200/40 bg-white/50">
@@ -140,7 +86,7 @@ export function AppleHealthIntegration({ onHealthDataSync }: AppleHealthIntegrat
           <div className="space-y-1" style={{ fontFamily: "'Work Sans', sans-serif" }}>
             <p className="font-semibold text-gray-950">Apple Health</p>
             <p className="text-sm text-gray-700 leading-relaxed">
-              Connect this on the ByteWise iPhone app to send logged meals and water to the Health app.
+              Connect this on the ByteWise iPhone app to show your daily activity next to your nutrition.
             </p>
           </div>
         </div>
@@ -162,7 +108,7 @@ export function AppleHealthIntegration({ onHealthDataSync }: AppleHealthIntegrat
           )}
         </CardTitle>
         <CardDescription className="text-gray-700">
-          Write meals and water you log in ByteWise into the Health app.
+          Show your daily activity from the Health app alongside your nutrition.
         </CardDescription>
       </CardHeader>
 
@@ -170,12 +116,13 @@ export function AppleHealthIntegration({ onHealthDataSync }: AppleHealthIntegrat
         {!isConnected ? (
           <div className="space-y-4">
             <div className="text-sm text-gray-700">
-              <p className="mb-2">Connecting lets ByteWise:</p>
+              <p className="mb-2">Connecting lets ByteWise read:</p>
               <ul className="list-disc list-inside space-y-1">
-                <li>Write calories from each logged meal</li>
-                <li>Write water when you log a glass</li>
-                <li>Keep Health in sync without storing that data on our servers</li>
+                <li>Steps</li>
+                <li>Active (move) calories</li>
+                <li>Walking and running distance</li>
               </ul>
+              <p className="mt-2">This data stays on your iPhone and isn't stored on our servers.</p>
             </div>
 
             <Button
@@ -188,43 +135,18 @@ export function AppleHealthIntegration({ onHealthDataSync }: AppleHealthIntegrat
           </div>
         ) : (
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label htmlFor="auto-sync">Automatic Sync</Label>
-                <div className="text-sm text-gray-500">
-                  Write to Apple Health when you log meals or water
-                </div>
-              </div>
-              <Switch
-                id="auto-sync"
-                checked={autoSync}
-                onCheckedChange={handleAutoSyncToggle}
-              />
-            </div>
-
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                onClick={handleManualSync}
-                disabled={isLoading}
-                className="flex-1"
-              >
-                {isLoading ? 'Syncing...' : 'Sync Now'}
-              </Button>
-
-              <Button
-                variant="outline"
-                onClick={handleDisconnect}
-                className="flex-1"
-              >
-                <Settings className="h-4 w-4 mr-2" />
-                Disconnect
-              </Button>
-            </div>
+            <Button
+              variant="outline"
+              onClick={handleDisconnect}
+              className="w-full"
+            >
+              <Settings className="h-4 w-4 mr-2" />
+              Disconnect
+            </Button>
 
             <div className="text-xs text-gray-600 bg-white/60 p-3 rounded-lg">
-              <strong>Privacy:</strong> Health data goes to Apple Health on this iPhone.
-              Manage access in iOS Settings → Privacy & Security → Health → ByteWise Nutritionist.
+              <strong>Privacy:</strong> Activity is read from Apple Health on this iPhone and isn't stored on our servers.
+              If steps or calories show 0, turn them on in iOS Settings → Privacy & Security → Health → ByteWise Nutritionist.
             </div>
           </div>
         )}
