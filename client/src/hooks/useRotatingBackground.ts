@@ -92,7 +92,8 @@ export function useRotatingBackground(activeTab: string) {
 
   useEffect(() => {
     setIndex(0);
-    images.forEach(preloadImage);
+    // Only fetch what's on screen; the next image is preloaded one rotation ahead below.
+    if (images[0]) preloadImage(images[0]);
   }, [images]);
 
   useEffect(() => {

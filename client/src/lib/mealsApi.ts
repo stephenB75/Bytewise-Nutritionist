@@ -128,7 +128,7 @@ function writeGuestMeals(meals: LoggedMeal[]) {
 export async function ensureUserProfile(): Promise<string | null> {
   const { data: { session } } = await supabase.auth.getSession();
   const user = session?.user;
-  if (!user?.id || !session.access_token) {
+  if (!session || !user?.id || !session.access_token) {
     return null;
   }
 
@@ -204,7 +204,9 @@ export async function listLoggedMeals(): Promise<LoggedMeal[]> {
   }
 }
 
-export async function logMeal(input: LogMealInput): Promise<LoggedMeal> {
+export async function logMeal(
+  input: LogMealInput
+): Promise<LoggedMeal & { newAchievements?: Array<Record<string, any>> }> {
   const user = await getSessionUserOrNull();
   const localMeal: LoggedMeal = {
     id: Date.now(),
@@ -259,7 +261,7 @@ export async function logMeal(input: LogMealInput): Promise<LoggedMeal> {
   const meal = mapMeal((result?.meal || result) as Record<string, unknown>);
   window.dispatchEvent(new CustomEvent('reload-meal-data', { detail: meal }));
   window.dispatchEvent(new CustomEvent('calories-logged', { detail: meal }));
-  return meal;
+  return { ...meal, newAchievements: result?.newAchievements };
 }
 
 export async function syncGuestMeals(): Promise<number> {

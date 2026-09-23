@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Crown, Star, Lock, Sparkles } from 'lucide-react';
 
 interface PremiumFeatureGateProps {
-  children: ReactNode;
+  children?: ReactNode;
   feature: 'premium' | 'pro';
   featureName: string;
   description?: string;

@@ -42,7 +42,7 @@ function getAllowedAuthOrigins(): string[] {
     'https://www.bytewisenutritionist.com',
     'https://bytewisenutritionist.com',
   ];
-  return [...new Set(candidates.filter(Boolean).map((url) => String(url).replace(/\/$/, '')))];
+  return Array.from(new Set(candidates.filter(Boolean).map((url) => String(url).replace(/\/$/, ''))));
 }
 
 function isAllowedAuthRedirect(url: string): boolean {

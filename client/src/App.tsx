@@ -13,7 +13,6 @@ import ModernFoodLayout from './pages/ModernFoodLayout';
 import VerifyEmail from './pages/VerifyEmail';
 import { ResetPassword } from './pages/ResetPassword';
 import AuthConfirm from './pages/AuthConfirm';
-import AIFoodAnalyzer from './pages/AIFoodAnalyzer';
 import { useDataRestoration } from '@/hooks/useDataRestoration';
 import { DataIntegrityManager } from '@/components/DataIntegrityManager';
 import { useSessionManager } from '@/hooks/useSessionManager';

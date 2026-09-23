@@ -189,18 +189,22 @@ export class DatabaseStorage implements IStorage {
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
+    if (!userData.id) {
+      throw new Error('upsertUser requires the Supabase auth user id');
+    }
+    const withId = { ...userData, id: userData.id };
     if (!getDatabaseUrl() || !isDbReady()) {
-      return (await upsertUserViaSupabase(userData)) as User;
+      return (await upsertUserViaSupabase(withId)) as User;
     }
     try {
-      return await this.upsertUserInDatabase(userData);
+      return await this.upsertUserInDatabase(withId);
     } catch (error) {
       console.warn('Database upsertUser failed, using Supabase admin:', error);
-      return (await upsertUserViaSupabase(userData)) as User;
+      return (await upsertUserViaSupabase(withId)) as User;
     }
   }
 
-  private async upsertUserInDatabase(userData: UpsertUser): Promise<User> {
+  private async upsertUserInDatabase(userData: UpsertUser & { id: string }): Promise<User> {
     // Storage: upsertUser called with user data
     
     // First check if user exists by email

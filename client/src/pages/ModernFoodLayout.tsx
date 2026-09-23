@@ -10,17 +10,12 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import CalorieCalculator from '@/components/CalorieCalculator';
-import { UserSettingsManager } from '@/components/UserSettingsManager';
 import { SignOnModule } from '@/components/SignOnModule';
 import { useAuth } from '@/hooks/useAuth';
-import { DataManagementPanel } from '@/components/DataManagementPanel';
 import { AchievementCelebration } from '@/components/AchievementCelebration';
-import { AwardsAchievements } from '@/components/AwardsAchievements';
 import { ConfettiCelebration } from '@/components/ConfettiCelebration';
 import { ProfileCompletionModal } from '@/components/ProfileCompletionModal';
 import { SaveAccountPrompt } from '@/components/SaveAccountPrompt';
-import { FastingTracker } from '@/components/FastingTracker';
 import { FastingStatusCard } from '@/components/FastingStatusCard';
 import { useGoalAchievements } from '@/hooks/useGoalAchievements';
 import { useRotatingBackground } from '@/hooks/useRotatingBackground';
@@ -28,7 +23,6 @@ import { useAchievements, getAchievementIcon, formatAchievementDate } from '@/ho
 import { ProfileIcon } from '@/components/ProfileIcon';
 import { TourLauncher, useAppTour, WelcomeBanner } from '@/components/TourLauncher';
 import { AppTour } from '@/components/AppTour';
-import { RecipeManager } from '@/components/RecipeManager';
 import { UserFoodSuggestions } from '@/components/UserFoodSuggestions';
 import { getFeatureAllowance } from '@/lib/usageLimits';
 import { apiRequest } from '@/lib/queryClient';
@@ -79,10 +73,44 @@ import { AppleFitnessCard } from '@/components/AppleFitnessCard';
 import { fixMealDateMismatches } from '@/utils/mealDateFixer';
 import { getCachedLocalStorage, debounce } from '@/utils/performanceUtils';
 import { useLocation } from 'wouter';
-import AIFoodAnalyzer from './AIFoodAnalyzer';
 import { healthKitService } from '../services/healthKit';
 import { PremiumFeatureGate } from '@/components/PremiumFeatureGate';
 import { useSubscription } from '@/hooks/useSubscription';
+
+function lazySection<C extends React.ComponentType<any>>(load: () => Promise<{ default: C }>) {
+  const Lazy = React.lazy(load);
+  return function LazySection(props: React.ComponentProps<C>) {
+    return (
+      <React.Suspense
+        fallback={
+          <div className="flex justify-center py-8">
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-amber-500 border-t-transparent" />
+          </div>
+        }
+      >
+        <Lazy {...(props as any)} />
+      </React.Suspense>
+    );
+  };
+}
+
+const CalorieCalculator = lazySection(() => import('@/components/CalorieCalculator'));
+const AIFoodAnalyzer = lazySection(() => import('./AIFoodAnalyzer'));
+const UserSettingsManager = lazySection(() =>
+  import('@/components/UserSettingsManager').then((m) => ({ default: m.UserSettingsManager }))
+);
+const DataManagementPanel = lazySection(() =>
+  import('@/components/DataManagementPanel').then((m) => ({ default: m.DataManagementPanel }))
+);
+const AwardsAchievements = lazySection(() =>
+  import('@/components/AwardsAchievements').then((m) => ({ default: m.AwardsAchievements }))
+);
+const FastingTracker = lazySection(() =>
+  import('@/components/FastingTracker').then((m) => ({ default: m.FastingTracker }))
+);
+const RecipeManager = lazySection(() =>
+  import('@/components/RecipeManager').then((m) => ({ default: m.RecipeManager }))
+);
 
 
 // Types
