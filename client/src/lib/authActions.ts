@@ -270,7 +270,17 @@ export async function signUpWithEmail(email: string, password: string): Promise<
       message?: string;
       code?: string;
       requiresVerification?: boolean;
+      session?: { access_token: string; refresh_token: string };
     };
+
+    if (response.ok && body.session?.access_token && body.session.refresh_token) {
+      markNewSignupForProfile();
+      const { error: sessionError } = await supabase.auth.setSession(body.session);
+      if (!sessionError) {
+        return finishSignedIn();
+      }
+      console.warn('Could not apply sign-up session:', sessionError.message);
+    }
 
     if (response.ok) {
       markNewSignupForProfile();

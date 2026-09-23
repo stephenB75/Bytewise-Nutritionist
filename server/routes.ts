@@ -616,9 +616,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
+      // "Confirm email" disabled in Supabase Auth: user is auto-confirmed and gets a session now.
+      if (data.session && data.user?.email_confirmed_at) {
+        return res.json({
+          requiresVerification: false,
+          email,
+          session: {
+            access_token: data.session.access_token,
+            refresh_token: data.session.refresh_token,
+          },
+        });
+      }
+
       console.log('📧 User created successfully, email verification required');
-      
-      // Always return verification required for admin-created users
+
       res.json({
         user: null,
         session: null,

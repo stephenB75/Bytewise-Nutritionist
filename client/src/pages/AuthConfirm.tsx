@@ -72,6 +72,15 @@ export default function AuthConfirm() {
         return;
       }
 
+      // Default email template: supabase-js consumes #access_token during client init.
+      const { data: { session } } = await supabase.auth.getSession();
+      if (cancelled) return;
+      if (session?.user) {
+        window.dispatchEvent(new CustomEvent('auth-state-change'));
+        navigate('/?verified=true');
+        return;
+      }
+
       setMessage('Nothing to confirm. Redirecting…');
       navigate('/');
     })();
