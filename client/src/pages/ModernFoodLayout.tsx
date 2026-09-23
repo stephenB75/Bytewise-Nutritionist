@@ -127,6 +127,22 @@ interface Notification {
   read: boolean;
 }
 
+const NOTIFICATIONS_KEY = 'bytewise_notifications';
+const MAX_NOTIFICATIONS = 50;
+
+// iOS can discard the web view whenever the app is backgrounded, so the bell list lives in localStorage.
+function loadStoredNotifications(): Notification[] {
+  try {
+    const stored = JSON.parse(localStorage.getItem(NOTIFICATIONS_KEY) || '[]');
+    if (!Array.isArray(stored)) return [];
+    return stored
+      .map((n: any) => ({ ...n, timestamp: new Date(n.timestamp) }))
+      .filter((n: Notification) => n.id && n.title && !Number.isNaN(n.timestamp.getTime()));
+  } catch {
+    return [];
+  }
+}
+
 interface Achievement {
   type: 'daily-goal' | 'weekly-goal' | 'milestone' | 'special';
   title: string;
@@ -281,7 +297,27 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const [trackingView, setTrackingView] = useState<TrackingView>('daily');
   const [nutritionMode, setNutritionMode] = useState<'ai' | 'calculator'>('calculator');
 
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>(loadStoredNotifications);
+  const notificationPanelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(notifications.slice(0, MAX_NOTIFICATIONS)));
+    } catch {
+      // Storage full or unavailable; the list still works for this session.
+    }
+  }, [notifications]);
+
+  useEffect(() => {
+    if (!showNotificationDropdown) return;
+    const closeOnOutsideTap = (event: PointerEvent) => {
+      if (notificationPanelRef.current && !notificationPanelRef.current.contains(event.target as Node)) {
+        setShowNotificationDropdown(false);
+      }
+    };
+    document.addEventListener('pointerdown', closeOnOutsideTap);
+    return () => document.removeEventListener('pointerdown', closeOnOutsideTap);
+  }, [showNotificationDropdown]);
   
   // Tour progress tracking
   const [tourProgress, setTourProgress] = useState(() => {
@@ -517,13 +553,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   const addNotification = useCallback((type: Notification['type'], title: string, message: string) => {
     setNotifications(prev => [{
-      id: Date.now().toString(),
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
       type,
       title,
       message,
       timestamp: new Date(),
       read: false
-    }, ...prev]);
+    }, ...prev].slice(0, MAX_NOTIFICATIONS));
   }, []);
 
   // Fetch daily stats including fasting status
@@ -3057,11 +3093,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     <div data-testid="app-container" className="min-h-[100dvh] w-full overflow-x-hidden">
       {/* Fixed notification control — safe area aware (status bar / Dynamic Island) */}
       <div className="app-notification-anchor">
-        <div className="relative">
+        <div className="relative" ref={notificationPanelRef}>
           <Button
             variant="ghost"
             size="icon"
-            className="app-notification-button group relative shrink-0 bg-transparent text-white shadow-none hover:bg-transparent hover:text-white focus-visible:ring-white/30"
+            className="app-notification-button group relative shrink-0 bg-transparent text-red-600 shadow-none hover:bg-transparent hover:text-red-500 focus-visible:ring-red-500/40"
             onClick={() => setShowNotificationDropdown(!showNotificationDropdown)}
             aria-label={`Notifications${notifications.filter(n => !n.read).length > 0 ? ` - ${notifications.filter(n => !n.read).length} unread` : ''}`}
             aria-expanded={showNotificationDropdown}
@@ -3069,14 +3105,14 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             data-testid="button-notifications"
           >
             {notifications.filter(n => !n.read).length > 0 ? (
-              <BellRing className="h-6 w-6 drop-shadow-md transition-transform duration-200 group-hover:rotate-12" strokeWidth={2.25} aria-hidden="true" />
+              <BellRing className="app-notification-icon text-red-600 h-6 w-6 transition-transform duration-200 group-hover:rotate-12" strokeWidth={2.25} aria-hidden="true" />
             ) : (
-              <Bell className="h-6 w-6 drop-shadow-md transition-transform duration-200 group-hover:rotate-6" strokeWidth={2.25} aria-hidden="true" />
+              <Bell className="app-notification-icon text-red-600 h-6 w-6 transition-transform duration-200 group-hover:rotate-6" strokeWidth={2.25} aria-hidden="true" />
             )}
 
             {notifications.filter(n => !n.read).length > 0 && (
               <span
-                className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-gradient-to-r from-red-500 to-pink-500 px-1 text-[10px] font-bold leading-none text-white shadow-md"
+                className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-gradient-to-r from-red-500 to-pink-500 px-1 text-[10px] font-bold leading-none text-white shadow-md ring-2 ring-white"
                 aria-hidden="true"
               >
                 {notifications.filter(n => !n.read).length > 9 ? '9+' : notifications.filter(n => !n.read).length}
@@ -3100,25 +3136,33 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   </Button>
                 </div>
               </div>
-              <div className="max-h-80 overflow-y-auto">
+              <div className="max-h-[min(20rem,60dvh)] overflow-y-auto overscroll-contain">
+                {notifications.length === 0 && (
+                  <p className="p-6 text-center text-sm text-gray-600">You're all caught up. Goals, achievements and fasting updates will appear here.</p>
+                )}
                 {notifications.map((notification) => (
                   <div
                     key={notification.id}
                     className={`p-4 border-b border-amber-200/30 ${!notification.read ? 'bg-amber-200/30' : ''}`}
+                    onClick={() => handleMarkAsRead(notification.id)}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <h4 className="text-gray-900 font-medium text-sm">{notification.title}</h4>
                         <p className="text-gray-700 text-xs mt-1">{notification.message}</p>
                         <p className="text-gray-600 text-xs mt-2">
-                          {notification.timestamp.toLocaleDateString()}
+                          {notification.timestamp.toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
                         </p>
                       </div>
                       <Button
                         variant="ghost"
                         size="sm"
                         className="text-gray-600 hover:text-gray-900 p-1"
-                        onClick={() => handleDeleteNotification(notification.id)}
+                        aria-label="Delete notification"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          handleDeleteNotification(notification.id);
+                        }}
                       >
                         <X className="w-4 h-4" />
                       </Button>

@@ -1369,7 +1369,18 @@ button[data-testid="button-notifications"] .text-white {
   color: #ffffff;
 }
 
-/* Allow notification icon to use its own color (grey by default, white on hover) */
+/* Notification bell is always red; beats the ghost-button orange override */
+.app-notification-anchor button.app-notification-button,
+.app-notification-anchor button.app-notification-button:hover {
+  color: #dc2626 !important;
+}
+
+/* The global dark-text catch-all hits the classless <path>s, so paint them directly */
+.app-notification-icon * {
+  stroke: #dc2626 !important;
+  fill: #dc2626 !important;
+}
+
 button[data-testid="button-notifications"] svg {
   color: inherit !important;
 }
@@ -1736,6 +1747,11 @@ div[class*="min-h-screen"]:not([data-testid*="navigation"]):not([data-hero="true
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
+}
+
+/* Light halo keeps the red bell visible on red/dark backgrounds, dark shadow on light ones */
+.app-notification-icon {
+  filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.95)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.45));
 }
 
 @media screen and (min-width: 768px) {

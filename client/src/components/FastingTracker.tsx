@@ -30,6 +30,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
+import { cancelFastingCompleteNotification, scheduleFastingCompleteNotification } from '@/services/localNotifications';
 
 interface FastingPlan {
   id: string;
@@ -490,6 +491,19 @@ const FastingTracker = React.memo(function FastingTracker() {
       }
     }
   }, [activeFastingSession, currentSession]);
+
+  // Keep the iOS "fast complete" notification in step with the running fast
+  // (start, pause/resume, stop, completion, and sessions restored on reopen).
+  const fastEndsAt = isActive && currentSession
+    ? new Date(currentSession.startTime).getTime() + currentSession.targetDuration
+    : null;
+  useEffect(() => {
+    if (fastEndsAt) {
+      void scheduleFastingCompleteNotification(new Date(fastEndsAt), selectedPlan.name);
+    } else {
+      void cancelFastingCompleteNotification();
+    }
+  }, [fastEndsAt, selectedPlan.name]);
 
   // Check for milestone achievements
   const checkMilestones = (elapsed: number, milestones: number[]) => {
