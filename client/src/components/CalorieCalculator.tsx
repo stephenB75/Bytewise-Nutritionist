@@ -796,7 +796,7 @@ function CalorieCalculator({
             {calculateCalories.isPending ? (
               <>
                 <Search className="w-5 h-5 mr-2 animate-spin" />
-                Analyzing with USDA Database...
+                Analyzing with Bytewise Food Database...
               </>
             ) : (
               <>

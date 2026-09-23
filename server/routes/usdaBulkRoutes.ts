@@ -169,14 +169,14 @@ router.get('/test-connection', async (req, res) => {
     
     res.json({
       success: true,
-      message: 'USDA API connection successful',
+      message: 'Food database connection successful',
       testResult: testFoods.length > 0 ? 'Found test data' : 'No data returned',
       apiKey: usdaApiKey === 'DEMO_KEY' ? 'Using demo key' : 'Using production key'
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'USDA API connection failed',
+      message: 'Food database connection failed',
       error: error instanceof Error ? error.message : 'Unknown error',
       suggestion: 'Check USDA_API_KEY environment variable'
     });

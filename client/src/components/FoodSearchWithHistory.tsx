@@ -270,7 +270,7 @@ export function FoodSearchWithHistory({
               <div className="p-8 text-center text-gray-500">
                 <Search className="h-8 w-8 mx-auto mb-2 text-gray-300" />
                 <p className="text-sm">No matching meals found</p>
-                <p className="text-xs mt-1">Try searching in the USDA database</p>
+                <p className="text-xs mt-1">Try searching the Bytewise Food Database</p>
               </div>
             ) : (
               <div className="p-8 text-center text-gray-500">

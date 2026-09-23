@@ -2,6 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import path from "path";
 import { registerRoutes } from "./routes";
 import { getListenHost } from "./listenHost";
+import { startPhotoRetentionJob } from "./services/photoRetention";
 
 // Simple logging function
 function log(message: string) {
@@ -202,6 +203,8 @@ app.use((req, res, next) => {
     } else {
       log(`🔧 Development server ready`);
     }
+
+    startPhotoRetentionJob();
   });
 
   // Configure server timeout and keep-alive settings

@@ -2,7 +2,7 @@
  * AI Food Analyzer Page
  * 
  * Allows users to upload food photos for AI-powered nutrition analysis
- * Uses GPT-4 Vision to identify foods and cross-references with USDA database
+ * Uses Gemini Vision to identify foods and cross-references with the Bytewise Food Database
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -90,7 +90,7 @@ function PhotoDisplay({ imageUrl, alt, className }: PhotoDisplayProps) {
           Photo no longer available
         </div>
         <div className="text-xs text-gray-500 mt-1 text-center px-2">
-          Upload a new photo to see it here
+          Photos are deleted after 7 days
         </div>
       </div>
     );
@@ -563,7 +563,7 @@ export default function AIFoodAnalyzer() {
           <h2 className="text-2xl font-bold text-gray-800">AI Food Analyzer</h2>
         </div>
         <p className="text-gray-600 max-w-2xl mx-auto">
-          Take a photo of your food and let AI identify ingredients and calculate nutrition information using the USDA database
+          Take a photo of your food and let AI identify ingredients and calculate nutrition information using the Bytewise Food Database
         </p>
 
       </div>
@@ -613,7 +613,7 @@ export default function AIFoodAnalyzer() {
               <Alert className="bg-amber-100/50 border-amber-300 text-gray-900">
                 <Eye className="h-4 w-4 text-gray-900" />
                 <AlertDescription className="text-gray-900">
-                  For best results, ensure good lighting and that all food items are clearly visible in the photo.
+                  For best results, ensure good lighting and that all food items are clearly visible in the photo. Photos are automatically deleted after 7 days.
                 </AlertDescription>
               </Alert>
             </div>

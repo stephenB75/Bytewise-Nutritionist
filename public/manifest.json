@@ -2,7 +2,7 @@
   "id": "com.bytewise.nutritionist",
   "name": "bytewise nutritionist",
   "short_name": "bytewise",
-  "description": "Professional nutrition tracking app with USDA database integration, meal planning, and progress analytics",
+  "description": "Professional nutrition tracking app powered by the Bytewise Food Database, meal planning, and progress analytics",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
@@ -158,10 +158,5 @@
       "url": "/app?action=%s"
     }
   ],
-  "iarc_rating_id": "e58c174a-81d2-5c3c-32cc-34b8de4a52e9",
-  "scope_extensions": [
-    {
-      "origin": "https://api.nal.usda.gov"
-    }
-  ]
+  "iarc_rating_id": "e58c174a-81d2-5c3c-32cc-34b8de4a52e9"
 }

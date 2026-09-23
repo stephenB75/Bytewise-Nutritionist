@@ -32,7 +32,7 @@ const TOUR_FEATURES = [
   {
     icon: <Utensils className="w-5 h-5 text-orange-500" />,
     title: 'Smart Food Search',
-    description: 'Search 300,000+ USDA foods with brand recognition',
+    description: 'Search 300,000+ foods in the Bytewise Food Database',
     category: 'Core Feature',
     targetTab: 'nutrition',
     nutritionMode: 'calculator'

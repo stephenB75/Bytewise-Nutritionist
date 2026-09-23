@@ -2355,7 +2355,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
     res.json({
       success: true,
-      message: `Successfully synced ${syncedCount} foods from USDA database`,
+      message: `Successfully synced ${syncedCount} foods into the Bytewise Food Database`,
       syncResults,
       timestamp: new Date().toISOString()
     });

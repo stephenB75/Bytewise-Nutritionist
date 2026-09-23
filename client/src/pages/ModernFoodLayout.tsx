@@ -1412,7 +1412,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         backgroundImage={backgroundImage}
         title="Track Your"
         subtitle="Nutrition"
-        description="Track nutrition with scientific precision using our comprehensive USDA database"
+        description="Track nutrition with scientific precision using the comprehensive Bytewise Food Database"
         buttonText="View Progress"
         onButtonClick={() => scrollToTestId('progress-section')}
         showLogo={true}
@@ -2429,7 +2429,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           backgroundImage={backgroundImage}
           title="Smart"
           subtitle="Nutrition"
-          description="AI-powered food analysis or precise USDA database calculator"
+          description="AI-powered food analysis or the precise Bytewise Calculator"
           buttonText="Choose Analysis Method"
           onButtonClick={() => scrollToTestId('analysis-method-choice')}
         />
@@ -2455,10 +2455,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 <div className="bg-orange-500/5 border border-orange-500/20 rounded-lg p-3">
                   <div className="flex items-center gap-2 mb-2">
                     <Target className="h-4 w-4 text-orange-400" />
-                    <span className="font-medium text-gray-900">USDA Calculator</span>
+                    <span className="font-medium text-gray-900">Bytewise Calculator</span>
                   </div>
                   <p className="text-gray-700 text-sm">
-                    Search and manually select foods from the USDA database. 
+                    Search and manually select foods from the Bytewise Food Database. 
                     Ideal for precise nutrition tracking and portion control.
                   </p>
                 </div>
@@ -2497,8 +2497,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 data-testid="button-calculator-mode"
               >
                 <Target className="h-4 w-4" />
-                <span className="sm:hidden">USDA</span>
-                <span className="hidden sm:inline">USDA Calculator</span>
+                <span className="sm:hidden">Calculator</span>
+                <span className="hidden sm:inline">Bytewise Calculator</span>
               </button>
             </div>
           </div>
@@ -2733,7 +2733,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                                 {
                                   icon: <Utensils className="w-5 h-5 text-orange-600" />,
                                   title: 'Smart Food Search',
-                                  description: 'Search 300,000+ USDA foods with brand recognition',
+                                  description: 'Search 300,000+ foods in the Bytewise Food Database',
                                   category: 'Core Feature',
                                   targetTab: 'nutrition',
                                   nutritionMode: 'calculator'

@@ -135,7 +135,7 @@ export const getVersionHistory = (): Array<AppVersion> => [
     buildDate: '2025-08-12',
     changelog: [
       'Core nutrition tracking features',
-      'USDA FoodData Central integration',
+      'Bytewise Food Database integration',
       'Basic fasting timer implementation',
       'Achievement system foundation',
       'PWA capabilities enhancement'

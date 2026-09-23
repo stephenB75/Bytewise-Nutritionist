@@ -398,7 +398,7 @@ export class USDAService {
       });
 
       if (!response.ok) {
-        throw new Error(`USDA API error: ${response.statusText}`);
+        throw new Error(`Food database error: ${response.statusText}`);
       }
 
       const data: USDASearchResponse = await response.json();
@@ -489,7 +489,7 @@ export class USDAService {
       const response = await fetch(`${this.baseUrl}/food/${fdcId}?api_key=${this.apiKey}`);
       
       if (!response.ok) {
-        throw new Error(`USDA API error: ${response.statusText}`);
+        throw new Error(`Food database error: ${response.statusText}`);
       }
 
       const food: USDAFood = await response.json();
@@ -639,7 +639,7 @@ export class USDAService {
       
       // Simple validation - skip complex unreasonable calorie check for now
       if (nutrients.calories < 0 || nutrients.calories > 900) {
-        throw new Error('Invalid calorie data from USDA, using fallback');
+        throw new Error('Invalid calorie data from food database, using fallback');
       }
       
       // Apply cooking adjustments if needed (simplified for now)
@@ -677,7 +677,7 @@ export class USDAService {
         measurement: `${quantity} ${unit} (~${gramsEquivalent}g)`,
         estimatedCalories,
         equivalentMeasurement: `100g ≈ ${nutrients.calories} kcal`,
-        note: `From USDA database (${food.dataType})`,
+        note: 'From the Bytewise Food Database',
         nutritionPer100g: {
           ...nutrients,
           ...micronutrientsPer100g
@@ -3314,7 +3314,7 @@ export class USDAService {
         measurement: `${quantity} ${unit} (~${gramsEquivalent}g)`,
         estimatedCalories,
         equivalentMeasurement: `100g ≈ ${nutrition.calories} kcal`,
-        note: 'Estimate based on USDA nutrition averages with enhanced conversion factors',
+        note: 'Estimate based on Bytewise Food Database averages',
         nutritionPer100g: nutritionWithMicronutrients,
         usdaPortionUsed: false,
         portionInfo: portionInfo
