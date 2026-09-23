@@ -520,11 +520,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error) {
         console.log('❌ Sign-up error:', error.message);
         const lower = error.message.toLowerCase();
-        const code =
-          lower.includes('already registered') || lower.includes('user already exists')
-            ? 'ACCOUNT_EXISTS'
-            : 'AUTH_ERROR';
-        return res.status(400).json({ message: error.message, code });
+        let code = 'AUTH_ERROR';
+        let message = error.message;
+        if (
+          lower.includes('already registered') ||
+          lower.includes('user already exists')
+        ) {
+          code = 'ACCOUNT_EXISTS';
+        } else if (
+          lower.includes('database error') ||
+          lower.includes('unique constraint') ||
+          lower.includes('duplicate key')
+        ) {
+          code = 'AUTH_ERROR';
+          message =
+            'We could not finish creating your account because an older profile exists for this email. Try signing in, or use Forgot password. If it persists, contact support.';
+        }
+        return res.status(400).json({ message, code });
       }
       
       console.log('✅ User created:', data.user?.email, 'Confirmed:', !!data.user?.email_confirmed_at);

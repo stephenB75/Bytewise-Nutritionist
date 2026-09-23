@@ -88,6 +88,19 @@ function mapAuthError(error: { message?: string; code?: string } | null, email: 
     };
   }
 
+  if (
+    lower.includes('database error saving new user') ||
+    lower.includes('database error')
+  ) {
+    return {
+      ok: false,
+      code: 'AUTH_ERROR',
+      message:
+        'Account setup hit a profile conflict for this email. Try Sign in or Forgot password. If you never verified before, try again in a minute.',
+      email,
+    };
+  }
+
   if (lower.includes('invalid login credentials') || lower.includes('invalid_credentials')) {
     return {
       ok: false,
