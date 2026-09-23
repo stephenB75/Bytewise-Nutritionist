@@ -197,7 +197,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
         birthDate: personalInfo?.birth_date || personalInfo?.birthDate || '',
         height: personalInfo?.height || '',
         weight: personalInfo?.weight || '',
-        activityLevel: personalInfo?.activityLevel || 'Moderately Active',
+        activityLevel: personalInfo?.activity_level || personalInfo?.activityLevel || 'Moderately Active',
         dietaryPreferences: personalInfo?.dietary_preferences || [],
         calorieGoal: userData?.dailyCalorieGoal || userData?.calorie_goal || 2000,
         joinDate: userData?.createdAt || new Date().toISOString(),
@@ -212,35 +212,14 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
     setIsSaving(true);
     
     try {
-      // Get the current access token (same logic as useAuth.ts)
-      let accessToken = null;
-      
-      // Check for locally stored custom tokens first
-      const storedSession = localStorage.getItem('supabase.auth.token');
-      if (storedSession) {
-        try {
-          const parsedSession = JSON.parse(storedSession);
-          if (parsedSession.access_token) {
-            accessToken = parsedSession.access_token;
-          }
-        } catch (parseError) {
-        }
-      }
-      
-      // If no custom token, check Supabase session
+      const { data: { session } } = await supabase.auth.getSession();
+      const accessToken = session?.access_token;
       if (!accessToken) {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.access_token) {
-          accessToken = session.access_token;
-        }
+        throw new Error('Your session expired. Please sign in again.');
       }
-      
-      if (!accessToken) {
-        throw new Error('No authentication token available');
-      }
-      
-      // Ensure firstName and lastName are properly split from name if needed
-      const [firstName = '', lastName = ''] = userInfo.name.split(' ');
+
+      const [firstName = '', ...lastNameParts] = userInfo.name.trim().split(/\s+/);
+      const lastName = lastNameParts.join(' ');
       
       const profileData = {
         firstName: firstName.trim(),
@@ -343,7 +322,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
           birthDate: refreshedPersonalInfo?.birth_date || refreshedPersonalInfo?.birthDate || '',
           height: refreshedPersonalInfo?.height || '',
           weight: refreshedPersonalInfo?.weight || '',
-          activityLevel: refreshedPersonalInfo?.activityLevel || 'Moderately Active',
+          activityLevel: refreshedPersonalInfo?.activity_level || refreshedPersonalInfo?.activityLevel || 'Moderately Active',
           dietaryPreferences: refreshedPersonalInfo?.dietary_preferences || [],
           calorieGoal: userData?.dailyCalorieGoal || userData?.calorie_goal || 2000,
           joinDate: userData?.createdAt || new Date().toISOString(),

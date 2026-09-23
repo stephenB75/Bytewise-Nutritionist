@@ -116,27 +116,7 @@ export async function upsertUserViaSupabase(user: {
   };
 }
 
-export async function updateUserProfileViaSupabase(userId: string, profile: {
-  firstName?: string | null;
-  lastName?: string | null;
-  profileIcon?: number | null;
-}) {
-  const { data, error } = await supabaseAdmin
-    .from('users')
-    .upsert({
-      id: userId,
-      first_name: profile.firstName ?? null,
-      last_name: profile.lastName ?? null,
-      profile_icon: profile.profileIcon || 1,
-      updated_at: new Date().toISOString(),
-    }, { onConflict: 'id' })
-    .select('*')
-    .single();
-
-  if (error) {
-    throw error;
-  }
-
+function mapUserRow(data: Record<string, any>) {
   return {
     id: data.id,
     email: data.email,
@@ -144,9 +124,91 @@ export async function updateUserProfileViaSupabase(userId: string, profile: {
     lastName: data.last_name,
     emailVerified: data.email_verified,
     profileIcon: data.profile_icon,
+    profileImageUrl: data.profile_image_url,
+    personalInfo: data.personal_info,
+    privacySettings: data.privacy_settings,
+    notificationSettings: data.notification_settings,
+    displaySettings: data.display_settings,
     createdAt: data.created_at,
     updatedAt: data.updated_at,
+    dailyCalorieGoal: data.daily_calorie_goal,
+    dailyProteinGoal: data.daily_protein_goal,
+    dailyCarbGoal: data.daily_carb_goal,
+    dailyFatGoal: data.daily_fat_goal,
+    dailyWaterGoal: data.daily_water_goal,
   };
+}
+
+/** Update only the provided columns; create the row if the auth user has none yet. */
+async function updateUserColumnsViaSupabase(userId: string, columns: Record<string, unknown>) {
+  const values = { ...columns, updated_at: new Date().toISOString() };
+
+  const { data: updated, error: updateError } = await supabaseAdmin
+    .from('users')
+    .update(values)
+    .eq('id', userId)
+    .select('*')
+    .maybeSingle();
+
+  if (updateError) {
+    throw updateError;
+  }
+  if (updated) {
+    return mapUserRow(updated);
+  }
+
+  const { data: authData } = await supabaseAdmin.auth.admin.getUserById(userId);
+  const { data: inserted, error: insertError } = await supabaseAdmin
+    .from('users')
+    .insert({
+      id: userId,
+      email: authData?.user?.email ?? null,
+      email_verified: !!authData?.user?.email_confirmed_at,
+      ...values,
+    })
+    .select('*')
+    .single();
+
+  if (insertError) {
+    throw insertError;
+  }
+  return mapUserRow(inserted);
+}
+
+export async function updateUserProfileViaSupabase(userId: string, profile: {
+  firstName?: string | null;
+  lastName?: string | null;
+  profileIcon?: number | null;
+  personalInfo?: Record<string, unknown> | null;
+  notificationSettings?: Record<string, unknown> | null;
+  privacySettings?: Record<string, unknown> | null;
+}) {
+  const columns: Record<string, unknown> = {};
+  if (profile.firstName !== undefined) columns.first_name = profile.firstName;
+  if (profile.lastName !== undefined) columns.last_name = profile.lastName;
+  if (profile.profileIcon !== undefined && profile.profileIcon !== null) columns.profile_icon = profile.profileIcon;
+  if (profile.personalInfo !== undefined) columns.personal_info = profile.personalInfo;
+  if (profile.notificationSettings !== undefined) columns.notification_settings = profile.notificationSettings;
+  if (profile.privacySettings !== undefined) columns.privacy_settings = profile.privacySettings;
+
+  return updateUserColumnsViaSupabase(userId, columns);
+}
+
+export async function updateUserGoalsViaSupabase(userId: string, goals: {
+  dailyCalorieGoal?: number;
+  dailyProteinGoal?: number;
+  dailyCarbGoal?: number;
+  dailyFatGoal?: number;
+  dailyWaterGoal?: number;
+}) {
+  const columns: Record<string, unknown> = {};
+  if (goals.dailyCalorieGoal !== undefined) columns.daily_calorie_goal = goals.dailyCalorieGoal;
+  if (goals.dailyProteinGoal !== undefined) columns.daily_protein_goal = goals.dailyProteinGoal;
+  if (goals.dailyCarbGoal !== undefined) columns.daily_carb_goal = goals.dailyCarbGoal;
+  if (goals.dailyFatGoal !== undefined) columns.daily_fat_goal = goals.dailyFatGoal;
+  if (goals.dailyWaterGoal !== undefined) columns.daily_water_goal = goals.dailyWaterGoal;
+
+  return updateUserColumnsViaSupabase(userId, columns);
 }
 
 export async function getUserViaSupabase(userId: string) {
@@ -163,21 +225,7 @@ export async function getUserViaSupabase(userId: string) {
     return undefined;
   }
 
-  return {
-    id: data.id,
-    email: data.email,
-    firstName: data.first_name,
-    lastName: data.last_name,
-    emailVerified: data.email_verified,
-    profileIcon: data.profile_icon,
-    createdAt: data.created_at,
-    updatedAt: data.updated_at,
-    dailyCalorieGoal: data.daily_calorie_goal,
-    dailyProteinGoal: data.daily_protein_goal,
-    dailyCarbGoal: data.daily_carb_goal,
-    dailyFatGoal: data.daily_fat_goal,
-    dailyWaterGoal: data.daily_water_goal,
-  };
+  return mapUserRow(data);
 }
 
 export async function createMealViaSupabase(meal: Record<string, any>) {

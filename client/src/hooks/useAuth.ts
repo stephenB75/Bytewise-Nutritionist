@@ -1,32 +1,36 @@
-import { useEffect } from 'react';
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from '@/lib/supabase';
 import { apiFetch } from '@/lib/apiUrl';
+import { queryClient } from '@/lib/queryClient';
+
+// useAuth is mounted by many components; register auth listeners once so a single
+// Supabase event produces a single refetch instead of one per mounted hook.
+let authListenersRegistered = false;
+
+function registerAuthListeners() {
+  if (authListenersRegistered) return;
+  authListenersRegistered = true;
+
+  supabase.auth.onAuthStateChange((event) => {
+    // TOKEN_REFRESHED is routine (autoRefreshToken) and doesn't change the user.
+    if (event === 'SIGNED_IN') {
+      localStorage.setItem('fresh-auth-session', 'true');
+      window.dispatchEvent(new CustomEvent('auth-state-change'));
+    } else if (event === 'SIGNED_OUT') {
+      localStorage.removeItem('fresh-auth-session');
+      window.dispatchEvent(new CustomEvent('auth-state-change'));
+    } else if (event === 'USER_UPDATED') {
+      window.dispatchEvent(new CustomEvent('auth-state-change'));
+    }
+  });
+
+  window.addEventListener('auth-state-change', () => {
+    void queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+  });
+}
 
 export function useAuth() {
-  // Always call useEffect first to maintain hook order
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        
-        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-          // Mark this as a fresh authentication for tour purposes
-          if (event === 'SIGNED_IN') {
-            localStorage.setItem('fresh-auth-session', 'true');
-          }
-          
-          // Trigger a refetch of user data when auth state changes
-          window.dispatchEvent(new CustomEvent('auth-state-change'));
-        } else if (event === 'SIGNED_OUT') {
-          // Clear user data and fresh auth flag on sign out
-          localStorage.removeItem('fresh-auth-session');
-          window.dispatchEvent(new CustomEvent('auth-state-change'));
-        }
-      }
-    );
-
-    return () => subscription.unsubscribe();
-  }, []);
+  registerAuthListeners();
 
   const { data: user, isLoading, isFetching, refetch } = useQuery({
     queryKey: ["/api/auth/user"],
@@ -117,13 +121,6 @@ export function useAuth() {
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
-  // Listen for auth state changes to refetch
-  useEffect(() => {
-    const handleAuthChange = () => refetch();
-    window.addEventListener('auth-state-change', handleAuthChange);
-    return () => window.removeEventListener('auth-state-change', handleAuthChange);
-  }, [refetch]);
-
   const signOut = async () => {
     try {
       localStorage.removeItem('supabase.auth.token');
@@ -157,7 +154,8 @@ export function useAuth() {
 
   return {
     user,
-    isLoading: isLoading || isFetching,
+    // Background refetches keep showing the current user instead of a loading state.
+    isLoading: isLoading || (isFetching && !user),
     isAuthenticated: !!user,
     refetch,
     supabase,

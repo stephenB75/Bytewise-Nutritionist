@@ -1959,17 +1959,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         personalInfo: personalInfo ? Object.keys(personalInfo) : 'none'
       });
       
-      // Update user profile information
-      const profileUpdateData: any = {
-        firstName: firstName?.trim() || '',
-        lastName: lastName?.trim() || '',
-        personalInfo: personalInfo || {}
-      };
-      
-      // Include profileIcon if provided
-      if (profileIcon !== undefined) {
-        profileUpdateData.profileIcon = profileIcon;
-      }
+      // Only touch fields the client sent, so partial saves don't wipe other data.
+      const profileUpdateData: any = {};
+      if (typeof firstName === 'string') profileUpdateData.firstName = firstName.trim();
+      if (typeof lastName === 'string') profileUpdateData.lastName = lastName.trim();
+      if (personalInfo && typeof personalInfo === 'object') profileUpdateData.personalInfo = personalInfo;
+      if (profileIcon !== undefined && profileIcon !== null) profileUpdateData.profileIcon = profileIcon;
       
       const updatedUser = await storage.updateUserProfile(userId, profileUpdateData);
       

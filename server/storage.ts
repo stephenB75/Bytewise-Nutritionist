@@ -45,6 +45,7 @@ import {
   getUserWaterHistoryViaSupabase,
   getUserWaterIntakeViaSupabase,
   updateUserProfileViaSupabase,
+  updateUserGoalsViaSupabase,
   upsertUserViaSupabase,
   upsertWaterIntakeViaSupabase,
 } from "./supabaseData";
@@ -311,17 +312,25 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateUserGoals(userId: string, goals: Partial<Pick<User, 'dailyCalorieGoal' | 'dailyProteinGoal' | 'dailyCarbGoal' | 'dailyFatGoal' | 'dailyWaterGoal'>>): Promise<User> {
-    // Storage: updateUserGoals called
-    
-    const [user] = await db
-      .update(users)
-      .set({ ...goals, updatedAt: new Date() })
-      .where(eq(users.id, userId))
-      .returning();
-      
-    // Storage: updateUserGoals completed
-    
-    return user;
+    const cleanGoals = Object.fromEntries(
+      Object.entries(goals).filter(([, value]) => value !== undefined && value !== null)
+    ) as { [K in keyof typeof goals]: number };
+
+    if (!getDatabaseUrl() || !isDbReady()) {
+      return (await updateUserGoalsViaSupabase(userId, cleanGoals)) as unknown as User;
+    }
+
+    try {
+      const [user] = await db
+        .update(users)
+        .set({ ...cleanGoals, updatedAt: new Date() })
+        .where(eq(users.id, userId))
+        .returning();
+      if (user) return user;
+    } catch (error) {
+      console.warn('Database updateUserGoals failed, using Supabase admin:', error);
+    }
+    return (await updateUserGoalsViaSupabase(userId, cleanGoals)) as unknown as User;
   }
 
   private async updateUserProfileInDatabase(userId: string, profileData: {
@@ -418,10 +427,14 @@ export class DatabaseStorage implements IStorage {
     privacySettings?: any;
     profileIcon?: number;
   }): Promise<User> {
+    if (!getDatabaseUrl() || !isDbReady()) {
+      return (await updateUserProfileViaSupabase(userId, profileData)) as unknown as User;
+    }
     try {
       return await this.updateUserProfileInDatabase(userId, profileData);
     } catch (error) {
-      return await updateUserProfileViaSupabase(userId, profileData) as any;
+      console.warn('Database updateUserProfile failed, using Supabase admin:', error);
+      return (await updateUserProfileViaSupabase(userId, profileData)) as unknown as User;
     }
   }
 

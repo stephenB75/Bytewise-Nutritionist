@@ -445,6 +445,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     await handleHealthDataSync(payload || { type: 'auto_sync' });
   }, [handleHealthDataSync]);
 
+  // syncHealthDataIfEnabled changes whenever meals/stats load; the meal-loading effect
+  // reads it through a ref so reloading data doesn't re-run that effect in a loop.
+  const syncHealthDataRef = React.useRef(syncHealthDataIfEnabled);
+  syncHealthDataRef.current = syncHealthDataIfEnabled;
+
   // Function to calculate micronutrients from meals - uses real data when available
   const calculateMicronutrients = useCallback((meals: any[]) => {
     
@@ -1069,7 +1074,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             'Meal Logged! 🍽️', 
             `Added ${foodName || name || 'food item'} (${calories || 0} cal${protein ? `, ${protein}g protein` : ''}) to ${mealType || 'your meals'}`
           );
-          syncHealthDataIfEnabled({ meal: event.detail }).catch(console.error);
+          syncHealthDataRef.current({ meal: event.detail }).catch(console.error);
         } else {
           // Generic meal logged notification when no details available
           addNotification('success', 'Meal Updated! 🍽️', 'Your nutrition data has been updated');
@@ -1138,7 +1143,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       window.removeEventListener('reload-meal-data', handleReloadMealData);
       clearInterval(fastingInterval);
     };
-  }, [user, authLoading, fetchDailyStats, calculateMicronutrients, checkFastingStatus, syncHealthDataIfEnabled]);
+  }, [user, authLoading, fetchDailyStats, calculateMicronutrients, checkFastingStatus]);
 
   // Food categories inspired by Deliveroo
   const categories = [

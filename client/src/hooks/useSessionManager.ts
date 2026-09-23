@@ -77,9 +77,9 @@ export function useSessionManager() {
       return;
     }
 
-    // Refresh session proactively
-    await refreshSession();
-  }, [refreshSession, toast]);
+    // Token refresh is handled by supabase-js (autoRefreshToken). Forcing it here
+    // fires TOKEN_REFRESHED on every mount, which re-triggers auth refetches.
+  }, [toast]);
 
   // Set up session warning
   const setupSessionWarning = useCallback(() => {
