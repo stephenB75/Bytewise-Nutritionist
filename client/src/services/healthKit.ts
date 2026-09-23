@@ -6,6 +6,8 @@ const LEGACY_KEYS = ['appleHealthAutoSync', 'appleHealthSyncedMealIds', 'appleHe
 // The only Activity types @capgo/capacitor-health 7.x understands; any other identifier fails the whole request.
 const FITNESS_READ_TYPES = ['steps', 'calories', 'distance'] as const;
 
+export type HealthPermissionResult = { ok: true } | { ok: false; reason: string };
+
 export type AppleFitnessSummary = {
   steps: number;
   activeCalories: number;
@@ -31,6 +33,17 @@ type HealthBridge = {
 
 function isNativeIos() {
   return Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios';
+}
+
+function errorMessage(error: unknown): string {
+  const message = String((error as any)?.message ?? error ?? '');
+  if (/entitlement/i.test(message)) {
+    return 'This build is missing the HealthKit capability. In Xcode, add HealthKit under Signing & Capabilities and reinstall.';
+  }
+  if (/not implemented/i.test(message)) {
+    return 'The Apple Health plugin is missing from this build. Run npm run ios:prepare and rebuild in Xcode.';
+  }
+  return message || 'Apple Health could not be opened.';
 }
 
 function toNumber(value: unknown): number {
@@ -60,6 +73,7 @@ function wasAsked(result: AuthorizationResult): boolean {
 
 export class HealthKitService {
   private isAvailable = false;
+  private unavailableReason: string | null = null;
   private isAuthorized = localStorage.getItem(CONNECTED_KEY) === 'true';
   private ready: Promise<void>;
 
@@ -71,12 +85,14 @@ export class HealthKitService {
     const health = await getHealth();
     if (!health) {
       this.isAvailable = false;
+      this.unavailableReason = isNativeIos() ? 'The Apple Health plugin is missing from this build.' : null;
       return;
     }
 
     try {
       const status = await health.isAvailable();
       this.isAvailable = !!status.available;
+      this.unavailableReason = status.available ? null : status.reason || "Apple Health isn't available on this device.";
 
       if (this.isAvailable && this.isAuthorized) {
         const auth = await health.checkAuthorization({ read: [...FITNESS_READ_TYPES], write: [] });
@@ -84,6 +100,8 @@ export class HealthKitService {
       }
     } catch (error) {
       console.warn('HealthKit availability check failed:', error);
+      this.isAvailable = false;
+      this.unavailableReason = errorMessage(error);
     }
   }
 
@@ -96,26 +114,33 @@ export class HealthKitService {
     await this.ready;
   }
 
-  async requestPermissions(): Promise<boolean> {
+  async requestPermissions(): Promise<HealthPermissionResult> {
     await this.ready;
-    if (!this.isAvailable) {
-      return false;
+    const health = await getHealth();
+    if (!health || !this.isAvailable) {
+      return { ok: false, reason: this.unavailableReason || "Apple Health isn't available on this device." };
     }
 
     try {
-      const health = await getHealth();
-      if (!health) {
-        return false;
-      }
-
       const status = await health.requestAuthorization({ read: [...FITNESS_READ_TYPES], write: [] });
       this.setAuthorized(wasAsked(status));
-      return this.isAuthorized;
+      return this.isAuthorized
+        ? { ok: true }
+        : { ok: false, reason: 'Apple Health did not record an answer. Please try again.' };
     } catch (error) {
       console.error('HealthKit permission request failed:', error);
       this.setAuthorized(false);
-      return false;
+      return { ok: false, reason: errorMessage(error) };
     }
+  }
+
+  /** iOS shows the permission sheet only once; afterwards access is changed in the Health app. */
+  openHealthApp(): void {
+    window.location.href = 'x-apple-health://';
+  }
+
+  getUnavailableReason(): string | null {
+    return this.unavailableReason;
   }
 
   private async sumSamplesForDay(dataType: string, date: Date = new Date()): Promise<number> {

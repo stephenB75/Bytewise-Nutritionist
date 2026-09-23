@@ -12,7 +12,7 @@ interface ObjectUploaderProps {
     method: "PUT";
     url: string;
   }>;
-  onComplete?: (result: { successful: boolean; file?: File }) => void;
+  onComplete?: (result: { successful: boolean; file?: File; uploadURL?: string }) => void;
   buttonClassName?: string;
   children: ReactNode;
 }
@@ -69,8 +69,9 @@ export function ObjectUploader({
         return;
       }
       
-      // Validate file type (images only)
-      if (!file.type.startsWith('image/')) {
+      // Validate file type (images only); iOS can report an empty type for HEIC photos
+      const looksLikeImage = file.type.startsWith('image/') || /\.(jpe?g|png|heic|heif|webp|gif)$/i.test(file.name);
+      if (!looksLikeImage) {
         setUploadError('Please select an image file (JPG, PNG, HEIC, WEBP)');
         return;
       }
@@ -117,13 +118,13 @@ export function ObjectUploader({
         xhr.onabort = () => reject(new Error('Upload was cancelled'));
         
         xhr.open(method, url);
-        xhr.setRequestHeader('Content-Type', selectedFile.type);
+        xhr.setRequestHeader('Content-Type', selectedFile.type || 'image/jpeg');
         xhr.send(selectedFile);
       });
       
       // Upload successful
       setUploading(false);
-      onComplete?.({ successful: true, file: selectedFile });
+      onComplete?.({ successful: true, file: selectedFile, uploadURL: url });
       setShowModal(false);
       setSelectedFile(null);
       setUploadProgress(0);

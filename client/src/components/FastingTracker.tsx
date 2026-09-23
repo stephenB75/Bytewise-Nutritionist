@@ -259,10 +259,15 @@ const FastingTracker = React.memo(function FastingTracker() {
     },
     onError: (error) => {
       // Keep the timer running even if API fails - it's stored locally
-      toast({
-        title: "Offline Mode",
-        description: "Timer started locally. We'll sync when you're back online.",
-      });
+      toast(navigator.onLine
+        ? {
+            title: "Timer started on this device",
+            description: `Couldn't save to your account (${error instanceof Error ? error.message : 'server error'}). Your timer is still running.`,
+          }
+        : {
+            title: "Offline Mode",
+            description: "Timer started locally. We'll sync when you're back online.",
+          });
     }
   });
 

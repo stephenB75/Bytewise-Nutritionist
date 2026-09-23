@@ -18,6 +18,8 @@ export function AppleHealthIntegration() {
   const [isConnected, setIsConnected] = useState(false);
   const [isChecking, setIsChecking] = useState(isNativeIos);
   const [isLoading, setIsLoading] = useState(false);
+  const [nativeReason, setNativeReason] = useState<string | null>(null);
+  const [lastError, setLastError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isNativeIos) return;
@@ -27,6 +29,7 @@ export function AppleHealthIntegration() {
       await healthKitService.initialize();
       if (cancelled) return;
       setIsAvailable(healthKitService.getAvailability());
+      setNativeReason(healthKitService.getUnavailableReason());
       setIsConnected(healthKitService.getAuthorizationStatus());
       setIsChecking(false);
     };
@@ -39,11 +42,12 @@ export function AppleHealthIntegration() {
 
   const handleConnect = async () => {
     setIsLoading(true);
+    setLastError(null);
 
     try {
-      const success = await healthKitService.requestPermissions();
+      const result = await healthKitService.requestPermissions();
 
-      if (success) {
+      if (result.ok) {
         setIsConnected(true);
         window.dispatchEvent(new CustomEvent('apple-health-changed'));
         toast({
@@ -52,11 +56,12 @@ export function AppleHealthIntegration() {
           duration: 3000,
         });
       } else {
+        setLastError(result.reason);
         toast({
-          title: 'Connection Failed',
-          description: 'Allow Bytewise in the Apple Health permission sheet, then try again.',
+          title: 'Apple Health not connected',
+          description: result.reason,
           variant: 'destructive',
-          duration: 4000,
+          duration: 6000,
         });
       }
     } catch (error) {
@@ -91,7 +96,7 @@ export function AppleHealthIntegration() {
   const unavailableReason = !isNativeIos
     ? 'Open the Bytewise app on your iPhone to connect Apple Health.'
     : !isChecking && !isAvailable
-      ? "Apple Health isn't available on this device."
+      ? nativeReason || "Apple Health isn't available on this device."
       : null;
 
   return (
@@ -131,12 +136,17 @@ export function AppleHealthIntegration() {
       {isConnected ? (
         <div className="space-y-3">
           <p className="text-xs text-gray-600 bg-white/60 p-3 rounded-lg">
-            If a number shows 0, turn it on in iOS Settings → Privacy &amp; Security → Health → Bytewise.
+            If a number shows 0, open the Health app → your profile picture → Apps → Bytewise and turn it on.
             Your activity stays on your iPhone and isn't stored on our servers.
           </p>
-          <Button variant="outline" onClick={handleDisconnect} className="w-full">
-            Disconnect
-          </Button>
+          <div className="grid grid-cols-2 gap-2">
+            <Button variant="outline" onClick={() => healthKitService.openHealthApp()} className="w-full">
+              Open Health app
+            </Button>
+            <Button variant="outline" onClick={handleDisconnect} className="w-full">
+              Disconnect
+            </Button>
+          </div>
         </div>
       ) : (
         <div className="space-y-2">
@@ -158,6 +168,16 @@ export function AppleHealthIntegration() {
               <Smartphone className="h-4 w-4 shrink-0" />
               {unavailableReason}
             </p>
+          ) : lastError ? (
+            <div className="space-y-2 rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-800">
+              <p>{lastError}</p>
+              <p className="text-xs text-gray-700">
+                iOS asks only once. If you already answered, open the Health app → your profile picture → Apps → Bytewise to turn on Steps, Active Energy and Walking + Running Distance.
+              </p>
+              <Button variant="outline" size="sm" onClick={() => healthKitService.openHealthApp()} className="w-full">
+                Open Health app
+              </Button>
+            </div>
           ) : (
             <p className="text-center text-xs text-gray-600">
               Apple will ask which data to share. Your activity stays on your iPhone.

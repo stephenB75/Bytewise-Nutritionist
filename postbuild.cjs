@@ -64,7 +64,7 @@ if (fs.existsSync(destIconsDir)) {
   }
   
   // Copy manifest and favicon
-  ['manifest.json', 'favicon.ico', 'supabase-api-config.js', 'domain-validator.js', 'sw.js'].forEach(file => {
+  ['manifest.json', 'favicon.ico', 'supabase-api-config.js', 'domain-validator.js'].forEach(file => {
     const src = path.join(srcIconsDir, file);
     const dest = path.join(destIconsDir, file);
     if (fs.existsSync(src)) {

@@ -411,16 +411,17 @@ export default function AIFoodAnalyzer() {
     }
   };
 
-  const handleUploadComplete = async (result: { successful: boolean; file?: File }) => {
+  const handleUploadComplete = async (result: { successful: boolean; file?: File; uploadURL?: string }) => {
     if (result.successful && result.file) {
-      // For direct uploads, we need to construct the final image URL from the stored upload URL
+      // For direct uploads, we need to construct the final image URL from the upload URL
       try {
-        if (!currentUploadUrl) {
+        const uploadUrl = result.uploadURL || currentUploadUrl;
+        if (!uploadUrl) {
           throw new Error('No upload URL available');
         }
         
         // Clean the URL - remove query parameters and convert from upload URL to final storage URL
-        const url = new URL(currentUploadUrl);
+        const url = new URL(uploadUrl);
         let pathname = url.pathname;
         
         // Convert from upload URL format to final storage URL format
@@ -451,7 +452,7 @@ export default function AIFoodAnalyzer() {
             fileName: result.file.name,
             storagePath: storagePath,
             storageUrl: finalImageUrl,
-            mimeType: result.file.type,
+            mimeType: result.file.type || 'image/jpeg',
             fileSize: result.file.size,
             analysisId: null // Will be set later if analysis is performed
           });

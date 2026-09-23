@@ -7,6 +7,9 @@
  */
 
 import { jsPDF } from 'jspdf';
+import { Capacitor } from '@capacitor/core';
+import { Directory, Filesystem } from '@capacitor/filesystem';
+import { Share } from '@capacitor/share';
 import { apiRequest } from '@/lib/queryClient';
 import { apiFetch } from '@/lib/apiUrl';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
@@ -1392,9 +1395,7 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     console.log('💾 Saving PDF with filename:', filename);
     
     try {
-      // Use direct jsPDF save - single, reliable method
-      console.log('💾 Generating and downloading PDF...');
-      pdf.save(filename);
+      await savePdf(pdf, filename);
       console.log('✅ PDF download initiated successfully');
       
       return true;
@@ -1412,5 +1413,32 @@ export async function generateProgressReportPDF(): Promise<boolean> {
       stack: error.stack?.substring(0, 500)
     });
     throw error; // Re-throw to let the UI handle the error display
+  }
+}
+
+/** Browser download on the web; on iOS/Android the web view can't download, so write the file and open the share sheet. */
+async function savePdf(pdf: jsPDF, filename: string): Promise<void> {
+  if (!Capacitor.isNativePlatform()) {
+    pdf.save(filename);
+    return;
+  }
+
+  const base64 = pdf.output('datauristring').split(',')[1];
+  const { uri } = await Filesystem.writeFile({
+    path: filename,
+    data: base64,
+    directory: Directory.Cache,
+  });
+
+  try {
+    await Share.share({
+      title: 'Bytewise Nutrition Report',
+      url: uri,
+      dialogTitle: 'Save or share your report',
+    });
+  } catch (error: any) {
+    if (!/cancel/i.test(String(error?.message ?? error))) {
+      throw error;
+    }
   }
 }
