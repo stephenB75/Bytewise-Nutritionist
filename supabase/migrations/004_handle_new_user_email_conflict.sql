@@ -34,7 +34,7 @@ BEGIN
   SELECT id INTO legacy_id
   FROM public.users
   WHERE email IS NOT NULL
-    AND email = NEW.email
+    AND lower(trim(email)) = lower(trim(NEW.email))
     AND id <> NEW.id
   LIMIT 1;
 

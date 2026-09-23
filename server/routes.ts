@@ -504,18 +504,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { email: rawEmail, password } = req.body;
       const email = rawEmail?.toLowerCase().trim(); // Normalize email case
+
+      if (!email || !password) {
+        return res.status(400).json({ message: 'Email and password are required.', code: 'AUTH_ERROR' });
+      }
       
       console.log('📝 Sign-up attempt for:', email);
       console.log('🔐 Service key available:', !!supabaseAdmin);
-      
-      // Sign up user with admin Supabase client (sends verification email automatically)
-      const { data, error } = await supabaseAdmin.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: getSafeRedirectUrl('/auth/confirm'),
-        },
-      });
+
+      const {
+        findAuthUserByEmail,
+        removeOrphanPublicProfilesForEmail,
+      } = await import('./supabaseData');
+
+      const existingAuthUser = await findAuthUserByEmail(email);
+      if (existingAuthUser) {
+        return res.status(400).json({
+          message:
+            'An account with this email already exists. Sign in instead, or use Forgot password to set a new password.',
+          code: 'ACCOUNT_EXISTS',
+        });
+      }
+
+      const removedOrphans = await removeOrphanPublicProfilesForEmail(email);
+      if (removedOrphans > 0) {
+        console.log(`🧹 Removed ${removedOrphans} orphan public profile(s) before sign-up for:`, email);
+      }
+
+      const runSignUp = () =>
+        supabaseAdmin.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: getSafeRedirectUrl('/auth/confirm'),
+          },
+        });
+
+      let { data, error } = await runSignUp();
+
+      if (error) {
+        const lower = error.message.toLowerCase();
+        const isProfileConflict =
+          lower.includes('database error') ||
+          lower.includes('unique constraint') ||
+          lower.includes('duplicate key');
+
+        if (isProfileConflict) {
+          const removedAgain = await removeOrphanPublicProfilesForEmail(email);
+          console.log('🔁 Sign-up profile conflict, orphan cleanup removed:', removedAgain);
+          ({ data, error } = await runSignUp());
+        }
+      }
       
       if (error) {
         console.log('❌ Sign-up error:', error.message);
@@ -527,14 +566,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
           lower.includes('user already exists')
         ) {
           code = 'ACCOUNT_EXISTS';
+          message =
+            'An account with this email already exists. Sign in instead, or use Forgot password to set a new password.';
         } else if (
           lower.includes('database error') ||
           lower.includes('unique constraint') ||
           lower.includes('duplicate key')
         ) {
-          code = 'AUTH_ERROR';
+          code = 'ACCOUNT_EXISTS';
           message =
-            'We could not finish creating your account because an older profile exists for this email. Try signing in, or use Forgot password. If it persists, contact support.';
+            'This email is already tied to an account. Use Sign in, or Forgot password if you need to reset your password.';
         }
         return res.status(400).json({ message, code });
       }

@@ -90,13 +90,15 @@ function mapAuthError(error: { message?: string; code?: string } | null, email: 
 
   if (
     lower.includes('database error saving new user') ||
-    lower.includes('database error')
+    lower.includes('database error') ||
+    lower.includes('older profile') ||
+    lower.includes('already tied to an account')
   ) {
     return {
       ok: false,
-      code: 'AUTH_ERROR',
+      code: 'ACCOUNT_EXISTS',
       message:
-        'Account setup hit a profile conflict for this email. Try Sign in or Forgot password. If you never verified before, try again in a minute.',
+        'This email is already registered. Sign in instead, or use Forgot password to set a new password.',
       email,
     };
   }

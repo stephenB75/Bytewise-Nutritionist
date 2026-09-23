@@ -1,4 +1,66 @@
+import type { User } from '@supabase/supabase-js';
 import { supabaseAdmin } from './supabaseAuth';
+
+function normalizeEmail(email: string): string {
+  return email.trim().toLowerCase();
+}
+
+/** Find auth.users row by email (admin API has no direct email filter). */
+export async function findAuthUserByEmail(email: string): Promise<User | null> {
+  const target = normalizeEmail(email);
+  let page = 1;
+  const perPage = 200;
+
+  while (page <= 15) {
+    const { data, error } = await supabaseAdmin.auth.admin.listUsers({ page, perPage });
+    if (error) {
+      console.warn('findAuthUserByEmail listUsers failed:', error.message);
+      return null;
+    }
+
+    const match = data.users.find((u) => u.email && normalizeEmail(u.email) === target);
+    if (match) {
+      return match;
+    }
+
+    if (data.users.length < perPage) {
+      break;
+    }
+    page += 1;
+  }
+
+  return null;
+}
+
+/**
+ * Removes public.users rows that have no matching auth.users account (legacy app-created profiles).
+ * Required before signUp when email unique constraint blocked the auth trigger.
+ */
+export async function removeOrphanPublicProfilesForEmail(email: string): Promise<number> {
+  const target = normalizeEmail(email);
+  const { data: rows, error } = await supabaseAdmin.from('users').select('id').eq('email', target);
+
+  if (error || !rows?.length) {
+    return 0;
+  }
+
+  let removed = 0;
+  for (const row of rows) {
+    const { data: authData } = await supabaseAdmin.auth.admin.getUserById(row.id);
+    if (authData?.user) {
+      continue;
+    }
+
+    const { error: deleteError } = await supabaseAdmin.from('users').delete().eq('id', row.id);
+    if (!deleteError) {
+      removed += 1;
+    } else {
+      console.warn('removeOrphanPublicProfilesForEmail delete failed:', deleteError.message);
+    }
+  }
+
+  return removed;
+}
 
 function toNumber(value: unknown): number {
   const parsed = Number(value);
