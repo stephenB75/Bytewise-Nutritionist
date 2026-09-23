@@ -11,6 +11,7 @@ import { eq, and, gte, desc, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { supabaseStorageService } from "./supabaseStorage";
 import express from "express";
+import { isSupabaseRateLimit } from "./authErrors";
 
 // Zod schemas for request validation
 const subscriptionSyncSchema = z.object({
@@ -438,6 +439,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
             });
           }
 
+          if (isSupabaseRateLimit(msg)) {
+            return res.status(429).json({
+              message: msg,
+              code: 'RATE_LIMIT',
+            });
+          }
+
           return res.status(400).json({
             message: msg || 'Sign in failed. Please try again.',
             code: 'SIGNIN_FAILED',
@@ -543,6 +551,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let { data, error } = await runSignUp();
 
       if (error) {
+        if (isSupabaseRateLimit(error.message)) {
+          return res.status(429).json({
+            message: error.message,
+            code: 'RATE_LIMIT',
+          });
+        }
+
         const lower = error.message.toLowerCase();
         const isProfileConflict =
           lower.includes('database error') ||
@@ -558,6 +573,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (error) {
         console.log('❌ Sign-up error:', error.message);
+        if (isSupabaseRateLimit(error.message)) {
+          return res.status(429).json({
+            message: error.message,
+            code: 'RATE_LIMIT',
+          });
+        }
         const lower = error.message.toLowerCase();
         let code = 'AUTH_ERROR';
         let message = error.message;
@@ -746,6 +767,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (error) {
         console.error('Resend verification error:', error.message);
+        if (isSupabaseRateLimit(error.message)) {
+          return res.status(429).json({ message: error.message, code: 'RATE_LIMIT' });
+        }
         return res.status(400).json({ message: error.message });
       }
 
@@ -781,6 +805,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (error) {
         console.error('Password reset email error:', error.message);
+        if (isSupabaseRateLimit(error.message)) {
+          return res.status(429).json({ message: error.message, code: 'RATE_LIMIT' });
+        }
         return res.status(400).json({ message: error.message });
       }
 

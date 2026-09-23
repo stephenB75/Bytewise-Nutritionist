@@ -11,7 +11,46 @@ export type AuthCode =
   | 'ACCOUNT_NOT_FOUND'
   | 'SERVICE_ERROR'
   | 'NETWORK_ERROR'
+  | 'RATE_LIMIT'
   | 'AUTH_ERROR';
+
+type AuthErrorContext = 'signup' | 'signin' | 'reset' | 'resend' | 'generic';
+
+function isRateLimitMessage(message: string): boolean {
+  const lower = message.toLowerCase();
+  return (
+    lower.includes('rate limit') ||
+    lower.includes('too many requests') ||
+    lower.includes('too many') ||
+    lower.includes('once every') ||
+    lower.includes('over_email_send_rate_limit') ||
+    lower.includes('429')
+  );
+}
+
+function rateLimitUserMessage(context: AuthErrorContext, rawMessage: string): string {
+  const lower = rawMessage.toLowerCase();
+  const secondsMatch = lower.match(/(\d+)\s*seconds?/);
+  const waitHint = secondsMatch
+    ? ` Please wait about ${secondsMatch[1]} seconds and try again.`
+    : ' Please wait a few minutes and try again.';
+
+  switch (context) {
+    case 'reset':
+      return `Too many password reset emails sent.${waitHint}`;
+    case 'resend':
+      return `Too many verification emails sent.${waitHint}`;
+    case 'signup':
+      return `Too many sign-up attempts for this email.${waitHint}`;
+    case 'signin':
+      return `Too many sign-in attempts.${waitHint}`;
+    default:
+      if (lower.includes('email') || lower.includes('verification')) {
+        return `Too many emails sent for this address.${waitHint}`;
+      }
+      return `Too many authentication attempts.${waitHint}`;
+  }
+}
 
 export type AuthActionResult =
   | { ok: true; kind: 'signed_in' }
@@ -34,8 +73,20 @@ function isNetworkFailure(error: unknown): boolean {
   );
 }
 
-function mapApiErrorBody(body: { message?: string; code?: string }, email: string): AuthActionResult {
+function mapApiErrorBody(
+  body: { message?: string; code?: string },
+  email: string,
+  context: AuthErrorContext = 'generic'
+): AuthActionResult {
   const message = body.message || 'Authentication failed. Please try again.';
+  if (isRateLimitMessage(message)) {
+    return {
+      ok: false,
+      code: 'RATE_LIMIT',
+      message: rateLimitUserMessage(context, message),
+      email,
+    };
+  }
   switch (body.code) {
     case 'EMAIL_NOT_VERIFIED':
       return { ok: false, code: 'EMAIL_NOT_VERIFIED', message, email };
@@ -45,12 +96,23 @@ function mapApiErrorBody(body: { message?: string; code?: string }, email: strin
       return { ok: false, code: 'ACCOUNT_NOT_FOUND', message, email };
     case 'SERVICE_ERROR':
       return { ok: false, code: 'SERVICE_ERROR', message, email };
+    case 'RATE_LIMIT':
+      return {
+        ok: false,
+        code: 'RATE_LIMIT',
+        message: rateLimitUserMessage(context, message),
+        email,
+      };
     default:
-      return mapAuthError({ message, code: body.code }, email);
+      return mapAuthError({ message, code: body.code }, email, context);
   }
 }
 
-function mapAuthError(error: { message?: string; code?: string } | null, email: string): AuthActionResult {
+function mapAuthError(
+  error: { message?: string; code?: string } | null,
+  email: string,
+  context: AuthErrorContext = 'generic'
+): AuthActionResult {
   const message = error?.message || 'Authentication failed. Please try again.';
   const lower = message.toLowerCase();
 
@@ -122,11 +184,11 @@ function mapAuthError(error: { message?: string; code?: string } | null, email: 
     };
   }
 
-  if (lower.includes('rate limit') || lower.includes('too many')) {
+  if (isRateLimitMessage(message)) {
     return {
       ok: false,
-      code: 'AUTH_ERROR',
-      message: 'Too many reset attempts. Please wait a few minutes and try again.',
+      code: 'RATE_LIMIT',
+      message: rateLimitUserMessage(context, message),
       email,
     };
   }
@@ -211,17 +273,29 @@ export async function signUpWithEmail(email: string, password: string): Promise<
       };
     }
 
-    if (response.status >= 500) {
-      return mapApiErrorBody({ ...body, code: body.code || 'SERVICE_ERROR' }, normalized);
+    if (response.status === 429 || body.code === 'RATE_LIMIT') {
+      return mapApiErrorBody({ ...body, code: 'RATE_LIMIT' }, normalized, 'signup');
     }
 
-    return mapApiErrorBody(body, normalized);
+    if (response.status >= 500) {
+      return mapApiErrorBody({ ...body, code: body.code || 'SERVICE_ERROR' }, normalized, 'signup');
+    }
+
+    return mapApiErrorBody(body, normalized, 'signup');
   } catch (error) {
     if (!isNetworkFailure(error)) {
-      console.warn('Signup API failed, falling back to Supabase client:', error);
+      console.warn('Signup API unreachable:', error);
+      return {
+        ok: false,
+        code: 'NETWORK_ERROR',
+        message:
+          'Could not reach the server to create your account. Check your connection and try again.',
+        email: normalized,
+      };
     }
   }
 
+  // Network-only fallback (avoids doubling Supabase signUp calls after API errors).
   const { data, error } = await supabase.auth.signUp({
     email: normalized,
     password,
@@ -231,7 +305,7 @@ export async function signUpWithEmail(email: string, password: string): Promise<
   });
 
   if (error) {
-    return mapAuthError(error, normalized);
+    return mapAuthError(error, normalized, 'signup');
   }
 
   if (data?.user?.identities?.length === 0) {
@@ -266,7 +340,7 @@ async function signInWithSupabaseClient(
   });
 
   if (error) {
-    return mapAuthError(error, normalized);
+    return mapAuthError(error, normalized, 'signin');
   }
 
   if (data?.user && !data.user.email_confirmed_at) {
@@ -311,20 +385,27 @@ export async function signInWithEmail(email: string, password: string): Promise<
       console.warn('Sign-in API returned 200 without session');
     }
 
+    if (response.status === 429 || body.code === 'RATE_LIMIT') {
+      return mapApiErrorBody({ ...body, code: 'RATE_LIMIT' }, normalized, 'signin');
+    }
+
     if (!response.ok && response.status < 500) {
       const code = body.code;
       if (code === 'EMAIL_NOT_VERIFIED') {
-        return mapApiErrorBody(body, normalized);
+        return mapApiErrorBody(body, normalized, 'signin');
+      }
+      if (code === 'RATE_LIMIT') {
+        return mapApiErrorBody(body, normalized, 'signin');
       }
       if (code === 'INVALID_CREDENTIALS' || code === 'SIGNIN_FAILED') {
         const clientResult = await signInWithSupabaseClient(normalized, password);
         if (clientResult.ok || clientResult.code === 'EMAIL_NOT_VERIFIED') {
           return clientResult;
         }
-        return mapApiErrorBody(body, normalized);
+        return mapApiErrorBody(body, normalized, 'signin');
       }
       if (code !== 'ACCOUNT_NOT_FOUND') {
-        return mapApiErrorBody(body, normalized);
+        return mapApiErrorBody(body, normalized, 'signin');
       }
     }
 
@@ -358,9 +439,12 @@ export async function resetPasswordForEmail(email: string): Promise<AuthActionRe
       return { ok: true, kind: 'verification_required', email: normalized };
     }
 
-    const body = (await response.json().catch(() => ({}))) as { message?: string };
+    const body = (await response.json().catch(() => ({}))) as { message?: string; code?: string };
+    if (response.status === 429 || body.code === 'RATE_LIMIT') {
+      return mapApiErrorBody({ ...body, code: 'RATE_LIMIT' }, normalized, 'reset');
+    }
     const serverMessage = body.message || `Password reset failed (${response.status})`;
-    return mapAuthError({ message: serverMessage, code: body.code }, normalized);
+    return mapAuthError({ message: serverMessage, code: body.code }, normalized, 'reset');
   } catch (error) {
     if (isNetworkFailure(error)) {
       return {
@@ -376,7 +460,7 @@ export async function resetPasswordForEmail(email: string): Promise<AuthActionRe
   const { error } = await supabase.auth.resetPasswordForEmail(normalized, { redirectTo });
 
   if (error) {
-    return mapAuthError(error, normalized);
+    return mapAuthError(error, normalized, 'reset');
   }
 
   return { ok: true, kind: 'verification_required', email: normalized };
@@ -397,7 +481,10 @@ export async function resendVerificationEmail(email: string): Promise<AuthAction
     }
 
     const body = (await response.json().catch(() => ({}))) as { message?: string; code?: string };
-    return mapApiErrorBody(body, normalized);
+    if (response.status === 429 || body.code === 'RATE_LIMIT') {
+      return mapApiErrorBody({ ...body, code: 'RATE_LIMIT' }, normalized, 'resend');
+    }
+    return mapApiErrorBody(body, normalized, 'resend');
   } catch (error) {
     if (isNetworkFailure(error)) {
       return {
@@ -418,7 +505,7 @@ export async function resendVerificationEmail(email: string): Promise<AuthAction
   });
 
   if (error) {
-    return mapAuthError(error, normalized);
+    return mapAuthError(error, normalized, 'resend');
   }
 
   return { ok: true, kind: 'verification_required', email: normalized };

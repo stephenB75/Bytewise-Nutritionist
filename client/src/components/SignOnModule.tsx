@@ -239,6 +239,13 @@ export function SignOnModule({ onClose }: SignOnModuleProps) {
             description: errorMessage,
             duration: 8000
           });
+        } else if (errorCode === 'RATE_LIMIT') {
+          showNotification({
+            type: 'warning',
+            title: "Please wait",
+            description: errorMessage,
+            duration: 12000
+          });
         } else {
           // Handle password validation errors and general errors
           let displayMessage = errorMessage;
