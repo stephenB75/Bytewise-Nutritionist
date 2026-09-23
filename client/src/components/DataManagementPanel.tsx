@@ -135,16 +135,16 @@ export function DataManagementPanel() {
           <h3 className="text-xl font-semibold text-gray-950 mb-6" style={{ fontFamily: "'League Spartan', sans-serif" }}>Data Overview</h3>
         
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-            <div className="text-center p-4 bg-gradient-to-br from-[#45c73e]/10 to-[#45c73e]/5 rounded-lg border border-[#45c73e]/20">
-              <div className="text-2xl font-bold text-[#45c73e]" style={{ fontFamily: "'League Spartan', sans-serif" }}>{dataStats.totalMeals}</div>
+            <div className="text-center p-4 bg-white/80 rounded-lg border border-green-200">
+              <div className="text-2xl font-bold text-green-700" style={{ fontFamily: "'League Spartan', sans-serif" }}>{dataStats.totalMeals}</div>
               <div className="text-sm text-gray-900" style={{ fontFamily: "'Work Sans', sans-serif" }}>Meals Logged</div>
             </div>
-            <div className="text-center p-4 bg-gradient-to-br from-[#1f4aa6]/10 to-[#1f4aa6]/5 rounded-lg border border-[#1f4aa6]/20">
-              <div className="text-2xl font-bold text-[#1f4aa6]" style={{ fontFamily: "'League Spartan', sans-serif" }}>{dataStats.totalDays}</div>
+            <div className="text-center p-4 bg-white/80 rounded-lg border border-blue-200">
+              <div className="text-2xl font-bold text-blue-700" style={{ fontFamily: "'League Spartan', sans-serif" }}>{dataStats.totalDays}</div>
               <div className="text-sm text-gray-900" style={{ fontFamily: "'Work Sans', sans-serif" }}>Days Tracked</div>
             </div>
-            <div className="text-center p-4 bg-gradient-to-br from-[#faed39]/10 to-[#faed39]/5 rounded-lg border border-[#faed39]/20">
-              <div className="text-2xl font-bold text-[#faed39]" style={{ fontFamily: "'League Spartan', sans-serif" }}>{dataStats.dataSize}</div>
+            <div className="text-center p-4 bg-white/80 rounded-lg border border-amber-300">
+              <div className="text-2xl font-bold text-amber-700" style={{ fontFamily: "'League Spartan', sans-serif" }}>{dataStats.dataSize}</div>
               <div className="text-sm text-gray-900" style={{ fontFamily: "'Work Sans', sans-serif" }}>Data Size</div>
             </div>
           </div>
@@ -157,7 +157,7 @@ export function DataManagementPanel() {
                 <p className="text-sm text-gray-900" style={{ fontFamily: "'Quicksand', sans-serif" }}>Your data syncs automatically as you use the app</p>
               </div>
             </div>
-            <Badge className="bg-[#45c73e]/20 text-[#45c73e] border-[#45c73e]/30">
+            <Badge className="bg-green-100 text-green-800 border-green-300">
               Always Active
             </Badge>
           </div>
@@ -166,10 +166,10 @@ export function DataManagementPanel() {
         {/* Data Management Content */}
         <div className="space-y-6">
           {/* Export Section */}
-                  <div className="p-6 bg-gradient-to-br from-[#1f4aa6]/10 to-[#1f4aa6]/5 rounded-2xl border border-[#1f4aa6]/20 backdrop-blur-md">
+                  <div className="p-6 bg-white/80 rounded-2xl border border-blue-200">
                     <div className="flex flex-col items-center text-center space-y-4">
-                      <div className="p-4 bg-[#1f4aa6]/20 rounded-2xl">
-                        <Download className="w-8 h-8 text-[#1f4aa6]" strokeWidth={2.5} />
+                      <div className="p-4 bg-blue-100 rounded-2xl">
+                        <Download className="w-8 h-8 text-blue-700" strokeWidth={2.5} />
                       </div>
                       <div>
                         <h4 className="font-bold text-gray-950 text-xl mb-2" style={{ fontFamily: "'League Spartan', sans-serif" }}>
@@ -178,7 +178,7 @@ export function DataManagementPanel() {
                         <p className="text-sm text-gray-900 mb-4" style={{ fontFamily: "'Quicksand', sans-serif" }}>
                           Download comprehensive nutrition reports with graphs and insights
                         </p>
-                        <Badge className="bg-[#1f4aa6]/20 text-[#1f4aa6] border-[#1f4aa6]/30 mb-4">
+                        <Badge className="bg-blue-100 text-blue-800 border-blue-300 mb-4">
                           PDF Format
                         </Badge>
                       </div>
@@ -215,19 +215,19 @@ export function DataManagementPanel() {
                   <Separator className="bg-amber-300/40" />
 
                   {/* Danger Zone */}
-                  <div className="p-6 bg-red-950/30 rounded-2xl border border-red-800/30 backdrop-blur-md">
+                  <div className="p-6 bg-red-50 rounded-2xl border border-red-200">
                     <div className="flex flex-col items-center text-center space-y-4">
-                      <div className="p-4 bg-red-600/20 rounded-2xl">
+                      <div className="p-4 bg-red-100 rounded-2xl">
                         <Trash2 className="w-8 h-8 text-red-600" strokeWidth={2.5} />
                       </div>
                       <div>
-                        <h4 className="font-bold text-red-400 text-xl mb-2" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                        <h4 className="font-bold text-red-700 text-xl mb-2" style={{ fontFamily: "'League Spartan', sans-serif" }}>
                           Danger Zone
                         </h4>
-                        <p className="text-sm text-red-300 mb-4" style={{ fontFamily: "'Quicksand', sans-serif" }}>
+                        <p className="text-sm text-gray-800 mb-4" style={{ fontFamily: "'Quicksand', sans-serif" }}>
                           Permanently delete all your nutrition data and progress
                         </p>
-                        <Badge variant="destructive" className="bg-red-600/20 text-red-400 border-red-600/30 mb-4">
+                        <Badge variant="destructive" className="bg-red-100 text-red-700 border-red-300 mb-4">
                           Irreversible Action
                         </Badge>
                       </div>

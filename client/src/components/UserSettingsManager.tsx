@@ -691,7 +691,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
               </div>
 
               {showPasswordChange && (
-                <div className="space-y-4 bg-white/5 p-4 rounded-lg border border-white/10">
+                <div className="space-y-4 bg-amber-50 p-4 rounded-lg border border-amber-200">
                   <div className="space-y-2">
                     <label className="text-sm text-gray-700 font-medium flex items-center">
                       <Lock className="w-4 h-4 mr-2 text-purple-400" />
@@ -701,7 +701,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                       type="password"
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
-                      className="bg-white/10 border-white/20 text-white placeholder-gray-400"
+                      className="bg-white border-amber-200 text-gray-900"
                       placeholder="Enter your current password"
                     />
                   </div>
@@ -715,7 +715,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                       type="password"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      className="bg-white/10 border-white/20 text-white placeholder-gray-400"
+                      className="bg-white border-amber-200 text-gray-900"
                       placeholder="Enter new password (min 6 characters)"
                     />
                   </div>
@@ -729,7 +729,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                       type="password"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="bg-white/10 border-white/20 text-white placeholder-gray-400"
+                      className="bg-white border-amber-200 text-gray-900"
                       placeholder="Re-enter new password"
                     />
                   </div>

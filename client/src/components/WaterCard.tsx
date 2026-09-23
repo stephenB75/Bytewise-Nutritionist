@@ -264,7 +264,7 @@ export const WaterCard = React.memo(function WaterCard({
               style={{
                 background: i < glasses
                   ? 'linear-gradient(to top, #06b6d4 0%, #0891b2 100%)'
-                  : 'transparent',
+                  : '#d1d5db',
               }}
             />
           ))}

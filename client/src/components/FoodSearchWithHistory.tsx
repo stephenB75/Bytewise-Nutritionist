@@ -51,7 +51,7 @@ interface FoodSearchWithHistoryProps {
 export function FoodSearchWithHistory({
   onSelectFood,
   onSearchChange,
-  placeholder = "Search Meal's",
+  placeholder = "Search meals",
   className = ""
 }: FoodSearchWithHistoryProps) {
   const { user } = useAuth();

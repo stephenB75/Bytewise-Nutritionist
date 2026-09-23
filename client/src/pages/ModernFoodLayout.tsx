@@ -251,7 +251,7 @@ const HeroSection = React.memo(function HeroSection({
             <Button
               onClick={onButtonClick}
               size="lg"
-              className="group relative bg-gradient-to-r from-orange-400 to-red-400 hover:from-orange-500 hover:to-red-500 font-bold px-16 py-6 rounded-full text-xl md:text-2xl shadow-2xl transition-all duration-200 ease-out overflow-hidden transform hover:scale-105"
+              className="group relative bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 font-bold px-16 py-6 rounded-full text-xl md:text-2xl shadow-2xl transition-all duration-200 ease-out overflow-hidden transform hover:scale-105"
               style={{ color: '#ffffff !important' }}
             >
               <span className="relative z-10 flex items-center gap-3" style={{ color: '#ffffff !important' }}>
@@ -1228,13 +1228,17 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     // Memoize calculated values
     const progressWidth = React.useMemo(() => Math.min(percentage, 100), [percentage]);
     const isComplete = progressWidth >= 100;
+    // Full class names so Tailwind can generate them
+    const palette = color === 'orange'
+      ? { tile: 'bg-orange-500/30', text: 'text-orange-700', fill: 'bg-gradient-to-r from-orange-500 to-red-600' }
+      : { tile: 'bg-blue-500/30', text: 'text-blue-700', fill: 'bg-gradient-to-r from-blue-600 to-cyan-600' };
     
     return (
       <Card className="bg-gradient-to-br from-amber-100 to-amber-200 border-none p-5 shadow-lg" data-testid="progress-card">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
-            <div className={`p-2 bg-${color}-500/30 rounded-xl`}>
-              <Icon className={`w-5 h-5 text-${color}-700`} />
+            <div className={`p-2 ${palette.tile} rounded-xl`}>
+              <Icon className={`w-5 h-5 ${palette.text}`} />
             </div>
             <div>
               <h3 className="text-gray-900 font-medium">{title}</h3>
@@ -1242,13 +1246,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             </div>
           </div>
           <div className="text-right">
-            <div className={`text-2xl font-medium text-${color}-700`}>{progressWidth}%</div>
+            <div className={`text-2xl font-medium ${palette.text}`}>{progressWidth}%</div>
             <div className="text-xs text-gray-900 font-normal">of goal</div>
           </div>
         </div>
         <div className="relative h-3 bg-gray-300/60 rounded-full overflow-hidden mb-4 shadow-inner border border-gray-400/20">
           <div 
-            className={`absolute left-0 top-0 h-full bg-gradient-to-r from-${color}-600 to-${color === 'orange' ? 'red' : 'cyan'}-700 rounded-full transition-all duration-1000 shadow-sm`}
+            className={`absolute left-0 top-0 h-full ${palette.fill} rounded-full transition-all duration-1000 shadow-sm`}
             style={{ width: `${progressWidth}%` }}
           />
           {isComplete && (
@@ -1276,8 +1280,14 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       data.map(height => Math.max(height * 100, 10))
     , [data]);
 
-    // Determine text color based on remaining value
-    const textColor = isNegative ? 'text-red-700' : `text-${color}-700`;
+    // Full class names so Tailwind can generate them
+    const macroPalette: Record<string, { text: string; bar: string }> = {
+      green: { text: 'text-green-700', bar: 'bg-green-500/60' },
+      yellow: { text: 'text-yellow-700', bar: 'bg-yellow-500/70' },
+      purple: { text: 'text-purple-700', bar: 'bg-purple-500/60' },
+    };
+    const swatch = macroPalette[color] ?? macroPalette.green;
+    const textColor = isNegative ? 'text-red-700' : swatch.text;
     const labelColor = isNegative ? 'text-red-600' : 'text-gray-900';
 
     return (
@@ -1294,7 +1304,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             {chartData.map((height, i) => (
               <div 
                 key={i}
-                className={`flex-1 ${isNegative ? 'bg-red-500/40' : `bg-${color}-500/40`} rounded-t transition-all duration-500`}
+                className={`flex-1 ${isNegative ? 'bg-red-500/60' : swatch.bar} rounded-t transition-all duration-500`}
                 style={{ height: `${height}%` }}
               />
             ))}
@@ -1341,13 +1351,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           textColor: 'text-slate-600',
           gradientClass: 'bg-gradient-to-r from-slate-400 to-gray-500'
         };
-        case 'white': return {
-          textColor: 'text-gray-900',
-          gradientClass: 'bg-gradient-to-r from-white to-gray-300'
+        case 'violet': return {
+          textColor: 'text-violet-600',
+          gradientClass: 'bg-gradient-to-r from-violet-400 to-purple-600'
         };
         case 'amber': return {
-          textColor: 'text-amber-600',
-          gradientClass: 'bg-gradient-to-r from-amber-400 to-yellow-500'
+          textColor: 'text-amber-700',
+          gradientClass: 'bg-gradient-to-r from-amber-500 to-orange-600'
         };
         case 'rose': return {
           textColor: 'text-rose-600',
@@ -1438,8 +1448,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <h2 className="text-2xl sm:text-3xl font-semibold text-gray-900">Today's Progress</h2>
             <div className="flex gap-2">
               <Button 
-                variant="ghost" 
-                className="text-orange-400 hover:text-orange-300"
+                className="on-color bg-orange-700 hover:bg-orange-800 rounded-full"
                 onClick={() => handleTabChange('nutrition')}
               >
                 Track Food
@@ -1564,7 +1573,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             
             <div className="grid grid-cols-2 gap-3">
               <MicronutrientCard name="Iron" value={dailyMicronutrients.iron} goal={18} unit="mg" color="slate" />
-              <MicronutrientCard name="Calcium" value={dailyMicronutrients.calcium} goal={1000} unit="mg" color="white" />
+              <MicronutrientCard name="Calcium" value={dailyMicronutrients.calcium} goal={1000} unit="mg" color="violet" />
               <MicronutrientCard name="Zinc" value={dailyMicronutrients.zinc} goal={11} unit="mg" color="amber" />
               <MicronutrientCard name="Magnesium" value={dailyMicronutrients.magnesium} goal={400} unit="mg" color="rose" />
             </div>

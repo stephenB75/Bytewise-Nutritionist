@@ -471,7 +471,7 @@ function CalorieCalculator({
                 }));
               }}
               onSearchChange={(query) => setIngredient(query)}
-              placeholder="Search Meal's"
+              placeholder="Search meals"
               className="text-base bg-amber-50/90 border-2 border-amber-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg pr-4 py-3 text-gray-950 placeholder-gray-700"
             />
             <Input
@@ -734,7 +734,7 @@ function CalorieCalculator({
                   // Clear USDA suggestions for historical search
                   setIngredientSuggestions([]);
                 }}
-                placeholder="Search Meal's"
+                placeholder="Search meals"
                 className="text-base bg-amber-50/90 border-2 border-amber-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg pr-4 py-3 text-gray-950 placeholder-gray-700"
               />
               
@@ -791,7 +791,7 @@ function CalorieCalculator({
           <Button 
             type="submit" 
             disabled={calculateCalories.isPending || !ingredient.trim() || !measurement.trim()}
-            className="w-full text-lg py-6"
+            className="w-full text-lg py-6 disabled:opacity-75"
           >
             {calculateCalories.isPending ? (
               <>

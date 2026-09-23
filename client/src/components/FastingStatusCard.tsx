@@ -70,7 +70,7 @@ export function FastingStatusCard({ fastingStatus }: FastingStatusProps) {
         <CardTitle className="text-sm flex items-center gap-2 text-gray-900">
           <Clock className="w-4 h-4 text-blue-500" />
           Active Fast
-          <Badge variant="secondary" className="ml-auto bg-blue-600 text-white">
+          <Badge variant="secondary" className="on-color ml-auto bg-blue-600">
             {fastingStatus.planName || 'Custom'}
           </Badge>
         </CardTitle>

@@ -141,10 +141,9 @@ export function AppleHealthIntegration() {
       ) : (
         <div className="space-y-2">
           <Button
-            id="apple-health-connect"
             onClick={handleConnect}
             disabled={!!unavailableReason || isChecking || isLoading}
-            className="w-full h-12 bg-rose-600 hover:bg-rose-700 text-base font-semibold disabled:opacity-60"
+            className="on-color w-full h-12 bg-rose-600 hover:bg-rose-700 text-base font-semibold disabled:opacity-75"
             data-testid="button-connect-apple-health"
           >
             {isLoading || isChecking ? (

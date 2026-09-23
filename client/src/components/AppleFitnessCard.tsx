@@ -74,10 +74,9 @@ export function AppleFitnessCard({ onConnect }: AppleFitnessCardProps) {
           </p>
           {onConnect && (
             <Button
-              id="apple-fitness-connect"
               type="button"
               size="sm"
-              className="bg-rose-600 hover:bg-rose-700"
+              className="on-color bg-rose-600 hover:bg-rose-700"
               onClick={onConnect}
             >
               Connect Apple Health

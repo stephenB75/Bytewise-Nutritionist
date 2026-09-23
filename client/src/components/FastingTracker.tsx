@@ -873,16 +873,16 @@ const FastingTracker = React.memo(function FastingTracker() {
 
       <Tabs defaultValue="tracker" className="w-full">
         <TabsList className="grid w-full grid-cols-3 h-12 bg-transparent border-0 shadow-none ring-0">
-          <TabsTrigger value="tracker" data-testid="tab-tracker" className="flex items-center justify-center gap-1 text-xs sm:text-sm text-gray-900 bg-transparent border-0 shadow-none outline-none focus:outline-none ring-0 focus:ring-0 data-[state=active]:bg-amber-200/70 data-[state=active]:text-gray-900 data-[state=active]:shadow-none data-[state=active]:border-0 active:scale-95 active:bg-amber-300/80 transition-all duration-150">
+          <TabsTrigger value="tracker" data-testid="tab-tracker" className="flex items-center justify-center gap-1 text-xs sm:text-sm text-gray-900 bg-white/60 border-0 shadow-none outline-none focus:outline-none ring-0 focus:ring-0 data-[state=active]:bg-amber-400 data-[state=active]:font-semibold data-[state=active]:text-gray-900 data-[state=active]:shadow-none data-[state=active]:border-0 active:scale-95 active:bg-amber-300/80 transition-all duration-150">
             <Target className="w-3 h-3 sm:w-4 sm:h-4 text-gray-900" />
             <span className="hidden xs:inline text-gray-900">Tracker</span>
             <span className="xs:hidden text-gray-900">Track</span>
           </TabsTrigger>
-          <TabsTrigger value="plans" data-testid="tab-plans" className="flex items-center justify-center gap-1 text-xs sm:text-sm text-gray-900 bg-transparent border-0 shadow-none outline-none focus:outline-none ring-0 focus:ring-0 data-[state=active]:bg-amber-200/70 data-[state=active]:text-gray-900 data-[state=active]:shadow-none data-[state=active]:border-0 active:scale-95 active:bg-amber-300/80 transition-all duration-150">
+          <TabsTrigger value="plans" data-testid="tab-plans" className="flex items-center justify-center gap-1 text-xs sm:text-sm text-gray-900 bg-white/60 border-0 shadow-none outline-none focus:outline-none ring-0 focus:ring-0 data-[state=active]:bg-amber-400 data-[state=active]:font-semibold data-[state=active]:text-gray-900 data-[state=active]:shadow-none data-[state=active]:border-0 active:scale-95 active:bg-amber-300/80 transition-all duration-150">
             <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-gray-900" />
             Plans
           </TabsTrigger>
-          <TabsTrigger value="tips" data-testid="tab-tips" className="flex items-center justify-center gap-1 text-xs sm:text-sm text-gray-900 bg-transparent border-0 shadow-none outline-none focus:outline-none ring-0 focus:ring-0 data-[state=active]:bg-amber-200/70 data-[state=active]:text-gray-900 data-[state=active]:shadow-none data-[state=active]:border-0 active:scale-95 active:bg-amber-300/80 transition-all duration-150">
+          <TabsTrigger value="tips" data-testid="tab-tips" className="flex items-center justify-center gap-1 text-xs sm:text-sm text-gray-900 bg-white/60 border-0 shadow-none outline-none focus:outline-none ring-0 focus:ring-0 data-[state=active]:bg-amber-400 data-[state=active]:font-semibold data-[state=active]:text-gray-900 data-[state=active]:shadow-none data-[state=active]:border-0 active:scale-95 active:bg-amber-300/80 transition-all duration-150">
             <Coffee className="w-3 h-3 sm:w-4 sm:h-4 text-gray-900" />
             Tips
           </TabsTrigger>

@@ -227,10 +227,10 @@ export function WeeklyCaloriesCard() {
                 key={dayData.date}
                 className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
                   isToday 
-                    ? 'bg-orange-500/20 border-orange-400/30 shadow-lg' 
+                    ? 'bg-orange-100 border-orange-300 shadow-lg' 
                     : hasMeals
-                    ? 'bg-amber-100/70 border-amber-200/60 hover:bg-amber-200/70'
-                    : 'bg-amber-50/40 border-amber-200/30'
+                    ? 'bg-white/90 border-amber-200 hover:bg-white'
+                    : 'bg-white/60 border-amber-200/70'
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -257,10 +257,10 @@ export function WeeklyCaloriesCard() {
                   
                   <div className="flex items-center gap-2">
                     {isToday && (
-                      <Badge className="bg-orange-600 text-white text-xs">Today</Badge>
+                      <Badge className="on-color bg-orange-700 text-xs">Today</Badge>
                     )}
                     {dayData.mealCount > 0 && (
-                      <Badge variant="outline" className="text-xs text-orange-600 border-orange-400 bg-white/80">
+                      <Badge variant="outline" className="text-xs text-orange-800 border-orange-400 bg-white">
                         {dayData.mealCount} meal{dayData.mealCount !== 1 ? 's' : ''}
                       </Badge>
                     )}

@@ -590,12 +590,6 @@ button[style*="background-color: rgb(30"]:not([data-testid*="nav-"]):not([class*
   color: #030712 !important; /* Very dark gray/black for maximum contrast */
 }
 
-/* Fix Badge text colors in weekly card - prevent white text on amber background */
-.weekly-calories-card-wrapper .bg-amber-800 {
-  background: linear-gradient(135deg, #d97706, #b45309) !important; /* Darker amber gradient */
-  color: #ffffff !important; /* White text on dark amber */
-}
-
 /* Fix Badge outline variant in weekly card */
 .weekly-calories-card-wrapper .border-gray-500 {
   border-color: #6b7280 !important;
@@ -1262,11 +1256,6 @@ svg.w-4 {
 /* Button border enhancements - DISABLED - No borders on any buttons */
 /* All buttons now borderless for clean appearance */
 
-/* Amber theme for blur backgrounds */
-.backdrop-blur-md:not([data-testid*="progress"]):not([data-testid*="water"]):not([data-testid*="macro"]):not([data-testid*="micro"]) {
-  background: rgba(252, 211, 77, 0.2) !important;
-}
-
 /* Gradient background fixes for light theme */
 .bg-gradient-to-br.from-cyan-500\/10.to-blue-600\/10 {
   background: linear-gradient(to bottom right, #ecfeff 50%, #dbeafe 100%) !important;
@@ -1376,11 +1365,10 @@ button[data-testid="button-notifications"] .text-white {
   color: #ffffff;
 }
 
-/* White label on the rose Apple Health buttons; the ids outrank the global dark-text overrides */
-#apple-health-connect,
-#apple-health-connect *,
-#apple-fitness-connect,
-#apple-fitness-connect * {
+/* White text for elements on a strong colour. The :is(#…) gives id-level specificity so it
+   outranks the global rules that turn .text-white dark; no element needs that id. */
+.on-color:is(#on-color, .on-color),
+.on-color:is(#on-color, .on-color) * {
   color: #ffffff !important;
 }
 
@@ -1855,7 +1843,7 @@ html {
 }
 
 .profile-input-field::placeholder {
-  color: rgba(156, 163, 175, 0.5) !important; /* Lighter gray with reduced opacity */
+  color: #6b7280 !important;
   opacity: 1 !important;
 }
 
@@ -1951,7 +1939,7 @@ body {
 }
 
 .input-with-icon input::placeholder {
-  color: #9ca3af;
+  color: #6b7280;
   opacity: 1;
 }
 
@@ -2216,7 +2204,7 @@ input[type="number"]::placeholder,
 input[type="search"]::placeholder,
 textarea::placeholder {
   color: #6b7280 !important;
-  opacity: 0.8 !important;
+  opacity: 1 !important;
 }
 
 /* Focus states for better visibility */
@@ -3629,7 +3617,7 @@ select {
   position: absolute;
   inset: 0;
   z-index: 12;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.6) 30%, rgba(0, 0, 0, 0.3) 60%, rgba(0, 0, 0, 0.1) 80%, transparent 95%);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.6) 30%, rgba(0, 0, 0, 0.45) 60%, rgba(0, 0, 0, 0.35) 100%);
 }
 
 /* Hero Content Layout - Three-Column Standard */
