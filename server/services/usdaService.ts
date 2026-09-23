@@ -10,6 +10,7 @@ import { usdaFoodCache } from '@shared/schema';
 import { eq, like, desc, asc, sql, or } from 'drizzle-orm';
 import { getPortionWeight, parseMeasurement } from '../data/portionData.js';
 import { findCandyNutrition, calculateCandyNutrition } from '../data/candyNutritionDatabase.js';
+import { findEnhancedFood, type EnhancedFoodEntry } from '../data/enhancedFoodDatabase.js';
 import { getUsdaApiKey } from '../env';
 
 interface USDANutrient {
@@ -591,18 +592,22 @@ export class USDAService {
         return zeroCalorieResult;
       }
       
-      // Enhanced food database integration temporarily disabled for compilation
-      
-      // Try liquid fallbacks and enhanced fallback data
+      // Curated entries first; unknown foods fall through to USDA instead of a generic guess.
       try {
-        const fallbackResult = this.getEnhancedFallbackEstimate(ingredientName, measurement);
+        const fallbackResult = this.getEnhancedFallbackEstimate(ingredientName, measurement, false);
         if (fallbackResult) {
-          // Cache the fallback result for future requests
           this.setMemoryCache(cacheKey, fallbackResult);
           return fallbackResult;
         }
       } catch (error) {
-        // Continue to USDA search if no fallback available
+        // Continue to catalog / USDA search
+      }
+
+      const enhancedFood = findEnhancedFood(ingredientName);
+      if (enhancedFood) {
+        const catalogResult = this.buildEnhancedFoodResult(ingredientName, measurement, enhancedFood);
+        this.setMemoryCache(cacheKey, catalogResult);
+        return catalogResult;
       }
 
       // Enhanced search with preprocessing
@@ -1119,6 +1124,13 @@ export class USDAService {
     'cream cheese': { calories: 342, protein: 6.2, carbs: 4.1, fat: 34.4 },
     'butter': { calories: 717, protein: 0.9, carbs: 0.1, fat: 81.0 },
     'margarine': { calories: 719, protein: 0.2, carbs: 0.9, fat: 80.7 },
+    'olive oil': { calories: 884, protein: 0.0, carbs: 0.0, fat: 100.0 },
+    'extra virgin olive oil': { calories: 884, protein: 0.0, carbs: 0.0, fat: 100.0 },
+    'vegetable oil': { calories: 884, protein: 0.0, carbs: 0.0, fat: 100.0 },
+    'canola oil': { calories: 884, protein: 0.0, carbs: 0.0, fat: 100.0 },
+    'coconut oil': { calories: 892, protein: 0.0, carbs: 0.0, fat: 99.1 },
+    'avocado oil': { calories: 884, protein: 0.0, carbs: 0.0, fat: 100.0 },
+    'sesame oil': { calories: 884, protein: 0.0, carbs: 0.0, fat: 100.0 },
     
     // Condiments and Spreads
     'mayo': { calories: 680, protein: 1.0, carbs: 0.6, fat: 75.0 },
@@ -1627,7 +1639,7 @@ export class USDAService {
         const gramsEquivalent = quantity * matchingServing.grams;
         return {
           quantity,
-          unit: matchingServing.name,
+          unit: matchingServing.name.replace(/^1\s+/, ''),
           gramsEquivalent,
           portionInfo: {
             isRealistic: true,
@@ -1642,7 +1654,7 @@ export class USDAService {
         const gramsEquivalent = quantity * defaultServing.grams;
         return {
           quantity,
-          unit: defaultServing.name,
+          unit: defaultServing.name.replace(/^1\s+/, ''),
           gramsEquivalent,
           portionInfo: {
             isRealistic: true,
@@ -2411,6 +2423,22 @@ export class USDAService {
         if (description.includes(term)) score += 200;
       }
       
+      // USDA names are inverted ("Oil, olive, extra virgin"), so match word by word
+      const searchWords = searchLower.split(/\s+/).filter(w => w.length > 1);
+      const descWords = description.split(/[^a-z0-9&]+/);
+      const matchedWords = searchWords.filter(w =>
+        descWords.some(d => d === w || d === `${w}s` || `${d}s` === w)
+      );
+      score += matchedWords.length * 150;
+      if (searchWords.length > 1 && matchedWords.length < searchWords.length) score -= 250;
+      // The primary food comes before the first comma ("Anchovies, canned in olive oil")
+      const headWords = description.split(',')[0].split(/[^a-z0-9&]+/);
+      const headMatches = searchWords.some(w => headWords.some(d => d === w || d === `${w}s` || `${d}s` === w));
+      score += headMatches ? 150 : -150;
+
+      // Candy catalog entries are generic types chosen for brand queries, so names won't match
+      if (food.dataType === 'Enhanced') score += 1000;
+
       // Higher score for exact matches
       if (description.includes(searchLower)) score += 100;
       if (description === searchLower) score += 300;
@@ -2711,7 +2739,36 @@ export class USDAService {
   /**
    * Enhanced fallback estimation with better nutrition data
    */
-  private getEnhancedFallbackEstimate(ingredientName: string, measurement: string) {
+  private buildEnhancedFoodResult(ingredientName: string, measurement: string, entry: EnhancedFoodEntry) {
+    const mockFood: USDAFood = {
+      fdcId: 0,
+      description: entry.name,
+      dataType: 'Enhanced Database',
+      foodNutrients: [],
+    };
+    const { quantity, unit, gramsEquivalent } = this.parseMeasurement(measurement, mockFood);
+    const isBareNumber = /^\s*\d*\.?\d+\s*$/.test(measurement);
+    const isPortionUnit = isBareNumber || /serving|portion|piece|each|plate|order|bowl|whole|patty|item/i.test(unit);
+    const qty = Number(quantity) > 0 ? Number(quantity) : 1;
+    const grams = isPortionUnit ? Math.round(entry.portionWeight * qty) : gramsEquivalent;
+    const unitLabel = isBareNumber ? (qty === 1 ? 'serving' : 'servings') : unit;
+    const per100g = entry.nutritionPer100g;
+    const estimatedCalories = Math.round((per100g.calories * grams) / 100);
+
+    return {
+      ingredient: entry.name.toUpperCase(),
+      measurement: `${qty} ${unitLabel} (~${grams}g)`,
+      estimatedCalories,
+      equivalentMeasurement: `100g ≈ ${per100g.calories} kcal`,
+      note: entry.note || 'From Bytewise enhanced food database',
+      nutritionPer100g: per100g,
+      enhancedDatabase: true,
+      category: entry.category,
+      portionInfo: this.validatePortionSize(ingredientName.toLowerCase(), grams, estimatedCalories),
+    };
+  }
+
+  private getEnhancedFallbackEstimate(ingredientName: string, measurement: string, allowGeneric = true) {
     const normalized = ingredientName.toLowerCase().trim();
 
     // Enhanced food database integration temporarily disabled
@@ -3271,8 +3328,7 @@ export class USDAService {
       return result;
     }
 
-    // Final fallback: create basic estimate
-    return this.getGenericFoodEstimate(ingredientName, measurement);
+    return allowGeneric ? this.getGenericFoodEstimate(ingredientName, measurement) : null;
   }
 
   /**

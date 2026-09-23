@@ -112,6 +112,7 @@ interface IdentifiedFood {
   name: string;
   confidence: number;
   portion: string;
+  estimatedGrams?: number;
   calories: number;
   protein: number;
   carbs: number;
@@ -134,6 +135,9 @@ interface IdentifiedFood {
 interface AnalysisResult {
   imageUrl: string;
   identifiedFoods: IdentifiedFood[];
+  /** Foods as returned by the analysis, used as the baseline for portion adjustments. */
+  originalFoods?: IdentifiedFood[];
+  message?: string;
   totalNutrition: {
     calories: number;
     protein: number;
@@ -254,6 +258,14 @@ export default function AIFoodAnalyzer() {
       return result as AnalysisResult;
     },
     onSuccess: async (result) => {
+      if (!result.identifiedFoods || result.identifiedFoods.length === 0) {
+        setUploadedImageUrl('');
+        toast({
+          title: "No Food Detected",
+          description: result.message || "No food items were detected in this image. Please try a different photo.",
+        });
+        return;
+      }
 
       // Calculate total nutrition from identified foods including micronutrients
       const totalNutrition = result.identifiedFoods.reduce(
@@ -284,6 +296,7 @@ export default function AIFoodAnalyzer() {
       const analysisResultWithTotals = {
         ...result,
         imageUrl: uploadedImageUrl, // Ensure uploaded image URL is preserved
+        originalFoods: result.identifiedFoods,
         totalNutrition
       };
 
@@ -348,16 +361,9 @@ export default function AIFoodAnalyzer() {
       let title = "Analysis Failed";
       let description = error.message || "Failed to analyze the food image";
       
-      // Handle quota exceeded error specifically
-      if (error.message && error.message.includes('QUOTA_EXCEEDED')) {
-        title = "Imagga API Quota Exceeded";
-        description = "The AI analysis feature is temporarily unavailable due to API quota limits. You can still manually add foods using the food database search.";
-      } else if (error.message && error.message.includes('INVALID_API_KEY')) {
-        title = "API Configuration Error";
-        description = "The Imagga API key is invalid. Please check the API configuration.";
-      } else if (error.message && error.message.includes('MISSING_CREDENTIALS')) {
-        title = "API Not Configured";
-        description = "Imagga API credentials are not configured. Please contact support.";
+      if (error.message && (error.message.includes('AI_UNAVAILABLE') || error.message.includes('MISSING_CREDENTIALS'))) {
+        title = "AI Analysis Unavailable";
+        description = "AI food analysis is temporarily unavailable. Nothing was logged — you can add the food manually with the calculator.";
       } else if (error.message && error.message.includes('IMAGE_ERROR')) {
         title = "Image Processing Error";
         description = "Unable to analyze the image. Please try uploading a clearer photo with better lighting or a different format (JPG, PNG).";
@@ -483,9 +489,11 @@ export default function AIFoodAnalyzer() {
   const handlePortionAdjustment = (foodIndex: number, newPortion: number) => {
     if (!analysisResult) return;
 
-    const updatedFoods = analysisResult.identifiedFoods.map((food, index) => {
+    const baseFoods = analysisResult.originalFoods || analysisResult.identifiedFoods;
+    const updatedFoods = analysisResult.identifiedFoods.map((current, index) => {
       if (index === foodIndex) {
-        const multiplier = newPortion / 100; // Assume 100g is base portion
+        const food = baseFoods[index] || current;
+        const multiplier = newPortion / (food.estimatedGrams || 100);
         return {
           ...food,
           adjustedPortion: newPortion,
@@ -507,7 +515,7 @@ export default function AIFoodAnalyzer() {
           folate: Math.round((food.folate || 0) * multiplier * 10) / 10,
         };
       }
-      return food;
+      return current;
     });
 
     // Recalculate total nutrition including micronutrients
@@ -638,8 +646,8 @@ export default function AIFoodAnalyzer() {
               </div>
               <h3 className="text-lg font-medium text-red-600">Analysis Failed</h3>
               <p className="text-gray-700 text-center max-w-md">
-                {analyzeFoodMutation.error?.message.includes('quota') 
-                  ? 'OpenAI quota exceeded. Please try again later or contact support for a new API key.'
+                {analyzeFoodMutation.error?.message.includes('AI_UNAVAILABLE')
+                  ? 'AI food analysis is temporarily unavailable. Nothing was logged. Please try again later or use the calculator.'
                   : 'Unable to analyze the image. Please try uploading a clearer photo with better lighting.'
                 }
               </p>
@@ -653,7 +661,7 @@ export default function AIFoodAnalyzer() {
                 >
                   Try Another Photo
                 </Button>
-                {analyzeFoodMutation.error?.message.includes('quota') && (
+                {analyzeFoodMutation.error?.message.includes('AI_UNAVAILABLE') && (
                   <Button
                     onClick={() => analyzeFoodMutation.mutate(uploadedImageUrl)}
                     variant="default"
@@ -750,8 +758,11 @@ export default function AIFoodAnalyzer() {
                         type="number"
                         min="1"
                         max="1000"
-                        defaultValue={food.adjustedPortion || 100}
-                        onChange={(e) => handlePortionAdjustment(index, parseInt(e.target.value) || 100)}
+                        defaultValue={food.adjustedPortion || food.estimatedGrams || 100}
+                        onChange={(e) => {
+                          const grams = parseInt(e.target.value);
+                          if (grams > 0) handlePortionAdjustment(index, grams);
+                        }}
                         className="w-20 border-amber-200 focus:border-amber-400 focus:ring-amber-200"
                         data-testid={`input-portion-${index}`}
                       />

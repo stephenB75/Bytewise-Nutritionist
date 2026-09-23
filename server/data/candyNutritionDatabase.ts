@@ -559,6 +559,20 @@ export function findCandyNutrition(searchTerm: string): CandyNutrition | null {
   );
   
   if (match) return match;
+
+  // Brand names map to the closest generic category we have data for.
+  const brandCategories: Array<[RegExp, CandyNutrition['category']]> = [
+    [/snickers|milky way|three musketeers|3 musketeers|kit ?kat|reese|hershey|butterfinger|crunch bar|almond joy|mounds|m&m|twix|baby ruth|100 grand/, 'chocolate'],
+    [/skittles|starburst|haribo|sour patch|swedish fish|nerds|twizzler|gummi/, 'gummy'],
+    [/jolly rancher|lifesaver|life saver|york peppermint|altoids|werther/, 'hard'],
+    [/tootsie|sugar daddy|milk duds/, 'caramel'],
+  ];
+  for (const [pattern, category] of brandCategories) {
+    if (pattern.test(term)) {
+      const byCategory = CANDY_NUTRITION_DATABASE.find(c => c.category === category);
+      if (byCategory) return byCategory;
+    }
+  }
   
   // Category-based matching
   if (term.includes('chocolate') || term.includes('cocoa') || term.includes('fudge')) {

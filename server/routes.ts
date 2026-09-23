@@ -1689,6 +1689,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { analyzeFoodImage } = await import('./aiService');
       const aiResult = await analyzeFoodImage(imageUrl);
 
+      if (aiResult.isFallback) {
+        return res.status(503).json({
+          error: 'AI_UNAVAILABLE',
+          message: 'AI food analysis is temporarily unavailable. Please try again later or add the food manually.'
+        });
+      }
+
       // Handle case where no foods are identified
       if (!aiResult.identifiedFoods || aiResult.identifiedFoods.length === 0) {
         return res.json({
@@ -1705,10 +1712,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         name: food.name,
         confidence: food.confidence,
         portion: food.portion,
+        estimatedGrams: food.estimatedGrams,
         calories: food.calories || 0,
         protein: food.protein || 0,
         carbs: food.carbs || 0,
         fat: food.fat || 0,
+        fiber: food.fiber || 0,
+        sugar: food.sugar || 0,
+        sodium: food.sodium || 0,
         // Include micronutrients from AI analysis
         iron: food.iron || 0,
         calcium: food.calcium || 0,
@@ -1727,6 +1738,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           protein: total.protein + food.protein,
           carbs: total.carbs + food.carbs,
           fat: total.fat + food.fat,
+          fiber: total.fiber + food.fiber,
+          sugar: total.sugar + food.sugar,
+          sodium: total.sodium + food.sodium,
           // Aggregate micronutrients
           iron: total.iron + food.iron,
           calcium: total.calcium + food.calcium,
@@ -1738,7 +1752,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           folate: total.folate + food.folate,
         }),
         { 
-          calories: 0, protein: 0, carbs: 0, fat: 0,
+          calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0, sugar: 0, sodium: 0,
           iron: 0, calcium: 0, zinc: 0, magnesium: 0,
           vitaminC: 0, vitaminD: 0, vitaminB12: 0, folate: 0
         }

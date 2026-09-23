@@ -34,7 +34,12 @@ export interface IdentifiedFood {
 export interface FoodAnalysisResult {
   identifiedFoods: IdentifiedFood[];
   analysisTime: string;
+  /** Placeholder data because the vision model could not be used; must not be shown or logged as a real analysis. */
+  isFallback?: boolean;
 }
+
+const GEMINI_MODELS = [process.env.GEMINI_MODEL, 'gemini-2.5-flash', 'gemini-flash-latest']
+  .filter((m, i, all): m is string => !!m && all.indexOf(m) === i);
 
 /**
  * Analyze a food image using Google Gemini Vision API
@@ -49,19 +54,11 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
       throw new Error('MISSING_CREDENTIALS: Google API key is not configured. Please check GOOGLE_API_KEY environment variable.');
     }
 
-    // Initialize Gemini AI
     const genAI = new GoogleGenerativeAI(GOOGLE_API_KEY);
-    
-    // Try gemini-2.0-flash-exp first, fall back to stable model if needed
-    let model;
-    try {
-      model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
-    } catch (modelError) {
-      model = genAI.getGenerativeModel({ model: "gemini-1.5-pro-latest" });
-    }
 
     // Download the image from our storage and convert to base64
     let imageBuffer: Buffer;
+    let imageMimeType = 'image/jpeg';
     
     try {
       // Validate URL format before processing
@@ -136,6 +133,7 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
         }
         
         imageBuffer = Buffer.from(await data.arrayBuffer());
+        if (data.type && data.type.startsWith('image/')) imageMimeType = data.type;
         
       } else {
         throw new Error('INVALID_URL: Unable to parse storage URL');
@@ -168,14 +166,26 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
     const imagePart = {
       inlineData: {
         data: imageBuffer.toString('base64'),
-        mimeType: 'image/jpeg'
+        mimeType: imageMimeType
       }
     };
 
     try {
-      const geminiResult = await model.generateContent([prompt, imagePart]);
-      const response = await geminiResult.response;
-      const text = response.text();
+      // getGenerativeModel never fails; retired/unknown model names only surface as a 404 here.
+      let text = '';
+      for (let i = 0; i < GEMINI_MODELS.length; i++) {
+        try {
+          const model = genAI.getGenerativeModel({ model: GEMINI_MODELS[i] });
+          const geminiResult = await model.generateContent([prompt, imagePart]);
+          text = geminiResult.response.text();
+          break;
+        } catch (modelError) {
+          const message = modelError instanceof Error ? modelError.message : String(modelError);
+          const modelMissing = /404|not found|is not supported/i.test(message);
+          if (!modelMissing || i === GEMINI_MODELS.length - 1) throw modelError;
+          console.warn(`⚠️ Gemini model ${GEMINI_MODELS[i]} unavailable, trying ${GEMINI_MODELS[i + 1]}`);
+        }
+      }
 
 
       // Parse the JSON response
@@ -236,37 +246,15 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
           }
         }
       } catch (parseError) {
-        // Fallback: create a generic food item WITH micronutrients
-        const fallbackNutrition = getEstimatedNutrition('Food Item', 150);
-        foodItems = [{
-          name: 'Food Item',
-          confidence: 0.6,
-          portion: '1 serving',
-          estimatedGrams: 150,
-          ...fallbackNutrition
-        }];
+        console.error('❌ Could not parse Gemini response:', parseError);
+        return getFallbackAnalysis();
       }
 
-      // Ensure default fallback also has micronutrients
-      const defaultFallback = foodItems.length > 0 ? foodItems : (() => {
-        const fallbackNutrition = getEstimatedNutrition('Food Item', 150);
-        return [{
-          name: 'Food Item',
-          confidence: 0.5,
-          portion: '1 serving',
-          estimatedGrams: 150,
-          ...fallbackNutrition
-        }];
-      })();
-
-      const analysisResult: FoodAnalysisResult = {
-        identifiedFoods: defaultFallback,
+      // An empty list means no food was detected; the route reports that to the user.
+      return {
+        identifiedFoods: foodItems,
         analysisTime: new Date().toISOString()
       };
-
-      // Ensure micronutrients are included in final result
-
-      return analysisResult;
 
     } catch (geminiError) {
       console.error('❌ Gemini API call failed:', geminiError);
@@ -633,7 +621,8 @@ function getFallbackAnalysis(): FoodAnalysisResult {
   
   return {
     identifiedFoods: [fallbackFood],
-    analysisTime: new Date().toISOString()
+    analysisTime: new Date().toISOString(),
+    isFallback: true
   };
 }
 
