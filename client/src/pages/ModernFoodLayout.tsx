@@ -263,10 +263,16 @@ const HeroSection = React.memo(function HeroSection({
         </div>
       </div>
 
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 text-white opacity-100 pointer-events-none">
-        <div className="flex flex-col items-center gap-2">
-          <div className="w-px h-8 bg-gradient-to-b from-transparent to-white opacity-70" />
-          <ChevronRight className="w-6 h-6 rotate-90 drop-shadow-lg opacity-80" />
+      <div
+        className="absolute left-1/2 -translate-x-1/2 z-20 text-white opacity-100 pointer-events-none"
+        style={{ bottom: 'calc(66px + env(safe-area-inset-bottom, 0px) + 20px)' }}
+        aria-hidden
+      >
+        <div className="flex flex-col items-center gap-1">
+          <div className="hero-scroll-line w-px h-8 bg-gradient-to-b from-transparent to-white" />
+          <div className="hero-scroll-arrow">
+            <ChevronRight className="w-7 h-7 rotate-90 drop-shadow-lg" strokeWidth={2.5} />
+          </div>
         </div>
       </div>
     </div>
