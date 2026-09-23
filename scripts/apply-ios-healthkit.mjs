@@ -27,6 +27,16 @@ if (!plist.includes(shareKey)) {
   writeFileSync(plistPath, plist);
 }
 
+// App Store settings: 64-bit only, and HTTPS-only encryption skips the export compliance prompt.
+plist = plist.replace('<string>armv7</string>', '<string>arm64</string>');
+if (!plist.includes('ITSAppUsesNonExemptEncryption')) {
+  plist = plist.replace(
+    '<key>LSRequiresIPhoneOS</key>',
+    '<key>ITSAppUsesNonExemptEncryption</key>\n        <false/>\n        <key>LSRequiresIPhoneOS</key>',
+  );
+}
+writeFileSync(plistPath, plist);
+
 if (existsSync(entitlementsSource)) {
   copyFileSync(entitlementsSource, entitlementsPath);
 }
@@ -38,6 +48,8 @@ if (existsSync(pbxprojPath)) {
       'ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;\n\t\t\t\tCODE_SIGN_STYLE = Automatic;',
       'ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;\n\t\t\t\tCODE_SIGN_ENTITLEMENTS = App/App.entitlements;\n\t\t\t\tCODE_SIGN_STYLE = Automatic;',
     );
-    writeFileSync(pbxprojPath, project);
   }
+  // Xcode 27 can't build for anything below iOS 15.
+  project = project.replaceAll('IPHONEOS_DEPLOYMENT_TARGET = 14.0;', 'IPHONEOS_DEPLOYMENT_TARGET = 15.0;');
+  writeFileSync(pbxprojPath, project);
 }

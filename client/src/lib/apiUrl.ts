@@ -1,5 +1,7 @@
 import { Capacitor } from '@capacitor/core';
 
+const PRODUCTION_ORIGIN = 'https://www.bytewisenutritionist.com';
+
 function getEnvAppUrl(): string {
   try {
     return String(import.meta.env.VITE_APP_URL || '').replace(/\/$/, '');
@@ -14,9 +16,9 @@ export function getApiOrigin(): string {
     return '';
   }
 
-  const appUrl = getEnvAppUrl();
-  if (Capacitor.isNativePlatform() && appUrl) {
-    return appUrl;
+  // Bundled native assets are served from <scheme>://localhost, which has no API behind it.
+  if (Capacitor.isNativePlatform()) {
+    return getEnvAppUrl() || PRODUCTION_ORIGIN;
   }
 
   return `${window.location.protocol}//${window.location.host}`;

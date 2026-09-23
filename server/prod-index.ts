@@ -23,7 +23,10 @@ const isProduction = process.env.NODE_ENV === 'production';
 const allowedOrigins = isProduction 
   ? [
       'https://www.bytewisenutritionist.com',
-      'https://bytewisenutritionist.com'
+      'https://bytewisenutritionist.com',
+      // iOS app web view origins (custom scheme from capacitor.config.ts, plus Capacitor's default)
+      'bytewise-nutritionist://localhost',
+      'capacitor://localhost'
     ]
   : ['http://localhost:3000', 'http://localhost:5173', '*'];
 

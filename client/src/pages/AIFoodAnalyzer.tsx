@@ -17,6 +17,7 @@ import { ObjectUploader } from '@/components/ObjectUploader';
 import { Camera, Loader2, Sparkles, Plus, Eye, Utensils, AlertTriangle, Trash2 } from 'lucide-react';
 import { useMutation } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
+import { resolveApiUrl } from '@/lib/apiUrl';
 import { logMeal } from '@/lib/mealsApi';
 import { useToast } from '@/hooks/use-toast';
 import { useCalorieTracking } from '@/hooks/useCalorieTracking';
@@ -57,7 +58,7 @@ function PhotoDisplay({ imageUrl, alt, className }: PhotoDisplayProps) {
       
       if (bucketIndex !== -1) {
         const objectPath = pathParts.slice(bucketIndex + 1).join('/');
-        const proxyUrl = `/api/proxy-image/${objectPath}`;
+        const proxyUrl = resolveApiUrl(`/api/proxy-image/${objectPath}`);
         
         // Test the proxy URL and provide feedback
         fetch(proxyUrl)
