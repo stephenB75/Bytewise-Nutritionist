@@ -33,6 +33,12 @@ if (plist.includes(shareKey)) {
   );
 }
 
+// Name under the home-screen icon; the full "Bytewise Nutritionist" name belongs to the App Store listing.
+plist = plist.replace(
+  /(<key>CFBundleDisplayName<\/key>\s*<string>)[^<]*(<\/string>)/,
+  '$1Bytewise$2',
+);
+
 // App Store settings: 64-bit only, and HTTPS-only encryption skips the export compliance prompt.
 plist = plist.replace('<string>armv7</string>', '<string>arm64</string>');
 if (!plist.includes('ITSAppUsesNonExemptEncryption')) {
