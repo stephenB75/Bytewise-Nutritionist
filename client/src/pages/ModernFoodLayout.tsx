@@ -264,7 +264,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const [openCard, setOpenCard] = useState<string | undefined>(undefined);
   const [navigationTrigger, setNavigationTrigger] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const { backgroundImage } = useRotatingBackground(activeTab);
+  const { backgroundImage } = useRotatingBackground(activeTab, navigationTrigger);
   const { data: achievements = [], isLoading: achievementsLoading } = useAchievements();
   const [searchQuery, setSearchQuery] = useState('');
   const [showAchievement, setShowAchievement] = useState(false);
@@ -1207,16 +1207,14 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   };
 
   const handleTabChange = (newTab: string) => {
+    // Every nav click swaps the hero photo, even when re-tapping the active tab.
+    setNavigationTrigger(prev => prev + 1);
+
     if (newTab !== activeTab) {
-      // Immediate state update - no transitions
       setPreviousTab(activeTab);
       setActiveTab(newTab);
       setOpenCard(undefined);
-      
-      // Trigger new background image loading
-      setNavigationTrigger(prev => prev + 1);
-      
-      // Force scroll to top immediately
+
       window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
       document.documentElement.scrollTop = 0;
       document.body.scrollTop = 0;
@@ -3186,10 +3184,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 setTimeout(() => text.classList.remove('nav-text-clicked'), 400);
               }
 
-              // Direct navigation - no transition guards
-              if (tab.id !== activeTab) {
-                handleTabChange(tab.id);
-              }
+              handleTabChange(tab.id);
             };
             
             return (

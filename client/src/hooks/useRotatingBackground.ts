@@ -86,32 +86,46 @@ function preloadImage(src: string) {
   img.src = src;
 }
 
-export function useRotatingBackground(activeTab: string) {
-  const images = useMemo(() => getTabImages(activeTab), [activeTab]);
-  const [index, setIndex] = useState(0);
+function pickDifferentIndex(images: string[], currentSrc: string | undefined): number {
+  const choices = images
+    .map((src, i) => (src === currentSrc ? -1 : i))
+    .filter((i) => i >= 0);
+  if (choices.length === 0) return 0;
+  return choices[Math.floor(Math.random() * choices.length)];
+}
 
-  useEffect(() => {
-    setIndex(0);
-    // Only fetch what's on screen; the next image is preloaded one rotation ahead below.
-    if (images[0]) preloadImage(images[0]);
-  }, [images]);
+/**
+ * `navigationTrigger` should change on every nav click (including re-tapping the
+ * active tab) so the photo swaps immediately and the rotation timer restarts.
+ */
+export function useRotatingBackground(activeTab: string, navigationTrigger = 0) {
+  const images = useMemo(() => getTabImages(activeTab), [activeTab]);
+  const [state, setState] = useState(() => ({
+    images,
+    trigger: navigationTrigger,
+    index: pickDifferentIndex(images, undefined),
+  }));
+
+  let { index } = state;
+  if (state.images !== images || state.trigger !== navigationTrigger) {
+    index = pickDifferentIndex(images, state.images[state.index]);
+    setState({ images, trigger: navigationTrigger, index });
+  }
 
   useEffect(() => {
     if (images.length <= 1) return undefined;
 
     const timer = window.setInterval(() => {
-      setIndex((current) => (current + 1) % images.length);
+      setState((s) => (s.images === images ? { ...s, index: (s.index + 1) % images.length } : s));
     }, ROTATION_MS);
 
     return () => window.clearInterval(timer);
-  }, [images]);
+  }, [images, navigationTrigger]);
 
   useEffect(() => {
     const next = images[(index + 1) % images.length];
     if (next) preloadImage(next);
   }, [index, images]);
 
-  const backgroundImage = images[index] || foodImages[0];
-
-  return { backgroundImage };
+  return { backgroundImage: images[index] || foodImages[0] };
 }
