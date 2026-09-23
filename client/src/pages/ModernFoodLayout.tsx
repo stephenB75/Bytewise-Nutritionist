@@ -3,7 +3,7 @@
  * Features: Hero sections, food cards, nutrition breakdown, and modern navigation
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -60,7 +60,7 @@ import {
 import { House, ForkKnife, Timer, ChartBar, User } from 'phosphor-react';
 import { NotificationDropdown } from '@/components/NotificationDropdown';
 import { WeeklyCaloriesCard } from '@/components/WeeklyCaloriesCard';
-import { WaterCard, writeLocalWaterGlasses } from '@/components/WaterCard';
+import { WaterCard, clampWaterGlasses, readLocalWaterGlasses, writeLocalWaterGlasses } from '@/components/WaterCard';
 import { GuestSaveHint } from '@/components/GuestSaveHint';
 import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/hooks/use-toast';
@@ -319,101 +319,64 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   
 
 
-  // Utility function to add notifications - using useCallback for stable reference
-  // Water consumption update function with 8-glass daily limit
-  const updateWaterConsumption = useCallback(async (change: number) => {
-    if (!user) {
-      // Update localStorage for unauthenticated users
-      const localStats = JSON.parse(localStorage.getItem('dailyStats') || '{}');
-      const currentGlasses = (localStats.waterGlasses || 0) + change;
-      const newGlasses = Math.max(0, Math.min(8, currentGlasses)); // Limit to 0-8 glasses
-      
-      // Update localStorage
-      const updatedStats = { ...localStats, waterGlasses: newGlasses };
-      localStorage.setItem('dailyStats', JSON.stringify(updatedStats));
-      writeLocalWaterGlasses(newGlasses);
-      
-      // Update component state
-      setDailyStats((prev: any) => prev ? { ...prev, waterGlasses: newGlasses } : { 
-        totalCalories: 0, totalProtein: 0, totalCarbs: 0, totalFat: 0, 
-        waterGlasses: newGlasses, fastingStatus: undefined 
-      });
-      
-      // Achievement notification
-      if (newGlasses >= 8 && (localStats.waterGlasses || 0) < 8) {
-        toast({
-          title: "Hydration Goal Achieved! 💧",
-          description: "You've reached your daily water intake goal!",
-          variant: "default",
-          duration: 3000,
-        });
-        // Add bell notification
-        addNotification('success', 'Daily Hydration Goal! 💧', 'You\'ve reached your 8-glass water goal today!');
-      }
-      
-      // Milestone notifications for water intake
-      if (newGlasses === 4 && (localStats.waterGlasses || 0) < 4) {
-        addNotification('info', 'Halfway There! 💧', 'You\'ve had 4 glasses of water today. Keep going!');
-      }
-      
-      syncHealthDataIfEnabled({ waterGlasses: newGlasses }).catch(console.error);
-      
-      return;
-    }
-    
-    try {
-      const currentGlasses = (dailyStats?.waterGlasses || 0) + change;
-      const newGlasses = Math.max(0, Math.min(8, currentGlasses)); // Limit to 0-8 glasses
-      
-      // Optimistic update
-      setDailyStats((prev: any) => prev ? { ...prev, waterGlasses: newGlasses } : null);
-      
-      // Update in database with proper authentication
-      writeLocalWaterGlasses(newGlasses);
-      const response = await apiRequest('POST', '/api/daily-stats', {
-        waterGlasses: newGlasses,
-        date: getLocalDateKey()
-      });
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to update water consumption: ${response.status} - ${errorText}`);
-      }
-      
-      await response.json();
-      
-      // Refresh daily stats to update UI
-      await fetchDailyStats();
-      
-      // Show toast notification for achievement
-      if (newGlasses >= 8 && (dailyStats?.waterGlasses || 0) < 8) {
-        toast({
-          title: "Hydration Goal Achieved! 💧",
-          description: "You've reached your daily water intake goal!",
-          variant: "default",
-          duration: 3000,
-        });
-        // Add bell notification
-        addNotification('success', 'Daily Hydration Goal! 💧', 'You\'ve reached your 8-glass water goal today!');
-      }
-      
-      // Milestone notifications for water intake
-      if (newGlasses === 4 && (dailyStats?.waterGlasses || 0) < 4) {
-        addNotification('info', 'Halfway There! 💧', 'You\'ve had 4 glasses of water today. Keep going!');
-      }
-      
-      syncHealthDataIfEnabled({ waterGlasses: newGlasses }).catch(console.error);
-      
-    } catch (error) {
-      // Revert optimistic update
-      setDailyStats((prev: any) => prev ? { ...prev, waterGlasses: (dailyStats?.waterGlasses || 0) } : null);
+  // Water consumption update function with 8-glass daily limit.
+  // The ref holds the latest count so rapid taps build on each other instead of a stale render value.
+  const waterGlassesRef = useRef(0);
+  const waterSaveQueueRef = useRef<Promise<void>>(Promise.resolve());
+  useEffect(() => {
+    waterGlassesRef.current = dailyStats?.waterGlasses || 0;
+  }, [dailyStats?.waterGlasses]);
+
+  const updateWaterConsumption = useCallback((change: number) => {
+    const previousGlasses = waterGlassesRef.current;
+    const newGlasses = clampWaterGlasses(previousGlasses + change);
+    if (newGlasses === previousGlasses) return;
+
+    waterGlassesRef.current = newGlasses;
+    writeLocalWaterGlasses(newGlasses);
+    setDailyStats((prev: any) => prev ? { ...prev, waterGlasses: newGlasses } : {
+      totalCalories: 0, totalProtein: 0, totalCarbs: 0, totalFat: 0,
+      waterGlasses: newGlasses, fastingStatus: undefined
+    });
+
+    if (newGlasses >= 8 && previousGlasses < 8) {
       toast({
-        title: "Error",
-        description: "Failed to update water consumption",
-        variant: "destructive",
+        title: "Hydration Goal Achieved! 💧",
+        description: "You've reached your daily water intake goal!",
+        variant: "default",
+        duration: 3000,
       });
+      addNotification('success', 'Daily Hydration Goal! 💧', 'You\'ve reached your 8-glass water goal today!');
     }
-  }, [user, dailyStats?.waterGlasses, toast]);
+    if (newGlasses === 4 && previousGlasses < 4) {
+      addNotification('info', 'Halfway There! 💧', 'You\'ve had 4 glasses of water today. Keep going!');
+    }
+    syncHealthDataIfEnabled({ waterGlasses: newGlasses }).catch(console.error);
+
+    if (!user) return;
+
+    // Saves run one at a time so a slow earlier request can't overwrite a newer count.
+    waterSaveQueueRef.current = waterSaveQueueRef.current.then(async () => {
+      try {
+        await apiRequest('POST', '/api/daily-stats', {
+          waterGlasses: newGlasses,
+          date: getLocalDateKey()
+        });
+      } catch (error) {
+        console.error('Failed to save water intake:', error);
+        if (waterGlassesRef.current === newGlasses) {
+          waterGlassesRef.current = previousGlasses;
+          writeLocalWaterGlasses(previousGlasses);
+          setDailyStats((prev: any) => prev ? { ...prev, waterGlasses: previousGlasses } : prev);
+        }
+        toast({
+          title: "Error",
+          description: "Failed to update water consumption",
+          variant: "destructive",
+        });
+      }
+    });
+  }, [user, toast]);
 
   const handleHealthDataSync = useCallback(async (data: any) => {
     try {
@@ -566,7 +529,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   // Fetch daily stats including fasting status
   const fetchDailyStats = useCallback(async () => {
     if (!user) {
-      const localStats = JSON.parse(localStorage.getItem('dailyStats') || '{}');
       const meals = await listLoggedMeals();
       const today = getLocalDateKey();
       const todayMeals = meals.filter((meal) => {
@@ -582,7 +544,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
       setDailyStats({
         ...totals,
-        waterGlasses: localStats.waterGlasses || 0,
+        waterGlasses: readLocalWaterGlasses(),
         fastingStatus: undefined,
       });
       setDailyCalories(totals.totalCalories);
@@ -591,7 +553,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     
     try {
       // Use the correct GET endpoint for daily stats
-      const response = await apiRequest('GET', `/api/users/${user.id}/daily-stats`);
+      const response = await apiRequest('GET', `/api/users/${user.id}/daily-stats?date=${getLocalDateKey()}`);
       
       if (!response.ok) {
         throw new Error(`Failed to fetch daily stats: ${response.status}`);
@@ -604,22 +566,23 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         totalProtein: data.totalProtein || 0,
         totalCarbs: data.totalCarbs || 0,
         totalFat: data.totalFat || 0,
-        waterGlasses: data.waterGlasses || 0,
+        waterGlasses: clampWaterGlasses(data.waterGlasses || 0),
         fastingStatus: data.fastingStatus
       };
       
+      writeLocalWaterGlasses(stats.waterGlasses);
       setDailyStats(stats);
       setDailyCalories(stats.totalCalories);
       
     } catch (error) {
       console.error('❌ Daily stats fetch error for authenticated user:', error);
-      // Set default stats to prevent UI issues
-      setDailyStats({
+      // Keep what we already know instead of resetting to zero.
+      setDailyStats((prev: any) => prev ?? {
         totalCalories: 0,
         totalProtein: 0,
         totalCarbs: 0,
         totalFat: 0,
-        waterGlasses: 0,
+        waterGlasses: readLocalWaterGlasses(),
         fastingStatus: undefined
       });
     }
@@ -787,29 +750,43 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   // Listen for water updates from calorie tracker
   useEffect(() => {
-    const handleWaterUpdate = (event: any) => {
-      if (user) {
-        fetchDailyStats();
-      } else {
-        // For unauthenticated users, update from localStorage directly
-        const localStats = JSON.parse(localStorage.getItem('dailyStats') || '{}');
-        const newWaterGlasses = localStats.waterGlasses || event.detail?.glasses || 0;
-        
-        setDailyStats((prev: any) => ({
-          ...prev,
-          totalCalories: prev?.totalCalories || 0,
-          totalProtein: prev?.totalProtein || 0,
-          totalCarbs: prev?.totalCarbs || 0,
-          totalFat: prev?.totalFat || 0,
-          waterGlasses: newWaterGlasses,
-          fastingStatus: prev?.fastingStatus
-        }));
-      }
+    // The sender has already written the new count locally (and saves it to the server itself),
+    // so refetching here would race that save and can show the old value.
+    const handleWaterUpdate = () => {
+      const newWaterGlasses = readLocalWaterGlasses();
+      waterGlassesRef.current = newWaterGlasses;
+      setDailyStats((prev: any) => ({
+        ...prev,
+        totalCalories: prev?.totalCalories || 0,
+        totalProtein: prev?.totalProtein || 0,
+        totalCarbs: prev?.totalCarbs || 0,
+        totalFat: prev?.totalFat || 0,
+        waterGlasses: newWaterGlasses,
+        fastingStatus: prev?.fastingStatus
+      }));
     };
     
     window.addEventListener('waterUpdated', handleWaterUpdate);
     return () => window.removeEventListener('waterUpdated', handleWaterUpdate);
-  }, [user, fetchDailyStats]);
+  }, []);
+
+  // Start a fresh day at local midnight (or when the app is reopened on a new day).
+  useEffect(() => {
+    let dayKey = getLocalDateKey();
+    const checkForNewDay = () => {
+      const nowKey = getLocalDateKey();
+      if (nowKey !== dayKey) {
+        dayKey = nowKey;
+        fetchDailyStats();
+      }
+    };
+    const interval = window.setInterval(checkForNewDay, 60 * 1000);
+    document.addEventListener('visibilitychange', checkForNewDay);
+    return () => {
+      window.clearInterval(interval);
+      document.removeEventListener('visibilitychange', checkForNewDay);
+    };
+  }, [fetchDailyStats]);
 
 
   // Refresh micronutrients when tab changes or meals change - Database-first
@@ -1509,7 +1486,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           {/* Water Consumption */}
           <div className="mb-4" data-testid="water-consumption-card">
             <WaterCard
-              glasses={dailyStats?.waterGlasses || 0}
+              glasses={dailyStats ? (dailyStats.waterGlasses || 0) : readLocalWaterGlasses()}
               onIncrement={() => updateWaterConsumption(1)}
               onDecrement={() => updateWaterConsumption(-1)}
             />

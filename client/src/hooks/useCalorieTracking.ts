@@ -10,7 +10,7 @@ import { getLocalDateKey, formatLocalTime, getMealTypeByTime } from '@/utils/dat
 import { apiRequest } from '@/lib/queryClient';
 import { useAuth } from './useAuth';
 import { logMeal } from '@/lib/mealsApi';
-import { writeLocalWaterGlasses } from '@/components/WaterCard';
+import { clampWaterGlasses, readLocalWaterGlasses, writeLocalWaterGlasses } from '@/components/WaterCard';
 
 interface CalculatedCalories {
   id: string;
@@ -213,15 +213,7 @@ export function useCalorieTracking() {
       }
       
       // Always update localStorage immediately for instant UI feedback
-      const currentStats = JSON.parse(localStorage.getItem('dailyStats') || '{}');
-      const currentWater = currentStats.waterGlasses || 0;
-      const newWaterTotal = currentWater + waterGlasses;
-      
-      // Update localStorage immediately
-      localStorage.setItem('dailyStats', JSON.stringify({
-        ...currentStats,
-        waterGlasses: newWaterTotal
-      }));
+      const newWaterTotal = clampWaterGlasses(readLocalWaterGlasses() + waterGlasses);
       writeLocalWaterGlasses(newWaterTotal);
       
       console.log('💧 Water updated in localStorage:', {

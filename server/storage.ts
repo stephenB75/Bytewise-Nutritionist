@@ -993,50 +993,29 @@ export class DatabaseStorage implements IStorage {
       const endOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
 
       // Get meals for the day
-      let dayMeals;
-      try {
-        dayMeals = await db
-          .select()
-          .from(meals)
-          .where(
-            and(
-              eq(meals.userId, userId),
-              gte(meals.date, startOfDay),
-              lte(meals.date, endOfDay)
-            )
-          );
-      } catch (error: any) {
-        // Handle missing micronutrient columns
-        if (error.code === '42703' && error.message?.includes('iron')) {
-          console.log('🔧 Adding missing micronutrient columns to meals table...');
-          await db.execute(sql`ALTER TABLE meals ADD COLUMN IF NOT EXISTS iron DECIMAL(8,2) DEFAULT '0'`);
-          await db.execute(sql`ALTER TABLE meals ADD COLUMN IF NOT EXISTS calcium DECIMAL(8,2) DEFAULT '0'`);
-          await db.execute(sql`ALTER TABLE meals ADD COLUMN IF NOT EXISTS zinc DECIMAL(8,2) DEFAULT '0'`);
-          await db.execute(sql`ALTER TABLE meals ADD COLUMN IF NOT EXISTS magnesium DECIMAL(8,2) DEFAULT '0'`);
-          await db.execute(sql`ALTER TABLE meals ADD COLUMN IF NOT EXISTS vitamin_c DECIMAL(8,2) DEFAULT '0'`);
-          await db.execute(sql`ALTER TABLE meals ADD COLUMN IF NOT EXISTS vitamin_d DECIMAL(8,2) DEFAULT '0'`);
-          await db.execute(sql`ALTER TABLE meals ADD COLUMN IF NOT EXISTS vitamin_b12 DECIMAL(8,2) DEFAULT '0'`);
-          await db.execute(sql`ALTER TABLE meals ADD COLUMN IF NOT EXISTS folate DECIMAL(8,2) DEFAULT '0'`);
-          console.log('✅ Micronutrient columns added successfully');
-          
-          // Retry the query
-          dayMeals = await db
-            .select()
-            .from(meals)
-            .where(
-              and(
-                eq(meals.userId, userId),
-                gte(meals.date, startOfDay),
-                lte(meals.date, endOfDay)
-              )
-            );
-        } else {
-          throw error;
+      const fetchMealsFromDb = () => db
+        .select()
+        .from(meals)
+        .where(
+          and(
+            eq(meals.userId, userId),
+            gte(meals.date, startOfDay),
+            lte(meals.date, endOfDay)
+          )
+        );
+      let dayMeals: Array<{ totalCalories: unknown; totalProtein: unknown; totalCarbs: unknown; totalFat: unknown }>;
+      if (!getDatabaseUrl() || !isDbReady()) {
+        dayMeals = await getUserMealsViaSupabase(userId, startOfDay, endOfDay);
+      } else {
+        try {
+          dayMeals = await fetchMealsFromDb();
+        } catch {
+          dayMeals = await getUserMealsViaSupabase(userId, startOfDay, endOfDay);
         }
       }
 
       // Sum up nutrition from all meals
-      const totals = dayMeals.reduce((acc, meal) => ({
+      const totals = dayMeals.reduce<{ totalCalories: number; totalProtein: number; totalCarbs: number; totalFat: number }>((acc, meal) => ({
         totalCalories: acc.totalCalories + Number(meal.totalCalories || 0),
         totalProtein: acc.totalProtein + Number(meal.totalProtein || 0),
         totalCarbs: acc.totalCarbs + Number(meal.totalCarbs || 0),
@@ -1051,8 +1030,8 @@ export class DatabaseStorage implements IStorage {
       // Get water intake
       const water = await this.getUserWaterIntake(userId, date);
 
-      // Get active fasting session
-      const activeFasting = await this.getUserActiveFastingSession(userId);
+      // Fasting status is optional; a failure here must not zero out meals and water.
+      const activeFasting = await this.getUserActiveFastingSession(userId).catch(() => null);
       let fastingStatus = undefined;
       
       if (activeFasting) {

@@ -18,6 +18,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useQuery } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
+import { getLocalDateKey } from '@/utils/dateUtils';
 import { 
   Trophy, 
   Star, 
@@ -283,7 +284,7 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
       if (!user?.id) return null;
       
       try {
-        const response = await apiRequest('GET', `/api/users/${user.id}/daily-stats`);
+        const response = await apiRequest('GET', `/api/users/${user.id}/daily-stats?date=${getLocalDateKey()}`);
         const dailyStats = await response.json();
         
         // Get additional data from localStorage for offline tracking

@@ -2807,27 +2807,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     try {
-      const today = new Date();
-      // Getting daily stats for user
-      
+      // The client's local calendar date; the server clock (UTC) is a day ahead on US evenings.
+      const dateParam = req.query.date;
+      const today = typeof dateParam === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateParam)
+        ? new Date(`${dateParam}T12:00:00.000Z`)
+        : new Date();
+
       const stats = await storage.getUserDailyStats(userId, today);
       // Daily stats retrieved successfully
       
       res.json(stats);
     } catch (error: any) {
       console.error('❌ Failed to get daily stats:', error.message, error.stack);
-      
-      // Return default stats instead of failing completely
-      const defaultStats = {
-        totalCalories: 0,
-        totalProtein: 0,
-        totalCarbs: 0,
-        totalFat: 0,
-        waterGlasses: 0,
-        fastingStatus: undefined
-      };
-      
-      res.json(defaultStats);
+      // A real error, not zeros: zeros would overwrite the client's saved water count.
+      res.status(500).json({ message: 'Failed to load daily stats' });
     }
   });
 

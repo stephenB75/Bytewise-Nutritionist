@@ -30,14 +30,6 @@ function readLocalWaterHistory(todayGlasses: number): WaterDay[] {
   } catch {
     // Keep an empty map if storage is corrupt.
   }
-  try {
-    const daily = JSON.parse(localStorage.getItem('dailyStats') || '{}');
-    if (typeof daily.waterGlasses === 'number') {
-      byDate[getLocalDateKey()] = daily.waterGlasses;
-    }
-  } catch {
-    // Ignore malformed daily stats.
-  }
   byDate[getLocalDateKey()] = todayGlasses;
   return Object.entries(byDate).map(([date, glasses]) => ({
     date,
@@ -45,12 +37,37 @@ function readLocalWaterHistory(todayGlasses: number): WaterDay[] {
   }));
 }
 
-export function writeLocalWaterGlasses(glasses: number): void {
-  const today = getLocalDateKey();
+export function clampWaterGlasses(glasses: number): number {
+  return Math.max(0, Math.min(DAILY_GOAL, Math.round(Number(glasses) || 0)));
+}
+
+/** Today's glasses from the date-keyed local log, so the count resets at local midnight. */
+export function readLocalWaterGlasses(): number {
   try {
     const byDate = JSON.parse(localStorage.getItem(WATER_HISTORY_KEY) || '{}');
-    byDate[today] = glasses;
+    return clampWaterGlasses(byDate[getLocalDateKey()] ?? 0);
+  } catch {
+    return 0;
+  }
+}
+
+export function writeLocalWaterGlasses(glasses: number): void {
+  const today = getLocalDateKey();
+  const value = clampWaterGlasses(glasses);
+  try {
+    const byDate = JSON.parse(localStorage.getItem(WATER_HISTORY_KEY) || '{}');
+    byDate[today] = value;
+    // Keep the log bounded to the calendar window.
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - HISTORY_DAYS * 2);
+    const cutoffKey = getLocalDateKey(cutoff);
+    for (const key of Object.keys(byDate)) {
+      if (key < cutoffKey) delete byDate[key];
+    }
     localStorage.setItem(WATER_HISTORY_KEY, JSON.stringify(byDate));
+
+    const daily = JSON.parse(localStorage.getItem('dailyStats') || '{}');
+    localStorage.setItem('dailyStats', JSON.stringify({ ...daily, waterGlasses: value, date: today }));
   } catch {
     // localStorage may be unavailable.
   }
