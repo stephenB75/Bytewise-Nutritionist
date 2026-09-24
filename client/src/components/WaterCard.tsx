@@ -156,6 +156,13 @@ export const WaterCard = React.memo(function WaterCard({
   const [waterHistory, setWaterHistory] = useState<WaterDay[]>(() => readLocalWaterHistory(glasses));
   const [isSyncingHistory, setIsSyncingHistory] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [refreshTick, setRefreshTick] = useState(0);
+
+  useEffect(() => {
+    const handleRefresh = () => setRefreshTick((tick) => tick + 1);
+    window.addEventListener('app-data-refresh', handleRefresh);
+    return () => window.removeEventListener('app-data-refresh', handleRefresh);
+  }, []);
 
   const toggleHistory = () => {
     setShowHistory((open) => !open);
@@ -218,7 +225,7 @@ export const WaterCard = React.memo(function WaterCard({
     return () => {
       cancelled = true;
     };
-  }, [showHistory, glasses]);
+  }, [showHistory, glasses, refreshTick]);
 
   const filledDays = calendarCells.filter((cell) => !cell.empty);
   const totalGlasses = filledDays.reduce((sum, cell) => sum + (historyByDate.get(cell.dateStr) || 0), 0);

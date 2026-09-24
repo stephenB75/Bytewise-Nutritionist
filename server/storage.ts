@@ -49,6 +49,12 @@ import {
   updateUserGoalsViaSupabase,
   upsertUserViaSupabase,
   upsertWaterIntakeViaSupabase,
+  createFastingSessionViaSupabase,
+  getUserFastingSessionsViaSupabase,
+  getFastingSessionViaSupabase,
+  getUserActiveFastingSessionViaSupabase,
+  updateFastingSessionViaSupabase,
+  completeFastingSessionViaSupabase,
 } from "./supabaseData";
 
 export interface IStorage {
@@ -1067,67 +1073,96 @@ export class DatabaseStorage implements IStorage {
 
   // Fasting session operations
   async createFastingSession(session: InsertFastingSession): Promise<FastingSession> {
-    const [newSession] = await db.insert(fastingSessions).values(session).returning();
-    return newSession;
+    try {
+      const [newSession] = await db.insert(fastingSessions).values(session).returning();
+      return newSession;
+    } catch (error) {
+      return await createFastingSessionViaSupabase(session) as any;
+    }
   }
 
   async getUserFastingSessions(userId: string): Promise<FastingSession[]> {
-    return db
-      .select()
-      .from(fastingSessions)
-      .where(eq(fastingSessions.userId, userId))
-      .orderBy(desc(fastingSessions.createdAt));
+    try {
+      return await db
+        .select()
+        .from(fastingSessions)
+        .where(eq(fastingSessions.userId, userId))
+        .orderBy(desc(fastingSessions.createdAt));
+    } catch (error) {
+      return await getUserFastingSessionsViaSupabase(userId) as any;
+    }
   }
 
   async getFastingSession(id: string): Promise<FastingSession | null> {
-    const [session] = await db
-      .select()
-      .from(fastingSessions)
-      .where(eq(fastingSessions.id, id));
-    return session || null;
+    try {
+      const [session] = await db
+        .select()
+        .from(fastingSessions)
+        .where(eq(fastingSessions.id, id));
+      return session || null;
+    } catch (error) {
+      return await getFastingSessionViaSupabase(id) as any;
+    }
   }
 
   async updateFastingSession(id: string, updates: Partial<FastingSession>): Promise<FastingSession> {
-    const [updated] = await db
-      .update(fastingSessions)
-      .set(updates)
-      .where(eq(fastingSessions.id, id))
-      .returning();
-    return updated;
+    try {
+      const [updated] = await db
+        .update(fastingSessions)
+        .set(updates)
+        .where(eq(fastingSessions.id, id))
+        .returning();
+      return updated;
+    } catch (error) {
+      return await updateFastingSessionViaSupabase(id, updates) as any;
+    }
   }
 
   async completeFastingSession(id: string): Promise<FastingSession> {
     const completedAt = new Date();
-    const [completed] = await db
-      .update(fastingSessions)
-      .set({ 
-        status: 'completed',
-        endTime: completedAt,
-        completedAt,
-        actualDuration: sql`${fastingSessions.targetDuration}`
-      })
-      .where(eq(fastingSessions.id, id))
-      .returning();
+    let completed: FastingSession | undefined;
+    try {
+      [completed] = await db
+        .update(fastingSessions)
+        .set({ 
+          status: 'completed',
+          endTime: completedAt,
+          completedAt,
+          actualDuration: sql`${fastingSessions.targetDuration}`
+        })
+        .where(eq(fastingSessions.id, id))
+        .returning();
+    } catch (error) {
+      completed = await completeFastingSessionViaSupabase(id) as any;
+    }
     
     // Check for fasting achievements
     if (completed) {
-      await this.checkAndCreateAchievements(completed.userId);
+      try {
+        await this.checkAndCreateAchievements(completed.userId);
+      } catch (error) {
+        console.warn('Achievement check after fast failed:', error);
+      }
     }
     
-    return completed;
+    return completed as FastingSession;
   }
 
   async getUserActiveFastingSession(userId: string): Promise<FastingSession | null> {
-    const [session] = await db
-      .select()
-      .from(fastingSessions)
-      .where(and(
-        eq(fastingSessions.userId, userId),
-        eq(fastingSessions.status, 'active')
-      ))
-      .orderBy(desc(fastingSessions.createdAt))
-      .limit(1);
-    return session || null;
+    try {
+      const [session] = await db
+        .select()
+        .from(fastingSessions)
+        .where(and(
+          eq(fastingSessions.userId, userId),
+          eq(fastingSessions.status, 'active')
+        ))
+        .orderBy(desc(fastingSessions.createdAt))
+        .limit(1);
+      return session || null;
+    } catch (error) {
+      return await getUserActiveFastingSessionViaSupabase(userId) as any;
+    }
   }
 
   // Water intake management

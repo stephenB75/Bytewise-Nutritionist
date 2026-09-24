@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
+import { ACTIVE_FAST_QUERY_KEY, fetchActiveFast } from '@/lib/fastingApi';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { cancelFastingCompleteNotification, scheduleFastingCompleteNotification } from '@/services/localNotifications';
@@ -222,19 +223,12 @@ const FastingTracker = React.memo(function FastingTracker() {
     [fastingHistory],
   );
 
-  const { data: activeFastingSession } = useQuery({
-    queryKey: ['/api/fasting/active'],
-    enabled: !!user && !currentSession,
+  const { data: activeFastingSession, isSuccess: activeFastingLoaded, dataUpdatedAt: activeFastingUpdatedAt } = useQuery({
+    queryKey: ACTIVE_FAST_QUERY_KEY,
+    enabled: !!user,
     retry: false,
     staleTime: 10000,
-    queryFn: async () => {
-      try {
-        const response = await apiRequest('GET', '/api/fasting/active');
-        return await response.json();
-      } catch {
-        return null;
-      }
-    },
+    queryFn: fetchActiveFast,
   });
 
   // Start fasting session mutation
@@ -460,6 +454,32 @@ const FastingTracker = React.memo(function FastingTracker() {
     
     loadStoredSession();
   }, []);
+
+  // A fast this device saved to the account is gone from the server: it was ended on another device.
+  useEffect(() => {
+    if (!activeFastingLoaded || !currentSession?.id || startFastingMutation.isPending) return;
+    if (Date.now() - new Date(currentSession.startTime).getTime() < 60_000) return;
+    const serverFast = activeFastingSession && activeFastingSession.id === currentSession.id
+      ? activeFastingSession
+      : null;
+    if (serverFast) return;
+    if (activeFastingSession && activeFastingSession.id !== currentSession.id) {
+      const serverRemaining =
+        activeFastingSession.targetDuration - (Date.now() - new Date(activeFastingSession.startTime).getTime());
+      if (serverRemaining > 0) {
+        setCurrentSession(null);
+        return;
+      }
+    }
+    localStorage.removeItem(FASTING_SESSION_KEY);
+    localStorage.removeItem(FASTING_ACTIVE_KEY);
+    localStorage.removeItem(FASTING_MILESTONES_KEY);
+    setCurrentSession(null);
+    setIsActive(false);
+    setTimeRemaining(0);
+    queryClient.invalidateQueries({ queryKey: ['/api/fasting/history'] });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeFastingUpdatedAt, activeFastingLoaded]);
 
   // Sync with server active session if localStorage is empty
   useEffect(() => {

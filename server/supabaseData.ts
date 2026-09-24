@@ -420,3 +420,110 @@ export async function upsertWaterIntakeViaSupabase(userId: string, date: Date, g
 
   return mapWaterIntake(data);
 }
+
+// fasting_sessions timestamps are "without time zone" and always hold UTC wall-clock values.
+function parseUtcTimestamp(value: unknown): Date | null {
+  if (!value) return null;
+  const text = String(value);
+  return new Date(/[zZ]|[+-]\d{2}:?\d{2}$/.test(text) ? text : `${text}Z`);
+}
+
+function mapFastingRow(row: any) {
+  return {
+    id: row.id,
+    userId: row.user_id,
+    planId: row.plan_id,
+    planName: row.plan_name,
+    startTime: parseUtcTimestamp(row.start_time)!,
+    endTime: parseUtcTimestamp(row.end_time),
+    targetDuration: Number(row.target_duration) || 0,
+    actualDuration: row.actual_duration == null ? null : Number(row.actual_duration),
+    status: row.status,
+    createdAt: parseUtcTimestamp(row.created_at) ?? new Date(),
+    completedAt: parseUtcTimestamp(row.completed_at),
+  };
+}
+
+export async function createFastingSessionViaSupabase(session: Record<string, any>) {
+  const { data, error } = await supabaseAdmin
+    .from('fasting_sessions')
+    .insert({
+      id: session.id,
+      user_id: session.userId,
+      plan_id: session.planId,
+      plan_name: session.planName,
+      start_time: new Date(session.startTime).toISOString(),
+      target_duration: Math.round(Number(session.targetDuration) || 0),
+      status: session.status || 'active',
+    })
+    .select('*')
+    .single();
+  if (error) throw error;
+  return mapFastingRow(data);
+}
+
+export async function getUserFastingSessionsViaSupabase(userId: string) {
+  const { data, error } = await supabaseAdmin
+    .from('fasting_sessions')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data || []).map(mapFastingRow);
+}
+
+export async function getFastingSessionViaSupabase(id: string) {
+  const { data, error } = await supabaseAdmin
+    .from('fasting_sessions')
+    .select('*')
+    .eq('id', id)
+    .maybeSingle();
+  if (error) throw error;
+  return data ? mapFastingRow(data) : null;
+}
+
+export async function getUserActiveFastingSessionViaSupabase(userId: string) {
+  const { data, error } = await supabaseAdmin
+    .from('fasting_sessions')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('status', 'active')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw error;
+  return data ? mapFastingRow(data) : null;
+}
+
+export async function updateFastingSessionViaSupabase(id: string, updates: Record<string, any>) {
+  const row: Record<string, unknown> = {};
+  if (updates.status !== undefined) row.status = updates.status;
+  if (updates.planId !== undefined) row.plan_id = updates.planId;
+  if (updates.planName !== undefined) row.plan_name = updates.planName;
+  if (updates.startTime !== undefined) row.start_time = new Date(updates.startTime).toISOString();
+  if (updates.endTime !== undefined) row.end_time = updates.endTime ? new Date(updates.endTime).toISOString() : null;
+  if (updates.targetDuration !== undefined) row.target_duration = Math.round(Number(updates.targetDuration) || 0);
+  if (updates.actualDuration !== undefined) row.actual_duration = updates.actualDuration == null ? null : Math.round(Number(updates.actualDuration));
+  if (updates.completedAt !== undefined) row.completed_at = updates.completedAt ? new Date(updates.completedAt).toISOString() : null;
+
+  const { data, error } = await supabaseAdmin
+    .from('fasting_sessions')
+    .update(row)
+    .eq('id', id)
+    .select('*')
+    .single();
+  if (error) throw error;
+  return mapFastingRow(data);
+}
+
+export async function completeFastingSessionViaSupabase(id: string) {
+  const existing = await getFastingSessionViaSupabase(id);
+  if (!existing) throw new Error('Fasting session not found');
+  const completedAt = new Date();
+  return updateFastingSessionViaSupabase(id, {
+    status: 'completed',
+    endTime: completedAt,
+    completedAt,
+    actualDuration: Math.max(0, completedAt.getTime() - existing.startTime.getTime()),
+  });
+}

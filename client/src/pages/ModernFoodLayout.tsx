@@ -26,6 +26,8 @@ import { AppTour } from '@/components/AppTour';
 import { UserFoodSuggestions } from '@/components/UserFoodSuggestions';
 import { getFeatureAllowance } from '@/lib/usageLimits';
 import { apiRequest } from '@/lib/queryClient';
+import { useQuery } from '@tanstack/react-query';
+import { ACTIVE_FAST_QUERY_KEY, fetchActiveFast } from '@/lib/fastingApi';
 const logoImage = '/BWN_Logo.png';
 import { 
   Search, 
@@ -649,6 +651,46 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       });
     }
   }, []);
+
+  // Mirror the account's active fast into this device so the dashboard matches the other device.
+  const { data: serverActiveFast, isSuccess: serverActiveFastLoaded, dataUpdatedAt: serverActiveFastAt } = useQuery({
+    queryKey: ACTIVE_FAST_QUERY_KEY,
+    queryFn: fetchActiveFast,
+    enabled: !!user,
+    retry: false,
+    staleTime: 10000,
+  });
+
+  useEffect(() => {
+    if (!serverActiveFastLoaded) return;
+    let local: { id?: string; startTime?: string } | null = null;
+    try {
+      local = JSON.parse(localStorage.getItem('bytewise_fasting_session') || 'null');
+    } catch {
+      local = null;
+    }
+    const serverRemaining = serverActiveFast
+      ? serverActiveFast.targetDuration - (Date.now() - new Date(serverActiveFast.startTime).getTime())
+      : 0;
+
+    if (serverActiveFast && serverRemaining > 0) {
+      if (local?.id !== serverActiveFast.id) {
+        localStorage.setItem('bytewise_fasting_session', JSON.stringify({
+          id: serverActiveFast.id,
+          planId: serverActiveFast.planId,
+          startTime: serverActiveFast.startTime,
+          targetDuration: serverActiveFast.targetDuration,
+          status: 'active',
+        }));
+        localStorage.setItem('bytewise_fasting_active', 'true');
+      }
+    } else if (local?.id && Date.now() - new Date(local.startTime || 0).getTime() > 60_000) {
+      localStorage.removeItem('bytewise_fasting_session');
+      localStorage.removeItem('bytewise_fasting_active');
+    }
+    checkFastingStatus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [serverActiveFastAt, serverActiveFastLoaded]);
 
 
 

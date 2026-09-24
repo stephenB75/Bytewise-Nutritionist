@@ -22,6 +22,8 @@ import { runDataMigration } from '@/utils/dataMigration';
 import { toast } from '@/hooks/use-toast';
 import { apiFetch } from '@/lib/apiUrl';
 import { Toaster } from '@/components/ui/toaster';
+import { PullToRefresh } from '@/components/PullToRefresh';
+import { startAutoSync } from '@/lib/appRefresh';
 
 function AppContent() {
   const [activeTab, setActiveTab] = useState<string>('redesigned');
@@ -174,6 +176,8 @@ function AppContent() {
     };
   }, []);
 
+  useEffect(() => startAutoSync(), []);
+
   // No special routes - direct access to modern layout
   const checkSpecialRoutes = () => {
     return null;
@@ -197,6 +201,7 @@ function AppContent() {
         </main>
         <DataIntegrityManager />
         <PWAUpdateNotification />
+        <PullToRefresh />
         <Toaster />
       </div>
     </Router>
