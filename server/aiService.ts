@@ -36,7 +36,10 @@ export interface FoodAnalysisResult {
   analysisTime: string;
   /** Placeholder data because the vision model could not be used; must not be shown or logged as a real analysis. */
   isFallback?: boolean;
+  fallbackReason?: FallbackReason;
 }
+
+export type FallbackReason = 'quota' | 'access' | 'image' | 'unreadable';
 
 const GEMINI_MODELS = [process.env.GEMINI_MODEL, 'gemini-2.5-flash', 'gemini-flash-latest']
   .filter((m, i, all): m is string => !!m && all.indexOf(m) === i);
@@ -246,7 +249,7 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
         }
       } catch (parseError) {
         console.error('❌ Could not parse Gemini response:', parseError);
-        return getFallbackAnalysis();
+        return getFallbackAnalysis('unreadable');
       }
 
       // An empty list means no food was detected; the route reports that to the user.
@@ -265,7 +268,7 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
         geminiError.message.includes('RESOURCE_EXHAUSTED') ||
         geminiError.message.includes('quota exceeded')
       )) {
-        return getFallbackAnalysis();
+        return getFallbackAnalysis('quota');
       }
       
       // Check if it's an API access restriction and return fallback immediately
@@ -275,7 +278,7 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
         geminiError.message.includes('blocked') ||
         geminiError.message.includes('unauthorized')
       )) {
-        return getFallbackAnalysis();
+        return getFallbackAnalysis('access');
       }
       
       // Check if it's an image validation error and return fallback immediately
@@ -285,7 +288,7 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
         geminiError.message.includes('Bad Request') ||
         geminiError.message.includes('invalid image')
       )) {
-        return getFallbackAnalysis();
+        return getFallbackAnalysis('image');
       }
       
       // For other errors, throw to outer catch
@@ -305,7 +308,7 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
       error.message.includes('quota exceeded')
     )) {
       console.log('⚠️ Gemini API quota exceeded, providing fallback analysis...');
-      return getFallbackAnalysis();
+      return getFallbackAnalysis('quota');
     }
     
     // Check for invalid API key, disabled API, or HTTP referrer restrictions
@@ -320,7 +323,7 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
       error.message.includes('blocked')
     )) {
       console.log('⚠️ API access restricted, providing fallback analysis...');
-      return getFallbackAnalysis();
+      return getFallbackAnalysis('access');
     }
 
     // Check for image-related errors
@@ -584,8 +587,8 @@ function preprocessFoodNameForUSDA(foodName: string): string[] {
 /**
  * Provide a fallback analysis when Gemini API is unavailable
  */
-function getFallbackAnalysis(): FoodAnalysisResult {
-  console.log('🔄 Providing fallback AI analysis due to API limitations');
+function getFallbackAnalysis(reason: FallbackReason): FoodAnalysisResult {
+  console.log(`🔄 Providing fallback AI analysis (reason: ${reason})`);
   
   // Include comprehensive nutrition including micronutrients
   const fallbackFood = {
@@ -621,7 +624,8 @@ function getFallbackAnalysis(): FoodAnalysisResult {
   return {
     identifiedFoods: [fallbackFood],
     analysisTime: new Date().toISOString(),
-    isFallback: true
+    isFallback: true,
+    fallbackReason: reason
   };
 }
 

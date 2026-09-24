@@ -78,6 +78,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       databaseConfigured: !!getDatabaseUrl(),
       serviceRoleConfigured: !!getSupabaseServiceKey(),
       usdaKeyConfigured: getUsdaApiKey() !== 'DEMO_KEY',
+      aiKeyConfigured: !!process.env.GOOGLE_API_KEY,
     });
   });
 
@@ -1693,6 +1694,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (aiResult.isFallback) {
         return res.status(503).json({
           error: 'AI_UNAVAILABLE',
+          reason: aiResult.fallbackReason,
           message: 'AI food analysis is temporarily unavailable. Please try again later or add the food manually.'
         });
       }

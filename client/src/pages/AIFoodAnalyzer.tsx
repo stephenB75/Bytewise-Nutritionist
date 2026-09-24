@@ -366,7 +366,14 @@ export default function AIFoodAnalyzer() {
       
       if (error.message && (error.message.includes('AI_UNAVAILABLE') || error.message.includes('MISSING_CREDENTIALS'))) {
         title = "AI Analysis Unavailable";
-        description = "AI food analysis is temporarily unavailable. Nothing was logged — you can add the food manually with the calculator.";
+        const reason = error.message.match(/"reason":"(\w+)"/)?.[1];
+        const detail = {
+          quota: "The AI service's usage limit has been reached. Try again later.",
+          access: "The AI service rejected the app's API key.",
+          image: "The AI service couldn't read this image. Try a JPG or PNG.",
+          unreadable: "The AI service returned an answer the app couldn't read. Please try again.",
+        }[reason as string] || "AI food analysis is temporarily unavailable.";
+        description = `${detail} Nothing was logged — you can add the food manually with the calculator.`;
       } else if (error.message && error.message.includes('IMAGE_ERROR')) {
         title = "Image Processing Error";
         description = "Unable to analyze the image. Please try uploading a clearer photo with better lighting or a different format (JPG, PNG).";
