@@ -40,6 +40,7 @@ import { eq, desc, and, gte, lte, like, sql, inArray } from "drizzle-orm";
 import { getDatabaseUrl } from "./env";
 import {
   createMealViaSupabase,
+  deleteMealViaSupabase,
   getUserMealsViaSupabase,
   getUserViaSupabase,
   getUserWaterHistoryViaSupabase,
@@ -678,12 +679,16 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteMeal(id: number, userId?: string): Promise<void> {
-    if (userId) {
-      // Verify meal belongs to user before deleting (security fix)
-      await db.delete(meals).where(and(eq(meals.id, id), eq(meals.userId, userId)));
-    } else {
-      // Fallback for backward compatibility (admin operations)
-      await db.delete(meals).where(eq(meals.id, id));
+    try {
+      if (userId) {
+        // Verify meal belongs to user before deleting (security fix)
+        await db.delete(meals).where(and(eq(meals.id, id), eq(meals.userId, userId)));
+      } else {
+        // Fallback for backward compatibility (admin operations)
+        await db.delete(meals).where(eq(meals.id, id));
+      }
+    } catch (error) {
+      await deleteMealViaSupabase(id, userId);
     }
   }
 

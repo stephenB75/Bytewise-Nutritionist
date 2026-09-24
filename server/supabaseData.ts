@@ -279,6 +279,17 @@ export async function createMealViaSupabase(meal: Record<string, any>) {
   };
 }
 
+export async function deleteMealViaSupabase(id: number, userId?: string) {
+  let query = supabaseAdmin.from('meals').delete().eq('id', id);
+  if (userId) {
+    query = query.eq('user_id', userId);
+  }
+  const { error } = await query;
+  if (error) {
+    throw error;
+  }
+}
+
 export async function getUserMealsViaSupabase(userId: string, startDate?: Date, endDate?: Date) {
   let query = supabaseAdmin
     .from('meals')
