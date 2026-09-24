@@ -4,6 +4,7 @@ import { Activity, Flame, Footprints, HeartPulse } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { healthKitService, type AppleFitnessSummary } from '@/services/healthKit';
+import { toast } from '@/hooks/use-toast';
 
 type AppleFitnessCardProps = {
   onConnect?: () => void;
@@ -46,6 +47,24 @@ export function AppleFitnessCard({ onConnect }: AppleFitnessCardProps) {
     };
   }, [refresh]);
 
+  const [connecting, setConnecting] = useState(false);
+
+  const handleConnect = async () => {
+    setConnecting(true);
+    try {
+      const result = await healthKitService.requestPermissions();
+      if (result.ok) {
+        window.dispatchEvent(new CustomEvent('apple-health-changed'));
+        toast({ title: 'Apple Health Connected', duration: 3000 });
+      } else {
+        toast({ title: 'Apple Health not connected', description: result.reason, variant: 'destructive', duration: 6000 });
+        onConnect?.();
+      }
+    } finally {
+      setConnecting(false);
+    }
+  };
+
   const isNativeIos =
     Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios';
 
@@ -72,16 +91,15 @@ export function AppleFitnessCard({ onConnect }: AppleFitnessCardProps) {
           <p className="text-sm text-gray-700">
             Connect Apple Health to show today's steps, move calories, and distance alongside nutrition.
           </p>
-          {onConnect && (
-            <Button
-              type="button"
-              size="sm"
-              className="on-color bg-rose-600 hover:bg-rose-700"
-              onClick={onConnect}
-            >
-              Connect Apple Health
-            </Button>
-          )}
+          <Button
+            type="button"
+            size="sm"
+            className="on-color bg-rose-600 hover:bg-rose-700 disabled:opacity-75"
+            onClick={handleConnect}
+            disabled={connecting}
+          >
+            {connecting ? 'Connecting…' : 'Connect Apple Health'}
+          </Button>
         </div>
       ) : (
         <div className="grid grid-cols-3 gap-2">

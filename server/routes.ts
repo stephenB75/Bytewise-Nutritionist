@@ -12,6 +12,7 @@ import { z } from "zod";
 import { supabaseStorageService } from "./supabaseStorage";
 import express from "express";
 import { isSupabaseRateLimit } from "./authErrors";
+import { registerFriendsRoutes } from "./friendsRoutes";
 
 // Zod schemas for request validation
 const subscriptionSyncSchema = z.object({
@@ -2623,6 +2624,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Fasting API endpoints
+  registerFriendsRoutes(app);
+
   app.post('/api/fasting/start', isAuthenticated, async (req: any, res: Response) => {
     const userId = req.user?.id;
     if (!userId) {

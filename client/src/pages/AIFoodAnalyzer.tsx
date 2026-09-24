@@ -245,6 +245,8 @@ export default function AIFoodAnalyzer() {
 
   // Analyze food image mutation
   const analyzeFoodMutation = useMutation({
+    // Every attempt is a billed Gemini call; never retry automatically.
+    retry: false,
     mutationFn: async (imageUrl: string) => {
       const response = await apiRequest('POST', '/api/ai/analyze-food', {
         imageUrl
@@ -368,6 +370,9 @@ export default function AIFoodAnalyzer() {
       } else if (error.message && error.message.includes('IMAGE_ERROR')) {
         title = "Image Processing Error";
         description = "Unable to analyze the image. Please try uploading a clearer photo with better lighting or a different format (JPG, PNG).";
+      } else if (error.message && /STORAGE_ERROR|UPLOAD_ERROR/.test(error.message)) {
+        title = "Photo Not Found";
+        description = "Your photo uploaded but couldn't be read for analysis. Please try again.";
       } else if (error.message && error.message.includes('NETWORK_ERROR')) {
         title = "Connection Error";
         description = "Unable to connect to the analysis service. Please check your internet connection and try again.";

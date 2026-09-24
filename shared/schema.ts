@@ -205,6 +205,29 @@ export const fastingSessions = pgTable('fasting_sessions', {
   completedAt: timestamp('completed_at')
 });
 
+// Friends & family connections (see supabase/migrations/008_friends_and_shared_activities.sql)
+export const friendConnections = pgTable("friend_connections", {
+  id: serial("id").primaryKey(),
+  requesterId: varchar("requester_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  addresseeId: varchar("addressee_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  status: varchar("status", { length: 20 }).notNull().default('pending'), // pending, accepted
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  respondedAt: timestamp("responded_at"),
+});
+
+// Activities a member chose to share with their accepted connections
+export const sharedActivities = pgTable("shared_activities", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  activityType: varchar("activity_type", { length: 30 }).notNull(), // summary, meal, fast, water
+  title: varchar("title", { length: 200 }).notNull(),
+  details: jsonb("details"),
+  note: varchar("note", { length: 280 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => ({
+  userCreatedIdx: index("shared_activities_user_created_idx").on(table.userId, table.createdAt),
+}));
+
 // User subscriptions table for Apple subscription tracking
 export const subscriptions = pgTable("subscriptions", {
   id: serial("id").primaryKey(),

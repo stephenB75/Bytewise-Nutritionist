@@ -84,10 +84,9 @@ export async function analyzeFoodImage(imageUrl: string): Promise<FoodAnalysisRe
         // Supabase Storage URL format: /storage/v1/object/public/bucket/path or /storage/v1/object/sign/bucket/path
         const storageIndex = pathParts.findIndex(part => part === 'storage');
         if (storageIndex !== -1 && pathParts.length > storageIndex + 5) {
-          // Extract object path correctly
-          // Format: ["", "storage", "v1", "object", "public|sign", "bucket-name", ...object-path]
-          // Skip ["", "storage", "v1", "object", "public|sign", "bucket-name"] and get the rest
-          objectPath = pathParts.slice(storageIndex + 6).join('/');
+          // pathParts: ["", "storage", "v1", "object", "public|sign", "bucket-name", ...object-path]
+          // storageIndex points at "storage", so the bucket is storageIndex + 4.
+          objectPath = decodeURIComponent(pathParts.slice(storageIndex + 5).join('/'));
           console.log(`🔍 Parsed Supabase URL - Path: ${objectPath}, Full pathname: ${url.pathname}`);
         } else {
           objectPath = pathParts.slice(-1)[0]; // Just the filename as fallback
