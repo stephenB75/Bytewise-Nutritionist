@@ -1,16 +1,17 @@
 import { Capacitor } from '@capacitor/core';
+import { LocalNotifications } from '@capacitor/local-notifications';
 
 const FASTING_COMPLETE_ID = 1001;
 
-async function getPlugin() {
+// Must stay synchronous: awaiting a Capacitor plugin proxy hangs forever on native.
+function getPlugin() {
   if (!Capacitor.isNativePlatform() || !Capacitor.isPluginAvailable('LocalNotifications')) {
     return null;
   }
-  const { LocalNotifications } = await import('@capacitor/local-notifications');
   return LocalNotifications;
 }
 
-async function ensurePermission(plugin: NonNullable<Awaited<ReturnType<typeof getPlugin>>>): Promise<boolean> {
+async function ensurePermission(plugin: typeof LocalNotifications): Promise<boolean> {
   let { display } = await plugin.checkPermissions();
   if (display === 'prompt' || display === 'prompt-with-rationale') {
     ({ display } = await plugin.requestPermissions());
@@ -24,7 +25,7 @@ async function ensurePermission(plugin: NonNullable<Awaited<ReturnType<typeof ge
  */
 export async function scheduleFastingCompleteNotification(endAt: Date, planName: string): Promise<void> {
   try {
-    const plugin = await getPlugin();
+    const plugin = getPlugin();
     if (!plugin) return;
     await plugin.cancel({ notifications: [{ id: FASTING_COMPLETE_ID }] });
     if (endAt.getTime() <= Date.now()) return;
@@ -45,7 +46,7 @@ export async function scheduleFastingCompleteNotification(endAt: Date, planName:
 
 export async function cancelFastingCompleteNotification(): Promise<void> {
   try {
-    const plugin = await getPlugin();
+    const plugin = getPlugin();
     if (!plugin) return;
     await plugin.cancel({ notifications: [{ id: FASTING_COMPLETE_ID }] });
   } catch (error) {

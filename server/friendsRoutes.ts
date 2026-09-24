@@ -1,24 +1,44 @@
 import type { Express, Response } from "express";
-import { sql } from "drizzle-orm";
 import { z } from "zod";
-import { db } from "./db";
-import { isAuthenticated } from "./supabaseAuth";
+import { isAuthenticated, supabaseAdmin } from "./supabaseAuth";
 
-type Row = Record<string, any>;
+// Uses the Supabase admin client rather than the direct Postgres pool: in production the pool can be
+// unreachable while the REST API works, and the rest of storage.ts already falls back to it.
 
-async function query(statement: ReturnType<typeof sql>): Promise<Row[]> {
-  const result: any = await db.execute(statement);
-  return result.rows ?? result;
+type Profile = { id: string; email: string | null; first_name: string | null; last_name: string | null };
+
+function displayName(profile?: Profile): string {
+  if (!profile) return 'Bytewise member';
+  const name = [profile.first_name, profile.last_name].filter(Boolean).join(' ').trim();
+  return name || profile.email?.split('@')[0] || 'Bytewise member';
 }
 
-function displayName(row: Row, prefix = ''): string {
-  const first = row[`${prefix}first_name`];
-  const last = row[`${prefix}last_name`];
-  const email: string = row[`${prefix}email`] || '';
-  const name = [first, last].filter(Boolean).join(' ').trim();
-  return name || email.split('@')[0] || 'Bytewise member';
+async function loadProfiles(ids: string[]): Promise<Map<string, Profile>> {
+  if (ids.length === 0) return new Map();
+  const { data, error } = await supabaseAdmin
+    .from('users')
+    .select('id, email, first_name, last_name')
+    .in('id', Array.from(new Set(ids)));
+  if (error) throw error;
+  return new Map((data || []).map((p: Profile) => [p.id, p]));
 }
 
+async function acceptedFriendIds(userId: string): Promise<string[]> {
+  const { data, error } = await supabaseAdmin
+    .from('friend_connections')
+    .select('requester_id, addressee_id')
+    .eq('status', 'accepted')
+    .or(`requester_id.eq.${userId},addressee_id.eq.${userId}`);
+  if (error) throw error;
+  return (data || []).map((c: any) => (c.requester_id === userId ? c.addressee_id : c.requester_id));
+}
+
+function fail(res: Response, label: string, error: any) {
+  console.error(`❌ ${label}:`, error?.message || error);
+  res.status(500).json({ message: label });
+}
+
+const idParam = z.coerce.number().int().positive();
 const inviteSchema = z.object({ email: z.string().trim().toLowerCase().email() });
 
 const shareSchema = z.object({
@@ -37,45 +57,57 @@ const summarySchema = z.object({
 
 export function registerFriendsRoutes(app: Express) {
   app.get('/api/friends', isAuthenticated, async (req: any, res: Response) => {
-    const userId = req.user?.id;
+    const userId: string = req.user?.id;
     try {
-      const rows = await query(sql`
-        select fc.id, fc.status, fc.requester_id, fc.created_at,
-               u.id as other_id, u.email, u.first_name, u.last_name
-        from friend_connections fc
-        join users u on u.id = case when fc.requester_id = ${userId} then fc.addressee_id else fc.requester_id end
-        where fc.requester_id = ${userId} or fc.addressee_id = ${userId}
-        order by fc.created_at desc
-      `);
+      const { data, error } = await supabaseAdmin
+        .from('friend_connections')
+        .select('id, status, requester_id, addressee_id, created_at')
+        .or(`requester_id.eq.${userId},addressee_id.eq.${userId}`)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
 
-      const toPerson = (row: Row) => ({
-        connectionId: row.id,
-        userId: row.other_id,
-        name: displayName(row),
-        email: row.email,
-        since: row.created_at,
-      });
+      const rows = data || [];
+      const otherId = (row: any) => (row.requester_id === userId ? row.addressee_id : row.requester_id);
+      const profiles = await loadProfiles(rows.map(otherId));
+
+      const toPerson = (row: any) => {
+        const profile = profiles.get(otherId(row));
+        return {
+          connectionId: row.id,
+          userId: otherId(row),
+          name: displayName(profile),
+          email: profile?.email || '',
+          since: row.created_at,
+        };
+      };
 
       res.json({
         friends: rows.filter(r => r.status === 'accepted').map(toPerson),
         incoming: rows.filter(r => r.status === 'pending' && r.requester_id !== userId).map(toPerson),
         outgoing: rows.filter(r => r.status === 'pending' && r.requester_id === userId).map(toPerson),
       });
-    } catch (error: any) {
-      console.error('❌ Failed to load friends:', error.message);
-      res.status(500).json({ message: 'Failed to load friends' });
+    } catch (error) {
+      fail(res, 'Failed to load friends', error);
     }
   });
 
   app.post('/api/friends/invite', isAuthenticated, async (req: any, res: Response) => {
-    const userId = req.user?.id;
+    const userId: string = req.user?.id;
     const parsed = inviteSchema.safeParse(req.body);
     if (!parsed.success) {
       return res.status(400).json({ message: 'Please enter a valid email address.' });
     }
 
     try {
-      const [target] = await query(sql`select id from users where lower(email) = ${parsed.data.email} limit 1`);
+      const escaped = parsed.data.email.replace(/[\\%_]/g, (c) => `\\${c}`);
+      const { data: matches, error: lookupError } = await supabaseAdmin
+        .from('users')
+        .select('id')
+        .ilike('email', escaped)
+        .limit(1);
+      if (lookupError) throw lookupError;
+
+      const target = matches?.[0];
       if (!target) {
         return res.status(404).json({ message: 'No Bytewise member uses that email. Ask them to create an account first.' });
       }
@@ -83,11 +115,13 @@ export function registerFriendsRoutes(app: Express) {
         return res.status(400).json({ message: "That's your own email." });
       }
 
-      const [existing] = await query(sql`
-        select id, status, requester_id from friend_connections
-        where least(requester_id, addressee_id) = least(${userId}::uuid, ${target.id}::uuid)
-          and greatest(requester_id, addressee_id) = greatest(${userId}::uuid, ${target.id}::uuid)
-      `);
+      const { data: existingRows, error: existingError } = await supabaseAdmin
+        .from('friend_connections')
+        .select('id, status, requester_id')
+        .or(`and(requester_id.eq.${userId},addressee_id.eq.${target.id}),and(requester_id.eq.${target.id},addressee_id.eq.${userId})`)
+        .limit(1);
+      if (existingError) throw existingError;
+      const existing = existingRows?.[0];
 
       if (existing?.status === 'accepted') {
         return res.status(409).json({ message: "You're already connected." });
@@ -96,75 +130,81 @@ export function registerFriendsRoutes(app: Express) {
         return res.status(409).json({ message: 'Invite already sent. Waiting for them to accept.' });
       }
       if (existing) {
-        await query(sql`update friend_connections set status = 'accepted', responded_at = now() where id = ${existing.id}`);
+        const { error } = await supabaseAdmin
+          .from('friend_connections')
+          .update({ status: 'accepted', responded_at: new Date().toISOString() })
+          .eq('id', existing.id);
+        if (error) throw error;
         return res.json({ status: 'accepted', message: 'They had already invited you, so you are now connected.' });
       }
 
-      await query(sql`insert into friend_connections (requester_id, addressee_id) values (${userId}, ${target.id})`);
+      const { error: insertError } = await supabaseAdmin
+        .from('friend_connections')
+        .insert({ requester_id: userId, addressee_id: target.id });
+      if (insertError) throw insertError;
       res.json({ status: 'pending', message: 'Invite sent. They will see it in Friends & Family.' });
-    } catch (error: any) {
-      console.error('❌ Failed to send invite:', error.message);
-      res.status(500).json({ message: 'Failed to send invite' });
+    } catch (error) {
+      fail(res, 'Failed to send invite', error);
     }
   });
 
   app.post('/api/friends/:id/accept', isAuthenticated, async (req: any, res: Response) => {
-    const userId = req.user?.id;
+    const userId: string = req.user?.id;
+    const id = idParam.safeParse(req.params.id);
+    if (!id.success) return res.status(400).json({ message: 'Invalid invite' });
+
     try {
-      const rows = await query(sql`
-        update friend_connections set status = 'accepted', responded_at = now()
-        where id = ${Number(req.params.id)} and addressee_id = ${userId} and status = 'pending'
-        returning id
-      `);
-      if (rows.length === 0) {
-        return res.status(404).json({ message: 'Invite not found' });
-      }
+      const { data, error } = await supabaseAdmin
+        .from('friend_connections')
+        .update({ status: 'accepted', responded_at: new Date().toISOString() })
+        .eq('id', id.data)
+        .eq('addressee_id', userId)
+        .eq('status', 'pending')
+        .select('id');
+      if (error) throw error;
+      if (!data?.length) return res.status(404).json({ message: 'Invite not found' });
       res.json({ success: true });
-    } catch (error: any) {
-      console.error('❌ Failed to accept invite:', error.message);
-      res.status(500).json({ message: 'Failed to accept invite' });
+    } catch (error) {
+      fail(res, 'Failed to accept invite', error);
     }
   });
 
   // Declines an invite, cancels one you sent, or removes a connection.
   app.delete('/api/friends/:id', isAuthenticated, async (req: any, res: Response) => {
-    const userId = req.user?.id;
+    const userId: string = req.user?.id;
+    const id = idParam.safeParse(req.params.id);
+    if (!id.success) return res.status(400).json({ message: 'Invalid connection' });
+
     try {
-      const rows = await query(sql`
-        delete from friend_connections
-        where id = ${Number(req.params.id)} and (requester_id = ${userId} or addressee_id = ${userId})
-        returning id
-      `);
-      if (rows.length === 0) {
-        return res.status(404).json({ message: 'Connection not found' });
-      }
+      const { data, error } = await supabaseAdmin
+        .from('friend_connections')
+        .delete()
+        .eq('id', id.data)
+        .or(`requester_id.eq.${userId},addressee_id.eq.${userId}`)
+        .select('id');
+      if (error) throw error;
+      if (!data?.length) return res.status(404).json({ message: 'Connection not found' });
       res.json({ success: true });
-    } catch (error: any) {
-      console.error('❌ Failed to remove connection:', error.message);
-      res.status(500).json({ message: 'Failed to remove connection' });
+    } catch (error) {
+      fail(res, 'Failed to remove connection', error);
     }
   });
 
   app.get('/api/activity-feed', isAuthenticated, async (req: any, res: Response) => {
-    const userId = req.user?.id;
+    const userId: string = req.user?.id;
     try {
-      const rows = await query(sql`
-        select sa.id, sa.user_id, sa.activity_type, sa.title, sa.details, sa.note, sa.created_at,
-               u.email, u.first_name, u.last_name
-        from shared_activities sa
-        join users u on u.id = sa.user_id
-        where sa.user_id = ${userId}
-           or sa.user_id in (
-             select case when requester_id = ${userId} then addressee_id else requester_id end
-             from friend_connections
-             where status = 'accepted' and (requester_id = ${userId} or addressee_id = ${userId})
-           )
-        order by sa.created_at desc
-        limit 50
-      `);
+      const authorIds = [userId, ...(await acceptedFriendIds(userId))];
+      const { data, error } = await supabaseAdmin
+        .from('shared_activities')
+        .select('id, user_id, activity_type, title, details, note, created_at')
+        .in('user_id', authorIds)
+        .order('created_at', { ascending: false })
+        .limit(50);
+      if (error) throw error;
 
+      const profiles = await loadProfiles((data || []).map((row: any) => row.user_id));
       res.json({
-        activities: rows.map(row => ({
+        activities: (data || []).map((row: any) => ({
           id: row.id,
           type: row.activity_type,
           title: row.title,
@@ -172,17 +212,16 @@ export function registerFriendsRoutes(app: Express) {
           note: row.note,
           createdAt: row.created_at,
           isMine: row.user_id === userId,
-          author: displayName(row),
+          author: displayName(profiles.get(row.user_id)),
         })),
       });
-    } catch (error: any) {
-      console.error('❌ Failed to load activity feed:', error.message);
-      res.status(500).json({ message: 'Failed to load activity feed' });
+    } catch (error) {
+      fail(res, 'Failed to load activity feed', error);
     }
   });
 
   app.post('/api/activities/share', isAuthenticated, async (req: any, res: Response) => {
-    const userId = req.user?.id;
+    const userId: string = req.user?.id;
     const parsed = shareSchema.safeParse(req.body);
     if (!parsed.success) {
       return res.status(400).json({ message: 'Invalid activity' });
@@ -190,21 +229,21 @@ export function registerFriendsRoutes(app: Express) {
 
     try {
       const { type, title, details, note } = parsed.data;
-      const [row] = await query(sql`
-        insert into shared_activities (user_id, activity_type, title, details, note)
-        values (${userId}, ${type}, ${title}, ${details ? JSON.stringify(details) : null}::jsonb, ${note || null})
-        returning id
-      `);
-      res.json({ id: row.id });
-    } catch (error: any) {
-      console.error('❌ Failed to share activity:', error.message);
-      res.status(500).json({ message: 'Failed to share activity' });
+      const { data, error } = await supabaseAdmin
+        .from('shared_activities')
+        .insert({ user_id: userId, activity_type: type, title, details: details ?? null, note: note || null })
+        .select('id')
+        .single();
+      if (error) throw error;
+      res.json({ id: data.id });
+    } catch (error) {
+      fail(res, 'Failed to share activity', error);
     }
   });
 
   // Totals come from the server's own records so a shared summary can't be edited before posting.
   app.post('/api/activities/share-summary', isAuthenticated, async (req: any, res: Response) => {
-    const userId = req.user?.id;
+    const userId: string = req.user?.id;
     const parsed = summarySchema.safeParse(req.body);
     if (!parsed.success) {
       return res.status(400).json({ message: 'Invalid date' });
@@ -212,55 +251,63 @@ export function registerFriendsRoutes(app: Express) {
 
     try {
       const { date, dayStart, dayEnd, note } = parsed.data;
-      const [mealTotals] = await query(sql`
-        select count(*)::int as meals, coalesce(sum(total_calories), 0)::float as calories,
-               coalesce(sum(total_protein), 0)::float as protein
-        from meals where user_id = ${userId} and (date at time zone 'UTC')::date = ${date}::date
-      `);
-      const [water] = await query(sql`
-        select coalesce(max(glasses), 0)::int as glasses
-        from water_intake where user_id = ${userId} and (date at time zone 'UTC')::date = ${date}::date
-      `);
-      const [fast] = await query(sql`
-        select plan_name, actual_duration from fasting_sessions
-        where user_id = ${userId} and status = 'completed'
-          and completed_at >= ${dayStart}::timestamptz and completed_at < ${dayEnd}::timestamptz
-        order by completed_at desc limit 1
-      `);
+      // Meals and water are stored on the calendar day in UTC (noon and midnight respectively).
+      const dayFrom = `${date}T00:00:00.000Z`;
+      const dayTo = `${date}T23:59:59.999Z`;
 
+      const [mealsResult, waterResult, fastResult] = await Promise.all([
+        supabaseAdmin.from('meals').select('total_calories, total_protein')
+          .eq('user_id', userId).gte('date', dayFrom).lte('date', dayTo),
+        supabaseAdmin.from('water_intake').select('glasses')
+          .eq('user_id', userId).gte('date', dayFrom).lte('date', dayTo),
+        supabaseAdmin.from('fasting_sessions').select('plan_name, actual_duration')
+          .eq('user_id', userId).eq('status', 'completed')
+          .gte('completed_at', dayStart).lt('completed_at', dayEnd)
+          .order('completed_at', { ascending: false }).limit(1),
+      ]);
+      for (const result of [mealsResult, waterResult, fastResult]) {
+        if (result.error) throw result.error;
+      }
+
+      const meals = mealsResult.data || [];
+      const fast: any = fastResult.data?.[0];
       const details = {
-        meals: mealTotals?.meals ?? 0,
-        calories: Math.round(mealTotals?.calories ?? 0),
-        protein: Math.round(mealTotals?.protein ?? 0),
-        water: water?.glasses ?? 0,
+        meals: meals.length,
+        calories: Math.round(meals.reduce((sum: number, m: any) => sum + (Number(m.total_calories) || 0), 0)),
+        protein: Math.round(meals.reduce((sum: number, m: any) => sum + (Number(m.total_protein) || 0), 0)),
+        water: Math.max(0, ...(waterResult.data || []).map((w: any) => Number(w.glasses) || 0)),
         fast: fast ? `${fast.plan_name}${fast.actual_duration ? ` · ${Math.round(fast.actual_duration / 3600000)}h` : ''}` : null,
       };
 
-      const [row] = await query(sql`
-        insert into shared_activities (user_id, activity_type, title, details, note)
-        values (${userId}, 'summary', ${"Today's summary"}, ${JSON.stringify(details)}::jsonb, ${note || null})
-        returning id
-      `);
-      res.json({ id: row.id, details });
-    } catch (error: any) {
-      console.error('❌ Failed to share summary:', error.message);
-      res.status(500).json({ message: 'Failed to share summary' });
+      const { data, error } = await supabaseAdmin
+        .from('shared_activities')
+        .insert({ user_id: userId, activity_type: 'summary', title: "Today's summary", details, note: note || null })
+        .select('id')
+        .single();
+      if (error) throw error;
+      res.json({ id: data.id, details });
+    } catch (error) {
+      fail(res, 'Failed to share summary', error);
     }
   });
 
   app.delete('/api/activities/:id', isAuthenticated, async (req: any, res: Response) => {
-    const userId = req.user?.id;
+    const userId: string = req.user?.id;
+    const id = idParam.safeParse(req.params.id);
+    if (!id.success) return res.status(400).json({ message: 'Invalid activity' });
+
     try {
-      const rows = await query(sql`
-        delete from shared_activities where id = ${Number(req.params.id)} and user_id = ${userId} returning id
-      `);
-      if (rows.length === 0) {
-        return res.status(404).json({ message: 'Activity not found' });
-      }
+      const { data, error } = await supabaseAdmin
+        .from('shared_activities')
+        .delete()
+        .eq('id', id.data)
+        .eq('user_id', userId)
+        .select('id');
+      if (error) throw error;
+      if (!data?.length) return res.status(404).json({ message: 'Activity not found' });
       res.json({ success: true });
-    } catch (error: any) {
-      console.error('❌ Failed to delete activity:', error.message);
-      res.status(500).json({ message: 'Failed to delete activity' });
+    } catch (error) {
+      fail(res, 'Failed to delete activity', error);
     }
   });
 }

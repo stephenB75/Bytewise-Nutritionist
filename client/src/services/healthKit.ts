@@ -1,4 +1,5 @@
 import { Capacitor } from '@capacitor/core';
+import { Health } from '@capgo/capacitor-health';
 
 const CONNECTED_KEY = 'appleHealthConnected';
 const LEGACY_KEYS = ['appleHealthAutoSync', 'appleHealthSyncedMealIds', 'appleHealthSyncedWater', 'pendingHealthKitSync'];
@@ -51,18 +52,10 @@ function toNumber(value: unknown): number {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
-async function getHealth(): Promise<HealthBridge | null> {
-  if (!isNativeIos()) {
-    return null;
-  }
-
-  try {
-    const mod = await import('@capgo/capacitor-health');
-    return mod.Health as unknown as HealthBridge;
-  } catch (error) {
-    console.warn('Apple Health plugin is not available:', error);
-    return null;
-  }
+// Must stay synchronous: Capacitor plugin proxies answer every property, including `then`,
+// so returning one from an async function (or awaiting it) hangs forever on native.
+function getHealth(): HealthBridge | null {
+  return isNativeIos() ? (Health as unknown as HealthBridge) : null;
 }
 
 // Apple never reveals whether read access was granted, only whether the user has been asked
@@ -82,7 +75,7 @@ export class HealthKitService {
   }
 
   private async checkAvailability(): Promise<void> {
-    const health = await getHealth();
+    const health = getHealth();
     if (!health) {
       this.isAvailable = false;
       this.unavailableReason = isNativeIos() ? 'The Apple Health plugin is missing from this build.' : null;
@@ -116,7 +109,7 @@ export class HealthKitService {
 
   async requestPermissions(): Promise<HealthPermissionResult> {
     await this.ready;
-    const health = await getHealth();
+    const health = getHealth();
     if (!health || !this.isAvailable) {
       return { ok: false, reason: this.unavailableReason || "Apple Health isn't available on this device." };
     }
@@ -144,7 +137,7 @@ export class HealthKitService {
   }
 
   private async sumSamplesForDay(dataType: string, date: Date = new Date()): Promise<number> {
-    const health = await getHealth();
+    const health = getHealth();
     if (!health) {
       return 0;
     }

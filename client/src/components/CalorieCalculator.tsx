@@ -37,6 +37,7 @@ import {
 } from 'lucide-react';
 import { FoodSearchWithHistory } from '@/components/FoodSearchWithHistory';
 import { UserFoodSuggestions } from '@/components/UserFoodSuggestions';
+import { FastFoodMenu } from '@/components/FastFoodMenu';
 import { apiFetch } from '@/lib/apiUrl';
 
 
@@ -983,6 +984,8 @@ function CalorieCalculator({
 
       {/* Simple User Food Suggestions - One line text only */}
       <UserFoodTextSuggestions onSuggestionClick={(foodName) => setIngredient(foodName)} />
+
+      <FastFoodMenu />
     </div>
   );
 }
