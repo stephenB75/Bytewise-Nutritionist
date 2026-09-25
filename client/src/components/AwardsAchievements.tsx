@@ -217,16 +217,6 @@ const ALL_ACHIEVEMENTS: Omit<Achievement, 'progress' | 'completed' | 'completedD
     difficulty: 'gold',
     target: 10,
     points: 75
-  },
-  {
-    id: 'ai_food_analyzer',
-    title: 'AI Explorer',
-    description: 'Use AI Food Analyzer 5 times',
-    icon: '🤖',
-    category: 'special',
-    difficulty: 'silver',
-    target: 5,
-    points: 30
   }
 ];
 
@@ -365,7 +355,7 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
         return { progress: waterGoalMet ? 1 : 0, completed: waterGoalMet };
         
       case 'three_meals_day':
-        const today = new Date().toISOString().split('T')[0];
+        const today = getLocalDateKey();
         const todayMeals = weeklyMeals.filter((meal: any) => {
           const mealDate = meal.date?.includes('T') ? meal.date.split('T')[0] : meal.date;
           return mealDate === today;
@@ -384,12 +374,12 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
         if (achievement.id === 'three_day_streak') {
           let currentStreak = 0;
           let maxStreak = 0;
-          const today_date = new Date().toISOString().split('T')[0];
+          const today_date = getLocalDateKey();
           
           for (let i = uniqueDates.length - 1; i >= 0; i--) {
             const expectedDate = new Date();
             expectedDate.setDate(expectedDate.getDate() - (uniqueDates.length - 1 - i));
-            const expectedDateStr = expectedDate.toISOString().split('T')[0];
+            const expectedDateStr = getLocalDateKey(expectedDate);
             
             if (uniqueDates[i] === expectedDateStr || (i === uniqueDates.length - 1 && uniqueDates[i] === today_date)) {
               currentStreak++;
@@ -411,9 +401,6 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
       case 'fasting_warrior':
         const totalCompletedFasts = fastingHistory.filter((f: any) => f.status === 'completed').length;
         return { progress: Math.min(totalCompletedFasts, 10), completed: totalCompletedFasts >= 10 };
-        
-      case 'ai_food_analyzer':
-        return { progress: Math.min(aiAnalyzerUsage.length, 5), completed: aiAnalyzerUsage.length >= 5 };
         
       case 'hundred_meals':
         return { progress: Math.min(weeklyMeals.length, 100), completed: weeklyMeals.length >= 100 };

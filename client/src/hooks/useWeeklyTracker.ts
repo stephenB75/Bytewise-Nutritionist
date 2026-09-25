@@ -175,7 +175,7 @@ export function useWeeklyTracker() {
   }, [weeklyData, currentWeek]);
 
   const getTodayData = useCallback(() => {
-    const today = new Date().toISOString().split('T')[0];
+    const today = getLocalDateKey();
     const currentWeekData = getCurrentWeekData();
     return currentWeekData?.days.find(d => d.date === today);
   }, [getCurrentWeekData]);

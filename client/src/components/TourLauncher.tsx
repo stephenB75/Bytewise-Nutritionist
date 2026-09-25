@@ -17,7 +17,6 @@ import {
   Clock, 
   Trophy, 
   Target, 
-  Camera, 
   Utensils,
   Droplets
 } from 'lucide-react';
@@ -36,14 +35,6 @@ const TOUR_FEATURES = [
     category: 'Core Feature',
     targetTab: 'nutrition',
     nutritionMode: 'calculator'
-  },
-  {
-    icon: <Camera className="w-5 h-5 text-purple-500" />,
-    title: 'AI Photo Analysis',
-    description: 'Snap photos for instant nutrition breakdown',
-    category: 'AI Feature',
-    targetTab: 'nutrition',
-    nutritionMode: 'ai'
   },
   {
     icon: <Target className="w-5 h-5 text-green-500" />,
@@ -154,7 +145,7 @@ export function TourLauncher({ isVisible = true, onNavigateToFeature, onCardInte
               <div className="flex items-center gap-4 mt-3 text-sm text-gray-900">
                 <span className="flex items-center gap-1">
                   <Target className="w-4 h-4" />
-                  6 key features
+                  {TOUR_FEATURES.length} key features
                 </span>
                 <Badge variant="secondary" className="text-xs text-white bg-orange-600">
                   Click to explore
@@ -222,7 +213,7 @@ export function WelcomeBanner({ onDismiss }: { onDismiss: () => void }) {
             </div>
             <p className="text-gray-600 text-sm mb-3">
               Explore all the powerful features available to track your nutrition, 
-              analyze foods with AI, manage fasting, and achieve your health goals!
+              calculate food nutrition, manage fasting, and achieve your health goals!
             </p>
             <div className="flex flex-wrap gap-2">
               <Button

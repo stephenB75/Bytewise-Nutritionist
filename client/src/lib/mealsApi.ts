@@ -195,13 +195,16 @@ export async function listLoggedMeals(): Promise<LoggedMeal[]> {
     return [];
   }
 
-  try {
-    const response = await apiRequest('GET', '/api/meals/logged');
-    const data = await response.json();
-    return (Array.isArray(data) ? data : []).map((row) => mapMeal(row as Record<string, unknown>));
-  } catch {
-    return [];
+  // Throws on failure: callers must not treat a failed load as "no meals".
+  const response = await apiRequest('GET', '/api/meals/logged');
+  if (!response.ok) {
+    throw new Error(`Failed to load meals: ${response.status}`);
   }
+  const data = await response.json();
+  if (!Array.isArray(data)) {
+    throw new Error('Unexpected meals response');
+  }
+  return data.map((row) => mapMeal(row as Record<string, unknown>));
 }
 
 export async function logMeal(

@@ -72,8 +72,7 @@ export function SubscriptionPaywall({ isOpen, onClose, feature }: SubscriptionPa
   };
 
   const premiumFeatures = [
-    { icon: Sparkles, text: "Unlimited AI food photo analysis", highlight: true },
-    { icon: Star, text: "Advanced nutrition insights & micronutrient tracking" },
+    { icon: Star, text: "Advanced nutrition insights & micronutrient tracking", highlight: true },
     { icon: Crown, text: "Custom nutrition goals & recommendations" },
     { icon: CheckCircle, text: "Priority customer support" },
     { icon: Star, text: "Ad-free experience" }

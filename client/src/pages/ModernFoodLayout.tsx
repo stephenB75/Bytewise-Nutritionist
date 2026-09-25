@@ -24,10 +24,10 @@ import { ProfileIcon } from '@/components/ProfileIcon';
 import { TourLauncher, useAppTour, WelcomeBanner } from '@/components/TourLauncher';
 import { AppTour } from '@/components/AppTour';
 import { UserFoodSuggestions } from '@/components/UserFoodSuggestions';
-import { getFeatureAllowance } from '@/lib/usageLimits';
 import { apiRequest } from '@/lib/queryClient';
 import { useQuery } from '@tanstack/react-query';
 import { ACTIVE_FAST_QUERY_KEY, fetchActiveFast } from '@/lib/fastingApi';
+import { refreshAppData } from '@/lib/appRefresh';
 const logoImage = '/BWN_Logo.png';
 import { 
   Search, 
@@ -52,12 +52,9 @@ import {
   Sparkles,
   Droplets,
   Trash2,
-  ArrowLeft,
-  ArrowRight,
   PlayCircle,
   GraduationCap,
   Play,
-  Camera,
   Eye,
   EyeOff,
 } from 'lucide-react';
@@ -79,7 +76,6 @@ import { FriendsPanel } from '@/components/FriendsPanel';
 import { fixMealDateMismatches } from '@/utils/mealDateFixer';
 import { getCachedLocalStorage, debounce } from '@/utils/performanceUtils';
 import { useLocation } from 'wouter';
-import { PremiumFeatureGate } from '@/components/PremiumFeatureGate';
 import { useSubscription } from '@/hooks/useSubscription';
 
 function lazySection<C extends React.ComponentType<any>>(load: () => Promise<{ default: C }>) {
@@ -100,7 +96,6 @@ function lazySection<C extends React.ComponentType<any>>(load: () => Promise<{ d
 }
 
 const CalorieCalculator = lazySection(() => import('@/components/CalorieCalculator'));
-const AIFoodAnalyzer = lazySection(() => import('./AIFoodAnalyzer'));
 const UserSettingsManager = lazySection(() =>
   import('@/components/UserSettingsManager').then((m) => ({ default: m.UserSettingsManager }))
 );
@@ -306,8 +301,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const [weeklyMeals, setWeeklyMeals] = useState<any[]>([]);
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
   const [trackingView, setTrackingView] = useState<TrackingView>('daily');
-  const [nutritionMode, setNutritionMode] = useState<'ai' | 'calculator'>('calculator');
-
   const [notifications, setNotifications] = useState<Notification[]>(loadStoredNotifications);
   const notificationPanelRef = useRef<HTMLDivElement>(null);
 
@@ -369,12 +362,20 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   // Water consumption update function with 8-glass daily limit.
   // The ref holds the latest count so rapid taps build on each other instead of a stale render value.
   const waterGlassesRef = useRef(0);
+  const waterDayRef = useRef(getLocalDateKey());
+  const pendingWaterSavesRef = useRef(0);
   const waterSaveQueueRef = useRef<Promise<void>>(Promise.resolve());
   useEffect(() => {
     waterGlassesRef.current = dailyStats?.waterGlasses || 0;
   }, [dailyStats?.waterGlasses]);
 
   const updateWaterConsumption = useCallback((change: number) => {
+    const dateKey = getLocalDateKey();
+    if (waterDayRef.current !== dateKey) {
+      // First tap after midnight: build on today's count, not yesterday's.
+      waterDayRef.current = dateKey;
+      waterGlassesRef.current = readLocalWaterGlasses();
+    }
     const previousGlasses = waterGlassesRef.current;
     const newGlasses = clampWaterGlasses(previousGlasses + change);
     if (newGlasses === previousGlasses) return;
@@ -401,11 +402,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     if (!user) return;
 
     // Saves run one at a time so a slow earlier request can't overwrite a newer count.
+    pendingWaterSavesRef.current += 1;
     waterSaveQueueRef.current = waterSaveQueueRef.current.then(async () => {
       try {
         await apiRequest('POST', '/api/daily-stats', {
           waterGlasses: newGlasses,
-          date: getLocalDateKey()
+          date: dateKey
         });
       } catch (error) {
         console.error('Failed to save water intake:', error);
@@ -419,6 +421,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           description: "Failed to update water consumption",
           variant: "destructive",
         });
+      } finally {
+        pendingWaterSavesRef.current -= 1;
       }
     });
   }, [user, toast]);
@@ -563,24 +567,30 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     
     try {
       // Use the correct GET endpoint for daily stats
-      const response = await apiRequest('GET', `/api/users/${user.id}/daily-stats?date=${getLocalDateKey()}`);
+      const requestedDay = getLocalDateKey();
+      const response = await apiRequest('GET', `/api/users/${user.id}/daily-stats?date=${requestedDay}`);
       
       if (!response.ok) {
         throw new Error(`Failed to fetch daily stats: ${response.status}`);
       }
       const data = await response.json();
-      
-      // Extract stats from response
+
+      // While a water save is in flight the server still has the older count.
+      const keepLocalWater = pendingWaterSavesRef.current > 0 && waterDayRef.current === requestedDay;
       const stats = {
         totalCalories: data.totalCalories || 0,
         totalProtein: data.totalProtein || 0,
         totalCarbs: data.totalCarbs || 0,
         totalFat: data.totalFat || 0,
-        waterGlasses: clampWaterGlasses(data.waterGlasses || 0),
+        waterGlasses: keepLocalWater ? waterGlassesRef.current : clampWaterGlasses(data.waterGlasses || 0),
         fastingStatus: data.fastingStatus
       };
-      
-      writeLocalWaterGlasses(stats.waterGlasses);
+
+      if (!keepLocalWater && getLocalDateKey() === requestedDay) {
+        waterDayRef.current = requestedDay;
+        waterGlassesRef.current = stats.waterGlasses;
+        writeLocalWaterGlasses(stats.waterGlasses);
+      }
       setDailyStats(stats);
       setDailyCalories(stats.totalCalories);
       
@@ -827,7 +837,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       const nowKey = getLocalDateKey();
       if (nowKey !== dayKey) {
         dayKey = nowKey;
-        fetchDailyStats();
+        void refreshAppData();
       }
     };
     const interval = window.setInterval(checkForNewDay, 60 * 1000);
@@ -836,7 +846,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       window.clearInterval(interval);
       document.removeEventListener('visibilitychange', checkForNewDay);
     };
-  }, [fetchDailyStats]);
+  }, []);
 
 
   // Refresh micronutrients when tab changes or meals change - Database-first
@@ -934,7 +944,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         try {
           stored = await listLoggedMeals();
         } catch (error) {
-          stored = [];
+          console.error('Failed to load meals; keeping the last loaded data:', error);
+          const todayKey = getLocalDateKey();
+          setLoggedMeals((prev) => prev.filter((meal: any) => {
+            const mealDate = meal.date?.includes('T') ? meal.date.split('T')[0] : meal.date;
+            return mealDate === todayKey;
+          }));
+          await fetchDailyStats();
+          checkFastingStatus();
+          return;
         }
         
         // Simple date matching - use today's actual date without correction
@@ -1056,20 +1074,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         }
         
       } catch (error) {
-        // Reset to safe state on error
-        setLoggedMeals([]);
-        setDailyCalories(0);
-        setWeeklyCalories(0);
-        setDailyMicronutrients({
-          vitaminC: 0,
-          vitaminD: 0,
-          vitaminB12: 0,
-          folate: 0,
-          iron: 0,
-          calcium: 0,
-          zinc: 0,
-          magnesium: 0
-        });
+        // Keep what's on screen: zeroing it here would make a failed refresh look like lost data.
+        console.error('Failed to refresh dashboard data:', error);
       }
     };
 
@@ -1115,13 +1121,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     // Handle tour navigation
     const handleTourNavigation = (event: Event) => {
       const customEvent = event as CustomEvent;
-      const { tab, nutritionMode, accordionTarget } = customEvent.detail;
+      const { tab, accordionTarget } = customEvent.detail;
       setActiveTab(tab);
-      
-      // Set nutrition mode if specified
-      if (nutritionMode && (nutritionMode === 'ai' || nutritionMode === 'calculator')) {
-        setNutritionMode(nutritionMode);
-      }
       
       // Open specific accordion if specified
       if (accordionTarget) {
@@ -2315,7 +2316,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           onSelectFood={(food) => {
             setSearchQuery(food.name);
             handleTabChange('nutrition');
-            setNutritionMode('calculator');
           }}
         />
         {/* Daily Header */}
@@ -2473,108 +2473,18 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           backgroundImage={backgroundImage}
           title="Smart"
           subtitle="Nutrition"
-          description="AI-powered food analysis or the precise Bytewise Calculator"
-          buttonText="Choose Analysis Method"
-          onButtonClick={() => scrollToTestId('analysis-method-choice')}
+          description="Search foods and get precise nutrition with the Bytewise Calculator"
+          buttonText="Start Calculating"
+          onButtonClick={() => scrollToTestId('nutrition-food-search')}
         />
         
         {/* Content Section - Completely Separate and Underneath */}
         <div className="px-4 sm:px-6 py-3 content-section">
-          {/* Instructions Section */}
-          <div className="mb-6 text-center">
-            <div data-testid="analysis-method-choice" className="bg-gradient-to-r from-blue-500/10 to-orange-500/10 border border-gray-400/20 rounded-xl p-4 mb-4 transition-all duration-300">
-              <h3 className="font-semibold text-base sm:text-lg mb-3 text-center">🔍 Choose Your Nutrition Analysis Method</h3>
-              <p className="text-center text-gray-600 text-sm mb-4">Select your preferred method below, then use the toggle buttons to switch between options:</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-base">
-                <div className="bg-blue-500/5 border border-blue-500/20 rounded-lg p-3">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Sparkles className="h-4 w-4 text-amber-500" />
-                    <span className="font-medium text-gray-900">AI Photo Analysis</span>
-                  </div>
-                  <p className="text-gray-700 text-sm">
-                    Take a photo of your food and let AI identify it automatically. 
-                    Perfect for quick logging of complete meals and dishes.
-                  </p>
-                </div>
-                <div className="bg-orange-500/5 border border-orange-500/20 rounded-lg p-3">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Target className="h-4 w-4 text-orange-400" />
-                    <span className="font-medium text-gray-900">Bytewise Calculator</span>
-                  </div>
-                  <p className="text-gray-700 text-sm">
-                    Search and manually select foods from the Bytewise Food Database. 
-                    Ideal for precise nutrition tracking and portion control.
-                  </p>
-                </div>
-              </div>
-              <div className="mt-3 flex items-center justify-center text-sm text-gray-400">
-                <ArrowLeft className="h-4 w-4 mr-1" />
-                <span>Slide left or right to switch between options</span>
-                <ArrowRight className="h-4 w-4 ml-1" />
-              </div>
-            </div>
-          </div>
-          
-          {/* Mode Toggle */}
-          <div className="mb-6">
-            <div className="flex flex-wrap items-center justify-center gap-1 rounded-full p-1 max-w-md mx-auto">
-              <button
-                onClick={() => setNutritionMode('ai')}
-                className={`flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ${
-                  nutritionMode === 'ai'
-                    ? 'bg-amber-500 text-white shadow-lg'
-                    : 'text-gray-400 hover:text-gray-900'
-                }`}
-                data-testid="button-ai-mode"
-              >
-                <Sparkles className="h-4 w-4" />
-                <span className="sm:hidden">AI Photo</span>
-                <span className="hidden sm:inline">AI Photo Analysis</span>
-              </button>
-              <button
-                onClick={() => setNutritionMode('calculator')}
-                className={`flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ${
-                  nutritionMode === 'calculator'
-                    ? 'bg-orange-500 text-white shadow-lg'
-                    : 'text-gray-400 hover:text-gray-900'
-                }`}
-                data-testid="button-calculator-mode"
-              >
-                <Target className="h-4 w-4" />
-                <span className="sm:hidden">Calculator</span>
-                <span className="hidden sm:inline">Bytewise Calculator</span>
-              </button>
-            </div>
-          </div>
-
-          <div className="main-content">
-            {nutritionMode === 'ai' ? (
-              !user ? (
-                <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200 p-8 text-center">
-                  <Sparkles className="w-10 h-10 mx-auto mb-3 text-amber-600" />
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Sign in for AI Photo Analysis</h3>
-                  <p className="text-sm text-gray-700 mb-4">
-                    Photo analysis requires an account. Free users get 10 analyses each month.
-                  </p>
-                  <Button onClick={() => handleTabChange('profile')} className="bg-amber-600 hover:bg-amber-700 text-white">
-                    Sign In
-                  </Button>
-                </Card>
-              ) : getFeatureAllowance('ai', isPremium, (user as any)?.id).allowed ? (
-                <AIFoodAnalyzer />
-              ) : (
-                <PremiumFeatureGate
-                  feature="premium"
-                  featureName="Unlimited AI Food Analysis"
-                  description="You've used this month's 10 free photo analyses. Upgrade for unlimited AI logging."
-                />
-              )
-            ) : (
-              <CalorieCalculator 
-                onNavigate={onNavigate}
-                isCompact={false}
-              />
-            )}
+          <div className="main-content" data-testid="calorie-calculator-section">
+            <CalorieCalculator 
+              onNavigate={onNavigate}
+              isCompact={false}
+            />
           </div>
         </div>
       </div>
@@ -2688,7 +2598,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                           <div>
                             <h4 className="font-semibold text-gray-900 mb-1">Comprehensive App Tour</h4>
                             <p className="text-sm text-gray-700 leading-relaxed">
-                              Take our interactive 10-step tour covering food search, AI photo analysis, 
+                              Take our interactive 10-step tour covering food search, the calorie calculator, 
                               fasting timer, water tracking, meal journaling, achievements, and profile settings.
                             </p>
                             <div className="flex items-center gap-4 mt-2 text-xs text-gray-600">
@@ -2746,7 +2656,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                               <div className="flex items-center gap-4 mt-3 text-sm text-gray-900">
                                 <span className="flex items-center gap-1">
                                   <Target className="w-4 h-4" />
-                                  6 key features
+                                  5 key features
                                 </span>
                                 <Badge variant="secondary" className="text-xs text-gray-900 bg-gray-100">
                                   Click to explore
@@ -2781,14 +2691,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                                   category: 'Core Feature',
                                   targetTab: 'nutrition',
                                   nutritionMode: 'calculator'
-                                },
-                                {
-                                  icon: <Camera className="w-5 h-5 text-purple-600" />,
-                                  title: 'AI Photo Analysis',
-                                  description: 'Snap photos for instant nutrition breakdown',
-                                  category: 'AI Feature',
-                                  targetTab: 'nutrition',
-                                  nutritionMode: 'ai'
                                 },
                                 {
                                   icon: <Target className="w-5 h-5 text-green-600" />,

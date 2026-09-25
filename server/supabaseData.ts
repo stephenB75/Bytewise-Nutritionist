@@ -387,30 +387,16 @@ export async function getUserWaterHistoryViaSupabase(userId: string, days: numbe
 }
 
 export async function upsertWaterIntakeViaSupabase(userId: string, date: Date, glasses: number) {
-  const existing = await getUserWaterIntakeViaSupabase(userId, date);
-
-  if (existing) {
-    const { data, error } = await supabaseAdmin
-      .from('water_intake')
-      .update({ glasses })
-      .eq('id', existing.id)
-      .select('*')
-      .single();
-
-    if (error) {
-      throw error;
-    }
-
-    return mapWaterIntake(data);
-  }
-
   const { data, error } = await supabaseAdmin
     .from('water_intake')
-    .insert({
-      user_id: userId,
-      date: startOfUtcDay(date).toISOString(),
-      glasses,
-    })
+    .upsert(
+      {
+        user_id: userId,
+        date: startOfUtcDay(date).toISOString(),
+        glasses,
+      },
+      { onConflict: 'user_id,date' },
+    )
     .select('*')
     .single();
 

@@ -17,7 +17,7 @@ const TOUR_STEPS: Step[] = [
   },
   {
     target: '[data-testid="nav-calculator"]',
-    content: 'Calorie Tracker has AI photo analysis and the Bytewise Calculator.',
+    content: 'Calorie Tracker has the Bytewise Calculator for searching and logging foods.',
   },
   {
     target: '[data-testid="nav-fasting"]',
