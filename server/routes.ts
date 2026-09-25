@@ -13,6 +13,12 @@ import { supabaseStorageService } from "./supabaseStorage";
 import express from "express";
 import { isSupabaseRateLimit } from "./authErrors";
 import { registerFriendsRoutes } from "./friendsRoutes";
+import { readFileSync } from "fs";
+import path from "path";
+
+const packageJson = JSON.parse(readFileSync(path.resolve(process.cwd(), "package.json"), "utf8"));
+const APP_VERSION: string = packageJson.version;
+const APP_BUILD: number = Number(packageJson.buildNumber) || 1;
 
 // Zod schemas for request validation
 const subscriptionSyncSchema = z.object({
@@ -2480,17 +2486,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Version check API
   app.get('/api/version/check', async (req, res) => {
-    // Simulate version check
-    res.json({
-      version: '2.1.2',
-      buildDate: '2025-01-31',
-      changelog: [
-        'Enhanced calculator-logger communication',
-        'Improved button functionality throughout app',
-        'Better visual feedback for all interactions'
-      ],
-      required: false
-    });
+    res.json({ version: APP_VERSION, build: APP_BUILD, required: false });
   });
 
   // Sync backup endpoint

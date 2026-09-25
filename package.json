@@ -1,6 +1,7 @@
 {
   "name": "rest-express",
-  "version": "1.0.0",
+  "version": "1.22.0",
+  "buildNumber": 2,
   "type": "module",
   "license": "MIT",
   "scripts": {
@@ -12,7 +13,9 @@
     "cap:sync": "npx cap sync && node scripts/apply-ios-healthkit.mjs",
     "ios:add": "npx cap add ios && node scripts/apply-ios-healthkit.mjs",
     "ios:prepare": "node scripts/ios-prepare.mjs",
-    "ios:open": "npx cap open ios"
+    "ios:open": "npx cap open ios",
+    "version:sync": "node scripts/app-version.mjs",
+    "version:bump": "node scripts/app-version.mjs bump"
   },
   "dependencies": {
     "@capacitor/android": "^7.4.3",

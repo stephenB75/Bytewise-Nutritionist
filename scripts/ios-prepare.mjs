@@ -24,5 +24,6 @@ if (!existsSync(iosDir)) {
 
 run('npx cap sync ios');
 run('node scripts/apply-ios-healthkit.mjs');
+run('node scripts/app-version.mjs');
 
 console.log('\n✅ iOS project ready. Open Xcode with: npm run ios:open\n');
