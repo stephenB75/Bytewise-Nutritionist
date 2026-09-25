@@ -8,29 +8,33 @@ const entitlementsPath = join(root, 'ios/App/App/App.entitlements');
 const entitlementsSource = join(root, 'native/healthkit/App.entitlements');
 const pbxprojPath = join(root, 'ios/App/App.xcodeproj/project.pbxproj');
 
-// The app only reads steps, active calories and distance (all @capgo/capacitor-health 7.x supports),
-// so there is no write/update permission; reviewers check this text against what the app does.
-const shareKey = 'NSHealthShareUsageDescription';
-const updateKey = 'NSHealthUpdateUsageDescription';
-const shareText =
-  'ByteWise reads your steps, active calories, and walking distance from Apple Health to show your daily activity next to your nutrition.';
+// The app only reads steps, active calories and distance. App Store Connect still rejects builds
+// without the update string because the HealthKit plugin links write APIs, so both keys are required;
+// reviewers check this text against what the app does, so it must not claim writes.
+const healthUsage = {
+  NSHealthShareUsageDescription:
+    'ByteWise reads your steps, active calories, and walking distance from Apple Health to show your daily activity next to your nutrition.',
+  NSHealthUpdateUsageDescription:
+    'ByteWise does not write or change any data in Apple Health. It only reads your steps, active calories, and walking distance to show your daily activity next to your nutrition.',
+};
 
 if (!existsSync(plistPath)) {
   process.exit(0);
 }
 
 let plist = readFileSync(plistPath, 'utf8');
-plist = plist.replace(new RegExp(`\\s*<key>${updateKey}</key>\\s*<string>[^<]*</string>`), '');
-if (plist.includes(shareKey)) {
-  plist = plist.replace(
-    new RegExp(`(<key>${shareKey}</key>\\s*<string>)[^<]*(</string>)`),
-    `$1${shareText}$2`,
-  );
-} else {
-  plist = plist.replace(
-    '</dict>\n</plist>',
-    `        <key>${shareKey}</key>\n        <string>${shareText}</string>\n</dict>\n</plist>`,
-  );
+for (const [key, text] of Object.entries(healthUsage)) {
+  if (plist.includes(`<key>${key}</key>`)) {
+    plist = plist.replace(
+      new RegExp(`(<key>${key}</key>\\s*<string>)[^<]*(</string>)`),
+      `$1${text}$2`,
+    );
+  } else {
+    plist = plist.replace(
+      '</dict>\n</plist>',
+      `\t<key>${key}</key>\n\t<string>${text}</string>\n</dict>\n</plist>`,
+    );
+  }
 }
 
 // Name under the home-screen icon; the full "Bytewise Nutritionist" name belongs to the App Store listing.
