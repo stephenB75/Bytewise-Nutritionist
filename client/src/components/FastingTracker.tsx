@@ -219,7 +219,7 @@ const FastingTracker = React.memo(function FastingTracker() {
   }, [serverHistory, localHistory]);
 
   const pastSessions = useMemo(
-    () => fastingHistory.filter(isPastFastingSession).slice(0, 8),
+    () => fastingHistory.filter(isPastFastingSession).slice(0, 4),
     [fastingHistory],
   );
 

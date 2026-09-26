@@ -33,6 +33,13 @@ async function acceptedFriendIds(userId: string): Promise<string[]> {
   return (data || []).map((c: any) => (c.requester_id === userId ? c.addressee_id : c.requester_id));
 }
 
+// friend_connections and shared_activities use `timestamp without time zone` holding UTC, which
+// browsers would otherwise parse as local time.
+function asUtc(timestamp: string | null | undefined): string | null {
+  if (!timestamp) return null;
+  return /(Z|[+-]\d{2}:?\d{2})$/.test(timestamp) ? timestamp : `${timestamp}Z`;
+}
+
 function fail(res: Response, label: string, error: any) {
   console.error(`❌ ${label}:`, error?.message || error);
   res.status(500).json({ message: label });
@@ -61,7 +68,7 @@ export function registerFriendsRoutes(app: Express) {
     try {
       const { data, error } = await supabaseAdmin
         .from('friend_connections')
-        .select('id, status, requester_id, addressee_id, created_at')
+        .select('id, status, requester_id, addressee_id, created_at, responded_at')
         .or(`requester_id.eq.${userId},addressee_id.eq.${userId}`)
         .order('created_at', { ascending: false });
       if (error) throw error;
@@ -77,7 +84,9 @@ export function registerFriendsRoutes(app: Express) {
           userId: otherId(row),
           name: displayName(profile),
           email: profile?.email || '',
-          since: row.created_at,
+          since: asUtc(row.created_at),
+          acceptedAt: asUtc(row.responded_at),
+          sentByMe: row.requester_id === userId,
         };
       };
 
@@ -210,7 +219,7 @@ export function registerFriendsRoutes(app: Express) {
           title: row.title,
           details: row.details,
           note: row.note,
-          createdAt: row.created_at,
+          createdAt: asUtc(row.created_at),
           isMine: row.user_id === userId,
           author: displayName(profiles.get(row.user_id)),
         })),

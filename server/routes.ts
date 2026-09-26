@@ -13,6 +13,7 @@ import { supabaseStorageService } from "./supabaseStorage";
 import express from "express";
 import { isSupabaseRateLimit } from "./authErrors";
 import { registerFriendsRoutes } from "./friendsRoutes";
+import { registerNutritionInsightsRoutes } from "./nutritionInsights";
 import { readFileSync } from "fs";
 import path from "path";
 
@@ -2623,6 +2624,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Fasting API endpoints
   registerFriendsRoutes(app);
+  registerNutritionInsightsRoutes(app);
 
   app.post('/api/fasting/start', isAuthenticated, async (req: any, res: Response) => {
     const userId = req.user?.id;

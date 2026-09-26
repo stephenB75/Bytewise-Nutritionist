@@ -55,7 +55,27 @@ import {
   getUserActiveFastingSessionViaSupabase,
   updateFastingSessionViaSupabase,
   completeFastingSessionViaSupabase,
+  getUserAchievementsViaSupabase,
+  createAchievementViaSupabase,
+  getUserRecipesViaSupabase,
+  getRecipeByIdViaSupabase,
+  createRecipeViaSupabase,
+  updateRecipeNutritionViaSupabase,
+  deleteRecipeViaSupabase,
 } from "./supabaseData";
+
+/** Runs the Postgres query when the pool is usable, otherwise (or on failure) the Supabase REST version. */
+async function dbOrSupabase<T>(viaDb: () => Promise<T>, viaSupabase: () => Promise<T>): Promise<T> {
+  if (!getDatabaseUrl() || !isDbReady() || !db) {
+    return viaSupabase();
+  }
+  try {
+    return await viaDb();
+  } catch (error) {
+    console.warn('Database query failed, using Supabase admin:', (error as Error)?.message || error);
+    return viaSupabase();
+  }
+}
 
 export interface IStorage {
   // User operations
@@ -246,8 +266,8 @@ export class DatabaseStorage implements IStorage {
           const [updatedUser] = await db
             .update(users)
             .set({
-              firstName: userData.firstName,
-              lastName: userData.lastName,
+              firstName: existing.firstName || userData.firstName,
+              lastName: existing.lastName || userData.lastName,
               emailVerified: userData.emailVerified ?? true,
               updatedAt: new Date(),
             })
@@ -278,8 +298,8 @@ export class DatabaseStorage implements IStorage {
           .update(users)
           .set({
             email: userData.email,
-            firstName: userData.firstName,
-            lastName: userData.lastName,
+            firstName: existingUserById[0].firstName || userData.firstName,
+            lastName: existingUserById[0].lastName || userData.lastName,
             emailVerified: true,
             updatedAt: new Date(),
           })
@@ -483,14 +503,24 @@ export class DatabaseStorage implements IStorage {
 
   // Recipe operations
   async getUserRecipes(userId: string): Promise<Recipe[]> {
-    return await db
-      .select()
-      .from(recipes)
-      .where(eq(recipes.userId, userId))
-      .orderBy(desc(recipes.createdAt));
+    return dbOrSupabase(
+      () => db
+        .select()
+        .from(recipes)
+        .where(eq(recipes.userId, userId))
+        .orderBy(desc(recipes.createdAt)),
+      () => getUserRecipesViaSupabase(userId) as Promise<Recipe[]>,
+    );
   }
 
   async getRecipeById(id: number): Promise<RecipeWithIngredients | undefined> {
+    return dbOrSupabase(
+      () => this.getRecipeByIdFromDatabase(id),
+      () => getRecipeByIdViaSupabase(id) as Promise<RecipeWithIngredients | undefined>,
+    );
+  }
+
+  private async getRecipeByIdFromDatabase(id: number): Promise<RecipeWithIngredients | undefined> {
     const recipe = await db
       .select()
       .from(recipes)
@@ -520,8 +550,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createRecipe(recipe: InsertRecipe): Promise<Recipe> {
-    const [newRecipe] = await db.insert(recipes).values(recipe).returning();
-    return newRecipe;
+    return dbOrSupabase(
+      async () => (await db.insert(recipes).values(recipe).returning())[0],
+      () => createRecipeViaSupabase(recipe) as Promise<Recipe>,
+    );
   }
 
   async updateRecipe(id: number, recipe: Partial<InsertRecipe>): Promise<Recipe> {
@@ -534,7 +566,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteRecipe(id: number): Promise<void> {
-    await db.delete(recipes).where(eq(recipes.id, id));
+    await dbOrSupabase(
+      async () => { await db.delete(recipes).where(eq(recipes.id, id)); },
+      () => deleteRecipeViaSupabase(id),
+    );
   }
 
   async addRecipeIngredient(ingredient: InsertRecipeIngredient): Promise<RecipeIngredient> {
@@ -565,12 +600,14 @@ export class DatabaseStorage implements IStorage {
     totalSugar: string;
     totalSodium: string;
   }): Promise<Recipe> {
-    const [updatedRecipe] = await db
-      .update(recipes)
-      .set({ ...nutrition, updatedAt: new Date() })
-      .where(eq(recipes.id, recipeId))
-      .returning();
-    return updatedRecipe;
+    return dbOrSupabase(
+      async () => (await db
+        .update(recipes)
+        .set({ ...nutrition, updatedAt: new Date() })
+        .where(eq(recipes.id, recipeId))
+        .returning())[0],
+      () => updateRecipeNutritionViaSupabase(recipeId, nutrition) as Promise<Recipe>,
+    );
   }
 
   // Meal operations
@@ -804,16 +841,21 @@ export class DatabaseStorage implements IStorage {
 
   // Achievement operations
   async getUserAchievements(userId: string): Promise<Achievement[]> {
-    return await db
-      .select()
-      .from(achievements)
-      .where(eq(achievements.userId, userId))
-      .orderBy(desc(achievements.earnedAt));
+    return dbOrSupabase(
+      () => db
+        .select()
+        .from(achievements)
+        .where(eq(achievements.userId, userId))
+        .orderBy(desc(achievements.earnedAt)),
+      () => getUserAchievementsViaSupabase(userId) as Promise<Achievement[]>,
+    );
   }
 
   async createAchievement(achievement: InsertAchievement): Promise<Achievement> {
-    const [newAchievement] = await db.insert(achievements).values(achievement).returning();
-    return newAchievement;
+    return dbOrSupabase(
+      async () => (await db.insert(achievements).values(achievement).returning())[0],
+      () => createAchievementViaSupabase(achievement) as Promise<Achievement>,
+    );
   }
 
   async checkAndCreateAchievements(userId: string): Promise<Achievement[]> {
@@ -880,16 +922,11 @@ export class DatabaseStorage implements IStorage {
     }
 
     // Check Three Meals Achievement
-    const todayMeals = await db
-      .select()
-      .from(meals)
-      .where(
-        and(
-          eq(meals.userId, userId),
-          gte(meals.date, startOfToday),
-          lte(meals.date, new Date(startOfToday.getTime() + 24 * 60 * 60 * 1000))
-        )
-      );
+    const todayMeals = await this.getUserMeals(
+      userId,
+      startOfToday,
+      new Date(startOfToday.getTime() + 24 * 60 * 60 * 1000),
+    );
 
     if (!achievementTypes.includes('three_meals_logged') && todayMeals.length >= 3) {
       const achievement = await this.createAchievement({
@@ -905,18 +942,10 @@ export class DatabaseStorage implements IStorage {
 
     // Check Weekly Streak (simplified - check if user has meals for 5 of last 7 days)
     const sevenDaysAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-    const weekMeals = await db
-      .select()
-      .from(meals)
-      .where(
-        and(
-          eq(meals.userId, userId),
-          gte(meals.date, sevenDaysAgo)
-        )
-      );
+    const weekMeals = await this.getUserMeals(userId, sevenDaysAgo, today);
 
     const daysWithMeals = new Set(
-      weekMeals.map(meal => meal.date.toISOString().split('T')[0])
+      weekMeals.map(meal => new Date(meal.date).toISOString().split('T')[0])
     ).size;
 
     if (!achievementTypes.includes('five_day_streak') && daysWithMeals >= 5) {
@@ -932,17 +961,9 @@ export class DatabaseStorage implements IStorage {
     }
 
     // Check Fasting Achievements
-    const userFastingSessions = await db
-      .select()
-      .from(fastingSessions)
-      .where(
-        and(
-          eq(fastingSessions.userId, userId),
-          eq(fastingSessions.status, 'completed')
-        )
-      );
+    const userFastingSessions = await this.getUserFastingSessions(userId);
 
-    const completedFasts = userFastingSessions.length;
+    const completedFasts = userFastingSessions.filter(session => session.status === 'completed').length;
 
     // First Fast Achievement
     if (!achievementTypes.includes('first_fast_completed') && completedFasts >= 1) {

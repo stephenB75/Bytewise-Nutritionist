@@ -195,9 +195,9 @@ function CalorieCalculator({
       if (data.portionInfo?.warning && data.portionInfo.warning !== 'No warning') {
         console.log('Setting portion warning from API:', data.portionInfo);
         // Don't reset form immediately if there's a warning to show
-        setRecentAnalyses(prev => [data, ...prev.slice(0, 4)]);
+        setRecentAnalyses(prev => [data, ...prev.slice(0, 3)]);
       } else {
-        setRecentAnalyses(prev => [data, ...prev.slice(0, 4)]);
+        setRecentAnalyses(prev => [data, ...prev.slice(0, 3)]);
         resetForm();
       }
       

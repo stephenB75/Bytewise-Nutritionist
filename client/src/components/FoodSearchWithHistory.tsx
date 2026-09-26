@@ -125,7 +125,7 @@ export function FoodSearchWithHistory({
       }
     });
     
-    return Array.from(uniqueMeals.values()).slice(0, 10); // Limit to 10 results
+    return Array.from(uniqueMeals.values()).slice(0, searchQuery.trim() ? 10 : 4);
   }, [historicalMeals, searchQuery]);
 
   // Group meals by frequency for popular items

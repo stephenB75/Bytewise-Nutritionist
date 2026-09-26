@@ -115,7 +115,7 @@ export function UserFoodSuggestions({
       .slice(0, 5)
       .map(item => item.food);
     
-    return { uniqueFoods: unique.slice(0, 10), popularFoods: popular };
+    return { uniqueFoods: unique.slice(0, 4), popularFoods: popular };
   }, [userFoods]);
 
   const getDateLabel = (dateStr: string) => {
@@ -236,9 +236,9 @@ export function UserFoodSuggestions({
         </div>
       </div>
 
-      {uniqueFoods.length >= 10 && (
+      {uniqueFoods.length >= 4 && (
         <div className="mt-4 text-center">
-          <p className="text-xs text-gray-500">Showing your 10 most recent custom foods</p>
+          <p className="text-xs text-gray-500">Showing your 4 most recent custom foods</p>
         </div>
       )}
     </Card>

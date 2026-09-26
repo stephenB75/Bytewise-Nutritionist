@@ -158,10 +158,10 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
     joinDate: new Date().toISOString(),
   });
 
-  // Update local state when user data changes
+  // Update local state when user data changes, but never while the user is typing.
   useEffect(() => {
     
-    if (user) {
+    if (user && !isEditing) {
       const userData = user as any;
       const firstName = userData?.firstName || '';
       const lastName = userData?.lastName || '';
@@ -206,7 +206,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
       
       setUserInfo(newUserInfo);
     }
-  }, [user]);
+  }, [user, isEditing]);
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -238,10 +238,11 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
 
       // Validate required fields
       if (!firstName.trim()) {
-        throw new Error('First name is required');
+        throw new Error('Please enter your name');
       }
-      if (!lastName.trim()) {
-        throw new Error('Last name is required');
+      const calorieGoal = Number(userInfo.calorieGoal);
+      if (!Number.isFinite(calorieGoal) || calorieGoal < 1000 || calorieGoal > 5000) {
+        throw new Error('Daily calorie goal must be between 1000 and 5000');
       }
       
       // Update user profile via backend API (database) instead of Supabase metadata
@@ -268,7 +269,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
           'Authorization': `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
-          dailyCalorieGoal: userInfo.calorieGoal,
+          dailyCalorieGoal: calorieGoal,
         })
       });
 
@@ -278,60 +279,30 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
         throw new Error(`Failed to update calorie goal: ${goalsResponse.status}`);
       }
 
-      // Both updates successful
+      // Keep the login metadata in step so every fallback path shows the same name.
+      void supabase.auth.updateUser({
+        data: { first_name: profileData.firstName, last_name: profileData.lastName },
+      }).catch(() => undefined);
+
+      // Put the saved values straight into the cached user so the form shows them immediately,
+      // even if the follow-up fetch falls back to the session user (which has no personal info).
+      queryClient.setQueryData(['/api/auth/user'], (previous: any) => ({
+        ...(previous || {}),
+        firstName: profileData.firstName,
+        lastName: profileData.lastName,
+        personalInfo: { ...(previous?.personalInfo || {}), ...profileData.personalInfo },
+        dailyCalorieGoal: calorieGoal,
+      }));
+      setUserInfo(prev => ({ ...prev, calorieGoal }));
+      setIsEditing(false);
 
       toast({
-        title: "Profile Updated",
-        description: "Your profile has been successfully updated.",
+        title: "Profile saved",
+        description: "Your changes are saved to your account.",
       });
 
-      sonnerToast.success("Profile updated successfully!");
-      setIsEditing(false);
-      
-      // Refetch user data to show updated information
-      const refetchResult = await refetch();
-
-      // Force update form state with the fresh data (in case useEffect doesn't trigger)
-      if (refetchResult.data) {
-        const userData = refetchResult.data as any;
-        const refreshedFirstName = userData?.firstName || '';
-        const refreshedLastName = userData?.lastName || '';
-        const refreshedPersonalInfo = userData?.personalInfo || {};
-        
-        // Apply same email-detection logic for refreshed data
-        const isRefreshedFirstNameEmail = refreshedFirstName && refreshedFirstName.includes('@');
-        
-        let refreshedFullName = '';
-        if (!isRefreshedFirstNameEmail && refreshedFirstName && refreshedLastName) {
-          refreshedFullName = `${refreshedFirstName} ${refreshedLastName}`.trim();
-        } else if (!isRefreshedFirstNameEmail && refreshedFirstName) {
-          refreshedFullName = refreshedFirstName.trim();
-        } else {
-          refreshedFullName = refreshedPersonalInfo?.name || userData?.name || 
-                             (userData?.email ? userData.email.split('@')[0] : '') || '';
-        }
-        
-        
-        setUserInfo({
-          firstName: isRefreshedFirstNameEmail ? '' : refreshedFirstName,
-          lastName: isRefreshedFirstNameEmail ? '' : refreshedLastName, 
-          name: refreshedFullName,
-          email: userData?.email || '',
-          phone: refreshedPersonalInfo?.phone || '',
-          location: refreshedPersonalInfo?.location || '',
-          birthDate: refreshedPersonalInfo?.birth_date || refreshedPersonalInfo?.birthDate || '',
-          height: refreshedPersonalInfo?.height || '',
-          weight: refreshedPersonalInfo?.weight || '',
-          activityLevel: refreshedPersonalInfo?.activity_level || refreshedPersonalInfo?.activityLevel || 'Moderately Active',
-          dietaryPreferences: refreshedPersonalInfo?.dietary_preferences || [],
-          calorieGoal: userData?.dailyCalorieGoal || userData?.calorie_goal || 2000,
-          joinDate: userData?.createdAt || new Date().toISOString(),
-        });
-      }
-      
-      // Dispatch custom event to notify dashboard of profile changes
       window.dispatchEvent(new CustomEvent('user-profile-updated', { 
-        detail: { calorieGoal: userInfo.calorieGoal } 
+        detail: { calorieGoal } 
       }));
     } catch (error: any) {
       console.error('❌ Profile save error:', error);
@@ -346,8 +317,6 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
         variant: "destructive",
       });
       
-      // Show more detailed error via sonner for debugging
-      sonnerToast.error(`Profile save failed: ${error.message || 'Unknown error'}`);
     } finally {
       setIsSaving(false);
     }
@@ -618,9 +587,11 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                   type="number"
                   value={userInfo.weight ? Math.round(parseFloat(userInfo.weight) * 2.20462) : ''}
                   onChange={(e) => {
-                    const lbs = parseFloat(e.target.value) || 0;
-                    const kg = lbs / 2.20462;
-                    setUserInfo(prev => ({ ...prev, weight: kg.toFixed(1) }));
+                    const lbs = parseFloat(e.target.value);
+                    setUserInfo(prev => ({
+                      ...prev,
+                      weight: Number.isFinite(lbs) && lbs > 0 ? (lbs / 2.20462).toFixed(1) : '',
+                    }));
                   }}
                   className="bg-white/80 border-amber-300 text-gray-900 placeholder-gray-500 w-full"
                   placeholder="Enter your weight in pounds"
@@ -642,8 +613,8 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                   type="number"
                   value={userInfo.calorieGoal}
                   onChange={(e) => {
-                    const goal = parseInt(e.target.value) || 2000;
-                    setUserInfo(prev => ({ ...prev, calorieGoal: goal }));
+                    const goal = parseInt(e.target.value, 10);
+                    setUserInfo(prev => ({ ...prev, calorieGoal: Number.isNaN(goal) ? ('' as unknown as number) : goal }));
                   }}
                   className="bg-white/80 border-amber-300 text-gray-900 placeholder-gray-500 w-full"
                   placeholder="Enter your daily calorie goal"

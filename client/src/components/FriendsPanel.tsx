@@ -4,10 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { toast } from '@/hooks/use-toast';
-import { Check, Droplets, Loader2, Share2, Timer, Trash2, UserPlus, Users, Utensils, X, BarChart3 } from 'lucide-react';
+import { Check, CheckCircle2, Clock, Droplets, Loader2, Share2, Timer, Trash2, UserPlus, Users, Utensils, X, BarChart3 } from 'lucide-react';
+import { FRIENDS_QUERY_KEY, type FriendsResponse } from '@/hooks/useFriendUpdates';
 
-type Person = { connectionId: number; userId: string; name: string; email: string; since: string };
-type FriendsResponse = { friends: Person[]; incoming: Person[]; outgoing: Person[] };
+const FEED_LIMIT = 4;
 type Activity = {
   id: number;
   type: 'summary' | 'meal' | 'fast' | 'water';
@@ -21,7 +21,7 @@ type Activity = {
 type LoggedMeal = { id: number; name: string | null; mealType: string; date: string; totalCalories: string };
 type FastingSession = { id: string; planName: string; status: string; actualDuration: number | null; completedAt: string | null };
 
-const FRIENDS_KEY = ['/api/friends'];
+const FRIENDS_KEY = FRIENDS_QUERY_KEY;
 const FEED_KEY = ['/api/activity-feed'];
 
 const TYPE_ICONS = { summary: BarChart3, meal: Utensils, fast: Timer, water: Droplets } as const;
@@ -48,6 +48,10 @@ function timeAgo(iso: string): string {
   const hours = Math.round(minutes / 60);
   if (hours < 24) return `${hours}h ago`;
   return new Date(iso).toLocaleDateString();
+}
+
+function shortDate(iso: string | null | undefined): string {
+  return iso ? new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';
 }
 
 function describe(activity: Activity): string {
@@ -77,8 +81,9 @@ function refreshAll() {
 export function FriendsPanel() {
   const [email, setEmail] = useState('');
   const [note, setNote] = useState('');
+  const [inviteResult, setInviteResult] = useState<{ status: 'pending' | 'accepted'; message: string } | null>(null);
 
-  const friendsQuery = useQuery<FriendsResponse>({ queryKey: FRIENDS_KEY, retry: 1 });
+  const friendsQuery = useQuery<FriendsResponse>({ queryKey: FRIENDS_KEY, retry: 1, refetchInterval: 30_000 });
   const feedQuery = useQuery<{ activities: Activity[] }>({ queryKey: FEED_KEY, retry: 1 });
   const mealsQuery = useQuery<LoggedMeal[]>({ queryKey: ['/api/meals/logged'], retry: 1 });
   const fastsQuery = useQuery<FastingSession[]>({ queryKey: ['/api/fasting/history'], retry: 1 });
@@ -92,12 +97,18 @@ export function FriendsPanel() {
 
   const invite = useMutation({
     mutationFn: async () => (await apiRequest('POST', '/api/friends/invite', { email })).json(),
-    onSuccess: (data: { message: string }) => {
+    onMutate: () => setInviteResult(null),
+    onSuccess: (data: { status: 'pending' | 'accepted'; message: string }) => {
+      const sentTo = email.trim();
       setEmail('');
-      toast({ title: 'Invite', description: data.message });
+      const message = data.status === 'accepted'
+        ? data.message
+        : `Request sent to ${sentTo}. It shows below as "Waiting" until they accept.`;
+      setInviteResult({ status: data.status, message });
+      toast({ title: data.status === 'accepted' ? 'Connected' : 'Request sent', description: message });
       refreshAll();
     },
-    onError: (error) => toast({ title: 'Invite not sent', description: errorText(error), variant: 'destructive' }),
+    onError: (error) => toast({ title: 'Request not sent', description: errorText(error), variant: 'destructive' }),
   });
 
   const respond = useMutation({
@@ -143,7 +154,7 @@ export function FriendsPanel() {
 
   const incoming = friendsQuery.data?.incoming || [];
   const outgoing = friendsQuery.data?.outgoing || [];
-  const activities = feedQuery.data?.activities || [];
+  const activities = (feedQuery.data?.activities || []).slice(0, FEED_LIMIT);
 
   return (
     <div className="space-y-6" data-testid="friends-panel" style={{ fontFamily: "'Work Sans', sans-serif" }}>
@@ -172,6 +183,16 @@ export function FriendsPanel() {
             <span className="ml-1.5">Invite</span>
           </Button>
         </form>
+        {inviteResult && (
+          <p
+            className="flex items-start gap-2 rounded-lg border border-green-300 bg-green-50 p-2.5 text-sm text-green-900"
+            role="status"
+            data-testid="text-invite-result"
+          >
+            <CheckCircle2 className="h-4 w-4 mt-0.5 shrink-0 text-green-700" />
+            {inviteResult.message}
+          </p>
+        )}
         <p className="text-xs text-gray-600">They need a Bytewise account. You only see what each other chooses to share.</p>
       </section>
 
@@ -183,6 +204,7 @@ export function FriendsPanel() {
               <div className="min-w-0">
                 <p className="font-medium text-gray-950 truncate">{person.name}</p>
                 <p className="text-xs text-gray-600 truncate">{person.email}</p>
+                <p className="text-xs text-orange-800 mt-0.5">Wants to connect · {shortDate(person.since)}</p>
               </div>
               <div className="flex gap-2 shrink-0">
                 <Button size="sm" className="on-color bg-green-700 hover:bg-green-800" onClick={() => respond.mutate({ id: person.connectionId, accept: true })}>
@@ -204,17 +226,22 @@ export function FriendsPanel() {
         </p>
         {friendsQuery.isLoading ? (
           <p className="text-sm text-gray-600">Loading…</p>
-        ) : friendsQuery.isError ? (
+        ) : friendsQuery.isError && !friendsQuery.data ? (
           <p className="text-sm text-red-700">Couldn't load your connections. {errorText(friendsQuery.error)}</p>
         ) : friends.length === 0 && outgoing.length === 0 ? (
           <p className="text-sm text-gray-700 bg-white/60 rounded-lg p-3">No one yet. Invite someone above to start sharing.</p>
         ) : (
           <ul className="space-y-2">
             {friends.map(person => (
-              <li key={person.connectionId} className="flex items-center justify-between gap-2 rounded-lg bg-white/80 border border-amber-200 p-3">
+              <li key={person.connectionId} className="flex items-center justify-between gap-2 rounded-lg bg-white/80 border border-amber-200 p-3" data-testid={`friend-accepted-${person.connectionId}`}>
                 <div className="min-w-0">
                   <p className="font-medium text-gray-950 truncate">{person.name}</p>
                   <p className="text-xs text-gray-600 truncate">{person.email}</p>
+                  <p className="mt-1 inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+                    <CheckCircle2 className="h-3 w-3" />
+                    {person.sentByMe ? 'Accepted your request' : 'Connected'}
+                    {person.acceptedAt ? ` · ${shortDate(person.acceptedAt)}` : ''}
+                  </p>
                 </div>
                 <Button
                   size="sm"
@@ -229,10 +256,14 @@ export function FriendsPanel() {
               </li>
             ))}
             {outgoing.map(person => (
-              <li key={person.connectionId} className="flex items-center justify-between gap-2 rounded-lg bg-white/60 border border-dashed border-amber-300 p-3">
+              <li key={person.connectionId} className="flex items-center justify-between gap-2 rounded-lg bg-white/60 border border-dashed border-amber-300 p-3" data-testid={`friend-pending-${person.connectionId}`}>
                 <div className="min-w-0">
                   <p className="font-medium text-gray-900 truncate">{person.name}</p>
-                  <p className="text-xs text-gray-600">Invite pending</p>
+                  <p className="text-xs text-gray-600 truncate">{person.email}</p>
+                  <p className="mt-1 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-900">
+                    <Clock className="h-3 w-3" />
+                    Request sent {shortDate(person.since)} · Waiting for them to accept
+                  </p>
                 </div>
                 <Button size="sm" variant="ghost" className="text-gray-700 shrink-0" onClick={() => respond.mutate({ id: person.connectionId, accept: false })}>
                   Cancel

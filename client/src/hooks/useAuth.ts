@@ -79,7 +79,9 @@ export function useAuth() {
         });
         
         if (!response.ok) {
-          return sessionUser;
+          // A failed lookup shouldn't blank out profile fields that were already loaded.
+          const previous = queryClient.getQueryData<Record<string, any>>(['/api/auth/user']);
+          return previous?.id === authUserId ? previous : sessionUser;
         }
         
         const userData = await response.json();

@@ -74,6 +74,9 @@ import { clearGuestNutritionStorage } from '@/lib/guestStorage';
 import { AppleFitnessCard } from '@/components/AppleFitnessCard';
 import { AppleHealthIntegration } from '@/components/AppleHealthIntegration';
 import { FriendsPanel } from '@/components/FriendsPanel';
+import { useFriendUpdates } from '@/hooks/useFriendUpdates';
+import { NutritionTrendsCard } from '@/components/NutritionTrendsCard';
+import { AINutritionAnalyzer } from '@/components/AINutritionAnalyzer';
 import { fixMealDateMismatches } from '@/utils/mealDateFixer';
 import { getCachedLocalStorage, debounce } from '@/utils/performanceUtils';
 import { useLocation } from 'wouter';
@@ -540,6 +543,17 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       read: false
     }, ...prev].slice(0, MAX_NOTIFICATIONS));
   }, []);
+
+  const { data: friendsData } = useFriendUpdates(user?.id, addNotification);
+  const friendsStatusLine = (() => {
+    if (!friendsData) return 'Share your activity with people you invite';
+    const parts = [
+      friendsData.incoming.length ? `${friendsData.incoming.length} request${friendsData.incoming.length === 1 ? '' : 's'} for you` : null,
+      friendsData.outgoing.length ? `${friendsData.outgoing.length} waiting to accept` : null,
+      friendsData.friends.length ? `${friendsData.friends.length} connected` : null,
+    ].filter(Boolean);
+    return parts.length ? parts.join(' · ') : 'Share your activity with people you invite';
+  })();
 
   // Fetch daily stats including fasting status
   const fetchDailyStats = useCallback(async () => {
@@ -1631,6 +1645,14 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             </div>
             
           </div>
+
+          <div className="mb-4">
+            <NutritionTrendsCard meals={weeklyMeals} calorieGoal={goalCalories} />
+          </div>
+
+          <div className="mb-4">
+            <AINutritionAnalyzer isSignedIn={!!user} onCreateAccount={() => handleTabChange('profile')} />
+          </div>
         </div>
       </div>
     </div>
@@ -2425,7 +2447,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               const dateB = new Date(b.timestamp || `${b.date} ${b.time}`);
               return dateB.getTime() - dateA.getTime();
             })
-            .slice(0, 25);
+            .slice(0, 4);
 
           if (recentMeals.length === 0) return null;
 
@@ -2985,8 +3007,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                         <h3 className="text-xl font-semibold transition-colors" style={{ fontFamily: "'League Spartan', sans-serif" }}>
                           Friends & Family
                         </h3>
-                        <p className="text-sm text-gray-700" style={{ fontFamily: "'Work Sans', sans-serif" }}>
-                          Share your activity with people you invite
+                        <p className="text-sm text-gray-700" style={{ fontFamily: "'Work Sans', sans-serif" }} data-testid="text-friends-status">
+                          {friendsStatusLine}
                         </p>
                       </div>
                     </div>

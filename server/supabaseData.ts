@@ -86,19 +86,40 @@ export async function upsertUserViaSupabase(user: {
   emailVerified?: boolean | null;
   profileIcon?: number | null;
 }) {
-  const { data, error } = await supabaseAdmin
+  const { data: existing, error: existingError } = await supabaseAdmin
     .from('users')
-    .upsert({
-      id: user.id,
-      email: user.email,
-      first_name: user.firstName || null,
-      last_name: user.lastName || null,
-      email_verified: user.emailVerified ?? true,
-      profile_icon: user.profileIcon || 1,
-      updated_at: new Date().toISOString(),
-    }, { onConflict: 'id' })
-    .select('*')
-    .single();
+    .select('id, first_name, last_name, email_verified')
+    .eq('id', user.id)
+    .maybeSingle();
+  if (existingError) {
+    throw existingError;
+  }
+
+  // Sign-in and auth syncs call this repeatedly; never overwrite what the user saved in Profile.
+  const query = existing
+    ? supabaseAdmin
+        .from('users')
+        .update({
+          ...(user.email ? { email: user.email } : {}),
+          first_name: existing.first_name || user.firstName || null,
+          last_name: existing.last_name || user.lastName || null,
+          email_verified: existing.email_verified || !!(user.emailVerified ?? true),
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', user.id)
+    : supabaseAdmin
+        .from('users')
+        .insert({
+          id: user.id,
+          email: user.email,
+          first_name: user.firstName || null,
+          last_name: user.lastName || null,
+          email_verified: user.emailVerified ?? true,
+          profile_icon: user.profileIcon || 1,
+          updated_at: new Date().toISOString(),
+        });
+
+  const { data, error } = await query.select('*').single();
 
   if (error) {
     throw error;
@@ -512,4 +533,133 @@ export async function completeFastingSessionViaSupabase(id: string) {
     completedAt,
     actualDuration: Math.max(0, completedAt.getTime() - existing.startTime.getTime()),
   });
+}
+
+function mapAchievementRow(row: any) {
+  return {
+    id: row.id,
+    userId: row.user_id,
+    achievementType: row.achievement_type,
+    achievementData: row.achievement_data ?? null,
+    earnedAt: row.earned_at ? new Date(row.earned_at) : new Date(),
+    viewed: !!row.viewed,
+    title: row.title,
+    description: row.description,
+    iconName: row.icon_name,
+    colorClass: row.color_class,
+    createdAt: row.created_at ? new Date(row.created_at) : new Date(),
+  };
+}
+
+export async function getUserAchievementsViaSupabase(userId: string) {
+  const { data, error } = await supabaseAdmin
+    .from('achievements')
+    .select('*')
+    .eq('user_id', userId)
+    .order('earned_at', { ascending: false });
+  if (error) throw error;
+  return (data || []).map(mapAchievementRow);
+}
+
+export async function createAchievementViaSupabase(achievement: Record<string, any>) {
+  const { data, error } = await supabaseAdmin
+    .from('achievements')
+    .insert({
+      user_id: achievement.userId,
+      achievement_type: achievement.achievementType,
+      achievement_data: achievement.achievementData ?? null,
+      title: achievement.title,
+      description: achievement.description ?? null,
+      icon_name: achievement.iconName ?? null,
+      color_class: achievement.colorClass ?? null,
+      viewed: achievement.viewed ?? false,
+    })
+    .select('*')
+    .single();
+  if (error) throw error;
+  return mapAchievementRow(data);
+}
+
+function mapRecipeRow(row: any) {
+  const str = (value: unknown) => (value === null || value === undefined ? null : String(value));
+  return {
+    id: row.id,
+    userId: row.user_id,
+    name: row.name,
+    description: row.description,
+    instructions: row.instructions,
+    servings: row.servings,
+    prepTime: row.prep_time,
+    cookTime: row.cook_time,
+    difficulty: row.difficulty,
+    cuisine: row.cuisine,
+    dietaryTags: row.dietary_tags,
+    totalCalories: str(row.total_calories),
+    totalProtein: str(row.total_protein),
+    totalCarbs: str(row.total_carbs),
+    totalFat: str(row.total_fat),
+    totalFiber: str(row.total_fiber),
+    totalSugar: str(row.total_sugar),
+    totalSodium: str(row.total_sodium),
+    createdAt: row.created_at ? new Date(row.created_at) : new Date(),
+    updatedAt: row.updated_at ? new Date(row.updated_at) : new Date(),
+  };
+}
+
+export async function getUserRecipesViaSupabase(userId: string) {
+  const { data, error } = await supabaseAdmin
+    .from('recipes')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data || []).map(mapRecipeRow);
+}
+
+export async function getRecipeByIdViaSupabase(id: number) {
+  const { data, error } = await supabaseAdmin.from('recipes').select('*').eq('id', id).maybeSingle();
+  if (error) throw error;
+  // Recipes saved from the app store totals only; ingredient rows need the foods table join.
+  return data ? { ...mapRecipeRow(data), ingredients: [] } : undefined;
+}
+
+export async function createRecipeViaSupabase(recipe: Record<string, any>) {
+  const { data, error } = await supabaseAdmin
+    .from('recipes')
+    .insert({
+      user_id: recipe.userId,
+      name: recipe.name,
+      description: recipe.description ?? null,
+      instructions: recipe.instructions ?? null,
+      servings: recipe.servings ?? 1,
+    })
+    .select('*')
+    .single();
+  if (error) throw error;
+  return mapRecipeRow(data);
+}
+
+export async function updateRecipeNutritionViaSupabase(recipeId: number, nutrition: Record<string, string>) {
+  const { data, error } = await supabaseAdmin
+    .from('recipes')
+    .update({
+      total_calories: nutrition.totalCalories,
+      total_protein: nutrition.totalProtein,
+      total_carbs: nutrition.totalCarbs,
+      total_fat: nutrition.totalFat,
+      total_fiber: nutrition.totalFiber,
+      total_sugar: nutrition.totalSugar,
+      total_sodium: nutrition.totalSodium,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', recipeId)
+    .select('*')
+    .single();
+  if (error) throw error;
+  return mapRecipeRow(data);
+}
+
+export async function deleteRecipeViaSupabase(id: number) {
+  const { error } = await supabaseAdmin.from('recipes').delete().eq('id', id);
+  if (error) throw error;
 }
