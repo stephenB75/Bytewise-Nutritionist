@@ -79,7 +79,7 @@ const config: CapacitorConfig = {
     },
 
     Health: {
-      read: ['steps', 'calories', 'distance'],
+      read: ['steps', 'calories', 'distance', 'sleep', 'workouts'],
       write: [],
     },
   }

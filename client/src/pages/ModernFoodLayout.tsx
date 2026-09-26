@@ -2961,7 +2961,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                           Apple Health
                         </h3>
                         <p className="text-sm text-gray-700" style={{ fontFamily: "'Work Sans', sans-serif" }}>
-                          Show your steps, move calories, and distance
+                          Show your steps, move calories, distance, sleep, and workouts
                         </p>
                       </div>
                     </div>

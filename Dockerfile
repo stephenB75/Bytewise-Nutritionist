@@ -1,5 +1,5 @@
 # Use Debian-based Node.js for reliable native module compilation
-FROM node:20-bookworm-slim AS builder
+FROM node:22-bookworm-slim AS builder
 
 # Install build dependencies
 RUN apt-get update && apt-get install -y \
@@ -35,7 +35,7 @@ ENV CI=false
 RUN npm run build
 
 # Production stage
-FROM node:20-bookworm-slim AS runner
+FROM node:22-bookworm-slim AS runner
 
 # Set working directory
 WORKDIR /app

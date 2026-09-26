@@ -8,14 +8,14 @@ const entitlementsPath = join(root, 'ios/App/App/App.entitlements');
 const entitlementsSource = join(root, 'native/healthkit/App.entitlements');
 const pbxprojPath = join(root, 'ios/App/App.xcodeproj/project.pbxproj');
 
-// The app only reads steps, active calories and distance. App Store Connect still rejects builds
+// The app only reads steps, active calories, distance, sleep and workouts. App Store Connect still rejects builds
 // without the update string because the HealthKit plugin links write APIs, so both keys are required;
 // reviewers check this text against what the app does, so it must not claim writes.
 const healthUsage = {
   NSHealthShareUsageDescription:
-    'ByteWise reads your steps, active calories, and walking distance from Apple Health to show your daily activity next to your nutrition.',
+    'ByteWise reads your steps, active calories, walking distance, sleep, and workouts from Apple Health to show your daily activity and a sleep score next to your nutrition.',
   NSHealthUpdateUsageDescription:
-    'ByteWise does not write or change any data in Apple Health. It only reads your steps, active calories, and walking distance to show your daily activity next to your nutrition.',
+    'ByteWise does not write or change any data in Apple Health. It only reads your steps, active calories, walking distance, sleep, and workouts to show your daily activity next to your nutrition.',
 };
 
 if (!existsSync(plistPath)) {
