@@ -24,7 +24,7 @@ import { ProfileIcon } from '@/components/ProfileIcon';
 import { TourLauncher, useAppTour, WelcomeBanner } from '@/components/TourLauncher';
 import { AppTour } from '@/components/AppTour';
 import { UserFoodSuggestions } from '@/components/UserFoodSuggestions';
-import { apiRequest } from '@/lib/queryClient';
+import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useQuery } from '@tanstack/react-query';
 import { ACTIVE_FAST_QUERY_KEY, fetchActiveFast } from '@/lib/fastingApi';
 import { refreshAppData } from '@/lib/appRefresh';
@@ -74,7 +74,8 @@ import { clearGuestNutritionStorage } from '@/lib/guestStorage';
 import { AppleFitnessCard } from '@/components/AppleFitnessCard';
 import { AppleHealthIntegration } from '@/components/AppleHealthIntegration';
 import { FriendsPanel } from '@/components/FriendsPanel';
-import { useFriendUpdates } from '@/hooks/useFriendUpdates';
+import { FRIENDS_QUERY_KEY, useFriendUpdates } from '@/hooks/useFriendUpdates';
+import { registerForPush } from '@/services/pushNotifications';
 import { NutritionTrendsCard } from '@/components/NutritionTrendsCard';
 import { AINutritionAnalyzer } from '@/components/AINutritionAnalyzer';
 import { fixMealDateMismatches } from '@/utils/mealDateFixer';
@@ -141,7 +142,7 @@ function loadStoredNotifications(): Notification[] {
     if (!Array.isArray(stored)) return [];
     return stored
       .map((n: any) => ({ ...n, timestamp: new Date(n.timestamp) }))
-      .filter((n: Notification) => n.id && n.title && !Number.isNaN(n.timestamp.getTime()));
+      .filter((n: Notification) => n.id && n.title && !n.read && !Number.isNaN(n.timestamp.getTime()));
   } catch {
     return [];
   }
@@ -545,6 +546,25 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   }, []);
 
   const { data: friendsData } = useFriendUpdates(user?.id, addNotification);
+
+  // iOS asks for push permission only once friends are involved; afterwards the token is refreshed quietly.
+  const hasFriendConnections = !!friendsData
+    && friendsData.friends.length + friendsData.incoming.length + friendsData.outgoing.length > 0;
+  useEffect(() => {
+    if (!user?.id) return;
+    void registerForPush({
+      prompt: hasFriendConnections,
+      // The friends poll turns the change into the in-app toast and bell entry.
+      onReceived: () => queryClient.invalidateQueries({ queryKey: FRIENDS_QUERY_KEY }),
+      onOpened: (type) => {
+        queryClient.invalidateQueries({ queryKey: FRIENDS_QUERY_KEY });
+        if (type === 'friend_request' || type === 'friend_accepted') {
+          setActiveTab('profile');
+          setTimeout(() => setOpenCard('friends'), 100);
+        }
+      },
+    });
+  }, [user?.id, hasFriendConnections]);
   const friendsStatusLine = (() => {
     if (!friendsData) return 'Share your activity with people you invite';
     const parts = [
@@ -720,14 +740,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
 
   // Notification handler functions
+  // Read notifications are removed rather than kept in the list.
   const handleMarkAsRead = (id: string) => {
-    setNotifications(prev => prev.map(n => 
-      n.id === id ? { ...n, read: true } : n
-    ));
+    setNotifications(prev => prev.filter(n => n.id !== id));
   };
 
   const handleMarkAllAsRead = () => {
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    setNotifications([]);
   };
 
   const handleDeleteNotification = (id: string) => {
@@ -3135,14 +3154,14 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <div className="p-4 border-b border-amber-200/40">
                 <div className="flex items-center justify-between">
                   <h3 className="font-semibold text-gray-900">Notifications</h3>
-                  <Button
+                  {notifications.length > 0 && <Button
                     variant="ghost"
                     size="sm"
                     className="text-gray-700 hover:text-gray-900 bg-amber-200/50 hover:bg-amber-300/50"
                     onClick={handleMarkAllAsRead}
                   >
                     Mark all read
-                  </Button>
+                  </Button>}
                 </div>
               </div>
               <div className="max-h-[min(20rem,60dvh)] overflow-y-auto overscroll-contain">

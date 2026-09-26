@@ -1,6 +1,7 @@
 import type { Express, Response } from "express";
 import { z } from "zod";
 import { isAuthenticated, supabaseAdmin } from "./supabaseAuth";
+import { sendPushToUser } from "./pushNotifications";
 
 // Uses the Supabase admin client rather than the direct Postgres pool: in production the pool can be
 // unreachable while the REST API works, and the rest of storage.ts already falls back to it.
@@ -38,6 +39,16 @@ async function acceptedFriendIds(userId: string): Promise<string[]> {
 function asUtc(timestamp: string | null | undefined): string | null {
   if (!timestamp) return null;
   return /(Z|[+-]\d{2}:?\d{2})$/.test(timestamp) ? timestamp : `${timestamp}Z`;
+}
+
+/** Pushes run after the response so a slow or unconfigured APNs never delays the app. */
+function notifyInBackground(recipientId: string, actorId: string, kind: 'request' | 'accepted') {
+  void (async () => {
+    const actor = displayName((await loadProfiles([actorId])).get(actorId));
+    await sendPushToUser(recipientId, kind === 'request'
+      ? { title: 'New friend request', body: `${actor} wants to connect on Bytewise.`, data: { type: 'friend_request' } }
+      : { title: 'Friend request accepted', body: `${actor} accepted your friend request.`, data: { type: 'friend_accepted' } });
+  })().catch(error => console.warn('Friend push failed:', error?.message || error));
 }
 
 function fail(res: Response, label: string, error: any) {
@@ -144,6 +155,7 @@ export function registerFriendsRoutes(app: Express) {
           .update({ status: 'accepted', responded_at: new Date().toISOString() })
           .eq('id', existing.id);
         if (error) throw error;
+        notifyInBackground(target.id, userId, 'accepted');
         return res.json({ status: 'accepted', message: 'They had already invited you, so you are now connected.' });
       }
 
@@ -151,6 +163,7 @@ export function registerFriendsRoutes(app: Express) {
         .from('friend_connections')
         .insert({ requester_id: userId, addressee_id: target.id });
       if (insertError) throw insertError;
+      notifyInBackground(target.id, userId, 'request');
       res.json({ status: 'pending', message: 'Invite sent. They will see it in Friends & Family.' });
     } catch (error) {
       fail(res, 'Failed to send invite', error);
@@ -169,9 +182,10 @@ export function registerFriendsRoutes(app: Express) {
         .eq('id', id.data)
         .eq('addressee_id', userId)
         .eq('status', 'pending')
-        .select('id');
+        .select('id, requester_id');
       if (error) throw error;
       if (!data?.length) return res.status(404).json({ message: 'Invite not found' });
+      notifyInBackground(data[0].requester_id, userId, 'accepted');
       res.json({ success: true });
     } catch (error) {
       fail(res, 'Failed to accept invite', error);

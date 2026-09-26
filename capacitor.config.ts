@@ -59,8 +59,9 @@ const config: CapacitorConfig = {
       sound: 'notification.wav'
     },
     
+    // No banner while the app is open: the in-app toast and bell cover it.
     PushNotifications: {
-      presentationOptions: ['badge', 'sound', 'alert']
+      presentationOptions: []
     },
     
     Haptics: {},

@@ -107,8 +107,8 @@ Current permissions (all essential):
 
 ### 3. App.entitlements
 Current entitlements (correct):
-- ✅ Empty file (capabilities set in Xcode)
-- ✅ No hardcoded `aps-environment` (set by provisioning profile)
+- ✅ HealthKit entitlements
+- ✅ `aps-environment` = `development` (required for push; App Store/TestFlight exports switch it to production)
 - ✅ No Apple Pay entitlements (we use StoreKit)
 
 ## Environment Validation Checklist

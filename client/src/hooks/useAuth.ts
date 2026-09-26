@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from '@/lib/supabase';
 import { apiFetch } from '@/lib/apiUrl';
 import { queryClient } from '@/lib/queryClient';
+import { unregisterPush } from '@/services/pushNotifications';
 
 // useAuth is mounted by many components; register auth listeners once so a single
 // Supabase event produces a single refetch instead of one per mounted hook.
@@ -125,6 +126,7 @@ export function useAuth() {
 
   const signOut = async () => {
     try {
+      await unregisterPush();
       localStorage.removeItem('supabase.auth.token');
       
       // Try to sign out from Supabase

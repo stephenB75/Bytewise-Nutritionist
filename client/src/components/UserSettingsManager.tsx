@@ -42,6 +42,7 @@ import { SessionStatus } from './SessionStatus';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { apiFetch } from '@/lib/apiUrl';
+import { unregisterPush } from '@/services/pushNotifications';
 
 // Type definitions for photo management
 interface UserPhoto {
@@ -402,6 +403,9 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
     try {
       console.log('🚪 UserSettingsManager: Starting sign out process...');
       
+      // Needs the session, so it runs before the tokens are cleared.
+      await unregisterPush();
+
       // Clear custom tokens first
       localStorage.removeItem('supabase.auth.token');
       console.log('✅ Cleared custom tokens');
