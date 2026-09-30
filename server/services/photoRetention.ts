@@ -1,7 +1,7 @@
 /**
  * AI Food Analyzer photo retention
  * Photos uploaded for analysis are kept for 7 days, then removed from storage
- * along with their user_photos tracking rows.
+ * along with their user_photos tracking rows. Profile photos (avatars/) are kept until the user deletes them.
  */
 
 import { supabaseStorageService } from '../supabaseStorage';
@@ -64,6 +64,7 @@ export async function purgeExpiredAnalyzerPhotos(): Promise<{ deletedFiles: numb
       .from('user_photos')
       .delete()
       .lt('uploaded_at', cutoff.toISOString())
+      .like('storage_path', `${UPLOADS_FOLDER}/%`)
       .select('id');
     if (rowsError) {
       console.error('❌ Photo retention: failed to delete user_photos rows:', rowsError.message);

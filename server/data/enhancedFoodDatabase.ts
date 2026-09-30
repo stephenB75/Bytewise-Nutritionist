@@ -3,6 +3,8 @@
  * Provides accurate nutritional data for foods not well-covered by USDA fallbacks
  */
 
+import { WORLD_DISHES } from './worldDishes';
+
 export interface EnhancedFoodEntry {
   name: string;
   aliases: string[];
@@ -1649,18 +1651,63 @@ export const ENHANCED_FOOD_DATABASE: Record<string, EnhancedFoodEntry> = {
       phosphorus: 87
     },
     note: "Baked wheat snack with salt coating - lower fat but very high sodium"
-  }
+  },
+
+  ...WORLD_DISHES,
 };
+
+function foodWords(text: string): string[] {
+  return text
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/[’']/g, '')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim()
+    .split(' ')
+    .filter(Boolean);
+}
+
+// Plural-tolerant: "tamales" matches "tamale", "dumpling" matches "dumplings".
+function sameWord(a: string, b: string): boolean {
+  const singular = (w: string) => (w.length > 3 && w.endsWith('s') && !w.endsWith('ss') ? w.slice(0, -1) : w);
+  return singular(a) === singular(b);
+}
+
+function containsPhrase(words: string[], phrase: string[]): boolean {
+  if (phrase.length === 0 || phrase.length > words.length) return false;
+  for (let start = 0; start + phrase.length <= words.length; start++) {
+    if (phrase.every((word, i) => sameWord(words[start + i], word))) return true;
+  }
+  return false;
+}
+
+/**
+ * The entry whose name or an alias accounts for every word of the query, ignoring the given filler
+ * words. "and"/"with" must be in the alias too, so "fried chicken and rice" isn't "chicken fried rice".
+ */
+export function findEnhancedFoodCovering(query: string, ignoredWords: Set<string>): EnhancedFoodEntry | null {
+  const queryWords = foodWords(query).filter(word => !ignoredWords.has(word));
+  if (queryWords.length === 0) return null;
+  for (const entry of Object.values(ENHANCED_FOOD_DATABASE)) {
+    const covered = [entry.name, ...entry.aliases].some(alias => {
+      const aliasWords = foodWords(alias);
+      return queryWords.every(word => aliasWords.some(aliasWord => sameWord(aliasWord, word)));
+    });
+    if (covered) return entry;
+  }
+  return null;
+}
 
 /**
  * Find enhanced food data by name or alias with improved pattern matching
  */
 export function findEnhancedFood(foodName: string): EnhancedFoodEntry | null {
   const normalized = foodName.toLowerCase().trim();
+  const queryWords = foodWords(foodName);
   
-  // Phase 1: Direct key match first
+  // Phase 1: Direct key match first (whole words, so "dal" doesn't match "medallions")
   for (const [key, food] of Object.entries(ENHANCED_FOOD_DATABASE)) {
-    if (normalized.includes(key.replace(/_/g, ' '))) {
+    if (containsPhrase(queryWords, foodWords(key.replace(/_/g, ' ')))) {
       return food;
     }
   }
@@ -1668,20 +1715,17 @@ export function findEnhancedFood(foodName: string): EnhancedFoodEntry | null {
   // Phase 1: Exact alias matching (highest priority)
   for (const food of Object.values(ENHANCED_FOOD_DATABASE)) {
     for (const alias of food.aliases) {
-      if (normalized === alias || normalized.includes(alias)) {
+      if (containsPhrase(queryWords, foodWords(alias))) {
         return food;
       }
     }
   }
   
-  // Phase 1: Partial alias matching with word boundaries
+  // Phase 1: Alias words in any order ("curry chicken" for "chicken curry")
   for (const food of Object.values(ENHANCED_FOOD_DATABASE)) {
     for (const alias of food.aliases) {
-      const aliasWords = alias.split(' ');
-      const normalizedWords = normalized.split(' ');
-      
-      // Check if all alias words are present in the search term
-      if (aliasWords.every(word => normalizedWords.some(nWord => nWord.includes(word)))) {
+      const aliasWords = foodWords(alias);
+      if (aliasWords.length > 0 && aliasWords.every(word => queryWords.some(queryWord => sameWord(queryWord, word)))) {
         return food;
       }
     }

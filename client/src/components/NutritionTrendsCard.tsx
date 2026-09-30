@@ -148,7 +148,7 @@ export function NutritionTrendsCard({ meals, calorieGoal }: { meals: TrendMeal[]
                 <YAxis tick={{ fontSize: 10, fill: '#374151' }} tickLine={false} axisLine={false} width={36} />
                 <Tooltip
                   cursor={{ fill: 'rgba(251, 191, 36, 0.2)' }}
-                  formatter={(value: number) => [`${value} kcal`, 'Calories']}
+                  formatter={(value: number) => [`${value} cal`, 'Calories']}
                   labelFormatter={(label: string) => label}
                 />
                 <ReferenceLine y={calorieGoal} stroke="#c2410c" strokeDasharray="4 3" />
@@ -156,7 +156,7 @@ export function NutritionTrendsCard({ meals, calorieGoal }: { meals: TrendMeal[]
               </BarChart>
             </ResponsiveContainer>
           </div>
-          <p className="text-xs text-gray-600 mb-3">Dashed line is your {calorieGoal} kcal goal.</p>
+          <p className="text-xs text-gray-600 mb-3">Dashed line is your {calorieGoal} cal goal.</p>
 
           <div className="grid grid-cols-3 gap-2 mb-4">
             {[

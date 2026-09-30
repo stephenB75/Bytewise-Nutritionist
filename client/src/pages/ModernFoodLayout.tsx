@@ -12,6 +12,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { SignOnModule } from '@/components/SignOnModule';
 import { useAuth } from '@/hooks/useAuth';
+import { useProfilePhoto } from '@/hooks/useProfilePhoto';
 import { AchievementCelebration } from '@/components/AchievementCelebration';
 import { ConfettiCelebration } from '@/components/ConfettiCelebration';
 import { ProfileCompletionModal } from '@/components/ProfileCompletionModal';
@@ -62,7 +63,16 @@ import {
 import { House, ForkKnife, Timer, ChartBar, User } from 'phosphor-react';
 import { NotificationDropdown } from '@/components/NotificationDropdown';
 import { WeeklyCaloriesCard } from '@/components/WeeklyCaloriesCard';
-import { WaterCard, clampWaterGlasses, readLocalWaterGlasses, writeLocalWaterGlasses } from '@/components/WaterCard';
+import {
+  WaterCard,
+  changeWaterContainers,
+  clampWaterGlasses,
+  readLocalWaterContainers,
+  readLocalWaterGlasses,
+  reconcileWaterContainers,
+  writeLocalWaterContainers,
+  writeLocalWaterGlasses,
+} from '@/components/WaterCard';
 import { GuestSaveHint } from '@/components/GuestSaveHint';
 import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/hooks/use-toast';
@@ -285,6 +295,7 @@ const HeroSection = React.memo(function HeroSection({
 
 export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) {
   const { user, isLoading: authLoading, refetch: refetchUser } = useAuth();
+  const { photoUrl: profilePhotoUrl } = useProfilePhoto();
   const { isPremium, isLoading: subscriptionLoading } = useSubscription();
   const [activeTab, setActiveTab] = useState('home');
   const [previousTab, setPreviousTab] = useState('home');
@@ -374,7 +385,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     waterGlassesRef.current = dailyStats?.waterGlasses || 0;
   }, [dailyStats?.waterGlasses]);
 
-  const updateWaterConsumption = useCallback((change: number) => {
+  const updateWaterConsumption = useCallback((change: number, containerOz = 8) => {
     const dateKey = getLocalDateKey();
     if (waterDayRef.current !== dateKey) {
       // First tap after midnight: build on today's count, not yesterday's.
@@ -385,8 +396,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     const newGlasses = clampWaterGlasses(previousGlasses + change);
     if (newGlasses === previousGlasses) return;
 
+    const previousContainers = reconcileWaterContainers(readLocalWaterContainers(dateKey), previousGlasses);
+    const newContainers = changeWaterContainers(previousContainers, previousGlasses, newGlasses, containerOz);
     waterGlassesRef.current = newGlasses;
     writeLocalWaterGlasses(newGlasses);
+    writeLocalWaterContainers(newContainers, dateKey);
     setDailyStats((prev: any) => prev ? { ...prev, waterGlasses: newGlasses } : {
       totalCalories: 0, totalProtein: 0, totalCarbs: 0, totalFat: 0,
       waterGlasses: newGlasses, fastingStatus: undefined
@@ -399,10 +413,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         variant: "default",
         duration: 3000,
       });
-      addNotification('success', 'Daily Hydration Goal! 💧', 'You\'ve reached your 8-glass water goal today!');
+      addNotification('success', 'Daily Hydration Goal! 💧', 'You\'ve reached your 64 oz water goal today!');
     }
-    if (newGlasses === 4 && previousGlasses < 4) {
-      addNotification('info', 'Halfway There! 💧', 'You\'ve had 4 glasses of water today. Keep going!');
+    if (newGlasses >= 4 && newGlasses < 8 && previousGlasses < 4) {
+      addNotification('info', 'Halfway There! 💧', `You've had ${newGlasses * 8} oz of water today. Keep going!`);
     }
     if (!user) return;
 
@@ -412,6 +426,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       try {
         await apiRequest('POST', '/api/daily-stats', {
           waterGlasses: newGlasses,
+          containers: newContainers,
           date: dateKey
         });
       } catch (error) {
@@ -419,6 +434,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         if (waterGlassesRef.current === newGlasses) {
           waterGlassesRef.current = previousGlasses;
           writeLocalWaterGlasses(previousGlasses);
+          writeLocalWaterContainers(previousContainers, dateKey);
           setDailyStats((prev: any) => prev ? { ...prev, waterGlasses: previousGlasses } : prev);
         }
         toast({
@@ -625,6 +641,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         waterDayRef.current = requestedDay;
         waterGlassesRef.current = stats.waterGlasses;
         writeLocalWaterGlasses(stats.waterGlasses);
+        if (data.waterContainers) {
+          writeLocalWaterContainers(reconcileWaterContainers(data.waterContainers, stats.waterGlasses), requestedDay);
+        }
       }
       setDailyStats(stats);
       setDailyCalories(stats.totalCalories);
@@ -1546,8 +1565,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <ProgressCard
               title="Daily Calories"
               icon={Flame}
-              value={`${Math.round(dailyCalories)} kcal`}
-              goal={`${goalCalories} kcal`}
+              value={`${Math.round(dailyCalories)} cal`}
+              goal={`${goalCalories} cal`}
               percentage={Math.round((dailyCalories/goalCalories)*100)}
               color="orange"
             />
@@ -1589,8 +1608,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           <div className="mb-4" data-testid="water-consumption-card">
             <WaterCard
               glasses={dailyStats ? (dailyStats.waterGlasses || 0) : readLocalWaterGlasses()}
-              onIncrement={() => updateWaterConsumption(1)}
-              onDecrement={() => updateWaterConsumption(-1)}
+              onIncrement={(glasses, containerOz) => updateWaterConsumption(glasses, containerOz)}
+              onDecrement={(glasses, containerOz) => updateWaterConsumption(-glasses, containerOz)}
             />
           </div>
 
@@ -1599,8 +1618,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <ProgressCard
               title="Weekly Progress"
               icon={Calendar}
-              value={`${Math.round(weeklyCalories)} kcal`}
-              goal={`${weeklyGoal} kcal`}
+              value={`${Math.round(weeklyCalories)} cal`}
+              goal={`${weeklyGoal} cal`}
               percentage={Math.round((weeklyCalories/weeklyGoal)*100)}
               color="blue"
             />
@@ -1903,7 +1922,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h3 className="text-gray-900 font-semibold">Weekly Total</h3>
-                  <p className="text-gray-900 text-sm">{Math.round(weeklyCalories)}/{weeklyGoal} kcal</p>
+                  <p className="text-gray-900 text-sm">{Math.round(weeklyCalories)}/{weeklyGoal} cal</p>
                 </div>
                 <div className="text-right">
                   <div className="text-2xl font-bold text-amber-600">{Math.round((weeklyCalories/weeklyGoal)*100)}%</div>
@@ -2454,47 +2473,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           )}
         </div>
 
-        {!searchQuery && (() => {
-          const todayKey = getLocalDateKey();
-          const recentMeals = weeklyMeals
-            .filter((meal) => {
-              const mealDateKey = meal.date?.includes('T') ? meal.date.split('T')[0] : meal.date;
-              return mealDateKey !== todayKey;
-            })
-            .sort((a, b) => {
-              const dateA = new Date(a.timestamp || `${a.date} ${a.time}`);
-              const dateB = new Date(b.timestamp || `${b.date} ${b.time}`);
-              return dateB.getTime() - dateA.getTime();
-            })
-            .slice(0, 4);
-
-          if (recentMeals.length === 0) return null;
-
-          return (
-            <div data-testid="recent-meal-history" className="space-y-4 mt-8">
-              <h3 className="text-xl font-bold text-gray-900">Recent Entries</h3>
-              {recentMeals.map((meal, index) => (
-                <Card key={`recent-${meal.id || meal.name}-${meal.timestamp || index}`} className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <h4 className="text-gray-900 font-semibold">{meal.name}</h4>
-                      <p className="text-gray-700 text-sm">
-                        {new Date(meal.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} • {meal.time} • {meal.mealType}
-                      </p>
-                      <div className="flex flex-wrap gap-3 mt-1">
-                        <span className="text-orange-600 font-bold">{Math.round(meal.calories || 0)} cal</span>
-                        <span className="text-xs text-green-700 font-medium">P: {(meal.protein || 0).toFixed(1)}g</span>
-                        <span className="text-xs text-orange-700 font-medium">C: {(meal.carbs || 0).toFixed(1)}g</span>
-                        <span className="text-xs text-purple-700 font-medium">F: {(meal.fat || 0).toFixed(1)}g</span>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          );
-        })()}
-
         {/* Weekly Calories Summary */}
         <div className="space-y-4 mt-8">
           <div className="flex justify-between items-center">
@@ -2571,6 +2549,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                         <ProfileIcon 
                           data-testid="profile-icon"
                           iconNumber={user?.profileIcon || 1} 
+                          imageUrl={profilePhotoUrl}
                           size="md" 
                           className="ring-2 ring-white/20"
                         />

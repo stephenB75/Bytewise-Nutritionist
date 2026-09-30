@@ -3,7 +3,7 @@
  * Single consolidated card for profile and personal information management
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -36,13 +36,17 @@ import {
   Shield,
   Camera,
   Trash2,
-  AlertTriangle
+  AlertTriangle,
+  Upload,
+  Loader2
 } from 'lucide-react';
 import { SessionStatus } from './SessionStatus';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { apiFetch } from '@/lib/apiUrl';
 import { unregisterPush } from '@/services/pushNotifications';
+import { useProfilePhoto, PROFILE_PHOTO_QUERY_KEY, USER_PHOTOS_QUERY_KEY } from '@/hooks/useProfilePhoto';
+import { ProfileIcon } from './ProfileIcon';
 
 // Type definitions for photo management
 interface UserPhoto {
@@ -50,7 +54,9 @@ interface UserPhoto {
   fileName: string;
   uploadedAt: string;
   fileSize: number | null;
-  analysisId: string | null;
+  kind: 'profile' | 'analyzer';
+  isAvatar: boolean;
+  url: string | null;
 }
 
 interface PhotosResponse {
@@ -82,10 +88,41 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
   const [selectedPhotos, setSelectedPhotos] = useState<number[]>([]);
   
   const queryClient = useQueryClient();
+  const profilePhoto = useProfilePhoto();
+  const photoInputRef = useRef<HTMLInputElement>(null);
+
+  const handlePhotoPicked = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      toast({ title: 'Choose a photo', description: 'Pick an image file for your profile photo.', variant: 'destructive' });
+      return;
+    }
+    profilePhoto.upload.mutate(file, {
+      onSuccess: () => toast({ title: 'Profile photo updated' }),
+      onError: (error: any) =>
+        toast({ title: 'Upload failed', description: error?.message || 'Please try again.', variant: 'destructive' }),
+    });
+  };
+
+  const setAsProfilePhoto = (photoId: number) => {
+    profilePhoto.choose.mutate(photoId, {
+      onSuccess: () => toast({ title: 'Profile photo updated' }),
+      onError: () => toast({ title: 'Could not update profile photo', variant: 'destructive' }),
+    });
+  };
+
+  const removeProfilePhoto = () => {
+    profilePhoto.remove.mutate(undefined, {
+      onSuccess: () => toast({ title: 'Profile photo removed', description: 'Your photo is still in Manage Uploaded Photos.' }),
+      onError: () => toast({ title: 'Could not remove profile photo', variant: 'destructive' }),
+    });
+  };
 
   // Photo management queries and mutations
   const photosQuery = useQuery<PhotosResponse>({
-    queryKey: ['/api/user/photos'],
+    queryKey: USER_PHOTOS_QUERY_KEY,
     enabled: showPhotos, // Only fetch when photos section is open
   });
 
@@ -98,7 +135,8 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/user/photos'] });
+      queryClient.invalidateQueries({ queryKey: USER_PHOTOS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: PROFILE_PHOTO_QUERY_KEY });
       toast({
         title: "Photo Deleted",
         description: "Photo has been permanently deleted from your account.",
@@ -125,7 +163,8 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
       return response.json();
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['/api/user/photos'] });
+      queryClient.invalidateQueries({ queryKey: USER_PHOTOS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: PROFILE_PHOTO_QUERY_KEY });
       toast({
         title: "Photos Deleted",
         description: `Successfully deleted ${data.deletedCount || selectedPhotos.length} photos from your account.`,
@@ -461,6 +500,52 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
     <div className="space-y-6">
             {/* Session Status Card */}
             <SessionStatus />
+
+            <div className="flex items-center gap-4 rounded-lg bg-white/70 border border-amber-200/60 p-4" data-testid="profile-photo-section">
+              <ProfileIcon iconNumber={user?.profileIcon || 1} imageUrl={profilePhoto.photoUrl} size="lg" />
+              <div className="flex-1 min-w-0 space-y-2">
+                <h4 className="profile-section-title">Profile Photo</h4>
+                <p className="text-xs text-gray-600">Choose a photo from your library or take a new one. It's cropped to a square.</p>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    type="button"
+                    size="sm"
+                    className="on-color bg-orange-600 hover:bg-orange-700 disabled:opacity-75"
+                    onClick={() => photoInputRef.current?.click()}
+                    disabled={profilePhoto.upload.isPending}
+                    data-testid="button-upload-profile-photo"
+                  >
+                    {profilePhoto.upload.isPending ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <Upload className="w-4 h-4 mr-2" />
+                    )}
+                    {profilePhoto.upload.isPending ? 'Uploading…' : profilePhoto.photoUrl ? 'Change photo' : 'Upload photo'}
+                  </Button>
+                  {profilePhoto.photoUrl && (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      className="border-amber-400/60 text-gray-700 bg-white/90 hover:bg-amber-50"
+                      onClick={removeProfilePhoto}
+                      disabled={profilePhoto.remove.isPending}
+                      data-testid="button-remove-profile-photo"
+                    >
+                      Use default avatar
+                    </Button>
+                  )}
+                </div>
+                <input
+                  ref={photoInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handlePhotoPicked}
+                  data-testid="input-profile-photo"
+                />
+              </div>
+            </div>
             
             {/* Profile Form */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -767,7 +852,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <p className="text-sm text-gray-700">
-                        View and delete photos you've uploaded for AI analysis to maintain your privacy.
+                        Photos you've uploaded as profile pictures. Pick one to use, or delete any you no longer want.
                       </p>
                       {selectedPhotos.length > 0 && (
                         <Button
@@ -803,7 +888,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                         {((photosQuery.data as any)?.photos?.length === 0) ? (
                           <div className="text-center py-8">
                             <Camera className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                            <p className="text-gray-600">No uploaded photos found.</p>
+                            <p className="text-gray-600">No uploaded photos yet. Use Upload photo above to add one.</p>
                           </div>
                         ) : (
                           <>
@@ -831,18 +916,40 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                                       className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                                       data-testid={`checkbox-photo-${photo.id}`}
                                     />
-                                    <Camera className="w-4 h-4 text-gray-500" />
-                                    <div>
-                                      <p className="text-sm font-medium text-gray-900" data-testid={`text-filename-${photo.id}`}>
-                                        {photo.fileName}
+                                    {photo.url ? (
+                                      <img
+                                        src={photo.url}
+                                        alt=""
+                                        className="w-12 h-12 rounded-md object-cover border border-blue-200/60"
+                                      />
+                                    ) : (
+                                      <div className="w-12 h-12 rounded-md bg-gray-100 flex items-center justify-center">
+                                        <Camera className="w-4 h-4 text-gray-500" />
+                                      </div>
+                                    )}
+                                    <div className="min-w-0">
+                                      <p className="text-sm font-medium text-gray-900 truncate" data-testid={`text-filename-${photo.id}`}>
+                                        {photo.kind === 'profile' ? 'Profile photo' : 'Food analysis photo'}
+                                        {photo.isAvatar && (
+                                          <span className="ml-2 rounded-full bg-green-600 px-2 py-0.5 text-[10px] font-semibold on-color align-middle">
+                                            In use
+                                          </span>
+                                        )}
                                       </p>
                                       <p className="text-xs text-gray-500" data-testid={`text-upload-date-${photo.id}`}>
                                         Uploaded: {new Date(photo.uploadedAt).toLocaleDateString()}
+                                        {photo.fileSize ? ` · ${Math.max(1, Math.round(photo.fileSize / 1024))} KB` : ''}
                                       </p>
-                                      {photo.fileSize && (
-                                        <p className="text-xs text-gray-500">
-                                          Size: {(photo.fileSize / 1024 / 1024).toFixed(2)} MB
-                                        </p>
+                                      {photo.kind === 'profile' && !photo.isAvatar && (
+                                        <button
+                                          type="button"
+                                          className="mt-1 text-xs font-semibold text-orange-700 bg-[transparent] hover:underline disabled:opacity-60"
+                                          onClick={() => setAsProfilePhoto(photo.id)}
+                                          disabled={profilePhoto.choose.isPending}
+                                          data-testid={`button-use-photo-${photo.id}`}
+                                        >
+                                          Use as profile photo
+                                        </button>
                                       )}
                                     </div>
                                   </div>

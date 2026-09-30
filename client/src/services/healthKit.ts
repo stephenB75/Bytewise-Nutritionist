@@ -7,7 +7,9 @@ const LEGACY_KEYS = ['appleHealthAutoSync', 'appleHealthSyncedMealIds', 'appleHe
 const FITNESS_READ_TYPES = ['steps', 'calories', 'distance'] as const;
 // Added after the first release; people who connected earlier were never asked for these.
 const RECOVERY_READ_TYPES = ['sleep', 'workouts'] as const;
-const READ_TYPES = [...FITNESS_READ_TYPES, ...RECOVERY_READ_TYPES];
+// Apple's Exercise ring minutes; added after sleep and workouts, so it is asked about separately.
+const EXERCISE_READ_TYPES = ['exerciseTime'] as const;
+const READ_TYPES = [...FITNESS_READ_TYPES, ...RECOVERY_READ_TYPES, ...EXERCISE_READ_TYPES];
 
 export type HealthPermissionResult = { ok: true } | { ok: false; reason: string };
 
@@ -32,6 +34,8 @@ export type AppleFitnessSummary = {
   steps: number;
   activeCalories: number;
   distanceMiles: number;
+  /** Null until the user has been asked for Exercise minutes. */
+  exerciseMinutes: number | null;
   sleep: SleepSummary | null;
   workouts: WorkoutSummary;
 };
@@ -149,11 +153,17 @@ function wasAskedForRecovery(result: AuthorizationResult): boolean {
   return RECOVERY_READ_TYPES.every((type) => asked.includes(type));
 }
 
+function wasAskedForExercise(result: AuthorizationResult): boolean {
+  const asked = result.readAuthorized || [];
+  return EXERCISE_READ_TYPES.every((type) => asked.includes(type));
+}
+
 export class HealthKitService {
   private isAvailable = false;
   private unavailableReason: string | null = null;
   private isAuthorized = localStorage.getItem(CONNECTED_KEY) === 'true';
   private recoveryAsked = false;
+  private exerciseAsked = false;
   private ready: Promise<void>;
 
   constructor() {
@@ -177,6 +187,7 @@ export class HealthKitService {
         const auth = await health.checkAuthorization({ read: READ_TYPES, write: [] });
         this.setAuthorized(wasAsked(auth));
         this.recoveryAsked = wasAskedForRecovery(auth);
+        this.exerciseAsked = wasAskedForExercise(auth);
       }
     } catch (error) {
       console.warn('HealthKit availability check failed:', error);
@@ -205,6 +216,7 @@ export class HealthKitService {
       const status = await health.requestAuthorization({ read: READ_TYPES, write: [] });
       this.setAuthorized(wasAsked(status));
       this.recoveryAsked = wasAskedForRecovery(status);
+      this.exerciseAsked = wasAskedForExercise(status);
       return this.isAuthorized
         ? { ok: true }
         : { ok: false, reason: 'Apple Health did not record an answer. Please try again.' };
@@ -263,10 +275,11 @@ export class HealthKitService {
       return null;
     }
 
-    const [steps, activeCalories, distanceMeters, sleep, workouts] = await Promise.all([
+    const [steps, activeCalories, distanceMeters, exerciseMinutes, sleep, workouts] = await Promise.all([
       this.sumSamplesForDay('steps'),
       this.sumSamplesForDay('calories'),
       this.sumSamplesForDay('distance'),
+      this.exerciseAsked ? this.sumSamplesForDay('exerciseTime') : Promise.resolve(null),
       this.readLastNightSleep(),
       this.readTodayWorkouts(),
     ]);
@@ -275,6 +288,7 @@ export class HealthKitService {
       steps: Math.round(steps),
       activeCalories: Math.round(activeCalories),
       distanceMiles: Math.round((distanceMeters / 1609.34) * 10) / 10,
+      exerciseMinutes: exerciseMinutes === null ? null : Math.round(exerciseMinutes),
       sleep,
       workouts,
     };
@@ -409,6 +423,11 @@ export class HealthKitService {
   /** Connected before sleep and workouts were added, so iOS has not asked about them yet. */
   needsRecoveryPermission(): boolean {
     return this.isAvailable && this.isAuthorized && !this.recoveryAsked;
+  }
+
+  /** Connected before Exercise minutes were added. */
+  needsExercisePermission(): boolean {
+    return this.isAvailable && this.isAuthorized && !this.exerciseAsked;
   }
 
   getAvailability(): boolean {

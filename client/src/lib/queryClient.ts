@@ -10,7 +10,7 @@ async function throwIfResNotOk(res: Response) {
 }
 
 // Get authentication headers for API requests
-async function getAuthHeaders(): Promise<Record<string, string>> {
+export async function getAuthHeaders(): Promise<Record<string, string>> {
   const headers: Record<string, string> = {};
   let accessToken = null;
   

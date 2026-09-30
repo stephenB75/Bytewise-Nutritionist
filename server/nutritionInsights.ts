@@ -111,13 +111,13 @@ function ruleObservations(avg: Totals, goals: InsightsResult['goals'], range: 't
     out.push({
       tone: 'info',
       title: 'Above your calorie goal',
-      detail: `About ${Math.round(avg.calories)} kcal ${scope} against a ${goals.calories} kcal goal.`,
+      detail: `About ${Math.round(avg.calories)} cal ${scope} against a ${goals.calories} cal goal.`,
     });
   } else if (avg.calories < goals.calories * 0.6 && (range === 'week' || mealsCount >= 2)) {
     out.push({
       tone: 'info',
       title: 'Well under your calorie goal',
-      detail: `About ${Math.round(avg.calories)} kcal ${scope} against a ${goals.calories} kcal goal. If that's not everything you ate, logging all meals makes these tips more accurate.`,
+      detail: `About ${Math.round(avg.calories)} cal ${scope} against a ${goals.calories} cal goal. If that's not everything you ate, logging all meals makes these tips more accurate.`,
     });
   }
 
@@ -172,11 +172,11 @@ async function aiObservations(input: {
 
   const r = (n: number) => Math.round(n * 10) / 10;
   const prompt = `You are a friendly nutrition coach inside a food-tracking app. Give simple, practical observations about the user's logged meals.
-Rules: plain everyday language, no medical advice or diagnoses, no judgement, each detail at most 2 short sentences, suggest specific foods where helpful. Base everything ONLY on the numbers below; do not invent foods they ate.
+Rules: plain everyday language, no medical advice or diagnoses, no judgement, each detail at most 2 short sentences, suggest specific foods where helpful. Write energy as "calories" or "cal", never "kcal". Base everything ONLY on the numbers below; do not invent foods they ate.
 
 Period: ${input.range === 'today' ? "today's meals" : 'daily average over the last 7 days'}
 Meals logged: ${input.mealNames.slice(0, 25).join('; ') || 'none'}
-Calories: ${r(input.averages.calories)} kcal (goal ${input.goals.calories})
+Calories: ${r(input.averages.calories)} cal (goal ${input.goals.calories})
 Protein: ${r(input.averages.protein)} g (goal ${input.goals.protein})
 Carbs: ${r(input.averages.carbs)} g (goal ${input.goals.carbs})
 Fat: ${r(input.averages.fat)} g (goal ${input.goals.fat})
@@ -192,7 +192,7 @@ Give 2 to 4 observations, most important first. Use "suggestion" for things to c
     try {
       const model = genAI.getGenerativeModel({
         model: GEMINI_MODELS[i],
-        generationConfig: { responseMimeType: 'application/json', temperature: 0.4, maxOutputTokens: 800 },
+        generationConfig: { responseMimeType: 'application/json', temperature: 0.4, maxOutputTokens: 4096 },
       });
       const result = await model.generateContent(prompt);
       const text = result.response.text();

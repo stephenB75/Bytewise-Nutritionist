@@ -16,6 +16,7 @@ import {
 import { Check, Loader2, Plus, Search, Store, X } from 'lucide-react';
 
 const chipRow = 'flex flex-wrap gap-2';
+const ADDED_CONFIRMATION_MS = 2500;
 
 const POPULAR_RESTAURANTS = [
   "McDonald's",
@@ -67,7 +68,7 @@ export function FastFoodMenu() {
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState<FastFoodCategory | 'all'>('all');
   const [restaurant, setRestaurant] = useState<string | 'all'>('all');
-  const [savingId, setSavingId] = useState<string | null>(null);
+  const [savingIds, setSavingIds] = useState<Set<string>>(new Set());
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
   const [showAllPlaces, setShowAllPlaces] = useState(false);
 
@@ -87,7 +88,7 @@ export function FastFoodMenu() {
   }, [query, category, restaurant]);
 
   const addItem = async (item: FastFoodItem) => {
-    setSavingId(item.id);
+    setSavingIds((prev) => new Set(prev).add(item.id));
     const mealType = getMealTypeByTime(new Date());
     try {
       await logMeal({
@@ -108,8 +109,8 @@ export function FastFoodMenu() {
           next.delete(item.id);
           return next;
         });
-      }, 2000);
-      toast({ title: 'Added to your log', description: `${item.name} · ${item.calories} kcal → ${mealType}` });
+      }, ADDED_CONFIRMATION_MS);
+      toast({ title: 'Added to your log', description: `${item.name} · ${item.calories} cal → ${mealType}` });
     } catch (error) {
       toast({
         title: 'Could not add food',
@@ -117,7 +118,11 @@ export function FastFoodMenu() {
         variant: 'destructive',
       });
     } finally {
-      setSavingId(null);
+      setSavingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(item.id);
+        return next;
+      });
     }
   };
 
@@ -219,10 +224,14 @@ export function FastFoodMenu() {
           data-testid="fastfood-results"
         >
           {results.map((item) => {
-            const saving = savingId === item.id;
+            const saving = savingIds.has(item.id);
             const added = addedIds.has(item.id);
             return (
-              <li key={item.id} className="flex items-center gap-3 px-3 py-2" data-testid={`fastfood-item-${item.id}`}>
+              <li
+                key={item.id}
+                className={`flex items-center gap-3 px-3 py-2 transition-colors duration-300 ${added ? 'bg-green-100' : saving ? 'bg-green-50' : ''}`}
+                data-testid={`fastfood-item-${item.id}`}
+              >
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-gray-900 truncate">{item.name}</p>
                   <p className="text-[11px] text-gray-700 truncate">
@@ -234,22 +243,33 @@ export function FastFoodMenu() {
                 </div>
                 <span className="text-sm font-bold text-gray-900 shrink-0 tabular-nums">
                   {item.calories}
-                  <span className="text-[10px] font-normal text-gray-700"> kcal</span>
+                  <span className="text-[10px] font-normal text-gray-700"> cal</span>
                 </span>
                 <button
                   type="button"
                   onClick={() => addItem(item)}
-                  disabled={saving}
-                  aria-label={added ? `${item.name} added` : `Add ${item.name}`}
-                  className={`shrink-0 h-9 w-9 min-h-[36px] min-w-[36px] p-0 rounded-full flex items-center justify-center text-[#ffffff] transition-colors disabled:opacity-60 ${
-                    added ? 'bg-green-500' : 'bg-green-700 hover:bg-green-800'
+                  disabled={saving || added}
+                  aria-label={saving ? `Adding ${item.name}` : added ? `${item.name} added` : `Add ${item.name}`}
+                  aria-live="polite"
+                  className={`on-color shrink-0 h-9 min-h-[36px] min-w-[36px] rounded-full flex items-center justify-center gap-1 text-xs font-bold text-[#ffffff] transition-all duration-200 ${
+                    saving
+                      ? 'px-3 bg-green-800 cursor-wait'
+                      : added
+                        ? 'px-3 bg-green-600 ring-2 ring-green-300 animate-in zoom-in-75 duration-200'
+                        : 'w-9 p-0 bg-green-700 hover:bg-green-800 active:scale-90'
                   }`}
                   data-testid={`fastfood-add-${item.id}`}
                 >
                   {saving ? (
-                    <Loader2 className="w-4 h-4 animate-spin" color="#ffffff" />
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" color="#ffffff" />
+                      <span>Adding…</span>
+                    </>
                   ) : added ? (
-                    <Check className="w-4 h-4" color="#ffffff" />
+                    <>
+                      <Check className="w-4 h-4" color="#ffffff" strokeWidth={3} />
+                      <span>Added</span>
+                    </>
                   ) : (
                     <Plus className="w-4 h-4" color="#ffffff" />
                   )}

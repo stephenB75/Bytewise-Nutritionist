@@ -10,8 +10,173 @@ import { usdaFoodCache } from '@shared/schema';
 import { eq, like, desc, asc, sql, or } from 'drizzle-orm';
 import { getPortionWeight, parseMeasurement } from '../data/portionData.js';
 import { findCandyNutrition, calculateCandyNutrition } from '../data/candyNutritionDatabase.js';
-import { findEnhancedFood, type EnhancedFoodEntry } from '../data/enhancedFoodDatabase.js';
+import { findEnhancedFood, findEnhancedFoodCovering, type EnhancedFoodEntry } from '../data/enhancedFoodDatabase.js';
 import { getUsdaApiKey } from '../env';
+import { FAST_FOOD_ITEMS, type FastFoodItem } from '@shared/fastFoodMenu';
+import { estimateFoodWithAI } from '../foodAiEstimate';
+
+function normalizeWords(text: string): string[] {
+  return text.toLowerCase().replace(/[’']/g, '').replace(/[^a-z0-9]+/g, ' ').trim().split(' ').filter(Boolean);
+}
+
+// Words that describe a dish's form or preparation rather than which food it is.
+const NON_DISTINCTIVE_WORDS = new Set([
+  'a', 'an', 'the', 'and', 'with', 'of', 'in', 'on', 'my', 'some', 'plain', 'fresh', 'homemade', 'home', 'made',
+  'soup', 'stew', 'dish', 'plate', 'bowl', 'meal', 'side', 'small', 'medium', 'large', 'piece', 'pieces', 'slice',
+  'cooked', 'raw', 'fried', 'grilled', 'baked', 'roasted', 'boiled', 'steamed', 'stewed', 'sauteed', 'sauce', 'style',
+]);
+// A menu item named only with these (e.g. "Chicken Sandwich") is too generic to match without a restaurant.
+const GENERIC_MENU_WORDS = new Set([
+  ...Array.from(NON_DISTINCTIVE_WORDS), 'chicken', 'beef', 'pork', 'fish', 'sandwich', 'burger', 'cheeseburger', 'fries', 'french',
+  'salad', 'nuggets', 'wrap', 'taco', 'tacos', 'burrito', 'bowl', 'coffee', 'latte', 'cookie', 'pizza', 'sub', 'hot',
+  'dog', 'egg', 'bacon', 'cheese', 'crispy', 'spicy', 'classic', 'original', 'double', 'single', 'combo',
+]);
+const stem = (word: string) => word.replace(/(es|s)$/, '');
+const menuNameWords = (name: string) => normalizeWords(name.replace(/\([^)]*\)/g, ' '));
+const FILLER_WORDS = new Set(['a', 'an', 'the', 'and', 'with', 'of', 'from', 'at', 'my', 'some', 'order']);
+// People say "McNuggets" or "Wendy's nuggets", not "Chicken McNuggets".
+const OPTIONAL_MENU_WORDS = new Set(['chicken', 'classic', 'original', 'signature']);
+
+/** Menu items by brand: needs the restaurant named, or a distinctive item name like "Big Mac". */
+function findFastFoodItem(query: string): FastFoodItem | null {
+  const queryWords = normalizeWords(query);
+  const queryText = ` ${queryWords.join(' ')} `;
+  const hasAll = (words: string[]) => words.every(word => queryWords.some(q => stem(q) === stem(word)));
+
+  let best: { item: FastFoodItem; score: number } | null = null;
+  for (const item of FAST_FOOD_ITEMS) {
+    const nameWords = menuNameWords(item.name);
+    const requiredWords = nameWords.filter(word => !OPTIONAL_MENU_WORDS.has(word));
+    if (!hasAll(requiredWords.length ? requiredWords : nameWords)) continue;
+    const restaurantWords = normalizeWords(item.restaurant);
+    const restaurantNamed = queryText.includes(` ${restaurantWords.join(' ')} `);
+    const itemWords = nameWords.filter(word => !restaurantWords.includes(word));
+    const distinctiveName = itemWords.some(word => !GENERIC_MENU_WORDS.has(word));
+    if (!restaurantNamed && !distinctiveName) continue;
+    // "(8 ct)"-style size notes are optional, but naming the size picks that item.
+    const sizeWords = normalizeWords((item.name.match(/\(([^)]*)\)/) || [])[1] || '');
+    const sizeNamed = sizeWords.length > 0 && hasAll(sizeWords);
+    const explained = [...nameWords, ...restaurantWords, ...sizeWords].map(stem);
+    const unexplained = queryWords.filter(
+      word => !explained.includes(stem(word)) && !FILLER_WORDS.has(word) && !/^\d+$/.test(word),
+    ).length;
+    // One extra word ("big mac burger") is fine; more ("big mac sauce recipe") is a different food.
+    if (unexplained > 1) continue;
+    const matchedItemWords = itemWords.filter(word => queryWords.some(q => stem(q) === stem(word))).length;
+    const score = matchedItemWords * 2 + (restaurantNamed ? 5 : 0) + (sizeNamed ? 3 : 0) - unexplained * 3;
+    if (!best || score > best.score) best = { item, score };
+  }
+  if (!best) return null;
+  // Without the restaurant, a name shared by several chains is ambiguous.
+  const restaurantNamed = queryText.includes(` ${normalizeWords(best.item.restaurant).join(' ')} `);
+  if (!restaurantNamed) {
+    const bestName = menuNameWords(best.item.name).join(' ');
+    const chains = new Set(
+      FAST_FOOD_ITEMS.filter(item => menuNameWords(item.name).join(' ') === bestName).map(item => item.restaurant),
+    );
+    if (chains.size > 1) return null;
+  }
+  return best.item;
+}
+
+/** Reads "2", "1/2", "1 1/2" or "2 burgers" as a count of menu items. */
+function itemCount(measurement: string): number {
+  const text = measurement.trim();
+  const mixed = text.match(/^(\d+)\s+(\d+)\/(\d+)/);
+  if (mixed) return Number(mixed[1]) + Number(mixed[2]) / Number(mixed[3]);
+  const fraction = text.match(/^(\d+)\/(\d+)/);
+  if (fraction) return Number(fraction[1]) / Number(fraction[2]);
+  const number = text.match(/^(\d+(?:\.\d+)?)/);
+  const count = number ? Number(number[1]) : 1;
+  return count > 0 && count <= 20 ? count : 1;
+}
+
+/** True when the USDA description mentions the words that identify the food (e.g. "egusi" in "egusi soup"). */
+function descriptionMatchesQuery(query: string, description: string): boolean {
+  const distinctive = normalizeWords(query).filter(word => word.length >= 3 && !NON_DISTINCTIVE_WORDS.has(word));
+  if (distinctive.length === 0) return true;
+  const descriptionWords = normalizeWords(description).map(stem);
+  const matched = distinctive.filter(word => descriptionWords.some(d => d.startsWith(stem(word)) || (d.length >= 4 && stem(word).startsWith(d))));
+  return matched.length > 0 && matched.length >= Math.ceil(distinctive.length / 2);
+}
+
+const UNCOOKED_DESCRIPTION = /\b(raw|dry|dried|uncooked|unprepared|dehydrated|flour|powder|mix)\b/;
+const USUALLY_COOKED_FOOD = /\b(rice|pasta|spaghetti|noodles?|macaroni|oats|oatmeal|quinoa|barley|couscous|bulgur|lentils?|beans?|chickpeas?|peas|chicken|beef|pork|lamb|goat|mutton|turkey|duck|fish|salmon|cod|tilapia|snapper|shrimp|prawns?|steak|oxtail|potato(es)?|yams?|cassava|plantains?)\b/;
+
+/** "white rice" means cooked rice, so USDA's "Rice, white, long-grain, raw" is the wrong entry. */
+function isUncookedFormMismatch(query: string, description: string): boolean {
+  const q = query.toLowerCase();
+  const d = description.toLowerCase().replace(/\bdry heat\b|\bdry roasted\b/g, ' ');
+  return USUALLY_COOKED_FOOD.test(q) && UNCOOKED_DESCRIPTION.test(d) && !UNCOOKED_DESCRIPTION.test(q);
+}
+
+export interface PlateComponent {
+  name: string;
+  ingredient: string;
+  measurement: string;
+  estimatedCalories: number;
+  note?: string;
+}
+
+const PLATE_FILLER_WORDS = new Set(['a', 'an', 'the', 'my', 'some', 'of', 'plate', 'bowl', 'order', 'serving', 'side', 'homemade']);
+const PLATE_SEPARATORS = /\s*(?:,|\+|;|\bserved with\b|\bwith a side of\b|\bwith\b|\bplus\b|\bside of\b|\bon a bed of\b|\bover\b)\s*/;
+// "X and Y <dish>" is one food: "ham and cheese sandwich", "chicken and rice soup".
+const SINGLE_DISH_SUFFIX = /\b(sandwich|sub|hoagie|wrap|burger|omelet|omelette|quesadilla|pizza|salad|soup|stew|bagel|croissant|biscuit|tacos?|burrito|crepe|pie|smoothie|shake|casserole|bake|stir fry|panini|melt|toastie|skewers?|bowl|platter|roll)$/;
+
+type PlatePortion = [amount: number, unit: string];
+const PLATE_PORTIONS: Array<[RegExp, PlatePortion]> = [
+  [/^sugar$/, [1, 'teaspoon']],
+  [/^(\w+ )?(gravy|sauce|salsa|dressing|ranch|pesto|guacamole|hummus|chutney|raita|tzatziki|curry sauce|dip)$/, [2, 'tablespoon']],
+  [/^(\w+ )?(butter|margarine|jam|jelly|honey|syrup|ketchup|mayo|mayonnaise|mustard|hot sauce|pepper sauce|cream cheese|sour cream)$/, [1, 'tablespoon']],
+  [/^(\w+ )?(cheese|cheddar|mozzarella|feta|parmesan)$/, [1, 'ounce']],
+  [/\b(fries|chips|tostones|plantains?|maduros|wedges|hash browns?)\b/, [4, 'ounce']],
+  [/\b(rice|pilaf|biryani|pasta|spaghetti|noodles|macaroni|mac|quinoa|couscous|grits|oatmeal|porridge|beans|lentils|dal|dhal|peas|chickpeas|mashed potatoes|coleslaw|potato salad)\b/, [1, 'cup']],
+  [/\b(salad|greens|lettuce|spinach|cabbage|broccoli|carrots|vegetables|veggies|callaloo|okra|green beans|corn)\b/, [1, 'cup']],
+  [/\b(roti|naan|chapati|paratha|tortilla|pita|injera|arepa|bammy|festival|johnny cakes?|bake)\b/, [1, 'piece']],
+  [/\b(bread|toast|cornbread)\b/, [1, 'slice']],
+  [/\b(eggs)\b/, [2, 'large']],
+  [/\b(egg)\b/, [1, 'large']],
+  [/\b(chicken|beef|pork|lamb|goat|mutton|turkey|duck|steak|fish|salmon|cod|tilapia|snapper|shrimp|prawns|tofu|oxtail|ribs|wings|thighs?|breast|drumsticks?|brisket|sausages?|ham|meatballs|patty)\b/, [5, 'ounce']],
+];
+
+function titleCase(text: string): string {
+  return text.replace(/\b[a-z]/g, letter => letter.toUpperCase());
+}
+
+/** Splits "curry chicken and white rice" into dishes, keeping names like "rice and peas" whole. */
+function splitPlate(query: string, isKnownDish: (text: string) => boolean): string[] {
+  const text = query.toLowerCase().replace(/&/g, ' and ').replace(/\bon the side\b/g, ' ').replace(/\s+/g, ' ').trim();
+  if (!/,|\+|;|\band\b|\bwith\b|\bplus\b|\bover\b|\bside of\b|\bbed of\b/.test(text)) return [text];
+  if (isKnownDish(text)) return [text];
+
+  const parts: string[] = [];
+  for (const rawPiece of text.split(PLATE_SEPARATORS)) {
+    const piece = rawPiece.replace(/^(and|a|an|some)\s+/, '').trim();
+    if (!piece) continue;
+    if (!/\band\b/.test(piece) || isKnownDish(piece) || SINGLE_DISH_SUFFIX.test(piece)) {
+      parts.push(piece);
+      continue;
+    }
+    // "rice and peas and plantains": keep the longest run of words that names a dish.
+    const words = piece.split(/\s+and\s+/).map(part => part.trim()).filter(Boolean);
+    for (let start = 0; start < words.length;) {
+      let end = words.length;
+      while (end > start + 1 && !isKnownDish(words.slice(start, end).join(' and '))) end--;
+      parts.push(words.slice(start, end).join(' and '));
+      start = end;
+    }
+  }
+  return parts.length > 1 && parts.length <= 6 ? parts : [text];
+}
+
+function parseAmount(text: string): number | null {
+  const mixed = text.match(/^(\d+)\s+(\d+)\/(\d+)$/);
+  if (mixed) return Number(mixed[1]) + Number(mixed[2]) / Number(mixed[3]);
+  const fraction = text.match(/^(\d+)\/(\d+)$/);
+  if (fraction) return Number(fraction[1]) / Number(fraction[2]);
+  const number = Number(text);
+  return Number.isFinite(number) && number > 0 ? number : null;
+}
 
 interface USDANutrient {
   id: number;
@@ -508,7 +673,8 @@ export class USDAService {
    */
   async calculateIngredientCalories(
     ingredientName: string,
-    measurement: string
+    measurement: string,
+    options: { clientKey?: string } = {}
   ): Promise<{
     ingredient: string;
     measurement: string;
@@ -537,6 +703,7 @@ export class USDAService {
     fdaServing?: string;
     enhancedDatabase?: boolean;
     category?: string;
+    components?: PlateComponent[];
     portionInfo?: {
       isRealistic?: boolean;
       warning?: string;
@@ -564,7 +731,7 @@ export class USDAService {
           ingredient: ingredientName.toUpperCase(),
           measurement: `${measurement} (~330g)`,
           estimatedCalories: 0,
-          equivalentMeasurement: '100g ≈ 0 kcal',
+          equivalentMeasurement: '100g ≈ 0 cal',
           note: 'Zero-calorie sparkling water',
           nutritionPer100g: {
             calories: 0,
@@ -591,7 +758,20 @@ export class USDAService {
         this.setMemoryCache(cacheKey, zeroCalorieResult);
         return zeroCalorieResult;
       }
+
+      const plateResult = await this.calculatePlate(ingredientName, measurement, options);
+      if (plateResult) {
+        this.setMemoryCache(cacheKey, plateResult);
+        return plateResult;
+      }
       
+      const menuItem = findFastFoodItem(ingredientName);
+      if (menuItem) {
+        const menuResult = this.buildFastFoodResult(menuItem, measurement);
+        this.setMemoryCache(cacheKey, menuResult);
+        return menuResult;
+      }
+
       // Curated entries first; unknown foods fall through to USDA instead of a generic guess.
       try {
         const fallbackResult = this.getEnhancedFallbackEstimate(ingredientName, measurement, false);
@@ -624,13 +804,12 @@ export class USDAService {
         throw new Error('No suitable foods found');
       }
       
-      // Use the most relevant result (first one after filtering)
-      const food = filteredFoods[0];
-      
-
-      
-      // Validate food match quality before proceeding
-      if (this.isIncorrectFoodMatch(ingredientName, food.description)) {
+      // Most relevant result that is actually this food, in the form people eat it
+      const food = filteredFoods.find(candidate =>
+        !this.isIncorrectFoodMatch(ingredientName, candidate.description)
+        && descriptionMatchesQuery(ingredientName, candidate.description)
+        && !isUncookedFormMismatch(ingredientName, candidate.description));
+      if (!food) {
         throw new Error('Incorrect food match detected, using fallback');
       }
 
@@ -676,7 +855,7 @@ export class USDAService {
         ingredient: food.description,
         measurement: `${quantity} ${unit} (~${gramsEquivalent}g)`,
         estimatedCalories,
-        equivalentMeasurement: `100g ≈ ${nutrients.calories} kcal`,
+        equivalentMeasurement: `100g ≈ ${nutrients.calories} cal`,
         note: 'From the Bytewise Food Database',
         nutritionPer100g: {
           ...nutrients,
@@ -692,7 +871,12 @@ export class USDAService {
       
       return result;
     } catch (error) {
-      
+      const aiResult = await this.buildAiEstimateResult(ingredientName, measurement, options.clientKey);
+      if (aiResult) {
+        this.setMemoryCache(cacheKey, aiResult);
+        return aiResult;
+      }
+
       // Fallback to enhanced estimation with proper nutrition data
       try {
         return this.getEnhancedFallbackEstimate(ingredientName, measurement);
@@ -875,6 +1059,25 @@ export class USDAService {
   };
 
   // Comprehensive fallback nutrition data per 100g
+  private static readonly COOKED_CUP_GRAMS: Array<[RegExp, number]> = [
+    [/\bmac(aroni)? (and|n) cheese\b/, 200],
+    [/\b(noodles?|pasta|spaghetti|macaroni|penne|linguine|fettuccine|lo mein|chow mein|pad thai|udon|ramen)\b/, 140],
+    [/\bbrown rice\b/, 195],
+    [/\bfried rice\b/, 140],
+    [/\b(rice and peas|rice and beans|peas and rice|red beans and rice|moros|gallo pinto|arroz con gandules|pelau|cook up rice)\b/, 190],
+    [/\b(rice|pilaf|pilau|biryani|jollof|risotto|paella)\b/, 158],
+    [/\bquinoa\b/, 185],
+    [/\bcouscous\b/, 157],
+    [/\b(oatmeal|porridge|grits|cream of wheat)\b/, 234],
+    [/\bmashed potato(es)?\b/, 210],
+    [/\b(beans?|lentils?|dal|dhal|chickpeas?|chana|black eyed peas|pigeon peas|split peas)\b/, 175],
+    [/\bcoleslaw\b/, 120],
+    [/\b(potato|chicken|tuna|egg|shrimp|macaroni) salad\b/, 210],
+    [/\b(salad|lettuce|greens|spinach|arugula|kale|mixed greens)\b/, 55],
+    [/\b(broccoli|carrots?|green beans|vegetables|veggies|cabbage|callaloo|okra|corn|cauliflower|peas)\b/, 150],
+    [/\b(curry|stew|chili|gumbo|jambalaya|soup)\b/, 240],
+  ];
+
   private static readonly FALLBACK_NUTRITION: Record<string, { calories: number; protein: number; carbs: number; fat: number }> = {
     // Fruits
     'apple': { calories: 52, protein: 0.3, carbs: 14, fat: 0.2 },
@@ -1042,7 +1245,7 @@ export class USDAService {
     'plantains': { calories: 122, protein: 1.3, carbs: 32, fat: 0.4 },
     'fried plantains': { calories: 148, protein: 1.1, carbs: 38, fat: 0.1 },
     'jerk chicken': { calories: 190, protein: 29, carbs: 2, fat: 7 },
-    'rice and beans': { calories: 205, protein: 8, carbs: 38, fat: 3 },
+    'rice and beans': { calories: 150, protein: 5.5, carbs: 27, fat: 2.5 },
     'beef patty': { calories: 350, protein: 15, carbs: 30, fat: 20 },
     'chicken patty': { calories: 320, protein: 16, carbs: 28, fat: 18 },
     'roti': { calories: 230, protein: 6, carbs: 45, fat: 4 },
@@ -2204,6 +2407,14 @@ export class USDAService {
 
     // Check for item-specific conversions first - prioritize ingredient name over food description
     const ingredientName = (food.description?.toLowerCase() || '').replace(/[^\w\s]/g, ' ');
+
+    // A cup of cooked food weighs far less than 240 g of water (a cup of cooked rice is ~158 g).
+    if (/^(cups?|c)\b/.test(unit) && !/\b(raw|dry|uncooked|flour|milk|cakes?|crackers?|cereal|puffed|krispies)\b/.test(ingredientName)) {
+      const cupGrams = USDAService.COOKED_CUP_GRAMS.find(([pattern]) => pattern.test(ingredientName))?.[1];
+      if (cupGrams) {
+        return { quantity, unit, gramsEquivalent: Math.round(quantity * cupGrams) };
+      }
+    }
     
     for (const [ingredient, conversions] of Object.entries(itemConversions)) {
       // Check the food description for ingredient matches
@@ -2223,13 +2434,14 @@ export class USDAService {
     // Enhanced unit matching with variations
     let unitMatched = false;
     
-    // First, try to match using unit variations
+    // First, try to match using unit variations (whole words, so "c" doesn't match "ounce" or "piece")
+    const unitWords = unit.split(/[^a-z]+/).filter(Boolean);
     for (const [baseUnit, variations] of Object.entries(unitVariations)) {
       for (const variation of variations) {
-        if (unit.includes(variation)) {
+        if (unitWords.includes(variation)) {
           const conversionFactor = conversions[baseUnit];
           if (conversionFactor) {
-            gramsEquivalent = quantity * conversionFactor;
+            gramsEquivalent = Math.round(quantity * conversionFactor * 10) / 10;
             unitMatched = true;
             break;
           }
@@ -2241,7 +2453,7 @@ export class USDAService {
     // If no variation matched, try direct conversion lookup
     if (!unitMatched) {
       for (const [unitPattern, grams] of Object.entries(conversions)) {
-        if (unit.includes(unitPattern)) {
+        if (unitWords.some(word => word === unitPattern || word === `${unitPattern}s` || word === `${unitPattern}es`)) {
           gramsEquivalent = quantity * grams;
           break;
         }
@@ -2417,11 +2629,15 @@ export class USDAService {
       if (description.includes('with ') || description.includes('mixed')) score -= 150;
       if (description.includes('salad') || description.includes('dish') || description.includes('recipe')) score -= 300;
       
-      // Strong preference for basic ingredient names
-      const basicTerms = ['raw', 'fresh', 'plain', 'unsweetened', 'unflavored'];
+      // Strong preference for basic ingredient names; rice, beans or chicken are eaten cooked, though
+      const wantsCooked = USUALLY_COOKED_FOOD.test(searchLower) && !UNCOOKED_DESCRIPTION.test(searchLower);
+      const basicTerms = wantsCooked
+        ? ['cooked', 'boiled', 'steamed', 'roasted', 'baked', 'plain', 'unsweetened', 'unflavored']
+        : ['raw', 'fresh', 'plain', 'unsweetened', 'unflavored'];
       for (const term of basicTerms) {
         if (description.includes(term)) score += 200;
       }
+      if (wantsCooked && isUncookedFormMismatch(searchLower, description)) score -= 400;
       
       // USDA names are inverted ("Oil, olive, extra virgin"), so match word by word
       const searchWords = searchLower.split(/\s+/).filter(w => w.length > 1);
@@ -2759,12 +2975,149 @@ export class USDAService {
       ingredient: entry.name.toUpperCase(),
       measurement: `${qty} ${unitLabel} (~${grams}g)`,
       estimatedCalories,
-      equivalentMeasurement: `100g ≈ ${per100g.calories} kcal`,
+      equivalentMeasurement: `100g ≈ ${per100g.calories} cal`,
       note: entry.note || 'From Bytewise enhanced food database',
       nutritionPer100g: per100g,
       enhancedDatabase: true,
       category: entry.category,
       portionInfo: this.validatePortionSize(ingredientName.toLowerCase(), grams, estimatedCalories),
+    };
+  }
+
+  private buildFastFoodResult(item: FastFoodItem, measurement: string) {
+    const count = itemCount(measurement);
+    const scale = (value: number) => Math.round(value * count * 10) / 10;
+    const name = item.name.toLowerCase().startsWith(item.restaurant.toLowerCase())
+      ? item.name
+      : `${item.restaurant} ${item.name}`;
+    const possessive = /['’]s$/i.test(item.restaurant)
+      ? item.restaurant
+      : /s$/i.test(item.restaurant) ? `${item.restaurant}'` : `${item.restaurant}'s`;
+    return {
+      ingredient: name.toUpperCase(),
+      measurement: `${count} × ${item.serving}`,
+      estimatedCalories: Math.round(item.calories * count),
+      equivalentMeasurement: `${item.serving} ≈ ${item.calories} cal`,
+      note: `From ${possessive} published nutrition`,
+      // Menu data is per item, not per 100 g. The client scales macros by
+      // estimatedCalories / nutritionPer100g.calories, which here is the item count.
+      nutritionPer100g: {
+        calories: item.calories,
+        protein: item.protein,
+        carbs: item.carbs,
+        fat: item.fat,
+        sodium: item.sodium,
+      },
+      enhancedDatabase: true,
+      category: 'fast_food',
+      source: 'menu' as const,
+    };
+  }
+
+  private async buildAiEstimateResult(ingredientName: string, measurement: string, clientKey?: string) {
+    const estimate = await estimateFoodWithAI(ingredientName, measurement, clientKey);
+    if (!estimate) return null;
+    const grams = Math.round(estimate.grams);
+    const per100g = { ...estimate.per100g, calories: Math.round(estimate.per100g.calories) };
+    const estimatedCalories = Math.round((per100g.calories * grams) / 100);
+    return {
+      ingredient: estimate.name.toUpperCase(),
+      measurement: `${measurement || '1 serving'} (~${grams}g)`,
+      estimatedCalories,
+      equivalentMeasurement: `100g ≈ ${per100g.calories} cal`,
+      note: `AI estimate${estimate.cuisine ? ` · ${estimate.cuisine}` : ''} (not in the food databases)`,
+      nutritionPer100g: per100g,
+      category: estimate.cuisine,
+      source: 'ai' as const,
+      portionInfo: this.validatePortionSize(ingredientName.toLowerCase(), grams, estimatedCalories),
+    };
+  }
+
+  private isKnownDish(text: string): boolean {
+    if (USDAService.FALLBACK_NUTRITION[text]) return true;
+    if (findEnhancedFoodCovering(text, PLATE_FILLER_WORDS)) return true;
+    const menuItem = findFastFoodItem(text);
+    if (!menuItem) return false;
+    const explained = [...menuNameWords(menuItem.name), ...normalizeWords(menuItem.restaurant)].map(stem);
+    return normalizeWords(text).every(word => explained.includes(stem(word)) || PLATE_FILLER_WORDS.has(word));
+  }
+
+  /** How much of each dish is on the plate: the user's weight/volume split evenly, otherwise a typical portion. */
+  private platePartMeasurement(part: string, index: number, measurement: string, partCount: number): string {
+    const text = measurement.trim().toLowerCase();
+    const match = text.match(/^(\d+\s+\d+\/\d+|\d+\/\d+|\d*\.?\d+)?\s*(.*)$/);
+    const quantity = (match?.[1] && parseAmount(match[1].trim())) || 1;
+    const unit = (match?.[2] || '').trim();
+    const round = (value: number) => Math.round(value * 100) / 100;
+
+    if (/^(g|grams?|kg|kilograms?|oz|ounces?|lbs?|pounds?|cups?|ml|milliliters?)\b/.test(unit)) {
+      return `${round(quantity / partCount)} ${unit}`;
+    }
+    if (findFastFoodItem(part)) return String(round(quantity));
+    if (index > 0 && /^(milk|cream|creamer|half and half)$/.test(part)) return `${round(2 * quantity)} tablespoon`;
+    const portion: PlatePortion = !USDAService.FALLBACK_NUTRITION[part] && findEnhancedFood(part)
+      ? [1, 'serving']
+      : PLATE_PORTIONS.find(([pattern]) => pattern.test(part))?.[1] ?? [1, 'serving'];
+    return `${round(portion[0] * quantity)} ${portion[1]}`;
+  }
+
+  /** A mixed plate ("curry chicken and white rice") is the sum of its dishes, each looked up on its own. */
+  private async calculatePlate(ingredientName: string, measurement: string, options: { clientKey?: string }) {
+    const parts = splitPlate(ingredientName, text => this.isKnownDish(text));
+    if (parts.length < 2) return null;
+
+    const results = await Promise.all(parts.map((part, index) => {
+      // "2 eggs and toast": the count belongs to that item
+      const counted = part.match(/^(\d+(?:\.\d+)?)\s+(.+)$/);
+      if (counted) {
+        const defaultUnit = this.platePartMeasurement(counted[2], index, '1', parts.length).replace(/^[\d.]+\s*/, '');
+        const unit = defaultUnit === 'ounce' ? 'piece' : defaultUnit;
+        return this.calculateIngredientCalories(counted[2], `${counted[1]} ${unit}`.trim(), options);
+      }
+      return this.calculateIngredientCalories(part, this.platePartMeasurement(part, index, measurement, parts.length), options);
+    }));
+
+    const totals: Record<string, number> = {};
+    let totalGrams: number | null = 0;
+    for (const result of results) {
+      const per100g = (result.nutritionPer100g || {}) as Record<string, number | undefined>;
+      const grams = Number(result.measurement.match(/~(\d+(?:\.\d+)?)g\)/)?.[1]);
+      totalGrams = totalGrams !== null && grams > 0 ? totalGrams + grams : null;
+      const factor = per100g.calories && per100g.calories > 0
+        ? result.estimatedCalories / per100g.calories
+        : (grams > 0 ? grams / 100 : 0);
+      for (const [key, value] of Object.entries(per100g)) {
+        if (typeof value === 'number') totals[key] = (totals[key] || 0) + value * factor;
+      }
+    }
+
+    const estimatedCalories = results.reduce((sum, result) => sum + result.estimatedCalories, 0);
+    totals.calories = estimatedCalories;
+    // With a known total weight these are true per-100 g values; otherwise they're for the whole plate,
+    // which the client's estimatedCalories / nutritionPer100g.calories scaling handles either way.
+    const divisor = totalGrams ? totalGrams / 100 : 1;
+    const nutritionPer100g = Object.fromEntries(
+      Object.entries({ protein: 0, carbs: 0, fat: 0, ...totals })
+        .map(([key, value]) => [key, Math.round((value / divisor) * 10) / 10]),
+    ) as { calories: number; protein: number; carbs: number; fat: number };
+    const names = parts.map(titleCase);
+
+    return {
+      ingredient: names.join(' + ').toUpperCase(),
+      measurement: `${measurement || '1 plate'}${totalGrams ? ` (~${Math.round(totalGrams)}g)` : ''}`,
+      estimatedCalories,
+      equivalentMeasurement: totalGrams ? `100g ≈ ${Math.round(nutritionPer100g.calories)} cal` : undefined,
+      note: `${results.length} items on this plate, each looked up separately`,
+      nutritionPer100g,
+      category: 'plate',
+      source: 'plate' as const,
+      components: results.map((result, index): PlateComponent => ({
+        name: names[index],
+        ingredient: result.ingredient,
+        measurement: result.measurement,
+        estimatedCalories: result.estimatedCalories,
+        note: result.note,
+      })),
     };
   }
 
@@ -2783,7 +3136,7 @@ export class USDAService {
         ingredient: ingredientName.toUpperCase(),
         measurement: `${measurement} (~240g)`,
         estimatedCalories: 0,
-        equivalentMeasurement: '100g ≈ 0 kcal',
+        equivalentMeasurement: '100g ≈ 0 cal',
         note: 'Contains no calories',
         nutritionPer100g: {
           calories: 0,
@@ -2944,8 +3297,7 @@ export class USDAService {
       'cocoa puffs': { calories: 387, protein: 5.3, carbs: 86.7, fat: 4.0 },
       'trix': { calories: 387, protein: 4.0, carbs: 93.3, fat: 1.3 },
       
-      // Healthier cereals
-      'oatmeal': { calories: 389, protein: 16.9, carbs: 66.3, fat: 6.9 },
+      // Healthier cereals (cooked "oatmeal" comes from FALLBACK_NUTRITION)
       'granola': { calories: 471, protein: 13.0, carbs: 64.0, fat: 20.0 },
       'muesli': { calories: 362, protein: 9.7, carbs: 72.2, fat: 5.9 },
       'bran flakes': { calories: 321, protein: 10.7, carbs: 67.9, fat: 1.8 },
@@ -3261,8 +3613,10 @@ export class USDAService {
         ingredient: normalized.toUpperCase(),
         measurement: `${quantity} ${unit} (~${gramsEquivalent}g)`,
         estimatedCalories,
-        equivalentMeasurement: `100g ≈ ${nutrition.calories} kcal`,
-        note: estimatedCalories === 0 ? 'Contains no calories' : 'Low-calorie beverage',
+        equivalentMeasurement: `100g ≈ ${nutrition.calories} cal`,
+        note: estimatedCalories === 0
+          ? 'Contains no calories'
+          : nutrition.calories <= 50 ? 'Low-calorie beverage' : 'Estimate based on Bytewise Food Database averages',
         nutritionPer100g: nutritionWithMicronutrients,
         portionInfo: portionInfo
       };
@@ -3313,7 +3667,7 @@ export class USDAService {
         ingredient: normalized.toUpperCase(),
         measurement: `${quantity} ${unit} (~${gramsEquivalent}g)`,
         estimatedCalories,
-        equivalentMeasurement: `100g ≈ ${nutrition.calories} kcal`,
+        equivalentMeasurement: `100g ≈ ${nutrition.calories} cal`,
         note: 'Estimate based on Bytewise Food Database averages',
         nutritionPer100g: nutritionWithMicronutrients,
         usdaPortionUsed: false,
@@ -3367,7 +3721,12 @@ export class USDAService {
       baseCalories = 25; protein = 2.5; carbs = 5.0; fat = 0.2;
     } else if (normalized.includes('meat') || normalized.match(/\b(chicken|beef|pork|fish|turkey)\b/)) {
       baseCalories = 250; protein = 25.0; carbs = 0.0; fat = 15.0;
-    } else if (normalized.includes('grain') || normalized.match(/\b(rice|bread|pasta|cereal|oats)\b/)) {
+    } else if (normalized.match(/\b(rice|pasta|noodles|spaghetti|couscous|quinoa)\b/)) {
+      // Eaten cooked
+      baseCalories = 140; protein = 3.5; carbs = 28.0; fat = 1.5;
+    } else if (normalized.match(/\b(bread|toast|bun|roll)\b/)) {
+      baseCalories = 265; protein = 9.0; carbs = 49.0; fat = 3.2;
+    } else if (normalized.includes('grain') || normalized.match(/\b(cereal|oats)\b/)) {
       baseCalories = 350; protein = 10.0; carbs = 70.0; fat = 2.0;
     }
     
@@ -3409,7 +3768,7 @@ export class USDAService {
       ingredient: ingredientName.toUpperCase(),
       measurement: `${quantity} ${unit} (~${gramsEquivalent}g)`,
       estimatedCalories,
-      equivalentMeasurement: `100g ≈ ${nutrition.calories} kcal`,
+      equivalentMeasurement: `100g ≈ ${nutrition.calories} cal`,
       note: 'Generic estimate - consider adding specific nutrition data',
       nutritionPer100g: nutrition,
       isGenericEstimate: true,

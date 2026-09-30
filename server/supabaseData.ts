@@ -359,9 +359,25 @@ function mapWaterIntake(row: any) {
     userId: row.user_id,
     date: row.date ? new Date(row.date) : new Date(),
     glasses: toNumber(row.glasses),
+    containers: sanitizeWaterContainers(row.containers),
     createdAt: row.created_at ? new Date(row.created_at) : new Date(),
   };
 }
+
+export const WATER_CONTAINER_SIZES = ['8', '16', '24', '32'] as const;
+export type WaterContainers = Partial<Record<(typeof WATER_CONTAINER_SIZES)[number], number>>;
+
+export function sanitizeWaterContainers(value: unknown): WaterContainers | null {
+  if (!value || typeof value !== 'object') return null;
+  const result: WaterContainers = {};
+  for (const size of WATER_CONTAINER_SIZES) {
+    const count = Math.floor(Number((value as Record<string, unknown>)[size]));
+    if (count > 0 && count <= 8) result[size] = count;
+  }
+  return result;
+}
+
+let containersColumnMissing = false;
 
 function startOfUtcDay(date: Date): Date {
   return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
@@ -407,19 +423,34 @@ export async function getUserWaterHistoryViaSupabase(userId: string, days: numbe
   return (data || []).map(mapWaterIntake);
 }
 
-export async function upsertWaterIntakeViaSupabase(userId: string, date: Date, glasses: number) {
-  const { data, error } = await supabaseAdmin
+export async function upsertWaterIntakeViaSupabase(
+  userId: string,
+  date: Date,
+  glasses: number,
+  containers?: WaterContainers | null,
+) {
+  const save = (withContainers: boolean) => supabaseAdmin
     .from('water_intake')
     .upsert(
       {
         user_id: userId,
         date: startOfUtcDay(date).toISOString(),
         glasses,
+        ...(withContainers ? { containers } : {}),
       },
       { onConflict: 'user_id,date' },
     )
     .select('*')
     .single();
+
+  const includeContainers = containers !== undefined && !containersColumnMissing;
+  let { data, error } = await save(includeContainers);
+  // Until migration 011 is applied, keep saving the total without the breakdown.
+  if (error && includeContainers && (error.code === 'PGRST204' || error.code === '42703')) {
+    containersColumnMissing = true;
+    console.warn('⚠️ water_intake.containers is missing; apply migration 011_water_containers.sql');
+    ({ data, error } = await save(false));
+  }
 
   if (error) {
     throw error;

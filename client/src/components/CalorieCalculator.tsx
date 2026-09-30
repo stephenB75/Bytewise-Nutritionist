@@ -67,6 +67,13 @@ interface IngredientAnalysis {
     phosphorus?: number;
   };
   fdaServing?: string;
+  components?: Array<{
+    name: string;
+    ingredient: string;
+    measurement: string;
+    estimatedCalories: number;
+    note?: string;
+  }>;
   portionInfo?: {
     isRealistic?: boolean;
     warning?: string;
@@ -839,7 +846,7 @@ function CalorieCalculator({
                   <div className="text-right">
                     <Badge variant="default" className="bg-orange-600 text-white text-lg px-3 py-1 mb-1">
                       <Flame className="w-4 h-4 mr-1" />
-                      {analysis.estimatedCalories} kcal
+                      {analysis.estimatedCalories} cal
                     </Badge>
                     <p className="text-xs text-gray-900">Total for this portion</p>
                   </div>
@@ -926,28 +933,50 @@ function CalorieCalculator({
                   </div>
                 )}
 
-                {analysis.nutritionPer100g && (
+                {analysis.components && analysis.components.length > 1 && (
                   <div className="mb-3">
-                    <p className="text-xs text-gray-900 mb-2 font-medium">Nutrition per 100g (for comparison):</p>
-                    <div className="grid grid-cols-3 gap-3">
-                      <div className="text-center p-2 bg-amber-50/60 rounded">
-                        <Beef className="w-4 h-4 mx-auto text-red-500 mb-1" />
-                        <p className="text-xs text-gray-600">Protein</p>
-                        <p className="font-bold text-gray-900">{Math.round(analysis.nutritionPer100g.protein)}g</p>
-                      </div>
-                      <div className="text-center p-2 bg-amber-50/60 rounded">
-                        <Wheat className="w-4 h-4 mx-auto text-[#faed39] mb-1" />
-                        <p className="text-xs text-gray-600">Carbs</p>
-                        <p className="font-bold text-gray-900">{Math.round(analysis.nutritionPer100g.carbs)}g</p>
-                      </div>
-                      <div className="text-center p-2 bg-amber-50/60 rounded">
-                        <Droplets className="w-4 h-4 mx-auto text-[#1f4aa6] mb-1" />
-                        <p className="text-xs text-gray-600">Fat</p>
-                        <p className="font-bold text-gray-900">{Math.round(analysis.nutritionPer100g.fat)}g</p>
-                      </div>
-                    </div>
+                    <p className="text-xs text-gray-900 mb-2 font-medium">On this plate:</p>
+                    <ul className="divide-y divide-gray-100 rounded bg-amber-50/60">
+                      {analysis.components.map((component, index) => (
+                        <li key={`${component.name}-${index}`} className="flex items-center justify-between gap-3 px-3 py-2">
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-gray-900 truncate">{component.name}</p>
+                            <p className="text-xs text-gray-600 truncate">{component.measurement}</p>
+                          </div>
+                          <p className="text-sm font-semibold text-gray-900 whitespace-nowrap">{component.estimatedCalories} cal</p>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 )}
+
+                {analysis.nutritionPer100g && (() => {
+                  const caloriesPer100g = analysis.nutritionPer100g.calories || 100;
+                  const scale = caloriesPer100g > 0 ? analysis.estimatedCalories / caloriesPer100g : 1;
+                  const grams = (value: number | undefined) => Math.round((value || 0) * scale);
+                  return (
+                    <div className="mb-3">
+                      <p className="text-xs text-gray-900 mb-2 font-medium">Nutrition for this portion:</p>
+                      <div className="grid grid-cols-3 gap-3">
+                        <div className="text-center p-2 bg-amber-50/60 rounded">
+                          <Beef className="w-4 h-4 mx-auto text-red-500 mb-1" />
+                          <p className="text-xs text-gray-600">Protein</p>
+                          <p className="font-bold text-gray-900">{grams(analysis.nutritionPer100g.protein)}g</p>
+                        </div>
+                        <div className="text-center p-2 bg-amber-50/60 rounded">
+                          <Wheat className="w-4 h-4 mx-auto text-[#faed39] mb-1" />
+                          <p className="text-xs text-gray-600">Carbs</p>
+                          <p className="font-bold text-gray-900">{grams(analysis.nutritionPer100g.carbs)}g</p>
+                        </div>
+                        <div className="text-center p-2 bg-amber-50/60 rounded">
+                          <Droplets className="w-4 h-4 mx-auto text-[#1f4aa6] mb-1" />
+                          <p className="text-xs text-gray-600">Fat</p>
+                          <p className="font-bold text-gray-900">{grams(analysis.nutritionPer100g.fat)}g</p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
 
                 {analysis.note && (
                   <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded">

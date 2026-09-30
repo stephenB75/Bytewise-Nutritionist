@@ -1,16 +1,21 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface ProfileIconProps {
   iconNumber: number; // 1-2 for the 2 different avatar types (1=male, 2=female)
+  /** The user's uploaded profile photo; the preset avatar is shown when absent or broken. */
+  imageUrl?: string | null;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 }
 
 export const ProfileIcon: React.FC<ProfileIconProps> = ({ 
   iconNumber, 
+  imageUrl,
   size = 'md', 
   className = '' 
 }) => {
+  const [photoFailed, setPhotoFailed] = useState(false);
+  useEffect(() => setPhotoFailed(false), [imageUrl]);
   const sizeClasses = {
     sm: 'w-8 h-8 min-w-[2rem] min-h-[2rem]',
     md: 'w-16 h-16 min-w-[4rem] min-h-[4rem]', 
@@ -20,6 +25,22 @@ export const ProfileIcon: React.FC<ProfileIconProps> = ({
   // Determine which avatar to use based on iconNumber (ensure valid range)
   const validIconNumber = iconNumber === 2 ? 2 : 1; // Default to 1 if not 2
   const avatarSrc = validIconNumber === 2 ? '/avatar-female.png' : '/avatar-male.png';
+
+  if (imageUrl && !photoFailed) {
+    return (
+      <div
+        className={`${sizeClasses[size]} rounded-full overflow-hidden bg-amber-100 shadow-lg ${className}`}
+        data-testid="profile-icon-photo"
+      >
+        <img
+          src={imageUrl}
+          alt="Profile photo"
+          className="w-full h-full object-cover rounded-full"
+          onError={() => setPhotoFailed(true)}
+        />
+      </div>
+    );
+  }
 
   return (
     <div 

@@ -49,6 +49,7 @@ import {
   updateUserGoalsViaSupabase,
   upsertUserViaSupabase,
   upsertWaterIntakeViaSupabase,
+  type WaterContainers,
   createFastingSessionViaSupabase,
   getUserFastingSessionsViaSupabase,
   getFastingSessionViaSupabase,
@@ -140,6 +141,7 @@ export interface IStorage {
     totalCarbs: number;
     totalFat: number;
     waterGlasses: number;
+    waterContainers?: WaterContainers | null;
     fastingStatus?: {
       isActive: boolean;
       timeRemaining?: number;
@@ -1014,6 +1016,7 @@ export class DatabaseStorage implements IStorage {
     totalCarbs: number;
     totalFat: number;
     waterGlasses: number;
+    waterContainers?: WaterContainers | null;
     fastingStatus?: {
       isActive: boolean;
       timeRemaining?: number;
@@ -1082,6 +1085,7 @@ export class DatabaseStorage implements IStorage {
       const result = {
         ...totals,
         waterGlasses: water?.glasses || 0,
+        waterContainers: (water as { containers?: WaterContainers | null } | undefined)?.containers ?? null,
         fastingStatus
       };
       
@@ -1187,9 +1191,9 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Water intake management
-  async updateWaterIntake(userId: string, date: Date, glasses: number): Promise<WaterIntake> {
+  async updateWaterIntake(userId: string, date: Date, glasses: number, containers?: WaterContainers | null): Promise<WaterIntake> {
     if (!getDatabaseUrl()) {
-      return await upsertWaterIntakeViaSupabase(userId, date, glasses) as any;
+      return await upsertWaterIntakeViaSupabase(userId, date, glasses, containers) as any;
     }
 
     try {
@@ -1225,14 +1229,18 @@ export class DatabaseStorage implements IStorage {
         .returning();
       return created;
     } catch {
-      return await upsertWaterIntakeViaSupabase(userId, date, glasses) as any;
+      return await upsertWaterIntakeViaSupabase(userId, date, glasses, containers) as any;
     }
   }
 
   // Update daily stats (including water consumption)
-  async updateUserDailyStats(userId: string, date: Date, updates: { waterGlasses?: number }): Promise<{ waterGlasses: number }> {
+  async updateUserDailyStats(
+    userId: string,
+    date: Date,
+    updates: { waterGlasses?: number; waterContainers?: WaterContainers | null },
+  ): Promise<{ waterGlasses: number }> {
     if (updates.waterGlasses !== undefined) {
-      const waterRecord = await this.updateWaterIntake(userId, date, updates.waterGlasses);
+      const waterRecord = await this.updateWaterIntake(userId, date, updates.waterGlasses, updates.waterContainers);
       return { waterGlasses: waterRecord.glasses };
     }
     

@@ -59,13 +59,13 @@ function describe(activity: Activity): string {
   switch (activity.type) {
     case 'summary':
       return [
-        `${d.calories ?? 0} kcal from ${d.meals ?? 0} meal${d.meals === 1 ? '' : 's'}`,
+        `${d.calories ?? 0} cal from ${d.meals ?? 0} meal${d.meals === 1 ? '' : 's'}`,
         `${d.protein ?? 0}g protein`,
         `${d.water ?? 0} glasses of water`,
         d.fast ? `Fast: ${d.fast}` : null,
       ].filter(Boolean).join(' · ');
     case 'meal':
-      return [d.mealType, d.calories != null ? `${d.calories} kcal` : null].filter(Boolean).join(' · ');
+      return [d.mealType, d.calories != null ? `${d.calories} cal` : null].filter(Boolean).join(' · ');
     case 'fast':
       return d.hours != null ? `${d.hours} hours` : '';
     default:
@@ -302,7 +302,7 @@ export function FriendsPanel() {
               <div key={meal.id} className="flex items-center justify-between gap-2 rounded-lg bg-white border border-amber-100 px-3 py-2">
                 <div className="min-w-0">
                   <p className="text-sm text-gray-900 truncate">{meal.name || meal.mealType}</p>
-                  <p className="text-xs text-gray-600">{Math.round(Number(meal.totalCalories) || 0)} kcal</p>
+                  <p className="text-xs text-gray-600">{Math.round(Number(meal.totalCalories) || 0)} cal</p>
                 </div>
                 <Button
                   size="sm"
