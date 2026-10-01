@@ -345,17 +345,43 @@ function normalize(text: string): string {
   return text.toLowerCase().replace(/[’']/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
 }
 
+function compact(text: string): string {
+  return normalize(text).replace(/ /g, '');
+}
+
+const SEARCH_ALIASES: Record<string, string> = {
+  lagrandra: 'la granja',
+  lagranja: 'la granja',
+  tropicalpollo: 'pollo tropical',
+  pollotropical: 'pollo tropical',
+};
+
+function expandSearchQuery(query: string): string {
+  let spaced = normalize(query);
+  const collapsed = compact(query);
+  const exact = SEARCH_ALIASES[collapsed];
+  if (exact) return normalize(exact);
+  for (const [alias, canonical] of Object.entries(SEARCH_ALIASES)) {
+    if (spaced.split(' ').includes(alias)) {
+      spaced = spaced.replace(new RegExp(`\\b${alias}\\b`, 'g'), canonical);
+    }
+  }
+  return spaced;
+}
+
 export function searchFastFood(
   query: string,
   category: FastFoodCategory | 'all' = 'all',
   restaurant: string | 'all' = 'all'
 ): FastFoodItem[] {
-  const words = normalize(query).split(' ').filter(Boolean);
+  const words = expandSearchQuery(query).split(' ').filter(Boolean);
+  const uniqueWords = Array.from(new Set(words));
   return FAST_FOOD_ITEMS.filter((item) => {
     if (category !== 'all' && item.category !== category) return false;
     if (restaurant !== 'all' && item.restaurant !== restaurant) return false;
-    if (words.length === 0) return true;
+    if (uniqueWords.length === 0) return true;
     const haystack = normalize([item.name, item.restaurant, item.category, ...(item.keywords || [])].join(' '));
-    return words.every((word) => haystack.includes(word));
+    const haystackCompact = compact(haystack);
+    return uniqueWords.every((word) => haystack.includes(word) || haystackCompact.includes(compact(word)));
   });
 }

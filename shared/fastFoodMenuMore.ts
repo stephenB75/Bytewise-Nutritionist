@@ -128,11 +128,25 @@ export const MORE_FAST_FOOD_ITEMS: FastFoodItem[] = [
   item('golden-krust-curry-goat', 'Curry Goat with Rice & Peas (regular)', 'Golden Krust', 'dinner', '1 plate', 870, 46, 92, 34, 1700, ['caribbean', 'jamaican']),
   item('golden-krust-oxtail', 'Oxtail with Rice & Peas (regular)', 'Golden Krust', 'dinner', '1 plate', 1050, 52, 92, 52, 1600, ['caribbean', 'jamaican']),
 
-  // Pollo Tropical
-  item('pollo-tropical-quarter-white', '1/4 Chicken (white meat)', 'Pollo Tropical', 'dinner', '1/4 chicken', 300, 45, 1, 13, 760, ['grilled chicken', 'caribbean']),
-  item('pollo-tropical-quarter-dark', '1/4 Chicken (dark meat)', 'Pollo Tropical', 'dinner', '1/4 chicken', 380, 32, 2, 27, 880, ['grilled chicken', 'caribbean']),
-  item('pollo-tropical-tropichop', 'Chicken TropiChop (white rice, black beans)', 'Pollo Tropical', 'lunch', '1 bowl', 560, 36, 80, 10, 1500, ['bowl', 'caribbean']),
-  item('pollo-tropical-sweet-plantains', 'Sweet Plantains (regular)', 'Pollo Tropical', 'snacks', 'regular side', 340, 2, 52, 14, 15, ['maduros', 'caribbean']),
+  // Pollo Tropical (also searched as tropical pollo)
+  item('pollo-tropical-quarter-white', '1/4 Chicken (white meat, with skin)', 'Pollo Tropical', 'dinner', '1/4 chicken', 360, 43, 0, 20, 730, ['grilled chicken', 'caribbean', 'tropical pollo']),
+  item('pollo-tropical-quarter-dark', '1/4 Chicken (dark meat, with skin)', 'Pollo Tropical', 'dinner', '1/4 chicken', 290, 24, 0, 22, 430, ['grilled chicken', 'caribbean', 'tropical pollo']),
+  item('pollo-tropical-half-chicken', '1/2 Chicken', 'Pollo Tropical', 'dinner', '1/2 chicken', 650, 67, 0, 42, 1160, ['grilled chicken', 'caribbean', 'tropical pollo']),
+  item('pollo-tropical-grilled-breasts', 'Grilled Chicken Breasts (2)', 'Pollo Tropical', 'dinner', '2 breasts', 240, 59, 10, 6, 860, ['grilled chicken', 'tropical pollo']),
+  item('pollo-tropical-tropichop', 'Chicken TropiChop (white rice, black beans)', 'Pollo Tropical', 'lunch', '1 bowl', 530, 31, 90, 10, 1460, ['bowl', 'caribbean', 'tropical pollo']),
+  item('pollo-tropical-pollo-bites', 'Pollo Bites (8 pc)', 'Pollo Tropical', 'lunch', '8 pieces', 410, 44, 21, 17, 990, ['nuggets', 'tropical pollo']),
+  item('pollo-tropical-classic-sandwich', 'Classic Chicken Sandwich', 'Pollo Tropical', 'sandwiches', '1 sandwich', 430, 35, 41, 19, 770, ['tropical pollo']),
+  item('pollo-tropical-cuban', 'Cuban Sandwich', 'Pollo Tropical', 'sandwiches', '1 sandwich', 1050, 61, 67, 59, 2260, ['cuban', 'tropical pollo']),
+  item('pollo-tropical-chicken-blt', 'Chicken BLT Sandwich', 'Pollo Tropical', 'sandwiches', '1 sandwich', 570, 44, 41, 29, 1170, ['tropical pollo']),
+  item('pollo-tropical-caesar-wrap', 'Chicken Caesar Wrap (crispy)', 'Pollo Tropical', 'lunch', '1 wrap', 770, 32, 48, 50, 1410, ['tropical pollo']),
+  item('pollo-tropical-white-rice', 'White Rice (regular)', 'Pollo Tropical', 'snacks', 'regular side', 330, 6, 67, 5, 700, ['tropical pollo']),
+  item('pollo-tropical-black-beans', 'Black Beans (regular)', 'Pollo Tropical', 'snacks', 'regular side', 310, 15, 44, 8, 660, ['tropical pollo']),
+  item('pollo-tropical-rice-beans', 'White Rice and Black Beans (regular)', 'Pollo Tropical', 'lunch', 'regular side', 520, 15, 93, 10, 1100, ['tropical pollo']),
+  item('pollo-tropical-sweet-plantains', 'Sweet Plantains (regular)', 'Pollo Tropical', 'snacks', 'regular side', 450, 3, 85, 11, 0, ['maduros', 'caribbean', 'tropical pollo']),
+  item('pollo-tropical-fried-yuca', 'Fried Yuca (regular)', 'Pollo Tropical', 'snacks', 'regular side', 320, 1, 46, 14, 430, ['yuca', 'tropical pollo']),
+  item('pollo-tropical-cilantro-garlic', 'Cilantro Garlic Sauce', 'Pollo Tropical', 'snacks', '1 oz', 160, 0, 2, 17, 170, ['dip', 'tropical pollo']),
+  item('pollo-tropical-caribbean-soup', 'Caribbean Chicken Soup (bowl)', 'Pollo Tropical', 'lunch', '1 bowl', 300, 22, 41, 5, 1730, ['soup', 'tropical pollo']),
+  item('pollo-tropical-flan', 'Flan', 'Pollo Tropical', 'snacks', '1 serving', 210, 8, 26, 9, 550, ['dessert', 'tropical pollo']),
 
   // Dave's Hot Chicken
   item('daves-hot-chicken-slider', 'Slider (1 tender on bun)', "Dave's Hot Chicken", 'sandwiches', '1 slider', 620, 32, 46, 34, 1700, ['nashville hot chicken']),
@@ -364,4 +378,25 @@ export const MORE_FAST_FOOD_ITEMS: FastFoodItem[] = [
   item('jasons-deli-club', 'Club Sandwich', "Jason's Deli", 'sandwiches', '1 sandwich', 780, 46, 58, 38, 1860, ['club']),
   item('jasons-deli-turkey-wrap', 'Turkey Wrap', "Jason's Deli", 'sandwiches', '1 wrap', 520, 32, 48, 20, 1420),
   item('jasons-deli-veggie-soup', 'Organic Vegetable Soup (cup)', "Jason's Deli", 'lunch', '1 cup', 90, 3, 16, 1.5, 640, ['soup']),
+
+  // La Granja (Peruvian pollo a la brasa; also searched as Lagrandra / La Granja)
+  // Chain does not publish a nutrition PDF; values are typical for these platters (USDA rotisserie chicken + common sides).
+  item('la-granja-quarter-chicken', '1/4 Chicken (Pollo a la Brasa)', 'La Granja', 'dinner', '1/4 chicken', 320, 35, 1, 19, 720, ['lagrandra', 'lagranja', 'pollo a la brasa', 'peruvian', 'rotisserie chicken']),
+  item('la-granja-quarter-rice-beans', '1/4 Chicken with Rice & Beans', 'La Granja', 'lunch', '1 platter', 700, 48, 68, 27, 1540, ['lagrandra', 'lagranja', 'pollo a la brasa', 'peruvian', 'lunch special']),
+  item('la-granja-quarter-special', '1/4 Chicken Special (rice, beans, plantains)', 'La Granja', 'lunch', '1 platter', 930, 50, 111, 32, 1540, ['lagrandra', 'lagranja', 'pollo a la brasa', 'peruvian']),
+  item('la-granja-half-chicken', '1/2 Chicken (Pollo a la Brasa)', 'La Granja', 'dinner', '1/2 chicken', 640, 67, 1, 38, 1160, ['lagrandra', 'lagranja', 'pollo a la brasa', 'peruvian']),
+  item('la-granja-half-special', '1/2 Chicken Special (rice, beans, plantains)', 'La Granja', 'dinner', '1 platter', 1250, 82, 111, 51, 1980, ['lagrandra', 'lagranja', 'pollo a la brasa', 'peruvian']),
+  item('la-granja-whole-chicken', 'Whole Chicken (Pollo a la Brasa)', 'La Granja', 'dinner', '1 whole chicken', 1280, 134, 2, 76, 2320, ['lagrandra', 'lagranja', 'pollo a la brasa', 'peruvian']),
+  item('la-granja-boneless-plate', 'Grilled Boneless Chicken (rice, beans, plantains)', 'La Granja', 'dinner', '1 platter', 850, 74, 120, 19, 1680, ['lagrandra', 'lagranja', 'peruvian']),
+  item('la-granja-chicken-bowl', 'Chicken Super Bowl (rice, beans, corn, plantains)', 'La Granja', 'lunch', '1 bowl', 780, 46, 92, 24, 1620, ['lagrandra', 'lagranja', 'peruvian', 'bowl']),
+  item('la-granja-aji-de-gallina', 'Aji de Gallina', 'La Granja', 'dinner', '1 plate', 680, 38, 52, 32, 1240, ['lagrandra', 'lagranja', 'peruvian']),
+  item('la-granja-popcorn-chicken', 'Popcorn Chicken (Chicharrón de Pollo)', 'La Granja', 'lunch', '1 order', 410, 32, 22, 22, 980, ['lagrandra', 'lagranja', 'peruvian', 'chicharron']),
+  item('la-granja-chicken-wrap', 'Chicken Wrap with Rice & Beans', 'La Granja', 'lunch', '1 wrap + side', 720, 38, 78, 26, 1680, ['lagrandra', 'lagranja', 'peruvian']),
+  item('la-granja-wings', 'Chicken Wings', 'La Granja', 'dinner', '1 order', 520, 38, 8, 36, 1420, ['lagrandra', 'lagranja', 'chicken wings', 'peruvian']),
+  item('la-granja-churrasco', 'Grilled Steak, 1/2 lb (Churrasco)', 'La Granja', 'dinner', '1/2 lb', 480, 42, 2, 32, 780, ['lagrandra', 'lagranja', 'peruvian', 'steak']),
+  item('la-granja-white-rice', 'White Rice', 'La Granja', 'snacks', '1 side', 200, 4, 40, 3, 420, ['lagrandra', 'lagranja', 'peruvian']),
+  item('la-granja-black-beans', 'Black Beans', 'La Granja', 'snacks', '1 side', 180, 9, 27, 5, 400, ['lagrandra', 'lagranja', 'peruvian']),
+  item('la-granja-plantains', 'Sweet Plantains (Maduros)', 'La Granja', 'snacks', '1 side', 230, 2, 43, 5, 10, ['lagrandra', 'lagranja', 'maduros', 'peruvian']),
+  item('la-granja-tostones', 'Tostones', 'La Granja', 'snacks', '1 side', 280, 2, 38, 14, 220, ['lagrandra', 'lagranja', 'plantains', 'peruvian']),
+  item('la-granja-fries', 'French Fries', 'La Granja', 'snacks', '1 side', 360, 4, 46, 18, 480, ['lagrandra', 'lagranja', 'french fries']),
 ];

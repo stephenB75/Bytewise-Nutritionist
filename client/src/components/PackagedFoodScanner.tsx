@@ -123,25 +123,32 @@ function BarcodeCamera({ onDetected, onClose }: { onDetected: (code: string) => 
           import('@zxing/library'),
         ]);
         const hints = new Map();
+        hints.set(DecodeHintType.TRY_HARDER, true);
         hints.set(DecodeHintType.POSSIBLE_FORMATS, [
           BarcodeFormat.UPC_A,
           BarcodeFormat.UPC_E,
           BarcodeFormat.EAN_13,
           BarcodeFormat.EAN_8,
         ]);
-        const reader = new BrowserMultiFormatReader(hints, { delayBetweenScanAttempts: 120 });
+        const reader = new BrowserMultiFormatReader(hints, { delayBetweenScanAttempts: 80 });
         if (cancelled || !videoRef.current) return;
-        controls = await reader.decodeFromConstraints(
-          { video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } } },
-          videoRef.current,
-          (result, _error, scanControls) => {
-            if (!result || detected) return;
-            detected = true;
-            scanControls.stop();
-            tapFeedback();
-            onDetected(result.getText());
-          },
-        );
+        const onScan = (result: { getText: () => string } | undefined, _error: unknown, scanControls: IScannerControls) => {
+          if (!result || detected) return;
+          detected = true;
+          scanControls.stop();
+          tapFeedback();
+          onDetected(result.getText());
+        };
+        try {
+          controls = await reader.decodeFromConstraints(
+            { video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } } },
+            videoRef.current,
+            onScan,
+          );
+        } catch {
+          if (cancelled || !videoRef.current) return;
+          controls = await reader.decodeFromConstraints({ video: true }, videoRef.current, onScan);
+        }
         if (cancelled) controls.stop();
       } catch (error) {
         if (cancelled) return;
