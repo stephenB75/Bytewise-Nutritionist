@@ -30,6 +30,7 @@ const GENERIC_MENU_WORDS = new Set([
   ...Array.from(NON_DISTINCTIVE_WORDS), 'chicken', 'beef', 'pork', 'fish', 'sandwich', 'burger', 'cheeseburger', 'fries', 'french',
   'salad', 'nuggets', 'wrap', 'taco', 'tacos', 'burrito', 'bowl', 'coffee', 'latte', 'cookie', 'pizza', 'sub', 'hot',
   'dog', 'egg', 'bacon', 'cheese', 'crispy', 'spicy', 'classic', 'original', 'double', 'single', 'combo',
+  'breast', 'thigh', 'wing', 'wings', 'tender', 'tenders', 'filet', 'fillet',
 ]);
 const stem = (word: string) => word.replace(/(es|s)$/, '');
 const menuNameWords = (name: string) => normalizeWords(name.replace(/\([^)]*\)/g, ' '));
@@ -736,7 +737,7 @@ export class USDAService {
           measurement: `${measurement} (~330g)`,
           estimatedCalories: 0,
           equivalentMeasurement: '100g ≈ 0 cal',
-          note: 'Zero-calorie sparkling water',
+          note: 'Contains no calories',
           nutritionPer100g: {
             calories: 0,
             protein: 0,
@@ -1998,6 +1999,22 @@ export class USDAService {
       return candyPortionResult;
     }
 
+    // USDA portion weights (pizza slice, medium orange, 1/2 cup ice cream, etc.)
+    const catalogGrams = getPortionWeight(food.description || '', measurement);
+    if (catalogGrams && catalogGrams > 0 && !/\b(\d+(?:\.\d+)?)\s*(g|grams?)\b/i.test(measurement)) {
+      const parsed = parseMeasurement(measurement);
+      const qty = parsed.quantity > 0 ? parsed.quantity : 1;
+      const unitLabel = parsed.unit || measurement;
+      // getPortionWeight is one named portion; multiply when the user asked for 2 slices, 1/2 cup, etc.
+      const countMatch = measurement.trim().match(/^(\d+(?:\.\d+)?|\d+\s*\/\s*\d+|½|¼|¾)\s+/);
+      const multiplier = countMatch ? qty : 1;
+      return {
+        quantity: qty,
+        unit: unitLabel,
+        gramsEquivalent: Math.round(catalogGrams * multiplier),
+      };
+    }
+
     // Remove extra whitespace and normalize
     let normalized = measurement.toLowerCase().trim();
     
@@ -2193,9 +2210,14 @@ export class USDAService {
         'bars': 60,
       },
       'ice cream': {
-        'cup': 66,     // FDA RACC: 2/3 cup = 66g
-        'scoop': 66,   // 1 scoop ≈ 2/3 cup
+        'cup': 132,    // 1 cup; FDA RACC 2/3 cup is 66g
+        'scoop': 66,
         'tablespoon': 15,
+      },
+      'pizza': {
+        'slice': 107,
+        'slices': 107,
+        'piece': 107,
       },
       // Premium ice cream bars - specific brands
       'haagen dazs bar': {
@@ -2523,7 +2545,19 @@ export class USDAService {
         } else if (foodType.includes('apple')) {
           gramsEquivalent = quantity * 180; // medium apple
         } else if (foodType.includes('banana')) {
-          gramsEquivalent = quantity * 120; // medium banana  
+          gramsEquivalent = quantity * 120; // medium banana
+        } else if (foodType.includes('orange')) {
+          gramsEquivalent = quantity * 154;
+        } else if (foodType.includes('mango')) {
+          gramsEquivalent = quantity * 165;
+        } else if (foodType.includes('avocado')) {
+          gramsEquivalent = quantity * 150;
+        } else if (foodType.includes('nectarine')) {
+          gramsEquivalent = quantity * 142;
+        } else if (foodType.includes('carrot')) {
+          gramsEquivalent = quantity * 61;
+        } else if (foodType.includes('pizza')) {
+          gramsEquivalent = quantity * 107;
         } else if (foodType.includes('lettuce') && unit.includes('cup')) {
           gramsEquivalent = quantity * 47; // 1 cup chopped lettuce
         } else {
@@ -2752,7 +2786,14 @@ export class USDAService {
       'bubly', 'schweppes', 'canada dry', 'tonic water', 'mineral water'
     ];
     
-    return liquidKeywords.some(keyword => searchTerm.toLowerCase().includes(keyword));
+    const text = searchTerm.toLowerCase();
+    return liquidKeywords.some((keyword) => {
+      if (keyword.length <= 4) {
+        const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        return new RegExp(`\\b${escaped}\\b`).test(text);
+      }
+      return text.includes(keyword);
+    });
   }
 
   /**
@@ -3620,7 +3661,9 @@ export class USDAService {
         equivalentMeasurement: `100g ≈ ${nutrition.calories} cal`,
         note: estimatedCalories === 0
           ? 'Contains no calories'
-          : nutrition.calories <= 50 ? 'Low-calorie beverage' : 'Estimate based on Bytewise Food Database averages',
+          : (this.isLiquidQuery(normalized) && estimatedCalories <= 20)
+            ? 'Low-calorie beverage'
+            : 'Estimate based on Bytewise Food Database averages',
         nutritionPer100g: nutritionWithMicronutrients,
         portionInfo: portionInfo
       };

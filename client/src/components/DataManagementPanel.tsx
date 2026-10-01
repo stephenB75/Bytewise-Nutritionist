@@ -113,36 +113,46 @@ export function DataManagementPanel() {
           </div>
         </div>
 
-        {/* Data Overview */}
-        <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 p-6">
-          <h3 className="text-xl font-semibold text-gray-950 mb-6" style={{ fontFamily: "'League Spartan', sans-serif" }}>Data Overview</h3>
-        
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-            <div className="text-center p-4 bg-white/80 rounded-lg border border-green-200">
-              <div className="text-2xl font-bold text-green-700" style={{ fontFamily: "'League Spartan', sans-serif" }}>{dataStats.totalMeals}</div>
-              <div className="text-sm text-gray-900" style={{ fontFamily: "'Work Sans', sans-serif" }}>Meals Logged</div>
-            </div>
-            <div className="text-center p-4 bg-white/80 rounded-lg border border-blue-200">
-              <div className="text-2xl font-bold text-blue-700" style={{ fontFamily: "'League Spartan', sans-serif" }}>{dataStats.totalDays}</div>
-              <div className="text-sm text-gray-900" style={{ fontFamily: "'Work Sans', sans-serif" }}>Days Tracked</div>
-            </div>
-            <div className="text-center p-4 bg-white/80 rounded-lg border border-amber-300">
-              <div className="text-2xl font-bold text-amber-700" style={{ fontFamily: "'League Spartan', sans-serif" }}>{dataStats.dataSize}</div>
-              <div className="text-sm text-gray-900" style={{ fontFamily: "'Work Sans', sans-serif" }}>Data Size</div>
-            </div>
-          </div>
+        <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 p-4 sm:p-6">
+          <h3 className="mb-4 text-xl font-semibold text-gray-950" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+            Data overview
+          </h3>
 
-          <div className="flex items-center justify-between p-4 bg-gradient-to-br from-amber-100 to-amber-200 rounded-lg border border-amber-300/40">
-            <div className="flex items-center space-x-3">
-              <Cloud className="w-5 h-5 text-[#1f4aa6]" />
-              <div>
-                <p className="font-medium text-gray-950" style={{ fontFamily: "'Work Sans', sans-serif" }}>Auto Sync Status</p>
-                <p className="text-sm text-gray-900" style={{ fontFamily: "'Quicksand', sans-serif" }}>Your data syncs automatically as you use the app</p>
+          <div className="space-y-3">
+            {[
+              { label: 'Meals logged', value: dataStats.totalMeals },
+              { label: 'Days tracked', value: dataStats.totalDays },
+              { label: 'Data size', value: dataStats.dataSize },
+            ].map((stat) => (
+              <div
+                key={stat.label}
+                className="flex items-center justify-between gap-3 rounded-xl border border-amber-200 bg-white/90 px-4 py-3"
+              >
+                <div className="text-sm text-gray-800" style={{ fontFamily: "'Work Sans', sans-serif" }}>
+                  {stat.label}
+                </div>
+                <div className="text-xl font-bold tabular-nums text-gray-950" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                  {stat.value}
+                </div>
               </div>
+            ))}
+
+            <div className="space-y-3 rounded-xl border border-amber-300/50 bg-amber-100/80 p-4">
+              <div className="flex items-start gap-3">
+                <Cloud className="mt-0.5 h-5 w-5 shrink-0 text-[#1f4aa6]" />
+                <div className="min-w-0">
+                  <p className="font-medium text-gray-950" style={{ fontFamily: "'Work Sans', sans-serif" }}>
+                    Auto sync
+                  </p>
+                  <p className="text-sm leading-snug text-gray-800" style={{ fontFamily: "'Quicksand', sans-serif" }}>
+                    Your data syncs automatically as you use the app.
+                  </p>
+                </div>
+              </div>
+              <Badge className="w-fit bg-green-100 text-green-800 border-green-300">
+                Always active
+              </Badge>
             </div>
-            <Badge className="bg-green-100 text-green-800 border-green-300">
-              Always Active
-            </Badge>
           </div>
         </Card>
 

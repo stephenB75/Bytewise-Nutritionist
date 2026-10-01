@@ -927,7 +927,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                                       <p className="text-sm font-medium text-gray-900 truncate" data-testid={`text-filename-${photo.id}`}>
                                         {photo.kind === 'profile' ? 'Profile photo' : 'Food analysis photo'}
                                         {photo.isAvatar && (
-                                          <span className="ml-2 rounded-full bg-green-600 px-2 py-0.5 text-[10px] font-semibold on-color align-middle">
+                                          <span className="ml-2 rounded-md bg-green-600 px-2 py-0.5 text-[10px] font-semibold on-color align-middle">
                                             In use
                                           </span>
                                         )}

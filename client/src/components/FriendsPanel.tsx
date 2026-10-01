@@ -270,7 +270,7 @@ export function FriendsPanel() {
                 <div className="min-w-0">
                   <p className="font-medium text-gray-950 truncate">{person.name}</p>
                   <p className="text-xs text-gray-600 truncate">{person.email}</p>
-                  <p className="mt-1 inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+                  <p className="mt-1 inline-flex items-center gap-1 rounded-md bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
                     <CheckCircle2 className="h-3 w-3" />
                     {person.sentByMe ? 'Accepted your request' : 'Connected'}
                     {person.acceptedAt ? ` · ${shortDate(person.acceptedAt)}` : ''}
@@ -293,7 +293,7 @@ export function FriendsPanel() {
                 <div className="min-w-0">
                   <p className="font-medium text-gray-900 truncate">{person.name}</p>
                   <p className="text-xs text-gray-600 truncate">{person.email}</p>
-                  <p className="mt-1 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-900">
+                  <p className="mt-1 inline-flex items-center gap-1 rounded-md bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-900">
                     <Clock className="h-3 w-3" />
                     Request sent {shortDate(person.since)} · Waiting for them to accept
                   </p>

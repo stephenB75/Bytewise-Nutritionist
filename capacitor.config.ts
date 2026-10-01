@@ -56,7 +56,9 @@ const config: CapacitorConfig = {
     LocalNotifications: {
       smallIcon: 'ic_stat_nutrition',
       iconColor: '#faed39',
-      sound: 'notification.wav'
+      sound: 'notification.wav',
+      // Foreground: in-app toast + bell. Background/lock screen still shows the full alert.
+      presentationOptions: ['badge', 'sound', 'list']
     },
     
     // No banner while the app is open: the in-app toast and bell cover it.

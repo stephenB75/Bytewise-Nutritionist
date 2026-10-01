@@ -31,6 +31,23 @@ export const PORTION_WEIGHTS: Record<string, PortionData[]> = {
     { fdc_id: "169097", portion_description: "small", gram_weight: 96, amount: 1 },
     { fdc_id: "169097", portion_description: "cup sections", gram_weight: 180, amount: 1 }
   ],
+  "mango": [
+    { fdc_id: "169910", portion_description: "medium", gram_weight: 165, amount: 1 },
+    { fdc_id: "169910", portion_description: "large", gram_weight: 336, amount: 1 },
+    { fdc_id: "169910", portion_description: "small", gram_weight: 138, amount: 1 },
+    { fdc_id: "169910", portion_description: "cup sliced", gram_weight: 165, amount: 1 }
+  ],
+  "avocado": [
+    { fdc_id: "171705", portion_description: "medium", gram_weight: 150, amount: 1 },
+    { fdc_id: "171705", portion_description: "large", gram_weight: 201, amount: 1 },
+    { fdc_id: "171705", portion_description: "small", gram_weight: 136, amount: 1 },
+    { fdc_id: "171705", portion_description: "cup cubed", gram_weight: 150, amount: 1 }
+  ],
+  "nectarine": [
+    { fdc_id: "169914", portion_description: "medium", gram_weight: 142, amount: 1 },
+    { fdc_id: "169914", portion_description: "large", gram_weight: 156, amount: 1 },
+    { fdc_id: "169914", portion_description: "small", gram_weight: 129, amount: 1 }
+  ],
   "cherry": [
     { fdc_id: "2708231", portion_description: "cup", gram_weight: 154, amount: 1 },
     { fdc_id: "2708231", portion_description: "piece", gram_weight: 8, amount: 1 }

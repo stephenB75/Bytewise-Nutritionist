@@ -1,0 +1,13 @@
+diff --git a/node_modules/@revenuecat/purchases-capacitor/ios/Sources/RevenuecatPurchasesCapacitor/PurchasesPlugin.swift b/node_modules/@revenuecat/purchases-capacitor/ios/Sources/RevenuecatPurchasesCapacitor/PurchasesPlugin.swift
+index 9a2c755..3f3c02e 100644
+--- a/node_modules/@revenuecat/purchases-capacitor/ios/Sources/RevenuecatPurchasesCapacitor/PurchasesPlugin.swift
++++ b/node_modules/@revenuecat/purchases-capacitor/ios/Sources/RevenuecatPurchasesCapacitor/PurchasesPlugin.swift
+@@ -171,7 +171,7 @@ public class PurchasesPlugin: CAPPlugin, PurchasesDelegate, CAPBridgedPlugin {
+     @objc func getCachedVirtualCurrencies(_ call: CAPPluginCall) {
+         guard self.rejectIfPurchasesNotConfigured(call) else { return }
+         call.resolve([
+-            "cachedVirtualCurrencies": CommonFunctionality.getCachedVirtualCurrencies()
++            "cachedVirtualCurrencies": CommonFunctionality.getCachedVirtualCurrencies() ?? NSNull()
+         ])
+     }
+ 

@@ -545,7 +545,7 @@ export const WaterCard = React.memo(function WaterCard({
                       {selectedContainers.map(({ oz, name, Icon, count }) => (
                         <li
                           key={oz}
-                          className="flex items-center gap-1.5 rounded-full bg-cyan-50 px-2.5 py-1 text-xs font-medium text-gray-800 ring-1 ring-cyan-200"
+                          className="flex items-center gap-1.5 rounded-md bg-cyan-50 px-2.5 py-1 text-xs font-medium text-gray-800 ring-1 ring-cyan-200 whitespace-nowrap"
                         >
                           <Icon className="h-3.5 w-3.5 text-cyan-700" />
                           {count} × {name} ({oz} oz)

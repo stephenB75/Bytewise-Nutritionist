@@ -86,7 +86,7 @@ export function DailyProgress({
           <h3 className="text-3xl font-bold text-gray-900 mb-1">Daily Progress</h3>
           <p className="text-lg text-gray-600">Track your nutrition goals day by day</p>
         </div>
-        <Badge variant="outline" className="text-lg text-purple-600 border-purple-200 bg-purple-50">
+        <Badge variant="outline" className="shrink-0 rounded-md text-lg text-purple-600 border-purple-200 bg-purple-50">
           <Calendar className="w-4 h-4 mr-1" />
           7 Days
         </Badge>
@@ -203,7 +203,7 @@ export function DailyProgress({
               {/* Energy Indicator */}
               {progress > 0 && (
                 <div className="absolute bottom-2 right-2">
-                  <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
+                  <div className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium whitespace-nowrap ${
                     status === 'complete' ? 'bg-[#45c73e]/10 text-[#45c73e]' :
                     status === 'good' ? 'bg-[#1f4aa6]/10 text-[#1f4aa6]' :
                     status === 'started' ? 'bg-[#faed39]/10 text-[#faed39]' :

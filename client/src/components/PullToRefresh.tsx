@@ -118,7 +118,7 @@ export function PullToRefresh() {
       data-testid="pull-to-refresh"
     >
       <div
-        className="flex items-center gap-2 rounded-full bg-[#ffffff] px-4 py-2 shadow-lg ring-1 ring-amber-200 text-sm font-semibold text-[#1f4aa6]"
+        className="flex items-center gap-2 rounded-md bg-[#ffffff] px-4 py-2 shadow-lg ring-1 ring-amber-200 text-sm font-semibold text-[#1f4aa6]"
         style={{ opacity: refreshing ? 1 : 0.4 + progress * 0.6 }}
       >
         {refreshing ? (

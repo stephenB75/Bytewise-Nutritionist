@@ -84,6 +84,15 @@ interface IngredientAnalysis {
   };
 }
 
+/** Logged names are stored as "Food (1 cup (~240g))". Split that back into the calculator fields. */
+function fieldsFromLoggedFood(name: string): { ingredient: string; measurement: string } {
+  const match = name.trim().match(/^(.*?)\s*\((.+)\)\s*$/);
+  if (match?.[1] && match[2]) {
+    return { ingredient: match[1].trim(), measurement: match[2].trim() };
+  }
+  return { ingredient: name.trim(), measurement: '1 serving' };
+}
+
 interface CalorieCalculatorProps {
   onAddToMeal?: (ingredient: IngredientAnalysis) => void;
   onNavigate?: (page: string) => void;
@@ -480,6 +489,7 @@ function CalorieCalculator({
                 }));
               }}
               onSearchChange={(query) => setIngredient(query)}
+              value={ingredient}
               placeholder="Search meals"
               className="text-base bg-amber-50/90 border-2 border-amber-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg pr-4 py-3 text-gray-950 placeholder-gray-700"
             />
@@ -552,7 +562,7 @@ function CalorieCalculator({
                     <p className="font-medium text-gray-900">{analysis.ingredient}</p>
                     <p className="text-sm text-gray-600">{analysis.measurement}</p>
                   </div>
-                  <Badge variant="secondary" className="bg-orange-100 text-orange-800">
+                  <Badge variant="secondary" className="shrink-0 rounded-md bg-orange-100 text-orange-800">
                     <Flame className="w-3 h-3 mr-1" />
                     {analysis.estimatedCalories} cal
                   </Badge>
@@ -640,7 +650,7 @@ function CalorieCalculator({
       <Card className="p-6 bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-sm border-amber-200/40 shadow-lg">
         <h3 className="text-lg font-bold text-gray-900 mb-4">How to Use</h3>
         
-        <div className="grid grid-cols-2 gap-3 sm:gap-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
           <div className="space-y-3">
             <h4 className="font-medium text-gray-700">Food Entry</h4>
             <div className="space-y-2 text-sm text-gray-600">
@@ -745,6 +755,7 @@ function CalorieCalculator({
                   // Clear USDA suggestions for historical search
                   setIngredientSuggestions([]);
                 }}
+                value={ingredient}
                 placeholder="Search meals"
                 className="text-base bg-amber-50/90 border-2 border-amber-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg pr-4 py-3 text-gray-950 placeholder-gray-700"
               />
@@ -755,8 +766,14 @@ function CalorieCalculator({
               <UserFoodSuggestions
                 className="mt-4"
                 onSelectFood={(food) => {
-                  setIngredient(food.name);
-                  setMeasurement('1 serving');
+                  const fields = fieldsFromLoggedFood(food.name);
+                  setIngredient(fields.ingredient);
+                  setMeasurement(fields.measurement);
+                  setIngredientSuggestions([]);
+                  requestAnimationFrame(() => {
+                    document.querySelector<HTMLElement>('[data-testid="nutrition-food-search"]')
+                      ?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                  });
                 }}
               />
             </div>
@@ -846,12 +863,12 @@ function CalorieCalculator({
                     <h4 className="font-bold text-gray-900 text-lg">{analysis.ingredient}</h4>
                     <p className="text-gray-600 text-sm">{analysis.measurement}</p>
                   </div>
-                  <div className="text-right">
-                    <Badge variant="default" className="bg-orange-600 text-white text-lg px-3 py-1 mb-1">
-                      <Flame className="w-4 h-4 mr-1" />
+                  <div className="shrink-0 rounded-lg bg-orange-600 px-3 py-2 text-right">
+                    <p className="flex items-center justify-end gap-1 text-lg font-semibold text-white whitespace-nowrap">
+                      <Flame className="w-4 h-4 shrink-0" />
                       {analysis.estimatedCalories} cal
-                    </Badge>
-                    <p className="text-xs text-gray-900">Total for this portion</p>
+                    </p>
+                    <p className="text-xs text-orange-100 whitespace-nowrap">Total for this portion</p>
                   </div>
                 </div>
 
@@ -1240,22 +1257,22 @@ function UserFoodTextSuggestions({ onSuggestionClick }: { onSuggestionClick: (fo
                         <div className="text-xs font-medium text-gray-600 uppercase tracking-wide">Minerals</div>
                         <div className="flex flex-wrap gap-1.5">
                           {(food.iron || 0) > 0 && (
-                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-transparent text-slate-700 border-2 border-slate-500 hover:border-slate-600 hover:text-slate-800 transition-colors">
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap bg-transparent text-slate-700 border-2 border-slate-500 hover:border-slate-600 hover:text-slate-800 transition-colors">
                               Fe {(food.iron || 0).toFixed(1)}mg
                             </span>
                           )}
                           {(food.calcium || 0) > 0 && (
-                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-transparent text-stone-700 border-2 border-stone-500 hover:border-stone-600 hover:text-stone-800 transition-colors">
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap bg-transparent text-stone-700 border-2 border-stone-500 hover:border-stone-600 hover:text-stone-800 transition-colors">
                               Ca {Math.round(food.calcium || 0)}mg
                             </span>
                           )}
                           {(food.zinc || 0) > 0 && (
-                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-transparent text-gray-700 border-2 border-gray-500 hover:border-gray-600 hover:text-gray-800 transition-colors">
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap bg-transparent text-gray-700 border-2 border-gray-500 hover:border-gray-600 hover:text-gray-800 transition-colors">
                               Zn {(food.zinc || 0).toFixed(1)}mg
                             </span>
                           )}
                           {(food.magnesium || 0) > 0 && (
-                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-transparent text-neutral-700 border-2 border-neutral-500 hover:border-neutral-600 hover:text-neutral-800 transition-colors">
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap bg-transparent text-neutral-700 border-2 border-neutral-500 hover:border-neutral-600 hover:text-neutral-800 transition-colors">
                               Mg {Math.round(food.magnesium || 0)}mg
                             </span>
                           )}
@@ -1269,22 +1286,22 @@ function UserFoodTextSuggestions({ onSuggestionClick }: { onSuggestionClick: (fo
                         <div className="text-xs font-medium text-gray-600 uppercase tracking-wide">Vitamins</div>
                         <div className="flex flex-wrap gap-1.5">
                           {(food.vitaminC || 0) > 0 && (
-                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-transparent text-orange-700 border-2 border-orange-500 hover:border-orange-600 hover:text-orange-800 transition-colors">
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap bg-transparent text-orange-700 border-2 border-orange-500 hover:border-orange-600 hover:text-orange-800 transition-colors">
                               C {Math.round(food.vitaminC || 0)}mg
                             </span>
                           )}
                           {(food.vitaminD || 0) > 0 && (
-                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-transparent text-amber-700 border-2 border-amber-500 hover:border-amber-600 hover:text-amber-800 transition-colors">
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap bg-transparent text-amber-700 border-2 border-amber-500 hover:border-amber-600 hover:text-amber-800 transition-colors">
                               D {(food.vitaminD || 0).toFixed(1)}μg
                             </span>
                           )}
                           {(food.vitaminB12 || 0) > 0 && (
-                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-transparent text-red-700 border-2 border-red-500 hover:border-red-600 hover:text-red-800 transition-colors">
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap bg-transparent text-red-700 border-2 border-red-500 hover:border-red-600 hover:text-red-800 transition-colors">
                               B12 {(food.vitaminB12 || 0).toFixed(1)}μg
                             </span>
                           )}
                           {(food.folate || 0) > 0 && (
-                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-transparent text-green-700 border-2 border-green-500 hover:border-green-600 hover:text-green-800 transition-colors">
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap bg-transparent text-green-700 border-2 border-green-500 hover:border-green-600 hover:text-green-800 transition-colors">
                               Folate {Math.round(food.folate || 0)}μg
                             </span>
                           )}

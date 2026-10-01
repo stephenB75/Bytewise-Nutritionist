@@ -30,7 +30,12 @@ import { apiRequest, authFetch } from '@/lib/queryClient';
 import { ACTIVE_FAST_QUERY_KEY, fetchActiveFast } from '@/lib/fastingApi';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
-import { cancelFastingCompleteNotification, scheduleFastingCompleteNotification } from '@/services/localNotifications';
+import {
+  cancelFastingCompleteNotification,
+  cancelFastingMilestoneNotifications,
+  scheduleFastingCompleteNotification,
+  scheduleFastingMilestoneNotifications,
+} from '@/services/localNotifications';
 
 interface FastingPlan {
   id: string;
@@ -516,18 +521,21 @@ const FastingTracker = React.memo(function FastingTracker() {
     }
   }, [activeFastingSession, currentSession]);
 
-  // Keep the iOS "fast complete" notification in step with the running fast
-  // (start, pause/resume, stop, completion, and sessions restored on reopen).
+  // Keep OS fasting alerts in step with the running fast (start, pause/resume,
+  // stop, completion, and sessions restored on reopen). Works on iOS and Android.
   const fastEndsAt = isActive && currentSession
     ? new Date(currentSession.startTime).getTime() + currentSession.targetDuration
     : null;
+  const fastStartsAt = isActive && currentSession ? new Date(currentSession.startTime).getTime() : null;
   useEffect(() => {
-    if (fastEndsAt) {
+    if (fastEndsAt && fastStartsAt && currentSession) {
       void scheduleFastingCompleteNotification(new Date(fastEndsAt), selectedPlan.name);
+      void scheduleFastingMilestoneNotifications(new Date(fastStartsAt), currentSession.targetDuration);
     } else {
       void cancelFastingCompleteNotification();
+      void cancelFastingMilestoneNotifications();
     }
-  }, [fastEndsAt, selectedPlan.name]);
+  }, [fastEndsAt, fastStartsAt, currentSession, selectedPlan.name]);
 
   // Check for milestone achievements
   const checkMilestones = (elapsed: number, milestones: number[]) => {

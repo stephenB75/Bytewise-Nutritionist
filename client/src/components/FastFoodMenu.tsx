@@ -115,7 +115,7 @@ export function FastFoodMenu() {
           return next;
         });
       }, ADDED_CONFIRMATION_MS);
-      toast({ title: 'Added to your log', description: `${item.name} · ${item.calories} cal → ${mealType}` });
+      toast({ title: 'Added to Journal', description: `${item.name} · ${item.calories} cal is on Journal under Logged Today.` });
     } catch (error) {
       toast({
         title: 'Could not add food',
@@ -139,14 +139,19 @@ export function FastFoodMenu() {
 
   return (
     <Card className="mt-4 p-4 bg-white/95 border-amber-200 shadow-md" data-testid="fastfood-menu">
-      <div className="flex items-center justify-between gap-2 mb-3">
-        <div className="flex items-center gap-2 min-w-0">
-          <Store className="w-5 h-5 text-[#1f4aa6] shrink-0" />
-          <h3 className="text-lg font-bold text-gray-900 truncate">Popular Fast Food</h3>
+      <div className="mb-3">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <Store className="w-5 h-5 text-[#1f4aa6] shrink-0" />
+            <h3 className="text-lg font-bold text-gray-900 truncate">Popular Fast Food</h3>
+          </div>
+          <span className="text-[11px] text-gray-700 shrink-0">
+            {FAST_FOOD_ITEMS.length} items · {FAST_FOOD_RESTAURANTS.length} places
+          </span>
         </div>
-        <span className="text-[11px] text-gray-700 shrink-0">
-          {FAST_FOOD_ITEMS.length} items · {FAST_FOOD_RESTAURANTS.length} places
-        </span>
+        <p className="mt-1 text-sm text-gray-700">
+          Added meals show up on Journal under Logged Today.
+        </p>
       </div>
 
       <div className="relative mb-3">

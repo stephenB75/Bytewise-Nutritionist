@@ -46,16 +46,20 @@ interface FoodSearchWithHistoryProps {
   onSearchChange: (query: string) => void;
   placeholder?: string;
   className?: string;
+  /** Keeps the search box in sync when a suggestion fills the calculator. */
+  value?: string;
 }
 
 export function FoodSearchWithHistory({
   onSelectFood,
   onSearchChange,
   placeholder = "Search meals",
-  className = ""
+  className = "",
+  value,
 }: FoodSearchWithHistoryProps) {
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
+  const displayQuery = value !== undefined ? value : searchQuery;
   const [historicalMeals, setHistoricalMeals] = useState<LoggedFood[]>([]);
   const [showResults, setShowResults] = useState(false);
 
@@ -107,8 +111,8 @@ export function FoodSearchWithHistory({
     let meals = [...historicalMeals];
     
     // Filter by search query only
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
+    if (displayQuery.trim()) {
+      const query = displayQuery.toLowerCase();
       meals = meals.filter(meal => 
         meal.name.toLowerCase().includes(query)
       );
@@ -125,8 +129,8 @@ export function FoodSearchWithHistory({
       }
     });
     
-    return Array.from(uniqueMeals.values()).slice(0, searchQuery.trim() ? 10 : 4);
-  }, [historicalMeals, searchQuery]);
+    return Array.from(uniqueMeals.values()).slice(0, displayQuery.trim() ? 10 : 4);
+  }, [historicalMeals, displayQuery]);
 
   // Group meals by frequency for popular items
   const popularMeals = useMemo(() => {
@@ -148,10 +152,10 @@ export function FoodSearchWithHistory({
       .map(item => item.food);
   }, [historicalMeals]);
 
-  const handleSearch = (value: string) => {
-    setSearchQuery(value);
+  const handleSearch = (next: string) => {
+    if (value === undefined) setSearchQuery(next);
     setShowResults(false); // Disable dropdown results
-    onSearchChange(value);
+    onSearchChange(next);
   };
 
   const handleSelectFood = (food: LoggedFood) => {
@@ -180,7 +184,7 @@ export function FoodSearchWithHistory({
       <div className="relative">
         <Input
           data-testid="nutrition-food-search"
-          value={searchQuery}
+          value={displayQuery}
           onChange={(e) => handleSearch(e.target.value)}
           onFocus={() => setShowResults(false)}
           placeholder={placeholder}

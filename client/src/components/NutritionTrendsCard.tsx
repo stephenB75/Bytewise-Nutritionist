@@ -118,13 +118,13 @@ export function NutritionTrendsCard({ meals, calorieGoal }: { meals: TrendMeal[]
           <TrendingUp className="h-5 w-5 text-orange-700" />
           Nutrition Trends
         </h3>
-        <div className="flex rounded-full bg-amber-200/70 p-0.5" role="group" aria-label="Trend range">
+        <div className="flex shrink-0 rounded-md bg-amber-200/70 p-0.5" role="group" aria-label="Trend range">
           {([7, 30] as const).map(option => (
             <button
               key={option}
               type="button"
               onClick={() => setRange(option)}
-              className={`rounded-full px-3 py-1 text-xs font-semibold ${range === option ? 'bg-orange-700 on-color' : 'bg-amber-100 text-gray-800'}`}
+              className={`shrink-0 whitespace-nowrap rounded-md px-3 py-1 text-xs font-semibold ${range === option ? 'bg-orange-700 on-color' : 'bg-amber-100 text-gray-800'}`}
               aria-pressed={range === option}
               data-testid={`button-trends-${option}d`}
             >

@@ -1794,6 +1794,16 @@ div[class*="min-h-screen"]:not([data-testid*="navigation"]):not([data-hero="true
   z-index: 30;
 }
 
+@media (max-width: 640px) {
+  .react-joyride__tooltip {
+    max-width: calc(100vw - 16px) !important;
+  }
+
+  .react-joyride__tooltip button {
+    white-space: nowrap;
+  }
+}
+
 /* Bottom navigation spacing and safe area handling */
 .safe-area-pb {
   padding-bottom: max(0.75rem, env(safe-area-inset-bottom)) !important;

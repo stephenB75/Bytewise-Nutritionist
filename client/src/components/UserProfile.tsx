@@ -83,7 +83,7 @@ export function UserProfile({ showDetails = false, size = 'md' }: UserProfilePro
             </div>
             
             {user.email && (
-              <div className="flex items-center justify-center gap-3 text-gray-900 bg-amber-100/70 backdrop-blur-sm rounded-full px-4 py-2 border border-amber-300/40">
+              <div className="flex items-center justify-center gap-3 text-gray-900 bg-amber-100/70 backdrop-blur-sm rounded-lg px-4 py-2 border border-amber-300/40">
                 <div className="p-1 bg-[#1f4aa6]/20 rounded-full">
                   <Mail className="w-4 h-4 text-[#1f4aa6]" />
                 </div>

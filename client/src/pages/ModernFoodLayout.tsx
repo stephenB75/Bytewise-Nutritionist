@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { SignOnModule } from '@/components/SignOnModule';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfilePhoto } from '@/hooks/useProfilePhoto';
@@ -22,7 +21,7 @@ import { useGoalAchievements } from '@/hooks/useGoalAchievements';
 import { useRotatingBackground } from '@/hooks/useRotatingBackground';
 import { useAchievements, getAchievementIcon, formatAchievementDate } from '@/hooks/useAchievements';
 import { ProfileIcon } from '@/components/ProfileIcon';
-import { TourLauncher, useAppTour, WelcomeBanner } from '@/components/TourLauncher';
+import { KEY_TOOLS, useAppTour } from '@/components/TourLauncher';
 import { AppTour } from '@/components/AppTour';
 import { UserFoodSuggestions, mealTypeForNow } from '@/components/UserFoodSuggestions';
 import { apiRequest, queryClient } from '@/lib/queryClient';
@@ -46,17 +45,12 @@ import {
   BellRing,
   X,
   Home,
-  BarChart3,
   UserCircle,
   Utensils,
-  Clock,
   CheckCircle2,
-  Sparkles,
+  Compass,
   Droplets,
   Trash2,
-  PlayCircle,
-  GraduationCap,
-  Play,
   Eye,
   EyeOff,
 } from 'lucide-react';
@@ -87,6 +81,13 @@ import { AppleHealthIntegration } from '@/components/AppleHealthIntegration';
 import { FriendsPanel } from '@/components/FriendsPanel';
 import { FRIENDS_QUERY_KEY, useFriendUpdates } from '@/hooks/useFriendUpdates';
 import { registerForPush } from '@/services/pushNotifications';
+import {
+  notifyAchievementUnlocked,
+  notifyCalorieGoalReached,
+  notifyWaterGoalReached,
+  syncDailyReminders,
+  watchLocalNotificationTaps,
+} from '@/services/localNotifications';
 import { NutritionTrendsCard } from '@/components/NutritionTrendsCard';
 import { AINutritionAnalyzer } from '@/components/AINutritionAnalyzer';
 import { fixMealDateMismatches } from '@/utils/mealDateFixer';
@@ -237,42 +238,42 @@ const HeroSection = React.memo(function HeroSection({
       />
       <div className="hero-gradient-overlay opacity-100" style={{ zIndex: 11 }} />
 
-      <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-6 z-20 text-white">
-        <div className="space-y-8 max-w-2xl w-full">
+      <div className="absolute inset-0 z-20 flex flex-col items-center justify-center px-5 text-center text-white pt-[max(4.75rem,calc(env(safe-area-inset-top)+3.75rem))] pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] sm:px-6 sm:pt-16 sm:pb-24">
+        <div className="w-full max-w-2xl space-y-4 sm:space-y-8">
           {showLogo && (
-            <div className="mb-12 -mt-16">
+            <div className="mb-1 sm:mb-12 sm:-mt-16">
               <img
                 src={logoImage}
                 alt="ByteWise Nutritionist Logo"
-                className="h-20 w-auto object-contain mx-auto drop-shadow-2xl"
+                className="mx-auto h-12 w-auto object-contain drop-shadow-2xl sm:h-20"
                 data-testid="bytewise-hero-logo"
               />
             </div>
           )}
 
-          <div className="space-y-3 hero-optimized">
-            <h1 className="hero-title text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] drop-shadow-2xl font-league-spartan text-optimized opacity-100">
+          <div className="space-y-2 hero-optimized sm:space-y-3">
+            <h1 className="hero-title text-4xl font-black leading-[0.9] tracking-tighter drop-shadow-2xl font-league-spartan text-optimized opacity-100 sm:text-6xl md:text-7xl lg:text-8xl sm:leading-[0.85]">
               {title}
             </h1>
-            <h2 className={`hero-title text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.85] font-league-spartan ${showLogo ? 'text-white' : 'text-optimized'} drop-shadow-2xl opacity-100`}>
+            <h2 className={`hero-title text-4xl font-black leading-[0.9] tracking-tighter font-league-spartan sm:text-6xl md:text-7xl lg:text-8xl sm:leading-[0.85] ${showLogo ? 'text-white' : 'text-optimized'} drop-shadow-2xl opacity-100`}>
               {subtitle}
             </h2>
           </div>
 
-          <p className="text-2xl md:text-3xl font-light leading-relaxed max-w-xl mx-auto drop-shadow-xl font-work-sans text-gray-100 opacity-100">
+          <p className="mx-auto max-w-xl text-base font-light leading-snug text-gray-100 opacity-100 drop-shadow-xl font-work-sans sm:text-2xl sm:leading-relaxed md:text-3xl">
             {description}
           </p>
 
-          <div className="pt-8 opacity-100">
+          <div className="pt-1 opacity-100 sm:pt-8">
             <Button
               onClick={onButtonClick}
               size="lg"
-              className="group relative bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 font-bold px-16 py-6 rounded-full text-xl md:text-2xl shadow-2xl transition-all duration-200 ease-out overflow-hidden transform hover:scale-105"
+              className="group relative overflow-hidden rounded-full bg-gradient-to-r from-orange-600 to-red-600 px-8 py-3 text-base font-bold shadow-2xl transition-all duration-200 ease-out hover:from-orange-700 hover:to-red-700 hover:scale-105 sm:px-16 sm:py-6 sm:text-xl md:text-2xl"
               style={{ color: '#ffffff !important' }}
             >
-              <span className="relative z-10 flex items-center gap-3" style={{ color: '#ffffff !important' }}>
+              <span className="relative z-10 flex items-center gap-2 sm:gap-3" style={{ color: '#ffffff !important' }}>
                 {buttonText}
-                <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-150" />
+                <ChevronRight className="h-5 w-5 transition-transform duration-150 group-hover:translate-x-1" />
               </span>
             </Button>
           </div>
@@ -340,12 +341,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     document.addEventListener('pointerdown', closeOnOutsideTap);
     return () => document.removeEventListener('pointerdown', closeOnOutsideTap);
   }, [showNotificationDropdown]);
-  
-  // Tour progress tracking
-  const [tourProgress, setTourProgress] = useState(() => {
-    const saved = localStorage.getItem('tour-progress');
-    return saved ? JSON.parse(saved) : { clickedCards: [], suggestedNext: 0 };
-  });
   
   // Toast hook for notifications
   const { toast } = useToast();
@@ -416,6 +411,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         duration: 3000,
       });
       addNotification('success', 'Daily Hydration Goal! 💧', 'You\'ve reached your 64 oz water goal today!');
+      void notifyWaterGoalReached();
     }
     if (newGlasses >= 4 && newGlasses < 8 && previousGlasses < 4) {
       addNotification('info', 'Halfway There! 💧', `You've had ${newGlasses * 8} oz of water today. Keep going!`);
@@ -795,6 +791,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       
       // Add bell notification for achievement
       addNotification('achievement', achievement.title, achievement.message);
+      void notifyAchievementUnlocked(achievement.title, achievement.message);
     }
   }, [celebrationAchievement, addNotification]);
 
@@ -816,6 +813,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       setShowConfettiCelebration(true);
       
       addNotification('achievement', achievement.title, achievement.message);
+      void notifyAchievementUnlocked(achievement.title, achievement.message);
     };
 
     window.addEventListener('achievement-unlocked', handleGoalAchievement);
@@ -831,6 +829,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       // Goal achievement notifications
       if (totalCalories >= goalCalories && (dailyCalories < goalCalories || dailyCalories === 0)) {
         addNotification('success', 'Daily Calorie Goal! 🎯', `Congratulations! You've reached your ${goalCalories} calorie goal today.`);
+        // Only fire the OS banner when calories actually cross the goal this session.
+        if (dailyCalories > 0 && dailyCalories < goalCalories) {
+          void notifyCalorieGoalReached(goalCalories);
+        }
       }
       
       // Milestone notifications
@@ -844,6 +846,24 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       setDailyCalories(totalCalories);
     }
   }, [dailyStats, goalCalories, dailyCalories, addNotification]);
+
+  // Water and meal reminders for iOS/Android when the app is backgrounded.
+  useEffect(() => {
+    void syncDailyReminders({
+      waterGlasses: dailyStats?.waterGlasses ?? 0,
+      mealsLoggedToday: loggedMeals.length,
+    });
+  }, [dailyStats?.waterGlasses, loggedMeals.length]);
+
+  useEffect(() => {
+    void watchLocalNotificationTaps((tab) => {
+      if (!tab) return;
+      setActiveTab(tab);
+      if (tab === 'profile') {
+        setTimeout(() => setOpenCard('achievements'), 100);
+      }
+    });
+  }, []);
 
   // Load data on component mount (for both authenticated and unauthenticated users)
   useEffect(() => {
@@ -968,6 +988,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       window.removeEventListener('auth-state-change', handleAuthStateChange);
     };
   }, [user, shouldShowTour]);
+
+  useEffect(() => {
+    const hideWelcome = () => setShowWelcomeBanner(false);
+    window.addEventListener('tour-completed', hideWelcome);
+    return () => window.removeEventListener('tour-completed', hideWelcome);
+  }, []);
 
   // Signed-out users must not keep or display persisted meal data on this device
   useEffect(() => {
@@ -1176,14 +1202,20 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     // Handle tour navigation
     const handleTourNavigation = (event: Event) => {
       const customEvent = event as CustomEvent;
-      const { tab, accordionTarget } = customEvent.detail;
-      setActiveTab(tab);
-      
-      // Open specific accordion if specified
+      const { tab, accordionTarget, scrollTo } = customEvent.detail || {};
+      if (tab) setActiveTab(tab);
+
       if (accordionTarget) {
-        setTimeout(() => {
+        window.setTimeout(() => {
           setOpenCard(accordionTarget);
-        }, 100); // Small delay to ensure tab switch completes first
+        }, 100);
+      }
+
+      if (scrollTo) {
+        window.setTimeout(() => {
+          const el = document.querySelector(`[data-testid="${scrollTo}"]`);
+          el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 450);
       }
     };
 
@@ -1518,35 +1550,37 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               <GuestSaveHint onCreateAccount={() => handleTabChange('profile')} />
             </div>
           )}
-          {/* Welcome Banner for Tour */}
           {user && showWelcomeBanner && (
-            <div className="mb-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-2xl">🎯</span>
-                <h3 className="font-medium text-lg text-gray-900">Welcome to ByteWise!</h3>
-              </div>
-              <p className="text-gray-700 text-sm mb-3">
-                Ready to discover all the amazing features? Take our interactive tour to learn how to track nutrition and build healthy habits.
+            <div
+              className="mb-4 rounded-2xl border border-amber-300/80 bg-amber-50 p-4 shadow-sm"
+              data-testid="welcome-tour-banner"
+            >
+              <h3 className="text-lg font-semibold text-gray-900">Your tools, in one place</h3>
+              <p className="mt-1 text-sm leading-relaxed text-gray-700">
+                Scan a barcode, look up a meal, pick a restaurant item, log water, or start a fast. A short tour shows each one.
               </p>
-              <div className="flex gap-2">
-                <button
+              <div className="mt-3 flex flex-col gap-2 min-[400px]:flex-row">
+                <Button
+                  className="w-full bg-amber-500 text-gray-900 hover:bg-amber-600 min-[400px]:w-auto"
                   onClick={() => {
                     setShowWelcomeBanner(false);
                     startTour();
                   }}
-                  className="px-4 py-2 bg-amber-400 text-gray-900 rounded-lg text-sm font-medium hover:bg-amber-500 transition-colors"
+                  data-testid="welcome-start-tour"
                 >
-                  Take Tour
-                </button>
-                <button
+                  Start tour
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full border-amber-300 bg-white text-gray-800 hover:bg-amber-100 min-[400px]:w-auto"
                   onClick={() => {
                     setShowWelcomeBanner(false);
                     dismissTour();
                   }}
-                  className="px-4 py-2 bg-amber-200 text-gray-900 rounded-lg text-sm font-medium hover:bg-amber-300 transition-colors btn-hero-enhanced"
+                  data-testid="welcome-dismiss-tour"
                 >
-                  Maybe Later
-                </button>
+                  Maybe later
+                </Button>
               </div>
             </div>
           )}
@@ -1846,32 +1880,32 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                       (meal.vitaminC || meal.vitamin_c) > 0 || (meal.zinc || meal.zinc > 0)) && (
                       <div className="flex flex-wrap gap-2 mt-1 pt-1 border-t border-gray-400/30">
                         {(meal.iron > 0) && (
-                          <span className="text-xs bg-slate-500/20 px-2 py-0.5 rounded-full text-gray-800">
+                          <span className="text-xs bg-slate-500/20 px-2 py-0.5 rounded-md whitespace-nowrap text-gray-800">
                             Iron: {(meal.iron).toFixed(1)}mg
                           </span>
                         )}
                         {(meal.calcium > 0) && (
-                          <span className="text-xs bg-gray-500/20 px-2 py-0.5 rounded-full text-gray-800">
+                          <span className="text-xs bg-gray-500/20 px-2 py-0.5 rounded-md whitespace-nowrap text-gray-800">
                             Calcium: {Math.round(meal.calcium)}mg
                           </span>
                         )}
                         {((meal.vitaminC || meal.vitamin_c) > 0) && (
-                          <span className="text-xs bg-cyan-500/20 px-2 py-0.5 rounded-full text-cyan-800">
+                          <span className="text-xs bg-cyan-500/20 px-2 py-0.5 rounded-md whitespace-nowrap text-cyan-800">
                             Vit C: {Math.round(meal.vitaminC || meal.vitamin_c)}mg
                           </span>
                         )}
                         {(meal.zinc > 0) && (
-                          <span className="text-xs bg-amber-500/30 px-2 py-0.5 rounded-full text-amber-800">
+                          <span className="text-xs bg-amber-500/30 px-2 py-0.5 rounded-md whitespace-nowrap text-amber-800">
                             Zinc: {(meal.zinc).toFixed(1)}mg
                           </span>
                         )}
                         {(meal.magnesium > 0) && (
-                          <span className="text-xs bg-rose-500/20 px-2 py-0.5 rounded-full text-rose-800">
+                          <span className="text-xs bg-rose-500/20 px-2 py-0.5 rounded-md whitespace-nowrap text-rose-800">
                             Mg: {Math.round(meal.magnesium)}mg
                           </span>
                         )}
                         {((meal.vitaminD || meal.vitamin_d) > 0) && (
-                          <span className="text-xs bg-orange-500/20 px-2 py-0.5 rounded-full text-orange-800">
+                          <span className="text-xs bg-orange-500/20 px-2 py-0.5 rounded-md whitespace-nowrap text-orange-800">
                             Vit D: {(meal.vitaminD || meal.vitamin_d).toFixed(1)}μg
                           </span>
                         )}
@@ -2485,7 +2519,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <h2 className="text-2xl font-bold mb-2 text-gray-900">Food Search</h2>
             <p className="text-gray-700">Search what you've logged in the past 2 weeks and add it again</p>
           </div>
-          <div className="relative">
+          <div className="relative" data-testid="journal-search">
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-600 w-5 h-5" />
             <Input
               data-testid="main-food-search"
@@ -2541,6 +2575,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           className="mb-6"
           meals={user ? weeklyMeals : []}
           onAddFood={(food, mealType) => addMealToToday(food, mealType)}
+          showRecentEntries={false}
         />
         {/* Daily Header */}
         <div className="flex space-x-4 mb-6">
@@ -2694,309 +2729,59 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               </Card>
             </AccordionItem>
 
-            {/* App Tour Launcher Card */}
             <AccordionItem value="tour" className="border-none">
               <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 overflow-hidden rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:from-amber-100 hover:to-amber-200 hover:border-amber-300/50">
-                <AccordionTrigger className="px-6 py-6 hover:bg-amber-200/30 hover:no-underline [&[data-state=open]>div]:text-[#faed39] [&[data-state=open]]:bg-amber-200/30">
-                  <div className="flex items-center justify-between w-full">
-                    <div className="flex items-center space-x-3">
-                      <GraduationCap className="w-6 h-6 text-[#faed39]" />
-                      <div>
+                <AccordionTrigger className="px-4 py-5 sm:px-6 sm:py-6 hover:bg-amber-200/30 hover:no-underline [&[data-state=open]>div]:text-[#faed39] [&[data-state=open]]:bg-amber-200/30">
+                  <div className="flex items-center justify-between w-full min-w-0">
+                    <div className="flex min-w-0 items-center space-x-3">
+                      <Compass className="h-6 w-6 shrink-0 text-[#faed39]" />
+                      <div className="min-w-0 text-left">
                         <h3 className="text-xl font-semibold transition-colors" style={{ fontFamily: "'League Spartan', sans-serif" }}>
-                          App Tour & Training
+                          App tour
                         </h3>
                         <p className="text-sm text-gray-700" style={{ fontFamily: "'Work Sans', sans-serif" }}>
-                          Explore features or retake the guided tour
+                          Key tools and a short walkthrough
                         </p>
-                      </div>
-                    </div>
-                    <div className="text-right flex-shrink-0 ml-3">
-                      <div className="text-xs text-gray-600">
-                        {localStorage.getItem('bytewise-tour-completed') === 'true' ? 'Completed' : 'Available'}
                       </div>
                     </div>
                   </div>
                 </AccordionTrigger>
-                
-                <AccordionContent className="px-6 pb-6 pt-0">
+
+                <AccordionContent className="px-4 pb-5 pt-0 sm:px-6 sm:pb-6">
                   <div className="space-y-4">
-                    {/* Tour Status */}
-                    <div className="bg-amber-200/30 rounded-lg p-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-center space-x-3">
-                          <PlayCircle className="w-5 h-5 text-amber-600 flex-shrink-0" />
-                          <div>
-                            <h4 className="font-semibold text-gray-900 mb-1">Comprehensive App Tour</h4>
-                            <p className="text-sm text-gray-700 leading-relaxed">
-                              Take our interactive 10-step tour covering food search, the calorie calculator, 
-                              fasting timer, water tracking, meal journaling, achievements, and profile settings.
-                            </p>
-                            <div className="flex items-center gap-4 mt-2 text-xs text-gray-600">
-                              <span className="flex items-center gap-1">
-                                <Clock className="w-3 h-3" />
-                                8-10 minutes
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <Target className="w-3 h-3" />
-                                10 key features
-                              </span>
-                              {localStorage.getItem('bytewise-tour-completed') === 'true' && (
-                                <span className="flex items-center gap-1 text-green-600">
-                                  <CheckCircle2 className="w-3 h-3" />
-                                  Completed
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Tour Actions */}
-                    <div className="flex flex-wrap gap-3">
-                      {/* Always show explore features for existing users */}
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button
-                            variant="default"
-                            size="sm"
-                            className="bg-amber-600 hover:bg-amber-700 text-white font-medium"
-                            data-testid="tour-launch-button"
+                    <p className="text-sm leading-relaxed text-gray-700">
+                      Jump to a tool, or start the guided tour. It highlights calories, water, barcode scan, the calculator, fast food, fasting, and your journal.
+                    </p>
+                    <Button
+                      className="w-full bg-amber-600 text-white hover:bg-amber-700"
+                      onClick={() => startTour()}
+                      data-testid="tour-launch-button"
+                    >
+                      {localStorage.getItem('bytewise-tour-completed') === 'true' ? 'Retake tour' : 'Start tour'}
+                    </Button>
+                    <div className="grid grid-cols-2 gap-2">
+                      {KEY_TOOLS.map((tool) => {
+                        const Icon = tool.icon;
+                        return (
+                          <button
+                            key={tool.id}
+                            type="button"
+                            className="flex min-w-0 items-start gap-2 rounded-xl border border-amber-200 bg-white/80 p-2.5 text-left hover:bg-amber-50 sm:p-3"
+                            onClick={() => {
+                              window.dispatchEvent(new CustomEvent('navigate-to-tab', {
+                                detail: { tab: tool.tab, scrollTo: tool.scrollTo },
+                              }));
+                            }}
+                            data-testid={`key-tool-${tool.id}`}
                           >
-                            <Play className="w-4 h-4 mr-2" />
-                            {localStorage.getItem('bytewise-tour-completed') === 'true' ? 'Retake Tour' : 'Start Tour'}
-                          </Button>
-                        </DialogTrigger>
-                        
-                        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-amber-50 to-yellow-50 border-amber-200">
-                          <DialogHeader>
-                            <DialogTitle className="flex items-center gap-2 text-xl">
-                              <Sparkles className="w-6 h-6 text-yellow-500" />
-                              ByteWise Features Tour
-                            </DialogTitle>
-                          </DialogHeader>
-                          
-                          <div className="space-y-4">
-                            <div className="bg-gradient-to-r from-amber-50 to-amber-100 rounded-lg p-4">
-                              <h3 className="font-semibold text-lg mb-2">🎯 App Features</h3>
-                              <p className="text-gray-900 text-sm">
-                                Explore all the powerful features available in ByteWise Nutritionist. 
-                                Click any card below to navigate directly to that feature.
-                              </p>
-                              <div className="flex items-center gap-4 mt-3 text-sm text-gray-900">
-                                <span className="flex items-center gap-1">
-                                  <Target className="w-4 h-4" />
-                                  5 key features
-                                </span>
-                                <Badge variant="secondary" className="text-xs text-gray-900 bg-gray-100">
-                                  Click to explore
-                                </Badge>
-                              </div>
-                            </div>
-                            
-                            {/* Progress indicator */}
-                            {tourProgress.clickedCards.length > 0 && (
-                              <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
-                                <div className="flex items-center gap-2 text-green-800">
-                                  <CheckCircle2 className="w-4 h-4" />
-                                  <span className="text-sm font-medium">
-                                    Progress: {tourProgress.clickedCards.length}/6 features explored
-                                  </span>
-                                </div>
-                                {tourProgress.suggestedNext < 6 && (
-                                  <p className="text-xs text-green-700 mt-1">
-                                    Try the highlighted card next! 💫
-                                  </p>
-                                )}
-                              </div>
-                            )}
-                            
-                            {/* Feature Cards Grid */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                              {[
-                                {
-                                  icon: <Utensils className="w-5 h-5 text-orange-600" />,
-                                  title: 'Smart Food Search',
-                                  description: 'Search 300,000+ foods in the Bytewise Food Database',
-                                  category: 'Core Feature',
-                                  targetTab: 'nutrition',
-                                  nutritionMode: 'calculator'
-                                },
-                                {
-                                  icon: <Target className="w-5 h-5 text-green-600" />,
-                                  title: 'Calorie Calculator',
-                                  description: 'Instant nutrition facts with portion warnings',
-                                  category: 'Core Feature',
-                                  targetTab: 'nutrition',
-                                  nutritionMode: 'calculator'
-                                },
-                                {
-                                  icon: <Clock className="w-5 h-5 text-orange-600" />,
-                                  title: 'Fasting Timer',
-                                  description: 'Track intermittent fasting with celebrations',
-                                  category: 'Wellness',
-                                  targetTab: 'fasting'
-                                },
-                                {
-                                  icon: <Trophy className="w-5 h-5 text-amber-800" />,
-                                  title: 'Achievement System',
-                                  description: 'Unlock rewards as you hit your goals',
-                                  category: 'Motivation',
-                                  targetTab: 'profile',
-                                  accordionTarget: 'achievements'
-                                },
-                                {
-                                  icon: <Droplets className="w-5 h-5 text-cyan-600" />,
-                                  title: 'Hydration Tracking',
-                                  description: 'Beautiful water intake visualization',
-                                  category: 'Wellness',
-                                  targetTab: 'home'
-                                }
-                              ].map((feature, index) => (
-                                <Card
-                                  key={index}
-                                  className={`cursor-pointer transition-all duration-200 ${
-                                    tourProgress.clickedCards.includes(feature.title)
-                                      ? 'bg-green-100 border-green-300 shadow-md' // Already clicked
-                                      : index === tourProgress.suggestedNext
-                                      ? 'bg-gradient-to-br from-blue-50 to-blue-100 border-blue-300 shadow-lg ring-2 ring-blue-200 hover:ring-blue-300' // Suggested next
-                                      : 'bg-amber-50/60 border-gray-200 hover:border-gray-300 hover:bg-amber-100/60 hover:shadow-md' // Default
-                                  }`}
-                                  onClick={() => {
-                                    // Track this card click
-                                    const newProgress = {
-                                      clickedCards: tourProgress.clickedCards.includes(feature.title)
-                                        ? tourProgress.clickedCards
-                                        : [...tourProgress.clickedCards, feature.title],
-                                      suggestedNext: tourProgress.clickedCards.includes(feature.title)
-                                        ? tourProgress.suggestedNext
-                                        : Math.min(tourProgress.suggestedNext + 1, 5)
-                                    };
-                                    setTourProgress(newProgress);
-                                    localStorage.setItem('tour-progress', JSON.stringify(newProgress));
-                                    
-                                    // Navigate to the feature's page/tab with mode information
-                                    setActiveTab(feature.targetTab);
-                                    
-                                    // Send custom event with tab, mode, and accordion info
-                                    window.dispatchEvent(new CustomEvent('navigate-to-tab', {
-                                      detail: { 
-                                        tab: feature.targetTab,
-                                        nutritionMode: feature.nutritionMode,
-                                        accordionTarget: feature.accordionTarget
-                                      }
-                                    }));
-                                  }}
-                                >
-                                  <CardContent className="p-4">
-                                    <div className="flex items-start gap-3">
-                                      <div className={`p-2 rounded-lg ${
-                                        tourProgress.clickedCards.includes(feature.title)
-                                          ? 'bg-green-200' // Already clicked
-                                          : index === tourProgress.suggestedNext
-                                          ? 'bg-blue-200' // Suggested next
-                                          : 'bg-gray-100' // Default
-                                      }`}>
-                                        {feature.icon}
-                                      </div>
-                                      <div className="flex-1">
-                                        <div className="flex items-center justify-between mb-1">
-                                          <h4 className="font-medium text-gray-900 flex items-center gap-2">
-                                            {feature.title}
-                                            {tourProgress.clickedCards.includes(feature.title) && (
-                                              <CheckCircle2 className="w-4 h-4 text-green-600" />
-                                            )}
-                                            {index === tourProgress.suggestedNext && !tourProgress.clickedCards.includes(feature.title) && (
-                                              <Sparkles className="w-4 h-4 text-blue-600 animate-pulse" />
-                                            )}
-                                          </h4>
-                                          <Badge variant="outline" className={`text-xs ${
-                                            tourProgress.clickedCards.includes(feature.title)
-                                              ? 'text-green-700 bg-green-100 border-green-300'
-                                              : index === tourProgress.suggestedNext
-                                              ? 'text-blue-700 bg-blue-100 border-blue-300'
-                                              : 'text-gray-700 bg-gray-100 border-gray-300'
-                                          }`}>
-                                            {feature.category}
-                                          </Badge>
-                                        </div>
-                                        <p className="text-sm text-gray-800 leading-relaxed">
-                                          {feature.description}
-                                        </p>
-                                        {index === tourProgress.suggestedNext && !tourProgress.clickedCards.includes(feature.title) && (
-                                          <p className="text-xs text-blue-600 mt-1 font-medium">
-                                            💫 Try this next!
-                                          </p>
-                                        )}
-                                      </div>
-                                    </div>
-                                  </CardContent>
-                                </Card>
-                              ))}
-                            </div>
-                          </div>
-                        </DialogContent>
-                      </Dialog>
-                      
-                      {localStorage.getItem('bytewise-tour-completed') === 'true' && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            localStorage.removeItem('bytewise-tour-completed');
-                            localStorage.removeItem('tour-cards-clicked');
-                            localStorage.removeItem('tour-progress');
-                            setTourProgress({ clickedCards: [], suggestedNext: 0 });
-                            window.location.reload();
-                          }}
-                          className="text-gray-600 hover:text-gray-900 border-amber-300 hover:bg-amber-100"
-                        >
-                          Reset Tour Progress
-                        </Button>
-                      )}
-                    </div>
-
-                    {/* Feature Quick Links */}
-                    <div className="border-t border-amber-300/30 pt-4">
-                      <h5 className="font-medium text-gray-900 mb-3 text-sm">Quick Feature Access</h5>
-                      <div className="grid grid-cols-2 gap-2 text-xs">
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="justify-start h-8 text-gray-700 hover:text-gray-900 hover:bg-amber-200/30"
-                          onClick={() => handleTabChange('nutrition')}
-                        >
-                          <Utensils className="w-3 h-3 mr-2" />
-                          Food Search
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="justify-start h-8 text-gray-700 hover:text-gray-900 hover:bg-amber-200/30"
-                          onClick={() => handleTabChange('fasting')}
-                        >
-                          <Clock className="w-3 h-3 mr-2" />
-                          Fasting Timer
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="justify-start h-8 text-gray-700 hover:text-gray-900 hover:bg-amber-200/30"
-                          onClick={() => handleTabChange('daily')}
-                        >
-                          <BarChart3 className="w-3 h-3 mr-2" />
-                          Meal Journal
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="justify-start h-8 text-gray-700 hover:text-gray-900 hover:bg-amber-200/30"
-                          onClick={() => setOpenCard('achievements')}
-                        >
-                          <Trophy className="w-3 h-3 mr-2" />
-                          Achievements
-                        </Button>
-                      </div>
+                            <Icon className="mt-0.5 h-4 w-4 shrink-0 text-amber-800" />
+                            <span className="min-w-0">
+                              <span className="block text-sm font-semibold leading-tight text-gray-900">{tool.title}</span>
+                              <span className="block text-xs leading-snug text-gray-600">{tool.description}</span>
+                            </span>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 </AccordionContent>
@@ -3405,38 +3190,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           setShowSaveAccountPrompt(false);
         }}
       />
-      
-      {/* Tour Launcher - Fixed position, available on all pages */}
-      {user && !showProfileCompletion && (() => {
-        const userData = user as any;
-        const hasFirstName = userData?.firstName && userData.firstName.trim() !== '';
-        const hasLastName = userData?.lastName && userData.lastName.trim() !== '';
-        const profileCompleted = hasFirstName && hasLastName;
-        
-        return profileCompleted ? (
-          <div className="fixed bottom-20 right-6 z-45">
-            <TourLauncher
-              onNavigateToFeature={(tab) => setActiveTab(tab)}
-              isVisible={shouldShowTour()}
-              onCardInteraction={() => {
-                // Force re-render to hide button after interaction
-                setTimeout(() => window.location.reload(), 500);
-              }}
-            />
-            {/* Notify other components about tour visibility */}
-            {typeof window !== 'undefined' && (() => {
-              window.dispatchEvent(new CustomEvent('tour-visibility', {
-                detail: { visible: shouldShowTour() }
-              }));
-              return null;
-            })()}
-          </div>
-        ) : null;
-      })()}
-      
-
-      
-
       
       <AppTour />
       <Toaster />

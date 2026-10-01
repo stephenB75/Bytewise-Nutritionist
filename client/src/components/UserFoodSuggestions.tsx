@@ -46,6 +46,8 @@ interface UserFoodSuggestionsProps {
   className?: string;
   /** When provided, suggestions come from app state (e.g. API) instead of localStorage only */
   meals?: UserFood[];
+  /** Journal already lists Logged Today, so skip the overlapping recent list there. */
+  showRecentEntries?: boolean;
 }
 
 const MEAL_TYPES: MealType[] = ['breakfast', 'lunch', 'dinner', 'snack'];
@@ -75,6 +77,7 @@ export function UserFoodSuggestions({
   onAddFood,
   className = "",
   meals,
+  showRecentEntries = true,
 }: UserFoodSuggestionsProps) {
   const [userFoods, setUserFoods] = useState<UserFood[]>([]);
   const [expandedKey, setExpandedKey] = useState<string | null>(null);
@@ -196,7 +199,7 @@ export function UserFoodSuggestions({
             role="radio"
             aria-checked={mealType === type}
             onClick={() => setMealType(type)}
-            className={`rounded-full px-3 py-1 text-xs font-medium capitalize ring-1 transition-colors ${
+            className={`shrink-0 whitespace-nowrap rounded-md px-3 py-1 text-xs font-medium capitalize ring-1 transition-colors ${
               mealType === type
                 ? 'on-color bg-orange-600 ring-orange-600'
                 : 'bg-white text-gray-800 ring-gray-300 hover:bg-orange-50'
@@ -226,6 +229,7 @@ export function UserFoodSuggestions({
   );
 
   if (userFoods.length === 0) {
+    if (!showRecentEntries) return null;
     return (
       <Card className={`p-6 bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-sm border-0 shadow-lg ${className}`}>
         <div className="text-center text-gray-500">
@@ -235,6 +239,10 @@ export function UserFoodSuggestions({
         </div>
       </Card>
     );
+  }
+
+  if (!showRecentEntries && popularFoods.length === 0) {
+    return null;
   }
 
   const chevron = (open: boolean) => onAddFood
@@ -257,7 +265,7 @@ export function UserFoodSuggestions({
 
       {/* Popular Foods */}
       {popularFoods.length > 0 && (
-        <div className="mb-6">
+        <div className={showRecentEntries ? 'mb-6' : undefined}>
           <div className="flex items-center gap-2 mb-3">
             <Star className="w-4 h-4 text-yellow-500" />
             <h4 className="font-medium text-gray-700">Frequently Added</h4>
@@ -299,55 +307,55 @@ export function UserFoodSuggestions({
         </div>
       )}
 
-      {/* Recent Foods */}
-      <div>
-        <div className="flex items-center gap-2 mb-3">
-          <History className="w-4 h-4 text-blue-500" />
-          <h4 className="font-medium text-gray-700">Recent Entries</h4>
-        </div>
-        <div className="space-y-2">
-          {uniqueFoods.map((food) => {
-            const key = `recent-${food.id}`;
-            return (
-              <div key={key}>
-                <button
-                  type="button"
-                  onClick={() => handleSelectFood(food, key)}
-                  aria-expanded={onAddFood ? expandedKey === key : undefined}
-                  className="w-full text-left p-3 hover:bg-amber-50/60 rounded-lg transition-colors group border border-gray-100"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <div className="font-medium text-sm group-hover:text-blue-600">
-                        {food.name}
+      {showRecentEntries && (
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <History className="w-4 h-4 text-blue-500" />
+            <h4 className="font-medium text-gray-700">Recent Entries</h4>
+          </div>
+          <div className="space-y-2">
+            {uniqueFoods.map((food) => {
+              const key = `recent-${food.id}`;
+              return (
+                <div key={key}>
+                  <button
+                    type="button"
+                    onClick={() => handleSelectFood(food, key)}
+                    aria-expanded={onAddFood ? expandedKey === key : undefined}
+                    className="w-full text-left p-3 hover:bg-amber-50/60 rounded-lg transition-colors group border border-gray-100"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <div className="font-medium text-sm group-hover:text-blue-600">
+                          {food.name}
+                        </div>
+                        <div className="flex items-center gap-3 text-xs text-gray-500">
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {getDateLabel(food.date)}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Utensils className="h-3 w-3" />
+                            {Math.round(Number(food.calories) || 0)} cal
+                          </span>
+                          <Badge variant="outline" className="text-xs px-1 py-0">
+                            {food.mealType}
+                          </Badge>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-3 text-xs text-gray-500">
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          {getDateLabel(food.date)}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Utensils className="h-3 w-3" />
-                          {Math.round(Number(food.calories) || 0)} cal
-                        </span>
-                        <Badge variant="outline" className="text-xs px-1 py-0">
-                          {food.mealType}
-                        </Badge>
-                      </div>
+                      {chevron(expandedKey === key)}
                     </div>
-                    {chevron(expandedKey === key)}
-                  </div>
-                </button>
-                {expandedKey === key && renderAddPanel(food)}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {uniqueFoods.length >= 4 && (
-        <div className="mt-4 text-center">
-          <p className="text-xs text-gray-500">Showing your 4 most recent custom foods</p>
+                  </button>
+                  {expandedKey === key && renderAddPanel(food)}
+                </div>
+              );
+            })}
+          </div>
+          {uniqueFoods.length >= 4 && (
+            <div className="mt-4 text-center">
+              <p className="text-xs text-gray-500">Showing your 4 most recent custom foods</p>
+            </div>
+          )}
         </div>
       )}
     </Card>

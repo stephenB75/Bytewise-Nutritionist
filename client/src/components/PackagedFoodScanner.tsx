@@ -323,7 +323,7 @@ function ProductPanel({ food, onClose }: { food: PackagedFood; onClose: () => vo
               role="radio"
               aria-checked={mode === m}
               onClick={() => setMode(m)}
-              className={`rounded-full px-3 py-1 text-xs font-medium capitalize ring-1 ${
+              className={`shrink-0 whitespace-nowrap rounded-md px-3 py-1 text-xs font-medium capitalize ring-1 ${
                 mode === m ? 'on-color bg-[#1f4aa6] ring-[#1f4aa6]' : 'bg-white text-gray-800 ring-gray-300'
               }`}
             >
@@ -400,7 +400,7 @@ function ProductPanel({ food, onClose }: { food: PackagedFood; onClose: () => vo
                 role="radio"
                 aria-checked={mealType === type}
                 onClick={() => setMealType(type)}
-                className={`rounded-full px-3 py-1 text-xs font-medium capitalize ring-1 transition-colors ${
+                className={`shrink-0 whitespace-nowrap rounded-md px-3 py-1 text-xs font-medium capitalize ring-1 transition-colors ${
                   mealType === type ? 'on-color bg-orange-600 ring-orange-600' : 'bg-white text-gray-800 ring-gray-300 hover:bg-orange-50'
                 }`}
               >
@@ -530,12 +530,12 @@ export function PackagedFoodScanner() {
         </form>
       )}
 
-      <form onSubmit={runSearch} className="mt-3 flex gap-2">
+      <form onSubmit={runSearch} className="mt-3 flex min-w-0 gap-2">
         <Input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search by name, e.g. Doritos Cool Ranch"
-          className="bg-amber-50/90 text-base text-gray-950"
+          className="min-w-0 flex-1 bg-amber-50/90 text-base text-gray-950"
           data-testid="input-packaged-search"
         />
         <Button type="submit" disabled={searching || query.trim().length < 2} className="on-color shrink-0 bg-orange-700 hover:bg-orange-800" aria-label="Search packaged foods">
