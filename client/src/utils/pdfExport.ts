@@ -10,8 +10,7 @@ import { jsPDF } from 'jspdf';
 import { Capacitor } from '@capacitor/core';
 import { Directory, Filesystem } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
-import { apiRequest } from '@/lib/queryClient';
-import { apiFetch } from '@/lib/apiUrl';
+import { apiRequest, authFetch } from '@/lib/queryClient';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 
 // Register Chart.js components
@@ -411,7 +410,7 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     
     try {
       // Fetch meals data - using credentials for session-based auth
-      const mealsResponse = await apiFetch('/api/meals/logged', {
+      const mealsResponse = await authFetch('/api/meals/logged', {
         credentials: 'include'
       });
       if (mealsResponse.ok) {
@@ -423,7 +422,7 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     
     try {
       // Fetch achievements data
-      const achievementsResponse = await apiFetch('/api/achievements', {
+      const achievementsResponse = await authFetch('/api/achievements', {
         credentials: 'include'
       });
       if (achievementsResponse.ok) {
@@ -436,7 +435,7 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     
     try {
       // Fetch fasting data
-      const fastingResponse = await apiFetch('/api/fasting/history', {
+      const fastingResponse = await authFetch('/api/fasting/history', {
         credentials: 'include'
       });
       if (fastingResponse.ok) {
@@ -449,7 +448,7 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     
     try {
       // Fetch water data
-      const waterResponse = await apiFetch('/api/water-history?days=90', {
+      const waterResponse = await authFetch('/api/water-history?days=90', {
         credentials: 'include'
       });
       if (waterResponse.ok) {
@@ -461,7 +460,7 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     
     try {
       // Fetch user profile
-      const userResponse = await apiFetch('/api/auth/user', {
+      const userResponse = await authFetch('/api/auth/user', {
         credentials: 'include'
       });
       if (userResponse.ok) {

@@ -60,10 +60,20 @@ const idParam = z.coerce.number().int().positive();
 const inviteSchema = z.object({ email: z.string().trim().toLowerCase().email() });
 
 const shareSchema = z.object({
-  type: z.enum(['meal', 'fast', 'water']),
+  type: z.enum(['meal', 'fast', 'water', 'fitness']),
   title: z.string().trim().min(1).max(200),
   details: z.record(z.union([z.string(), z.number(), z.null()])).optional(),
   note: z.string().trim().max(280).optional(),
+});
+
+// Apple Health only exists on the phone, so these come from the client.
+const healthSchema = z.object({
+  steps: z.number().int().min(0).max(200_000),
+  activeCalories: z.number().int().min(0).max(20_000),
+  exerciseMinutes: z.number().int().min(0).max(1_440).nullable(),
+  workouts: z.number().int().min(0).max(100),
+  workoutMinutes: z.number().int().min(0).max(1_440),
+  distanceMiles: z.number().min(0).max(500),
 });
 
 const summarySchema = z.object({
@@ -71,6 +81,7 @@ const summarySchema = z.object({
   dayStart: z.string().datetime(),
   dayEnd: z.string().datetime(),
   note: z.string().trim().max(280).optional(),
+  health: healthSchema.optional(),
 });
 
 export function registerFriendsRoutes(app: Express) {
@@ -252,9 +263,13 @@ export function registerFriendsRoutes(app: Express) {
 
     try {
       const { type, title, details, note } = parsed.data;
+      // activity_type is limited by a check constraint to summary/meal/fast/water.
+      const row = type === 'fitness'
+        ? { activity_type: 'summary', details: { ...(details ?? {}), kind: 'fitness' } }
+        : { activity_type: type, details: details ?? null };
       const { data, error } = await supabaseAdmin
         .from('shared_activities')
-        .insert({ user_id: userId, activity_type: type, title, details: details ?? null, note: note || null })
+        .insert({ user_id: userId, ...row, title, note: note || null })
         .select('id')
         .single();
       if (error) throw error;
@@ -273,7 +288,7 @@ export function registerFriendsRoutes(app: Express) {
     }
 
     try {
-      const { date, dayStart, dayEnd, note } = parsed.data;
+      const { date, dayStart, dayEnd, note, health } = parsed.data;
       // Meals and water are stored on the calendar day in UTC (noon and midnight respectively).
       const dayFrom = `${date}T00:00:00.000Z`;
       const dayTo = `${date}T23:59:59.999Z`;
@@ -300,6 +315,12 @@ export function registerFriendsRoutes(app: Express) {
         protein: Math.round(meals.reduce((sum: number, m: any) => sum + (Number(m.total_protein) || 0), 0)),
         water: Math.max(0, ...(waterResult.data || []).map((w: any) => Number(w.glasses) || 0)),
         fast: fast ? `${fast.plan_name}${fast.actual_duration ? ` · ${Math.round(fast.actual_duration / 3600000)}h` : ''}` : null,
+        ...(health ? {
+          steps: health.steps,
+          activeCalories: health.activeCalories,
+          exerciseMinutes: health.exerciseMinutes,
+          workouts: health.workouts,
+        } : {}),
       };
 
       const { data, error } = await supabaseAdmin

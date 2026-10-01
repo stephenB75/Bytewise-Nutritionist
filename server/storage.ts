@@ -41,6 +41,7 @@ import { getDatabaseUrl } from "./env";
 import {
   createMealViaSupabase,
   deleteMealViaSupabase,
+  deleteAllUserDataViaSupabase,
   getUserMealsViaSupabase,
   getUserViaSupabase,
   getUserWaterHistoryViaSupabase,
@@ -1396,6 +1397,10 @@ export class DatabaseStorage implements IStorage {
   async deleteAllUserData(userId: string): Promise<{counts: Record<string, number>}> {
     console.log(`🗑️ Starting complete data deletion for user: ${userId.substring(0, 8)}...`);
     
+    if (!getDatabaseUrl() || !isDbReady() || !db) {
+      return deleteAllUserDataViaSupabase(userId);
+    }
+
     const counts: Record<string, number> = {};
     
     // Use transaction to ensure atomicity - all or nothing

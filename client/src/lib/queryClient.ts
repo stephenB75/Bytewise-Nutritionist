@@ -46,6 +46,16 @@ export async function getAuthHeaders(): Promise<Record<string, string>> {
   return headers;
 }
 
+/** fetch() with the signed-in user's bearer token; unlike apiRequest it doesn't throw on error statuses. */
+export async function authFetch(url: string, init: RequestInit = {}): Promise<Response> {
+  const authHeaders = await getAuthHeaders();
+  return fetch(resolveApiUrl(url), {
+    credentials: "include",
+    ...init,
+    headers: { ...authHeaders, ...(init.headers as Record<string, string> | undefined) },
+  });
+}
+
 export async function apiRequest(
   method: string,
   url: string,

@@ -27,6 +27,8 @@ export type LoggedMeal = {
   name: string;
   date: string;
   mealType: string;
+  /** When the entry was saved (ISO), used to show the time it was logged. */
+  loggedAt: string | null;
   calories: number;
   totalCalories: number;
   protein: number;
@@ -50,18 +52,24 @@ function toNumber(value: unknown): number {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
+function localDateKey(date: Date): string {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
 function toDateKey(value: unknown): string {
   if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
     return value;
   }
+  // Meal dates are stored at noon UTC on the calendar day, so the UTC date part is the day.
   if (typeof value === 'string' && value.includes('T')) {
     return value.split('T')[0];
   }
+  // No date means today on the user's calendar (UTC would already be tomorrow in the evening in the US).
   const date = value ? new Date(String(value)) : new Date();
   if (Number.isNaN(date.getTime())) {
-    return new Date().toISOString().split('T')[0];
+    return localDateKey(new Date());
   }
-  return date.toISOString().split('T')[0];
+  return value ? date.toISOString().split('T')[0] : localDateKey(date);
 }
 
 function mapMeal(row: Record<string, unknown>): LoggedMeal {
@@ -77,6 +85,7 @@ function mapMeal(row: Record<string, unknown>): LoggedMeal {
     name: String(row.name ?? 'Meal'),
     date,
     mealType: String(row.meal_type ?? row.mealType ?? 'meal'),
+    loggedAt: row.created_at || row.createdAt ? String(row.created_at ?? row.createdAt) : null,
     calories,
     totalCalories: calories,
     protein,
@@ -217,6 +226,7 @@ export async function logMeal(
     name: input.name,
     date: toDateKey(input.date),
     mealType: input.mealType || 'meal',
+    loggedAt: new Date().toISOString(),
     calories: toNumber(input.totalCalories),
     totalCalories: toNumber(input.totalCalories),
     protein: toNumber(input.totalProtein),

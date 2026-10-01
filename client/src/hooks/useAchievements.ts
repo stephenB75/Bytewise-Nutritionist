@@ -13,7 +13,7 @@ export interface Achievement {
   createdAt: string | null;
 }
 
-export function useAchievements() {
+export function useAchievements(enabled = true) {
   return useQuery({
     queryKey: ['/api/achievements'],
     queryFn: async () => {
@@ -21,6 +21,7 @@ export function useAchievements() {
       const data = await response.json();
       return data.achievements as Achievement[];
     },
+    enabled,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 }

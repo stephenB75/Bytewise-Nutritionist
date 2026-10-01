@@ -300,6 +300,33 @@ export async function createMealViaSupabase(meal: Record<string, any>) {
   };
 }
 
+// Meals go before recipes: meal_foods.recipe_id doesn't cascade. meal_foods and recipe_ingredients
+// cascade from their parents.
+const USER_DATA_TABLES = [
+  'subscription_transactions',
+  'achievements',
+  'water_intake',
+  'fasting_sessions',
+  'meals',
+  'recipes',
+  'subscriptions',
+] as const;
+
+export async function deleteAllUserDataViaSupabase(userId: string): Promise<{ counts: Record<string, number> }> {
+  const counts: Record<string, number> = {};
+  for (const table of USER_DATA_TABLES) {
+    const { count, error } = await supabaseAdmin
+      .from(table)
+      .delete({ count: 'exact' })
+      .eq('user_id', userId);
+    if (error) {
+      throw error;
+    }
+    counts[table] = count ?? 0;
+  }
+  return { counts };
+}
+
 export async function deleteMealViaSupabase(id: number, userId?: string) {
   let query = supabaseAdmin.from('meals').delete().eq('id', id);
   if (userId) {

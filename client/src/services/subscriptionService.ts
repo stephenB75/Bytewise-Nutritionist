@@ -1,5 +1,5 @@
 import { Capacitor } from '@capacitor/core';
-import { apiFetch } from '@/lib/apiUrl';
+import { authFetch } from '@/lib/queryClient';
 
 // Dynamic import for RevenueCat to avoid build issues on web
 let Purchases: any;
@@ -149,9 +149,7 @@ class SubscriptionService {
       // If on web platform, fetch from backend API
       if (!Capacitor.isNativePlatform()) {
         try {
-          const response = await apiFetch('/api/subscription/status', {
-            credentials: 'include' // Include auth cookies
-          });
+          const response = await authFetch('/api/subscription/status');
           
           if (response.ok) {
             const data = await response.json();

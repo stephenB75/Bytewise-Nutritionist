@@ -22,7 +22,7 @@ import {
   Database,
   Cloud
 } from 'lucide-react';
-import { apiFetch } from '@/lib/apiUrl';
+import { authFetch } from '@/lib/queryClient';
 
 export function DataManagementPanel() {
   const { toast } = useToast();
@@ -69,7 +69,7 @@ export function DataManagementPanel() {
   const handleDeleteAllData = async () => {
     if (confirm("Are you sure you want to delete all your data? This action cannot be undone.")) {
       try {
-        const response = await apiFetch('/api/user/delete-data', {
+        const response = await authFetch('/api/user/delete-data', {
           method: 'DELETE',
         });
         

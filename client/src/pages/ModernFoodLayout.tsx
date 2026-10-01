@@ -24,7 +24,7 @@ import { useAchievements, getAchievementIcon, formatAchievementDate } from '@/ho
 import { ProfileIcon } from '@/components/ProfileIcon';
 import { TourLauncher, useAppTour, WelcomeBanner } from '@/components/TourLauncher';
 import { AppTour } from '@/components/AppTour';
-import { UserFoodSuggestions } from '@/components/UserFoodSuggestions';
+import { UserFoodSuggestions, mealTypeForNow } from '@/components/UserFoodSuggestions';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useQuery } from '@tanstack/react-query';
 import { ACTIVE_FAST_QUERY_KEY, fetchActiveFast } from '@/lib/fastingApi';
@@ -77,11 +77,12 @@ import { GuestSaveHint } from '@/components/GuestSaveHint';
 import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
-import { deleteLoggedMeal, listLoggedMeals, saveUserProfile } from '@/lib/mealsApi';
+import { deleteLoggedMeal, listLoggedMeals, logMeal, saveUserProfile } from '@/lib/mealsApi';
 import { clearProfileCompletionPrompt, resendVerificationEmail, resetPasswordForEmail, shouldShowProfileCompletion, signInWithEmail, signUpWithEmail } from '@/lib/authActions';
 import { getWeekDates, getLocalDateKey, getMealTypeByTime, formatLocalTime } from '@/utils/dateUtils';
 import { clearGuestNutritionStorage } from '@/lib/guestStorage';
 import { AppleFitnessCard } from '@/components/AppleFitnessCard';
+import { ExerciseMinutesCard } from '@/components/ExerciseMinutesCard';
 import { AppleHealthIntegration } from '@/components/AppleHealthIntegration';
 import { FriendsPanel } from '@/components/FriendsPanel';
 import { FRIENDS_QUERY_KEY, useFriendUpdates } from '@/hooks/useFriendUpdates';
@@ -142,6 +143,7 @@ interface Notification {
   read: boolean;
 }
 
+const JOURNAL_SEARCH_DAYS = 14;
 const NOTIFICATIONS_KEY = 'bytewise_notifications';
 const MAX_NOTIFICATIONS = 50;
 
@@ -303,7 +305,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const [navigationTrigger, setNavigationTrigger] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const { backgroundImage } = useRotatingBackground(activeTab, navigationTrigger);
-  const { data: achievements = [], isLoading: achievementsLoading } = useAchievements();
+  const { data: achievements = [], isLoading: achievementsLoading } = useAchievements(!!user);
   const [searchQuery, setSearchQuery] = useState('');
   const [showAchievement, setShowAchievement] = useState(false);
   const [currentAchievement, setCurrentAchievement] = useState<Achievement | null>(null);
@@ -1604,6 +1606,18 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             />
           </div>
 
+          <div className="mb-4">
+            <ExerciseMinutesCard
+              onConnect={() => {
+                handleTabChange('profile');
+                setTimeout(() => {
+                  setOpenCard('apple-health');
+                  setTimeout(() => scrollToTestId('apple-health-card'), 250);
+                }, 100);
+              }}
+            />
+          </div>
+
           {/* Water Consumption */}
           <div className="mb-4" data-testid="water-consumption-card">
             <WaterCard
@@ -2331,7 +2345,128 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     );
   };
 
-  const renderDailyWeekly = () => (
+  const mealDayKey = (meal: any): string =>
+    meal.date && String(meal.date).includes('T') ? String(meal.date).split('T')[0] : String(meal.date || '');
+
+  const mealSortTime = (meal: any): number =>
+    (meal.loggedAt && Date.parse(meal.loggedAt)) || Date.parse(`${mealDayKey(meal)}T12:00:00`) || 0;
+
+  const formatJournalDay = (dayKey: string): string => {
+    const today = getLocalDateKey();
+    const yesterday = getLocalDateKey(new Date(Date.now() - 86400000));
+    if (dayKey === today) return 'Today';
+    if (dayKey === yesterday) return 'Yesterday';
+    return new Date(`${dayKey}T12:00:00`).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+  };
+
+  const formatLoggedTime = (meal: any): string | null =>
+    meal.loggedAt ? new Date(meal.loggedAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : null;
+
+  const addMealToToday = async (meal: any, mealType: string) => {
+    if (!user) {
+      addNotification('info', 'Sign in to save', 'Create an account on Profile to add food to your log.');
+      return;
+    }
+    try {
+      await logMeal({
+        name: meal.name,
+        date: getLocalDateKey(),
+        mealType,
+        totalCalories: meal.totalCalories ?? meal.calories,
+        totalProtein: meal.totalProtein ?? meal.protein,
+        totalCarbs: meal.totalCarbs ?? meal.carbs,
+        totalFat: meal.totalFat ?? meal.fat,
+        iron: meal.iron,
+        calcium: meal.calcium,
+        zinc: meal.zinc,
+        magnesium: meal.magnesium,
+        vitaminC: meal.vitaminC,
+        vitaminD: meal.vitaminD,
+        vitaminB12: meal.vitaminB12,
+        folate: meal.folate,
+      });
+    } catch (error) {
+      console.error('Error adding meal:', error);
+      addNotification('info', 'Not added', error instanceof Error ? error.message : 'Could not add this food. Please try again.');
+    }
+  };
+
+  const deleteJournalMeal = async (meal: any) => {
+    try {
+      if (!meal.id) {
+        addNotification('info', 'Delete Failed', 'Cannot delete meal: missing meal ID');
+        return;
+      }
+      await deleteLoggedMeal(meal.id);
+      addNotification('success', 'Meal Deleted', `Removed ${meal.name} from your meals`);
+      window.dispatchEvent(new CustomEvent('refresh-meals'));
+    } catch (error) {
+      console.error('Error deleting meal:', error);
+      addNotification('info', 'Delete Failed', 'Could not delete meal. Please try again.');
+    }
+  };
+
+  const renderJournalMeal = (meal: any, index: number, mode: 'today' | 'search') => {
+    const time = formatLoggedTime(meal);
+    const when = mode === 'today' ? time : [formatJournalDay(mealDayKey(meal)), time].filter(Boolean).join(' · ');
+    return (
+      <Card key={`${mode}-${meal.id || meal.name}-${index}`} className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 p-4">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex-1 min-w-0">
+            <h4 className="text-gray-900 font-semibold truncate">{meal.name}</h4>
+            <p className="text-gray-700 text-sm capitalize">{[when, meal.mealType].filter(Boolean).join(' • ')}</p>
+            <div className="flex space-x-4 mt-1">
+              <span className="text-xs text-green-600">P: {Number(meal.totalProtein || meal.protein || 0).toFixed(1)}g</span>
+              <span className="text-xs text-yellow-600">C: {Number(meal.totalCarbs || meal.carbs || 0).toFixed(1)}g</span>
+              <span className="text-xs text-purple-600">F: {Number(meal.totalFat || meal.fat || 0).toFixed(1)}g</span>
+            </div>
+          </div>
+          <div className="text-right shrink-0">
+            <p className="text-orange-600 font-bold text-lg">{Math.round(Number(meal.totalCalories || meal.calories || 0))} cal</p>
+            {mode === 'search' ? (
+              <Button
+                size="sm"
+                className="on-color mt-1 h-8 bg-orange-700 hover:bg-orange-800"
+                data-testid={`button-add-search-meal-${index}`}
+                onClick={() => addMealToToday(meal, mealTypeForNow())}
+                title="Add this food to today's log"
+              >
+                <Plus className="w-4 h-4 mr-1" /> Add to today
+              </Button>
+            ) : (
+              <Button
+                size="sm"
+                variant="ghost"
+                className="text-gray-600 hover:text-red-600 p-2"
+                data-testid={`button-delete-logged-meal-${index}`}
+                onClick={() => deleteJournalMeal(meal)}
+                title="Delete meal entry"
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            )}
+          </div>
+        </div>
+      </Card>
+    );
+  };
+
+  const renderDailyWeekly = () => {
+    const todayKey = getLocalDateKey();
+    const searchFromKey = getLocalDateKey(new Date(Date.now() - (JOURNAL_SEARCH_DAYS - 1) * 86400000));
+    const query = searchQuery.trim().toLowerCase();
+    const todaysMeals = loggedMeals
+      .filter(meal => mealDayKey(meal) === todayKey)
+      .sort((a, b) => mealSortTime(b) - mealSortTime(a));
+    const searchResults = query
+      ? weeklyMeals
+          .filter(meal => mealDayKey(meal) >= searchFromKey)
+          .filter(meal => `${meal.name} ${meal.mealType}`.toLowerCase().includes(query))
+          .sort((a, b) => mealSortTime(b) - mealSortTime(a))
+      : [];
+    const resultDays = Array.from(new Set(searchResults.map(mealDayKey)));
+
+    return (
     <div className="space-y-0">
       <HeroSection
         backgroundImage={backgroundImage}
@@ -2348,13 +2483,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         <div className="space-y-4 mb-8">
           <div className="text-center">
             <h2 className="text-2xl font-bold mb-2 text-gray-900">Food Search</h2>
-            <p className="text-gray-700">Find and log nutrition information</p>
+            <p className="text-gray-700">Search what you've logged in the past 2 weeks and add it again</p>
           </div>
           <div className="relative">
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-600 w-5 h-5" />
             <Input
               data-testid="main-food-search"
-              placeholder="Search weekly food entries..."
+              placeholder="Search the last 2 weeks..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-12 pr-12 h-12 sm:h-14 md:h-16 bg-amber-50/90 border-amber-400 text-gray-900 placeholder-gray-600 rounded-2xl text-base md:text-xl font-medium text-center"
@@ -2371,13 +2506,41 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             )}
           </div>
         </div>
+        {query && (
+          <div data-testid="journal-search-results" className="space-y-3 mb-8">
+            <div className="flex justify-between items-center">
+              <h3 className="text-xl font-bold text-gray-900">Search results</h3>
+              <Badge className="bg-amber-800 text-amber-100 border border-amber-700">
+                {searchResults.length} in the last 2 weeks
+              </Badge>
+            </div>
+            {searchResults.length === 0 ? (
+              <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 p-6 text-center">
+                <p className="text-gray-900">Nothing called "{searchQuery.trim()}" in the last 2 weeks.</p>
+                <Button
+                  onClick={() => handleTabChange('nutrition')}
+                  className="on-color mt-3 bg-orange-600 hover:bg-orange-700"
+                >
+                  Look it up in the Tracker
+                </Button>
+              </Card>
+            ) : (
+              resultDays.map(day => (
+                <div key={day} className="space-y-2">
+                  <p className="text-sm font-semibold text-gray-800">{formatJournalDay(day)}</p>
+                  {searchResults
+                    .filter(meal => mealDayKey(meal) === day)
+                    .map(meal => renderJournalMeal(meal, searchResults.indexOf(meal), 'search'))}
+                </div>
+              ))
+            )}
+          </div>
+        )}
+
         <UserFoodSuggestions
           className="mb-6"
           meals={user ? weeklyMeals : []}
-          onSelectFood={(food) => {
-            setSearchQuery(food.name);
-            handleTabChange('nutrition');
-          }}
+          onAddFood={(food, mealType) => addMealToToday(food, mealType)}
         />
         {/* Daily Header */}
         <div className="flex space-x-4 mb-6">
@@ -2387,15 +2550,19 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           </div>
         </div>
 
-        {/* Logged Foods - Real entries from calculator */}
+        {/* Only entries dated today; past days are reached through search */}
         <div data-testid="meal-history" className="space-y-4">
           <div className="flex justify-between items-center">
             <h3 className="text-xl font-bold text-gray-900">Logged Today</h3>
-            {loggedMeals.length === 0 && (
+            {todaysMeals.length === 0 ? (
               <Badge className="bg-amber-800 text-amber-100 border border-amber-700">No meals logged</Badge>
+            ) : (
+              <Badge className="bg-amber-800 text-amber-100 border border-amber-700">
+                {todaysMeals.length} {todaysMeals.length === 1 ? 'entry' : 'entries'} · {Math.round(todaysMeals.reduce((sum, meal) => sum + Number(meal.totalCalories || meal.calories || 0), 0))} cal
+              </Badge>
             )}
           </div>
-          {!searchQuery && loggedMeals.length === 0 ? (
+          {todaysMeals.length === 0 ? (
             <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 p-6 text-center">
               <div className="text-gray-700">
                 <Calendar className="w-12 h-12 mx-auto mb-3 opacity-50" />
@@ -2409,67 +2576,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 </Button>
               </div>
             </Card>
-          ) : searchQuery && weeklyMeals.filter(meal =>
-              meal.name.toLowerCase().includes(searchQuery.toLowerCase())
-            ).length === 0 ? (
-            <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 p-6 text-center">
-              <p className="text-gray-900">No meals match your search.</p>
-            </Card>
           ) : (
-            (searchQuery ? weeklyMeals : loggedMeals)
-              .filter(meal =>
-                !searchQuery ||
-                meal.name.toLowerCase().includes(searchQuery.toLowerCase())
-              )
-              .sort((a, b) => {
-                const dateA = new Date(a.timestamp || `${a.date} ${a.time}`);
-                const dateB = new Date(b.timestamp || `${b.date} ${b.time}`);
-                return dateB.getTime() - dateA.getTime();
-              })
-              .map((meal, index) => (
-            <Card key={`meal-${meal.id || meal.name}-${meal.timestamp || index}`} className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <h4 className="text-gray-900 font-semibold">{meal.name}</h4>
-                  <p className="text-gray-700 text-sm">{meal.time} • {meal.mealType}</p>
-                  <div className="flex space-x-4 mt-1">
-                    <span className="text-xs text-green-600">P: {Number(meal.totalProtein || meal.protein || 0).toFixed(1)}g</span>
-                    <span className="text-xs text-yellow-600">C: {Number(meal.totalCarbs || meal.carbs || 0).toFixed(1)}g</span>
-                    <span className="text-xs text-purple-600">F: {Number(meal.totalFat || meal.fat || 0).toFixed(1)}g</span>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-orange-600 font-bold text-lg">{Math.round(Number(meal.totalCalories || meal.calories || 0))} cal</p>
-                  <Button 
-                    size="sm" 
-                    variant="ghost" 
-                    className="text-gray-600 hover:text-red-600 p-2"
-                    data-testid={`button-delete-logged-meal-${index}`}
-                    onClick={async () => {
-                      try {
-                        if (!meal.id) {
-                          addNotification('info', 'Delete Failed', 'Cannot delete meal: missing meal ID');
-                          return;
-                        }
-
-                        await deleteLoggedMeal(meal.id);
-                        addNotification('success', 'Meal Deleted', `Removed ${meal.name} from your meals`);
-                        
-                        // Dispatch refresh event to update other components
-                        window.dispatchEvent(new CustomEvent('refresh-meals'));
-                      } catch (error) {
-                        console.error('Error deleting meal:', error);
-                        addNotification('info', 'Delete Failed', 'Could not delete meal. Please try again.');
-                      }
-                    }}
-                    title="Delete meal entry"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            </Card>
-              ))
+            todaysMeals.map((meal, index) => renderJournalMeal(meal, index, 'today'))
           )}
         </div>
 
@@ -2483,7 +2591,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         </div>
       </div>
     </div>
-  );
+    );
+  };
 
 
   const renderCalculator = () => {

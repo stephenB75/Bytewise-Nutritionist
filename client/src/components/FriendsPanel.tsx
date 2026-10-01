@@ -4,8 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { toast } from '@/hooks/use-toast';
-import { Check, CheckCircle2, Clock, Droplets, Loader2, Share2, Timer, Trash2, UserPlus, Users, Utensils, X, BarChart3 } from 'lucide-react';
+import { Check, CheckCircle2, Clock, Droplets, HeartPulse, Loader2, Share2, Timer, Trash2, UserPlus, Users, Utensils, X, BarChart3 } from 'lucide-react';
+import { Capacitor } from '@capacitor/core';
 import { FRIENDS_QUERY_KEY, type FriendsResponse } from '@/hooks/useFriendUpdates';
+import { healthKitService, type AppleFitnessSummary } from '@/services/healthKit';
 
 const FEED_LIMIT = 4;
 type Activity = {
@@ -54,15 +56,29 @@ function shortDate(iso: string | null | undefined): string {
   return iso ? new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';
 }
 
+function fitnessParts(d: Record<string, string | number | null>): Array<string | null> {
+  return [
+    d.steps != null ? `${Number(d.steps).toLocaleString()} steps` : null,
+    d.exerciseMinutes != null ? `${d.exerciseMinutes} exercise min` : null,
+    d.activeCalories != null ? `${d.activeCalories} move cal` : null,
+    d.distanceMiles ? `${d.distanceMiles} mi` : null,
+    d.workouts ? `${d.workouts} workout${d.workouts === 1 ? '' : 's'}${d.workoutMinutes ? ` (${d.workoutMinutes} min)` : ''}` : null,
+  ];
+}
+
 function describe(activity: Activity): string {
   const d = activity.details || {};
   switch (activity.type) {
     case 'summary':
+      if (d.kind === 'fitness') {
+        return fitnessParts(d).filter(Boolean).join(' · ');
+      }
       return [
         `${d.calories ?? 0} cal from ${d.meals ?? 0} meal${d.meals === 1 ? '' : 's'}`,
         `${d.protein ?? 0}g protein`,
         `${d.water ?? 0} glasses of water`,
         d.fast ? `Fast: ${d.fast}` : null,
+        ...fitnessParts({ ...d, distanceMiles: null }),
       ].filter(Boolean).join(' · ');
     case 'meal':
       return [d.mealType, d.calories != null ? `${d.calories} cal` : null].filter(Boolean).join(' · ');
@@ -87,6 +103,22 @@ export function FriendsPanel() {
   const feedQuery = useQuery<{ activities: Activity[] }>({ queryKey: FEED_KEY, retry: 1 });
   const mealsQuery = useQuery<LoggedMeal[]>({ queryKey: ['/api/meals/logged'], retry: 1 });
   const fastsQuery = useQuery<FastingSession[]>({ queryKey: ['/api/fasting/history'], retry: 1 });
+  const onIphone = Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios';
+  const healthQuery = useQuery<AppleFitnessSummary | null>({
+    queryKey: ['apple-health-today'],
+    queryFn: () => healthKitService.readTodayFitnessSummary(),
+    enabled: onIphone,
+    staleTime: 60_000,
+  });
+  const health = healthQuery.data ?? null;
+  const healthPayload = health ? {
+    steps: health.steps,
+    activeCalories: health.activeCalories,
+    exerciseMinutes: health.exerciseMinutes,
+    workouts: health.workouts.count,
+    workoutMinutes: health.workouts.minutes,
+    distanceMiles: health.distanceMiles,
+  } : null;
 
   const today = localDateKey();
   const todaysMeals = (Array.isArray(mealsQuery.data) ? mealsQuery.data : []).filter(meal => meal.date?.slice(0, 10) === today);
@@ -119,7 +151,7 @@ export function FriendsPanel() {
   });
 
   const share = useMutation({
-    mutationFn: async (payload: { kind: 'summary' } | { kind: 'item'; type: 'meal' | 'fast'; title: string; details: Record<string, string | number | null> }) => {
+    mutationFn: async (payload: { kind: 'summary' } | { kind: 'item'; type: 'meal' | 'fast' | 'fitness'; title: string; details: Record<string, string | number | null> }) => {
       if (payload.kind === 'summary') {
         const start = new Date();
         start.setHours(0, 0, 0, 0);
@@ -130,6 +162,7 @@ export function FriendsPanel() {
           dayStart: start.toISOString(),
           dayEnd: end.toISOString(),
           note: note || undefined,
+          health: healthPayload ?? undefined,
         });
       }
       return apiRequest('POST', '/api/activities/share', {
@@ -294,6 +327,40 @@ export function FriendsPanel() {
         >
           <BarChart3 className="h-4 w-4 mr-2" /> Share today's summary
         </Button>
+        {healthPayload && (
+          <p className="-mt-1 text-xs text-gray-600">Includes your Apple Health steps, exercise minutes, and move calories.</p>
+        )}
+
+        {healthPayload ? (
+          <div className="flex items-center justify-between gap-2 rounded-lg bg-white border border-rose-100 px-3 py-2" data-testid="share-apple-health">
+            <div className="min-w-0">
+              <p className="flex items-center gap-1.5 text-sm text-gray-900">
+                <HeartPulse className="h-4 w-4 text-rose-600" /> Apple Health today
+              </p>
+              <p className="text-xs text-gray-600">
+                {fitnessParts({ ...healthPayload }).filter(Boolean).join(' · ') || 'No activity recorded yet'}
+              </p>
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={share.isPending}
+              data-testid="button-share-apple-health"
+              onClick={() => share.mutate({
+                kind: 'item',
+                type: 'fitness',
+                title: 'Apple Health activity',
+                details: { ...healthPayload },
+              })}
+            >
+              Share
+            </Button>
+          </div>
+        ) : onIphone && !healthQuery.isLoading ? (
+          <p className="text-xs text-gray-600">Connect Apple Health in Profile to share your steps and exercise minutes.</p>
+        ) : !onIphone ? (
+          <p className="text-xs text-gray-600">Open the Bytewise iPhone app to share your Apple Health activity.</p>
+        ) : null}
 
         {todaysMeals.length > 0 && (
           <div className="space-y-1.5">
@@ -349,7 +416,7 @@ export function FriendsPanel() {
         ) : (
           <ul className="space-y-2" data-testid="activity-feed">
             {activities.map(activity => {
-              const Icon = TYPE_ICONS[activity.type] || Share2;
+              const Icon = activity.details?.kind === 'fitness' ? HeartPulse : TYPE_ICONS[activity.type] || Share2;
               return (
                 <li key={activity.id} className="flex gap-3 rounded-lg bg-white/80 border border-amber-200 p-3">
                   <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-orange-100">

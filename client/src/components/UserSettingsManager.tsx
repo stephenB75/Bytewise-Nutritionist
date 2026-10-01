@@ -40,7 +40,6 @@ import {
   Upload,
   Loader2
 } from 'lucide-react';
-import { SessionStatus } from './SessionStatus';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { apiFetch } from '@/lib/apiUrl';
@@ -498,9 +497,6 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
 
   return (
     <div className="space-y-6">
-            {/* Session Status Card */}
-            <SessionStatus />
-
             <div className="flex items-center gap-4 rounded-lg bg-white/70 border border-amber-200/60 p-4" data-testid="profile-photo-section">
               <ProfileIcon iconNumber={user?.profileIcon || 1} imageUrl={profilePhoto.photoUrl} size="lg" />
               <div className="flex-1 min-w-0 space-y-2">

@@ -294,6 +294,22 @@ export class HealthKitService {
     };
   }
 
+  /** Exercise ring minutes for each of the last `days` days, oldest first (today last). */
+  async readExerciseHistory(days = 7): Promise<Array<{ date: Date; minutes: number }> | null> {
+    await this.ready;
+    if (!this.isAvailable || !this.isAuthorized || !this.exerciseAsked) {
+      return null;
+    }
+
+    const dates = Array.from({ length: days }, (_, index) => {
+      const date = new Date();
+      date.setDate(date.getDate() - (days - 1 - index));
+      return date;
+    });
+    const minutes = await Promise.all(dates.map((date) => this.sumSamplesForDay('exerciseTime', date)));
+    return dates.map((date, index) => ({ date, minutes: Math.round(minutes[index]) }));
+  }
+
   /** Sleep between 6 PM yesterday and 6 PM today (or now, if earlier). */
   private async readLastNightSleep(): Promise<SleepSummary | null> {
     const health = getHealth();

@@ -4,7 +4,6 @@
  */
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { apiFetch } from '@/lib/apiUrl';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -27,7 +26,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiRequest } from '@/lib/queryClient';
+import { apiRequest, authFetch } from '@/lib/queryClient';
 import { ACTIVE_FAST_QUERY_KEY, fetchActiveFast } from '@/lib/fastingApi';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
@@ -328,7 +327,7 @@ const FastingTracker = React.memo(function FastingTracker() {
       queryClient.invalidateQueries({ queryKey: ['/api/fasting/active'] });
       
       // Check for new achievements after completing fast
-      apiFetch('/api/achievements/check', { method: 'POST' })
+      authFetch('/api/achievements/check', { method: 'POST' })
         .then(res => res.json())
         .then(data => {
           if (data.newAchievements && data.newAchievements.length > 0) {
@@ -623,7 +622,7 @@ const FastingTracker = React.memo(function FastingTracker() {
     }));
 
     // Check for achievements
-    apiFetch('/api/achievements/check', { method: 'POST' })
+    authFetch('/api/achievements/check', { method: 'POST' })
       .then(res => res.json())
       .then(data => {
         if (data.newAchievements && data.newAchievements.length > 0) {

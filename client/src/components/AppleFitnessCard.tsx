@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
-import { Activity, Dumbbell, Flame, Footprints, HeartPulse, Moon, Timer } from 'lucide-react';
+import { Activity, Dumbbell, Flame, Footprints, HeartPulse, Moon } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { healthKitService, type AppleFitnessSummary, type SleepSummary } from '@/services/healthKit';
@@ -51,57 +51,6 @@ function SleepTile({ sleep }: { sleep: SleepSummary | null }) {
   );
 }
 
-const EXERCISE_TARGET_MINUTES = 30;
-
-function ExerciseTile({
-  minutes,
-  needsPermission,
-  onAllow,
-  allowing,
-}: {
-  minutes: number | null | undefined;
-  needsPermission: boolean;
-  onAllow: () => void;
-  allowing: boolean;
-}) {
-  const value = minutes ?? 0;
-  const progress = Math.min(value / EXERCISE_TARGET_MINUTES, 1) * 100;
-  return (
-    <div className="rounded-lg bg-white/70 p-3 border border-amber-200/50" data-testid="apple-fitness-exercise">
-      <div className="flex items-center gap-1.5 text-xs text-gray-600 mb-1">
-        <Timer className="h-3.5 w-3.5 text-lime-600" />
-        Exercise
-      </div>
-      {needsPermission ? (
-        <>
-          <p className="text-xs text-gray-700 mb-2">Allow Exercise minutes to see your green ring.</p>
-          <Button
-            type="button"
-            size="sm"
-            className="on-color h-7 px-2 text-xs bg-lime-600 hover:bg-lime-700 disabled:opacity-75"
-            onClick={onAllow}
-            disabled={allowing}
-            data-testid="button-allow-exercise"
-          >
-            {allowing ? 'Opening…' : 'Allow'}
-          </Button>
-        </>
-      ) : (
-        <>
-          <p className="text-lg font-bold text-gray-900">
-            {formatMinutes(value)}
-            <span className="ml-1.5 text-xs font-medium text-gray-700">of {EXERCISE_TARGET_MINUTES}m</span>
-          </p>
-          <div className="mt-1 h-1.5 rounded-full bg-lime-100 overflow-hidden">
-            <div className="h-full rounded-full bg-lime-500" style={{ width: `${progress}%` }} />
-          </div>
-          <p className="mt-1 text-xs text-gray-700">Brisk activity all day</p>
-        </>
-      )}
-    </div>
-  );
-}
-
 function WorkoutsTile({ workouts }: { workouts: AppleFitnessSummary['workouts'] | undefined }) {
   const count = workouts?.count ?? 0;
   return (
@@ -140,7 +89,6 @@ export function AppleFitnessCard({ onConnect }: AppleFitnessCardProps) {
   const [connected, setConnected] = useState(false);
   const [available, setAvailable] = useState(false);
   const [needsRecoveryPermission, setNeedsRecoveryPermission] = useState(false);
-  const [needsExercisePermission, setNeedsExercisePermission] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
@@ -152,8 +100,6 @@ export function AppleFitnessCard({ onConnect }: AppleFitnessCardProps) {
       setAvailable(isAvailable);
       setConnected(isConnected);
       setNeedsRecoveryPermission(healthKitService.needsRecoveryPermission());
-      setNeedsExercisePermission(healthKitService.needsExercisePermission());
-
       if (isAvailable && isConnected) {
         const data = await healthKitService.readTodayFitnessSummary();
         setSummary(data);
@@ -276,17 +222,9 @@ export function AppleFitnessCard({ onConnect }: AppleFitnessCardProps) {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-2 gap-2">
-                <ExerciseTile
-                  minutes={summary?.exerciseMinutes}
-                  needsPermission={needsExercisePermission}
-                  onAllow={handleConnect}
-                  allowing={connecting}
-                />
-                <WorkoutsTile workouts={summary?.workouts} />
-              </div>
+              <WorkoutsTile workouts={summary?.workouts} />
               <p className="text-[11px] text-gray-600">
-                Exercise counts every minute of brisk movement, like a fast walk (the green ring). Workouts are sessions you start in the Workout app or another fitness app.
+                Workouts are sessions you start in the Workout app or another fitness app. All-day exercise minutes (the green ring) have their own card.
               </p>
               <SleepTile sleep={summary?.sleep ?? null} />
               <p className="text-[11px] text-gray-600">
