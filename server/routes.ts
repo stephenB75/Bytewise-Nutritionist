@@ -13,6 +13,7 @@ import { supabaseStorageService } from "./supabaseStorage";
 import express from "express";
 import { isSupabaseRateLimit } from "./authErrors";
 import { registerFriendsRoutes } from "./friendsRoutes";
+import { registerPackagedFoodRoutes } from "./packagedFoodRoutes";
 import { registerNutritionInsightsRoutes } from "./nutritionInsights";
 import { registerPushRoutes } from "./pushNotifications";
 import { registerProfilePhotoRoutes } from "./profilePhotoRoutes";
@@ -2419,6 +2420,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Fasting API endpoints
   registerFriendsRoutes(app);
+  registerPackagedFoodRoutes(app);
   registerNutritionInsightsRoutes(app);
   registerPushRoutes(app);
 

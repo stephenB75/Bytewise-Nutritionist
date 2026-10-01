@@ -3,6 +3,8 @@
  * Values are for the standard build of one menu item; recipes vary by region and over time.
  */
 
+import { MORE_FAST_FOOD_ITEMS } from './fastFoodMenuMore';
+
 export type FastFoodCategory = 'breakfast' | 'sandwiches' | 'lunch' | 'dinner' | 'snacks';
 
 export interface FastFoodItem {
@@ -27,7 +29,7 @@ export const FAST_FOOD_CATEGORIES: { id: FastFoodCategory; label: string }[] = [
   { id: 'snacks', label: 'Snacks' },
 ];
 
-export const FAST_FOOD_ITEMS: FastFoodItem[] = [
+const CORE_FAST_FOOD_ITEMS: FastFoodItem[] = [
   // Breakfast
   { id: 'mcd-egg-mcmuffin', name: 'Egg McMuffin', restaurant: "McDonald's", category: 'breakfast', serving: '1 sandwich', calories: 310, protein: 17, carbs: 30, fat: 13, sodium: 770 },
   { id: 'mcd-sausage-mcmuffin-egg', name: 'Sausage McMuffin with Egg', restaurant: "McDonald's", category: 'breakfast', serving: '1 sandwich', calories: 480, protein: 20, carbs: 30, fat: 31, sodium: 820 },
@@ -332,6 +334,8 @@ export const FAST_FOOD_ITEMS: FastFoodItem[] = [
   { id: 'auntie-annes-pretzel-dog', name: 'Original Pretzel Dog', restaurant: "Auntie Anne's", category: 'lunch', serving: '1 pretzel dog', calories: 400, protein: 12, carbs: 38, fat: 22, sodium: 820, keywords: ['hot dog'] },
   { id: 'sweetgreen-kale-caesar', name: 'Kale Caesar', restaurant: 'Sweetgreen', category: 'lunch', serving: '1 bowl', calories: 430, protein: 30, carbs: 21, fat: 26, sodium: 920, keywords: ['salad'] },
 ];
+
+export const FAST_FOOD_ITEMS: FastFoodItem[] = [...CORE_FAST_FOOD_ITEMS, ...MORE_FAST_FOOD_ITEMS];
 
 export const FAST_FOOD_RESTAURANTS: string[] = Array.from(new Set(FAST_FOOD_ITEMS.map((item) => item.restaurant))).sort(
   (a, b) => a.localeCompare(b)

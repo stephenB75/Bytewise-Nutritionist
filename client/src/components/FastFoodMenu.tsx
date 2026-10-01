@@ -31,6 +31,9 @@ const POPULAR_RESTAURANTS = [
   'Panda Express',
   "Dunkin'",
   'KFC',
+  'IHOP',
+  "Olive Garden",
+  "Chili's",
 ];
 
 function Chip({ active, label, onClick, testId }: { active: boolean; label: string; onClick: () => void; testId: string }) {

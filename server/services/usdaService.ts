@@ -38,7 +38,7 @@ const FILLER_WORDS = new Set(['a', 'an', 'the', 'and', 'with', 'of', 'from', 'at
 const OPTIONAL_MENU_WORDS = new Set(['chicken', 'classic', 'original', 'signature']);
 
 /** Menu items by brand: needs the restaurant named, or a distinctive item name like "Big Mac". */
-function findFastFoodItem(query: string): FastFoodItem | null {
+function findFastFoodItem(query: string, measurement = ''): FastFoodItem | null {
   const queryWords = normalizeWords(query);
   const queryText = ` ${queryWords.join(' ')} `;
   const hasAll = (words: string[]) => words.every(word => queryWords.some(q => stem(q) === stem(word)));
@@ -75,6 +75,10 @@ function findFastFoodItem(query: string): FastFoodItem | null {
       FAST_FOOD_ITEMS.filter(item => menuNameWords(item.name).join(' ') === bestName).map(item => item.restaurant),
     );
     if (chains.size > 1) return null;
+    // Everyday foods ("mashed potatoes", "pinto beans") use the general food data unless a chain is named.
+    if (findEnhancedFoodCovering(query, FILLER_WORDS)) return null;
+    // "1 cup sweet plantains" is a measured portion, not a chain's side order.
+    if (/\b(g|grams?|kg|oz|ounces?|lbs?|pounds?|cups?|ml|tbsp|tablespoons?|tsp|teaspoons?)\b/i.test(measurement)) return null;
   }
   return best.item;
 }
@@ -765,7 +769,7 @@ export class USDAService {
         return plateResult;
       }
       
-      const menuItem = findFastFoodItem(ingredientName);
+      const menuItem = findFastFoodItem(ingredientName, measurement);
       if (menuItem) {
         const menuResult = this.buildFastFoodResult(menuItem, measurement);
         this.setMemoryCache(cacheKey, menuResult);

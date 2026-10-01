@@ -68,7 +68,7 @@ const config: CapacitorConfig = {
     
     Camera: {
       permissions: {
-        camera: 'ByteWise uses the camera to photograph meals for accurate nutrition tracking and food recognition.',
+        camera: 'ByteWise uses the camera to scan food barcodes and photograph meals for accurate nutrition tracking.',
         photos: 'ByteWise accesses your photo library to select meal images for nutrition logging and analysis.'
       }
     },

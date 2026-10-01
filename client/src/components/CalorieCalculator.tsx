@@ -38,6 +38,7 @@ import {
 import { FoodSearchWithHistory } from '@/components/FoodSearchWithHistory';
 import { UserFoodSuggestions } from '@/components/UserFoodSuggestions';
 import { FastFoodMenu } from '@/components/FastFoodMenu';
+import { PackagedFoodScanner } from '@/components/PackagedFoodScanner';
 import { apiFetch } from '@/lib/apiUrl';
 
 
@@ -633,6 +634,8 @@ function CalorieCalculator({
         </div>
       )}
 
+      <PackagedFoodScanner />
+
       {/* User Guide Card - Moved Above */}
       <Card className="p-6 bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-sm border-amber-200/40 shadow-lg">
         <h3 className="text-lg font-bold text-gray-900 mb-4">How to Use</h3>
@@ -641,10 +644,10 @@ function CalorieCalculator({
           <div className="space-y-3">
             <h4 className="font-medium text-gray-700">Food Entry</h4>
             <div className="space-y-2 text-sm text-gray-600">
-              <p>• Search your meal history</p>
+              <p>• Scan a packaged-food barcode</p>
+              <p>• Search snacks and groceries by name</p>
               <p>• Enter any food name</p>
               <p>• Get instant calorie estimates</p>
-              <p>• Track detailed nutrition</p>
             </div>
           </div>
           
