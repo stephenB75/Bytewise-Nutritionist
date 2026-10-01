@@ -149,8 +149,8 @@ export function FastFoodMenu() {
             {FAST_FOOD_ITEMS.length} items · {FAST_FOOD_RESTAURANTS.length} places
           </span>
         </div>
-        <p className="mt-1 text-sm text-gray-700">
-          Added meals show up on Journal under Logged Today.
+        <p className="mt-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm leading-snug text-gray-800">
+          Tap + to log a meal. It shows up on Journal under Logged Today.
         </p>
       </div>
 
@@ -290,7 +290,7 @@ export function FastFoodMenu() {
         </ul>
       )}
       <p className="text-[10px] text-gray-600 mt-2">
-        Calories per item from each chain's published nutrition; tap + to log it to your current meal.
+        Calories per item from each chain's published nutrition. Logged items appear on Journal under Logged Today.
       </p>
     </Card>
   );

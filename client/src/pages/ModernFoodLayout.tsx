@@ -2857,8 +2857,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                   </div>
                 </AccordionTrigger>
                 
-                <AccordionContent className="px-6 pb-6 pt-0">
-                  <DataManagementPanel />
+                <AccordionContent className="px-4 pb-5 pt-0 sm:px-6 sm:pb-6">
+                  <DataManagementPanel embedded />
                 </AccordionContent>
               </Card>
             </AccordionItem>

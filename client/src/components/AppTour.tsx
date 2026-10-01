@@ -68,7 +68,7 @@ const TOUR_STEPS: AppTourStep[] = [
     tab: 'nutrition',
     target: '[data-testid="fastfood-menu"]',
     title: 'Popular fast food',
-    content: 'Search a restaurant or meal (Pollo Tropical, La Granja, McDonald’s) and tap + to add it to today.',
+    content: 'Search a restaurant or meal (Pollo Tropical, La Granja, McDonald’s) and tap +. It shows up on Journal under Logged Today.',
     disableBeacon: true,
     placement: 'top',
   },

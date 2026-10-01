@@ -827,7 +827,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
 
             {/* Photo Management Section - Privacy Compliance */}
             <div className="space-y-4">
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <h4 className="profile-section-title">
                   Privacy & Data Management
                 </h4>
@@ -835,7 +835,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
                   variant="outline"
                   size="sm"
                   onClick={() => setShowPhotos(!showPhotos)}
-                  className="border-amber-400/60 text-gray-700 hover:border-blue-400 hover:text-blue-600 bg-white/90 hover:bg-blue-50/80"
+                  className="w-full sm:w-auto border-amber-400/60 text-gray-700 hover:border-blue-400 hover:text-blue-600 bg-white/90 hover:bg-blue-50/80"
                   data-testid="button-manage-photos"
                 >
                   <Camera className="w-4 h-4 mr-2" />

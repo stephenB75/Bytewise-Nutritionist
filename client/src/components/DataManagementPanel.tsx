@@ -3,17 +3,12 @@
  * Consolidated data export, sync, and management functionality - ByteWise Brand Styling
  */
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
 import { useToast } from '@/hooks/use-toast';
 import { 
   Download,
@@ -23,10 +18,31 @@ import {
   Cloud
 } from 'lucide-react';
 import { authFetch } from '@/lib/queryClient';
+import { listLoggedMeals } from '@/lib/mealsApi';
 
-export function DataManagementPanel() {
+function formatDataSize(mealCount: number): string {
+  const bytes = mealCount * 2048;
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+export function DataManagementPanel({ embedded = false }: { embedded?: boolean }) {
   const { toast } = useToast();
   const [isExporting, setIsExporting] = useState(false);
+  const { data: meals = [] } = useQuery({
+    queryKey: ['/api/meals/logged'],
+    queryFn: listLoggedMeals,
+  });
+
+  const dataStats = useMemo(() => {
+    const days = new Set(meals.map((meal) => meal.date).filter(Boolean));
+    return {
+      totalMeals: meals.length,
+      totalDays: days.size,
+      dataSize: formatDataSize(meals.length),
+    };
+  }, [meals]);
 
   const handleExportData = async () => {
     console.log('🚀 PDF Export button clicked - starting process...');
@@ -91,34 +107,27 @@ export function DataManagementPanel() {
     }
   };
 
-  const dataStats = {
-    totalMeals: 127,
-    totalDays: 45,
-    dataSize: '2.3 MB'
-  };
-
   return (
-    <div className="px-4 sm:px-6 py-3" data-testid="data-management-panel">
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="p-3 bg-gradient-to-br from-[#faed39] to-[#1f4aa6] rounded-xl">
-              <Database className="w-6 h-6 text-gray-900" />
+    <div className={embedded ? 'py-1' : 'px-4 sm:px-6 py-3'} data-testid="data-management-panel">
+      <div className="flex flex-col gap-6">
+        {!embedded && (
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#faed39] to-[#1f4aa6]">
+              <Database className="h-6 w-6 text-gray-900" />
             </div>
-            <div>
+            <div className="min-w-0">
               <h2 className="text-2xl font-bold text-gray-900" style={{ fontFamily: "'League Spartan', sans-serif" }}>Data Management</h2>
               <p className="text-gray-700" style={{ fontFamily: "'Work Sans', sans-serif" }}>Export, sync, and manage your nutrition data</p>
             </div>
           </div>
-        </div>
+        )}
 
-        <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 p-4 sm:p-6">
-          <h3 className="mb-4 text-xl font-semibold text-gray-950" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+        <Card className="flex flex-col gap-4 bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 p-4 sm:p-6">
+          <h3 className="text-xl font-semibold text-gray-950" style={{ fontFamily: "'League Spartan', sans-serif" }}>
             Data overview
           </h3>
 
-          <div className="space-y-3">
+          <div className="flex w-full flex-col gap-3">
             {[
               { label: 'Meals logged', value: dataStats.totalMeals },
               { label: 'Days tracked', value: dataStats.totalDays },
@@ -126,18 +135,18 @@ export function DataManagementPanel() {
             ].map((stat) => (
               <div
                 key={stat.label}
-                className="flex items-center justify-between gap-3 rounded-xl border border-amber-200 bg-white/90 px-4 py-3"
+                className="flex w-full min-w-0 items-center justify-between gap-3 rounded-xl border border-amber-200 bg-white/90 px-4 py-3"
               >
-                <div className="text-sm text-gray-800" style={{ fontFamily: "'Work Sans', sans-serif" }}>
+                <div className="min-w-0 text-sm text-gray-800" style={{ fontFamily: "'Work Sans', sans-serif" }}>
                   {stat.label}
                 </div>
-                <div className="text-xl font-bold tabular-nums text-gray-950" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                <div className="shrink-0 text-xl font-bold tabular-nums text-gray-950" style={{ fontFamily: "'League Spartan', sans-serif" }}>
                   {stat.value}
                 </div>
               </div>
             ))}
 
-            <div className="space-y-3 rounded-xl border border-amber-300/50 bg-amber-100/80 p-4">
+            <div className="flex w-full flex-col gap-3 rounded-xl border border-amber-300/50 bg-amber-100/80 p-4">
               <div className="flex items-start gap-3">
                 <Cloud className="mt-0.5 h-5 w-5 shrink-0 text-[#1f4aa6]" />
                 <div className="min-w-0">
@@ -149,15 +158,14 @@ export function DataManagementPanel() {
                   </p>
                 </div>
               </div>
-              <Badge className="w-fit bg-green-100 text-green-800 border-green-300">
+              <Badge className="w-fit rounded-md bg-green-100 text-green-800 border-green-300">
                 Always active
               </Badge>
             </div>
           </div>
         </Card>
 
-        {/* Data Management Content */}
-        <div className="space-y-6">
+        <div className="flex flex-col gap-6">
           {/* Export Section */}
                   <div className="p-6 bg-white/80 rounded-2xl border border-blue-200">
                     <div className="flex flex-col items-center text-center space-y-4">
