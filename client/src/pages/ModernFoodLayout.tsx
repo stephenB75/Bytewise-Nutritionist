@@ -377,6 +377,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const waterGlassesRef = useRef(0);
   const waterDayRef = useRef(getLocalDateKey());
   const pendingWaterSavesRef = useRef(0);
+  const lastWaterWriteAtRef = useRef(0);
   const waterSaveQueueRef = useRef<Promise<void>>(Promise.resolve());
   useEffect(() => {
     waterGlassesRef.current = dailyStats?.waterGlasses || 0;
@@ -389,13 +390,18 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       waterDayRef.current = dateKey;
       waterGlassesRef.current = readLocalWaterGlasses();
     }
-    const previousGlasses = waterGlassesRef.current;
+    const previousGlasses = Math.max(
+      readLocalWaterGlasses(),
+      clampWaterGlasses(dailyStats?.waterGlasses ?? 0),
+    );
+    waterGlassesRef.current = previousGlasses;
     const newGlasses = clampWaterGlasses(previousGlasses + change);
     if (newGlasses === previousGlasses) return;
 
     const previousContainers = reconcileWaterContainers(readLocalWaterContainers(dateKey), previousGlasses);
     const newContainers = changeWaterContainers(previousContainers, previousGlasses, newGlasses, containerOz);
     waterGlassesRef.current = newGlasses;
+    lastWaterWriteAtRef.current = Date.now();
     writeLocalWaterGlasses(newGlasses);
     writeLocalWaterContainers(newContainers, dateKey);
     setDailyStats((prev: any) => prev ? { ...prev, waterGlasses: newGlasses } : {
@@ -429,22 +435,16 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         });
       } catch (error) {
         console.error('Failed to save water intake:', error);
-        if (waterGlassesRef.current === newGlasses) {
-          waterGlassesRef.current = previousGlasses;
-          writeLocalWaterGlasses(previousGlasses);
-          writeLocalWaterContainers(previousContainers, dateKey);
-          setDailyStats((prev: any) => prev ? { ...prev, waterGlasses: previousGlasses } : prev);
-        }
         toast({
           title: "Error",
-          description: "Failed to update water consumption",
+          description: "Water is saved on this device. Sync will retry next time you're online.",
           variant: "destructive",
         });
       } finally {
         pendingWaterSavesRef.current -= 1;
       }
     });
-  }, [user, toast]);
+  }, [user, toast, dailyStats?.waterGlasses]);
 
   // Function to calculate micronutrients from meals - uses real data when available
   const calculateMicronutrients = useCallback((meals: any[]) => {
@@ -625,7 +625,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       const data = await response.json();
 
       // While a water save is in flight the server still has the older count.
-      const keepLocalWater = pendingWaterSavesRef.current > 0 && waterDayRef.current === requestedDay;
+      const keepLocalWater = waterDayRef.current === requestedDay && (
+        pendingWaterSavesRef.current > 0 ||
+        Date.now() - lastWaterWriteAtRef.current < 8000
+      );
       const stats = {
         totalCalories: data.totalCalories || 0,
         totalProtein: data.totalProtein || 0,
@@ -1655,7 +1658,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           {/* Water Consumption */}
           <div className="mb-4" data-testid="water-consumption-card">
             <WaterCard
-              glasses={dailyStats ? (dailyStats.waterGlasses || 0) : readLocalWaterGlasses()}
+              glasses={Math.max(dailyStats?.waterGlasses ?? 0, readLocalWaterGlasses())}
               onIncrement={(glasses, containerOz) => updateWaterConsumption(glasses, containerOz)}
               onDecrement={(glasses, containerOz) => updateWaterConsumption(-glasses, containerOz)}
             />

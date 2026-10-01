@@ -27,7 +27,7 @@ const TOUR_STEPS: AppTourStep[] = [
     tab: 'home',
     target: '[data-testid="water-consumption-card"]',
     title: 'Water',
-    content: 'Log a glass, bottle, or larger size. The 30-day log shows what you drank each day.',
+    content: 'Pick a size first. Each bar is that amount — 8, 16, 24, or 32 oz. Tap + to log one. The 30-day log shows what you drank each day.',
     disableBeacon: true,
     placement: 'top',
   },

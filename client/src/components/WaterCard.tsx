@@ -12,6 +12,7 @@ const DAILY_GOAL = 8;
 const HISTORY_DAYS = 30;
 // Water is stored as a count of 8 oz glasses, so every container is a whole number of glasses.
 const OZ_PER_GLASS = 8;
+const GOAL_OZ = DAILY_GOAL * OZ_PER_GLASS;
 
 type WaterContainer = { oz: number; label: string; name: string; Icon: LucideIcon; iconClass: string };
 
@@ -267,6 +268,10 @@ export const WaterCard = React.memo(function WaterCard({
   const [containerOz, setContainerOz] = useState(readContainerOz);
   const container = WATER_CONTAINERS.find((c) => c.oz === containerOz) ?? WATER_CONTAINERS[0];
   const containerGlasses = container.oz / OZ_PER_GLASS;
+  // Local write lands before parent state; use the higher count so + fills a bar immediately.
+  const displayGlasses = Math.max(clampWaterGlasses(glasses), readLocalWaterGlasses());
+  const barCount = Math.max(1, Math.ceil(GOAL_OZ / container.oz));
+  const filledBars = (displayGlasses * OZ_PER_GLASS) / container.oz;
   const selectContainer = (oz: number) => {
     setContainerOz(oz);
     try {
@@ -279,6 +284,8 @@ export const WaterCard = React.memo(function WaterCard({
   const [isSyncingHistory, setIsSyncingHistory] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [refreshTick, setRefreshTick] = useState(0);
+  const [fillTick, setFillTick] = useState(0);
+  const bumpFill = () => setFillTick((tick) => tick + 1);
 
   useEffect(() => {
     const handleRefresh = () => setRefreshTick((tick) => tick + 1);
@@ -290,8 +297,8 @@ export const WaterCard = React.memo(function WaterCard({
     setShowHistory((open) => !open);
   };
 
-  const percentage = Math.min((glasses / DAILY_GOAL) * 100, 100);
-  const isGoalReached = glasses >= DAILY_GOAL;
+  const percentage = Math.min((displayGlasses / DAILY_GOAL) * 100, 100);
+  const isGoalReached = displayGlasses >= DAILY_GOAL;
   const calendarCells = useMemo(() => buildCalendarCells(HISTORY_DAYS), [showHistory]);
 
   const historyByDate = useMemo(() => {
@@ -299,9 +306,9 @@ export const WaterCard = React.memo(function WaterCard({
     for (const row of waterHistory) {
       map.set(row.date, row.glasses);
     }
-    map.set(getLocalDateKey(), glasses);
+    map.set(getLocalDateKey(), displayGlasses);
     return map;
-  }, [waterHistory, glasses]);
+  }, [waterHistory, glasses, displayGlasses, fillTick]);
 
   const [selectedDate, setSelectedDate] = useState(getLocalDateKey);
   const selectedGlasses = historyByDate.get(selectedDate) || 0;
@@ -372,9 +379,9 @@ export const WaterCard = React.memo(function WaterCard({
           <div>
             <h3 className="text-gray-900 font-medium text-lg">Water Intake</h3>
             <p className="text-gray-900 text-sm font-medium">
-              {glasses * OZ_PER_GLASS}/{DAILY_GOAL * OZ_PER_GLASS} oz today
+              {displayGlasses * OZ_PER_GLASS}/{GOAL_OZ} oz today
             </p>
-            <p className="text-gray-700 text-xs">{glasses} of {DAILY_GOAL} glasses (8 oz each)</p>
+            <p className="text-gray-700 text-xs">1 bar = {container.oz} oz ({container.label})</p>
           </div>
         </div>
         <div className="text-right">
@@ -418,27 +425,44 @@ export const WaterCard = React.memo(function WaterCard({
         })}
       </div>
 
-      <div className="flex items-center justify-between">
-        <div className="flex space-x-1">
-          {Array.from({ length: DAILY_GOAL }, (_, i) => (
-            <div
-              key={i}
-              className={`w-4 h-6 rounded-sm transition-all duration-300 ${
-                i < glasses ? 'bg-cyan-400' : 'bg-gray-300'
-              }`}
-              style={{
-                background: i < glasses
-                  ? 'linear-gradient(to top, #06b6d4 0%, #0891b2 100%)'
-                  : '#d1d5db',
-              }}
-            />
-          ))}
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <div className="flex items-end gap-1.5" data-testid="water-bars" aria-label={`${barCount} bars, 1 bar is ${container.oz} ounces`}>
+            {Array.from({ length: barCount }, (_, i) => {
+              const fill = Math.min(1, Math.max(0, filledBars - i));
+              const fillPercent = Math.round(fill * 100);
+              return (
+                <div
+                  key={`${container.oz}-${i}`}
+                  className="rounded-sm shadow-inner transition-all duration-300"
+                  style={{
+                    width: barCount <= 2 ? 22 : barCount <= 4 ? 18 : 16,
+                    height: barCount <= 4 ? 36 : 24,
+                    background: fill <= 0
+                      ? '#d1d5db'
+                      : fill >= 1
+                        ? 'linear-gradient(to top, #06b6d4 0%, #0891b2 100%)'
+                        : `linear-gradient(to top, #06b6d4 0%, #0891b2 ${fillPercent}%, #d1d5db ${fillPercent}%)`,
+                  }}
+                  title={`${container.oz} oz`}
+                  data-testid={`water-bar-${i}`}
+                  data-fill={fillPercent}
+                />
+              );
+            })}
+          </div>
+          <p className="mt-1 text-[11px] font-medium text-gray-700">
+            1 bar = {container.oz} oz
+          </p>
         </div>
 
         <div className="flex items-center space-x-2">
           <Button
-            onClick={() => onDecrement(containerGlasses, container.oz)}
-            disabled={glasses <= 0}
+            onClick={() => {
+              onDecrement(containerGlasses, container.oz);
+              bumpFill();
+            }}
+            disabled={displayGlasses <= 0}
             size="sm"
             variant="ghost"
             className="h-8 w-8 p-0 text-cyan-600 hover:text-cyan-500 hover:bg-cyan-500/10 disabled:opacity-50 shadow-lg hover:shadow-xl transition-shadow duration-200"
@@ -448,8 +472,11 @@ export const WaterCard = React.memo(function WaterCard({
             <Minus className="w-4 h-4" />
           </Button>
           <Button
-            onClick={() => onIncrement(containerGlasses, container.oz)}
-            disabled={glasses >= DAILY_GOAL}
+            onClick={() => {
+              onIncrement(containerGlasses, container.oz);
+              bumpFill();
+            }}
+            disabled={displayGlasses >= DAILY_GOAL}
             size="sm"
             variant="ghost"
             className="h-8 px-2 gap-1 text-cyan-700 hover:text-cyan-600 hover:bg-cyan-500/10 disabled:opacity-50 shadow-lg hover:shadow-xl transition-shadow duration-200 border border-cyan-500/50 hover:border-cyan-500/70 disabled:hover:bg-[transparent]"
