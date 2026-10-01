@@ -119,7 +119,21 @@ if (existsSync(appDelegatePath)) {
 }
 
 if (existsSync(entitlementsSource)) {
-  copyFileSync(entitlementsSource, entitlementsPath);
+  // Merge so cap:sync cannot wipe Push (aps-environment) if Xcode or this repo added it.
+  const sourceEntitlements = readFileSync(entitlementsSource, 'utf8');
+  let destEntitlements = existsSync(entitlementsPath)
+    ? readFileSync(entitlementsPath, 'utf8')
+    : sourceEntitlements;
+  if (!destEntitlements.includes('com.apple.developer.healthkit')) {
+    destEntitlements = sourceEntitlements;
+  }
+  if (!destEntitlements.includes('aps-environment')) {
+    destEntitlements = destEntitlements.replace(
+      '</dict>\n</plist>',
+      '\t<key>aps-environment</key>\n\t<string>development</string>\n</dict>\n</plist>',
+    );
+  }
+  writeFileSync(entitlementsPath, destEntitlements);
 }
 
 // `cap add ios` ships Capacitor's placeholder icon; replace it with the ByteWise icon
