@@ -104,17 +104,28 @@
   
   <!-- Service Worker Registration -->
   <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-          .then((registration) => {
-            // Service Worker registered successfully
-          })
-          .catch((error) => {
-            // Service Worker registration failed
-          });
-      });
-    }
+    window.addEventListener('load', async () => {
+      if (!('serviceWorker' in navigator)) return;
+      const isNative = typeof window.Capacitor?.isNativePlatform === 'function'
+        ? window.Capacitor.isNativePlatform()
+        : !!window.Capacitor;
+      // Native builds already ship local files. A SW here keeps a stale index.html
+      // after cap sync / Xcode runs, so the phone shows the previous UI.
+      if (isNative) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map((reg) => reg.unregister()));
+        if (window.caches) {
+          const names = await caches.keys();
+          await Promise.all(names.map((name) => caches.delete(name)));
+        }
+        return;
+      }
+      try {
+        await navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' });
+      } catch {
+        // Registration can fail in private mode.
+      }
+    });
   </script>
   
 

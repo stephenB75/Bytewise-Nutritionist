@@ -2,35 +2,27 @@
 // API and Supabase traffic is never intercepted: responses carry per-user auth
 // state and must reach the app with their real status codes.
 
-const VERSION = 'v2.0.1';
+const VERSION = 'v2.0.2';
 const STATIC_CACHE = `bytewise-static-${VERSION}`;
 const DYNAMIC_CACHE = `bytewise-dynamic-${VERSION}`;
 
-const STATIC_ASSETS = ['/', '/manifest.json', '/icon-192.svg', '/icon-512.svg'];
-
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(STATIC_CACHE)
-      .then(cache => cache.addAll(STATIC_ASSETS))
-      .catch(() => {})
-      .then(() => self.skipWaiting())
-  );
+  event.waitUntil(self.skipWaiting());
 });
 
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys()
-      .then(names => Promise.all(
-        names
-          .filter(name => name !== STATIC_CACHE && name !== DYNAMIC_CACHE)
-          .map(name => caches.delete(name))
-      ))
+      .then(names => Promise.all(names.map(name => caches.delete(name))))
       .then(() => self.clients.claim())
   );
 });
 
 self.addEventListener('message', event => {
   if (event.data?.type === 'SKIP_WAITING') self.skipWaiting();
+  if (event.data?.type === 'CLEAR_CACHES') {
+    event.waitUntil(caches.keys().then(names => Promise.all(names.map(name => caches.delete(name)))));
+  }
 });
 
 self.addEventListener('fetch', event => {
@@ -41,8 +33,9 @@ self.addEventListener('fetch', event => {
   if (url.origin !== self.location.origin) return;
   if (url.pathname.startsWith('/api/')) return;
 
-  if (request.mode === 'navigate') {
-    event.respondWith(networkFirst(request, STATIC_CACHE, '/'));
+  // Never serve a cached app shell — stale index.html points at old hashed JS.
+  if (request.mode === 'navigate' || url.pathname === '/' || url.pathname.endsWith('.html')) {
+    event.respondWith(networkOnly(request));
     return;
   }
 
@@ -53,6 +46,16 @@ self.addEventListener('fetch', event => {
 
   event.respondWith(networkFirst(request, DYNAMIC_CACHE));
 });
+
+async function networkOnly(request) {
+  try {
+    return await fetch(request, { cache: 'no-store' });
+  } catch (error) {
+    const cached = await caches.match(request);
+    if (cached) return cached;
+    throw error;
+  }
+}
 
 async function cacheFirst(request) {
   const cached = await caches.match(request);
@@ -65,16 +68,16 @@ async function cacheFirst(request) {
   return response;
 }
 
-async function networkFirst(request, cacheName, fallbackPath) {
+async function networkFirst(request, cacheName) {
   try {
     const response = await fetch(request);
     if (response.ok) {
       const cache = await caches.open(cacheName);
-      cache.put(fallbackPath || request, response.clone());
+      cache.put(request, response.clone());
     }
     return response;
   } catch (error) {
-    const cached = await caches.match(fallbackPath || request);
+    const cached = await caches.match(request);
     if (cached) return cached;
     throw error;
   }
