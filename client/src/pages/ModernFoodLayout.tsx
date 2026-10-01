@@ -29,7 +29,7 @@ import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useQuery } from '@tanstack/react-query';
 import { ACTIVE_FAST_QUERY_KEY, fetchActiveFast } from '@/lib/fastingApi';
 import { refreshAppData } from '@/lib/appRefresh';
-import { APP_VERSION_LABEL } from '@/lib/appVersion';
+import { AppVersionInfo } from '@/components/AppVersionInfo';
 const logoImage = '/BWN_Logo.png';
 import { 
   Search, 
@@ -3133,9 +3133,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <SignOnModule />
           </Card>
         )}
-        <p className="mt-6 text-center text-xs text-gray-600" data-testid="text-app-version">
-          {APP_VERSION_LABEL}
-        </p>
+        <div className="mt-6">
+          <AppVersionInfo />
+        </div>
       </div>
     </div>
   );
