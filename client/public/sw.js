@@ -2,7 +2,7 @@
 // API and Supabase traffic is never intercepted: responses carry per-user auth
 // state and must reach the app with their real status codes.
 
-const VERSION = 'v2.0.0';
+const VERSION = 'v2.0.1';
 const STATIC_CACHE = `bytewise-static-${VERSION}`;
 const DYNAMIC_CACHE = `bytewise-dynamic-${VERSION}`;
 
