@@ -271,30 +271,50 @@ export const CALORIE_CONVERSION_FACTORS = {
   carbs: 3.87     // kcal per gram
 };
 
+/** Grams, ounces, pounds — convert with the standard factor, not a named food portion. */
+export function isExplicitWeightMeasurement(measurement: string): boolean {
+  return /\b\d+(?:\.\d+)?\s*(g|grams?|kg|kilograms?|oz|ounces?|lbs?|pounds?|fl\.?\s*oz)\b/i.test(measurement);
+}
+
+/**
+ * Longest catalog key that appears as a whole phrase, preferring the one later in the name
+ * so "cheese pizza" is pizza (not cheese) and "grilled chicken breast" is chicken breast.
+ */
+export function findBestFoodKey(foodName: string, keys: string[]): string | null {
+  const text = foodName.toLowerCase();
+  let best: { key: string; index: number; len: number } | null = null;
+  for (const key of keys) {
+    const escaped = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const match = text.match(new RegExp(`\\b${escaped}\\b`));
+    if (!match || match.index === undefined) continue;
+    const index = match.index;
+    const len = key.length;
+    if (!best || index > best.index || (index === best.index && len > best.len)) {
+      best = { key, index, len };
+    }
+  }
+  return best?.key ?? null;
+}
+
 /**
  * Get portion weight for a food item and measurement
  */
 export function getPortionWeight(foodName: string, measurement: string): number | null {
+  if (isExplicitWeightMeasurement(measurement)) return null;
+
   const normalizedFood = foodName.toLowerCase().trim();
   const normalizedMeasurement = measurement.toLowerCase().trim();
-  
-  // Find exact food match
-  const portions = PORTION_WEIGHTS[normalizedFood];
-  if (!portions) {
-    // Try partial matches
-    const foodKey = Object.keys(PORTION_WEIGHTS).find(key => 
-      normalizedFood.includes(key) || key.includes(normalizedFood)
-    );
-    if (foodKey) {
-      return getPortionWeight(foodKey, measurement);
-    }
-    return null;
-  }
-  
-  // Find best portion match - enhanced for natural language
+  const foodKey = PORTION_WEIGHTS[normalizedFood]
+    ? normalizedFood
+    : findBestFoodKey(normalizedFood, Object.keys(PORTION_WEIGHTS));
+  if (!foodKey) return null;
+  const portions = PORTION_WEIGHTS[foodKey];
+  if (!portions) return null;
+
   const portion = portions.find(p => {
     const desc = p.portion_description.toLowerCase();
-    return desc.includes(normalizedMeasurement) || 
+    if (desc === 'g' || desc === 'gram' || desc === 'grams') return false;
+    return desc.includes(normalizedMeasurement) ||
            normalizedMeasurement.includes(desc) ||
            (normalizedMeasurement.includes('medium') && desc === 'medium') ||
            (normalizedMeasurement.includes('large') && desc === 'large') ||
@@ -305,20 +325,17 @@ export function getPortionWeight(foodName: string, measurement: string): number 
            (normalizedMeasurement.includes('hot dog') && desc === 'item') ||
            (normalizedMeasurement.includes('standard') && desc === 'item') ||
            (normalizedMeasurement.includes('item') && desc === 'item') ||
-           // Enhanced natural language matching
            (normalizedMeasurement.includes('half') && desc === 'half') ||
            (normalizedMeasurement.includes('quarter') && desc === 'quarter') ||
            (normalizedMeasurement.includes('whole') && desc === 'whole') ||
            (normalizedMeasurement.includes('wedge') && desc === 'wedge');
   });
-  
+
   if (portion) {
     return portion.gram_weight * portion.amount;
   }
-  
-  // Default to medium portion if available
-  const defaultPortion = portions.find(p => p.portion_description.includes('medium')) || portions[0];
-  return defaultPortion ? defaultPortion.gram_weight * defaultPortion.amount : null;
+
+  return null;
 }
 
 /**

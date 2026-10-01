@@ -8,7 +8,7 @@
 import { db } from '../db';
 import { usdaFoodCache } from '@shared/schema';
 import { eq, like, desc, asc, sql, or } from 'drizzle-orm';
-import { getPortionWeight, parseMeasurement } from '../data/portionData.js';
+import { findBestFoodKey, getPortionWeight, isExplicitWeightMeasurement, parseMeasurement } from '../data/portionData.js';
 import { findCandyNutrition, calculateCandyNutrition } from '../data/candyNutritionDatabase.js';
 import { findEnhancedFood, findEnhancedFoodCovering, type EnhancedFoodEntry } from '../data/enhancedFoodDatabase.js';
 import { getUsdaApiKey } from '../env';
@@ -2001,7 +2001,7 @@ export class USDAService {
 
     // USDA portion weights (pizza slice, medium orange, 1/2 cup ice cream, etc.)
     const catalogGrams = getPortionWeight(food.description || '', measurement);
-    if (catalogGrams && catalogGrams > 0 && !/\b(\d+(?:\.\d+)?)\s*(g|grams?)\b/i.test(measurement)) {
+    if (catalogGrams && catalogGrams > 0 && !isExplicitWeightMeasurement(measurement)) {
       const parsed = parseMeasurement(measurement);
       const qty = parsed.quantity > 0 ? parsed.quantity : 1;
       const unitLabel = parsed.unit || measurement;
@@ -3677,8 +3677,11 @@ export class USDAService {
     }
 
     // Use enhanced fallback data if available
-    if (USDAService.FALLBACK_NUTRITION[normalized]) {
-      const nutrition = USDAService.FALLBACK_NUTRITION[normalized];
+    const fallbackKey = USDAService.FALLBACK_NUTRITION[normalized]
+      ? normalized
+      : findBestFoodKey(normalized, Object.keys(USDAService.FALLBACK_NUTRITION));
+    if (fallbackKey && USDAService.FALLBACK_NUTRITION[fallbackKey]) {
+      const nutrition = USDAService.FALLBACK_NUTRITION[fallbackKey];
       const mockFood: USDAFood = {
         fdcId: 0,
         description: normalized,
@@ -3745,7 +3748,9 @@ export class USDAService {
     let fat = 3.0;
     
     // Enhanced pattern-based nutrition estimates for complex foods
-    if (normalized.includes('patty') || normalized.includes('pie') || normalized.includes('turnover')) {
+    if (normalized.includes('pizza')) {
+      baseCalories = 266; protein = 11; carbs = 33; fat = 10;
+    } else if (normalized.includes('patty') || /\bpie\b/.test(normalized) || normalized.includes('turnover')) {
       // Pastry-wrapped foods (meat + pastry)
       baseCalories = 285; protein = 12.5; carbs = 25.0; fat = 16.0;
     } else if (normalized.includes('sandwich') || normalized.includes('burger') || normalized.includes('wrap')) {
