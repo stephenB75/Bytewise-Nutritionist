@@ -252,15 +252,15 @@ const HeroSection = React.memo(function HeroSection({
           )}
 
           <div className="space-y-2 hero-optimized sm:space-y-3">
-            <h1 className="hero-title text-4xl font-black leading-[0.9] tracking-tighter drop-shadow-2xl font-league-spartan text-optimized opacity-100 sm:text-6xl md:text-7xl lg:text-8xl sm:leading-[0.85]">
+            <h1 className="hero-title text-6xl font-black leading-[0.85] tracking-tighter drop-shadow-2xl font-league-spartan text-optimized opacity-100 md:text-7xl lg:text-8xl">
               {title}
             </h1>
-            <h2 className={`hero-title text-4xl font-black leading-[0.9] tracking-tighter font-league-spartan sm:text-6xl md:text-7xl lg:text-8xl sm:leading-[0.85] ${showLogo ? 'text-white' : 'text-optimized'} drop-shadow-2xl opacity-100`}>
+            <h2 className={`hero-title text-6xl font-black leading-[0.85] tracking-tighter font-league-spartan md:text-7xl lg:text-8xl ${showLogo ? 'text-white' : 'text-optimized'} drop-shadow-2xl opacity-100`}>
               {subtitle}
             </h2>
           </div>
 
-          <p className="mx-auto max-w-xl text-base font-light leading-snug text-gray-100 opacity-100 drop-shadow-xl font-work-sans sm:text-2xl sm:leading-relaxed md:text-3xl">
+          <p className="mx-auto max-w-xl text-2xl font-light leading-relaxed text-gray-100 opacity-100 drop-shadow-xl font-work-sans md:text-3xl">
             {description}
           </p>
 
