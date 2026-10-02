@@ -7,6 +7,12 @@ const WATER_EVENING_ID = 1003;
 const MEAL_LUNCH_ID = 1004;
 const MEAL_DINNER_ID = 1005;
 const WATER_GOAL_ID = 1006;
+/** Rolling 7-day window so reminders still fire if the app stays closed. */
+const REMINDER_DAYS = 7;
+const WATER_AFTERNOON_BASE = 3000;
+const WATER_EVENING_BASE = 3010;
+const MEAL_LUNCH_BASE = 3020;
+const MEAL_DINNER_BASE = 3030;
 const CALORIE_GOAL_ID = 1007;
 const FASTING_MILESTONE_BASE = 1100;
 const ACHIEVEMENT_ID_BASE = 2000;
@@ -44,15 +50,6 @@ async function ensurePermission(plugin: typeof LocalNotifications): Promise<bool
     ({ display } = await plugin.requestPermissions());
   }
   return display === 'granted';
-}
-
-function nextOccurrence(hour: number, minute: number): Date {
-  const at = new Date();
-  at.setHours(hour, minute, 0, 0);
-  if (at.getTime() <= Date.now() + 30_000) {
-    at.setDate(at.getDate() + 1);
-  }
-  return at;
 }
 
 function isSameLocalDay(date: Date, other = new Date()): boolean {
@@ -205,9 +202,41 @@ export async function notifyAchievementUnlocked(title: string, message: string):
   await notifyNow(id, title, message, 'profile');
 }
 
+function seriesIds(base: number): number[] {
+  return Array.from({ length: REMINDER_DAYS }, (_, i) => base + i);
+}
+
+/** Next N clock times, skipping today when that day's goal is already met. */
+function upcomingDailyTimes(hour: number, minute: number, skipToday: boolean): Date[] {
+  const times: Date[] = [];
+  for (let day = 0; times.length < REMINDER_DAYS && day < REMINDER_DAYS + 2; day++) {
+    const at = new Date();
+    at.setHours(hour, minute, 0, 0);
+    at.setDate(at.getDate() + day);
+    if (at.getTime() <= Date.now() + 30_000) continue;
+    if (skipToday && isSameLocalDay(at)) continue;
+    times.push(at);
+  }
+  return times;
+}
+
+function buildDailySeries(
+  baseId: number,
+  title: string,
+  body: string,
+  hour: number,
+  minute: number,
+  tab: TabId,
+  skipToday: boolean,
+): LocalNotificationSchema[] {
+  return upcomingDailyTimes(hour, minute, skipToday).map((at, index) =>
+    buildNotification(baseId + index, title, body, at, tab),
+  );
+}
+
 /**
- * Keeps daily water and meal reminders on the next due slot.
- * Skips today's copy once the matching goal is already met.
+ * Schedules water and meal reminders for the next 7 days so they still fire
+ * if the app stays closed. Skips today's copy once that goal is already met.
  */
 export async function syncDailyReminders(opts: {
   waterGlasses: number;
@@ -218,54 +247,58 @@ export async function syncDailyReminders(opts: {
     if (!plugin) return;
     if (!(await ensurePermission(plugin))) return;
 
-    const reminderIds = [WATER_AFTERNOON_ID, WATER_EVENING_ID, MEAL_LUNCH_ID, MEAL_DINNER_ID];
-    await cancelIds(plugin, reminderIds);
+    const idsToCancel = [
+      WATER_AFTERNOON_ID,
+      WATER_EVENING_ID,
+      MEAL_LUNCH_ID,
+      MEAL_DINNER_ID,
+      ...seriesIds(WATER_AFTERNOON_BASE),
+      ...seriesIds(WATER_EVENING_BASE),
+      ...seriesIds(MEAL_LUNCH_BASE),
+      ...seriesIds(MEAL_DINNER_BASE),
+    ];
+    await cancelIds(plugin, idsToCancel);
 
     const waterGoalMet = opts.waterGlasses >= 8;
     const hasMeals = opts.mealsLoggedToday > 0;
-    const waterAfternoon = nextOccurrence(15, 0);
-    const waterEvening = nextOccurrence(19, 0);
-    const mealLunch = nextOccurrence(13, 0);
-    const mealDinner = nextOccurrence(18, 30);
-
-    const notifications: LocalNotificationSchema[] = [];
-
-    if (!waterGoalMet || !isSameLocalDay(waterAfternoon)) {
-      notifications.push(buildNotification(
-        WATER_AFTERNOON_ID,
+    const notifications = [
+      ...buildDailySeries(
+        WATER_AFTERNOON_BASE,
         'Hydration reminder 💧',
         'A glass of water now keeps you on track for 64 oz today.',
-        waterAfternoon,
+        15,
+        0,
         'home',
-      ));
-    }
-    if (!waterGoalMet || !isSameLocalDay(waterEvening)) {
-      notifications.push(buildNotification(
-        WATER_EVENING_ID,
+        waterGoalMet,
+      ),
+      ...buildDailySeries(
+        WATER_EVENING_BASE,
         'Evening hydration 💧',
-        "You still have room before 64 oz. Finish the day hydrated.",
-        waterEvening,
+        'You still have room before 64 oz. Finish the day hydrated.',
+        19,
+        0,
         'home',
-      ));
-    }
-    if (!hasMeals || !isSameLocalDay(mealLunch)) {
-      notifications.push(buildNotification(
-        MEAL_LUNCH_ID,
+        waterGoalMet,
+      ),
+      ...buildDailySeries(
+        MEAL_LUNCH_BASE,
         'Log lunch 🍽️',
         "Nothing is on today's Journal yet. Add a meal so your calories stay accurate.",
-        mealLunch,
+        13,
+        0,
         'nutrition',
-      ));
-    }
-    if (!hasMeals || !isSameLocalDay(mealDinner)) {
-      notifications.push(buildNotification(
-        MEAL_DINNER_ID,
+        hasMeals,
+      ),
+      ...buildDailySeries(
+        MEAL_DINNER_BASE,
         'Log dinner 🍽️',
-        "Still no meals logged today. A quick add on Tracker keeps your day complete.",
-        mealDinner,
+        'Still no meals logged today. A quick add on Tracker keeps your day complete.',
+        18,
+        30,
         'nutrition',
-      ));
-    }
+        hasMeals,
+      ),
+    ];
 
     if (notifications.length) {
       await plugin.schedule({ notifications });

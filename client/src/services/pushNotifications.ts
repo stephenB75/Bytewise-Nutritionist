@@ -14,6 +14,15 @@ type PushHandlers = {
 let handlers: PushHandlers | null = null;
 let listenersAdded = false;
 
+async function savePushToken(token: string): Promise<void> {
+  try {
+    await apiRequest('POST', '/api/push/register', { token });
+    localStorage.setItem(TOKEN_KEY, token);
+  } catch (error) {
+    console.warn('Could not save push token:', error);
+  }
+}
+
 // Must stay synchronous: awaiting a Capacitor plugin proxy hangs forever on native.
 function getPlugin() {
   if (!Capacitor.isNativePlatform() || !Capacitor.isPluginAvailable('PushNotifications')) {
@@ -27,12 +36,7 @@ async function addListeners(plugin: typeof PushNotifications) {
   listenersAdded = true;
 
   await plugin.addListener('registration', async ({ value }) => {
-    try {
-      await apiRequest('POST', '/api/push/register', { token: value });
-      localStorage.setItem(TOKEN_KEY, value);
-    } catch (error) {
-      console.warn('Could not save push token:', error);
-    }
+    await savePushToken(value);
   });
   await plugin.addListener('registrationError', error => {
     console.warn('Push registration failed:', error?.error || error);
@@ -64,9 +68,20 @@ export async function registerForPush(options: PushHandlers & { prompt: boolean 
     }
     await addListeners(plugin);
     await plugin.register();
+    const existing = localStorage.getItem(TOKEN_KEY);
+    if (existing) await savePushToken(existing);
   } catch (error) {
     console.warn('Could not register for push notifications:', error);
   }
+}
+
+/** Registers APNs when notification permission is already granted (no extra prompt). */
+export async function refreshPushIfPermitted(): Promise<void> {
+  await registerForPush({
+    prompt: false,
+    onReceived: handlers?.onReceived ?? (() => undefined),
+    onOpened: handlers?.onOpened ?? (() => undefined),
+  });
 }
 
 /** Stops pushes for the current user on this device. Call before signing out. */

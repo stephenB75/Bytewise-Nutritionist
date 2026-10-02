@@ -80,7 +80,7 @@ import { ExerciseMinutesCard } from '@/components/ExerciseMinutesCard';
 import { AppleHealthIntegration } from '@/components/AppleHealthIntegration';
 import { FriendsPanel } from '@/components/FriendsPanel';
 import { FRIENDS_QUERY_KEY, useFriendUpdates } from '@/hooks/useFriendUpdates';
-import { registerForPush } from '@/services/pushNotifications';
+import { refreshPushIfPermitted, registerForPush } from '@/services/pushNotifications';
 import {
   notifyAchievementUnlocked,
   notifyCalorieGoalReached,
@@ -855,8 +855,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     void syncDailyReminders({
       waterGlasses: dailyStats?.waterGlasses ?? 0,
       mealsLoggedToday: loggedMeals.length,
+    }).then(() => {
+      if (user?.id) void refreshPushIfPermitted();
     });
-  }, [dailyStats?.waterGlasses, loggedMeals.length]);
+  }, [dailyStats?.waterGlasses, loggedMeals.length, user?.id]);
 
   useEffect(() => {
     void watchLocalNotificationTaps((tab) => {
