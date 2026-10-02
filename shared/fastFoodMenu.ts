@@ -4,6 +4,7 @@
  */
 
 import { MORE_FAST_FOOD_ITEMS } from './fastFoodMenuMore';
+import { FULL_FAST_FOOD_ITEMS } from './fastFoodMenuFull';
 
 export type FastFoodCategory = 'breakfast' | 'sandwiches' | 'lunch' | 'dinner' | 'snacks';
 
@@ -335,7 +336,7 @@ const CORE_FAST_FOOD_ITEMS: FastFoodItem[] = [
   { id: 'sweetgreen-kale-caesar', name: 'Kale Caesar', restaurant: 'Sweetgreen', category: 'lunch', serving: '1 bowl', calories: 430, protein: 30, carbs: 21, fat: 26, sodium: 920, keywords: ['salad'] },
 ];
 
-export const FAST_FOOD_ITEMS: FastFoodItem[] = [...CORE_FAST_FOOD_ITEMS, ...MORE_FAST_FOOD_ITEMS];
+export const FAST_FOOD_ITEMS: FastFoodItem[] = [...CORE_FAST_FOOD_ITEMS, ...MORE_FAST_FOOD_ITEMS, ...FULL_FAST_FOOD_ITEMS];
 
 export const FAST_FOOD_RESTAURANTS: string[] = Array.from(new Set(FAST_FOOD_ITEMS.map((item) => item.restaurant))).sort(
   (a, b) => a.localeCompare(b)
@@ -354,6 +355,15 @@ const SEARCH_ALIASES: Record<string, string> = {
   lagranja: 'la granja',
   tropicalpollo: 'pollo tropical',
   pollotropical: 'pollo tropical',
+  charleys: "charley's",
+  charley: "charley's",
+  bucees: "buc-ee's",
+  bucee: "buc-ee's",
+  llhawaiian: 'l l hawaiian',
+  landl: 'l l hawaiian',
+  skyline: 'skyline chili',
+  tgif: "tgi friday's",
+  fridays: "tgi friday's",
 };
 
 function expandSearchQuery(query: string): string {
