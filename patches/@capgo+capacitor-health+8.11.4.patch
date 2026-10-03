@@ -1,0 +1,80 @@
+diff --git a/node_modules/@capgo/capacitor-health/ios/Sources/HealthPlugin/Health.swift b/node_modules/@capgo/capacitor-health/ios/Sources/HealthPlugin/Health.swift
+index 49fd04f..657dd2f 100644
+--- a/node_modules/@capgo/capacitor-health/ios/Sources/HealthPlugin/Health.swift
++++ b/node_modules/@capgo/capacitor-health/ios/Sources/HealthPlugin/Health.swift
+@@ -205,7 +205,7 @@ enum WorkoutType: String, CaseIterable {
+         case .cycling, .bikingStationary:
+             return .cycling
+         case .dance, .dancing:
+-            return .dance
++            return .socialDance
+         case .elliptical:
+             return .elliptical
+         case .fencing:
+@@ -353,15 +353,9 @@ enum WorkoutType: String, CaseIterable {
+         case .wrestling:
+             return .wrestling
+         case .cardioDance:
+-            if #available(iOS 14.0, *) {
+-                return .cardioDance
+-            }
+-            return .dance
++            return .cardioDance
+         case .socialDance:
+-            if #available(iOS 14.0, *) {
+-                return .socialDance
+-            }
+-            return .dance
++            return .socialDance
+         case .scubaDiving:
+             if #available(iOS 17.0, *) {
+                 return .underwaterDiving
+@@ -430,8 +424,6 @@ enum WorkoutType: String, CaseIterable {
+             return .crossTraining
+         case .curling:
+             return .curling
+-        case .dance:
+-            return .dance
+         case .discSports:
+             return .discSports
+         case .downhillSkiing:
+@@ -531,6 +523,10 @@ enum WorkoutType: String, CaseIterable {
+         case .wrestling:
+             return .wrestling
+         default:
++            // HKWorkoutActivityType.dance (rawValue 14) was deprecated in iOS 14.
++            if hkType.rawValue == 14 {
++                return .dance
++            }
+             if #available(iOS 14.0, *) {
+                 if hkType == .cardioDance {
+                     return .cardioDance
+@@ -1820,12 +1816,12 @@ final class Health {
+             if !lapEvents.isEmpty {
+                 payload["workoutEvents"] = lapEvents.enumerated().map { index, event in
+                     let nextDate = index + 1 < lapEvents.count
+-                        ? lapEvents[index + 1].date
++                        ? lapEvents[index + 1].dateInterval.start
+                         : workout.endDate
+-                    let durationSeconds = max(0, nextDate.timeIntervalSince(event.date))
++                    let durationSeconds = max(0, nextDate.timeIntervalSince(event.dateInterval.start))
+                     var lapPayload: [String: Any] = [
+                         "type": "lap",
+-                        "date": isoFormatter.string(from: event.date),
++                        "date": isoFormatter.string(from: event.dateInterval.start),
+                         "durationSeconds": durationSeconds,
+                     ]
+                     if let metadata = event.metadata,
+diff --git a/node_modules/@capgo/capacitor-health/ios/Sources/HealthPlugin/HealthPlugin.swift b/node_modules/@capgo/capacitor-health/ios/Sources/HealthPlugin/HealthPlugin.swift
+index 8dcd7c9..b0c307f 100644
+--- a/node_modules/@capgo/capacitor-health/ios/Sources/HealthPlugin/HealthPlugin.swift
++++ b/node_modules/@capgo/capacitor-health/ios/Sources/HealthPlugin/HealthPlugin.swift
+@@ -108,7 +108,7 @@ public class HealthPlugin: CAPPlugin, CAPBridgedPlugin {
+         let unit = call.getString("unit")
+         let startDate = call.getString("startDate")
+         let endDate = call.getString("endDate")
+-        let metadataAny = call.getObject("metadata") as? [String: Any]
++        let metadataAny = call.getObject("metadata")
+         let metadata = metadataAny?.reduce(into: [String: String]()) { result, entry in
+             if let stringValue = entry.value as? String {
+                 result[entry.key] = stringValue

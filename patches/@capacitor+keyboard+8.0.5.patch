@@ -1,0 +1,21 @@
+diff --git a/node_modules/@capacitor/keyboard/ios/Sources/KeyboardPlugin/Keyboard.m b/node_modules/@capacitor/keyboard/ios/Sources/KeyboardPlugin/Keyboard.m
+index 54a6694..a7b9c05 100644
+--- a/node_modules/@capacitor/keyboard/ios/Sources/KeyboardPlugin/Keyboard.m
++++ b/node_modules/@capacitor/keyboard/ios/Sources/KeyboardPlugin/Keyboard.m
+@@ -45,6 +45,7 @@ @interface KeyboardPlugin () <UIScrollViewDelegate>
+ 
+ #pragma clang diagnostic push
+ #pragma clang diagnostic ignored "-Wprotocol"
++#pragma clang diagnostic ignored "-Wobjc-protocol-property-synthesis"
+ // suppressing warnings of the type: "Class 'KeyboardPlugin' does not conform to protocol 'CAPBridgedPlugin'"
+ // protocol conformance for this class is implemented by a macro and clang isn't detecting that
+ @implementation KeyboardPlugin
+@@ -333,7 +334,7 @@ - (void)resizeElement:(NSString *)element withPaddingBottom:(int)paddingBottom w
+ 
+ - (void)_updateFrame
+ {
+-  CGRect f, wf = CGRectZero;
++  CGRect f = CGRectZero, wf = CGRectZero;
+   UIWindow *window = [self currentKeyWindow];
+ 
+   if (window) {
