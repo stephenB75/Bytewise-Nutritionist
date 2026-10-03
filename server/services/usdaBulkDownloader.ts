@@ -8,6 +8,7 @@
 import { db } from '../db';
 import { usdaFoodCache } from '@shared/schema';
 import { USDAService } from './usdaService';
+import { extractUsdaNutrients } from '../data/extractUsdaNutrients';
 import { sql } from 'drizzle-orm';
 
 interface BulkDownloadProgress {
@@ -178,48 +179,7 @@ export class USDABulkDownloader {
    * Extract nutrients from USDA food data (simplified version)
    */
   private extractNutrients(foodNutrients: any[]): any {
-    const nutrients: any = {
-      calories: 0,
-      protein: 0,
-      carbs: 0,
-      fat: 0,
-      fiber: 0,
-      sugar: 0,
-      sodium: 0,
-    };
-
-    if (!foodNutrients || !Array.isArray(foodNutrients)) {
-      return nutrients;
-    }
-
-    for (const nutrient of foodNutrients) {
-      if (!nutrient || (!nutrient.nutrientName && !nutrient.nutrient?.name)) {
-        continue;
-      }
-      
-      const name = (nutrient.nutrientName || nutrient.nutrient?.name || '').toLowerCase();
-      const amount = nutrient.value || nutrient.amount || 0;
-      const nutrientId = nutrient.nutrientId || nutrient.nutrient?.id;
-
-      // Map using USDA nutrient IDs
-      if (name.includes('energy') || name.includes('calorie') || nutrientId === 1008) {
-        nutrients.calories = amount;
-      } else if (name.includes('protein') || nutrientId === 1003) {
-        nutrients.protein = amount;
-      } else if ((name.includes('carbohydrate') && !name.includes('fiber')) || nutrientId === 1005) {
-        nutrients.carbs = amount;
-      } else if (name.includes('total lipid') || name.includes('fat') || nutrientId === 1004) {
-        nutrients.fat = amount;
-      } else if (name.includes('fiber') || nutrientId === 1079) {
-        nutrients.fiber = amount;
-      } else if (name.includes('sugar') || nutrientId === 2000) {
-        nutrients.sugar = amount;
-      } else if (name.includes('sodium') || nutrientId === 1093) {
-        nutrients.sodium = amount > 100 ? amount / 1000 : amount; // Convert mg to g if needed
-      }
-    }
-
-    return nutrients;
+    return extractUsdaNutrients(foodNutrients);
   }
 
   /**

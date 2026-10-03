@@ -574,7 +574,7 @@ export const MORE_FAST_FOOD_ITEMS: FastFoodItem[] = [
   item('taco-cabana-carne-asada-taco', 'Carne Asada Taco', 'Taco Cabana', 'lunch', '1 taco', 290, 20, 20, 15, 750),
   item('taco-cabana-crispy-beef-taco', 'Crispy Beef Taco', 'Taco Cabana', 'lunch', '1 taco', 230, 11, 13, 15, 400),
   item('taco-cabana-bean-cheese-taco', 'Bean & Cheese Taco', 'Taco Cabana', 'lunch', '1 taco', 300, 10, 31, 14, 580),
-  item('taco-cabana-chicken-flautas-3', 'Chicken Flautas (3)', 'Taco Cabana', 'lunch', '3 flautas', 390, 9, 37, 14, 450),
+  item('taco-cabana-chicken-flautas-3', 'Chicken Flautas (3)', 'Taco Cabana', 'lunch', '3 flautas', 360, 19, 40, 12, 640),
   item('taco-cabana-salad-chicken', 'Cabana Salad with Chicken Fajita', 'Taco Cabana', 'lunch', '1 salad', 680, 45, 45, 35, 2570, ['salad']),
 
   // Cafe Rio (West / Mountain West)

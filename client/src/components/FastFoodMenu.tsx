@@ -36,6 +36,7 @@ const POPULAR_RESTAURANTS = [
   "Chili's",
   'Pollo Tropical',
   'La Granja',
+  'Hawkers',
 ];
 
 function Chip({ active, label, onClick, testId }: { active: boolean; label: string; onClick: () => void; testId: string }) {

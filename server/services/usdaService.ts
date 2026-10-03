@@ -14,6 +14,7 @@ import { findEnhancedFood, findEnhancedFoodCovering, type EnhancedFoodEntry } fr
 import { getUsdaApiKey } from '../env';
 import { FAST_FOOD_ITEMS, type FastFoodItem } from '@shared/fastFoodMenu';
 import { estimateFoodWithAI } from '../foodAiEstimate';
+import { extractUsdaNutrients } from '../data/extractUsdaNutrients';
 
 function normalizeWords(text: string): string[] {
   return text.toLowerCase().replace(/[’']/g, '').replace(/[^a-z0-9]+/g, ' ').trim().split(' ').filter(Boolean);
@@ -1628,89 +1629,7 @@ export class USDAService {
    * Extract and normalize nutrients from USDA data
    */
   private extractNutrients(foodNutrients: USDAFoodNutrient[]) {
-    const nutrients: any = {
-      calories: 0,
-      protein: 0,
-      carbs: 0,
-      fat: 0,
-      fiber: 0,
-      sugar: 0,
-      sodium: 0,
-      // Micronutrients
-      iron: 0,
-      calcium: 0,
-      zinc: 0,
-      magnesium: 0,
-      vitaminC: 0,
-      vitaminD: 0,
-      vitaminB12: 0,
-      folate: 0,
-      vitaminA: 0,
-      vitaminE: 0,
-      potassium: 0,
-      phosphorus: 0
-    };
-
-    if (!foodNutrients || !Array.isArray(foodNutrients)) {
-      return nutrients;
-    }
-
-    for (const nutrient of foodNutrients) {
-      // Handle actual USDA API format
-      if (!nutrient || (!nutrient.nutrientName && !nutrient.nutrient?.name)) {
-        continue;
-      }
-      
-      // Extract data from actual API response format
-      const name = (nutrient.nutrientName || nutrient.nutrient?.name || '').toLowerCase();
-      const amount = nutrient.value || nutrient.amount || 0;
-      const nutrientId = nutrient.nutrientId || nutrient.nutrient?.id;
-
-
-
-      // Map using exact USDA nutrient IDs and names
-      if (name.includes('energy') || name.includes('calorie') || nutrientId === 1008) {
-        nutrients.calories = amount;
-      } else if (name.includes('protein') || nutrientId === 1003) {
-        nutrients.protein = amount;
-      } else if ((name.includes('carbohydrate') && !name.includes('fiber')) || nutrientId === 1005) {
-        nutrients.carbs = amount;
-      } else if (name.includes('total lipid') || name.includes('fat') || nutrientId === 1004) {
-        nutrients.fat = amount;
-      } else if (name.includes('fiber') || nutrientId === 1079) {
-        nutrients.fiber = amount;
-      } else if (name.includes('sugar') || nutrientId === 2000) {
-        nutrients.sugar = amount;
-      } else if (name.includes('sodium') || nutrientId === 1093) {
-        nutrients.sodium = amount > 100 ? amount / 1000 : amount; // Convert mg to g if needed
-      } else if (name.includes('iron') || nutrientId === 1089) { // Iron, mg
-        nutrients.iron = amount;
-      } else if (name.includes('calcium') || nutrientId === 1087) { // Calcium, mg
-        nutrients.calcium = amount;
-      } else if (name.includes('zinc') || nutrientId === 1095) { // Zinc, mg
-        nutrients.zinc = amount;
-      } else if (name.includes('magnesium') || nutrientId === 1090) { // Magnesium, mg
-        nutrients.magnesium = amount;
-      } else if ((name.includes('vitamin c') || name.includes('ascorbic')) || nutrientId === 1162) { // Vitamin C, mg
-        nutrients.vitaminC = amount;
-      } else if (name.includes('vitamin d') || nutrientId === 1110 || nutrientId === 1114) { // Vitamin D (D2 + D3), mcg
-        nutrients.vitaminD += amount;
-      } else if (name.includes('vitamin b-12') || name.includes('cobalamin') || nutrientId === 1178) { // Vitamin B12, mcg
-        nutrients.vitaminB12 = amount;
-      } else if (name.includes('folate') || nutrientId === 1177) { // Folate, mcg
-        nutrients.folate = amount;
-      } else if (name.includes('vitamin a') || nutrientId === 1106 || nutrientId === 1107) { // Vitamin A, mcg
-        nutrients.vitaminA += amount;
-      } else if (name.includes('vitamin e') || nutrientId === 1109) { // Vitamin E, mg
-        nutrients.vitaminE = amount;
-      } else if (name.includes('potassium') || nutrientId === 1092) { // Potassium, mg
-        nutrients.potassium = amount;
-      } else if (name.includes('phosphorus') || nutrientId === 1091) { // Phosphorus, mg
-        nutrients.phosphorus = amount;
-      }
-    }
-
-    return nutrients;
+    return extractUsdaNutrients(foodNutrients);
   }
 
   /**

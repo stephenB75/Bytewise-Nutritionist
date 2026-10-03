@@ -5,6 +5,7 @@
 
 import { MORE_FAST_FOOD_ITEMS } from './fastFoodMenuMore';
 import { FULL_FAST_FOOD_ITEMS } from './fastFoodMenuFull';
+import { ASIAN_FAST_FOOD_ITEMS } from './fastFoodMenuAsian';
 
 export type FastFoodCategory = 'breakfast' | 'sandwiches' | 'lunch' | 'dinner' | 'snacks';
 
@@ -336,7 +337,7 @@ const CORE_FAST_FOOD_ITEMS: FastFoodItem[] = [
   { id: 'sweetgreen-kale-caesar', name: 'Kale Caesar', restaurant: 'Sweetgreen', category: 'lunch', serving: '1 bowl', calories: 430, protein: 30, carbs: 21, fat: 26, sodium: 920, keywords: ['salad'] },
 ];
 
-export const FAST_FOOD_ITEMS: FastFoodItem[] = [...CORE_FAST_FOOD_ITEMS, ...MORE_FAST_FOOD_ITEMS, ...FULL_FAST_FOOD_ITEMS];
+export const FAST_FOOD_ITEMS: FastFoodItem[] = [...CORE_FAST_FOOD_ITEMS, ...MORE_FAST_FOOD_ITEMS, ...FULL_FAST_FOOD_ITEMS, ...ASIAN_FAST_FOOD_ITEMS];
 
 export const FAST_FOOD_RESTAURANTS: string[] = Array.from(new Set(FAST_FOOD_ITEMS.map((item) => item.restaurant))).sort(
   (a, b) => a.localeCompare(b)
@@ -364,6 +365,22 @@ const SEARCH_ALIASES: Record<string, string> = {
   skyline: 'skyline chili',
   tgif: "tgi friday's",
   fridays: "tgi friday's",
+  hawkers: 'hawkers',
+  hawkersasian: 'hawkers',
+  pfchangs: "p f chang's",
+  pfchang: "p f chang's",
+  teriyakimadness: 'teriyaki madness',
+  waba: 'waba grill',
+  wabagrill: 'waba grill',
+  yoshinoya: 'yoshinoya',
+  sarku: 'sarku japan',
+  sarkujapan: 'sarku japan',
+  huhot: 'huhot',
+  manchuwok: 'manchu wok',
+  wowbao: 'wow bao',
+  tokyojoes: "tokyo joe's",
+  leeannchin: 'leeann chin',
+  leeann: 'leeann chin',
 };
 
 function expandSearchQuery(query: string): string {
