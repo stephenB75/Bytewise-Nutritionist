@@ -196,7 +196,195 @@ export const CARIBBEAN_RESTAURANTS = [
   'Potwah Jamaican Cuisine',
 ] as const;
 
-export type FoodCuisine = 'caribbean';
+/**
+ * Food culture / style filters for the Places picker.
+ * A restaurant should appear in the one primary style that best matches how users search.
+ */
+export type FoodCuisine =
+  | 'caribbean'
+  | 'asian'
+  | 'mexican'
+  | 'italian'
+  | 'chicken'
+  | 'burgers'
+  | 'bbq'
+  | 'mediterranean'
+  | 'seafood'
+  | 'cafe';
+
+export const CUISINE_LABELS: Record<FoodCuisine, string> = {
+  caribbean: 'Caribbean',
+  asian: 'Asian',
+  mexican: 'Mexican',
+  italian: 'Italian',
+  chicken: 'Chicken',
+  burgers: 'Burgers',
+  bbq: 'BBQ',
+  mediterranean: 'Mediterranean',
+  seafood: 'Seafood',
+  cafe: 'Cafe',
+};
+
+export const ASIAN_RESTAURANTS = [
+  'Panda Express',
+  "P.F. Chang's",
+  'Pei Wei',
+  'Manchu Wok',
+  'Sarku Japan',
+  'Teriyaki Madness',
+  "Tokyo Joe's",
+  'Yoshinoya',
+  'Wow Bao',
+  'Bonchon',
+  'Bibibop',
+  'Hawkers',
+  'HuHot',
+  'Jollibee',
+  'Leeann Chin',
+  "Lee's Sandwiches",
+  "L&L Hawaiian Barbecue",
+  'WaBa Grill',
+  'Noodles & Company',
+] as const;
+
+export const MEXICAN_RESTAURANTS = [
+  'Taco Bell',
+  'Chipotle',
+  'Qdoba',
+  "Moe's Southwest Grill",
+  'Del Taco',
+  'El Pollo Loco',
+  'Cafe Rio',
+  "Rubio's",
+  'Taco Cabana',
+  'Taco Bueno',
+  "Taco John's",
+  "Torchy's Tacos",
+  'Pollo Campero',
+  'La Granja',
+] as const;
+
+export const ITALIAN_RESTAURANTS = [
+  'Olive Garden',
+  "Carrabba's Italian Grill",
+  "Domino's",
+  'Pizza Hut',
+  "Papa John's",
+  'Little Caesars',
+  'Blaze Pizza',
+  'MOD Pizza',
+  "Marco's Pizza",
+  'Sbarro',
+  'California Pizza Kitchen',
+  "Fazoli's",
+  "Hungry Howie's",
+  "Papa Murphy's",
+  "Tomasino's Pizza",
+  'Pizzeria Valdiano',
+] as const;
+
+export const CHICKEN_RESTAURANTS = [
+  'Chick-fil-A',
+  'Popeyes',
+  'KFC',
+  "Raising Cane's",
+  'Wingstop',
+  "Zaxby's",
+  'Bojangles',
+  "Church's Texas Chicken",
+  'Golden Chick',
+  'Slim Chickens',
+  "Dave's Hot Chicken",
+  'Buffalo Wild Wings',
+  'PDQ',
+  'Boston Market',
+  "Nando's PERi-PERi",
+] as const;
+
+export const BURGER_RESTAURANTS = [
+  "McDonald's",
+  'Burger King',
+  "Wendy's",
+  'Five Guys',
+  'Shake Shack',
+  'In-N-Out',
+  'Whataburger',
+  "Culver's",
+  "Carl's Jr.",
+  "Hardee's",
+  'Sonic',
+  'Jack in the Box',
+  'White Castle',
+  'Smashburger',
+  'The Habit Burger Grill',
+  'Fatburger',
+  "Freddy's",
+  "Checkers & Rally's",
+  'Krystal',
+  "Steak 'n Shake",
+  "A&W",
+  "Red Robin",
+] as const;
+
+export const BBQ_RESTAURANTS = [
+  "Sonny's BBQ",
+  "Famous Dave's",
+  "Dickey's Barbecue Pit",
+  'Texas Roadhouse',
+  'Bill Miller Bar-B-Q',
+  'LongHorn Steakhouse',
+  'Outback Steakhouse',
+  'Cracker Barrel',
+  "Logan's Roadhouse",
+] as const;
+
+export const MEDITERRANEAN_RESTAURANTS = [
+  'Cava',
+  'The Halal Guys',
+  'Sweetgreen',
+  'Bolay',
+  'Fresh Kitchen',
+] as const;
+
+export const SEAFOOD_RESTAURANTS = [
+  'Red Lobster',
+  "Long John Silver's",
+  "Captain D's",
+  'Bonefish Grill',
+] as const;
+
+export const CAFE_RESTAURANTS = [
+  'Starbucks',
+  "Dunkin'",
+  "Peet's Coffee",
+  'Dutch Bros',
+  'Caribou Coffee',
+  'The Coffee Bean & Tea Leaf',
+  "Scooter's Coffee",
+  '7 Brew',
+  'Tim Hortons',
+  'Panera Bread',
+  'First Watch',
+  "Einstein Bros. Bagels",
+  'Krispy Kreme',
+  'Duck Donuts',
+  'Cinnabon',
+  "Auntie Anne's",
+  "Wetzel's Pretzels",
+  'Baskin-Robbins',
+  "Ben & Jerry's",
+  'Cold Stone Creamery',
+  "Menchie's",
+  'Yogurtland',
+  'Crumbl',
+  'Insomnia Cookies',
+  'Nothing Bundt Cakes',
+  "Rita's Italian Ice",
+  "Andy's Frozen Custard",
+  'Jamba',
+  'Smoothie King',
+  'Tropical Smoothie Cafe',
+] as const;
 
 /** Prefer these in the compact popular row when we know the user's region. */
 const FEATURED_NEARBY: Record<UsFoodRegion, string[]> = {

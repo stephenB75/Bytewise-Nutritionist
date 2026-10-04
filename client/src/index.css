@@ -2831,7 +2831,7 @@ select {
   input, 
   textarea, 
   select,
-  button {
+  button:not(.fastfood-style-pill):not(.fastfood-place-chip):not([data-testid^="fastfood-restaurant-"]):not([data-testid^="fastfood-cuisine-"]):not([data-testid="fastfood-more-places"]):not([data-testid="fastfood-use-location"]):not([data-testid="fastfood-more-places-footer"]) {
     min-height: 44px; /* iOS minimum touch target */
     font-size: 16px !important;
   }
@@ -6104,4 +6104,89 @@ button.tour-button-override:hover *,
 [data-testid*="food-item-"] div[class*="font-medium"],
 [data-testid*="food-item-"] div[class*="text-sm"] {
   color: #111827 !important; /* Dark text for all food card content */
+}
+
+/* Fast Food “Food style” chips — true pills; beat dialog/global button overrides */
+button.fastfood-style-pill,
+[data-radix-dialog-content] button.fastfood-style-pill,
+[role="dialog"] button.fastfood-style-pill {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  box-sizing: border-box !important;
+  min-height: 30px !important;
+  max-height: 30px !important;
+  height: 30px !important;
+  padding: 0 14px !important;
+  border: none !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  border-radius: 999px !important; /* full capsule / pill ends */
+  -webkit-border-radius: 999px !important;
+  overflow: hidden !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  line-height: 30px !important;
+  white-space: nowrap !important;
+  background-color: rgba(31, 74, 166, 0.12) !important;
+  background-image: none !important;
+  color: #1f4aa6 !important;
+  box-shadow: none !important;
+  outline: none !important;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+button.fastfood-style-pill:hover,
+[data-radix-dialog-content] button.fastfood-style-pill:hover,
+[role="dialog"] button.fastfood-style-pill:hover {
+  background-color: rgba(31, 74, 166, 0.15) !important;
+  color: #1f4aa6 !important;
+  border-color: transparent !important;
+}
+
+button.fastfood-style-pill.fastfood-style-pill--active,
+button.fastfood-style-pill--active,
+[data-radix-dialog-content] button.fastfood-style-pill.fastfood-style-pill--active,
+[role="dialog"] button.fastfood-style-pill.fastfood-style-pill--active {
+  background-color: #1f4aa6 !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+}
+
+button.fastfood-style-pill.fastfood-style-pill--active:hover,
+button.fastfood-style-pill--active:hover,
+[data-radix-dialog-content] button.fastfood-style-pill.fastfood-style-pill--active:hover,
+[role="dialog"] button.fastfood-style-pill.fastfood-style-pill--active:hover {
+  background-color: #0f2f75 !important;
+  color: #ffffff !important;
+}
+
+@media screen and (max-width: 768px) {
+  button.fastfood-style-pill,
+  [data-radix-dialog-content] button.fastfood-style-pill,
+  [role="dialog"] button.fastfood-style-pill {
+    min-height: 30px !important;
+    height: 30px !important;
+    max-height: 30px !important;
+    line-height: 30px !important;
+    font-size: 12px !important; /* chips are not text inputs; zoom rule N/A */
+    border-radius: 999px !important;
+  }
+
+  button.fastfood-place-chip,
+  button[data-testid^="fastfood-restaurant-"] {
+    min-height: 28px !important;
+    font-size: 12px !important;
+  }
+
+  button[data-testid="fastfood-more-places"],
+  button[data-testid="fastfood-use-location"],
+  button[data-testid="fastfood-more-places-footer"] {
+    min-height: 28px !important;
+    font-size: 12px !important;
+  }
 }

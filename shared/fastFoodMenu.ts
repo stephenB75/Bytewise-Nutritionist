@@ -14,16 +14,35 @@ import { SOUTHEAST_FAST_FOOD_ITEMS } from './fastFoodMenuSoutheast';
 import { CULTURAL_FAST_FOOD_ITEMS } from './fastFoodMenuCultural';
 import { DESSERT_FAST_FOOD_ITEMS } from './fastFoodMenuDesserts';
 import {
+  ASIAN_RESTAURANTS,
+  BBQ_RESTAURANTS,
+  BURGER_RESTAURANTS,
+  CAFE_RESTAURANTS,
   CARIBBEAN_RESTAURANTS,
+  CHICKEN_RESTAURANTS,
+  ITALIAN_RESTAURANTS,
+  MEDITERRANEAN_RESTAURANTS,
+  MEXICAN_RESTAURANTS,
+  SEAFOOD_RESTAURANTS,
   type FoodCuisine,
 } from './fastFoodRegions';
 
 /** Cuisine keyword → restaurant list (kept here so menu search never depends on a separate binding). */
 const CUISINE_RESTAURANTS: Record<FoodCuisine, readonly string[]> = {
   caribbean: CARIBBEAN_RESTAURANTS,
+  asian: ASIAN_RESTAURANTS,
+  mexican: MEXICAN_RESTAURANTS,
+  italian: ITALIAN_RESTAURANTS,
+  chicken: CHICKEN_RESTAURANTS,
+  burgers: BURGER_RESTAURANTS,
+  bbq: BBQ_RESTAURANTS,
+  mediterranean: MEDITERRANEAN_RESTAURANTS,
+  seafood: SEAFOOD_RESTAURANTS,
+  cafe: CAFE_RESTAURANTS,
 };
 
 const CUISINE_SEARCH_WORDS: Record<string, FoodCuisine> = {
+  // Caribbean
   caribbean: 'caribbean',
   carribean: 'caribbean',
   westindian: 'caribbean',
@@ -37,6 +56,56 @@ const CUISINE_SEARCH_WORDS: Record<string, FoodCuisine> = {
   cuban: 'caribbean',
   cuba: 'caribbean',
   jerk: 'caribbean',
+  // Asian
+  asian: 'asian',
+  chinese: 'asian',
+  japanese: 'asian',
+  korean: 'asian',
+  thai: 'asian',
+  vietnamese: 'asian',
+  teriyaki: 'asian',
+  sushi: 'asian',
+  // Mexican / Latin
+  mexican: 'mexican',
+  mexico: 'mexican',
+  texmex: 'mexican',
+  latino: 'mexican',
+  latin: 'mexican',
+  taco: 'mexican',
+  tacos: 'mexican',
+  // Italian
+  italian: 'italian',
+  italy: 'italian',
+  pizza: 'italian',
+  pasta: 'italian',
+  // Chicken
+  chicken: 'chicken',
+  wings: 'chicken',
+  // Burgers
+  burger: 'burgers',
+  burgers: 'burgers',
+  hamburger: 'burgers',
+  // BBQ
+  bbq: 'bbq',
+  barbecue: 'bbq',
+  barbeque: 'bbq',
+  southern: 'bbq',
+  steakhouse: 'bbq',
+  // Mediterranean
+  mediterranean: 'mediterranean',
+  greek: 'mediterranean',
+  middleeastern: 'mediterranean',
+  halal: 'mediterranean',
+  // Seafood
+  seafood: 'seafood',
+  fish: 'seafood',
+  // Cafe / coffee / sweets
+  cafe: 'cafe',
+  coffee: 'cafe',
+  bakery: 'cafe',
+  dessert: 'cafe',
+  desserts: 'cafe',
+  smoothie: 'cafe',
 };
 
 export function cuisineFromSearchQuery(query: string): FoodCuisine | null {
@@ -47,6 +116,13 @@ export function cuisineFromSearchQuery(query: string): FoodCuisine | null {
 export function restaurantsForCuisine(cuisine: FoodCuisine, catalog: string[]): string[] {
   const wanted = CUISINE_RESTAURANTS[cuisine] || [];
   return wanted.filter((name) => catalog.includes(name));
+}
+
+/** All cuisine ids that have at least one place in the catalog (for UI chips). */
+export function availableCuisines(catalog: string[]): FoodCuisine[] {
+  return (Object.keys(CUISINE_RESTAURANTS) as FoodCuisine[]).filter(
+    (cuisine) => restaurantsForCuisine(cuisine, catalog).length > 0
+  );
 }
 
 export type FastFoodCategory = 'breakfast' | 'sandwiches' | 'lunch' | 'dinner' | 'snacks';
