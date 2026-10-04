@@ -878,6 +878,26 @@ export class DatabaseStorage implements IStorage {
 
 
 
+    const todayMeals = await this.getUserMeals(
+      userId,
+      startOfToday,
+      new Date(startOfToday.getTime() + 24 * 60 * 60 * 1000),
+    );
+    const allMeals = await this.getUserMeals(userId);
+
+    // First meal ever
+    if (!achievementTypes.includes('first_meal_logged') && allMeals.length >= 1) {
+      const achievement = await this.createAchievement({
+        userId,
+        achievementType: 'first_meal_logged',
+        title: 'First Meal',
+        description: 'Log your first meal to start your nutrition journey',
+        iconName: 'utensils',
+        colorClass: 'bg-green-500/20 border-green-500/30'
+      });
+      newAchievements.push(achievement);
+    }
+
     // Check First Day Achievement
     if (!achievementTypes.includes('first_day_complete') && dailyStats.totalCalories >= 500) {
       const achievement = await this.createAchievement({
@@ -924,13 +944,21 @@ export class DatabaseStorage implements IStorage {
       newAchievements.push(achievement);
     }
 
-    // Check Three Meals Achievement
-    const todayMeals = await this.getUserMeals(
-      userId,
-      startOfToday,
-      new Date(startOfToday.getTime() + 24 * 60 * 60 * 1000),
-    );
+    // Water goal
+    const waterGoal = user.dailyWaterGoal || 8;
+    if (!achievementTypes.includes('water_goal_met') && (dailyStats.waterGlasses || 0) >= waterGoal) {
+      const achievement = await this.createAchievement({
+        userId,
+        achievementType: 'water_goal_met',
+        title: 'Hydration Hero',
+        description: 'Complete your daily water intake goal',
+        iconName: 'droplets',
+        colorClass: 'bg-sky-500/20 border-sky-500/30'
+      });
+      newAchievements.push(achievement);
+    }
 
+    // Check Three Meals Achievement
     if (!achievementTypes.includes('three_meals_logged') && todayMeals.length >= 3) {
       const achievement = await this.createAchievement({
         userId,
@@ -939,6 +967,19 @@ export class DatabaseStorage implements IStorage {
         description: 'Logged 3 or more meals in a day',
         iconName: 'utensils',
         colorClass: 'bg-blue-500/20 border-blue-500/30'
+      });
+      newAchievements.push(achievement);
+    }
+
+    // Meal century
+    if (!achievementTypes.includes('hundred_meals') && allMeals.length >= 100) {
+      const achievement = await this.createAchievement({
+        userId,
+        achievementType: 'hundred_meals',
+        title: 'Meal Century',
+        description: 'Log 100 total meals',
+        iconName: 'trophy',
+        colorClass: 'bg-yellow-500/20 border-yellow-500/30'
       });
       newAchievements.push(achievement);
     }
@@ -959,6 +1000,39 @@ export class DatabaseStorage implements IStorage {
         description: 'Tracked nutrition for 5 days this week',
         iconName: 'calendar',
         colorClass: 'bg-yellow-500/20 border-yellow-500/30'
+      });
+      newAchievements.push(achievement);
+    }
+
+    // Week warrior — 7 distinct days with meals (all-time)
+    const allMealDays = new Set(
+      allMeals.map(meal => new Date(meal.date).toISOString().split('T')[0])
+    ).size;
+    if (!achievementTypes.includes('weekly_consistency') && allMealDays >= 7) {
+      const achievement = await this.createAchievement({
+        userId,
+        achievementType: 'weekly_consistency',
+        title: 'Week Warrior',
+        description: 'Log meals on 7 different days',
+        iconName: 'crown',
+        colorClass: 'bg-yellow-500/20 border-yellow-500/30'
+      });
+      newAchievements.push(achievement);
+    }
+
+    // Calorie counter — 50k total calories tracked
+    const totalCaloriesTracked = allMeals.reduce(
+      (sum, meal) => sum + (Number(meal.totalCalories) || 0),
+      0,
+    );
+    if (!achievementTypes.includes('thousand_calories_tracked') && totalCaloriesTracked >= 50000) {
+      const achievement = await this.createAchievement({
+        userId,
+        achievementType: 'thousand_calories_tracked',
+        title: 'Calorie Counter',
+        description: 'Track 50,000 total calories',
+        iconName: 'activity',
+        colorClass: 'bg-orange-500/20 border-orange-500/30'
       });
       newAchievements.push(achievement);
     }

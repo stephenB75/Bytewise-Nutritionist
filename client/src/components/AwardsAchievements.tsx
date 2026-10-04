@@ -57,9 +57,9 @@ interface Achievement {
   reward?: string;
 }
 
-// Comprehensive list of all possible achievements
+/** IDs must match server `checkAndCreateAchievements` achievementType values. */
 const ALL_ACHIEVEMENTS: Omit<Achievement, 'progress' | 'completed' | 'completedDate'>[] = [
-  // Daily Achievements
+  // Daily
   {
     id: 'first_meal_logged',
     title: 'First Meal',
@@ -68,7 +68,17 @@ const ALL_ACHIEVEMENTS: Omit<Achievement, 'progress' | 'completed' | 'completedD
     category: 'daily',
     difficulty: 'bronze',
     target: 1,
-    points: 10
+    points: 10,
+  },
+  {
+    id: 'first_day_complete',
+    title: 'First Day Complete',
+    description: 'Log at least 500 calories in a day',
+    icon: '🌅',
+    category: 'daily',
+    difficulty: 'bronze',
+    target: 1,
+    points: 15,
   },
   {
     id: 'calorie_goal_met',
@@ -78,7 +88,7 @@ const ALL_ACHIEVEMENTS: Omit<Achievement, 'progress' | 'completed' | 'completedD
     category: 'daily',
     difficulty: 'bronze',
     target: 1,
-    points: 15
+    points: 15,
   },
   {
     id: 'protein_goal_met',
@@ -88,7 +98,7 @@ const ALL_ACHIEVEMENTS: Omit<Achievement, 'progress' | 'completed' | 'completedD
     category: 'daily',
     difficulty: 'bronze',
     target: 1,
-    points: 10
+    points: 10,
   },
   {
     id: 'water_goal_met',
@@ -98,74 +108,42 @@ const ALL_ACHIEVEMENTS: Omit<Achievement, 'progress' | 'completed' | 'completedD
     category: 'daily',
     difficulty: 'bronze',
     target: 1,
-    points: 10
+    points: 10,
   },
   {
-    id: 'three_meals_day',
+    id: 'three_meals_logged',
     title: 'Three Meals Champion',
-    description: 'Log breakfast, lunch, and dinner in one day',
+    description: 'Log 3 or more meals in one day',
     icon: '🍽️',
     category: 'daily',
     difficulty: 'silver',
     target: 3,
-    points: 20
+    points: 20,
   },
 
-  // Weekly Achievements  
+  // Weekly
   {
-    id: 'three_day_streak',
-    title: '3 Day Streak',
-    description: 'Track nutrition for 3 consecutive days',
+    id: 'five_day_streak',
+    title: '5 Day Streak',
+    description: 'Track nutrition for 5 days this week',
     icon: '🔥',
     category: 'weekly',
     difficulty: 'silver',
-    target: 3,
-    points: 25
+    target: 5,
+    points: 35,
   },
   {
     id: 'weekly_consistency',
     title: 'Week Warrior',
-    description: 'Log meals for 7 consecutive days',
+    description: 'Log meals on 7 different days',
     icon: '👑',
     category: 'weekly',
     difficulty: 'gold',
     target: 7,
-    points: 50
-  },
-  {
-    id: 'weekly_calorie_average',
-    title: 'Weekly Balance',
-    description: 'Maintain your weekly calorie average',
-    icon: '⚖️',
-    category: 'weekly',
-    difficulty: 'silver',
-    target: 7,
-    points: 35
+    points: 50,
   },
 
-  // Monthly Achievements
-  {
-    id: 'monthly_consistency',
-    title: 'Month Master',
-    description: 'Log meals for 20 days in a month',
-    icon: '🏆',
-    category: 'monthly',
-    difficulty: 'gold',
-    target: 20,
-    points: 100
-  },
-  {
-    id: 'monthly_calorie_goals',
-    title: 'Monthly Goal Crusher',
-    description: 'Hit calorie goals for 15 days in a month',
-    icon: '🎯',
-    category: 'monthly',
-    difficulty: 'gold',
-    target: 15,
-    points: 75
-  },
-
-  // Milestone Achievements
+  // Milestone
   {
     id: 'hundred_meals',
     title: 'Meal Century',
@@ -174,7 +152,7 @@ const ALL_ACHIEVEMENTS: Omit<Achievement, 'progress' | 'completed' | 'completedD
     category: 'milestone',
     difficulty: 'platinum',
     target: 100,
-    points: 150
+    points: 150,
   },
   {
     id: 'thousand_calories_tracked',
@@ -184,41 +162,52 @@ const ALL_ACHIEVEMENTS: Omit<Achievement, 'progress' | 'completed' | 'completedD
     category: 'milestone',
     difficulty: 'gold',
     target: 50000,
-    points: 100
-  },
-  {
-    id: 'nutrition_master',
-    title: 'Nutrition Master',
-    description: 'Achieve 30 daily goals',
-    icon: '🧠',
-    category: 'milestone',
-    difficulty: 'platinum',
-    target: 30,
-    points: 200
+    points: 100,
   },
 
-  // Special Achievements
+  // Special / fasting
   {
-    id: 'fasting_beginner',
+    id: 'first_fast_completed',
     title: 'Fasting Beginner',
     description: 'Complete your first intermittent fast',
     icon: '⏰',
     category: 'special',
     difficulty: 'bronze',
     target: 1,
-    points: 25
+    points: 25,
   },
   {
-    id: 'fasting_warrior',
-    title: 'Fasting Warrior',
-    description: 'Complete 10 fasting sessions',
+    id: 'five_fasts_completed',
+    title: 'Fasting Streak',
+    description: 'Complete 5 intermittent fasting sessions',
+    icon: '🔥',
+    category: 'special',
+    difficulty: 'silver',
+    target: 5,
+    points: 50,
+  },
+  {
+    id: 'twenty_fasts_completed',
+    title: 'Fasting Master',
+    description: 'Complete 20 intermittent fasting sessions',
     icon: '⚔️',
     category: 'special',
     difficulty: 'gold',
-    target: 10,
-    points: 75
-  }
+    target: 20,
+    points: 100,
+  },
 ];
+
+function mealDateKey(meal: any): string {
+  const raw = meal?.date;
+  if (!raw) return '';
+  if (typeof raw === 'string') return raw.includes('T') ? raw.split('T')[0] : raw.slice(0, 10);
+  try {
+    return getLocalDateKey(new Date(raw));
+  } catch {
+    return '';
+  }
+}
 
 interface AwardsAchievementsProps {
   onClose?: () => void;
@@ -244,7 +233,6 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
     { id: 'all', name: 'All', icon: Grid },
     { id: 'daily', name: 'Daily', icon: Sun },
     { id: 'weekly', name: 'Weekly', icon: Calendar },
-    { id: 'monthly', name: 'Monthly', icon: CalendarCheck },
     { id: 'milestone', name: 'Milestones', icon: Flag },
     { id: 'special', name: 'Special', icon: Crown }
   ];
@@ -272,30 +260,49 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
     queryKey: ['/api/user/progress', user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
-      
+
+      const empty = {
+        dailyStats: { totalCalories: 0, totalProtein: 0, waterGlasses: 0 },
+        allMeals: [] as any[],
+        fastingHistory: [] as any[],
+        calorieGoal: (user as any).dailyCalorieGoal || 2000,
+        proteinGoal: (user as any).dailyProteinGoal || 150,
+        waterGoal: (user as any).dailyWaterGoal || 8,
+      };
+
       try {
-        const response = await apiRequest('GET', `/api/users/${user.id}/daily-stats?date=${getLocalDateKey()}`);
-        const dailyStats = await response.json();
-        
-        // Get additional data from localStorage for offline tracking
-        const weeklyMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-        const fastingHistory = JSON.parse(localStorage.getItem('fastingHistory') || '[]');
-        const aiAnalyzerUsage = JSON.parse(localStorage.getItem('aiAnalyzerUsage') || '[]');
-        
+        const [statsRes, mealsRes, fastingRes] = await Promise.all([
+          apiRequest('GET', `/api/users/${user.id}/daily-stats?date=${getLocalDateKey()}`),
+          apiRequest('GET', '/api/meals/logged'),
+          apiRequest('GET', '/api/fasting/history').catch(() => null),
+        ]);
+        const dailyStats = await statsRes.json();
+        const mealsPayload = await mealsRes.json();
+        const allMeals = Array.isArray(mealsPayload)
+          ? mealsPayload
+          : Array.isArray(mealsPayload?.meals)
+            ? mealsPayload.meals
+            : [];
+        let fastingHistory: any[] = [];
+        if (fastingRes) {
+          const fastingPayload = await fastingRes.json();
+          fastingHistory = Array.isArray(fastingPayload)
+            ? fastingPayload
+            : Array.isArray(fastingPayload?.sessions)
+              ? fastingPayload.sessions
+              : Array.isArray(fastingPayload?.history)
+                ? fastingPayload.history
+                : [];
+        }
         return {
+          ...empty,
           dailyStats,
-          weeklyMeals,
+          allMeals,
           fastingHistory,
-          aiAnalyzerUsage
         };
       } catch (error) {
-        console.error('Error fetching daily stats:', error);
-        return {
-          dailyStats: { totalCalories: 0, totalProtein: 0, waterGlasses: 0 },
-          weeklyMeals: JSON.parse(localStorage.getItem('weeklyMeals') || '[]'),
-          fastingHistory: JSON.parse(localStorage.getItem('fastingHistory') || '[]'),
-          aiAnalyzerUsage: JSON.parse(localStorage.getItem('aiAnalyzerUsage') || '[]')
-        };
+        console.error('Error fetching progress data:', error);
+        return empty;
       }
     },
     enabled: !!user,
@@ -322,141 +329,163 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
     enabled: !!user,
   });
 
-  // Calculate user progress for all achievements
-  const calculateProgress = (achievement: typeof ALL_ACHIEVEMENTS[0], progressData: any): { progress: number; completed: boolean; completedDate?: Date } => {
-    if (!progressData) return { progress: 0, completed: false };
-    
-    const { dailyStats, weeklyMeals = [], fastingHistory = [], aiAnalyzerUsage = [] } = progressData;
-    
-    // Check if achievement is already completed
-    const completedAchievement = achievementsData?.achievements?.find((a: any) => a.achievementType === achievement.id);
+  // Calculate user progress for all achievements (IDs match server achievementType)
+  const calculateProgress = (
+    achievement: typeof ALL_ACHIEVEMENTS[0],
+    data: NonNullable<typeof progressData>,
+  ): { progress: number; completed: boolean; completedDate?: Date } => {
+    const completedAchievement = achievementsData?.achievements?.find(
+      (a: any) => a.achievementType === achievement.id,
+    );
     if (completedAchievement) {
-      return { 
-        progress: achievement.target, 
-        completed: true, 
-        completedDate: new Date(completedAchievement.earnedAt) 
+      return {
+        progress: achievement.target,
+        completed: true,
+        completedDate: new Date(completedAchievement.earnedAt),
       };
     }
 
+    const {
+      dailyStats,
+      allMeals = [],
+      fastingHistory = [],
+      calorieGoal = 2000,
+      proteinGoal = 150,
+      waterGoal = 8,
+    } = data;
+    const today = getLocalDateKey();
+    const todayMeals = allMeals.filter((meal: any) => mealDateKey(meal) === today);
+    const uniqueDays = new Set(allMeals.map((m: any) => mealDateKey(m)).filter(Boolean));
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    const weekAgoKey = getLocalDateKey(weekAgo);
+    const weekDays = new Set(
+      allMeals
+        .map((m: any) => mealDateKey(m))
+        .filter((d: string) => d && d >= weekAgoKey),
+    );
+    const completedFasts = fastingHistory.filter((f: any) => f.status === 'completed').length;
+    const totalCalories = allMeals.reduce(
+      (sum: number, meal: any) => sum + (Number(meal.totalCalories ?? meal.calories) || 0),
+      0,
+    );
+
     switch (achievement.id) {
       case 'first_meal_logged':
-        return { progress: weeklyMeals.length > 0 ? 1 : 0, completed: weeklyMeals.length > 0 };
-        
-      case 'calorie_goal_met':
-        const calorieGoalMet = dailyStats?.totalCalories >= 1800 && dailyStats?.totalCalories <= 2200;
-        return { progress: calorieGoalMet ? 1 : 0, completed: calorieGoalMet };
-        
-      case 'protein_goal_met':
-        const proteinGoalMet = dailyStats?.totalProtein >= 120;
-        return { progress: proteinGoalMet ? 1 : 0, completed: proteinGoalMet };
-        
-      case 'water_goal_met':
-        const waterGoalMet = dailyStats?.waterGlasses >= 8;
-        return { progress: waterGoalMet ? 1 : 0, completed: waterGoalMet };
-        
-      case 'three_meals_day':
-        const today = getLocalDateKey();
-        const todayMeals = weeklyMeals.filter((meal: any) => {
-          const mealDate = meal.date?.includes('T') ? meal.date.split('T')[0] : meal.date;
-          return mealDate === today;
-        });
-        return { progress: Math.min(todayMeals.length, 3), completed: todayMeals.length >= 3 };
-        
-      case 'three_day_streak':
+        return { progress: allMeals.length > 0 ? 1 : 0, completed: allMeals.length > 0 };
+
+      case 'first_day_complete': {
+        const met = (dailyStats?.totalCalories || 0) >= 500;
+        return { progress: met ? 1 : 0, completed: met };
+      }
+
+      case 'calorie_goal_met': {
+        const cal = dailyStats?.totalCalories || 0;
+        const met = cal >= calorieGoal * 0.9 && cal <= calorieGoal * 1.1;
+        return { progress: met ? 1 : 0, completed: met };
+      }
+
+      case 'protein_goal_met': {
+        const met = (dailyStats?.totalProtein || 0) >= proteinGoal * 0.9;
+        return { progress: met ? 1 : 0, completed: met };
+      }
+
+      case 'water_goal_met': {
+        const met = (dailyStats?.waterGlasses || 0) >= waterGoal;
+        return { progress: met ? 1 : 0, completed: met };
+      }
+
+      case 'three_meals_logged':
+        return {
+          progress: Math.min(todayMeals.length, 3),
+          completed: todayMeals.length >= 3,
+        };
+
+      case 'five_day_streak':
+        return {
+          progress: Math.min(weekDays.size, 5),
+          completed: weekDays.size >= 5,
+        };
+
       case 'weekly_consistency':
-        // Calculate consecutive days with meals logged
-        const uniqueDatesArray = weeklyMeals.map((meal: any) => {
-          const mealDate = meal.date?.includes('T') ? meal.date.split('T')[0] : meal.date;
-          return mealDate;
-        });
-        const uniqueDates = Array.from(new Set(uniqueDatesArray)).sort();
-        
-        if (achievement.id === 'three_day_streak') {
-          let currentStreak = 0;
-          let maxStreak = 0;
-          const today_date = getLocalDateKey();
-          
-          for (let i = uniqueDates.length - 1; i >= 0; i--) {
-            const expectedDate = new Date();
-            expectedDate.setDate(expectedDate.getDate() - (uniqueDates.length - 1 - i));
-            const expectedDateStr = getLocalDateKey(expectedDate);
-            
-            if (uniqueDates[i] === expectedDateStr || (i === uniqueDates.length - 1 && uniqueDates[i] === today_date)) {
-              currentStreak++;
-              maxStreak = Math.max(maxStreak, currentStreak);
-            } else {
-              currentStreak = 0;
-            }
-          }
-          
-          return { progress: Math.min(maxStreak, 3), completed: maxStreak >= 3 };
-        } else {
-          return { progress: Math.min(uniqueDates.length, 7), completed: uniqueDates.length >= 7 };
-        }
-        
-      case 'fasting_beginner':
-        const completedFasts = fastingHistory.filter((f: any) => f.status === 'completed').length;
-        return { progress: Math.min(completedFasts, 1), completed: completedFasts >= 1 };
-        
-      case 'fasting_warrior':
-        const totalCompletedFasts = fastingHistory.filter((f: any) => f.status === 'completed').length;
-        return { progress: Math.min(totalCompletedFasts, 10), completed: totalCompletedFasts >= 10 };
-        
+        return {
+          progress: Math.min(uniqueDays.size, 7),
+          completed: uniqueDays.size >= 7,
+        };
+
       case 'hundred_meals':
-        return { progress: Math.min(weeklyMeals.length, 100), completed: weeklyMeals.length >= 100 };
-        
+        return {
+          progress: Math.min(allMeals.length, 100),
+          completed: allMeals.length >= 100,
+        };
+
       case 'thousand_calories_tracked':
-        const totalCalories = weeklyMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
-        return { progress: Math.min(totalCalories, 50000), completed: totalCalories >= 50000 };
-        
-      case 'calorie_counter':
-        const totalTrackedCalories = weeklyMeals.reduce((sum: number, meal: any) => sum + (meal.calories || 0), 0);
-        return { progress: Math.min(totalTrackedCalories, 50000), completed: totalTrackedCalories >= 50000 };
-        
+        return {
+          progress: Math.min(totalCalories, 50000),
+          completed: totalCalories >= 50000,
+        };
+
+      case 'first_fast_completed':
+        return {
+          progress: Math.min(completedFasts, 1),
+          completed: completedFasts >= 1,
+        };
+
+      case 'five_fasts_completed':
+        return {
+          progress: Math.min(completedFasts, 5),
+          completed: completedFasts >= 5,
+        };
+
+      case 'twenty_fasts_completed':
+        return {
+          progress: Math.min(completedFasts, 20),
+          completed: completedFasts >= 20,
+        };
+
       default:
         return { progress: 0, completed: false };
     }
   };
 
-  // Update local state when data changes  
+  // Update local state when data changes
   useEffect(() => {
-    if (achievementsData?.achievements) {
-      // Map backend achievements to frontend format
-      const backendAchievements = achievementsData.achievements.map((dbAchievement: any) => {
-        // Find the matching static achievement definition
-        const staticAchievement = ALL_ACHIEVEMENTS.find(a => a.id === dbAchievement.achievementType);
-        
+    const unlocked = achievementsData?.achievements || [];
+    const completedTypes = new Set(unlocked.map((a: any) => a.achievementType));
+
+    const backendAchievements = unlocked.map((dbAchievement: any) => {
+      const staticAchievement = ALL_ACHIEVEMENTS.find(a => a.id === dbAchievement.achievementType);
+      return {
+        id: dbAchievement.achievementType,
+        title: dbAchievement.title,
+        description: dbAchievement.description,
+        icon: staticAchievement?.icon || '🏅',
+        category: staticAchievement?.category || ('daily' as const),
+        difficulty: staticAchievement?.difficulty || ('bronze' as const),
+        progress: staticAchievement?.target || 1,
+        target: staticAchievement?.target || 1,
+        completed: true,
+        completedDate: new Date(dbAchievement.earnedAt),
+        points: staticAchievement?.points || 10,
+      };
+    });
+
+    const incompleteAchievements = ALL_ACHIEVEMENTS
+      .filter(a => !completedTypes.has(a.id))
+      .map(achievement => {
+        const { progress, completed, completedDate } = progressData
+          ? calculateProgress(achievement, progressData)
+          : { progress: 0, completed: false as const };
         return {
-          id: dbAchievement.achievementType,
-          title: dbAchievement.title,
-          description: dbAchievement.description,
-          icon: staticAchievement?.icon || '🏅',
-          category: staticAchievement?.category || 'daily',
-          difficulty: staticAchievement?.difficulty || 'bronze',
-          progress: staticAchievement?.target || 1,
-          target: staticAchievement?.target || 1,
-          completed: true,
-          completedDate: new Date(dbAchievement.earnedAt),
-          points: staticAchievement?.points || 10
+          ...achievement,
+          progress,
+          completed,
+          completedDate,
         };
       });
 
-      // Add incomplete achievements (show progress for achievable ones)
-      const completedTypes = new Set(backendAchievements.map((a: any) => a.id));
-      const incompleteAchievements = ALL_ACHIEVEMENTS
-        .filter(a => !completedTypes.has(a.id))
-        .map(achievement => ({
-          ...achievement,
-          progress: 0,
-          completed: false
-        }));
-
-      setAchievements([...backendAchievements, ...incompleteAchievements]);
-    } else {
-      // Show all achievements as incomplete if no backend data
-      setAchievements(ALL_ACHIEVEMENTS.map(a => ({ ...a, progress: 0, completed: false })));
-    }
-  }, [achievementsData]);
+    setAchievements([...backendAchievements, ...incompleteAchievements]);
+  }, [achievementsData, progressData]);
 
   // Update user stats when data changes
   useEffect(() => {
@@ -577,7 +606,7 @@ export function AwardsAchievements({ onClose }: AwardsAchievementsProps) {
         </div>
 
         {/* Category Filter */}
-        <div className="grid grid-cols-3 lg:grid-cols-6 gap-6 my-8">
+        <div className="grid grid-cols-3 lg:grid-cols-5 gap-6 my-8">
           {categories.map((category) => {
             const IconComponent = category.icon;
             const isActive = selectedCategory === category.id;

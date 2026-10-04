@@ -93,9 +93,28 @@ export function FastFoodMenu() {
   const morePlacesCount = Math.max(0, FAST_FOOD_RESTAURANTS.length - visiblePlaces.length);
 
   const results = useMemo(() => {
-    if (!activePlace && !query.trim()) return [];
-    return searchFastFood(query, category, restaurant);
+    const trimmed = query.trim();
+    if (!activePlace && !trimmed) return [];
+    // Without a selected place, only search once the query looks like a meal name
+    // (avoid dumping the whole catalog for 1–2 character keystrokes).
+    if (!activePlace && trimmed.length < 3) return [];
+    const hits = searchFastFood(query, category, restaurant);
+    if (activePlace) return hits;
+    const qNorm = trimmed.toLowerCase();
+    // Prefer items whose name matches the typed meal; keep restaurant on each card.
+    return [...hits]
+      .sort((a, b) => {
+        const aName = a.name.toLowerCase();
+        const bName = b.name.toLowerCase();
+        const aExact = aName === qNorm || aName.startsWith(qNorm) ? 0 : aName.includes(qNorm) ? 1 : 2;
+        const bExact = bName === qNorm || bName.startsWith(qNorm) ? 0 : bName.includes(qNorm) ? 1 : 2;
+        if (aExact !== bExact) return aExact - bExact;
+        return a.name.localeCompare(b.name) || a.restaurant.localeCompare(b.restaurant);
+      })
+      .slice(0, 60);
   }, [query, category, restaurant, activePlace]);
+
+  const showItemResults = Boolean(activePlace) || (query.trim().length >= 3 && results.length > 0);
 
   const selectPlace = (name: string) => {
     setRestaurant((current) => (current === name ? 'all' : name));
@@ -259,23 +278,27 @@ export function FastFoodMenu() {
         )}
       </div>
 
-      {activePlace && (
+      {showItemResults && (
         <div className="mb-3 flex items-baseline justify-between gap-3" data-testid="fastfood-selected-place">
-          <p className="text-sm font-bold text-gray-900 truncate">{activePlace}</p>
+          <p className="text-sm font-bold text-gray-900 truncate">
+            {activePlace || 'Matching meals'}
+          </p>
           <div className="flex items-center gap-3 shrink-0">
             <p className="text-[11px] text-gray-600">{results.length} items</p>
-            <button
-              type="button"
-              onClick={() => {
-                setRestaurant('all');
-                setQuery('');
-                setCategory('all');
-              }}
-              className="bg-[transparent] p-0 text-xs font-semibold text-[#1f4aa6]"
-              data-testid="fastfood-change-place"
-            >
-              Clear
-            </button>
+            {(activePlace || query.trim()) && (
+              <button
+                type="button"
+                onClick={() => {
+                  setRestaurant('all');
+                  setQuery('');
+                  setCategory('all');
+                }}
+                className="bg-[transparent] p-0 text-xs font-semibold text-[#1f4aa6]"
+                data-testid="fastfood-change-place"
+              >
+                Clear
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -304,14 +327,18 @@ export function FastFoodMenu() {
         </div>
       )}
 
-      {!activePlace ? (
-        <p className="text-sm text-gray-600 py-4">Tap a place to see the menu. Tap a meal to add it to Journal.</p>
+      {!showItemResults ? (
+        <p className="text-sm text-gray-600 py-4">
+          {query.trim().length >= 3
+            ? 'No matching meals. Try another name, or tap a place to browse its menu.'
+            : 'Tap a place or type a meal name (Big Mac, Whopper…). Tap a meal to add it to Journal.'}
+        </p>
       ) : results.length === 0 ? (
         <p className="text-sm text-gray-600 py-4">No matches in this menu. Try another search.</p>
       ) : (
         <div className="-mx-1 overflow-x-auto pb-1 [scrollbar-width:thin]" data-testid="fastfood-results">
           <div
-            key={`${activePlace}-${category}-${query}`}
+            key={`${activePlace || 'all'}-${category}-${query}`}
             className="grid w-max grid-flow-col grid-rows-5 gap-1.5 auto-cols-[136px] sm:auto-cols-[148px] sm:grid-rows-4"
           >
             {results.map((item, index) => {
@@ -333,6 +360,9 @@ export function FastFoodMenu() {
                   data-testid={`fastfood-item-${item.id}`}
                 >
                   <p className="truncate text-[11px] font-semibold leading-tight text-gray-900">{item.name}</p>
+                  {!activePlace && (
+                    <p className="truncate text-[9px] font-medium leading-tight text-[#1f4aa6]">{item.restaurant}</p>
+                  )}
                   <p
                     className="mt-0.5 bg-inherit text-[16px] font-bold leading-none tabular-nums"
                     style={{ color: added ? '#15803d' : tone.color }}
