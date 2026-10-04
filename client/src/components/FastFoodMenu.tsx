@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { logMeal } from '@/lib/mealsApi';
@@ -9,65 +9,56 @@ import {
   FAST_FOOD_CATEGORIES,
   FAST_FOOD_ITEMS,
   FAST_FOOD_RESTAURANTS,
+  featuredNearbyRestaurants,
+  matchFastFoodRestaurants,
+  regionFromCoords,
+  REGION_LABELS,
   searchFastFood,
+  suggestFastFoodRestaurants,
   type FastFoodCategory,
   type FastFoodItem,
+  type UsFoodRegion,
 } from '@/data/fastFoodMenu';
-import { Check, Loader2, Plus, Search, Store, X } from 'lucide-react';
+import { Check, Loader2, MapPin, Search, Store, X } from 'lucide-react';
 
-const chipRow = 'flex flex-wrap gap-2';
 const ADDED_CONFIRMATION_MS = 2500;
 
-const POPULAR_RESTAURANTS = [
+function calorieTone(calories: number) {
+  if (calories < 400) return { color: '#059669', wash: 'bg-emerald-100' };
+  if (calories < 800) return { color: '#d97706', wash: 'bg-amber-100' };
+  return { color: '#ea580c', wash: 'bg-orange-100' };
+}
+
+const PINNED_POPULAR = [
   "McDonald's",
   'Chick-fil-A',
   'Taco Bell',
   "Wendy's",
-  'Burger King',
-  'Subway',
   'Chipotle',
   'Starbucks',
+  'Subway',
+  'Burger King',
   'Popeyes',
   'Panda Express',
   "Dunkin'",
   'KFC',
   'IHOP',
-  "Olive Garden",
+  'Olive Garden',
   "Chili's",
-  'Pollo Tropical',
-  'La Granja',
-  'Hawkers',
 ];
 
-function Chip({ active, label, onClick, testId }: { active: boolean; label: string; onClick: () => void; testId: string }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`shrink-0 whitespace-nowrap min-h-[36px] px-3 py-1 rounded-full text-xs font-semibold ring-1 ring-inset transition-colors ${
-        active ? 'bg-[#1f4aa6] text-[#ffffff] ring-[#1f4aa6]' : 'bg-white text-gray-800 ring-amber-300 hover:bg-amber-50'
-      }`}
-      data-testid={testId}
-    >
-      {label}
-    </button>
-  );
-}
-
-function PlaceLink({ active, label, onClick, testId }: { active: boolean; label: string; onClick: () => void; testId: string }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={active}
-      className={`bg-[transparent] whitespace-nowrap min-h-[32px] px-0 py-1 text-sm underline-offset-4 ${
-        active ? 'font-bold text-[#0f2f75] underline decoration-2' : 'font-medium text-[#1f4aa6] hover:underline'
-      }`}
-      data-testid={testId}
-    >
-      {label}
-    </button>
-  );
+function requestUserRegion(): Promise<UsFoodRegion | null> {
+  return new Promise((resolve) => {
+    if (!navigator.geolocation) {
+      resolve(null);
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (position) => resolve(regionFromCoords(position.coords.latitude, position.coords.longitude)),
+      () => resolve(null),
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 30 * 60 * 1000 }
+    );
+  });
 }
 
 export function FastFoodMenu() {
@@ -76,24 +67,47 @@ export function FastFoodMenu() {
   const [restaurant, setRestaurant] = useState<string | 'all'>('all');
   const [savingIds, setSavingIds] = useState<Set<string>>(new Set());
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
-  const [showAllPlaces, setShowAllPlaces] = useState(false);
+  const [region, setRegion] = useState<UsFoodRegion | null>(null);
+  const [locationStatus, setLocationStatus] = useState<'idle' | 'asking' | 'ready' | 'denied'>('idle');
 
   const visiblePlaces = useMemo(() => {
-    if (showAllPlaces) return FAST_FOOD_RESTAURANTS;
-    const places = POPULAR_RESTAURANTS.filter((name) => FAST_FOOD_RESTAURANTS.includes(name));
-    return restaurant !== 'all' && !places.includes(restaurant) ? [...places, restaurant] : places;
-  }, [showAllPlaces, restaurant]);
-  const hiddenPlaceCount = FAST_FOOD_RESTAURANTS.length - visiblePlaces.length;
-  const listRef = useRef<HTMLUListElement>(null);
+    const pinned = PINNED_POPULAR.filter((name) => FAST_FOOD_RESTAURANTS.includes(name));
+    const extras = FAST_FOOD_RESTAURANTS.filter((name) => !pinned.includes(name));
+    if (!region) return [...pinned, ...extras].slice(0, 30);
+    const nearby = featuredNearbyRestaurants(region, FAST_FOOD_RESTAURANTS, 3).filter((name) => !pinned.includes(name));
+    const rest = extras.filter((name) => !nearby.includes(name));
+    return [...nearby, ...pinned, ...rest].slice(0, 30);
+  }, [region]);
 
-  const results = useMemo(() => searchFastFood(query, category, restaurant), [query, category, restaurant]);
-  const filtered = query.trim() !== '' || category !== 'all' || restaurant !== 'all';
+  const queryPlaces = useMemo(() => matchFastFoodRestaurants(query), [query]);
+  const placeSuggestions = useMemo(() => suggestFastFoodRestaurants(query, 12), [query]);
+  const activePlace = restaurant !== 'all' ? restaurant : queryPlaces.length === 1 ? queryPlaces[0] : null;
+  const gridPlaces = query.trim() && restaurant === 'all' && placeSuggestions.length > 0 ? placeSuggestions : visiblePlaces;
 
-  useEffect(() => {
-    listRef.current?.scrollTo({ top: 0 });
-  }, [query, category, restaurant]);
+  const results = useMemo(() => {
+    if (!activePlace && !query.trim()) return [];
+    return searchFastFood(query, category, restaurant);
+  }, [query, category, restaurant, activePlace]);
+
+  const selectPlace = (name: string) => {
+    setRestaurant((current) => (current === name ? 'all' : name));
+    setQuery('');
+    setCategory('all');
+  };
+
+  const useMyLocation = async () => {
+    setLocationStatus('asking');
+    const next = await requestUserRegion();
+    if (next) {
+      setRegion(next);
+      setLocationStatus('ready');
+    } else {
+      setLocationStatus('denied');
+    }
+  };
 
   const addItem = async (item: FastFoodItem) => {
+    if (savingIds.has(item.id) || addedIds.has(item.id)) return;
     setSavingIds((prev) => new Set(prev).add(item.id));
     const mealType = getMealTypeByTime(new Date());
     try {
@@ -132,37 +146,27 @@ export function FastFoodMenu() {
     }
   };
 
-  const resetFilters = () => {
-    setQuery('');
-    setCategory('all');
-    setRestaurant('all');
-  };
-
   return (
     <Card className="mt-4 p-4 bg-white/95 border-amber-200 shadow-md" data-testid="fastfood-menu">
-      <div className="mb-3">
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 min-w-0">
-            <Store className="w-5 h-5 text-[#1f4aa6] shrink-0" />
-            <h3 className="text-lg font-bold text-gray-900 truncate">Popular Fast Food</h3>
-          </div>
-          <span className="text-[11px] text-gray-700 shrink-0">
-            {FAST_FOOD_ITEMS.length} items · {FAST_FOOD_RESTAURANTS.length} places
-          </span>
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <Store className="w-5 h-5 text-[#1f4aa6] shrink-0" />
+          <h3 className="text-lg font-bold text-gray-900 truncate">Popular Fast Food</h3>
         </div>
-        <p className="mt-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm leading-snug text-gray-800">
-          Tap + to log a meal. It shows up on Journal under Logged Today.
-        </p>
+        <span className="text-[11px] text-gray-700 shrink-0">
+          {FAST_FOOD_ITEMS.length} items · {FAST_FOOD_RESTAURANTS.length} places
+        </span>
       </div>
 
-      <div className="relative mb-3">
+      <div className="relative mb-4">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
         <Input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search Big Mac, burrito, pizza…"
+          placeholder={activePlace ? `Search the ${activePlace} menu…` : 'Search a restaurant or item…'}
           className="pl-9 pr-9 bg-white text-gray-900"
           data-testid="fastfood-search"
+          autoComplete="off"
         />
         {query && (
           <button
@@ -176,122 +180,156 @@ export function FastFoodMenu() {
         )}
       </div>
 
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-0.5 mb-3" data-testid="fastfood-restaurants">
-        <PlaceLink active={restaurant === 'all'} label="All places" onClick={() => setRestaurant('all')} testId="fastfood-restaurant-all" />
-        {visiblePlaces.map((name) => (
-          <PlaceLink
-            key={name}
-            active={restaurant === name}
-            label={name}
-            onClick={() => setRestaurant(restaurant === name ? 'all' : name)}
-            testId={`fastfood-restaurant-${name}`}
-          />
-        ))}
-        {(showAllPlaces || hiddenPlaceCount > 0) && (
+      <div className="mb-4" data-testid="fastfood-restaurants">
+        <div className="flex items-center justify-between gap-2 mb-2">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-600">
+            {query.trim() && restaurant === 'all' && placeSuggestions.length > 0
+              ? 'Matching places'
+              : region
+                ? `Places · ${REGION_LABELS[region]}`
+                : 'Places'}
+          </p>
+          {locationStatus !== 'ready' && (
+            <button
+              type="button"
+              onClick={useMyLocation}
+              disabled={locationStatus === 'asking'}
+              className="inline-flex items-center gap-1 bg-[transparent] min-h-[28px] px-0 text-xs font-semibold text-[#1f4aa6]"
+              data-testid="fastfood-use-location"
+            >
+              {locationStatus === 'asking' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <MapPin className="w-3.5 h-3.5" />}
+              {locationStatus === 'denied' ? 'Location off' : 'Near you'}
+            </button>
+          )}
+        </div>
+        <div className="-mx-1 overflow-x-auto pb-0.5 [scrollbar-width:thin]">
+          <div className="grid w-max grid-flow-col grid-rows-5 gap-x-4 gap-y-0.5 auto-cols-[max-content]">
+            {gridPlaces.map((name) => {
+              const selected = activePlace === name;
+              return (
+                <button
+                  key={name}
+                  type="button"
+                  onClick={() => selectPlace(name)}
+                  aria-pressed={selected}
+                  className={`bg-[transparent] min-h-[26px] px-0 py-0.5 text-left text-[12px] leading-snug whitespace-nowrap ${
+                    selected ? 'font-bold text-[#0f2f75]' : 'font-medium text-[#1f4aa6] hover:text-[#0f2f75]'
+                  }`}
+                  data-testid={`fastfood-restaurant-${name}`}
+                >
+                  {name}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {activePlace && (
+        <div className="mb-3 flex items-baseline justify-between gap-3" data-testid="fastfood-selected-place">
+          <p className="text-sm font-bold text-gray-900 truncate">{activePlace}</p>
+          <div className="flex items-center gap-3 shrink-0">
+            <p className="text-[11px] text-gray-600">{results.length} items</p>
+            <button
+              type="button"
+              onClick={() => {
+                setRestaurant('all');
+                setQuery('');
+                setCategory('all');
+              }}
+              className="bg-[transparent] p-0 text-xs font-semibold text-[#1f4aa6]"
+              data-testid="fastfood-change-place"
+            >
+              Clear
+            </button>
+          </div>
+        </div>
+      )}
+
+      {activePlace && (
+        <div className="flex flex-wrap gap-x-4 gap-y-1 mb-2">
           <button
             type="button"
-            onClick={() => setShowAllPlaces((v) => !v)}
-            className="bg-[transparent] whitespace-nowrap min-h-[32px] px-0 py-1 text-sm font-semibold text-gray-700 hover:underline underline-offset-4"
-            data-testid="fastfood-more-places"
+            onClick={() => setCategory('all')}
+            className={`bg-[transparent] px-0 py-1 text-xs ${category === 'all' ? 'font-bold text-[#0f2f75]' : 'font-medium text-gray-600'}`}
+            data-testid="fastfood-category-all"
           >
-            {showAllPlaces ? 'Show fewer' : `+ ${hiddenPlaceCount} more`}
+            All
           </button>
-        )}
-      </div>
+          {FAST_FOOD_CATEGORIES.map((c) => (
+            <button
+              key={c.id}
+              type="button"
+              onClick={() => setCategory(category === c.id ? 'all' : c.id)}
+              className={`bg-[transparent] px-0 py-1 text-xs ${category === c.id ? 'font-bold text-[#0f2f75]' : 'font-medium text-gray-600'}`}
+              data-testid={`fastfood-category-${c.id}`}
+            >
+              {c.label}
+            </button>
+          ))}
+        </div>
+      )}
 
-      <div className={`${chipRow} mb-3`}>
-        <Chip active={category === 'all'} label="All meals" onClick={() => setCategory('all')} testId="fastfood-category-all" />
-        {FAST_FOOD_CATEGORIES.map((c) => (
-          <Chip
-            key={c.id}
-            active={category === c.id}
-            label={c.label}
-            onClick={() => setCategory(category === c.id ? 'all' : c.id)}
-            testId={`fastfood-category-${c.id}`}
-          />
-        ))}
-      </div>
-
-      <div className="flex items-center justify-between text-[11px] text-gray-700 mb-1.5">
-        <span>
-          {results.length} {results.length === 1 ? 'match' : 'matches'}
-          {results.length > 5 && ' · scroll the list'}
-        </span>
-        {filtered && (
-          <button type="button" onClick={resetFilters} className="bg-[transparent] p-0 text-xs font-semibold text-[#1f4aa6] underline" data-testid="fastfood-reset">
-            Reset
-          </button>
-        )}
-      </div>
-
-      {results.length === 0 ? (
-        <p className="text-sm text-gray-700 py-6 text-center rounded-lg border border-amber-200 bg-amber-50/60">
-          No matches. Try the calculator above for anything not listed here.
-        </p>
+      {!activePlace ? (
+        <p className="text-sm text-gray-600 py-4">Tap a place to see the menu. Tap a meal to add it to Journal.</p>
+      ) : results.length === 0 ? (
+        <p className="text-sm text-gray-600 py-4">No matches in this menu. Try another search.</p>
       ) : (
-        <ul
-          ref={listRef}
-          className="max-h-[340px] overflow-y-auto overscroll-contain rounded-lg border border-amber-200 bg-amber-50/40 divide-y divide-amber-200"
-          data-testid="fastfood-results"
-        >
-          {results.map((item) => {
-            const saving = savingIds.has(item.id);
-            const added = addedIds.has(item.id);
-            return (
-              <li
-                key={item.id}
-                className={`flex items-center gap-3 px-3 py-2 transition-colors duration-300 ${added ? 'bg-green-100' : saving ? 'bg-green-50' : ''}`}
-                data-testid={`fastfood-item-${item.id}`}
-              >
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-900 truncate">{item.name}</p>
-                  <p className="text-[11px] text-gray-700 truncate">
-                    {item.restaurant} · {item.serving}
-                  </p>
-                  <p className="text-[11px] text-gray-700">
-                    P {item.protein}g · C {item.carbs}g · F {item.fat}g
-                  </p>
-                </div>
-                <span className="text-sm font-bold text-gray-900 shrink-0 tabular-nums">
-                  {item.calories}
-                  <span className="text-[10px] font-normal text-gray-700"> cal</span>
-                </span>
+        <div className="-mx-1 overflow-x-auto pb-1 [scrollbar-width:thin]" data-testid="fastfood-results">
+          <div
+            key={`${activePlace}-${category}-${query}`}
+            className="grid w-max grid-flow-col grid-rows-5 gap-1.5 auto-cols-[136px] sm:auto-cols-[148px] sm:grid-rows-4"
+          >
+            {results.map((item, index) => {
+              const saving = savingIds.has(item.id);
+              const added = addedIds.has(item.id);
+              const tone = calorieTone(item.calories);
+              return (
                 <button
+                  key={item.id}
                   type="button"
                   onClick={() => addItem(item)}
                   disabled={saving || added}
                   aria-label={saving ? `Adding ${item.name}` : added ? `${item.name} added` : `Add ${item.name}`}
                   aria-live="polite"
-                  className={`on-color shrink-0 h-9 min-h-[36px] min-w-[36px] rounded-full flex items-center justify-center gap-1 text-xs font-bold text-[#ffffff] transition-all duration-200 ${
-                    saving
-                      ? 'px-3 bg-green-800 cursor-wait'
-                      : added
-                        ? 'px-3 bg-green-600 ring-2 ring-green-300 animate-in zoom-in-75 duration-200'
-                        : 'w-9 p-0 bg-green-700 hover:bg-green-800 active:scale-90'
+                  style={{ animationDelay: `${Math.min(index, 20) * 20}ms`, animationFillMode: 'both' }}
+                  className={`animate-in fade-in duration-300 h-[72px] rounded-lg px-2 py-1.5 text-left transition-colors ${
+                    added ? 'bg-green-50' : saving ? 'bg-gray-50' : tone.wash
                   }`}
-                  data-testid={`fastfood-add-${item.id}`}
+                  data-testid={`fastfood-item-${item.id}`}
                 >
-                  {saving ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" color="#ffffff" />
-                      <span>Adding…</span>
-                    </>
-                  ) : added ? (
-                    <>
-                      <Check className="w-4 h-4" color="#ffffff" strokeWidth={3} />
-                      <span>Added</span>
-                    </>
-                  ) : (
-                    <Plus className="w-4 h-4" color="#ffffff" />
-                  )}
+                  <p className="truncate text-[11px] font-semibold leading-tight text-gray-900">{item.name}</p>
+                  <p
+                    className="mt-0.5 bg-inherit text-[16px] font-bold leading-none tabular-nums"
+                    style={{ color: added ? '#15803d' : tone.color }}
+                  >
+                    {item.calories}
+                    <span className="ml-0.5 text-[9px] font-semibold uppercase tracking-wide">cal</span>
+                  </p>
+                  <p className="mt-0.5 truncate text-[9px] leading-tight text-gray-600">
+                    {added ? (
+                      <span className="inline-flex items-center gap-0.5 font-semibold text-green-700">
+                        <Check className="w-2.5 h-2.5" /> Added
+                      </span>
+                    ) : saving ? (
+                      <span className="inline-flex items-center gap-0.5">
+                        <Loader2 className="w-2.5 h-2.5 animate-spin" /> Adding…
+                      </span>
+                    ) : (
+                      <>
+                        {item.serving}
+                        <span className="text-gray-500"> · P{item.protein} C{item.carbs} F{item.fat}</span>
+                      </>
+                    )}
+                  </p>
                 </button>
-              </li>
-            );
-          })}
-        </ul>
+              );
+            })}
+          </div>
+        </div>
       )}
-      <p className="text-[10px] text-gray-600 mt-2">
-        Calories per item from each chain's published nutrition. Logged items appear on Journal under Logged Today.
+      <p className="text-[10px] text-gray-600 mt-3">
+        Calories from each chain's published nutrition. Logged items appear on Journal under Logged Today.
       </p>
     </Card>
   );

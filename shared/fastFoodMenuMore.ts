@@ -108,9 +108,9 @@ export const MORE_FAST_FOOD_ITEMS: FastFoodItem[] = [
   item('cava-pita-chips', 'Pita Chips', 'Cava', 'snacks', '1 bag', 370, 6, 44, 19, 450),
 
   // Firehouse Subs
-  item('firehouse-hook-ladder', 'Hook & Ladder (medium)', 'Firehouse Subs', 'sandwiches', 'medium sub', 780, 45, 75, 33, 2250, ['sub', 'turkey', 'ham']),
-  item('firehouse-meatball', 'Firehouse Meatball (medium)', 'Firehouse Subs', 'sandwiches', 'medium sub', 960, 48, 82, 49, 2600, ['sub']),
-  item('firehouse-italian', 'Italian (medium)', 'Firehouse Subs', 'sandwiches', 'medium sub', 930, 46, 73, 51, 2930, ['sub']),
+  item('firehouse-hook-ladder', 'Hook & Ladder (medium, wheat)', 'Firehouse Subs', 'sandwiches', 'medium sub', 690, 35, 65, 32, 1750, ['sub', 'turkey', 'ham']),
+  item('firehouse-meatball', 'Firehouse Meatball (medium, wheat)', 'Firehouse Subs', 'sandwiches', 'medium sub', 810, 37, 60, 47, 2000, ['sub']),
+  item('firehouse-italian', 'Italian (medium, wheat)', 'Firehouse Subs', 'sandwiches', 'medium sub', 910, 38, 65, 55, 2520, ['sub']),
 
   // Jollibee
   item('jollibee-chickenjoy', 'Chickenjoy (1 pc, breast)', 'Jollibee', 'dinner', '1 piece', 370, 29, 11, 24, 1060, ['fried chicken', 'filipino']),
@@ -690,11 +690,11 @@ export const MORE_FAST_FOOD_ITEMS: FastFoodItem[] = [
   item('outback-bread', 'Table Bread and Butter', 'Outback Steakhouse', 'snacks', '1 serving', 370, 10, 51, 15, 420),
 
   // Texas Roadhouse (nationwide)
-  item('txrh-roll', 'Fresh-Baked Roll with Butter', 'Texas Roadhouse', 'snacks', '1 roll', 230, 5, 32, 9, 280),
-  item('txrh-sirloin-6', 'USDA Choice Sirloin (6 oz)', 'Texas Roadhouse', 'dinner', '6 oz', 250, 39, 0, 10, 480, ['steak']),
-  item('txrh-ribeye-12', 'Ft. Worth Ribeye (12 oz)', 'Texas Roadhouse', 'dinner', '12 oz', 960, 68, 2, 76, 980, ['steak']),
-  item('txrh-chicken-critters', 'Chicken Critters', 'Texas Roadhouse', 'dinner', '1 order', 480, 39, 28, 22, 1240, ['tenders']),
-  item('txrh-ribs-full', 'Fall-Off-The-Bone Ribs (full slab)', 'Texas Roadhouse', 'dinner', 'full slab', 1450, 92, 36, 98, 2680, ['ribs', 'bbq']),
+  item('txrh-roll', 'Fresh-Baked Bread', 'Texas Roadhouse', 'snacks', '1 roll', 200, 5, 28, 8, 200),
+  item('txrh-sirloin-6', 'USDA Choice Sirloin (6 oz)', 'Texas Roadhouse', 'dinner', '6 oz', 250, 46, 3, 6, 560, ['steak']),
+  item('txrh-ribeye-12', 'Ft. Worth Ribeye (12 oz)', 'Texas Roadhouse', 'dinner', '12 oz', 960, 78, 12, 72, 1180, ['steak']),
+  item('txrh-chicken-critters', 'Chicken Critters', 'Texas Roadhouse', 'dinner', '1 order', 480, 45, 26, 21, 1190, ['tenders']),
+  item('txrh-ribs-full', 'Fall-Off-The-Bone Ribs (full slab)', 'Texas Roadhouse', 'dinner', 'full slab', 1450, 116, 15, 102, 2260, ['ribs', 'bbq']),
 
   // Cracker Barrel (South / highways)
   item('cracker-barrel-hashbrown-casserole', 'Hashbrown Casserole', 'Cracker Barrel', 'breakfast', '1 side', 260, 6, 22, 16, 620),

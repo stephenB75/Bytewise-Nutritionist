@@ -6,6 +6,8 @@
 import { MORE_FAST_FOOD_ITEMS } from './fastFoodMenuMore';
 import { FULL_FAST_FOOD_ITEMS } from './fastFoodMenuFull';
 import { ASIAN_FAST_FOOD_ITEMS } from './fastFoodMenuAsian';
+import { CAFE_FAST_FOOD_ITEMS } from './fastFoodMenuCafes';
+import { MORE_PLACES_FAST_FOOD_ITEMS } from './fastFoodMenuMorePlaces';
 
 export type FastFoodCategory = 'breakfast' | 'sandwiches' | 'lunch' | 'dinner' | 'snacks';
 
@@ -337,7 +339,7 @@ const CORE_FAST_FOOD_ITEMS: FastFoodItem[] = [
   { id: 'sweetgreen-kale-caesar', name: 'Kale Caesar', restaurant: 'Sweetgreen', category: 'lunch', serving: '1 bowl', calories: 430, protein: 30, carbs: 21, fat: 26, sodium: 920, keywords: ['salad'] },
 ];
 
-export const FAST_FOOD_ITEMS: FastFoodItem[] = [...CORE_FAST_FOOD_ITEMS, ...MORE_FAST_FOOD_ITEMS, ...FULL_FAST_FOOD_ITEMS, ...ASIAN_FAST_FOOD_ITEMS];
+export const FAST_FOOD_ITEMS: FastFoodItem[] = [...CORE_FAST_FOOD_ITEMS, ...MORE_FAST_FOOD_ITEMS, ...FULL_FAST_FOOD_ITEMS, ...ASIAN_FAST_FOOD_ITEMS, ...CAFE_FAST_FOOD_ITEMS, ...MORE_PLACES_FAST_FOOD_ITEMS];
 
 export const FAST_FOOD_RESTAURANTS: string[] = Array.from(new Set(FAST_FOOD_ITEMS.map((item) => item.restaurant))).sort(
   (a, b) => a.localeCompare(b)
@@ -362,6 +364,17 @@ const SEARCH_ALIASES: Record<string, string> = {
   bucee: "buc-ee's",
   llhawaiian: 'l l hawaiian',
   landl: 'l l hawaiian',
+  ll: 'l l hawaiian',
+  aw: 'a w',
+  cfa: 'chick fil a',
+  chickfila: 'chick fil a',
+  mcd: "mcdonald's",
+  mcdonalds: "mcdonald's",
+  innout: 'in n out',
+  wendys: "wendy's",
+  dunkin: 'dunkin',
+  canes: 'raising canes',
+  raisingcanes: 'raising canes',
   skyline: 'skyline chili',
   tgif: "tgi friday's",
   fridays: "tgi friday's",
@@ -381,6 +394,35 @@ const SEARCH_ALIASES: Record<string, string> = {
   tokyojoes: "tokyo joe's",
   leeannchin: 'leeann chin',
   leeann: 'leeann chin',
+  bolay: 'bolay',
+  firehouse: 'firehouse subs',
+  firehousesubs: 'firehouse subs',
+  texasroadhouse: 'texas roadhouse',
+  txrh: 'texas roadhouse',
+  roadhouse: 'texas roadhouse',
+  peets: 'peets coffee',
+  peetscoffee: 'peets coffee',
+  scooters: 'scooters coffee',
+  scooterscoffee: 'scooters coffee',
+  '7brew': '7 brew',
+  sevenbrew: '7 brew',
+  caribou: 'caribou coffee',
+  coffeebean: 'the coffee bean tea leaf',
+  cbtl: 'the coffee bean tea leaf',
+  redlobster: 'red lobster',
+  firstwatch: 'first watch',
+  carrabbas: 'carrabbas italian grill',
+  bjs: 'bjs restaurant brewhouse',
+  bjsrestaurant: 'bjs restaurant brewhouse',
+  pizookie: 'bjs restaurant brewhouse',
+  cpk: 'california pizza kitchen',
+  californiapizza: 'california pizza kitchen',
+  famousdaves: 'famous daves',
+  bobevans: 'bob evans',
+  logans: 'logans roadhouse',
+  logansroadhouse: 'logans roadhouse',
+  benandjerrys: 'ben jerrys',
+  benjerrys: 'ben jerrys',
 };
 
 function expandSearchQuery(query: string): string {
@@ -396,16 +438,115 @@ function expandSearchQuery(query: string): string {
   return spaced;
 }
 
+function restaurantNameParts(name: string): { norm: string; compact: string; words: string[] } {
+  const norm = normalize(name);
+  return { norm, compact: compact(name), words: norm.split(' ').filter(Boolean) };
+}
+
+/** Restaurants whose name is the whole query (or an alias for it). */
+export function matchFastFoodRestaurants(query: string): string[] {
+  const trimmed = query.trim();
+  if (!trimmed) return [];
+  const expanded = expandSearchQuery(trimmed);
+  const qNorm = normalize(trimmed);
+  const qComp = compact(trimmed);
+  const expComp = compact(expanded);
+  const queryWords = expanded.split(' ').filter((word) => word.length > 1);
+
+  const exact: string[] = [];
+  const named: string[] = [];
+  for (const restaurant of FAST_FOOD_RESTAURANTS) {
+    const parts = restaurantNameParts(restaurant);
+    if (parts.compact === qComp || parts.compact === expComp || parts.norm === qNorm || parts.norm === expanded) {
+      exact.push(restaurant);
+      continue;
+    }
+    if (queryWords.length > 0 && queryWords.every((word) => parts.norm.includes(word) || parts.compact.includes(compact(word)))) {
+      named.push(restaurant);
+    }
+  }
+  if (exact.length) return exact;
+  if (named.length > 0 && named.length <= 4) return named;
+  if (qComp.length >= 4) {
+    const prefix = FAST_FOOD_RESTAURANTS.filter((restaurant) => {
+      const parts = restaurantNameParts(restaurant);
+      return parts.compact.startsWith(qComp) || parts.norm.startsWith(qNorm);
+    });
+    if (prefix.length > 0 && prefix.length <= 4) return prefix;
+  }
+  return [];
+}
+
+/** Restaurant names to offer while the user is still typing. */
+export function suggestFastFoodRestaurants(query: string, limit = 6): string[] {
+  const trimmed = query.trim();
+  if (!trimmed) return [];
+  const exact = matchFastFoodRestaurants(trimmed);
+  if (exact.length) return exact.slice(0, limit);
+
+  const expanded = expandSearchQuery(trimmed);
+  const qNorm = normalize(trimmed);
+  const qComp = compact(trimmed);
+  const expNorm = normalize(expanded);
+  const expComp = compact(expanded);
+  if (qComp.length < 2 && expComp.length < 2) return [];
+
+  const scored: { name: string; score: number }[] = [];
+  for (const restaurant of FAST_FOOD_RESTAURANTS) {
+    const parts = restaurantNameParts(restaurant);
+    let score = 0;
+    if (parts.compact.startsWith(qComp) || parts.compact.startsWith(expComp) || parts.norm.startsWith(qNorm) || parts.norm.startsWith(expNorm)) {
+      score = 3;
+    } else if (parts.words.some((word) => word.startsWith(qNorm) || word.startsWith(expNorm))) {
+      score = 2;
+    } else if (qComp.length >= 4 && (parts.norm.includes(qNorm) || parts.norm.includes(expNorm) || parts.compact.includes(qComp) || parts.compact.includes(expComp))) {
+      score = 1;
+    }
+    if (score) scored.push({ name: restaurant, score });
+  }
+  return scored
+    .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name))
+    .slice(0, limit)
+    .map((entry) => entry.name);
+}
+
+function leftoverFoodWords(query: string, restaurants: string[]): string[] {
+  const words = Array.from(new Set(expandSearchQuery(query).split(' ').filter((word) => word.length > 1)));
+  if (restaurants.length === 0) return words;
+  return words.filter((word) => {
+    const compactWord = compact(word);
+    return !restaurants.some((restaurant) => {
+      const parts = restaurantNameParts(restaurant);
+      return parts.norm.includes(word) || parts.compact.includes(compactWord);
+    });
+  });
+}
+
 export function searchFastFood(
   query: string,
   category: FastFoodCategory | 'all' = 'all',
   restaurant: string | 'all' = 'all'
 ): FastFoodItem[] {
-  const words = expandSearchQuery(query).split(' ').filter(Boolean);
-  const uniqueWords = Array.from(new Set(words));
+  const placeHits = matchFastFoodRestaurants(query);
+  const foodWords = leftoverFoodWords(query, placeHits);
+  const uniqueWords = foodWords.length > 0
+    ? foodWords
+    : placeHits.length === 0
+      ? Array.from(new Set(expandSearchQuery(query).split(' ').filter((word) => word.length > 1)))
+      : [];
+
+  const restaurantFilter =
+    restaurant !== 'all' && !(placeHits.length > 0 && !placeHits.includes(restaurant))
+      ? restaurant
+      : 'all';
+
   return FAST_FOOD_ITEMS.filter((item) => {
     if (category !== 'all' && item.category !== category) return false;
-    if (restaurant !== 'all' && item.restaurant !== restaurant) return false;
+    if (restaurantFilter !== 'all' && item.restaurant !== restaurantFilter) return false;
+    if (placeHits.length && !foodWords.length) return placeHits.includes(item.restaurant);
+    if (placeHits.length && foodWords.length) {
+      if (!placeHits.includes(item.restaurant)) return false;
+    }
     if (uniqueWords.length === 0) return true;
     const haystack = normalize([item.name, item.restaurant, item.category, ...(item.keywords || [])].join(' '));
     const haystackCompact = compact(haystack);
