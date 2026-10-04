@@ -23,11 +23,6 @@ const WATER_CONTAINERS: WaterContainer[] = [
   { oz: 32, label: 'XL', name: 'XL bottle', Icon: Milk, iconClass: 'h-6 w-6' },
 ];
 
-function readContainerOz(): number {
-  const saved = Number(localStorage.getItem(CONTAINER_KEY));
-  return WATER_CONTAINERS.some((c) => c.oz === saved) ? saved : OZ_PER_GLASS;
-}
-
 /** How many of each container (keyed by ounces) were drunk on a day, e.g. { "8": 1, "16": 2 }. */
 export type WaterContainers = Record<string, number>;
 const WATER_CONTAINERS_KEY = 'waterContainersByDate';
@@ -102,10 +97,12 @@ export function writeLocalWaterContainers(containers: WaterContainers, dateKey: 
   }
 }
 
-function describeContainers(containers: WaterContainers) {
-  return WATER_CONTAINERS.filter(({ oz }) => containers[oz] > 0).map((container) => ({
+type DescribedContainer = WaterContainer & { count: number };
+
+function describeContainers(containers: WaterContainers): DescribedContainer[] {
+  return WATER_CONTAINERS.filter(({ oz }) => (containers[oz] || 0) > 0).map((container) => ({
     ...container,
-    count: containers[container.oz],
+    count: containers[container.oz] || 0,
   }));
 }
 
@@ -265,15 +262,9 @@ export const WaterCard = React.memo(function WaterCard({
   onIncrement: (glasses: number, containerOz: number) => void;
   onDecrement: (glasses: number, containerOz: number) => void;
 }) {
-  const [containerOz, setContainerOz] = useState(readContainerOz);
-  const container = WATER_CONTAINERS.find((c) => c.oz === containerOz) ?? WATER_CONTAINERS[0];
-  const containerGlasses = container.oz / OZ_PER_GLASS;
-  // Local write lands before parent state; use the higher count so + fills a bar immediately.
+  // Local write lands before parent state; use the higher count so + updates immediately.
   const displayGlasses = Math.max(clampWaterGlasses(glasses), readLocalWaterGlasses());
-  const barCount = Math.max(1, Math.ceil(GOAL_OZ / container.oz));
-  const filledBars = (displayGlasses * OZ_PER_GLASS) / container.oz;
   const selectContainer = (oz: number) => {
-    setContainerOz(oz);
     try {
       localStorage.setItem(CONTAINER_KEY, String(oz));
     } catch {
@@ -286,6 +277,15 @@ export const WaterCard = React.memo(function WaterCard({
   const [refreshTick, setRefreshTick] = useState(0);
   const [fillTick, setFillTick] = useState(0);
   const bumpFill = () => setFillTick((tick) => tick + 1);
+
+  const todayContainerCounts = useMemo(
+    () => reconcileWaterContainers(readLocalWaterContainers(), displayGlasses),
+    [displayGlasses, fillTick, glasses],
+  );
+  const todayDrinksSummary = useMemo(
+    () => describeContainers(todayContainerCounts),
+    [todayContainerCounts],
+  );
 
   useEffect(() => {
     const handleRefresh = () => setRefreshTick((tick) => tick + 1);
@@ -381,7 +381,7 @@ export const WaterCard = React.memo(function WaterCard({
             <p className="text-gray-900 text-sm font-medium">
               {displayGlasses * OZ_PER_GLASS}/{GOAL_OZ} oz today
             </p>
-            <p className="text-gray-700 text-xs">1 bar = {container.oz} oz ({container.label})</p>
+            <p className="text-gray-700 text-xs">Log glasses, bottles, and how many of each</p>
           </div>
         </div>
         <div className="text-right">
@@ -400,93 +400,100 @@ export const WaterCard = React.memo(function WaterCard({
         )}
       </div>
 
-      <div className="grid grid-cols-4 gap-2 mb-4" role="radiogroup" aria-label="Container size">
-        {WATER_CONTAINERS.map((option) => {
-          const selected = option.oz === container.oz;
-          return (
-            <button
-              key={option.oz}
-              type="button"
-              role="radio"
-              aria-checked={selected}
-              onClick={() => selectContainer(option.oz)}
-              className={`flex flex-col items-center justify-end gap-0.5 rounded-lg ring-1 px-1 py-1.5 text-[11px] font-medium transition-colors ${
-                selected
-                  ? 'bg-cyan-600 ring-cyan-700 on-color shadow-sm'
-                  : 'bg-white/70 ring-cyan-200 text-gray-800 hover:bg-cyan-50'
-              }`}
-              data-testid={`water-container-${option.oz}`}
-            >
-              <option.Icon className={`${option.iconClass} ${selected ? '' : 'text-cyan-700'}`} />
-              <span>{option.label}</span>
-              <span className={selected ? '' : 'text-gray-600'}>{option.oz} oz</span>
-            </button>
-          );
-        })}
-      </div>
+      <div className="mb-1">
+        <p className="text-xs font-semibold uppercase tracking-wide text-gray-700 mb-2">
+          What did you drink?
+        </p>
+        <div className="space-y-2" data-testid="water-size-counts" role="list" aria-label="Drinks by container size">
+          {WATER_CONTAINERS.map((option) => {
+            const count = todayContainerCounts[option.oz] || 0;
+            const glassesForSize = option.oz / OZ_PER_GLASS;
+            const canAdd = displayGlasses < DAILY_GOAL;
+            const canRemove = count > 0 && displayGlasses > 0;
+            return (
+              <div
+                key={option.oz}
+                role="listitem"
+                className={`flex items-center justify-between gap-3 rounded-xl px-3 py-2.5 ring-1 transition-colors ${
+                  count > 0
+                    ? 'bg-cyan-50/90 ring-cyan-300'
+                    : 'bg-white/70 ring-cyan-200/80'
+                }`}
+                data-testid={`water-container-${option.oz}`}
+              >
+                <button
+                  type="button"
+                  onClick={() => selectContainer(option.oz)}
+                  className="min-w-0 flex items-center gap-2.5 bg-[transparent] p-0 text-left"
+                  aria-label={`${option.label}, ${option.oz} ounces`}
+                >
+                  <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${
+                    count > 0 ? 'bg-cyan-600 text-white' : 'bg-cyan-100 text-cyan-800'
+                  }`}>
+                    <option.Icon className={option.iconClass} />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-sm font-semibold text-gray-900">{option.label}</span>
+                    <span className="block text-[11px] text-gray-600">{option.oz} oz each</span>
+                  </span>
+                </button>
 
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <div className="flex items-end gap-1.5" data-testid="water-bars" aria-label={`${barCount} bars, 1 bar is ${container.oz} ounces`}>
-            {Array.from({ length: barCount }, (_, i) => {
-              const fill = Math.min(1, Math.max(0, filledBars - i));
-              const fillPercent = Math.round(fill * 100);
-              return (
-                <div
-                  key={`${container.oz}-${i}`}
-                  className="rounded-sm shadow-inner transition-all duration-300"
-                  style={{
-                    width: barCount <= 2 ? 22 : barCount <= 4 ? 18 : 16,
-                    height: barCount <= 4 ? 36 : 24,
-                    background: fill <= 0
-                      ? '#d1d5db'
-                      : fill >= 1
-                        ? 'linear-gradient(to top, #06b6d4 0%, #0891b2 100%)'
-                        : `linear-gradient(to top, #06b6d4 0%, #0891b2 ${fillPercent}%, #d1d5db ${fillPercent}%)`,
-                  }}
-                  title={`${container.oz} oz`}
-                  data-testid={`water-bar-${i}`}
-                  data-fill={fillPercent}
-                />
-              );
-            })}
-          </div>
-          <p className="mt-1 text-[11px] font-medium text-gray-700">
-            1 bar = {container.oz} oz
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <Button
+                    onClick={() => {
+                      selectContainer(option.oz);
+                      onDecrement(glassesForSize, option.oz);
+                      bumpFill();
+                    }}
+                    disabled={!canRemove}
+                    size="sm"
+                    variant="ghost"
+                    className="h-9 w-9 p-0 rounded-full text-cyan-700 hover:text-cyan-600 hover:bg-cyan-500/10 disabled:opacity-40"
+                    aria-label={`Remove one ${option.label}`}
+                    data-testid={`button-decrement-water-${option.oz}`}
+                  >
+                    <Minus className="w-4 h-4" />
+                  </Button>
+                  <div
+                    className="min-w-[2.5rem] text-center tabular-nums"
+                    aria-live="polite"
+                    data-testid={`water-count-${option.oz}`}
+                  >
+                    <div className="text-lg font-bold text-gray-950 leading-none">{count}</div>
+                    <div className="text-[10px] font-medium text-gray-600">qty</div>
+                  </div>
+                  <Button
+                    onClick={() => {
+                      selectContainer(option.oz);
+                      onIncrement(glassesForSize, option.oz);
+                      bumpFill();
+                    }}
+                    disabled={!canAdd}
+                    size="sm"
+                    variant="ghost"
+                    className="h-9 w-9 p-0 rounded-full border border-cyan-500/50 text-cyan-700 hover:text-cyan-600 hover:bg-cyan-500/10 disabled:opacity-40"
+                    aria-label={`Add one ${option.label}`}
+                    data-testid={`button-increment-water-${option.oz}`}
+                  >
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        {todayDrinksSummary.length > 0 ? (
+          <p className="mt-2 text-xs font-medium text-gray-700" data-testid="water-drinks-summary">
+            Today:{' '}
+            {todayDrinksSummary
+              .map(({ count, name, oz }) => `${count}× ${name} (${count * oz} oz)`)
+              .join(' · ')}
           </p>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <Button
-            onClick={() => {
-              onDecrement(containerGlasses, container.oz);
-              bumpFill();
-            }}
-            disabled={displayGlasses <= 0}
-            size="sm"
-            variant="ghost"
-            className="h-8 w-8 p-0 text-cyan-600 hover:text-cyan-500 hover:bg-cyan-500/10 disabled:opacity-50 shadow-lg hover:shadow-xl transition-shadow duration-200"
-            aria-label={`Remove ${container.oz} oz`}
-            data-testid="button-decrement-water"
-          >
-            <Minus className="w-4 h-4" />
-          </Button>
-          <Button
-            onClick={() => {
-              onIncrement(containerGlasses, container.oz);
-              bumpFill();
-            }}
-            disabled={displayGlasses >= DAILY_GOAL}
-            size="sm"
-            variant="ghost"
-            className="h-8 px-2 gap-1 text-cyan-700 hover:text-cyan-600 hover:bg-cyan-500/10 disabled:opacity-50 shadow-lg hover:shadow-xl transition-shadow duration-200 border border-cyan-500/50 hover:border-cyan-500/70 disabled:hover:bg-[transparent]"
-            aria-label={`Add ${container.oz} oz`}
-            data-testid="button-increment-water"
-          >
-            <Plus className="w-4 h-4" />
-            <span className="text-xs font-semibold">{container.oz} oz</span>
-          </Button>
-        </div>
+        ) : (
+          <p className="mt-2 text-xs text-gray-600">
+            Tap + on a size to log how many you drank.
+          </p>
+        )}
       </div>
 
       <div className="mt-4 pt-4 border-t border-gray-400/20">

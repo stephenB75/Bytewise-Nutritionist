@@ -119,6 +119,32 @@ export function getMealTypeByTime(date: Date = new Date()): 'breakfast' | 'lunch
 }
 
 /**
+ * Normalize a meal's date field to YYYY-MM-DD for week/day filtering.
+ * Meals are stored as calendar-day keys (or noon-UTC timestamps on that day),
+ * so the YYYY-MM-DD prefix is the source of truth when present.
+ */
+export function getMealDateKey(mealDate: unknown): string {
+  if (typeof mealDate === 'string') {
+    if (/^\d{4}-\d{2}-\d{2}$/.test(mealDate)) return mealDate;
+    const prefix = mealDate.slice(0, 10);
+    if (/^\d{4}-\d{2}-\d{2}$/.test(prefix) && (mealDate.includes('T') || mealDate.length === 10)) {
+      return prefix;
+    }
+    const parsed = new Date(mealDate);
+    if (!Number.isNaN(parsed.getTime())) return getLocalDateKey(parsed);
+  }
+  if (mealDate instanceof Date && !Number.isNaN(mealDate.getTime())) {
+    return getLocalDateKey(mealDate);
+  }
+  return '';
+}
+
+/** Local YYYY-MM-DD key for the Sunday that starts the current week. */
+export function getWeekStartKey(date: Date = new Date()): string {
+  return getLocalDateKey(getWeekStart(date));
+}
+
+/**
  * Get the week start date (Sunday) for a given date
  * Fixed to use proper local date calculation without timezone shifts
  */

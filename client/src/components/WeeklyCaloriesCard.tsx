@@ -13,7 +13,7 @@ import { Calendar, Flame } from 'lucide-react';
 import { useCheckAchievements } from '@/hooks/useAchievements';
 import { useAuth } from '@/hooks/useAuth';
 import { listLoggedMeals } from '@/lib/mealsApi';
-import { getWeekDates, getLocalDateKey } from '@/utils/dateUtils';
+import { getWeekDates, getWeekStartKey, getLocalDateKey, getMealDateKey } from '@/utils/dateUtils';
 import { checkMealDateMismatches } from '@/utils/mealDateFixer';
 import { debounce, getCachedLocalStorage } from '@/utils/performanceUtils';
 // Removed timezone correction import to fix date display issues
@@ -102,39 +102,14 @@ export function WeeklyCaloriesCard() {
         localStorage.setItem('weeklyMeals', JSON.stringify(storedMeals));
       }
       
-      // Calculate calories for each day of the week with fixed date matching
+      // Calculate calories for each day of the current Sun–Sat week only
       const weeklyData = weekDates.map(dayData => {
-        // Strict filtering to prevent duplicate matches - each meal should only appear once
-        const dayMeals = storedMeals.filter((meal: any) => {
-          if (!meal.date) return false;
-          
-          const mealDateStr = meal.date;
-          
-          // Handle timestamp format dates - extract date part and normalize
-          let normalizedMealDate = mealDateStr.includes('T') 
-            ? mealDateStr.split('T')[0] 
-            : mealDateStr;
-            
-          // If the meal date is an ISO string, parse it properly to get the local date
-          if (mealDateStr.includes('T') || mealDateStr.includes('Z')) {
-            const mealDate = new Date(mealDateStr);
-            normalizedMealDate = getLocalDateKey(mealDate);
-          }
-          
-          // Debug: Log date matching
-          if (normalizedMealDate === dayData.date) {
-            return true;
-          }
-          
-          return false;
-        });
-        
+        const dayMeals = storedMeals.filter((meal: any) => getMealDateKey(meal?.date) === dayData.date);
         const dayCalories = dayMeals.reduce((sum: number, meal: any) => {
           const mealCalories = Number(meal.calories) || Number(meal.totalCalories) || 0;
           return sum + mealCalories;
         }, 0);
-        
-        
+
         return {
           ...dayData,
           calories: dayCalories,
@@ -159,41 +134,53 @@ export function WeeklyCaloriesCard() {
   // Debounced version of calculateWeeklyCalories for performance
   const debouncedCalculateWeeklyCalories = debounce(calculateWeeklyCalories, 250);
 
-  // Load data on component mount and listen for updates
+  // Load data on mount; refresh on meal events and when the calendar week rolls.
   useEffect(() => {
-    // Clear any cached date overrides on component load
     if (typeof window !== 'undefined' && window.localStorage) {
       localStorage.removeItem('user-date-override');
       localStorage.removeItem('date-calculation-cache');
     }
-    
+
+    let weekKey = getWeekStartKey();
     calculateWeeklyCalories();
 
     const handleMealLogged = () => {
       debouncedCalculateWeeklyCalories();
-      
-      // Check for achievements after weekly data updates (debounced)
       setTimeout(() => checkAchievements.mutate(), 500);
     };
 
-    // Listen for localStorage storage events
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'weeklyMeals') {
         calculateWeeklyCalories();
       }
     };
 
-    // Multiple event listeners to catch all meal logging scenarios
+    const checkWeekRoll = () => {
+      const nextWeekKey = getWeekStartKey();
+      if (nextWeekKey !== weekKey) {
+        weekKey = nextWeekKey;
+        setWeeklyData(getCurrentWeekDates());
+        setTotalWeeklyCalories(0);
+        void calculateWeeklyCalories();
+      }
+    };
+
     window.addEventListener('calories-logged', handleMealLogged);
     window.addEventListener('meal-logged-success', handleMealLogged);
     window.addEventListener('refresh-weekly-data', handleMealLogged);
+    window.addEventListener('reload-meal-data', handleMealLogged);
     window.addEventListener('storage', handleStorageChange);
+    document.addEventListener('visibilitychange', checkWeekRoll);
+    const interval = window.setInterval(checkWeekRoll, 60 * 1000);
 
     return () => {
       window.removeEventListener('calories-logged', handleMealLogged);
       window.removeEventListener('meal-logged-success', handleMealLogged);
       window.removeEventListener('refresh-weekly-data', handleMealLogged);
+      window.removeEventListener('reload-meal-data', handleMealLogged);
       window.removeEventListener('storage', handleStorageChange);
+      document.removeEventListener('visibilitychange', checkWeekRoll);
+      window.clearInterval(interval);
     };
   }, []);
 

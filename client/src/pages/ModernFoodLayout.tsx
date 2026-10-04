@@ -73,7 +73,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
 import { deleteLoggedMeal, listLoggedMeals, logMeal, saveUserProfile } from '@/lib/mealsApi';
 import { clearProfileCompletionPrompt, resendVerificationEmail, resetPasswordForEmail, shouldShowProfileCompletion, signInWithEmail, signUpWithEmail } from '@/lib/authActions';
-import { getWeekDates, getLocalDateKey, getMealTypeByTime, formatLocalTime } from '@/utils/dateUtils';
+import { getWeekDates, getWeekStartKey, getLocalDateKey, getMealDateKey, getMealTypeByTime, formatLocalTime } from '@/utils/dateUtils';
 import { clearGuestNutritionStorage } from '@/lib/guestStorage';
 import { AppleFitnessCard } from '@/components/AppleFitnessCard';
 import { ExerciseMinutesCard } from '@/components/ExerciseMinutesCard';
@@ -312,6 +312,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const [confettiAchievement, setConfettiAchievement] = useState<Achievement | null>(null);
   const [dailyCalories, setDailyCalories] = useState(0);
   const [weeklyCalories, setWeeklyCalories] = useState(0);
+  const [weeklyDaysLogged, setWeeklyDaysLogged] = useState(0);
+  const [weeklyMealCount, setWeeklyMealCount] = useState(0);
   const [goalCalories, setGoalCalories] = useState((user as any)?.dailyCalorieGoal || 2000);
   const [weeklyGoal, setWeeklyGoal] = useState(14000);
   const [loggedMeals, setLoggedMeals] = useState<any[]>([]);
@@ -909,11 +911,22 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   }, []);
 
   // Start a fresh day at local midnight (or when the app is reopened on a new day).
+  // When the week rolls (Sunday), clear weekly progress immediately so last week doesn't linger.
   useEffect(() => {
     let dayKey = getLocalDateKey();
+    let weekKey = getWeekStartKey();
     const checkForNewDay = () => {
       const nowKey = getLocalDateKey();
-      if (nowKey !== dayKey) {
+      const nowWeekKey = getWeekStartKey();
+      const weekChanged = nowWeekKey !== weekKey;
+      const dayChanged = nowKey !== dayKey;
+      if (weekChanged) {
+        weekKey = nowWeekKey;
+        setWeeklyCalories(0);
+        setWeeklyDaysLogged(0);
+        setWeeklyMealCount(0);
+      }
+      if (dayChanged || weekChanged) {
         dayKey = nowKey;
         void refreshAppData();
       }
@@ -1008,6 +1021,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     setWeeklyMeals([]);
     setDailyCalories(0);
     setWeeklyCalories(0);
+    setWeeklyDaysLogged(0);
+    setWeeklyMealCount(0);
   }, [user, authLoading]);
 
   // Load existing meal data and set up tracking
@@ -1105,57 +1120,21 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         // Check fasting status from localStorage
         checkFastingStatus();
         
-        // Calculate weekly calories from database data (matching WeeklyCaloriesCard logic)
-        if (stored.length) {
-          try {
-            const databaseMeals = stored;
-            const currentWeekDates = getWeekDates();
-            const weekDateKeys = currentWeekDates.map(date => getLocalDateKey(date));
-            
-            const currentWeekMeals = databaseMeals.filter((meal: any) => {
-              if (!meal.date) return false;
-              const normalizedMealDate = meal.date.includes('T') 
-                ? meal.date.split('T')[0] 
-                : meal.date;
-              return weekDateKeys.includes(normalizedMealDate);
-            });
-            
-            const weeklyTotal = currentWeekMeals.reduce((sum: number, meal: any) => {
-              const mealCalories = Number(meal.calories) || Number(meal.totalCalories) || 0;
-              return sum + mealCalories;
-            }, 0);
-            
-            setWeeklyCalories(weeklyTotal);
-          } catch (error) {
-            // Fallback to localStorage calculation with improved parsing
-            const currentWeekDates = getWeekDates();
-            const weekDateKeys = currentWeekDates.map(date => getLocalDateKey(date));
-            const currentWeekMeals = stored.filter((meal: any) => {
-              if (weekDateKeys.includes(meal.date)) return true;
-              if (meal.date && meal.date.includes('T')) {
-                const extractedDate = meal.date.split('T')[0];
-                return weekDateKeys.includes(extractedDate);
-              }
-              return false;
-            });
-            const weeklyTotal = currentWeekMeals.reduce((sum: number, meal: any) => sum + (Number(meal.calories) || 0), 0);
-            setWeeklyCalories(weeklyTotal);
-          }
-        } else {
-          // For non-authenticated users, use localStorage
-          const currentWeekDates = getWeekDates();
-          const weekDateKeys = currentWeekDates.map(date => getLocalDateKey(date));
-          const currentWeekMeals = stored.filter((meal: any) => {
-            if (weekDateKeys.includes(meal.date)) return true;
-            if (meal.date && meal.date.includes('T')) {
-              const extractedDate = meal.date.split('T')[0];
-              return weekDateKeys.includes(extractedDate);
-            }
-            return false;
-          });
-          const weeklyTotal = currentWeekMeals.reduce((sum: number, meal: any) => sum + (Number(meal.calories) || 0), 0);
-          setWeeklyCalories(weeklyTotal);
-        }
+        // Current Sun–Sat week only — last week drops off when getWeekDates() rolls.
+        const weekDateKeys = getWeekDates().map((date) => getLocalDateKey(date));
+        const currentWeekMeals = stored.filter((meal: any) => {
+          const key = getMealDateKey(meal?.date);
+          return key !== '' && weekDateKeys.includes(key);
+        });
+        const weeklyTotal = currentWeekMeals.reduce((sum: number, meal: any) => {
+          return sum + (Number(meal.calories) || Number(meal.totalCalories) || 0);
+        }, 0);
+        const daysWithMeals = new Set(
+          currentWeekMeals.map((meal: any) => getMealDateKey(meal?.date)).filter(Boolean),
+        ).size;
+        setWeeklyCalories(weeklyTotal);
+        setWeeklyDaysLogged(daysWithMeals);
+        setWeeklyMealCount(currentWeekMeals.length);
         
       } catch (error) {
         // Keep what's on screen: zeroing it here would make a failed refresh look like lost data.
@@ -1676,10 +1655,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             />
             <div className="grid grid-cols-4 gap-2 mt-4">
               {[
-                { label: 'Days', value: '7' },
-                { label: 'Avg/Day', value: Math.round(weeklyCalories/7) },
-                { label: 'Remain', value: Math.round(weeklyGoal - weeklyCalories) },
-                { label: 'Total', value: loggedMeals.length }
+                { label: 'Days', value: weeklyDaysLogged },
+                { label: 'Avg/Day', value: Math.round(weeklyCalories / 7) },
+                { label: 'Remain', value: Math.max(0, Math.round(weeklyGoal - weeklyCalories)) },
+                { label: 'Meals', value: weeklyMealCount },
               ].map((item, index) => (
                 <div key={index} className="text-center p-2 bg-gradient-to-br from-amber-100 to-amber-200 rounded-lg">
                   <div className="text-sm font-bold text-gray-900">{item.value}</div>
