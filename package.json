@@ -16,7 +16,7 @@
     "ios:open": "npx cap open ios",
     "version:sync": "node scripts/app-version.mjs",
     "version:bump": "node scripts/app-version.mjs bump",
-    "postinstall": "patch-package && node scripts/setup-git-hooks.mjs",
+    "postinstall": "patch-package && node -e \"import('node:fs').then(async ({existsSync})=>{ if (!existsSync('scripts/setup-git-hooks.mjs')) process.exit(0); await import('./scripts/setup-git-hooks.mjs'); })\"",
     "hooks:install": "node scripts/setup-git-hooks.mjs"
   },
   "dependencies": {

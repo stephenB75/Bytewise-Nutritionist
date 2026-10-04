@@ -10,7 +10,8 @@ import { execSync } from 'node:child_process';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const hooksDir = join(root, '.githooks');
 
-if (!existsSync(hooksDir)) {
+// Docker / CI: no git hooks needed (and often no .git / .githooks in the image)
+if (process.env.CI === 'true' || process.env.RAILWAY_ENVIRONMENT || !existsSync(hooksDir)) {
   process.exit(0);
 }
 

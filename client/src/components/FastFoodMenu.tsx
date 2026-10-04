@@ -258,8 +258,8 @@ export function FastFoodMenu() {
             )}
           </div>
         </div>
-        <div className={`overflow-y-auto pr-1 [scrollbar-width:thin] ${showAllPlaces ? 'max-h-[420px]' : 'max-h-[280px]'}`}>
-          <div className="grid grid-cols-3 gap-x-3 gap-y-0.5">
+        <div className={`overflow-y-auto py-1 pr-1 [scrollbar-width:thin] ${showAllPlaces ? 'max-h-[420px]' : 'max-h-[280px]'}`}>
+          <div className="grid grid-cols-3 gap-x-2 gap-y-1.5">
             {gridPlaces.map((name) => {
               const selected = activePlace === name;
               return (
@@ -270,18 +270,18 @@ export function FastFoodMenu() {
                   aria-pressed={selected}
                   className={`min-h-[28px] rounded-md px-1.5 py-1 text-left text-[12px] leading-snug transition-colors ${
                     selected
-                      ? 'bg-[#1f4aa6]/12 font-bold text-[#0f2f75] ring-1 ring-[#1f4aa6]/35'
-                      : 'bg-[transparent] font-medium text-[#1f4aa6] hover:text-[#0f2f75]'
+                      ? 'border border-[#1f4aa6]/45 bg-[#1f4aa6]/12 font-bold text-[#0f2f75]'
+                      : 'border border-transparent font-medium text-[#1f4aa6] hover:text-[#0f2f75]'
                   }`}
                   data-testid={`fastfood-restaurant-${name}`}
                 >
                   {selected ? (
-                    <span className="inline-flex items-center gap-1">
+                    <span className="inline-flex items-center gap-1 min-w-0">
                       <Check className="w-3 h-3 shrink-0 text-[#1f4aa6]" aria-hidden />
-                      {name}
+                      <span className="truncate">{name}</span>
                     </span>
                   ) : (
-                    name
+                    <span className="truncate block">{name}</span>
                   )}
                 </button>
               );

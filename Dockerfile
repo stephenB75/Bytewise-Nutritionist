@@ -11,10 +11,12 @@ RUN apt-get update && apt-get install -y \
 # Set working directory
 WORKDIR /app
 
-# Copy package files
+# Copy package files (+ patches for patch-package during postinstall)
 COPY package*.json ./
+COPY patches ./patches
 
 # Install all dependencies (including dev for build)
+# postinstall runs before the full source COPY; git-hook setup is skipped if scripts/ is absent
 RUN npm ci --silent
 
 # Copy application source
