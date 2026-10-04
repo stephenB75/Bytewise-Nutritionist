@@ -16,7 +16,8 @@
     "ios:open": "npx cap open ios",
     "version:sync": "node scripts/app-version.mjs",
     "version:bump": "node scripts/app-version.mjs bump",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package && node scripts/setup-git-hooks.mjs",
+    "hooks:install": "node scripts/setup-git-hooks.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.0.0",

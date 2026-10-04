@@ -25,6 +25,13 @@ npm run ios:open
 3. `npx cap sync ios` (copy web build + Capacitor plugins)  
 4. Apply HealthKit `Info.plist` strings and entitlements via `scripts/apply-ios-healthkit.mjs`
 
+### Auto-sync on GitHub push
+
+A git **pre-push** hook (`.githooks/pre-push`) runs `npm run ios:prepare` before every push to GitHub, so the local Xcode project always has the latest web build. Hooks are enabled by `npm install` / `npm run hooks:install`.
+
+- Skip once: `SKIP_IOS_PREPARE=1 git push`
+- Pushing does **not** upload to App Store Connect — still **Product → Archive** in Xcode after the sync.
+
 ## Xcode checklist
 
 1. Open **`ios/App/App.xcworkspace`** (or use `npm run ios:open`).  

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { logMeal } from '@/lib/mealsApi';
@@ -70,6 +70,8 @@ export function FastFoodMenu() {
   const [region, setRegion] = useState<UsFoodRegion | null>(null);
   const [locationStatus, setLocationStatus] = useState<'idle' | 'asking' | 'ready' | 'denied'>('idle');
   const [showAllPlaces, setShowAllPlaces] = useState(false);
+  const menuSectionRef = useRef<HTMLDivElement>(null);
+  const prevActivePlaceRef = useRef<string | null>(null);
 
   const visiblePlaces = useMemo(() => {
     const pinned = PINNED_POPULAR.filter((name) => FAST_FOOD_RESTAURANTS.includes(name));
@@ -121,6 +123,17 @@ export function FastFoodMenu() {
     setQuery('');
     setCategory('all');
   };
+
+  // When a place is newly selected, scroll the menu into view under the bottom nav.
+  useEffect(() => {
+    const prev = prevActivePlaceRef.current;
+    prevActivePlaceRef.current = activePlace;
+    if (!activePlace || activePlace === prev) return;
+    const frame = window.requestAnimationFrame(() => {
+      menuSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [activePlace]);
 
   const useMyLocation = async () => {
     setLocationStatus('asking');
@@ -255,12 +268,21 @@ export function FastFoodMenu() {
                   type="button"
                   onClick={() => selectPlace(name)}
                   aria-pressed={selected}
-                  className={`bg-[transparent] min-h-[28px] px-0.5 py-0.5 text-left text-[12px] leading-snug ${
-                    selected ? 'font-bold text-[#0f2f75]' : 'font-medium text-[#1f4aa6] hover:text-[#0f2f75]'
+                  className={`min-h-[28px] rounded-md px-1.5 py-1 text-left text-[12px] leading-snug transition-colors ${
+                    selected
+                      ? 'bg-[#1f4aa6]/12 font-bold text-[#0f2f75] ring-1 ring-[#1f4aa6]/35'
+                      : 'bg-[transparent] font-medium text-[#1f4aa6] hover:text-[#0f2f75]'
                   }`}
                   data-testid={`fastfood-restaurant-${name}`}
                 >
-                  {name}
+                  {selected ? (
+                    <span className="inline-flex items-center gap-1">
+                      <Check className="w-3 h-3 shrink-0 text-[#1f4aa6]" aria-hidden />
+                      {name}
+                    </span>
+                  ) : (
+                    name
+                  )}
                 </button>
               );
             })}
@@ -279,12 +301,44 @@ export function FastFoodMenu() {
       </div>
 
       {showItemResults && (
-        <div className="mb-3 flex items-baseline justify-between gap-3" data-testid="fastfood-selected-place">
-          <p className="text-sm font-bold text-gray-900 truncate">
-            {activePlace || 'Matching meals'}
-          </p>
-          <div className="flex items-center gap-3 shrink-0">
-            <p className="text-[11px] text-gray-600">{results.length} items</p>
+        <div
+          ref={menuSectionRef}
+          className={`mb-3 scroll-mt-20 rounded-xl px-3 py-3 ${
+            activePlace
+              ? 'border border-[#1f4aa6]/25 bg-gradient-to-r from-[#1f4aa6]/10 to-[#faed39]/15'
+              : 'border border-amber-200/60 bg-amber-50/40'
+          }`}
+          data-testid="fastfood-selected-place"
+        >
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0 flex items-start gap-2.5">
+              <span
+                className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${
+                  activePlace ? 'bg-[#1f4aa6] text-white' : 'bg-amber-200 text-amber-900'
+                }`}
+                aria-hidden
+              >
+                <Store className="w-4 h-4" />
+              </span>
+              <div className="min-w-0">
+                {activePlace && (
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-[#1f4aa6]">
+                    Selected menu
+                  </p>
+                )}
+                <p
+                  className={`truncate font-bold text-gray-950 ${
+                    activePlace ? 'text-xl leading-tight sm:text-2xl' : 'text-base'
+                  }`}
+                  style={{ fontFamily: "'League Spartan', sans-serif" }}
+                >
+                  {activePlace || 'Matching meals'}
+                </p>
+                <p className="mt-0.5 text-[11px] text-gray-600">
+                  {results.length} items · tap a meal to add
+                </p>
+              </div>
+            </div>
             {(activePlace || query.trim()) && (
               <button
                 type="button"
@@ -293,7 +347,7 @@ export function FastFoodMenu() {
                   setQuery('');
                   setCategory('all');
                 }}
-                className="bg-[transparent] p-0 text-xs font-semibold text-[#1f4aa6]"
+                className="shrink-0 bg-[transparent] p-0 pt-1 text-xs font-semibold text-[#1f4aa6]"
                 data-testid="fastfood-change-place"
               >
                 Clear
