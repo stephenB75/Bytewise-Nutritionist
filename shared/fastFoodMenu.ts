@@ -13,6 +13,41 @@ import { FLORIDA_FAST_FOOD_ITEMS } from './fastFoodMenuFlorida';
 import { SOUTHEAST_FAST_FOOD_ITEMS } from './fastFoodMenuSoutheast';
 import { CULTURAL_FAST_FOOD_ITEMS } from './fastFoodMenuCultural';
 import { DESSERT_FAST_FOOD_ITEMS } from './fastFoodMenuDesserts';
+import {
+  CARIBBEAN_RESTAURANTS,
+  type FoodCuisine,
+} from './fastFoodRegions';
+
+/** Cuisine keyword → restaurant list (kept here so menu search never depends on a separate binding). */
+const CUISINE_RESTAURANTS: Record<FoodCuisine, readonly string[]> = {
+  caribbean: CARIBBEAN_RESTAURANTS,
+};
+
+const CUISINE_SEARCH_WORDS: Record<string, FoodCuisine> = {
+  caribbean: 'caribbean',
+  carribean: 'caribbean',
+  westindian: 'caribbean',
+  jamaican: 'caribbean',
+  jamaica: 'caribbean',
+  haitian: 'caribbean',
+  haiti: 'caribbean',
+  trinidad: 'caribbean',
+  trinidadian: 'caribbean',
+  tobagonian: 'caribbean',
+  cuban: 'caribbean',
+  cuba: 'caribbean',
+  jerk: 'caribbean',
+};
+
+export function cuisineFromSearchQuery(query: string): FoodCuisine | null {
+  const key = query.trim().toLowerCase().replace(/[^a-z]/g, '');
+  return CUISINE_SEARCH_WORDS[key] ?? null;
+}
+
+export function restaurantsForCuisine(cuisine: FoodCuisine, catalog: string[]): string[] {
+  const wanted = CUISINE_RESTAURANTS[cuisine] || [];
+  return wanted.filter((name) => catalog.includes(name));
+}
 
 export type FastFoodCategory = 'breakfast' | 'sandwiches' | 'lunch' | 'dinner' | 'snacks';
 
@@ -56,16 +91,16 @@ const CORE_FAST_FOOD_ITEMS: FastFoodItem[] = [
   { id: 'tb-breakfast-crunchwrap', name: 'Breakfast Crunchwrap (Sausage)', restaurant: 'Taco Bell', category: 'breakfast', serving: '1 crunchwrap', calories: 680, protein: 21, carbs: 51, fat: 44, sodium: 1260 },
 
   // Sandwiches & burgers
-  { id: 'mcd-big-mac', name: 'Big Mac', restaurant: "McDonald's", category: 'sandwiches', serving: '1 burger', calories: 590, protein: 25, carbs: 46, fat: 34, sodium: 1050, keywords: ['burger'] },
+  { id: 'mcd-big-mac', name: 'Big Mac', restaurant: "McDonald's", category: 'sandwiches', serving: '1 burger', calories: 580, protein: 25, carbs: 45, fat: 34, sodium: 1060, keywords: ['burger'] },
   { id: 'mcd-qpc', name: 'Quarter Pounder with Cheese', restaurant: "McDonald's", category: 'sandwiches', serving: '1 burger', calories: 520, protein: 30, carbs: 42, fat: 26, sodium: 1140, keywords: ['burger', 'cheeseburger'] },
   { id: 'mcd-cheeseburger', name: 'Cheeseburger', restaurant: "McDonald's", category: 'sandwiches', serving: '1 burger', calories: 300, protein: 15, carbs: 32, fat: 13, sodium: 720, keywords: ['burger'] },
   { id: 'mcd-mcchicken', name: 'McChicken', restaurant: "McDonald's", category: 'sandwiches', serving: '1 sandwich', calories: 400, protein: 14, carbs: 39, fat: 21, sodium: 560, keywords: ['chicken sandwich'] },
   { id: 'mcd-mccrispy', name: 'McCrispy Chicken Sandwich', restaurant: "McDonald's", category: 'sandwiches', serving: '1 sandwich', calories: 470, protein: 26, carbs: 45, fat: 20, sodium: 1040, keywords: ['chicken sandwich'] },
   { id: 'mcd-filet-o-fish', name: 'Filet-O-Fish', restaurant: "McDonald's", category: 'sandwiches', serving: '1 sandwich', calories: 390, protein: 16, carbs: 38, fat: 19, sodium: 560, keywords: ['fish sandwich'] },
-  { id: 'cfa-chicken-sandwich', name: 'Chick-fil-A Chicken Sandwich', restaurant: 'Chick-fil-A', category: 'sandwiches', serving: '1 sandwich', calories: 420, protein: 28, carbs: 41, fat: 18, sodium: 1460, keywords: ['chicken sandwich'] },
+  { id: 'cfa-chicken-sandwich', name: 'Chick-fil-A Chicken Sandwich', restaurant: 'Chick-fil-A', category: 'sandwiches', serving: '1 sandwich', calories: 420, protein: 29, carbs: 41, fat: 18, sodium: 1460, keywords: ['chicken sandwich'] },
   { id: 'cfa-spicy-chicken-sandwich', name: 'Spicy Chicken Sandwich', restaurant: 'Chick-fil-A', category: 'sandwiches', serving: '1 sandwich', calories: 450, protein: 28, carbs: 42, fat: 19, sodium: 1620, keywords: ['chicken sandwich'] },
   { id: 'cfa-grilled-chicken-sandwich', name: 'Grilled Chicken Sandwich', restaurant: 'Chick-fil-A', category: 'sandwiches', serving: '1 sandwich', calories: 390, protein: 28, carbs: 44, fat: 12, sodium: 770, keywords: ['chicken sandwich'] },
-  { id: 'bk-whopper', name: 'Whopper', restaurant: 'Burger King', category: 'sandwiches', serving: '1 burger', calories: 670, protein: 31, carbs: 51, fat: 40, sodium: 1140, keywords: ['burger'] },
+  { id: 'bk-whopper', name: 'Whopper', restaurant: 'Burger King', category: 'sandwiches', serving: '1 burger', calories: 660, protein: 28, carbs: 49, fat: 40, sodium: 980, keywords: ['burger'] },
   { id: 'bk-whopper-jr', name: 'Whopper Jr.', restaurant: 'Burger King', category: 'sandwiches', serving: '1 burger', calories: 330, protein: 16, carbs: 29, fat: 17, sodium: 560, keywords: ['burger'] },
   { id: 'bk-original-chicken', name: 'Original Chicken Sandwich', restaurant: 'Burger King', category: 'sandwiches', serving: '1 sandwich', calories: 670, protein: 23, carbs: 55, fat: 40, sodium: 1170, keywords: ['chicken sandwich'] },
   { id: 'wendys-daves-single', name: "Dave's Single", restaurant: "Wendy's", category: 'sandwiches', serving: '1 burger', calories: 590, protein: 29, carbs: 39, fat: 37, sodium: 1180, keywords: ['burger', 'cheeseburger'] },
@@ -86,7 +121,7 @@ const CORE_FAST_FOOD_ITEMS: FastFoodItem[] = [
   { id: 'cfa-nuggets-8', name: 'Chick-fil-A Nuggets (8 ct)', restaurant: 'Chick-fil-A', category: 'lunch', serving: '8 nuggets', calories: 250, protein: 27, carbs: 11, fat: 11, sodium: 1210, keywords: ['nuggets'] },
   { id: 'cfa-grilled-nuggets-8', name: 'Grilled Nuggets (8 ct)', restaurant: 'Chick-fil-A', category: 'lunch', serving: '8 nuggets', calories: 130, protein: 25, carbs: 1, fat: 3, sodium: 440, keywords: ['nuggets'] },
   { id: 'popeyes-tenders-3', name: 'Chicken Tenders (3 pc)', restaurant: 'Popeyes', category: 'lunch', serving: '3 tenders', calories: 440, protein: 36, carbs: 26, fat: 21, sodium: 1520, keywords: ['strips'] },
-  { id: 'tb-crunchwrap', name: 'Crunchwrap Supreme', restaurant: 'Taco Bell', category: 'lunch', serving: '1 crunchwrap', calories: 530, protein: 16, carbs: 71, fat: 21, sodium: 1200 },
+  { id: 'tb-crunchwrap', name: 'Crunchwrap Supreme', restaurant: 'Taco Bell', category: 'lunch', serving: '1 crunchwrap', calories: 530, protein: 15, carbs: 74, fat: 20, sodium: 1210 },
   { id: 'tb-chicken-quesadilla', name: 'Chicken Quesadilla', restaurant: 'Taco Bell', category: 'lunch', serving: '1 quesadilla', calories: 510, protein: 26, carbs: 37, fat: 27, sodium: 1250 },
   { id: 'tb-crunchy-taco', name: 'Crunchy Taco', restaurant: 'Taco Bell', category: 'lunch', serving: '1 taco', calories: 170, protein: 8, carbs: 13, fat: 10, sodium: 310 },
   { id: 'tb-cheesy-gordita', name: 'Cheesy Gordita Crunch', restaurant: 'Taco Bell', category: 'lunch', serving: '1 gordita', calories: 500, protein: 20, carbs: 41, fat: 28, sodium: 850, keywords: ['taco'] },
@@ -220,7 +255,7 @@ const CORE_FAST_FOOD_ITEMS: FastFoodItem[] = [
   { id: 'wendys-fries-medium', name: 'Natural-Cut Fries (medium)', restaurant: "Wendy's", category: 'snacks', serving: 'medium', calories: 350, protein: 5, carbs: 47, fat: 16, sodium: 330, keywords: ['french fries'] },
 
   // Burger King
-  { id: 'bk-double-whopper', name: 'Double Whopper', restaurant: 'Burger King', category: 'sandwiches', serving: '1 burger', calories: 920, protein: 48, carbs: 51, fat: 58, sodium: 1330, keywords: ['burger'] },
+  { id: 'bk-double-whopper', name: 'Double Whopper', restaurant: 'Burger King', category: 'sandwiches', serving: '1 burger', calories: 900, protein: 48, carbs: 49, fat: 58, sodium: 1050, keywords: ['burger'] },
   { id: 'bk-impossible-whopper', name: 'Impossible Whopper', restaurant: 'Burger King', category: 'sandwiches', serving: '1 burger', calories: 630, protein: 25, carbs: 58, fat: 34, sodium: 1080, keywords: ['burger', 'plant based', 'vegetarian'] },
   { id: 'bk-nuggets-8', name: 'Chicken Nuggets (8 pc)', restaurant: 'Burger King', category: 'lunch', serving: '8 pieces', calories: 380, protein: 18, carbs: 23, fat: 24, sodium: 690, keywords: ['nuggets'] },
   { id: 'bk-fries-medium', name: 'French Fries (medium)', restaurant: 'Burger King', category: 'snacks', serving: 'medium', calories: 380, protein: 5, carbs: 53, fat: 17, sodium: 570, keywords: ['fries'] },
@@ -363,6 +398,45 @@ const SEARCH_ALIASES: Record<string, string> = {
   lagranja: 'la granja',
   tropicalpollo: 'pollo tropical',
   pollotropical: 'pollo tropical',
+  trueisland: 'true island grille',
+  trueislandgrille: 'true island grille',
+  truisland: 'true island grille',
+  tasteofjamaica: 'taste of jamaica',
+  tastejamaica: 'taste of jamaica',
+  caribbeansunshine: 'caribbean sunshine bakery',
+  sunshinebakery: 'caribbean sunshine bakery',
+  misslilys: "miss lily's",
+  misslily: "miss lily's",
+  jerkatnite: 'jerk at nite',
+  jerknite: 'jerk at nite',
+  jerkking: 'jerk king',
+  jagrill: "ja' grill",
+  jaggrill: "ja' grill",
+  jerkshack: 'the jerk shack',
+  thejerkshack: 'the jerk shack',
+  jamaicanjerkbiz: 'jamaican jerk biz',
+  jerkbiz: 'jamaican jerk biz',
+  marksjamaican: "mark's jamaican bar & grill",
+  marksjamaicangrille: "mark's jamaican bar & grill",
+  marksjamaicanbar: "mark's jamaican bar & grill",
+  marksgrill: "mark's jamaican bar & grill",
+  marksgrille: "mark's jamaican bar & grill",
+  markgrille: "mark's jamaican bar & grill",
+  markgrill: "mark's jamaican bar & grill",
+  negriljamaican: 'negril jamaican restaurant',
+  negrilrestaurant: 'negril jamaican restaurant',
+  negrileats: 'negril jamaican eatery',
+  negrileatery: 'negril jamaican eatery',
+  scotchbonnet: 'scotch bonnet kitchen',
+  scotchbonnetkitchen: 'scotch bonnet kitchen',
+  reggaepot: 'reggae pot',
+  islandspice: 'island spice',
+  peppersjamaican: 'peppers jamaican',
+  peppersla: 'peppers jamaican',
+  boukas: "bouka's jamaican restaurant",
+  boukasjamaican: "bouka's jamaican restaurant",
+  potwah: 'potwah jamaican cuisine',
+  potwahjamaican: 'potwah jamaican cuisine',
   charleys: "charley's",
   charley: "charley's",
   bucees: "buc-ee's",
@@ -437,6 +511,14 @@ const SEARCH_ALIASES: Record<string, string> = {
   juicypattie: 'juici patties',
   charliespastries: 'charlies pastries',
   charliespatties: 'charlies pastries',
+  bahamabreeze: 'bahama breeze',
+  bahama: 'bahama breeze',
+  islandgrille: 'bahama breeze',
+  peppas: 'peppas jerk chicken',
+  peppasjerk: 'peppas jerk chicken',
+  peppajerk: 'peppas jerk chicken',
+  chefcreole: 'chef creole',
+  creole: 'chef creole',
   zaza: 'zaza cuban comfort',
   zazacuban: 'zaza cuban comfort',
   zara: 'zaza cuban comfort',
@@ -509,6 +591,13 @@ function restaurantNameParts(name: string): { norm: string; compact: string; wor
 export function matchFastFoodRestaurants(query: string): string[] {
   const trimmed = query.trim();
   if (!trimmed) return [];
+
+  // "caribbean" / "jamaican" / "haitian" → all catalog Caribbean places (nationwide browse)
+  const cuisine = cuisineFromSearchQuery(trimmed);
+  if (cuisine) {
+    return restaurantsForCuisine(cuisine, FAST_FOOD_RESTAURANTS);
+  }
+
   const expanded = expandSearchQuery(trimmed);
   const qNorm = normalize(trimmed);
   const qComp = compact(trimmed);
@@ -543,6 +632,10 @@ export function matchFastFoodRestaurants(query: string): string[] {
 export function suggestFastFoodRestaurants(query: string, limit = 6): string[] {
   const trimmed = query.trim();
   if (!trimmed) return [];
+  const cuisine = cuisineFromSearchQuery(trimmed);
+  if (cuisine) {
+    return restaurantsForCuisine(cuisine, FAST_FOOD_RESTAURANTS).slice(0, Math.max(limit, 12));
+  }
   const exact = matchFastFoodRestaurants(trimmed);
   if (exact.length) return exact.slice(0, limit);
 

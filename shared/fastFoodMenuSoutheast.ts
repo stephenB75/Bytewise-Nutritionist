@@ -37,7 +37,8 @@ export const SOUTHEAST_FAST_FOOD_ITEMS: FastFoodItem[] = [
   item('sonnys-brisket-dinner', 'Chopped Brisket Dinner', "Sonny's BBQ", 'dinner', '1 plate', 1210, 78, 79, 68, 2340, ['bbq', 'brisket']),
   item('sonnys-chicken-dinner', 'Smoked Chicken Dinner (dark & white)', "Sonny's BBQ", 'dinner', '1 plate', 1180, 84, 120, 43, 1760, ['bbq', 'chicken']),
   item('sonnys-pulled-pork-pit', 'Pulled Pork (pit combo portion)', "Sonny's BBQ", 'lunch', '145 g', 440, 35, 5, 31, 520, ['bbq', 'pork']),
-  item('sonnys-ribs-pit', 'Sweet & Smokey Ribs (pit combo portion)', "Sonny's BBQ", 'lunch', '182 g', 460, 49, 7, 45, 510, ['bbq', 'ribs']),
+  // Calories aligned to Atwater from published-style macros (~630 for this portion)
+  item('sonnys-ribs-pit', 'Sweet & Smokey Ribs (pit combo portion)', "Sonny's BBQ", 'lunch', '182 g', 630, 49, 7, 45, 510, ['bbq', 'ribs']),
   item('sonnys-brisket-pit', 'Chopped Brisket (pit combo portion)', "Sonny's BBQ", 'lunch', '145 g', 420, 41, 0, 29, 610, ['bbq', 'brisket']),
   item('sonnys-smoked-wings', 'Smoked Wings', "Sonny's BBQ", 'lunch', '1 order', 750, 83, 3, 45, 2380, ['wings', 'bbq']),
   item('sonnys-fries', 'Crinkle-Cut Fries', "Sonny's BBQ", 'snacks', '1 side', 480, 6, 61, 23, 1590, ['fries']),

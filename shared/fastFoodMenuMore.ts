@@ -460,8 +460,8 @@ export const MORE_FAST_FOOD_ITEMS: FastFoodItem[] = [
 
   // Burger King
   item('bk-bacon-king', 'Bacon King', 'Burger King', 'sandwiches', '1 burger', 1150, 61, 49, 79, 2150, ['burger', 'bacon']),
-  item('bk-whopper-cheese', 'Whopper with Cheese', 'Burger King', 'sandwiches', '1 burger', 740, 34, 53, 46, 1340, ['burger']),
-  item('bk-triple-whopper', 'Triple Whopper', 'Burger King', 'sandwiches', '1 burger', 1170, 71, 51, 82, 1470, ['burger']),
+  item('bk-whopper-cheese', 'Whopper with Cheese', 'Burger King', 'sandwiches', '1 burger', 740, 32, 50, 46, 1340, ['burger']),
+  item('bk-triple-whopper', 'Triple Whopper', 'Burger King', 'sandwiches', '1 burger', 1130, 67, 49, 75, 1120, ['burger']),
   item('bk-royal-crispy-chicken', 'Royal Crispy Chicken', 'Burger King', 'sandwiches', '1 sandwich', 630, 28, 57, 32, 1480, ['chicken sandwich']),
   item('bk-big-fish', 'Big Fish Sandwich', 'Burger King', 'sandwiches', '1 sandwich', 510, 18, 57, 24, 1180, ['fish sandwich']),
   item('bk-rodeo-burger', 'Rodeo Burger', 'Burger King', 'sandwiches', '1 burger', 310, 12, 38, 13, 450, ['burger']),

@@ -47,9 +47,33 @@ export const REGIONAL_RESTAURANTS: Record<string, UsFoodRegion[]> = {
   Bolay: ['florida'],
   'Kingston 5': ['florida'],
   "Singh's Roti Shop": ['florida'],
-  'Juici Patties': ['florida', 'southeast'],
+  'Juici Patties': ['florida', 'southeast', 'northeast'],
   "Charlie's Pastries": ['florida'],
+  // National Darden chain — surface in every region’s “near you” row
+  'Bahama Breeze': ['florida', 'southeast', 'midwest', 'northeast', 'southwest', 'texas', 'west', 'hawaii'],
+  "Peppa's Jerk Chicken": ['florida'],
+  'Chef Creole': ['florida'],
   'Zaza Cuban Comfort': ['florida'],
+  'True Island Grille': ['florida'],
+  'Caribbean Sunshine Bakery': ['florida'],
+  // Common independent Jamaican restaurant name used in many cities
+  'Taste of Jamaica': ['florida', 'southeast', 'texas', 'northeast', 'midwest'],
+  "Miss Lily's": ['northeast'],
+  // Multi-city Caribbean brands filling Midwest / DMV / Texas / Atlanta gaps
+  'Jerk at Nite': ['northeast', 'southeast', 'midwest', 'texas'],
+  'Jerk King': ['midwest'],
+  "Ja' Grill": ['midwest'],
+  'The Jerk Shack': ['texas', 'southwest'],
+  'Jamaican Jerk Biz': ['southeast'],
+  "Mark's Jamaican Bar & Grill": ['florida'],
+  'Negril Jamaican Restaurant': ['florida'],
+  'Negril Jamaican Eatery': ['northeast', 'southeast'],
+  'Scotch Bonnet Kitchen': ['northeast'],
+  'Reggae Pot': ['southwest', 'west'],
+  'Island Spice': ['northeast', 'southeast'],
+  'Peppers Jamaican': ['west'],
+  "Bouka's Jamaican Restaurant": ['west'],
+  'Potwah Jamaican Cuisine': ['west'],
   'Fresh Kitchen': ['florida'],
   "Tomasino's Pizza": ['florida'],
   'Pizzeria Valdiano': ['florida'],
@@ -116,7 +140,8 @@ export const REGIONAL_RESTAURANTS: Record<string, UsFoodRegion[]> = {
   'Primanti Bros': ['northeast'],
   'Tim Hortons': ['northeast', 'midwest'],
   "Rita's Italian Ice": ['northeast'],
-  'Golden Krust': ['northeast', 'florida'],
+  // Largest Caribbean QSR footprint in the US — keep visible beyond the Northeast/FL core
+  'Golden Krust': ['northeast', 'florida', 'southeast', 'texas', 'midwest'],
   Jollibee: ['west', 'northeast', 'florida'],
   "Checkers & Rally's": ['southeast', 'midwest', 'northeast'],
   "Hardee's": ['southeast', 'midwest'],
@@ -136,16 +161,53 @@ export function regionFromCoords(lat: number, lng: number): UsFoodRegion | null 
   return null;
 }
 
+/**
+ * Caribbean / West Indian places with menus in the catalog.
+ * Shown via the Caribbean cuisine filter and cuisine-keyword search nationwide.
+ */
+export const CARIBBEAN_RESTAURANTS = [
+  'Golden Krust',
+  'Pollo Tropical',
+  'Bahama Breeze',
+  'Juici Patties',
+  "Charlie's Pastries",
+  'Kingston 5',
+  "Singh's Roti Shop",
+  "Peppa's Jerk Chicken",
+  'Chef Creole',
+  'Zaza Cuban Comfort',
+  'True Island Grille',
+  'Taste of Jamaica',
+  'Caribbean Sunshine Bakery',
+  "Miss Lily's",
+  'Jerk at Nite',
+  'Jerk King',
+  "Ja' Grill",
+  'The Jerk Shack',
+  'Jamaican Jerk Biz',
+  "Mark's Jamaican Bar & Grill",
+  'Negril Jamaican Restaurant',
+  'Negril Jamaican Eatery',
+  'Scotch Bonnet Kitchen',
+  'Reggae Pot',
+  'Island Spice',
+  'Peppers Jamaican',
+  "Bouka's Jamaican Restaurant",
+  'Potwah Jamaican Cuisine',
+] as const;
+
+export type FoodCuisine = 'caribbean';
+
 /** Prefer these in the compact popular row when we know the user's region. */
 const FEATURED_NEARBY: Record<UsFoodRegion, string[]> = {
-  florida: ["Sonny's BBQ", 'PDQ', "Miller's Ale House", 'Fresh Kitchen'],
-  southeast: ["Sonny's BBQ", 'Bojangles', 'Waffle House', "Zaxby's"],
-  texas: ['Whataburger', "Buc-ee's", 'Taco Cabana', "Torchy's Tacos"],
-  southwest: ['Whataburger', 'El Pollo Loco', 'In-N-Out', 'Cafe Rio'],
-  west: ['In-N-Out', "Carl's Jr.", 'Dutch Bros', "Peet's Coffee"],
-  midwest: ["Culver's", 'Skyline Chili', "Portillo's", 'White Castle'],
-  northeast: ['Wawa', 'Sheetz', 'Tim Hortons', 'Primanti Bros'],
-  hawaii: ["L&L Hawaiian Barbecue", 'Yoshinoya'],
+  florida: ['Negril Jamaican Restaurant', "Mark's Jamaican Bar & Grill", 'Caribbean Sunshine Bakery', 'Pollo Tropical'],
+  southeast: ['Jamaican Jerk Biz', 'Negril Jamaican Eatery', 'Island Spice', 'Golden Krust'],
+  texas: ['The Jerk Shack', 'Jerk at Nite', 'Taste of Jamaica', 'Golden Krust'],
+  southwest: ['Reggae Pot', 'The Jerk Shack', 'Bahama Breeze', 'Whataburger'],
+  west: ['Peppers Jamaican', "Bouka's Jamaican Restaurant", 'Potwah Jamaican Cuisine', 'Reggae Pot'],
+  midwest: ["Ja' Grill", 'Jerk King', 'Jerk at Nite', 'Bahama Breeze'],
+  northeast: ['Negril Jamaican Eatery', 'Scotch Bonnet Kitchen', 'Jerk at Nite', 'Golden Krust'],
+  hawaii: ['Bahama Breeze', "L&L Hawaiian Barbecue", 'Yoshinoya'],
 };
 
 export function regionalRestaurantsFor(region: UsFoodRegion, catalog: string[]): string[] {

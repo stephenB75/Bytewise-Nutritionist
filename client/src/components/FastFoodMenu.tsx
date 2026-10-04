@@ -13,13 +13,19 @@ import {
   matchFastFoodRestaurants,
   regionFromCoords,
   REGION_LABELS,
+  restaurantsForCuisine,
   searchFastFood,
   suggestFastFoodRestaurants,
   type FastFoodCategory,
   type FastFoodItem,
+  type FoodCuisine,
   type UsFoodRegion,
 } from '@/data/fastFoodMenu';
 import { Check, Loader2, MapPin, Search, Store, X } from 'lucide-react';
+
+const PLACE_CUISINES: { id: FoodCuisine; label: string }[] = [
+  { id: 'caribbean', label: 'Caribbean' },
+];
 
 const ADDED_CONFIRMATION_MS = 2500;
 
@@ -29,7 +35,28 @@ function calorieTone(calories: number) {
   return { color: '#ea580c', wash: 'bg-orange-100' };
 }
 
+/** Always shown first nationwide so Caribbean isn’t buried behind location or “More”. */
+const NATIONWIDE_CARIBBEAN = [
+  'Golden Krust',
+  'Pollo Tropical',
+  'Bahama Breeze',
+  'Negril Jamaican Eatery',
+  'Negril Jamaican Restaurant',
+  "Mark's Jamaican Bar & Grill",
+  'Jerk at Nite',
+  'Juici Patties',
+  'Taste of Jamaica',
+  'Peppers Jamaican',
+  "Bouka's Jamaican Restaurant",
+  'Scotch Bonnet Kitchen',
+  'Reggae Pot',
+  'The Jerk Shack',
+];
+
 const PINNED_POPULAR = [
+  'Golden Krust',
+  'Pollo Tropical',
+  'Bahama Breeze',
   "McDonald's",
   'Chick-fil-A',
   'Taco Bell',
@@ -70,29 +97,46 @@ export function FastFoodMenu() {
   const [region, setRegion] = useState<UsFoodRegion | null>(null);
   const [locationStatus, setLocationStatus] = useState<'idle' | 'asking' | 'ready' | 'denied'>('idle');
   const [showAllPlaces, setShowAllPlaces] = useState(false);
+  const [placeCuisine, setPlaceCuisine] = useState<FoodCuisine | 'all'>('all');
   const menuSectionRef = useRef<HTMLDivElement>(null);
   const prevActivePlaceRef = useRef<string | null>(null);
 
   const visiblePlaces = useMemo(() => {
-    const pinned = PINNED_POPULAR.filter((name) => FAST_FOOD_RESTAURANTS.includes(name));
-    const extras = FAST_FOOD_RESTAURANTS.filter((name) => !pinned.includes(name)).sort((a, b) => a.localeCompare(b));
-    if (showAllPlaces) {
-      if (!region) return [...pinned, ...extras];
-      const nearby = featuredNearbyRestaurants(region, FAST_FOOD_RESTAURANTS, 8).filter((name) => !pinned.includes(name));
-      const rest = extras.filter((name) => !nearby.includes(name));
-      return [...nearby, ...pinned, ...rest];
+    if (placeCuisine !== 'all') {
+      return restaurantsForCuisine(placeCuisine, FAST_FOOD_RESTAURANTS);
     }
-    if (!region) return pinned.slice(0, 15);
-    const nearby = featuredNearbyRestaurants(region, FAST_FOOD_RESTAURANTS, 3).filter((name) => !pinned.includes(name));
-    return [...nearby, ...pinned].slice(0, 18);
-  }, [region, showAllPlaces]);
+    const caribbean = NATIONWIDE_CARIBBEAN.filter((name) => FAST_FOOD_RESTAURANTS.includes(name));
+    const pinned = PINNED_POPULAR.filter((name) => FAST_FOOD_RESTAURANTS.includes(name));
+    const extras = FAST_FOOD_RESTAURANTS.filter(
+      (name) => !pinned.includes(name) && !caribbean.includes(name)
+    ).sort((a, b) => a.localeCompare(b));
+    if (showAllPlaces) {
+      if (!region) return [...caribbean, ...pinned.filter((n) => !caribbean.includes(n)), ...extras];
+      const nearby = featuredNearbyRestaurants(region, FAST_FOOD_RESTAURANTS, 8).filter(
+        (name) => !pinned.includes(name) && !caribbean.includes(name)
+      );
+      const rest = extras.filter((name) => !nearby.includes(name));
+      return [...caribbean, ...nearby, ...pinned.filter((n) => !caribbean.includes(n)), ...rest];
+    }
+    // Compact row: Caribbean first for every US user, then nearby + national pins
+    if (!region) {
+      const rest = pinned.filter((n) => !caribbean.includes(n));
+      return [...caribbean, ...rest].slice(0, 18);
+    }
+    const nearby = featuredNearbyRestaurants(region, FAST_FOOD_RESTAURANTS, 3).filter(
+      (name) => !pinned.includes(name) && !caribbean.includes(name)
+    );
+    const rest = pinned.filter((n) => !caribbean.includes(n));
+    return [...caribbean, ...nearby, ...rest].slice(0, 20);
+  }, [region, showAllPlaces, placeCuisine]);
 
   const queryPlaces = useMemo(() => matchFastFoodRestaurants(query), [query]);
   const placeSuggestions = useMemo(() => suggestFastFoodRestaurants(query, 24), [query]);
   const activePlace = restaurant !== 'all' ? restaurant : queryPlaces.length === 1 ? queryPlaces[0] : null;
   const searchingPlaces = query.trim() && restaurant === 'all' && placeSuggestions.length > 0;
   const gridPlaces = searchingPlaces ? placeSuggestions : visiblePlaces;
-  const morePlacesCount = Math.max(0, FAST_FOOD_RESTAURANTS.length - visiblePlaces.length);
+  const morePlacesCount =
+    placeCuisine !== 'all' ? 0 : Math.max(0, FAST_FOOD_RESTAURANTS.length - visiblePlaces.length);
 
   const results = useMemo(() => {
     const trimmed = query.trim();
@@ -225,16 +269,18 @@ export function FastFoodMenu() {
           <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-600">
             {searchingPlaces
               ? 'Matching places'
-              : showAllPlaces
-                ? region
-                  ? `All places · ${REGION_LABELS[region]}`
-                  : 'All places'
-                : region
-                  ? `Places · ${REGION_LABELS[region]}`
-                  : 'Places'}
+              : placeCuisine === 'caribbean'
+                ? 'Caribbean · USA'
+                : showAllPlaces
+                  ? region
+                    ? `All places · ${REGION_LABELS[region]}`
+                    : 'All places'
+                  : region
+                    ? `Places · ${REGION_LABELS[region]}`
+                    : 'Places'}
           </p>
           <div className="flex items-center gap-3 shrink-0">
-            {!searchingPlaces && (
+            {!searchingPlaces && placeCuisine === 'all' && (
               <button
                 type="button"
                 onClick={() => setShowAllPlaces((open) => !open)}
@@ -257,6 +303,47 @@ export function FastFoodMenu() {
               </button>
             )}
           </div>
+        </div>
+
+        <div className="mb-2 flex flex-wrap gap-2" data-testid="fastfood-cuisine-filters">
+          <button
+            type="button"
+            onClick={() => {
+              setPlaceCuisine('all');
+              setRestaurant('all');
+            }}
+            className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
+              placeCuisine === 'all'
+                ? 'bg-[#1f4aa6] text-white'
+                : 'bg-[#1f4aa6]/10 text-[#1f4aa6] hover:bg-[#1f4aa6]/15'
+            }`}
+            data-testid="fastfood-cuisine-all"
+          >
+            All
+          </button>
+          {PLACE_CUISINES.map((cuisine) => {
+            const active = placeCuisine === cuisine.id;
+            return (
+              <button
+                key={cuisine.id}
+                type="button"
+                onClick={() => {
+                  setPlaceCuisine(active ? 'all' : cuisine.id);
+                  setRestaurant('all');
+                  setQuery('');
+                  setShowAllPlaces(false);
+                }}
+                className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
+                  active
+                    ? 'bg-[#1f4aa6] text-white'
+                    : 'bg-[#1f4aa6]/10 text-[#1f4aa6] hover:bg-[#1f4aa6]/15'
+                }`}
+                data-testid={`fastfood-cuisine-${cuisine.id}`}
+              >
+                {cuisine.label}
+              </button>
+            );
+          })}
         </div>
         <div className={`overflow-y-auto py-1 pr-1 [scrollbar-width:thin] ${showAllPlaces ? 'max-h-[420px]' : 'max-h-[280px]'}`}>
           <div className="grid grid-cols-3 gap-x-2 gap-y-1.5">
@@ -288,7 +375,7 @@ export function FastFoodMenu() {
             })}
           </div>
         </div>
-        {!searchingPlaces && !showAllPlaces && morePlacesCount > 0 && (
+        {!searchingPlaces && placeCuisine === 'all' && !showAllPlaces && morePlacesCount > 0 && (
           <button
             type="button"
             onClick={() => setShowAllPlaces(true)}
@@ -297,6 +384,11 @@ export function FastFoodMenu() {
           >
             More places · browse all {FAST_FOOD_RESTAURANTS.length} without sharing location
           </button>
+        )}
+        {placeCuisine === 'caribbean' && (
+          <p className="mt-2 text-[11px] text-gray-600">
+            Full Caribbean & West Indian catalog across the USA — tap a place for its menu.
+          </p>
         )}
       </div>
 
