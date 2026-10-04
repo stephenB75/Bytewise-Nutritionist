@@ -18,11 +18,38 @@ type InsightsResult = {
   generatedAt: string;
 };
 
+type StoredAnalyzer = {
+  dateKey: string;
+  results: Partial<Record<Range, InsightsResult>>;
+};
+
+const STORAGE_KEY = 'bytewise_nutrition_analyzer';
+
 const TONE_STYLES = {
   suggestion: { icon: Lightbulb, box: 'border-amber-300 bg-amber-50', iconColor: 'text-amber-700' },
   positive: { icon: CheckCircle2, box: 'border-green-300 bg-green-50', iconColor: 'text-green-700' },
   info: { icon: Info, box: 'border-sky-300 bg-sky-50', iconColor: 'text-sky-700' },
 } as const;
+
+function loadStored(dateKey: string): Partial<Record<Range, InsightsResult>> {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw) as StoredAnalyzer;
+    if (parsed?.dateKey !== dateKey || !parsed.results) return {};
+    return parsed.results;
+  } catch {
+    return {};
+  }
+}
+
+function saveStored(dateKey: string, results: Partial<Record<Range, InsightsResult>>) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ dateKey, results } satisfies StoredAnalyzer));
+  } catch {
+    // Ignore quota / private-mode write failures; in-memory results still work.
+  }
+}
 
 // apiRequest throws "500: {json}"; show the server's message rather than the raw text.
 function errorText(error: unknown): string {
@@ -34,28 +61,70 @@ function errorText(error: unknown): string {
   }
 }
 
+function formatGeneratedAt(iso: string): string {
+  try {
+    return new Date(iso).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  } catch {
+    return '';
+  }
+}
+
 export function AINutritionAnalyzer({ isSignedIn, onCreateAccount }: { isSignedIn: boolean; onCreateAccount: () => void }) {
+  const [dateKey, setDateKey] = useState(() => getLocalDateKey());
   const [range, setRange] = useState<Range>('today');
-  const [results, setResults] = useState<Partial<Record<Range, InsightsResult>>>({});
+  const [results, setResults] = useState<Partial<Record<Range, InsightsResult>>>(() => loadStored(getLocalDateKey()));
   const [stale, setStale] = useState(false);
 
+  // Keep today's analysis across tab switches; roll over when the calendar day changes.
   useEffect(() => {
-    const markStale = () => setStale(true);
+    const syncDay = () => {
+      const today = getLocalDateKey();
+      if (today === dateKey) return;
+      setDateKey(today);
+      setResults(loadStored(today));
+      setStale(false);
+    };
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') syncDay();
+    };
+    window.addEventListener('focus', syncDay);
+    document.addEventListener('visibilitychange', onVisible);
+    const timer = window.setInterval(syncDay, 60_000);
+    return () => {
+      window.removeEventListener('focus', syncDay);
+      document.removeEventListener('visibilitychange', onVisible);
+      window.clearInterval(timer);
+    };
+  }, [dateKey]);
+
+  // Meals can change the underlying data, but do not overwrite today's saved analysis
+  // until the user chooses to update.
+  useEffect(() => {
+    const markStale = () => {
+      if (results.today || results.week) setStale(true);
+    };
     const events = ['refresh-meals', 'calories-logged', 'meals-updated'];
     events.forEach(name => window.addEventListener(name, markStale));
     return () => events.forEach(name => window.removeEventListener(name, markStale));
-  }, []);
+  }, [results.today, results.week]);
 
   const analyze = useMutation({
     mutationFn: async (selected: Range): Promise<InsightsResult> =>
       (await apiRequest('POST', '/api/ai/nutrition-insights', { today: getLocalDateKey(), range: selected })).json(),
     onSuccess: (data, selected) => {
-      setResults(prev => ({ ...prev, [selected]: data }));
+      const today = getLocalDateKey();
+      setDateKey(today);
+      setResults(prev => {
+        const next = { ...prev, [selected]: data };
+        saveStored(today, next);
+        return next;
+      });
       setStale(false);
     },
   });
 
   const result = results[range];
+  const generatedLabel = result?.generatedAt ? formatGeneratedAt(result.generatedAt) : '';
 
   return (
     <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200/40 p-4 shadow-lg" data-testid="ai-nutrition-analyzer">
@@ -79,7 +148,9 @@ export function AINutritionAnalyzer({ isSignedIn, onCreateAccount }: { isSignedI
           ))}
         </div>
       </div>
-      <p className="text-sm text-gray-700 mb-3">Simple observations on the meals you've logged, like whether to add protein or cut back on carbs.</p>
+      <p className="text-sm text-gray-700 mb-3">
+        Simple observations on the meals you've logged. Saved for today until you choose to update it.
+      </p>
 
       {!isSignedIn ? (
         <div className="rounded-lg bg-white/70 p-3 text-sm text-gray-800">
@@ -90,30 +161,53 @@ export function AINutritionAnalyzer({ isSignedIn, onCreateAccount }: { isSignedI
         </div>
       ) : (
         <>
-          <Button
-            onClick={() => analyze.mutate(range)}
-            disabled={analyze.isPending}
-            className="on-color w-full bg-orange-700 hover:bg-orange-800 disabled:opacity-75"
-            data-testid="button-analyze-meals"
-          >
-            {analyze.isPending ? (
-              <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Analyzing…</>
-            ) : result ? (
-              <><RefreshCw className="h-4 w-4 mr-2" /> Analyze again</>
-            ) : (
-              <><Sparkles className="h-4 w-4 mr-2" /> Analyze {range === 'today' ? "today's" : 'this week\'s'} meals</>
-            )}
-          </Button>
+          {!result && (
+            <Button
+              onClick={() => analyze.mutate(range)}
+              disabled={analyze.isPending}
+              className="on-color w-full bg-orange-700 hover:bg-orange-800 disabled:opacity-75"
+              data-testid="button-analyze-meals"
+            >
+              {analyze.isPending ? (
+                <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Analyzing…</>
+              ) : (
+                <><Sparkles className="h-4 w-4 mr-2" /> Analyze {range === 'today' ? "today's" : "this week's"} meals</>
+              )}
+            </Button>
+          )}
 
           {analyze.isError && (
             <p className="mt-3 text-sm text-red-700" role="alert">{errorText(analyze.error)}</p>
           )}
 
           {result && (
-            <div className="mt-4 space-y-2" data-testid="analyzer-results">
+            <div className="mt-1 space-y-2" data-testid="analyzer-results">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-xs text-gray-600">
+                  Saved for today{generatedLabel ? ` · ${generatedLabel}` : ''}
+                </p>
+                <Button
+                  size="sm"
+                  variant={stale ? 'default' : 'outline'}
+                  onClick={() => analyze.mutate(range)}
+                  disabled={analyze.isPending}
+                  className={stale ? 'on-color h-8 bg-orange-700 hover:bg-orange-800 text-xs' : 'h-8 text-xs border-amber-300 bg-white/80'}
+                  data-testid="button-analyze-meals"
+                >
+                  {analyze.isPending ? (
+                    <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> Updating…</>
+                  ) : (
+                    <><RefreshCw className="h-3.5 w-3.5 mr-1.5" /> {stale ? 'Update from meals' : 'Update analysis'}</>
+                  )}
+                </Button>
+              </div>
+
               {stale && (
-                <p className="text-xs text-amber-900 bg-amber-100 rounded-md px-2 py-1">You've logged food since this analysis. Tap "Analyze again" to update it.</p>
+                <p className="text-xs text-amber-900 bg-amber-100 rounded-md px-2 py-1" data-testid="analyzer-stale-banner">
+                  You've logged food since this was saved. Keeping today's analysis — tap "Update from meals" if you want a new one.
+                </p>
               )}
+
               <p className="text-sm font-semibold text-gray-900" data-testid="text-analyzer-summary">{result.summary}</p>
               {result.observations.map((obs, index) => {
                 const style = TONE_STYLES[obs.tone] || TONE_STYLES.info;

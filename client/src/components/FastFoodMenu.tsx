@@ -69,20 +69,28 @@ export function FastFoodMenu() {
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
   const [region, setRegion] = useState<UsFoodRegion | null>(null);
   const [locationStatus, setLocationStatus] = useState<'idle' | 'asking' | 'ready' | 'denied'>('idle');
+  const [showAllPlaces, setShowAllPlaces] = useState(false);
 
   const visiblePlaces = useMemo(() => {
     const pinned = PINNED_POPULAR.filter((name) => FAST_FOOD_RESTAURANTS.includes(name));
-    const extras = FAST_FOOD_RESTAURANTS.filter((name) => !pinned.includes(name));
-    if (!region) return [...pinned, ...extras].slice(0, 30);
+    const extras = FAST_FOOD_RESTAURANTS.filter((name) => !pinned.includes(name)).sort((a, b) => a.localeCompare(b));
+    if (showAllPlaces) {
+      if (!region) return [...pinned, ...extras];
+      const nearby = featuredNearbyRestaurants(region, FAST_FOOD_RESTAURANTS, 8).filter((name) => !pinned.includes(name));
+      const rest = extras.filter((name) => !nearby.includes(name));
+      return [...nearby, ...pinned, ...rest];
+    }
+    if (!region) return pinned.slice(0, 15);
     const nearby = featuredNearbyRestaurants(region, FAST_FOOD_RESTAURANTS, 3).filter((name) => !pinned.includes(name));
-    const rest = extras.filter((name) => !nearby.includes(name));
-    return [...nearby, ...pinned, ...rest].slice(0, 30);
-  }, [region]);
+    return [...nearby, ...pinned].slice(0, 18);
+  }, [region, showAllPlaces]);
 
   const queryPlaces = useMemo(() => matchFastFoodRestaurants(query), [query]);
-  const placeSuggestions = useMemo(() => suggestFastFoodRestaurants(query, 12), [query]);
+  const placeSuggestions = useMemo(() => suggestFastFoodRestaurants(query, 24), [query]);
   const activePlace = restaurant !== 'all' ? restaurant : queryPlaces.length === 1 ? queryPlaces[0] : null;
-  const gridPlaces = query.trim() && restaurant === 'all' && placeSuggestions.length > 0 ? placeSuggestions : visiblePlaces;
+  const searchingPlaces = query.trim() && restaurant === 'all' && placeSuggestions.length > 0;
+  const gridPlaces = searchingPlaces ? placeSuggestions : visiblePlaces;
+  const morePlacesCount = Math.max(0, FAST_FOOD_RESTAURANTS.length - visiblePlaces.length);
 
   const results = useMemo(() => {
     if (!activePlace && !query.trim()) return [];
@@ -183,27 +191,43 @@ export function FastFoodMenu() {
       <div className="mb-4" data-testid="fastfood-restaurants">
         <div className="flex items-center justify-between gap-2 mb-2">
           <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-600">
-            {query.trim() && restaurant === 'all' && placeSuggestions.length > 0
+            {searchingPlaces
               ? 'Matching places'
-              : region
-                ? `Places · ${REGION_LABELS[region]}`
-                : 'Places'}
+              : showAllPlaces
+                ? region
+                  ? `All places · ${REGION_LABELS[region]}`
+                  : 'All places'
+                : region
+                  ? `Places · ${REGION_LABELS[region]}`
+                  : 'Places'}
           </p>
-          {locationStatus !== 'ready' && (
-            <button
-              type="button"
-              onClick={useMyLocation}
-              disabled={locationStatus === 'asking'}
-              className="inline-flex items-center gap-1 bg-[transparent] min-h-[28px] px-0 text-xs font-semibold text-[#1f4aa6]"
-              data-testid="fastfood-use-location"
-            >
-              {locationStatus === 'asking' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <MapPin className="w-3.5 h-3.5" />}
-              {locationStatus === 'denied' ? 'Location off' : 'Near you'}
-            </button>
-          )}
+          <div className="flex items-center gap-3 shrink-0">
+            {!searchingPlaces && (
+              <button
+                type="button"
+                onClick={() => setShowAllPlaces((open) => !open)}
+                className="bg-[transparent] min-h-[28px] px-0 text-xs font-semibold text-[#1f4aa6]"
+                data-testid="fastfood-more-places"
+              >
+                {showAllPlaces ? 'Show less' : `More${morePlacesCount > 0 ? ` · ${morePlacesCount}` : ''}`}
+              </button>
+            )}
+            {locationStatus !== 'ready' && (
+              <button
+                type="button"
+                onClick={useMyLocation}
+                disabled={locationStatus === 'asking'}
+                className="inline-flex items-center gap-1 bg-[transparent] min-h-[28px] px-0 text-xs font-semibold text-[#1f4aa6]"
+                data-testid="fastfood-use-location"
+              >
+                {locationStatus === 'asking' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <MapPin className="w-3.5 h-3.5" />}
+                {locationStatus === 'denied' ? 'Location off' : 'Near you'}
+              </button>
+            )}
+          </div>
         </div>
-        <div className="-mx-1 overflow-x-auto pb-0.5 [scrollbar-width:thin]">
-          <div className="grid w-max grid-flow-col grid-rows-5 gap-x-4 gap-y-0.5 auto-cols-[max-content]">
+        <div className={`overflow-y-auto pr-1 [scrollbar-width:thin] ${showAllPlaces ? 'max-h-[420px]' : 'max-h-[280px]'}`}>
+          <div className="grid grid-cols-3 gap-x-3 gap-y-0.5">
             {gridPlaces.map((name) => {
               const selected = activePlace === name;
               return (
@@ -212,7 +236,7 @@ export function FastFoodMenu() {
                   type="button"
                   onClick={() => selectPlace(name)}
                   aria-pressed={selected}
-                  className={`bg-[transparent] min-h-[26px] px-0 py-0.5 text-left text-[12px] leading-snug whitespace-nowrap ${
+                  className={`bg-[transparent] min-h-[28px] px-0.5 py-0.5 text-left text-[12px] leading-snug ${
                     selected ? 'font-bold text-[#0f2f75]' : 'font-medium text-[#1f4aa6] hover:text-[#0f2f75]'
                   }`}
                   data-testid={`fastfood-restaurant-${name}`}
@@ -223,6 +247,16 @@ export function FastFoodMenu() {
             })}
           </div>
         </div>
+        {!searchingPlaces && !showAllPlaces && morePlacesCount > 0 && (
+          <button
+            type="button"
+            onClick={() => setShowAllPlaces(true)}
+            className="mt-2 w-full bg-[transparent] py-1.5 text-center text-xs font-semibold text-[#1f4aa6]"
+            data-testid="fastfood-more-places-footer"
+          >
+            More places · browse all {FAST_FOOD_RESTAURANTS.length} without sharing location
+          </button>
+        )}
       </div>
 
       {activePlace && (

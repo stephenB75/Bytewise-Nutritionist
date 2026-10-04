@@ -162,10 +162,10 @@ export const MORE_FAST_FOOD_ITEMS: FastFoodItem[] = [
   item('captain-ds-batter-fish', 'Batter-Dipped Fish (1 pc)', "Captain D's", 'dinner', '1 piece', 170, 9, 11, 10, 510, ['fish']),
   item('captain-ds-fish-meal', 'Fish & Fries Meal (2 pc)', "Captain D's", 'dinner', '1 meal', 760, 22, 84, 37, 1700, ['fish and chips']),
 
-  // Dessert, bakery & coffee chains
-  item('cinnabon-classic-roll', 'Classic Roll', 'Cinnabon', 'snacks', '1 roll', 880, 13, 127, 37, 830, ['cinnamon roll', 'dessert']),
-  item('cinnabon-minibon', 'MiniBon Classic Roll', 'Cinnabon', 'snacks', '1 roll', 350, 5, 49, 15, 330, ['cinnamon roll', 'dessert']),
-  item('cinnabon-bonbites', 'Classic BonBites (4 pc)', 'Cinnabon', 'snacks', '4 pieces', 360, 5, 52, 15, 340, ['cinnamon roll', 'dessert']),
+  // Cinnabon — Nov 2025 domestic nutrition guide
+  item('cinnabon-classic-roll', 'Classic Roll', 'Cinnabon', 'snacks', '1 roll', 880, 12, 129, 37, 1150, ['cinnamon roll', 'dessert', 'cinnabun']),
+  item('cinnabon-minibon', 'MiniBon Classic Roll', 'Cinnabon', 'snacks', '1 roll', 350, 5, 52, 15, 350, ['cinnamon roll', 'dessert', 'cinnabun']),
+  item('cinnabon-bonbites', 'Classic BonBites (4 pc)', 'Cinnabon', 'snacks', '4 pieces', 410, 5, 58, 17, 480, ['cinnamon roll', 'dessert', 'cinnabun']),
   item('baskin-robbins-chocolate', 'Chocolate Ice Cream (regular scoop)', 'Baskin-Robbins', 'snacks', '4 oz scoop', 280, 5, 33, 15, 140, ['dessert', 'ice cream']),
   item('baskin-robbins-pralines', "Pralines 'n Cream (regular scoop)", 'Baskin-Robbins', 'snacks', '4 oz scoop', 290, 4, 38, 14, 200, ['dessert', 'ice cream']),
   item('baskin-robbins-mint-chip', 'Mint Chocolate Chip (regular scoop)', 'Baskin-Robbins', 'snacks', '4 oz scoop', 290, 4, 32, 16, 120, ['dessert', 'ice cream']),

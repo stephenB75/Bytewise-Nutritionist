@@ -8,6 +8,11 @@ import { FULL_FAST_FOOD_ITEMS } from './fastFoodMenuFull';
 import { ASIAN_FAST_FOOD_ITEMS } from './fastFoodMenuAsian';
 import { CAFE_FAST_FOOD_ITEMS } from './fastFoodMenuCafes';
 import { MORE_PLACES_FAST_FOOD_ITEMS } from './fastFoodMenuMorePlaces';
+import { CARIBBEAN_FAST_FOOD_ITEMS } from './fastFoodMenuCaribbean';
+import { FLORIDA_FAST_FOOD_ITEMS } from './fastFoodMenuFlorida';
+import { SOUTHEAST_FAST_FOOD_ITEMS } from './fastFoodMenuSoutheast';
+import { CULTURAL_FAST_FOOD_ITEMS } from './fastFoodMenuCultural';
+import { DESSERT_FAST_FOOD_ITEMS } from './fastFoodMenuDesserts';
 
 export type FastFoodCategory = 'breakfast' | 'sandwiches' | 'lunch' | 'dinner' | 'snacks';
 
@@ -339,7 +344,7 @@ const CORE_FAST_FOOD_ITEMS: FastFoodItem[] = [
   { id: 'sweetgreen-kale-caesar', name: 'Kale Caesar', restaurant: 'Sweetgreen', category: 'lunch', serving: '1 bowl', calories: 430, protein: 30, carbs: 21, fat: 26, sodium: 920, keywords: ['salad'] },
 ];
 
-export const FAST_FOOD_ITEMS: FastFoodItem[] = [...CORE_FAST_FOOD_ITEMS, ...MORE_FAST_FOOD_ITEMS, ...FULL_FAST_FOOD_ITEMS, ...ASIAN_FAST_FOOD_ITEMS, ...CAFE_FAST_FOOD_ITEMS, ...MORE_PLACES_FAST_FOOD_ITEMS];
+export const FAST_FOOD_ITEMS: FastFoodItem[] = [...CORE_FAST_FOOD_ITEMS, ...MORE_FAST_FOOD_ITEMS, ...FULL_FAST_FOOD_ITEMS, ...ASIAN_FAST_FOOD_ITEMS, ...CAFE_FAST_FOOD_ITEMS, ...MORE_PLACES_FAST_FOOD_ITEMS, ...CARIBBEAN_FAST_FOOD_ITEMS, ...FLORIDA_FAST_FOOD_ITEMS, ...SOUTHEAST_FAST_FOOD_ITEMS, ...CULTURAL_FAST_FOOD_ITEMS, ...DESSERT_FAST_FOOD_ITEMS];
 
 export const FAST_FOOD_RESTAURANTS: string[] = Array.from(new Set(FAST_FOOD_ITEMS.map((item) => item.restaurant))).sort(
   (a, b) => a.localeCompare(b)
@@ -423,6 +428,63 @@ const SEARCH_ALIASES: Record<string, string> = {
   logansroadhouse: 'logans roadhouse',
   benandjerrys: 'ben jerrys',
   benjerrys: 'ben jerrys',
+  kingston5: 'kingston 5',
+  kingston: 'kingston 5',
+  singhs: 'singhs roti shop',
+  singhsroti: 'singhs roti shop',
+  juici: 'juici patties',
+  juicypatties: 'juici patties',
+  juicypattie: 'juici patties',
+  charliespastries: 'charlies pastries',
+  charliespatties: 'charlies pastries',
+  zaza: 'zaza cuban comfort',
+  zazacuban: 'zaza cuban comfort',
+  zara: 'zaza cuban comfort',
+  zaracuban: 'zaza cuban comfort',
+  freshkitchen: 'fresh kitchen',
+  fk: 'fresh kitchen',
+  tomasino: 'tomasinos pizza',
+  tomasinos: 'tomasinos pizza',
+  tommasino: 'tomasinos pizza',
+  tommasinos: 'tomasinos pizza',
+  valdiano: 'pizzeria valdiano',
+  valdianos: 'pizzeria valdiano',
+  pizzeriavaldiano: 'pizzeria valdiano',
+  sonnys: 'sonnys bbq',
+  sonnysbbq: 'sonnys bbq',
+  sonnysbarbecue: 'sonnys bbq',
+  pdq: 'pdq',
+  millers: 'millers ale house',
+  millersalehouse: 'millers ale house',
+  alehouse: 'millers ale house',
+  bonefish: 'bonefish grill',
+  bonefishgrill: 'bonefish grill',
+  bibibop: 'bibibop',
+  bibi: 'bibibop',
+  nandos: 'nandos peri peri',
+  nando: 'nandos peri peri',
+  periperi: 'nandos peri peri',
+  lees: 'lees sandwiches',
+  leessandwiches: 'lees sandwiches',
+  banhmi: 'lees sandwiches',
+  nothingbundt: 'nothing bundt cakes',
+  nothingbundtcakes: 'nothing bundt cakes',
+  bundt: 'nothing bundt cakes',
+  bundtini: 'nothing bundt cakes',
+  bundtlet: 'nothing bundt cakes',
+  insomnia: 'insomnia cookies',
+  insomniacookies: 'insomnia cookies',
+  yogurtland: 'yogurtland',
+  menchies: 'menchies',
+  andys: 'andys frozen custard',
+  andysfrozencustard: 'andys frozen custard',
+  duckdonuts: 'duck donuts',
+  duck: 'duck donuts',
+  cinnabon: 'cinnabon',
+  cinnabun: 'cinnabon',
+  cinnabuns: 'cinnabon',
+  cinnabonroll: 'cinnabon',
+  cinnamonroll: 'cinnabon',
 };
 
 function expandSearchQuery(query: string): string {
