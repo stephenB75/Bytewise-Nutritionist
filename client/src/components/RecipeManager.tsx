@@ -7,10 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
-import { useSubscription } from '@/hooks/useSubscription';
 import { RecipeNutritionSummary } from '@/components/RecipeNutritionSummary';
-import { PremiumFeatureGate } from '@/components/PremiumFeatureGate';
-import { FREE_LIMITS } from '@/lib/usageLimits';
 import { getLocalDateKey, getMealTypeByTime } from '@/utils/dateUtils';
 import { Plus, Trash2, Utensils, BookOpen } from 'lucide-react';
 
@@ -39,7 +36,6 @@ const emptyForm = {
 
 export function RecipeManager() {
   const { toast } = useToast();
-  const { isPremium } = useSubscription();
   const queryClient = useQueryClient();
   const [form, setForm] = useState(emptyForm);
   const [showForm, setShowForm] = useState(false);
@@ -53,7 +49,6 @@ export function RecipeManager() {
   });
 
   const recipes = data?.recipes || [];
-  const atFreeLimit = !isPremium && recipes.length >= FREE_LIMITS.recipes;
 
   const createRecipe = useMutation({
     mutationFn: async () => {
@@ -123,9 +118,7 @@ export function RecipeManager() {
       <div className="flex items-center justify-between">
         <div>
           <h4 className="font-semibold text-gray-900">Recipe Library</h4>
-          <p className="text-xs text-gray-600">
-            {isPremium ? 'Unlimited recipes' : `${recipes.length}/${FREE_LIMITS.recipes} free recipes`}
-          </p>
+          <p className="text-xs text-gray-600">Save meals and log them in one tap.</p>
         </div>
         <Button
           size="sm"
@@ -137,13 +130,7 @@ export function RecipeManager() {
         </Button>
       </div>
 
-      {showForm && atFreeLimit ? (
-        <PremiumFeatureGate
-          feature="premium"
-          featureName="Unlimited Recipes"
-          description="Free accounts can save 5 recipes. Upgrade to keep a full recipe library."
-        />
-      ) : showForm ? (
+      {showForm ? (
         <Card className="p-4 bg-white/70 border-amber-200 space-y-3">
           <Input
             placeholder="Recipe name"

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
+import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
 import type { IScannerControls } from '@zxing/browser';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -85,11 +86,11 @@ function servingCalories(food: PackagedFood): string {
   return '';
 }
 
-function tapFeedback() {
-  if (!Capacitor.isNativePlatform()) return;
-  import('@capacitor/haptics')
-    .then(({ Haptics, ImpactStyle }) => Haptics.impact({ style: ImpactStyle.Medium }))
-    .catch(() => {});
+function barcodeAcceptedHaptic() {
+  if (!Capacitor.isNativePlatform() || !Capacitor.isPluginAvailable('Haptics')) return;
+  void Haptics.notification({ type: NotificationType.Success }).catch(() => {
+    void Haptics.impact({ style: ImpactStyle.Medium });
+  });
 }
 
 function BarcodeCamera({ onDetected, onClose }: { onDetected: (code: string) => void; onClose: () => void }) {
@@ -136,7 +137,7 @@ function BarcodeCamera({ onDetected, onClose }: { onDetected: (code: string) => 
           if (!result || detected) return;
           detected = true;
           scanControls.stop();
-          tapFeedback();
+          barcodeAcceptedHaptic();
           onDetected(result.getText());
         };
         try {
@@ -444,6 +445,7 @@ export function PackagedFoodScanner() {
     setSelected(null);
     try {
       setSelected(await fetchBarcode(code));
+      barcodeAcceptedHaptic();
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Barcode lookup failed.');
     } finally {

@@ -1480,17 +1480,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(401).json({ message: 'User not found' });
     }
     try {
-      const subscription = await storage.getUserSubscription(userId);
-      const isPremium = subscription?.status === 'active' &&
-        (subscription.tier === 'premium' || subscription.tier === 'pro');
-      const existing = await storage.getUserRecipes(userId);
-      if (!isPremium && existing.length >= 5) {
-        return res.status(402).json({
-          error: 'RECIPE_LIMIT',
-          message: 'Free accounts can save 5 recipes. Upgrade for unlimited recipes.',
-        });
-      }
-
       const recipe = await storage.createRecipe({
         userId,
         name: req.body.name,

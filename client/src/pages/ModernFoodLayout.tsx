@@ -93,7 +93,6 @@ import { AINutritionAnalyzer } from '@/components/AINutritionAnalyzer';
 import { fixMealDateMismatches } from '@/utils/mealDateFixer';
 import { getCachedLocalStorage, debounce } from '@/utils/performanceUtils';
 import { useLocation } from 'wouter';
-import { useSubscription } from '@/hooks/useSubscription';
 
 function lazySection<C extends React.ComponentType<any>>(load: () => Promise<{ default: C }>) {
   const Lazy = React.lazy(load);
@@ -299,7 +298,6 @@ const HeroSection = React.memo(function HeroSection({
 export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) {
   const { user, isLoading: authLoading, refetch: refetchUser } = useAuth();
   const { photoUrl: profilePhotoUrl } = useProfilePhoto();
-  const { isPremium, isLoading: subscriptionLoading } = useSubscription();
   const [activeTab, setActiveTab] = useState('home');
   const [previousTab, setPreviousTab] = useState('home');
   const [openCard, setOpenCard] = useState<string | undefined>(undefined);
