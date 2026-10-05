@@ -4,10 +4,10 @@ import type { FastFoodCategory, FastFoodItem } from './fastFoodMenu';
  * Southeast / Florida chains with published nutrition guides.
  * Sonny's BBQ — Dec 2024 nutritionals PDF.
  * PDQ — Nutritionix interactive menu (chain-provided).
- * Miller's Ale House — May 2026 nutrition guide (items without sides unless named).
+ * Miller's Ale House — June 25, 2026 nutrition guide (items without sides unless named).
  * Bonefish Grill — Nov 2025 OSI nutrition PDF.
- * Marlow's Tavern — official 6 oz salmon add-on; other items are Atwater-aligned
- *   estimates from typical builds / third-party menu analyses (chain does not publish a full guide).
+ * Marlow's Tavern — SS2026 GA/FL menus; official 6 oz salmon add-on only;
+ *   remaining items are Atwater-aligned estimates (chain does not publish a full guide).
  */
 const item = (
   id: string,
@@ -65,19 +65,19 @@ export const SOUTHEAST_FAST_FOOD_ITEMS: FastFoodItem[] = [
   item('pdq-nuggets-kids', 'Kids Nuggets', 'PDQ', 'lunch', 'kids order', 180, 16, 11, 8, 270, ['nuggets']),
   item('pdq-sauce', 'PDQ Sauce', 'PDQ', 'snacks', '1 serving', 150, 1, 2, 15, 210, ['sauce']),
 
-  // Miller's Ale House — May 2026 guide (no sides unless named)
-  item('mah-classic-cheeseburger', 'Classic Cheeseburger', "Miller's Ale House", 'sandwiches', '1 burger', 1010, 53, 42, 70, 2150, ['burger']),
-  item('mah-prime-burger', 'Prime Burger', "Miller's Ale House", 'sandwiches', '1 burger', 1280, 64, 51, 92, 3040, ['burger']),
-  item('mah-cue-bacon', 'Cue Bacon Cheeseburger', "Miller's Ale House", 'sandwiches', '1 burger', 1160, 58, 53, 79, 2890, ['burger', 'bbq']),
-  item('mah-brunch-burger', 'Brunch Burger', "Miller's Ale House", 'sandwiches', '1 burger', 1440, 56, 46, 114, 2690, ['burger']),
-  item('mah-wings-12', 'Fresh Chicken Wings (12, no sauce)', "Miller's Ale House", 'lunch', '12 wings', 440, 76, 0, 12, 280, ['wings']),
-  item('mah-wings-6', 'Fresh Chicken Wings (6, no sauce)', "Miller's Ale House", 'lunch', '6 wings', 220, 38, 0, 6, 140, ['wings']),
-  item('mah-zingers', 'World Famous Zingers (no sauce)', "Miller's Ale House", 'lunch', '1 order', 850, 60, 38, 49, 240, ['zingers', 'chicken']),
+  // Miller's Ale House — June 25, 2026 guide (no sides unless named)
+  item('mah-classic-cheeseburger', 'Classic Cheeseburger', "Miller's Ale House", 'sandwiches', '1 burger', 1030, 52, 44, 71, 2160, ['burger']),
+  item('mah-prime-burger', 'Prime Burger', "Miller's Ale House", 'sandwiches', '1 burger', 1300, 63, 53, 93, 3120, ['burger']),
+  item('mah-cue-bacon', 'Cue Bacon Cheeseburger', "Miller's Ale House", 'sandwiches', '1 burger', 1180, 57, 54, 80, 2900, ['burger', 'bbq']),
+  item('mah-brunch-burger', 'Brunch Burger', "Miller's Ale House", 'sandwiches', '1 burger', 1410, 55, 47, 111, 2690, ['burger']),
+  item('mah-wings-12', 'Fresh Chicken Wings (12, no sauce)', "Miller's Ale House", 'lunch', '12 wings', 1290, 106, 0, 93, 510, ['wings']),
+  item('mah-wings-6', 'Fresh Chicken Wings (6, no sauce)', "Miller's Ale House", 'lunch', '6 wings', 675, 53, 0, 49, 260, ['wings']),
+  item('mah-zingers', 'World Famous Zingers (no sauce)', "Miller's Ale House", 'lunch', '1 order', 800, 75, 57, 29, 1090, ['zingers', 'chicken']),
   item('mah-philly', 'Philly Cheese Steak', "Miller's Ale House", 'sandwiches', '1 sandwich', 990, 60, 65, 53, 3030, ['philly']),
   item('mah-chicken-blt', 'Grilled Chicken BLT', "Miller's Ale House", 'sandwiches', '1 sandwich', 590, 56, 42, 21, 3050, ['chicken']),
   item('mah-french-fries', 'French Fries', "Miller's Ale House", 'snacks', '1 side', 450, 1, 12, 46, 510, ['fries']),
-  item('mah-ribs', 'Barbecue Baby Back Ribs', "Miller's Ale House", 'dinner', '1 order', 1320, 95, 0, 83, 0, ['ribs', 'bbq']),
-  item('mah-prime-rib-12', 'Prime Rib (12 oz)', "Miller's Ale House", 'dinner', '12 oz', 810, 109, 6, 39, 3950, ['steak']),
+  item('mah-ribs', 'Barbecue Baby Back Ribs (includes coleslaw)', "Miller's Ale House", 'dinner', '1 order', 1330, 95, 47, 83, 3820, ['ribs', 'bbq']),
+  item('mah-prime-rib-12', 'Prime Rib (12 oz)', "Miller's Ale House", 'dinner', '12 oz', 820, 109, 6, 40, 4480, ['steak']),
 
   // Bonefish Grill — Nov 2025 OSI PDF
   item('bfg-bang-bang', 'Bang Bang Shrimp', 'Bonefish Grill', 'snacks', '1 serving', 740, 29, 28, 60, 1950, ['shrimp', 'appetizer']),
@@ -98,23 +98,66 @@ export const SOUTHEAST_FAST_FOOD_ITEMS: FastFoodItem[] = [
   item('bfg-grilled-chicken', 'Simply Grilled Chicken', 'Bonefish Grill', 'dinner', '1 serving', 280, 58, 0, 5, 190, ['chicken']),
   item('bfg-jasmine-rice', 'Jasmine Rice', 'Bonefish Grill', 'snacks', '1 side', 200, 3, 37, 4.5, 440, ['side', 'rice']),
 
-  // Marlow's Tavern — GA/FL casual tavern (official salmon add-on; remaining ≈ menu analyses)
-  item('marlows-salmon-6', 'Grilled Salmon Add-On (6 oz)', "Marlow's Tavern", 'dinner', '6 oz', 241, 34, 0, 11, 75, ['salmon', 'fish']),
-  item('marlows-salmon-plate', 'Grilled Atlantic Salmon (with couscous)', "Marlow's Tavern", 'dinner', '1 entrée', 780, 42, 62, 40, 980, ['salmon', 'fish']),
+  // Marlow's Tavern — SS2026 GA/FL menus (official salmon add-on; remaining ≈ Atwater estimates)
+  // Burgers (no side)
   item('marlows-classic-tavern', 'Classic Tavern Burger (no side)', "Marlow's Tavern", 'sandwiches', '1 burger', 650, 38, 38, 38, 1180, ['burger']),
   item('marlows-black-blue', 'Black & Blue Burger (no side)', "Marlow's Tavern", 'sandwiches', '1 burger', 800, 42, 40, 52, 1420, ['burger', 'bacon']),
   item('marlows-royale', 'Royale with Cheese (no side)', "Marlow's Tavern", 'sandwiches', '1 burger', 1200, 48, 70, 80, 1680, ['burger', 'wagyu']),
   item('marlows-kickin-turkey', "Kickin' Turkey Burger (no side)", "Marlow's Tavern", 'sandwiches', '1 burger', 720, 42, 48, 38, 1540, ['burger', 'turkey']),
   item('marlows-veggie', 'Very Veggie Burger (no side)', "Marlow's Tavern", 'sandwiches', '1 burger', 580, 22, 68, 24, 980, ['burger', 'vegetarian']),
+  // Big bar sandwiches (no side)
   item('marlows-french-dip', 'Prime Rib French Dip (no side)', "Marlow's Tavern", 'sandwiches', '1 sandwich', 850, 55, 60, 42, 1860, ['sandwich', 'prime rib']),
-  item('marlows-bistro-steak', 'Bistro Steak (6 oz, with sides)', "Marlow's Tavern", 'dinner', '1 plate', 820, 48, 42, 48, 1280, ['steak']),
-  item('marlows-filet', 'Grilled Filet Mignon (8 oz, with sides)', "Marlow's Tavern", 'dinner', '1 plate', 940, 58, 44, 58, 980, ['steak', 'filet']),
+  item('marlows-chicken-panini', 'Chicken Panini (no side)', "Marlow's Tavern", 'sandwiches', '1 sandwich', 700, 45, 48, 36, 1420, ['sandwich', 'chicken']),
+  item('marlows-grilled-chicken-sandwich', 'Grilled Chicken Sandwich (no side)', "Marlow's Tavern", 'sandwiches', '1 sandwich', 520, 42, 38, 22, 1180, ['sandwich', 'chicken']),
+  item('marlows-deli-stack', 'The Deli Stack (no side)', "Marlow's Tavern", 'sandwiches', '1 sandwich', 920, 52, 58, 52, 2140, ['sandwich', 'turkey', 'ham']),
+  item('marlows-crispy-grouper', 'Crispy Grouper (no side)', "Marlow's Tavern", 'sandwiches', '1 sandwich', 860, 38, 72, 46, 1680, ['sandwich', 'fish', 'grouper']),
+  item('marlows-fish-tacos', 'Infamous Fish Tacos (order)', "Marlow's Tavern", 'sandwiches', '1 order', 910, 55, 78, 42, 1480, ['tacos', 'fish', 'grouper']),
+  item('marlows-banh-mi', 'Chili Crisp Banh Mi Wrap (tofu)', "Marlow's Tavern", 'sandwiches', '1 wrap', 620, 22, 68, 28, 1320, ['wrap', 'tofu', 'vegetarian']),
+  // Tavern favorites / steaks
+  item('marlows-salmon-plate', 'Grilled Atlantic Salmon (with couscous)', "Marlow's Tavern", 'dinner', '1 entrée', 780, 42, 62, 40, 980, ['salmon', 'fish']),
   item('marlows-shrimp-grits', 'Shrimp & Grits', "Marlow's Tavern", 'dinner', '1 entrée', 780, 36, 48, 48, 1680, ['shrimp', 'grits']),
   item('marlows-buddha', 'V&G Buddha Bowl', "Marlow's Tavern", 'lunch', '1 bowl', 680, 24, 82, 28, 920, ['bowl', 'vegetarian']),
+  item('marlows-pollo-al-carbon', 'Pollo al Carbón', "Marlow's Tavern", 'dinner', '1 entrée', 720, 48, 42, 38, 1280, ['chicken']),
+  item('marlows-chicken-piccata', 'Pan Seared Chicken Piccata', "Marlow's Tavern", 'dinner', '1 entrée', 860, 52, 58, 42, 1540, ['chicken', 'pasta']),
+  item('marlows-trout', 'Pan Seared Trout (with sides)', "Marlow's Tavern", 'dinner', '1 entrée', 740, 44, 38, 42, 980, ['trout', 'fish']),
+  item('marlows-bistro-steak', 'Bistro Steak (6 oz, with sides)', "Marlow's Tavern", 'dinner', '1 plate', 820, 48, 42, 48, 1280, ['steak']),
+  item('marlows-filet', 'Grilled Filet Mignon (8 oz, with sides)', "Marlow's Tavern", 'dinner', '1 plate', 940, 58, 44, 58, 980, ['steak', 'filet']),
+  item('marlows-ny-strip', 'NY Strip (10 oz, with sides)', "Marlow's Tavern", 'dinner', '1 plate', 1120, 68, 42, 72, 1180, ['steak']),
+  // Salads
+  item('marlows-tavern-salad', 'Tavern Salad', "Marlow's Tavern", 'lunch', '1 salad', 220, 4, 16, 16, 420, ['salad']),
+  item('marlows-caesar', 'Classic Caesar Salad', "Marlow's Tavern", 'lunch', '1 salad', 420, 14, 22, 32, 780, ['salad', 'caesar']),
+  item('marlows-cobb', 'Garden Cobb Salad', "Marlow's Tavern", 'lunch', '1 salad', 520, 22, 28, 36, 920, ['salad', 'cobb']),
+  item('marlows-asian-miso', 'Asian Soy Miso Salad', "Marlow's Tavern", 'lunch', '1 salad', 480, 16, 42, 28, 980, ['salad', 'asian']),
+  item('marlows-steak-salad', 'Black & Blue Steak Salad', "Marlow's Tavern", 'lunch', '1 salad', 780, 48, 22, 54, 1420, ['salad', 'steak']),
+  // Salad add-ons (official salmon; others ≈)
+  item('marlows-salmon-6', 'Grilled Salmon Add-On (6 oz)', "Marlow's Tavern", 'dinner', '6 oz', 241, 34, 0, 11, 75, ['salmon', 'fish']),
+  item('marlows-chicken-addon', 'Grilled Chicken Add-On', "Marlow's Tavern", 'lunch', '1 add-on', 210, 38, 0, 6, 520, ['chicken']),
+  item('marlows-shrimp-addon', 'Jumbo Shrimp Add-On', "Marlow's Tavern", 'lunch', '1 add-on', 180, 32, 2, 5, 680, ['shrimp']),
+  item('marlows-tuna-addon', 'Spice-Seared Tuna Add-On', "Marlow's Tavern", 'lunch', '1 add-on', 220, 36, 2, 8, 420, ['tuna', 'fish']),
+  item('marlows-filet-addon', 'Marinated Bistro Filet Add-On', "Marlow's Tavern", 'lunch', '1 add-on', 320, 34, 2, 20, 580, ['steak']),
+  item('marlows-tofu-addon', 'Tempura Tofu Add-On', "Marlow's Tavern", 'lunch', '1 add-on', 280, 14, 22, 16, 620, ['tofu', 'vegetarian']),
+  // Start | snack | share
   item('marlows-wings', 'Tavern Wings (order)', "Marlow's Tavern", 'lunch', '1 order', 720, 48, 12, 52, 1480, ['wings']),
-  item('marlows-fries', 'Hand-Cut Tavern Fries', "Marlow's Tavern", 'snacks', '1 side', 450, 6, 52, 24, 680, ['fries']),
-  item('marlows-truffle-fries', 'Truffle Parmesan Fries', "Marlow's Tavern", 'snacks', '1 side', 500, 8, 48, 30, 820, ['fries']),
-  item('marlows-onion-rings', 'Tavern Onion Rings', "Marlow's Tavern", 'snacks', '1 side', 620, 8, 68, 34, 980, ['onion rings']),
   item('marlows-asparagus-fries', 'Asparagus Fries', "Marlow's Tavern", 'snacks', '1 appetizer', 380, 8, 32, 24, 720, ['asparagus', 'appetizer']),
-  item('marlows-tavern-salad', 'Tavern Salad', "Marlow's Tavern", 'lunch', '1 salad', 320, 8, 18, 24, 540, ['salad']),
+  item('marlows-truffle-fries', 'Truffle Parmesan Fries', "Marlow's Tavern", 'snacks', '1 side', 500, 8, 48, 30, 820, ['fries']),
+  item('marlows-fries', 'Hand-Cut Tavern Fries', "Marlow's Tavern", 'snacks', '1 side', 450, 6, 52, 24, 680, ['fries']),
+  item('marlows-firecracker-shrimp', 'Firecracker Shrimp', "Marlow's Tavern", 'snacks', '1 appetizer', 620, 28, 48, 34, 1480, ['shrimp', 'appetizer']),
+  item('marlows-shrimp-crab-nacho', 'Shrimp & Crab Nacho Plate', "Marlow's Tavern", 'snacks', '1 appetizer', 680, 36, 32, 44, 1620, ['shrimp', 'crab', 'appetizer']),
+  item('marlows-duck-rolls', 'Duck Carnitas Spring Rolls', "Marlow's Tavern", 'snacks', '1 appetizer', 540, 24, 42, 30, 1180, ['duck', 'appetizer']),
+  item('marlows-carpaccio', 'Seared Beef Carpaccio', "Marlow's Tavern", 'snacks', '1 appetizer', 420, 28, 18, 26, 780, ['beef', 'appetizer']),
+  item('marlows-ahi-poke', 'Ahi Tuna Poke', "Marlow's Tavern", 'snacks', '1 appetizer', 480, 32, 38, 22, 980, ['tuna', 'poke']),
+  item('marlows-trout-dip', 'Smoked Trout Dip', "Marlow's Tavern", 'snacks', '1 appetizer', 520, 22, 28, 36, 1120, ['trout', 'dip']),
+  item('marlows-brisket-sliders', 'Grilled Cheese Brisket Sliders', "Marlow's Tavern", 'snacks', '1 order', 860, 42, 58, 48, 1680, ['brisket', 'sliders']),
+  item('marlows-kettle-chips', "J.T.'s Kettle Chips", "Marlow's Tavern", 'snacks', '1 appetizer', 640, 18, 48, 42, 1280, ['chips', 'appetizer']),
+  item('marlows-burrata', 'Melon & Basil Burrata', "Marlow's Tavern", 'snacks', '1 appetizer', 480, 16, 28, 34, 620, ['burrata', 'appetizer']),
+  item('marlows-hummus', 'MT Hummus', "Marlow's Tavern", 'snacks', '1 appetizer', 520, 14, 52, 28, 880, ['hummus', 'vegetarian']),
+  item('marlows-crab-dip', 'Parmesan Crab Dip', "Marlow's Tavern", 'snacks', '1 appetizer', 620, 28, 24, 46, 1420, ['crab', 'dip']),
+  // Sides
+  item('marlows-mac', 'Mac & Cheese', "Marlow's Tavern", 'snacks', '1 side', 420, 14, 38, 24, 780, ['side', 'mac']),
+  item('marlows-grit-cake', 'White Cheddar Grit Cake', "Marlow's Tavern", 'snacks', '1 side', 280, 8, 32, 14, 620, ['side', 'grits']),
+  item('marlows-okra', 'Fried Okra', "Marlow's Tavern", 'snacks', '1 side', 320, 6, 34, 18, 680, ['side', 'okra']),
+  // Desserts
+  item('marlows-creme-brulee', 'Classic Crème Brûlée', "Marlow's Tavern", 'snacks', '1 dessert', 420, 6, 38, 28, 120, ['dessert']),
+  item('marlows-coffee-cake', 'Coffee Butter Cake', "Marlow's Tavern", 'snacks', '1 dessert', 540, 6, 62, 28, 280, ['dessert', 'cake']),
+  item('marlows-cheesecake', 'Cheesecake of the Moment', "Marlow's Tavern", 'snacks', '1 dessert', 580, 8, 52, 38, 360, ['dessert', 'cheesecake']),
 ];

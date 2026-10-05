@@ -490,9 +490,12 @@ function CalorieCalculator({
               }}
               onSearchChange={(query) => setIngredient(query)}
               value={ingredient}
-              placeholder="Search meals"
+              placeholder="e.g. curry chicken with white rice and steamed vegetables"
               className="text-base bg-amber-50/90 border-2 border-amber-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg pr-4 py-3 text-gray-950 placeholder-gray-700"
             />
+            <p className="text-xs text-gray-800 leading-snug" data-testid="calculator-search-tip-compact">
+              Tip: Describe the meal as it is — e.g. curry chicken with white rice and steamed vegetables (carrots, peas, cabbage, plantain, etc.).
+            </p>
             <Input
               placeholder="Measurement (e.g., 1 cup, 100g, 1 medium)"
               value={measurement}
@@ -756,12 +759,12 @@ function CalorieCalculator({
                   setIngredientSuggestions([]);
                 }}
                 value={ingredient}
-                placeholder="Search meals"
+                placeholder="e.g. curry chicken with white rice and steamed vegetables"
                 className="text-base bg-amber-50/90 border-2 border-amber-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg pr-4 py-3 text-gray-950 placeholder-gray-700"
               />
               
-              <p className="text-xs text-gray-900 mt-1">
-                Search your meal history or enter new food items
+              <p className="text-xs text-gray-800 mt-1.5 leading-snug" data-testid="calculator-search-tip">
+                Tip: Describe the meal as it is — e.g. curry chicken with white rice and steamed vegetables (carrots, peas, cabbage, plantain, etc.).
               </p>
               <UserFoodSuggestions
                 className="mt-4"

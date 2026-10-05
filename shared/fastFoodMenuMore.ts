@@ -132,7 +132,8 @@ export const MORE_FAST_FOOD_ITEMS: FastFoodItem[] = [
   item('pollo-tropical-quarter-white', '1/4 Chicken (white meat, with skin)', 'Pollo Tropical', 'dinner', '1/4 chicken', 360, 43, 0, 20, 730, ['grilled chicken', 'caribbean', 'tropical pollo']),
   item('pollo-tropical-quarter-dark', '1/4 Chicken (dark meat, with skin)', 'Pollo Tropical', 'dinner', '1/4 chicken', 290, 24, 0, 22, 430, ['grilled chicken', 'caribbean', 'tropical pollo']),
   item('pollo-tropical-half-chicken', '1/2 Chicken', 'Pollo Tropical', 'dinner', '1/2 chicken', 650, 67, 0, 42, 1160, ['grilled chicken', 'caribbean', 'tropical pollo']),
-  item('pollo-tropical-grilled-breasts', 'Grilled Chicken Breasts (2)', 'Pollo Tropical', 'dinner', '2 breasts', 240, 59, 10, 6, 860, ['grilled chicken', 'tropical pollo']),
+  // Macros aligned to Atwater from published ~240 kcal grilled-breast plate
+  item('pollo-tropical-grilled-breasts', 'Grilled Chicken Breasts (2)', 'Pollo Tropical', 'dinner', '2 breasts', 240, 45, 3, 5, 860, ['grilled chicken', 'tropical pollo']),
   item('pollo-tropical-tropichop', 'Chicken TropiChop (white rice, black beans)', 'Pollo Tropical', 'lunch', '1 bowl', 530, 31, 90, 10, 1460, ['bowl', 'caribbean', 'tropical pollo']),
   item('pollo-tropical-pollo-bites', 'Pollo Bites (8 pc)', 'Pollo Tropical', 'lunch', '8 pieces', 410, 44, 21, 17, 990, ['nuggets', 'tropical pollo']),
   item('pollo-tropical-classic-sandwich', 'Classic Chicken Sandwich', 'Pollo Tropical', 'sandwiches', '1 sandwich', 430, 35, 41, 19, 770, ['tropical pollo']),
@@ -314,12 +315,13 @@ export const MORE_FAST_FOOD_ITEMS: FastFoodItem[] = [
   item('waffle-house-bacon-egg-cheese', 'Bacon, Egg & Cheese Sandwich', 'Waffle House', 'breakfast', '1 sandwich', 430, 19, 28, 26, 980),
 
   // Olive Garden
-  item('olive-garden-breadstick', 'Breadstick', 'Olive Garden', 'snacks', '1 stick', 140, 4, 25, 2.5, 400),
-  item('olive-garden-house-salad', 'House Salad with Signature Italian Dressing', 'Olive Garden', 'lunch', '1 salad', 350, 6, 21, 27, 1110, ['salad']),
-  item('olive-garden-fettuccine-alfredo', 'Fettuccine Alfredo', 'Olive Garden', 'dinner', '1 entrée', 1220, 32, 96, 75, 1350, ['pasta']),
-  item('olive-garden-chicken-alfredo', 'Chicken Alfredo', 'Olive Garden', 'dinner', '1 entrée', 1480, 81, 96, 88, 2010, ['pasta']),
-  item('olive-garden-lasagna', 'Lasagna Classico', 'Olive Garden', 'dinner', '1 entrée', 940, 58, 65, 53, 1990, ['pasta']),
-  item('olive-garden-chicken-parm', 'Chicken Parmigiana', 'Olive Garden', 'dinner', '1 entrée', 1060, 65, 79, 52, 2940),
+  // Olive Garden — current US nutrition PDF (dinner unless noted)
+  item('olive-garden-breadstick', 'Breadstick', 'Olive Garden', 'snacks', '1 stick', 140, 4, 25, 2.5, 460),
+  item('olive-garden-house-salad', 'House Salad with Signature Italian Dressing', 'Olive Garden', 'lunch', '1 salad', 150, 3, 13, 10, 770, ['salad']),
+  item('olive-garden-fettuccine-alfredo', 'Fettuccine Alfredo', 'Olive Garden', 'dinner', '1 entrée', 1310, 30, 95, 90, 1210, ['pasta']),
+  item('olive-garden-chicken-alfredo', 'Chicken Alfredo (with grilled chicken)', 'Olive Garden', 'dinner', '1 entrée', 1570, 81, 96, 95, 2290, ['pasta']),
+  item('olive-garden-lasagna', 'Lasagna Classico', 'Olive Garden', 'dinner', '1 entrée', 940, 54, 61, 55, 2260, ['pasta']),
+  item('olive-garden-chicken-parm', 'Chicken Parmigiana', 'Olive Garden', 'dinner', '1 entrée', 1020, 64, 80, 51, 3300),
   item('olive-garden-zuppa-toscana', 'Zuppa Toscana (bowl)', 'Olive Garden', 'lunch', '1 bowl', 220, 7, 15, 15, 790, ['soup']),
 
   // Chili's
@@ -532,11 +534,11 @@ export const MORE_FAST_FOOD_ITEMS: FastFoodItem[] = [
   item('ihop-chocolate-chip-pancakes', 'Chocolate Chip Pancakes (3)', 'IHOP', 'breakfast', '3 pancakes', 610, 13, 88, 22, 1180, ['pancakes']),
 
   // Olive Garden
-  item('olive-garden-tour-of-italy', 'Tour of Italy', 'Olive Garden', 'dinner', '1 entrée', 1550, 81, 111, 86, 3210, ['pasta']),
-  item('olive-garden-five-cheese-ziti', 'Five Cheese Ziti al Forno', 'Olive Garden', 'dinner', '1 entrée', 1170, 49, 94, 64, 1910, ['pasta']),
-  item('olive-garden-shrimp-scampi', 'Shrimp Scampi', 'Olive Garden', 'dinner', '1 entrée', 510, 32, 52, 18, 1440, ['pasta']),
-  item('olive-garden-chicken-gnocchi', 'Chicken & Gnocchi Soup (bowl)', 'Olive Garden', 'lunch', '1 bowl', 230, 11, 22, 12, 1180, ['soup']),
-  item('olive-garden-tiramisu', 'Tiramisu', 'Olive Garden', 'snacks', '1 slice', 470, 6, 47, 28, 160, ['dessert']),
+  item('olive-garden-tour-of-italy', 'Tour of Italy', 'Olive Garden', 'dinner', '1 entrée', 1550, 72, 99, 97, 3220, ['pasta']),
+  item('olive-garden-five-cheese-ziti', 'Five Cheese Ziti al Forno', 'Olive Garden', 'dinner', '1 entrée', 1170, 46, 98, 69, 2440, ['pasta']),
+  item('olive-garden-shrimp-scampi', 'Shrimp Scampi', 'Olive Garden', 'dinner', '1 entrée', 490, 29, 52, 18, 1120, ['pasta']),
+  item('olive-garden-chicken-gnocchi', 'Chicken & Gnocchi Soup (bowl)', 'Olive Garden', 'lunch', '1 bowl', 230, 11, 22, 12, 1290, ['soup']),
+  item('olive-garden-tiramisu', 'Tiramisu', 'Olive Garden', 'snacks', '1 slice', 470, 6, 54, 27, 125, ['dessert']),
 
   // Chili's
   item('chilis-chicken-fajitas', 'Chicken Fajitas (with tortillas)', "Chili's", 'dinner', '1 sizzle', 1070, 62, 86, 50, 2860),

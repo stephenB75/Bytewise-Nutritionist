@@ -5,7 +5,7 @@ import type { FastFoodCategory, FastFoodItem } from './fastFoodMenu';
  * Red Lobster uses the June 2026 US nutrition PDF. First Watch uses firstwatch.com.
  * Carrabba's uses the May 2026 OSI nutrition PDF. BJ's uses the restaurant nutrition guide.
  * Famous Dave's uses the Summer/Farmhouse nutrition guide. CPK slice values are from cpk.com.
- * Bob Evans lunch items are from the FY26 lunch/dinner guide. Logan's uses the Oct 2025 PDF.
+ * Bob Evans lunch items are from the FY26 lunch/dinner guide. Logan's uses the Oct 22, 2025 PDF.
  * Ben & Jerry's servings are the official 2/3-cup pint serving on benjerry.com.
  * Twin Peaks — July 2026 nutrition & allergen PDF (burgers/sandwiches without fries unless named).
  * Mellow Mushroom — Nutritionix interactive menu (Apr 2026).
@@ -108,10 +108,39 @@ export const MORE_PLACES_FAST_FOOD_ITEMS: FastFoodItem[] = [
   item('bob-evans-apple-pie', 'Double-Crust Apple Pie', 'Bob Evans', 'snacks', '1 slice', 580, 5, 80, 28, 250, ['dessert']),
   item('bob-evans-coleslaw', 'Signature Coleslaw', 'Bob Evans', 'snacks', '1 side', 170, 1, 16, 12, 210),
 
-  // Logan's Roadhouse — Oct 2025 nutrition PDF
+  // Logan's Roadhouse — Oct 22, 2025 nutrition PDF (no sides unless named)
+  item('logans-sirloin-6', 'Center-Cut Top Sirloin (6 oz)', "Logan's Roadhouse", 'dinner', '6 oz', 330, 31, 2, 28, 990, ['steak', 'sirloin']),
+  item('logans-the-logan', 'The Logan Sirloin (11 oz)', "Logan's Roadhouse", 'dinner', '11 oz', 605, 63, 7, 41, 3767, ['steak', 'sirloin']),
+  item('logans-filet-7', 'Filet Mignon (7 oz)', "Logan's Roadhouse", 'dinner', '7 oz', 300, 36, 1, 16, 620, ['steak', 'filet']),
+  item('logans-ny-strip', 'New York Strip (12 oz)', "Logan's Roadhouse", 'dinner', '12 oz', 550, 38, 1, 43, 2834, ['steak', 'strip']),
+  item('logans-ribeye-12', 'Ribeye (12 oz)', "Logan's Roadhouse", 'dinner', '12 oz', 720, 58, 2, 69, 1900, ['steak', 'ribeye']),
+  item('logans-ribeye-16', 'Ribeye (16 oz)', "Logan's Roadhouse", 'dinner', '16 oz', 1000, 77, 3, 87, 2780, ['steak', 'ribeye']),
+  item('logans-porterhouse', 'Porterhouse (22 oz)', "Logan's Roadhouse", 'dinner', '22 oz', 790, 62, 0, 60, 3067, ['steak']),
+  item('logans-country-fried', 'Country Fried Steak with White Gravy', "Logan's Roadhouse", 'dinner', '1 entrée', 920, 29, 60, 63, 2310, ['steak']),
+  item('logans-chopped-steak', 'Smothered Chopped Steak with Mashed Potatoes', "Logan's Roadhouse", 'dinner', '1 entrée', 830, 36, 31, 62, 3210, ['steak']),
+  item('logans-steak-tips', 'Steak Tips', "Logan's Roadhouse", 'dinner', '1 order', 230, 28, 2, 13, 1127, ['steak']),
+  item('logans-ribs-full', 'Fall-off-the-Bone Ribs (full rack)', "Logan's Roadhouse", 'dinner', 'full rack', 1800, 102, 118, 99, 7040, ['ribs', 'bbq']),
+  item('logans-ribs-half', 'Fall-off-the-Bone Ribs (half rack)', "Logan's Roadhouse", 'dinner', 'half rack', 920, 51, 59, 52, 3520, ['ribs', 'bbq']),
   item('logans-bbq-chicken', 'Cedar Plank 1/4 BBQ Chicken', "Logan's Roadhouse", 'dinner', '1/4 chicken', 574, 32, 22, 37, 2127, ['chicken', 'bbq']),
   item('logans-grilled-chicken', 'Wood-Grilled Chicken with Roadhouse Rice', "Logan's Roadhouse", 'dinner', '1 entrée', 820, 50, 30, 54, 1860, ['chicken']),
+  item('logans-buttermilk-chicken', 'Country Style Buttermilk Chicken with White Gravy', "Logan's Roadhouse", 'dinner', '1 entrée', 1060, 68, 68, 57, 2540, ['chicken']),
+  item('logans-tenders', 'Hand-Breaded Chicken Tenders with Honey Mustard', "Logan's Roadhouse", 'dinner', '1 order', 930, 58, 45, 55, 1805, ['tenders', 'chicken']),
+  item('logans-salmon', 'Mesquite Wood-Grilled Salmon with Roadhouse Rice', "Logan's Roadhouse", 'dinner', '1 entrée', 1080, 51, 5, 60, 2013, ['salmon', 'fish']),
+  item('logans-pork-chops', 'Mesquite Grilled Pork Chops with Cinnamon Apples', "Logan's Roadhouse", 'dinner', '1 entrée', 930, 68, 34, 56, 1610, ['pork']),
+  item('logans-steak-alfredo', "Logan's Steak Alfredo", "Logan's Roadhouse", 'dinner', '1 entrée', 1679, 71, 176, 78, 3164, ['pasta', 'steak']),
+  item('logans-cheeseburger', 'All American Cheeseburger (American)', "Logan's Roadhouse", 'sandwiches', '1 burger', 731, 52, 46, 37, 2283, ['burger']),
+  item('logans-deluxe-burger', 'Roadhouse Deluxe Burger', "Logan's Roadhouse", 'sandwiches', '1 burger', 919, 62, 58, 48, 3041, ['burger']),
   item('logans-kickin-salad', "Kickin' Chicken Salad (blackened)", "Logan's Roadhouse", 'lunch', '1 salad', 770, 56, 25, 62, 2259, ['salad']),
+  item('logans-steak-cobb', 'Roadhouse Steak Cobb Salad (no dressing)', "Logan's Roadhouse", 'lunch', '1 salad', 750, 47, 26, 53, 1420, ['salad', 'steak']),
+  item('logans-nachos', 'Roadhouse Nachos', "Logan's Roadhouse", 'snacks', '1 order', 1450, 58, 146, 71, 3250, ['nachos']),
+  item('logans-wings-buffalo', 'Mesquite Smokin\' Wings (Buffalo)', "Logan's Roadhouse", 'lunch', '1 order', 950, 36, 6, 75, 2840, ['wings']),
+  item('logans-onion-rings', 'Beer-Battered Onion Rings', "Logan's Roadhouse", 'snacks', '1 order', 1410, 11, 66, 124, 4177, ['onion rings']),
+  item('logans-spin-dip', 'Spin Dip', "Logan's Roadhouse", 'snacks', '1 appetizer', 930, 31, 100, 49, 1797, ['dip']),
+  item('logans-fries', 'Fries', "Logan's Roadhouse", 'snacks', '1 side', 284, 3, 40, 13, 535, ['fries']),
+  item('logans-mac', 'Macaroni & Cheese', "Logan's Roadhouse", 'snacks', '1 side', 290, 10, 24, 17, 850, ['mac', 'side']),
+  item('logans-loaded-potato', 'Loaded Baked Potato', "Logan's Roadhouse", 'snacks', '1 potato', 530, 15, 62, 36, 4190, ['side']),
+  item('logans-brownie', 'Mississippi Brownie', "Logan's Roadhouse", 'snacks', '1 dessert', 1660, 20, 272, 61, 1170, ['dessert']),
+  item('logans-key-lime', 'Key Lime Cheesecake', "Logan's Roadhouse", 'snacks', '1 dessert', 940, 10, 80, 65, 554, ['dessert']),
 
   // Ben & Jerry's — official 2/3-cup pint serving
   item('bj-cherry-garcia', 'Cherry Garcia', "Ben & Jerry's", 'snacks', '2/3 cup', 250, 4, 29, 14, 40, ['ice cream', 'dessert']),

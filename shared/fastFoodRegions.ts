@@ -83,6 +83,15 @@ export const REGIONAL_RESTAURANTS: Record<string, UsFoodRegion[]> = {
   "Marlow's Tavern": ['florida', 'southeast'],
   'Twin Peaks': ['florida', 'southeast', 'texas', 'southwest', 'midwest', 'west', 'northeast'],
   'Mellow Mushroom': ['florida', 'southeast', 'midwest', 'southwest', 'texas', 'northeast'],
+  'Yard House': ['florida', 'southeast', 'west', 'southwest', 'midwest', 'northeast', 'texas'],
+  "Maggiano's Little Italy": ['florida', 'southeast', 'midwest', 'northeast', 'southwest', 'texas', 'west'],
+  'Seasons 52': ['florida', 'southeast', 'midwest', 'northeast', 'southwest', 'texas'],
+  "Chuy's": ['texas', 'southwest', 'southeast', 'florida'],
+  'Bar Louie': ['florida', 'southeast', 'midwest', 'northeast', 'southwest', 'texas', 'west'],
+  'Saltgrass Steak House': ['texas', 'southwest', 'southeast', 'florida'],
+  "Ruth's Chris Steak House": ['florida', 'southeast', 'midwest', 'northeast', 'southwest', 'texas', 'west'],
+  "Fleming's Prime Steakhouse": ['florida', 'southeast', 'midwest', 'northeast', 'southwest', 'texas', 'west'],
+  'The Capital Grille': ['florida', 'southeast', 'midwest', 'northeast', 'southwest', 'texas', 'west'],
   'Bonefish Grill': ['florida', 'southeast', 'northeast', 'midwest', 'southwest'],
   Bibibop: ['midwest', 'southeast', 'texas'],
   "Nando's PERi-PERi": ['northeast', 'midwest', 'west', 'florida'],
@@ -265,6 +274,7 @@ export const MEXICAN_RESTAURANTS = [
   "Torchy's Tacos",
   'Pollo Campero',
   'La Granja',
+  "Chuy's",
 ] as const;
 
 export const ITALIAN_RESTAURANTS = [
@@ -285,6 +295,7 @@ export const ITALIAN_RESTAURANTS = [
   "Tomasino's Pizza",
   'Pizzeria Valdiano',
   'Mellow Mushroom',
+  "Maggiano's Little Italy",
 ] as const;
 
 export const CHICKEN_RESTAURANTS = [
@@ -331,6 +342,8 @@ export const BURGER_RESTAURANTS = [
   "Marlow's Tavern",
   "Miller's Ale House",
   'Twin Peaks',
+  'Yard House',
+  'Bar Louie',
 ] as const;
 
 export const BBQ_RESTAURANTS = [
@@ -343,6 +356,10 @@ export const BBQ_RESTAURANTS = [
   'Outback Steakhouse',
   'Cracker Barrel',
   "Logan's Roadhouse",
+  'Saltgrass Steak House',
+  "Ruth's Chris Steak House",
+  "Fleming's Prime Steakhouse",
+  'The Capital Grille',
 ] as const;
 
 export const MEDITERRANEAN_RESTAURANTS = [
