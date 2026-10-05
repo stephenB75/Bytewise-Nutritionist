@@ -80,6 +80,9 @@ export const REGIONAL_RESTAURANTS: Record<string, UsFoodRegion[]> = {
   "Sonny's BBQ": ['florida', 'southeast'],
   PDQ: ['florida', 'southeast'],
   "Miller's Ale House": ['florida', 'southeast', 'northeast'],
+  "Marlow's Tavern": ['florida', 'southeast'],
+  'Twin Peaks': ['florida', 'southeast', 'texas', 'southwest', 'midwest', 'west', 'northeast'],
+  'Mellow Mushroom': ['florida', 'southeast', 'midwest', 'southwest', 'texas', 'northeast'],
   'Bonefish Grill': ['florida', 'southeast', 'northeast', 'midwest', 'southwest'],
   Bibibop: ['midwest', 'southeast', 'texas'],
   "Nando's PERi-PERi": ['northeast', 'midwest', 'west', 'florida'],
@@ -281,6 +284,7 @@ export const ITALIAN_RESTAURANTS = [
   "Papa Murphy's",
   "Tomasino's Pizza",
   'Pizzeria Valdiano',
+  'Mellow Mushroom',
 ] as const;
 
 export const CHICKEN_RESTAURANTS = [
@@ -324,6 +328,9 @@ export const BURGER_RESTAURANTS = [
   "Steak 'n Shake",
   "A&W",
   "Red Robin",
+  "Marlow's Tavern",
+  "Miller's Ale House",
+  'Twin Peaks',
 ] as const;
 
 export const BBQ_RESTAURANTS = [
@@ -388,8 +395,8 @@ export const CAFE_RESTAURANTS = [
 
 /** Prefer these in the compact popular row when we know the user's region. */
 const FEATURED_NEARBY: Record<UsFoodRegion, string[]> = {
-  florida: ['Negril Jamaican Restaurant', "Mark's Jamaican Bar & Grill", 'Caribbean Sunshine Bakery', 'Pollo Tropical'],
-  southeast: ['Jamaican Jerk Biz', 'Negril Jamaican Eatery', 'Island Spice', 'Golden Krust'],
+  florida: ["Marlow's Tavern", "Miller's Ale House", 'Negril Jamaican Restaurant', 'Pollo Tropical'],
+  southeast: ["Marlow's Tavern", 'Mellow Mushroom', 'Twin Peaks', 'Golden Krust'],
   texas: ['The Jerk Shack', 'Jerk at Nite', 'Taste of Jamaica', 'Golden Krust'],
   southwest: ['Reggae Pot', 'The Jerk Shack', 'Bahama Breeze', 'Whataburger'],
   west: ['Peppers Jamaican', "Bouka's Jamaican Restaurant", 'Potwah Jamaican Cuisine', 'Reggae Pot'],

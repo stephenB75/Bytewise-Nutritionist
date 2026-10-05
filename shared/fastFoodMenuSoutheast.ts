@@ -6,6 +6,8 @@ import type { FastFoodCategory, FastFoodItem } from './fastFoodMenu';
  * PDQ — Nutritionix interactive menu (chain-provided).
  * Miller's Ale House — May 2026 nutrition guide (items without sides unless named).
  * Bonefish Grill — Nov 2025 OSI nutrition PDF.
+ * Marlow's Tavern — official 6 oz salmon add-on; other items are Atwater-aligned
+ *   estimates from typical builds / third-party menu analyses (chain does not publish a full guide).
  */
 const item = (
   id: string,
@@ -95,4 +97,24 @@ export const SOUTHEAST_FAST_FOOD_ITEMS: FastFoodItem[] = [
   item('bfg-atlantic-salmon', 'Atlantic Salmon (simply grilled)', 'Bonefish Grill', 'dinner', '1 serving', 360, 41, 3, 21, 190, ['salmon', 'fish']),
   item('bfg-grilled-chicken', 'Simply Grilled Chicken', 'Bonefish Grill', 'dinner', '1 serving', 280, 58, 0, 5, 190, ['chicken']),
   item('bfg-jasmine-rice', 'Jasmine Rice', 'Bonefish Grill', 'snacks', '1 side', 200, 3, 37, 4.5, 440, ['side', 'rice']),
+
+  // Marlow's Tavern — GA/FL casual tavern (official salmon add-on; remaining ≈ menu analyses)
+  item('marlows-salmon-6', 'Grilled Salmon Add-On (6 oz)', "Marlow's Tavern", 'dinner', '6 oz', 241, 34, 0, 11, 75, ['salmon', 'fish']),
+  item('marlows-salmon-plate', 'Grilled Atlantic Salmon (with couscous)', "Marlow's Tavern", 'dinner', '1 entrée', 780, 42, 62, 40, 980, ['salmon', 'fish']),
+  item('marlows-classic-tavern', 'Classic Tavern Burger (no side)', "Marlow's Tavern", 'sandwiches', '1 burger', 650, 38, 38, 38, 1180, ['burger']),
+  item('marlows-black-blue', 'Black & Blue Burger (no side)', "Marlow's Tavern", 'sandwiches', '1 burger', 800, 42, 40, 52, 1420, ['burger', 'bacon']),
+  item('marlows-royale', 'Royale with Cheese (no side)', "Marlow's Tavern", 'sandwiches', '1 burger', 1200, 48, 70, 80, 1680, ['burger', 'wagyu']),
+  item('marlows-kickin-turkey', "Kickin' Turkey Burger (no side)", "Marlow's Tavern", 'sandwiches', '1 burger', 720, 42, 48, 38, 1540, ['burger', 'turkey']),
+  item('marlows-veggie', 'Very Veggie Burger (no side)', "Marlow's Tavern", 'sandwiches', '1 burger', 580, 22, 68, 24, 980, ['burger', 'vegetarian']),
+  item('marlows-french-dip', 'Prime Rib French Dip (no side)', "Marlow's Tavern", 'sandwiches', '1 sandwich', 850, 55, 60, 42, 1860, ['sandwich', 'prime rib']),
+  item('marlows-bistro-steak', 'Bistro Steak (6 oz, with sides)', "Marlow's Tavern", 'dinner', '1 plate', 820, 48, 42, 48, 1280, ['steak']),
+  item('marlows-filet', 'Grilled Filet Mignon (8 oz, with sides)', "Marlow's Tavern", 'dinner', '1 plate', 940, 58, 44, 58, 980, ['steak', 'filet']),
+  item('marlows-shrimp-grits', 'Shrimp & Grits', "Marlow's Tavern", 'dinner', '1 entrée', 780, 36, 48, 48, 1680, ['shrimp', 'grits']),
+  item('marlows-buddha', 'V&G Buddha Bowl', "Marlow's Tavern", 'lunch', '1 bowl', 680, 24, 82, 28, 920, ['bowl', 'vegetarian']),
+  item('marlows-wings', 'Tavern Wings (order)', "Marlow's Tavern", 'lunch', '1 order', 720, 48, 12, 52, 1480, ['wings']),
+  item('marlows-fries', 'Hand-Cut Tavern Fries', "Marlow's Tavern", 'snacks', '1 side', 450, 6, 52, 24, 680, ['fries']),
+  item('marlows-truffle-fries', 'Truffle Parmesan Fries', "Marlow's Tavern", 'snacks', '1 side', 500, 8, 48, 30, 820, ['fries']),
+  item('marlows-onion-rings', 'Tavern Onion Rings', "Marlow's Tavern", 'snacks', '1 side', 620, 8, 68, 34, 980, ['onion rings']),
+  item('marlows-asparagus-fries', 'Asparagus Fries', "Marlow's Tavern", 'snacks', '1 appetizer', 380, 8, 32, 24, 720, ['asparagus', 'appetizer']),
+  item('marlows-tavern-salad', 'Tavern Salad', "Marlow's Tavern", 'lunch', '1 salad', 320, 8, 18, 24, 540, ['salad']),
 ];

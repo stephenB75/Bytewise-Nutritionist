@@ -7,6 +7,8 @@ import type { FastFoodCategory, FastFoodItem } from './fastFoodMenu';
  * Famous Dave's uses the Summer/Farmhouse nutrition guide. CPK slice values are from cpk.com.
  * Bob Evans lunch items are from the FY26 lunch/dinner guide. Logan's uses the Oct 2025 PDF.
  * Ben & Jerry's servings are the official 2/3-cup pint serving on benjerry.com.
+ * Twin Peaks — July 2026 nutrition & allergen PDF (burgers/sandwiches without fries unless named).
+ * Mellow Mushroom — Nutritionix interactive menu (Apr 2026).
  */
 const item = (
   id: string,
@@ -116,4 +118,34 @@ export const MORE_PLACES_FAST_FOOD_ITEMS: FastFoodItem[] = [
   item('bj-half-baked', 'Half Baked', "Ben & Jerry's", 'snacks', '2/3 cup', 270, 4, 34, 14, 85, ['ice cream', 'dessert']),
   item('bj-cookie-dough', 'Chocolate Chip Cookie Dough', "Ben & Jerry's", 'snacks', '2/3 cup', 270, 4, 32, 14, 75, ['ice cream', 'dessert']),
   item('bj-phish-food', 'Phish Food', "Ben & Jerry's", 'snacks', '2/3 cup', 280, 4, 36, 14, 75, ['ice cream', 'dessert']),
+
+  // Twin Peaks — July 2026 nutrition PDF (no fries unless named)
+  item('twin-peaks-cheeseburger', 'Cheeseburger with American (no fries)', 'Twin Peaks', 'sandwiches', '1 burger', 810, 31, 45, 55, 1430, ['burger']),
+  item('twin-peaks-avocado-smash', 'Avocado Smash Burger (no fries)', 'Twin Peaks', 'sandwiches', '1 burger', 820, 33, 44, 56, 930, ['burger', 'avocado']),
+  item('twin-peaks-billionaire', "Billionaire's Bacon Burger (no fries)", 'Twin Peaks', 'sandwiches', '1 burger', 1030, 37, 85, 60, 1490, ['burger', 'bacon']),
+  item('twin-peaks-hangover', 'The Hangover (no fries)', 'Twin Peaks', 'sandwiches', '1 burger', 980, 41, 44, 68, 1350, ['burger']),
+  item('twin-peaks-smokestack', 'The Smokestack (no fries)', 'Twin Peaks', 'sandwiches', '1 burger', 1150, 44, 57, 81, 1800, ['burger']),
+  item('twin-peaks-wings-naked-6', 'Bone-In Naked Wings (6, no sauce)', 'Twin Peaks', 'lunch', '6 wings', 570, 53, 0, 38, 230, ['wings']),
+  item('twin-peaks-wings-boneless-6', 'Boneless Wings (6, no sauce)', 'Twin Peaks', 'lunch', '6 wings', 500, 39, 35, 23, 930, ['wings']),
+  item('twin-peaks-fries', 'French Fries with Ketchup', 'Twin Peaks', 'snacks', '1 entrée side', 400, 2, 54, 22, 1390, ['fries']),
+  item('twin-peaks-chicken-ranch', 'Chicken Ranch Sandwich — Grilled (no fries)', 'Twin Peaks', 'sandwiches', '1 sandwich', 840, 48, 41, 52, 1620, ['chicken']),
+  item('twin-peaks-nashville', 'Nashville Hot Chicken Sandwich (no fries)', 'Twin Peaks', 'sandwiches', '1 sandwich', 1310, 40, 97, 85, 3170, ['chicken', 'spicy']),
+  item('twin-peaks-philly', 'Philly Cheesesteak (no fries)', 'Twin Peaks', 'sandwiches', '1 sandwich', 1200, 51, 69, 80, 2350, ['philly', 'cheesesteak']),
+  item('twin-peaks-street-tacos', 'Street Tacos — Smoked Chicken (3)', 'Twin Peaks', 'lunch', '3 tacos', 610, 22, 45, 37, 1090, ['tacos']),
+  item('twin-peaks-caesar', 'Chicken Caesar Salad (no dressing)', 'Twin Peaks', 'lunch', '1 salad', 440, 32, 15, 28, 1070, ['salad']),
+  item('twin-peaks-pepperoni-flatbread', 'OG Pepperoni Flatbread', 'Twin Peaks', 'dinner', '1 flatbread', 1380, 52, 105, 83, 3560, ['pizza', 'flatbread']),
+
+  // Mellow Mushroom — Nutritionix interactive menu (Apr 2026)
+  item('mellow-cheese-bread', 'Cheese Bread', 'Mellow Mushroom', 'snacks', '1 order', 890, 38, 91, 46, 1740, ['bread', 'appetizer']),
+  item('mellow-pretzel-bites', 'Pretzel Bites with Beer Cheese', 'Mellow Mushroom', 'snacks', '1 order', 1240, 45, 190, 34, 2850, ['pretzel']),
+  item('mellow-spinach-dip', 'Spinach Artichoke Dip', 'Mellow Mushroom', 'snacks', '1 appetizer', 650, 24, 58, 37, 1330, ['dip']),
+  item('mellow-wings-10', 'Wings (10, no sauce)', 'Mellow Mushroom', 'lunch', '10 wings', 1000, 91, 0, 67, 280, ['wings']),
+  item('mellow-cheese-slice-lg', 'Cheese Pizza (large slice)', 'Mellow Mushroom', 'dinner', '1 slice', 430, 21, 61, 12, 1010, ['pizza']),
+  item('mellow-mighty-meaty-lg', 'Mighty Meaty Pizza (large slice)', 'Mellow Mushroom', 'dinner', '1 slice', 530, 28, 61, 20, 1370, ['pizza']),
+  item('mellow-kosmic-lg', 'Kosmic Karma Pizza (large slice)', 'Mellow Mushroom', 'dinner', '1 slice', 490, 22, 62, 18, 1070, ['pizza']),
+  item('mellow-holy-shiitake-lg', 'Holy Shiitake Pie (large slice)', 'Mellow Mushroom', 'dinner', '1 slice', 530, 20, 59, 25, 870, ['pizza']),
+  item('mellow-house-special-lg', 'House Special Pizza (large slice)', 'Mellow Mushroom', 'dinner', '1 slice', 510, 27, 62, 18, 1250, ['pizza']),
+  item('mellow-smashburger', "Mel's All American Smashburger", 'Mellow Mushroom', 'sandwiches', '1 burger', 1660, 46, 97, 111, 2860, ['burger']),
+  item('mellow-chicken-hoagie-half', 'Chicken & Cheese Hoagie (half)', 'Mellow Mushroom', 'sandwiches', 'half', 740, 41, 49, 40, 860, ['hoagie', 'chicken']),
+  item('mellow-brownie', "Mary Jane's Triple Chocolate Brownie", 'Mellow Mushroom', 'snacks', '1 dessert', 510, 6, 68, 25, 170, ['dessert']),
 ];
