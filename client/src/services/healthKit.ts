@@ -419,11 +419,21 @@ export class HealthKitService {
         }
       }
 
-      const items = kept.map((workout) => ({
-        name: workoutName(workout.workoutType),
-        minutes: Math.round(toNumber(workout.duration) / 60),
-        calories: Math.round(toNumber(workout.totalEnergyBurned)),
-      }));
+      const items = kept.map((workout) => {
+        // Capgo documents duration in seconds; fall back to wall-clock when missing.
+        const durationSeconds = toNumber(workout.duration);
+        const spanSeconds = Math.max(
+          0,
+          (Date.parse(workout.endDate) - Date.parse(workout.startDate)) / 1000,
+        );
+        const seconds = durationSeconds > 0 ? durationSeconds : spanSeconds;
+        return {
+          name: workoutName(workout.workoutType),
+          minutes: Math.max(0, Math.round(seconds / 60)),
+          calories: Math.round(toNumber(workout.totalEnergyBurned)),
+        };
+      });
+      // Headline total = every completed workout today (after de-dupe).
       return {
         count: items.length,
         minutes: items.reduce((sum, item) => sum + item.minutes, 0),

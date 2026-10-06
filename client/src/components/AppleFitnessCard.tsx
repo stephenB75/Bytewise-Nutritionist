@@ -53,32 +53,33 @@ function SleepTile({ sleep }: { sleep: SleepSummary | null }) {
 
 function WorkoutsTile({ workouts }: { workouts: AppleFitnessSummary['workouts'] | undefined }) {
   const count = workouts?.count ?? 0;
+  const totalMinutes = workouts?.minutes ?? 0;
   return (
     <div className="rounded-lg bg-white/70 p-3 border border-amber-200/50" data-testid="apple-fitness-workouts">
       <div className="flex items-center gap-1.5 text-xs text-gray-600 mb-1">
         <Dumbbell className="h-3.5 w-3.5 text-emerald-600" />
-        Workouts
+        Exercise minutes
       </div>
       {count > 0 && workouts ? (
         <>
-          <p className="text-lg font-bold text-gray-900">
-            {count}
-            <span className="ml-1.5 text-xs font-medium text-gray-700">
-              {formatMinutes(workouts.minutes)}
-              {workouts.calories > 0 ? ` · ${workouts.calories} cal` : ''}
-            </span>
+          <p className="text-2xl font-bold text-gray-900" data-testid="apple-fitness-workout-total-minutes">
+            {formatMinutes(totalMinutes)}
           </p>
-          <ul className="text-xs text-gray-700 space-y-0.5">
-            {workouts.items.slice(0, 3).map((item, index) => (
-              <li key={`${item.name}-${index}`}>
-                {item.name} · {formatMinutes(item.minutes)}
+          <p className="text-xs text-gray-700">
+            Total from {count} completed workout{count === 1 ? '' : 's'} today
+            {workouts.calories > 0 ? ` · ${workouts.calories} cal` : ''}
+          </p>
+          <ul className="mt-1.5 text-xs text-gray-700 space-y-0.5" data-testid="apple-fitness-workout-list">
+            {workouts.items.map((item, index) => (
+              <li key={`${item.name}-${index}`} className="flex items-center justify-between gap-2">
+                <span className="truncate">{item.name}</span>
+                <span className="shrink-0 font-medium text-gray-900">{formatMinutes(item.minutes)}</span>
               </li>
             ))}
-            {workouts.items.length > 3 && <li>+{workouts.items.length - 3} more</li>}
           </ul>
         </>
       ) : (
-        <p className="text-xs text-gray-700">No workout sessions yet today</p>
+        <p className="text-xs text-gray-700">No completed workouts yet today</p>
       )}
     </div>
   );
@@ -224,7 +225,7 @@ export function AppleFitnessCard({ onConnect }: AppleFitnessCardProps) {
             <>
               <WorkoutsTile workouts={summary?.workouts} />
               <p className="text-[11px] text-gray-600">
-                Workouts are sessions you start in the Workout app or another fitness app. All-day exercise minutes (the green ring) have their own card.
+                Total exercise minutes add every completed workout from Apple Health today. All-day green-ring minutes are on the Exercise Minutes card below.
               </p>
               <SleepTile sleep={summary?.sleep ?? null} />
               <p className="text-[11px] text-gray-600">
