@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
-import { Timer } from 'lucide-react';
+import { Dumbbell, Timer } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { healthKitService } from '@/services/healthKit';
+import { healthKitService, type WorkoutSummary } from '@/services/healthKit';
 import { toast } from '@/hooks/use-toast';
 
 const DAILY_TARGET_MINUTES = 30;
@@ -17,17 +17,41 @@ type DayMinutes = {
   totalMinutes: number;
 };
 
-type CardState = 'loading' | 'web' | 'unavailable' | 'disconnected' | 'needs-permission' | 'ready';
+type CardState =
+  | 'loading'
+  | 'web'
+  | 'unavailable'
+  | 'disconnected'
+  | 'needs-permission'
+  | 'ready';
 
+/** Plain language for users — avoid "3m" / "20m". */
 function formatMinutes(total: number): string {
-  const hours = Math.floor(total / 60);
-  const minutes = total % 60;
-  return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+  const safe = Math.max(0, Math.round(total));
+  const hours = Math.floor(safe / 60);
+  const minutes = safe % 60;
+  if (hours > 0 && minutes > 0) {
+    return `${hours} hr ${minutes} min`;
+  }
+  if (hours > 0) {
+    return hours === 1 ? '1 hr' : `${hours} hr`;
+  }
+  return minutes === 1 ? '1 minute' : `${minutes} minutes`;
+}
+
+function formatMinutesShort(total: number): string {
+  const safe = Math.max(0, Math.round(total));
+  const hours = Math.floor(safe / 60);
+  const minutes = safe % 60;
+  if (hours > 0 && minutes > 0) return `${hours}h ${minutes}min`;
+  if (hours > 0) return `${hours}h`;
+  return `${minutes} min`;
 }
 
 export function ExerciseMinutesCard({ onConnect }: { onConnect?: () => void }) {
   const [state, setState] = useState<CardState>('loading');
   const [days, setDays] = useState<DayMinutes[]>([]);
+  const [todayWorkouts, setTodayWorkouts] = useState<WorkoutSummary | null>(null);
   const [allowing, setAllowing] = useState(false);
 
   const refresh = useCallback(async () => {
@@ -38,14 +62,24 @@ export function ExerciseMinutesCard({ onConnect }: { onConnect?: () => void }) {
     await healthKitService.initialize();
     if (!healthKitService.getAvailability()) {
       setState('unavailable');
-    } else if (!healthKitService.getAuthorizationStatus()) {
-      setState('disconnected');
-    } else if (healthKitService.needsExercisePermission()) {
-      setState('needs-permission');
-    } else {
-      setDays((await healthKitService.readExerciseHistory(7)) || []);
-      setState('ready');
+      return;
     }
+    if (!healthKitService.getAuthorizationStatus()) {
+      setState('disconnected');
+      return;
+    }
+    if (healthKitService.needsExercisePermission()) {
+      setState('needs-permission');
+      return;
+    }
+
+    const [history, summary] = await Promise.all([
+      healthKitService.readExerciseHistory(7),
+      healthKitService.readTodayFitnessSummary(),
+    ]);
+    setDays(history || []);
+    setTodayWorkouts(summary?.workouts ?? { count: 0, minutes: 0, calories: 0, items: [] });
+    setState('ready');
   }, []);
 
   useEffect(() => {
@@ -79,19 +113,20 @@ export function ExerciseMinutesCard({ onConnect }: { onConnect?: () => void }) {
   const today = days[days.length - 1];
   const todayTotal = today?.totalMinutes ?? 0;
   const todayRing = today?.ringMinutes ?? 0;
-  const todayWorkouts = today?.workoutMinutes ?? 0;
+  const todayWorkoutMinutes = today?.workoutMinutes ?? todayWorkouts?.minutes ?? 0;
   const weekTotal = days.reduce((sum, day) => sum + day.totalMinutes, 0);
   const daysOnTarget = days.filter((day) => day.totalMinutes >= DAILY_TARGET_MINUTES).length;
   const scaleMax = Math.max(DAILY_TARGET_MINUTES * 1.5, ...days.map((day) => day.totalMinutes), 1);
   const todayProgress = Math.min(todayTotal / DAILY_TARGET_MINUTES, 1) * 100;
+  const workoutItems = todayWorkouts?.items ?? [];
 
   return (
     <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200/60 p-4 shadow-md" data-testid="exercise-minutes-card">
       <div className="flex items-center gap-2 mb-3">
         <Timer className="h-5 w-5 text-lime-600" />
         <div>
-          <h3 className="text-base font-bold text-gray-900">Exercise Minutes</h3>
-          <p className="text-xs text-gray-700">Green ring + completed workouts</p>
+          <h3 className="text-base font-bold text-gray-900">Exercise</h3>
+          <p className="text-xs text-gray-700">All-day activity and workouts in one place</p>
         </div>
       </div>
 
@@ -99,7 +134,7 @@ export function ExerciseMinutesCard({ onConnect }: { onConnect?: () => void }) {
         <p className="text-sm text-gray-600">Loading exercise…</p>
       ) : state === 'web' ? (
         <p className="text-sm text-gray-700">
-          Open the Bytewise iPhone app and connect Apple Health to see your daily exercise minutes and the last 7 days here.
+          Open the Bytewise iPhone app and connect Apple Health to see today’s exercise total, workouts, and the last 7 days here.
         </p>
       ) : state === 'unavailable' ? (
         <p className="text-sm text-gray-700">Apple Health is not available on this device.</p>
@@ -107,8 +142,8 @@ export function ExerciseMinutesCard({ onConnect }: { onConnect?: () => void }) {
         <div className="space-y-2">
           <p className="text-sm text-gray-700">
             {state === 'disconnected'
-              ? 'Connect Apple Health to track your exercise minutes.'
-              : 'Allow Exercise minutes in Apple Health to see your green ring here.'}
+              ? 'Connect Apple Health to track your exercise minutes and workouts.'
+              : 'Allow Exercise minutes in Apple Health to see your activity here.'}
           </p>
           <Button
             type="button"
@@ -124,44 +159,78 @@ export function ExerciseMinutesCard({ onConnect }: { onConnect?: () => void }) {
       ) : (
         <div className="space-y-3">
           <div className="rounded-lg bg-white/70 p-3 border border-amber-200/50" data-testid="exercise-minutes-today-tally">
-            <div className="flex items-baseline justify-between">
+            <p className="text-xs font-medium text-gray-600 mb-1">Today’s total</p>
+            <div className="flex items-baseline justify-between gap-2">
               <p className="text-2xl font-bold text-gray-900">
                 {formatMinutes(todayTotal)}
-                <span className="ml-1.5 text-sm font-medium text-gray-700">of {DAILY_TARGET_MINUTES}m today</span>
+                <span className="ml-1.5 text-sm font-medium text-gray-700">
+                  of {DAILY_TARGET_MINUTES} minutes
+                </span>
               </p>
-              {todayTotal >= DAILY_TARGET_MINUTES && <span className="text-xs font-semibold text-lime-700">Goal met</span>}
+              {todayTotal >= DAILY_TARGET_MINUTES && (
+                <span className="shrink-0 text-xs font-semibold text-lime-700">Goal met</span>
+              )}
             </div>
             <div className="mt-2 h-2 rounded-full bg-lime-100 overflow-hidden">
               <div className="h-full rounded-full bg-lime-500" style={{ width: `${todayProgress}%` }} />
             </div>
-            <div className="mt-2 grid grid-cols-2 gap-2 text-xs text-gray-700">
-              <p>
-                Green ring{' '}
+
+            <div className="mt-3 space-y-2 text-sm text-gray-800">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-gray-700">All-day activity (green ring)</span>
                 <span className="font-semibold text-gray-900" data-testid="exercise-ring-minutes">
                   {formatMinutes(todayRing)}
                 </span>
-              </p>
-              <p className="text-right">
-                Workouts{' '}
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-gray-700">Completed workouts</span>
                 <span className="font-semibold text-gray-900" data-testid="exercise-workout-minutes">
-                  {formatMinutes(todayWorkouts)}
+                  {formatMinutes(todayWorkoutMinutes)}
                 </span>
-              </p>
+              </div>
             </div>
           </div>
 
+          <div className="rounded-lg bg-white/70 p-3 border border-amber-200/50" data-testid="exercise-workout-list">
+            <div className="flex items-center gap-1.5 text-xs text-gray-600 mb-2">
+              <Dumbbell className="h-3.5 w-3.5 text-emerald-600" />
+              Today’s workouts
+            </div>
+            {workoutItems.length > 0 ? (
+              <ul className="space-y-1.5">
+                {workoutItems.map((item, index) => (
+                  <li
+                    key={`${item.name}-${index}`}
+                    className="flex items-center justify-between gap-2 text-sm text-gray-800"
+                  >
+                    <span className="truncate">{item.name}</span>
+                    <span className="shrink-0 font-medium text-gray-900">
+                      {formatMinutes(item.minutes)}
+                      {item.calories > 0 ? ` · ${item.calories} cal` : ''}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-gray-700">No completed workouts yet today</p>
+            )}
+          </div>
+
           <div className="rounded-lg bg-white/70 p-3 border border-amber-200/50">
+            <p className="text-xs font-medium text-gray-600 mb-2">Last 7 days (combined total)</p>
             <div className="flex items-end justify-between gap-1.5 h-24" aria-label="Total exercise minutes, last 7 days">
               {days.map((day, index) => {
                 const isToday = index === days.length - 1;
                 const height = day.totalMinutes > 0 ? Math.max((day.totalMinutes / scaleMax) * 100, 6) : 2;
                 return (
                   <div key={day.date.toDateString()} className="flex flex-1 flex-col items-center gap-1 h-full justify-end">
-                    <span className="text-[10px] font-medium text-gray-700">{day.totalMinutes || ''}</span>
+                    <span className="text-[10px] font-medium text-gray-700">
+                      {day.totalMinutes > 0 ? formatMinutesShort(day.totalMinutes) : ''}
+                    </span>
                     <div
                       className={`w-full max-w-[28px] rounded-t ${day.totalMinutes >= DAILY_TARGET_MINUTES ? 'bg-lime-500' : 'bg-lime-200'} ${isToday ? 'ring-2 ring-lime-700/40' : ''}`}
                       style={{ height: `${height}%` }}
-                      title={`${day.date.toLocaleDateString('en-US', { weekday: 'long' })}: ${day.totalMinutes} min total (ring ${day.ringMinutes} + workouts ${day.workoutMinutes})`}
+                      title={`${day.date.toLocaleDateString('en-US', { weekday: 'long' })}: ${formatMinutes(day.totalMinutes)} total`}
                     />
                     <span className={`text-[10px] ${isToday ? 'font-bold text-gray-900' : 'text-gray-600'}`}>
                       {isToday ? 'Today' : day.date.toLocaleDateString('en-US', { weekday: 'narrow' })}
@@ -171,13 +240,11 @@ export function ExerciseMinutesCard({ onConnect }: { onConnect?: () => void }) {
               })}
             </div>
             <p className="mt-2 text-xs text-gray-700">
-              {formatMinutes(weekTotal)} in the last 7 days (guideline: {WEEKLY_TARGET_MINUTES}m a week) · {daysOnTarget} of 7 days hit {DAILY_TARGET_MINUTES}m
+              {formatMinutes(weekTotal)} over the last 7 days (guideline: {WEEKLY_TARGET_MINUTES} minutes a week)
+              {' · '}
+              {daysOnTarget} of 7 days hit {DAILY_TARGET_MINUTES} minutes
             </p>
           </div>
-
-          <p className="text-[11px] text-gray-600">
-            Today’s tally adds green-ring minutes and completed workout minutes from Apple Health. Workout sessions are listed in the Apple Fitness card above.
-          </p>
         </div>
       )}
     </Card>

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
-import { Activity, Dumbbell, Flame, Footprints, HeartPulse, Moon } from 'lucide-react';
+import { Activity, Flame, Footprints, HeartPulse, Moon } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { healthKitService, type AppleFitnessSummary, type SleepSummary } from '@/services/healthKit';
@@ -11,9 +11,12 @@ type AppleFitnessCardProps = {
 };
 
 function formatMinutes(total: number): string {
-  const hours = Math.floor(total / 60);
-  const minutes = total % 60;
-  return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+  const safe = Math.max(0, Math.round(total));
+  const hours = Math.floor(safe / 60);
+  const minutes = safe % 60;
+  if (hours > 0 && minutes > 0) return `${hours} hr ${minutes} min`;
+  if (hours > 0) return hours === 1 ? '1 hr' : `${hours} hr`;
+  return minutes === 1 ? '1 minute' : `${minutes} minutes`;
 }
 
 function sleepRating(score: number): { label: string; className: string } {
@@ -46,40 +49,6 @@ function SleepTile({ sleep }: { sleep: SleepSummary | null }) {
         </>
       ) : (
         <p className="text-xs text-gray-700">No sleep recorded last night</p>
-      )}
-    </div>
-  );
-}
-
-function WorkoutsTile({ workouts }: { workouts: AppleFitnessSummary['workouts'] | undefined }) {
-  const count = workouts?.count ?? 0;
-  const totalMinutes = workouts?.minutes ?? 0;
-  return (
-    <div className="rounded-lg bg-white/70 p-3 border border-amber-200/50" data-testid="apple-fitness-workouts">
-      <div className="flex items-center gap-1.5 text-xs text-gray-600 mb-1">
-        <Dumbbell className="h-3.5 w-3.5 text-emerald-600" />
-        Workouts
-      </div>
-      {count > 0 && workouts ? (
-        <>
-          <p className="text-lg font-bold text-gray-900" data-testid="apple-fitness-workout-total-minutes">
-            {formatMinutes(totalMinutes)}
-            <span className="ml-1.5 text-xs font-medium text-gray-700">
-              from {count} session{count === 1 ? '' : 's'}
-              {workouts.calories > 0 ? ` · ${workouts.calories} cal` : ''}
-            </span>
-          </p>
-          <ul className="mt-1 text-xs text-gray-700 space-y-0.5" data-testid="apple-fitness-workout-list">
-            {workouts.items.map((item, index) => (
-              <li key={`${item.name}-${index}`} className="flex items-center justify-between gap-2">
-                <span className="truncate">{item.name}</span>
-                <span className="shrink-0 font-medium text-gray-900">{formatMinutes(item.minutes)}</span>
-              </li>
-            ))}
-          </ul>
-        </>
-      ) : (
-        <p className="text-xs text-gray-700">No completed workouts yet today</p>
       )}
     </div>
   );
@@ -160,14 +129,14 @@ export function AppleFitnessCard({ onConnect }: AppleFitnessCardProps) {
         <p className="text-sm text-gray-600">Loading activity…</p>
       ) : !isNativeIos ? (
         <p className="text-sm text-gray-700">
-          Open the Bytewise iPhone app and connect Apple Health in Profile to see steps, move calories, distance, exercise minutes, sleep, and workouts here.
+          Open the Bytewise iPhone app and connect Apple Health in Profile to see steps, move calories, distance, and sleep here.
         </p>
       ) : !available ? (
         <p className="text-sm text-gray-700">Apple Health is not available on this device.</p>
       ) : !connected ? (
         <div className="space-y-2">
           <p className="text-sm text-gray-700">
-            Connect Apple Health to show today's steps, move calories, distance, exercise minutes, sleep, and workouts alongside nutrition.
+            Connect Apple Health to show today’s steps, move calories, distance, and sleep alongside nutrition.
           </p>
           <Button
             type="button"
@@ -208,7 +177,7 @@ export function AppleFitnessCard({ onConnect }: AppleFitnessCardProps) {
           {needsRecoveryPermission ? (
             <div className="rounded-lg bg-white/70 p-3 border border-amber-200/50 space-y-2">
               <p className="text-sm text-gray-700">
-                Allow Bytewise to read sleep, exercise, and workouts from Apple Health to see your sleep score and today's activity.
+                Allow Bytewise to read sleep from Apple Health to see your sleep score here. Exercise and workouts are on the Exercise card below.
               </p>
               <Button
                 type="button"
@@ -218,18 +187,14 @@ export function AppleFitnessCard({ onConnect }: AppleFitnessCardProps) {
                 disabled={connecting}
                 data-testid="button-allow-sleep-workouts"
               >
-                {connecting ? 'Opening Apple Health…' : 'Allow sleep & workouts'}
+                {connecting ? 'Opening Apple Health…' : 'Allow sleep'}
               </Button>
             </div>
           ) : (
             <>
-              <WorkoutsTile workouts={summary?.workouts} />
-              <p className="text-[11px] text-gray-600">
-                These session minutes are added to your green ring on the Exercise Minutes card below for today’s total.
-              </p>
               <SleepTile sleep={summary?.sleep ?? null} />
               <p className="text-[11px] text-gray-600">
-                Sleep score is calculated by Bytewise from your Apple Health sleep data; it is not Apple's Sleep Score.
+                Sleep score is calculated by Bytewise from your Apple Health sleep data; it is not Apple's Sleep Score. Exercise and workouts are on the Exercise card below.
               </p>
             </>
           )}
