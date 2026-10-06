@@ -78,10 +78,13 @@ import { clearGuestNutritionStorage } from '@/lib/guestStorage';
 import { AppleFitnessCard } from '@/components/AppleFitnessCard';
 import { ExerciseMinutesCard } from '@/components/ExerciseMinutesCard';
 import { AppleHealthIntegration } from '@/components/AppleHealthIntegration';
+import { NotificationPreferences } from '@/components/NotificationPreferences';
 import { FriendsPanel } from '@/components/FriendsPanel';
 import { FRIENDS_QUERY_KEY, useFriendUpdates } from '@/hooks/useFriendUpdates';
 import { refreshPushIfPermitted, registerForPush } from '@/services/pushNotifications';
 import {
+  OS_NOTIFICATIONS_PREF_EVENT,
+  areOsNotificationsEnabled,
   notifyInternalAlert,
   syncDailyReminders,
   usesNativeNotifications,
@@ -577,7 +580,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const hasFriendConnections = !!friendsData
     && friendsData.friends.length + friendsData.incoming.length + friendsData.outgoing.length > 0;
   useEffect(() => {
-    if (!user?.id) return;
+    if (!user?.id || !areOsNotificationsEnabled()) return;
     void registerForPush({
       prompt: hasFriendConnections,
       // The friends poll turns the change into the in-app toast and bell entry.
@@ -859,12 +862,17 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   // Water and meal reminders for iOS/Android when the app is backgrounded.
   useEffect(() => {
-    void syncDailyReminders({
-      waterGlasses: dailyStats?.waterGlasses ?? 0,
-      mealsLoggedToday: loggedMeals.length,
-    }).then(() => {
-      if (user?.id) void refreshPushIfPermitted();
-    });
+    const sync = () => {
+      void syncDailyReminders({
+        waterGlasses: dailyStats?.waterGlasses ?? 0,
+        mealsLoggedToday: loggedMeals.length,
+      }).then(() => {
+        if (user?.id && areOsNotificationsEnabled()) void refreshPushIfPermitted();
+      });
+    };
+    sync();
+    window.addEventListener(OS_NOTIFICATIONS_PREF_EVENT, sync);
+    return () => window.removeEventListener(OS_NOTIFICATIONS_PREF_EVENT, sync);
   }, [dailyStats?.waterGlasses, loggedMeals.length, user?.id]);
 
   useEffect(() => {
@@ -2907,7 +2915,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <SignOnModule />
           </Card>
         )}
-        <div className="mt-6">
+        <div className="mt-6 space-y-6">
+          <NotificationPreferences />
           <AppVersionInfo />
         </div>
       </div>

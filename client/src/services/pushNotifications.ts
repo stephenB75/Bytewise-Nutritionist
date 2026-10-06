@@ -1,6 +1,7 @@
 import { Capacitor } from '@capacitor/core';
 import { PushNotifications } from '@capacitor/push-notifications';
 import { apiRequest } from '@/lib/queryClient';
+import { areOsNotificationsEnabled } from '@/services/localNotifications';
 
 const TOKEN_KEY = 'bytewise-push-token';
 
@@ -58,6 +59,12 @@ export async function registerForPush(options: PushHandlers & { prompt: boolean 
   const plugin = getPlugin();
   if (!plugin) return;
   handlers = { onReceived: options.onReceived, onOpened: options.onOpened };
+
+  // Respect Profile → App notifications master switch.
+  if (!areOsNotificationsEnabled()) {
+    await unregisterPush();
+    return;
+  }
 
   try {
     let { receive } = await plugin.checkPermissions();

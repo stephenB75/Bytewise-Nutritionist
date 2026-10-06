@@ -17,6 +17,9 @@ const CALORIE_GOAL_ID = 1007;
 const FASTING_MILESTONE_BASE = 1100;
 const ACHIEVEMENT_ID_BASE = 2000;
 const INTERNAL_ID_BASE = 4000;
+/** User preference: deliver alerts via iOS/Android Local Notifications. Default on. */
+const OS_NOTIFICATIONS_PREF_KEY = 'bytewise-os-notifications-enabled';
+export const OS_NOTIFICATIONS_PREF_EVENT = 'os-notifications-pref-changed';
 
 const SIGNIFICANT_FASTING_HOURS = [12, 16, 18, 20, 24, 36, 48, 72];
 const FASTING_MILESTONE_COPY: Record<number, { title: string; body: string }> = {
@@ -45,12 +48,118 @@ function getPlugin() {
   return LocalNotifications;
 }
 
+function fastingMilestoneId(hours: number): number {
+  return FASTING_MILESTONE_BASE + hours;
+}
+
+function seriesIds(base: number): number[] {
+  return Array.from({ length: REMINDER_DAYS }, (_, i) => base + i);
+}
+
+export type OsNotificationPermission = 'granted' | 'denied' | 'prompt' | 'unavailable';
+
+/** In-app master switch for OS banners/reminders. Bell inbox is unaffected. */
+export function areOsNotificationsEnabled(): boolean {
+  try {
+    const raw = localStorage.getItem(OS_NOTIFICATIONS_PREF_KEY);
+    if (raw === null) return true;
+    return raw === '1' || raw === 'true';
+  } catch {
+    return true;
+  }
+}
+
+function writeOsNotificationsPref(enabled: boolean): void {
+  try {
+    localStorage.setItem(OS_NOTIFICATIONS_PREF_KEY, enabled ? '1' : '0');
+  } catch {
+    // ignore quota / private mode
+  }
+  window.dispatchEvent(new CustomEvent(OS_NOTIFICATIONS_PREF_EVENT, { detail: { enabled } }));
+}
+
+export async function getOsNotificationPermission(): Promise<OsNotificationPermission> {
+  const plugin = getPlugin();
+  if (!plugin) return 'unavailable';
+  try {
+    const { display } = await plugin.checkPermissions();
+    if (display === 'granted') return 'granted';
+    if (display === 'denied') return 'denied';
+    return 'prompt';
+  } catch {
+    return 'unavailable';
+  }
+}
+
 async function ensurePermission(plugin: typeof LocalNotifications): Promise<boolean> {
+  if (!areOsNotificationsEnabled()) return false;
   let { display } = await plugin.checkPermissions();
   if (display === 'prompt' || display === 'prompt-with-rationale') {
     ({ display } = await plugin.requestPermissions());
   }
   return display === 'granted';
+}
+
+async function cancelAllPending(plugin: typeof LocalNotifications): Promise<void> {
+  try {
+    const pending = await plugin.getPending();
+    const ids = (pending.notifications || []).map((n) => n.id);
+    await cancelIds(plugin, ids);
+  } catch (error) {
+    console.warn('Could not cancel pending local notifications:', error);
+  }
+  // Also clear known id ranges in case getPending is empty on some builds.
+  const known = [
+    FASTING_COMPLETE_ID,
+    WATER_AFTERNOON_ID,
+    WATER_EVENING_ID,
+    MEAL_LUNCH_ID,
+    MEAL_DINNER_ID,
+    WATER_GOAL_ID,
+    CALORIE_GOAL_ID,
+    ...SIGNIFICANT_FASTING_HOURS.map(fastingMilestoneId),
+    ...seriesIds(WATER_AFTERNOON_BASE),
+    ...seriesIds(WATER_EVENING_BASE),
+    ...seriesIds(MEAL_LUNCH_BASE),
+    ...seriesIds(MEAL_DINNER_BASE),
+  ];
+  await cancelIds(plugin, known);
+}
+
+/**
+ * Master switch for iOS/Android Local Notifications (+ callers should unregister push when off).
+ * Turning on requests OS permission when possible.
+ */
+export async function setOsNotificationsEnabled(enabled: boolean): Promise<{
+  enabled: boolean;
+  permission: OsNotificationPermission;
+  needsSettings?: boolean;
+}> {
+  if (!enabled) {
+    writeOsNotificationsPref(false);
+    const plugin = getPlugin();
+    if (plugin) await cancelAllPending(plugin);
+    return { enabled: false, permission: await getOsNotificationPermission() };
+  }
+
+  writeOsNotificationsPref(true);
+  const plugin = getPlugin();
+  if (!plugin) {
+    return { enabled: true, permission: 'unavailable' };
+  }
+
+  let { display } = await plugin.checkPermissions();
+  if (display === 'prompt' || display === 'prompt-with-rationale') {
+    ({ display } = await plugin.requestPermissions());
+  }
+  if (display !== 'granted') {
+    return {
+      enabled: true,
+      permission: display === 'denied' ? 'denied' : 'prompt',
+      needsSettings: display === 'denied',
+    };
+  }
+  return { enabled: true, permission: 'granted' };
 }
 
 function isSameLocalDay(date: Date, other = new Date()): boolean {
@@ -116,10 +225,6 @@ export async function cancelFastingCompleteNotification(): Promise<void> {
   } catch (error) {
     console.warn('Could not cancel fasting notification:', error);
   }
-}
-
-function fastingMilestoneId(hours: number): number {
-  return FASTING_MILESTONE_BASE + hours;
 }
 
 /** Upcoming 12h+ milestones so they still fire if the app is backgrounded. */
@@ -221,10 +326,6 @@ export function usesNativeNotifications(): boolean {
   return !!getPlugin();
 }
 
-function seriesIds(base: number): number[] {
-  return Array.from({ length: REMINDER_DAYS }, (_, i) => base + i);
-}
-
 /** Next N clock times, skipping today when that day's goal is already met. */
 function upcomingDailyTimes(hour: number, minute: number, skipToday: boolean): Date[] {
   const times: Date[] = [];
@@ -264,7 +365,6 @@ export async function syncDailyReminders(opts: {
   try {
     const plugin = getPlugin();
     if (!plugin) return;
-    if (!(await ensurePermission(plugin))) return;
 
     const idsToCancel = [
       WATER_AFTERNOON_ID,
@@ -277,6 +377,8 @@ export async function syncDailyReminders(opts: {
       ...seriesIds(MEAL_DINNER_BASE),
     ];
     await cancelIds(plugin, idsToCancel);
+    if (!areOsNotificationsEnabled()) return;
+    if (!(await ensurePermission(plugin))) return;
 
     const waterGoalMet = opts.waterGlasses >= 8;
     const hasMeals = opts.mealsLoggedToday > 0;
