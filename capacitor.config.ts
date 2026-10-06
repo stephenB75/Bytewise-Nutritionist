@@ -57,11 +57,11 @@ const config: CapacitorConfig = {
       smallIcon: 'ic_stat_nutrition',
       iconColor: '#faed39',
       sound: 'notification.wav',
-      // Foreground: in-app toast + bell. Background/lock screen still shows the full alert.
-      presentationOptions: ['badge', 'sound', 'list']
+      // All internal alerts use iOS banners (not in-app toasts) on native.
+      presentationOptions: ['badge', 'sound', 'banner', 'list']
     },
     
-    // No banner while the app is open: the in-app toast and bell cover it.
+    // Friend push stays quiet in foreground; local notifications own the banner.
     PushNotifications: {
       presentationOptions: []
     },

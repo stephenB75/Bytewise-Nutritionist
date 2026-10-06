@@ -16,6 +16,7 @@ const MEAL_DINNER_BASE = 3030;
 const CALORIE_GOAL_ID = 1007;
 const FASTING_MILESTONE_BASE = 1100;
 const ACHIEVEMENT_ID_BASE = 2000;
+const INTERNAL_ID_BASE = 4000;
 
 const SIGNIFICANT_FASTING_HOURS = [12, 16, 18, 20, 24, 36, 48, 72];
 const FASTING_MILESTONE_COPY: Record<number, { title: string; body: string }> = {
@@ -200,6 +201,24 @@ export async function notifyCalorieGoalReached(goalCalories: number): Promise<vo
 export async function notifyAchievementUnlocked(title: string, message: string): Promise<void> {
   const id = ACHIEVEMENT_ID_BASE + (Date.now() % 8000);
   await notifyNow(id, title, message, 'profile');
+}
+
+/**
+ * Delivers every in-app alert as a real iOS/Android local notification
+ * (banner + Notification Center). No-op on web — callers keep toast/bell there.
+ */
+export async function notifyInternalAlert(
+  title: string,
+  body: string,
+  tab: TabId = 'home',
+): Promise<void> {
+  const id = INTERNAL_ID_BASE + (Date.now() % 9000);
+  await notifyNow(id, title, body, tab);
+}
+
+/** True when this device should prefer OS banners over in-app toasts. */
+export function usesNativeNotifications(): boolean {
+  return !!getPlugin();
 }
 
 function seriesIds(base: number): number[] {

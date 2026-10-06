@@ -82,10 +82,9 @@ import { FriendsPanel } from '@/components/FriendsPanel';
 import { FRIENDS_QUERY_KEY, useFriendUpdates } from '@/hooks/useFriendUpdates';
 import { refreshPushIfPermitted, registerForPush } from '@/services/pushNotifications';
 import {
-  notifyAchievementUnlocked,
-  notifyCalorieGoalReached,
-  notifyWaterGoalReached,
+  notifyInternalAlert,
   syncDailyReminders,
+  usesNativeNotifications,
   watchLocalNotificationTaps,
 } from '@/services/localNotifications';
 import { NutritionTrendsCard } from '@/components/NutritionTrendsCard';
@@ -410,14 +409,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     });
 
     if (newGlasses >= 8 && previousGlasses < 8) {
-      toast({
-        title: "Hydration Goal Achieved! 💧",
-        description: "You've reached your daily water intake goal!",
-        variant: "default",
-        duration: 3000,
-      });
       addNotification('success', 'Daily Hydration Goal! 💧', 'You\'ve reached your 64 oz water goal today!');
-      void notifyWaterGoalReached();
+      if (!usesNativeNotifications()) {
+        toast({
+          title: 'Hydration Goal Achieved! 💧',
+          description: "You've reached your daily water intake goal!",
+          variant: 'default',
+          duration: 3000,
+        });
+      }
     }
     if (newGlasses >= 4 && newGlasses < 8 && previousGlasses < 4) {
       addNotification('info', 'Halfway There! 💧', `You've had ${newGlasses * 8} oz of water today. Keep going!`);
@@ -557,6 +557,18 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       timestamp: new Date(),
       read: false
     }, ...prev].slice(0, MAX_NOTIFICATIONS));
+
+    // Every internal alert → iOS/Android Local Notification banner (no-op on web).
+    const lower = title.toLowerCase();
+    const tab =
+      type === 'achievement' || lower.includes('friend') || lower.includes('request')
+        ? 'profile'
+        : lower.includes('fast')
+          ? 'fasting'
+          : lower.includes('meal') || lower.includes('calorie') || lower.includes('lunch') || lower.includes('dinner')
+            ? 'nutrition'
+            : 'home';
+    void notifyInternalAlert(title, message, tab);
   }, []);
 
   const { data: friendsData } = useFriendUpdates(user?.id, addNotification);
@@ -792,9 +804,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       setCurrentAchievement(achievement);
       setShowAchievement(true);
       
-      // Add bell notification for achievement
+      // Bell + iOS banner for achievement
       addNotification('achievement', achievement.title, achievement.message);
-      void notifyAchievementUnlocked(achievement.title, achievement.message);
     }
   }, [celebrationAchievement, addNotification]);
 
@@ -816,7 +827,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       setShowConfettiCelebration(true);
       
       addNotification('achievement', achievement.title, achievement.message);
-      void notifyAchievementUnlocked(achievement.title, achievement.message);
     };
 
     window.addEventListener('achievement-unlocked', handleGoalAchievement);
@@ -830,12 +840,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       const progress = (totalCalories / goalCalories) * 100;
       
       // Goal achievement notifications
-      if (totalCalories >= goalCalories && (dailyCalories < goalCalories || dailyCalories === 0)) {
+      // Only announce when calories actually cross the goal this session (avoid reopen spam).
+      if (totalCalories >= goalCalories && dailyCalories > 0 && dailyCalories < goalCalories) {
         addNotification('success', 'Daily Calorie Goal! 🎯', `Congratulations! You've reached your ${goalCalories} calorie goal today.`);
-        // Only fire the OS banner when calories actually cross the goal this session.
-        if (dailyCalories > 0 && dailyCalories < goalCalories) {
-          void notifyCalorieGoalReached(goalCalories);
-        }
       }
       
       // Milestone notifications

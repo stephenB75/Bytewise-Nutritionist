@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from '@/hooks/use-toast';
+import { usesNativeNotifications } from '@/services/localNotifications';
 
 export type FriendPerson = {
   connectionId: number;
@@ -53,22 +54,37 @@ export function useFriendUpdates(
 
     // On the first run on a device, past acceptances aren't replayed, but pending invites are still
     // announced because they need action.
+    const announce = (type: 'success' | 'info', title: string, message: string) => {
+      // Bell + (on native) iOS banner happen in ModernFoodLayout.addNotification.
+      notify(type, title, message);
+      // Web has no OS banner — keep the in-app toast there only.
+      if (!usesNativeNotifications()) {
+        toast({ title, description: message });
+      }
+    };
+
     for (const person of friends) {
       if (previous?.outgoing.includes(person.connectionId)) {
-        const message = `${person.name} accepted your request. You can now see each other's shared activity.`;
-        notify('success', 'Friend request accepted', message);
-        toast({ title: 'Friend request accepted', description: message });
+        announce(
+          'success',
+          'Friend request accepted',
+          `${person.name} accepted your request. You can now see each other's shared activity.`,
+        );
       }
     }
     const newIncoming = incoming.filter(person => !previous?.incoming.includes(person.connectionId));
     if (newIncoming.length === 1) {
-      const message = `${newIncoming[0].name} wants to connect. Open Profile → Friends & Family to accept.`;
-      notify('info', 'New friend request', message);
-      toast({ title: 'New friend request', description: message });
+      announce(
+        'info',
+        'New friend request',
+        `${newIncoming[0].name} wants to connect. Open Profile → Friends & Family to accept.`,
+      );
     } else if (newIncoming.length > 1) {
-      const message = `${newIncoming.length} people want to connect. Open Profile → Friends & Family to accept.`;
-      notify('info', 'New friend requests', message);
-      toast({ title: 'New friend requests', description: message });
+      announce(
+        'info',
+        'New friend requests',
+        `${newIncoming.length} people want to connect. Open Profile → Friends & Family to accept.`,
+      );
     }
 
     const next: Snapshot = {
