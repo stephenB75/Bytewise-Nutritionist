@@ -36,6 +36,7 @@ import {
   scheduleFastingCompleteNotification,
   scheduleFastingMilestoneNotifications,
 } from '@/services/localNotifications';
+import { FastingTrendsCard } from '@/components/FastingTrendsCard';
 
 interface FastingPlan {
   id: string;
@@ -1006,6 +1007,10 @@ const FastingTracker = React.memo(function FastingTracker() {
               </div>
             </CardContent>
           </Card>
+
+          <div className="mt-8">
+            <FastingTrendsCard sessions={fastingHistory} />
+          </div>
 
           {/* Fasting History */}
           <Card className="mt-8 bg-gradient-to-br from-amber-50 to-amber-100 border-none shadow-none">
