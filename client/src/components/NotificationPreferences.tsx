@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { Bell } from 'lucide-react';
 import { Card } from '@/components/ui/card';
-import { Switch } from '@/components/ui/switch';
 import { toast } from '@/hooks/use-toast';
 import {
   OS_NOTIFICATIONS_PREF_EVENT,
@@ -125,14 +124,42 @@ export function NotificationPreferences() {
             )}
           </div>
         </div>
-        <Switch
-          checked={enabled}
-          disabled={busy}
-          onCheckedChange={(checked) => void handleToggle(checked)}
+        <button
+          type="button"
+          role="switch"
+          aria-checked={enabled}
           aria-label="App notifications"
-          data-testid="notification-preferences-switch"
-          className="data-[state=checked]:bg-amber-600"
-        />
+          data-testid="app-os-alerts-switch"
+          disabled={busy}
+          onClick={() => void handleToggle(!enabled)}
+          className={`bw-toggle ${enabled ? 'bg-amber-600' : 'bg-amber-200'}`}
+          style={{
+            width: 52,
+            height: 32,
+            minWidth: 52,
+            maxWidth: 52,
+            minHeight: 32,
+            maxHeight: 32,
+            padding: 2,
+            borderRadius: 9999,
+            display: 'inline-flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            boxSizing: 'border-box',
+          }}
+        >
+          <span
+            className="bw-toggle__thumb bg-white shadow-sm transition-transform duration-200"
+            style={{
+              width: 28,
+              height: 28,
+              minWidth: 28,
+              minHeight: 28,
+              borderRadius: 9999,
+              transform: enabled ? 'translateX(20px)' : 'translateX(0)',
+            }}
+          />
+        </button>
       </div>
     </Card>
   );

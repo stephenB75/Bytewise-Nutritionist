@@ -2831,7 +2831,7 @@ select {
   input, 
   textarea, 
   select,
-  button:not(.fastfood-style-pill):not(.fastfood-place-chip):not([data-testid^="fastfood-restaurant-"]):not([data-testid^="fastfood-cuisine-"]):not([data-testid="fastfood-more-places"]):not([data-testid="fastfood-use-location"]):not([data-testid="fastfood-more-places-footer"]) {
+  button:not(.fastfood-style-pill):not(.fastfood-place-chip):not([data-testid^="fastfood-restaurant-"]):not([data-testid^="fastfood-cuisine-"]):not([data-testid="fastfood-more-places"]):not([data-testid="fastfood-use-location"]):not([data-testid="fastfood-more-places-footer"]):not([role="switch"]):not(.bw-toggle) {
     min-height: 44px; /* iOS minimum touch target */
     font-size: 16px !important;
   }
@@ -6104,6 +6104,48 @@ button.tour-button-override:hover *,
 [data-testid*="food-item-"] div[class*="font-medium"],
 [data-testid*="food-item-"] div[class*="text-sm"] {
   color: #111827 !important; /* Dark text for all food card content */
+}
+
+/* Horizontal toggle pill — never inherit global mobile button min-height:44px */
+button[role="switch"],
+[role="switch"],
+.bw-toggle {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  box-sizing: border-box !important;
+  width: 52px !important;
+  height: 32px !important;
+  min-width: 52px !important;
+  max-width: 52px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
+  padding: 2px !important;
+  margin: 0 !important;
+  border: none !important;
+  border-radius: 9999px !important;
+  line-height: 0 !important;
+  font-size: 0 !important;
+  flex-shrink: 0 !important;
+  align-self: center !important;
+  overflow: hidden !important;
+}
+
+button[role="switch"] > span,
+[role="switch"] > span,
+.bw-toggle__thumb {
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  max-width: 28px !important;
+  min-height: 28px !important;
+  max-height: 28px !important;
+  border-radius: 9999px !important;
+  flex-shrink: 0 !important;
+  display: block !important;
 }
 
 /* Fast Food “Food style” chips — true pills; beat dialog/global button overrides */
