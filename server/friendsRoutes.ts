@@ -72,7 +72,7 @@ async function assertUnderShareLimit(userId: string, res: Response): Promise<boo
   const count = await countUserShares(userId);
   if (count >= ACTIVITY_SHARE_LIMIT) {
     res.status(400).json({
-      message: `Activity share shows your ${ACTIVITY_SHARE_LIMIT} most recent posts. Delete one below, or export a PDF report to share more detail.`,
+      message: `Activity share shows your ${ACTIVITY_SHARE_LIMIT} most recent posts. Delete one below, or go to Data and export a PDF report for more detail.`,
       code: 'share_limit',
       limit: ACTIVITY_SHARE_LIMIT,
     });

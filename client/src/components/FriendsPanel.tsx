@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { toast } from '@/hooks/use-toast';
-import { Check, CheckCircle2, ChevronDown, Clock, Droplets, FileDown, HeartPulse, Loader2, Share2, Timer, Trash2, UserPlus, Users, Utensils, X, BarChart3 } from 'lucide-react';
+import { Check, CheckCircle2, ChevronDown, Clock, Droplets, HeartPulse, Loader2, Share2, Timer, Trash2, UserPlus, Users, Utensils, X, BarChart3 } from 'lucide-react';
 import { Capacitor } from '@capacitor/core';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { FRIENDS_QUERY_KEY, type FriendsResponse } from '@/hooks/useFriendUpdates';
@@ -12,7 +12,9 @@ import { healthKitService, type AppleFitnessSummary } from '@/services/healthKit
 
 const FEED_LIMIT = 4;
 const SHARE_LIMIT_HINT =
-  `Activity share keeps your ${FEED_LIMIT} most recent posts. For more detail, export a PDF report and share that instead.`;
+  `Activity share keeps your ${FEED_LIMIT} most recent posts. For more detail, go to Data and export a PDF report.`;
+const PDF_DATA_HINT =
+  'For any additional activity info, go to Data and export a PDF report.';
 type Activity = {
   id: number;
   type: 'summary' | 'meal' | 'fast' | 'water';
@@ -107,7 +109,6 @@ export function FriendsPanel() {
   const [email, setEmail] = useState('');
   const [note, setNote] = useState('');
   const [inviteResult, setInviteResult] = useState<{ status: 'pending' | 'accepted'; message: string } | null>(null);
-  const [exportingPdf, setExportingPdf] = useState(false);
   const [friendsOpen, setFriendsOpen] = useState(false);
 
   const friendsQuery = useQuery<FriendsResponse>({ queryKey: FRIENDS_KEY, retry: 1, refetchInterval: 30_000 });
@@ -168,24 +169,6 @@ export function FriendsPanel() {
     ?? (feedQuery.data?.myShares || feedQuery.data?.activities || []).filter(a => a.isMine).length;
   const shareLimit = feedQuery.data?.shareLimit ?? FEED_LIMIT;
   const atShareLimit = myShareCount >= shareLimit;
-
-  const exportPdfReport = async () => {
-    setExportingPdf(true);
-    try {
-      const { generateProgressReportPDF } = await import('@/utils/pdfExport');
-      const success = await generateProgressReportPDF();
-      if (!success) throw new Error('PDF generation failed');
-      toast({ title: 'PDF report ready', description: 'Share the exported PDF for a fuller activity history.' });
-    } catch (error) {
-      toast({
-        title: 'Export failed',
-        description: error instanceof Error ? error.message : 'Could not generate the PDF report.',
-        variant: 'destructive',
-      });
-    } finally {
-      setExportingPdf(false);
-    }
-  };
 
   const share = useMutation({
     mutationFn: async (payload: { kind: 'summary' } | { kind: 'item'; type: 'meal' | 'fast' | 'fitness'; title: string; details: Record<string, string | number | null> }) => {
@@ -380,23 +363,12 @@ export function FriendsPanel() {
           <Share2 className="h-4 w-4 text-orange-700" /> Share an activity
         </p>
         <p className="text-xs text-gray-600">
-          Shows the {shareLimit} most recent shared posts. For a fuller history, export a PDF report.
+          Shows the {shareLimit} most recent shared posts. {PDF_DATA_HINT}
         </p>
         {atShareLimit && (
           <div className="rounded-lg border border-amber-300 bg-amber-50 p-3 space-y-2" data-testid="share-limit-notice">
             <p className="text-sm text-amber-950">{SHARE_LIMIT_HINT}</p>
-            <p className="text-xs text-amber-900">Delete one of your posts below to share something new, or export a PDF.</p>
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full border-amber-300 bg-white"
-              disabled={exportingPdf}
-              onClick={exportPdfReport}
-              data-testid="button-export-pdf-from-share"
-            >
-              {exportingPdf ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <FileDown className="h-4 w-4 mr-2" />}
-              Export PDF report
-            </Button>
+            <p className="text-xs text-amber-900">Delete one of your posts below to share something new.</p>
             {myShares.length > 0 && (
               <ul className="space-y-1.5 pt-1">
                 {myShares.map(activity => (
@@ -513,26 +485,14 @@ export function FriendsPanel() {
             <Timer className="h-4 w-4 mr-2" /> Share my last completed fast
           </Button>
         )}
-
-        {!atShareLimit && (
-          <Button
-            type="button"
-            variant="ghost"
-            className="w-full text-gray-700"
-            disabled={exportingPdf}
-            onClick={exportPdfReport}
-            data-testid="button-export-pdf-share-hint"
-          >
-            {exportingPdf ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <FileDown className="h-4 w-4 mr-2" />}
-            Prefer a full report? Export PDF
-          </Button>
-        )}
       </section>
 
       {/* Feed */}
       <section className="space-y-2">
         <p className="text-sm font-medium text-gray-900">Recent activity</p>
-        <p className="text-xs text-gray-600">Showing the {FEED_LIMIT} most recent shared posts.</p>
+        <p className="text-xs text-gray-600">
+          Showing the {FEED_LIMIT} most recent shared posts. {PDF_DATA_HINT}
+        </p>
         {feedQuery.isLoading ? (
           <p className="text-sm text-gray-600">Loading…</p>
         ) : activities.length === 0 ? (

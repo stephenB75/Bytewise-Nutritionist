@@ -177,7 +177,7 @@ export function DataManagementPanel({ embedded = false }: { embedded?: boolean }
                           Export Data
                         </h4>
                         <p className="text-sm text-gray-900 mb-4" style={{ fontFamily: "'Quicksand', sans-serif" }}>
-                          Download comprehensive nutrition reports with graphs and insights
+                          Download a 30-day report with macros (including sugar), micronutrients, fasting trends, shared activity summaries, water, achievements, and Apple Health when available
                         </p>
                         <Badge className="bg-blue-100 text-blue-800 border-blue-300 mb-4">
                           PDF Format

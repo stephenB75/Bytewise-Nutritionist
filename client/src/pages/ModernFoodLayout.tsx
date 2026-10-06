@@ -91,6 +91,7 @@ import {
   watchLocalNotificationTaps,
 } from '@/services/localNotifications';
 import { NutritionTrendsCard } from '@/components/NutritionTrendsCard';
+import { FoodTypeTrendsCard } from '@/components/FoodTypeTrendsCard';
 import { AINutritionAnalyzer } from '@/components/AINutritionAnalyzer';
 import { fixMealDateMismatches } from '@/utils/mealDateFixer';
 import { getCachedLocalStorage, debounce } from '@/utils/performanceUtils';
@@ -2631,6 +2632,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <Badge className="bg-amber-800 text-amber-100 border border-amber-700">Weekly Summary</Badge>
           </div>
           <WeeklyCaloriesCard />
+          <FoodTypeTrendsCard meals={weeklyMeals} />
         </div>
       </div>
     </div>

@@ -22,6 +22,7 @@ interface DailyNutritionData {
   protein: number;
   carbs: number;
   fat: number;
+  sugar: number;
   fiber: number;
   sodium: number;
   vitaminC: number;
@@ -43,6 +44,7 @@ interface WeeklyNutritionData {
   avgProtein: number;
   avgCarbs: number;
   avgFat: number;
+  avgSugar: number;
   avgFiber: number;
   avgSodium: number;
   avgVitaminC: number;
@@ -56,6 +58,20 @@ interface WeeklyNutritionData {
   totalMeals: number;
   daysWithData: number;
 }
+
+/** Same daily values as the dashboard Essential Micronutrients cards. */
+const MICRO_DV: Array<{ key: keyof DailyNutritionData; label: string; goal: number; unit: string }> = [
+  { key: 'vitaminC', label: 'Vitamin C', goal: 90, unit: 'mg' },
+  { key: 'vitaminD', label: 'Vitamin D', goal: 20, unit: 'μg' },
+  { key: 'vitaminB12', label: 'Vitamin B12', goal: 2.4, unit: 'μg' },
+  { key: 'folate', label: 'Folate', goal: 400, unit: 'μg' },
+  { key: 'iron', label: 'Iron', goal: 18, unit: 'mg' },
+  { key: 'calcium', label: 'Calcium', goal: 1000, unit: 'mg' },
+  { key: 'zinc', label: 'Zinc', goal: 11, unit: 'mg' },
+  { key: 'magnesium', label: 'Magnesium', goal: 400, unit: 'mg' },
+];
+
+const SUGAR_DAILY_LIMIT = 50;
 
 interface UserProgressData {
   // Nutrition Data
@@ -90,11 +106,45 @@ interface UserProgressData {
     totalCalories: number;
     createdAt: string;
   }>;
+  sharedActivities: Array<{
+    type: string;
+    title: string;
+    summary: string;
+    note: string | null;
+    createdAt: string;
+  }>;
+  macroAverages: {
+    protein: number;
+    carbs: number;
+    fat: number;
+    sugar: number;
+    daysLogged: number;
+  };
+  fastingTrends: {
+    sessions: number;
+    completed: number;
+    completionRate: number;
+    avgHours: number;
+    longestHours: number;
+    totalHours: number;
+  };
+  appleHealthToday: {
+    steps: number;
+    activeCalories: number;
+    exerciseMinutes: number | null;
+    distanceMiles: number | null;
+    workouts: number;
+    workoutMinutes: number;
+  } | null;
   userProfile: {
     firstName: string;
     lastName: string;
     email: string;
     dailyCalorieGoal: number;
+    dailyProteinGoal: number;
+    dailyCarbGoal: number;
+    dailyFatGoal: number;
+    dailySugarGoal: number;
     dailyWaterGoal: number;
     createdAt: string;
   };
@@ -135,6 +185,10 @@ function mealFat(meal: any): number {
   return parseFloat(meal?.totalFat ?? meal?.fat) || 0;
 }
 
+function mealSugar(meal: any): number {
+  return parseFloat(meal?.totalSugar ?? meal?.sugar) || 0;
+}
+
 function mealDateKey(meal: any): string {
   const raw = meal?.date ?? meal?.createdAt ?? meal?.created_at ?? '';
   const text = String(raw);
@@ -145,6 +199,43 @@ function mealDateKey(meal: any): string {
 
 function formatCalories(value: number): string {
   return `${Math.round(value).toLocaleString('en-US')} cal`;
+}
+
+function formatSharedActivitySummary(type: string, details: Record<string, unknown> | null | undefined): string {
+  const d = details || {};
+  const num = (key: string) => {
+    const value = Number(d[key]);
+    return Number.isFinite(value) ? value : null;
+  };
+  switch (type) {
+    case 'summary': {
+      if (d.kind === 'fitness') {
+        return [
+          num('steps') != null ? `${num('steps')!.toLocaleString()} steps` : null,
+          num('exerciseMinutes') != null ? `${num('exerciseMinutes')} exercise min` : null,
+          num('activeCalories') != null ? `${num('activeCalories')} move cal` : null,
+          num('workouts') != null ? `${num('workouts')} workouts` : null,
+        ].filter(Boolean).join(' · ');
+      }
+      return [
+        `${num('calories') ?? 0} cal from ${num('meals') ?? 0} meal${num('meals') === 1 ? '' : 's'}`,
+        `${num('protein') ?? 0}g protein`,
+        `${num('water') ?? 0} glasses of water`,
+        d.fast ? `Fast: ${d.fast}` : null,
+        num('steps') != null ? `${num('steps')!.toLocaleString()} steps` : null,
+        num('exerciseMinutes') != null ? `${num('exerciseMinutes')} exercise min` : null,
+        num('activeCalories') != null ? `${num('activeCalories')} move cal` : null,
+      ].filter(Boolean).join(' · ');
+    }
+    case 'meal':
+      return [d.mealType, num('calories') != null ? `${num('calories')} cal` : null].filter(Boolean).join(' · ');
+    case 'fast':
+      return num('hours') != null ? `${num('hours')} hours` : '';
+    case 'water':
+      return num('glasses') != null ? `${num('glasses')} glasses` : '';
+    default:
+      return '';
+  }
 }
 
 function formatCount(value: number): string {
@@ -448,6 +539,7 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     let achievements: any[] = [];
     let fastingSessions: any[] = [];
     let waterData: any[] = [];
+    let sharedActivitiesRaw: any[] = [];
     let userProfile: any = {};
     const recipes: any[] = []; // No recipe endpoint available, use empty array
     
@@ -461,6 +553,19 @@ export async function generateProgressReportPDF(): Promise<boolean> {
       }
     } catch (error) {
       console.warn('Failed to fetch meals:', error);
+    }
+
+    try {
+      const activityResponse = await authFetch('/api/activity-feed', {
+        credentials: 'include'
+      });
+      if (activityResponse.ok) {
+        const activityPayload = await activityResponse.json();
+        sharedActivitiesRaw = asArray(activityPayload, 'myShares', 'activities')
+          .filter((activity: any) => activity?.isMine !== false);
+      }
+    } catch (error) {
+      console.warn('Failed to fetch shared activities:', error);
     }
     
     try {
@@ -509,6 +614,26 @@ export async function generateProgressReportPDF(): Promise<boolean> {
       }
     } catch (error) {
       console.warn('Failed to fetch user profile:', error);
+    }
+
+    let appleHealthToday: UserProgressData['appleHealthToday'] = null;
+    try {
+      if (Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios') {
+        const { healthKitService } = await import('@/services/healthKit');
+        const summary = await healthKitService.readTodayFitnessSummary();
+        if (summary) {
+          appleHealthToday = {
+            steps: summary.steps,
+            activeCalories: summary.activeCalories,
+            exerciseMinutes: summary.exerciseMinutes,
+            distanceMiles: summary.distanceMiles,
+            workouts: summary.workouts?.count ?? 0,
+            workoutMinutes: summary.workouts?.minutes ?? 0,
+          };
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to read Apple Health for PDF:', error);
     }
     
     // Data fetched for PDF generation
@@ -643,6 +768,7 @@ export async function generateProgressReportPDF(): Promise<boolean> {
         protein: dayMeals.reduce((sum: number, meal: any) => sum + mealProtein(meal), 0),
         carbs: dayMeals.reduce((sum: number, meal: any) => sum + mealCarbs(meal), 0),
         fat: dayMeals.reduce((sum: number, meal: any) => sum + mealFat(meal), 0),
+        sugar: dayMeals.reduce((sum: number, meal: any) => sum + mealSugar(meal), 0),
         fiber: dayMeals.reduce((sum: number, meal: any) => sum + (parseFloat(meal.fiber) || 0), 0),
         sodium: dayMeals.reduce((sum: number, meal: any) => sum + (parseFloat(meal.sodium) || 0), 0),
         // Handle both camelCase and snake_case micronutrient properties
@@ -688,6 +814,7 @@ export async function generateProgressReportPDF(): Promise<boolean> {
           avgProtein: Math.round(weekDays.reduce((sum: number, day: DailyNutritionData) => sum + day.protein, 0) / daysWithData * 10) / 10,
           avgCarbs: Math.round(weekDays.reduce((sum: number, day: DailyNutritionData) => sum + day.carbs, 0) / daysWithData * 10) / 10,
           avgFat: Math.round(weekDays.reduce((sum: number, day: DailyNutritionData) => sum + day.fat, 0) / daysWithData * 10) / 10,
+          avgSugar: Math.round(weekDays.reduce((sum: number, day: DailyNutritionData) => sum + day.sugar, 0) / daysWithData * 10) / 10,
           avgFiber: Math.round(weekDays.reduce((sum: number, day: DailyNutritionData) => sum + day.fiber, 0) / daysWithData * 10) / 10,
           avgSodium: Math.round(weekDays.reduce((sum: number, day: DailyNutritionData) => sum + day.sodium, 0) / daysWithData),
           avgVitaminC: Math.round(weekDays.reduce((sum: number, day: DailyNutritionData) => sum + day.vitaminC, 0) / daysWithData * 10) / 10,
@@ -811,6 +938,47 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     ).length;
     
     const goalCompletionRate = daysWithMeals > 0 ? Math.round((daysWithGoalMet / daysWithMeals) * 100) : 0;
+
+    const loggedDays = dailyBreakdown.filter(day => day.mealsCount > 0);
+    const macroAverages = {
+      protein: loggedDays.length
+        ? Math.round(loggedDays.reduce((sum, day) => sum + day.protein, 0) / loggedDays.length)
+        : 0,
+      carbs: loggedDays.length
+        ? Math.round(loggedDays.reduce((sum, day) => sum + day.carbs, 0) / loggedDays.length)
+        : 0,
+      fat: loggedDays.length
+        ? Math.round(loggedDays.reduce((sum, day) => sum + day.fat, 0) / loggedDays.length)
+        : 0,
+      sugar: loggedDays.length
+        ? Math.round(loggedDays.reduce((sum, day) => sum + day.sugar, 0) / loggedDays.length)
+        : 0,
+      daysLogged: loggedDays.length,
+    };
+
+    const mappedFastingSessions = recentFastingSessions.map((session: any) => ({
+      planName: session.planName || 'Intermittent Fasting',
+      startTime: session.startTime,
+      endTime: session.endTime,
+      status: session.status || 'completed',
+      actualDuration: session.actualDuration,
+    }));
+    const completedFasts = mappedFastingSessions.filter(s => String(s.status).toLowerCase() === 'completed');
+    const fastHours = (session: { actualDuration: number | null }) =>
+      session.actualDuration ? session.actualDuration / (1000 * 60 * 60) : 0;
+    const fastingHoursList = mappedFastingSessions.map(fastHours).filter(h => h > 0);
+    const fastingTrends = {
+      sessions: mappedFastingSessions.length,
+      completed: completedFasts.length,
+      completionRate: mappedFastingSessions.length
+        ? Math.round((completedFasts.length / mappedFastingSessions.length) * 100)
+        : 0,
+      avgHours: fastingHoursList.length
+        ? Math.round((fastingHoursList.reduce((a, b) => a + b, 0) / fastingHoursList.length) * 10) / 10
+        : 0,
+      longestHours: fastingHoursList.length ? Math.round(Math.max(...fastingHoursList) * 10) / 10 : 0,
+      totalHours: Math.round(fastingHoursList.reduce((a, b) => a + b, 0)),
+    };
     
     // Gather comprehensive user progress data with all app areas
     const progressData: UserProgressData = {
@@ -829,13 +997,7 @@ export async function generateProgressReportPDF(): Promise<boolean> {
         earnedAt: achievement.earnedAt || achievement.createdAt,
         achievementType: achievement.achievementType || 'general'
       })),
-      fastingSessions: recentFastingSessions.map((session: any) => ({
-        planName: session.planName || 'Intermittent Fasting',
-        startTime: session.startTime,
-        endTime: session.endTime,
-        status: session.status || 'completed',
-        actualDuration: session.actualDuration
-      })),
+      fastingSessions: mappedFastingSessions,
       waterIntakeData: recentWaterData.map((water: any) => ({
         date: water.date,
         glasses: water.glasses || 0
@@ -846,11 +1008,25 @@ export async function generateProgressReportPDF(): Promise<boolean> {
         totalCalories: recipe.totalCalories || 0,
         createdAt: recipe.createdAt || ''
       })),
+      sharedActivities: sharedActivitiesRaw.map((activity: any) => ({
+        type: activity.type || 'summary',
+        title: activity.title || 'Shared activity',
+        summary: formatSharedActivitySummary(activity.type || 'summary', activity.details),
+        note: activity.note || null,
+        createdAt: activity.createdAt || '',
+      })),
+      macroAverages,
+      fastingTrends,
+      appleHealthToday,
       userProfile: {
         firstName: userProfile.firstName || 'ByteWise',
         lastName: userProfile.lastName || 'User',
         email: userProfile.email || '',
         dailyCalorieGoal: userProfile.dailyCalorieGoal || 2000,
+        dailyProteinGoal: userProfile.dailyProteinGoal || 180,
+        dailyCarbGoal: userProfile.dailyCarbGoal || 200,
+        dailyFatGoal: userProfile.dailyFatGoal || 70,
+        dailySugarGoal: SUGAR_DAILY_LIMIT,
         dailyWaterGoal: userProfile.dailyWaterGoal || 8,
         createdAt: userProfile.createdAt || ''
       },
@@ -945,9 +1121,11 @@ export async function generateProgressReportPDF(): Promise<boolean> {
       { label: 'Meals logged', value: formatCount(progressData.totalMealsLogged), color: [245, 158, 11] },
       { label: 'Average daily calories', value: formatCalories(progressData.averageDailyCalories), color: [217, 119, 6] },
       { label: 'Best streak', value: `${formatCount(progressData.streakRecord)} days`, color: [251, 191, 36] },
-      { label: 'Goal completion', value: `${progressData.goalCompletionRate}%`, color: [245, 158, 11] },
-      { label: 'Achievements', value: formatCount(progressData.achievements.length), color: [217, 119, 6] },
-      { label: 'Calories tracked', value: formatCalories(progressData.monthlyBreakdown.reduce((sum, m) => sum + m.calories, 0)), color: [251, 191, 36] },
+      { label: 'Calorie goal hit', value: `${progressData.goalCompletionRate}%`, color: [245, 158, 11] },
+      { label: 'Avg sugar / logged day', value: `${progressData.macroAverages.sugar}g`, color: [217, 119, 6] },
+      { label: 'Achievements', value: formatCount(progressData.achievements.length), color: [251, 191, 36] },
+      { label: 'Fasting sessions', value: formatCount(progressData.fastingTrends.sessions), color: [245, 158, 11] },
+      { label: 'Shared activities', value: formatCount(progressData.sharedActivities.length), color: [217, 119, 6] },
     ];
 
     pdf.setFontSize(12);
@@ -986,6 +1164,69 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     // Reset text color for content
     pdf.setTextColor(0, 0, 0);
 
+    // Dashboard-style macro averages vs goals
+    if (yPosition > 220) {
+      pdf.addPage();
+      yPosition = 25;
+    }
+    pdf.setFontSize(16);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(146, 64, 14);
+    pdf.text('Daily Macro Averages (Dashboard)', 20, yPosition);
+    pdf.setTextColor(0, 0, 0);
+    yPosition += 8;
+    pdf.setFontSize(9);
+    pdf.setFont('helvetica', 'normal');
+    pdf.setTextColor(100, 100, 100);
+    pdf.text(
+      `Based on ${progressData.macroAverages.daysLogged} logged day${progressData.macroAverages.daysLogged === 1 ? '' : 's'} in this period.`,
+      20,
+      yPosition,
+    );
+    yPosition += 12;
+    pdf.setFontSize(11);
+    pdf.setTextColor(0, 0, 0);
+    const macroRows = [
+      { label: 'Protein', avg: progressData.macroAverages.protein, goal: progressData.userProfile.dailyProteinGoal },
+      { label: 'Carbs', avg: progressData.macroAverages.carbs, goal: progressData.userProfile.dailyCarbGoal },
+      { label: 'Fat', avg: progressData.macroAverages.fat, goal: progressData.userProfile.dailyFatGoal },
+      { label: 'Sugar', avg: progressData.macroAverages.sugar, goal: progressData.userProfile.dailySugarGoal },
+    ];
+    macroRows.forEach((row) => {
+      const pct = row.goal > 0 ? Math.round((row.avg / row.goal) * 100) : 0;
+      pdf.text(`${row.label}: ${row.avg}g avg  ·  goal ${row.goal}g  ·  ${pct}% of goal`, 25, yPosition);
+      yPosition += 7;
+    });
+    yPosition += 8;
+
+    // Essential micronutrient averages (% DV) — matches dashboard cards
+    if (yPosition > 210) {
+      pdf.addPage();
+      yPosition = 25;
+    }
+    pdf.setFontSize(16);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(146, 64, 14);
+    pdf.text('Essential Micronutrients (Daily Average)', 20, yPosition);
+    pdf.setTextColor(0, 0, 0);
+    yPosition += 12;
+    pdf.setFontSize(10);
+    pdf.setFont('helvetica', 'normal');
+    MICRO_DV.forEach((micro) => {
+      const avg = loggedDays.length
+        ? loggedDays.reduce((sum, day) => sum + Number(day[micro.key] || 0), 0) / loggedDays.length
+        : 0;
+      const pct = Math.round((avg / micro.goal) * 100);
+      const avgLabel = avg < 10 ? avg.toFixed(1) : Math.round(avg).toString();
+      pdf.text(`${micro.label}: ${avgLabel}${micro.unit}  ·  ${pct}% DV (goal ${micro.goal}${micro.unit})`, 25, yPosition);
+      yPosition += 6;
+      if (yPosition > 270) {
+        pdf.addPage();
+        yPosition = 25;
+      }
+    });
+    yPosition += 10;
+
     // Check if we need a new page for the detailed breakdowns
     if (yPosition > 200) {
       pdf.addPage();
@@ -1005,7 +1246,7 @@ export async function generateProgressReportPDF(): Promise<boolean> {
         // Week header with background
         if (idx % 2 === 0) {
           pdf.setFillColor(245, 245, 245);
-          pdf.rect(15, yPosition - 5, pageWidth - 30, 35, 'F');
+          pdf.rect(15, yPosition - 5, pageWidth - 30, 42, 'F');
         }
         
         pdf.setFontSize(12);
@@ -1024,24 +1265,31 @@ export async function generateProgressReportPDF(): Promise<boolean> {
         
         pdf.text(`Calories: ${formatCalories(week.avgCalories)}`, 25, yPosition);
         pdf.text(`Protein: ${week.avgProtein}g`, 70, yPosition);
-        pdf.text(`Carbs: ${week.avgCarbs}g`, 120, yPosition);
-        pdf.text(`Fat: ${week.avgFat}g`, 165, yPosition);
+        pdf.text(`Carbs: ${week.avgCarbs}g`, 115, yPosition);
+        pdf.text(`Fat: ${week.avgFat}g`, 155, yPosition);
+        
+        yPosition += 7;
+
+        pdf.text(`Sugar: ${week.avgSugar}g`, 25, yPosition);
+        pdf.text(`Fiber: ${week.avgFiber}g`, 70, yPosition);
+        pdf.text(`Sodium: ${week.avgSodium}mg`, 115, yPosition);
+        pdf.text(`Meals: ${week.totalMeals}`, 165, yPosition);
         
         yPosition += 7;
         
         // Micronutrients row
-        pdf.text(`Fiber: ${week.avgFiber}g`, 25, yPosition);
-        pdf.text(`Sodium: ${week.avgSodium}mg`, 75, yPosition);
-        pdf.text(`Vit C: ${week.avgVitaminC}mg`, 125, yPosition);
-        pdf.text(`Iron: ${week.avgIron}mg`, 175, yPosition);
+        pdf.text(`Vit C: ${week.avgVitaminC}mg`, 25, yPosition);
+        pdf.text(`Vit D: ${week.avgVitaminD}μg`, 70, yPosition);
+        pdf.text(`B12: ${week.avgVitaminB12}μg`, 120, yPosition);
+        pdf.text(`Folate: ${week.avgFolate}μg`, 160, yPosition);
         
         yPosition += 7;
         
         // Additional nutrients row
-        pdf.text(`Calcium: ${week.avgCalcium}mg`, 25, yPosition);
-        pdf.text(`Zinc: ${week.avgZinc}mg`, 75, yPosition);
-        pdf.text(`Magnesium: ${week.avgMagnesium}mg`, 125, yPosition);
-        pdf.text(`Meals: ${week.totalMeals}`, 175, yPosition);
+        pdf.text(`Iron: ${week.avgIron}mg`, 25, yPosition);
+        pdf.text(`Calcium: ${week.avgCalcium}mg`, 70, yPosition);
+        pdf.text(`Zinc: ${week.avgZinc}mg`, 120, yPosition);
+        pdf.text(`Mg: ${week.avgMagnesium}mg`, 160, yPosition);
         
         yPosition += 15;
         
@@ -1104,25 +1352,32 @@ export async function generateProgressReportPDF(): Promise<boolean> {
         pdf.setTextColor(0, 0, 0);
         pdf.setFontSize(9);
         
-        // Row 1: Main macros
+        // Row 1: Main macros (matches dashboard cards)
         pdf.text(formatCalories(day.calories), 25, yPosition);
-        pdf.text(`P: ${day.protein.toFixed(1)}g`, 65, yPosition);
-        pdf.text(`C: ${day.carbs.toFixed(1)}g`, 95, yPosition);
-        pdf.text(`F: ${day.fat.toFixed(1)}g`, 125, yPosition);
-        pdf.text(`Fiber: ${day.fiber.toFixed(1)}g`, 155, yPosition);
+        pdf.text(`P: ${day.protein.toFixed(0)}g`, 60, yPosition);
+        pdf.text(`C: ${day.carbs.toFixed(0)}g`, 88, yPosition);
+        pdf.text(`F: ${day.fat.toFixed(0)}g`, 116, yPosition);
+        pdf.text(`Sugar: ${day.sugar.toFixed(0)}g`, 142, yPosition);
         
         yPosition += 5;
         
-        // Row 2: Key micronutrients (only show if > 0)
-        let microText = [];
+        // Row 2: Fiber + key micronutrients (only show if > 0)
+        const microText: string[] = [];
+        if (day.fiber > 0) microText.push(`Fiber: ${day.fiber.toFixed(0)}g`);
         if (day.vitaminC > 0) microText.push(`Vit C: ${day.vitaminC.toFixed(1)}mg`);
+        if (day.vitaminD > 0) microText.push(`Vit D: ${day.vitaminD.toFixed(1)}μg`);
+        if (day.vitaminB12 > 0) microText.push(`B12: ${day.vitaminB12.toFixed(1)}μg`);
+        if (day.folate > 0) microText.push(`Folate: ${day.folate.toFixed(0)}μg`);
         if (day.iron > 0) microText.push(`Iron: ${day.iron.toFixed(1)}mg`);
         if (day.calcium > 0) microText.push(`Ca: ${day.calcium.toFixed(0)}mg`);
+        if (day.zinc > 0) microText.push(`Zn: ${day.zinc.toFixed(1)}mg`);
+        if (day.magnesium > 0) microText.push(`Mg: ${day.magnesium.toFixed(0)}mg`);
         if (day.sodium > 0) microText.push(`Na: ${day.sodium.toFixed(0)}mg`);
         
         if (microText.length > 0) {
-          pdf.text(microText.join('  •  '), 25, yPosition);
-          yPosition += 5;
+          const lines = pdf.splitTextToSize(microText.join('  ·  '), pageWidth - 50);
+          pdf.text(lines, 25, yPosition);
+          yPosition += lines.length * 4 + 1;
         }
         
         yPosition += 5;
@@ -1215,8 +1470,8 @@ export async function generateProgressReportPDF(): Promise<boolean> {
       yPosition += 15;
     }
 
-    // Fasting Sessions Section
-    if (progressData.fastingSessions.length > 0) {
+    // Fasting Sessions + Trends (matches Fasting page)
+    if (progressData.fastingSessions.length > 0 || progressData.fastingTrends.sessions > 0) {
       if (yPosition > 200) {
         pdf.addPage();
         yPosition = 25;
@@ -1224,22 +1479,115 @@ export async function generateProgressReportPDF(): Promise<boolean> {
       pdf.setFontSize(16);
       pdf.setFont('helvetica', 'bold');
       pdf.setTextColor(146, 64, 14); // Amber-800 for section headers
-      pdf.text('Intermittent Fasting', 20, yPosition);
+      pdf.text('Intermittent Fasting Trends', 20, yPosition);
       pdf.setTextColor(0, 0, 0);
       yPosition += 15;
 
-      const completedSessions = progressData.fastingSessions.filter(s => s.status === 'completed');
-      const totalFastingHours = completedSessions.reduce((sum, session) => {
-        return sum + (session.actualDuration ? Math.round(session.actualDuration / (1000 * 60 * 60)) : 0);
-      }, 0);
-
+      const trends = progressData.fastingTrends;
       pdf.setFontSize(12);
-      pdf.text(`Total sessions: ${formatCount(progressData.fastingSessions.length)}`, 25, yPosition);
+      pdf.text(`Total sessions: ${formatCount(trends.sessions)}`, 25, yPosition);
       yPosition += 8;
-      pdf.text(`Completed: ${formatCount(completedSessions.length)}`, 25, yPosition);
+      pdf.text(`Goals completed: ${formatCount(trends.completed)} (${trends.completionRate}%)`, 25, yPosition);
       yPosition += 8;
-      pdf.text(`Total fasting time: ${formatCount(totalFastingHours)} hours`, 25, yPosition);
+      pdf.text(`Average fast: ${trends.avgHours}h`, 25, yPosition);
+      yPosition += 8;
+      pdf.text(`Longest fast: ${trends.longestHours}h`, 25, yPosition);
+      yPosition += 8;
+      pdf.text(`Total fasting time: ${formatCount(trends.totalHours)} hours`, 25, yPosition);
       yPosition += 15;
+    }
+
+    // Apple Health (today) — when available from the iPhone app
+    if (progressData.appleHealthToday) {
+      if (yPosition > 230) {
+        pdf.addPage();
+        yPosition = 25;
+      }
+      const health = progressData.appleHealthToday;
+      pdf.setFontSize(16);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(146, 64, 14);
+      pdf.text('Apple Health (Today)', 20, yPosition);
+      pdf.setTextColor(0, 0, 0);
+      yPosition += 15;
+      pdf.setFontSize(12);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text(`Steps: ${health.steps.toLocaleString()}`, 25, yPosition);
+      yPosition += 8;
+      pdf.text(`Move calories: ${health.activeCalories}`, 25, yPosition);
+      yPosition += 8;
+      if (health.exerciseMinutes != null) {
+        pdf.text(`Exercise minutes: ${health.exerciseMinutes}`, 25, yPosition);
+        yPosition += 8;
+      }
+      if (health.distanceMiles != null) {
+        pdf.text(`Distance: ${health.distanceMiles} mi`, 25, yPosition);
+        yPosition += 8;
+      }
+      if (health.workouts > 0) {
+        pdf.text(`Workouts: ${health.workouts}${health.workoutMinutes ? ` (${health.workoutMinutes} min)` : ''}`, 25, yPosition);
+        yPosition += 8;
+      }
+      yPosition += 7;
+    }
+
+    // Shared activity summaries (from Friends / activity share)
+    if (yPosition > 200) {
+      pdf.addPage();
+      yPosition = 25;
+    }
+    pdf.setFontSize(16);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(146, 64, 14);
+    pdf.text('Shared Activity Summaries', 20, yPosition);
+    pdf.setTextColor(0, 0, 0);
+    yPosition += 10;
+    pdf.setFontSize(9);
+    pdf.setFont('helvetica', 'normal');
+    pdf.setTextColor(100, 100, 100);
+    pdf.text('Posts you shared with friends and family in Bytewise.', 20, yPosition);
+    yPosition += 12;
+
+    if (progressData.sharedActivities.length === 0) {
+      pdf.setFontSize(11);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text('No shared activity summaries yet.', 25, yPosition);
+      yPosition += 15;
+    } else {
+      progressData.sharedActivities.forEach((activity, idx) => {
+        if (yPosition > 250) {
+          pdf.addPage();
+          yPosition = 25;
+        }
+
+        pdf.setFontSize(11);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(217, 119, 6);
+        const label = `${idx + 1}. ${activity.title}`;
+        pdf.text(label.length > 70 ? `${label.slice(0, 67)}...` : label, 25, yPosition);
+        yPosition += 6;
+
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(9);
+        pdf.setTextColor(0, 0, 0);
+        if (activity.summary) {
+          const lines = pdf.splitTextToSize(activity.summary, pageWidth - 55);
+          pdf.text(lines, 30, yPosition);
+          yPosition += lines.length * 4 + 2;
+        }
+        if (activity.note) {
+          const noteLines = pdf.splitTextToSize(`Note: "${activity.note}"`, pageWidth - 55);
+          pdf.setTextColor(55, 65, 81);
+          pdf.text(noteLines, 30, yPosition);
+          yPosition += noteLines.length * 4 + 2;
+        }
+        pdf.setTextColor(100, 100, 100);
+        const when = activity.createdAt
+          ? new Date(activity.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+          : 'Date unavailable';
+        pdf.text(`${activity.type} · ${when}`, 30, yPosition);
+        yPosition += 10;
+      });
     }
 
     // Custom Recipes Section
