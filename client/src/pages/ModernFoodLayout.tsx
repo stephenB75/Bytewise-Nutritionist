@@ -1586,16 +1586,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               </div>
             </div>
           )}
-          <div data-testid="progress-section" className="mb-3 flex items-center justify-between gap-3">
-            <h2 className="min-w-0 flex-1 text-xl font-semibold text-gray-900 sm:text-2xl md:text-3xl">Today's Progress</h2>
-            <div className="flex shrink-0 gap-2">
-              <Button 
-                className="on-color bg-orange-700 hover:bg-orange-800 rounded-full whitespace-nowrap"
-                onClick={() => handleTabChange('nutrition')}
-              >
-                Track Food
-              </Button>
-            </div>
+          <div data-testid="progress-section" className="mb-3">
+            <h2 className="text-xl font-semibold text-gray-900 sm:text-2xl md:text-3xl">Today's Progress</h2>
           </div>
 
           {/* Daily Progress */}
