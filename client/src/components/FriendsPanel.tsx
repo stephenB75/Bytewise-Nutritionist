@@ -43,17 +43,23 @@ function localDateKey(date = new Date()): string {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 }
 
-function timeAgo(iso: string): string {
-  const minutes = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
-  if (minutes < 1) return 'just now';
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.round(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  return new Date(iso).toLocaleDateString();
-}
-
 function shortDate(iso: string | null | undefined): string {
   return iso ? new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';
+}
+
+/** Shared activity stamp — calendar date only (no relative hours that later flip to a date). */
+function activityDate(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return '';
+  const today = localDateKey();
+  const key = localDateKey(date);
+  if (key === today) return 'Today';
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  if (key === localDateKey(yesterday)) return 'Yesterday';
+  const opts: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' };
+  if (date.getFullYear() !== new Date().getFullYear()) opts.year = 'numeric';
+  return date.toLocaleDateString('en-US', opts);
 }
 
 function fitnessParts(d: Record<string, string | number | null>): Array<string | null> {
@@ -430,7 +436,7 @@ export function FriendsPanel() {
                     </p>
                     {describe(activity) && <p className="text-xs text-gray-700 mt-0.5">{describe(activity)}</p>}
                     {activity.note && <p className="text-sm text-gray-800 mt-1">“{activity.note}”</p>}
-                    <p className="text-xs text-gray-500 mt-1">{timeAgo(activity.createdAt)}</p>
+                    <p className="text-xs text-gray-500 mt-1">{activityDate(activity.createdAt)}</p>
                   </div>
                   {activity.isMine && (
                     <Button

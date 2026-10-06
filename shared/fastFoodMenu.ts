@@ -21,6 +21,7 @@ import { FLORIDA_LOCALS_FAST_FOOD_ITEMS } from './fastFoodMenuFloridaLocals';
 import { MORE_LOCALS_FAST_FOOD_ITEMS } from './fastFoodMenuMoreLocals';
 import { CASUAL_LOCALS_FAST_FOOD_ITEMS } from './fastFoodMenuCasualLocals';
 import { CHAINS_MORE_FAST_FOOD_ITEMS } from './fastFoodMenuChainsMore';
+import { SPANISH_FAST_FOOD_ITEMS } from './fastFoodMenuSpanish';
 import {
   ASIAN_RESTAURANTS,
   BBQ_RESTAURANTS,
@@ -32,6 +33,7 @@ import {
   MEDITERRANEAN_RESTAURANTS,
   MEXICAN_RESTAURANTS,
   SEAFOOD_RESTAURANTS,
+  SPANISH_RESTAURANTS,
   type FoodCuisine,
 } from './fastFoodRegions';
 
@@ -45,6 +47,7 @@ const CUISINE_RESTAURANTS: Record<FoodCuisine, readonly string[]> = {
   burgers: BURGER_RESTAURANTS,
   bbq: BBQ_RESTAURANTS,
   mediterranean: MEDITERRANEAN_RESTAURANTS,
+  spanish: SPANISH_RESTAURANTS,
   seafood: SEAFOOD_RESTAURANTS,
   cafe: CAFE_RESTAURANTS,
 };
@@ -104,6 +107,11 @@ const CUISINE_SEARCH_WORDS: Record<string, FoodCuisine> = {
   greek: 'mediterranean',
   middleeastern: 'mediterranean',
   halal: 'mediterranean',
+  // Spanish (Spain — tapas / paella)
+  spanish: 'spanish',
+  spain: 'spanish',
+  tapas: 'spanish',
+  paella: 'spanish',
   // Seafood
   seafood: 'seafood',
   fish: 'seafood',
@@ -465,7 +473,7 @@ const CORE_FAST_FOOD_ITEMS: FastFoodItem[] = [
   { id: 'sweetgreen-kale-caesar', name: 'Kale Caesar', restaurant: 'Sweetgreen', category: 'lunch', serving: '1 bowl', calories: 430, protein: 30, carbs: 21, fat: 26, sodium: 920, keywords: ['salad'] },
 ];
 
-export const FAST_FOOD_ITEMS: FastFoodItem[] = [...CORE_FAST_FOOD_ITEMS, ...MORE_FAST_FOOD_ITEMS, ...FULL_FAST_FOOD_ITEMS, ...ASIAN_FAST_FOOD_ITEMS, ...CAFE_FAST_FOOD_ITEMS, ...MORE_PLACES_FAST_FOOD_ITEMS, ...CARIBBEAN_FAST_FOOD_ITEMS, ...FLORIDA_FAST_FOOD_ITEMS, ...SOUTHEAST_FAST_FOOD_ITEMS, ...CULTURAL_FAST_FOOD_ITEMS, ...DESSERT_FAST_FOOD_ITEMS, ...CASUAL_MORE_FAST_FOOD_ITEMS, ...STEAKHOUSE_FAST_FOOD_ITEMS, ...BRUNCH_TAPAS_FAST_FOOD_ITEMS, ...BAGEL_FAST_FOOD_ITEMS, ...FLORIDA_LOCALS_FAST_FOOD_ITEMS, ...MORE_LOCALS_FAST_FOOD_ITEMS, ...CASUAL_LOCALS_FAST_FOOD_ITEMS, ...CHAINS_MORE_FAST_FOOD_ITEMS];
+export const FAST_FOOD_ITEMS: FastFoodItem[] = [...CORE_FAST_FOOD_ITEMS, ...MORE_FAST_FOOD_ITEMS, ...FULL_FAST_FOOD_ITEMS, ...ASIAN_FAST_FOOD_ITEMS, ...CAFE_FAST_FOOD_ITEMS, ...MORE_PLACES_FAST_FOOD_ITEMS, ...CARIBBEAN_FAST_FOOD_ITEMS, ...FLORIDA_FAST_FOOD_ITEMS, ...SOUTHEAST_FAST_FOOD_ITEMS, ...CULTURAL_FAST_FOOD_ITEMS, ...DESSERT_FAST_FOOD_ITEMS, ...CASUAL_MORE_FAST_FOOD_ITEMS, ...STEAKHOUSE_FAST_FOOD_ITEMS, ...BRUNCH_TAPAS_FAST_FOOD_ITEMS, ...BAGEL_FAST_FOOD_ITEMS, ...FLORIDA_LOCALS_FAST_FOOD_ITEMS, ...MORE_LOCALS_FAST_FOOD_ITEMS, ...CASUAL_LOCALS_FAST_FOOD_ITEMS, ...CHAINS_MORE_FAST_FOOD_ITEMS, ...SPANISH_FAST_FOOD_ITEMS];
 
 export const FAST_FOOD_RESTAURANTS: string[] = Array.from(new Set(FAST_FOOD_ITEMS.map((item) => item.restaurant))).sort(
   (a, b) => a.localeCompare(b)
@@ -525,6 +533,20 @@ const SEARCH_ALIASES: Record<string, string> = {
   potwahjamaican: 'potwah jamaican cuisine',
   charleys: "charley's",
   charley: "charley's",
+  bulla: 'bulla gastrobar',
+  bullagastrobar: 'bulla gastrobar',
+  jaleo: 'jaleo',
+  joseandres: 'jaleo',
+  teleferic: 'teleferic barcelona',
+  telefericbarcelona: 'teleferic barcelona',
+  barcelona: 'barcelona wine bar',
+  barcelonawinebar: 'barcelona wine bar',
+  barcelonawine: 'barcelona wine bar',
+  boqueria: 'boqueria',
+  santiagos: 'santiagos bodega',
+  santiagosbodega: 'santiagos bodega',
+  columbiarestaurant: 'columbia restaurant',
+  columbia: 'columbia restaurant',
   bucees: "buc-ee's",
   bucee: "buc-ee's",
   llhawaiian: 'l l hawaiian',

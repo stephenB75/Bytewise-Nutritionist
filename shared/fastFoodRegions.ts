@@ -149,6 +149,11 @@ export const REGIONAL_RESTAURANTS: Record<string, UsFoodRegion[]> = {
   'On The Border': ['florida', 'southeast', 'midwest', 'southwest', 'texas', 'west'],
   "Jet's Pizza": ['florida', 'southeast', 'midwest', 'northeast'],
   "Anthony's Coal Fired Pizza": ['florida', 'southeast', 'northeast'],
+  'Bulla Gastrobar': ['florida'],
+  Jaleo: ['florida', 'southeast', 'northeast', 'southwest', 'west'],
+  'Telefèric Barcelona': ['west', 'southwest'],
+  'Barcelona Wine Bar': ['northeast', 'southeast', 'florida', 'midwest'],
+  Boqueria: ['northeast', 'midwest'],
   Bojangles: ['southeast'],
   'Waffle House': ['southeast'],
   'Cook Out': ['southeast'],
@@ -271,6 +276,7 @@ export type FoodCuisine =
   | 'burgers'
   | 'bbq'
   | 'mediterranean'
+  | 'spanish'
   | 'seafood'
   | 'cafe';
 
@@ -283,6 +289,7 @@ export const CUISINE_LABELS: Record<FoodCuisine, string> = {
   burgers: 'Burgers',
   bbq: 'BBQ',
   mediterranean: 'Mediterranean',
+  spanish: 'Spanish',
   seafood: 'Seafood',
   cafe: 'Cafe',
 };
@@ -440,9 +447,19 @@ export const MEDITERRANEAN_RESTAURANTS = [
   'Sweetgreen',
   'Bolay',
   'Fresh Kitchen',
-  "Santiago's Bodega",
   'The Melting Pot',
   'Just Salad',
+] as const;
+
+/** Spain — tapas / paella (not Mexican or Cuban-Latin). */
+export const SPANISH_RESTAURANTS = [
+  'Bulla Gastrobar',
+  'Jaleo',
+  'Telefèric Barcelona',
+  'Barcelona Wine Bar',
+  'Boqueria',
+  "Santiago's Bodega",
+  'Columbia Restaurant',
 ] as const;
 
 export const SEAFOOD_RESTAURANTS = [

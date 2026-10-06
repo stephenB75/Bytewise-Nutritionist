@@ -31,6 +31,7 @@ const PLACE_CUISINE_ORDER: FoodCuisine[] = [
   'asian',
   'mexican',
   'italian',
+  'spanish',
   'chicken',
   'burgers',
   'bbq',
