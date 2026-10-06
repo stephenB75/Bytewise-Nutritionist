@@ -103,6 +103,52 @@ export const REGIONAL_RESTAURANTS: Record<string, UsFoodRegion[]> = {
   "Andy's Frozen Custard": ['midwest', 'southeast', 'texas', 'southwest', 'florida'],
   'Duck Donuts': ['southeast', 'northeast', 'florida', 'midwest'],
   'First Watch': ['florida', 'southeast', 'midwest', 'southwest'],
+  'Another Broken Egg Cafe': ['florida', 'southeast', 'midwest', 'southwest', 'texas', 'northeast'],
+  'Snooze an AM Eatery': ['west', 'southwest', 'texas', 'midwest', 'southeast', 'florida'],
+  'The Melting Pot': ['florida', 'southeast', 'midwest', 'northeast', 'southwest', 'texas', 'west'],
+  "Santiago's Bodega": ['florida'],
+  'H&H Bagels': ['northeast', 'florida'],
+  "Bruegger's Bagels": ['northeast', 'midwest', 'southeast', 'west', 'florida'],
+  "Noah's New York Bagels": ['west', 'southwest'],
+  'Manhattan Bagel': ['northeast', 'southeast', 'midwest', 'florida'],
+  'Ess-a-Bagel': ['northeast'],
+  'PopUp Bagels': ['northeast', 'southeast', 'florida', 'texas', 'midwest', 'west'],
+  'Brooklyn Water Bagels': ['florida', 'southeast'],
+  "Linda's La Cantina": ['florida'],
+  'Mecatos Bakery & Cafe': ['florida'],
+  'Bakery 1908': ['florida'],
+  'Beefy King': ['florida'],
+  'World of Beer': ['florida', 'southeast', 'midwest', 'northeast', 'southwest', 'texas'],
+  'BENTO Asian Kitchen + Sushi': ['florida', 'southeast'],
+  'Summer Palace': ['florida'],
+  "Gator's Dockside": ['florida'],
+  'Se7en Bites': ['florida'],
+  'Black Bean Deli': ['florida'],
+  "Pig Floyd's Urban Barbakoa": ['florida'],
+  'Earl of Sandwich': ['florida', 'southeast', 'midwest', 'northeast', 'southwest', 'west', 'texas'],
+  "Keke's Breakfast Cafe": ['florida', 'southeast'],
+  'Metro Diner': ['florida', 'southeast', 'midwest', 'northeast'],
+  'Hard Rock Cafe': ['florida', 'southeast', 'midwest', 'northeast', 'southwest', 'west', 'texas'],
+  "Cooper's Hawk Winery & Restaurants": ['florida', 'southeast', 'midwest', 'northeast', 'southwest', 'texas'],
+  '4 Rivers Smokehouse': ['florida', 'southeast'],
+  "Bubbalou's Bodacious BBQ": ['florida'],
+  'Lazy Moon Pizza': ['florida'],
+  'Hash House A Go Go': ['florida', 'west', 'southwest'],
+  'Columbia Restaurant': ['florida'],
+  'Just Salad': ['florida', 'northeast', 'southeast', 'midwest'],
+  "Nature's Table": ['florida', 'southeast'],
+  "Duffy's Sports Grill": ['florida'],
+  'Mission BBQ': ['florida', 'southeast', 'midwest', 'northeast', 'southwest', 'texas'],
+  "Newk's Eatery": ['florida', 'southeast', 'midwest', 'texas', 'southwest'],
+  Hooters: ['florida', 'southeast', 'midwest', 'northeast', 'southwest', 'west', 'texas'],
+  "TooJay's": ['florida'],
+  'Which Wich': ['florida', 'southeast', 'midwest', 'southwest', 'texas', 'west', 'northeast'],
+  "Romano's Macaroni Grill": ['florida', 'southeast', 'midwest', 'southwest', 'texas', 'west', 'northeast'],
+  'Firebirds Wood Fired Grill': ['florida', 'southeast', 'midwest', 'northeast', 'southwest', 'texas'],
+  'City Barbeque': ['florida', 'southeast', 'midwest'],
+  'On The Border': ['florida', 'southeast', 'midwest', 'southwest', 'texas', 'west'],
+  "Jet's Pizza": ['florida', 'southeast', 'midwest', 'northeast'],
+  "Anthony's Coal Fired Pizza": ['florida', 'southeast', 'northeast'],
   Bojangles: ['southeast'],
   'Waffle House': ['southeast'],
   'Cook Out': ['southeast'],
@@ -206,6 +252,10 @@ export const CARIBBEAN_RESTAURANTS = [
   'Peppers Jamaican',
   "Bouka's Jamaican Restaurant",
   'Potwah Jamaican Cuisine',
+  'Black Bean Deli',
+  'Mecatos Bakery & Cafe',
+  'Columbia Restaurant',
+  'Earl of Sandwich',
 ] as const;
 
 /**
@@ -257,6 +307,9 @@ export const ASIAN_RESTAURANTS = [
   "L&L Hawaiian Barbecue",
   'WaBa Grill',
   'Noodles & Company',
+  'BENTO Asian Kitchen + Sushi',
+  'Bakery 1908',
+  'Summer Palace',
 ] as const;
 
 export const MEXICAN_RESTAURANTS = [
@@ -275,6 +328,7 @@ export const MEXICAN_RESTAURANTS = [
   'Pollo Campero',
   'La Granja',
   "Chuy's",
+  'On The Border',
 ] as const;
 
 export const ITALIAN_RESTAURANTS = [
@@ -296,6 +350,10 @@ export const ITALIAN_RESTAURANTS = [
   'Pizzeria Valdiano',
   'Mellow Mushroom',
   "Maggiano's Little Italy",
+  'Lazy Moon Pizza',
+  "Jet's Pizza",
+  "Anthony's Coal Fired Pizza",
+  "Romano's Macaroni Grill",
 ] as const;
 
 export const CHICKEN_RESTAURANTS = [
@@ -344,6 +402,14 @@ export const BURGER_RESTAURANTS = [
   'Twin Peaks',
   'Yard House',
   'Bar Louie',
+  'World of Beer',
+  "Gator's Dockside",
+  'Beefy King',
+  'Hard Rock Cafe',
+  "Cooper's Hawk Winery & Restaurants",
+  "Duffy's Sports Grill",
+  'Hooters',
+  'Firebirds Wood Fired Grill',
 ] as const;
 
 export const BBQ_RESTAURANTS = [
@@ -360,6 +426,12 @@ export const BBQ_RESTAURANTS = [
   "Ruth's Chris Steak House",
   "Fleming's Prime Steakhouse",
   'The Capital Grille',
+  "Linda's La Cantina",
+  "Pig Floyd's Urban Barbakoa",
+  '4 Rivers Smokehouse',
+  "Bubbalou's Bodacious BBQ",
+  'Mission BBQ',
+  'City Barbeque',
 ] as const;
 
 export const MEDITERRANEAN_RESTAURANTS = [
@@ -368,6 +440,9 @@ export const MEDITERRANEAN_RESTAURANTS = [
   'Sweetgreen',
   'Bolay',
   'Fresh Kitchen',
+  "Santiago's Bodega",
+  'The Melting Pot',
+  'Just Salad',
 ] as const;
 
 export const SEAFOOD_RESTAURANTS = [
@@ -389,7 +464,22 @@ export const CAFE_RESTAURANTS = [
   'Tim Hortons',
   'Panera Bread',
   'First Watch',
+  'Another Broken Egg Cafe',
+  'Snooze an AM Eatery',
   "Einstein Bros. Bagels",
+  'H&H Bagels',
+  "Bruegger's Bagels",
+  "Noah's New York Bagels",
+  'Manhattan Bagel',
+  'Ess-a-Bagel',
+  'PopUp Bagels',
+  'Brooklyn Water Bagels',
+  'Mecatos Bakery & Cafe',
+  'Bakery 1908',
+  'Se7en Bites',
+  "Keke's Breakfast Cafe",
+  'Hash House A Go Go',
+  'Metro Diner',
   'Krispy Kreme',
   'Duck Donuts',
   'Cinnabon',
@@ -408,6 +498,10 @@ export const CAFE_RESTAURANTS = [
   'Jamba',
   'Smoothie King',
   'Tropical Smoothie Cafe',
+  "Nature's Table",
+  "Newk's Eatery",
+  "TooJay's",
+  'Which Wich',
 ] as const;
 
 /** Prefer these in the compact popular row when we know the user's region. */

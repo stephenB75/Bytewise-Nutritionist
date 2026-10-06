@@ -164,7 +164,8 @@ export function useCalorieTracking() {
         totalCalories: calorieEntry.calories,
         totalProtein: calorieEntry.protein,
         totalCarbs: calorieEntry.carbs,
-        totalFat: calorieEntry.fat
+        totalFat: calorieEntry.fat,
+        totalSugar: calorieEntry.sugar,
       });
       
       return mealEntry;

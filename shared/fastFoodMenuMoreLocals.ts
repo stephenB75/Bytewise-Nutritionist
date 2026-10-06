@@ -1,0 +1,176 @@
+import type { FastFoodCategory, FastFoodItem } from './fastFoodMenu';
+
+/**
+ * Second wave of missing popular places (Florida + national).
+ * Earl of Sandwich — Jul 2022 nutrition PDF (full macros).
+ * Keke's Breakfast Cafe / Metro Diner / Hard Rock Cafe / Cooper's Hawk —
+ * published menu calories; macros Atwater-aligned from typical builds.
+ * 4 Rivers, Bubbalou's, Lazy Moon, Hash House A Go Go, Columbia Restaurant —
+ * no official full guides; BBQ / pizza / brunch / Spanish-Cuban analogs.
+ */
+const item = (
+  id: string,
+  name: string,
+  restaurant: string,
+  category: FastFoodCategory,
+  serving: string,
+  calories: number,
+  protein: number,
+  carbs: number,
+  fat: number,
+  sodium: number,
+  keywords?: string[],
+): FastFoodItem => ({ id, name, restaurant, category, serving, calories, protein, carbs, fat, sodium, ...(keywords ? { keywords } : {}) });
+
+export const MORE_LOCALS_FAST_FOOD_ITEMS: FastFoodItem[] = [
+  // ——— Earl of Sandwich (2022 nutrition PDF) ———
+  item('eos-earls-club', "The Earl's Club", 'Earl of Sandwich', 'sandwiches', '1 sandwich', 730, 40, 78, 29, 2620, ['club', 'turkey']),
+  item('eos-original', 'The Original 1762', 'Earl of Sandwich', 'sandwiches', '1 sandwich', 780, 46, 75, 33, 1970, ['roast beef']),
+  item('eos-montagu', 'The Full Montagu', 'Earl of Sandwich', 'sandwiches', '1 sandwich', 730, 43, 77, 28, 2100, ['roast beef', 'turkey']),
+  item('eos-chipotle', 'Chipotle Chicken Avocado', 'Earl of Sandwich', 'sandwiches', '1 sandwich', 950, 49, 90, 45, 1800, ['chicken', 'avocado']),
+  item('eos-tuna-melt', 'Tuna Melt', 'Earl of Sandwich', 'sandwiches', '1 sandwich', 960, 40, 70, 60, 1550, ['tuna']),
+  item('eos-italian', 'Italian', 'Earl of Sandwich', 'sandwiches', '1 sandwich', 910, 41, 76, 52, 3190, ['italian']),
+  item('eos-cuban', 'Cuban', 'Earl of Sandwich', 'sandwiches', '1 sandwich', 720, 42, 71, 30, 2750, ['cuban']),
+  item('eos-ham-swiss', 'Ham & Swiss', 'Earl of Sandwich', 'sandwiches', '1 sandwich', 750, 45, 73, 33, 2380, ['ham']),
+  item('eos-veggie', 'Veggie', 'Earl of Sandwich', 'sandwiches', '1 sandwich', 700, 20, 77, 37, 2110, ['vegetarian']),
+  item('eos-caprese', 'Caprese', 'Earl of Sandwich', 'sandwiches', '1 sandwich', 620, 31, 76, 23, 1480, ['caprese']),
+  item('eos-buff-wrap', 'Buffalo Chicken Wrap', 'Earl of Sandwich', 'sandwiches', '1 wrap', 620, 34, 60, 27, 2040, ['wrap', 'buffalo']),
+  item('eos-cobb-wrap', "Earl's Cobb Wrap", 'Earl of Sandwich', 'sandwiches', '1 wrap', 760, 37, 74, 34, 1610, ['wrap', 'cobb']),
+  item('eos-cobb-salad', "Earl's Cobb Salad", 'Earl of Sandwich', 'lunch', '1 salad', 460, 30, 24, 27, 880, ['salad', 'cobb']),
+  item('eos-caesar', 'Chicken Caesar Salad', 'Earl of Sandwich', 'lunch', '1 salad', 460, 29, 21, 29, 1660, ['salad', 'caesar']),
+  item('eos-bec', 'Bacon, Egg & Cheddar', 'Earl of Sandwich', 'breakfast', '1 sandwich', 540, 26, 43, 29, 1800, ['breakfast', 'egg']),
+  item('eos-sec', 'Sausage, Egg & Cheddar', 'Earl of Sandwich', 'breakfast', '1 sandwich', 750, 26, 40, 54, 1700, ['breakfast', 'egg']),
+  item('eos-mac', 'Mac & Cheese', 'Earl of Sandwich', 'snacks', '1 side', 360, 16, 32, 18, 1120, ['mac']),
+  item('eos-tots', 'Tater Tots', 'Earl of Sandwich', 'snacks', '1 side', 350, 3, 43, 19, 1300, ['tots']),
+  item('eos-cookie', 'Chocolate Chip Cookie', 'Earl of Sandwich', 'snacks', '1 cookie', 420, 6, 71, 23, 200, ['dessert', 'cookie']),
+
+  // ——— Keke's Breakfast Cafe (published menu calories; macros estimated) ———
+  item('keke-classic-pancakes', 'Classic Pancakes (3)', "Keke's Breakfast Cafe", 'breakfast', '1 stack', 880, 18, 132, 28, 1680, ['pancakes']),
+  item('keke-blueberry-pancakes', 'Blueberry Pancakes (3)', "Keke's Breakfast Cafe", 'breakfast', '1 stack', 940, 18, 142, 28, 1720, ['pancakes', 'blueberry']),
+  item('keke-chocolate-pancakes', 'Chocolate Chip Pancakes (3)', "Keke's Breakfast Cafe", 'breakfast', '1 stack', 1400, 22, 188, 58, 1860, ['pancakes', 'chocolate']),
+  item('keke-fresh-fruit-pancakes', 'Fresh Fruit Pancakes', "Keke's Breakfast Cafe", 'breakfast', '1 stack', 1520, 24, 220, 52, 1780, ['pancakes', 'fruit']),
+  item('keke-cinnamon-roll-pancakes', 'Cinnamon Roll Pancakes (full)', "Keke's Breakfast Cafe", 'breakfast', '1 stack', 1290, 22, 186, 48, 1920, ['pancakes', 'cinnamon']),
+  item('keke-french-toast', 'Classic French Toast (3)', "Keke's Breakfast Cafe", 'breakfast', '1 order', 660, 18, 78, 28, 980, ['french toast']),
+  item('keke-banana-caramel-ft', 'Banana Caramel Pecan French Toast', "Keke's Breakfast Cafe", 'breakfast', '1 order', 1120, 22, 128, 52, 1180, ['french toast']),
+  item('keke-waffle', 'Belgian Waffle', "Keke's Breakfast Cafe", 'breakfast', '1 waffle', 210, 6, 32, 7, 380, ['waffle']),
+  item('keke-chicken-waffle', 'Chicken & Waffle', "Keke's Breakfast Cafe", 'breakfast', '1 plate', 495, 28, 42, 22, 1120, ['waffle', 'chicken']),
+  item('keke-avocado-toast', 'Avocado Toast', "Keke's Breakfast Cafe", 'breakfast', '1 order', 510, 14, 42, 32, 780, ['avocado', 'toast']),
+  item('keke-eggs-benedict', 'Eggs Benedict', "Keke's Breakfast Cafe", 'breakfast', '1 order', 580, 28, 36, 36, 1420, ['benedict']),
+  item('keke-western-omelet', 'Western Omelet (mid-range)', "Keke's Breakfast Cafe", 'breakfast', '1 omelet', 1130, 52, 28, 88, 2180, ['omelet']),
+  item('keke-greek-omelet', 'Greek Omelet (mid-range)', "Keke's Breakfast Cafe", 'breakfast', '1 omelet', 990, 48, 18, 78, 1860, ['omelet']),
+  item('keke-two-egg-platter', 'Two Egg Breakfast (mid-range)', "Keke's Breakfast Cafe", 'breakfast', '1 platter', 820, 32, 68, 42, 1480, ['eggs']),
+  item('keke-blt', 'BLT', "Keke's Breakfast Cafe", 'sandwiches', '1 sandwich', 1080, 38, 62, 72, 1980, ['blt']),
+  item('keke-turkey-club', 'Turkey Club', "Keke's Breakfast Cafe", 'sandwiches', '1 sandwich', 1550, 62, 78, 98, 2680, ['club', 'turkey']),
+  item('keke-carolina-salad', 'Carolina Chicken Salad (mid-range)', "Keke's Breakfast Cafe", 'lunch', '1 salad', 1425, 48, 72, 98, 2280, ['salad', 'chicken']),
+  item('keke-cheeseburger', 'Cheeseburger', "Keke's Breakfast Cafe", 'sandwiches', '1 burger', 960, 48, 52, 58, 1680, ['burger']),
+  item('keke-yogurt-parfait', 'Yogurt Parfait', "Keke's Breakfast Cafe", 'breakfast', '1 parfait', 790, 22, 98, 28, 220, ['yogurt', 'parfait']),
+  item('keke-home-fries', 'Home Fries', "Keke's Breakfast Cafe", 'snacks', '1 side', 280, 4, 38, 12, 520, ['side', 'potatoes']),
+
+  // ——— Metro Diner (published menu calories; macros estimated) ———
+  item('metro-all-american', 'All American Burger', 'Metro Diner', 'sandwiches', '1 burger', 990, 48, 52, 62, 1680, ['burger']),
+  item('metro-bacon-swiss', 'Bacon Mushroom Swiss Burger', 'Metro Diner', 'sandwiches', '1 burger', 990, 52, 48, 64, 1780, ['burger']),
+  item('metro-philly', 'Philly Cheese Steak', 'Metro Diner', 'sandwiches', '1 sandwich', 1270, 58, 72, 78, 2480, ['philly']),
+  item('metro-french-dip', 'French Dip', 'Metro Diner', 'sandwiches', '1 sandwich', 750, 46, 62, 32, 1980, ['roast beef']),
+  item('metro-club', 'Metro Club', 'Metro Diner', 'sandwiches', '1 sandwich', 1320, 62, 78, 78, 2680, ['club']),
+  item('metro-blt', "Big Mike's BLT", 'Metro Diner', 'sandwiches', '1 sandwich', 830, 32, 52, 52, 1680, ['blt']),
+  item('metro-fried-chicken-sand', 'Fried Chicken Sandwich', 'Metro Diner', 'sandwiches', '1 sandwich', 970, 48, 68, 52, 1980, ['chicken']),
+  item('metro-meatloaf', 'Iron City Meatloaf Plate', 'Metro Diner', 'dinner', '1 plate', 920, 48, 58, 52, 1860, ['meatloaf']),
+  item('metro-turkey-plate', 'Roasted Turkey Plate', 'Metro Diner', 'dinner', '1 plate', 1030, 58, 78, 48, 2100, ['turkey']),
+  item('metro-fried-chicken', 'Fried Chicken Plate', 'Metro Diner', 'dinner', '1 plate', 1860, 82, 98, 118, 3280, ['chicken']),
+  item('metro-tenders', 'Chicken Tender Plate', 'Metro Diner', 'lunch', '1 plate', 980, 48, 78, 52, 1980, ['tenders']),
+  item('metro-biscuits-gravy', 'Biscuits & Sausage Gravy', 'Metro Diner', 'breakfast', '1 order', 680, 22, 62, 38, 1680, ['biscuit', 'gravy']),
+  item('metro-egg-platter', 'Two Egg Platter (mid-range)', 'Metro Diner', 'breakfast', '1 platter', 780, 32, 58, 42, 1480, ['eggs']),
+  item('metro-western', 'Western Omelet (mid-range)', 'Metro Diner', 'breakfast', '1 omelet', 825, 42, 38, 52, 1680, ['omelet']),
+  item('metro-mac', 'Mac & Cheese', 'Metro Diner', 'snacks', '1 side', 290, 12, 28, 14, 680, ['mac']),
+  item('metro-fries', 'Seasoned Fries', 'Metro Diner', 'snacks', '1 side', 300, 4, 38, 14, 620, ['fries']),
+
+  // ——— Hard Rock Cafe (published menu calories; macros estimated) ———
+  item('hrc-legendary-burger', 'Original Legendary Burger', 'Hard Rock Cafe', 'sandwiches', '1 burger', 1354, 62, 78, 88, 5100, ['burger', 'legendary']),
+  item('hrc-bbq-bacon', 'BBQ Bacon Cheeseburger', 'Hard Rock Cafe', 'sandwiches', '1 burger', 1564, 68, 82, 102, 6300, ['burger', 'bbq']),
+  item('hrc-big-cheese', 'The Big Cheeseburger', 'Hard Rock Cafe', 'sandwiches', '1 burger', 1212, 58, 72, 78, 4700, ['burger']),
+  item('hrc-impossible', 'Impossible Burger', 'Hard Rock Cafe', 'sandwiches', '1 burger', 1149, 42, 88, 68, 1850, ['burger', 'vegetarian']),
+  item('hrc-nachos', 'Legendary Nachos', 'Hard Rock Cafe', 'snacks', '1 order', 1550, 48, 142, 88, 3790, ['nachos']),
+  item('hrc-wings', 'Twisted Mac & Cheese Wings (mid-range)', 'Hard Rock Cafe', 'snacks', '1 order', 1405, 72, 48, 98, 2120, ['wings']),
+  item('hrc-shrimp', 'One Night in Bangkok Spicy Shrimp', 'Hard Rock Cafe', 'snacks', '1 order', 1130, 42, 78, 72, 3760, ['shrimp']),
+  item('hrc-flatbread', 'Margherita Flatbread', 'Hard Rock Cafe', 'dinner', '1 flatbread', 948, 38, 98, 42, 2370, ['flatbread', 'pizza']),
+  item('hrc-fajitas-chicken', 'Famous Fajitas (chicken)', 'Hard Rock Cafe', 'dinner', '1 order', 1420, 78, 98, 72, 4600, ['fajitas', 'chicken']),
+  item('hrc-ribs', 'Smokehouse BBQ Ribs', 'Hard Rock Cafe', 'dinner', '1 rack', 1510, 82, 68, 98, 3280, ['ribs', 'bbq']),
+  item('hrc-salad', 'Twisted Cobb Salad', 'Hard Rock Cafe', 'lunch', '1 salad', 980, 48, 42, 68, 1980, ['salad', 'cobb']),
+  item('hrc-beans', 'Smokehouse Beans', 'Hard Rock Cafe', 'snacks', '1 side', 168, 8, 28, 4, 1060, ['side', 'beans']),
+
+  // ——— Cooper's Hawk (Life Balance published cals + analogs) ———
+  item('ch-potstickers', 'Chicken Potstickers (Life Balance)', "Cooper's Hawk Winery & Restaurants", 'snacks', '1 order', 570, 28, 48, 28, 1420, ['potstickers', 'appetizer']),
+  item('ch-ahi', 'Asian Ahi Tuna Sashimi (Life Balance)', "Cooper's Hawk Winery & Restaurants", 'snacks', '1 order', 300, 28, 12, 16, 680, ['tuna', 'ahi']),
+  item('ch-house-salad', "Plain Ol' House Salad (Life Balance)", "Cooper's Hawk Winery & Restaurants", 'lunch', '1 salad', 333, 8, 28, 20, 620, ['salad']),
+  item('ch-bbq-ranch', 'BBQ Ranch Chicken Salad (Life Balance)', "Cooper's Hawk Winery & Restaurants", 'lunch', '1 salad', 600, 42, 38, 28, 1280, ['salad', 'chicken']),
+  item('ch-parm-chicken', 'Parmesan-Crusted Chicken (Life Balance)', "Cooper's Hawk Winery & Restaurants", 'dinner', '1 entrée', 520, 48, 42, 18, 1180, ['chicken']),
+  item('ch-tenderloin', 'Grilled Tenderloin Medallions (Life Balance)', "Cooper's Hawk Winery & Restaurants", 'dinner', '1 entrée', 590, 48, 32, 28, 980, ['steak', 'tenderloin']),
+  item('ch-salmon', 'Lemon-Herb Glazed Salmon (Life Balance)', "Cooper's Hawk Winery & Restaurants", 'dinner', '1 entrée', 560, 42, 28, 28, 920, ['salmon']),
+  item('ch-ahi-blackened', 'Blackened Ahi Tuna (Life Balance)', "Cooper's Hawk Winery & Restaurants", 'dinner', '1 entrée', 605, 48, 42, 24, 1120, ['tuna', 'ahi']),
+  item('ch-chicken-burger', 'All American Chicken Burger (Life Balance)', "Cooper's Hawk Winery & Restaurants", 'sandwiches', '1 burger', 700, 48, 48, 32, 1480, ['burger', 'chicken']),
+  item('ch-cheeseburger', 'Classic Cheeseburger', "Cooper's Hawk Winery & Restaurants", 'sandwiches', '1 burger', 980, 52, 52, 62, 1680, ['burger', 'estimated']),
+  item('ch-calamari', "Cooper's Hawk Calamari (per serving)", "Cooper's Hawk Winery & Restaurants", 'snacks', '1 serving', 320, 10, 30, 20, 880, ['calamari']),
+  item('ch-meatballs', 'House-Made Meatballs (per serving)', "Cooper's Hawk Winery & Restaurants", 'snacks', '1 serving', 330, 10, 20, 20, 580, ['meatballs']),
+  item('ch-bisque', 'Crab & Lobster Bisque (bowl)', "Cooper's Hawk Winery & Restaurants", 'lunch', '1 bowl', 590, 10, 20, 50, 1420, ['soup', 'bisque']),
+  item('ch-tortilla-soup', 'Chicken Tortilla Soup (bowl)', "Cooper's Hawk Winery & Restaurants", 'lunch', '1 bowl', 270, 20, 20, 10, 1700, ['soup']),
+
+  // ——— 4 Rivers Smokehouse (FatSecret + BBQ analogs) ———
+  item('4r-brisket', 'Signature Angus Brisket (1/2 lb)', '4 Rivers Smokehouse', 'dinner', '1/2 lb', 620, 48, 4, 46, 980, ['bbq', 'brisket', 'estimated']),
+  item('4r-pulled-pork', 'Pulled Pork (1/2 lb)', '4 Rivers Smokehouse', 'dinner', '1/2 lb', 480, 42, 6, 32, 1120, ['bbq', 'pork', 'estimated']),
+  item('4r-pulled-chicken', 'Pulled Chicken (1/2 lb)', '4 Rivers Smokehouse', 'dinner', '1/2 lb', 360, 48, 4, 16, 880, ['bbq', 'chicken', 'estimated']),
+  item('4r-burnt-ends', 'Burnt Ends', '4 Rivers Smokehouse', 'lunch', '1 serving', 340, 25, 2, 20, 720, ['bbq', 'burnt ends']),
+  item('4r-ribs', 'St. Louis Style Ribs (1/2 rack)', '4 Rivers Smokehouse', 'dinner', '1/2 rack', 780, 48, 18, 56, 1480, ['bbq', 'ribs', 'estimated']),
+  item('4r-sausage', 'Texas Sausage (link)', '4 Rivers Smokehouse', 'lunch', '1 sausage', 170, 19, 0, 10, 620, ['bbq', 'sausage']),
+  item('4r-smoked-chicken', 'Smoked Chicken (1/4)', '4 Rivers Smokehouse', 'dinner', '1/4 chicken', 300, 30, 2, 18, 680, ['bbq', 'chicken', 'estimated']),
+  item('4r-brisket-sandwich', 'Brisket Sandwich', '4 Rivers Smokehouse', 'sandwiches', '1 sandwich', 720, 42, 48, 38, 1480, ['bbq', 'brisket', 'estimated']),
+  item('4r-messy-pig', 'Messy Pig Sandwich', '4 Rivers Smokehouse', 'sandwiches', '1 sandwich', 850, 44, 62, 48, 1680, ['bbq', 'estimated']),
+  item('4r-mac', 'Mac & Cheese', '4 Rivers Smokehouse', 'snacks', '1 side', 380, 14, 32, 22, 880, ['mac', 'estimated']),
+  item('4r-beans', '4R BBQ Beans', '4 Rivers Smokehouse', 'snacks', '1 side', 280, 10, 42, 8, 780, ['beans', 'estimated']),
+  item('4r-collards', 'Collard Greens', '4 Rivers Smokehouse', 'snacks', '1 side', 140, 6, 12, 8, 720, ['sides', 'estimated']),
+  item('4r-sauce', 'Signature BBQ Sauce (2 tbsp)', '4 Rivers Smokehouse', 'snacks', '2 tbsp', 50, 0, 12, 0, 280, ['sauce', 'bbq']),
+
+  // ——— Bubbalou's Bodacious BBQ ———
+  item('bub-brisket', 'Sliced Brisket Plate', "Bubbalou's Bodacious BBQ", 'dinner', '1 plate', 780, 52, 48, 42, 1520, ['bbq', 'brisket', 'estimated']),
+  item('bub-pulled-pork', 'Pulled Pork Sandwich', "Bubbalou's Bodacious BBQ", 'sandwiches', '1 sandwich', 620, 36, 48, 28, 1380, ['bbq', 'pork', 'estimated']),
+  item('bub-ribs', 'Baby Back Ribs (1/2 rack)', "Bubbalou's Bodacious BBQ", 'dinner', '1/2 rack', 820, 48, 22, 58, 1580, ['bbq', 'ribs', 'estimated']),
+  item('bub-chicken', 'Smoked Chicken Plate', "Bubbalou's Bodacious BBQ", 'dinner', '1 plate', 680, 52, 42, 32, 1280, ['bbq', 'chicken', 'estimated']),
+  item('bub-combo', 'Two-Meat Combo Plate', "Bubbalou's Bodacious BBQ", 'dinner', '1 plate', 980, 62, 52, 58, 1860, ['bbq', 'estimated']),
+  item('bub-mac', 'Mac & Cheese', "Bubbalou's Bodacious BBQ", 'snacks', '1 side', 400, 14, 34, 24, 920, ['mac', 'estimated']),
+  item('bub-beans', 'BBQ Baked Beans', "Bubbalou's Bodacious BBQ", 'snacks', '1 side', 260, 10, 40, 6, 760, ['beans', 'estimated']),
+  item('bub-coleslaw', 'Coleslaw', "Bubbalou's Bodacious BBQ", 'snacks', '1 side', 180, 2, 16, 12, 320, ['coleslaw', 'estimated']),
+
+  // ——— Lazy Moon Pizza ———
+  item('lm-cheese-slice', 'Cheese Pizza (slice)', 'Lazy Moon Pizza', 'dinner', '1 slice', 320, 14, 38, 12, 680, ['pizza', 'estimated']),
+  item('lm-pepperoni-slice', 'Pepperoni Pizza (slice)', 'Lazy Moon Pizza', 'dinner', '1 slice', 360, 16, 38, 16, 820, ['pizza', 'pepperoni', 'estimated']),
+  item('lm-meat-slice', 'Meat Lovers Slice', 'Lazy Moon Pizza', 'dinner', '1 slice', 420, 20, 38, 22, 980, ['pizza', 'estimated']),
+  item('lm-veggie-slice', 'Veggie Slice', 'Lazy Moon Pizza', 'dinner', '1 slice', 300, 12, 40, 10, 720, ['pizza', 'vegetarian', 'estimated']),
+  item('lm-vegan-slice', 'Vegan Cheese Slice', 'Lazy Moon Pizza', 'dinner', '1 slice', 280, 10, 40, 8, 640, ['pizza', 'vegan', 'estimated']),
+  item('lm-calzone', 'Calzone (cheese)', 'Lazy Moon Pizza', 'dinner', '1 calzone', 780, 32, 88, 32, 1680, ['calzone', 'estimated']),
+  item('lm-salad', 'House Salad', 'Lazy Moon Pizza', 'lunch', '1 salad', 220, 6, 18, 14, 420, ['salad', 'estimated']),
+  item('lm-garlic-knots', 'Garlic Knots (order)', 'Lazy Moon Pizza', 'snacks', '1 order', 480, 12, 62, 20, 980, ['garlic', 'estimated']),
+
+  // ——— Hash House A Go Go ———
+  item('hhagg-corned-beef-hash', 'Corned Beef Hash Skillet', 'Hash House A Go Go', 'breakfast', '1 skillet', 1240, 52, 88, 72, 2680, ['hash', 'estimated']),
+  item('hhagg-meatloaf-hash', 'Famous Meatloaf Hash', 'Hash House A Go Go', 'breakfast', '1 skillet', 1320, 56, 92, 78, 2780, ['hash', 'meatloaf', 'estimated']),
+  item('hhagg-bacon-scramble', 'Bacon Avocado Onion Swiss Scramble', 'Hash House A Go Go', 'breakfast', '1 scramble', 980, 48, 58, 62, 2100, ['scramble', 'estimated']),
+  item('hhagg-california', 'California Scramble', 'Hash House A Go Go', 'breakfast', '1 scramble', 1020, 52, 52, 64, 2180, ['scramble', 'estimated']),
+  item('hhagg-flapjack', 'Classic Buttermilk Flapjack', 'Hash House A Go Go', 'breakfast', '1 pancake', 420, 10, 62, 14, 780, ['pancake', 'estimated']),
+  item('hhagg-twisted', "Famous 'Twisted' Flapjacks", 'Hash House A Go Go', 'breakfast', '1 order', 780, 14, 98, 32, 1120, ['pancake', 'estimated']),
+  item('hhagg-biscuits-gravy', 'Biscuits & Sausage Gravy', 'Hash House A Go Go', 'breakfast', '1 plate', 980, 32, 78, 58, 2480, ['biscuit', 'gravy', 'estimated']),
+  item('hhagg-cinnamon-roll', 'Cinnamon Roll A Go Go', 'Hash House A Go Go', 'snacks', '1 roll', 980, 14, 128, 48, 980, ['cinnamon roll', 'dessert', 'estimated']),
+  item('hhagg-burger', 'Farmhouse Burger', 'Hash House A Go Go', 'sandwiches', '1 burger', 1180, 58, 68, 78, 2280, ['burger', 'estimated']),
+  item('hhagg-fried-chicken', 'Fried Chicken & Waffle', 'Hash House A Go Go', 'breakfast', '1 plate', 1280, 52, 98, 72, 2480, ['chicken', 'waffle', 'estimated']),
+
+  // ——— Columbia Restaurant (Florida Spanish landmark) ———
+  item('col-1905', '1905 Salad', 'Columbia Restaurant', 'lunch', '1 salad', 420, 18, 12, 34, 980, ['salad', 'spanish', 'estimated']),
+  item('col-cuban', 'Cuban Sandwich', 'Columbia Restaurant', 'sandwiches', '1 sandwich', 680, 36, 52, 34, 1620, ['cuban', 'estimated']),
+  item('col-paella', 'Seafood Paella (entrée)', 'Columbia Restaurant', 'dinner', '1 entrée', 780, 48, 72, 28, 1680, ['paella', 'spanish', 'estimated']),
+  item('col-ropa', 'Ropa Vieja', 'Columbia Restaurant', 'dinner', '1 entrée', 620, 42, 38, 32, 1480, ['cuban', 'estimated']),
+  item('col-boliche', 'Boliche (eye round)', 'Columbia Restaurant', 'dinner', '1 entrée', 680, 48, 28, 38, 1380, ['cuban', 'estimated']),
+  item('col-snapper', 'Red Snapper Alicante', 'Columbia Restaurant', 'dinner', '1 entrée', 520, 48, 22, 26, 1120, ['fish', 'snapper', 'estimated']),
+  item('col-steak', 'Filet Salteado', 'Columbia Restaurant', 'dinner', '1 entrée', 720, 52, 18, 48, 1280, ['steak', 'estimated']),
+  item('col-croquetas', 'Ham Croquetas (order)', 'Columbia Restaurant', 'snacks', '1 order', 420, 16, 28, 26, 880, ['croquetas', 'appetizer', 'estimated']),
+  item('col-empanada', 'Empanada', 'Columbia Restaurant', 'snacks', '1 empanada', 280, 10, 26, 16, 460, ['empanada', 'estimated']),
+  item('col-flan', 'Flan', 'Columbia Restaurant', 'snacks', '1 dessert', 320, 8, 42, 12, 180, ['dessert', 'flan', 'estimated']),
+  item('col-sangria', 'Sangria (glass, approx)', 'Columbia Restaurant', 'snacks', '1 glass', 180, 1, 22, 0, 10, ['sangria', 'estimated']),
+];

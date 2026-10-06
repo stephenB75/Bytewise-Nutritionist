@@ -1128,6 +1128,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         totalProtein: req.body.totalProtein ? req.body.totalProtein.toString() : '0',
         totalCarbs: req.body.totalCarbs ? req.body.totalCarbs.toString() : '0',
         totalFat: req.body.totalFat ? req.body.totalFat.toString() : '0',
+        totalSugar: req.body.totalSugar ? req.body.totalSugar.toString() : '0',
         // Include micronutrients from CalorieCalculator
         iron: req.body.iron ? req.body.iron.toString() : '0',
         calcium: req.body.calcium ? req.body.calcium.toString() : '0',
@@ -1549,6 +1550,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         totalProtein: recipe.totalProtein || '0',
         totalCarbs: recipe.totalCarbs || '0',
         totalFat: recipe.totalFat || '0',
+        totalSugar: recipe.totalSugar || '0',
       });
 
       res.json({ success: true, meal });

@@ -141,6 +141,7 @@ export interface IStorage {
     totalProtein: number;
     totalCarbs: number;
     totalFat: number;
+    totalSugar: number;
     waterGlasses: number;
     waterContainers?: WaterContainers | null;
     fastingStatus?: {
@@ -1090,6 +1091,7 @@ export class DatabaseStorage implements IStorage {
     totalProtein: number;
     totalCarbs: number;
     totalFat: number;
+    totalSugar: number;
     waterGlasses: number;
     waterContainers?: WaterContainers | null;
     fastingStatus?: {
@@ -1113,7 +1115,7 @@ export class DatabaseStorage implements IStorage {
             lte(meals.date, endOfDay)
           )
         );
-      let dayMeals: Array<{ totalCalories: unknown; totalProtein: unknown; totalCarbs: unknown; totalFat: unknown }>;
+      let dayMeals: Array<{ totalCalories: unknown; totalProtein: unknown; totalCarbs: unknown; totalFat: unknown; totalSugar?: unknown }>;
       if (!getDatabaseUrl() || !isDbReady()) {
         dayMeals = await getUserMealsViaSupabase(userId, startOfDay, endOfDay);
       } else {
@@ -1125,16 +1127,18 @@ export class DatabaseStorage implements IStorage {
       }
 
       // Sum up nutrition from all meals
-      const totals = dayMeals.reduce<{ totalCalories: number; totalProtein: number; totalCarbs: number; totalFat: number }>((acc, meal) => ({
+      const totals = dayMeals.reduce<{ totalCalories: number; totalProtein: number; totalCarbs: number; totalFat: number; totalSugar: number }>((acc, meal) => ({
         totalCalories: acc.totalCalories + Number(meal.totalCalories || 0),
         totalProtein: acc.totalProtein + Number(meal.totalProtein || 0),
         totalCarbs: acc.totalCarbs + Number(meal.totalCarbs || 0),
         totalFat: acc.totalFat + Number(meal.totalFat || 0),
+        totalSugar: acc.totalSugar + Number(meal.totalSugar || 0),
       }), {
         totalCalories: 0,
         totalProtein: 0,
         totalCarbs: 0,
         totalFat: 0,
+        totalSugar: 0,
       });
 
       // Get water intake

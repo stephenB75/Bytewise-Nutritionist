@@ -142,6 +142,7 @@ export const meals = pgTable("meals", {
   totalProtein: decimal("total_protein", { precision: 8, scale: 2 }).default('0'),
   totalCarbs: decimal("total_carbs", { precision: 8, scale: 2 }).default('0'),
   totalFat: decimal("total_fat", { precision: 8, scale: 2 }).default('0'),
+  totalSugar: decimal("total_sugar", { precision: 8, scale: 2 }).default('0'),
   // Micronutrients from USDA database
   iron: decimal("iron", { precision: 8, scale: 2 }).default('0'),
   calcium: decimal("calcium", { precision: 8, scale: 2 }).default('0'),

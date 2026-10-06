@@ -53,6 +53,8 @@ interface IngredientAnalysis {
     protein: number;
     carbs: number;
     fat: number;
+    sugar?: number;
+    fiber?: number;
     // Micronutrients
     iron?: number;
     calcium?: number;
@@ -117,6 +119,7 @@ interface LoggedMealData {
   protein: number;
   carbs: number;
   fat: number;
+  sugar?: number;
   // Micronutrients
   iron?: number;
   calcium?: number;
@@ -243,8 +246,8 @@ function CalorieCalculator({
           vitaminE: (data.nutritionPer100g?.vitaminE || 0) * scalingFactor,
           potassium: (data.nutritionPer100g?.potassium || 0) * scalingFactor,
           phosphorus: (data.nutritionPer100g?.phosphorus || 0) * scalingFactor,
-          fiber: 0,
-          sugar: 0,
+          fiber: (data.nutritionPer100g?.fiber || 0) * scalingFactor,
+          sugar: (data.nutritionPer100g?.sugar || 0) * scalingFactor,
           sodium: 0,
           ingredients: [data.ingredient]
         });
@@ -322,6 +325,7 @@ function CalorieCalculator({
       protein: (analysis.nutritionPer100g?.protein || 0) * scalingFactor,
       carbs: (analysis.nutritionPer100g?.carbs || 0) * scalingFactor,
       fat: (analysis.nutritionPer100g?.fat || 0) * scalingFactor,
+      sugar: (analysis.nutritionPer100g?.sugar || 0) * scalingFactor,
       // Scale micronutrients based on actual serving size (real data from USDA when available)
       iron: (analysis.nutritionPer100g?.iron || 0) * scalingFactor,
       calcium: (analysis.nutritionPer100g?.calcium || 0) * scalingFactor,
@@ -356,6 +360,7 @@ function CalorieCalculator({
         totalProtein: mealData.protein,
         totalCarbs: mealData.carbs,
         totalFat: mealData.fat,
+        totalSugar: mealData.sugar,
         // Include micronutrients in API request
         iron: mealData.iron,
         calcium: mealData.calcium,
@@ -713,6 +718,7 @@ function CalorieCalculator({
                     protein: food.protein,
                     carbs: food.carbs,
                     fat: food.fat,
+                    sugar: food.sugar ?? 0,
                     date: getLocalDateKey(now),
                     time: formatLocalTime(now),
                     mealType,
@@ -735,7 +741,8 @@ function CalorieCalculator({
                       totalCalories: mealData.calories,
                       totalProtein: mealData.protein,
                       totalCarbs: mealData.carbs,
-                      totalFat: mealData.fat
+                      totalFat: mealData.fat,
+                      totalSugar: mealData.sugar,
                     });
                     
                     // Show success animation

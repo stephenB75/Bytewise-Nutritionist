@@ -15,6 +15,12 @@ import { CULTURAL_FAST_FOOD_ITEMS } from './fastFoodMenuCultural';
 import { DESSERT_FAST_FOOD_ITEMS } from './fastFoodMenuDesserts';
 import { CASUAL_MORE_FAST_FOOD_ITEMS } from './fastFoodMenuCasualMore';
 import { STEAKHOUSE_FAST_FOOD_ITEMS } from './fastFoodMenuSteakhouses';
+import { BRUNCH_TAPAS_FAST_FOOD_ITEMS } from './fastFoodMenuBrunchTapas';
+import { BAGEL_FAST_FOOD_ITEMS } from './fastFoodMenuBagels';
+import { FLORIDA_LOCALS_FAST_FOOD_ITEMS } from './fastFoodMenuFloridaLocals';
+import { MORE_LOCALS_FAST_FOOD_ITEMS } from './fastFoodMenuMoreLocals';
+import { CASUAL_LOCALS_FAST_FOOD_ITEMS } from './fastFoodMenuCasualLocals';
+import { CHAINS_MORE_FAST_FOOD_ITEMS } from './fastFoodMenuChainsMore';
 import {
   ASIAN_RESTAURANTS,
   BBQ_RESTAURANTS,
@@ -105,6 +111,8 @@ const CUISINE_SEARCH_WORDS: Record<string, FoodCuisine> = {
   cafe: 'cafe',
   coffee: 'cafe',
   bakery: 'cafe',
+  bagel: 'cafe',
+  bagels: 'cafe',
   dessert: 'cafe',
   desserts: 'cafe',
   smoothie: 'cafe',
@@ -457,7 +465,7 @@ const CORE_FAST_FOOD_ITEMS: FastFoodItem[] = [
   { id: 'sweetgreen-kale-caesar', name: 'Kale Caesar', restaurant: 'Sweetgreen', category: 'lunch', serving: '1 bowl', calories: 430, protein: 30, carbs: 21, fat: 26, sodium: 920, keywords: ['salad'] },
 ];
 
-export const FAST_FOOD_ITEMS: FastFoodItem[] = [...CORE_FAST_FOOD_ITEMS, ...MORE_FAST_FOOD_ITEMS, ...FULL_FAST_FOOD_ITEMS, ...ASIAN_FAST_FOOD_ITEMS, ...CAFE_FAST_FOOD_ITEMS, ...MORE_PLACES_FAST_FOOD_ITEMS, ...CARIBBEAN_FAST_FOOD_ITEMS, ...FLORIDA_FAST_FOOD_ITEMS, ...SOUTHEAST_FAST_FOOD_ITEMS, ...CULTURAL_FAST_FOOD_ITEMS, ...DESSERT_FAST_FOOD_ITEMS, ...CASUAL_MORE_FAST_FOOD_ITEMS, ...STEAKHOUSE_FAST_FOOD_ITEMS];
+export const FAST_FOOD_ITEMS: FastFoodItem[] = [...CORE_FAST_FOOD_ITEMS, ...MORE_FAST_FOOD_ITEMS, ...FULL_FAST_FOOD_ITEMS, ...ASIAN_FAST_FOOD_ITEMS, ...CAFE_FAST_FOOD_ITEMS, ...MORE_PLACES_FAST_FOOD_ITEMS, ...CARIBBEAN_FAST_FOOD_ITEMS, ...FLORIDA_FAST_FOOD_ITEMS, ...SOUTHEAST_FAST_FOOD_ITEMS, ...CULTURAL_FAST_FOOD_ITEMS, ...DESSERT_FAST_FOOD_ITEMS, ...CASUAL_MORE_FAST_FOOD_ITEMS, ...STEAKHOUSE_FAST_FOOD_ITEMS, ...BRUNCH_TAPAS_FAST_FOOD_ITEMS, ...BAGEL_FAST_FOOD_ITEMS, ...FLORIDA_LOCALS_FAST_FOOD_ITEMS, ...MORE_LOCALS_FAST_FOOD_ITEMS, ...CASUAL_LOCALS_FAST_FOOD_ITEMS, ...CHAINS_MORE_FAST_FOOD_ITEMS];
 
 export const FAST_FOOD_RESTAURANTS: string[] = Array.from(new Set(FAST_FOOD_ITEMS.map((item) => item.restaurant))).sort(
   (a, b) => a.localeCompare(b)

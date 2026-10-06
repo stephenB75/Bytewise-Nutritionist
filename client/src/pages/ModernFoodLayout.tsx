@@ -618,7 +618,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         totalProtein: acc.totalProtein + (meal.protein || meal.totalProtein || 0),
         totalCarbs: acc.totalCarbs + (meal.carbs || meal.totalCarbs || 0),
         totalFat: acc.totalFat + (meal.fat || meal.totalFat || 0),
-      }), { totalCalories: 0, totalProtein: 0, totalCarbs: 0, totalFat: 0 });
+        totalSugar: acc.totalSugar + (meal.sugar || meal.totalSugar || 0),
+      }), { totalCalories: 0, totalProtein: 0, totalCarbs: 0, totalFat: 0, totalSugar: 0 });
 
       setDailyStats({
         ...totals,
@@ -649,6 +650,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         totalProtein: data.totalProtein || 0,
         totalCarbs: data.totalCarbs || 0,
         totalFat: data.totalFat || 0,
+        totalSugar: data.totalSugar || 0,
         waterGlasses: keepLocalWater ? waterGlassesRef.current : clampWaterGlasses(data.waterGlasses || 0),
         fastingStatus: data.fastingStatus
       };
@@ -672,6 +674,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         totalProtein: 0,
         totalCarbs: 0,
         totalFat: 0,
+        totalSugar: 0,
         waterGlasses: readLocalWaterGlasses(),
         fastingStatus: undefined
       });
@@ -1420,6 +1423,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       green: { text: 'text-green-700', bar: 'bg-green-500/60' },
       yellow: { text: 'text-yellow-700', bar: 'bg-yellow-500/70' },
       purple: { text: 'text-purple-700', bar: 'bg-purple-500/60' },
+      pink: { text: 'text-pink-700', bar: 'bg-pink-500/60' },
     };
     const swatch = macroPalette[color] ?? macroPalette.green;
     const textColor = isNegative ? 'text-red-700' : swatch.text;
@@ -1684,7 +1688,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           </div>
 
           {/* Macros Breakdown - Enhanced with Remaining Values */}
-          <div className="grid grid-cols-3 gap-4 mb-4">
+          <div className="grid grid-cols-2 gap-4 mb-4 sm:grid-cols-4">
             <MacroCard 
               name="Protein" 
               value={Math.round(dailyStats?.totalProtein || 0)} 
@@ -1702,6 +1706,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               value={Math.round(dailyStats?.totalFat || 0)} 
               goal={user?.dailyFatGoal || 70} 
               color="purple" 
+            />
+            <MacroCard 
+              name="Sugar" 
+              value={Math.round(dailyStats?.totalSugar || 0)} 
+              goal={50} 
+              color="pink" 
             />
           </div>
 
@@ -2407,6 +2417,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         totalProtein: meal.totalProtein ?? meal.protein,
         totalCarbs: meal.totalCarbs ?? meal.carbs,
         totalFat: meal.totalFat ?? meal.fat,
+        totalSugar: meal.totalSugar ?? meal.sugar,
         iron: meal.iron,
         calcium: meal.calcium,
         zinc: meal.zinc,

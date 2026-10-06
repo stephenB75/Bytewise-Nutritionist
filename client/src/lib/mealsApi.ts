@@ -11,6 +11,7 @@ export type LogMealInput = {
   totalProtein?: number | string;
   totalCarbs?: number | string;
   totalFat?: number | string;
+  totalSugar?: number | string;
   iron?: number | string;
   calcium?: number | string;
   zinc?: number | string;
@@ -37,6 +38,8 @@ export type LoggedMeal = {
   totalCarbs: number;
   fat: number;
   totalFat: number;
+  sugar: number;
+  totalSugar: number;
   iron: number;
   calcium: number;
   zinc: number;
@@ -77,6 +80,7 @@ function mapMeal(row: Record<string, unknown>): LoggedMeal {
   const protein = toNumber(row.total_protein ?? row.totalProtein ?? row.protein);
   const carbs = toNumber(row.total_carbs ?? row.totalCarbs ?? row.carbs);
   const fat = toNumber(row.total_fat ?? row.totalFat ?? row.fat);
+  const sugar = toNumber(row.total_sugar ?? row.totalSugar ?? row.sugar);
   const date = toDateKey(row.date);
 
   return {
@@ -94,6 +98,8 @@ function mapMeal(row: Record<string, unknown>): LoggedMeal {
     totalCarbs: carbs,
     fat,
     totalFat: fat,
+    sugar,
+    totalSugar: sugar,
     iron: toNumber(row.iron),
     calcium: toNumber(row.calcium),
     zinc: toNumber(row.zinc),
@@ -235,6 +241,8 @@ export async function logMeal(
     totalCarbs: toNumber(input.totalCarbs),
     fat: toNumber(input.totalFat),
     totalFat: toNumber(input.totalFat),
+    sugar: toNumber(input.totalSugar),
+    totalSugar: toNumber(input.totalSugar),
     iron: toNumber(input.iron),
     calcium: toNumber(input.calcium),
     zinc: toNumber(input.zinc),
@@ -261,6 +269,7 @@ export async function logMeal(
     totalProtein: toNumber(input.totalProtein),
     totalCarbs: toNumber(input.totalCarbs),
     totalFat: toNumber(input.totalFat),
+    totalSugar: toNumber(input.totalSugar),
     iron: toNumber(input.iron),
     calcium: toNumber(input.calcium),
     zinc: toNumber(input.zinc),
@@ -296,6 +305,7 @@ export async function syncGuestMeals(): Promise<number> {
         totalProtein: meal.totalProtein,
         totalCarbs: meal.totalCarbs,
         totalFat: meal.totalFat,
+        totalSugar: meal.totalSugar,
         iron: meal.iron,
         calcium: meal.calcium,
         zinc: meal.zinc,

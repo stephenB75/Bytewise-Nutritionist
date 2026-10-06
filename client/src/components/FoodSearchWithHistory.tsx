@@ -35,6 +35,7 @@ interface LoggedFood {
   protein: number;
   carbs: number;
   fat: number;
+  sugar?: number;
   date: string;
   time: string;
   mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack';

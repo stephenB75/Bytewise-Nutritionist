@@ -270,6 +270,7 @@ function ProductPanel({ food, onClose }: { food: PackagedFood; onClose: () => vo
         totalProtein: nutrients.protein,
         totalCarbs: nutrients.carbs,
         totalFat: nutrients.fat,
+        totalSugar: nutrients.sugar,
       });
       queryClient.invalidateQueries({ queryKey: ['/api/meals/logged'] });
       window.dispatchEvent(new CustomEvent('refresh-weekly-data'));
