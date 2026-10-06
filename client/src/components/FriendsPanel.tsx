@@ -4,12 +4,15 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { toast } from '@/hooks/use-toast';
-import { Check, CheckCircle2, Clock, Droplets, HeartPulse, Loader2, Share2, Timer, Trash2, UserPlus, Users, Utensils, X, BarChart3 } from 'lucide-react';
+import { Check, CheckCircle2, ChevronDown, Clock, Droplets, FileDown, HeartPulse, Loader2, Share2, Timer, Trash2, UserPlus, Users, Utensils, X, BarChart3 } from 'lucide-react';
 import { Capacitor } from '@capacitor/core';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { FRIENDS_QUERY_KEY, type FriendsResponse } from '@/hooks/useFriendUpdates';
 import { healthKitService, type AppleFitnessSummary } from '@/services/healthKit';
 
 const FEED_LIMIT = 4;
+const SHARE_LIMIT_HINT =
+  `Activity share keeps your ${FEED_LIMIT} most recent posts. For more detail, export a PDF report and share that instead.`;
 type Activity = {
   id: number;
   type: 'summary' | 'meal' | 'fast' | 'water';
@@ -104,9 +107,14 @@ export function FriendsPanel() {
   const [email, setEmail] = useState('');
   const [note, setNote] = useState('');
   const [inviteResult, setInviteResult] = useState<{ status: 'pending' | 'accepted'; message: string } | null>(null);
+  const [exportingPdf, setExportingPdf] = useState(false);
+  const [friendsOpen, setFriendsOpen] = useState(false);
 
   const friendsQuery = useQuery<FriendsResponse>({ queryKey: FRIENDS_KEY, retry: 1, refetchInterval: 30_000 });
-  const feedQuery = useQuery<{ activities: Activity[] }>({ queryKey: FEED_KEY, retry: 1 });
+  const feedQuery = useQuery<{ activities: Activity[]; myShareCount?: number; shareLimit?: number; myShares?: Activity[] }>({
+    queryKey: FEED_KEY,
+    retry: 1,
+  });
   const mealsQuery = useQuery<LoggedMeal[]>({ queryKey: ['/api/meals/logged'], retry: 1 });
   const fastsQuery = useQuery<FastingSession[]>({ queryKey: ['/api/fasting/history'], retry: 1 });
   const onIphone = Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios';
@@ -156,8 +164,34 @@ export function FriendsPanel() {
     onError: (error) => toast({ title: 'Something went wrong', description: errorText(error), variant: 'destructive' }),
   });
 
+  const myShareCount = feedQuery.data?.myShareCount
+    ?? (feedQuery.data?.myShares || feedQuery.data?.activities || []).filter(a => a.isMine).length;
+  const shareLimit = feedQuery.data?.shareLimit ?? FEED_LIMIT;
+  const atShareLimit = myShareCount >= shareLimit;
+
+  const exportPdfReport = async () => {
+    setExportingPdf(true);
+    try {
+      const { generateProgressReportPDF } = await import('@/utils/pdfExport');
+      const success = await generateProgressReportPDF();
+      if (!success) throw new Error('PDF generation failed');
+      toast({ title: 'PDF report ready', description: 'Share the exported PDF for a fuller activity history.' });
+    } catch (error) {
+      toast({
+        title: 'Export failed',
+        description: error instanceof Error ? error.message : 'Could not generate the PDF report.',
+        variant: 'destructive',
+      });
+    } finally {
+      setExportingPdf(false);
+    }
+  };
+
   const share = useMutation({
     mutationFn: async (payload: { kind: 'summary' } | { kind: 'item'; type: 'meal' | 'fast' | 'fitness'; title: string; details: Record<string, string | number | null> }) => {
+      if (atShareLimit) {
+        throw new Error(JSON.stringify({ message: SHARE_LIMIT_HINT, code: 'share_limit' }));
+      }
       if (payload.kind === 'summary') {
         const start = new Date();
         start.setHours(0, 0, 0, 0);
@@ -194,6 +228,8 @@ export function FriendsPanel() {
   const incoming = friendsQuery.data?.incoming || [];
   const outgoing = friendsQuery.data?.outgoing || [];
   const activities = (feedQuery.data?.activities || []).slice(0, FEED_LIMIT);
+  const myShares = feedQuery.data?.myShares || activities.filter(a => a.isMine);
+  const shareDisabled = share.isPending || atShareLimit;
 
   return (
     <div className="space-y-6" data-testid="friends-panel" style={{ fontFamily: "'Work Sans', sans-serif" }}>
@@ -259,10 +295,7 @@ export function FriendsPanel() {
       )}
 
       {/* Connections */}
-      <section className="space-y-2">
-        <p className="flex items-center gap-2 text-sm font-medium text-gray-900">
-          <Users className="h-4 w-4 text-orange-700" /> Your circle ({friends.length})
-        </p>
+      <section className="space-y-3">
         {friendsQuery.isLoading ? (
           <p className="text-sm text-gray-600">Loading…</p>
         ) : friendsQuery.isError && !friendsQuery.data ? (
@@ -270,46 +303,74 @@ export function FriendsPanel() {
         ) : friends.length === 0 && outgoing.length === 0 ? (
           <p className="text-sm text-gray-700 bg-white/60 rounded-lg p-3">No one yet. Invite someone above to start sharing.</p>
         ) : (
-          <ul className="space-y-2">
-            {friends.map(person => (
-              <li key={person.connectionId} className="flex items-center justify-between gap-2 rounded-lg bg-white/80 border border-amber-200 p-3" data-testid={`friend-accepted-${person.connectionId}`}>
-                <div className="min-w-0">
-                  <p className="font-medium text-gray-950 truncate">{person.name}</p>
-                  <p className="text-xs text-gray-600 truncate">{person.email}</p>
-                  <p className="mt-1 inline-flex items-center gap-1 rounded-md bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
-                    <CheckCircle2 className="h-3 w-3" />
-                    {person.sentByMe ? 'Accepted your request' : 'Connected'}
-                    {person.acceptedAt ? ` · ${shortDate(person.acceptedAt)}` : ''}
-                  </p>
-                </div>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="text-gray-700 shrink-0"
-                  onClick={() => {
-                    if (confirm(`Stop sharing with ${person.name}?`)) respond.mutate({ id: person.connectionId, accept: false });
-                  }}
+          <>
+            {outgoing.length > 0 && (
+              <div className="space-y-2">
+                <p className="flex items-center gap-2 text-sm font-medium text-gray-900">
+                  <Clock className="h-4 w-4 text-amber-700" /> Pending invites ({outgoing.length})
+                </p>
+                <ul className="space-y-2">
+                  {outgoing.map(person => (
+                    <li key={person.connectionId} className="flex items-center justify-between gap-2 rounded-lg bg-white/60 border border-dashed border-amber-300 p-3" data-testid={`friend-pending-${person.connectionId}`}>
+                      <div className="min-w-0">
+                        <p className="font-medium text-gray-900 truncate">{person.name}</p>
+                        <p className="text-xs text-gray-600 truncate">{person.email}</p>
+                        <p className="mt-1 inline-flex items-center gap-1 rounded-md bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-900">
+                          <Clock className="h-3 w-3" />
+                          Request sent {shortDate(person.since)} · Waiting for them to accept
+                        </p>
+                      </div>
+                      <Button size="sm" variant="ghost" className="text-gray-700 shrink-0" onClick={() => respond.mutate({ id: person.connectionId, accept: false })}>
+                        Cancel
+                      </Button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {friends.length > 0 && (
+              <Collapsible open={friendsOpen} onOpenChange={setFriendsOpen} className="space-y-2">
+                <CollapsibleTrigger
+                  className="flex w-full items-center justify-between gap-2 rounded-lg bg-white/80 border border-amber-200 px-3 py-2.5 text-left"
+                  data-testid="button-toggle-friends-list"
                 >
-                  Remove
-                </Button>
-              </li>
-            ))}
-            {outgoing.map(person => (
-              <li key={person.connectionId} className="flex items-center justify-between gap-2 rounded-lg bg-white/60 border border-dashed border-amber-300 p-3" data-testid={`friend-pending-${person.connectionId}`}>
-                <div className="min-w-0">
-                  <p className="font-medium text-gray-900 truncate">{person.name}</p>
-                  <p className="text-xs text-gray-600 truncate">{person.email}</p>
-                  <p className="mt-1 inline-flex items-center gap-1 rounded-md bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-900">
-                    <Clock className="h-3 w-3" />
-                    Request sent {shortDate(person.since)} · Waiting for them to accept
-                  </p>
-                </div>
-                <Button size="sm" variant="ghost" className="text-gray-700 shrink-0" onClick={() => respond.mutate({ id: person.connectionId, accept: false })}>
-                  Cancel
-                </Button>
-              </li>
-            ))}
-          </ul>
+                  <span className="flex items-center gap-2 text-sm font-medium text-gray-900">
+                    <Users className="h-4 w-4 text-orange-700" />
+                    Your circle ({friends.length})
+                  </span>
+                  <ChevronDown className={`h-4 w-4 shrink-0 text-gray-700 transition-transform ${friendsOpen ? 'rotate-180' : ''}`} />
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <ul className="space-y-2 pt-1">
+                    {friends.map(person => (
+                      <li key={person.connectionId} className="flex items-center justify-between gap-2 rounded-lg bg-white/80 border border-amber-200 p-3" data-testid={`friend-accepted-${person.connectionId}`}>
+                        <div className="min-w-0">
+                          <p className="font-medium text-gray-950 truncate">{person.name}</p>
+                          <p className="text-xs text-gray-600 truncate">{person.email}</p>
+                          <p className="mt-1 inline-flex items-center gap-1 rounded-md bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+                            <CheckCircle2 className="h-3 w-3" />
+                            {person.sentByMe ? 'Accepted your request' : 'Connected'}
+                            {person.acceptedAt ? ` · ${shortDate(person.acceptedAt)}` : ''}
+                          </p>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="text-gray-700 shrink-0"
+                          onClick={() => {
+                            if (confirm(`Stop sharing with ${person.name}?`)) respond.mutate({ id: person.connectionId, accept: false });
+                          }}
+                        >
+                          Remove
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                </CollapsibleContent>
+              </Collapsible>
+            )}
+          </>
         )}
       </section>
 
@@ -318,22 +379,64 @@ export function FriendsPanel() {
         <p className="flex items-center gap-2 text-sm font-medium text-gray-900">
           <Share2 className="h-4 w-4 text-orange-700" /> Share an activity
         </p>
+        <p className="text-xs text-gray-600">
+          Shows the {shareLimit} most recent shared posts. For a fuller history, export a PDF report.
+        </p>
+        {atShareLimit && (
+          <div className="rounded-lg border border-amber-300 bg-amber-50 p-3 space-y-2" data-testid="share-limit-notice">
+            <p className="text-sm text-amber-950">{SHARE_LIMIT_HINT}</p>
+            <p className="text-xs text-amber-900">Delete one of your posts below to share something new, or export a PDF.</p>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full border-amber-300 bg-white"
+              disabled={exportingPdf}
+              onClick={exportPdfReport}
+              data-testid="button-export-pdf-from-share"
+            >
+              {exportingPdf ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <FileDown className="h-4 w-4 mr-2" />}
+              Export PDF report
+            </Button>
+            {myShares.length > 0 && (
+              <ul className="space-y-1.5 pt-1">
+                {myShares.map(activity => (
+                  <li key={activity.id} className="flex items-center justify-between gap-2 rounded-md bg-white border border-amber-100 px-2.5 py-1.5">
+                    <div className="min-w-0">
+                      <p className="text-xs font-medium text-gray-900 truncate">{activity.title}</p>
+                      <p className="text-[11px] text-gray-600">{activityDate(activity.createdAt)}</p>
+                    </div>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-7 w-7 shrink-0 text-gray-500"
+                      onClick={() => removeActivity.mutate(activity.id)}
+                      aria-label="Delete shared activity"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
         <Input
           placeholder="Add a note (optional)"
           maxLength={280}
           value={note}
           onChange={(event) => setNote(event.target.value)}
+          disabled={atShareLimit}
           className="bg-white border-amber-200 text-gray-900"
         />
         <Button
           onClick={() => share.mutate({ kind: 'summary' })}
-          disabled={share.isPending}
+          disabled={shareDisabled}
           className="on-color w-full bg-orange-700 hover:bg-orange-800 disabled:opacity-75"
           data-testid="button-share-summary"
         >
           <BarChart3 className="h-4 w-4 mr-2" /> Share today's summary
         </Button>
-        {healthPayload && (
+        {healthPayload && !atShareLimit && (
           <p className="-mt-1 text-xs text-gray-600">Includes your Apple Health steps, exercise minutes, and move calories.</p>
         )}
 
@@ -350,7 +453,7 @@ export function FriendsPanel() {
             <Button
               size="sm"
               variant="outline"
-              disabled={share.isPending}
+              disabled={shareDisabled}
               data-testid="button-share-apple-health"
               onClick={() => share.mutate({
                 kind: 'item',
@@ -368,7 +471,7 @@ export function FriendsPanel() {
           <p className="text-xs text-gray-600">Open the Bytewise iPhone app to share your Apple Health activity.</p>
         ) : null}
 
-        {todaysMeals.length > 0 && (
+        {todaysMeals.length > 0 && !atShareLimit && (
           <div className="space-y-1.5">
             <p className="text-xs font-medium text-gray-700">Or share a meal from today</p>
             {todaysMeals.map(meal => (
@@ -380,7 +483,7 @@ export function FriendsPanel() {
                 <Button
                   size="sm"
                   variant="outline"
-                  disabled={share.isPending}
+                  disabled={shareDisabled}
                   onClick={() => share.mutate({
                     kind: 'item',
                     type: 'meal',
@@ -399,7 +502,7 @@ export function FriendsPanel() {
           <Button
             variant="outline"
             className="w-full"
-            disabled={share.isPending}
+            disabled={shareDisabled}
             onClick={() => share.mutate({
               kind: 'item',
               type: 'fast',
@@ -410,11 +513,26 @@ export function FriendsPanel() {
             <Timer className="h-4 w-4 mr-2" /> Share my last completed fast
           </Button>
         )}
+
+        {!atShareLimit && (
+          <Button
+            type="button"
+            variant="ghost"
+            className="w-full text-gray-700"
+            disabled={exportingPdf}
+            onClick={exportPdfReport}
+            data-testid="button-export-pdf-share-hint"
+          >
+            {exportingPdf ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <FileDown className="h-4 w-4 mr-2" />}
+            Prefer a full report? Export PDF
+          </Button>
+        )}
       </section>
 
       {/* Feed */}
       <section className="space-y-2">
         <p className="text-sm font-medium text-gray-900">Recent activity</p>
+        <p className="text-xs text-gray-600">Showing the {FEED_LIMIT} most recent shared posts.</p>
         {feedQuery.isLoading ? (
           <p className="text-sm text-gray-600">Loading…</p>
         ) : activities.length === 0 ? (

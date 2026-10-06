@@ -56,6 +56,31 @@ function fail(res: Response, label: string, error: any) {
   res.status(500).json({ message: label });
 }
 
+/** Activity feed keeps the four most recent posts; further history is via PDF export. */
+const ACTIVITY_SHARE_LIMIT = 4;
+
+async function countUserShares(userId: string): Promise<number> {
+  const { count, error } = await supabaseAdmin
+    .from('shared_activities')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', userId);
+  if (error) throw error;
+  return count ?? 0;
+}
+
+async function assertUnderShareLimit(userId: string, res: Response): Promise<boolean> {
+  const count = await countUserShares(userId);
+  if (count >= ACTIVITY_SHARE_LIMIT) {
+    res.status(400).json({
+      message: `Activity share shows your ${ACTIVITY_SHARE_LIMIT} most recent posts. Delete one below, or export a PDF report to share more detail.`,
+      code: 'share_limit',
+      limit: ACTIVITY_SHARE_LIMIT,
+    });
+    return false;
+  }
+  return true;
+}
+
 const idParam = z.coerce.number().int().positive();
 const inviteSchema = z.object({ email: z.string().trim().toLowerCase().email() });
 
@@ -228,26 +253,43 @@ export function registerFriendsRoutes(app: Express) {
     const userId: string = req.user?.id;
     try {
       const authorIds = [userId, ...(await acceptedFriendIds(userId))];
-      const { data, error } = await supabaseAdmin
-        .from('shared_activities')
-        .select('id, user_id, activity_type, title, details, note, created_at')
-        .in('user_id', authorIds)
-        .order('created_at', { ascending: false })
-        .limit(50);
-      if (error) throw error;
+      const [feedResult, mineResult, myShareCount] = await Promise.all([
+        supabaseAdmin
+          .from('shared_activities')
+          .select('id, user_id, activity_type, title, details, note, created_at')
+          .in('user_id', authorIds)
+          .order('created_at', { ascending: false })
+          .limit(ACTIVITY_SHARE_LIMIT),
+        supabaseAdmin
+          .from('shared_activities')
+          .select('id, user_id, activity_type, title, details, note, created_at')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false })
+          .limit(50),
+        countUserShares(userId),
+      ]);
+      if (feedResult.error) throw feedResult.error;
+      if (mineResult.error) throw mineResult.error;
 
-      const profiles = await loadProfiles((data || []).map((row: any) => row.user_id));
+      const rows = [...(feedResult.data || []), ...(mineResult.data || [])];
+      const profiles = await loadProfiles(rows.map((row: any) => row.user_id));
+      const mapRow = (row: any) => ({
+        id: row.id,
+        type: row.activity_type,
+        title: row.title,
+        details: row.details,
+        note: row.note,
+        createdAt: asUtc(row.created_at),
+        isMine: row.user_id === userId,
+        author: displayName(profiles.get(row.user_id)),
+      });
+
+      // Feed is capped at four; myShares lists posts the user can delete to free a slot.
       res.json({
-        activities: (data || []).map((row: any) => ({
-          id: row.id,
-          type: row.activity_type,
-          title: row.title,
-          details: row.details,
-          note: row.note,
-          createdAt: asUtc(row.created_at),
-          isMine: row.user_id === userId,
-          author: displayName(profiles.get(row.user_id)),
-        })),
+        myShareCount,
+        shareLimit: ACTIVITY_SHARE_LIMIT,
+        activities: (feedResult.data || []).map(mapRow),
+        myShares: (mineResult.data || []).map(mapRow),
       });
     } catch (error) {
       fail(res, 'Failed to load activity feed', error);
@@ -262,6 +304,7 @@ export function registerFriendsRoutes(app: Express) {
     }
 
     try {
+      if (!(await assertUnderShareLimit(userId, res))) return;
       const { type, title, details, note } = parsed.data;
       // activity_type is limited by a check constraint to summary/meal/fast/water.
       const row = type === 'fitness'
@@ -288,6 +331,7 @@ export function registerFriendsRoutes(app: Express) {
     }
 
     try {
+      if (!(await assertUnderShareLimit(userId, res))) return;
       const { date, dayStart, dayEnd, note, health } = parsed.data;
       // Meals and water are stored on the calendar day in UTC (noon and midnight respectively).
       const dayFrom = `${date}T00:00:00.000Z`;
