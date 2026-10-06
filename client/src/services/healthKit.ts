@@ -281,7 +281,7 @@ export class HealthKitService {
       this.sumSamplesForDay('distance'),
       this.exerciseAsked ? this.sumSamplesForDay('exerciseTime') : Promise.resolve(null),
       this.readLastNightSleep(),
-      this.readTodayWorkouts(),
+      this.readWorkoutsForDay(),
     ]);
 
     return {
@@ -294,8 +294,16 @@ export class HealthKitService {
     };
   }
 
-  /** Exercise ring minutes for each of the last `days` days, oldest first (today last). */
-  async readExerciseHistory(days = 7): Promise<Array<{ date: Date; minutes: number }> | null> {
+  /**
+   * Green-ring + completed-workout minutes for each of the last `days` days
+   * (oldest first, today last). `totalMinutes` is ring + workouts for that day.
+   */
+  async readExerciseHistory(days = 7): Promise<Array<{
+    date: Date;
+    ringMinutes: number;
+    workoutMinutes: number;
+    totalMinutes: number;
+  }> | null> {
     await this.ready;
     if (!this.isAvailable || !this.isAuthorized || !this.exerciseAsked) {
       return null;
@@ -306,8 +314,22 @@ export class HealthKitService {
       date.setDate(date.getDate() - (days - 1 - index));
       return date;
     });
-    const minutes = await Promise.all(dates.map((date) => this.sumSamplesForDay('exerciseTime', date)));
-    return dates.map((date, index) => ({ date, minutes: Math.round(minutes[index]) }));
+    const [ringMinutes, workouts] = await Promise.all([
+      Promise.all(dates.map((date) => this.sumSamplesForDay('exerciseTime', date))),
+      this.recoveryAsked
+        ? Promise.all(dates.map((date) => this.readWorkoutsForDay(date)))
+        : Promise.resolve(dates.map(() => ({ count: 0, minutes: 0, calories: 0, items: [] } as WorkoutSummary))),
+    ]);
+    return dates.map((date, index) => {
+      const ring = Math.round(ringMinutes[index]);
+      const workout = workouts[index].minutes;
+      return {
+        date,
+        ringMinutes: ring,
+        workoutMinutes: workout,
+        totalMinutes: ring + workout,
+      };
+    });
   }
 
   /** Sleep between 6 PM yesterday and 6 PM today (or now, if earlier). */
@@ -387,20 +409,23 @@ export class HealthKitService {
     }
   }
 
-  private async readTodayWorkouts(): Promise<WorkoutSummary> {
+  private async readWorkoutsForDay(day = new Date()): Promise<WorkoutSummary> {
     const empty: WorkoutSummary = { count: 0, minutes: 0, calories: 0, items: [] };
     const health = getHealth();
     if (!health || !this.recoveryAsked) {
       return empty;
     }
 
-    const start = new Date();
+    const start = new Date(day);
     start.setHours(0, 0, 0, 0);
+    const end = new Date(day);
+    end.setHours(23, 59, 59, 999);
+    const endAt = end.getTime() > Date.now() ? new Date() : end;
 
     try {
       const { workouts } = await health.queryWorkouts({
         startDate: start.toISOString(),
-        endDate: new Date().toISOString(),
+        endDate: endAt.toISOString(),
         limit: 50,
       });
 

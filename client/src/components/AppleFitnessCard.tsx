@@ -58,18 +58,18 @@ function WorkoutsTile({ workouts }: { workouts: AppleFitnessSummary['workouts'] 
     <div className="rounded-lg bg-white/70 p-3 border border-amber-200/50" data-testid="apple-fitness-workouts">
       <div className="flex items-center gap-1.5 text-xs text-gray-600 mb-1">
         <Dumbbell className="h-3.5 w-3.5 text-emerald-600" />
-        Exercise minutes
+        Workouts
       </div>
       {count > 0 && workouts ? (
         <>
-          <p className="text-2xl font-bold text-gray-900" data-testid="apple-fitness-workout-total-minutes">
+          <p className="text-lg font-bold text-gray-900" data-testid="apple-fitness-workout-total-minutes">
             {formatMinutes(totalMinutes)}
+            <span className="ml-1.5 text-xs font-medium text-gray-700">
+              from {count} session{count === 1 ? '' : 's'}
+              {workouts.calories > 0 ? ` · ${workouts.calories} cal` : ''}
+            </span>
           </p>
-          <p className="text-xs text-gray-700">
-            Total from {count} completed workout{count === 1 ? '' : 's'} today
-            {workouts.calories > 0 ? ` · ${workouts.calories} cal` : ''}
-          </p>
-          <ul className="mt-1.5 text-xs text-gray-700 space-y-0.5" data-testid="apple-fitness-workout-list">
+          <ul className="mt-1 text-xs text-gray-700 space-y-0.5" data-testid="apple-fitness-workout-list">
             {workouts.items.map((item, index) => (
               <li key={`${item.name}-${index}`} className="flex items-center justify-between gap-2">
                 <span className="truncate">{item.name}</span>
@@ -225,7 +225,7 @@ export function AppleFitnessCard({ onConnect }: AppleFitnessCardProps) {
             <>
               <WorkoutsTile workouts={summary?.workouts} />
               <p className="text-[11px] text-gray-600">
-                Total exercise minutes add every completed workout from Apple Health today. All-day green-ring minutes are on the Exercise Minutes card below.
+                These session minutes are added to your green ring on the Exercise Minutes card below for today’s total.
               </p>
               <SleepTile sleep={summary?.sleep ?? null} />
               <p className="text-[11px] text-gray-600">
