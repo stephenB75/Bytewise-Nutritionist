@@ -151,13 +151,30 @@ function titleCase(text: string): string {
 
 /** Splits "curry chicken and white rice" into dishes, keeping names like "rice and peas" whole. */
 function splitPlate(query: string, isKnownDish: (text: string) => boolean): string[] {
-  const text = query.toLowerCase().replace(/&/g, ' and ').replace(/\bon the side\b/g, ' ').replace(/\s+/g, ' ').trim();
+  // Expand parentheticals ("vegetables (carrots, peas)") into a flat list so commas inside
+  // don't leave stray ")" tokens or get skipped as a single opaque side.
+  // Prefer the listed veggies over a generic "steamed vegetables (...)" wrapper.
+  const text = query
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/\b((?:steamed|mixed|stir[- ]?fried|sauteed|sautéed)?\s*vegetables?)\s*\(([^)]*)\)/g, (_, _veg, inner: string) => `, ${inner}`)
+    .replace(/\(([^)]*)\)/g, (_, inner: string) => `, ${inner}`)
+    .replace(/\betc\.?/g, ' ')
+    .replace(/\bon the side\b/g, ' ')
+    .replace(/\b(and|with|plus)\s*,/g, ',')
+    .replace(/[)(\]\[]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
   if (!/,|\+|;|\band\b|\bwith\b|\bplus\b|\bover\b|\bside of\b|\bbed of\b/.test(text)) return [text];
   if (isKnownDish(text)) return [text];
 
   const parts: string[] = [];
   for (const rawPiece of text.split(PLATE_SEPARATORS)) {
-    const piece = rawPiece.replace(/^(and|a|an|some)\s+/, '').trim();
+    const piece = rawPiece
+      .replace(/^(and|a|an|some|with|plus)\s+/, '')
+      .replace(/\s+(and|with|plus)$/g, '')
+      .replace(/[.,;:]+$/g, '')
+      .trim();
     if (!piece) continue;
     if (!/\band\b/.test(piece) || isKnownDish(piece) || SINGLE_DISH_SUFFIX.test(piece)) {
       parts.push(piece);
@@ -172,7 +189,7 @@ function splitPlate(query: string, isKnownDish: (text: string) => boolean): stri
       start = end;
     }
   }
-  return parts.length > 1 && parts.length <= 6 ? parts : [text];
+  return parts.length > 1 && parts.length <= 8 ? parts : [text];
 }
 
 function parseAmount(text: string): number | null {
@@ -778,7 +795,16 @@ export class USDAService {
         return menuResult;
       }
 
-      // Curated entries first; unknown foods fall through to USDA instead of a generic guess.
+      // World / curated dishes before generic fallback keys so "curry chicken"
+      // hits the dish (~150 kcal/100g) instead of plain chicken breast.
+      const enhancedFood = findEnhancedFood(ingredientName);
+      if (enhancedFood) {
+        const catalogResult = this.buildEnhancedFoodResult(ingredientName, measurement, enhancedFood);
+        this.setMemoryCache(cacheKey, catalogResult);
+        return catalogResult;
+      }
+
+      // Curated single-ingredient entries; unknown foods fall through to USDA.
       try {
         const fallbackResult = this.getEnhancedFallbackEstimate(ingredientName, measurement, false);
         if (fallbackResult) {
@@ -786,14 +812,7 @@ export class USDAService {
           return fallbackResult;
         }
       } catch (error) {
-        // Continue to catalog / USDA search
-      }
-
-      const enhancedFood = findEnhancedFood(ingredientName);
-      if (enhancedFood) {
-        const catalogResult = this.buildEnhancedFoodResult(ingredientName, measurement, enhancedFood);
-        this.setMemoryCache(cacheKey, catalogResult);
-        return catalogResult;
+        // Continue to USDA search
       }
 
       // Enhanced search with preprocessing
@@ -1176,6 +1195,12 @@ export class USDAService {
     // Vegetables
     'broccoli': { calories: 34, protein: 2.8, carbs: 7, fat: 0.4 },
     'carrot': { calories: 41, protein: 0.9, carbs: 10, fat: 0.2 },
+    'carrots': { calories: 41, protein: 0.9, carbs: 10, fat: 0.2 },
+    'peas': { calories: 81, protein: 5.4, carbs: 14.5, fat: 0.4 },
+    'green peas': { calories: 81, protein: 5.4, carbs: 14.5, fat: 0.4 },
+    'cabbage': { calories: 25, protein: 1.3, carbs: 5.8, fat: 0.1 },
+    'steamed vegetables': { calories: 35, protein: 1.5, carbs: 7, fat: 0.3 },
+    'vegetables': { calories: 35, protein: 1.5, carbs: 7, fat: 0.3 },
     'spinach': { calories: 23, protein: 2.9, carbs: 3.6, fat: 0.4 },
     'corn': { calories: 86, protein: 3.3, carbs: 19, fat: 1.4 },
     'sweet corn': { calories: 86, protein: 3.3, carbs: 19, fat: 1.4 },
@@ -1365,7 +1390,6 @@ export class USDAService {
     'lettuce': { calories: 15, protein: 1.4, carbs: 2.9, fat: 0.2 },
     'kale': { calories: 35, protein: 2.9, carbs: 4.4, fat: 1.5 },
     'cauliflower': { calories: 25, protein: 1.9, carbs: 5.0, fat: 0.3 },
-    'carrots': { calories: 41, protein: 0.9, carbs: 9.6, fat: 0.2 },
     'celery': { calories: 16, protein: 0.7, carbs: 3.5, fat: 0.2 },
     'onion': { calories: 40, protein: 1.1, carbs: 9.3, fat: 0.1 },
     
