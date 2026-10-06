@@ -1036,46 +1036,88 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     };
 
     // Create PDF directly using jsPDF
-    
-    // jsPDF library loaded
     const pdf = new jsPDF('p', 'mm', 'a4');
-    
     const pageWidth = 210;
     const pageHeight = 297;
-    let yPosition = 25;
+    const marginX = 16;
+    const contentWidth = pageWidth - marginX * 2;
+    const pageBottom = pageHeight - 28;
+    let yPosition = 20;
 
-    // Add ByteWise Nutritionist logo
+    const startNewPage = () => {
+      pdf.addPage();
+      yPosition = 20;
+    };
+
+    /** Reserve vertical space; starts a new page when the block would overflow. */
+    const ensureSpace = (neededMm: number) => {
+      if (yPosition + neededMm > pageBottom) startNewPage();
+    };
+
+    const writeSectionTitle = (title: string, minSpace = 36) => {
+      ensureSpace(minSpace);
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(146, 64, 14);
+      pdf.text(title, marginX, yPosition);
+      pdf.setTextColor(0, 0, 0);
+      yPosition += 8;
+    };
+
+    const writeWrapped = (text: string, x: number, maxWidth: number, lineH = 4.2, reserve = true) => {
+      const lines = pdf.splitTextToSize(text, maxWidth);
+      if (reserve) ensureSpace(lines.length * lineH + 2);
+      pdf.text(lines, x, yPosition);
+      yPosition += lines.length * lineH;
+      return lines.length;
+    };
+
+    const addChartBlock = (
+      dataUri: string | null | undefined,
+      opts: { width: number; height: number; caption?: string },
+    ) => {
+      if (!dataUri) return;
+      const captionH = opts.caption ? 8 : 0;
+      ensureSpace(opts.height + captionH + 12);
+      if (opts.caption) {
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(120, 53, 15);
+        pdf.text(opts.caption, marginX, yPosition);
+        yPosition += 6;
+      }
+      try {
+        pdf.addImage(dataUri, 'PNG', (pageWidth - opts.width) / 2, yPosition, opts.width, opts.height);
+        yPosition += opts.height + 10;
+      } catch (chartImageError) {
+        console.warn('Failed to add chart image:', chartImageError);
+      }
+      pdf.setTextColor(0, 0, 0);
+    };
+
+    // Logo
     try {
-      // Fetch and convert the logo to base64
-      const logoUrl = '/icon-512.png'; // High quality ByteWise logo
+      const logoUrl = '/icon-512.png';
       const response = await fetch(logoUrl);
       const blob = await response.blob();
       const reader = new FileReader();
-      
       await new Promise((resolve, reject) => {
         reader.onloadend = () => resolve(reader.result);
         reader.onerror = reject;
         reader.readAsDataURL(blob);
       });
-      
       const logoData = reader.result as string;
-      
-      // Add logo to PDF (centered, 40mm width for better visibility)
-      const logoWidth = 40;
-      const logoHeight = 40;
-      const logoX = (pageWidth - logoWidth) / 2;
-      
-      pdf.addImage(logoData, 'PNG', logoX, yPosition, logoWidth, logoHeight);
-      yPosition += logoHeight + 5;
+      const logoWidth = 32;
+      const logoHeight = 32;
+      pdf.addImage(logoData, 'PNG', (pageWidth - logoWidth) / 2, yPosition, logoWidth, logoHeight);
+      yPosition += logoHeight + 6;
     } catch (logoError) {
-      // If logo fails to load, continue without it
       console.warn('Could not load ByteWise logo for PDF:', logoError);
     }
 
     // Report Title
-    yPosition += 12;
     pdf.setTextColor(30, 30, 30);
-    pdf.setFontSize(16);
+    pdf.setFontSize(15);
     pdf.setFont('helvetica', 'bold');
     const reportName = [progressData.userProfile.firstName, progressData.userProfile.lastName]
       .filter(Boolean)
@@ -1083,108 +1125,74 @@ export async function generateProgressReportPDF(): Promise<boolean> {
       .trim();
     if (reportName && reportName !== 'ByteWise User') {
       pdf.text(reportName, pageWidth / 2, yPosition, { align: 'center' });
-      yPosition += 8;
+      yPosition += 7;
     }
-    pdf.setTextColor(100, 100, 100);
-    pdf.setFontSize(16);
+    pdf.setTextColor(80, 80, 80);
+    pdf.setFontSize(14);
     pdf.text('30-Day Nutrition Report', pageWidth / 2, yPosition, { align: 'center' });
-    
-    yPosition += 8;
-    pdf.setFontSize(12);
+    yPosition += 6;
+    pdf.setFontSize(9);
     pdf.setFont('helvetica', 'normal');
-    pdf.text(`Generated on ${new Date().toLocaleDateString()}`, pageWidth / 2, yPosition, { align: 'center' });
-    
-    yPosition += 5;
-    pdf.setFontSize(10);
-    pdf.text(`Report Period: ${thirtyDaysAgo.toLocaleDateString()} - ${now.toLocaleDateString()}`, pageWidth / 2, yPosition, { align: 'center' });
-    
-    // Add a decorative line - updated to amber theme
-    yPosition += 10;
-    pdf.setDrawColor(245, 158, 11); // Amber-500 color
+    pdf.text(`Generated ${new Date().toLocaleDateString()}  ·  ${thirtyDaysAgo.toLocaleDateString()} – ${now.toLocaleDateString()}`, pageWidth / 2, yPosition, { align: 'center' });
+    yPosition += 6;
+    pdf.setDrawColor(245, 158, 11);
     pdf.setLineWidth(0.5);
-    pdf.line(40, yPosition, pageWidth - 40, yPosition);
-    
-    yPosition += 15;
-    
-    // Reset text color to black for content
+    pdf.line(marginX + 20, yPosition, pageWidth - marginX - 20, yPosition);
+    yPosition += 10;
     pdf.setTextColor(0, 0, 0);
 
-    // Statistics Grid - Updated with amber theme
-    pdf.setFontSize(16);
-    pdf.setFont('helvetica', 'bold');
-    pdf.setTextColor(146, 64, 14); // Amber-800 for section headers
-    pdf.text('Nutrition Summary', 20, yPosition);
-    pdf.setTextColor(0, 0, 0); // Reset to black
-    yPosition += 15;
-
+    // Statistics Grid
+    writeSectionTitle('Nutrition Summary', 70);
     const stats = [
-      { label: 'Meals logged', value: formatCount(progressData.totalMealsLogged), color: [245, 158, 11] },
-      { label: 'Average daily calories', value: formatCalories(progressData.averageDailyCalories), color: [217, 119, 6] },
-      { label: 'Best streak', value: `${formatCount(progressData.streakRecord)} days`, color: [251, 191, 36] },
-      { label: 'Calorie goal hit', value: `${progressData.goalCompletionRate}%`, color: [245, 158, 11] },
-      { label: 'Avg sugar / logged day', value: `${progressData.macroAverages.sugar}g`, color: [217, 119, 6] },
-      { label: 'Achievements', value: formatCount(progressData.achievements.length), color: [251, 191, 36] },
-      { label: 'Fasting sessions', value: formatCount(progressData.fastingTrends.sessions), color: [245, 158, 11] },
-      { label: 'Shared activities', value: formatCount(progressData.sharedActivities.length), color: [217, 119, 6] },
+      { label: 'Meals logged', value: formatCount(progressData.totalMealsLogged), color: [245, 158, 11] as const },
+      { label: 'Avg daily calories', value: formatCalories(progressData.averageDailyCalories), color: [217, 119, 6] as const },
+      { label: 'Best streak', value: `${formatCount(progressData.streakRecord)} days`, color: [251, 191, 36] as const },
+      { label: 'Calorie goal hit', value: `${progressData.goalCompletionRate}%`, color: [245, 158, 11] as const },
+      { label: 'Avg sugar / day', value: `${progressData.macroAverages.sugar}g`, color: [217, 119, 6] as const },
+      { label: 'Achievements', value: formatCount(progressData.achievements.length), color: [251, 191, 36] as const },
+      { label: 'Fasting sessions', value: formatCount(progressData.fastingTrends.sessions), color: [245, 158, 11] as const },
+      { label: 'Shared activities', value: formatCount(progressData.sharedActivities.length), color: [217, 119, 6] as const },
     ];
 
-    pdf.setFontSize(12);
-    
+    const cardW = (contentWidth - 6) / 2;
     let col = 0;
-    const colWidth = 90;
-    const startX = 20;
-    
-    stats.forEach((stat, index) => {
-      const xPos = startX + (col * colWidth);
-      
+    stats.forEach((stat) => {
+      if (col === 0) ensureSpace(24);
+      const xPos = marginX + col * (cardW + 6);
       pdf.setFillColor(250, 250, 250);
-      pdf.rect(xPos - 2, yPosition - 6, 85, 20, 'F');
-      
+      pdf.rect(xPos, yPosition - 5, cardW, 18, 'F');
       pdf.setFillColor(stat.color[0], stat.color[1], stat.color[2]);
-      pdf.rect(xPos - 2, yPosition - 6, 3, 20, 'F');
-      
+      pdf.rect(xPos, yPosition - 5, 2.5, 18, 'F');
+      pdf.setFontSize(11);
       pdf.setFont('helvetica', 'bold');
       pdf.setTextColor(stat.color[0], stat.color[1], stat.color[2]);
-      pdf.text(stat.value, xPos + 5, yPosition);
-      
+      pdf.text(stat.value, xPos + 6, yPosition + 2);
       pdf.setFont('helvetica', 'normal');
-      pdf.setTextColor(60, 60, 60);
-      pdf.text(stat.label, xPos + 5, yPosition + 8);
-      
-      col++;
+      pdf.setFontSize(8);
+      pdf.setTextColor(70, 70, 70);
+      pdf.text(stat.label, xPos + 6, yPosition + 8);
+      col += 1;
       if (col >= 2) {
         col = 0;
-        yPosition += 26;
+        yPosition += 22;
       }
     });
-
-    if (col > 0) yPosition += 25;
-    yPosition += 10;
-    
-    // Reset text color for content
+    if (col > 0) yPosition += 22;
+    yPosition += 6;
     pdf.setTextColor(0, 0, 0);
 
-    // Dashboard-style macro averages vs goals
-    if (yPosition > 220) {
-      pdf.addPage();
-      yPosition = 25;
-    }
-    pdf.setFontSize(16);
-    pdf.setFont('helvetica', 'bold');
-    pdf.setTextColor(146, 64, 14);
-    pdf.text('Daily Macro Averages (Dashboard)', 20, yPosition);
-    pdf.setTextColor(0, 0, 0);
-    yPosition += 8;
-    pdf.setFontSize(9);
+    // Macros + pie chart kept together
+    writeSectionTitle('Daily Macro Averages', 120);
+    pdf.setFontSize(8);
     pdf.setFont('helvetica', 'normal');
     pdf.setTextColor(100, 100, 100);
     pdf.text(
       `Based on ${progressData.macroAverages.daysLogged} logged day${progressData.macroAverages.daysLogged === 1 ? '' : 's'} in this period.`,
-      20,
+      marginX,
       yPosition,
     );
-    yPosition += 12;
-    pdf.setFontSize(11);
+    yPosition += 8;
+    pdf.setFontSize(10);
     pdf.setTextColor(0, 0, 0);
     const macroRows = [
       { label: 'Protein', avg: progressData.macroAverages.protein, goal: progressData.userProfile.dailyProteinGoal },
@@ -1194,591 +1202,284 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     ];
     macroRows.forEach((row) => {
       const pct = row.goal > 0 ? Math.round((row.avg / row.goal) * 100) : 0;
-      pdf.text(`${row.label}: ${row.avg}g avg  ·  goal ${row.goal}g  ·  ${pct}% of goal`, 25, yPosition);
-      yPosition += 7;
+      ensureSpace(8);
+      writeWrapped(`${row.label}: ${row.avg}g avg  |  goal ${row.goal}g  |  ${pct}% of goal`, marginX + 4, contentWidth - 4, 5);
     });
-    yPosition += 8;
+    yPosition += 2;
+    addChartBlock(macronutrientChart, { width: 110, height: 88, caption: 'Macronutrient mix' });
 
-    // Essential micronutrient averages (% DV) — matches dashboard cards
-    if (yPosition > 210) {
-      pdf.addPage();
-      yPosition = 25;
-    }
-    pdf.setFontSize(16);
-    pdf.setFont('helvetica', 'bold');
-    pdf.setTextColor(146, 64, 14);
-    pdf.text('Essential Micronutrients (Daily Average)', 20, yPosition);
-    pdf.setTextColor(0, 0, 0);
-    yPosition += 12;
-    pdf.setFontSize(10);
+    // Micronutrients (2-column to avoid overflow)
+    writeSectionTitle('Essential Micronutrients (Daily Average)', 60);
+    pdf.setFontSize(9);
     pdf.setFont('helvetica', 'normal');
+    let microCol = 0;
+    const microColW = contentWidth / 2;
     MICRO_DV.forEach((micro) => {
       const avg = loggedDays.length
         ? loggedDays.reduce((sum, day) => sum + Number(day[micro.key] || 0), 0) / loggedDays.length
         : 0;
       const pct = Math.round((avg / micro.goal) * 100);
-      const avgLabel = avg < 10 ? avg.toFixed(1) : Math.round(avg).toString();
-      pdf.text(`${micro.label}: ${avgLabel}${micro.unit}  ·  ${pct}% DV (goal ${micro.goal}${micro.unit})`, 25, yPosition);
-      yPosition += 6;
-      if (yPosition > 270) {
-        pdf.addPage();
-        yPosition = 25;
+      const avgLabel = avg < 10 ? avg.toFixed(1) : String(Math.round(avg));
+      const unit = micro.unit === 'μg' ? 'ug' : micro.unit;
+      if (microCol === 0) ensureSpace(8);
+      const x = marginX + microCol * microColW;
+      pdf.text(`${micro.label}: ${avgLabel}${unit} (${pct}% DV)`, x, yPosition);
+      microCol += 1;
+      if (microCol >= 2) {
+        microCol = 0;
+        yPosition += 6;
       }
     });
-    yPosition += 10;
+    if (microCol > 0) yPosition += 6;
+    yPosition += 6;
 
-    // Check if we need a new page for the detailed breakdowns
-    if (yPosition > 200) {
-      pdf.addPage();
-      yPosition = 25;
-    }
-
-    // Weekly Nutrition Summary - Updated with amber theme
-    pdf.setFontSize(16);
-    pdf.setFont('helvetica', 'bold');
-    pdf.setTextColor(146, 64, 14); // Amber-800 for section headers
-    pdf.text('Weekly Nutrition Averages (Last 30 Days)', 20, yPosition);
-    pdf.setTextColor(0, 0, 0);
-    yPosition += 15;
-
+    // Weekly averages + weekly calories chart (kept together)
+    writeSectionTitle('Weekly Nutrition Averages', 50);
     if (progressData.weeklyBreakdown.length > 0) {
       progressData.weeklyBreakdown.forEach((week, idx) => {
-        // Week header with background
-        if (idx % 2 === 0) {
-          pdf.setFillColor(245, 245, 245);
-          pdf.rect(15, yPosition - 5, pageWidth - 30, 42, 'F');
-        }
-        
-        pdf.setFontSize(12);
-        pdf.setFont('helvetica', 'bold');
-        pdf.setTextColor(146, 64, 14); // Amber-800 for week headers
         const weekStartDate = new Date(week.weekStart);
         const weekEndDate = new Date(week.weekEnd);
-        pdf.text(`Week ${week.weekNumber}: ${weekStartDate.toLocaleDateString()} - ${weekEndDate.toLocaleDateString()}`, 20, yPosition);
-        
-        yPosition += 8;
-        
-        // Macros row
+        const title = `Week ${week.weekNumber}: ${weekStartDate.toLocaleDateString()} – ${weekEndDate.toLocaleDateString()}`;
+        const macros = `${formatCalories(week.avgCalories)}  |  P ${week.avgProtein}g  |  C ${week.avgCarbs}g  |  F ${week.avgFat}g  |  Sugar ${week.avgSugar}g  |  Fiber ${week.avgFiber}g  |  Na ${week.avgSodium}mg  |  Meals ${week.totalMeals}`;
+        const micros = `Vit C ${week.avgVitaminC}mg  |  Vit D ${week.avgVitaminD}ug  |  B12 ${week.avgVitaminB12}ug  |  Folate ${week.avgFolate}ug  |  Fe ${week.avgIron}mg  |  Ca ${week.avgCalcium}mg  |  Zn ${week.avgZinc}mg  |  Mg ${week.avgMagnesium}mg`;
+        pdf.setFontSize(10);
+        const titleLines = pdf.splitTextToSize(title, contentWidth).length;
+        pdf.setFontSize(8);
+        const blockH = titleLines * 5 + pdf.splitTextToSize(macros, contentWidth - 2).length * 4
+          + pdf.splitTextToSize(micros, contentWidth - 2).length * 4 + 6;
+        ensureSpace(blockH);
+        const blockTop = yPosition - 3;
+        if (idx % 2 === 0) {
+          pdf.setFillColor(248, 248, 248);
+          pdf.rect(marginX - 2, blockTop, contentWidth + 4, blockH, 'F');
+        }
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(146, 64, 14);
+        writeWrapped(title, marginX, contentWidth, 5, false);
         pdf.setFont('helvetica', 'normal');
         pdf.setTextColor(0, 0, 0);
-        pdf.setFontSize(10);
-        
-        pdf.text(`Calories: ${formatCalories(week.avgCalories)}`, 25, yPosition);
-        pdf.text(`Protein: ${week.avgProtein}g`, 70, yPosition);
-        pdf.text(`Carbs: ${week.avgCarbs}g`, 115, yPosition);
-        pdf.text(`Fat: ${week.avgFat}g`, 155, yPosition);
-        
-        yPosition += 7;
-
-        pdf.text(`Sugar: ${week.avgSugar}g`, 25, yPosition);
-        pdf.text(`Fiber: ${week.avgFiber}g`, 70, yPosition);
-        pdf.text(`Sodium: ${week.avgSodium}mg`, 115, yPosition);
-        pdf.text(`Meals: ${week.totalMeals}`, 165, yPosition);
-        
-        yPosition += 7;
-        
-        // Micronutrients row
-        pdf.text(`Vit C: ${week.avgVitaminC}mg`, 25, yPosition);
-        pdf.text(`Vit D: ${week.avgVitaminD}μg`, 70, yPosition);
-        pdf.text(`B12: ${week.avgVitaminB12}μg`, 120, yPosition);
-        pdf.text(`Folate: ${week.avgFolate}μg`, 160, yPosition);
-        
-        yPosition += 7;
-        
-        // Additional nutrients row
-        pdf.text(`Iron: ${week.avgIron}mg`, 25, yPosition);
-        pdf.text(`Calcium: ${week.avgCalcium}mg`, 70, yPosition);
-        pdf.text(`Zinc: ${week.avgZinc}mg`, 120, yPosition);
-        pdf.text(`Mg: ${week.avgMagnesium}mg`, 160, yPosition);
-        
-        yPosition += 15;
-        
-        // Check if we need a new page
-        if (yPosition > 250) {
-          pdf.addPage();
-          yPosition = 25;
-        }
+        pdf.setFontSize(8);
+        writeWrapped(macros, marginX + 2, contentWidth - 2, 4, false);
+        writeWrapped(micros, marginX + 2, contentWidth - 2, 4, false);
+        yPosition += 4;
       });
     } else {
-      pdf.setFontSize(12);
+      pdf.setFontSize(10);
       pdf.setTextColor(100, 100, 100);
-      pdf.text('No weekly data available for the selected period.', 20, yPosition);
-      yPosition += 15;
+      writeWrapped('No weekly data available for the selected period.', marginX, contentWidth);
+      yPosition += 4;
     }
+    addChartBlock(weeklyCaloriesChart, { width: 150, height: 95, caption: 'Weekly calorie averages' });
 
-    yPosition += 10;
-
-    // Check if we need a new page for daily breakdown
-    if (yPosition > 200) {
-      pdf.addPage();
-      yPosition = 25;
-    }
-
-    // Daily Nutrition Breakdown - Updated with amber theme
-    pdf.setFontSize(16);
-    pdf.setFont('helvetica', 'bold');
-    pdf.setTextColor(146, 64, 14); // Amber-800 for section headers
-    pdf.text('Daily Nutrition Details (Last 30 Days)', 20, yPosition);
-    pdf.setTextColor(0, 0, 0);
-    yPosition += 15;
-
-    // Filter out days with no meals for cleaner display
-    const filteredDays = progressData.dailyBreakdown.filter(day => day.mealsCount > 0);
-    
+    // Daily details + progress chart
+    writeSectionTitle('Daily Nutrition Details', 50);
+    const filteredDays = progressData.dailyBreakdown.filter((day) => day.mealsCount > 0);
     if (filteredDays.length > 0) {
       filteredDays.forEach((day, idx) => {
-        // Check if we need a new page
-        if (yPosition > 270) {
-          pdf.addPage();
-          yPosition = 25;
-        }
-        
-        // Day header with background
+        ensureSpace(18);
         if (idx % 2 === 0) {
-          pdf.setFillColor(245, 245, 245);
-          pdf.rect(15, yPosition - 3, pageWidth - 30, 20, 'F');
+          pdf.setFillColor(248, 248, 248);
+          pdf.rect(marginX - 2, yPosition - 3, contentWidth + 4, 14, 'F');
         }
-        
-        pdf.setFontSize(11);
+        pdf.setFontSize(9);
         pdf.setFont('helvetica', 'bold');
-        pdf.setTextColor(146, 64, 14); // Amber-800 for day headers
+        pdf.setTextColor(146, 64, 14);
         const dayDate = new Date(day.date);
-        pdf.text(`${dayDate.toLocaleDateString()} (${day.mealsCount} meals)`, 20, yPosition);
-        
-        yPosition += 6;
-        
-        // Nutrition data in compact format
+        pdf.text(`${dayDate.toLocaleDateString()} (${day.mealsCount} meals)`, marginX, yPosition);
+        yPosition += 5;
         pdf.setFont('helvetica', 'normal');
         pdf.setTextColor(0, 0, 0);
-        pdf.setFontSize(9);
-        
-        // Row 1: Main macros (matches dashboard cards)
-        pdf.text(formatCalories(day.calories), 25, yPosition);
-        pdf.text(`P: ${day.protein.toFixed(0)}g`, 60, yPosition);
-        pdf.text(`C: ${day.carbs.toFixed(0)}g`, 88, yPosition);
-        pdf.text(`F: ${day.fat.toFixed(0)}g`, 116, yPosition);
-        pdf.text(`Sugar: ${day.sugar.toFixed(0)}g`, 142, yPosition);
-        
-        yPosition += 5;
-        
-        // Row 2: Fiber + key micronutrients (only show if > 0)
+        pdf.setFontSize(8);
+        writeWrapped(
+          `${formatCalories(day.calories)}  |  P ${day.protein.toFixed(0)}g  |  C ${day.carbs.toFixed(0)}g  |  F ${day.fat.toFixed(0)}g  |  Sugar ${day.sugar.toFixed(0)}g`,
+          marginX + 2,
+          contentWidth - 2,
+          3.8,
+        );
         const microText: string[] = [];
-        if (day.fiber > 0) microText.push(`Fiber: ${day.fiber.toFixed(0)}g`);
-        if (day.vitaminC > 0) microText.push(`Vit C: ${day.vitaminC.toFixed(1)}mg`);
-        if (day.vitaminD > 0) microText.push(`Vit D: ${day.vitaminD.toFixed(1)}μg`);
-        if (day.vitaminB12 > 0) microText.push(`B12: ${day.vitaminB12.toFixed(1)}μg`);
-        if (day.folate > 0) microText.push(`Folate: ${day.folate.toFixed(0)}μg`);
-        if (day.iron > 0) microText.push(`Iron: ${day.iron.toFixed(1)}mg`);
-        if (day.calcium > 0) microText.push(`Ca: ${day.calcium.toFixed(0)}mg`);
-        if (day.zinc > 0) microText.push(`Zn: ${day.zinc.toFixed(1)}mg`);
-        if (day.magnesium > 0) microText.push(`Mg: ${day.magnesium.toFixed(0)}mg`);
-        if (day.sodium > 0) microText.push(`Na: ${day.sodium.toFixed(0)}mg`);
-        
+        if (day.fiber > 0) microText.push(`Fiber ${day.fiber.toFixed(0)}g`);
+        if (day.vitaminC > 0) microText.push(`Vit C ${day.vitaminC.toFixed(1)}mg`);
+        if (day.vitaminD > 0) microText.push(`Vit D ${day.vitaminD.toFixed(1)}ug`);
+        if (day.vitaminB12 > 0) microText.push(`B12 ${day.vitaminB12.toFixed(1)}ug`);
+        if (day.folate > 0) microText.push(`Folate ${day.folate.toFixed(0)}ug`);
+        if (day.iron > 0) microText.push(`Fe ${day.iron.toFixed(1)}mg`);
+        if (day.calcium > 0) microText.push(`Ca ${day.calcium.toFixed(0)}mg`);
+        if (day.zinc > 0) microText.push(`Zn ${day.zinc.toFixed(1)}mg`);
+        if (day.magnesium > 0) microText.push(`Mg ${day.magnesium.toFixed(0)}mg`);
+        if (day.sodium > 0) microText.push(`Na ${day.sodium.toFixed(0)}mg`);
         if (microText.length > 0) {
-          const lines = pdf.splitTextToSize(microText.join('  ·  '), pageWidth - 50);
-          pdf.text(lines, 25, yPosition);
-          yPosition += lines.length * 4 + 1;
+          writeWrapped(microText.join('  |  '), marginX + 2, contentWidth - 2, 3.8);
         }
-        
-        yPosition += 5;
+        yPosition += 3;
       });
     } else {
-      pdf.setFontSize(12);
+      pdf.setFontSize(10);
       pdf.setTextColor(100, 100, 100);
-      pdf.text('No daily nutrition data available for the selected period.', 20, yPosition);
-      yPosition += 15;
+      writeWrapped('No daily nutrition data available for the selected period.', marginX, contentWidth);
     }
+    addChartBlock(progressChart, { width: 150, height: 95, caption: 'Daily calorie progress' });
 
-    yPosition += 20;
-
-    // Add comprehensive user data sections
-    if (yPosition > 200) {
-      pdf.addPage();
-      yPosition = 25;
-    }
-
-    // Achievements Section
+    // Achievements
     if (progressData.achievements.length > 0) {
-      pdf.setFontSize(16);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(146, 64, 14); // Amber-800 for section headers
-      pdf.text('Achievements Earned', 20, yPosition);
-      pdf.setTextColor(0, 0, 0);
-      yPosition += 15;
-
-      progressData.achievements.slice(0, 5).forEach((achievement, idx) => {
-        pdf.setFontSize(11);
-        pdf.setFont('helvetica', 'bold');
-        pdf.setTextColor(217, 119, 6); // Amber-600
-        pdf.text(`Achievement: ${achievement.title}`, 25, yPosition);
-        
-        yPosition += 6;
-        pdf.setFontSize(9);
-        pdf.setFont('helvetica', 'normal');
-        pdf.setTextColor(0, 0, 0);
-        
-        if (achievement.description && achievement.description.length > 0) {
-          pdf.text(achievement.description.substring(0, 80) + (achievement.description.length > 80 ? '...' : ''), 30, yPosition);
-          yPosition += 5;
-        }
-        
-        const earnedDate = new Date(achievement.earnedAt);
-        pdf.setTextColor(100, 100, 100);
-        pdf.text(`Earned: ${earnedDate.toLocaleDateString()}`, 30, yPosition);
-        yPosition += 10;
-        
-        if (yPosition > 250) {
-          pdf.addPage();
-          yPosition = 25;
-        }
-      });
-
-      if (progressData.achievements.length > 5) {
+      writeSectionTitle('Achievements Earned', 40);
+      progressData.achievements.slice(0, 5).forEach((achievement) => {
+        ensureSpace(20);
         pdf.setFontSize(10);
-        pdf.setTextColor(100, 100, 100);
-        pdf.text(`... and ${progressData.achievements.length - 5} more achievements!`, 25, yPosition);
-        yPosition += 15;
-      }
-    }
-
-    // Water Intake Section
-    if (progressData.waterIntakeData.length > 0) {
-      if (yPosition > 220) {
-        pdf.addPage();
-        yPosition = 25;
-      }
-      yPosition += 10;
-      pdf.setFontSize(16);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(146, 64, 14); // Amber-800 for section headers
-      pdf.text('Water Intake Summary', 20, yPosition);
-      pdf.setTextColor(0, 0, 0);
-      yPosition += 15;
-
-      const totalWaterGlasses = progressData.waterIntakeData.reduce((sum, day) => sum + day.glasses, 0);
-      const avgDailyWater = Math.round(totalWaterGlasses / Math.max(1, progressData.waterIntakeData.length));
-      const goalWater = progressData.userProfile.dailyWaterGoal || 8;
-
-      pdf.setFontSize(12);
-      pdf.text(`Total water: ${formatCount(totalWaterGlasses)} glasses`, 25, yPosition);
-      yPosition += 8;
-      pdf.text(`Daily average: ${formatCount(avgDailyWater)} glasses (goal: ${goalWater})`, 25, yPosition);
-      yPosition += 8;
-      
-      const waterGoalRate = Math.round((avgDailyWater / goalWater) * 100);
-      pdf.text(`Goal achievement: ${waterGoalRate}%`, 25, yPosition);
-      yPosition += 15;
-    }
-
-    // Fasting Sessions + Trends (matches Fasting page)
-    if (progressData.fastingSessions.length > 0 || progressData.fastingTrends.sessions > 0) {
-      if (yPosition > 200) {
-        pdf.addPage();
-        yPosition = 25;
-      }
-      pdf.setFontSize(16);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(146, 64, 14); // Amber-800 for section headers
-      pdf.text('Intermittent Fasting Trends', 20, yPosition);
-      pdf.setTextColor(0, 0, 0);
-      yPosition += 15;
-
-      const trends = progressData.fastingTrends;
-      pdf.setFontSize(12);
-      pdf.text(`Total sessions: ${formatCount(trends.sessions)}`, 25, yPosition);
-      yPosition += 8;
-      pdf.text(`Goals completed: ${formatCount(trends.completed)} (${trends.completionRate}%)`, 25, yPosition);
-      yPosition += 8;
-      pdf.text(`Average fast: ${trends.avgHours}h`, 25, yPosition);
-      yPosition += 8;
-      pdf.text(`Longest fast: ${trends.longestHours}h`, 25, yPosition);
-      yPosition += 8;
-      pdf.text(`Total fasting time: ${formatCount(trends.totalHours)} hours`, 25, yPosition);
-      yPosition += 15;
-    }
-
-    // Apple Health (today) — when available from the iPhone app
-    if (progressData.appleHealthToday) {
-      if (yPosition > 230) {
-        pdf.addPage();
-        yPosition = 25;
-      }
-      const health = progressData.appleHealthToday;
-      pdf.setFontSize(16);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(146, 64, 14);
-      pdf.text('Apple Health (Today)', 20, yPosition);
-      pdf.setTextColor(0, 0, 0);
-      yPosition += 15;
-      pdf.setFontSize(12);
-      pdf.setFont('helvetica', 'normal');
-      pdf.text(`Steps: ${health.steps.toLocaleString()}`, 25, yPosition);
-      yPosition += 8;
-      pdf.text(`Move calories: ${health.activeCalories}`, 25, yPosition);
-      yPosition += 8;
-      if (health.exerciseMinutes != null) {
-        pdf.text(`Exercise minutes: ${health.exerciseMinutes}`, 25, yPosition);
-        yPosition += 8;
-      }
-      if (health.distanceMiles != null) {
-        pdf.text(`Distance: ${health.distanceMiles} mi`, 25, yPosition);
-        yPosition += 8;
-      }
-      if (health.workouts > 0) {
-        pdf.text(`Workouts: ${health.workouts}${health.workoutMinutes ? ` (${health.workoutMinutes} min)` : ''}`, 25, yPosition);
-        yPosition += 8;
-      }
-      yPosition += 7;
-    }
-
-    // Shared activity summaries (from Friends / activity share)
-    if (yPosition > 200) {
-      pdf.addPage();
-      yPosition = 25;
-    }
-    pdf.setFontSize(16);
-    pdf.setFont('helvetica', 'bold');
-    pdf.setTextColor(146, 64, 14);
-    pdf.text('Shared Activity Summaries', 20, yPosition);
-    pdf.setTextColor(0, 0, 0);
-    yPosition += 10;
-    pdf.setFontSize(9);
-    pdf.setFont('helvetica', 'normal');
-    pdf.setTextColor(100, 100, 100);
-    pdf.text('Posts you shared with friends and family in Bytewise.', 20, yPosition);
-    yPosition += 12;
-
-    if (progressData.sharedActivities.length === 0) {
-      pdf.setFontSize(11);
-      pdf.setTextColor(100, 100, 100);
-      pdf.text('No shared activity summaries yet.', 25, yPosition);
-      yPosition += 15;
-    } else {
-      progressData.sharedActivities.forEach((activity, idx) => {
-        if (yPosition > 250) {
-          pdf.addPage();
-          yPosition = 25;
-        }
-
-        pdf.setFontSize(11);
         pdf.setFont('helvetica', 'bold');
         pdf.setTextColor(217, 119, 6);
-        const label = `${idx + 1}. ${activity.title}`;
-        pdf.text(label.length > 70 ? `${label.slice(0, 67)}...` : label, 25, yPosition);
-        yPosition += 6;
-
+        writeWrapped(achievement.title, marginX + 4, contentWidth - 4, 5);
         pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(9);
+        pdf.setFontSize(8);
         pdf.setTextColor(0, 0, 0);
-        if (activity.summary) {
-          const lines = pdf.splitTextToSize(activity.summary, pageWidth - 55);
-          pdf.text(lines, 30, yPosition);
-          yPosition += lines.length * 4 + 2;
+        if (achievement.description) {
+          writeWrapped(
+            achievement.description.length > 100
+              ? `${achievement.description.slice(0, 97)}...`
+              : achievement.description,
+            marginX + 6,
+            contentWidth - 6,
+            4,
+          );
         }
+        pdf.setTextColor(100, 100, 100);
+        pdf.text(`Earned: ${new Date(achievement.earnedAt).toLocaleDateString()}`, marginX + 6, yPosition);
+        yPosition += 8;
+      });
+      if (progressData.achievements.length > 5) {
+        pdf.setFontSize(9);
+        pdf.setTextColor(100, 100, 100);
+        writeWrapped(`... and ${progressData.achievements.length - 5} more achievements`, marginX + 4, contentWidth - 4);
+        yPosition += 4;
+      }
+    }
+
+    // Water + chart together
+    if (progressData.waterIntakeData.length > 0 || waterChart) {
+      writeSectionTitle('Water Intake', 50);
+      if (progressData.waterIntakeData.length > 0) {
+        const totalWaterGlasses = progressData.waterIntakeData.reduce((sum, day) => sum + day.glasses, 0);
+        const avgDailyWater = Math.round(totalWaterGlasses / Math.max(1, progressData.waterIntakeData.length));
+        const goalWater = progressData.userProfile.dailyWaterGoal || 8;
+        const waterGoalRate = Math.round((avgDailyWater / goalWater) * 100);
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setTextColor(0, 0, 0);
+        writeWrapped(`Total: ${formatCount(totalWaterGlasses)} glasses`, marginX + 4, contentWidth - 4, 5);
+        writeWrapped(`Daily average: ${formatCount(avgDailyWater)} glasses (goal ${goalWater})`, marginX + 4, contentWidth - 4, 5);
+        writeWrapped(`Goal achievement: ${waterGoalRate}%`, marginX + 4, contentWidth - 4, 5);
+        yPosition += 2;
+      }
+      addChartBlock(waterChart, { width: 150, height: 95, caption: 'Weekly water intake' });
+    }
+
+    // Fasting
+    if (progressData.fastingSessions.length > 0 || progressData.fastingTrends.sessions > 0) {
+      writeSectionTitle('Intermittent Fasting Trends', 50);
+      const trends = progressData.fastingTrends;
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(0, 0, 0);
+      writeWrapped(`Total sessions: ${formatCount(trends.sessions)}`, marginX + 4, contentWidth - 4, 5);
+      writeWrapped(`Goals completed: ${formatCount(trends.completed)} (${trends.completionRate}%)`, marginX + 4, contentWidth - 4, 5);
+      writeWrapped(`Average fast: ${trends.avgHours}h  |  Longest: ${trends.longestHours}h`, marginX + 4, contentWidth - 4, 5);
+      writeWrapped(`Total fasting time: ${formatCount(trends.totalHours)} hours`, marginX + 4, contentWidth - 4, 5);
+      yPosition += 4;
+    }
+
+    // Apple Health
+    if (progressData.appleHealthToday) {
+      writeSectionTitle('Apple Health (Today)', 45);
+      const health = progressData.appleHealthToday;
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(0, 0, 0);
+      writeWrapped(`Steps: ${health.steps.toLocaleString()}  |  Move calories: ${health.activeCalories}`, marginX + 4, contentWidth - 4, 5);
+      const extras: string[] = [];
+      if (health.exerciseMinutes != null) extras.push(`Exercise ${health.exerciseMinutes} min`);
+      if (health.distanceMiles != null) extras.push(`${health.distanceMiles} mi`);
+      if (health.workouts > 0) {
+        extras.push(`Workouts ${health.workouts}${health.workoutMinutes ? ` (${health.workoutMinutes} min)` : ''}`);
+      }
+      if (extras.length) writeWrapped(extras.join('  |  '), marginX + 4, contentWidth - 4, 5);
+      yPosition += 4;
+    }
+
+    // Shared activities
+    writeSectionTitle('Shared Activity Summaries', 40);
+    pdf.setFontSize(8);
+    pdf.setFont('helvetica', 'normal');
+    pdf.setTextColor(100, 100, 100);
+    writeWrapped('Posts you shared with friends and family in Bytewise.', marginX, contentWidth, 4);
+    yPosition += 2;
+    if (progressData.sharedActivities.length === 0) {
+      pdf.setFontSize(10);
+      writeWrapped('No shared activity summaries yet.', marginX + 4, contentWidth - 4);
+      yPosition += 4;
+    } else {
+      progressData.sharedActivities.forEach((activity, idx) => {
+        ensureSpace(24);
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(217, 119, 6);
+        writeWrapped(`${idx + 1}. ${activity.title}`, marginX + 4, contentWidth - 4, 4.5);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(8);
+        pdf.setTextColor(0, 0, 0);
+        if (activity.summary) writeWrapped(activity.summary, marginX + 6, contentWidth - 6, 3.8);
         if (activity.note) {
-          const noteLines = pdf.splitTextToSize(`Note: "${activity.note}"`, pageWidth - 55);
           pdf.setTextColor(55, 65, 81);
-          pdf.text(noteLines, 30, yPosition);
-          yPosition += noteLines.length * 4 + 2;
+          writeWrapped(`Note: "${activity.note}"`, marginX + 6, contentWidth - 6, 3.8);
         }
         pdf.setTextColor(100, 100, 100);
         const when = activity.createdAt
           ? new Date(activity.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
           : 'Date unavailable';
-        pdf.text(`${activity.type} · ${when}`, 30, yPosition);
-        yPosition += 10;
+        writeWrapped(`${activity.type} · ${when}`, marginX + 6, contentWidth - 6, 4);
+        yPosition += 4;
       });
     }
 
-    // Custom Recipes Section
-    if (progressData.recipes.length > 0 && yPosition < 180) {
-      pdf.setFontSize(16);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(146, 64, 14); // Amber-800 for section headers
-      pdf.text('Custom Recipes', 20, yPosition);
+    // Recipes
+    if (progressData.recipes.length > 0) {
+      writeSectionTitle('Custom Recipes', 35);
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'normal');
       pdf.setTextColor(0, 0, 0);
-      yPosition += 15;
-
-      pdf.setFontSize(12);
-      pdf.text(`Recipes created: ${formatCount(progressData.recipes.length)}`, 25, yPosition);
-      yPosition += 10;
-
-      // Show top 3 recipes
+      writeWrapped(`Recipes created: ${formatCount(progressData.recipes.length)}`, marginX + 4, contentWidth - 4, 5);
       progressData.recipes.slice(0, 3).forEach((recipe, idx) => {
-        if (yPosition > 250) {
-          pdf.addPage();
-          yPosition = 25;
-        }
-        
-        pdf.setFontSize(10);
+        ensureSpace(14);
+        pdf.setFontSize(9);
         pdf.setFont('helvetica', 'bold');
-        pdf.setTextColor(217, 119, 6); // Amber-600
-        pdf.text(`${idx + 1}. ${recipe.name}`, 30, yPosition);
-        
-        yPosition += 5;
+        pdf.setTextColor(217, 119, 6);
+        writeWrapped(`${idx + 1}. ${recipe.name}`, marginX + 6, contentWidth - 6, 4);
         pdf.setFont('helvetica', 'normal');
         pdf.setTextColor(0, 0, 0);
-        pdf.text(`${formatCalories(recipe.totalCalories)}  •  ${recipe.servings} servings`, 35, yPosition);
-        yPosition += 8;
+        writeWrapped(`${formatCalories(recipe.totalCalories)}  ·  ${recipe.servings} servings`, marginX + 8, contentWidth - 8, 4);
       });
-
       if (progressData.recipes.length > 3) {
-        pdf.setFontSize(9);
+        pdf.setFontSize(8);
         pdf.setTextColor(100, 100, 100);
-        pdf.text(`... and ${progressData.recipes.length - 3} more recipes`, 30, yPosition);
-        yPosition += 10;
+        writeWrapped(`... and ${progressData.recipes.length - 3} more recipes`, marginX + 6, contentWidth - 6);
       }
     }
 
-    // Data Visualization Section - Charts
-    if (weeklyCaloriesChart || macronutrientChart || progressChart || waterChart) {
-      // Adding charts to PDF
-      
-      // Add new page for charts
-      pdf.addPage();
-      yPosition = 20;
-      
-      // Charts section header
-      pdf.setFontSize(18);
+    // Footers on every page
+    const totalPages = pdf.getNumberOfPages();
+    for (let page = 1; page <= totalPages; page += 1) {
+      pdf.setPage(page);
+      const footerY = pageHeight - 14;
+      pdf.setDrawColor(245, 158, 11);
+      pdf.setLineWidth(0.3);
+      pdf.line(marginX + 10, footerY - 6, pageWidth - marginX - 10, footerY - 6);
+      pdf.setFontSize(8);
       pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(120, 53, 15); // amber-800
-      pdf.text('Weekly Progress Analytics', pageWidth / 2, yPosition, { align: 'center' });
-      
-      yPosition += 10;
-      pdf.setFontSize(11);
+      pdf.setTextColor(146, 64, 14);
+      pdf.text('ByteWise Nutritionist', pageWidth / 2, footerY, { align: 'center' });
       pdf.setFont('helvetica', 'normal');
-      pdf.setTextColor(146, 64, 14); // amber-700
-      pdf.text('Visual analysis of your nutrition and health data', pageWidth / 2, yPosition, { align: 'center' });
-      
-      yPosition += 20;
-      
-      // Weekly Calories Bar Chart
-      if (weeklyCaloriesChart) {
-        try {
-          const chartWidth = 160;
-          const chartHeight = 106;
-          
-          pdf.addImage(
-            weeklyCaloriesChart, 
-            'PNG', 
-            (pageWidth - chartWidth) / 2, 
-            yPosition, 
-            chartWidth, 
-            chartHeight
-          );
-          yPosition += chartHeight + 15;
-          
-          // Weekly calories chart added
-        } catch (chartImageError) {
-          console.warn('Failed to add weekly calories chart:', chartImageError);
-        }
-      }
-      
-      // Macronutrient Pie Chart
-      if (macronutrientChart && yPosition < 200) {
-        try {
-          const chartWidth = 133;
-          const chartHeight = 106;
-          
-          pdf.addImage(
-            macronutrientChart, 
-            'PNG', 
-            (pageWidth - chartWidth) / 2, 
-            yPosition, 
-            chartWidth, 
-            chartHeight
-          );
-          yPosition += chartHeight + 15;
-          
-          // Macronutrient pie chart added
-        } catch (chartImageError) {
-          console.warn('Failed to add macronutrient chart:', chartImageError);
-        }
-      }
-      
-      // Add new page if needed for remaining charts
-      if (yPosition > 180 && (progressChart || waterChart)) {
-        pdf.addPage();
-        yPosition = 20;
-      }
-      
-      // Progress Line Chart
-      if (progressChart) {
-        try {
-          const chartWidth = 160;
-          const chartHeight = 106;
-          
-          pdf.addImage(
-            progressChart, 
-            'PNG', 
-            (pageWidth - chartWidth) / 2, 
-            yPosition, 
-            chartWidth, 
-            chartHeight
-          );
-          yPosition += chartHeight + 15;
-          
-          console.log('✅ Progress line chart added');
-        } catch (chartImageError) {
-          console.warn('Failed to add progress chart:', chartImageError);
-        }
-      }
-      
-      // Water Intake Chart
-      if (waterChart && yPosition < 200) {
-        try {
-          const chartWidth = 160;
-          const chartHeight = 106;
-          
-          pdf.addImage(
-            waterChart, 
-            'PNG', 
-            (pageWidth - chartWidth) / 2, 
-            yPosition, 
-            chartWidth, 
-            chartHeight
-          );
-          yPosition += chartHeight + 10;
-          
-          console.log('✅ Water intake chart added');
-        } catch (chartImageError) {
-          console.warn('Failed to add water intake chart:', chartImageError);
-        }
-      }
-      
-      console.log('📊 All charts added to PDF successfully');
+      pdf.setTextColor(140, 140, 140);
+      pdf.text(`${page} / ${totalPages}`, pageWidth - marginX, footerY, { align: 'right' });
     }
-
-    yPosition += 20;
-
-    // Footer with branding
-    yPosition = pageHeight - 30;
-    
-    // Add footer line with amber theme
-    pdf.setDrawColor(245, 158, 11); // Amber-500 
-    pdf.setLineWidth(0.3);
-    pdf.line(40, yPosition, pageWidth - 40, yPosition);
-    
-    yPosition += 8;
-    
-    // Footer text with amber brand colors
-    pdf.setFontSize(11);
-    pdf.setFont('helvetica', 'bold');
-    pdf.setTextColor(146, 64, 14); // Amber-800
-    pdf.text('ByteWise', pageWidth / 2 - 20, yPosition, { align: 'center' });
-    
-    pdf.setFont('helvetica', 'normal');
-    pdf.setTextColor(217, 119, 6); // Amber-600
-    pdf.text('Nutritionist', pageWidth / 2 + 20, yPosition, { align: 'center' });
-    
-    yPosition += 6;
-    pdf.setTextColor(100, 100, 100);
-    pdf.setFontSize(9);
-    pdf.setFont('helvetica', 'italic');
-    pdf.text('Your Personal Nutrition Companion', pageWidth / 2, yPosition, { align: 'center' });
-    
-    yPosition += 5;
-    pdf.text('Your comprehensive 30-day nutrition analysis!', pageWidth / 2, yPosition, { align: 'center' });
 
     // Save the comprehensive PDF with single download method
     const filename = `bytewise-30day-nutrition-report-${new Date().toISOString().split('T')[0]}.pdf`;
