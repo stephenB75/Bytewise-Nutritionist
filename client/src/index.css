@@ -1787,6 +1787,39 @@ div[class*="min-h-screen"]:not([data-testid*="navigation"]):not([data-hero="true
   scroll-padding-bottom: 7rem;
 }
 
+/* Soft keyboard: keep focused fields above the keyboard; hide fixed bottom nav while typing */
+html {
+  scroll-padding-bottom: 7rem;
+}
+
+html.keyboard-open,
+body.keyboard-open {
+  scroll-padding-bottom: calc(var(--keyboard-height, 0px) + 1.5rem);
+}
+
+body.keyboard-open .content-section {
+  padding-bottom: calc(var(--keyboard-height, 0px) + 2rem);
+  scroll-padding-bottom: calc(var(--keyboard-height, 0px) + 2rem);
+}
+
+body.keyboard-open [data-testid="navigation-tabs"] {
+  transform: translateY(110%);
+  pointer-events: none;
+  transition: transform 180ms ease-out;
+}
+
+[data-testid="navigation-tabs"] {
+  transition: transform 180ms ease-out;
+}
+
+body.keyboard-open input:focus,
+body.keyboard-open textarea:focus,
+body.keyboard-open select:focus,
+body.keyboard-open [contenteditable="true"]:focus {
+  scroll-margin-bottom: calc(var(--keyboard-height, 0px) + 1.25rem);
+  scroll-margin-top: 1.25rem;
+}
+
 [data-testid="water-card"] button,
 [data-testid="button-increment-water"],
 [data-testid="button-decrement-water"] {

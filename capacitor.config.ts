@@ -47,9 +47,10 @@ const config: CapacitorConfig = {
       overlaysWebView: false
     },
     
+    // "body" resizes the document for React; "ionic" only works with <ion-app>.
     Keyboard: {
-      resize: 'ionic' as any,
-      style: 'dark' as any,
+      resize: 'body',
+      style: 'dark',
       resizeOnFullScreen: true
     },
     
