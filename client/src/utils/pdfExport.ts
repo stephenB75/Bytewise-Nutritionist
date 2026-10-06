@@ -529,6 +529,121 @@ async function generateWaterIntakeChart(waterData: any[]): Promise<string> {
   });
 }
 
+async function renderChartToDataUrl(config: ChartConfiguration, width = 600, height = 400): Promise<string> {
+  return new Promise((resolve, reject) => {
+    try {
+      const canvas = createChartCanvas(width, height);
+      const chart = new Chart(canvas, { ...config, options: { ...(config.options || {}), responsive: false, animation: false } });
+      setTimeout(() => {
+        try {
+          const dataUrl = canvas.toDataURL('image/png');
+          chart.destroy();
+          resolve(dataUrl);
+        } catch (error) {
+          chart.destroy();
+          reject(error);
+        }
+      }, 400);
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
+async function generateMacroTrendsChart(
+  points: Array<{ label: string; protein: number; carbs: number; fat: number; sugar: number }>,
+): Promise<string> {
+  return renderChartToDataUrl({
+    type: 'line',
+    data: {
+      labels: points.map((p) => p.label),
+      datasets: [
+        { label: 'Protein', data: points.map((p) => p.protein), borderColor: '#f59e0b', backgroundColor: 'transparent', borderWidth: 2, tension: 0.3, pointRadius: 2 },
+        { label: 'Carbs', data: points.map((p) => p.carbs), borderColor: '#fbbf24', backgroundColor: 'transparent', borderWidth: 2, tension: 0.3, pointRadius: 2 },
+        { label: 'Fat', data: points.map((p) => p.fat), borderColor: '#d97706', backgroundColor: 'transparent', borderWidth: 2, tension: 0.3, pointRadius: 2 },
+        { label: 'Sugar', data: points.map((p) => p.sugar), borderColor: '#ea580c', backgroundColor: 'transparent', borderWidth: 2, tension: 0.3, pointRadius: 2 },
+      ],
+    },
+    options: {
+      plugins: {
+        title: { display: true, text: '14-Day Macro Trends (g)', color: '#78350f', font: { size: 16, weight: 'bold', family: 'Arial' } },
+        legend: { labels: { color: '#92400e', font: { size: 11, family: 'Arial' } } },
+      },
+      scales: {
+        y: { beginAtZero: true, ticks: { color: '#92400e' }, grid: { color: 'rgba(146, 64, 14, 0.1)' } },
+        x: { ticks: { color: '#92400e', maxRotation: 45 }, grid: { color: 'rgba(146, 64, 14, 0.1)' } },
+      },
+    },
+  });
+}
+
+async function generateFastingTrendsChart(
+  points: Array<{ label: string; hours: number }>,
+): Promise<string> {
+  return renderChartToDataUrl({
+    type: 'bar',
+    data: {
+      labels: points.map((p) => p.label),
+      datasets: [{
+        label: 'Hours fasted',
+        data: points.map((p) => p.hours),
+        backgroundColor: 'rgba(217, 119, 6, 0.75)',
+        borderColor: '#b45309',
+        borderWidth: 2,
+        borderRadius: 6,
+      }],
+    },
+    options: {
+      plugins: {
+        title: { display: true, text: '14-Day Fasting Duration Trend', color: '#78350f', font: { size: 16, weight: 'bold', family: 'Arial' } },
+        legend: { labels: { color: '#92400e', font: { size: 12, family: 'Arial' } } },
+      },
+      scales: {
+        y: { beginAtZero: true, ticks: { color: '#92400e' }, grid: { color: 'rgba(146, 64, 14, 0.1)' }, title: { display: true, text: 'Hours', color: '#92400e' } },
+        x: { ticks: { color: '#92400e', maxRotation: 45 }, grid: { color: 'rgba(146, 64, 14, 0.1)' } },
+      },
+    },
+  });
+}
+
+async function generateFoodTypeChart(
+  points: Array<{ label: string; calories: number; color: string }>,
+): Promise<string> {
+  return renderChartToDataUrl({
+    type: 'bar',
+    data: {
+      labels: points.map((p) => p.label),
+      datasets: [{
+        label: 'Calories',
+        data: points.map((p) => p.calories),
+        backgroundColor: points.map((p) => p.color),
+        borderColor: '#92400e',
+        borderWidth: 1,
+        borderRadius: 6,
+      }],
+    },
+    options: {
+      plugins: {
+        title: { display: true, text: 'Calories by Meal Type (30 Days)', color: '#78350f', font: { size: 16, weight: 'bold', family: 'Arial' } },
+        legend: { display: false },
+      },
+      scales: {
+        y: { beginAtZero: true, ticks: { color: '#92400e' }, grid: { color: 'rgba(146, 64, 14, 0.1)' } },
+        x: { ticks: { color: '#92400e' }, grid: { color: 'rgba(146, 64, 14, 0.1)' } },
+      },
+    },
+  });
+}
+
+function normalizeMealTypeBucket(raw: unknown): 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'other' {
+  const type = String(raw || '').toLowerCase().trim();
+  if (type.includes('breakfast') || type === 'brunch') return 'breakfast';
+  if (type.includes('lunch')) return 'lunch';
+  if (type.includes('dinner') || type.includes('supper')) return 'dinner';
+  if (type.includes('snack') || type.includes('dessert')) return 'snack';
+  return 'other';
+}
+
 export async function generateProgressReportPDF(): Promise<boolean> {
   try {
     // Starting PDF report generation
@@ -702,32 +817,106 @@ export async function generateProgressReportPDF(): Promise<boolean> {
       });
     }
 
+    // 14-day macro trend points
+    const macroTrendPoints: Array<{ label: string; protein: number; carbs: number; fat: number; sugar: number }> = [];
+    for (let day = 13; day >= 0; day--) {
+      const date = new Date(now);
+      date.setDate(now.getDate() - day);
+      const dateStr = date.toISOString().split('T')[0];
+      const dayMeals = meals.filter((meal: any) => mealDateKey(meal) === dateStr);
+      macroTrendPoints.push({
+        label: date.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' }),
+        protein: Math.round(dayMeals.reduce((sum: number, meal: any) => sum + mealProtein(meal), 0)),
+        carbs: Math.round(dayMeals.reduce((sum: number, meal: any) => sum + mealCarbs(meal), 0)),
+        fat: Math.round(dayMeals.reduce((sum: number, meal: any) => sum + mealFat(meal), 0)),
+        sugar: Math.round(dayMeals.reduce((sum: number, meal: any) => sum + mealSugar(meal), 0)),
+      });
+    }
+
+    // 14-day fasting duration points
+    const fastingTrendPoints: Array<{ label: string; hours: number }> = [];
+    for (let day = 13; day >= 0; day--) {
+      const date = new Date(now);
+      date.setHours(12, 0, 0, 0);
+      date.setDate(now.getDate() - day);
+      const dateStr = date.toISOString().split('T')[0];
+      const daySessions = fastingSessions.filter((session: any) => {
+        const raw = session.completedAt || session.endTime || session.startTime || session.createdAt || '';
+        if (!raw) return false;
+        const key = String(raw).includes('T') ? String(raw).split('T')[0] : String(raw).slice(0, 10);
+        return key === dateStr && String(session.status || '').toLowerCase() !== 'active';
+      });
+      const hours = daySessions.reduce((sum: number, session: any) => {
+        if (session.actualHoursFasted != null && Number.isFinite(Number(session.actualHoursFasted))) {
+          return sum + Math.max(0, Number(session.actualHoursFasted));
+        }
+        if (session.actualDuration != null && Number.isFinite(Number(session.actualDuration))) {
+          return sum + Math.max(0, Number(session.actualDuration) / (1000 * 60 * 60));
+        }
+        return sum;
+      }, 0);
+      fastingTrendPoints.push({
+        label: date.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' }),
+        hours: Math.round(hours * 10) / 10,
+      });
+    }
+
+    // Meal-type calorie distribution (30 days)
+    const foodTypeTotals: Record<string, { label: string; calories: number; color: string }> = {
+      breakfast: { label: 'Breakfast', calories: 0, color: '#f59e0b' },
+      lunch: { label: 'Lunch', calories: 0, color: '#ea580c' },
+      dinner: { label: 'Dinner', calories: 0, color: '#e11d48' },
+      snack: { label: 'Snack', calories: 0, color: '#059669' },
+      other: { label: 'Other', calories: 0, color: '#78716c' },
+    };
+    meals.forEach((meal: any) => {
+      const key = mealDateKey(meal);
+      if (!key) return;
+      const mealDate = new Date(`${key}T12:00:00`);
+      if (mealDate < thirtyDaysAgo || mealDate > now) return;
+      const bucket = normalizeMealTypeBucket(meal.mealType);
+      foodTypeTotals[bucket].calories += mealCalories(meal);
+    });
+    const foodTypePoints = Object.values(foodTypeTotals)
+      .filter((row) => row.calories > 0 || row.label !== 'Other')
+      .map((row) => ({ ...row, calories: Math.round(row.calories) }));
+
     // Generate chart images
-    // Rendering charts with data
     let weeklyCaloriesChart = '';
     let macronutrientChart = '';
     let progressChart = '';
     let waterChart = '';
+    let macroTrendsChart = '';
+    let fastingTrendsChart = '';
+    let foodTypeChart = '';
     
     try {
       if (weeklyCalorieData.length > 0) {
         weeklyCaloriesChart = await generateWeeklyCaloriesChart(weeklyCalorieData);
-        // Weekly calories chart generated
       }
       
       if (macronutrientTotals.carbs + macronutrientTotals.protein + macronutrientTotals.fat > 0) {
         macronutrientChart = await generateMacronutrientPieChart(macronutrientTotals);
-        // Macronutrient pie chart generated
       }
       
-      if (dailyCalorieProgress.length > 0) {
+      if (dailyCalorieProgress.some((d) => d.calories > 0)) {
         progressChart = await generateWeightProgressChart(dailyCalorieProgress);
-        // Progress line chart generated
       }
       
       if (chartWaterData.length > 0) {
         waterChart = await generateWaterIntakeChart(chartWaterData);
-        // Water intake chart generated
+      }
+
+      if (macroTrendPoints.some((p) => p.protein + p.carbs + p.fat + p.sugar > 0)) {
+        macroTrendsChart = await generateMacroTrendsChart(macroTrendPoints);
+      }
+
+      if (fastingTrendPoints.some((p) => p.hours > 0)) {
+        fastingTrendsChart = await generateFastingTrendsChart(fastingTrendPoints);
+      }
+
+      if (foodTypePoints.some((p) => p.calories > 0)) {
+        foodTypeChart = await generateFoodTypeChart(foodTypePoints);
       }
     } catch (chartError) {
       console.warn('⚠️ Chart generation failed, continuing without charts:', chartError);
@@ -1041,12 +1230,15 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     const pageHeight = 297;
     const marginX = 16;
     const contentWidth = pageWidth - marginX * 2;
-    const pageBottom = pageHeight - 28;
+    const pageBottom = pageHeight - 32;
+    const sectionGap = 14;
+    const chartW = 158;
+    const chartH = 100;
     let yPosition = 20;
 
     const startNewPage = () => {
       pdf.addPage();
-      yPosition = 20;
+      yPosition = 22;
     };
 
     /** Reserve vertical space; starts a new page when the block would overflow. */
@@ -1054,14 +1246,25 @@ export async function generateProgressReportPDF(): Promise<boolean> {
       if (yPosition + neededMm > pageBottom) startNewPage();
     };
 
-    const writeSectionTitle = (title: string, minSpace = 36) => {
-      ensureSpace(minSpace);
+    /**
+     * Start a section on a fresh vertical band. If the estimated full section
+     * (title + body + optional chart) will not fit, begin on a new page so
+     * related content stays together when possible.
+     */
+    const beginSection = (estimatedHeightMm: number) => {
+      const needed = estimatedHeightMm + sectionGap;
+      if (yPosition > 22 && yPosition + needed > pageBottom) startNewPage();
+      else if (yPosition > 22) yPosition += sectionGap;
+    };
+
+    const writeSectionTitle = (title: string) => {
+      ensureSpace(28);
       pdf.setFontSize(14);
       pdf.setFont('helvetica', 'bold');
       pdf.setTextColor(146, 64, 14);
       pdf.text(title, marginX, yPosition);
       pdf.setTextColor(0, 0, 0);
-      yPosition += 8;
+      yPosition += 10;
     };
 
     const writeWrapped = (text: string, x: number, maxWidth: number, lineH = 4.2, reserve = true) => {
@@ -1074,21 +1277,23 @@ export async function generateProgressReportPDF(): Promise<boolean> {
 
     const addChartBlock = (
       dataUri: string | null | undefined,
-      opts: { width: number; height: number; caption?: string },
+      opts: { width?: number; height?: number; caption?: string } = {},
     ) => {
       if (!dataUri) return;
+      const width = opts.width ?? chartW;
+      const height = opts.height ?? chartH;
       const captionH = opts.caption ? 8 : 0;
-      ensureSpace(opts.height + captionH + 12);
+      ensureSpace(height + captionH + 14);
       if (opts.caption) {
         pdf.setFontSize(10);
         pdf.setFont('helvetica', 'bold');
         pdf.setTextColor(120, 53, 15);
         pdf.text(opts.caption, marginX, yPosition);
-        yPosition += 6;
+        yPosition += 7;
       }
       try {
-        pdf.addImage(dataUri, 'PNG', (pageWidth - opts.width) / 2, yPosition, opts.width, opts.height);
-        yPosition += opts.height + 10;
+        pdf.addImage(dataUri, 'PNG', (pageWidth - width) / 2, yPosition, width, height);
+        yPosition += height + 12;
       } catch (chartImageError) {
         console.warn('Failed to add chart image:', chartImageError);
       }
@@ -1142,7 +1347,8 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     pdf.setTextColor(0, 0, 0);
 
     // Statistics Grid
-    writeSectionTitle('Nutrition Summary', 70);
+    beginSection(100);
+    writeSectionTitle('Nutrition Summary');
     const stats = [
       { label: 'Meals logged', value: formatCount(progressData.totalMealsLogged), color: [245, 158, 11] as const },
       { label: 'Avg daily calories', value: formatCalories(progressData.averageDailyCalories), color: [217, 119, 6] as const },
@@ -1174,15 +1380,15 @@ export async function generateProgressReportPDF(): Promise<boolean> {
       col += 1;
       if (col >= 2) {
         col = 0;
-        yPosition += 22;
+        yPosition += 24;
       }
     });
-    if (col > 0) yPosition += 22;
-    yPosition += 6;
+    if (col > 0) yPosition += 24;
     pdf.setTextColor(0, 0, 0);
 
-    // Macros + pie chart kept together
-    writeSectionTitle('Daily Macro Averages', 120);
+    // Macros + pie + macro trend charts kept together when possible
+    beginSection(macronutrientChart || macroTrendsChart ? 230 : 70);
+    writeSectionTitle('Daily Macro Averages');
     pdf.setFontSize(8);
     pdf.setFont('helvetica', 'normal');
     pdf.setTextColor(100, 100, 100);
@@ -1191,7 +1397,7 @@ export async function generateProgressReportPDF(): Promise<boolean> {
       marginX,
       yPosition,
     );
-    yPosition += 8;
+    yPosition += 9;
     pdf.setFontSize(10);
     pdf.setTextColor(0, 0, 0);
     const macroRows = [
@@ -1203,13 +1409,18 @@ export async function generateProgressReportPDF(): Promise<boolean> {
     macroRows.forEach((row) => {
       const pct = row.goal > 0 ? Math.round((row.avg / row.goal) * 100) : 0;
       ensureSpace(8);
-      writeWrapped(`${row.label}: ${row.avg}g avg  |  goal ${row.goal}g  |  ${pct}% of goal`, marginX + 4, contentWidth - 4, 5);
+      writeWrapped(`${row.label}: ${row.avg}g avg  |  goal ${row.goal}g  |  ${pct}% of goal`, marginX + 4, contentWidth - 4, 5.5);
     });
-    yPosition += 2;
-    addChartBlock(macronutrientChart, { width: 110, height: 88, caption: 'Macronutrient mix' });
+    yPosition += 4;
+    addChartBlock(macronutrientChart, { width: 120, height: 92, caption: 'Macronutrient mix' });
+    if (macroTrendsChart) {
+      beginSection(chartH + 30);
+      addChartBlock(macroTrendsChart, { caption: 'Macro trends (protein, carbs, fat, sugar)' });
+    }
 
-    // Micronutrients (2-column to avoid overflow)
-    writeSectionTitle('Essential Micronutrients (Daily Average)', 60);
+    // Micronutrients
+    beginSection(55);
+    writeSectionTitle('Essential Micronutrients (Daily Average)');
     pdf.setFontSize(9);
     pdf.setFont('helvetica', 'normal');
     let microCol = 0;
@@ -1227,14 +1438,16 @@ export async function generateProgressReportPDF(): Promise<boolean> {
       microCol += 1;
       if (microCol >= 2) {
         microCol = 0;
-        yPosition += 6;
+        yPosition += 7;
       }
     });
-    if (microCol > 0) yPosition += 6;
-    yPosition += 6;
+    if (microCol > 0) yPosition += 7;
 
-    // Weekly averages + weekly calories chart (kept together)
-    writeSectionTitle('Weekly Nutrition Averages', 50);
+    // Weekly averages + chart — chart first so it stays with the section intro
+    const weekCount = progressData.weeklyBreakdown.length;
+    beginSection(chartH + 40 + Math.min(weekCount, 2) * 28);
+    writeSectionTitle('Weekly Nutrition Averages');
+    addChartBlock(weeklyCaloriesChart, { caption: 'Weekly calorie averages' });
     if (progressData.weeklyBreakdown.length > 0) {
       progressData.weeklyBreakdown.forEach((week, idx) => {
         const weekStartDate = new Date(week.weekStart);
@@ -1246,7 +1459,7 @@ export async function generateProgressReportPDF(): Promise<boolean> {
         const titleLines = pdf.splitTextToSize(title, contentWidth).length;
         pdf.setFontSize(8);
         const blockH = titleLines * 5 + pdf.splitTextToSize(macros, contentWidth - 2).length * 4
-          + pdf.splitTextToSize(micros, contentWidth - 2).length * 4 + 6;
+          + pdf.splitTextToSize(micros, contentWidth - 2).length * 4 + 8;
         ensureSpace(blockH);
         const blockTop = yPosition - 3;
         if (idx % 2 === 0) {
@@ -1262,25 +1475,47 @@ export async function generateProgressReportPDF(): Promise<boolean> {
         pdf.setFontSize(8);
         writeWrapped(macros, marginX + 2, contentWidth - 2, 4, false);
         writeWrapped(micros, marginX + 2, contentWidth - 2, 4, false);
-        yPosition += 4;
+        yPosition += 6;
       });
     } else {
       pdf.setFontSize(10);
       pdf.setTextColor(100, 100, 100);
       writeWrapped('No weekly data available for the selected period.', marginX, contentWidth);
-      yPosition += 4;
     }
-    addChartBlock(weeklyCaloriesChart, { width: 150, height: 95, caption: 'Weekly calorie averages' });
 
-    // Daily details + progress chart
-    writeSectionTitle('Daily Nutrition Details', 50);
+    // Calorie trend chart on its own band (keep chart intact)
+    if (progressChart) {
+      beginSection(chartH + 35);
+      writeSectionTitle('Calorie Intake Trend');
+      addChartBlock(progressChart, { caption: '30-day daily calorie progress' });
+    }
+
+    // Food type trends
+    if (foodTypeChart || foodTypePoints.some((p) => p.calories > 0)) {
+      beginSection(chartH + 50);
+      writeSectionTitle('Food Type Trends');
+      pdf.setFontSize(9);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(0, 0, 0);
+      foodTypePoints
+        .filter((p) => p.calories > 0)
+        .forEach((row) => {
+          writeWrapped(`${row.label}: ${formatCalories(row.calories)}`, marginX + 4, contentWidth - 4, 5);
+        });
+      yPosition += 4;
+      addChartBlock(foodTypeChart, { caption: 'Calories by meal type' });
+    }
+
+    // Daily details (rows may span pages; each day stays together)
+    beginSection(40);
+    writeSectionTitle('Daily Nutrition Details');
     const filteredDays = progressData.dailyBreakdown.filter((day) => day.mealsCount > 0);
     if (filteredDays.length > 0) {
       filteredDays.forEach((day, idx) => {
-        ensureSpace(18);
+        ensureSpace(20);
         if (idx % 2 === 0) {
           pdf.setFillColor(248, 248, 248);
-          pdf.rect(marginX - 2, yPosition - 3, contentWidth + 4, 14, 'F');
+          pdf.rect(marginX - 2, yPosition - 3, contentWidth + 4, 16, 'F');
         }
         pdf.setFontSize(9);
         pdf.setFont('helvetica', 'bold');
@@ -1296,6 +1531,7 @@ export async function generateProgressReportPDF(): Promise<boolean> {
           marginX + 2,
           contentWidth - 2,
           3.8,
+          false,
         );
         const microText: string[] = [];
         if (day.fiber > 0) microText.push(`Fiber ${day.fiber.toFixed(0)}g`);
@@ -1309,22 +1545,22 @@ export async function generateProgressReportPDF(): Promise<boolean> {
         if (day.magnesium > 0) microText.push(`Mg ${day.magnesium.toFixed(0)}mg`);
         if (day.sodium > 0) microText.push(`Na ${day.sodium.toFixed(0)}mg`);
         if (microText.length > 0) {
-          writeWrapped(microText.join('  |  '), marginX + 2, contentWidth - 2, 3.8);
+          writeWrapped(microText.join('  |  '), marginX + 2, contentWidth - 2, 3.8, false);
         }
-        yPosition += 3;
+        yPosition += 5;
       });
     } else {
       pdf.setFontSize(10);
       pdf.setTextColor(100, 100, 100);
       writeWrapped('No daily nutrition data available for the selected period.', marginX, contentWidth);
     }
-    addChartBlock(progressChart, { width: 150, height: 95, caption: 'Daily calorie progress' });
 
     // Achievements
     if (progressData.achievements.length > 0) {
-      writeSectionTitle('Achievements Earned', 40);
+      beginSection(50);
+      writeSectionTitle('Achievements Earned');
       progressData.achievements.slice(0, 5).forEach((achievement) => {
-        ensureSpace(20);
+        ensureSpace(22);
         pdf.setFontSize(10);
         pdf.setFont('helvetica', 'bold');
         pdf.setTextColor(217, 119, 6);
@@ -1344,19 +1580,19 @@ export async function generateProgressReportPDF(): Promise<boolean> {
         }
         pdf.setTextColor(100, 100, 100);
         pdf.text(`Earned: ${new Date(achievement.earnedAt).toLocaleDateString()}`, marginX + 6, yPosition);
-        yPosition += 8;
+        yPosition += 10;
       });
       if (progressData.achievements.length > 5) {
         pdf.setFontSize(9);
         pdf.setTextColor(100, 100, 100);
         writeWrapped(`... and ${progressData.achievements.length - 5} more achievements`, marginX + 4, contentWidth - 4);
-        yPosition += 4;
       }
     }
 
     // Water + chart together
     if (progressData.waterIntakeData.length > 0 || waterChart) {
-      writeSectionTitle('Water Intake', 50);
+      beginSection(chartH + 55);
+      writeSectionTitle('Water Intake');
       if (progressData.waterIntakeData.length > 0) {
         const totalWaterGlasses = progressData.waterIntakeData.reduce((sum, day) => sum + day.glasses, 0);
         const avgDailyWater = Math.round(totalWaterGlasses / Math.max(1, progressData.waterIntakeData.length));
@@ -1365,60 +1601,62 @@ export async function generateProgressReportPDF(): Promise<boolean> {
         pdf.setFontSize(10);
         pdf.setFont('helvetica', 'normal');
         pdf.setTextColor(0, 0, 0);
-        writeWrapped(`Total: ${formatCount(totalWaterGlasses)} glasses`, marginX + 4, contentWidth - 4, 5);
-        writeWrapped(`Daily average: ${formatCount(avgDailyWater)} glasses (goal ${goalWater})`, marginX + 4, contentWidth - 4, 5);
-        writeWrapped(`Goal achievement: ${waterGoalRate}%`, marginX + 4, contentWidth - 4, 5);
-        yPosition += 2;
+        writeWrapped(`Total: ${formatCount(totalWaterGlasses)} glasses`, marginX + 4, contentWidth - 4, 5.5);
+        writeWrapped(`Daily average: ${formatCount(avgDailyWater)} glasses (goal ${goalWater})`, marginX + 4, contentWidth - 4, 5.5);
+        writeWrapped(`Goal achievement: ${waterGoalRate}%`, marginX + 4, contentWidth - 4, 5.5);
+        yPosition += 4;
       }
-      addChartBlock(waterChart, { width: 150, height: 95, caption: 'Weekly water intake' });
+      addChartBlock(waterChart, { caption: 'Weekly water intake' });
     }
 
-    // Fasting
-    if (progressData.fastingSessions.length > 0 || progressData.fastingTrends.sessions > 0) {
-      writeSectionTitle('Intermittent Fasting Trends', 50);
+    // Fasting + chart together
+    if (progressData.fastingSessions.length > 0 || progressData.fastingTrends.sessions > 0 || fastingTrendsChart) {
+      beginSection(chartH + 55);
+      writeSectionTitle('Intermittent Fasting Trends');
       const trends = progressData.fastingTrends;
       pdf.setFontSize(10);
       pdf.setFont('helvetica', 'normal');
       pdf.setTextColor(0, 0, 0);
-      writeWrapped(`Total sessions: ${formatCount(trends.sessions)}`, marginX + 4, contentWidth - 4, 5);
-      writeWrapped(`Goals completed: ${formatCount(trends.completed)} (${trends.completionRate}%)`, marginX + 4, contentWidth - 4, 5);
-      writeWrapped(`Average fast: ${trends.avgHours}h  |  Longest: ${trends.longestHours}h`, marginX + 4, contentWidth - 4, 5);
-      writeWrapped(`Total fasting time: ${formatCount(trends.totalHours)} hours`, marginX + 4, contentWidth - 4, 5);
+      writeWrapped(`Total sessions: ${formatCount(trends.sessions)}`, marginX + 4, contentWidth - 4, 5.5);
+      writeWrapped(`Goals completed: ${formatCount(trends.completed)} (${trends.completionRate}%)`, marginX + 4, contentWidth - 4, 5.5);
+      writeWrapped(`Average fast: ${trends.avgHours}h  |  Longest: ${trends.longestHours}h`, marginX + 4, contentWidth - 4, 5.5);
+      writeWrapped(`Total fasting time: ${formatCount(trends.totalHours)} hours`, marginX + 4, contentWidth - 4, 5.5);
       yPosition += 4;
+      addChartBlock(fastingTrendsChart, { caption: 'Daily fasting duration' });
     }
 
     // Apple Health
     if (progressData.appleHealthToday) {
-      writeSectionTitle('Apple Health (Today)', 45);
+      beginSection(45);
+      writeSectionTitle('Apple Health (Today)');
       const health = progressData.appleHealthToday;
       pdf.setFontSize(10);
       pdf.setFont('helvetica', 'normal');
       pdf.setTextColor(0, 0, 0);
-      writeWrapped(`Steps: ${health.steps.toLocaleString()}  |  Move calories: ${health.activeCalories}`, marginX + 4, contentWidth - 4, 5);
+      writeWrapped(`Steps: ${health.steps.toLocaleString()}  |  Move calories: ${health.activeCalories}`, marginX + 4, contentWidth - 4, 5.5);
       const extras: string[] = [];
       if (health.exerciseMinutes != null) extras.push(`Exercise ${health.exerciseMinutes} min`);
       if (health.distanceMiles != null) extras.push(`${health.distanceMiles} mi`);
       if (health.workouts > 0) {
         extras.push(`Workouts ${health.workouts}${health.workoutMinutes ? ` (${health.workoutMinutes} min)` : ''}`);
       }
-      if (extras.length) writeWrapped(extras.join('  |  '), marginX + 4, contentWidth - 4, 5);
-      yPosition += 4;
+      if (extras.length) writeWrapped(extras.join('  |  '), marginX + 4, contentWidth - 4, 5.5);
     }
 
     // Shared activities
-    writeSectionTitle('Shared Activity Summaries', 40);
+    beginSection(40);
+    writeSectionTitle('Shared Activity Summaries');
     pdf.setFontSize(8);
     pdf.setFont('helvetica', 'normal');
     pdf.setTextColor(100, 100, 100);
     writeWrapped('Posts you shared with friends and family in Bytewise.', marginX, contentWidth, 4);
-    yPosition += 2;
+    yPosition += 4;
     if (progressData.sharedActivities.length === 0) {
       pdf.setFontSize(10);
       writeWrapped('No shared activity summaries yet.', marginX + 4, contentWidth - 4);
-      yPosition += 4;
     } else {
       progressData.sharedActivities.forEach((activity, idx) => {
-        ensureSpace(24);
+        ensureSpace(26);
         pdf.setFontSize(10);
         pdf.setFont('helvetica', 'bold');
         pdf.setTextColor(217, 119, 6);
@@ -1436,19 +1674,20 @@ export async function generateProgressReportPDF(): Promise<boolean> {
           ? new Date(activity.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
           : 'Date unavailable';
         writeWrapped(`${activity.type} · ${when}`, marginX + 6, contentWidth - 6, 4);
-        yPosition += 4;
+        yPosition += 6;
       });
     }
 
     // Recipes
     if (progressData.recipes.length > 0) {
-      writeSectionTitle('Custom Recipes', 35);
+      beginSection(40);
+      writeSectionTitle('Custom Recipes');
       pdf.setFontSize(10);
       pdf.setFont('helvetica', 'normal');
       pdf.setTextColor(0, 0, 0);
-      writeWrapped(`Recipes created: ${formatCount(progressData.recipes.length)}`, marginX + 4, contentWidth - 4, 5);
+      writeWrapped(`Recipes created: ${formatCount(progressData.recipes.length)}`, marginX + 4, contentWidth - 4, 5.5);
       progressData.recipes.slice(0, 3).forEach((recipe, idx) => {
-        ensureSpace(14);
+        ensureSpace(16);
         pdf.setFontSize(9);
         pdf.setFont('helvetica', 'bold');
         pdf.setTextColor(217, 119, 6);
@@ -1456,6 +1695,7 @@ export async function generateProgressReportPDF(): Promise<boolean> {
         pdf.setFont('helvetica', 'normal');
         pdf.setTextColor(0, 0, 0);
         writeWrapped(`${formatCalories(recipe.totalCalories)}  ·  ${recipe.servings} servings`, marginX + 8, contentWidth - 8, 4);
+        yPosition += 2;
       });
       if (progressData.recipes.length > 3) {
         pdf.setFontSize(8);
