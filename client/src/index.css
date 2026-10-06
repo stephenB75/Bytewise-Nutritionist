@@ -2250,6 +2250,12 @@ textarea::placeholder {
   opacity: 1 !important;
 }
 
+/* Textareas: brand --background is near-black; keep fields light like inputs */
+textarea {
+  background-color: #ffffff !important;
+  color: #1f2937 !important;
+}
+
 /* Focus states for better visibility */
 input[type="text"]:focus, 
 input[type="email"]:focus, 
