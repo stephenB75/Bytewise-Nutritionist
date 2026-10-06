@@ -2673,6 +2673,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             Checking your session…
           </Card>
         ) : user ? (
+          <div className="w-full space-y-6">
+          <NotificationPreferences />
           <Accordion 
             type="single" 
             collapsible 
@@ -2910,13 +2912,16 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               </Card>
             </AccordionItem>
           </Accordion>
+          </div>
         ) : (
-          <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 p-8">
-            <SignOnModule />
-          </Card>
+          <div className="space-y-6">
+            <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 p-8">
+              <SignOnModule />
+            </Card>
+            <NotificationPreferences />
+          </div>
         )}
-        <div className="mt-6 space-y-6">
-          <NotificationPreferences />
+        <div className="mt-6">
           <AppVersionInfo />
         </div>
       </div>
