@@ -2758,35 +2758,79 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <AccordionItem value="profile" className="border-none">
               <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 overflow-hidden rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:from-amber-100 hover:to-amber-200 hover:border-amber-300/50">
                 <AccordionTrigger className="px-4 sm:px-6 py-4 sm:py-6 hover:bg-amber-200/30 hover:no-underline [&[data-state=open]]:bg-amber-200/30 [&>svg]:ml-2 sm:[&>svg]:ml-4">
-                  <div className="flex items-start justify-between w-full pr-2 sm:pr-4">
-                    <div className="flex items-start space-x-3 sm:space-x-4 flex-1 min-w-0">
+                  <div className="flex w-full min-w-0 flex-col gap-4 pr-1 sm:pr-2 text-left">
+                    {/* Identity */}
+                    <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                       <div className="relative flex-shrink-0">
-                        <ProfileIcon 
+                        <ProfileIcon
                           data-testid="profile-icon"
-                          iconNumber={user?.profileIcon || 1} 
+                          iconNumber={user?.profileIcon || 1}
                           imageUrl={profilePhotoUrl}
-                          size="md" 
+                          size="md"
                           className="ring-2 ring-white/20"
                         />
-                        <div className="absolute -bottom-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 bg-green-500 rounded-full border-2 border-black flex items-center justify-center">
+                        <div className="absolute -bottom-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 bg-green-500 rounded-full border-2 border-amber-100 flex items-center justify-center">
                           <CheckCircle2 className="w-2 h-2 sm:w-2.5 sm:h-2.5 text-white" />
                         </div>
                       </div>
-                      <div className="flex-1 min-w-0 space-y-1">
-                        <h3 className="text-lg sm:text-xl font-bold leading-tight" style={{ fontFamily: "'League Spartan', sans-serif" }}>
+                      <div className="min-w-0 flex-1">
+                        <h3
+                          className="text-lg sm:text-xl font-bold leading-tight text-gray-950 truncate"
+                          style={{ fontFamily: "'League Spartan', sans-serif" }}
+                        >
                           {user?.firstName || user?.email?.split('@')[0] || 'ByteWise User'}
                         </h3>
-                        <p className="text-gray-700 text-xs sm:text-sm truncate">{user?.email}</p>
-                        <div className="flex flex-wrap gap-x-2 sm:gap-x-3 gap-y-1 text-xs text-gray-600 mt-1">
-                          <span className="inline-flex items-center whitespace-nowrap">🏆 Level 1</span>
-                          <span className="inline-flex items-center whitespace-nowrap">📊 {loggedMeals?.length || 0} meals</span>
-                          <span className="inline-flex items-center whitespace-nowrap">🎯 {Math.round(dailyCalories)}/{goalCalories} cal</span>
-                        </div>
+                        <p className="text-gray-600 text-xs sm:text-sm truncate mt-0.5">
+                          {user?.email}
+                        </p>
                       </div>
                     </div>
-                    <div className="text-right flex-shrink-0 ml-2 sm:ml-3 min-w-[60px] sm:min-w-[80px]">
-                      <div className="text-base sm:text-lg font-bold text-orange-400 leading-tight">{achievements?.length || 0}</div>
-                      <div className="text-xs text-gray-600 whitespace-nowrap leading-tight">Awards</div>
+
+                    {/* Stats — separate cells so level / meals / cal / awards don't collide */}
+                    <div
+                      className="grid grid-cols-2 sm:grid-cols-4 gap-2 w-full"
+                      data-testid="profile-header-stats"
+                    >
+                      {[
+                        {
+                          label: 'Level',
+                          value: String(Math.floor((achievements?.length || 0) / 3) + 1),
+                          icon: Flame,
+                        },
+                        {
+                          label: 'Meals today',
+                          value: String(loggedMeals?.length || 0),
+                          icon: Utensils,
+                        },
+                        {
+                          label: 'Cal goal',
+                          value: `${Math.round(dailyCalories)}/${goalCalories}`,
+                          icon: Target,
+                        },
+                        {
+                          label: 'Awards',
+                          value: String(achievements?.length || 0),
+                          icon: Trophy,
+                        },
+                      ].map(({ label, value, icon: StatIcon }) => (
+                        <div
+                          key={label}
+                          className="rounded-xl bg-white/70 border border-amber-200/70 px-2.5 py-2.5 sm:px-3 text-center"
+                        >
+                          <div className="flex items-center justify-center gap-1 text-amber-800 mb-1">
+                            <StatIcon className="w-3.5 h-3.5 shrink-0" aria-hidden />
+                            <span className="text-[10px] sm:text-xs font-medium uppercase tracking-wide text-gray-600">
+                              {label}
+                            </span>
+                          </div>
+                          <div
+                            className="text-sm sm:text-base font-bold text-gray-950 tabular-nums leading-tight"
+                            style={{ fontFamily: "'League Spartan', sans-serif" }}
+                          >
+                            {value}
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </AccordionTrigger>

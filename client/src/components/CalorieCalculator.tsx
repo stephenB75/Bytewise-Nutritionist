@@ -653,34 +653,85 @@ function CalorieCalculator({
         </div>
       )}
 
-      <PackagedFoodScanner />
-
-      {/* User Guide Card - Moved Above */}
-      <Card className="p-6 bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-sm border-amber-200/40 shadow-lg">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">How to Use</h3>
-        
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
-          <div className="space-y-3">
-            <h4 className="font-medium text-gray-700">Food Entry</h4>
-            <div className="space-y-2 text-sm text-gray-600">
-              <p>• Scan a packaged-food barcode</p>
-              <p>• Search snacks and groceries by name</p>
-              <p>• Enter any food name</p>
-              <p>• Get instant calorie estimates</p>
-            </div>
+      {/* How to use — steps first so the tools below follow the same order */}
+      <Card
+        className="p-5 sm:p-6 bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-sm border-amber-200/40 shadow-lg"
+        data-testid="tracker-how-to-use"
+      >
+        <div className="flex items-start gap-3 mb-5">
+          <div className="p-2 rounded-lg bg-amber-200/70 shrink-0">
+            <Info className="w-5 h-5 text-amber-900" />
           </div>
-          
-          <div className="space-y-3">
-            <h4 className="font-medium text-gray-700">Measurement Examples</h4>
-            <div className="space-y-2 text-sm text-gray-600">
-              <p>• Weight: 100g, 2 oz, 1 lb</p>
-              <p>• Volume: 1 cup, 2 tbsp, 1 tsp</p>
-              <p>• Pieces: 1 medium, 1 slice, 1 whole</p>
-              <p>• Portions: 1 serving, handful, bunch</p>
-            </div>
+          <div>
+            <h3 className="text-lg font-bold text-gray-900 leading-tight">How to log food</h3>
+            <p className="text-sm text-gray-700 mt-1">
+              Three steps — find it, set the amount, then save it to today.
+            </p>
+          </div>
+        </div>
+
+        <ol className="space-y-4">
+          {[
+            {
+              step: 1,
+              title: 'Find your food',
+              body: 'Scan a barcode, search by name, or describe the meal as you ate it — for example, curry chicken with rice and plantain.',
+              icon: Search,
+            },
+            {
+              step: 2,
+              title: 'Set the amount',
+              body: 'Add how much you had. Weight, cups, pieces, and servings all work.',
+              icon: Scale,
+            },
+            {
+              step: 3,
+              title: 'Calculate & log',
+              body: 'Review calories and macros, then log the meal so it counts toward today’s totals.',
+              icon: CheckCircle,
+            },
+          ].map(({ step, title, body, icon: StepIcon }) => (
+            <li key={step} className="flex gap-3">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-900 text-amber-50 text-sm font-bold">
+                {step}
+              </span>
+              <div className="min-w-0 pt-0.5">
+                <div className="flex items-center gap-2 mb-1">
+                  <StepIcon className="w-4 h-4 text-amber-800 shrink-0" aria-hidden />
+                  <h4 className="font-semibold text-gray-900">{title}</h4>
+                </div>
+                <p className="text-sm text-gray-700 leading-relaxed">{body}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+
+        <div className="mt-5 pt-4 border-t border-amber-300/60">
+          <p className="text-xs font-semibold uppercase tracking-wide text-gray-600 mb-2">
+            Amount examples
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {[
+              '100g',
+              '2 oz',
+              '1 cup',
+              '2 tbsp',
+              '1 medium',
+              '1 slice',
+              '1 serving',
+            ].map((example) => (
+              <span
+                key={example}
+                className="inline-flex items-center rounded-md bg-white/70 px-2.5 py-1 text-sm text-gray-800 border border-amber-200/80"
+              >
+                {example}
+              </span>
+            ))}
           </div>
         </div>
       </Card>
+
+      <PackagedFoodScanner />
 
       {/* Main Calculator */}
       <Card className="p-6 bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-sm border-amber-200/40 shadow-lg" data-testid="calorie-calculator">
