@@ -7,7 +7,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { apiRequest } from '@/lib/queryClient';
-import { useToast } from '@/hooks/use-toast';
 
 interface DataIntegrityStatus {
   isVerified: boolean;
@@ -18,7 +17,6 @@ interface DataIntegrityStatus {
 
 export function useDataIntegrity() {
   const { user } = useAuth();
-  const { toast } = useToast();
   const [status, setStatus] = useState<DataIntegrityStatus>({
     isVerified: false,
     lastBackup: null,
@@ -65,16 +63,7 @@ export function useDataIntegrity() {
         dataHealth,
         issues
       });
-
-      // Show warning if data is at risk
-      if (issues.length > 0) {
-        toast({
-          title: 'Data Backup Recommended',
-          description: `${issues.length} data sync issue(s) detected. Your data is being protected.`,
-          variant: 'default'
-        });
-      }
-
+      // Silent — never toast/push for integrity checks (native maps toast → OS banners).
     } catch (error) {
       setStatus(prev => ({
         ...prev,
@@ -82,7 +71,7 @@ export function useDataIntegrity() {
         issues: ['Data verification failed']
       }));
     }
-  }, [user, toast]);
+  }, [user]);
 
   // Backup critical data to database
   const backupCriticalData = useCallback(async () => {
@@ -111,22 +100,15 @@ export function useDataIntegrity() {
         }
       }
 
-      // Record successful backup
+      // Record successful backup — silent (no toast / OS notification).
       localStorage.setItem('lastDataBackup', new Date().toISOString());
       localStorage.setItem('itemsBackedUp', itemsBackedUp.toString());
-
-      
-      toast({
-        title: 'Data Backup Complete',
-        description: `Successfully backed up ${itemsBackedUp} items to secure database`,
-        variant: 'default'
-      });
 
       return itemsBackedUp;
     } catch (error) {
       throw error;
     }
-  }, [user, toast]);
+  }, [user]);
 
   // Restore data from database if localStorage is empty
   const restoreDataFromDatabase = useCallback(async () => {

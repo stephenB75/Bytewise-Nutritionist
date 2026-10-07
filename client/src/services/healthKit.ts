@@ -17,14 +17,22 @@ const AGGREGATED_SUM_TYPES = new Set<string>(['steps', 'distance', 'calories']);
 
 export type HealthPermissionResult = { ok: true } | { ok: false; reason: string };
 
-export type SleepSummary = {
+export type SleepStageTotals = {
   asleepMinutes: number;
   awakeMinutes: number;
   deepMinutes: number;
   remMinutes: number;
   coreMinutes: number;
   hasStages: boolean;
+};
+
+export type SleepSummary = SleepStageTotals & {
+  /** Overall sleep quality 0–100 (Bytewise, not Apple's Sleep Score). */
   score: number;
+  /** Readiness from last night's sleep 0–100 (higher = more recovered). */
+  recovery: number;
+  /** Estimated strain from sleep debt / fragmentation 0–100 (higher = more stressed). */
+  stress: number;
 };
 
 export type WorkoutSummary = {
@@ -102,21 +110,87 @@ function dayBounds(date: Date = new Date()): { start: Date; end: Date } {
 }
 
 const SLEEP_GOAL_MINUTES = 8 * 60;
+/** Target share of sleep that is deep + REM for full restorative credit. */
+const RESTORATIVE_SHARE_TARGET = 0.35;
 
 /**
  * Bytewise's own 0-100 sleep score (Apple does not expose its Sleep Score to other apps):
  * 50 points for time asleep against an 8-hour goal, 30 for deep + REM share (35% earns full
  * marks; nights without stage data get a neutral 20), and 20 for staying asleep (an hour awake scores 0).
  */
-export function calculateSleepScore(sleep: Omit<SleepSummary, 'score'>): number {
+export function calculateSleepScore(sleep: SleepStageTotals): number {
   if (sleep.asleepMinutes <= 0) {
     return 0;
   }
   const duration = Math.min(sleep.asleepMinutes / SLEEP_GOAL_MINUTES, 1) * 50;
   const restorativeShare = (sleep.deepMinutes + sleep.remMinutes) / sleep.asleepMinutes;
-  const quality = sleep.hasStages ? Math.min(restorativeShare / 0.35, 1) * 30 : 20;
+  const quality = sleep.hasStages
+    ? Math.min(restorativeShare / RESTORATIVE_SHARE_TARGET, 1) * 30
+    : 20;
   const continuity = Math.max(0, 1 - sleep.awakeMinutes / 60) * 20;
   return Math.round(duration + quality + continuity);
+}
+
+/**
+ * Recovery 0–100 from last night's sleep only (no HRV required).
+ * Duration sweet spot 7–9h (40), deep+REM vs 35% (40), low night wakefulness (20).
+ */
+export function calculateRecoveryScore(sleep: SleepStageTotals): number {
+  if (sleep.asleepMinutes <= 0) {
+    return 0;
+  }
+
+  const hours = sleep.asleepMinutes / 60;
+  let durationPts: number;
+  if (hours >= 7 && hours <= 9) {
+    durationPts = 40;
+  } else if (hours >= 6 && hours < 7) {
+    durationPts = 28 + (hours - 6) * 12;
+  } else if (hours > 9 && hours <= 10) {
+    durationPts = 40 - (hours - 9) * 12;
+  } else if (hours < 6) {
+    durationPts = Math.max(0, (hours / 6) * 28);
+  } else {
+    durationPts = Math.max(0, 28 - (hours - 10) * 6);
+  }
+
+  const restorativeShare = (sleep.deepMinutes + sleep.remMinutes) / sleep.asleepMinutes;
+  const restorativePts = sleep.hasStages
+    ? Math.min(restorativeShare / RESTORATIVE_SHARE_TARGET, 1) * 40
+    : 22;
+  const continuityPts = Math.max(0, 1 - sleep.awakeMinutes / 45) * 20;
+
+  return Math.round(Math.min(100, durationPts + restorativePts + continuityPts));
+}
+
+/**
+ * Stress 0–100 estimated from sleep debt, night awakenings, and low restorative sleep.
+ * Higher = more stressed / less recovered from the night.
+ */
+export function calculateStressScore(sleep: SleepStageTotals): number {
+  if (sleep.asleepMinutes <= 0) {
+    return 0;
+  }
+
+  const debtRatio = Math.max(0, SLEEP_GOAL_MINUTES - sleep.asleepMinutes) / SLEEP_GOAL_MINUTES;
+  const debtPts = Math.min(debtRatio, 1.2) * 40;
+  const fragmentationPts = Math.min(sleep.awakeMinutes / 60, 1) * 30;
+
+  const restorativeShare = (sleep.deepMinutes + sleep.remMinutes) / sleep.asleepMinutes;
+  const lowRestPts = sleep.hasStages
+    ? Math.max(0, 1 - restorativeShare / RESTORATIVE_SHARE_TARGET) * 30
+    : 15;
+
+  return Math.round(Math.min(100, debtPts + fragmentationPts + lowRestPts));
+}
+
+export function buildSleepSummary(stages: SleepStageTotals): SleepSummary {
+  return {
+    ...stages,
+    score: calculateSleepScore(stages),
+    recovery: calculateRecoveryScore(stages),
+    stress: calculateStressScore(stages),
+  };
 }
 
 const WORKOUT_NAMES: Record<string, string> = {
@@ -459,7 +533,7 @@ export class HealthKitService {
       });
 
       // Watch, iPhone and sleep apps can each record the same night; use the most complete source.
-      const bySource = new Map<string, Omit<SleepSummary, 'score'>>();
+      const bySource = new Map<string, SleepStageTotals>();
       for (const sample of samples || []) {
         const source = sample.sourceId || sample.sourceName || 'unknown';
         const night = bySource.get(source) || {
@@ -498,15 +572,14 @@ export class HealthKitService {
       if (!best || best.asleepMinutes <= 0) {
         return null;
       }
-      const rounded = {
+      return buildSleepSummary({
         asleepMinutes: Math.round(best.asleepMinutes),
         awakeMinutes: Math.round(best.awakeMinutes),
         deepMinutes: Math.round(best.deepMinutes),
         remMinutes: Math.round(best.remMinutes),
         coreMinutes: Math.round(best.coreMinutes),
         hasStages: best.hasStages,
-      };
-      return { ...rounded, score: calculateSleepScore(rounded) };
+      });
     } catch (error) {
       console.warn('Failed to read sleep from Apple Health:', error);
       return null;

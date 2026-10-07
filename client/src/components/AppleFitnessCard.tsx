@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
-import { Activity, Flame, Footprints, HeartPulse, Moon } from 'lucide-react';
+import { Activity, Flame, Footprints, HeartPulse, Moon, Sparkles, Zap } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { healthKitService, type AppleFitnessSummary, type SleepSummary } from '@/services/healthKit';
@@ -25,25 +25,80 @@ function sleepRating(score: number): { label: string; className: string } {
   return { label: 'Poor', className: 'text-rose-700' };
 }
 
+function recoveryRating(score: number): { label: string; className: string } {
+  if (score >= 80) return { label: 'Ready', className: 'text-green-700' };
+  if (score >= 60) return { label: 'OK', className: 'text-amber-700' };
+  return { label: 'Low', className: 'text-rose-700' };
+}
+
+function stressRating(score: number): { label: string; className: string } {
+  if (score <= 30) return { label: 'Low', className: 'text-green-700' };
+  if (score <= 55) return { label: 'Moderate', className: 'text-amber-700' };
+  return { label: 'High', className: 'text-rose-700' };
+}
+
+function MetricCell({
+  icon: Icon,
+  iconClass,
+  label,
+  value,
+  rating,
+}: {
+  icon: typeof Moon;
+  iconClass: string;
+  label: string;
+  value: number;
+  rating: { label: string; className: string };
+}) {
+  return (
+    <div className="rounded-lg bg-amber-50/80 border border-amber-200/40 px-2 py-2 text-center">
+      <div className="flex items-center justify-center gap-1 text-[10px] sm:text-xs text-gray-600 mb-0.5">
+        <Icon className={`h-3 w-3 shrink-0 ${iconClass}`} aria-hidden />
+        <span>{label}</span>
+      </div>
+      <p className="text-base sm:text-lg font-bold text-gray-900 tabular-nums leading-tight">{value}</p>
+      <p className={`text-[10px] sm:text-xs font-semibold ${rating.className}`}>{rating.label}</p>
+    </div>
+  );
+}
+
 function SleepTile({ sleep }: { sleep: SleepSummary | null }) {
   return (
     <div className="rounded-lg bg-white/70 p-3 border border-amber-200/50" data-testid="apple-fitness-sleep">
-      <div className="flex items-center gap-1.5 text-xs text-gray-600 mb-1">
+      <div className="flex items-center gap-1.5 text-xs text-gray-600 mb-2">
         <Moon className="h-3.5 w-3.5 text-indigo-600" />
-        Sleep score
+        Sleep last night
       </div>
       {sleep ? (
         <>
-          <p className="text-lg font-bold text-gray-900">
-            {sleep.score}
-            <span className={`ml-1.5 text-xs font-semibold ${sleepRating(sleep.score).className}`}>
-              {sleepRating(sleep.score).label}
-            </span>
-          </p>
-          <p className="text-xs text-gray-700">{formatMinutes(sleep.asleepMinutes)} asleep last night</p>
+          <div className="grid grid-cols-3 gap-1.5 mb-2" data-testid="apple-fitness-sleep-metrics">
+            <MetricCell
+              icon={Moon}
+              iconClass="text-indigo-600"
+              label="Score"
+              value={sleep.score}
+              rating={sleepRating(sleep.score)}
+            />
+            <MetricCell
+              icon={Sparkles}
+              iconClass="text-emerald-600"
+              label="Recovery"
+              value={sleep.recovery}
+              rating={recoveryRating(sleep.recovery)}
+            />
+            <MetricCell
+              icon={Zap}
+              iconClass="text-orange-600"
+              label="Stress"
+              value={sleep.stress}
+              rating={stressRating(sleep.stress)}
+            />
+          </div>
+          <p className="text-xs text-gray-700">{formatMinutes(sleep.asleepMinutes)} asleep</p>
           {sleep.hasStages && (
             <p className="text-xs text-gray-600">
               Deep {formatMinutes(sleep.deepMinutes)} · REM {formatMinutes(sleep.remMinutes)}
+              {sleep.awakeMinutes > 0 ? ` · Awake ${formatMinutes(sleep.awakeMinutes)}` : ''}
             </p>
           )}
         </>
@@ -204,7 +259,7 @@ export function AppleFitnessCard({ onConnect }: AppleFitnessCardProps) {
             <>
               <SleepTile sleep={summary?.sleep ?? null} />
               <p className="text-[11px] text-gray-600">
-                Sleep score is calculated by Bytewise from your Apple Health sleep data; it is not Apple's Sleep Score. Exercise and workouts are on the Exercise card below.
+                Score, recovery, and stress are calculated by Bytewise from Apple Health sleep stages (duration, deep/REM, and night wakefulness)—not Apple’s Sleep Score. Exercise is on the card below.
               </p>
             </>
           )}

@@ -5,7 +5,6 @@
 
 import { useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { useToast } from '@/hooks/use-toast';
 import { useMutation } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 
@@ -18,7 +17,6 @@ interface PersistenceConfig {
 
 export function useDataPersistence({ key, data, syncToDatabase = true, debounceMs = 1000 }: PersistenceConfig) {
   const { user } = useAuth();
-  const { toast } = useToast();
   const timeoutRef = useRef<NodeJS.Timeout>();
   const lastSyncRef = useRef<string>('');
 
@@ -144,16 +142,12 @@ export function useDataPersistence({ key, data, syncToDatabase = true, debounceM
     return null;
   }, [key]);
 
-  // Force sync function
+  // Force sync function — silent; native toast routing would push OS banners.
   const forceSync = useCallback(() => {
     if (data && user) {
       syncMutation.mutate(data);
-      toast({
-        title: "Syncing data",
-        description: "Your data is being backed up to the cloud"
-      });
     }
-  }, [data, user, syncMutation, toast]);
+  }, [data, user, syncMutation]);
 
   return {
     loadFromLocalStorage,

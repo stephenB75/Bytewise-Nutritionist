@@ -86,6 +86,7 @@ import {
   OS_NOTIFICATIONS_PREF_EVENT,
   areOsNotificationsEnabled,
   APP_ALERT_EVENT,
+  isSilentSystemAlert,
   notifyInternalAlert,
   syncDailyReminders,
   usesNativeNotifications,
@@ -543,6 +544,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   // Collapse duplicate bell/OS alerts when the same meal/event fires multiple window events.
   const recentNotificationKeysRef = useRef<Map<string, number>>(new Map());
   const addNotification = useCallback((type: Notification['type'], title: string, message: string) => {
+    // Never bell/OS-notify restore/backup/sync system chatter.
+    if (isSilentSystemAlert(title, message)) return;
+
     const key = `${type}|${title}|${message}`;
     const now = Date.now();
     const lastAt = recentNotificationKeysRef.current.get(key) || 0;

@@ -331,6 +331,23 @@ export function usesNativeNotifications(): boolean {
   return !!getPlugin();
 }
 
+/** Background sync/restore/backup chatter — never surface as OS banners or bell alerts. */
+export function isSilentSystemAlert(title: string, body = ''): boolean {
+  const text = `${title} ${body}`.toLowerCase();
+  return (
+    text.includes('data restored') ||
+    text.includes('data backup') ||
+    text.includes('backup complete') ||
+    text.includes('backup recommended') ||
+    text.includes('backed up') ||
+    text.includes('syncing data') ||
+    text.includes('secure backup') ||
+    text.includes('data sync issue') ||
+    (text.includes('restored') &&
+      (text.includes('meal') || text.includes('item') || text.includes('account')))
+  );
+}
+
 /**
  * On iOS/Android with OS notifications enabled, route an alert into the bell inbox
  * (via APP_ALERT_EVENT) instead of showing an in-app toast. Returns true when routed.
@@ -343,6 +360,8 @@ export function routeAlertToNativeNotifications(opts: {
   if (!usesNativeNotifications() || !areOsNotificationsEnabled()) return false;
   const title = (opts.title || 'Bytewise').trim() || 'Bytewise';
   const body = (opts.description || title).trim() || title;
+  // Swallow restore/backup/sync noise entirely (no toast, no OS banner, no bell).
+  if (isSilentSystemAlert(title, body)) return true;
   const type = opts.variant === 'destructive' ? 'error' : 'info';
   window.dispatchEvent(
     new CustomEvent(APP_ALERT_EVENT, {
