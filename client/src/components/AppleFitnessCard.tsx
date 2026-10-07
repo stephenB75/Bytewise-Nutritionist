@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
-import { Activity, Flame, Footprints, HeartPulse, Moon } from 'lucide-react';
+import { Activity, Flame, Footprints, HeartPulse, Moon, RefreshCw } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { healthKitService, type AppleFitnessSummary, type SleepSummary } from '@/services/healthKit';
@@ -61,10 +61,11 @@ export function AppleFitnessCard({ onConnect }: AppleFitnessCardProps) {
   const [needsRecoveryPermission, setNeedsRecoveryPermission] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const refresh = useCallback(async () => {
-    setLoading(true);
+  const refresh = useCallback(async (opts?: { quiet?: boolean }) => {
+    if (!opts?.quiet) setLoading(true);
     try {
       await healthKitService.initialize();
+      await healthKitService.refreshAuthorization();
       const isAvailable = healthKitService.getAvailability();
       const isConnected = healthKitService.getAuthorizationStatus();
       setAvailable(isAvailable);
@@ -77,20 +78,25 @@ export function AppleFitnessCard({ onConnect }: AppleFitnessCardProps) {
         setSummary(null);
       }
     } finally {
-      setLoading(false);
+      if (!opts?.quiet) setLoading(false);
     }
   }, []);
 
   useEffect(() => {
     refresh();
-    const onHealthChange = () => refresh();
+    const onHealthChange = () => refresh({ quiet: true });
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') refresh({ quiet: true });
+    };
     window.addEventListener('apple-health-changed', onHealthChange);
     window.addEventListener('focus', onHealthChange);
     window.addEventListener('app-data-refresh', onHealthChange);
+    document.addEventListener('visibilitychange', onVisibility);
     return () => {
       window.removeEventListener('apple-health-changed', onHealthChange);
       window.removeEventListener('focus', onHealthChange);
       window.removeEventListener('app-data-refresh', onHealthChange);
+      document.removeEventListener('visibilitychange', onVisibility);
     };
   }, [refresh]);
 
@@ -117,12 +123,28 @@ export function AppleFitnessCard({ onConnect }: AppleFitnessCardProps) {
 
   return (
     <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200/60 p-4 shadow-md" data-testid="apple-fitness-card">
-      <div className="flex items-center gap-2 mb-3">
-        <HeartPulse className="h-5 w-5 text-rose-600" />
-        <div>
-          <h3 className="text-base font-bold text-gray-900">Apple Fitness</h3>
-          <p className="text-xs text-gray-700">Today from Apple Health</p>
+      <div className="flex items-center justify-between gap-2 mb-3">
+        <div className="flex items-center gap-2 min-w-0">
+          <HeartPulse className="h-5 w-5 shrink-0 text-rose-600" />
+          <div className="min-w-0">
+            <h3 className="text-base font-bold text-gray-900">Apple Fitness</h3>
+            <p className="text-xs text-gray-700">Today from Apple Health</p>
+          </div>
         </div>
+        {connected && available && isNativeIos && (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="shrink-0 border-amber-300 bg-white/80 text-gray-800"
+            onClick={() => refresh()}
+            disabled={loading}
+            data-testid="button-update-apple-fitness"
+          >
+            <RefreshCw className={`h-3.5 w-3.5 mr-1 ${loading ? 'animate-spin' : ''}`} />
+            Update
+          </Button>
+        )}
       </div>
 
       {loading && !summary ? (

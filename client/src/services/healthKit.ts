@@ -2,6 +2,8 @@ import { Capacitor } from '@capacitor/core';
 import { Health } from '@capgo/capacitor-health';
 
 const CONNECTED_KEY = 'appleHealthConnected';
+const RECOVERY_ASKED_KEY = 'appleHealthRecoveryAsked';
+const EXERCISE_ASKED_KEY = 'appleHealthExerciseAsked';
 const LEGACY_KEYS = ['appleHealthAutoSync', 'appleHealthSyncedMealIds', 'appleHealthSyncedWater', 'pendingHealthKitSync'];
 
 const FITNESS_READ_TYPES = ['steps', 'calories', 'distance'] as const;
@@ -10,6 +12,8 @@ const RECOVERY_READ_TYPES = ['sleep', 'workouts'] as const;
 // Apple's Exercise ring minutes; added after sleep and workouts, so it is asked about separately.
 const EXERCISE_READ_TYPES = ['exerciseTime'] as const;
 const READ_TYPES = [...FITNESS_READ_TYPES, ...RECOVERY_READ_TYPES, ...EXERCISE_READ_TYPES];
+/** Capgo only supports aggregated queries for these cumulative types. */
+const AGGREGATED_SUM_TYPES = new Set<string>(['steps', 'distance', 'calories']);
 
 export type HealthPermissionResult = { ok: true } | { ok: false; reason: string };
 
@@ -71,13 +75,31 @@ type HealthBridge = {
     startDate?: string;
     endDate?: string;
     limit?: number;
+    ascending?: boolean;
   }) => Promise<{ samples?: HealthSampleRow[] }>;
+  queryAggregated?: (options: {
+    dataType: string;
+    startDate?: string;
+    endDate?: string;
+    bucket?: 'hour' | 'day' | 'week' | 'month';
+    aggregation?: 'sum' | 'average' | 'min' | 'max';
+  }) => Promise<{ samples?: Array<{ value?: number; startDate?: string; endDate?: string }> }>;
   queryWorkouts: (options: {
     startDate?: string;
     endDate?: string;
     limit?: number;
   }) => Promise<{ workouts?: WorkoutRow[] }>;
 };
+
+function dayBounds(date: Date = new Date()): { start: Date; end: Date } {
+  const start = new Date(date);
+  start.setHours(0, 0, 0, 0);
+  const end = new Date(date);
+  end.setHours(23, 59, 59, 999);
+  // Cap end at now so partial today buckets stay current.
+  const capped = end.getTime() > Date.now() ? new Date() : end;
+  return { start, end: capped };
+}
 
 const SLEEP_GOAL_MINUTES = 8 * 60;
 
@@ -162,8 +184,8 @@ export class HealthKitService {
   private isAvailable = false;
   private unavailableReason: string | null = null;
   private isAuthorized = localStorage.getItem(CONNECTED_KEY) === 'true';
-  private recoveryAsked = false;
-  private exerciseAsked = false;
+  private recoveryAsked = localStorage.getItem(RECOVERY_ASKED_KEY) === 'true';
+  private exerciseAsked = localStorage.getItem(EXERCISE_ASKED_KEY) === 'true';
   private ready: Promise<void>;
 
   constructor() {
@@ -185,9 +207,10 @@ export class HealthKitService {
 
       if (this.isAvailable && this.isAuthorized) {
         const auth = await health.checkAuthorization({ read: READ_TYPES, write: [] });
-        this.setAuthorized(wasAsked(auth));
-        this.recoveryAsked = wasAskedForRecovery(auth);
-        this.exerciseAsked = wasAskedForExercise(auth);
+        // Keep a prior Connect; Apple/Capgo can omit previously asked types from a cold check.
+        this.setAuthorized(wasAsked(auth) || this.isAuthorized);
+        this.setRecoveryAsked(wasAskedForRecovery(auth) || this.recoveryAsked);
+        this.setExerciseAsked(wasAskedForExercise(auth) || this.exerciseAsked);
       }
     } catch (error) {
       console.warn('HealthKit availability check failed:', error);
@@ -201,8 +224,44 @@ export class HealthKitService {
     localStorage.setItem(CONNECTED_KEY, value ? 'true' : 'false');
   }
 
+  private setRecoveryAsked(value: boolean) {
+    this.recoveryAsked = value;
+    localStorage.setItem(RECOVERY_ASKED_KEY, value ? 'true' : 'false');
+  }
+
+  private setExerciseAsked(value: boolean) {
+    this.exerciseAsked = value;
+    localStorage.setItem(EXERCISE_ASKED_KEY, value ? 'true' : 'false');
+  }
+
   async initialize(): Promise<void> {
     await this.ready;
+  }
+
+  /**
+   * Re-read HealthKit authorization flags. Needed after the user changes access
+   * in the Health app or returns from the permission sheet — the first check
+   * only runs once at startup.
+   */
+  async refreshAuthorization(): Promise<void> {
+    await this.ready;
+    const health = getHealth();
+    if (!health || !this.isAvailable) {
+      return;
+    }
+
+    try {
+      const auth = await health.checkAuthorization({ read: READ_TYPES, write: [] });
+      // Keep a prior Connect as connected even if checkAuthorization returns empty
+      // (Apple does not expose true grant state for reads).
+      if (wasAsked(auth) || this.isAuthorized) {
+        this.setAuthorized(true);
+      }
+      this.setRecoveryAsked(wasAskedForRecovery(auth) || this.recoveryAsked);
+      this.setExerciseAsked(wasAskedForExercise(auth) || this.exerciseAsked);
+    } catch (error) {
+      console.warn('HealthKit authorization refresh failed:', error);
+    }
   }
 
   async requestPermissions(): Promise<HealthPermissionResult> {
@@ -213,13 +272,14 @@ export class HealthKitService {
     }
 
     try {
-      const status = await health.requestAuthorization({ read: READ_TYPES, write: [] });
-      this.setAuthorized(wasAsked(status));
-      this.recoveryAsked = wasAskedForRecovery(status);
-      this.exerciseAsked = wasAskedForExercise(status);
-      return this.isAuthorized
-        ? { ok: true }
-        : { ok: false, reason: 'Apple Health did not record an answer. Please try again.' };
+      await health.requestAuthorization({ read: READ_TYPES, write: [] });
+      // A successful requestAuthorization for READ_TYPES means iOS has been asked for
+      // sleep/workouts/exercise — Capgo's status payload sometimes omits them.
+      this.setAuthorized(true);
+      this.setRecoveryAsked(true);
+      this.setExerciseAsked(true);
+      await this.refreshAuthorization();
+      return { ok: true };
     } catch (error) {
       console.error('HealthKit permission request failed:', error);
       this.setAuthorized(false);
@@ -236,16 +296,35 @@ export class HealthKitService {
     return this.unavailableReason;
   }
 
+  /**
+   * Prefer HealthKit statistics (queryAggregated) for steps/distance/calories so totals
+   * match the Fitness app. exerciseTime is not supported by Capgo aggregation — use samples.
+   */
   private async sumSamplesForDay(dataType: string, date: Date = new Date()): Promise<number> {
     const health = getHealth();
     if (!health) {
       return 0;
     }
 
-    const start = new Date(date);
-    start.setHours(0, 0, 0, 0);
-    const end = new Date(date);
-    end.setHours(23, 59, 59, 999);
+    const { start, end } = dayBounds(date);
+
+    if (AGGREGATED_SUM_TYPES.has(dataType) && typeof health.queryAggregated === 'function') {
+      try {
+        const { samples } = await health.queryAggregated({
+          dataType,
+          startDate: start.toISOString(),
+          endDate: end.toISOString(),
+          bucket: 'day',
+          aggregation: 'sum',
+        });
+        const total = (samples || []).reduce((sum, sample) => sum + toNumber(sample.value), 0);
+        if (total > 0 || (samples && samples.length > 0)) {
+          return Math.max(0, total);
+        }
+      } catch (error) {
+        console.warn(`Aggregated ${dataType} read failed, falling back to samples:`, error);
+      }
+    }
 
     try {
       const { samples } = await health.readSamples({
@@ -253,16 +332,25 @@ export class HealthKitService {
         startDate: start.toISOString(),
         endDate: end.toISOString(),
         limit: 5000,
+        ascending: false,
       });
 
-      // iPhone and Apple Watch both record the same walk, so adding every sample double-counts.
-      // Health's own totals de-duplicate by source; the busiest source is a close stand-in.
+      // Exercise ring samples are non-overlapping minute quantities — sum them all.
+      // Steps/distance can be duplicated across Watch + iPhone; prefer the busiest source.
+      if (dataType === 'exerciseTime') {
+        return Math.max(
+          0,
+          (samples || []).reduce((sum, sample) => sum + toNumber(sample.value), 0),
+        );
+      }
+
       const totalsBySource = new Map<string, number>();
       for (const sample of samples || []) {
         const source = sample.sourceId || sample.sourceName || 'unknown';
         totalsBySource.set(source, (totalsBySource.get(source) || 0) + toNumber(sample.value));
       }
-      return Math.max(0, ...Array.from(totalsBySource.values()));
+      const values = Array.from(totalsBySource.values());
+      return values.length ? Math.max(0, ...values) : 0;
     } catch (error) {
       console.warn(`Failed to read ${dataType} from Apple Health:`, error);
       return 0;
@@ -271,6 +359,7 @@ export class HealthKitService {
 
   async readTodayFitnessSummary(): Promise<AppleFitnessSummary | null> {
     await this.ready;
+    await this.refreshAuthorization();
     if (!this.isAvailable || !this.isAuthorized) {
       return null;
     }
@@ -279,7 +368,8 @@ export class HealthKitService {
       this.sumSamplesForDay('steps'),
       this.sumSamplesForDay('calories'),
       this.sumSamplesForDay('distance'),
-      this.exerciseAsked ? this.sumSamplesForDay('exerciseTime') : Promise.resolve(null),
+      // Always attempt exercise reads when connected; empty until permission is granted.
+      this.sumSamplesForDay('exerciseTime'),
       this.readLastNightSleep(),
       this.readWorkoutsForDay(),
     ]);
@@ -288,7 +378,7 @@ export class HealthKitService {
       steps: Math.round(steps),
       activeCalories: Math.round(activeCalories),
       distanceMiles: Math.round((distanceMeters / 1609.34) * 10) / 10,
-      exerciseMinutes: exerciseMinutes === null ? null : Math.round(exerciseMinutes),
+      exerciseMinutes: Math.round(exerciseMinutes),
       sleep,
       workouts,
     };
@@ -305,7 +395,9 @@ export class HealthKitService {
     totalMinutes: number;
   }> | null> {
     await this.ready;
-    if (!this.isAvailable || !this.isAuthorized || !this.exerciseAsked) {
+    await this.refreshAuthorization();
+    // Read whenever connected — HealthKit returns empty samples until Exercise is allowed.
+    if (!this.isAvailable || !this.isAuthorized) {
       return null;
     }
 
@@ -316,20 +408,33 @@ export class HealthKitService {
     });
     const [ringMinutes, workouts] = await Promise.all([
       Promise.all(dates.map((date) => this.sumSamplesForDay('exerciseTime', date))),
-      this.recoveryAsked
-        ? Promise.all(dates.map((date) => this.readWorkoutsForDay(date)))
-        : Promise.resolve(dates.map(() => ({ count: 0, minutes: 0, calories: 0, items: [] } as WorkoutSummary))),
+      // Always try workouts; empty if permission was never granted.
+      Promise.all(dates.map((date) => this.readWorkoutsForDay(date))),
     ]);
-    return dates.map((date, index) => {
+
+    const history = dates.map((date, index) => {
       const ring = Math.round(ringMinutes[index]);
       const workout = workouts[index].minutes;
+      // Green ring already includes workout exercise minutes — do not add them again.
+      // If ring data is missing but workouts exist, show workout minutes as the total.
+      const totalMinutes = ring > 0 ? ring : workout;
       return {
         date,
         ringMinutes: ring,
         workoutMinutes: workout,
-        totalMinutes: ring + workout,
+        totalMinutes,
       };
     });
+
+    // If we successfully read exercise data, remember that access was granted.
+    if (history.some((day) => day.ringMinutes > 0)) {
+      this.setExerciseAsked(true);
+    }
+    if (history.some((day) => day.workoutMinutes > 0)) {
+      this.setRecoveryAsked(true);
+    }
+
+    return history;
   }
 
   /** Sleep between 6 PM yesterday and 6 PM today (or now, if earlier). */
@@ -491,7 +596,11 @@ export class HealthKitService {
 
   async disconnect(): Promise<void> {
     this.isAuthorized = false;
+    this.recoveryAsked = false;
+    this.exerciseAsked = false;
     localStorage.removeItem(CONNECTED_KEY);
+    localStorage.removeItem(RECOVERY_ASKED_KEY);
+    localStorage.removeItem(EXERCISE_ASKED_KEY);
     LEGACY_KEYS.forEach((key) => localStorage.removeItem(key));
   }
 }

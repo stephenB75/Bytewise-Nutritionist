@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
-import { Dumbbell, Timer } from 'lucide-react';
+import { Dumbbell, RefreshCw, Timer } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { healthKitService, type WorkoutSummary } from '@/services/healthKit';
@@ -53,6 +53,7 @@ export function ExerciseMinutesCard({ onConnect }: { onConnect?: () => void }) {
   const [days, setDays] = useState<DayMinutes[]>([]);
   const [todayWorkouts, setTodayWorkouts] = useState<WorkoutSummary | null>(null);
   const [allowing, setAllowing] = useState(false);
+  const [updating, setUpdating] = useState(false);
 
   const refresh = useCallback(async () => {
     if (!(Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios')) {
@@ -60,6 +61,7 @@ export function ExerciseMinutesCard({ onConnect }: { onConnect?: () => void }) {
       return;
     }
     await healthKitService.initialize();
+    await healthKitService.refreshAuthorization();
     if (!healthKitService.getAvailability()) {
       setState('unavailable');
       return;
@@ -68,9 +70,11 @@ export function ExerciseMinutesCard({ onConnect }: { onConnect?: () => void }) {
       setState('disconnected');
       return;
     }
+
+    // Always load when connected. Show the Allow prompt only if Health still
+    // hasn't been asked for Exercise minutes (legacy connects).
     if (healthKitService.needsExercisePermission()) {
       setState('needs-permission');
-      return;
     }
 
     const [history, summary] = await Promise.all([
@@ -79,19 +83,32 @@ export function ExerciseMinutesCard({ onConnect }: { onConnect?: () => void }) {
     ]);
     setDays(history || []);
     setTodayWorkouts(summary?.workouts ?? { count: 0, minutes: 0, calories: 0, items: [] });
-    setState('ready');
+    // Prefer ready once we have any readable data, even if a follow-up Allow is offered.
+    const hasData = (history || []).some((day) => day.totalMinutes > 0)
+      || (summary?.workouts?.count ?? 0) > 0
+      || (summary?.exerciseMinutes ?? 0) > 0;
+    if (hasData || !healthKitService.needsExercisePermission()) {
+      setState('ready');
+    } else {
+      setState('needs-permission');
+    }
   }, []);
 
   useEffect(() => {
     refresh();
     const onChange = () => refresh();
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') refresh();
+    };
     window.addEventListener('apple-health-changed', onChange);
     window.addEventListener('focus', onChange);
     window.addEventListener('app-data-refresh', onChange);
+    document.addEventListener('visibilitychange', onVisibility);
     return () => {
       window.removeEventListener('apple-health-changed', onChange);
       window.removeEventListener('focus', onChange);
       window.removeEventListener('app-data-refresh', onChange);
+      document.removeEventListener('visibilitychange', onVisibility);
     };
   }, [refresh]);
 
@@ -120,14 +137,40 @@ export function ExerciseMinutesCard({ onConnect }: { onConnect?: () => void }) {
   const todayProgress = Math.min(todayTotal / DAILY_TARGET_MINUTES, 1) * 100;
   const workoutItems = todayWorkouts?.items ?? [];
 
+  const handleUpdate = async () => {
+    setUpdating(true);
+    try {
+      await refresh();
+      toast({ title: 'Exercise updated', description: 'Pulled the latest minutes from Apple Health.', duration: 2500 });
+    } finally {
+      setUpdating(false);
+    }
+  };
+
   return (
     <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200/60 p-4 shadow-md" data-testid="exercise-minutes-card">
-      <div className="flex items-center gap-2 mb-3">
-        <Timer className="h-5 w-5 text-lime-600" />
-        <div>
-          <h3 className="text-base font-bold text-gray-900">Exercise</h3>
-          <p className="text-xs text-gray-700">All-day activity and workouts in one place</p>
+      <div className="flex items-center justify-between gap-2 mb-3">
+        <div className="flex items-center gap-2 min-w-0">
+          <Timer className="h-5 w-5 shrink-0 text-lime-600" />
+          <div className="min-w-0">
+            <h3 className="text-base font-bold text-gray-900">Exercise</h3>
+            <p className="text-xs text-gray-700">All-day activity and workouts in one place</p>
+          </div>
         </div>
+        {(state === 'ready' || state === 'needs-permission') && (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="shrink-0 border-amber-300 bg-white/80 text-gray-800"
+            onClick={handleUpdate}
+            disabled={updating}
+            data-testid="button-update-exercise"
+          >
+            <RefreshCw className={`h-3.5 w-3.5 mr-1 ${updating ? 'animate-spin' : ''}`} />
+            Update
+          </Button>
+        )}
       </div>
 
       {state === 'loading' ? (
@@ -138,12 +181,10 @@ export function ExerciseMinutesCard({ onConnect }: { onConnect?: () => void }) {
         </p>
       ) : state === 'unavailable' ? (
         <p className="text-sm text-gray-700">Apple Health is not available on this device.</p>
-      ) : state === 'disconnected' || state === 'needs-permission' ? (
+      ) : state === 'disconnected' ? (
         <div className="space-y-2">
           <p className="text-sm text-gray-700">
-            {state === 'disconnected'
-              ? 'Connect Apple Health to track your exercise minutes and workouts.'
-              : 'Allow Exercise minutes in Apple Health to see your activity here.'}
+            Connect Apple Health to track your exercise minutes and workouts.
           </p>
           <Button
             type="button"
@@ -153,11 +194,28 @@ export function ExerciseMinutesCard({ onConnect }: { onConnect?: () => void }) {
             disabled={allowing}
             data-testid="button-allow-exercise-card"
           >
-            {allowing ? 'Opening Apple Health…' : state === 'disconnected' ? 'Connect Apple Health' : 'Allow exercise minutes'}
+            {allowing ? 'Opening Apple Health…' : 'Connect Apple Health'}
           </Button>
         </div>
       ) : (
         <div className="space-y-3">
+          {state === 'needs-permission' && (
+            <div className="rounded-lg bg-white/70 p-3 border border-amber-200/50 space-y-2">
+              <p className="text-sm text-gray-700">
+                Allow Exercise minutes in Apple Health to keep this card updating with your green ring.
+              </p>
+              <Button
+                type="button"
+                size="sm"
+                className="on-color bg-lime-600 hover:bg-lime-700 disabled:opacity-75"
+                onClick={handleAllow}
+                disabled={allowing}
+                data-testid="button-allow-exercise-card"
+              >
+                {allowing ? 'Opening Apple Health…' : 'Allow exercise minutes'}
+              </Button>
+            </div>
+          )}
           <div className="rounded-lg bg-white/70 p-3 border border-amber-200/50" data-testid="exercise-minutes-today-tally">
             <p className="text-xs font-medium text-gray-600 mb-1">Today’s total</p>
             <div className="flex items-baseline justify-between gap-2">
