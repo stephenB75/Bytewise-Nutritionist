@@ -23,7 +23,8 @@ import { useAchievements, getAchievementIcon, formatAchievementDate } from '@/ho
 import { ProfileIcon } from '@/components/ProfileIcon';
 import { KEY_TOOLS, useAppTour } from '@/components/TourLauncher';
 import { AppTour } from '@/components/AppTour';
-import { UserFoodSuggestions, mealTypeForNow } from '@/components/UserFoodSuggestions';
+import { mealTypeForNow } from '@/components/UserFoodSuggestions';
+import { JournalHealthSuggestions } from '@/components/JournalHealthSuggestions';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useQuery } from '@tanstack/react-query';
 import { ACTIVE_FAST_QUERY_KEY, fetchActiveFast } from '@/lib/fastingApi';
@@ -2601,11 +2602,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           </div>
         )}
 
-        <UserFoodSuggestions
+        <JournalHealthSuggestions
           className="mb-6"
-          meals={user ? weeklyMeals : []}
-          onAddFood={(food, mealType) => addMealToToday(food, mealType)}
-          showRecentEntries={false}
+          meals={weeklyMeals}
+          dailyStats={dailyStats}
+          calorieGoal={goalCalories}
+          proteinGoal={(user as any)?.dailyProteinGoal || 150}
         />
         {/* Daily Header */}
         <div className="flex space-x-4 mb-6">
