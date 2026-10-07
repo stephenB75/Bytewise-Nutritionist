@@ -800,16 +800,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
 
   useEffect(() => {
     if (!serverActiveFastLoaded) return;
-    let local: { id?: string; startTime?: string } | null = null;
-    try {
-      local = JSON.parse(localStorage.getItem('bytewise_fasting_session') || 'null');
-    } catch {
-      local = null;
-    }
     const serverRemaining = serverActiveFast
       ? serverActiveFast.targetDuration - (Date.now() - new Date(serverActiveFast.startTime).getTime())
       : 0;
 
+    // Refresh only copies an active server fast onto this device.
+    // A null active-fast response must not delete a fast that is still running locally.
     if (serverActiveFast && serverRemaining > 0) {
       if (local?.id !== serverActiveFast.id) {
         localStorage.setItem('bytewise_fasting_session', JSON.stringify({
@@ -821,9 +817,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         }));
         localStorage.setItem('bytewise_fasting_active', 'true');
       }
-    } else if (local?.id && Date.now() - new Date(local.startTime || 0).getTime() > 60_000) {
-      localStorage.removeItem('bytewise_fasting_session');
-      localStorage.removeItem('bytewise_fasting_active');
     }
     checkFastingStatus();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1104,7 +1097,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     // Load existing meal data on component mount - Database-first approach
     const loadExistingData = async () => {
       const gen = ++mealLoadGenRef.current;
-      if (authLoading || !user) {
+      // A refresh that runs before the session is known must not wipe what's on screen.
+      if (authLoading) return;
+      if (!user) {
         clearGuestNutritionStorage();
         setLoggedMeals([]);
         setWeeklyMeals([]);
@@ -1121,14 +1116,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           if (gen !== mealLoadGenRef.current) return;
           stored = mergeRecentLocalMeals(stored);
         } catch (error) {
+          // Failed refresh keeps the meals already on screen. It must not drop them.
           console.error('Failed to load meals; keeping the last loaded data:', error);
-          const todayKey = getLocalDateKey();
-          setLoggedMeals((prev) => prev.filter((meal: any) => {
-            const mealDate = meal.date?.includes('T') ? meal.date.split('T')[0] : meal.date;
-            return mealDate === todayKey;
-          }));
-          await fetchDailyStats();
-          checkFastingStatus();
           return;
         }
         

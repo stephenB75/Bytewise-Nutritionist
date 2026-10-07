@@ -483,21 +483,15 @@ const FastingTracker = React.memo(function FastingTracker() {
       ? activeFastingSession
       : null;
     if (serverFast) return;
+    // Another device started a different fast that is still running: follow that one.
+    // A refresh that finds no server fast must leave this device's session in place.
     if (activeFastingSession && activeFastingSession.id !== currentSession.id) {
       const serverRemaining =
         activeFastingSession.targetDuration - (Date.now() - new Date(activeFastingSession.startTime).getTime());
       if (serverRemaining > 0) {
         setCurrentSession(null);
-        return;
       }
     }
-    localStorage.removeItem(FASTING_SESSION_KEY);
-    localStorage.removeItem(FASTING_ACTIVE_KEY);
-    localStorage.removeItem(FASTING_MILESTONES_KEY);
-    setCurrentSession(null);
-    setIsActive(false);
-    setTimeRemaining(0);
-    queryClient.invalidateQueries({ queryKey: ['/api/fasting/history'] });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeFastingUpdatedAt, activeFastingLoaded]);
 
