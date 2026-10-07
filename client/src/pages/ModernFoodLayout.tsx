@@ -300,6 +300,38 @@ const HeroSection = React.memo(function HeroSection({
   );
 });
 
+/** Keep a meal that was just written locally if a refresh returned before the server save landed. */
+function mergeRecentLocalMeals(serverMeals: any[]): any[] {
+  let local: any[] = [];
+  try {
+    local = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
+  } catch {
+    return serverMeals;
+  }
+  if (!Array.isArray(local) || local.length === 0) return serverMeals;
+
+  const cutoff = Date.now() - 2 * 60 * 1000;
+  const serverKeys = new Set(
+    serverMeals.map((meal) => {
+      const date = String(meal?.date || '').slice(0, 10);
+      const name = String(meal?.name || '').trim().toLowerCase();
+      const calories = Math.round(Number(meal?.totalCalories ?? meal?.calories) || 0);
+      return `${date}|${name}|${calories}`;
+    }),
+  );
+
+  const pending = local.filter((meal) => {
+    const stamped = Date.parse(meal?.timestamp || meal?.loggedAt || '');
+    if (!Number.isFinite(stamped) || stamped < cutoff) return false;
+    const date = String(meal?.date || '').slice(0, 10);
+    const name = String(meal?.name || '').trim().toLowerCase();
+    const calories = Math.round(Number(meal?.totalCalories ?? meal?.calories) || 0);
+    return !serverKeys.has(`${date}|${name}|${calories}`);
+  });
+
+  return pending.length ? [...pending, ...serverMeals] : serverMeals;
+}
+
 export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) {
   const { user, isLoading: authLoading, refetch: refetchUser } = useAuth();
   const { photoUrl: profilePhotoUrl } = useProfilePhoto();
@@ -390,6 +422,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const pendingWaterSavesRef = useRef(0);
   const lastWaterWriteAtRef = useRef(0);
   const waterSaveQueueRef = useRef<Promise<void>>(Promise.resolve());
+  const mealLoadGenRef = useRef(0);
+  const statsLoadGenRef = useRef(0);
   useEffect(() => {
     waterGlassesRef.current = dailyStats?.waterGlasses || 0;
   }, [dailyStats?.waterGlasses]);
@@ -648,6 +682,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       return;
     }
     
+    const gen = ++statsLoadGenRef.current;
     try {
       // Use the correct GET endpoint for daily stats
       const requestedDay = getLocalDateKey();
@@ -657,6 +692,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         throw new Error(`Failed to fetch daily stats: ${response.status}`);
       }
       const data = await response.json();
+      if (gen !== statsLoadGenRef.current) return;
 
       // While a water save is in flight the server still has the older count.
       const keepLocalWater = waterDayRef.current === requestedDay && (
@@ -1067,6 +1103,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   useEffect(() => {
     // Load existing meal data on component mount - Database-first approach
     const loadExistingData = async () => {
+      const gen = ++mealLoadGenRef.current;
       if (authLoading || !user) {
         clearGuestNutritionStorage();
         setLoggedMeals([]);
@@ -1081,6 +1118,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         
         try {
           stored = await listLoggedMeals();
+          if (gen !== mealLoadGenRef.current) return;
+          stored = mergeRecentLocalMeals(stored);
         } catch (error) {
           console.error('Failed to load meals; keeping the last loaded data:', error);
           const todayKey = getLocalDateKey();
@@ -1122,8 +1161,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           return mealDate >= oneMonthAgoDateKey;
         });
         
-        // Today's meals filtered
-        
+        if (gen !== mealLoadGenRef.current) return;
+
         setLoggedMeals(todayMeals);
         setWeeklyMeals(monthlyMeals); // Store last month's meals for comprehensive search functionality
         
@@ -1155,6 +1194,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         setDailyMicronutrients(updatedMicronutrients);
         
         await fetchDailyStats();
+        if (gen !== mealLoadGenRef.current) return;
         
         // Check fasting status from localStorage
         checkFastingStatus();

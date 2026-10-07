@@ -68,7 +68,6 @@ export function WeeklyCaloriesCard() {
       // For authenticated users, try to load from database first
       try {
         storedMeals = await listLoggedMeals();
-        localStorage.setItem('weeklyMeals', JSON.stringify(storedMeals));
       } catch (error) {
         storedMeals = getCachedLocalStorage('weeklyMeals', 0) || [];
       }

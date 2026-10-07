@@ -36,7 +36,7 @@ import {
   type MealWithFoods,
 } from "@shared/schema";
 import { db, isDbReady, withRetry } from "./db";
-import { eq, desc, and, gte, lte, like, sql, inArray } from "drizzle-orm";
+import { eq, desc, and, gte, lte, lt, like, sql, inArray } from "drizzle-orm";
 import { getDatabaseUrl } from "./env";
 import {
   createMealViaSupabase,
@@ -761,21 +761,28 @@ export class DatabaseStorage implements IStorage {
   // Water intake operations
   async getUserWaterIntake(userId: string, date: Date): Promise<WaterIntake | undefined> {
     const fetchFromDb = async () => {
-      const startOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-      const endOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
+      // Client dates arrive as noon UTC. Match that UTC day, plus a margin so rows
+      // saved at a server-local midnight are still found.
+      const utcStart = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+      const from = new Date(utcStart.getTime() - 14 * 60 * 60 * 1000);
+      const to = new Date(utcStart.getTime() + 24 * 60 * 60 * 1000);
 
-      const [intake] = await db
+      const rows = await db
         .select()
         .from(waterIntake)
         .where(
           and(
             eq(waterIntake.userId, userId),
-            gte(waterIntake.date, startOfDay),
-            lte(waterIntake.date, endOfDay)
+            gte(waterIntake.date, from),
+            lt(waterIntake.date, to)
           )
         );
 
-      return intake;
+      return rows.sort((a, b) => {
+        const aTime = new Date(a.createdAt || a.date).getTime();
+        const bTime = new Date(b.createdAt || b.date).getTime();
+        return bTime - aTime;
+      })[0];
     };
 
     if (!getDatabaseUrl()) {
@@ -1285,36 +1292,34 @@ export class DatabaseStorage implements IStorage {
     }
 
     try {
-      const startOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-
-      const [existing] = await db
-        .select()
-        .from(waterIntake)
-        .where(
-          and(
-            eq(waterIntake.userId, userId),
-            gte(waterIntake.date, startOfDay),
-            lte(waterIntake.date, new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1))
-          )
-        );
+      const existing = await this.getUserWaterIntake(userId, date);
+      const canonical = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
 
       if (existing) {
         const [updated] = await db
           .update(waterIntake)
-          .set({ glasses })
+          .set({ glasses, date: canonical })
           .where(eq(waterIntake.id, existing.id))
           .returning();
-        return updated;
+        if (updated) {
+          if (containers !== undefined) {
+            await upsertWaterIntakeViaSupabase(userId, canonical, glasses, containers).catch(() => undefined);
+          }
+          return updated;
+        }
       }
 
       const [created] = await db
         .insert(waterIntake)
         .values({
           userId,
-          date: startOfDay,
+          date: canonical,
           glasses
         })
         .returning();
+      if (containers !== undefined) {
+        await upsertWaterIntakeViaSupabase(userId, canonical, glasses, containers).catch(() => undefined);
+      }
       return created;
     } catch {
       return await upsertWaterIntakeViaSupabase(userId, date, glasses, containers) as any;

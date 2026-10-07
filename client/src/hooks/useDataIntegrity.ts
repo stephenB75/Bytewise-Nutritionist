@@ -121,22 +121,29 @@ export function useDataIntegrity() {
       
       if (localMeals.length === 0) {
         try {
-          const databaseMeals = await apiRequest('GET', '/api/meals/logged') as any;
+          const mealsResponse = await apiRequest('GET', '/api/meals/logged');
+          const databaseMeals = await mealsResponse.json();
           if (databaseMeals && Array.isArray(databaseMeals) && databaseMeals.length > 0) {
-            // Convert database format to localStorage format
-            const restoredMeals = databaseMeals.map((meal: any) => ({
-              id: meal.id || `restored-${Date.now()}-${Math.random()}`,
-              name: meal.name,
-              calories: meal.totalCalories || 0,
-              protein: meal.totalProtein || 0,
-              carbs: meal.totalCarbs || 0,
-              fat: meal.totalFat || 0,
-              date: meal.date ? new Date(meal.date).toLocaleDateString() : new Date().toLocaleDateString(),
-              time: meal.date ? new Date(meal.date).toLocaleTimeString() : new Date().toLocaleTimeString(),
-              mealType: meal.mealType || 'snack',
-              timestamp: meal.date || new Date().toISOString(),
-              source: 'database'
-            }));
+            const restoredMeals = databaseMeals.map((meal: any) => {
+              const rawDate = meal.date ? String(meal.date) : '';
+              const dateKey = /^\d{4}-\d{2}-\d{2}/.test(rawDate)
+                ? rawDate.slice(0, 10)
+                : new Date().toISOString().slice(0, 10);
+              return {
+                id: meal.id || `restored-${Date.now()}-${Math.random()}`,
+                name: meal.name,
+                calories: meal.totalCalories || meal.calories || 0,
+                totalCalories: meal.totalCalories || meal.calories || 0,
+                protein: meal.totalProtein || meal.protein || 0,
+                carbs: meal.totalCarbs || meal.carbs || 0,
+                fat: meal.totalFat || meal.fat || 0,
+                sugar: meal.totalSugar || meal.sugar || 0,
+                date: dateKey,
+                mealType: meal.mealType || 'snack',
+                timestamp: meal.createdAt || meal.loggedAt || new Date().toISOString(),
+                source: 'database',
+              };
+            });
 
             localStorage.setItem('weeklyMeals', JSON.stringify(restoredMeals));
             // Silent restore — no toast/notification/banner.
