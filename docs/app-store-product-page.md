@@ -106,6 +106,28 @@ calorie,nutrition,fasting,macros,meal tracker,diet,apple health,food log,intermi
 Support email (App Review / users): `support@bytewisenutritionist.com`  
 Privacy email: `privacy@bytewisenutritionist.com`
 
+### Header vs Search Results (creative assets — not screenshots)
+
+These tabs are **not** for portrait phone screenshots. Uploading `01-dashboard-hero.png` (1320×2868) here fails with “File dimensions are invalid.”
+
+| Tab | Purpose | Upload this |
+|-----|---------|-------------|
+| **Search Results** | Image shown in App Store search | Landscape creative from `app-store-screenshots/search-results/` |
+| **Header** | Banner at top of product page | Same **universal** file, or a dedicated 21:9 header later |
+| **App Previews and Screenshots** | Device screenshots | Portrait PNGs from `iphone-18/` / `ipad-13/` (see below) |
+
+**Search Results — use one of:**
+
+| File | Size | Notes |
+|------|------|--------|
+| `search-results-3840x2560.png` | 3840 × 2560 (3:2) | Preferred dedicated Search Results size |
+| `search-results-1920x1280.png` | 1920 × 1280 (3:2) | Smaller alternate (also accepted) |
+| `search-results-universal-5244x2950.png` | 5244 × 2950 (16:9) | Works for **both** Header and Search Results |
+
+Path: [`app-store-screenshots/search-results/`](../app-store-screenshots/search-results/)
+
+If no Search Results asset is added, Connect falls back to your app previews/screenshots (as noted in the UI).
+
 ---
 
 ## App Previews and Screenshots
@@ -179,6 +201,8 @@ Tips: no voiceover required; prefer device mute-friendly captions; avoid unfinis
 - [ ] What’s New set for this version
 - [ ] Categories: Health & Fitness + Food & Drink
 - [ ] Marketing / Support / Privacy URLs set
+- [ ] Search Results asset uploaded from `search-results/` (landscape — not phone screenshots)
+- [ ] Header asset set (use universal 5244×2950, or leave empty)
 - [ ] iPhone 6.9" screenshots (5) uploaded in order above
 - [ ] iPad 13" screenshots (5) uploaded in order above
 - [ ] App Preview videos skipped or recorded from storyboard

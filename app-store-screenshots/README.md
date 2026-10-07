@@ -4,7 +4,9 @@ Portrait PNGs sized for App Store Connect upload.
 
 **Product page copy & upload guide:** [docs/app-store-product-page.md](../docs/app-store-product-page.md)
 
-**Recommended Connect order (hero first):** `01-dashboard-hero.png` → `02-tracker.png` → `03-fasting.png` → `04-journal.png` → `05-profile.png` (same order for `iphone-18/` and `ipad-13/`).
+**Screenshots (App Previews and Screenshots only):** `01-dashboard-hero.png` → `02-tracker.png` → `03-fasting.png` → `04-journal.png` → `05-profile.png` (same order for `iphone-18/` and `ipad-13/`).
+
+**Search Results / Header tab:** do **not** upload portrait screenshots. Use `search-results/search-results-3840x2560.png` (or `search-results-universal-5244x2950.png` for both Header + Search).
 
 | Folder | Device | Size | App Store slot |
 |---|---|---|---|
@@ -12,6 +14,7 @@ Portrait PNGs sized for App Store Connect upload.
 | `iphone-duo-outer/` | iPhone Duo outer display | 1398×2034 | Duo (when Connect accepts) |
 | `iphone-duo-inner/` | iPhone Duo inner display | 2007×2853 | Duo (when Connect accepts) |
 | `ipad-13/` | iPad 13" | 2064×2752 | Required iPad |
+| `search-results/` | Landscape creative | 3840×2560 / 1920×1280 / 5244×2950 | Search Results (+ universal Header) |
 
 Each folder has five screens × two variants:
 
