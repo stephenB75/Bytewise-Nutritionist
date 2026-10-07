@@ -6,7 +6,7 @@ Portrait PNGs sized for App Store Connect upload.
 
 **Screenshots (App Previews and Screenshots only):** `01-dashboard-hero.png` → `02-tracker.png` → `03-fasting.png` → `04-journal.png` → `05-profile.png` (same order for `iphone-18/` and `ipad-13/`).
 
-**Search Results / Header tab:** do **not** upload portrait screenshots. Use `search-results/search-results-3840x2560.png` (or `search-results-universal-5244x2950.png` for both Header + Search).
+**Header / Search Results:** do **not** upload portrait screenshots. Use center-safe creatives in `search-results/` — `header-3840x1646.png` (Header) and `search-results-3840x2560.png` (Search). Regenerate with `node scripts/generate-app-store-creatives.mjs`.
 
 | Folder | Device | Size | App Store slot |
 |---|---|---|---|

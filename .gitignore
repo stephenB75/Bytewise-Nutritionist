@@ -1,3 +1,6 @@
+# Local tooling (Pillow venv for App Store creatives)
+.venv-img/
+
 # Dependencies
 node_modules/
 npm-debug.log*

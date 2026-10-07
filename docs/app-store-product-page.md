@@ -110,23 +110,32 @@ Privacy email: `privacy@bytewisenutritionist.com`
 
 These tabs are **not** for portrait phone screenshots. Uploading `01-dashboard-hero.png` (1320×2868) here fails with “File dimensions are invalid.”
 
+Apple **crops** Header / Search creatives to a small **center safe zone**. Edge-aligned logos, titles, or phone mockups get clipped in Preview (looks like “not cropped properly”). Use the regenerated center-safe files below.
+
 | Tab | Purpose | Upload this |
 |-----|---------|-------------|
-| **Search Results** | Image shown in App Store search | Landscape creative from `app-store-screenshots/search-results/` |
-| **Header** | Banner at top of product page | Same **universal** file, or a dedicated 21:9 header later |
+| **Header** | Banner at top of product page | `header-3840x1646.png` (21:9) |
+| **Search Results** | Image shown in App Store search | `search-results-3840x2560.png` (3:2) |
+| **Both (optional)** | One file for Header + Search | `search-results-universal-5244x2950.png` (16:9) |
 | **App Previews and Screenshots** | Device screenshots | Portrait PNGs from `iphone-18/` / `ipad-13/` (see below) |
-
-**Search Results — use one of:**
-
-| File | Size | Notes |
-|------|------|--------|
-| `search-results-3840x2560.png` | 3840 × 2560 (3:2) | Preferred dedicated Search Results size |
-| `search-results-1920x1280.png` | 1920 × 1280 (3:2) | Smaller alternate (also accepted) |
-| `search-results-universal-5244x2950.png` | 5244 × 2950 (16:9) | Works for **both** Header and Search Results |
 
 Path: [`app-store-screenshots/search-results/`](../app-store-screenshots/search-results/)
 
-If no Search Results asset is added, Connect falls back to your app previews/screenshots (as noted in the UI).
+| File | Size | Use |
+|------|------|-----|
+| `header-3840x1646.png` | 3840 × 1646 | **Header** tab |
+| `search-results-3840x2560.png` | 3840 × 2560 | **Search Results** tab (preferred) |
+| `search-results-1920x1280.png` | 1920 × 1280 | Search Results alternate |
+| `search-results-universal-5244x2950.png` | 5244 × 2950 | Optional single asset for both |
+
+Regenerate after brand/hero changes:
+
+```bash
+PATH="$HOME/.local/node-v22.23.3-darwin-arm64/bin:$PATH" \
+  node scripts/generate-app-store-creatives.mjs
+```
+
+Then re-upload in Connect and check **Preview** on iPhone + iPad. If no Search Results asset is added, Connect falls back to app previews/screenshots.
 
 ---
 
@@ -149,13 +158,13 @@ Use the same order for iPhone 6.9" and iPad 13":
 
 | Slot | File | What it shows |
 |------|------|----------------|
-| 1 | `01-dashboard-hero.png` | Branded hero + today’s progress |
+| 1 | `01-dashboard-hero.png` | Branded hero (optional; or use `01-dashboard.png` for more UI) |
 | 2 | `02-tracker.png` | Food tracker / calculator |
 | 3 | `03-fasting.png` | Intermittent fasting |
 | 4 | `04-journal.png` | Journal |
 | 5 | `05-profile.png` | Profile / settings |
 
-Optional alternates (same size): plain `01-dashboard.png` or other `*-hero.png` files if you prefer a different mix. Keep **slot 1** as a strong brand/hero image.
+Prefer **feature** PNGs (no `-hero`) for slots 2–5 so the carousel shows real UI, not only marketing folds. App Store further crops tall screenshots in Preview—that clipping is normal for device frames, not a bad file size.
 
 ### Connect steps
 
