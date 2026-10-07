@@ -492,37 +492,18 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     });
     
     
-    // Check if we have real data (any micronutrient value > 0)
-    const hasRealData = Object.values(realMicronutrients).some((value) => (value as number) > 0);
-    
-    if (hasRealData) {
-      // Return actual micronutrient data from meals
-      return {
-        vitaminC: Math.round(realMicronutrients.vitaminC * 10) / 10,
-        vitaminD: Math.round(realMicronutrients.vitaminD * 10) / 10,
-        vitaminB12: Math.round(realMicronutrients.vitaminB12 * 10) / 10,
-        folate: Math.round(realMicronutrients.folate),
-        iron: Math.round(realMicronutrients.iron * 10) / 10,
-        calcium: Math.round(realMicronutrients.calcium),
-        zinc: Math.round(realMicronutrients.zinc * 10) / 10,
-        magnesium: Math.round(realMicronutrients.magnesium)
-      };
-    } else {
-      // Fallback to estimation if no real data available
-      const totalCalories = meals.reduce((sum, meal) => sum + (meal.calories || 0), 0);
-      const baseMultiplier = totalCalories / 100;
-      
-      return {
-        vitaminC: Math.round(baseMultiplier * 8),
-        vitaminD: Math.round(baseMultiplier * 0.2),
-        vitaminB12: Math.round(baseMultiplier * 0.3 * 10) / 10,
-        folate: Math.round(baseMultiplier * 12),
-        iron: Math.round(baseMultiplier * 1.8 * 10) / 10,
-        calcium: Math.round(baseMultiplier * 25),
-        zinc: Math.round(baseMultiplier * 1.1 * 10) / 10,
-        magnesium: Math.round(baseMultiplier * 15)
-      };
-    }
+    // Only show micronutrients actually present on logged meals — never invent
+    // values from calories (that looked populated but was not real food data).
+    return {
+      vitaminC: Math.round(realMicronutrients.vitaminC * 10) / 10,
+      vitaminD: Math.round(realMicronutrients.vitaminD * 10) / 10,
+      vitaminB12: Math.round(realMicronutrients.vitaminB12 * 10) / 10,
+      folate: Math.round(realMicronutrients.folate),
+      iron: Math.round(realMicronutrients.iron * 10) / 10,
+      calcium: Math.round(realMicronutrients.calcium),
+      zinc: Math.round(realMicronutrients.zinc * 10) / 10,
+      magnesium: Math.round(realMicronutrients.magnesium),
+    };
   }, []);
 
   // Only after a new signup — never on later sign-ins
@@ -641,11 +622,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         return mealDate === today;
       });
       const totals = todayMeals.reduce((acc, meal) => ({
-        totalCalories: acc.totalCalories + (meal.calories || meal.totalCalories || 0),
-        totalProtein: acc.totalProtein + (meal.protein || meal.totalProtein || 0),
-        totalCarbs: acc.totalCarbs + (meal.carbs || meal.totalCarbs || 0),
-        totalFat: acc.totalFat + (meal.fat || meal.totalFat || 0),
-        totalSugar: acc.totalSugar + (meal.sugar || meal.totalSugar || 0),
+        totalCalories: acc.totalCalories + (Number(meal.totalCalories) || Number(meal.calories) || 0),
+        totalProtein: acc.totalProtein + (Number(meal.totalProtein) || Number(meal.protein) || 0),
+        totalCarbs: acc.totalCarbs + (Number(meal.totalCarbs) || Number(meal.carbs) || 0),
+        totalFat: acc.totalFat + (Number(meal.totalFat) || Number(meal.fat) || 0),
+        totalSugar: acc.totalSugar + (Number(meal.totalSugar) || Number(meal.sugar) || 0),
       }), { totalCalories: 0, totalProtein: 0, totalCarbs: 0, totalFat: 0, totalSugar: 0 });
 
       setDailyStats({
@@ -1432,55 +1413,45 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     );
   });
 
-  // Enhanced Macro Card Component - Shows Remaining Values with Negative Color Coding
-  const MacroCard = React.memo(({ name, value, goal, color, data = [0, 0, 0, 0, 0] }: {
+  // Macro card — remaining vs goal, with a real progress bar from logged totals
+  const MacroCard = React.memo(({ name, value, goal, color }: {
     name: string;
     value: number;
     goal: number;
     color: string;
-    data?: number[];
   }) => {
-    // Calculate remaining value (goal - current)
     const remaining = goal - value;
-    const isNegative = remaining < 0;
-    
-    // Memoize chart data calculation
-    const chartData = React.useMemo(() => 
-      data.map(height => Math.max(height * 100, 10))
-    , [data]);
+    const isOver = remaining < 0;
+    const progress = goal > 0 ? Math.min((value / goal) * 100, 100) : 0;
 
-    // Full class names so Tailwind can generate them
     const macroPalette: Record<string, { text: string; bar: string }> = {
-      green: { text: 'text-green-700', bar: 'bg-green-500/60' },
-      yellow: { text: 'text-yellow-700', bar: 'bg-yellow-500/70' },
-      purple: { text: 'text-purple-700', bar: 'bg-purple-500/60' },
-      pink: { text: 'text-pink-700', bar: 'bg-pink-500/60' },
+      green: { text: 'text-green-700', bar: 'bg-green-500' },
+      yellow: { text: 'text-yellow-700', bar: 'bg-yellow-500' },
+      purple: { text: 'text-purple-700', bar: 'bg-purple-500' },
+      pink: { text: 'text-pink-700', bar: 'bg-pink-500' },
     };
     const swatch = macroPalette[color] ?? macroPalette.green;
-    const textColor = isNegative ? 'text-red-700' : swatch.text;
-    const labelColor = isNegative ? 'text-red-600' : 'text-gray-900';
+    const textColor = isOver ? 'text-red-700' : swatch.text;
+    const labelColor = isOver ? 'text-red-600' : 'text-gray-900';
 
     return (
       <Card className="bg-amber-100 border-none p-4 transition-all duration-300 hover:bg-gradient-to-br hover:from-amber-100 hover:to-amber-200 shadow-lg hover:shadow-xl" data-testid="macro-card">
         <div className="text-center">
           <div className={`text-sm ${labelColor} mb-1 leading-tight font-normal`}>
-            <div>Remaining</div>
+            <div>{isOver ? 'Over' : 'Remaining'}</div>
             <div>{name}</div>
           </div>
           <div className={`text-xl font-medium ${textColor} mb-2`}>
-            {isNegative ? '+' : ''}{Math.abs(remaining)}g
+            {isOver ? '+' : ''}{Math.abs(Math.round(remaining))}g
           </div>
-          <div className="flex items-end space-x-px h-6 rounded bg-amber-100">
-            {chartData.map((height, i) => (
-              <div 
-                key={i}
-                className={`flex-1 ${isNegative ? 'bg-red-500/60' : swatch.bar} rounded-t transition-all duration-500`}
-                style={{ height: `${height}%` }}
-              />
-            ))}
+          <div className="relative h-2 rounded-full bg-amber-200/80 overflow-hidden">
+            <div
+              className={`absolute left-0 top-0 h-full rounded-full transition-all duration-500 ${isOver ? 'bg-red-500' : swatch.bar}`}
+              style={{ width: `${progress}%` }}
+            />
           </div>
           <div className="text-xs text-gray-900 font-normal mt-1">
-            {value}g / {goal}g
+            {Math.round(value)}g / {goal}g
           </div>
         </div>
       </Card>
@@ -1620,14 +1591,25 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <h2 className="text-xl font-semibold text-gray-900 sm:text-2xl md:text-3xl">Today's Progress</h2>
           </div>
 
-          {/* Daily Progress */}
+          {/* Daily Progress — prefer the larger of server stats vs today’s meal sum */}
           <div data-testid="daily-progress" className="mb-4">
+            {(() => {
+              const mealsCal = loggedMeals.reduce(
+                (sum, meal) => sum + (Number(meal.totalCalories) || Number(meal.calories) || 0),
+                0,
+              );
+              const statsCal = Number(dailyStats?.totalCalories) || 0;
+              const todayCal = Math.round(Math.max(dailyCalories, mealsCal, statsCal));
+              const pct = Math.round((todayCal / Math.max(goalCalories, 1)) * 100);
+              const over = todayCal > goalCalories;
+              return (
+                <>
             <ProgressCard
               title="Daily Calories"
               icon={Flame}
-              value={`${Math.round(dailyCalories)} cal`}
+              value={`${todayCal} cal`}
               goal={`${goalCalories} cal`}
-              percentage={Math.round((dailyCalories/goalCalories)*100)}
+              percentage={pct}
               color="orange"
             />
             <div className="grid grid-cols-3 gap-3 mt-4">
@@ -1636,14 +1618,23 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 <div className="text-xs text-gray-900">Meals</div>
               </div>
               <div className="text-center p-2 bg-gradient-to-br from-amber-100 to-amber-200 rounded-lg">
-                <div className="text-sm font-medium text-orange-600">{Math.round(goalCalories - dailyCalories)}</div>
-                <div className="text-xs text-gray-900">Remaining</div>
+                <div className={`text-sm font-medium ${over ? 'text-red-700' : 'text-orange-600'}`}>
+                  {over
+                    ? `+${Math.round(todayCal - goalCalories)}`
+                    : Math.round(Math.max(0, goalCalories - todayCal))}
+                </div>
+                <div className="text-xs text-gray-900">
+                  {over ? 'Over' : 'Remaining'}
+                </div>
               </div>
               <div className="text-center p-2 bg-gradient-to-br from-amber-100 to-amber-200 rounded-lg">
-                <div className="text-sm font-bold text-orange-600">{Math.round((dailyCalories/goalCalories)*100)}%</div>
+                <div className="text-sm font-bold text-orange-600">{pct}%</div>
                 <div className="text-xs text-gray-900">Complete</div>
               </div>
             </div>
+                </>
+              );
+            })()}
           </div>
 
           {/* Fasting Status */}
@@ -1710,32 +1701,32 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             </div>
           </div>
 
-          {/* Macros Breakdown - Enhanced with Remaining Values */}
+          {/* Macros — server dailyStats when present, else sum of today’s logged meals */}
           <div className="grid grid-cols-2 gap-4 mb-4 sm:grid-cols-4">
-            <MacroCard 
-              name="Protein" 
-              value={Math.round(dailyStats?.totalProtein || 0)} 
-              goal={user?.dailyProteinGoal || 180} 
-              color="green" 
-            />
-            <MacroCard 
-              name="Carbs" 
-              value={Math.round(dailyStats?.totalCarbs || 0)} 
-              goal={user?.dailyCarbGoal || 200} 
-              color="yellow" 
-            />
-            <MacroCard 
-              name="Fat" 
-              value={Math.round(dailyStats?.totalFat || 0)} 
-              goal={user?.dailyFatGoal || 70} 
-              color="purple" 
-            />
-            <MacroCard 
-              name="Sugar" 
-              value={Math.round(dailyStats?.totalSugar || 0)} 
-              goal={50} 
-              color="pink" 
-            />
+            {([
+              { name: 'Protein', key: 'totalProtein', alt: 'protein', goal: user?.dailyProteinGoal || 180, color: 'green' },
+              { name: 'Carbs', key: 'totalCarbs', alt: 'carbs', goal: user?.dailyCarbGoal || 200, color: 'yellow' },
+              { name: 'Fat', key: 'totalFat', alt: 'fat', goal: user?.dailyFatGoal || 70, color: 'purple' },
+              { name: 'Sugar', key: 'totalSugar', alt: 'sugar', goal: 50, color: 'pink' },
+            ] as const).map((macro) => {
+              const fromStats = Number(dailyStats?.[macro.key]) || 0;
+              const fromMeals = loggedMeals.reduce(
+                (sum, meal) => sum + (Number(meal[macro.key] ?? meal[macro.alt]) || 0),
+                0,
+              );
+              // Prefer the larger of server totals vs today’s meal sum so a slow
+              // daily-stats refresh can’t blank out macros just after logging.
+              const value = Math.round(Math.max(fromStats, fromMeals));
+              return (
+                <MacroCard
+                  key={macro.name}
+                  name={macro.name}
+                  value={value}
+                  goal={macro.goal}
+                  color={macro.color}
+                />
+              );
+            })}
           </div>
 
           {/* Micronutrients Section */}

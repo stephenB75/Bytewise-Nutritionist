@@ -77,7 +77,8 @@ function buildSuggestions(input: {
   const todayMeals = input.meals.filter((meal) => mealDayKey(meal) === todayKey);
   const mealCount = todayMeals.length;
 
-  const fromMeals = todayMeals.reduce(
+  type MealTotals = { calories: number; protein: number; carbs: number; fat: number; sugar: number };
+  const fromMeals = todayMeals.reduce<MealTotals>(
     (acc, meal) => ({
       calories: acc.calories + (Number(meal.totalCalories ?? meal.calories) || 0),
       protein: acc.protein + (Number(meal.totalProtein ?? meal.protein) || 0),
@@ -88,12 +89,12 @@ function buildSuggestions(input: {
     { calories: 0, protein: 0, carbs: 0, fat: 0, sugar: 0 },
   );
 
-  const calories = Math.round(input.dailyStats?.totalCalories ?? fromMeals.calories);
-  const protein = Math.round(input.dailyStats?.totalProtein ?? fromMeals.protein);
-  const carbs = Math.round(input.dailyStats?.totalCarbs ?? fromMeals.carbs);
-  const fat = Math.round(input.dailyStats?.totalFat ?? fromMeals.fat);
-  const sugar = Math.round(input.dailyStats?.totalSugar ?? fromMeals.sugar);
-  const waterGlasses = Math.round(input.dailyStats?.waterGlasses ?? 0);
+  const calories = Math.round(Number(input.dailyStats?.totalCalories ?? fromMeals.calories) || 0);
+  const protein = Math.round(Number(input.dailyStats?.totalProtein ?? fromMeals.protein) || 0);
+  const carbs = Math.round(Number(input.dailyStats?.totalCarbs ?? fromMeals.carbs) || 0);
+  const fat = Math.round(Number(input.dailyStats?.totalFat ?? fromMeals.fat) || 0);
+  const sugar = Math.round(Number(input.dailyStats?.totalSugar ?? fromMeals.sugar) || 0);
+  const waterGlasses = Math.round(Number(input.dailyStats?.waterGlasses ?? 0) || 0);
 
   const calorieGoal = input.calorieGoal > 0 ? input.calorieGoal : DEFAULT_CALORIE_GOAL;
   const proteinGoal = input.proteinGoal > 0 ? input.proteinGoal : DEFAULT_PROTEIN_GOAL;

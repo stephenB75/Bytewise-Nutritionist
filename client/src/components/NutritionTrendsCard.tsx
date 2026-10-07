@@ -62,7 +62,8 @@ function buildDays(meals: TrendMeal[], range: number): DayTotals[] {
       label: range <= 7
         ? date.toLocaleDateString('en-US', { weekday: 'short' })
         : date.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' }),
-      calories: Math.round(sum(m => m.calories ?? m.totalCalories)),
+      // Prefer totalCalories; `calories ?? totalCalories` would keep a real 0 and skip totalCalories.
+      calories: Math.round(sum((m) => Number(m.totalCalories) || Number(m.calories) || 0)),
       logged: dayMeals.length > 0,
     } as DayTotals;
     for (const micro of MICROS) day[micro.key] = sum(m => m[micro.key]);

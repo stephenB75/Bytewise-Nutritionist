@@ -1,8 +1,6 @@
 /**
- * User Food Suggestions Component
- * 
- * Shows only user-entered food items as suggestions
- * Filters out USDA database entries, showing only custom user entries
+ * Recent custom food entries for the Tracker calculator.
+ * Filters out USDA database entries; shows only user-logged foods.
  */
 
 import { useState, useEffect, useMemo } from 'react';
@@ -12,7 +10,6 @@ import { Button } from '@/components/ui/button';
 import { 
   User,
   History,
-  Star,
   ChevronRight,
   ChevronDown,
   Utensils,
@@ -51,9 +48,6 @@ interface UserFoodSuggestionsProps {
 }
 
 const MEAL_TYPES: MealType[] = ['breakfast', 'lunch', 'dinner', 'snack'];
-
-const formatMacro = (value: number) =>
-  Number.isFinite(Number(value)) ? (Math.round(Number(value) * 10) / 10).toFixed(1) : '0';
 
 export function mealTypeForNow(date = new Date()): MealType {
   const hour = date.getHours();
@@ -121,33 +115,19 @@ export function UserFoodSuggestions({
     };
   }, [meals]);
 
-  // Get unique foods and popular items
-  const { uniqueFoods, popularFoods } = useMemo(() => {
-    // Remove duplicates and track frequency
-    const frequency = new Map<string, { food: UserFood; count: number }>();
-    
-    userFoods.forEach(food => {
+  // Unique foods by name, newest first (recent entries only)
+  const uniqueFoods = useMemo(() => {
+    const byName = new Map<string, UserFood>();
+    userFoods.forEach((food) => {
       const key = food.name.toLowerCase().trim();
-      const existing = frequency.get(key);
-      if (existing) {
-        existing.count++;
-        // Keep the most recent entry
-        if (entryTime(food) > entryTime(existing.food)) {
-          existing.food = food;
-        }
-      } else {
-        frequency.set(key, { food, count: 1 });
+      const existing = byName.get(key);
+      if (!existing || entryTime(food) > entryTime(existing)) {
+        byName.set(key, food);
       }
     });
-    
-    const unique = Array.from(frequency.values()).map(item => item.food);
-    const popular = Array.from(frequency.values())
-      .filter(item => item.count > 1)
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 5)
-      .map(item => item.food);
-    
-    return { uniqueFoods: unique.slice(0, 4), popularFoods: popular };
+    return Array.from(byName.values())
+      .sort((a, b) => entryTime(b) - entryTime(a))
+      .slice(0, 4);
   }, [userFoods]);
 
   const getDateLabel = (dateStr: string) => {
@@ -228,134 +208,78 @@ export function UserFoodSuggestions({
     </div>
   );
 
-  if (userFoods.length === 0) {
+  if (!showRecentEntries || uniqueFoods.length === 0) {
     if (!showRecentEntries) return null;
     return (
       <Card className={`p-6 bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-sm border-0 shadow-lg ${className}`}>
         <div className="text-center text-gray-500">
           <User className="w-12 h-12 mx-auto mb-3 text-gray-700" />
           <h3 className="text-lg font-semibold mb-2">No Custom Foods Yet</h3>
-          <p className="text-sm">Start adding your own food entries to see personalized suggestions here</p>
+          <p className="text-sm">Log a meal to see it here for quick reuse</p>
         </div>
       </Card>
     );
   }
 
-  if (!showRecentEntries && popularFoods.length === 0) {
-    return null;
-  }
-
   const chevron = (open: boolean) => onAddFood
     ? (open ? <ChevronDown className="h-4 w-4 text-orange-600" /> : <Plus className="h-4 w-4 text-gray-700 group-hover:text-orange-600" />)
-    : <ChevronRight className="h-4 w-4 text-gray-700 group-hover:text-purple-600" />;
+    : <ChevronRight className="h-4 w-4 text-gray-700 group-hover:text-blue-600" />;
 
   return (
-    <Card className={`p-6 bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-sm border-0 shadow-lg ${className}`}>
+    <Card className={`p-6 bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-sm border-0 shadow-lg ${className}`} data-testid="tracker-recent-entries">
       <div className="flex items-center gap-3 mb-4">
-        <div className="p-2 bg-purple-100 rounded-lg">
-          <User className="w-5 h-5 text-purple-600" />
+        <div className="p-2 bg-blue-100 rounded-lg">
+          <History className="w-5 h-5 text-blue-600" />
         </div>
         <div>
-          <h3 className="text-lg font-bold text-gray-900">Your Food Suggestions</h3>
+          <h3 className="text-lg font-bold text-gray-900">Recent Entries</h3>
           <p className="text-sm text-gray-600">
-            {onAddFood ? 'Tap a food to add it to today' : "Foods you've added previously"}
+            {onAddFood ? 'Tap a food to add it to today' : 'Tap to fill the calculator'}
           </p>
         </div>
       </div>
 
-      {/* Popular Foods */}
-      {popularFoods.length > 0 && (
-        <div className={showRecentEntries ? 'mb-6' : undefined}>
-          <div className="flex items-center gap-2 mb-3">
-            <Star className="w-4 h-4 text-yellow-500" />
-            <h4 className="font-medium text-gray-700">Frequently Added</h4>
-          </div>
-          <div className="space-y-2">
-            {popularFoods.map((food) => {
-              const key = `popular-${food.id}`;
-              return (
-                <div key={key}>
-                  <button
-                    type="button"
-                    onClick={() => handleSelectFood(food, key)}
-                    aria-expanded={onAddFood ? expandedKey === key : undefined}
-                    className="w-full text-left p-3 hover:bg-amber-50/60 rounded-lg transition-colors group border border-gray-100"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <div className="font-medium text-sm group-hover:text-purple-600">
-                          {food.name}
-                        </div>
-                        <div className="flex items-center gap-3 text-xs text-gray-500">
-                          <span className="flex items-center gap-1">
-                            <Utensils className="h-3 w-3" />
-                            {Math.round(Number(food.calories) || 0)} cal
-                          </span>
-                          <span>P: {formatMacro(food.protein)}g</span>
-                          <span>C: {formatMacro(food.carbs)}g</span>
-                          <span>F: {formatMacro(food.fat)}g</span>
-                        </div>
-                      </div>
-                      {chevron(expandedKey === key)}
+      <div className="space-y-2">
+        {uniqueFoods.map((food) => {
+          const key = `recent-${food.id}`;
+          return (
+            <div key={key}>
+              <button
+                type="button"
+                onClick={() => handleSelectFood(food, key)}
+                aria-expanded={onAddFood ? expandedKey === key : undefined}
+                className="w-full text-left p-3 hover:bg-amber-50/60 rounded-lg transition-colors group border border-gray-100"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="font-medium text-sm group-hover:text-blue-600">
+                      {food.name}
                     </div>
-                  </button>
-                  {expandedKey === key && renderAddPanel(food)}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {showRecentEntries && (
-        <div>
-          <div className="flex items-center gap-2 mb-3">
-            <History className="w-4 h-4 text-blue-500" />
-            <h4 className="font-medium text-gray-700">Recent Entries</h4>
-          </div>
-          <div className="space-y-2">
-            {uniqueFoods.map((food) => {
-              const key = `recent-${food.id}`;
-              return (
-                <div key={key}>
-                  <button
-                    type="button"
-                    onClick={() => handleSelectFood(food, key)}
-                    aria-expanded={onAddFood ? expandedKey === key : undefined}
-                    className="w-full text-left p-3 hover:bg-amber-50/60 rounded-lg transition-colors group border border-gray-100"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <div className="font-medium text-sm group-hover:text-blue-600">
-                          {food.name}
-                        </div>
-                        <div className="flex items-center gap-3 text-xs text-gray-500">
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            {getDateLabel(food.date)}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Utensils className="h-3 w-3" />
-                            {Math.round(Number(food.calories) || 0)} cal
-                          </span>
-                          <Badge variant="outline" className="text-xs px-1 py-0">
-                            {food.mealType}
-                          </Badge>
-                        </div>
-                      </div>
-                      {chevron(expandedKey === key)}
+                    <div className="flex items-center gap-3 text-xs text-gray-500">
+                      <span className="flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        {getDateLabel(food.date)}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Utensils className="h-3 w-3" />
+                        {Math.round(Number(food.calories) || 0)} cal
+                      </span>
+                      <Badge variant="outline" className="text-xs px-1 py-0">
+                        {food.mealType}
+                      </Badge>
                     </div>
-                  </button>
-                  {expandedKey === key && renderAddPanel(food)}
+                  </div>
+                  {chevron(expandedKey === key)}
                 </div>
-              );
-            })}
-          </div>
-          {uniqueFoods.length >= 4 && (
-            <div className="mt-4 text-center">
-              <p className="text-xs text-gray-500">Showing your 4 most recent custom foods</p>
+              </button>
+              {expandedKey === key && renderAddPanel(food)}
             </div>
-          )}
+          );
+        })}
+      </div>
+      {uniqueFoods.length >= 4 && (
+        <div className="mt-4 text-center">
+          <p className="text-xs text-gray-500">Showing your 4 most recent custom foods</p>
         </div>
       )}
     </Card>

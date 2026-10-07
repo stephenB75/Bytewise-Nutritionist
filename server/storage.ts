@@ -1126,14 +1126,23 @@ export class DatabaseStorage implements IStorage {
         }
       }
 
-      // Sum up nutrition from all meals
-      const totals = dayMeals.reduce<{ totalCalories: number; totalProtein: number; totalCarbs: number; totalFat: number; totalSugar: number }>((acc, meal) => ({
-        totalCalories: acc.totalCalories + Number(meal.totalCalories || 0),
-        totalProtein: acc.totalProtein + Number(meal.totalProtein || 0),
-        totalCarbs: acc.totalCarbs + Number(meal.totalCarbs || 0),
-        totalFat: acc.totalFat + Number(meal.totalFat || 0),
-        totalSugar: acc.totalSugar + Number(meal.totalSugar || 0),
-      }), {
+      // Sum nutrition from meals (support both total* and short field names).
+      const totals = dayMeals.reduce<{ totalCalories: number; totalProtein: number; totalCarbs: number; totalFat: number; totalSugar: number }>((acc, meal) => {
+        const row = meal as {
+          totalCalories?: unknown; calories?: unknown;
+          totalProtein?: unknown; protein?: unknown;
+          totalCarbs?: unknown; carbs?: unknown;
+          totalFat?: unknown; fat?: unknown;
+          totalSugar?: unknown; sugar?: unknown;
+        };
+        return {
+          totalCalories: acc.totalCalories + (Number(row.totalCalories) || Number(row.calories) || 0),
+          totalProtein: acc.totalProtein + (Number(row.totalProtein) || Number(row.protein) || 0),
+          totalCarbs: acc.totalCarbs + (Number(row.totalCarbs) || Number(row.carbs) || 0),
+          totalFat: acc.totalFat + (Number(row.totalFat) || Number(row.fat) || 0),
+          totalSugar: acc.totalSugar + (Number(row.totalSugar) || Number(row.sugar) || 0),
+        };
+      }, {
         totalCalories: 0,
         totalProtein: 0,
         totalCarbs: 0,

@@ -129,7 +129,8 @@ export function FriendsPanel() {
   const healthPayload = health ? {
     steps: health.steps,
     activeCalories: health.activeCalories,
-    exerciseMinutes: health.exerciseMinutes,
+    // Match dashboard Exercise card: green ring + completed workout minutes.
+    exerciseMinutes: (health.exerciseMinutes ?? 0) + (health.workouts?.minutes ?? 0),
     workouts: health.workouts.count,
     workoutMinutes: health.workouts.minutes,
     distanceMiles: health.distanceMiles,

@@ -73,40 +73,12 @@ export function WeeklyCaloriesCard() {
         storedMeals = getCachedLocalStorage('weeklyMeals', 0) || [];
       }
 
-      
-      // Fix meals with missing calories and save back to localStorage
-      let needsSave = false;
-      storedMeals.forEach((meal: any) => {
-        const currentCalories = Number(meal.calories) || Number(meal.totalCalories) || 0;
-        
-        // Only estimate if calories are truly missing or zero
-        if (currentCalories === 0) {
-          needsSave = true;
-          
-          // Estimate calories based on meal name only as fallback
-          if (meal.name) {
-            const name = meal.name.toLowerCase();
-            if (name.includes('empanada')) meal.calories = 250;
-            else if (name.includes('apple')) meal.calories = 95;
-            else if (name.includes('water')) meal.calories = 0;
-            else if (name.includes('chicken')) meal.calories = 300;
-            else if (name.includes('popcycle') || name.includes('popsicle')) meal.calories = 150;
-            else meal.calories = 100; // Default estimate
-          }
-        }
-        // Important: Don't override existing valid calorie values
-      });
-      
-      // Save the fixed data back to localStorage
-      if (needsSave) {
-        localStorage.setItem('weeklyMeals', JSON.stringify(storedMeals));
-      }
-      
-      // Calculate calories for each day of the current Sun–Sat week only
+      // Calculate calories for each day of the current Sun–Sat week only.
+      // Use logged totals only — never invent calories from meal names.
       const weeklyData = weekDates.map(dayData => {
         const dayMeals = storedMeals.filter((meal: any) => getMealDateKey(meal?.date) === dayData.date);
         const dayCalories = dayMeals.reduce((sum: number, meal: any) => {
-          const mealCalories = Number(meal.calories) || Number(meal.totalCalories) || 0;
+          const mealCalories = Number(meal.totalCalories) || Number(meal.calories) || 0;
           return sum + mealCalories;
         }, 0);
 
