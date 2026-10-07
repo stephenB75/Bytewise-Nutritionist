@@ -395,10 +395,11 @@ function CalorieCalculator({
       // Meal save error handled by user feedback system
       // Still check achievements even if database save fails (fallback)
       checkAchievements.mutate();
+      // logMeal already fires calories-logged on success; only emit on failure so the UI still refreshes.
+      window.dispatchEvent(new CustomEvent('calories-logged', { detail: mealData }));
     }
     
-    // Dispatch events for weekly logger refresh
-    window.dispatchEvent(new CustomEvent('calories-logged', { detail: mealData }));
+    // UI refresh only — do not re-fire calories-logged (that triples notifications with logMeal).
     window.dispatchEvent(new CustomEvent('meal-logged-success', { detail: mealData }));
     window.dispatchEvent(new CustomEvent('refresh-weekly-data'));
     // Show success animation

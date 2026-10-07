@@ -4,6 +4,7 @@ import type {
   ToastActionElement,
   ToastProps,
 } from "@/components/ui/toast"
+import { routeAlertToNativeNotifications } from "@/services/localNotifications"
 
 const TOAST_LIMIT = 1
 const TOAST_REMOVE_DELAY = 1000000
@@ -139,13 +140,36 @@ function dispatch(action: Action) {
 
 type Toast = Omit<ToasterToast, "id">
 
+function nodeToText(value: React.ReactNode): string {
+  if (value == null || typeof value === "boolean") return ""
+  if (typeof value === "string" || typeof value === "number") return String(value)
+  return ""
+}
+
 function toast({ ...props }: Toast) {
   const id = genId()
+  const title = nodeToText(props.title) || "Bytewise"
+  const description = nodeToText(props.description)
 
-  const update = (props: ToasterToast) =>
+  // iOS/Android: every alert goes to Notification Center (with sound), not an in-app toast.
+  if (
+    routeAlertToNativeNotifications({
+      title,
+      description: description || undefined,
+      variant: props.variant ?? undefined,
+    })
+  ) {
+    return {
+      id,
+      dismiss: () => undefined,
+      update: () => undefined,
+    }
+  }
+
+  const update = (next: ToasterToast) =>
     dispatch({
       type: "UPDATE_TOAST",
-      toast: { ...props, id },
+      toast: { ...next, id },
     })
   const dismiss = () => dispatch({ type: "DISMISS_TOAST", toastId: id })
 

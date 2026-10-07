@@ -20,6 +20,10 @@ const INTERNAL_ID_BASE = 4000;
 /** User preference: deliver alerts via iOS/Android Local Notifications. Default on. */
 const OS_NOTIFICATIONS_PREF_KEY = 'bytewise-os-notifications-enabled';
 export const OS_NOTIFICATIONS_PREF_EVENT = 'os-notifications-pref-changed';
+/** Fired when a toast-style alert should become a bell + OS notification on native. */
+export const APP_ALERT_EVENT = 'bytewise-app-alert';
+/** Bundled chime — required on iOS (omitting sound makes banners silent). */
+const NOTIFICATION_SOUND = 'notification.wav';
 
 const SIGNIFICANT_FASTING_HOURS = [12, 16, 18, 20, 24, 36, 48, 72];
 const FASTING_MILESTONE_COPY: Record<number, { title: string; body: string }> = {
@@ -179,6 +183,7 @@ function buildNotification(
     id,
     title,
     body,
+    sound: NOTIFICATION_SOUND,
     schedule: { at, allowWhileIdle: true },
     extra: { tab },
   };
@@ -310,7 +315,7 @@ export async function notifyAchievementUnlocked(title: string, message: string):
 
 /**
  * Delivers every in-app alert as a real iOS/Android local notification
- * (banner + Notification Center). No-op on web — callers keep toast/bell there.
+ * (banner + Notification Center + sound). No-op on web — callers keep toast/bell there.
  */
 export async function notifyInternalAlert(
   title: string,
@@ -324,6 +329,27 @@ export async function notifyInternalAlert(
 /** True when this device should prefer OS banners over in-app toasts. */
 export function usesNativeNotifications(): boolean {
   return !!getPlugin();
+}
+
+/**
+ * On iOS/Android with OS notifications enabled, route an alert into the bell inbox
+ * (via APP_ALERT_EVENT) instead of showing an in-app toast. Returns true when routed.
+ */
+export function routeAlertToNativeNotifications(opts: {
+  title: string;
+  description?: string;
+  variant?: string;
+}): boolean {
+  if (!usesNativeNotifications() || !areOsNotificationsEnabled()) return false;
+  const title = (opts.title || 'Bytewise').trim() || 'Bytewise';
+  const body = (opts.description || title).trim() || title;
+  const type = opts.variant === 'destructive' ? 'error' : 'info';
+  window.dispatchEvent(
+    new CustomEvent(APP_ALERT_EVENT, {
+      detail: { type, title, message: body },
+    }),
+  );
+  return true;
 }
 
 /** Next N clock times, skipping today when that day's goal is already met. */

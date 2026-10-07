@@ -16,7 +16,6 @@ import {
 
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
-import { toast as sonnerToast } from 'sonner';
 import { 
   User, 
   Mail, 
@@ -417,7 +416,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
 
       if (updateError) throw updateError;
 
-      sonnerToast.success("Password changed successfully!");
+      toast({ title: "Password changed successfully!" });
       
       // Clear form
       setCurrentPassword('');
@@ -473,7 +472,7 @@ export function UserSettingsManager({ onClose }: UserSettingsManagerProps) {
       // Clear session storage
       sessionStorage.clear();
       
-      sonnerToast.success("Signed out successfully!");
+      toast({ title: "Signed out successfully!" });
       
       // Close modal if present
       if (onClose) onClose();

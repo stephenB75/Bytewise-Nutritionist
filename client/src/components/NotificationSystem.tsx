@@ -1,5 +1,5 @@
-import { createContext, useContext, useState, useCallback } from 'react';
-import { toast } from 'sonner';
+import { createContext, useContext, useCallback } from 'react';
+import { toast } from '@/hooks/use-toast';
 
 export interface Notification {
   id?: string;
@@ -17,25 +17,15 @@ const NotificationContext = createContext<NotificationContextType | undefined>(u
 
 export function NotificationProvider({ children }: { children: React.ReactNode }) {
   const addNotification = useCallback((notification: Notification) => {
-    const id = notification.id || Date.now().toString();
-    
-    switch (notification.type) {
-      case 'success':
-        toast.success(notification.message, { duration: notification.duration });
-        break;
-      case 'error':
-        toast.error(notification.message, { duration: notification.duration });
-        break;
-      case 'warning':
-        toast.warning(notification.message, { duration: notification.duration });
-        break;
-      default:
-        toast(notification.message, { duration: notification.duration });
-    }
+    toast({
+      title: notification.message,
+      variant: notification.type === 'error' ? 'destructive' : 'default',
+      duration: notification.duration,
+    });
   }, []);
 
-  const removeNotification = useCallback((id: string) => {
-    // Sonner handles removal automatically
+  const removeNotification = useCallback((_id: string) => {
+    // Dismissal is handled by the toast / OS notification layer.
   }, []);
 
   const value: NotificationContextType = {

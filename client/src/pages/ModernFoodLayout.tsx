@@ -68,7 +68,6 @@ import {
   writeLocalWaterGlasses,
 } from '@/components/WaterCard';
 import { GuestSaveHint } from '@/components/GuestSaveHint';
-import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
 import { deleteLoggedMeal, listLoggedMeals, logMeal, saveUserProfile } from '@/lib/mealsApi';
@@ -85,6 +84,7 @@ import { refreshPushIfPermitted, registerForPush } from '@/services/pushNotifica
 import {
   OS_NOTIFICATIONS_PREF_EVENT,
   areOsNotificationsEnabled,
+  APP_ALERT_EVENT,
   notifyInternalAlert,
   syncDailyReminders,
   usesNativeNotifications,
@@ -552,9 +552,21 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     }
   };
 
+  // Collapse duplicate bell/OS alerts when the same meal/event fires multiple window events.
+  const recentNotificationKeysRef = useRef<Map<string, number>>(new Map());
   const addNotification = useCallback((type: Notification['type'], title: string, message: string) => {
+    const key = `${type}|${title}|${message}`;
+    const now = Date.now();
+    const lastAt = recentNotificationKeysRef.current.get(key) || 0;
+    if (now - lastAt < 8_000) return;
+    recentNotificationKeysRef.current.set(key, now);
+    // Prune old keys so the map stays small.
+    recentNotificationKeysRef.current.forEach((at, k) => {
+      if (now - at > 60_000) recentNotificationKeysRef.current.delete(k);
+    });
+
     setNotifications(prev => [{
-      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      id: `${now}-${Math.random().toString(36).slice(2, 8)}`,
       type,
       title,
       message,
@@ -576,6 +588,19 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   }, []);
 
   const { data: friendsData } = useFriendUpdates(user?.id, addNotification);
+
+  // Toast helpers on native fire APP_ALERT_EVENT — turn them into bell + OS banners.
+  useEffect(() => {
+    const onAppAlert = (event: Event) => {
+      const detail = (event as CustomEvent<{ type?: string; title?: string; message?: string }>).detail;
+      if (!detail?.title) return;
+      const type: Notification['type'] =
+        detail.type === 'success' || detail.type === 'achievement' ? detail.type : 'info';
+      addNotification(type, detail.title, detail.message || detail.title);
+    };
+    window.addEventListener(APP_ALERT_EVENT, onAppAlert);
+    return () => window.removeEventListener(APP_ALERT_EVENT, onAppAlert);
+  }, [addNotification]);
 
   // iOS asks for push permission only once friends are involved; afterwards the token is refreshed quietly.
   const hasFriendConnections = !!friendsData
@@ -1176,27 +1201,31 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       checkFastingStatus();
     }, 120000); // Check every 2 minutes
 
-    // Set up event listeners for future meal logging
-    const handleMealLogged = (event?: any) => {
+    // Data refresh only — never notify. Meal logging used to fire calories-logged,
+    // meal-logged-success, and refresh-meals together, which tripled the bell/OS alert.
+    const handleMealDataRefresh = () => {
       try {
         loadExistingData();
-        
-        // Add notification for meal logging
-        if (event?.detail) {
-          const { foodName, name, calories, mealType, protein } = event.detail;
-          addNotification(
-            'success', 
-            'Meal Logged! 🍽️', 
-            `Added ${foodName || name || 'food item'} (${calories || 0} cal${protein ? `, ${protein}g protein` : ''}) to ${mealType || 'your meals'}`
-          );
-        } else {
-          // Generic meal logged notification when no details available
-          addNotification('success', 'Meal Updated! 🍽️', 'Your nutrition data has been updated');
-        }
-        
-        // Don't dispatch circular events - let other components handle their own refresh
-      } catch (error) {
-        // Handle errors silently to avoid console spam
+      } catch {
+        // Ignore refresh errors
+      }
+    };
+
+    // Single notify path for meal logs (detail required so refresh-only events stay quiet).
+    const handleMealLoggedNotify = (event?: any) => {
+      try {
+        loadExistingData();
+        if (!event?.detail) return;
+        const { foodName, name, calories, mealType, protein, totalCalories, totalProtein } = event.detail;
+        const cal = calories ?? totalCalories ?? 0;
+        const prot = protein ?? totalProtein;
+        addNotification(
+          'success',
+          'Meal Logged! 🍽️',
+          `Added ${foodName || name || 'food item'} (${cal || 0} cal${prot ? `, ${prot}g protein` : ''}) to ${mealType || 'your meals'}`,
+        );
+      } catch {
+        // Ignore notification errors
       }
     };
 
@@ -1233,11 +1262,11 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       }
     };
 
-    // Add event listeners with unique references to avoid conflicts
+    // Notify only on calories-logged (emitted once by logMeal). Other events refresh UI only.
     const eventsToAdd = [
-      { type: 'calories-logged', handler: handleMealLogged },
-      { type: 'meal-logged-success', handler: handleMealLogged },
-      { type: 'refresh-meals', handler: handleMealLogged }, // AI analyzer meal refresh
+      { type: 'calories-logged', handler: handleMealLoggedNotify },
+      { type: 'meal-logged-success', handler: handleMealDataRefresh },
+      { type: 'refresh-meals', handler: handleMealDataRefresh },
       { type: 'navigate-to-tab', handler: handleTourNavigation },
       { type: 'fasting-completed', handler: handleFastingCompleted },
       { type: 'fasting-milestone', handler: handleFastingMilestone }
@@ -3200,7 +3229,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       />
       
       <AppTour />
-      <Toaster />
+      {/* Toaster lives in App.tsx — avoid a second instance that doubles toast UI */}
     </div>
   );
 }
