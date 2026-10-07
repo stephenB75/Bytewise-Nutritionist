@@ -203,9 +203,9 @@ export function AINutritionAnalyzer({ isSignedIn, onCreateAccount }: { isSignedI
               </div>
 
               {stale && (
-                <p className="text-xs text-amber-900 bg-amber-100 rounded-md px-2 py-1" data-testid="analyzer-stale-banner">
+                <div className="text-xs font-medium text-gray-950 bg-amber-200/80 rounded-md px-2 py-1.5" data-testid="analyzer-stale-banner">
                   You've logged food since this was saved. Keeping today's analysis — tap "Update from meals" if you want a new one.
-                </p>
+                </div>
               )}
 
               <p className="text-sm font-semibold text-gray-900" data-testid="text-analyzer-summary">{result.summary}</p>
