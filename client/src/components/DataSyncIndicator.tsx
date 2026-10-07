@@ -53,28 +53,16 @@ export function DataSyncIndicator() {
       });
     };
 
-    const handleDataRestored = (event: CustomEvent) => {
-      if (event.detail?.itemsRestored > 0) {
-        requestAnimationFrame(() => {
-          setSyncStatus('success');
-          setMessage(`Restored ${event.detail.itemsRestored} items`);
-          setTimeout(() => setSyncStatus('idle'), 4000);
-        });
-      }
-    };
-
     window.addEventListener('tour-visibility', handleTourVisibility as EventListener);
     window.addEventListener('sync-start', handleSyncStart);
     window.addEventListener('sync-success', handleSyncSuccess as EventListener);
     window.addEventListener('sync-error', handleSyncError);
-    window.addEventListener('data-restored', handleDataRestored as EventListener);
 
     return () => {
       window.removeEventListener('tour-visibility', handleTourVisibility as EventListener);
       window.removeEventListener('sync-start', handleSyncStart);
       window.removeEventListener('sync-success', handleSyncSuccess as EventListener);
       window.removeEventListener('sync-error', handleSyncError);
-      window.removeEventListener('data-restored', handleDataRestored as EventListener);
     };
   }, [isMounted]);
 

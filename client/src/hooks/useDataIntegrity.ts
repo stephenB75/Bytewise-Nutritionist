@@ -157,23 +157,14 @@ export function useDataIntegrity() {
             }));
 
             localStorage.setItem('weeklyMeals', JSON.stringify(restoredMeals));
-            
-            
-            toast({
-              title: 'Data Restored',
-              description: `Restored ${restoredMeals.length} meals from your secure backup`,
-              variant: 'default'
-            });
-
-            // Notify other components of restored data
-            window.dispatchEvent(new CustomEvent('data-restored'));
+            // Silent restore — no toast/notification/banner.
           }
         } catch (error) {
         }
       }
     } catch (error) {
     }
-  }, [user, toast]);
+  }, [user]);
 
   // Auto-verify data integrity on app start
   useEffect(() => {

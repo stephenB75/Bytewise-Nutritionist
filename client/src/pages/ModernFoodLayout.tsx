@@ -318,6 +318,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   const [weeklyCalories, setWeeklyCalories] = useState(0);
   const [weeklyDaysLogged, setWeeklyDaysLogged] = useState(0);
   const [weeklyMealCount, setWeeklyMealCount] = useState(0);
+  const [weeklyMacros, setWeeklyMacros] = useState({
+    protein: 0,
+    carbs: 0,
+    fat: 0,
+    sugar: 0,
+  });
   const [goalCalories, setGoalCalories] = useState((user as any)?.dailyCalorieGoal || 2000);
   const [weeklyGoal, setWeeklyGoal] = useState(14000);
   const [loggedMeals, setLoggedMeals] = useState<any[]>([]);
@@ -951,6 +957,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         setWeeklyCalories(0);
         setWeeklyDaysLogged(0);
         setWeeklyMealCount(0);
+        setWeeklyMacros({ protein: 0, carbs: 0, fat: 0, sugar: 0 });
       }
       if (dayChanged || weekChanged) {
         dayKey = nowKey;
@@ -1049,6 +1056,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     setWeeklyCalories(0);
     setWeeklyDaysLogged(0);
     setWeeklyMealCount(0);
+    setWeeklyMacros({ protein: 0, carbs: 0, fat: 0, sugar: 0 });
   }, [user, authLoading]);
 
   // Load existing meal data and set up tracking
@@ -1060,6 +1068,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         setLoggedMeals([]);
         setWeeklyMeals([]);
         setDailyCalories(0);
+        setWeeklyMacros({ protein: 0, carbs: 0, fat: 0, sugar: 0 });
         return;
       }
 
@@ -1152,13 +1161,26 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           const key = getMealDateKey(meal?.date);
           return key !== '' && weekDateKeys.includes(key);
         });
-        const weeklyTotal = currentWeekMeals.reduce((sum: number, meal: any) => {
-          return sum + (Number(meal.calories) || Number(meal.totalCalories) || 0);
-        }, 0);
+        const weeklyTotals = currentWeekMeals.reduce(
+          (acc, meal: any) => ({
+            calories: acc.calories + (Number(meal.totalCalories) || Number(meal.calories) || 0),
+            protein: acc.protein + (Number(meal.totalProtein) || Number(meal.protein) || 0),
+            carbs: acc.carbs + (Number(meal.totalCarbs) || Number(meal.carbs) || 0),
+            fat: acc.fat + (Number(meal.totalFat) || Number(meal.fat) || 0),
+            sugar: acc.sugar + (Number(meal.totalSugar) || Number(meal.sugar) || 0),
+          }),
+          { calories: 0, protein: 0, carbs: 0, fat: 0, sugar: 0 },
+        );
         const daysWithMeals = new Set(
           currentWeekMeals.map((meal: any) => getMealDateKey(meal?.date)).filter(Boolean),
         ).size;
-        setWeeklyCalories(weeklyTotal);
+        setWeeklyCalories(weeklyTotals.calories);
+        setWeeklyMacros({
+          protein: weeklyTotals.protein,
+          carbs: weeklyTotals.carbs,
+          fat: weeklyTotals.fat,
+          sugar: weeklyTotals.sugar,
+        });
         setWeeklyDaysLogged(daysWithMeals);
         setWeeklyMealCount(currentWeekMeals.length);
         
@@ -1231,10 +1253,19 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       }
     };
 
-    // Handle fasting events
+    // Handle fasting events — refresh dashboard card as soon as the fast ends
     const handleFastingCompleted = (event: any) => {
-      const { planName, duration, message } = event.detail;
-      addNotification('success', `Fasting Complete! 🎉`, message);
+      const { message } = event.detail || {};
+      checkFastingStatus();
+      queryClient.invalidateQueries({ queryKey: ACTIVE_FAST_QUERY_KEY });
+      if (message) {
+        addNotification('success', `Fasting Complete! 🎉`, message);
+      }
+    };
+
+    const handleFastingStatusChanged = () => {
+      checkFastingStatus();
+      queryClient.invalidateQueries({ queryKey: ACTIVE_FAST_QUERY_KEY });
     };
     
     const handleFastingMilestone = (event: any) => {
@@ -1251,6 +1282,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       { type: 'refresh-meals', handler: handleMealDataRefresh },
       { type: 'navigate-to-tab', handler: handleTourNavigation },
       { type: 'fasting-completed', handler: handleFastingCompleted },
+      { type: 'fasting-status-changed', handler: handleFastingStatusChanged },
       { type: 'fasting-milestone', handler: handleFastingMilestone }
     ];
 
@@ -1413,7 +1445,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     );
   });
 
-  // Macro card — remaining vs goal, with a real progress bar from logged totals
+  // Macro card — remaining vs weekly goal (Sun–Sat; resets when the week rolls).
   const MacroCard = React.memo(({ name, value, goal, color }: {
     name: string;
     value: number;
@@ -1438,7 +1470,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       <Card className="bg-amber-100 border-none p-4 transition-all duration-300 hover:bg-gradient-to-br hover:from-amber-100 hover:to-amber-200 shadow-lg hover:shadow-xl" data-testid="macro-card">
         <div className="text-center">
           <div className={`text-sm ${labelColor} mb-1 leading-tight font-normal`}>
-            <div>{isOver ? 'Over' : 'Remaining'}</div>
+            <div>{isOver ? 'Over this week' : 'Left this week'}</div>
             <div>{name}</div>
           </div>
           <div className={`text-xl font-medium ${textColor} mb-2`}>
@@ -1451,7 +1483,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             />
           </div>
           <div className="text-xs text-gray-900 font-normal mt-1">
-            {Math.round(value)}g / {goal}g
+            {Math.round(value)}g / {Math.round(goal)}g week
           </div>
         </div>
       </Card>
@@ -1701,32 +1733,45 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             </div>
           </div>
 
-          {/* Macros — server dailyStats when present, else sum of today’s logged meals */}
-          <div className="grid grid-cols-2 gap-4 mb-4 sm:grid-cols-4">
-            {([
-              { name: 'Protein', key: 'totalProtein', alt: 'protein', goal: user?.dailyProteinGoal || 180, color: 'green' },
-              { name: 'Carbs', key: 'totalCarbs', alt: 'carbs', goal: user?.dailyCarbGoal || 200, color: 'yellow' },
-              { name: 'Fat', key: 'totalFat', alt: 'fat', goal: user?.dailyFatGoal || 70, color: 'purple' },
-              { name: 'Sugar', key: 'totalSugar', alt: 'sugar', goal: 50, color: 'pink' },
-            ] as const).map((macro) => {
-              const fromStats = Number(dailyStats?.[macro.key]) || 0;
-              const fromMeals = loggedMeals.reduce(
-                (sum, meal) => sum + (Number(meal[macro.key] ?? meal[macro.alt]) || 0),
-                0,
-              );
-              // Prefer the larger of server totals vs today’s meal sum so a slow
-              // daily-stats refresh can’t blank out macros just after logging.
-              const value = Math.round(Math.max(fromStats, fromMeals));
-              return (
+          {/* Weekly macros — accumulate Sun–Sat; reset only when the calendar week rolls */}
+          <div className="mb-4" data-testid="weekly-macros">
+            <h3 className="text-sm font-semibold text-gray-800 mb-2">Macros this week</h3>
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+              {([
+                {
+                  name: 'Protein',
+                  value: weeklyMacros.protein,
+                  dailyGoal: user?.dailyProteinGoal || 180,
+                  color: 'green',
+                },
+                {
+                  name: 'Carbs',
+                  value: weeklyMacros.carbs,
+                  dailyGoal: user?.dailyCarbGoal || 200,
+                  color: 'yellow',
+                },
+                {
+                  name: 'Fat',
+                  value: weeklyMacros.fat,
+                  dailyGoal: user?.dailyFatGoal || 70,
+                  color: 'purple',
+                },
+                {
+                  name: 'Sugar',
+                  value: weeklyMacros.sugar,
+                  dailyGoal: 50,
+                  color: 'pink',
+                },
+              ] as const).map((macro) => (
                 <MacroCard
                   key={macro.name}
                   name={macro.name}
-                  value={value}
-                  goal={macro.goal}
+                  value={Math.round(macro.value)}
+                  goal={macro.dailyGoal * 7}
                   color={macro.color}
                 />
-              );
-            })}
+              ))}
+            </div>
           </div>
 
           {/* Micronutrients Section */}

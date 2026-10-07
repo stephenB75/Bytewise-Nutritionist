@@ -328,9 +328,10 @@ const FastingTracker = React.memo(function FastingTracker() {
         description: "Great job! You can now break your fast with a nutritious meal.",
       });
       
-      // Force refresh the history
+      // Force refresh history + active status for tracker + dashboard cards
       queryClient.invalidateQueries({ queryKey: ['/api/fasting/history'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/fasting/active'] });
+      queryClient.invalidateQueries({ queryKey: ACTIVE_FAST_QUERY_KEY });
+      window.dispatchEvent(new CustomEvent('fasting-status-changed'));
       
       // Check for new achievements after completing fast
       authFetch('/api/achievements/check', { method: 'POST' })
@@ -395,6 +396,9 @@ const FastingTracker = React.memo(function FastingTracker() {
       setCurrentSession(null);
       setIsActive(false);
       setTimeRemaining(0);
+      queryClient.invalidateQueries({ queryKey: ['/api/fasting/history'] });
+      queryClient.invalidateQueries({ queryKey: ACTIVE_FAST_QUERY_KEY });
+      window.dispatchEvent(new CustomEvent('fasting-status-changed'));
       toast({
         title: "Session Ended",
         description: "Your fasting session has been completed locally. We'll sync when you're back online.",
@@ -672,8 +676,16 @@ const FastingTracker = React.memo(function FastingTracker() {
               duration: 8000,
             });
           }
-          
-          // Dispatch fasting completion event for notifications
+
+          // Clear local session first so dashboard cards read inactive immediately.
+          setTimeRemaining(0);
+          setIsActive(false);
+          setCurrentSession(null);
+          localStorage.removeItem(FASTING_SESSION_KEY);
+          localStorage.removeItem(FASTING_ACTIVE_KEY);
+          localStorage.removeItem(FASTING_MILESTONES_KEY);
+          setCompletedMilestones([]);
+
           window.dispatchEvent(new CustomEvent('fasting-completed', {
             detail: {
               planName: selectedPlan.name,
@@ -681,15 +693,13 @@ const FastingTracker = React.memo(function FastingTracker() {
               message: `You completed a ${Math.round(targetHours)}-hour ${selectedPlan.name} fast! Time to break your fast with a nutritious meal.`
             }
           }));
-          
-          setTimeRemaining(0);
-          localStorage.removeItem(FASTING_SESSION_KEY);
-          localStorage.removeItem(FASTING_ACTIVE_KEY);
-          localStorage.removeItem(FASTING_MILESTONES_KEY);
-          setCompletedMilestones([]);
+          window.dispatchEvent(new CustomEvent('fasting-status-changed'));
           
           if (currentSession.id) {
             completeFastingMutation.mutate(currentSession.id);
+          } else {
+            queryClient.invalidateQueries({ queryKey: ['/api/fasting/history'] });
+            queryClient.invalidateQueries({ queryKey: ACTIVE_FAST_QUERY_KEY });
           }
         } else {
           setTimeRemaining(remaining);
@@ -830,6 +840,18 @@ const FastingTracker = React.memo(function FastingTracker() {
     setIsActive(false);
     setTimeRemaining(0);
     setCompletedMilestones([]);
+
+    // Notify dashboard FastingStatusCard + trends immediately (don't wait on API).
+    if (isCompleted) {
+      window.dispatchEvent(new CustomEvent('fasting-completed', {
+        detail: {
+          planName: selectedPlan.name,
+          duration: Math.round(actualHoursFasted),
+          message: `You completed a ${formatHours(actualHoursFasted)} ${selectedPlan.name} fast!`,
+        },
+      }));
+    }
+    window.dispatchEvent(new CustomEvent('fasting-status-changed'));
     
     // Show detailed feedback to user
     if (isCompleted) {
@@ -868,6 +890,7 @@ const FastingTracker = React.memo(function FastingTracker() {
     
     refreshLocalHistory();
     queryClient.invalidateQueries({ queryKey: ['/api/fasting/history'] });
+    queryClient.invalidateQueries({ queryKey: ACTIVE_FAST_QUERY_KEY });
   };
 
   const formatTime = (milliseconds: number) => {
