@@ -2,6 +2,10 @@
 
 Portrait PNGs sized for App Store Connect upload.
 
+**Product page copy & upload guide:** [docs/app-store-product-page.md](../docs/app-store-product-page.md)
+
+**Recommended Connect order (hero first):** `01-dashboard-hero.png` → `02-tracker.png` → `03-fasting.png` → `04-journal.png` → `05-profile.png` (same order for `iphone-18/` and `ipad-13/`).
+
 | Folder | Device | Size | App Store slot |
 |---|---|---|---|
 | `iphone-18/` | iPhone 18 (6.9" / Pro Max class) | 1320×2868 | Required 6.9" iPhone |
