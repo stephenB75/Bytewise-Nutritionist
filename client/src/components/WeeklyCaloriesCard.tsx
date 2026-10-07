@@ -141,6 +141,7 @@ export function WeeklyCaloriesCard() {
     window.addEventListener('meal-logged-success', handleMealLogged);
     window.addEventListener('refresh-weekly-data', handleMealLogged);
     window.addEventListener('reload-meal-data', handleMealLogged);
+    window.addEventListener('app-data-refresh', handleMealLogged);
     window.addEventListener('storage', handleStorageChange);
     document.addEventListener('visibilitychange', checkWeekRoll);
     const interval = window.setInterval(checkWeekRoll, 60 * 1000);
@@ -150,6 +151,7 @@ export function WeeklyCaloriesCard() {
       window.removeEventListener('meal-logged-success', handleMealLogged);
       window.removeEventListener('refresh-weekly-data', handleMealLogged);
       window.removeEventListener('reload-meal-data', handleMealLogged);
+      window.removeEventListener('app-data-refresh', handleMealLogged);
       window.removeEventListener('storage', handleStorageChange);
       document.removeEventListener('visibilitychange', checkWeekRoll);
       window.clearInterval(interval);

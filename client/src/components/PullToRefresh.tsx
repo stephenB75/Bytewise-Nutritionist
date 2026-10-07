@@ -5,7 +5,7 @@ import { refreshAppData } from '@/lib/appRefresh';
 const THRESHOLD = 70;
 const MAX_PULL = 110;
 const MIN_SPIN_MS = 700;
-const MAX_SPIN_MS = 8000;
+const MAX_SPIN_MS = 10_000;
 
 function pageScrollTop(): number {
   return document.scrollingElement?.scrollTop ?? window.scrollY ?? 0;
@@ -60,6 +60,10 @@ export function PullToRefresh() {
       }
       distance = Math.min(MAX_PULL, dy * 0.5);
       setPull(distance);
+      // Take over the gesture once a real pull is underway so iOS doesn't steal it.
+      if (distance > 10 && event.cancelable) {
+        event.preventDefault();
+      }
     };
 
     const onTouchEnd = async () => {
@@ -78,7 +82,7 @@ export function PullToRefresh() {
       const started = Date.now();
       try {
         await Promise.race([
-          refreshAppData(),
+          refreshAppData({ force: true }),
           new Promise((resolve) => window.setTimeout(resolve, MAX_SPIN_MS)),
         ]);
       } finally {
@@ -92,7 +96,8 @@ export function PullToRefresh() {
     };
 
     window.addEventListener('touchstart', onTouchStart, { passive: true });
-    window.addEventListener('touchmove', onTouchMove, { passive: true });
+    // non-passive so we can preventDefault while pulling
+    window.addEventListener('touchmove', onTouchMove, { passive: false });
     window.addEventListener('touchend', onTouchEnd);
     window.addEventListener('touchcancel', reset);
     return () => {

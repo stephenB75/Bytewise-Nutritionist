@@ -185,6 +185,17 @@ const FastingTracker = React.memo(function FastingTracker() {
     setLocalHistory(readLocalFastingHistory());
   }, []);
 
+  // Pull-to-refresh / app-wide sync
+  useEffect(() => {
+    const onAppRefresh = () => {
+      refreshLocalHistory();
+      void queryClient.invalidateQueries({ queryKey: ['/api/fasting/history'] });
+      void queryClient.invalidateQueries({ queryKey: ACTIVE_FAST_QUERY_KEY });
+    };
+    window.addEventListener('app-data-refresh', onAppRefresh);
+    return () => window.removeEventListener('app-data-refresh', onAppRefresh);
+  }, [queryClient, refreshLocalHistory]);
+
   const { data: serverHistory, isFetching: isSyncingHistory } = useQuery({
     queryKey: ['/api/fasting/history'],
     enabled: !!user,

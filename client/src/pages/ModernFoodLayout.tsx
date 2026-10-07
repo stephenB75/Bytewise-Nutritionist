@@ -28,7 +28,7 @@ import { JournalHealthSuggestions } from '@/components/JournalHealthSuggestions'
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useQuery } from '@tanstack/react-query';
 import { ACTIVE_FAST_QUERY_KEY, fetchActiveFast } from '@/lib/fastingApi';
-import { refreshAppData } from '@/lib/appRefresh';
+import { APP_DATA_REFRESH_EVENT, refreshAppData } from '@/lib/appRefresh';
 import { AppVersionInfo } from '@/components/AppVersionInfo';
 const logoImage = '/BWN_Logo.png';
 import { 
@@ -1197,12 +1197,19 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     // Load existing data immediately
     loadExistingData();
     
-    // Listen for meal data reload events (e.g., after meal deletion)
+    // Listen for meal data reload events (e.g., after meal deletion) and pull-to-refresh
     const handleReloadMealData = () => {
-      loadExistingData();
+      void loadExistingData();
+    };
+
+    const handleAppDataRefresh = () => {
+      void loadExistingData();
+      checkFastingStatus();
+      void fetchDailyStats();
     };
     
     window.addEventListener('reload-meal-data', handleReloadMealData);
+    window.addEventListener(APP_DATA_REFRESH_EVENT, handleAppDataRefresh);
     
     // Update fasting status every 2 minutes to reduce conflicts with FastingTracker
     const fastingInterval = setInterval(() => {
@@ -1303,6 +1310,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       });
       window.removeEventListener('storage', loadExistingData);
       window.removeEventListener('reload-meal-data', handleReloadMealData);
+      window.removeEventListener(APP_DATA_REFRESH_EVENT, handleAppDataRefresh);
       clearInterval(fastingInterval);
     };
   }, [user, authLoading, fetchDailyStats, calculateMicronutrients, checkFastingStatus]);

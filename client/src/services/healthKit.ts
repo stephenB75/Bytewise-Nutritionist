@@ -459,6 +459,35 @@ export class HealthKitService {
   }
 
   /**
+   * Lightweight today-only read for the Exercise card (no steps/sleep).
+   * Keeps the dashboard updating while the user is active.
+   */
+  async readTodayExercise(): Promise<{ ringMinutes: number; workouts: WorkoutSummary } | null> {
+    await this.ready;
+    await this.refreshAuthorization();
+    if (!this.isAvailable || !this.isAuthorized) {
+      return null;
+    }
+
+    const [ringMinutes, workouts] = await Promise.all([
+      this.sumSamplesForDay('exerciseTime'),
+      this.readWorkoutsForDay(),
+    ]);
+
+    if (ringMinutes > 0) {
+      this.setExerciseAsked(true);
+    }
+    if (workouts.count > 0) {
+      this.setRecoveryAsked(true);
+    }
+
+    return {
+      ringMinutes: Math.round(ringMinutes),
+      workouts,
+    };
+  }
+
+  /**
    * Green-ring + completed-workout minutes for each of the last `days` days
    * (oldest first, today last). `totalMinutes` is ring + workouts for that day.
    */

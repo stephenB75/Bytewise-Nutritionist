@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { Dumbbell, Timer } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -11,6 +11,8 @@ import { toast } from '@/hooks/use-toast';
 const DAILY_TARGET_MINUTES = 45;
 // U.S. activity guideline: 150 minutes of moderate activity a week.
 const WEEKLY_TARGET_MINUTES = 150;
+/** Re-read HealthKit often enough that the green ring feels live while the app is open. */
+const LIVE_POLL_MS = 15_000;
 
 type DayMinutes = {
   date: Date;
@@ -56,67 +58,149 @@ export function ExerciseMinutesCard({ onConnect }: { onConnect?: () => void }) {
   const [todayWorkouts, setTodayWorkouts] = useState<WorkoutSummary | null>(null);
   const [todayRingFromSummary, setTodayRingFromSummary] = useState(0);
   const [allowing, setAllowing] = useState(false);
+  const refreshGenRef = useRef(0);
 
-  const refresh = useCallback(async () => {
-    if (!(Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios')) {
-      setState('web');
-      return;
-    }
-    await healthKitService.initialize();
-    await healthKitService.refreshAuthorization();
-    if (!healthKitService.getAvailability()) {
-      setState('unavailable');
-      return;
-    }
-    if (!healthKitService.getAuthorizationStatus()) {
-      setState('disconnected');
-      return;
-    }
-
-    // Always load when connected. Show the Allow prompt only if Health still
-    // hasn't been asked for Exercise minutes (legacy connects).
-    if (healthKitService.needsExercisePermission()) {
-      setState('needs-permission');
-    }
-
-    const [history, summary] = await Promise.all([
-      healthKitService.readExerciseHistory(7),
-      healthKitService.readTodayFitnessSummary(),
-    ]);
-    setDays(history || []);
-    setTodayWorkouts(summary?.workouts ?? { count: 0, minutes: 0, calories: 0, items: [] });
-    setTodayRingFromSummary(summary?.exerciseMinutes ?? 0);
-    // Prefer ready once we have any readable data, even if a follow-up Allow is offered.
-    const hasData = (history || []).some((day) => day.totalMinutes > 0)
-      || (summary?.workouts?.count ?? 0) > 0
-      || (summary?.exerciseMinutes ?? 0) > 0;
-    if (hasData || !healthKitService.needsExercisePermission()) {
-      setState('ready');
-    } else {
-      setState('needs-permission');
-    }
+  const applyToday = useCallback((ringMinutes: number, workouts: WorkoutSummary) => {
+    setTodayRingFromSummary(ringMinutes);
+    setTodayWorkouts(workouts);
+    setDays((prev) => {
+      if (prev.length === 0) {
+        const today = new Date();
+        today.setHours(12, 0, 0, 0);
+        return [{
+          date: today,
+          ringMinutes,
+          workoutMinutes: workouts.minutes,
+          totalMinutes: ringMinutes + workouts.minutes,
+        }];
+      }
+      const next = [...prev];
+      const last = next[next.length - 1];
+      next[next.length - 1] = {
+        ...last,
+        ringMinutes,
+        workoutMinutes: workouts.minutes,
+        totalMinutes: ringMinutes + workouts.minutes,
+      };
+      return next;
+    });
   }, []);
 
+  const refresh = useCallback(async (opts?: { todayOnly?: boolean }) => {
+    const gen = ++refreshGenRef.current;
+
+    try {
+      if (!(Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios')) {
+        if (gen === refreshGenRef.current) setState('web');
+        return;
+      }
+
+      await healthKitService.initialize();
+      await healthKitService.refreshAuthorization();
+      if (gen !== refreshGenRef.current) return;
+
+      if (!healthKitService.getAvailability()) {
+        setState('unavailable');
+        return;
+      }
+      if (!healthKitService.getAuthorizationStatus()) {
+        setState('disconnected');
+        return;
+      }
+
+      // Fast path first so the ring/workouts update without waiting on a 7-day history pull.
+      const today = await healthKitService.readTodayExercise();
+      if (gen !== refreshGenRef.current) return;
+
+      if (today) {
+        applyToday(today.ringMinutes, today.workouts);
+      }
+
+      const hasToday =
+        (today?.ringMinutes ?? 0) > 0 || (today?.workouts.count ?? 0) > 0;
+      if (hasToday || !healthKitService.needsExercisePermission()) {
+        setState('ready');
+      } else {
+        setState('needs-permission');
+      }
+
+      if (opts?.todayOnly) return;
+
+      const history = await healthKitService.readExerciseHistory(7);
+      if (gen !== refreshGenRef.current) return;
+
+      if (history && history.length > 0) {
+        // Keep the freshest today totals if history lag slightly behind.
+        const last = history[history.length - 1];
+        const ring = Math.max(last.ringMinutes, today?.ringMinutes ?? 0);
+        const workoutMinutes = Math.max(last.workoutMinutes, today?.workouts.minutes ?? 0);
+        history[history.length - 1] = {
+          ...last,
+          ringMinutes: ring,
+          workoutMinutes,
+          totalMinutes: ring + workoutMinutes,
+        };
+        setDays(history);
+        if (today?.workouts) {
+          setTodayWorkouts(today.workouts);
+        }
+        setTodayRingFromSummary(ring);
+      }
+
+      const hasData =
+        (history || []).some((day) => day.totalMinutes > 0)
+        || hasToday;
+      if (hasData || !healthKitService.needsExercisePermission()) {
+        setState('ready');
+      } else {
+        setState('needs-permission');
+      }
+    } catch (error) {
+      console.warn('Exercise card refresh failed:', error);
+      // Keep last good numbers on screen; only flip out of loading on first failure.
+      if (gen === refreshGenRef.current) {
+        setState((prev) => (prev === 'loading' ? 'disconnected' : prev));
+      }
+    }
+  }, [applyToday]);
+
   useEffect(() => {
-    refresh();
-    const onChange = () => refresh();
+    void refresh();
+
+    const onFullRefresh = () => void refresh();
+    const onLiveRefresh = () => void refresh({ todayOnly: true });
     const onVisibility = () => {
-      if (document.visibilityState === 'visible') refresh();
+      if (document.visibilityState === 'visible') void refresh();
     };
-    // Poll while the dashboard is visible so new HealthKit samples show up
-    // without a manual Update control.
+    const onPageShow = () => void refresh();
+
     const pollId = window.setInterval(() => {
-      if (document.visibilityState === 'visible') refresh();
+      if (document.visibilityState === 'visible') {
+        void refresh({ todayOnly: true });
+      }
+    }, LIVE_POLL_MS);
+
+    // Periodic full week rebuild so bars stay honest without hammering HealthKit.
+    const weekPollId = window.setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        void refresh();
+      }
     }, 60_000);
-    window.addEventListener('apple-health-changed', onChange);
-    window.addEventListener('focus', onChange);
-    window.addEventListener('app-data-refresh', onChange);
+
+    window.addEventListener('apple-health-changed', onFullRefresh);
+    window.addEventListener('focus', onLiveRefresh);
+    window.addEventListener('pageshow', onPageShow);
+    // Pull-to-refresh / app-wide sync should rebuild today + 7-day history.
+    window.addEventListener('app-data-refresh', onFullRefresh);
     document.addEventListener('visibilitychange', onVisibility);
+
     return () => {
       window.clearInterval(pollId);
-      window.removeEventListener('apple-health-changed', onChange);
-      window.removeEventListener('focus', onChange);
-      window.removeEventListener('app-data-refresh', onChange);
+      window.clearInterval(weekPollId);
+      window.removeEventListener('apple-health-changed', onFullRefresh);
+      window.removeEventListener('focus', onLiveRefresh);
+      window.removeEventListener('pageshow', onPageShow);
+      window.removeEventListener('app-data-refresh', onFullRefresh);
       document.removeEventListener('visibilitychange', onVisibility);
     };
   }, [refresh]);

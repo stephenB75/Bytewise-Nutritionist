@@ -108,10 +108,12 @@ export function UserFoodSuggestions({
     const handleRefresh = () => loadUserFoods();
     window.addEventListener('meals-updated', handleRefresh);
     window.addEventListener('calories-logged', handleRefresh);
+    window.addEventListener('app-data-refresh', handleRefresh);
     
     return () => {
       window.removeEventListener('meals-updated', handleRefresh);
       window.removeEventListener('calories-logged', handleRefresh);
+      window.removeEventListener('app-data-refresh', handleRefresh);
     };
   }, [meals]);
 
