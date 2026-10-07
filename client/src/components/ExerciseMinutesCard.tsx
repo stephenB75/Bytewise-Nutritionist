@@ -6,7 +6,9 @@ import { Button } from '@/components/ui/button';
 import { healthKitService, type WorkoutSummary } from '@/services/healthKit';
 import { toast } from '@/hooks/use-toast';
 
-const DAILY_TARGET_MINUTES = 30;
+// Daily exercise goal shown on the card (minutes). Matches a common Apple Watch
+// Exercise ring goal; Capgo Health cannot read the Watch goal from HealthKit yet.
+const DAILY_TARGET_MINUTES = 45;
 // U.S. activity guideline: 150 minutes of moderate activity a week.
 const WEEKLY_TARGET_MINUTES = 150;
 
@@ -52,6 +54,7 @@ export function ExerciseMinutesCard({ onConnect }: { onConnect?: () => void }) {
   const [state, setState] = useState<CardState>('loading');
   const [days, setDays] = useState<DayMinutes[]>([]);
   const [todayWorkouts, setTodayWorkouts] = useState<WorkoutSummary | null>(null);
+  const [todayRingFromSummary, setTodayRingFromSummary] = useState(0);
   const [allowing, setAllowing] = useState(false);
 
   const refresh = useCallback(async () => {
@@ -82,6 +85,7 @@ export function ExerciseMinutesCard({ onConnect }: { onConnect?: () => void }) {
     ]);
     setDays(history || []);
     setTodayWorkouts(summary?.workouts ?? { count: 0, minutes: 0, calories: 0, items: [] });
+    setTodayRingFromSummary(summary?.exerciseMinutes ?? 0);
     // Prefer ready once we have any readable data, even if a follow-up Allow is offered.
     const hasData = (history || []).some((day) => day.totalMinutes > 0)
       || (summary?.workouts?.count ?? 0) > 0
@@ -133,12 +137,19 @@ export function ExerciseMinutesCard({ onConnect }: { onConnect?: () => void }) {
   };
 
   const today = days[days.length - 1];
-  const todayTotal = today?.totalMinutes ?? 0;
-  const todayRing = today?.ringMinutes ?? 0;
-  const todayWorkoutMinutes = today?.workoutMinutes ?? todayWorkouts?.minutes ?? 0;
-  const weekTotal = days.reduce((sum, day) => sum + day.totalMinutes, 0);
-  const daysOnTarget = days.filter((day) => day.totalMinutes >= DAILY_TARGET_MINUTES).length;
-  const scaleMax = Math.max(DAILY_TARGET_MINUTES * 1.5, ...days.map((day) => day.totalMinutes), 1);
+  // Always derive the headline from the two breakdown lines so it can't drift
+  // from "green ring" + "completed workouts".
+  const todayRing = Math.max(today?.ringMinutes ?? 0, todayRingFromSummary);
+  const todayWorkoutMinutes = Math.max(
+    today?.workoutMinutes ?? 0,
+    todayWorkouts?.minutes ?? 0,
+  );
+  const todayTotal = todayRing + todayWorkoutMinutes;
+  // Always ring + workouts so bars/week match the Today breakdown.
+  const dayTotals = days.map((day) => day.ringMinutes + day.workoutMinutes);
+  const weekTotal = dayTotals.reduce((sum, n) => sum + n, 0);
+  const daysOnTarget = dayTotals.filter((n) => n >= DAILY_TARGET_MINUTES).length;
+  const scaleMax = Math.max(DAILY_TARGET_MINUTES * 1.5, ...dayTotals, 1);
   const todayProgress = Math.min(todayTotal / DAILY_TARGET_MINUTES, 1) * 100;
   const workoutItems = todayWorkouts?.items ?? [];
 
@@ -196,9 +207,9 @@ export function ExerciseMinutesCard({ onConnect }: { onConnect?: () => void }) {
             </div>
           )}
           <div className="rounded-lg bg-white/70 p-3 border border-amber-200/50" data-testid="exercise-minutes-today-tally">
-            <p className="text-xs font-medium text-gray-600 mb-1">Today’s total</p>
+            <p className="text-xs font-medium text-gray-600 mb-1">Today’s total (ring + workouts)</p>
             <div className="flex items-baseline justify-between gap-2">
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-2xl font-bold text-gray-900" data-testid="exercise-today-total">
                 {formatMinutes(todayTotal)}
                 <span className="ml-1.5 text-sm font-medium text-gray-700">
                   of {DAILY_TARGET_MINUTES} minutes
@@ -220,7 +231,7 @@ export function ExerciseMinutesCard({ onConnect }: { onConnect?: () => void }) {
                 </span>
               </div>
               <div className="flex items-center justify-between gap-3">
-                <span className="text-gray-700">Completed workouts</span>
+                <span className="text-gray-700">+ Completed workouts</span>
                 <span className="font-semibold text-gray-900" data-testid="exercise-workout-minutes">
                   {formatMinutes(todayWorkoutMinutes)}
                 </span>
@@ -258,16 +269,17 @@ export function ExerciseMinutesCard({ onConnect }: { onConnect?: () => void }) {
             <div className="flex items-end justify-between gap-1.5 h-24" aria-label="Total exercise minutes, last 7 days">
               {days.map((day, index) => {
                 const isToday = index === days.length - 1;
-                const height = day.totalMinutes > 0 ? Math.max((day.totalMinutes / scaleMax) * 100, 6) : 2;
+                const combined = dayTotals[index] ?? 0;
+                const height = combined > 0 ? Math.max((combined / scaleMax) * 100, 6) : 2;
                 return (
                   <div key={day.date.toDateString()} className="flex flex-1 flex-col items-center gap-1 h-full justify-end">
                     <span className="text-[10px] font-medium text-gray-700">
-                      {day.totalMinutes > 0 ? formatMinutesShort(day.totalMinutes) : ''}
+                      {combined > 0 ? formatMinutesShort(combined) : ''}
                     </span>
                     <div
-                      className={`w-full max-w-[28px] rounded-t ${day.totalMinutes >= DAILY_TARGET_MINUTES ? 'bg-lime-500' : 'bg-lime-200'} ${isToday ? 'ring-2 ring-lime-700/40' : ''}`}
+                      className={`w-full max-w-[28px] rounded-t ${combined >= DAILY_TARGET_MINUTES ? 'bg-lime-500' : 'bg-lime-200'} ${isToday ? 'ring-2 ring-lime-700/40' : ''}`}
                       style={{ height: `${height}%` }}
-                      title={`${day.date.toLocaleDateString('en-US', { weekday: 'long' })}: ${formatMinutes(day.totalMinutes)} total`}
+                      title={`${day.date.toLocaleDateString('en-US', { weekday: 'long' })}: ${formatMinutes(combined)} total`}
                     />
                     <span className={`text-[10px] ${isToday ? 'font-bold text-gray-900' : 'text-gray-600'}`}>
                       {isToday ? 'Today' : day.date.toLocaleDateString('en-US', { weekday: 'narrow' })}

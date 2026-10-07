@@ -415,9 +415,8 @@ export class HealthKitService {
     const history = dates.map((date, index) => {
       const ring = Math.round(ringMinutes[index]);
       const workout = workouts[index].minutes;
-      // Green ring already includes workout exercise minutes — do not add them again.
-      // If ring data is missing but workouts exist, show workout minutes as the total.
-      const totalMinutes = ring > 0 ? ring : workout;
+      // Dashboard "Today's total" / 7-day bars = green ring + completed workout minutes.
+      const totalMinutes = ring + workout;
       return {
         date,
         ringMinutes: ring,
@@ -517,7 +516,8 @@ export class HealthKitService {
   private async readWorkoutsForDay(day = new Date()): Promise<WorkoutSummary> {
     const empty: WorkoutSummary = { count: 0, minutes: 0, calories: 0, items: [] };
     const health = getHealth();
-    if (!health || !this.recoveryAsked) {
+    // Always attempt when Health is available — empty result if workouts were never allowed.
+    if (!health) {
       return empty;
     }
 
