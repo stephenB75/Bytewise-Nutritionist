@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Heart, CheckCircle, Footprints, Flame, Activity, Smartphone, Loader2, Moon, Dumbbell, Timer, RefreshCw } from 'lucide-react';
+import { Heart, CheckCircle, Footprints, Flame, Activity, Smartphone, Loader2, Moon, Dumbbell, Timer } from 'lucide-react';
 import { healthKitService } from '@/services/healthKit';
 import { toast } from '@/hooks/use-toast';
 
@@ -142,19 +142,6 @@ export function AppleHealthIntegration() {
             If a number shows 0, open the Health app → your profile picture → Apps → Bytewise and turn it on.
             Your activity stays on your iPhone and isn't stored on our servers.
           </p>
-          <Button
-            variant="outline"
-            className="w-full"
-            data-testid="button-update-apple-health"
-            onClick={async () => {
-              await healthKitService.refreshAuthorization();
-              window.dispatchEvent(new CustomEvent('apple-health-changed'));
-              toast({ title: 'Apple Health updated', description: 'Dashboard figures refreshed from Apple Health.', duration: 2500 });
-            }}
-          >
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Update dashboard from Health
-          </Button>
           <div className="grid grid-cols-2 gap-2">
             <Button variant="outline" onClick={() => healthKitService.openHealthApp()} className="w-full">
               Open Health app
