@@ -128,6 +128,12 @@ Path: [`app-store-screenshots/search-results/`](../app-store-screenshots/search-
 | `search-results-1920x1280.png` | 1920 × 1280 | Search Results alternate |
 | `search-results-universal-5244x2950.png` | 5244 × 2950 | Optional single asset for both |
 
+Creatives are built from real product assets (not placeholders):
+
+- App icon: `ios/.../AppIcon-512@2x.png`
+- Food photos: `assets/` (same library as in-app heroes)
+- Device UI: `app-store-screenshots/iphone-18/` (top of screen, readable)
+
 Regenerate after brand/hero changes:
 
 ```bash
