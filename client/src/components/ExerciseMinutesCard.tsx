@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
-import { Dumbbell, RefreshCw, Timer } from 'lucide-react';
+import { Dumbbell, Timer } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { healthKitService, type WorkoutSummary } from '@/services/healthKit';
@@ -53,7 +53,6 @@ export function ExerciseMinutesCard({ onConnect }: { onConnect?: () => void }) {
   const [days, setDays] = useState<DayMinutes[]>([]);
   const [todayWorkouts, setTodayWorkouts] = useState<WorkoutSummary | null>(null);
   const [allowing, setAllowing] = useState(false);
-  const [updating, setUpdating] = useState(false);
 
   const refresh = useCallback(async () => {
     if (!(Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios')) {
@@ -100,11 +99,17 @@ export function ExerciseMinutesCard({ onConnect }: { onConnect?: () => void }) {
     const onVisibility = () => {
       if (document.visibilityState === 'visible') refresh();
     };
+    // Poll while the dashboard is visible so new HealthKit samples show up
+    // without a manual Update control.
+    const pollId = window.setInterval(() => {
+      if (document.visibilityState === 'visible') refresh();
+    }, 60_000);
     window.addEventListener('apple-health-changed', onChange);
     window.addEventListener('focus', onChange);
     window.addEventListener('app-data-refresh', onChange);
     document.addEventListener('visibilitychange', onVisibility);
     return () => {
+      window.clearInterval(pollId);
       window.removeEventListener('apple-health-changed', onChange);
       window.removeEventListener('focus', onChange);
       window.removeEventListener('app-data-refresh', onChange);
@@ -137,40 +142,14 @@ export function ExerciseMinutesCard({ onConnect }: { onConnect?: () => void }) {
   const todayProgress = Math.min(todayTotal / DAILY_TARGET_MINUTES, 1) * 100;
   const workoutItems = todayWorkouts?.items ?? [];
 
-  const handleUpdate = async () => {
-    setUpdating(true);
-    try {
-      await refresh();
-      toast({ title: 'Exercise updated', description: 'Pulled the latest minutes from Apple Health.', duration: 2500 });
-    } finally {
-      setUpdating(false);
-    }
-  };
-
   return (
     <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200/60 p-4 shadow-md" data-testid="exercise-minutes-card">
-      <div className="flex items-center justify-between gap-2 mb-3">
-        <div className="flex items-center gap-2 min-w-0">
-          <Timer className="h-5 w-5 shrink-0 text-lime-600" />
-          <div className="min-w-0">
-            <h3 className="text-base font-bold text-gray-900">Exercise</h3>
-            <p className="text-xs text-gray-700">All-day activity and workouts in one place</p>
-          </div>
+      <div className="flex items-center gap-2 mb-3">
+        <Timer className="h-5 w-5 shrink-0 text-lime-600" />
+        <div className="min-w-0">
+          <h3 className="text-base font-bold text-gray-900">Exercise</h3>
+          <p className="text-xs text-gray-700">All-day activity and workouts in one place</p>
         </div>
-        {(state === 'ready' || state === 'needs-permission') && (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="shrink-0 border-amber-300 bg-white/80 text-gray-800"
-            onClick={handleUpdate}
-            disabled={updating}
-            data-testid="button-update-exercise"
-          >
-            <RefreshCw className={`h-3.5 w-3.5 mr-1 ${updating ? 'animate-spin' : ''}`} />
-            Update
-          </Button>
-        )}
       </div>
 
       {state === 'loading' ? (
