@@ -5,7 +5,7 @@
  * Features brand-compliant design and seamless navigation
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { Component, useState, useEffect } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from '@/lib/queryClient';
 import { Route, Router, Switch } from 'wouter';
@@ -208,10 +208,41 @@ function AppContent() {
   );
 }
 
+class AppErrorBoundary extends Component<{ children: React.ReactNode }, { error: Error | null }> {
+  state = { error: null as Error | null };
+
+  static getDerivedStateFromError(error: Error) {
+    return { error };
+  }
+
+  render() {
+    if (this.state.error) {
+      return (
+        <div style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, background: '#fff7ed', color: '#111827', fontFamily: 'system-ui, sans-serif', textAlign: 'center' }}>
+          <div>
+            <h1 style={{ fontSize: 22, marginBottom: 8 }}>Bytewise couldn’t open</h1>
+            <p style={{ marginBottom: 16 }}>{this.state.error.message || 'Something went wrong while starting.'}</p>
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              style={{ background: '#111827', color: '#fff', border: 0, borderRadius: 8, padding: '10px 16px' }}
+            >
+              Reload
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AppContent />
+      <AppErrorBoundary>
+        <AppContent />
+      </AppErrorBoundary>
     </QueryClientProvider>
   );
 }

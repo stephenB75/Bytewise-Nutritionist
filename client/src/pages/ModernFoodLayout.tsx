@@ -807,7 +807,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
     // Refresh only copies an active server fast onto this device.
     // A null active-fast response must not delete a fast that is still running locally.
     if (serverActiveFast && serverRemaining > 0) {
-      if (local?.id !== serverActiveFast.id) {
+      let localId: string | undefined;
+      try {
+        localId = JSON.parse(localStorage.getItem('bytewise_fasting_session') || 'null')?.id;
+      } catch {
+        localId = undefined;
+      }
+      if (localId !== serverActiveFast.id) {
         localStorage.setItem('bytewise_fasting_session', JSON.stringify({
           id: serverActiveFast.id,
           planId: serverActiveFast.planId,

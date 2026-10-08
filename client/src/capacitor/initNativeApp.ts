@@ -96,13 +96,6 @@ export async function initNativeApp(): Promise<void> {
   }
 
   try {
-    const { SplashScreen } = await import('@capacitor/splash-screen');
-    await SplashScreen.hide();
-  } catch {
-    // Optional plugin
-  }
-
-  try {
     const { StatusBar, Style } = await import('@capacitor/status-bar');
     await StatusBar.setOverlaysWebView({ overlay: false });
     await StatusBar.setStyle({ style: Style.Light });
