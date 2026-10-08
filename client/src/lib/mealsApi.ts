@@ -181,24 +181,13 @@ export async function saveUserProfile(profile: {
     },
   });
 
-  const { error } = await supabase.from('users').upsert({
-    id: user.id,
-    email: user.email,
-    first_name: profile.firstName,
-    last_name: profile.lastName,
-    profile_icon: profile.profileIcon || 1,
-    updated_at: new Date().toISOString(),
-  }, { onConflict: 'id' });
-
-  if (error) {
-    throw new Error(error.message || 'Failed to save profile');
-  }
-
-  try {
-    await apiRequest('PUT', '/api/user/profile', profile);
-  } catch {
-    // Express is optional; Supabase already has the name.
-  }
+  // public.users is protected by RLS (auth.uid() = id) and rejects browser inserts.
+  // The API writes the row with the service role after checking this session.
+  await apiRequest('PUT', '/api/user/profile', {
+    firstName: profile.firstName,
+    lastName: profile.lastName,
+    profileIcon: profile.profileIcon || 1,
+  });
 
   return { id: user.id, ...profile };
 }
