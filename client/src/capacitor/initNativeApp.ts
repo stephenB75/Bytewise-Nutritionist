@@ -26,6 +26,17 @@ function isTextField(el: Element | null): el is HTMLElement {
   );
 }
 
+function onTextFieldFocus(handler: (field: HTMLElement) => void): void {
+  document.addEventListener(
+    'focusin',
+    (event) => {
+      if (!(event.target instanceof HTMLElement) || !isTextField(event.target)) return;
+      handler(event.target);
+    },
+    true,
+  );
+}
+
 function nearestScroller(el: HTMLElement): HTMLElement | Window {
   let parent = el.parentElement;
   while (parent && parent !== document.body) {
@@ -74,7 +85,7 @@ function revealFocusedField(keyboardHeight = 0): void {
     }
   };
 
-  requestAnimationFrame(() => requestAnimationFrame(run));
+  requestAnimationFrame(run);
 }
 
 async function initKeyboardHandling(): Promise<void> {
@@ -102,41 +113,50 @@ async function initKeyboardHandling(): Promise<void> {
     clearKeyboardHeight();
   });
 
-  document.addEventListener(
-    'focusin',
-    (event) => {
-      if (!(event.target instanceof HTMLElement) || !isTextField(event.target)) return;
-      const raw = getComputedStyle(document.documentElement).getPropertyValue(KEYBOARD_HEIGHT_VAR);
-      const height = Number.parseFloat(raw) || 0;
-      if (height > 0 || document.body.classList.contains(KEYBOARD_OPEN_CLASS)) {
-        revealFocusedField(height);
-      } else {
-        window.setTimeout(() => revealFocusedField(0), 350);
-      }
-    },
-    true,
-  );
+  onTextFieldFocus(() => {
+    const raw = getComputedStyle(document.documentElement).getPropertyValue(KEYBOARD_HEIGHT_VAR);
+    const height = Number.parseFloat(raw) || 0;
+    if (height > 0 || document.body.classList.contains(KEYBOARD_OPEN_CLASS)) {
+      revealFocusedField(height);
+    } else {
+      window.setTimeout(() => {
+        const cover = visibleKeyboardCover(0);
+        if (cover > 0 || document.body.classList.contains(KEYBOARD_OPEN_CLASS)) {
+          revealFocusedField(cover);
+        }
+      }, 350);
+    }
+  });
+}
+
+function initBrowserKeyboardHandling(): void {
+  if (typeof window === 'undefined' || !window.visualViewport) return;
+
+  const onViewport = () => {
+    const covered = Math.max(0, window.innerHeight - window.visualViewport!.height - window.visualViewport!.offsetTop);
+    setKeyboardHeight(covered > 80 ? covered : 0);
+    if (covered > 80) revealFocusedField(covered);
+  };
+  window.visualViewport.addEventListener('resize', onViewport);
+  window.visualViewport.addEventListener('scroll', onViewport);
+
+  // Only scroll the field when a soft keyboard is actually covering the viewport.
+  onTextFieldFocus(() => {
+    const covered = visibleKeyboardCover(0);
+    if (covered > 80) {
+      revealFocusedField(covered);
+      return;
+    }
+    window.setTimeout(() => {
+      const later = visibleKeyboardCover(0);
+      if (later > 80) revealFocusedField(later);
+    }, 350);
+  });
 }
 
 export async function initNativeApp(): Promise<void> {
   if (!Capacitor.isNativePlatform()) {
-    if (typeof window !== 'undefined' && window.visualViewport) {
-      const onViewport = () => {
-        const covered = Math.max(0, window.innerHeight - window.visualViewport!.height - window.visualViewport!.offsetTop);
-        setKeyboardHeight(covered > 80 ? covered : 0);
-        if (covered > 80) revealFocusedField(covered);
-      };
-      window.visualViewport.addEventListener('resize', onViewport);
-      window.visualViewport.addEventListener('scroll', onViewport);
-      document.addEventListener(
-        'focusin',
-        (event) => {
-          if (!(event.target instanceof HTMLElement) || !isTextField(event.target)) return;
-          window.setTimeout(() => revealFocusedField(0), 350);
-        },
-        true,
-      );
-    }
+    initBrowserKeyboardHandling();
     return;
   }
 

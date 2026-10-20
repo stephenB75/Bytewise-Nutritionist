@@ -3077,18 +3077,15 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               </Card>
             </AccordionItem>
           </Accordion>
+          <AppVersionInfo />
           </div>
         ) : (
           <div className="space-y-6">
             <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 p-8">
               <SignOnModule />
             </Card>
-            <NotificationPreferences />
           </div>
         )}
-        <div className="mt-6">
-          <AppVersionInfo />
-        </div>
       </div>
     </div>
   );

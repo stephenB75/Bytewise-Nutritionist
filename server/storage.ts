@@ -1108,8 +1108,10 @@ export class DatabaseStorage implements IStorage {
     };
   }> {
     try {
-      // Meals are stored at noon UTC on the client's calendar day. Use UTC bounds
-      // so the server's local timezone cannot drop or shift that day.
+      // Callers pass the client's YYYY-MM-DD as noon UTC (see /api/users/:id/daily-stats).
+      // Meals are stored the same way. UTC day bounds keep that calendar day stable
+      // regardless of the server's local timezone. Do not use getFullYear/getMonth/getDate
+      // here — those follow the server TZ and shift US evening / APAC morning days.
       const startOfDay = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
       const endOfDay = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() + 1));
 

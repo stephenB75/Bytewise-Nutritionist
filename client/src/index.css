@@ -1822,8 +1822,16 @@ select,
 [contenteditable="true"],
 [role="textbox"],
 [role="searchbox"] {
-  scroll-margin-bottom: calc(var(--keyboard-height, 0px) + 1.5rem);
   scroll-margin-top: 1.25rem;
+}
+
+html.keyboard-open input,
+html.keyboard-open textarea,
+html.keyboard-open select,
+html.keyboard-open [contenteditable="true"],
+html.keyboard-open [role="textbox"],
+html.keyboard-open [role="searchbox"] {
+  scroll-margin-bottom: calc(var(--keyboard-height, 0px) + 1.5rem);
 }
 
 [data-testid="water-card"] button,
