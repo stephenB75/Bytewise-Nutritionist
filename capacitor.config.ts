@@ -47,9 +47,10 @@ const config: CapacitorConfig = {
       overlaysWebView: false
     },
     
-    // "body" resizes the document for React; "ionic" only works with <ion-app>.
+    // Native resizes the WKWebView on iOS so fields stay above the keyboard.
+    // Android still uses body. Do not use "ionic" (requires <ion-app>).
     Keyboard: {
-      resize: 'body',
+      resize: 'native',
       style: 'dark',
       resizeOnFullScreen: true
     },

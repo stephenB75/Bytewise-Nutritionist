@@ -31,20 +31,20 @@ export function useDataIntegrity() {
     try {
       const issues: string[] = [];
 
-      // Check user profile in database
       try {
         const userResponse = await apiRequest('GET', '/api/auth/user');
-        if (!userResponse) {
+        const profile = await userResponse.json();
+        if (!profile) {
           issues.push('User profile not found in database');
         }
       } catch (error) {
         issues.push('Cannot access user profile');
       }
 
-      // Check meal data in database (skip localStorage check to avoid quota errors)
       try {
-        const mealsResponse = await apiRequest('GET', '/api/meals/logged') as any;
-        if (!mealsResponse || !Array.isArray(mealsResponse)) {
+        const mealsResponse = await apiRequest('GET', '/api/meals/logged');
+        const meals = await mealsResponse.json();
+        if (!Array.isArray(meals)) {
           issues.push('Cannot access meal data from database');
         }
       } catch (error) {

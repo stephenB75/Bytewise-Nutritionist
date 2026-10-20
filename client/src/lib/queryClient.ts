@@ -1,6 +1,7 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 import { supabase } from './supabase';
 import { resolveApiUrl } from './apiUrl';
+import { whenAuthReady } from './authReady';
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
@@ -13,8 +14,8 @@ async function throwIfResNotOk(res: Response) {
 export async function getAuthHeaders(): Promise<Record<string, string>> {
   const headers: Record<string, string> = {};
   let accessToken = null;
-  
-  // PRIORITIZE Supabase session tokens (proper JWTs) over custom tokens
+
+  await whenAuthReady();
   const { data: { session } } = await supabase.auth.getSession();
   if (session?.access_token) {
     accessToken = session.access_token;

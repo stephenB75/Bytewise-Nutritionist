@@ -74,6 +74,19 @@ const PINNED_POPULAR = [
   "Chili's",
   'Pizza Hut',
   "Domino's",
+  "Raising Cane's",
+  'Cava',
+  "Dave's Hot Chicken",
+  'Five Guys',
+  'Whataburger',
+  'Wingstop',
+  'Crumbl',
+  'Waffle House',
+  'Panera Bread',
+  "Jersey Mike's",
+  'Quiznos',
+  'Perkins Restaurant & Bakery',
+  'Golden Corral',
 ];
 
 function requestUserRegion(): Promise<UsFoodRegion | null> {
@@ -133,13 +146,13 @@ export function FastFoodMenu() {
     // Compact row: national pins (incl. Olive Garden) + short Caribbean spotlight + nearby
     if (!region) {
       const spot = caribbeanSpot.filter((n) => !pinned.includes(n));
-      return [...pinned.slice(0, 12), ...spot].slice(0, 18);
+      return [...pinned.slice(0, 16), ...spot].slice(0, 22);
     }
     const nearby = featuredNearbyRestaurants(region, FAST_FOOD_RESTAURANTS, 3).filter(
       (name) => !pinned.includes(name) && !caribbeanSpot.includes(name)
     );
     const spot = caribbeanSpot.filter((n) => !pinned.includes(n) && !nearby.includes(n));
-    return [...nearby, ...pinned.slice(0, 12), ...spot].slice(0, 20);
+    return [...nearby, ...pinned.slice(0, 16), ...spot].slice(0, 24);
   }, [region, showAllPlaces, placeCuisine]);
 
   const queryPlaces = useMemo(() => matchFastFoodRestaurants(query), [query]);

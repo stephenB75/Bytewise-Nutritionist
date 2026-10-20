@@ -1670,8 +1670,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <h2 className="text-xl font-semibold text-gray-900 sm:text-2xl md:text-3xl">Today's Progress</h2>
           </div>
 
+          <section data-testid="daily-cards" className="mb-4 space-y-4">
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-600">Daily</h3>
           {/* Daily Progress — prefer the larger of server stats vs today’s meal sum */}
-          <div data-testid="daily-progress" className="mb-4">
+          <div data-testid="daily-progress">
             {(() => {
               const mealsCal = loggedMeals.reduce(
                 (sum, meal) => sum + (Number(meal.totalCalories) || Number(meal.calories) || 0),
@@ -1716,38 +1718,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             })()}
           </div>
 
-          {/* Fasting Status */}
-          <div className="mb-4">
-            <FastingStatusCard fastingStatus={fastingStatus || dailyStats?.fastingStatus} />
-          </div>
-
-          <div className="mb-4">
-            <AppleFitnessCard
-              onConnect={() => {
-                handleTabChange('profile');
-                // After the tab switch renders (it closes any open section), open Apple Health.
-                setTimeout(() => {
-                  setOpenCard('apple-health');
-                  setTimeout(() => scrollToTestId('apple-health-card'), 250);
-                }, 100);
-              }}
-            />
-          </div>
-
-          <div className="mb-4">
-            <ExerciseMinutesCard
-              onConnect={() => {
-                handleTabChange('profile');
-                setTimeout(() => {
-                  setOpenCard('apple-health');
-                  setTimeout(() => scrollToTestId('apple-health-card'), 250);
-                }, 100);
-              }}
-            />
-          </div>
-
           {/* Water Consumption */}
-          <div className="mb-4" data-testid="water-consumption-card">
+          <div data-testid="water-consumption-card">
             <WaterCard
               glasses={Math.max(dailyStats?.waterGlasses ?? 0, readLocalWaterGlasses())}
               onIncrement={(glasses, containerOz) => updateWaterConsumption(glasses, containerOz)}
@@ -1755,8 +1727,31 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             />
           </div>
 
+          {/* Micronutrients Section */}
+          <div>
+            <h3 className="text-lg font-bold text-gray-900 mb-3 flex items-center">
+              <span className="w-2 h-2 bg-cyan-400 rounded-full mr-2"></span>
+              Essential Micronutrients
+            </h3>
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              <MicronutrientCard name="Vitamin C" value={dailyMicronutrients.vitaminC} goal={90} unit="mg" color="cyan" />
+              <MicronutrientCard name="Vitamin D" value={dailyMicronutrients.vitaminD} goal={20} unit="μg" color="orange" />
+              <MicronutrientCard name="Vitamin B12" value={dailyMicronutrients.vitaminB12} goal={2.4} unit="μg" color="red" />
+              <MicronutrientCard name="Folate" value={dailyMicronutrients.folate} goal={400} unit="μg" color="green" />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <MicronutrientCard name="Iron" value={dailyMicronutrients.iron} goal={18} unit="mg" color="slate" />
+              <MicronutrientCard name="Calcium" value={dailyMicronutrients.calcium} goal={1000} unit="mg" color="violet" />
+              <MicronutrientCard name="Zinc" value={dailyMicronutrients.zinc} goal={11} unit="mg" color="amber" />
+              <MicronutrientCard name="Magnesium" value={dailyMicronutrients.magnesium} goal={400} unit="mg" color="rose" />
+            </div>
+          </div>
+          </section>
+
+          <section data-testid="weekly-cards" className="mb-4 space-y-4">
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-600">Weekly</h3>
           {/* Weekly Progress */}
-          <div className="mb-4">
+          <div>
             <ProgressCard
               title="Weekly Progress"
               icon={Calendar}
@@ -1781,7 +1776,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           </div>
 
           {/* Weekly macros — accumulate Sun–Sat; reset only when the calendar week rolls */}
-          <div className="mb-4" data-testid="weekly-macros">
+          <div data-testid="weekly-macros">
             <h3 className="text-sm font-semibold text-gray-800 mb-2">Macros this week</h3>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
               {([
@@ -1820,33 +1815,40 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               ))}
             </div>
           </div>
+          </section>
 
-          {/* Micronutrients Section */}
+          <section data-testid="monthly-cards" className="mb-4 space-y-4">
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-600">Monthly</h3>
+            <NutritionTrendsCard meals={weeklyMeals} calorieGoal={goalCalories} />
+          </section>
+
           <div className="mb-4">
-            <h3 className="text-lg font-bold text-gray-900 mb-3 flex items-center">
-              <span className="w-2 h-2 bg-cyan-400 rounded-full mr-2"></span>
-              Essential Micronutrients
-            </h3>
-            
-            
-            <div className="grid grid-cols-2 gap-3 mb-4">
-              <MicronutrientCard name="Vitamin C" value={dailyMicronutrients.vitaminC} goal={90} unit="mg" color="cyan" />
-              <MicronutrientCard name="Vitamin D" value={dailyMicronutrients.vitaminD} goal={20} unit="μg" color="orange" />
-              <MicronutrientCard name="Vitamin B12" value={dailyMicronutrients.vitaminB12} goal={2.4} unit="μg" color="red" />
-              <MicronutrientCard name="Folate" value={dailyMicronutrients.folate} goal={400} unit="μg" color="green" />
-            </div>
-            
-            <div className="grid grid-cols-2 gap-3">
-              <MicronutrientCard name="Iron" value={dailyMicronutrients.iron} goal={18} unit="mg" color="slate" />
-              <MicronutrientCard name="Calcium" value={dailyMicronutrients.calcium} goal={1000} unit="mg" color="violet" />
-              <MicronutrientCard name="Zinc" value={dailyMicronutrients.zinc} goal={11} unit="mg" color="amber" />
-              <MicronutrientCard name="Magnesium" value={dailyMicronutrients.magnesium} goal={400} unit="mg" color="rose" />
-            </div>
-            
+            <FastingStatusCard fastingStatus={fastingStatus || dailyStats?.fastingStatus} />
           </div>
 
           <div className="mb-4">
-            <NutritionTrendsCard meals={weeklyMeals} calorieGoal={goalCalories} />
+            <AppleFitnessCard
+              onConnect={() => {
+                handleTabChange('profile');
+                // After the tab switch renders (it closes any open section), open Apple Health.
+                setTimeout(() => {
+                  setOpenCard('apple-health');
+                  setTimeout(() => scrollToTestId('apple-health-card'), 250);
+                }, 100);
+              }}
+            />
+          </div>
+
+          <div className="mb-4">
+            <ExerciseMinutesCard
+              onConnect={() => {
+                handleTabChange('profile');
+                setTimeout(() => {
+                  setOpenCard('apple-health');
+                  setTimeout(() => scrollToTestId('apple-health-card'), 250);
+                }, 100);
+              }}
+            />
           </div>
 
           <div className="mb-4">

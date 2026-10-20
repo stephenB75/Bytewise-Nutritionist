@@ -39,38 +39,86 @@ const FILLER_WORDS = new Set(['a', 'an', 'the', 'and', 'with', 'of', 'from', 'at
 // People say "McNuggets" or "Wendy's nuggets", not "Chicken McNuggets".
 const OPTIONAL_MENU_WORDS = new Set(['chicken', 'classic', 'original', 'signature']);
 
+const MENU_WORD_SYNONYMS: Record<string, string[]> = {
+  fries: ['fry', 'fries', 'french'],
+  fry: ['fry', 'fries', 'french'],
+  french: ['fry', 'fries', 'french'],
+  nuggets: ['nugget', 'nuggets', 'mcnuggets'],
+  nugget: ['nugget', 'nuggets', 'mcnuggets'],
+  mcnuggets: ['nugget', 'nuggets', 'mcnuggets'],
+};
+
+function menuWordsMatch(a: string, b: string): boolean {
+  if (stem(a) === stem(b)) return true;
+  const left = MENU_WORD_SYNONYMS[stem(a)] || [];
+  const right = MENU_WORD_SYNONYMS[stem(b)] || [];
+  return left.includes(stem(b)) || right.includes(stem(a));
+}
+
+/** Pull "2 cups of rice" out of the food box when the amount field is empty or just "1 serving". */
+function splitQuantityFromFood(food: string, measurement: string): { food: string; measurement: string } {
+  const amount = measurement.trim();
+  const generic = !amount || /^(1|one)?\s*(servings?|portions?|plates?)?$/i.test(amount);
+  if (!generic) return { food, measurement };
+  const match = food.trim().match(
+    /^(\d+\s+\d+\/\d+|\d+\/\d+|\d*\.?\d+)\s+(cups?|tbsp|tablespoons?|tsp|teaspoons?|oz|ounces?|g|grams?|kg|lbs?|pounds?|ml|milliliters?|slices?|pieces?|medium|large|small|bowls?)\s+(?:of\s+)?(.+)$/i,
+  );
+  if (!match) return { food, measurement };
+  return { food: match[3].trim(), measurement: `${match[1]} ${match[2]}` };
+}
+
 /** Menu items by brand: needs the restaurant named, or a distinctive item name like "Big Mac". */
 function findFastFoodItem(query: string, measurement = ''): FastFoodItem | null {
   const queryWords = normalizeWords(query);
   const queryText = ` ${queryWords.join(' ')} `;
-  const hasAll = (words: string[]) => words.every(word => queryWords.some(q => stem(q) === stem(word)));
+  const hasAll = (words: string[]) => words.every(word => queryWords.some(q => menuWordsMatch(q, word)));
 
   let best: { item: FastFoodItem; score: number } | null = null;
   for (const item of FAST_FOOD_ITEMS) {
     const nameWords = menuNameWords(item.name);
-    const requiredWords = nameWords.filter(word => !OPTIONAL_MENU_WORDS.has(word));
-    if (!hasAll(requiredWords.length ? requiredWords : nameWords)) continue;
+    const keywordWords = (item.keywords || []).flatMap((keyword) => normalizeWords(keyword));
     const restaurantWords = normalizeWords(item.restaurant);
-    const restaurantNamed = queryText.includes(` ${restaurantWords.join(' ')} `);
+    const restaurantNamed = restaurantWords.length > 0 && (
+      queryText.includes(` ${restaurantWords.join(' ')} `)
+      || restaurantWords.every((word) => queryWords.some((q) => stem(q) === stem(word)))
+    );
+    const requiredWords = nameWords.filter(word => !OPTIONAL_MENU_WORDS.has(word));
+    const contentWords = requiredWords.length ? requiredWords : nameWords;
+    const nameHit = hasAll(contentWords);
+    const keywordHit = keywordWords.some((word) => queryWords.some((q) => menuWordsMatch(q, word)));
+    const shortNameHit = contentWords.some((word) => queryWords.some((q) => menuWordsMatch(q, word)));
+    if (restaurantNamed) {
+      if (!nameHit && !keywordHit && !shortNameHit) continue;
+    } else if (!nameHit) {
+      continue;
+    }
     const itemWords = nameWords.filter(word => !restaurantWords.includes(word));
     const distinctiveName = itemWords.some(word => !GENERIC_MENU_WORDS.has(word));
     if (!restaurantNamed && !distinctiveName) continue;
+    // A one-word everyday food ("avocado") is not a branded "Chicken Avocado".
+    const queryFoodWords = queryWords.filter((word) => !FILLER_WORDS.has(word) && !/^\d+$/.test(word));
+    if (!restaurantNamed && queryFoodWords.length === 1 && (
+      GENERIC_MENU_WORDS.has(queryFoodWords[0])
+      || queryFoodWords[0] === 'avocado'
+    )) continue;
+    if (!restaurantNamed && queryFoodWords.length < contentWords.length) continue;
     // "(8 ct)"-style size notes are optional, but naming the size picks that item.
     const sizeWords = normalizeWords((item.name.match(/\(([^)]*)\)/) || [])[1] || '');
     const sizeNamed = sizeWords.length > 0 && hasAll(sizeWords);
-    const explained = [...nameWords, ...restaurantWords, ...sizeWords].map(stem);
+    const explained = [...nameWords, ...restaurantWords, ...sizeWords, ...keywordWords].map(stem);
     const unexplained = queryWords.filter(
-      word => !explained.includes(stem(word)) && !FILLER_WORDS.has(word) && !/^\d+$/.test(word),
+      word => !explained.some((e) => e === stem(word) || menuWordsMatch(word, e)) && !FILLER_WORDS.has(word) && !/^\d+$/.test(word),
     ).length;
     // One extra word ("big mac burger") is fine; more ("big mac sauce recipe") is a different food.
-    if (unexplained > 1) continue;
-    const matchedItemWords = itemWords.filter(word => queryWords.some(q => stem(q) === stem(word))).length;
-    const score = matchedItemWords * 2 + (restaurantNamed ? 5 : 0) + (sizeNamed ? 3 : 0) - unexplained * 3;
+    if (!restaurantNamed && unexplained > 1) continue;
+    if (unexplained > 2) continue;
+    const matchedItemWords = itemWords.filter(word => queryWords.some(q => menuWordsMatch(q, word))).length;
+    const score = matchedItemWords * 2 + (restaurantNamed ? 5 : 0) + (keywordHit ? 4 : 0) + (sizeNamed ? 3 : 0) - unexplained * 3;
     if (!best || score > best.score) best = { item, score };
   }
   if (!best) return null;
   // Without the restaurant, a name shared by several chains is ambiguous.
-  const restaurantNamed = queryText.includes(` ${normalizeWords(best.item.restaurant).join(' ')} `);
+  const restaurantNamed = normalizeWords(query).join(' ').includes(normalizeWords(best.item.restaurant).join(' '));
   if (!restaurantNamed) {
     const bestName = menuNameWords(best.item.name).join(' ');
     const chains = new Set(
@@ -735,6 +783,10 @@ export class USDAService {
       recommendedCalories?: number;
     };
   }> {
+    const split = splitQuantityFromFood(ingredientName, measurement);
+    ingredientName = split.food;
+    measurement = split.measurement;
+
     // Create memory cache key for this calculation
     const cacheKey = `calc:${ingredientName.toLowerCase()}:${measurement.toLowerCase()}`;
     
@@ -790,9 +842,18 @@ export class USDAService {
       
       const menuItem = findFastFoodItem(ingredientName, measurement);
       if (menuItem) {
-        const menuResult = this.buildFastFoodResult(menuItem, measurement);
-        this.setMemoryCache(cacheKey, menuResult);
-        return menuResult;
+        const queryKey = ingredientName.toLowerCase().trim();
+        const restaurantNamed = normalizeWords(ingredientName).join(' ').includes(normalizeWords(menuItem.restaurant).join(' '));
+        const everydayKey = USDAService.FALLBACK_NUTRITION[queryKey]
+          ? queryKey
+          : findBestFoodKey(queryKey, Object.keys(USDAService.FALLBACK_NUTRITION));
+        const everydayWholeFood = everydayKey === queryKey
+          || (everydayKey !== null && queryKey === everydayKey);
+        if (!(everydayWholeFood && !restaurantNamed)) {
+          const menuResult = this.buildFastFoodResult(menuItem, measurement);
+          this.setMemoryCache(cacheKey, menuResult);
+          return menuResult;
+        }
       }
 
       // World / curated dishes before generic fallback keys so "curry chicken"
@@ -938,6 +999,15 @@ export class USDAService {
     'scrambled eggs': 'egg scrambled',
     'boiled eggs': 'egg hard boiled',
     'fried eggs': 'egg fried',
+    swiss: 'swiss cheese',
+    cheddar: 'cheddar cheese',
+    mozzarella: 'mozzarella cheese',
+    provolone: 'provolone cheese',
+    american: 'american cheese',
+    gouda: 'gouda cheese',
+    brie: 'brie cheese',
+    feta: 'feta cheese',
+    parmesan: 'parmesan cheese',
     
     // International cuisine
     'sushi roll': 'sushi california roll',
@@ -1206,8 +1276,9 @@ export class USDAService {
     'sweet corn': { calories: 86, protein: 3.3, carbs: 19, fat: 1.4 },
     'corn on cob': { calories: 86, protein: 3.3, carbs: 19, fat: 1.4 },
     'corn on the cob': { calories: 86, protein: 3.3, carbs: 19, fat: 1.4 },
-    'potato': { calories: 77, protein: 2, carbs: 17, fat: 0.1 },
+    'potato': { calories: 93, protein: 2.5, carbs: 21, fat: 0.1 },
     'baked potato': { calories: 93, protein: 2.5, carbs: 21, fat: 0.1 },
+    'raw potato': { calories: 77, protein: 2, carbs: 17, fat: 0.1 },
     
     // Processed Foods
     'hotdog': { calories: 290, protein: 10, carbs: 2, fat: 26 },
@@ -1518,6 +1589,11 @@ export class USDAService {
     // Check for direct synonym matches
     if (USDAService.FOOD_SYNONYMS[query]) {
       return USDAService.FOOD_SYNONYMS[query];
+    }
+
+    const cheeseNames = new Set(['swiss', 'cheddar', 'mozzarella', 'provolone', 'american', 'gouda', 'brie', 'feta', 'parmesan']);
+    if (cheeseNames.has(query)) {
+      return `${query} cheese`;
     }
 
     // Extract cooking methods and preparation forms
@@ -2020,6 +2096,8 @@ export class USDAService {
       }
     }
 
+    if (!unit || /^\d+(\.\d+)?$/.test(unit)) unit = 'piece';
+
     // Enhanced unit recognition with comprehensive variations
     const unitVariations: { [key: string]: string[] } = {
       'cup': ['cup', 'cups', 'c'],
@@ -2495,6 +2573,12 @@ export class USDAService {
           gramsEquivalent = quantity * 165;
         } else if (foodType.includes('avocado')) {
           gramsEquivalent = quantity * 150;
+        } else if (foodType.includes('cookie')) {
+          gramsEquivalent = quantity * 30;
+        } else if (foodType.includes('donut') || foodType.includes('doughnut')) {
+          gramsEquivalent = quantity * 52;
+        } else if (foodType.includes('potato')) {
+          gramsEquivalent = quantity * 173;
         } else if (foodType.includes('nectarine')) {
           gramsEquivalent = quantity * 142;
         } else if (foodType.includes('carrot')) {

@@ -2,6 +2,7 @@ import { supabase } from '@/lib/supabase';
 import { apiRequest } from '@/lib/queryClient';
 import { clearGuestNutritionStorage } from '@/lib/guestStorage';
 import { apiFetch } from '@/lib/apiUrl';
+import { whenAuthReady } from '@/lib/authReady';
 
 export type LogMealInput = {
   name: string;
@@ -114,6 +115,7 @@ function mapMeal(row: Record<string, unknown>): LoggedMeal {
 const GUEST_MEALS_KEY = 'guestMeals';
 
 async function getSessionUserOrNull() {
+  await whenAuthReady();
   const { data: { session } } = await supabase.auth.getSession();
   return session?.user ?? null;
 }

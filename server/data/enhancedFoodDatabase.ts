@@ -1704,32 +1704,41 @@ export function findEnhancedFoodCovering(query: string, ignoredWords: Set<string
 export function findEnhancedFood(foodName: string): EnhancedFoodEntry | null {
   const normalized = foodName.toLowerCase().trim();
   const queryWords = foodWords(foodName);
-  
-  // Phase 1: Direct key match first (whole words, so "dal" doesn't match "medallions")
+  const matches: Array<{ food: EnhancedFoodEntry; score: number }> = [];
+  const consider = (food: EnhancedFoodEntry, phrase: string[]) => {
+    if (phrase.length === 0) return;
+    matches.push({ food, score: phrase.length });
+  };
+  const longest = () => {
+    if (matches.length === 0) return null;
+    return matches.reduce((best, next) => (next.score > best.score ? next : best)).food;
+  };
+
+  // Prefer the longest phrase so "chicken breast" is not "chicken sandwich".
   for (const [key, food] of Object.entries(ENHANCED_FOOD_DATABASE)) {
-    if (containsPhrase(queryWords, foodWords(key.replace(/_/g, ' ')))) {
-      return food;
-    }
+    const phrase = foodWords(key.replace(/_/g, ' '));
+    if (containsPhrase(queryWords, phrase)) consider(food, phrase);
   }
-  
-  // Phase 1: Exact alias matching (highest priority)
   for (const food of Object.values(ENHANCED_FOOD_DATABASE)) {
     for (const alias of food.aliases) {
-      if (containsPhrase(queryWords, foodWords(alias))) {
-        return food;
-      }
+      const phrase = foodWords(alias);
+      if (containsPhrase(queryWords, phrase)) consider(food, phrase);
     }
   }
-  
-  // Phase 1: Alias words in any order ("curry chicken" for "chicken curry")
+  const phraseMatch = longest();
+  if (phraseMatch) return phraseMatch;
+
+  // Alias words in any order ("curry chicken" for "chicken curry")
   for (const food of Object.values(ENHANCED_FOOD_DATABASE)) {
     for (const alias of food.aliases) {
       const aliasWords = foodWords(alias);
       if (aliasWords.length > 0 && aliasWords.every(word => queryWords.some(queryWord => sameWord(queryWord, word)))) {
-        return food;
+        consider(food, aliasWords);
       }
     }
   }
+  const aliasMatch = longest();
+  if (aliasMatch) return aliasMatch;
   
   // Phase 1: Common pattern matching for better USDA integration
   const patterns = [

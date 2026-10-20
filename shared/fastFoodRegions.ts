@@ -210,6 +210,46 @@ export const REGIONAL_RESTAURANTS: Record<string, UsFoodRegion[]> = {
   "Hardee's": ['southeast', 'midwest'],
   'Tropical Smoothie Cafe': ['southeast', 'florida'],
   '7 Brew': ['midwest', 'southeast', 'texas'],
+  Quiznos: ['florida', 'southeast', 'midwest', 'northeast', 'southwest', 'texas', 'west'],
+  "Togo's": ['west'],
+  'Penn Station East Coast Subs': ['midwest', 'northeast', 'southeast'],
+  "Capriotti's": ['west', 'northeast', 'southwest'],
+  'Round Table Pizza': ['west'],
+  "Mountain Mike's Pizza": ['west'],
+  "Godfather's Pizza": ['midwest'],
+  "CiCi's Pizza": ['texas', 'southeast', 'southwest', 'midwest'],
+  'Donatos Pizza': ['midwest', 'southeast'],
+  "Giordano's": ['midwest'],
+  'Perkins Restaurant & Bakery': ['midwest', 'southeast', 'west', 'southwest'],
+  'Huddle House': ['southeast', 'florida'],
+  'Golden Corral': ['florida', 'southeast', 'midwest', 'southwest', 'texas', 'west', 'northeast'],
+  'Ruby Tuesday': ['florida', 'southeast', 'midwest', 'northeast', 'southwest', 'texas'],
+  "Guthrie's": ['southeast'],
+  Biscuitville: ['southeast'],
+  "Fuzzy's Taco Shop": ['texas', 'southwest', 'midwest'],
+  'Tijuana Flats': ['florida', 'southeast'],
+  'Costa Vida': ['west', 'southwest'],
+  'Baja Fresh': ['west', 'southwest'],
+  'Salad and Go': ['southwest', 'west', 'texas'],
+  Chopt: ['northeast', 'southeast', 'midwest'],
+  BurgerFi: ['florida', 'northeast', 'southeast'],
+  "Braum's": ['texas', 'midwest', 'southwest'],
+  'Shipley Do-Nuts': ['texas', 'southeast', 'southwest'],
+  'Biggby Coffee': ['midwest'],
+  'Royal Farms': ['northeast'],
+  'Hurricane Grill & Wings': ['florida', 'southeast'],
+  "Dave & Buster's": ['florida', 'southeast', 'midwest', 'northeast', 'southwest', 'texas', 'west'],
+  "Hattie B's Hot Chicken": ['southeast'],
+  "Zippy's": ['hawaii'],
+  'Corner Bakery Cafe': ['midwest', 'southwest', 'texas', 'southeast'],
+  'Au Bon Pain': ['northeast', 'midwest'],
+  'Mrs. Fields': ['florida', 'southeast', 'midwest', 'northeast', 'southwest', 'texas', 'west'],
+  TCBY: ['florida', 'southeast', 'midwest', 'southwest', 'texas'],
+  'Gold Star Chili': ['midwest'],
+  "Frisch's Big Boy": ['midwest'],
+  "Lee's Famous Recipe Chicken": ['southeast', 'midwest'],
+  Sizzler: ['west', 'southwest', 'hawaii'],
+  "Luby's": ['texas'],
 };
 
 export function regionFromCoords(lat: number, lng: number): UsFoodRegion | null {
@@ -336,6 +376,10 @@ export const MEXICAN_RESTAURANTS = [
   'La Granja',
   "Chuy's",
   'On The Border',
+  "Fuzzy's Taco Shop",
+  'Tijuana Flats',
+  'Costa Vida',
+  'Baja Fresh',
 ] as const;
 
 export const ITALIAN_RESTAURANTS = [
@@ -361,6 +405,12 @@ export const ITALIAN_RESTAURANTS = [
   "Jet's Pizza",
   "Anthony's Coal Fired Pizza",
   "Romano's Macaroni Grill",
+  'Round Table Pizza',
+  "Mountain Mike's Pizza",
+  "Godfather's Pizza",
+  "CiCi's Pizza",
+  'Donatos Pizza',
+  "Giordano's",
 ] as const;
 
 export const CHICKEN_RESTAURANTS = [
@@ -379,6 +429,10 @@ export const CHICKEN_RESTAURANTS = [
   'PDQ',
   'Boston Market',
   "Nando's PERi-PERi",
+  "Guthrie's",
+  "Hattie B's Hot Chicken",
+  "Lee's Famous Recipe Chicken",
+  'Royal Farms',
 ] as const;
 
 export const BURGER_RESTAURANTS = [
@@ -417,6 +471,9 @@ export const BURGER_RESTAURANTS = [
   "Duffy's Sports Grill",
   'Hooters',
   'Firebirds Wood Fired Grill',
+  'BurgerFi',
+  "Braum's",
+  "Frisch's Big Boy",
 ] as const;
 
 export const BBQ_RESTAURANTS = [
@@ -449,6 +506,8 @@ export const MEDITERRANEAN_RESTAURANTS = [
   'Fresh Kitchen',
   'The Melting Pot',
   'Just Salad',
+  'Salad and Go',
+  'Chopt',
 ] as const;
 
 /** Spain — tapas / paella (not Mexican or Cuban-Latin). */
@@ -467,6 +526,7 @@ export const SEAFOOD_RESTAURANTS = [
   "Long John Silver's",
   "Captain D's",
   'Bonefish Grill',
+  'Hurricane Grill & Wings',
 ] as const;
 
 export const CAFE_RESTAURANTS = [
@@ -519,18 +579,31 @@ export const CAFE_RESTAURANTS = [
   "Newk's Eatery",
   "TooJay's",
   'Which Wich',
+  'Quiznos',
+  "Togo's",
+  'Penn Station East Coast Subs',
+  "Capriotti's",
+  'Perkins Restaurant & Bakery',
+  'Huddle House',
+  'Biggby Coffee',
+  'Shipley Do-Nuts',
+  'Corner Bakery Cafe',
+  'Au Bon Pain',
+  'Mrs. Fields',
+  'TCBY',
+  'Golden Corral',
 ] as const;
 
 /** Prefer these in the compact popular row when we know the user's region. */
 const FEATURED_NEARBY: Record<UsFoodRegion, string[]> = {
-  florida: ["Marlow's Tavern", "Miller's Ale House", 'Negril Jamaican Restaurant', 'Pollo Tropical'],
-  southeast: ["Marlow's Tavern", 'Mellow Mushroom', 'Twin Peaks', 'Golden Krust'],
-  texas: ['The Jerk Shack', 'Jerk at Nite', 'Taste of Jamaica', 'Golden Krust'],
-  southwest: ['Reggae Pot', 'The Jerk Shack', 'Bahama Breeze', 'Whataburger'],
-  west: ['Peppers Jamaican', "Bouka's Jamaican Restaurant", 'Potwah Jamaican Cuisine', 'Reggae Pot'],
-  midwest: ["Ja' Grill", 'Jerk King', 'Jerk at Nite', 'Bahama Breeze'],
-  northeast: ['Negril Jamaican Eatery', 'Scotch Bonnet Kitchen', 'Jerk at Nite', 'Golden Krust'],
-  hawaii: ['Bahama Breeze', "L&L Hawaiian Barbecue", 'Yoshinoya'],
+  florida: ["Marlow's Tavern", 'Tijuana Flats', 'BurgerFi', 'Hurricane Grill & Wings'],
+  southeast: ["Guthrie's", 'Biscuitville', "Hattie B's Hot Chicken", 'Huddle House'],
+  texas: ["Fuzzy's Taco Shop", "Braum's", 'Shipley Do-Nuts', "Luby's"],
+  southwest: ['Costa Vida', 'Baja Fresh', 'Salad and Go', 'Whataburger'],
+  west: ["Togo's", 'Round Table Pizza', "Mountain Mike's Pizza", 'Baja Fresh'],
+  midwest: ['Donatos Pizza', "Giordano's", 'Gold Star Chili', "Frisch's Big Boy"],
+  northeast: ['Penn Station East Coast Subs', "Capriotti's", 'Au Bon Pain', 'Royal Farms'],
+  hawaii: ["Zippy's", "L&L Hawaiian Barbecue", 'Yoshinoya', 'Sizzler'],
 };
 
 export function regionalRestaurantsFor(region: UsFoodRegion, catalog: string[]): string[] {

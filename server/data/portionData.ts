@@ -43,6 +43,27 @@ export const PORTION_WEIGHTS: Record<string, PortionData[]> = {
     { fdc_id: "171705", portion_description: "small", gram_weight: 136, amount: 1 },
     { fdc_id: "171705", portion_description: "cup cubed", gram_weight: 150, amount: 1 }
   ],
+  "potato": [
+    { fdc_id: "170093", portion_description: "medium", gram_weight: 173, amount: 1 },
+    { fdc_id: "170093", portion_description: "large", gram_weight: 299, amount: 1 },
+    { fdc_id: "170093", portion_description: "small", gram_weight: 138, amount: 1 },
+    { fdc_id: "170093", portion_description: "baked", gram_weight: 173, amount: 1 }
+  ],
+  "baked potato": [
+    { fdc_id: "170093", portion_description: "medium", gram_weight: 173, amount: 1 },
+    { fdc_id: "170093", portion_description: "large", gram_weight: 299, amount: 1 },
+    { fdc_id: "170093", portion_description: "small", gram_weight: 138, amount: 1 }
+  ],
+  "cookie": [
+    { fdc_id: "174993", portion_description: "medium", gram_weight: 30, amount: 1 },
+    { fdc_id: "174993", portion_description: "piece", gram_weight: 30, amount: 1 },
+    { fdc_id: "174993", portion_description: "large", gram_weight: 40, amount: 1 },
+    { fdc_id: "174993", portion_description: "small", gram_weight: 16, amount: 1 }
+  ],
+  "chocolate chip cookie": [
+    { fdc_id: "174993", portion_description: "medium", gram_weight: 30, amount: 1 },
+    { fdc_id: "174993", portion_description: "piece", gram_weight: 30, amount: 1 }
+  ],
   "nectarine": [
     { fdc_id: "169914", portion_description: "medium", gram_weight: 142, amount: 1 },
     { fdc_id: "169914", portion_description: "large", gram_weight: 156, amount: 1 },

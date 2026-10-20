@@ -2,31 +2,19 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from '@/lib/supabase';
 import { apiFetch } from '@/lib/apiUrl';
 import { queryClient } from '@/lib/queryClient';
+import { whenAuthReady } from '@/lib/authReady';
 import { unregisterPush } from '@/services/pushNotifications';
 
-// useAuth is mounted by many components; register auth listeners once so a single
-// Supabase event produces a single refetch instead of one per mounted hook.
+// useAuth is mounted by many components; register query invalidation once.
 let authListenersRegistered = false;
 
 function registerAuthListeners() {
   if (authListenersRegistered) return;
   authListenersRegistered = true;
 
-  supabase.auth.onAuthStateChange((event) => {
-    // TOKEN_REFRESHED is routine (autoRefreshToken) and doesn't change the user.
-    if (event === 'SIGNED_IN') {
-      localStorage.setItem('fresh-auth-session', 'true');
-      window.dispatchEvent(new CustomEvent('auth-state-change'));
-    } else if (event === 'SIGNED_OUT') {
-      localStorage.removeItem('fresh-auth-session');
-      window.dispatchEvent(new CustomEvent('auth-state-change'));
-    } else if (event === 'USER_UPDATED') {
-      window.dispatchEvent(new CustomEvent('auth-state-change'));
-    }
-  });
-
   window.addEventListener('auth-state-change', () => {
     void queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+    void queryClient.invalidateQueries({ queryKey: ['/api/meals/logged'] });
   });
 }
 
@@ -38,8 +26,8 @@ export function useAuth() {
     queryFn: async () => {
       try {
         let accessToken = null;
-        
-        // Get current Supabase session - this is the only source of truth
+
+        await whenAuthReady();
         const { data: { session } } = await supabase.auth.getSession();
         
         if (session?.access_token) {

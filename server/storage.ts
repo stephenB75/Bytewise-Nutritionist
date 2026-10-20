@@ -1108,8 +1108,10 @@ export class DatabaseStorage implements IStorage {
     };
   }> {
     try {
-      const startOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-      const endOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
+      // Meals are stored at noon UTC on the client's calendar day. Use UTC bounds
+      // so the server's local timezone cannot drop or shift that day.
+      const startOfDay = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+      const endOfDay = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() + 1));
 
       // Get meals for the day
       const fetchMealsFromDb = () => db

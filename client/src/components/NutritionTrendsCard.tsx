@@ -120,16 +120,19 @@ export function NutritionTrendsCard({ meals, calorieGoal }: { meals: TrendMeal[]
           Nutrition Trends
         </h3>
         <div className="flex shrink-0 rounded-md bg-amber-200/70 p-0.5" role="group" aria-label="Trend range">
-          {([7, 30] as const).map(option => (
+          {([
+            { key: 7 as const, label: 'Weekly' },
+            { key: 30 as const, label: 'Monthly' },
+          ]).map(option => (
             <button
-              key={option}
+              key={option.key}
               type="button"
-              onClick={() => setRange(option)}
-              className={`shrink-0 whitespace-nowrap rounded-md px-3 py-1 text-xs font-semibold ${range === option ? 'bg-orange-700 on-color' : 'bg-amber-100 text-gray-800'}`}
-              aria-pressed={range === option}
-              data-testid={`button-trends-${option}d`}
+              onClick={() => setRange(option.key)}
+              className={`shrink-0 whitespace-nowrap rounded-md px-3 py-1 text-xs font-semibold ${range === option.key ? 'bg-orange-700 on-color' : 'bg-amber-100 text-gray-800'}`}
+              aria-pressed={range === option.key}
+              data-testid={`button-trends-${option.key}d`}
             >
-              {option} days
+              {option.label}
             </button>
           ))}
         </div>
