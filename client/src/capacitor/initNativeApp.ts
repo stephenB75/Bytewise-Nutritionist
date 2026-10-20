@@ -85,7 +85,11 @@ function revealFocusedField(keyboardHeight = 0): void {
     }
   };
 
-  requestAnimationFrame(run);
+  // Two frames: the caller often just set --keyboard-height / .keyboard-open.
+  // One rAF can still read the pre-keyboard layout; the 280ms/350ms retries
+  // then correct after the keyboard finishes, but the first scroll should not
+  // run against stale geometry.
+  requestAnimationFrame(() => requestAnimationFrame(run));
 }
 
 async function initKeyboardHandling(): Promise<void> {

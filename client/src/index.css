@@ -1825,6 +1825,20 @@ select,
   scroll-margin-top: 1.25rem;
 }
 
+/* Browser focus-scroll runs before .keyboard-open exists. On touch, reserve
+   typical keyboard space so the field is not parked under where the keyboard
+   will appear. Desktop (fine pointer) stays at 0 to avoid extra padding. */
+@media (pointer: coarse) {
+  input,
+  textarea,
+  select,
+  [contenteditable="true"],
+  [role="textbox"],
+  [role="searchbox"] {
+    scroll-margin-bottom: min(40dvh, 22rem);
+  }
+}
+
 html.keyboard-open input,
 html.keyboard-open textarea,
 html.keyboard-open select,
