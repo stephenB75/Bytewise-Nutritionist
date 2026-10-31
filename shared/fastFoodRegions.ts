@@ -342,6 +342,7 @@ export const REGIONAL_RESTAURANTS: Record<string, UsFoodRegion[]> = {
   'Tender Greens': ['west'],
   'Dig': ['northeast'],
   'Saladworks': ['northeast'],
+  'Pret A Manger': ['northeast'],
   'Zoup! Fresh Soup Co.': ['midwest'],
   'Kwik Trip': ['midwest'],
   "Lou Malnati's": ['midwest'],
