@@ -194,9 +194,10 @@ function recordLocalFast(session: FastingSession & { planName?: string }, endedA
     remainingHours: Math.max(0, (session.targetDuration - actualDuration) / (1000 * 60 * 60)),
   };
   try {
-    const existing = readLocalFastingHistory().filter(
-      (s: any) => s.id !== summary.id && new Date(s.startTime).getTime() !== startMs,
-    );
+    const history = readLocalFastingHistory();
+    // The goal timer and End Fast can both fire for one fast; the first recorded end is the real one.
+    if (history.some((s: any) => s.status !== 'active' && new Date(s.startTime).getTime() === startMs)) return;
+    const existing = history.filter((s: any) => s.id !== summary.id);
     localStorage.setItem(FASTING_HISTORY_KEY, JSON.stringify([summary, ...existing].slice(0, 60)));
   } catch {
     // localStorage may be unavailable.
@@ -319,6 +320,7 @@ const FastingTracker = React.memo(function FastingTracker() {
   });
 
   const endFastOnServer = useCallback((sessionId: string, endTime: Date) => {
+    if (endedFastIdsRef.current.has(sessionId)) return;
     endedFastIdsRef.current.add(sessionId);
     queryClient.setQueryData(ACTIVE_FAST_QUERY_KEY, (previous: any) =>
       previous && previous.id === sessionId ? null : previous,
@@ -660,7 +662,7 @@ const FastingTracker = React.memo(function FastingTracker() {
           if (currentSession.id) {
             endFastOnServer(currentSession.id, goalReachedAt);
           } else if (startFastingMutation.isPending) {
-            pendingEndRef.current = goalReachedAt;
+            pendingEndRef.current ??= goalReachedAt;
           }
         } else {
           setTimeRemaining(remaining);
@@ -771,7 +773,7 @@ const FastingTracker = React.memo(function FastingTracker() {
     if (currentSession.id) {
       endFastOnServer(currentSession.id, endedAt);
     } else if (startFastingMutation.isPending) {
-      pendingEndRef.current = endedAt;
+      pendingEndRef.current ??= endedAt;
     }
     
     // Clear current session localStorage

@@ -286,7 +286,9 @@ function wasAskedForBloodPressure(result: AuthorizationResult): boolean {
 }
 
 function localDayKey(date: Date): string {
-  return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${date.getFullYear()}-${month}-${day}`;
 }
 
 /** Midnight-anchored dates for the last `days` days, oldest first, today last. */
