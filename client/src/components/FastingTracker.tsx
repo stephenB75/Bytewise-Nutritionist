@@ -3,7 +3,7 @@
  * Features: Popular fasting schedules, timer tracking, meal windows, and suggestions
  */
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -36,7 +36,13 @@ import {
   scheduleFastingCompleteNotification,
   scheduleFastingMilestoneNotifications,
 } from '@/services/localNotifications';
-import { FastingTrendsCard } from '@/components/FastingTrendsCard';
+import {
+  FASTING_OUTCOME_LABEL,
+  FastingTrendsCard,
+  fastingHoursFasted,
+  fastingOutcome,
+  fastingTargetHours,
+} from '@/components/FastingTrendsCard';
 
 interface FastingPlan {
   id: string;
@@ -164,8 +170,37 @@ function normalizeFastingSession(session: any) {
 }
 
 function isPastFastingSession(session: any): boolean {
-  const status = String(session?.status ?? '').toLowerCase();
-  return status !== 'active';
+  return fastingOutcome(session) !== 'active';
+}
+
+/** Saves an ended fast to this device's history (newest first) so it shows before the server syncs. */
+function recordLocalFast(session: FastingSession & { planName?: string }, endedAt: Date) {
+  const startMs = new Date(session.startTime).getTime();
+  if (!Number.isFinite(startMs)) return;
+  const actualDuration = Math.max(0, endedAt.getTime() - startMs);
+  if (actualDuration < 5000) return;
+  const reachedGoal = actualDuration + 60_000 >= session.targetDuration;
+  const summary = {
+    ...session,
+    id: session.id || `local_${startMs}`,
+    startTime: new Date(startMs).toISOString(),
+    status: reachedGoal ? 'completed' : 'stopped',
+    endTime: endedAt.toISOString(),
+    completedAt: endedAt.toISOString(),
+    actualDuration,
+    actualHoursFasted: actualDuration / (1000 * 60 * 60),
+    targetHours: session.targetDuration / (1000 * 60 * 60),
+    wasCompleted: reachedGoal,
+    remainingHours: Math.max(0, (session.targetDuration - actualDuration) / (1000 * 60 * 60)),
+  };
+  try {
+    const existing = readLocalFastingHistory().filter(
+      (s: any) => s.id !== summary.id && new Date(s.startTime).getTime() !== startMs,
+    );
+    localStorage.setItem(FASTING_HISTORY_KEY, JSON.stringify([summary, ...existing].slice(0, 60)));
+  } catch {
+    // localStorage may be unavailable.
+  }
 }
 
 const FastingTracker = React.memo(function FastingTracker() {
@@ -247,27 +282,80 @@ const FastingTracker = React.memo(function FastingTracker() {
     queryFn: fetchActiveFast,
   });
 
+  // Fasts ended on this device. The active-fast query can still return one of these until the
+  // server finishes saving the end, and it must not be restored as a running fast.
+  const endedFastIdsRef = useRef<Set<string>>(new Set());
+  // End tapped before the server returned the new fast's id: finish it as soon as the id arrives.
+  const pendingEndRef = useRef<Date | null>(null);
+
+  const completeFastingMutation = useMutation({
+    mutationFn: ({ sessionId, endTime }: { sessionId: string; endTime: Date }) =>
+      apiRequest('PUT', `/api/fasting/${sessionId}/complete`, { endTime: endTime.toISOString() }),
+    onSuccess: () => {
+      authFetch('/api/achievements/check', { method: 'POST' })
+        .then(res => res.json())
+        .then(data => {
+          if (data.newAchievements && data.newAchievements.length > 0) {
+            window.dispatchEvent(new CustomEvent('achievement-unlocked', {
+              detail: data.newAchievements[0]
+            }));
+          }
+        })
+        .catch(() => {
+          // Achievement check is non-critical.
+        });
+    },
+    onError: () => {
+      toast({
+        title: "Saved on this device",
+        description: "We couldn't reach your account to save the end of this fast. It's in your history here.",
+      });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/fasting/history'] });
+      queryClient.invalidateQueries({ queryKey: ACTIVE_FAST_QUERY_KEY });
+      window.dispatchEvent(new CustomEvent('fasting-status-changed'));
+    },
+  });
+
+  const endFastOnServer = useCallback((sessionId: string, endTime: Date) => {
+    endedFastIdsRef.current.add(sessionId);
+    queryClient.setQueryData(ACTIVE_FAST_QUERY_KEY, (previous: any) =>
+      previous && previous.id === sessionId ? null : previous,
+    );
+    completeFastingMutation.mutate({ sessionId, endTime });
+  }, [completeFastingMutation, queryClient]);
+
   // Start fasting session mutation
   const startFastingMutation = useMutation({
-    mutationFn: (session: Omit<FastingSession, 'id'> & { planName?: string }) => 
+    mutationFn: (session: Omit<FastingSession, 'id'> & { planName?: string }) =>
       apiRequest('POST', '/api/fasting/start', session).then(res => res.json()),
-    onSuccess: (data) => {
-      // Update the stored session with the ID from the server
-      const updatedSession = {
-        ...currentSession,
-        id: data.id
-      };
-      setCurrentSession(updatedSession as FastingSession);
-      localStorage.setItem(FASTING_SESSION_KEY, JSON.stringify(updatedSession));
-      
+    onSuccess: (data, variables) => {
+      const pendingEnd = pendingEndRef.current;
+      if (pendingEnd) {
+        pendingEndRef.current = null;
+        if (data?.id) endFastOnServer(String(data.id), pendingEnd);
+        return;
+      }
+      // Attach the server id to the fast started by this request. Reading state here (not the
+      // render-time `currentSession`) keeps its start time and goal.
+      setCurrentSession(previous => {
+        const startedAt = new Date(variables.startTime).getTime();
+        if (!previous || new Date(previous.startTime).getTime() !== startedAt) return previous;
+        const updated = { ...previous, id: data?.id };
+        localStorage.setItem(FASTING_SESSION_KEY, JSON.stringify(updated));
+        return updated;
+      });
+
       toast({
         title: "Fasting Started! 🚀",
-        description: `Your ${selectedPlan.name} session has begun. Stay strong and hydrated!`,
+        description: `Your ${variables.planName || selectedPlan.name} session has begun. Stay strong and hydrated!`,
       });
       queryClient.invalidateQueries({ queryKey: ['/api/fasting/history'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/fasting/active'] });
+      queryClient.invalidateQueries({ queryKey: ACTIVE_FAST_QUERY_KEY });
     },
     onError: (error) => {
+      pendingEndRef.current = null;
       // Keep the timer running even if API fails - it's stored locally
       toast(navigator.onLine
         ? {
@@ -278,142 +366,6 @@ const FastingTracker = React.memo(function FastingTracker() {
             title: "Offline Mode",
             description: "Timer started locally. We'll sync when you're back online.",
           });
-    }
-  });
-
-  // Complete fasting session mutation
-  const completeFastingMutation = useMutation({
-    mutationFn: (sessionId: string) => 
-      apiRequest('PUT', `/api/fasting/${sessionId}/complete`),
-    onSuccess: (data) => {
-
-      
-      // Store completed session in local history
-      if (currentSession) {
-        const now = new Date();
-        const startTime = new Date(currentSession.startTime);
-        const actualDuration = now.getTime() - startTime.getTime();
-        
-        const completedSession = {
-          ...currentSession,
-          status: 'completed',
-          completedAt: now.toISOString(),
-          endTime: now.toISOString(),
-          actualDuration: actualDuration,
-          // Ensure we have planName for display
-          planName: (currentSession as any).planName || selectedPlan.name,
-          // Add hours for easier display calculations
-          targetHours: (currentSession.targetDuration || 0) / (1000 * 60 * 60),
-          actualHoursFasted: actualDuration / (1000 * 60 * 60),
-          wasCompleted: true
-        };
-        
-
-        
-        // Add to local history
-        try {
-          const existingHistory = JSON.parse(localStorage.getItem(FASTING_HISTORY_KEY) || '[]');
-          // Remove any duplicate session if it exists
-          const filteredHistory = existingHistory.filter((s: any) => 
-            s.id !== completedSession.id && s.startTime !== completedSession.startTime
-          );
-          filteredHistory.unshift(completedSession);
-          // Keep only last 10 sessions in local storage
-          const finalHistory = filteredHistory.slice(0, 10);
-          localStorage.setItem(FASTING_HISTORY_KEY, JSON.stringify(finalHistory));
-          refreshLocalHistory();
-        } catch (e) {
-          // Failed to save to localStorage
-        }
-      }
-      
-      // Clear current session from localStorage
-      localStorage.removeItem(FASTING_SESSION_KEY);
-      localStorage.removeItem(FASTING_ACTIVE_KEY);
-      
-      setCurrentSession(null);
-      setIsActive(false);
-      setTimeRemaining(0);
-      toast({
-        title: "Fasting Complete! 🎉",
-        description: "Great job! You can now break your fast with a nutritious meal.",
-      });
-      
-      // Force refresh history + active status for tracker + dashboard cards
-      queryClient.invalidateQueries({ queryKey: ['/api/fasting/history'] });
-      queryClient.invalidateQueries({ queryKey: ACTIVE_FAST_QUERY_KEY });
-      window.dispatchEvent(new CustomEvent('fasting-status-changed'));
-      
-      // Check for new achievements after completing fast
-      authFetch('/api/achievements/check', { method: 'POST' })
-        .then(res => res.json())
-        .then(data => {
-          if (data.newAchievements && data.newAchievements.length > 0) {
-            // Trigger achievement celebration
-            window.dispatchEvent(new CustomEvent('achievement-unlocked', {
-              detail: data.newAchievements[0]
-            }));
-          }
-        })
-        .catch(err => {
-          // Achievement check failed silently - non-critical for user experience
-        });
-    },
-    onError: (error: any) => {
-
-      
-      // Even if API fails, store the completed session locally
-      if (currentSession) {
-        const now = new Date();
-        const startTime = new Date(currentSession.startTime);
-        const actualDuration = now.getTime() - startTime.getTime();
-        
-        const completedSession = {
-          ...currentSession,
-          status: 'completed',
-          completedAt: now.toISOString(),
-          endTime: now.toISOString(),
-          actualDuration: actualDuration,
-          // Ensure we have planName for display
-          planName: (currentSession as any).planName || selectedPlan.name,
-          // Add hours for easier display calculations
-          targetHours: (currentSession.targetDuration || 0) / (1000 * 60 * 60),
-          actualHoursFasted: actualDuration / (1000 * 60 * 60),
-          wasCompleted: true,
-          // Mark as locally stored only
-          localOnly: true
-        };
-        
-
-        
-        // Add to local history
-        try {
-          const existingHistory = JSON.parse(localStorage.getItem(FASTING_HISTORY_KEY) || '[]');
-          // Remove any duplicate session if it exists
-          const filteredHistory = existingHistory.filter((s: any) => 
-            s.id !== completedSession.id && s.startTime !== completedSession.startTime
-          );
-          filteredHistory.unshift(completedSession);
-          const finalHistory = filteredHistory.slice(0, 10);
-          localStorage.setItem(FASTING_HISTORY_KEY, JSON.stringify(finalHistory));
-          refreshLocalHistory();
-        } catch (e) {
-          // Failed to save to localStorage
-        }
-      }
-      
-      localStorage.removeItem(FASTING_SESSION_KEY);
-      localStorage.removeItem(FASTING_ACTIVE_KEY);
-      setCurrentSession(null);
-      setIsActive(false);
-      setTimeRemaining(0);
-      queryClient.invalidateQueries({ queryKey: ['/api/fasting/history'] });
-      queryClient.invalidateQueries({ queryKey: ACTIVE_FAST_QUERY_KEY });
-      window.dispatchEvent(new CustomEvent('fasting-status-changed'));
-      toast({
-        title: "Session Ended",
-        description: "Your fasting session has been completed locally. We'll sync when you're back online.",
-      });
     }
   });
 
@@ -454,14 +406,16 @@ const FastingTracker = React.memo(function FastingTracker() {
               setSelectedPlan(plan);
             }
           } else {
-            // Session has expired, clear it
+            // The goal passed while the app was closed: the timer ends the fast at its goal.
             localStorage.removeItem(FASTING_SESSION_KEY);
             localStorage.removeItem(FASTING_ACTIVE_KEY);
             localStorage.removeItem(FASTING_MILESTONES_KEY);
-            
-            // If there was an id, complete the session
-            if (session.id) {
-              completeFastingMutation.mutate(session.id);
+
+            if (Number.isFinite(startTime)) {
+              const goalReachedAt = new Date(startTime + session.targetDuration);
+              recordLocalFast(session, goalReachedAt);
+              refreshLocalHistory();
+              if (session.id) endFastOnServer(session.id, goalReachedAt);
             }
           }
         }
@@ -497,7 +451,7 @@ const FastingTracker = React.memo(function FastingTracker() {
 
   // Sync with server active session if localStorage is empty
   useEffect(() => {
-    if (activeFastingSession && !currentSession) {
+    if (activeFastingSession && !currentSession && !endedFastIdsRef.current.has(activeFastingSession.id)) {
       const startTime = new Date(activeFastingSession.startTime).getTime();
       const now = Date.now();
       const elapsed = now - startTime;
@@ -699,12 +653,14 @@ const FastingTracker = React.memo(function FastingTracker() {
             }
           }));
           window.dispatchEvent(new CustomEvent('fasting-status-changed'));
-          
+
+          const goalReachedAt = new Date(startTime + currentSession.targetDuration);
+          recordLocalFast({ ...currentSession, planName: selectedPlan.name }, goalReachedAt);
+          refreshLocalHistory();
           if (currentSession.id) {
-            completeFastingMutation.mutate(currentSession.id);
-          } else {
-            queryClient.invalidateQueries({ queryKey: ['/api/fasting/history'] });
-            queryClient.invalidateQueries({ queryKey: ACTIVE_FAST_QUERY_KEY });
+            endFastOnServer(currentSession.id, goalReachedAt);
+          } else if (startFastingMutation.isPending) {
+            pendingEndRef.current = goalReachedAt;
           }
         } else {
           setTimeRemaining(remaining);
@@ -716,6 +672,7 @@ const FastingTracker = React.memo(function FastingTracker() {
   }, [isActive, currentSession, completedMilestones]);
 
   const startFasting = () => {
+    if (startFastingMutation.isPending || currentSession) return;
     const targetDuration = selectedPlan.fastingHours * 60 * 60 * 1000; // Convert to milliseconds
     const session: Omit<FastingSession, 'id'> = {
       planId: selectedPlan.id,
@@ -788,7 +745,8 @@ const FastingTracker = React.memo(function FastingTracker() {
     
     // Calculate actual time fasted and remaining time
     const startTime = new Date(currentSession.startTime).getTime();
-    const now = Date.now();
+    const endedAt = new Date();
+    const now = endedAt.getTime();
     const actualTimeFasted = now - startTime;
     const actualHoursFasted = actualTimeFasted / (1000 * 60 * 60);
     const targetHours = selectedPlan.fastingHours;
@@ -797,7 +755,7 @@ const FastingTracker = React.memo(function FastingTracker() {
     
 
     
-    const isCompleted = remainingTime <= 0;
+    const isCompleted = remainingTime <= 60_000;
     
     // Format time for display
     const formatHours = (hours: number) => {
@@ -806,33 +764,14 @@ const FastingTracker = React.memo(function FastingTracker() {
       return h > 0 ? `${h}h ${m}m` : `${m}m`;
     };
     
-    // Create session summary for storage
-    const sessionSummary = {
-      id: currentSession.id || `local_${Date.now()}`, // Ensure we have an ID
-      ...currentSession,
-      status: isCompleted ? 'completed' : 'stopped',
-      endTime: new Date().toISOString(),
-      completedAt: new Date().toISOString(), // Add completedAt field for display
-      actualDuration: actualTimeFasted,
-      actualHoursFasted: actualHoursFasted,
-      targetHours: targetHours,
-      wasCompleted: isCompleted,
-      remainingHours: isCompleted ? 0 : remainingHours,
-      planName: selectedPlan.name // Ensure planName is saved
-    };
-    
-    // Store in history if any meaningful time was fasted (5 seconds for testing)
-    if (actualTimeFasted >= 5000) { // 5 second threshold for testing
-      try {
-        const existingHistory = JSON.parse(localStorage.getItem(FASTING_HISTORY_KEY) || '[]');
-        existingHistory.unshift(sessionSummary);
-        localStorage.setItem(FASTING_HISTORY_KEY, JSON.stringify(existingHistory.slice(0, 20))); // Keep last 20 sessions
-        refreshLocalHistory();
-      } catch (e) {
-        // Failed to store session in history
-      }
-    } else {
+    recordLocalFast({ ...currentSession, planName: selectedPlan.name }, endedAt);
+    refreshLocalHistory();
 
+    // Save the end first so the cached active fast is cleared before any refetch can restore it.
+    if (currentSession.id) {
+      endFastOnServer(currentSession.id, endedAt);
+    } else if (startFastingMutation.isPending) {
+      pendingEndRef.current = endedAt;
     }
     
     // Clear current session localStorage
@@ -888,14 +827,6 @@ const FastingTracker = React.memo(function FastingTracker() {
       });
     }
     
-    // Complete the session via API if it has an ID
-    if (currentSession?.id) {
-      completeFastingMutation.mutate(currentSession.id);
-    }
-    
-    refreshLocalHistory();
-    queryClient.invalidateQueries({ queryKey: ['/api/fasting/history'] });
-    queryClient.invalidateQueries({ queryKey: ACTIVE_FAST_QUERY_KEY });
   };
 
   const formatTime = (milliseconds: number) => {
@@ -1055,12 +986,13 @@ const FastingTracker = React.memo(function FastingTracker() {
               {pastSessions.length > 0 ? (
                 <div className="space-y-4">
                   {pastSessions.map((session: any, index: number) => {
-                      const duration = session.actualDuration || session.targetDuration || 0;
-                      const actualHours = session.actualHoursFasted || (duration / (1000 * 60 * 60));
-                      const targetHours = session.targetHours || session.targetDuration / (1000 * 60 * 60) || 16; // fallback to 16h
-                      const wasCompleted = session.status === 'completed' || session.wasCompleted;
-                      const remainingHours = session.remainingHours || Math.max(0, targetHours - actualHours);
-                      const sessionDate = session.completedAt || session.endTime || session.createdAt;
+                      const outcome = fastingOutcome(session);
+                      const actualHours = fastingHoursFasted(session) ?? 0;
+                      const targetHours = Math.round((fastingTargetHours(session) || 16) * 10) / 10;
+                      const wasCompleted = outcome === 'completed';
+                      const notEnded = outcome === 'not-ended';
+                      const remainingHours = Math.max(0, targetHours - actualHours);
+                      const sessionDate = session.startTime || session.createdAt || session.completedAt;
                       
 
                       
@@ -1079,16 +1011,21 @@ const FastingTracker = React.memo(function FastingTracker() {
                             {wasCompleted ? (
                               <CheckCircle2 className="w-4 h-4 text-green-500" />
                             ) : (
-                              <AlertCircle className="w-4 h-4 text-orange-500" />
+                              <AlertCircle className={`w-4 h-4 ${notEnded ? 'text-gray-500' : 'text-orange-500'}`} />
                             )}
                             <div>
                               <p className="font-medium text-gray-900">{session.planName || `${Math.round(targetHours)}h Fasting Session`}</p>
                               <p className="text-sm text-gray-700">
                                 {sessionDate ? new Date(sessionDate).toLocaleDateString() : 'N/A'}
                               </p>
-                              {!wasCompleted && remainingHours > 0 && (
+                              {outcome === 'ended-early' && remainingHours > 0 && (
                                 <p className="text-xs text-orange-700 mt-1">
-                                  {formatHours(remainingHours)} remaining from {targetHours}h goal
+                                  Ended {formatHours(remainingHours)} before the {targetHours}h goal
+                                </p>
+                              )}
+                              {notEnded && (
+                                <p className="text-xs text-gray-600 mt-1">
+                                  Never ended in the app, so hours weren’t recorded
                                 </p>
                               )}
                             </div>
@@ -1096,15 +1033,20 @@ const FastingTracker = React.memo(function FastingTracker() {
                           <div className="text-right">
                             <Badge
                               variant="outline"
-                              className={wasCompleted ? 'border-none bg-green-100 text-green-900' : 'border-none bg-orange-100 text-orange-900'}
+                              className={
+                                wasCompleted
+                                  ? 'border-none bg-green-100 text-green-900'
+                                  : notEnded
+                                    ? 'border-none bg-gray-100 text-gray-800'
+                                    : 'border-none bg-orange-100 text-orange-900'
+                              }
+                              data-testid={`fasting-outcome-${outcome}`}
                             >
-                              {formatHours(actualHours)} {wasCompleted ? 'completed' : 'fasted'}
+                              {FASTING_OUTCOME_LABEL[outcome]}
                             </Badge>
-                            {!wasCompleted && (
-                              <p className="text-xs text-gray-700 mt-1">
-                                of {targetHours}h goal
-                              </p>
-                            )}
+                            <p className="text-xs text-gray-700 mt-1 tabular-nums">
+                              {notEnded ? `${targetHours}h goal` : `${formatHours(actualHours)} of ${targetHours}h`}
+                            </p>
                           </div>
                         </div>
                       );

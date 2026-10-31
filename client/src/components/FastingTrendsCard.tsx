@@ -22,12 +22,71 @@ type DayPoint = {
   key: string;
   label: string;
   hours: number;
+  completedHours: number;
+  earlyHours: number;
   sessions: number;
   completed: number;
+  endedEarly: number;
+  notEnded: number;
+};
+
+const HOUR_MS = 1000 * 60 * 60;
+// Same grace as the server: ending within a minute of the goal counts as reaching it.
+const GOAL_GRACE_HOURS = 1 / 60;
+
+/**
+ * - completed: fasted at least the goal
+ * - ended-early: the user ended it before the goal
+ * - not-ended: the timer ran past the goal but no end was ever recorded, so hours are unknown
+ * - active: still running
+ */
+export type FastingOutcome = 'completed' | 'ended-early' | 'not-ended' | 'active';
+
+export function fastingTargetHours(session: FastingTrendSession): number {
+  if (session.targetHours != null && Number(session.targetHours) > 0) return Number(session.targetHours);
+  return Math.max(0, Number(session.targetDuration) || 0) / HOUR_MS;
+}
+
+/** Hours actually fasted, or null when the session never recorded an end. */
+export function fastingHoursFasted(session: FastingTrendSession): number | null {
+  if (session.actualHoursFasted != null && Number.isFinite(Number(session.actualHoursFasted)) && Number(session.actualHoursFasted) > 0) {
+    return Number(session.actualHoursFasted);
+  }
+  if (session.actualDuration != null && Number.isFinite(Number(session.actualDuration)) && Number(session.actualDuration) > 0) {
+    return Number(session.actualDuration) / HOUR_MS;
+  }
+  const end = session.endTime || session.completedAt;
+  if (end && session.startTime) {
+    const ms = new Date(end).getTime() - new Date(session.startTime).getTime();
+    if (Number.isFinite(ms) && ms > 0) return ms / HOUR_MS;
+  }
+  return null;
+}
+
+export function fastingOutcome(session: FastingTrendSession, now: number = Date.now()): FastingOutcome {
+  const status = String(session.status || '').toLowerCase();
+  const target = fastingTargetHours(session);
+  if (status === 'active' || status === 'paused') {
+    const start = session.startTime ? new Date(session.startTime).getTime() : NaN;
+    const goalPassed = Number.isFinite(start) && target > 0 && now > start + target * HOUR_MS;
+    return goalPassed ? 'not-ended' : 'active';
+  }
+  const hours = fastingHoursFasted(session);
+  if (hours == null) return status === 'completed' || session.wasCompleted ? 'completed' : 'not-ended';
+  if (target <= 0) return status === 'completed' ? 'completed' : 'ended-early';
+  return hours + GOAL_GRACE_HOURS >= target ? 'completed' : 'ended-early';
+}
+
+export const FASTING_OUTCOME_LABEL: Record<FastingOutcome, string> = {
+  completed: 'Completed',
+  'ended-early': 'Ended early',
+  'not-ended': 'Not ended',
+  active: 'In progress',
 };
 
 function sessionDateKey(session: FastingTrendSession): string {
-  const raw = session.completedAt || session.endTime || session.startTime || session.createdAt || '';
+  // A fast belongs to the day it started; overnight fasts would otherwise land on the morning after.
+  const raw = session.startTime || session.createdAt || session.completedAt || session.endTime || '';
   if (!raw) return '';
   const date = new Date(raw);
   if (Number.isNaN(date.getTime())) {
@@ -37,21 +96,15 @@ function sessionDateKey(session: FastingTrendSession): string {
 }
 
 function hoursFasted(session: FastingTrendSession): number {
-  if (session.actualHoursFasted != null && Number.isFinite(session.actualHoursFasted)) {
-    return Math.max(0, Number(session.actualHoursFasted));
-  }
-  if (session.actualDuration != null && Number.isFinite(session.actualDuration)) {
-    return Math.max(0, Number(session.actualDuration) / (1000 * 60 * 60));
-  }
-  return 0;
+  return fastingHoursFasted(session) ?? 0;
 }
 
 function isCompleted(session: FastingTrendSession): boolean {
-  return session.wasCompleted === true || String(session.status || '').toLowerCase() === 'completed';
+  return fastingOutcome(session) === 'completed';
 }
 
 function isPastSession(session: FastingTrendSession): boolean {
-  return String(session.status || '').toLowerCase() !== 'active';
+  return fastingOutcome(session) !== 'active';
 }
 
 function average(values: number[]): number {
@@ -74,14 +127,25 @@ function buildDays(sessions: FastingTrendSession[], range: number): DayPoint[] {
     date.setDate(date.getDate() - offset);
     const key = getLocalDateKey(date);
     const daySessions = byDay.get(key) || [];
+    const round = (value: number) => Math.round(value * 10) / 10;
+    const completedHours = daySessions
+      .filter((s) => fastingOutcome(s) === 'completed')
+      .reduce((sum, s) => sum + hoursFasted(s), 0);
+    const earlyHours = daySessions
+      .filter((s) => fastingOutcome(s) === 'ended-early')
+      .reduce((sum, s) => sum + hoursFasted(s), 0);
     days.push({
       key,
       label: range <= 7
         ? date.toLocaleDateString('en-US', { weekday: 'short' })
         : date.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' }),
-      hours: Math.round(daySessions.reduce((sum, s) => sum + hoursFasted(s), 0) * 10) / 10,
+      hours: round(completedHours + earlyHours),
+      completedHours: round(completedHours),
+      earlyHours: round(earlyHours),
       sessions: daySessions.length,
       completed: daySessions.filter(isCompleted).length,
+      endedEarly: daySessions.filter((s) => fastingOutcome(s) === 'ended-early').length,
+      notEnded: daySessions.filter((s) => fastingOutcome(s) === 'not-ended').length,
     });
   }
   return days;
@@ -107,6 +171,9 @@ function TrendArrow({ change }: { change: number | null }) {
   return <ArrowRight className="h-4 w-4 text-gray-600" aria-label="Steady" />;
 }
 
+const COMPLETED_COLOR = '#16a34a';
+const EARLY_COLOR = '#f97316';
+
 function formatHours(hours: number): string {
   if (hours <= 0) return '0h';
   const h = Math.floor(hours);
@@ -119,9 +186,17 @@ function formatHours(hours: number): string {
 export function FastingTrendsCard({ sessions }: { sessions: FastingTrendSession[] }) {
   const [range, setRange] = useState<7 | 30>(7);
 
-  const { days, activeDays, avgHours, completionRate, streak, longestFast, hoursChange, completionChange, observations } = useMemo(() => {
+  const { days, activeDays, avgHours, completionRate, streak, longestFast, hoursChange, completionChange, observations, outcomeCounts } = useMemo(() => {
     const days = buildDays(sessions, range);
     const activeDays = days.filter(d => d.sessions > 0);
+    const outcomeCounts = days.reduce(
+      (acc, d) => ({
+        completed: acc.completed + d.completed,
+        endedEarly: acc.endedEarly + d.endedEarly,
+        notEnded: acc.notEnded + d.notEnded,
+      }),
+      { completed: 0, endedEarly: 0, notEnded: 0 },
+    );
     const pastInRange = sessions.filter(s => {
       if (!isPastSession(s)) return false;
       const key = sessionDateKey(s);
@@ -129,8 +204,8 @@ export function FastingTrendsCard({ sessions }: { sessions: FastingTrendSession[
     });
 
     const half = Math.floor(days.length / 2);
-    const earlier = days.slice(0, half).filter(d => d.sessions > 0);
-    const recent = days.slice(half).filter(d => d.sessions > 0);
+    const earlier = days.slice(0, half).filter(d => d.hours > 0);
+    const recent = days.slice(half).filter(d => d.hours > 0);
     const earlierAvg = average(earlier.map(d => d.hours));
     const recentAvg = average(recent.map(d => d.hours));
     const hoursChange = earlier.length && recent.length && earlierAvg > 0
@@ -155,7 +230,7 @@ export function FastingTrendsCard({ sessions }: { sessions: FastingTrendSession[
       ? recentRate - earlierRate
       : null;
 
-    const avgHours = average(activeDays.map(d => d.hours));
+    const avgHours = average(activeDays.filter(d => d.hours > 0).map(d => d.hours));
     const completedCount = pastInRange.filter(isCompleted).length;
     const completionRate = pastInRange.length
       ? Math.round((completedCount / pastInRange.length) * 100)
@@ -177,8 +252,14 @@ export function FastingTrendsCard({ sessions }: { sessions: FastingTrendSession[
 
       if (completionRate >= 70) {
         observations.push(`You finished ${completionRate}% of your goals — strong follow-through.`);
-      } else if (completionRate > 0 && completionRate < 50) {
-        observations.push('Many sessions ended early — shorter plans may fit your rhythm better.');
+      } else if (outcomeCounts.endedEarly > outcomeCounts.completed) {
+        observations.push('Most fasts ended before the goal — a shorter plan may fit your rhythm better.');
+      }
+
+      if (outcomeCounts.notEnded > 0) {
+        observations.push(
+          `${outcomeCounts.notEnded} fast${outcomeCounts.notEnded === 1 ? ' was' : 's were'} never ended in the app, so ${outcomeCounts.notEnded === 1 ? 'its' : 'their'} hours aren’t counted.`,
+        );
       }
 
       if (streak >= 3) {
@@ -202,6 +283,7 @@ export function FastingTrendsCard({ sessions }: { sessions: FastingTrendSession[
       hoursChange,
       completionChange,
       observations: observations.slice(0, 3),
+      outcomeCounts,
     };
   }, [sessions, range]);
 
@@ -234,7 +316,19 @@ export function FastingTrendsCard({ sessions }: { sessions: FastingTrendSession[
         </p>
       ) : (
         <>
-          <p className="text-sm font-semibold text-gray-900 mb-1">Hours fasted per day</p>
+          <div className="flex items-center justify-between gap-2 mb-1">
+            <p className="text-sm font-semibold text-gray-900">Hours fasted per day</p>
+            <div className="flex items-center gap-3 text-[11px] text-gray-700" aria-hidden>
+              <span className="inline-flex items-center gap-1">
+                <span className="h-2.5 w-2.5 rounded-sm" style={{ background: COMPLETED_COLOR }} />
+                Completed
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <span className="h-2.5 w-2.5 rounded-sm" style={{ background: EARLY_COLOR }} />
+                Ended early
+              </span>
+            </div>
+          </div>
           <div className="h-40 -ml-2" data-testid="chart-fasting-trend">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={days} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
@@ -242,15 +336,30 @@ export function FastingTrendsCard({ sessions }: { sessions: FastingTrendSession[
                 <YAxis tick={{ fontSize: 10, fill: '#374151' }} tickLine={false} axisLine={false} width={32} />
                 <Tooltip
                   cursor={{ fill: 'rgba(251, 191, 36, 0.2)' }}
-                  formatter={(value: number) => [`${value}h`, 'Hours fasted']}
+                  formatter={(value: number, name: string) => [`${value}h`, name]}
                   labelFormatter={(label: string) => label}
                 />
-                <Bar dataKey="hours" fill="#a855f7" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="completedHours" name="Completed" stackId="fast" fill={COMPLETED_COLOR} />
+                <Bar dataKey="earlyHours" name="Ended early" stackId="fast" fill={EARLY_COLOR} radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
 
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 mb-4 mt-3">
+          <div className="grid grid-cols-3 gap-2 mt-3" data-testid="fasting-outcome-counts">
+            {[
+              { label: 'Completed', hint: 'Reached the goal', value: outcomeCounts.completed, className: 'bg-green-100 text-green-900' },
+              { label: 'Ended early', hint: 'Stopped before goal', value: outcomeCounts.endedEarly, className: 'bg-orange-100 text-orange-900' },
+              { label: 'Not ended', hint: 'No end recorded', value: outcomeCounts.notEnded, className: 'bg-gray-100 text-gray-800' },
+            ].map(item => (
+              <div key={item.label} className={`rounded-lg p-2 text-center ${item.className}`}>
+                <div className="text-base font-bold tabular-nums">{item.value}</div>
+                <div className="text-[11px] font-semibold leading-tight">{item.label}</div>
+                <div className="text-[10px] leading-tight opacity-80">{item.hint}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 mb-4 mt-2">
             {[
               { label: 'Avg / fasting day', value: formatHours(avgHours) },
               { label: 'Days with a fast', value: `${activeDays.length}/${range}` },
@@ -286,7 +395,7 @@ export function FastingTrendsCard({ sessions }: { sessions: FastingTrendSession[
             </ul>
           )}
           <p className="text-xs text-gray-600 mt-2">
-            Bars total hours ended that day. Arrows compare the second half of the period with the first.
+            Bars show hours fasted on the day each fast started. A fast is completed when it reaches the plan’s goal. Arrows compare the second half of the period with the first.
           </p>
         </>
       )}

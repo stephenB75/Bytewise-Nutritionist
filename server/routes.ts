@@ -17,7 +17,7 @@ import { registerPackagedFoodRoutes } from "./packagedFoodRoutes";
 import { registerNutritionInsightsRoutes } from "./nutritionInsights";
 import { registerPushRoutes } from "./pushNotifications";
 import { registerProfilePhotoRoutes } from "./profilePhotoRoutes";
-import { sanitizeWaterContainers } from "./supabaseData";
+import { MAX_WATER_GLASSES, sanitizeWaterContainers } from "./supabaseData";
 import { readFileSync } from "fs";
 import path from "path";
 
@@ -2470,7 +2470,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Fasting session not found" });
       }
 
-      const completedSession = await storage.completeFastingSession(sessionId);
+      // The client sends when the user tapped End so a slow or retried request can't add time.
+      const requestedEnd = req.body?.endTime ? new Date(req.body.endTime) : null;
+      const now = new Date();
+      const startMs = new Date(session.startTime).getTime();
+      const endedAt = requestedEnd && !Number.isNaN(requestedEnd.getTime())
+        && requestedEnd.getTime() >= startMs && requestedEnd.getTime() <= now.getTime() + 60_000
+        ? requestedEnd
+        : now;
+
+      const completedSession = await storage.completeFastingSession(sessionId, endedAt);
       res.json(completedSession);
     } catch (error: any) {
       // Fasting completion error handled by response
@@ -2629,8 +2638,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(401).json({ message: "User not found or unauthorized" });
     }
 
-    if (typeof waterGlasses !== 'number' || waterGlasses < 0 || waterGlasses > 8) {
-      return res.status(400).json({ message: "Invalid water glasses count. Must be between 0 and 8." });
+    if (typeof waterGlasses !== 'number' || waterGlasses < 0 || waterGlasses > MAX_WATER_GLASSES) {
+      return res.status(400).json({ message: `Invalid water glasses count. Must be between 0 and ${MAX_WATER_GLASSES}.` });
     }
 
     try {

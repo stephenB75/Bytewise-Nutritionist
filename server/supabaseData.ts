@@ -395,6 +395,8 @@ function mapWaterIntake(row: any) {
 }
 
 export const WATER_CONTAINER_SIZES = ['8', '16', '24', '32'] as const;
+/** Matches the client's daily logging ceiling (32 × 8 oz). */
+export const MAX_WATER_GLASSES = 32;
 export type WaterContainers = Partial<Record<(typeof WATER_CONTAINER_SIZES)[number], number>>;
 
 export function sanitizeWaterContainers(value: unknown): WaterContainers | null {
@@ -402,7 +404,7 @@ export function sanitizeWaterContainers(value: unknown): WaterContainers | null 
   const result: WaterContainers = {};
   for (const size of WATER_CONTAINER_SIZES) {
     const count = Math.floor(Number((value as Record<string, unknown>)[size]));
-    if (count > 0 && count <= 8) result[size] = count;
+    if (count > 0 && count <= MAX_WATER_GLASSES) result[size] = count;
   }
   return result;
 }
@@ -584,15 +586,24 @@ export async function updateFastingSessionViaSupabase(id: string, updates: Recor
   return mapFastingRow(data);
 }
 
-export async function completeFastingSessionViaSupabase(id: string) {
+// A fast ended within a minute of its goal counts as reaching it (timer ticks, app resume delay).
+const FAST_GOAL_GRACE_MS = 60_000;
+
+export function fastingOutcome(startTime: Date | string, targetDuration: number, endedAt: Date) {
+  const actualDuration = Math.max(0, endedAt.getTime() - new Date(startTime).getTime());
+  const status = actualDuration + FAST_GOAL_GRACE_MS >= (Number(targetDuration) || 0) ? 'completed' : 'stopped';
+  return { status, actualDuration };
+}
+
+export async function completeFastingSessionViaSupabase(id: string, endedAt: Date = new Date()) {
   const existing = await getFastingSessionViaSupabase(id);
   if (!existing) throw new Error('Fasting session not found');
-  const completedAt = new Date();
+  const outcome = fastingOutcome(existing.startTime, existing.targetDuration, endedAt);
   return updateFastingSessionViaSupabase(id, {
-    status: 'completed',
-    endTime: completedAt,
-    completedAt,
-    actualDuration: Math.max(0, completedAt.getTime() - existing.startTime.getTime()),
+    status: outcome.status,
+    endTime: endedAt,
+    completedAt: endedAt,
+    actualDuration: outcome.actualDuration,
   });
 }
 

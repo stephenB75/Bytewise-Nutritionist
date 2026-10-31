@@ -9,10 +9,13 @@ import { apiFetch } from '@/lib/apiUrl';
 const WATER_HISTORY_KEY = 'waterHistoryByDate';
 const CONTAINER_KEY = 'waterContainerOz';
 const DAILY_GOAL = 8;
+// Logging can go past the goal; keep a ceiling (256 oz) so stray taps can't record an absurd amount.
+export const MAX_WATER_GLASSES = 32;
 const HISTORY_DAYS = 30;
 // Water is stored as a count of 8 oz glasses, so every container is a whole number of glasses.
 const OZ_PER_GLASS = 8;
 const GOAL_OZ = DAILY_GOAL * OZ_PER_GLASS;
+const MAX_WATER_OZ = MAX_WATER_GLASSES * OZ_PER_GLASS;
 
 type WaterContainer = { oz: number; label: string; name: string; Icon: LucideIcon; iconClass: string };
 
@@ -97,13 +100,18 @@ export function writeLocalWaterContainers(containers: WaterContainers, dateKey: 
   }
 }
 
-type DescribedContainer = WaterContainer & { count: number };
-
-function describeContainers(containers: WaterContainers): DescribedContainer[] {
-  return WATER_CONTAINERS.filter(({ oz }) => (containers[oz] || 0) > 0).map((container) => ({
-    ...container,
-    count: containers[container.oz] || 0,
-  }));
+function describeContainers(containers: WaterContainers) {
+  return WATER_CONTAINERS.filter(({ oz }) => (containers[oz] || 0) > 0).map((container) => {
+    const count = containers[container.oz] || 0;
+    return {
+      key: String(container.oz),
+      name: container.name,
+      Icon: container.Icon,
+      count,
+      totalOz: count * container.oz,
+      text: `${count} × ${container.name} (${container.oz} oz)`,
+    };
+  });
 }
 
 type WaterDay = { date: string; glasses: number; containers?: WaterContainers | null };
@@ -136,7 +144,7 @@ function readLocalWaterHistory(todayGlasses: number): WaterDay[] {
 }
 
 export function clampWaterGlasses(glasses: number): number {
-  return Math.max(0, Math.min(DAILY_GOAL, Math.round(Number(glasses) || 0)));
+  return Math.max(0, Math.min(MAX_WATER_GLASSES, Math.round(Number(glasses) || 0)));
 }
 
 /** Today's glasses from the date-keyed local log, so the count resets at local midnight. */
@@ -380,6 +388,11 @@ export const WaterCard = React.memo(function WaterCard({
             <h3 className="text-gray-900 font-medium text-lg">Water Intake</h3>
             <p className="text-gray-900 text-sm font-medium">
               {displayGlasses * OZ_PER_GLASS}/{GOAL_OZ} oz today
+              {displayGlasses > DAILY_GOAL && (
+                <span className="ml-1 text-cyan-800" data-testid="water-over-goal">
+                  (+{(displayGlasses - DAILY_GOAL) * OZ_PER_GLASS} oz over goal)
+                </span>
+              )}
             </p>
             <p className="text-gray-700 text-xs">Log glasses, bottles, and how many of each</p>
           </div>
@@ -408,7 +421,7 @@ export const WaterCard = React.memo(function WaterCard({
           {WATER_CONTAINERS.map((option) => {
             const count = todayContainerCounts[option.oz] || 0;
             const glassesForSize = option.oz / OZ_PER_GLASS;
-            const canAdd = displayGlasses < DAILY_GOAL;
+            const canAdd = displayGlasses + glassesForSize <= MAX_WATER_GLASSES;
             const canRemove = count > 0 && displayGlasses > 0;
             return (
               <div
@@ -481,17 +494,23 @@ export const WaterCard = React.memo(function WaterCard({
               </div>
             );
           })}
+
         </div>
+        {displayGlasses >= MAX_WATER_GLASSES && (
+          <p className="mt-2 text-[11px] text-gray-600" data-testid="water-daily-max">
+            That's the most one day can hold ({MAX_WATER_OZ} oz).
+          </p>
+        )}
         {todayDrinksSummary.length > 0 ? (
           <p className="mt-2 text-xs font-medium text-gray-700" data-testid="water-drinks-summary">
             Today:{' '}
             {todayDrinksSummary
-              .map(({ count, name, oz }) => `${count}× ${name} (${count * oz} oz)`)
+              .map(({ count, name, totalOz }) => `${count}× ${name} (${totalOz} oz)`)
               .join(' · ')}
           </p>
         ) : (
           <p className="mt-2 text-xs text-gray-600">
-            Tap + on a size to log how many you drank.
+            Tap + on a size for each one you drank. Keep tapping past the goal if you drank more.
           </p>
         )}
       </div>
@@ -576,13 +595,13 @@ export const WaterCard = React.memo(function WaterCard({
                   </div>
                   {selectedContainers.length > 0 ? (
                     <ul className="mt-2 flex flex-wrap gap-2">
-                      {selectedContainers.map(({ oz, name, Icon, count }) => (
+                      {selectedContainers.map(({ key, Icon, text }) => (
                         <li
-                          key={oz}
+                          key={key}
                           className="flex items-center gap-1.5 rounded-md bg-cyan-50 px-2.5 py-1 text-xs font-medium text-gray-800 ring-1 ring-cyan-200 whitespace-nowrap"
                         >
                           <Icon className="h-3.5 w-3.5 text-cyan-700" />
-                          {count} × {name} ({oz} oz)
+                          {text}
                         </li>
                       ))}
                     </ul>

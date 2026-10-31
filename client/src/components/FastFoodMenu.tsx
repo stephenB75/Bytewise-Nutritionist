@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { logMeal } from '@/lib/mealsApi';
@@ -23,7 +23,7 @@ import {
   type FoodCuisine,
   type UsFoodRegion,
 } from '@/data/fastFoodMenu';
-import { Check, Loader2, MapPin, Search, Store, X } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, Loader2, MapPin, Search, Store, X } from 'lucide-react';
 
 /** Culture / style chips — order is browse priority in the Places row. */
 const PLACE_CUISINE_ORDER: FoodCuisine[] = [
@@ -35,9 +35,11 @@ const PLACE_CUISINE_ORDER: FoodCuisine[] = [
   'chicken',
   'burgers',
   'bbq',
+  'steakhouse',
   'mediterranean',
   'seafood',
   'cafe',
+  'bakery',
 ];
 
 const ADDED_CONFIRMATION_MS = 2500;
@@ -89,6 +91,49 @@ const PINNED_POPULAR = [
   'Golden Corral',
 ];
 
+type ScrollState = { canLeft: boolean; canRight: boolean; thumbWidth: number; thumbOffset: number };
+
+/** Tracks a horizontal scroller so the UI can show there's more to swipe to, and where you are. */
+function useHorizontalScrollState() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [state, setState] = useState<ScrollState>({ canLeft: false, canRight: false, thumbWidth: 100, thumbOffset: 0 });
+
+  const update = useCallback(() => {
+    const el = ref.current;
+    if (!el) return;
+    const max = el.scrollWidth - el.clientWidth;
+    const thumbWidth = el.scrollWidth > 0 ? Math.min(100, (el.clientWidth / el.scrollWidth) * 100) : 100;
+    const progress = max > 0 ? el.scrollLeft / max : 0;
+    setState({
+      canLeft: el.scrollLeft > 2,
+      canRight: el.scrollLeft < max - 2,
+      thumbWidth,
+      thumbOffset: progress * (100 - thumbWidth),
+    });
+  }, []);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    update();
+    el.addEventListener('scroll', update, { passive: true });
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    return () => {
+      el.removeEventListener('scroll', update);
+      observer.disconnect();
+    };
+  }, [update]);
+
+  const scrollByPage = (direction: 1 | -1) => {
+    const el = ref.current;
+    if (!el) return;
+    el.scrollBy({ left: direction * el.clientWidth * 0.7, behavior: 'smooth' });
+  };
+
+  return { ref, state, update, scrollByPage };
+}
+
 function requestUserRegion(): Promise<UsFoodRegion | null> {
   return new Promise((resolve) => {
     if (!navigator.geolocation) {
@@ -114,6 +159,7 @@ export function FastFoodMenu() {
   const [showAllPlaces, setShowAllPlaces] = useState(false);
   const [placeCuisine, setPlaceCuisine] = useState<FoodCuisine | 'all'>('all');
   const menuSectionRef = useRef<HTMLDivElement>(null);
+  const styleScroll = useHorizontalScrollState();
   const prevActivePlaceRef = useRef<string | null>(null);
 
   const placeCuisines = useMemo(() => {
@@ -335,7 +381,12 @@ export function FastFoodMenu() {
             Food style
           </p>
           {/* Horizontal scroll keeps chips pill-shaped on narrow screens (avoids wrap + global 44px button min-height). */}
-          <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+          <div className="relative">
+          <div
+            ref={styleScroll.ref}
+            className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+            aria-label="Food styles, scroll sideways for more"
+          >
             <button
               type="button"
               onClick={() => {
@@ -371,6 +422,41 @@ export function FastFoodMenu() {
               );
             })}
           </div>
+            {styleScroll.state.canLeft && (
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex w-12 items-center bg-gradient-to-r from-[#fffbf4] via-[#fffbf4]/90 to-transparent pb-1">
+                <button
+                  type="button"
+                  onClick={() => styleScroll.scrollByPage(-1)}
+                  className="pointer-events-auto flex h-7 w-7 items-center justify-center rounded-full bg-white p-0 text-[#1f4aa6] shadow ring-1 ring-[#1f4aa6]/20"
+                  aria-label="Scroll food styles left"
+                  data-testid="fastfood-cuisine-scroll-left"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+              </div>
+            )}
+            {styleScroll.state.canRight && (
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex w-12 items-center justify-end bg-gradient-to-l from-[#fffbf4] via-[#fffbf4]/90 to-transparent pb-1">
+                <button
+                  type="button"
+                  onClick={() => styleScroll.scrollByPage(1)}
+                  className="pointer-events-auto flex h-7 w-7 items-center justify-center rounded-full bg-white p-0 text-[#1f4aa6] shadow ring-1 ring-[#1f4aa6]/20"
+                  aria-label="Scroll food styles right"
+                  data-testid="fastfood-cuisine-scroll-right"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
+            )}
+          </div>
+          {(styleScroll.state.canLeft || styleScroll.state.canRight) && (
+            <div className="mt-1 h-1 rounded-full bg-[#1f4aa6]/10" aria-hidden data-testid="fastfood-cuisine-scroll-indicator">
+              <div
+                className="h-full rounded-full bg-[#1f4aa6]/60 transition-[margin] duration-150"
+                style={{ width: `${styleScroll.state.thumbWidth}%`, marginLeft: `${styleScroll.state.thumbOffset}%` }}
+              />
+            </div>
+          )}
         </div>
         <div className={`overflow-y-auto py-1 pr-1 [scrollbar-width:thin] ${showAllPlaces ? 'max-h-[420px]' : 'max-h-[280px]'}`}>
           <div className="grid grid-cols-3 gap-x-2 gap-y-1.5">

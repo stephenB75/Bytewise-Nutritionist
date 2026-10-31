@@ -32,8 +32,7 @@ import {
   Beef,
   Wheat,
   Droplets,
-  Calendar,
-  Copy
+  Calendar
 } from 'lucide-react';
 import { FoodSearchWithHistory } from '@/components/FoodSearchWithHistory';
 import { UserFoodSuggestions } from '@/components/UserFoodSuggestions';
@@ -825,19 +824,6 @@ function CalorieCalculator({
               <p className="text-xs text-gray-800 mt-1.5 leading-snug" data-testid="calculator-search-tip">
                 Tip: Describe the meal as it is — e.g. curry chicken with white rice, steamed carrots, peas, cabbage, and plantain.
               </p>
-              <UserFoodSuggestions
-                className="mt-4"
-                onSelectFood={(food) => {
-                  const fields = fieldsFromLoggedFood(food.name);
-                  setIngredient(fields.ingredient);
-                  setMeasurement(fields.measurement);
-                  setIngredientSuggestions([]);
-                  requestAnimationFrame(() => {
-                    document.querySelector<HTMLElement>('[data-testid="nutrition-food-search"]')
-                      ?.scrollIntoView({ block: 'center', behavior: 'smooth' });
-                  });
-                }}
-              />
             </div>
             
             {/* Measurement Input - Simplified */}
@@ -856,6 +842,18 @@ function CalorieCalculator({
                 Any measurement works - the system will provide the best estimate
               </p>
             </div>
+            <UserFoodSuggestions
+              onSelectFood={(food) => {
+                const fields = fieldsFromLoggedFood(food.name);
+                setIngredient(fields.ingredient);
+                setMeasurement(fields.measurement);
+                setIngredientSuggestions([]);
+                requestAnimationFrame(() => {
+                  document.querySelector<HTMLElement>('[data-testid="nutrition-food-search"]')
+                    ?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                });
+              }}
+            />
           </div>
 
           {/* Real-time Portion Warning */}
@@ -1093,322 +1091,7 @@ function CalorieCalculator({
         </Card>
       )}
 
-      {/* Simple User Food Suggestions - One line text only */}
-      <UserFoodTextSuggestions onSuggestionClick={(foodName) => setIngredient(foodName)} />
-
       <FastFoodMenu />
-    </div>
-  );
-}
-
-// Enhanced food suggestions with nutritional info
-interface UserFoodData {
-  name: string;
-  calories: number;
-  protein: number;
-  carbs: number;
-  fat: number;
-  iron?: number;
-  calcium?: number;
-  vitaminC?: number;
-  zinc?: number;
-  magnesium?: number;
-  vitaminD?: number;
-  vitaminB12?: number;
-  folate?: number;
-}
-
-function UserFoodTextSuggestions({ onSuggestionClick }: { onSuggestionClick: (foodName: string) => void }) {
-  const [userFoods, setUserFoods] = useState<UserFoodData[]>([]);
-  const [copiedFood, setCopiedFood] = useState<string | null>(null);
-
-  // Add food directly to meal log
-  const addFoodToMeal = (food: UserFoodData) => {
-    try {
-      // Get current meal type based on time
-      const mealType = getMealTypeByTime(new Date());
-      
-      // Dispatch calories-logged event to add to meal tracker
-      window.dispatchEvent(new CustomEvent('calories-logged', {
-        detail: {
-          source: 'calculator',
-          name: food.name,
-          calories: food.calories,
-          protein: food.protein,
-          carbs: food.carbs,
-          fat: food.fat,
-          mealType: mealType,
-          timestamp: new Date().toISOString(),
-          // Include micronutrients
-          iron: food.iron || 0,
-          calcium: food.calcium || 0,
-          zinc: food.zinc || 0,
-          magnesium: food.magnesium || 0,
-          vitaminC: food.vitaminC || 0,
-          vitaminD: food.vitaminD || 0,
-          vitaminB12: food.vitaminB12 || 0,
-          folate: food.folate || 0
-        }
-      }));
-
-      // Show success toast
-      window.dispatchEvent(new CustomEvent('show-toast', {
-        detail: { 
-          message: `✅ Added "${food.name}" to ${mealType}`,
-          type: 'success'
-        }
-      }));
-
-      console.log(`🍽️ Added food to meal: ${food.name}`);
-    } catch (error) {
-      console.error('❌ Failed to add food to meal:', error);
-      window.dispatchEvent(new CustomEvent('show-toast', {
-        detail: { 
-          message: `❌ Failed to add ${food.name}`,
-          type: 'error'
-        }
-      }));
-    }
-  };
-
-  // Copy food name to clipboard
-  const copyFoodInfo = async (food: UserFoodData) => {
-    try {
-      // Set visual feedback immediately
-      setCopiedFood(food.name);
-      
-      // Copy only the food name
-      await navigator.clipboard.writeText(food.name);
-      
-      // Show simple success confirmation
-      window.dispatchEvent(new CustomEvent('show-toast', {
-        detail: { 
-          message: `✅ Copied "${food.name}" to clipboard`,
-          type: 'success'
-        }
-      }));
-
-      // Log successful copy
-      console.log(`📋 Food name copied to clipboard: ${food.name}`);
-
-      // Reset visual feedback after 2 seconds
-      setTimeout(() => {
-        setCopiedFood(null);
-      }, 2000);
-
-    } catch (error) {
-      console.error('❌ Failed to copy food entry:', error);
-      setCopiedFood(null);
-      
-      // Show error toast
-      window.dispatchEvent(new CustomEvent('show-toast', {
-        detail: { 
-          message: `❌ Failed to copy ${food.name}`,
-          type: 'error'
-        }
-      }));
-    }
-  };
-
-  useEffect(() => {
-    const loadUserFoods = () => {
-      try {
-        const weeklyMeals = JSON.parse(localStorage.getItem('weeklyMeals') || '[]');
-        
-        // Calculate one week ago from current date
-        const oneWeekAgo = new Date();
-        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-        
-        // Extract unique foods with their nutritional data from last week only
-        const userEnteredFoods = weeklyMeals
-          .filter((meal: any) => {
-            // Only include user-entered meals
-            if (meal.source !== 'user-suggestion' && meal.source !== 'calculator') {
-              return false;
-            }
-            
-            // Only include meals from the last week
-            if (meal.date) {
-              const mealDate = new Date(meal.date);
-              return mealDate >= oneWeekAgo;
-            }
-            
-            // If no date, check if it has a dateKey in the last week
-            if (meal.dateKey) {
-              const mealDate = new Date(meal.dateKey);
-              return mealDate >= oneWeekAgo;
-            }
-            
-            // If no date info, exclude it (likely old data)
-            return false;
-          })
-          .reduce((unique: UserFoodData[], meal: any) => {
-            const foodName = meal.name.split(' (')[0]; // Remove measurement part
-            
-            // Check if this food already exists
-            const existing = unique.find(f => f.name === foodName);
-            if (!existing) {
-              unique.push({
-                name: foodName,
-                calories: meal.calories || 0,
-                protein: meal.protein || 0,
-                carbs: meal.carbs || 0,
-                fat: meal.fat || 0,
-                iron: meal.iron || 0,
-                calcium: meal.calcium || 0,
-                vitaminC: meal.vitaminC || 0,
-                zinc: meal.zinc || 0,
-                magnesium: meal.magnesium || 0,
-                vitaminD: meal.vitaminD || 0,
-                vitaminB12: meal.vitaminB12 || 0,
-                folate: meal.folate || 0
-              });
-            }
-            return unique;
-          }, [])
-          .slice(0, 6); // Limit to 6 suggestions for space
-        
-        setUserFoods(userEnteredFoods);
-      } catch (error) {
-        // Silent fail - just set empty array
-        setUserFoods([]);
-      }
-    };
-
-    loadUserFoods();
-
-    // Listen for meal updates
-    const handleMealUpdate = () => loadUserFoods();
-    window.addEventListener('meals-updated', handleMealUpdate);
-    window.addEventListener('calories-logged', handleMealUpdate);
-
-    return () => {
-      window.removeEventListener('meals-updated', handleMealUpdate);
-      window.removeEventListener('calories-logged', handleMealUpdate);
-    };
-  }, []);
-
-  if (userFoods.length === 0) return null;
-
-  return (
-    <div className="mt-4 pt-3 border-t border-amber-200">
-      <p className="text-xs text-gray-900 mb-3">Quick suggestions (last 7 days):</p>
-      <div className="space-y-3">
-        {userFoods.map((food) => (
-          <div key={food.name} className="text-sm bg-amber-50/80 border border-amber-200 rounded-lg p-3 shadow-sm">
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <div className="font-medium text-gray-900 mb-1">
-                  {food.name}
-                </div>
-                
-                {/* Macronutrients */}
-                <div className="flex flex-wrap gap-3 mb-2 text-xs">
-                  <span className="text-orange-600 font-medium">{Math.round(food.calories || 0)} cal</span>
-                  <span className="text-green-600">P: {(food.protein || 0).toFixed(1)}g</span>
-                  <span className="text-yellow-600">C: {(food.carbs || 0).toFixed(1)}g</span>
-                  <span className="text-purple-600">F: {(food.fat || 0).toFixed(1)}g</span>
-                </div>
-                
-                {/* Micronutrients - organized by category */}
-                {((food.iron || 0) > 0 || (food.calcium || 0) > 0 || (food.vitaminC || 0) > 0 || (food.zinc || 0) > 0 || (food.magnesium || 0) > 0 || (food.vitaminD || 0) > 0) && (
-                  <div className="mt-2 space-y-2">
-                    {/* Minerals Section */}
-                    {((food.iron || 0) > 0 || (food.calcium || 0) > 0 || (food.zinc || 0) > 0 || (food.magnesium || 0) > 0) && (
-                      <div className="space-y-1">
-                        <div className="text-xs font-medium text-gray-600 uppercase tracking-wide">Minerals</div>
-                        <div className="flex flex-wrap gap-1.5">
-                          {(food.iron || 0) > 0 && (
-                            <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap bg-transparent text-slate-700 border-2 border-slate-500 hover:border-slate-600 hover:text-slate-800 transition-colors">
-                              Fe {(food.iron || 0).toFixed(1)}mg
-                            </span>
-                          )}
-                          {(food.calcium || 0) > 0 && (
-                            <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap bg-transparent text-stone-700 border-2 border-stone-500 hover:border-stone-600 hover:text-stone-800 transition-colors">
-                              Ca {Math.round(food.calcium || 0)}mg
-                            </span>
-                          )}
-                          {(food.zinc || 0) > 0 && (
-                            <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap bg-transparent text-gray-700 border-2 border-gray-500 hover:border-gray-600 hover:text-gray-800 transition-colors">
-                              Zn {(food.zinc || 0).toFixed(1)}mg
-                            </span>
-                          )}
-                          {(food.magnesium || 0) > 0 && (
-                            <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap bg-transparent text-neutral-700 border-2 border-neutral-500 hover:border-neutral-600 hover:text-neutral-800 transition-colors">
-                              Mg {Math.round(food.magnesium || 0)}mg
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                    
-                    {/* Vitamins Section */}
-                    {((food.vitaminC || 0) > 0 || (food.vitaminD || 0) > 0 || (food.vitaminB12 || 0) > 0 || (food.folate || 0) > 0) && (
-                      <div className="space-y-1">
-                        <div className="text-xs font-medium text-gray-600 uppercase tracking-wide">Vitamins</div>
-                        <div className="flex flex-wrap gap-1.5">
-                          {(food.vitaminC || 0) > 0 && (
-                            <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap bg-transparent text-orange-700 border-2 border-orange-500 hover:border-orange-600 hover:text-orange-800 transition-colors">
-                              C {Math.round(food.vitaminC || 0)}mg
-                            </span>
-                          )}
-                          {(food.vitaminD || 0) > 0 && (
-                            <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap bg-transparent text-amber-700 border-2 border-amber-500 hover:border-amber-600 hover:text-amber-800 transition-colors">
-                              D {(food.vitaminD || 0).toFixed(1)}μg
-                            </span>
-                          )}
-                          {(food.vitaminB12 || 0) > 0 && (
-                            <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap bg-transparent text-red-700 border-2 border-red-500 hover:border-red-600 hover:text-red-800 transition-colors">
-                              B12 {(food.vitaminB12 || 0).toFixed(1)}μg
-                            </span>
-                          )}
-                          {(food.folate || 0) > 0 && (
-                            <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap bg-transparent text-green-700 border-2 border-green-500 hover:border-green-600 hover:text-green-800 transition-colors">
-                              Folate {Math.round(food.folate || 0)}μg
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-              
-              {/* Add Button */}
-              <button
-                onClick={() => addFoodToMeal(food)}
-                className="ml-3 px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-md hover:bg-blue-700 transition-colors"
-                title={`Add ${food.name} to meal`}
-                data-testid={`button-add-food-${food.name.toLowerCase().replace(/\s+/g, '-')}`}
-              >
-                Add
-              </button>
-              
-              {/* Copy Button */}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  console.log('📋 Copy button clicked for:', food.name);
-                  copyFoodInfo(food);
-                }}
-                className={`ml-2 p-1.5 rounded-md transition-all duration-200 ${
-                  copiedFood === food.name 
-                    ? 'text-green-600 bg-green-50 hover:bg-green-100' 
-                    : 'text-gray-400 hover:text-blue-600 hover:bg-blue-50'
-                }`}
-                title={copiedFood === food.name ? 'Copied to clipboard!' : `Copy food name: ${food.name}`}
-                data-testid={`button-copy-food-${food.name.toLowerCase().replace(/\s+/g, '-')}`}
-              >
-                {copiedFood === food.name ? (
-                  <CheckCircle className="w-4 h-4" />
-                ) : (
-                  <Copy className="w-4 h-4" />
-                )}
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }

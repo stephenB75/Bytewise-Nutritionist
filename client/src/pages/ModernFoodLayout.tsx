@@ -415,7 +415,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
   
 
 
-  // Water consumption update function with 8-glass daily limit.
+  // Water consumption update (goal is 8 glasses; logging is capped at MAX_WATER_GLASSES).
   // The ref holds the latest count so rapid taps build on each other instead of a stale render value.
   const waterGlassesRef = useRef(0);
   const waterDayRef = useRef(getLocalDateKey());

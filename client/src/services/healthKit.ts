@@ -4,6 +4,7 @@ import { Health } from '@capgo/capacitor-health';
 const CONNECTED_KEY = 'appleHealthConnected';
 const RECOVERY_ASKED_KEY = 'appleHealthRecoveryAsked';
 const EXERCISE_ASKED_KEY = 'appleHealthExerciseAsked';
+const BLOOD_PRESSURE_ASKED_KEY = 'appleHealthBloodPressureAsked';
 const LEGACY_KEYS = ['appleHealthAutoSync', 'appleHealthSyncedMealIds', 'appleHealthSyncedWater', 'pendingHealthKitSync'];
 
 const FITNESS_READ_TYPES = ['steps', 'calories', 'distance'] as const;
@@ -11,7 +12,14 @@ const FITNESS_READ_TYPES = ['steps', 'calories', 'distance'] as const;
 const RECOVERY_READ_TYPES = ['sleep', 'workouts'] as const;
 // Apple's Exercise ring minutes; added after sleep and workouts, so it is asked about separately.
 const EXERCISE_READ_TYPES = ['exerciseTime'] as const;
-const READ_TYPES = [...FITNESS_READ_TYPES, ...RECOVERY_READ_TYPES, ...EXERCISE_READ_TYPES];
+// Added after Exercise minutes, so it is asked about separately too.
+const BLOOD_PRESSURE_READ_TYPES = ['bloodPressure'] as const;
+const READ_TYPES = [
+  ...FITNESS_READ_TYPES,
+  ...RECOVERY_READ_TYPES,
+  ...EXERCISE_READ_TYPES,
+  ...BLOOD_PRESSURE_READ_TYPES,
+];
 /** Capgo only supports aggregated queries for these cumulative types. */
 const AGGREGATED_SUM_TYPES = new Set<string>(['steps', 'distance', 'calories']);
 
@@ -52,6 +60,21 @@ export type AppleFitnessSummary = {
   workouts: WorkoutSummary;
 };
 
+export type BloodPressureDay = {
+  date: Date;
+  /** Daily average of that day's readings, mmHg. */
+  systolic: number;
+  diastolic: number;
+  readings: number;
+};
+
+export type ExerciseDay = {
+  date: Date;
+  ringMinutes: number;
+  workoutMinutes: number;
+  totalMinutes: number;
+};
+
 type AuthorizationResult = {
   readAuthorized?: string[];
   readDenied?: string[];
@@ -61,6 +84,9 @@ type SleepState = 'inBed' | 'asleep' | 'awake' | 'rem' | 'deep' | 'light';
 
 type HealthSampleRow = {
   value?: number;
+  startDate?: string;
+  systolic?: number;
+  diastolic?: number;
   sourceId?: string;
   sourceName?: string;
   sleepState?: SleepState;
@@ -254,12 +280,58 @@ function wasAskedForExercise(result: AuthorizationResult): boolean {
   return EXERCISE_READ_TYPES.every((type) => asked.includes(type));
 }
 
+function wasAskedForBloodPressure(result: AuthorizationResult): boolean {
+  const asked = result.readAuthorized || [];
+  return BLOOD_PRESSURE_READ_TYPES.every((type) => asked.includes(type));
+}
+
+function localDayKey(date: Date): string {
+  return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+}
+
+/** Midnight-anchored dates for the last `days` days, oldest first, today last. */
+function lastDays(days: number): Date[] {
+  return Array.from({ length: days }, (_, index) => {
+    const date = new Date();
+    date.setHours(0, 0, 0, 0);
+    date.setDate(date.getDate() - (days - 1 - index));
+    return date;
+  });
+}
+
+// The same session is often saved by both Apple Watch and a third-party app; keep one.
+function dedupeWorkouts(workouts: WorkoutRow[]): WorkoutRow[] {
+  const kept: WorkoutRow[] = [];
+  const sorted = [...workouts].sort((a, b) => Date.parse(a.startDate) - Date.parse(b.startDate));
+  for (const workout of sorted) {
+    const s = Date.parse(workout.startDate);
+    const e = Date.parse(workout.endDate);
+    const duplicate = kept.some((k) => {
+      const overlap = Math.min(e, Date.parse(k.endDate)) - Math.max(s, Date.parse(k.startDate));
+      return overlap > 0.5 * Math.min(e - s, Date.parse(k.endDate) - Date.parse(k.startDate));
+    });
+    if (!duplicate) {
+      kept.push(workout);
+    }
+  }
+  return kept;
+}
+
+function workoutMinutes(workout: WorkoutRow): number {
+  // Capgo documents duration in seconds; fall back to wall-clock when missing.
+  const durationSeconds = toNumber(workout.duration);
+  const spanSeconds = Math.max(0, (Date.parse(workout.endDate) - Date.parse(workout.startDate)) / 1000);
+  const seconds = durationSeconds > 0 ? durationSeconds : spanSeconds;
+  return Math.max(0, Math.round(seconds / 60));
+}
+
 export class HealthKitService {
   private isAvailable = false;
   private unavailableReason: string | null = null;
   private isAuthorized = localStorage.getItem(CONNECTED_KEY) === 'true';
   private recoveryAsked = localStorage.getItem(RECOVERY_ASKED_KEY) === 'true';
   private exerciseAsked = localStorage.getItem(EXERCISE_ASKED_KEY) === 'true';
+  private bloodPressureAsked = localStorage.getItem(BLOOD_PRESSURE_ASKED_KEY) === 'true';
   private ready: Promise<void>;
 
   constructor() {
@@ -285,6 +357,7 @@ export class HealthKitService {
         this.setAuthorized(wasAsked(auth) || this.isAuthorized);
         this.setRecoveryAsked(wasAskedForRecovery(auth) || this.recoveryAsked);
         this.setExerciseAsked(wasAskedForExercise(auth) || this.exerciseAsked);
+        this.setBloodPressureAsked(wasAskedForBloodPressure(auth) || this.bloodPressureAsked);
       }
     } catch (error) {
       console.warn('HealthKit availability check failed:', error);
@@ -306,6 +379,11 @@ export class HealthKitService {
   private setExerciseAsked(value: boolean) {
     this.exerciseAsked = value;
     localStorage.setItem(EXERCISE_ASKED_KEY, value ? 'true' : 'false');
+  }
+
+  private setBloodPressureAsked(value: boolean) {
+    this.bloodPressureAsked = value;
+    localStorage.setItem(BLOOD_PRESSURE_ASKED_KEY, value ? 'true' : 'false');
   }
 
   async initialize(): Promise<void> {
@@ -333,6 +411,7 @@ export class HealthKitService {
       }
       this.setRecoveryAsked(wasAskedForRecovery(auth) || this.recoveryAsked);
       this.setExerciseAsked(wasAskedForExercise(auth) || this.exerciseAsked);
+      this.setBloodPressureAsked(wasAskedForBloodPressure(auth) || this.bloodPressureAsked);
     } catch (error) {
       console.warn('HealthKit authorization refresh failed:', error);
     }
@@ -352,6 +431,7 @@ export class HealthKitService {
       this.setAuthorized(true);
       this.setRecoveryAsked(true);
       this.setExerciseAsked(true);
+      this.setBloodPressureAsked(true);
       await this.refreshAuthorization();
       return { ok: true };
     } catch (error) {
@@ -539,6 +619,103 @@ export class HealthKitService {
     return history;
   }
 
+  /**
+   * Ring + workout minutes per day for the last `days` days (oldest first, today last), read with
+   * one query per type instead of one per day.
+   */
+  async readExerciseRange(days = 30): Promise<ExerciseDay[] | null> {
+    await this.ready;
+    const health = getHealth();
+    if (!health || !this.isAvailable || !this.isAuthorized) {
+      return null;
+    }
+
+    const dates = lastDays(days);
+    const startDate = dates[0].toISOString();
+    const endDate = new Date().toISOString();
+    const ring = new Map<string, number>();
+    const workouts = new Map<string, number>();
+
+    const [ringResult, workoutResult] = await Promise.allSettled([
+      health.readSamples({ dataType: 'exerciseTime', startDate, endDate, limit: 50_000, ascending: true }),
+      health.queryWorkouts({ startDate, endDate, limit: 1000 }),
+    ]);
+    if (ringResult.status === 'fulfilled') {
+      for (const sample of ringResult.value.samples || []) {
+        if (!sample.startDate) continue;
+        const key = localDayKey(new Date(sample.startDate));
+        ring.set(key, (ring.get(key) || 0) + toNumber(sample.value));
+      }
+    }
+    if (workoutResult.status === 'fulfilled') {
+      for (const workout of dedupeWorkouts(workoutResult.value.workouts || [])) {
+        const key = localDayKey(new Date(workout.startDate));
+        workouts.set(key, (workouts.get(key) || 0) + workoutMinutes(workout));
+      }
+    }
+    if (ringResult.status === 'rejected' && workoutResult.status === 'rejected') {
+      console.warn('Failed to read exercise history from Apple Health:', ringResult.reason);
+      return null;
+    }
+
+    return dates.map((date) => {
+      const key = localDayKey(date);
+      const ringMinutes = Math.round(ring.get(key) || 0);
+      const workoutTotal = workouts.get(key) || 0;
+      return { date, ringMinutes, workoutMinutes: workoutTotal, totalMinutes: ringMinutes + workoutTotal };
+    });
+  }
+
+  /** Daily average blood pressure for days with readings in the last `days` days, oldest first. */
+  async readBloodPressureHistory(days = 30): Promise<BloodPressureDay[]> {
+    await this.ready;
+    const health = getHealth();
+    if (!health || !this.isAvailable || !this.isAuthorized || !this.bloodPressureAsked) {
+      return [];
+    }
+
+    try {
+      const { samples } = await health.readSamples({
+        dataType: 'bloodPressure',
+        startDate: lastDays(days)[0].toISOString(),
+        endDate: new Date().toISOString(),
+        limit: 1000,
+        ascending: true,
+      });
+
+      const byDay = new Map<string, { date: Date; systolic: number; diastolic: number; readings: number }>();
+      for (const sample of samples || []) {
+        const systolic = toNumber(sample.systolic ?? sample.value);
+        const diastolic = toNumber(sample.diastolic);
+        if (!sample.startDate || systolic <= 0 || diastolic <= 0) continue;
+        const taken = new Date(sample.startDate);
+        const key = localDayKey(taken);
+        const day = byDay.get(key) || {
+          date: new Date(taken.getFullYear(), taken.getMonth(), taken.getDate()),
+          systolic: 0,
+          diastolic: 0,
+          readings: 0,
+        };
+        day.systolic += systolic;
+        day.diastolic += diastolic;
+        day.readings += 1;
+        byDay.set(key, day);
+      }
+
+      return Array.from(byDay.values())
+        .sort((a, b) => a.date.getTime() - b.date.getTime())
+        .map((day) => ({
+          date: day.date,
+          systolic: Math.round(day.systolic / day.readings),
+          diastolic: Math.round(day.diastolic / day.readings),
+          readings: day.readings,
+        }));
+    } catch (error) {
+      console.warn('Failed to read blood pressure from Apple Health:', error);
+      return [];
+    }
+  }
+
   /** Sleep between 6 PM yesterday and 6 PM today (or now, if earlier). */
   private async readLastNightSleep(): Promise<SleepSummary | null> {
     const health = getHealth();
@@ -636,35 +813,11 @@ export class HealthKitService {
         limit: 50,
       });
 
-      // The same session is often saved by both Apple Watch and a third-party app; keep one.
-      const kept: WorkoutRow[] = [];
-      const sorted = [...(workouts || [])].sort((a, b) => Date.parse(a.startDate) - Date.parse(b.startDate));
-      for (const workout of sorted) {
-        const s = Date.parse(workout.startDate);
-        const e = Date.parse(workout.endDate);
-        const duplicate = kept.some((k) => {
-          const overlap = Math.min(e, Date.parse(k.endDate)) - Math.max(s, Date.parse(k.startDate));
-          return overlap > 0.5 * Math.min(e - s, Date.parse(k.endDate) - Date.parse(k.startDate));
-        });
-        if (!duplicate) {
-          kept.push(workout);
-        }
-      }
-
-      const items = kept.map((workout) => {
-        // Capgo documents duration in seconds; fall back to wall-clock when missing.
-        const durationSeconds = toNumber(workout.duration);
-        const spanSeconds = Math.max(
-          0,
-          (Date.parse(workout.endDate) - Date.parse(workout.startDate)) / 1000,
-        );
-        const seconds = durationSeconds > 0 ? durationSeconds : spanSeconds;
-        return {
-          name: workoutName(workout.workoutType),
-          minutes: Math.max(0, Math.round(seconds / 60)),
-          calories: Math.round(toNumber(workout.totalEnergyBurned)),
-        };
-      });
+      const items = dedupeWorkouts(workouts || []).map((workout) => ({
+        name: workoutName(workout.workoutType),
+        minutes: workoutMinutes(workout),
+        calories: Math.round(toNumber(workout.totalEnergyBurned)),
+      }));
       // Headline total = every completed workout today (after de-dupe).
       return {
         count: items.length,
@@ -688,6 +841,11 @@ export class HealthKitService {
     return this.isAvailable && this.isAuthorized && !this.exerciseAsked;
   }
 
+  /** Connected before blood pressure was added. */
+  needsBloodPressurePermission(): boolean {
+    return this.isAvailable && this.isAuthorized && !this.bloodPressureAsked;
+  }
+
   getAvailability(): boolean {
     return this.isAvailable;
   }
@@ -700,9 +858,11 @@ export class HealthKitService {
     this.isAuthorized = false;
     this.recoveryAsked = false;
     this.exerciseAsked = false;
+    this.bloodPressureAsked = false;
     localStorage.removeItem(CONNECTED_KEY);
     localStorage.removeItem(RECOVERY_ASKED_KEY);
     localStorage.removeItem(EXERCISE_ASKED_KEY);
+    localStorage.removeItem(BLOOD_PRESSURE_ASKED_KEY);
     LEGACY_KEYS.forEach((key) => localStorage.removeItem(key));
   }
 }

@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
+import { Area, AreaChart, ReferenceDot, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { Dumbbell, Timer } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { healthKitService, type WorkoutSummary } from '@/services/healthKit';
+import { healthKitService, type ExerciseDay, type WorkoutSummary } from '@/services/healthKit';
 import { toast } from '@/hooks/use-toast';
 
 // Daily exercise goal shown on the card (minutes). Matches a common Apple Watch
@@ -13,6 +14,9 @@ const DAILY_TARGET_MINUTES = 45;
 const WEEKLY_TARGET_MINUTES = 150;
 /** Re-read HealthKit often enough that the green ring feels live while the app is open. */
 const LIVE_POLL_MS = 15_000;
+/** The 30-day chart is a month-scale view; re-reading it every minute adds HealthKit load for no visible change. */
+const MONTH_REFRESH_MS = 5 * 60_000;
+const MONTH_DAYS = 30;
 
 type DayMinutes = {
   date: Date;
@@ -52,13 +56,109 @@ function formatMinutesShort(total: number): string {
   return `${minutes} min`;
 }
 
+function MonthlyActivityChart({ days }: { days: ExerciseDay[] }) {
+  const data = days.map((day) => ({
+    label: day.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+    minutes: day.totalMinutes,
+  }));
+  const total = data.reduce((sum, day) => sum + day.minutes, 0);
+  if (total === 0) {
+    return (
+      <div className="rounded-lg bg-white/70 p-3 border border-amber-200/50" data-testid="exercise-monthly-chart">
+        <p className="text-xs font-medium text-gray-600 mb-1">Last 30 days</p>
+        <p className="text-sm text-gray-700">No exercise recorded in the last 30 days yet.</p>
+      </div>
+    );
+  }
+
+  const peak = data.reduce((best, day) => (day.minutes > best.minutes ? day : best), data[0]);
+  // Today is still in progress, so it can't be the month's low.
+  const finishedDays = data.slice(0, -1);
+  const low = finishedDays.reduce((least, day) => (day.minutes < least.minutes ? day : least), finishedDays[0] ?? data[0]);
+  const activeDays = data.filter((day) => day.minutes > 0).length;
+  const average = Math.round(total / data.length);
+
+  return (
+    <div className="rounded-lg bg-white/70 p-3 border border-amber-200/50" data-testid="exercise-monthly-chart">
+      <p className="text-xs font-medium text-gray-600 mb-2">Last 30 days (ring + workouts)</p>
+      <div className="h-36" aria-label="Exercise minutes per day, last 30 days">
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart data={data} margin={{ top: 14, right: 10, bottom: 0, left: 0 }}>
+            <defs>
+              <linearGradient id="exerciseMonthFill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#65a30d" stopOpacity={0.45} />
+                <stop offset="100%" stopColor="#65a30d" stopOpacity={0.05} />
+              </linearGradient>
+            </defs>
+            <XAxis
+              dataKey="label"
+              tick={{ fontSize: 10, fill: '#374151' }}
+              tickLine={false}
+              axisLine={false}
+              interval="preserveStartEnd"
+              minTickGap={28}
+            />
+            <YAxis tick={{ fontSize: 10, fill: '#374151' }} tickLine={false} axisLine={false} width={32} allowDecimals={false} />
+            <Tooltip
+              formatter={(value: number) => [formatMinutes(value), 'Exercise']}
+              contentStyle={{ fontSize: 12, borderRadius: 8 }}
+            />
+            <ReferenceLine
+              y={DAILY_TARGET_MINUTES}
+              stroke="#4d7c0f"
+              strokeDasharray="4 4"
+              label={{ value: `${DAILY_TARGET_MINUTES} min goal`, position: 'insideTopRight', fontSize: 10, fill: '#3f6212' }}
+            />
+            <Area
+              type="monotone"
+              dataKey="minutes"
+              stroke="#65a30d"
+              strokeWidth={2}
+              fill="url(#exerciseMonthFill)"
+              isAnimationActive={false}
+            />
+            <ReferenceDot x={peak.label} y={peak.minutes} r={4} fill="#3f6212" stroke="#fff" strokeWidth={1.5} />
+            <ReferenceDot x={low.label} y={low.minutes} r={4} fill="#f97316" stroke="#fff" strokeWidth={1.5} />
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
+      <div className="mt-2 grid grid-cols-3 gap-2 text-center" data-testid="exercise-monthly-summary">
+        <div className="rounded-md bg-lime-50 px-1.5 py-1.5">
+          <p className="text-[10px] font-medium text-lime-800">Peak · {peak.label}</p>
+          <p className="text-sm font-bold text-gray-900">{formatMinutesShort(peak.minutes)}</p>
+        </div>
+        <div className="rounded-md bg-orange-50 px-1.5 py-1.5">
+          <p className="text-[10px] font-medium text-orange-800">Low · {low.label}</p>
+          <p className="text-sm font-bold text-gray-900">{formatMinutesShort(low.minutes)}</p>
+        </div>
+        <div className="rounded-md bg-amber-50 px-1.5 py-1.5">
+          <p className="text-[10px] font-medium text-gray-700">Daily average</p>
+          <p className="text-sm font-bold text-gray-900">{formatMinutesShort(average)}</p>
+        </div>
+      </div>
+      <p className="mt-2 text-xs text-gray-700">
+        Active on {activeDays} of {data.length} days. The low ignores today, since it isn't over yet.
+      </p>
+    </div>
+  );
+}
+
 export function ExerciseMinutesCard({ onConnect }: { onConnect?: () => void }) {
   const [state, setState] = useState<CardState>('loading');
   const [days, setDays] = useState<DayMinutes[]>([]);
   const [todayWorkouts, setTodayWorkouts] = useState<WorkoutSummary | null>(null);
   const [todayRingFromSummary, setTodayRingFromSummary] = useState(0);
   const [allowing, setAllowing] = useState(false);
+  const [monthDays, setMonthDays] = useState<ExerciseDay[]>([]);
   const refreshGenRef = useRef(0);
+  const monthReadAtRef = useRef(0);
+
+  const loadMonth = useCallback(async (force = false) => {
+    if (!force && Date.now() - monthReadAtRef.current < MONTH_REFRESH_MS) return;
+    monthReadAtRef.current = Date.now();
+    const month = await healthKitService.readExerciseRange(MONTH_DAYS);
+    if (month) setMonthDays(month);
+  }, []);
 
   const applyToday = useCallback((ringMinutes: number, workouts: WorkoutSummary) => {
     setTodayRingFromSummary(ringMinutes);
@@ -86,7 +186,7 @@ export function ExerciseMinutesCard({ onConnect }: { onConnect?: () => void }) {
     });
   }, []);
 
-  const refresh = useCallback(async (opts?: { todayOnly?: boolean }) => {
+  const refresh = useCallback(async (opts?: { todayOnly?: boolean; forceMonth?: boolean }) => {
     const gen = ++refreshGenRef.current;
 
     try {
@@ -126,7 +226,10 @@ export function ExerciseMinutesCard({ onConnect }: { onConnect?: () => void }) {
 
       if (opts?.todayOnly) return;
 
-      const history = await healthKitService.readExerciseHistory(7);
+      const [history] = await Promise.all([
+        healthKitService.readExerciseHistory(7),
+        loadMonth(opts?.forceMonth),
+      ]);
       if (gen !== refreshGenRef.current) return;
 
       if (history && history.length > 0) {
@@ -162,12 +265,12 @@ export function ExerciseMinutesCard({ onConnect }: { onConnect?: () => void }) {
         setState((prev) => (prev === 'loading' ? 'disconnected' : prev));
       }
     }
-  }, [applyToday]);
+  }, [applyToday, loadMonth]);
 
   useEffect(() => {
-    void refresh();
+    void refresh({ forceMonth: true });
 
-    const onFullRefresh = () => void refresh();
+    const onFullRefresh = () => void refresh({ forceMonth: true });
     const onLiveRefresh = () => void refresh({ todayOnly: true });
     const onVisibility = () => {
       if (document.visibilityState === 'visible') void refresh();
@@ -378,6 +481,8 @@ export function ExerciseMinutesCard({ onConnect }: { onConnect?: () => void }) {
               {daysOnTarget} of 7 days hit {DAILY_TARGET_MINUTES} minutes
             </p>
           </div>
+
+          {monthDays.length > 0 && <MonthlyActivityChart days={monthDays} />}
         </div>
       )}
     </Card>

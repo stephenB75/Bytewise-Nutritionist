@@ -1,9 +1,15 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
+import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { Activity, Flame, Footprints, HeartPulse, Moon, Sparkles, Zap } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { healthKitService, type AppleFitnessSummary, type SleepSummary } from '@/services/healthKit';
+import {
+  healthKitService,
+  type AppleFitnessSummary,
+  type BloodPressureDay,
+  type SleepSummary,
+} from '@/services/healthKit';
 import { toast } from '@/hooks/use-toast';
 
 type AppleFitnessCardProps = {
@@ -109,11 +115,105 @@ function SleepTile({ sleep }: { sleep: SleepSummary | null }) {
   );
 }
 
+/** American Heart Association categories, from the higher of the two numbers' categories. */
+function bloodPressureCategory(systolic: number, diastolic: number): { label: string; className: string } {
+  if (systolic > 180 || diastolic > 120) return { label: 'Very high', className: 'text-rose-800' };
+  if (systolic >= 140 || diastolic >= 90) return { label: 'High (stage 2)', className: 'text-rose-700' };
+  if (systolic >= 130 || diastolic >= 80) return { label: 'High (stage 1)', className: 'text-orange-700' };
+  if (systolic >= 120) return { label: 'Elevated', className: 'text-amber-700' };
+  return { label: 'Normal', className: 'text-green-700' };
+}
+
+function BloodPressureTile({ days }: { days: BloodPressureDay[] }) {
+  const latest = days[days.length - 1];
+  const category = bloodPressureCategory(latest.systolic, latest.diastolic);
+  const data = days.map((day) => ({
+    ...day,
+    label: day.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+  }));
+  const low = Math.min(...days.map((day) => day.diastolic));
+  const high = Math.max(...days.map((day) => day.systolic));
+
+  return (
+    <div className="rounded-lg bg-white/70 p-3 border border-amber-200/50" data-testid="apple-fitness-blood-pressure">
+      <div className="flex items-start justify-between gap-2 mb-2">
+        <div className="flex items-center gap-1.5 text-xs text-gray-600">
+          <HeartPulse className="h-3.5 w-3.5 text-rose-600" />
+          Blood pressure · last 30 days
+        </div>
+        <div className="text-right">
+          <p className="text-base font-bold text-gray-900 tabular-nums leading-tight">
+            {latest.systolic}/{latest.diastolic}
+            <span className="ml-1 text-[11px] font-medium text-gray-600">mmHg</span>
+          </p>
+          <p className={`text-[11px] font-semibold ${category.className}`}>{category.label}</p>
+        </div>
+      </div>
+      <div className="h-32" aria-label="Blood pressure readings, last 30 days">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={data} margin={{ top: 6, right: 8, bottom: 0, left: 0 }}>
+            <XAxis
+              dataKey="label"
+              tick={{ fontSize: 10, fill: '#374151' }}
+              tickLine={false}
+              axisLine={false}
+              interval="preserveStartEnd"
+              minTickGap={24}
+            />
+            <YAxis
+              domain={[Math.max(0, Math.floor((low - 10) / 10) * 10), Math.ceil((high + 10) / 10) * 10]}
+              tick={{ fontSize: 10, fill: '#374151' }}
+              tickLine={false}
+              axisLine={false}
+              width={32}
+            />
+            <Tooltip
+              formatter={(value: number, name: string) => [`${value} mmHg`, name]}
+              labelFormatter={(label, payload) => {
+                const readings = payload?.[0]?.payload?.readings ?? 0;
+                return readings > 1 ? `${label} · average of ${readings} readings` : label;
+              }}
+              contentStyle={{ fontSize: 12, borderRadius: 8 }}
+            />
+            <Line
+              type="monotone"
+              dataKey="systolic"
+              name="Systolic"
+              stroke="#e11d48"
+              strokeWidth={2}
+              dot={{ r: 2.5 }}
+              isAnimationActive={false}
+            />
+            <Line
+              type="monotone"
+              dataKey="diastolic"
+              name="Diastolic"
+              stroke="#2563eb"
+              strokeWidth={2}
+              dot={{ r: 2.5 }}
+              isAnimationActive={false}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+      <div className="mt-1 flex items-center gap-3 text-[11px] text-gray-700">
+        <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-rose-600" />Systolic (top)</span>
+        <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-blue-600" />Diastolic (bottom)</span>
+      </div>
+      <p className="mt-1 text-[11px] text-gray-600">
+        From readings saved in Apple Health (for example a blood pressure cuff). Days with more than one reading show the average.
+      </p>
+    </div>
+  );
+}
+
 export function AppleFitnessCard({ onConnect }: AppleFitnessCardProps) {
   const [summary, setSummary] = useState<AppleFitnessSummary | null>(null);
   const [connected, setConnected] = useState(false);
   const [available, setAvailable] = useState(false);
   const [needsRecoveryPermission, setNeedsRecoveryPermission] = useState(false);
+  const [needsBloodPressurePermission, setNeedsBloodPressurePermission] = useState(false);
+  const [bloodPressure, setBloodPressure] = useState<BloodPressureDay[]>([]);
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async (opts?: { quiet?: boolean }) => {
@@ -126,11 +226,17 @@ export function AppleFitnessCard({ onConnect }: AppleFitnessCardProps) {
       setAvailable(isAvailable);
       setConnected(isConnected);
       setNeedsRecoveryPermission(healthKitService.needsRecoveryPermission());
+      setNeedsBloodPressurePermission(healthKitService.needsBloodPressurePermission());
       if (isAvailable && isConnected) {
-        const data = await healthKitService.readTodayFitnessSummary();
+        const [data, pressure] = await Promise.all([
+          healthKitService.readTodayFitnessSummary(),
+          healthKitService.readBloodPressureHistory(30),
+        ]);
         setSummary(data);
+        setBloodPressure(pressure);
       } else {
         setSummary(null);
+        setBloodPressure([]);
       }
     } finally {
       if (!opts?.quiet) setLoading(false);
@@ -263,6 +369,26 @@ export function AppleFitnessCard({ onConnect }: AppleFitnessCardProps) {
               </p>
             </>
           )}
+
+          {bloodPressure.length > 0 ? (
+            <BloodPressureTile days={bloodPressure} />
+          ) : needsBloodPressurePermission && !needsRecoveryPermission ? (
+            <div className="rounded-lg bg-white/70 p-3 border border-amber-200/50 space-y-2">
+              <p className="text-sm text-gray-700">
+                Allow Bytewise to read blood pressure from Apple Health to chart your readings here.
+              </p>
+              <Button
+                type="button"
+                size="sm"
+                className="on-color bg-rose-600 hover:bg-rose-700 disabled:opacity-75"
+                onClick={handleConnect}
+                disabled={connecting}
+                data-testid="button-allow-blood-pressure"
+              >
+                {connecting ? 'Opening Apple Health…' : 'Allow blood pressure'}
+              </Button>
+            </div>
+          ) : null}
         </div>
       )}
     </Card>

@@ -57,6 +57,7 @@ import {
   getUserActiveFastingSessionViaSupabase,
   updateFastingSessionViaSupabase,
   completeFastingSessionViaSupabase,
+  fastingOutcome,
   getUserAchievementsViaSupabase,
   createAchievementViaSupabase,
   getUserRecipesViaSupabase,
@@ -156,7 +157,7 @@ export interface IStorage {
   getUserFastingSessions(userId: string): Promise<FastingSession[]>;
   getFastingSession(id: string): Promise<FastingSession | null>;
   updateFastingSession(id: string, updates: Partial<FastingSession>): Promise<FastingSession>;
-  completeFastingSession(id: string): Promise<FastingSession>;
+  completeFastingSession(id: string, endedAt?: Date): Promise<FastingSession>;
   getUserActiveFastingSession(userId: string): Promise<FastingSession | null>;
   getAllUsers(): Promise<User[]>;
   
@@ -1242,22 +1243,25 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async completeFastingSession(id: string): Promise<FastingSession> {
-    const completedAt = new Date();
+  /** Ends a fast. Status is `completed` only when the goal was reached; otherwise `stopped`. */
+  async completeFastingSession(id: string, endedAt: Date = new Date()): Promise<FastingSession> {
     let completed: FastingSession | undefined;
     try {
+      const [existing] = await db.select().from(fastingSessions).where(eq(fastingSessions.id, id));
+      if (!existing) throw new Error('Fasting session not found');
+      const outcome = fastingOutcome(existing.startTime, existing.targetDuration, endedAt);
       [completed] = await db
         .update(fastingSessions)
-        .set({ 
-          status: 'completed',
-          endTime: completedAt,
-          completedAt,
-          actualDuration: sql`${fastingSessions.targetDuration}`
+        .set({
+          status: outcome.status,
+          endTime: endedAt,
+          completedAt: endedAt,
+          actualDuration: outcome.actualDuration,
         })
         .where(eq(fastingSessions.id, id))
         .returning();
     } catch (error) {
-      completed = await completeFastingSessionViaSupabase(id) as any;
+      completed = await completeFastingSessionViaSupabase(id, endedAt) as any;
     }
     
     // Check for fasting achievements
