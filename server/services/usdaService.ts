@@ -3461,7 +3461,7 @@ export class USDAService {
       'cream of wheat': { calories: 56, protein: 1.6, carbs: 11.7, fat: 0.3 },
       'grits': { calories: 71, protein: 1.7, carbs: 15.6, fat: 0.5 },
       'quinoa cereal': { calories: 120, protein: 4.4, carbs: 21.3, fat: 1.9 },
-      'steel cut oats': { calories: 379, protein: 13.2, carbs: 67.7, fat: 6.5 },
+      'steel cut oats': { calories: 71, protein: 2.5, carbs: 12.0, fat: 1.5 },
       
       // Sandwiches and composite meals (per 100g)
       'chicken sandwich': { calories: 250, protein: 15.2, carbs: 25.8, fat: 10.4 },

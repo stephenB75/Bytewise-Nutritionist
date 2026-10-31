@@ -94,7 +94,11 @@ function scaleNutrients(per100g: PackagedNutrients, grams: number): PackagedNutr
   };
 }
 
-/** Energy the macros account for: net carbs at 4 kcal/g (fiber adds ~2), protein 4, fat 9. */
+/**
+ * Range of energy the macros account for (protein 4, fat 9, net carbs 4 kcal/g). Labels count
+ * fiber anywhere from 0 kcal/g (US insoluble fiber) to 4 (fiber left in total carbs), so `low`
+ * uses 0 and `high` uses 4; their midpoint is the usual ~2 kcal/g.
+ */
 function macroCalories(n: PackagedNutrients): { low: number; high: number } {
   const fiber = Math.min(Math.max(n.fiber, 0), Math.max(n.carbs, 0));
   return {
