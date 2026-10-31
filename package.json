@@ -1,7 +1,7 @@
 {
   "name": "rest-express",
-  "version": "1.30.0",
-  "buildNumber": 8,
+  "version": "1.31.0",
+  "buildNumber": 9,
   "type": "module",
   "license": "MIT",
   "scripts": {
