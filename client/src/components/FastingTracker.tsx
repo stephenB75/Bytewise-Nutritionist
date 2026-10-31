@@ -856,7 +856,7 @@ const FastingTracker = React.memo(function FastingTracker() {
   };
 
   return (
-    <div className="space-y-8 pb-24" data-testid="fasting-tracker">
+    <div className="space-y-8 pb-24 lg:pb-0" data-testid="fasting-tracker">
       <div className="flex items-center gap-3 mb-8">
         <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-400 to-purple-500 flex items-center justify-center">
           <Clock className="w-5 h-5 text-white" />
@@ -884,9 +884,9 @@ const FastingTracker = React.memo(function FastingTracker() {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="tracker" className="space-y-8 mt-6">
+        <TabsContent value="tracker" className="space-y-8 mt-6 lg:grid lg:grid-cols-2 lg:items-start lg:gap-8 lg:space-y-0">
           {/* Current Fasting Session */}
-          <Card data-testid="fasting-session-card" className="mb-8 bg-gradient-to-br from-amber-50 to-amber-100 border-none shadow-none">
+          <Card data-testid="fasting-session-card" className="mb-8 bg-gradient-to-br from-amber-50 to-amber-100 border-none shadow-none lg:mb-0">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
@@ -971,12 +971,11 @@ const FastingTracker = React.memo(function FastingTracker() {
             </CardContent>
           </Card>
 
-          <div className="mt-8">
-            <FastingTrendsCard sessions={fastingHistory} />
-          </div>
+          <div className="space-y-8">
+          <FastingTrendsCard sessions={fastingHistory} />
 
           {/* Fasting History */}
-          <Card className="mt-8 bg-gradient-to-br from-amber-50 to-amber-100 border-none shadow-none">
+          <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-none shadow-none">
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center gap-2 text-gray-900">
                 <TrendingUp className="w-5 h-5 text-gray-900" />
@@ -1065,10 +1064,11 @@ const FastingTracker = React.memo(function FastingTracker() {
               )}
             </CardContent>
           </Card>
+          </div>
         </TabsContent>
 
         <TabsContent value="plans" className="space-y-6 mt-6">
-          <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2">
+          <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
             {FASTING_PLANS.map((plan) => (
               <Card 
                 key={plan.id}
@@ -1132,7 +1132,7 @@ const FastingTracker = React.memo(function FastingTracker() {
                 Expert advice to make your fasting journey successful
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-5">
+            <CardContent className="space-y-5 lg:grid lg:grid-cols-2 lg:gap-4 lg:space-y-0">
               {FASTING_TIPS.map((tip, index) => (
                 <div key={index} className="flex items-start gap-3 p-4 bg-amber-100/50 rounded-lg">
                   <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
@@ -1140,7 +1140,7 @@ const FastingTracker = React.memo(function FastingTracker() {
                 </div>
               ))}
               
-              <Alert className="mt-6 bg-amber-100/50 border-none text-gray-900">
+              <Alert className="mt-6 bg-amber-100/50 border-none text-gray-900 lg:col-span-2">
                 <AlertCircle className="h-4 w-4 text-gray-900" />
                 <AlertDescription className="text-gray-900">
                   <strong>Important:</strong> Consult with a healthcare provider before starting any fasting regimen, 

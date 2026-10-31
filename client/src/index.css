@@ -1787,6 +1787,16 @@ div[class*="min-h-screen"]:not([data-testid*="navigation"]):not([data-hero="true
   scroll-padding-bottom: 7rem;
 }
 
+/* Desktop: centered content column below the full-width hero */
+@media (min-width: 1024px) {
+  .content-section {
+    max-width: 80rem;
+    margin-inline: auto;
+    padding-top: 2rem;
+    padding-inline: 2rem;
+  }
+}
+
 /* Soft keyboard: keep focused fields above the keyboard; hide fixed bottom nav while typing */
 html {
   --keyboard-height: 0px;

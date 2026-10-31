@@ -655,6 +655,8 @@ function CalorieCalculator({
         </div>
       )}
 
+      <div className="space-y-6 lg:grid lg:grid-cols-12 lg:items-start lg:gap-6 lg:space-y-0">
+      <div className="space-y-6 lg:col-span-5">
       {/* How to use — steps first so the tools below follow the same order */}
       <Card
         className="p-5 sm:p-6 bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-sm border-amber-200/40 shadow-lg"
@@ -734,7 +736,9 @@ function CalorieCalculator({
       </Card>
 
       <PackagedFoodScanner />
+      </div>
 
+      <div className="space-y-6 lg:col-span-7">
       {/* Main Calculator */}
       <Card className="p-6 bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-sm border-amber-200/40 shadow-lg" data-testid="calorie-calculator">
         <div className="flex items-center gap-3 mb-6">
@@ -1110,6 +1114,8 @@ function CalorieCalculator({
           </div>
         </Card>
       )}
+      </div>
+      </div>
 
       <FastFoodMenu />
     </div>
