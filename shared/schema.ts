@@ -206,7 +206,7 @@ export const fastingSessions = pgTable('fasting_sessions', {
   completedAt: timestamp('completed_at')
 });
 
-// Friends & family connections (see supabase/migrations/008_friends_and_shared_activities.sql)
+// Friends & family connections (see supabase/migrations/20260924004424_friends_and_shared_activities.sql)
 export const friendConnections = pgTable("friend_connections", {
   id: serial("id").primaryKey(),
   requesterId: varchar("requester_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
