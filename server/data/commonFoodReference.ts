@@ -6,6 +6,8 @@
  * label of the leading product) or 'recipe' (a standard build from USDA ingredients).
  */
 
+import { COMMON_FOOD_MICROS, type FoodMicros } from './commonFoodMicros';
+
 type Source = 'usda' | 'label' | 'recipe';
 // calories, protein, carbs, fat, fiber, sugar
 type Macros = [number, number, number, number, number?, number?];
@@ -495,7 +497,7 @@ export interface CommonFoodResult {
   estimatedCalories: number;
   equivalentMeasurement: string;
   note: string;
-  nutritionPer100g: CommonFood['per100g'];
+  nutritionPer100g: CommonFood['per100g'] & Partial<FoodMicros>;
   category: string;
   source: 'reference';
 }
@@ -578,7 +580,7 @@ export function calculateCommonFood(foodText: string, measurement: string): Comm
     estimatedCalories,
     equivalentMeasurement: `100g ≈ ${per100g.calories} cal`,
     note: SOURCE_NOTE[entry.source],
-    nutritionPer100g: per100g,
+    nutritionPer100g: { ...per100g, ...COMMON_FOOD_MICROS[entry.name] },
     category: 'reference',
     source: 'reference',
   };

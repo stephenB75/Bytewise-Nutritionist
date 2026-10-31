@@ -13,6 +13,7 @@ import { findCandyNutrition, calculateCandyNutrition } from '../data/candyNutrit
 import { findEnhancedFood, findEnhancedFoodCovering, type EnhancedFoodEntry } from '../data/enhancedFoodDatabase.js';
 import { getUsdaApiKey } from '../env';
 import { FAST_FOOD_ITEMS, type FastFoodItem } from '@shared/fastFoodMenu';
+import { estimateMenuMicros, estimateMicrosForCalories } from '@shared/menuMicronutrients';
 import { estimateFoodWithAI } from '../foodAiEstimate';
 import { extractUsdaNutrients } from '../data/extractUsdaNutrients';
 import { calculateCommonFood } from '../data/commonFoodReference';
@@ -133,6 +134,17 @@ function findFastFoodItem(query: string, measurement = ''): FastFoodItem | null 
     if (/\b(g|grams?|kg|oz|ounces?|lbs?|pounds?|cups?|ml|tbsp|tablespoons?|tsp|teaspoons?)\b/i.test(measurement)) return null;
   }
   return best.item;
+}
+
+/**
+ * Per-100 g nutrition with micronutrients the source didn't list filled in from the USDA
+ * food-group estimate for this kind of food. Values the source did list are kept.
+ */
+function withEstimatedMicros<T extends { calories: number }>(name: string, per100g: T): T & ReturnType<typeof estimateMicrosForCalories> {
+  const listed = Object.fromEntries(
+    Object.entries(per100g).filter(([, value]) => typeof value === 'number' && Number.isFinite(value)),
+  );
+  return { ...per100g, ...estimateMicrosForCalories(name, per100g.calories), ...listed } as T & ReturnType<typeof estimateMicrosForCalories>;
 }
 
 /** Reads "2", "1/2", "1 1/2" or "2 burgers" as a count of menu items. */
@@ -3075,7 +3087,7 @@ export class USDAService {
       estimatedCalories,
       equivalentMeasurement: `100g ≈ ${per100g.calories} cal`,
       note: entry.note || 'From Bytewise enhanced food database',
-      nutritionPer100g: per100g,
+      nutritionPer100g: withEstimatedMicros(entry.name, per100g),
       enhancedDatabase: true,
       category: entry.category,
       portionInfo: this.validatePortionSize(ingredientName.toLowerCase(), grams, estimatedCalories),
@@ -3105,6 +3117,7 @@ export class USDAService {
         carbs: item.carbs,
         fat: item.fat,
         sodium: item.sodium,
+        ...estimateMenuMicros(item),
       },
       enhancedDatabase: true,
       category: 'fast_food',
@@ -3175,7 +3188,7 @@ export class USDAService {
       estimatedCalories,
       equivalentMeasurement: `100g ≈ ${per100g.calories} cal`,
       note: `AI estimate${estimate.cuisine ? ` · ${estimate.cuisine}` : ''} (not in the food databases)`,
-      nutritionPer100g: per100g,
+      nutritionPer100g: withEstimatedMicros(estimate.name, per100g),
       category: estimate.cuisine,
       source: 'ai' as const,
       portionInfo: this.validatePortionSize(ingredientName.toLowerCase(), grams, estimatedCalories),
@@ -3741,23 +3754,7 @@ export class USDAService {
       const { quantity, unit, gramsEquivalent } = measurementResult;
       const estimatedCalories = Math.round((nutrition.calories * gramsEquivalent) / 100);
       
-      // Add estimated micronutrients to liquid fallback
-      const nutritionWithMicronutrients = {
-        ...nutrition,
-        // Estimate micronutrients for liquids (per 100g/ml)
-        iron: 0.1,
-        calcium: 5,
-        zinc: 0.1,
-        magnesium: 3,
-        vitaminC: 0,
-        vitaminD: 0,
-        vitaminB12: 0,
-        folate: 0,
-        vitaminA: 0,
-        vitaminE: 0,
-        potassium: 50,
-        phosphorus: 10
-      };
+      const nutritionWithMicronutrients = withEstimatedMicros(normalized, nutrition);
       
       // Check for portion size warnings
       const portionInfo = this.validatePortionSize(normalized, gramsEquivalent, estimatedCalories);
@@ -3800,23 +3797,7 @@ export class USDAService {
       const { quantity, unit, gramsEquivalent } = measurementResult;
       const estimatedCalories = Math.round((nutrition.calories * gramsEquivalent) / 100);
 
-      // Add estimated micronutrients based on food category
-      const nutritionWithMicronutrients = {
-        ...nutrition,
-        // Estimate micronutrients based on typical values (per 100g)
-        iron: Math.round((nutrition.protein * 0.1 + 1) * 10) / 10,
-        calcium: Math.round((nutrition.protein * 2 + 20)),
-        zinc: Math.round((nutrition.protein * 0.05 + 0.5) * 10) / 10,
-        magnesium: Math.round((nutrition.carbs * 0.5 + 10)),
-        vitaminC: Math.round((nutrition.carbs * 0.3)),
-        vitaminD: Math.round((nutrition.fat * 0.02) * 10) / 10,
-        vitaminB12: Math.round((nutrition.protein * 0.02) * 10) / 10,
-        folate: Math.round((nutrition.carbs * 0.8 + 5)),
-        vitaminA: Math.round((nutrition.fat * 0.5)),
-        vitaminE: Math.round((nutrition.fat * 0.1) * 10) / 10,
-        potassium: Math.round((nutrition.calories * 1.5)),
-        phosphorus: Math.round((nutrition.protein * 8 + 50))
-      };
+      const nutritionWithMicronutrients = withEstimatedMicros(fallbackKey, nutrition);
       
       // Check for portion size warnings
       const portionInfo = this.validatePortionSize(normalized, gramsEquivalent, estimatedCalories);
@@ -3890,26 +3871,7 @@ export class USDAService {
       baseCalories = 350; protein = 10.0; carbs = 70.0; fat = 2.0;
     }
     
-    // Add estimated micronutrients for generic foods
-    const nutrition = { 
-      calories: baseCalories, 
-      protein, 
-      carbs, 
-      fat,
-      // Generic micronutrient estimates (per 100g)
-      iron: Math.round((protein * 0.08 + 0.8) * 10) / 10,
-      calcium: Math.round((protein * 1.5 + 15)),
-      zinc: Math.round((protein * 0.04 + 0.4) * 10) / 10,
-      magnesium: Math.round((carbs * 0.4 + 8)),
-      vitaminC: Math.round((carbs * 0.2)),
-      vitaminD: Math.round((fat * 0.01) * 10) / 10,
-      vitaminB12: Math.round((protein * 0.01) * 10) / 10,
-      folate: Math.round((carbs * 0.6 + 4)),
-      vitaminA: Math.round((fat * 0.3)),
-      vitaminE: Math.round((fat * 0.08) * 10) / 10,
-      potassium: Math.round((baseCalories * 1.2)),
-      phosphorus: Math.round((protein * 6 + 40))
-    };
+    const nutrition = withEstimatedMicros(normalized, { calories: baseCalories, protein, carbs, fat });
     const mockFood: USDAFood = {
       fdcId: 0,
       description: normalized,

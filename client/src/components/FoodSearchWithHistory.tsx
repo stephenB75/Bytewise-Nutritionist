@@ -36,6 +36,14 @@ interface LoggedFood {
   carbs: number;
   fat: number;
   sugar?: number;
+  iron?: number;
+  calcium?: number;
+  zinc?: number;
+  magnesium?: number;
+  vitaminC?: number;
+  vitaminD?: number;
+  vitaminB12?: number;
+  folate?: number;
   date: string;
   time: string;
   mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack';

@@ -21,7 +21,10 @@ type Nutrients = {
   fiber: number;
   sugar: number;
   sodium: number;
-};
+} & Partial<Record<MicroKey, number>>;
+
+const MICRO_KEYS = ['iron', 'calcium', 'zinc', 'magnesium', 'vitaminC', 'vitaminD', 'vitaminB12', 'folate'] as const;
+type MicroKey = (typeof MICRO_KEYS)[number];
 
 export type PackagedFood = {
   id: string;
@@ -64,7 +67,7 @@ async function fetchSearch(query: string): Promise<PackagedFood[]> {
 
 function scale(n: Nutrients, factor: number): Nutrients {
   const r1 = (v: number) => Math.round(v * factor * 10) / 10;
-  return {
+  const scaled: Nutrients = {
     calories: Math.round(n.calories * factor),
     protein: r1(n.protein),
     carbs: r1(n.carbs),
@@ -73,6 +76,11 @@ function scale(n: Nutrients, factor: number): Nutrients {
     sugar: r1(n.sugar),
     sodium: Math.round(n.sodium * factor),
   };
+  for (const key of MICRO_KEYS) {
+    const value = n[key];
+    if (typeof value === 'number') scaled[key] = Math.round(value * factor * 100) / 100;
+  }
+  return scaled;
 }
 
 function displayName(food: PackagedFood): string {
@@ -271,6 +279,14 @@ function ProductPanel({ food, onClose }: { food: PackagedFood; onClose: () => vo
         totalCarbs: nutrients.carbs,
         totalFat: nutrients.fat,
         totalSugar: nutrients.sugar,
+        iron: nutrients.iron,
+        calcium: nutrients.calcium,
+        zinc: nutrients.zinc,
+        magnesium: nutrients.magnesium,
+        vitaminC: nutrients.vitaminC,
+        vitaminD: nutrients.vitaminD,
+        vitaminB12: nutrients.vitaminB12,
+        folate: nutrients.folate,
       });
       queryClient.invalidateQueries({ queryKey: ['/api/meals/logged'] });
       window.dispatchEvent(new CustomEvent('refresh-weekly-data'));

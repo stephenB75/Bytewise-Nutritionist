@@ -23,6 +23,7 @@ import {
   type FoodCuisine,
   type UsFoodRegion,
 } from '@/data/fastFoodMenu';
+import { estimateMenuMicros } from '@shared/menuMicronutrients';
 import { Check, ChevronLeft, ChevronRight, Loader2, MapPin, Search, Store, X } from 'lucide-react';
 
 /** Culture / style chips — order is browse priority in the Places row. */
@@ -274,6 +275,7 @@ export function FastFoodMenu() {
         totalProtein: item.protein,
         totalCarbs: item.carbs,
         totalFat: item.fat,
+        ...estimateMenuMicros(item),
       });
       queryClient.invalidateQueries({ queryKey: ['/api/meals/logged'] });
       window.dispatchEvent(new CustomEvent('refresh-weekly-data'));

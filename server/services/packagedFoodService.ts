@@ -1,4 +1,5 @@
 import { getUsdaApiKey } from '../env';
+import { estimateMicrosForCalories } from '@shared/menuMicronutrients';
 
 export interface PackagedNutrients {
   calories: number;
@@ -8,7 +9,18 @@ export interface PackagedNutrients {
   fiber: number;
   sugar: number;
   sodium: number; // mg
+  // Micronutrients, when the label lists them: mg, except vitamin D, B12 and folate in µg.
+  iron?: number;
+  calcium?: number;
+  zinc?: number;
+  magnesium?: number;
+  vitaminC?: number;
+  vitaminD?: number;
+  vitaminB12?: number;
+  folate?: number;
 }
+
+const MICRO_KEYS = ['iron', 'calcium', 'zinc', 'magnesium', 'vitaminC', 'vitaminD', 'vitaminB12', 'folate'] as const;
 
 export interface PackagedFood {
   id: string;
@@ -81,9 +93,21 @@ const sameGtin = (a: string, b: string) => a.replace(/^0+/, '') === b.replace(/^
 
 const round1 = (n: number) => Math.round(n * 10) / 10;
 
+const round2 = (n: number) => Math.round(n * 100) / 100;
+
+/** US labels only require calcium, iron and vitamin D (and potassium); estimate the rest for this kind of food. */
+function withMicros(name: string, n: PackagedNutrients): PackagedNutrients {
+  const estimate = estimateMicrosForCalories(name, n.calories);
+  const filled = { ...n };
+  for (const key of MICRO_KEYS) {
+    if (filled[key] === undefined) filled[key] = estimate[key];
+  }
+  return filled;
+}
+
 function scaleNutrients(per100g: PackagedNutrients, grams: number): PackagedNutrients {
   const f = grams / 100;
-  return {
+  const scaled: PackagedNutrients = {
     calories: Math.round(per100g.calories * f),
     protein: round1(per100g.protein * f),
     carbs: round1(per100g.carbs * f),
@@ -92,6 +116,10 @@ function scaleNutrients(per100g: PackagedNutrients, grams: number): PackagedNutr
     sugar: round1(per100g.sugar * f),
     sodium: Math.round(per100g.sodium * f),
   };
+  for (const key of MICRO_KEYS) {
+    if (per100g[key] !== undefined) scaled[key] = round2(per100g[key]! * f);
+  }
+  return scaled;
 }
 
 /**
@@ -192,6 +220,14 @@ const USDA_NUTRIENTS: Record<number, keyof PackagedNutrients> = {
   1079: 'fiber',
   2000: 'sugar',
   1093: 'sodium',
+  1089: 'iron',
+  1087: 'calcium',
+  1095: 'zinc',
+  1090: 'magnesium',
+  1162: 'vitaminC',
+  1114: 'vitaminD',
+  1178: 'vitaminB12',
+  1177: 'folate',
 };
 
 function fromUsda(food: any): PackagedFood | null {
@@ -200,12 +236,20 @@ function fromUsda(food: any): PackagedFood | null {
   for (const nutrient of food.foodNutrients || []) {
     const key = USDA_NUTRIENTS[nutrient.nutrientId];
     if (!key || typeof nutrient.value !== 'number') continue;
-    per100g[key] = key === 'calories' || key === 'sodium' ? Math.round(nutrient.value) : round1(nutrient.value);
+    per100g[key] = key === 'calories' || key === 'sodium' ? Math.round(nutrient.value)
+      : (MICRO_KEYS as readonly string[]).includes(key) ? round2(nutrient.value)
+      : round1(nutrient.value);
     if (key === 'calories') hasCalories = true;
   }
+  // Older branded labels list vitamin D only in IU (40 IU = 1 µg).
+  if (per100g.vitaminD === undefined) {
+    const iu = (food.foodNutrients || []).find((n: any) => n.nutrientId === 1110 && typeof n.value === 'number');
+    if (iu) per100g.vitaminD = round2(iu.value / 40);
+  }
   if (!hasCalories || !food.description) return null;
-  const checked = checkedPer100g(per100g);
-  if (!checked) return null;
+  const valid = checkedPer100g(per100g);
+  if (!valid) return null;
+  const checked = withMicros(String(food.description), valid);
 
   const unit = String(food.servingSizeUnit || '').toLowerCase();
   const grams = typeof food.servingSize === 'number' && food.servingSize >= 1 && ['g', 'grm', 'ml', 'mlt'].includes(unit) ? food.servingSize : null;
@@ -256,6 +300,27 @@ function offNumber(nutriments: any, key: string): number | null {
   return Number.isFinite(value) ? value : null;
 }
 
+// Open Food Facts stores every nutrient in grams.
+const OFF_MICROS: Array<[keyof PackagedNutrients, string, number]> = [
+  ['iron', 'iron', 1000],
+  ['calcium', 'calcium', 1000],
+  ['zinc', 'zinc', 1000],
+  ['magnesium', 'magnesium', 1000],
+  ['vitaminC', 'vitamin-c', 1000],
+  ['vitaminD', 'vitamin-d', 1e6],
+  ['vitaminB12', 'vitamin-b12', 1e6],
+  ['folate', 'vitamin-b9', 1e6],
+];
+
+function offMicros(nutriments: any, suffix: '_100g' | '_serving'): Partial<PackagedNutrients> {
+  const micros: Partial<PackagedNutrients> = {};
+  for (const [key, offKey, factor] of OFF_MICROS) {
+    const grams = offNumber(nutriments, `${offKey}${suffix}`);
+    if (grams !== null && grams >= 0) micros[key] = round2(grams * factor);
+  }
+  return micros;
+}
+
 function fromOpenFoodFacts(product: any, fallbackCode?: string): PackagedFood | null {
   const name = String(product?.product_name_en || product?.product_name || product?.generic_name || '').trim();
   if (!name) return null;
@@ -270,9 +335,11 @@ function fromOpenFoodFacts(product: any, fallbackCode?: string): PackagedFood | 
     fiber: round1(offNumber(n, 'fiber_100g') ?? 0),
     sugar: round1(offNumber(n, 'sugars_100g') ?? 0),
     sodium: Math.round((offNumber(n, 'sodium_100g') ?? 0) * 1000),
+    ...offMicros(n, '_100g'),
   };
-  const per100g = listed100g ? checkedPer100g(listed100g) : null;
-  if (listed100g && !per100g) return null;
+  const valid100g = listed100g ? checkedPer100g(listed100g) : null;
+  if (listed100g && !valid100g) return null;
+  const per100g = valid100g ? withMicros(name, valid100g) : null;
 
   const servingGrams = Number(product.serving_quantity);
   const grams = Number.isFinite(servingGrams) && servingGrams >= 1 ? servingGrams : null;
@@ -290,7 +357,9 @@ function fromOpenFoodFacts(product: any, fallbackCode?: string): PackagedFood | 
         fiber: round1(offNumber(n, 'fiber_serving') ?? 0),
         sugar: round1(offNumber(n, 'sugars_serving') ?? 0),
         sodium: Math.round((offNumber(n, 'sodium_serving') ?? 0) * 1000),
+        ...offMicros(n, '_serving'),
       };
+      perServing = withMicros(name, perServing);
     }
   }
   if (!per100g && !perServing) return null;
