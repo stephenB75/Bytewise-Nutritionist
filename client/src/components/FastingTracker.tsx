@@ -197,7 +197,9 @@ function recordLocalFast(session: FastingSession & { planName?: string }, endedA
     const history = readLocalFastingHistory();
     // The goal timer and End Fast can both fire for one fast; the first recorded end is the real one.
     if (history.some((s: any) => s.status !== 'active' && new Date(s.startTime).getTime() === startMs)) return;
-    const existing = history.filter((s: any) => s.id !== summary.id);
+    const existing = history.filter(
+      (s: any) => s.id !== summary.id && new Date(s.startTime).getTime() !== startMs,
+    );
     localStorage.setItem(FASTING_HISTORY_KEY, JSON.stringify([summary, ...existing].slice(0, 60)));
   } catch {
     // localStorage may be unavailable.
