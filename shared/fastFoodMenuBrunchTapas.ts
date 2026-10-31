@@ -49,7 +49,7 @@ export const BRUNCH_TAPAS_FAST_FOOD_ITEMS: FastFoodItem[] = [
   item('abe-southern-chicken', 'Southern Chicken Sandwich (fried) with Potatoes', 'Another Broken Egg Cafe', 'sandwiches', '1 sandwich + side', 1360, 70, 90, 82, 2590, ['chicken']),
   item('abe-southwest-chop', 'Southwest Chop Salad with Turkey', 'Another Broken Egg Cafe', 'lunch', '1 salad', 920, 37, 42, 72, 1790, ['salad']),
   item('abe-fried-chicken-salad', 'Southern Fried Chicken Salad', 'Another Broken Egg Cafe', 'lunch', '1 salad', 1130, 51, 47, 64, 1876, ['salad', 'chicken']),
-  item('abe-country-potatoes', 'Fresh Country Potatoes', 'Another Broken Egg Cafe', 'snacks', '1 side', 320, 5, 23, 2, 260, ['side', 'potatoes']),
+  item('abe-country-potatoes', 'Fresh Country Potatoes', 'Another Broken Egg Cafe', 'snacks', '1 side', 320, 5, 23, 23, 260, ['side', 'potatoes']),
   item('abe-grits', 'Grits', 'Another Broken Egg Cafe', 'snacks', '1 side', 180, 3, 29, 5, 560, ['side', 'grits']),
   item('abe-city-grits', 'City Grits (bacon Gouda)', 'Another Broken Egg Cafe', 'snacks', '1 side', 460, 11, 12, 41, 850, ['side', 'grits']),
 
@@ -81,7 +81,7 @@ export const BRUNCH_TAPAS_FAST_FOOD_ITEMS: FastFoodItem[] = [
   // ——— The Melting Pot (per-person / ½-order figures) ———
   item('mp-cheddar-fondue', 'Wisconsin Cheddar Cheese Fondue (per person)', 'The Melting Pot', 'dinner', '1 serving', 347, 17, 7, 21, 980, ['fondue', 'cheese']),
   item('mp-alpine-fondue', 'Classic Alpine Cheese Fondue (per person)', 'The Melting Pot', 'dinner', '1 serving', 368, 23, 9, 25, 920, ['fondue', 'cheese']),
-  item('mp-spinach-fondue', 'Spinach Artichoke Cheese Fondue (per person)', 'The Melting Pot', 'dinner', '1 serving', 302, 20, 29, 23, 1100, ['fondue', 'cheese']),
+  item('mp-spinach-fondue', 'Spinach Artichoke Cheese Fondue (per person)', 'The Melting Pot', 'dinner', '1 serving', 302, 20, 29, 12, 1100, ['fondue', 'cheese']),
   item('mp-fiesta-fondue', 'Fiesta Cheese Fondue (per person)', 'The Melting Pot', 'dinner', '1 serving', 332, 17, 9, 21, 1050, ['fondue', 'cheese']),
   item('mp-quattro-fondue', 'Quattro Formaggio Cheese Fondue (per person)', 'The Melting Pot', 'dinner', '1 serving', 374, 22, 10, 26, 980, ['fondue', 'cheese']),
   item('mp-green-goddess', 'Green Goddess Cheddar Fondue (per person)', 'The Melting Pot', 'dinner', '1 serving', 428, 18, 8, 28, 1120, ['fondue', 'cheese']),

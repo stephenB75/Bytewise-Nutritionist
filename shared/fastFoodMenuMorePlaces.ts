@@ -125,7 +125,7 @@ export const MORE_PLACES_FAST_FOOD_ITEMS: FastFoodItem[] = [
   item('logans-grilled-chicken', 'Wood-Grilled Chicken with Roadhouse Rice', "Logan's Roadhouse", 'dinner', '1 entrée', 820, 50, 30, 54, 1860, ['chicken']),
   item('logans-buttermilk-chicken', 'Country Style Buttermilk Chicken with White Gravy', "Logan's Roadhouse", 'dinner', '1 entrée', 1060, 68, 68, 57, 2540, ['chicken']),
   item('logans-tenders', 'Hand-Breaded Chicken Tenders with Honey Mustard', "Logan's Roadhouse", 'dinner', '1 order', 930, 58, 45, 55, 1805, ['tenders', 'chicken']),
-  item('logans-salmon', 'Mesquite Wood-Grilled Salmon with Roadhouse Rice', "Logan's Roadhouse", 'dinner', '1 entrée', 1080, 51, 5, 60, 2013, ['salmon', 'fish']),
+  item('logans-salmon', 'Mesquite Wood-Grilled Salmon with Roadhouse Rice', "Logan's Roadhouse", 'dinner', '1 entrée', 1080, 51, 84, 60, 2013, ['salmon', 'fish']),
   item('logans-pork-chops', 'Mesquite Grilled Pork Chops with Cinnamon Apples', "Logan's Roadhouse", 'dinner', '1 entrée', 930, 68, 34, 56, 1610, ['pork']),
   item('logans-steak-alfredo', "Logan's Steak Alfredo", "Logan's Roadhouse", 'dinner', '1 entrée', 1679, 71, 176, 78, 3164, ['pasta', 'steak']),
   item('logans-cheeseburger', 'All American Cheeseburger (American)', "Logan's Roadhouse", 'sandwiches', '1 burger', 731, 52, 46, 37, 2283, ['burger']),

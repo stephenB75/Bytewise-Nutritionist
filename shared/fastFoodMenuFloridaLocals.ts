@@ -91,7 +91,7 @@ export const FLORIDA_LOCALS_FAST_FOOD_ITEMS: FastFoodItem[] = [
   item('wob-wings-10', 'WOB Chicken Wings (10)', 'World of Beer', 'lunch', '10 wings', 911, 61, 16, 65, 2136, ['wings']),
   item('wob-wings-5', 'WOB Chicken Wings (5)', 'World of Beer', 'snacks', '5 wings', 458, 31, 8, 33, 1074, ['wings']),
   item('wob-boneless', 'Boneless Wings', 'World of Beer', 'lunch', '1 serving', 650, 83, 45, 11, 3694, ['wings']),
-  item('wob-pretzel-cheese', 'German Pretzel with Beer Cheese', 'World of Beer', 'snacks', '1 serving', 1100, 26, 196, 21, 20388, ['pretzel']),
+  item('wob-pretzel-cheese', 'German Pretzel with Beer Cheese', 'World of Beer', 'snacks', '1 serving', 1100, 26, 196, 21, 2039, ['pretzel']),
   item('wob-nachos', 'Beer Cheese Nachos', 'World of Beer', 'snacks', '1 serving', 1252, 37, 157, 51, 2181, ['nachos']),
   item('wob-truffle-fries', 'Parmesan Truffle Fries', 'World of Beer', 'snacks', '1 serving', 1000, 10, 65, 80, 1722, ['fries']),
   item('wob-mac-bites', 'Mac and Cheese Bites', 'World of Beer', 'snacks', '1 serving', 771, 9, 31, 66, 1310, ['mac']),

@@ -55,7 +55,7 @@ export const DESSERT_FAST_FOOD_ITEMS: FastFoodItem[] = [
   // Yogurtland — 4 wt oz (Mar 2026 PDF)
   item('yl-plain-tart', 'Plain Tart Frozen Yogurt (4 oz)', 'Yogurtland', 'snacks', '4 wt oz', 120, 3, 26, 0, 25, ['froyo', 'dessert', 'yogurt']),
   item('yl-strawberry', 'Fresh Strawberry Frozen Yogurt (4 oz)', 'Yogurtland', 'snacks', '4 wt oz', 130, 4, 30, 0, 80, ['froyo', 'dessert']),
-  item('yl-cookies-cream', 'Classic Cookies & Cream (4 oz)', 'Yogurtland', 'snacks', '4 wt oz', 150, 5, 30, 5, 100, ['froyo', 'dessert']),
+  item('yl-cookies-cream', 'Classic Cookies & Cream (4 oz)', 'Yogurtland', 'snacks', '4 wt oz', 150, 5, 30, 2, 100, ['froyo', 'dessert']),
   item('yl-cheesecake', 'Cheesecake Frozen Yogurt (4 oz)', 'Yogurtland', 'snacks', '4 wt oz', 140, 4, 29, 0, 95, ['froyo', 'dessert']),
   item('yl-mango', 'Alphonso Mango Tart (4 oz)', 'Yogurtland', 'snacks', '4 wt oz', 130, 3, 28, 0, 40, ['froyo', 'dessert']),
   item('yl-ube', 'Ube Frozen Yogurt (4 oz)', 'Yogurtland', 'snacks', '4 wt oz', 130, 4, 28, 0, 90, ['froyo', 'dessert']),

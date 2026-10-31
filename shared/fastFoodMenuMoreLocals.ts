@@ -42,7 +42,7 @@ export const MORE_LOCALS_FAST_FOOD_ITEMS: FastFoodItem[] = [
   item('eos-sec', 'Sausage, Egg & Cheddar', 'Earl of Sandwich', 'breakfast', '1 sandwich', 750, 26, 40, 54, 1700, ['breakfast', 'egg']),
   item('eos-mac', 'Mac & Cheese', 'Earl of Sandwich', 'snacks', '1 side', 360, 16, 32, 18, 1120, ['mac']),
   item('eos-tots', 'Tater Tots', 'Earl of Sandwich', 'snacks', '1 side', 350, 3, 43, 19, 1300, ['tots']),
-  item('eos-cookie', 'Chocolate Chip Cookie', 'Earl of Sandwich', 'snacks', '1 cookie', 420, 6, 71, 23, 200, ['dessert', 'cookie']),
+  item('eos-cookie', 'Chocolate Chip Cookie', 'Earl of Sandwich', 'snacks', '1 cookie', 420, 6, 50, 23, 200, ['dessert', 'cookie']),
 
   // ——— Keke's Breakfast Cafe (published menu calories; macros estimated) ———
   item('keke-classic-pancakes', 'Classic Pancakes (3)', "Keke's Breakfast Cafe", 'breakfast', '1 stack', 880, 18, 132, 28, 1680, ['pancakes']),

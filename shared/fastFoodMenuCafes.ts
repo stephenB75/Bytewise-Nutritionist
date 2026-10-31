@@ -33,7 +33,7 @@ export const CAFE_FAST_FOOD_ITEMS: FastFoodItem[] = [
   item('bolay-grilled-chicken', 'Simply Grilled Chicken (protein only)', 'Bolay', 'lunch', '1 serving', 250, 26, 0, 16, 510, ['add-on']),
   item('bolay-steak-protein', 'Signature Steak (protein only)', 'Bolay', 'lunch', '1 serving', 170, 24, 3, 7, 410, ['add-on', 'steak']),
   item('bolay-salmon-protein', 'Roasted Coho Salmon (protein only)', 'Bolay', 'lunch', '1 serving', 241, 25, 2, 15, 380, ['add-on', 'fish']),
-  item('bolay-tofu-protein', 'Miso Glazed Tofu (protein only)', 'Bolay', 'lunch', '1 serving', 139, 12, 2, 6, 420, ['add-on', 'vegetarian']),
+  item('bolay-tofu-protein', 'Miso Glazed Tofu (protein only)', 'Bolay', 'lunch', '1 serving', 139, 12, 2, 9, 420, ['add-on', 'vegetarian']),
   item('bolay-jasmine-rice', 'Jasmine Rice (base)', 'Bolay', 'snacks', '1 base', 225, 5, 40, 5, 315, ['side']),
   item('bolay-pesto-noodles', 'Pesto Noodles (base)', 'Bolay', 'snacks', '1 base', 183, 3, 29, 6, 535, ['side', 'noodles']),
   item('bolay-black-rice', 'Forbidden Black Rice (base)', 'Bolay', 'snacks', '1 base', 160, 5, 24, 5, 430, ['side']),
@@ -84,7 +84,7 @@ export const CAFE_FAST_FOOD_ITEMS: FastFoodItem[] = [
   // Peet's Coffee — small sizes from peets.com
   item('peets-vanilla-latte', 'Vanilla Latte (small)', "Peet's Coffee", 'breakfast', 'small', 240, 11, 37, 5, 150, ['coffee', 'drink']),
   item('peets-iced-vanilla-latte', 'Iced Vanilla Latte (small)', "Peet's Coffee", 'breakfast', 'small', 160, 6, 27, 3, 80, ['coffee', 'drink']),
-  item('peets-skinny-vanilla-latte', 'Skinny Vanilla Latte (small)', "Peet's Coffee", 'breakfast', 'small', 120, 11, 22, 4.5, 150, ['coffee', 'drink']),
+  item('peets-skinny-vanilla-latte', 'Skinny Vanilla Latte (small)', "Peet's Coffee", 'breakfast', 'small', 120, 11, 19, 0, 150, ['coffee', 'drink']),
   item('peets-drip', 'House Blend Coffee (medium)', "Peet's Coffee", 'breakfast', 'medium', 5, 0, 0, 0, 10, ['coffee', 'drink']),
   item('peets-cappuccino', 'Cappuccino (small)', "Peet's Coffee", 'breakfast', 'small', 80, 5, 8, 3, 70, ['coffee', 'drink']),
   item('peets-mocha', 'Caffè Mocha (small)', "Peet's Coffee", 'snacks', 'small', 280, 10, 40, 9, 140, ['coffee', 'drink']),
