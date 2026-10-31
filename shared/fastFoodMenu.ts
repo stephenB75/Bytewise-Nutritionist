@@ -26,6 +26,7 @@ import { FRANCHISE_FAST_FOOD_ITEMS } from './fastFoodMenuFranchises';
 import { NATIONWIDE_FAST_FOOD_ITEMS } from './fastFoodMenuNationwide';
 import { KNOWN_CHAINS_FAST_FOOD_ITEMS } from './fastFoodMenuKnownChains';
 import { REGIONAL_FAVORITES_FAST_FOOD_ITEMS } from './fastFoodMenuRegionalFavorites';
+import { ORLANDO_LOCALS_FAST_FOOD_ITEMS } from './fastFoodMenuOrlandoLocals';
 import {
   ASIAN_RESTAURANTS,
   BAKERY_RESTAURANTS,
@@ -501,14 +502,20 @@ const CORE_FAST_FOOD_ITEMS: FastFoodItem[] = [
   { id: 'sweetgreen-kale-caesar', name: 'Kale Caesar', restaurant: 'Sweetgreen', category: 'lunch', serving: '1 bowl', calories: 430, protein: 30, carbs: 21, fat: 26, sodium: 920, keywords: ['salad'] },
 ];
 
-export const FAST_FOOD_ITEMS: FastFoodItem[] = [...CORE_FAST_FOOD_ITEMS, ...MORE_FAST_FOOD_ITEMS, ...FULL_FAST_FOOD_ITEMS, ...ASIAN_FAST_FOOD_ITEMS, ...CAFE_FAST_FOOD_ITEMS, ...MORE_PLACES_FAST_FOOD_ITEMS, ...CARIBBEAN_FAST_FOOD_ITEMS, ...FLORIDA_FAST_FOOD_ITEMS, ...SOUTHEAST_FAST_FOOD_ITEMS, ...CULTURAL_FAST_FOOD_ITEMS, ...DESSERT_FAST_FOOD_ITEMS, ...CASUAL_MORE_FAST_FOOD_ITEMS, ...STEAKHOUSE_FAST_FOOD_ITEMS, ...BRUNCH_TAPAS_FAST_FOOD_ITEMS, ...BAGEL_FAST_FOOD_ITEMS, ...FLORIDA_LOCALS_FAST_FOOD_ITEMS, ...MORE_LOCALS_FAST_FOOD_ITEMS, ...CASUAL_LOCALS_FAST_FOOD_ITEMS, ...CHAINS_MORE_FAST_FOOD_ITEMS, ...SPANISH_FAST_FOOD_ITEMS, ...FRANCHISE_FAST_FOOD_ITEMS, ...NATIONWIDE_FAST_FOOD_ITEMS, ...KNOWN_CHAINS_FAST_FOOD_ITEMS, ...REGIONAL_FAVORITES_FAST_FOOD_ITEMS];
+export const FAST_FOOD_ITEMS: FastFoodItem[] = [...CORE_FAST_FOOD_ITEMS, ...MORE_FAST_FOOD_ITEMS, ...FULL_FAST_FOOD_ITEMS, ...ASIAN_FAST_FOOD_ITEMS, ...CAFE_FAST_FOOD_ITEMS, ...MORE_PLACES_FAST_FOOD_ITEMS, ...CARIBBEAN_FAST_FOOD_ITEMS, ...FLORIDA_FAST_FOOD_ITEMS, ...SOUTHEAST_FAST_FOOD_ITEMS, ...CULTURAL_FAST_FOOD_ITEMS, ...DESSERT_FAST_FOOD_ITEMS, ...CASUAL_MORE_FAST_FOOD_ITEMS, ...STEAKHOUSE_FAST_FOOD_ITEMS, ...BRUNCH_TAPAS_FAST_FOOD_ITEMS, ...BAGEL_FAST_FOOD_ITEMS, ...FLORIDA_LOCALS_FAST_FOOD_ITEMS, ...MORE_LOCALS_FAST_FOOD_ITEMS, ...CASUAL_LOCALS_FAST_FOOD_ITEMS, ...CHAINS_MORE_FAST_FOOD_ITEMS, ...SPANISH_FAST_FOOD_ITEMS, ...FRANCHISE_FAST_FOOD_ITEMS, ...NATIONWIDE_FAST_FOOD_ITEMS, ...KNOWN_CHAINS_FAST_FOOD_ITEMS, ...REGIONAL_FAVORITES_FAST_FOOD_ITEMS, ...ORLANDO_LOCALS_FAST_FOOD_ITEMS];
 
 export const FAST_FOOD_RESTAURANTS: string[] = Array.from(new Set(FAST_FOOD_ITEMS.map((item) => item.restaurant))).sort(
   (a, b) => a.localeCompare(b)
 );
 
 function normalize(text: string): string {
-  return text.toLowerCase().replace(/[’']/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+  return text
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[’']/g, '')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
 }
 
 function compact(text: string): string {

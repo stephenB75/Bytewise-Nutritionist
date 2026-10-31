@@ -468,6 +468,100 @@ export const REGIONAL_RESTAURANTS: Record<string, UsFoodRegion[]> = {
   "DiBella's Subs": ['northeast', 'midwest'],
   'Port of Subs': ['west', 'southwest'],
   "Razzoo's Cajun Cafe": ['texas'],
+  // Orlando-area independents
+  "Taino's Bakery & Deli": ['florida'],
+  'Panadería El Cafetal': ['florida'],
+  'Cubans on the Run': ['florida'],
+  'Oh! Que Bueno': ['florida'],
+  'Pio Pio Restaurant': ['florida'],
+  'Jerkman BBQ': ['florida'],
+  'The Bakery Cafe': ['florida'],
+  'Fortuna Bakery & Coffee': ['florida'],
+  'The Glass Knife': ['florida'],
+  "Gideon's Bakehouse": ['florida'],
+  "Charlie's Bakery & Creamery": ['florida'],
+  'Buttermilk Bakery': ['florida'],
+  "Sister Honey's": ['florida'],
+  'Sodiê Doces': ['florida'],
+  'Pão Gostoso Bakery': ['florida'],
+  'Amor em Pedaços': ['florida'],
+  'Cafe de Colombia Bakery': ['florida'],
+  'Ticos Bakery': ['florida'],
+  'La Fuente Bakery & Restaurant': ['florida'],
+  'Benjamin French Bakery & Cafe': ['florida'],
+  'iCafe de Paris': ['florida'],
+  'Bagel King': ['florida'],
+  'Yalaha Bakery': ['florida'],
+  'Melao Bakery': ['florida'],
+  'DOMU': ['florida'],
+  'Pho 88': ['florida'],
+  'King Bao': ['florida'],
+  'Sticky Rice Lao Street Food': ['florida'],
+  'Anh Hong': ['florida'],
+  'Saigon Noodle & Grill': ['florida'],
+  'Viet-Nomz': ['florida'],
+  'Paris Banh Mi': ['florida'],
+  'Kabooki Sushi': ['florida'],
+  'Bombay Street Kitchen': ['florida'],
+  'Tabla Indian Restaurant': ['florida'],
+  'Hunger Street Tacos': ['florida'],
+  'Tacos My Guey': ['florida'],
+  "Talkin' Tacos": ['florida'],
+  'Las Carretas': ['florida'],
+  'Agave Azul Cocina Mexicana': ['florida'],
+  'Reyes Mezcaleria': ['florida'],
+  'Pizza Bruno': ['florida'],
+  'SoDough Square': ['florida'],
+  'F&D Woodfired Italian Kitchen': ['florida'],
+  "Nonno's Italian Restaurant": ['florida'],
+  "Francesco's Ristorante & Pizzeria": ['florida'],
+  "Enzo's on the Lake": ['florida'],
+  "Antonio's": ['florida'],
+  "Stasio's Italian Deli & Market": ['florida'],
+  'Turci Pasta': ['florida'],
+  'Prato': ['florida'],
+  'Boteco': ['florida'],
+  "Camila's Brazilian Restaurant": ['florida'],
+  'Cafe Mineiro Brazilian Steakhouse': ['florida'],
+  "Christner's Prime Steak & Lobster": ['florida'],
+  'Kres Chophouse': ['florida'],
+  "Charley's Steak House": ['florida'],
+  'Chicken Fire': ['florida'],
+  'Smokemade Meats + Eats': ['florida'],
+  "Cecil's Texas Style Bar-B-Q": ['florida'],
+  'Yellow Dog Eats': ['florida'],
+  'The Tap Room at Dubsdread': ['florida'],
+  "Maxine's on Shine": ['florida'],
+  'The Ravenous Pig': ['florida'],
+  'The Hangry Bison': ['florida'],
+  'Teak Neighborhood Grill': ['florida'],
+  'Gnarly Barley': ['florida'],
+  'Nona Blue Modern Tavern': ['florida'],
+  'The Osprey Tavern': ['florida'],
+  'Hot Dog Heaven': ['florida'],
+  "High Tide Harry's": ['florida'],
+  'FishBones': ['florida'],
+  'Fish On Fire': ['florida'],
+  "Tibby's New Orleans Kitchen": ['florida'],
+  'Bosphorous Turkish Cuisine': ['florida'],
+  'Cafe Tu Tu Tango': ['florida'],
+  'White Wolf Cafe': ['florida'],
+  'Craft & Common': ['florida'],
+  'Foxtail Coffee Co.': ['florida'],
+  "Kelly's Homemade Ice Cream": ['florida'],
+  'Matcha Cafe Maiko': ['florida'],
+  'Jabal Coffee House': ['florida'],
+  "Pom Pom's Teahouse & Sandwicheria": ['florida'],
+  "Kappy's Subs": ['florida'],
+  "Bad As's Sandwich": ['florida'],
+  'Pickles NY Deli': ['florida'],
+  "Hinckley's Fancy Meats": ['florida'],
+  'Skybird Juicery': ['florida'],
+  'Shakers American Café': ['florida'],
+  "Hollerbach's Willow Tree Café": ['florida'],
+  'The Sanctum Cafe': ['florida'],
+  'Ethos Vegan Kitchen': ['florida'],
+  'Dandelion Communitea Café': ['florida'],
 };
 
 export function regionFromCoords(lat: number, lng: number): UsFoodRegion | null {
@@ -519,6 +613,12 @@ export const CARIBBEAN_RESTAURANTS = [
   'Mecatos Bakery & Cafe',
   'Columbia Restaurant',
   'Earl of Sandwich',
+  "Taino's Bakery & Deli",
+  'Panadería El Cafetal',
+  'Cubans on the Run',
+  'Oh! Que Bueno',
+  'Pio Pio Restaurant',
+  'Jerkman BBQ',
 ] as const;
 
 /**
@@ -591,6 +691,18 @@ export const ASIAN_RESTAURANTS = [
   'KPOT Korean BBQ & Hot Pot',
   'Haidilao Hot Pot',
   'Din Tai Fung',
+  'DOMU',
+  'JINYA Ramen Bar',
+  'Pho 88',
+  'King Bao',
+  'Sticky Rice Lao Street Food',
+  'Anh Hong',
+  'Saigon Noodle & Grill',
+  'Viet-Nomz',
+  'Paris Banh Mi',
+  'Kabooki Sushi',
+  'Bombay Street Kitchen',
+  'Tabla Indian Restaurant',
 ] as const;
 
 export const MEXICAN_RESTAURANTS = [
@@ -634,6 +746,12 @@ export const MEXICAN_RESTAURANTS = [
   "Salsarita's Fresh Mexican Grill",
   'Tacodeli',
   'bartaco',
+  'Hunger Street Tacos',
+  'Tacos My Guey',
+  "Talkin' Tacos",
+  'Las Carretas',
+  'Agave Azul Cocina Mexicana',
+  'Reyes Mezcaleria',
 ] as const;
 
 export const ITALIAN_RESTAURANTS = [
@@ -695,6 +813,16 @@ export const ITALIAN_RESTAURANTS = [
   'Home Run Inn Pizza',
   'Old Chicago Pizza + Taproom',
   "Biaggi's Ristorante Italiano",
+  'Pizza Bruno',
+  'SoDough Square',
+  'F&D Woodfired Italian Kitchen',
+  "Nonno's Italian Restaurant",
+  "Francesco's Ristorante & Pizzeria",
+  "Enzo's on the Lake",
+  "Antonio's",
+  "Stasio's Italian Deli & Market",
+  'Turci Pasta',
+  'Prato',
 ] as const;
 
 export const CHICKEN_RESTAURANTS = [
@@ -738,6 +866,7 @@ export const CHICKEN_RESTAURANTS = [
   'Wings Over',
   'Quaker Steak & Lube',
   'Atomic Wings',
+  'Chicken Fire',
 ] as const;
 
 export const BURGER_RESTAURANTS = [
@@ -822,6 +951,15 @@ export const BURGER_RESTAURANTS = [
   'Rock Bottom Restaurant & Brewery',
   'Gordon Biersch Brewery Restaurant',
   'Punch Bowl Social',
+  'The Tap Room at Dubsdread',
+  "Maxine's on Shine",
+  'The Ravenous Pig',
+  'The Hangry Bison',
+  'Teak Neighborhood Grill',
+  'Gnarly Barley',
+  'Nona Blue Modern Tavern',
+  'The Osprey Tavern',
+  'Hot Dog Heaven',
 ] as const;
 
 export const BBQ_RESTAURANTS = [
@@ -846,6 +984,9 @@ export const BBQ_RESTAURANTS = [
   'Dinosaur Bar-B-Que',
   "Moe's Original Bar B Que",
   "Lucille's Smokehouse Bar-B-Que",
+  'Smokemade Meats + Eats',
+  "Cecil's Texas Style Bar-B-Q",
+  'Yellow Dog Eats',
 ] as const;
 
 export const STEAKHOUSE_RESTAURANTS = [
@@ -876,6 +1017,12 @@ export const STEAKHOUSE_RESTAURANTS = [
   "Eddie Merlot's",
   "Perry's Steakhouse & Grille",
   'Hillstone',
+  'Boteco',
+  "Camila's Brazilian Restaurant",
+  'Cafe Mineiro Brazilian Steakhouse',
+  "Christner's Prime Steak & Lobster",
+  'Kres Chophouse',
+  "Charley's Steak House",
 ] as const;
 
 export const MEDITERRANEAN_RESTAURANTS = [
@@ -899,6 +1046,7 @@ export const MEDITERRANEAN_RESTAURANTS = [
   'Saladworks',
   'Pita Pit',
   'Little Greek Fresh Grill',
+  'Bosphorous Turkish Cuisine',
 ] as const;
 
 /** Spain — tapas / paella (not Mexican or Cuban-Latin). */
@@ -910,6 +1058,7 @@ export const SPANISH_RESTAURANTS = [
   'Boqueria',
   "Santiago's Bodega",
   'Columbia Restaurant',
+  'Cafe Tu Tu Tango',
 ] as const;
 
 export const SEAFOOD_RESTAURANTS = [
@@ -930,6 +1079,10 @@ export const SEAFOOD_RESTAURANTS = [
   "Eddie V's Prime Seafood",
   'Chart House',
   "Razzoo's Cajun Cafe",
+  "High Tide Harry's",
+  'FishBones',
+  'Fish On Fire',
+  "Tibby's New Orleans Kitchen",
 ] as const;
 
 export const CAFE_RESTAURANTS = [
@@ -1089,6 +1242,23 @@ export const CAFE_RESTAURANTS = [
   'Primo Hoagies',
   "DiBella's Subs",
   'Port of Subs',
+  'White Wolf Cafe',
+  'Craft & Common',
+  'Foxtail Coffee Co.',
+  "Kelly's Homemade Ice Cream",
+  'Matcha Cafe Maiko',
+  'Jabal Coffee House',
+  "Pom Pom's Teahouse & Sandwicheria",
+  "Kappy's Subs",
+  "Bad As's Sandwich",
+  'Pickles NY Deli',
+  "Hinckley's Fancy Meats",
+  'Skybird Juicery',
+  'Shakers American Café',
+  "Hollerbach's Willow Tree Café",
+  'The Sanctum Cafe',
+  'Ethos Vegan Kitchen',
+  'Dandelion Communitea Café',
 ] as const;
 
 export const BAKERY_RESTAURANTS = [
@@ -1125,6 +1295,24 @@ export const BAKERY_RESTAURANTS = [
   '85°C Bakery Cafe',
   "LaMar's Donuts",
   'Daylight Donuts',
+  'The Bakery Cafe',
+  'Fortuna Bakery & Coffee',
+  'The Glass Knife',
+  "Gideon's Bakehouse",
+  "Charlie's Bakery & Creamery",
+  'Buttermilk Bakery',
+  "Sister Honey's",
+  'Sodiê Doces',
+  'Pão Gostoso Bakery',
+  'Amor em Pedaços',
+  'Cafe de Colombia Bakery',
+  'Ticos Bakery',
+  'La Fuente Bakery & Restaurant',
+  'Benjamin French Bakery & Cafe',
+  'iCafe de Paris',
+  'Bagel King',
+  'Yalaha Bakery',
+  'Melao Bakery',
 ] as const;
 
 /** Prefer these in the compact popular row when we know the user's region. */
