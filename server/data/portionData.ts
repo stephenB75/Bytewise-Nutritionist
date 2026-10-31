@@ -329,6 +329,11 @@ export function getPortionWeight(foodName: string, measurement: string): number 
     ? normalizedFood
     : findBestFoodKey(normalizedFood, Object.keys(PORTION_WEIGHTS));
   if (!foodKey) return null;
+  // "orange juice" or "apple pie" is a different food than the fruit, with different portion weights.
+  const afterKey = normalizedFood.slice(normalizedFood.lastIndexOf(foodKey) + foodKey.length);
+  if (/\b(juice|bread|pie|cake|chips?|salad|sauce|soup|muffins?|smoothie|milk|butter|jam|jelly|cereal|bars?|cookies?|pudding|shake)\b/.test(afterKey)) {
+    return null;
+  }
   const portions = PORTION_WEIGHTS[foodKey];
   if (!portions) return null;
 

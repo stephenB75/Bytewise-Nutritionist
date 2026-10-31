@@ -15,6 +15,8 @@ import { getUsdaApiKey } from '../env';
 import { FAST_FOOD_ITEMS, type FastFoodItem } from '@shared/fastFoodMenu';
 import { estimateFoodWithAI } from '../foodAiEstimate';
 import { extractUsdaNutrients } from '../data/extractUsdaNutrients';
+import { calculateCommonFood } from '../data/commonFoodReference';
+import { findPackagedFoodMatch, mentionsPackagedBrand } from './packagedFoodService';
 
 function normalizeWords(text: string): string[] {
   return text.toLowerCase().replace(/[’']/g, '').replace(/[^a-z0-9]+/g, ' ').trim().split(' ').filter(Boolean);
@@ -834,6 +836,22 @@ export class USDAService {
         return zeroCalorieResult;
       }
 
+      // Exact everyday foods with real portion weights ("2 eggs", "1 cup grapes") before any fuzzy lookup.
+      const commonFood = calculateCommonFood(ingredientName, measurement);
+      if (commonFood) {
+        this.setMemoryCache(cacheKey, commonFood);
+        return commonFood;
+      }
+
+      // Brand-name groceries use the package label rather than a generic average.
+      if (mentionsPackagedBrand(ingredientName) && !findFastFoodItem(ingredientName)) {
+        const packagedResult = await this.buildPackagedFoodResult(ingredientName, measurement);
+        if (packagedResult) {
+          this.setMemoryCache(cacheKey, packagedResult);
+          return packagedResult;
+        }
+      }
+
       const plateResult = await this.calculatePlate(ingredientName, measurement, options);
       if (plateResult) {
         this.setMemoryCache(cacheKey, plateResult);
@@ -957,6 +975,13 @@ export class USDAService {
       
       return result;
     } catch (error) {
+      // Brand-name products ("clif bar", "doritos cool ranch") from the packaged-food label database.
+      const packagedResult = await this.buildPackagedFoodResult(ingredientName, measurement);
+      if (packagedResult) {
+        this.setMemoryCache(cacheKey, packagedResult);
+        return packagedResult;
+      }
+
       const aiResult = await this.buildAiEstimateResult(ingredientName, measurement, options.clientKey);
       if (aiResult) {
         this.setMemoryCache(cacheKey, aiResult);
@@ -2456,7 +2481,8 @@ export class USDAService {
     const ingredientName = (food.description?.toLowerCase() || '').replace(/[^\w\s]/g, ' ');
 
     // A cup of cooked food weighs far less than 240 g of water (a cup of cooked rice is ~158 g).
-    if (/^(cups?|c)\b/.test(unit) && !/\b(raw|dry|uncooked|flour|milk|cakes?|crackers?|cereal|puffed|krispies)\b/.test(ingredientName)) {
+    // Soups and stews are mostly broth, so they keep the liquid cup weight.
+    if (/^(cups?|c)\b/.test(unit) && !/\b(raw|dry|uncooked|flour|milk|cakes?|crackers?|cereal|puffed|krispies|soups?|stews?|broth|pho|chowder|chili)\b/.test(ingredientName)) {
       const cupGrams = USDAService.COOKED_CUP_GRAMS.find(([pattern]) => pattern.test(ingredientName))?.[1];
       if (cupGrams) {
         return { quantity, unit, gramsEquivalent: Math.round(quantity * cupGrams) };
@@ -3086,6 +3112,57 @@ export class USDAService {
     };
   }
 
+  private async buildPackagedFoodResult(ingredientName: string, measurement: string) {
+    const product = await findPackagedFoodMatch(ingredientName).catch(() => null);
+    if (!product) return null;
+    const name = (product.brand && !product.name.toLowerCase().includes(product.brand.toLowerCase())
+      ? `${product.brand} ${product.name}`
+      : product.name).toUpperCase();
+    const base = { ingredient: name, note: 'From the package nutrition label', category: 'packaged', source: 'packaged' as const };
+
+    const weight = measurement.toLowerCase().match(/(\d+(?:\.\d+)?)\s*(kg|g|grams?|fl\.?\s*oz|oz|ounces?|lbs?|pounds?|ml)\b/);
+    if (weight && product.per100g) {
+      const amount = parseFloat(weight[1]);
+      const unit = weight[2].replace(/\s+/g, '');
+      const factor = unit === 'kg' ? 1000
+        : /^(lb|lbs|pound|pounds)$/.test(unit) ? 453.6
+        : /^fl\.?oz$/.test(unit) ? 29.57
+        : /^(oz|ounce|ounces)$/.test(unit) ? 28.35
+        : 1;
+      const grams = Math.round(amount * factor);
+      return {
+        ...base,
+        measurement: `${measurement} (~${grams}g)`,
+        estimatedCalories: Math.round((product.per100g.calories * grams) / 100),
+        equivalentMeasurement: `100g ≈ ${product.per100g.calories} cal`,
+        nutritionPer100g: product.per100g,
+      };
+    }
+
+    const count = itemCount(measurement);
+    if (product.perServing) {
+      const grams = product.serving.grams ? Math.round(product.serving.grams * count) : null;
+      return {
+        ...base,
+        measurement: `${count} × ${product.serving.label}`,
+        estimatedCalories: Math.round(product.perServing.calories * count),
+        equivalentMeasurement: `${product.serving.label} ≈ ${product.perServing.calories} cal`,
+        // Per-100 g when the serving weight is known; otherwise per serving, which the client
+        // scales by the serving count like menu items.
+        nutritionPer100g: grams && product.per100g ? product.per100g : product.perServing,
+      };
+    }
+
+    const per100g = product.per100g!;
+    return {
+      ...base,
+      measurement: `${count} × 100 g`,
+      estimatedCalories: Math.round(per100g.calories * count),
+      equivalentMeasurement: `100g ≈ ${per100g.calories} cal`,
+      nutritionPer100g: per100g,
+    };
+  }
+
   private async buildAiEstimateResult(ingredientName: string, measurement: string, clientKey?: string) {
     const estimate = await estimateFoodWithAI(ingredientName, measurement, clientKey);
     if (!estimate) return null;
@@ -3380,10 +3457,10 @@ export class USDAService {
       'fiber one': { calories: 267, protein: 13.3, carbs: 86.7, fat: 3.3 },
       'wheaties': { calories: 352, protein: 10.6, carbs: 78.8, fat: 2.4 },
       
-      // Hot cereals
-      'cream of wheat': { calories: 371, protein: 10.7, carbs: 76.1, fat: 1.1 },
-      'grits': { calories: 371, protein: 8.9, carbs: 79.6, fat: 1.2 },
-      'quinoa cereal': { calories: 368, protein: 14.1, carbs: 64.2, fat: 6.1 },
+      // Hot cereals (cooked with water, as served)
+      'cream of wheat': { calories: 56, protein: 1.6, carbs: 11.7, fat: 0.3 },
+      'grits': { calories: 71, protein: 1.7, carbs: 15.6, fat: 0.5 },
+      'quinoa cereal': { calories: 120, protein: 4.4, carbs: 21.3, fat: 1.9 },
       'steel cut oats': { calories: 379, protein: 13.2, carbs: 67.7, fat: 6.5 },
       
       // Sandwiches and composite meals (per 100g)
@@ -3479,49 +3556,53 @@ export class USDAService {
       'lavash': { calories: 275, protein: 9.1, carbs: 55.7, fat: 1.2 },
       'flatbread': { calories: 275, protein: 9.1, carbs: 55.7, fat: 1.2 },
       
-      // Pasta varieties (dry, per 100g)
-      'pasta': { calories: 371, protein: 13.0, carbs: 74.7, fat: 1.5 },
-      'spaghetti': { calories: 371, protein: 13.0, carbs: 74.7, fat: 1.5 },
-      'penne': { calories: 371, protein: 13.0, carbs: 74.7, fat: 1.5 },
-      'rigatoni': { calories: 371, protein: 13.0, carbs: 74.7, fat: 1.5 },
-      'fusilli': { calories: 371, protein: 13.0, carbs: 74.7, fat: 1.5 },
-      'farfalle': { calories: 371, protein: 13.0, carbs: 74.7, fat: 1.5 },
-      'linguine': { calories: 371, protein: 13.0, carbs: 74.7, fat: 1.5 },
-      'fettuccine': { calories: 371, protein: 13.0, carbs: 74.7, fat: 1.5 },
-      'angel hair pasta': { calories: 371, protein: 13.0, carbs: 74.7, fat: 1.5 },
-      'rotini': { calories: 371, protein: 13.0, carbs: 74.7, fat: 1.5 },
-      'shells pasta': { calories: 371, protein: 13.0, carbs: 74.7, fat: 1.5 },
-      'bow tie pasta': { calories: 371, protein: 13.0, carbs: 74.7, fat: 1.5 },
-      'macaroni': { calories: 371, protein: 13.0, carbs: 74.7, fat: 1.5 },
-      'elbows pasta': { calories: 371, protein: 13.0, carbs: 74.7, fat: 1.5 },
-      'orzo': { calories: 371, protein: 13.0, carbs: 74.7, fat: 1.5 },
-      'ziti': { calories: 371, protein: 13.0, carbs: 74.7, fat: 1.5 },
-      'lasagna noodles': { calories: 371, protein: 13.0, carbs: 74.7, fat: 1.5 },
-      
-      // Whole grain pasta
-      'whole wheat pasta': { calories: 348, protein: 14.6, carbs: 71.5, fat: 2.5 },
-      'whole wheat spaghetti': { calories: 348, protein: 14.6, carbs: 71.5, fat: 2.5 },
-      'whole grain pasta': { calories: 348, protein: 14.6, carbs: 71.5, fat: 2.5 },
-      
-      // Specialty pasta
-      'gluten free pasta': { calories: 357, protein: 7.0, carbs: 78.0, fat: 2.0 },
-      'rice pasta': { calories: 364, protein: 7.2, carbs: 80.0, fat: 1.4 },
-      'quinoa pasta': { calories: 357, protein: 14.0, carbs: 71.6, fat: 2.8 },
-      'lentil pasta': { calories: 336, protein: 25.0, carbs: 52.0, fat: 2.0 },
-      'chickpea pasta': { calories: 337, protein: 20.9, carbs: 57.6, fat: 4.2 },
-      
+      // Pasta varieties (cooked, as eaten, per 100g; USDA enriched pasta cooked)
+      'pasta': { calories: 158, protein: 5.8, carbs: 30.9, fat: 0.9 },
+      'spaghetti': { calories: 158, protein: 5.8, carbs: 30.9, fat: 0.9 },
+      'penne': { calories: 158, protein: 5.8, carbs: 30.9, fat: 0.9 },
+      'rigatoni': { calories: 158, protein: 5.8, carbs: 30.9, fat: 0.9 },
+      'fusilli': { calories: 158, protein: 5.8, carbs: 30.9, fat: 0.9 },
+      'farfalle': { calories: 158, protein: 5.8, carbs: 30.9, fat: 0.9 },
+      'linguine': { calories: 158, protein: 5.8, carbs: 30.9, fat: 0.9 },
+      'fettuccine': { calories: 158, protein: 5.8, carbs: 30.9, fat: 0.9 },
+      'angel hair pasta': { calories: 158, protein: 5.8, carbs: 30.9, fat: 0.9 },
+      'rotini': { calories: 158, protein: 5.8, carbs: 30.9, fat: 0.9 },
+      'shells pasta': { calories: 158, protein: 5.8, carbs: 30.9, fat: 0.9 },
+      'bow tie pasta': { calories: 158, protein: 5.8, carbs: 30.9, fat: 0.9 },
+      'macaroni': { calories: 158, protein: 5.8, carbs: 30.9, fat: 0.9 },
+      'elbows pasta': { calories: 158, protein: 5.8, carbs: 30.9, fat: 0.9 },
+      'orzo': { calories: 158, protein: 5.8, carbs: 30.9, fat: 0.9 },
+      'ziti': { calories: 158, protein: 5.8, carbs: 30.9, fat: 0.9 },
+      'lasagna noodles': { calories: 158, protein: 5.8, carbs: 30.9, fat: 0.9 },
+
+      // Whole grain pasta (cooked)
+      'whole wheat pasta': { calories: 149, protein: 6.0, carbs: 29.9, fat: 1.7 },
+      'whole wheat spaghetti': { calories: 149, protein: 6.0, carbs: 29.9, fat: 1.7 },
+      'whole grain pasta': { calories: 149, protein: 6.0, carbs: 29.9, fat: 1.7 },
+
+      // Specialty pasta (cooked)
+      'gluten free pasta': { calories: 126, protein: 2.6, carbs: 27.9, fat: 0.7 },
+      'rice pasta': { calories: 108, protein: 1.8, carbs: 24.0, fat: 0.2 },
+      'quinoa pasta': { calories: 145, protein: 3.5, carbs: 30.0, fat: 1.2 },
+      'lentil pasta': { calories: 145, protein: 10.5, carbs: 23.0, fat: 1.0 },
+      'chickpea pasta': { calories: 145, protein: 8.5, carbs: 22.5, fat: 2.3 },
+
+      // Dry pasta, for people weighing it before cooking
+      'dry pasta': { calories: 371, protein: 13.0, carbs: 74.7, fat: 1.5 },
+      'uncooked pasta': { calories: 371, protein: 13.0, carbs: 74.7, fat: 1.5 },
+
       // Cooked pasta (per 100g)
-      'cooked pasta': { calories: 131, protein: 5.0, carbs: 25.0, fat: 1.1 },
-      'cooked spaghetti': { calories: 131, protein: 5.0, carbs: 25.0, fat: 1.1 },
-      'cooked penne': { calories: 131, protein: 5.0, carbs: 25.0, fat: 1.1 },
-      'cooked whole wheat pasta': { calories: 124, protein: 5.3, carbs: 23.0, fat: 1.4 },
-      
-      // Asian noodles
-      'ramen noodles': { calories: 436, protein: 9.4, carbs: 58.0, fat: 18.0 },
-      'udon noodles': { calories: 270, protein: 8.0, carbs: 52.0, fat: 2.0 },
-      'soba noodles': { calories: 274, protein: 11.0, carbs: 56.0, fat: 1.9 },
-      'rice noodles': { calories: 364, protein: 5.9, carbs: 83.0, fat: 0.6 },
-      'lo mein noodles': { calories: 384, protein: 14.0, carbs: 71.0, fat: 4.4 },
+      'cooked pasta': { calories: 158, protein: 5.8, carbs: 30.9, fat: 0.9 },
+      'cooked spaghetti': { calories: 158, protein: 5.8, carbs: 30.9, fat: 0.9 },
+      'cooked penne': { calories: 158, protein: 5.8, carbs: 30.9, fat: 0.9 },
+      'cooked whole wheat pasta': { calories: 149, protein: 6.0, carbs: 29.9, fat: 1.7 },
+
+      // Asian noodles (cooked)
+      'ramen noodles': { calories: 188, protein: 4.3, carbs: 26.0, fat: 7.2 },
+      'udon noodles': { calories: 105, protein: 2.6, carbs: 21.6, fat: 0.4 },
+      'soba noodles': { calories: 99, protein: 5.1, carbs: 21.4, fat: 0.1 },
+      'rice noodles': { calories: 108, protein: 1.8, carbs: 24.0, fat: 0.2 },
+      'lo mein noodles': { calories: 138, protein: 4.5, carbs: 25.2, fat: 2.1 },
       'pad thai noodles': { calories: 192, protein: 4.6, carbs: 42.2, fat: 0.6 },
       
       // Sodas and carbonated drinks

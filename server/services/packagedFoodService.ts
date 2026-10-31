@@ -20,6 +20,8 @@ export interface PackagedFood {
   per100g: PackagedNutrients | null;
   perServing: PackagedNutrients | null;
   source: 'usda' | 'openfoodfacts';
+  /** Sold in the US (Open Food Facts country tags); USDA Branded products always are. */
+  us?: boolean;
 }
 
 const USDA_BASE = 'https://api.nal.usda.gov/fdc/v1';
@@ -90,6 +92,35 @@ function scaleNutrients(per100g: PackagedNutrients, grams: number): PackagedNutr
     sugar: round1(per100g.sugar * f),
     sodium: Math.round(per100g.sodium * f),
   };
+}
+
+/** Energy the macros account for: net carbs at 4 kcal/g (fiber adds ~2), protein 4, fat 9. */
+function macroCalories(n: PackagedNutrients): { low: number; high: number } {
+  const fiber = Math.min(Math.max(n.fiber, 0), Math.max(n.carbs, 0));
+  return {
+    low: 4 * n.protein + 4 * (n.carbs - fiber) + 9 * n.fat,
+    high: 4 * n.protein + 4 * n.carbs + 9 * n.fat,
+  };
+}
+
+/**
+ * Crowd-sourced and some label data has typos (kJ entered as kcal, a missing decimal point).
+ * Returns the per-100 g values with calories corrected from the macros when the listed
+ * number is impossible, or null when the entry can't be trusted at all.
+ */
+function checkedPer100g(n: PackagedNutrients): PackagedNutrients | null {
+  const values = [n.calories, n.protein, n.carbs, n.fat];
+  if (values.some((v) => !Number.isFinite(v) || v < 0)) return null;
+  const macroGrams = n.protein + n.carbs + n.fat;
+  const macrosValid = macroGrams <= 102 && n.sugar <= n.carbs + 1 && n.fiber <= n.carbs + 1;
+  const { low, high } = macroCalories(n);
+
+  const tooHigh = n.calories > 900;
+  // Alcohol adds calories the macros don't show, so only a reading far *below* the macros is a typo.
+  const tooLow = macrosValid && high >= 60 && n.calories < low * 0.6 - 10;
+  if (!tooHigh && !tooLow) return n;
+  if (!macrosValid || macroGrams === 0) return null;
+  return { ...n, calories: Math.round((low + high) / 2) };
 }
 
 function titleCase(text: string): string {
@@ -169,9 +200,11 @@ function fromUsda(food: any): PackagedFood | null {
     if (key === 'calories') hasCalories = true;
   }
   if (!hasCalories || !food.description) return null;
+  const checked = checkedPer100g(per100g);
+  if (!checked) return null;
 
   const unit = String(food.servingSizeUnit || '').toLowerCase();
-  const grams = typeof food.servingSize === 'number' && ['g', 'grm', 'ml', 'mlt'].includes(unit) ? food.servingSize : null;
+  const grams = typeof food.servingSize === 'number' && food.servingSize >= 1 && ['g', 'grm', 'ml', 'mlt'].includes(unit) ? food.servingSize : null;
   const household = String(food.householdServingFullText || '').trim();
   const label = grams
     ? household ? `${household} (${round1(grams)} ${unit.startsWith('m') ? 'ml' : 'g'})` : `${round1(grams)} ${unit.startsWith('m') ? 'ml' : 'g'}`
@@ -184,9 +217,10 @@ function fromUsda(food: any): PackagedFood | null {
     brand: food.brandName || food.brandOwner ? titleCase(String(food.brandName || food.brandOwner)) : null,
     imageUrl: null,
     serving: { grams, label },
-    per100g,
-    perServing: grams ? scaleNutrients(per100g, grams) : null,
+    per100g: checked,
+    perServing: grams ? scaleNutrients(checked, grams) : null,
     source: 'usda',
+    us: true,
   };
 }
 
@@ -224,7 +258,7 @@ function fromOpenFoodFacts(product: any, fallbackCode?: string): PackagedFood | 
   const n = product.nutriments || {};
 
   const kcal100 = offNumber(n, 'energy-kcal_100g') ?? (offNumber(n, 'energy_100g') !== null ? offNumber(n, 'energy_100g')! / 4.184 : null);
-  const per100g: PackagedNutrients | null = kcal100 === null ? null : {
+  const listed100g: PackagedNutrients | null = kcal100 === null ? null : {
     calories: Math.round(kcal100),
     protein: round1(offNumber(n, 'proteins_100g') ?? 0),
     carbs: round1(offNumber(n, 'carbohydrates_100g') ?? 0),
@@ -233,9 +267,11 @@ function fromOpenFoodFacts(product: any, fallbackCode?: string): PackagedFood | 
     sugar: round1(offNumber(n, 'sugars_100g') ?? 0),
     sodium: Math.round((offNumber(n, 'sodium_100g') ?? 0) * 1000),
   };
+  const per100g = listed100g ? checkedPer100g(listed100g) : null;
+  if (listed100g && !per100g) return null;
 
   const servingGrams = Number(product.serving_quantity);
-  const grams = Number.isFinite(servingGrams) && servingGrams > 0 ? servingGrams : null;
+  const grams = Number.isFinite(servingGrams) && servingGrams >= 1 ? servingGrams : null;
   let perServing: PackagedNutrients | null = null;
   if (per100g && grams) {
     perServing = scaleNutrients(per100g, grams);
@@ -270,12 +306,15 @@ function fromOpenFoodFacts(product: any, fallbackCode?: string): PackagedFood | 
     per100g,
     perServing,
     source: 'openfoodfacts',
+    us: Array.isArray(product.countries_tags) && product.countries_tags.includes('en:united-states'),
   };
 }
 
+const OFF_FIELDS = 'code,product_name,product_name_en,generic_name,brands,nutriments,serving_quantity,serving_size,image_front_small_url,countries_tags';
+
 async function lookupOpenFoodFactsBarcode(candidates: string[]): Promise<PackagedFood | null> {
   for (const code of candidates.slice(0, 3)) {
-    const data = await fetchJson(`${OFF_BASE}/api/v2/product/${code}.json`);
+    const data = await fetchJson(`${OFF_BASE}/api/v2/product/${code}.json?fields=${OFF_FIELDS}`);
     if (data?.status === 1 && data.product) {
       const product = fromOpenFoodFacts(data.product, code);
       if (product) return product;
@@ -291,10 +330,44 @@ async function searchOpenFoodFacts(query: string, pageSize: number): Promise<Pac
     action: 'process',
     json: '1',
     page_size: String(pageSize),
+    fields: OFF_FIELDS,
   });
-    const data = await fetchJson(`${OFF_BASE}/cgi/search.pl?${params}`);
+  const data = await fetchJson(`${OFF_BASE}/cgi/search.pl?${params}`);
   const products = Array.isArray(data?.products) ? data.products : [];
   return products.map((p: any) => fromOpenFoodFacts(p)).filter(Boolean) as PackagedFood[];
+}
+
+// ---------- Ranking ----------
+
+const SEARCH_FILLER = new Set(['a', 'an', 'the', 'of', 'and', 'with', 'my', 'some', 'oz', 'g', 'ml', 'bag', 'can', 'bottle', 'serving', 'pack', 'package', 'box', 'bar', 'one', 'two', 'small', 'large', 'medium', 'big', 'snack', 'size']);
+const stemWord = (word: string) => word.replace(/(ies)$/, 'y').replace(/(es|s)$/, '');
+
+function textWords(text: string): string[] {
+  return text
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase().replace(/[’']/g, '').replace(/[^a-z0-9]+/g, ' ')
+    .trim().split(' ').filter(Boolean);
+}
+
+function queryWords(query: string): string[] {
+  return textWords(query).filter((word) => !SEARCH_FILLER.has(word) && !/^\d+(\.\d+)?$/.test(word)).map(stemWord);
+}
+
+/** Share of the search words found in the brand and product name (0–1). */
+function coverage(food: PackagedFood, words: string[]): number {
+  if (words.length === 0) return 1;
+  const have = textWords(`${food.brand || ''} ${food.name}`).map(stemWord);
+  const joined = have.join('');
+  const found = words.filter((word) => have.some((h) => h === word || (word.length >= 4 && h.startsWith(word))) || joined.includes(word));
+  return found.length / words.length;
+}
+
+function relevance(food: PackagedFood, words: string[]): number {
+  return coverage(food, words) * 10
+    + (food.us ? 3 : 0)
+    + (food.perServing && food.serving.grams ? 2 : 0)
+    + (food.source === 'usda' ? 1 : 0)
+    + (food.imageUrl ? 0.5 : 0);
 }
 
 // ---------- Public API ----------
@@ -328,21 +401,31 @@ export async function searchPackagedFoods(rawQuery: string, limit = 20): Promise
       searchUsdaBranded(term, limit).then((foods) => foods.map(fromUsda).filter(Boolean) as PackagedFood[]),
       searchOpenFoodFacts(term, limit),
     ]);
+    const words = queryWords(term);
     const seen = new Set<string>();
-    const results: PackagedFood[] = [];
     const keyFor = (food: PackagedFood) =>
       food.barcode ? `gtin:${food.barcode.replace(/^0+/, '')}` : `name:${(food.brand || '').toLowerCase()}|${food.name.toLowerCase()}`;
-    // Interleave so both well-known US brands and international products show up near the top.
-    for (let i = 0; i < Math.max(usdaFoods.length, offFoods.length) && results.length < limit; i++) {
+    // Same product listed twice with the same label numbers.
+    const labelKey = (food: PackagedFood) =>
+      `${(food.brand || '').toLowerCase()}|${food.name.toLowerCase()}|${food.perServing?.calories ?? ''}|${food.per100g?.calories ?? ''}`;
+    // Interleave first so ties keep a mix of both sources, then rank.
+    const merged: PackagedFood[] = [];
+    for (let i = 0; i < Math.max(usdaFoods.length, offFoods.length); i++) {
       for (const food of [usdaFoods[i], offFoods[i]]) {
         if (!food) continue;
         const key = keyFor(food);
-        if (seen.has(key)) continue;
+        const label = labelKey(food);
+        if (seen.has(key) || seen.has(label)) continue;
         seen.add(key);
-        results.push(food);
+        seen.add(label);
+        merged.push(food);
       }
     }
-    return results.slice(0, limit);
+    return merged
+      .map((food, index) => ({ food, index, score: relevance(food, words) }))
+      .sort((a, b) => b.score - a.score || a.index - b.index)
+      .map(({ food }) => food)
+      .slice(0, limit);
   };
 
   let final = await run(query);
@@ -353,4 +436,38 @@ export async function searchPackagedFoods(rawQuery: string, limit = 20): Promise
 
   searchCache.set(cacheKey, final, final.length > 0 ? 6 * HOUR : 10 * 60 * 1000);
   return final;
+}
+
+/**
+ * Best packaged product for a typed food ("doritos cool ranch", "clif bar"), only when its
+ * brand and name contain every word the user typed, so loose matches never replace a real estimate.
+ */
+export async function findPackagedFoodMatch(rawQuery: string, timeoutMs = 9000): Promise<PackagedFood | null> {
+  const words = queryWords(rawQuery);
+  if (words.length === 0) return null;
+  const results = await Promise.race([
+    searchPackagedFoods(rawQuery, 15),
+    new Promise<PackagedFood[]>((resolve) => setTimeout(() => resolve([]), timeoutMs)),
+  ]);
+  const matches = results.filter((food) => coverage(food, words) === 1 && (food.perServing || food.per100g));
+  // A real serving size ("1 bar (68 g)") lets counts like "3 oreos" work; a 100 g placeholder doesn't.
+  return matches.find((food) => food.perServing && food.serving.grams && food.serving.grams !== 100) || matches[0] || null;
+}
+
+const PACKAGED_BRANDS = [
+  'doritos', 'cheetos', 'fritos', 'tostitos', 'lays', 'ruffles', 'pringles', 'sun chips', 'sunchips', 'funyuns', 'takis', 'smartfood',
+  'oreo', 'oreos', 'chips ahoy', 'nutter butter', 'ritz', 'triscuit', 'wheat thins', 'cheez it', 'cheezit', 'goldfish', 'belvita',
+  'clif', 'kind bar', 'kind bars', 'quest bar', 'quest bars', 'quest protein', 'rxbar', 'larabar', 'nature valley', 'kirkland', 'pop tarts', 'poptarts',
+  'nutri grain', 'fiber one', 'quaker chewy', 'rice krispies treat', 'rice krispies treats', 'little debbie', 'hostess', 'twinkie', 'twinkies',
+  'chobani', 'fage', 'oikos', 'yoplait', 'dannon', 'activia', 'siggi', 'siggis', 'skippy', 'jif', 'nutella',
+  'snickers', 'kit kat', 'kitkat', 'reeses', 'm ms', 'twix', 'hershey', 'hersheys', 'milky way', 'butterfinger', 'skittles', 'starburst',
+  'red bull', 'monster energy', 'celsius', 'prime hydration', 'bodyarmor', 'body armor', 'vitaminwater', 'premier protein', 'fairlife',
+  'muscle milk', 'core power', 'ensure', 'slim jim', 'hot pockets', 'lean cuisine', 'healthy choice', 'totinos', 'digiorno',
+  'uncrustables', 'lunchables', 'bagel bites', 'eggo', 'kodiak',
+];
+const PACKAGED_BRAND_PATTERN = new RegExp(`\\b(${PACKAGED_BRANDS.map((b) => b.replace(/ /g, '\\s*')).join('|')})\\b`);
+
+/** True when the text names a packaged-food brand ("doritos cool ranch", "chobani"). */
+export function mentionsPackagedBrand(text: string): boolean {
+  return PACKAGED_BRAND_PATTERN.test(textWords(text).join(' '));
 }

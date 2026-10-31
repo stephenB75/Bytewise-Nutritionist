@@ -2766,6 +2766,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <CalorieCalculator 
               onNavigate={onNavigate}
               isCompact={false}
+              meals={weeklyMeals}
             />
           </div>
         </div>

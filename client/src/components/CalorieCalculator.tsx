@@ -35,7 +35,7 @@ import {
   Calendar
 } from 'lucide-react';
 import { FoodSearchWithHistory } from '@/components/FoodSearchWithHistory';
-import { UserFoodSuggestions } from '@/components/UserFoodSuggestions';
+import { UserFoodSuggestions, type UserFood } from '@/components/UserFoodSuggestions';
 import { FastFoodMenu } from '@/components/FastFoodMenu';
 import { PackagedFoodScanner } from '@/components/PackagedFoodScanner';
 import { apiFetch } from '@/lib/apiUrl';
@@ -109,6 +109,8 @@ interface CalorieCalculatorProps {
     category: 'breakfast' | 'lunch' | 'dinner' | 'snack';
   }) => void;
   isCompact?: boolean;
+  /** Saved meals from the account, so Recent Entries includes scans and restaurant picks too. */
+  meals?: UserFood[];
 }
 
 interface LoggedMealData {
@@ -141,7 +143,8 @@ function CalorieCalculator({
   onNavigate, 
   onCaloriesCalculated, 
   onLogToWeekly, 
-  isCompact = false 
+  isCompact = false,
+  meals,
 }: CalorieCalculatorProps) {
   // State management
   const [ingredient, setIngredient] = useState('');
@@ -843,6 +846,7 @@ function CalorieCalculator({
               </p>
             </div>
             <UserFoodSuggestions
+              meals={meals}
               onSelectFood={(food) => {
                 const fields = fieldsFromLoggedFood(food.name);
                 setIngredient(fields.ingredient);
