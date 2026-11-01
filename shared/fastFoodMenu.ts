@@ -28,6 +28,8 @@ import { KNOWN_CHAINS_FAST_FOOD_ITEMS } from './fastFoodMenuKnownChains';
 import { REGIONAL_FAVORITES_FAST_FOOD_ITEMS } from './fastFoodMenuRegionalFavorites';
 import { ORLANDO_LOCALS_FAST_FOOD_ITEMS } from './fastFoodMenuOrlandoLocals';
 import { AMERICAN_ICONS_FAST_FOOD_ITEMS } from './fastFoodMenuAmericanIcons';
+import { ORLANDO_EATS_FAST_FOOD_ITEMS } from './fastFoodMenuOrlandoEats';
+import { ORLANDO_FAVORITES_FAST_FOOD_ITEMS } from './fastFoodMenuOrlandoFavorites';
 import {
   ASIAN_RESTAURANTS,
   BAKERY_RESTAURANTS,
@@ -503,7 +505,7 @@ const CORE_FAST_FOOD_ITEMS: FastFoodItem[] = [
   { id: 'sweetgreen-kale-caesar', name: 'Kale Caesar', restaurant: 'Sweetgreen', category: 'lunch', serving: '1 bowl', calories: 430, protein: 30, carbs: 21, fat: 26, sodium: 920, keywords: ['salad'] },
 ];
 
-export const FAST_FOOD_ITEMS: FastFoodItem[] = [...CORE_FAST_FOOD_ITEMS, ...MORE_FAST_FOOD_ITEMS, ...FULL_FAST_FOOD_ITEMS, ...ASIAN_FAST_FOOD_ITEMS, ...CAFE_FAST_FOOD_ITEMS, ...MORE_PLACES_FAST_FOOD_ITEMS, ...CARIBBEAN_FAST_FOOD_ITEMS, ...FLORIDA_FAST_FOOD_ITEMS, ...SOUTHEAST_FAST_FOOD_ITEMS, ...CULTURAL_FAST_FOOD_ITEMS, ...DESSERT_FAST_FOOD_ITEMS, ...CASUAL_MORE_FAST_FOOD_ITEMS, ...STEAKHOUSE_FAST_FOOD_ITEMS, ...BRUNCH_TAPAS_FAST_FOOD_ITEMS, ...BAGEL_FAST_FOOD_ITEMS, ...FLORIDA_LOCALS_FAST_FOOD_ITEMS, ...MORE_LOCALS_FAST_FOOD_ITEMS, ...CASUAL_LOCALS_FAST_FOOD_ITEMS, ...CHAINS_MORE_FAST_FOOD_ITEMS, ...SPANISH_FAST_FOOD_ITEMS, ...FRANCHISE_FAST_FOOD_ITEMS, ...NATIONWIDE_FAST_FOOD_ITEMS, ...KNOWN_CHAINS_FAST_FOOD_ITEMS, ...REGIONAL_FAVORITES_FAST_FOOD_ITEMS, ...ORLANDO_LOCALS_FAST_FOOD_ITEMS, ...AMERICAN_ICONS_FAST_FOOD_ITEMS];
+export const FAST_FOOD_ITEMS: FastFoodItem[] = [...CORE_FAST_FOOD_ITEMS, ...MORE_FAST_FOOD_ITEMS, ...FULL_FAST_FOOD_ITEMS, ...ASIAN_FAST_FOOD_ITEMS, ...CAFE_FAST_FOOD_ITEMS, ...MORE_PLACES_FAST_FOOD_ITEMS, ...CARIBBEAN_FAST_FOOD_ITEMS, ...FLORIDA_FAST_FOOD_ITEMS, ...SOUTHEAST_FAST_FOOD_ITEMS, ...CULTURAL_FAST_FOOD_ITEMS, ...DESSERT_FAST_FOOD_ITEMS, ...CASUAL_MORE_FAST_FOOD_ITEMS, ...STEAKHOUSE_FAST_FOOD_ITEMS, ...BRUNCH_TAPAS_FAST_FOOD_ITEMS, ...BAGEL_FAST_FOOD_ITEMS, ...FLORIDA_LOCALS_FAST_FOOD_ITEMS, ...MORE_LOCALS_FAST_FOOD_ITEMS, ...CASUAL_LOCALS_FAST_FOOD_ITEMS, ...CHAINS_MORE_FAST_FOOD_ITEMS, ...SPANISH_FAST_FOOD_ITEMS, ...FRANCHISE_FAST_FOOD_ITEMS, ...NATIONWIDE_FAST_FOOD_ITEMS, ...KNOWN_CHAINS_FAST_FOOD_ITEMS, ...REGIONAL_FAVORITES_FAST_FOOD_ITEMS, ...ORLANDO_LOCALS_FAST_FOOD_ITEMS, ...AMERICAN_ICONS_FAST_FOOD_ITEMS, ...ORLANDO_EATS_FAST_FOOD_ITEMS, ...ORLANDO_FAVORITES_FAST_FOOD_ITEMS];
 
 export const FAST_FOOD_RESTAURANTS: string[] = Array.from(new Set(FAST_FOOD_ITEMS.map((item) => item.restaurant))).sort(
   (a, b) => a.localeCompare(b)
@@ -711,6 +713,55 @@ const SEARCH_ALIASES: Record<string, string> = {
   cinnabuns: 'cinnabon',
   cinnabonroll: 'cinnabon',
   cinnamonroll: 'cinnabon',
+  legends: 'legends caribbean shack',
+  legendsresto: 'legends caribbean shack',
+  legendsrestolounge: 'legends caribbean shack',
+  legendsrestoandlounge: 'legends caribbean shack',
+  legendsrestaurant: 'legends caribbean shack',
+  legendsrestaurantbar: 'legends caribbean shack',
+  legendsrestaurantandbar: 'legends caribbean shack',
+  legendsristorante: 'legends caribbean shack',
+  legendsristorantebar: 'legends caribbean shack',
+  legendsristoranteandbar: 'legends caribbean shack',
+  legendsrestorantie: 'legends caribbean shack',
+  legendsrestorantiebar: 'legends caribbean shack',
+  legendsrestorantieandbar: 'legends caribbean shack',
+  legendsbar: 'legends caribbean shack',
+  legendsshack: 'legends caribbean shack',
+  caribbeanshack: 'legends caribbean shack',
+  takocheena: 'tako cheena',
+  gringos: 'gringos locos',
+  shinjung: 'shin jung korean bbq',
+  hamburgermarys: 'hamburger marys',
+  fordsgarage: 'fords garage',
+  olered: 'ole red orlando',
+  roccos: 'roccos tacos tequila bar',
+  roccostacos: 'roccos tacos tequila bar',
+  cubalibre: 'cuba libre restaurant rum bar',
+  johnnysfillinstation: 'johnnys fillin station',
+  littlehaiti: 'little haiti pate kode',
+  bonappetit: 'bon appetit grill',
+  cilantrillo: 'el cilantrillo restaurant',
+  elcilantrillo: 'el cilantrillo restaurant',
+  toritori: 'tori tori',
+  chengdu: 'taste of chengdu',
+  tasteofchengdu: 'taste of chengdu',
+  lamsgarden: 'lams garden',
+  redpanda: 'red panda noodle',
+  koreahouse: 'korea house orlando',
+  banhmiboy: 'banh mi boy',
+  kaikai: 'kai kai bbq dumplings',
+  greekcorner: 'the greek corner',
+  mykonos: 'mykonos authentic greek cuisine',
+  ontheborder: 'on the border',
+  otb: 'on the border',
+  reelfish: 'reel fish coastal kitchen bar',
+  flanigans: 'flanigans seafood bar grill',
+  briarpatch: 'briarpatch restaurant',
+  hamiltons: 'hamiltons kitchen',
+  willieboys: 'willieboys bbq',
+  jeffsbagelrun: 'jeffs bagel run',
+  jadore: 'jadore the french bakery',
 };
 
 function expandSearchQuery(query: string): string {
@@ -729,6 +780,12 @@ function expandSearchQuery(query: string): string {
 function restaurantNameParts(name: string): { norm: string; compact: string; words: string[] } {
   const norm = normalize(name);
   return { norm, compact: compact(name), words: norm.split(' ').filter(Boolean) };
+}
+
+/** Name contains the word from the start of one of its words, so "oxtail" never matches "Foxtail". */
+function nameHasWord(parts: { words: string[] }, word: string): boolean {
+  const target = compact(word);
+  return parts.words.some((_, index) => parts.words.slice(index).join('').startsWith(target));
 }
 
 /** Restaurants whose name is the whole query (or an alias for it). */
@@ -756,7 +813,7 @@ export function matchFastFoodRestaurants(query: string): string[] {
       exact.push(restaurant);
       continue;
     }
-    if (queryWords.length > 0 && queryWords.every((word) => parts.norm.includes(word) || parts.compact.includes(compact(word)))) {
+    if (queryWords.length > 0 && queryWords.every((word) => nameHasWord(parts, word))) {
       named.push(restaurant);
     }
   }
@@ -798,7 +855,7 @@ export function suggestFastFoodRestaurants(query: string, limit = 6): string[] {
       score = 3;
     } else if (parts.words.some((word) => word.startsWith(qNorm) || word.startsWith(expNorm))) {
       score = 2;
-    } else if (qComp.length >= 4 && (parts.norm.includes(qNorm) || parts.norm.includes(expNorm) || parts.compact.includes(qComp) || parts.compact.includes(expComp))) {
+    } else if (qComp.length >= 4 && (nameHasWord(parts, qNorm) || nameHasWord(parts, expNorm))) {
       score = 1;
     }
     if (score) scored.push({ name: restaurant, score });
@@ -813,11 +870,7 @@ function leftoverFoodWords(query: string, restaurants: string[]): string[] {
   const words = Array.from(new Set(expandSearchQuery(query).split(' ').filter((word) => word.length > 1)));
   if (restaurants.length === 0) return words;
   return words.filter((word) => {
-    const compactWord = compact(word);
-    return !restaurants.some((restaurant) => {
-      const parts = restaurantNameParts(restaurant);
-      return parts.norm.includes(word) || parts.compact.includes(compactWord);
-    });
+    return !restaurants.some((restaurant) => nameHasWord(restaurantNameParts(restaurant), word));
   });
 }
 
@@ -847,8 +900,9 @@ export function searchFastFood(
       if (!placeHits.includes(item.restaurant)) return false;
     }
     if (uniqueWords.length === 0) return true;
-    const haystack = normalize([item.name, item.restaurant, item.category, ...(item.keywords || [])].join(' '));
+    const haystack = normalize([item.name, item.category, ...(item.keywords || [])].join(' '));
     const haystackCompact = compact(haystack);
-    return uniqueWords.every((word) => haystack.includes(word) || haystackCompact.includes(compact(word)));
+    const placeParts = restaurantNameParts(item.restaurant);
+    return uniqueWords.every((word) => haystack.includes(word) || haystackCompact.includes(compact(word)) || nameHasWord(placeParts, word));
   });
 }

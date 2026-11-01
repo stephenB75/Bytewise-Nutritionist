@@ -563,6 +563,65 @@ export const REGIONAL_RESTAURANTS: Record<string, UsFoodRegion[]> = {
   'The Sanctum Cafe': ['florida'],
   'Ethos Vegan Kitchen': ['florida'],
   'Dandelion Communitea Café': ['florida'],
+  'Legends Caribbean Shack': ['florida'],
+  'Tako Cheena': ['florida'],
+  'Gringos Locos': ['florida'],
+  'Dixie Dharma': ['florida'],
+  'Graffiti Junktion': ['florida'],
+  'Kai Asian Street Fare': ['florida'],
+  'Shin Jung Korean BBQ': ['florida'],
+  "Hamburger Mary's": ['florida', 'southeast', 'midwest', 'southwest', 'west'],
+  "Beth's Burger Bar": ['florida'],
+  'Swine & Sons': ['florida'],
+  'Ole Red Orlando': ['florida'],
+  'Seito Sushi': ['florida'],
+  "Ford's Garage": ['florida', 'southeast', 'midwest', 'texas'],
+  'Chroma Modern Bar + Kitchen': ['florida'],
+  "Rocco's Tacos & Tequila Bar": ['florida'],
+  'Cuba Libre Restaurant & Rum Bar': ['florida', 'northeast'],
+  "Johnny's Fillin' Station": ['florida'],
+  '340s Caribbean Restaurant': ['florida'],
+  'Belinda Take Out': ['florida'],
+  'Little Haiti Paté Kode': ['florida'],
+  'May Pen Cuisine': ['florida'],
+  Smokehouse876: ['florida'],
+  'Jamaican Me Happy': ['florida'],
+  'Bon Appetit Grill': ['florida'],
+  'Antilles Cuisine': ['florida'],
+  'Flavors of Jamaica': ['florida'],
+  "Annie's Island Breeze": ['florida'],
+  'Virgin Island Thyme': ['florida'],
+  'El Cilantrillo Restaurant': ['florida'],
+  'Pisco Peruvian Gastrobar': ['florida'],
+  'Tori Tori': ['florida'],
+  'Taste of Chengdu': ['florida'],
+  "Lam's Garden": ['florida'],
+  'Red Panda Noodle': ['florida'],
+  Surah: ['florida'],
+  'Bulgogi House': ['florida'],
+  'Korea House Orlando': ['florida'],
+  Lineage: ['florida'],
+  Kaya: ['florida'],
+  'Bánh Mì Boy': ['florida'],
+  UniGirl: ['florida'],
+  'Kai Kai BBQ & Dumplings': ['florida'],
+  'Tamarind Indian Cuisine': ['florida'],
+  'The Greek Corner': ['florida'],
+  'Mykonos Authentic Greek Cuisine': ['florida'],
+  "Theo's Kitchen": ['florida'],
+  'Mediterranean Deli': ['florida'],
+  "Cedar's Restaurant": ['florida'],
+  'Antica Pizzeria and Market': ['florida'],
+  'Don Julio Mexican Kitchen & Tequila Bar': ['florida'],
+  'Reel Fish Coastal Kitchen + Bar': ['florida'],
+  "Flanigan's Seafood Bar & Grill": ['florida'],
+  'Briarpatch Restaurant': ['florida'],
+  "Johnny's Diner": ['florida'],
+  "Hamilton's Kitchen": ['florida'],
+  "Willieboy's BBQ": ['florida'],
+  "Jeff's Bagel Run": ['florida'],
+  "J'adore the French Bakery": ['florida'],
+  'Croissant Gourmet': ['florida'],
   // Regional institutions
   "Katz's Delicatessen": ['northeast'],
   "Joe's Pizza": ['northeast'],
@@ -788,6 +847,21 @@ export const CARIBBEAN_RESTAURANTS = [
   'Versailles Restaurant',
   'La Carreta',
   'Paseo Caribbean Food',
+  'Legends Caribbean Shack',
+  'Cuba Libre Restaurant & Rum Bar',
+  '340s Caribbean Restaurant',
+  'Belinda Take Out',
+  'Little Haiti Paté Kode',
+  'May Pen Cuisine',
+  'Smokehouse876',
+  'Jamaican Me Happy',
+  'Bon Appetit Grill',
+  'Antilles Cuisine',
+  'Flavors of Jamaica',
+  "Annie's Island Breeze",
+  'Virgin Island Thyme',
+  'El Cilantrillo Restaurant',
+  'Pisco Peruvian Gastrobar',
 ] as const;
 
 /**
@@ -876,6 +950,24 @@ export const ASIAN_RESTAURANTS = [
   "Joe's Shanghai",
   'Nom Wah Tea Parlor',
   "Nong's Khao Man Gai",
+  'Legends Caribbean Shack',
+  'Tako Cheena',
+  'Kai Asian Street Fare',
+  'Shin Jung Korean BBQ',
+  'Seito Sushi',
+  'Tori Tori',
+  'Taste of Chengdu',
+  "Lam's Garden",
+  'Red Panda Noodle',
+  'Surah',
+  'Bulgogi House',
+  'Korea House Orlando',
+  'Lineage',
+  'Kaya',
+  'Bánh Mì Boy',
+  'UniGirl',
+  'Kai Kai BBQ & Dumplings',
+  'Tamarind Indian Cuisine',
 ] as const;
 
 export const MEXICAN_RESTAURANTS = [
@@ -941,6 +1033,9 @@ export const MEXICAN_RESTAURANTS = [
   'Veracruz All Natural',
   "Joe T. Garcia's",
   "The Original Ninfa's on Navigation",
+  'Gringos Locos',
+  "Rocco's Tacos & Tequila Bar",
+  'Don Julio Mexican Kitchen & Tequila Bar',
 ] as const;
 
 export const ITALIAN_RESTAURANTS = [
@@ -1024,6 +1119,7 @@ export const ITALIAN_RESTAURANTS = [
   "Valentino's",
   'Golden Boy Pizza',
   'Pizzeria Bianco',
+  'Antica Pizzeria and Market',
 ] as const;
 
 export const CHICKEN_RESTAURANTS = [
@@ -1215,6 +1311,13 @@ export const BURGER_RESTAURANTS = [
   'Ruby Tuesday',
   "Dave & Buster's",
   'Seasons 52',
+  'Graffiti Junktion',
+  "Hamburger Mary's",
+  "Beth's Burger Bar",
+  'Ole Red Orlando',
+  "Ford's Garage",
+  'Chroma Modern Bar + Kitchen',
+  "Johnny's Fillin' Station",
 ] as const;
 
 export const BBQ_RESTAURANTS = [
@@ -1262,6 +1365,8 @@ export const BBQ_RESTAURANTS = [
   "Killen's Barbecue",
   'Truth BBQ',
   'Goode Company Barbeque',
+  "Willieboy's BBQ",
+  'Smokehouse876',
 ] as const;
 
 export const STEAKHOUSE_RESTAURANTS = [
@@ -1326,6 +1431,11 @@ export const MEDITERRANEAN_RESTAURANTS = [
   'Little Greek Fresh Grill',
   'Bosphorous Turkish Cuisine',
   'Zankou Chicken',
+  'The Greek Corner',
+  'Mykonos Authentic Greek Cuisine',
+  "Theo's Kitchen",
+  'Mediterranean Deli',
+  "Cedar's Restaurant",
 ] as const;
 
 /** Spain — tapas / paella (not Mexican or Cuban-Latin). */
@@ -1377,6 +1487,8 @@ export const SEAFOOD_RESTAURANTS = [
   "Giovanni's Shrimp Truck",
   'Ono Seafood',
   "Duke's Waikiki",
+  'Reel Fish Coastal Kitchen + Bar',
+  "Flanigan's Seafood Bar & Grill",
 ] as const;
 
 export const CAFE_RESTAURANTS = [
@@ -1618,6 +1730,9 @@ export const CAFE_RESTAURANTS = [
   'Gold Star Chili',
   "Zippy's",
   "Luby's",
+  'Briarpatch Restaurant',
+  "Johnny's Diner",
+  "Hamilton's Kitchen",
 ] as const;
 
 export const BAKERY_RESTAURANTS = [
@@ -1683,6 +1798,9 @@ export const BAKERY_RESTAURANTS = [
   'Piroshky Piroshky',
   'Blue Star Donuts',
   "Leonard's Bakery",
+  "Jeff's Bagel Run",
+  "J'adore the French Bakery",
+  'Croissant Gourmet',
 ] as const;
 
 /** Prefer these in the compact popular row when we know the user's region. */
