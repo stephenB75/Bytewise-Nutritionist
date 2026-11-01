@@ -38,7 +38,9 @@ import { FoodSearchWithHistory } from '@/components/FoodSearchWithHistory';
 import { UserFoodSuggestions, type UserFood } from '@/components/UserFoodSuggestions';
 import { FastFoodMenu } from '@/components/FastFoodMenu';
 import { PackagedFoodScanner } from '@/components/PackagedFoodScanner';
+import { FoodQualityTags } from '@/components/FoodQualityTags';
 import { apiFetch } from '@/lib/apiUrl';
+import type { FoodQuality } from '@shared/foodQuality';
 
 
 interface IngredientAnalysis {
@@ -69,6 +71,7 @@ interface IngredientAnalysis {
     phosphorus?: number;
   };
   fdaServing?: string;
+  quality?: FoodQuality | null;
   components?: Array<{
     name: string;
     ingredient: string;
@@ -572,6 +575,7 @@ function CalorieCalculator({
                   <div className="flex-1">
                     <p className="font-medium text-gray-900">{analysis.ingredient}</p>
                     <p className="text-sm text-gray-600">{analysis.measurement}</p>
+                    <FoodQualityTags quality={analysis.quality} className="mt-1.5" />
                   </div>
                   <Badge variant="secondary" className="shrink-0 rounded-md bg-orange-100 text-orange-800">
                     <Flame className="w-3 h-3 mr-1" />
@@ -951,6 +955,7 @@ function CalorieCalculator({
                     <p className="text-xs text-orange-100 whitespace-nowrap">Total for this portion</p>
                   </div>
                 </div>
+                <FoodQualityTags quality={analysis.quality} className="-mt-2 mb-4" />
 
                 {/* Portion Warning Display */}
                 {(() => {

@@ -11,6 +11,8 @@ import { logMeal } from '@/lib/mealsApi';
 import { authFetch, queryClient } from '@/lib/queryClient';
 import { getLocalDateKey } from '@/utils/dateUtils';
 import { mealTypeForNow, type MealType } from '@/components/UserFoodSuggestions';
+import { FoodQualityTags, UpfMarker } from '@/components/FoodQualityTags';
+import type { FoodQuality } from '@shared/foodQuality';
 import { Keyboard, Loader2, Minus, Package, Plus, ScanBarcode, Search, X } from 'lucide-react';
 
 type Nutrients = {
@@ -36,6 +38,8 @@ export type PackagedFood = {
   per100g: Nutrients | null;
   perServing: Nutrients | null;
   source: 'usda' | 'openfoodfacts';
+  ingredients?: string | null;
+  quality?: FoodQuality | null;
 };
 
 const MEAL_TYPES: MealType[] = ['breakfast', 'lunch', 'dinner', 'snack'];
@@ -332,6 +336,8 @@ function ProductPanel({ food, onClose }: { food: PackagedFood; onClose: () => vo
         </button>
       </div>
 
+      <FoodQualityTags quality={food.quality} ingredients={food.ingredients} className="mt-3" />
+
       {hasServing && food.per100g && (
         <div className="mt-4 flex gap-1.5" role="radiogroup" aria-label="Amount type">
           {(['servings', 'grams'] as const).map((m) => (
@@ -589,7 +595,10 @@ export function PackagedFoodScanner() {
                     </div>
                   )}
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-gray-950">{food.name}</p>
+                    <div className="flex items-center gap-1.5">
+                      <p className="truncate text-sm font-medium text-gray-950">{food.name}</p>
+                      <UpfMarker quality={food.quality} />
+                    </div>
                     <p className="truncate text-xs text-gray-600">
                       {[food.brand, servingCalories(food)].filter(Boolean).join(' · ')}
                     </p>

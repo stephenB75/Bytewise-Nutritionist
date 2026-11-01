@@ -1,5 +1,6 @@
 import { getUsdaApiKey } from '../env';
 import { estimateMicrosForCalories } from '@shared/menuMicronutrients';
+import { assessFoodQuality, mergeFoodQuality, type FoodQuality } from '@shared/foodQuality';
 
 export interface PackagedNutrients {
   calories: number;
@@ -34,6 +35,8 @@ export interface PackagedFood {
   source: 'usda' | 'openfoodfacts';
   /** Sold in the US (Open Food Facts country tags); USDA Branded products always are. */
   us?: boolean;
+  ingredients: string | null;
+  quality: FoodQuality | null;
 }
 
 const USDA_BASE = 'https://api.nal.usda.gov/fdc/v1';
@@ -257,11 +260,13 @@ function fromUsda(food: any): PackagedFood | null {
   const label = grams
     ? household ? `${household} (${round1(grams)} ${unit.startsWith('m') ? 'ml' : 'g'})` : `${round1(grams)} ${unit.startsWith('m') ? 'ml' : 'g'}`
     : household || '100 g';
+  const name = titleCase(String(food.description).trim());
+  const ingredients = String(food.ingredients || '').trim() || null;
 
   return {
     id: `usda:${food.fdcId}`,
     barcode: food.gtinUpc || null,
-    name: titleCase(String(food.description).trim()),
+    name,
     brand: food.brandName || food.brandOwner ? titleCase(String(food.brandName || food.brandOwner)) : null,
     imageUrl: null,
     serving: { grams, label },
@@ -269,6 +274,8 @@ function fromUsda(food: any): PackagedFood | null {
     perServing: grams ? scaleNutrients(checked, grams) : null,
     source: 'usda',
     us: true,
+    ingredients,
+    quality: assessFoodQuality({ name, ingredients }),
   };
 }
 
@@ -366,6 +373,7 @@ function fromOpenFoodFacts(product: any, fallbackCode?: string): PackagedFood | 
 
   const code = String(product.code || fallbackCode || '') || null;
   const brand = String(product.brands || '').split(',')[0]?.trim() || null;
+  const ingredients = String(product.ingredients_text_en || product.ingredients_text || '').trim() || null;
   return {
     id: `off:${code || name}`,
     barcode: code,
@@ -380,10 +388,18 @@ function fromOpenFoodFacts(product: any, fallbackCode?: string): PackagedFood | 
     perServing,
     source: 'openfoodfacts',
     us: Array.isArray(product.countries_tags) && product.countries_tags.includes('en:united-states'),
+    ingredients,
+    quality: assessFoodQuality({
+      name,
+      ingredients,
+      novaGroup: Number(product.nova_group) || null,
+      additiveTags: Array.isArray(product.additives_tags) ? product.additives_tags : null,
+      labelTags: Array.isArray(product.labels_tags) ? product.labels_tags : null,
+    }),
   };
 }
 
-const OFF_FIELDS = 'code,product_name,product_name_en,generic_name,brands,nutriments,serving_quantity,serving_size,image_front_small_url,countries_tags';
+const OFF_FIELDS = 'code,product_name,product_name_en,generic_name,brands,nutriments,serving_quantity,serving_size,image_front_small_url,countries_tags,nova_group,additives_tags,labels_tags,ingredients_text_en,ingredients_text';
 
 async function lookupOpenFoodFactsBarcode(candidates: string[]): Promise<PackagedFood | null> {
   for (const code of candidates.slice(0, 3)) {
@@ -455,7 +471,13 @@ export async function lookupBarcode(candidates: string[]): Promise<PackagedFood 
   const [usda, off] = await Promise.all([lookupUsdaBarcode(candidates), lookupOpenFoodFactsBarcode(candidates)]);
   let product = usda || off;
   if (usda && off) {
-    product = { ...usda, imageUrl: off.imageUrl, brand: usda.brand || off.brand };
+    product = {
+      ...usda,
+      imageUrl: off.imageUrl,
+      brand: usda.brand || off.brand,
+      ingredients: usda.ingredients || off.ingredients,
+      quality: mergeFoodQuality([usda.quality, off.quality]),
+    };
   }
 
   barcodeCache.set(cacheKey, product, product ? 24 * HOUR : HOUR);

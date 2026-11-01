@@ -18,6 +18,7 @@ import { estimateFoodWithAI } from '../foodAiEstimate';
 import { extractUsdaNutrients } from '../data/extractUsdaNutrients';
 import { calculateCommonFood } from '../data/commonFoodReference';
 import { findPackagedFoodMatch, mentionsPackagedBrand } from './packagedFoodService';
+import { assessFoodQuality, mergeFoodQuality, type FoodQuality } from '@shared/foodQuality';
 
 function normalizeWords(text: string): string[] {
   return text.toLowerCase().replace(/[’']/g, '').replace(/[^a-z0-9]+/g, ' ').trim().split(' ').filter(Boolean);
@@ -184,6 +185,45 @@ export interface PlateComponent {
   measurement: string;
   estimatedCalories: number;
   note?: string;
+}
+
+export interface IngredientCalorieResult {
+  ingredient: string;
+  measurement: string;
+  estimatedCalories: number;
+  equivalentMeasurement?: string;
+  note?: string;
+  nutritionPer100g?: {
+    calories: number;
+    protein: number;
+    carbs: number;
+    fat: number;
+    // Micronutrients
+    iron?: number;
+    calcium?: number;
+    zinc?: number;
+    magnesium?: number;
+    vitaminC?: number;
+    vitaminD?: number;
+    vitaminB12?: number;
+    folate?: number;
+    vitaminA?: number;
+    vitaminE?: number;
+    potassium?: number;
+    phosphorus?: number;
+  };
+  fdaServing?: string;
+  enhancedDatabase?: boolean;
+  category?: string;
+  components?: PlateComponent[];
+  portionInfo?: {
+    isRealistic?: boolean;
+    warning?: string;
+    suggestion?: string;
+    recommendedServing?: string;
+    recommendedCalories?: number;
+  };
+  quality?: FoodQuality | null;
 }
 
 const PLATE_FILLER_WORDS = new Set(['a', 'an', 'the', 'my', 'some', 'of', 'plate', 'bowl', 'order', 'serving', 'side', 'homemade']);
@@ -754,49 +794,23 @@ export class USDAService {
   }
 
   /**
-   * Calculate calories for ingredient with measurement
+   * Calculate calories for ingredient with measurement, tagged with processing level, GMO status and additives
    */
   async calculateIngredientCalories(
     ingredientName: string,
     measurement: string,
     options: { clientKey?: string } = {}
-  ): Promise<{
-    ingredient: string;
-    measurement: string;
-    estimatedCalories: number;
-    equivalentMeasurement?: string;
-    note?: string;
-    nutritionPer100g?: {
-      calories: number;
-      protein: number;
-      carbs: number;
-      fat: number;
-      // Micronutrients
-      iron?: number;
-      calcium?: number;
-      zinc?: number;
-      magnesium?: number;
-      vitaminC?: number;
-      vitaminD?: number;
-      vitaminB12?: number;
-      folate?: number;
-      vitaminA?: number;
-      vitaminE?: number;
-      potassium?: number;
-      phosphorus?: number;
-    };
-    fdaServing?: string;
-    enhancedDatabase?: boolean;
-    category?: string;
-    components?: PlateComponent[];
-    portionInfo?: {
-      isRealistic?: boolean;
-      warning?: string;
-      suggestion?: string;
-      recommendedServing?: string;
-      recommendedCalories?: number;
-    };
-  }> {
+  ): Promise<IngredientCalorieResult & { quality: FoodQuality | null }> {
+    const result = await this.computeIngredientCalories(ingredientName, measurement, options);
+    if (result.quality !== undefined) return { ...result, quality: result.quality };
+    return { ...result, quality: assessFoodQuality({ name: ingredientName }) };
+  }
+
+  private async computeIngredientCalories(
+    ingredientName: string,
+    measurement: string,
+    options: { clientKey?: string } = {}
+  ): Promise<IngredientCalorieResult> {
     const split = splitQuantityFromFood(ingredientName, measurement);
     ingredientName = split.food;
     measurement = split.measurement;
@@ -3131,7 +3145,13 @@ export class USDAService {
     const name = (product.brand && !product.name.toLowerCase().includes(product.brand.toLowerCase())
       ? `${product.brand} ${product.name}`
       : product.name).toUpperCase();
-    const base = { ingredient: name, note: 'From the package nutrition label', category: 'packaged', source: 'packaged' as const };
+    const base = {
+      ingredient: name,
+      note: 'From the package nutrition label',
+      category: 'packaged',
+      source: 'packaged' as const,
+      quality: product.quality ?? assessFoodQuality({ name: product.name, ingredients: product.ingredients }),
+    };
 
     const weight = measurement.toLowerCase().match(/(\d+(?:\.\d+)?)\s*(kg|g|grams?|fl\.?\s*oz|oz|ounces?|lbs?|pounds?|ml)\b/);
     if (weight && product.per100g) {
@@ -3273,6 +3293,7 @@ export class USDAService {
       nutritionPer100g,
       category: 'plate',
       source: 'plate' as const,
+      quality: mergeFoodQuality(results.map((result) => result.quality)),
       components: results.map((result, index): PlateComponent => ({
         name: names[index],
         ingredient: result.ingredient,

@@ -23,6 +23,8 @@ import {
   type FoodCuisine,
   type UsFoodRegion,
 } from '@/data/fastFoodMenu';
+import { UpfMarker } from '@/components/FoodQualityTags';
+import { assessFoodQuality, type FoodQuality } from '@shared/foodQuality';
 import { estimateMenuMicros } from '@shared/menuMicronutrients';
 import { Check, ChevronLeft, ChevronRight, Loader2, MapPin, Search, Store, X } from 'lucide-react';
 
@@ -44,6 +46,16 @@ const PLACE_CUISINE_ORDER: FoodCuisine[] = [
 ];
 
 const ADDED_CONFIRMATION_MS = 2500;
+
+const qualityCache = new Map<string, FoodQuality>();
+function itemQuality(item: FastFoodItem): FoodQuality {
+  let quality = qualityCache.get(item.id);
+  if (!quality) {
+    quality = assessFoodQuality({ name: item.name });
+    qualityCache.set(item.id, quality);
+  }
+  return quality;
+}
 
 function calorieTone(calories: number) {
   if (calories < 400) return { color: '#059669', wash: 'bg-emerald-100' };
@@ -626,13 +638,16 @@ export function FastFoodMenu() {
                   {!activePlace && (
                     <p className="truncate text-[9px] font-medium leading-tight text-[#1f4aa6]">{item.restaurant}</p>
                   )}
-                  <p
-                    className="mt-0.5 bg-inherit text-[16px] font-bold leading-none tabular-nums"
-                    style={{ color: added ? '#15803d' : tone.color }}
-                  >
-                    {item.calories}
-                    <span className="ml-0.5 text-[9px] font-semibold uppercase tracking-wide">cal</span>
-                  </p>
+                  <div className="mt-0.5 flex items-center justify-between gap-1">
+                    <p
+                      className="bg-inherit text-[16px] font-bold leading-none tabular-nums"
+                      style={{ color: added ? '#15803d' : tone.color }}
+                    >
+                      {item.calories}
+                      <span className="ml-0.5 text-[9px] font-semibold uppercase tracking-wide">cal</span>
+                    </p>
+                    <UpfMarker quality={itemQuality(item)} />
+                  </div>
                   <p className="mt-0.5 truncate text-[9px] leading-tight text-gray-600">
                     {added ? (
                       <span className="inline-flex items-center gap-0.5 font-semibold text-green-700">
