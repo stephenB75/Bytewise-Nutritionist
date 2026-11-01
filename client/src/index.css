@@ -1733,7 +1733,8 @@ div[class*="min-h-screen"]:not([data-testid*="navigation"]):not([data-hero="true
 @media screen and (max-width: 767px) {
   .app-notification-anchor {
     /* Clear status bar / Dynamic Island when safe-area env is unavailable */
-    top: max(calc(env(safe-area-inset-top, 0px) + 0.5rem), 2.75rem);
+    --notification-bell-top: max(calc(env(safe-area-inset-top, 0px) + 0.5rem), 2.75rem);
+    top: var(--notification-bell-top);
   }
 }
 
@@ -1741,10 +1742,10 @@ div[class*="min-h-screen"]:not([data-testid*="navigation"]):not([data-hero="true
   pointer-events: auto;
 }
 
-/* Phones: full width just below the bell, which itself sits under the Dynamic Island */
+/* Phones: full width, pinned 2.5rem (bell height + gap) below the fixed bell */
 .app-notification-panel {
   position: fixed;
-  top: max(calc(env(safe-area-inset-top, 0px) + 3rem), 5.25rem);
+  top: calc(var(--notification-bell-top) + 2.5rem);
   left: calc(env(safe-area-inset-left, 0px) + 0.5rem);
   right: calc(env(safe-area-inset-right, 0px) + 0.5rem);
 }
