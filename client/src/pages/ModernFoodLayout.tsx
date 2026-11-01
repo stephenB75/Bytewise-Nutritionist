@@ -1670,10 +1670,10 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <h2 className="text-xl font-semibold text-gray-900 sm:text-2xl md:text-3xl">Today's Progress</h2>
           </div>
 
-          <section data-testid="daily-cards" className="mb-4 space-y-4 lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-6 lg:gap-y-4 lg:space-y-0">
+          <section data-testid="daily-cards" className="mb-4 space-y-4 lg:grid lg:grid-cols-2 lg:gap-x-6 lg:gap-y-4 lg:space-y-0">
             <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-600 lg:col-span-2">Daily</h3>
           {/* Daily Progress — prefer the larger of server stats vs today’s meal sum */}
-          <div data-testid="daily-progress" className="lg:col-start-1">
+          <div data-testid="daily-progress" className="lg:col-span-2">
             {(() => {
               const mealsCal = loggedMeals.reduce(
                 (sum, meal) => sum + (Number(meal.totalCalories) || Number(meal.calories) || 0),
@@ -1719,7 +1719,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           </div>
 
           {/* Water Consumption */}
-          <div data-testid="water-consumption-card" className="lg:col-start-2 lg:row-span-2 lg:row-start-2">
+          <div data-testid="water-consumption-card" className="lg:[&>*]:h-full">
             <WaterCard
               glasses={Math.max(dailyStats?.waterGlasses ?? 0, readLocalWaterGlasses())}
               onIncrement={(glasses, containerOz) => updateWaterConsumption(glasses, containerOz)}
@@ -1728,7 +1728,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           </div>
 
           {/* Micronutrients Section */}
-          <div className="lg:col-start-1">
+          <div>
             <h3 className="text-lg font-bold text-gray-900 mb-3 flex items-center">
               <span className="w-2 h-2 bg-cyan-400 rounded-full mr-2"></span>
               Essential Micronutrients
@@ -1748,8 +1748,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           </div>
           </section>
 
-          <section data-testid="weekly-cards" className="mb-4 space-y-4 lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-6 lg:gap-y-4 lg:space-y-0">
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-600 lg:col-span-2">Weekly</h3>
+          <section data-testid="weekly-cards" className="mb-4 space-y-4">
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-600">Weekly</h3>
           {/* Weekly Progress */}
           <div>
             <ProgressCard
@@ -1778,7 +1778,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           {/* Weekly macros — accumulate Sun–Sat; reset only when the calendar week rolls */}
           <div data-testid="weekly-macros">
             <h3 className="text-sm font-semibold text-gray-800 mb-2">Macros this week</h3>
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-2">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
               {([
                 {
                   name: 'Protein',
@@ -1822,12 +1822,12 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <NutritionTrendsCard meals={weeklyMeals} calorieGoal={goalCalories} />
           </section>
 
-          <div className="mb-4 space-y-4 lg:grid lg:grid-cols-2 lg:items-start lg:gap-6 lg:space-y-0">
+          <div className="mb-4 space-y-4 lg:grid lg:grid-cols-2 lg:gap-6 lg:space-y-0">
           <div className="lg:col-span-2">
             <FastingStatusCard fastingStatus={fastingStatus || dailyStats?.fastingStatus} />
           </div>
 
-          <div>
+          <div className="lg:[&>*]:h-full">
             <AppleFitnessCard
               onConnect={() => {
                 handleTabChange('profile');
@@ -1840,7 +1840,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             />
           </div>
 
-          <div>
+          <div className="lg:[&>*]:h-full">
             <ExerciseMinutesCard
               onConnect={() => {
                 handleTabChange('profile');
@@ -2630,9 +2630,9 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       />
 
       {/* Content Section - Completely Separate and Underneath */}
-      <div className="px-4 sm:px-6 py-3 content-section">
+      <div className="px-4 sm:px-6 py-3 content-section content-narrow">
         {/* Food Search Bar - Enhanced with filtering */}
-        <div className="space-y-4 mb-8 lg:mx-auto lg:max-w-3xl">
+        <div className="space-y-4 mb-8">
           <div className="text-center">
             <h2 className="text-2xl font-bold mb-2 text-gray-900">Food Search</h2>
             <p className="text-gray-700">Search what you've logged in the past 2 weeks and add it again</p>
@@ -2659,7 +2659,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           </div>
         </div>
         {query && (
-          <div data-testid="journal-search-results" className="space-y-3 mb-8 lg:mx-auto lg:max-w-3xl">
+          <div data-testid="journal-search-results" className="space-y-3 mb-8">
             <div className="flex justify-between items-center">
               <h3 className="text-xl font-bold text-gray-900">Search results</h3>
               <Badge className="bg-amber-800 text-amber-100 border border-amber-700">
@@ -2689,15 +2689,13 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           </div>
         )}
 
-        <div className="lg:grid lg:grid-cols-12 lg:items-start lg:gap-6">
         <JournalHealthSuggestions
-          className="mb-6 lg:col-span-5 lg:col-start-8 lg:row-start-1 lg:mb-0"
+          className="mb-6"
           meals={weeklyMeals}
           dailyStats={dailyStats}
           calorieGoal={goalCalories}
           proteinGoal={(user as any)?.dailyProteinGoal || 150}
         />
-        <div className="lg:col-span-7 lg:row-start-1">
         {/* Daily Header */}
         <div className="flex space-x-4 mb-6">
           <div className="bg-orange-500 text-white font-semibold px-6 py-3 rounded-xl shadow-lg border border-orange-400/50 flex items-center" data-testid="text-current-date">
@@ -2736,8 +2734,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             todaysMeals.map((meal, index) => renderJournalMeal(meal, index, 'today'))
           )}
         </div>
-        </div>
-        </div>
 
         {/* Weekly Calories Summary */}
         <div className="space-y-4 mt-8">
@@ -2745,10 +2741,8 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             <h3 className="text-xl font-bold text-gray-900">This Week</h3>
             <Badge className="bg-amber-800 text-amber-100 border border-amber-700">Weekly Summary</Badge>
           </div>
-          <div className="space-y-4 lg:grid lg:grid-cols-2 lg:items-start lg:gap-6 lg:space-y-0">
-            <WeeklyCaloriesCard />
-            <FoodTypeTrendsCard meals={weeklyMeals} />
-          </div>
+          <WeeklyCaloriesCard />
+          <FoodTypeTrendsCard meals={weeklyMeals} />
         </div>
       </div>
     </div>
@@ -2769,7 +2763,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
         />
         
         {/* Content Section - Completely Separate and Underneath */}
-        <div className="px-4 sm:px-6 py-3 content-section">
+        <div className="px-4 sm:px-6 py-3 content-section content-narrow">
           <div className="main-content" data-testid="calorie-calculator-section">
             <CalorieCalculator 
               onNavigate={onNavigate}
@@ -2796,7 +2790,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
       />
 
       {/* Content Section - Redesigned to match other pages */}
-      <div className="px-4 sm:px-6 py-3 content-section" data-testid="profile-content">
+      <div className="px-4 sm:px-6 py-3 content-section content-narrow" data-testid="profile-content">
         {/* Profile Cards with Unified Accordion System */}
         {authLoading ? (
           <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 p-8 text-center text-gray-700">
@@ -2808,7 +2802,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
           <Accordion 
             type="single" 
             collapsible 
-            className="w-full space-y-6 lg:grid lg:grid-cols-2 lg:items-start lg:gap-6 lg:space-y-0"
+            className="w-full space-y-6"
             value={openCard || ""}
             onValueChange={setOpenCard}
           >
@@ -2902,7 +2896,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
               </Card>
             </AccordionItem>
 
-            <div className="space-y-6">
             <AccordionItem value="tour" className="border-none">
               <Card className="bg-gradient-to-br from-amber-50 to-amber-100 backdrop-blur-md border-amber-200/40 overflow-hidden rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:from-amber-100 hover:to-amber-200 hover:border-amber-300/50">
                 <AccordionTrigger className="px-4 py-5 sm:px-6 sm:py-6 hover:bg-amber-200/30 hover:no-underline [&[data-state=open]>div]:text-[#faed39] [&[data-state=open]]:bg-amber-200/30">
@@ -3086,7 +3079,6 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
                 </AccordionContent>
               </Card>
             </AccordionItem>
-            </div>
           </Accordion>
           <AppVersionInfo />
           </div>
@@ -3122,7 +3114,7 @@ export default function ModernFoodLayout({ onNavigate }: ModernFoodLayoutProps) 
             />
             
             {/* Fasting Content Section */}
-            <div className="px-4 sm:px-6 py-3 content-section">
+            <div className="px-4 sm:px-6 py-3 content-section content-narrow">
               <div data-testid="fasting-tracker" className="fasting-tracker bg-amber-50/90 backdrop-blur-md rounded-3xl border border-amber-200 p-4 sm:p-6">
                 <FastingTracker />
               </div>

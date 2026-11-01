@@ -1795,6 +1795,10 @@ div[class*="min-h-screen"]:not([data-testid*="navigation"]):not([data-hero="true
     padding-top: 2rem;
     padding-inline: 2rem;
   }
+
+  .content-section.content-narrow {
+    max-width: 56rem;
+  }
 }
 
 /* Soft keyboard: keep focused fields above the keyboard; hide fixed bottom nav while typing */

@@ -884,9 +884,9 @@ const FastingTracker = React.memo(function FastingTracker() {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="tracker" className="space-y-8 mt-6 lg:grid lg:grid-cols-2 lg:items-start lg:gap-8 lg:space-y-0">
+        <TabsContent value="tracker" className="space-y-8 mt-6">
           {/* Current Fasting Session */}
-          <Card data-testid="fasting-session-card" className="mb-8 bg-gradient-to-br from-amber-50 to-amber-100 border-none shadow-none lg:mb-0">
+          <Card data-testid="fasting-session-card" className="mb-8 bg-gradient-to-br from-amber-50 to-amber-100 border-none shadow-none">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
@@ -971,11 +971,12 @@ const FastingTracker = React.memo(function FastingTracker() {
             </CardContent>
           </Card>
 
-          <div className="space-y-8">
-          <FastingTrendsCard sessions={fastingHistory} />
+          <div className="mt-8">
+            <FastingTrendsCard sessions={fastingHistory} />
+          </div>
 
           {/* Fasting History */}
-          <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-none shadow-none">
+          <Card className="mt-8 bg-gradient-to-br from-amber-50 to-amber-100 border-none shadow-none">
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center gap-2 text-gray-900">
                 <TrendingUp className="w-5 h-5 text-gray-900" />
@@ -1064,11 +1065,10 @@ const FastingTracker = React.memo(function FastingTracker() {
               )}
             </CardContent>
           </Card>
-          </div>
         </TabsContent>
 
         <TabsContent value="plans" className="space-y-6 mt-6">
-          <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2">
             {FASTING_PLANS.map((plan) => (
               <Card 
                 key={plan.id}
