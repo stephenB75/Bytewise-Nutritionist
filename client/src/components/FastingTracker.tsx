@@ -27,7 +27,13 @@ import {
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest, authFetch } from '@/lib/queryClient';
-import { ACTIVE_FAST_QUERY_KEY, fetchActiveFast } from '@/lib/fastingApi';
+import {
+  ACTIVE_FAST_QUERY_KEY,
+  completeFastRequest,
+  fetchActiveFast,
+  isFastEndedHere,
+  markFastEndedHere,
+} from '@/lib/fastingApi';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import {
@@ -293,7 +299,7 @@ const FastingTracker = React.memo(function FastingTracker() {
 
   const completeFastingMutation = useMutation({
     mutationFn: ({ sessionId, endTime }: { sessionId: string; endTime: Date }) =>
-      apiRequest('PUT', `/api/fasting/${sessionId}/complete`, { endTime: endTime.toISOString() }),
+      completeFastRequest(sessionId, endTime),
     onSuccess: () => {
       authFetch('/api/achievements/check', { method: 'POST' })
         .then(res => res.json())
@@ -324,6 +330,9 @@ const FastingTracker = React.memo(function FastingTracker() {
   const endFastOnServer = useCallback((sessionId: string, endTime: Date) => {
     if (endedFastIdsRef.current.has(sessionId)) return;
     endedFastIdsRef.current.add(sessionId);
+    markFastEndedHere(sessionId, endTime);
+    // An active-fast request already in flight would answer with the fast still running.
+    void queryClient.cancelQueries({ queryKey: ACTIVE_FAST_QUERY_KEY });
     queryClient.setQueryData(ACTIVE_FAST_QUERY_KEY, (previous: any) =>
       previous && previous.id === sessionId ? null : previous,
     );
@@ -382,6 +391,11 @@ const FastingTracker = React.memo(function FastingTracker() {
         
         if (storedSession) {
           const session = JSON.parse(storedSession) as FastingSession;
+          if (isFastEndedHere(session.id)) {
+            localStorage.removeItem(FASTING_SESSION_KEY);
+            localStorage.removeItem(FASTING_ACTIVE_KEY);
+            return;
+          }
           const startTime = new Date(session.startTime).getTime();
           const now = Date.now();
           const elapsed = now - startTime;

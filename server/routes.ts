@@ -2469,6 +2469,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!session || session.userId !== userId) {
         return res.status(404).json({ message: "Fasting session not found" });
       }
+      // Retries and a second device ending the same fast must not move the recorded end.
+      if (session.status !== 'active' && session.status !== 'paused') {
+        return res.json(session);
+      }
 
       // The client sends when the user tapped End so a slow or retried request can't add time.
       const requestedEnd = req.body?.endTime ? new Date(req.body.endTime) : null;
