@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Bar, BarChart, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { Area, Bar, BarChart, CartesianGrid, ComposedChart, LabelList, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { ArrowDown, ArrowRight, ArrowUp, TrendingUp } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { getLocalDateKey } from '@/utils/dateUtils';
@@ -139,8 +139,49 @@ function formatClock(hours: number | null, short = false): string {
   const m = totalMinutes % 60;
   const suffix = h < 12 ? 'AM' : 'PM';
   const h12 = h % 12 === 0 ? 12 : h % 12;
-  if (short) return `${h12}${suffix === 'AM' ? 'a' : 'p'}`;
+  if (short) return `${h12}:${String(m).padStart(2, '0')}${suffix === 'AM' ? 'a' : 'p'}`;
   return `${h12}:${String(m).padStart(2, '0')} ${suffix}`;
+}
+
+function formatHourTick(hours: number): string {
+  const h = ((Math.round(hours) % 24) + 24) % 24;
+  if (h === 0) return '12 AM';
+  if (h === 12) return 'Noon';
+  return `${h % 12} ${h < 12 ? 'AM' : 'PM'}`;
+}
+
+/**
+ * Times of day unwrapped onto one continuous axis that starts in the longest stretch of the
+ * clock with no data, so an overnight fast reads upward from start to end instead of wrapping
+ * from the top of the chart to the bottom at midnight.
+ */
+function clockUnwrapper(values: number[]): (v: number) => number {
+  if (!values.length) return (v) => v;
+  const sorted = [...values].sort((a, b) => a - b);
+  let gapStart = sorted[sorted.length - 1];
+  let gapSize = sorted[0] + 24 - gapStart;
+  for (let i = 1; i < sorted.length; i++) {
+    if (sorted[i] - sorted[i - 1] > gapSize) {
+      gapSize = sorted[i] - sorted[i - 1];
+      gapStart = sorted[i - 1];
+    }
+  }
+  const anchor = Math.floor(gapStart + gapSize / 2) % 24;
+  return (v) => anchor + (((v - anchor) % 24) + 24) % 24;
+}
+
+function clockTicks(plotted: number[]): { domain: [number, number]; ticks: number[] } {
+  if (!plotted.length) return { domain: [0, 24], ticks: [0, 6, 12, 18, 24] };
+  const min = Math.min(...plotted);
+  const max = Math.max(...plotted);
+  const span = max - min;
+  const step = span <= 4 ? 1 : span <= 10 ? 2 : 3;
+  const lo = Math.floor((min - 1) / step) * step;
+  let hi = Math.ceil((max + 1) / step) * step;
+  if (hi - lo < step * 2) hi = lo + step * 2;
+  const ticks: number[] = [];
+  for (let t = lo; t <= hi; t += step) ticks.push(t);
+  return { domain: [lo, hi], ticks };
 }
 
 function longestSession(sessions: FastingTrendSession[]): FastingTrendSession | null {
@@ -233,10 +274,25 @@ function formatHours(hours: number): string {
 export function FastingTrendsCard({ sessions }: { sessions: FastingTrendSession[] }) {
   const [range, setRange] = useState<7 | 30>(7);
 
-  const { days, activeDays, avgHours, completionRate, streak, longestFast, hoursChange, completionChange, observations, outcomeCounts, avgStart, avgEnd } = useMemo(() => {
+  const { days, activeDays, avgHours, completionRate, streak, longestFast, hoursChange, completionChange, observations, outcomeCounts, avgStart, avgEnd, timePoints, timeAxis } = useMemo(() => {
     const days = buildDays(sessions, range);
-    const avgStart = averageClock(days.flatMap((d) => (d.startClock == null ? [] : [d.startClock])));
-    const avgEnd = averageClock(days.flatMap((d) => (d.endClock == null ? [] : [d.endClock])));
+    const starts = days.flatMap((d) => (d.startClock == null ? [] : [d.startClock]));
+    const ends = days.flatMap((d) => (d.endClock == null ? [] : [d.endClock]));
+    const avgStart = averageClock(starts);
+    const avgEnd = averageClock(ends);
+    const unwrap = clockUnwrapper([...starts, ...ends]);
+    const timePoints = days.map((d) => {
+      const startPlot = d.startClock == null ? null : unwrap(d.startClock);
+      let endPlot = d.endClock == null ? null : unwrap(d.endClock);
+      if (startPlot != null && endPlot != null && endPlot < startPlot) endPlot += 24;
+      return {
+        label: d.label,
+        startPlot,
+        endPlot,
+        window: startPlot != null && endPlot != null ? [startPlot, endPlot] : null,
+      };
+    });
+    const timeAxis = clockTicks(timePoints.flatMap((p) => [p.startPlot, p.endPlot].filter((v): v is number => v != null)));
     const activeDays = days.filter(d => d.sessions > 0);
     const outcomeCounts = days.reduce(
       (acc, d) => ({
@@ -335,6 +391,8 @@ export function FastingTrendsCard({ sessions }: { sessions: FastingTrendSession[
       outcomeCounts,
       avgStart,
       avgEnd,
+      timePoints,
+      timeAxis,
     };
   }, [sessions, range]);
 
@@ -421,29 +479,54 @@ export function FastingTrendsCard({ sessions }: { sessions: FastingTrendSession[
                 <span className="h-0.5 w-3 rounded" style={{ background: END_COLOR }} />
                 Ended
               </span>
+              <span className="inline-flex items-center gap-1">
+                <span className="h-2.5 w-3 rounded-sm" style={{ background: START_COLOR, opacity: 0.15 }} />
+                Fasting
+              </span>
             </div>
           </div>
-          <div className="h-44 -ml-2" data-testid="chart-fasting-times">
+          <div className="h-80" data-testid="chart-fasting-times">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={days} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
-                <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#374151' }} tickLine={false} axisLine={false} interval={range === 7 ? 0 : 4} />
-                <YAxis
-                  domain={[0, 24]}
-                  ticks={[0, 6, 12, 18, 24]}
-                  tickFormatter={(value: number) => formatClock(value, true)}
+              <ComposedChart data={timePoints} margin={{ top: 12, right: 16, bottom: 8, left: 0 }}>
+                <CartesianGrid vertical={false} stroke="#e5e7eb" strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="label"
                   tick={{ fontSize: 10, fill: '#374151' }}
                   tickLine={false}
                   axisLine={false}
-                  width={32}
+                  tickMargin={10}
+                  padding={{ left: 28, right: 28 }}
+                  interval={range === 7 ? 0 : 4}
+                />
+                <YAxis
+                  domain={timeAxis.domain}
+                  ticks={timeAxis.ticks}
+                  allowDataOverflow
+                  tickFormatter={formatHourTick}
+                  tick={{ fontSize: 10, fill: '#374151' }}
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={10}
+                  padding={{ top: 24, bottom: 24 }}
+                  width={56}
                 />
                 <Tooltip
                   cursor={{ stroke: 'rgba(251, 191, 36, 0.6)' }}
                   formatter={(value: number, name: string) => [formatClock(value), name]}
                   labelFormatter={(label: string) => label}
                 />
-                <Line type="monotone" dataKey="startClock" name="Started" stroke={START_COLOR} strokeWidth={2} dot={{ r: 3 }} connectNulls />
-                <Line type="monotone" dataKey="endClock" name="Ended" stroke={END_COLOR} strokeWidth={2} dot={{ r: 3 }} connectNulls />
-              </LineChart>
+                <Area dataKey="window" name="Fasting window" fill={START_COLOR} fillOpacity={0.08} stroke="none" tooltipType="none" connectNulls={false} isAnimationActive={false} />
+                <Line type="linear" dataKey="startPlot" name="Started" stroke={START_COLOR} strokeWidth={2} dot={{ r: 3.5, fill: START_COLOR }} connectNulls>
+                  {range === 7 && (
+                    <LabelList dataKey="startPlot" position="bottom" offset={8} formatter={(v: number) => formatClock(v, true)} style={{ fontSize: 9, fill: START_COLOR, fontWeight: 600, stroke: '#fffbeb', strokeWidth: 3, paintOrder: 'stroke' }} />
+                  )}
+                </Line>
+                <Line type="linear" dataKey="endPlot" name="Ended" stroke={END_COLOR} strokeWidth={2} dot={{ r: 3.5, fill: END_COLOR }} connectNulls>
+                  {range === 7 && (
+                    <LabelList dataKey="endPlot" position="top" offset={8} formatter={(v: number) => formatClock(v, true)} style={{ fontSize: 9, fill: END_COLOR, fontWeight: 600, stroke: '#fffbeb', strokeWidth: 3, paintOrder: 'stroke' }} />
+                  )}
+                </Line>
+              </ComposedChart>
             </ResponsiveContainer>
           </div>
           <div className="grid grid-cols-2 gap-2 mt-2" data-testid="fasting-average-times">

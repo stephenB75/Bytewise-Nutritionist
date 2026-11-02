@@ -1,15 +1,36 @@
 import { useMemo } from 'react';
-import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { Bar, BarChart, Cell, Pie, PieChart as RechartsPieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { Coffee, Moon, PieChart, Sun, Sunrise, Utensils } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { getLocalDateKey, getMealDateKey, getWeekDates } from '@/utils/dateUtils';
+import { assessFoodQuality } from '@shared/foodQuality';
 
 type TrendMeal = {
   date?: string;
   mealType?: string;
+  name?: string;
   calories?: number;
   totalCalories?: number;
 };
+
+type QualityBucket = 'both' | 'upf' | 'gmo' | 'none';
+
+const QUALITY_BUCKETS: Array<{ key: QualityBucket; label: string; fill: string }> = [
+  { key: 'both', label: 'UPF + possible GMO', fill: '#b91c1c' },
+  { key: 'upf', label: 'Ultra-processed (UPF)', fill: '#f87171' },
+  { key: 'gmo', label: 'Possible GMO', fill: '#7c3aed' },
+  { key: 'none', label: 'No flags found', fill: '#16a34a' },
+];
+
+function qualityBucket(name: string | undefined): QualityBucket {
+  const quality = assessFoodQuality({ name: name || '' });
+  const upf = quality.nova === 4;
+  const gmo = quality.gmo === 'bioengineered' || quality.gmo === 'may-contain';
+  if (upf && gmo) return 'both';
+  if (upf) return 'upf';
+  if (gmo) return 'gmo';
+  return 'none';
+}
 
 type MealBucket = 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'other';
 
@@ -47,7 +68,7 @@ function isInCurrentWeek(meal: TrendMeal, weekKeys: Set<string>): boolean {
 }
 
 export function FoodTypeTrendsCard({ meals = [] }: { meals?: TrendMeal[] }) {
-  const { chartData, totals, topType, observations } = useMemo(() => {
+  const { chartData, totals, topType, observations, qualityData, flaggedPercent } = useMemo(() => {
     const weekKeys = new Set(getWeekDates().map((date) => getLocalDateKey(date)));
     const weekMeals = meals.filter((meal) => isInCurrentWeek(meal, weekKeys));
 
@@ -77,6 +98,15 @@ export function FoodTypeTrendsCard({ meals = [] }: { meals?: TrendMeal[] }) {
           fill: bucket.fill,
         };
       });
+
+    const qualityCounts: Record<QualityBucket, number> = { both: 0, upf: 0, gmo: 0, none: 0 };
+    for (const meal of weekMeals) qualityCounts[qualityBucket(meal.name)] += 1;
+    const qualityData = QUALITY_BUCKETS.map((bucket) => ({
+      ...bucket,
+      count: qualityCounts[bucket.key],
+      percent: totalCount > 0 ? Math.round((qualityCounts[bucket.key] / totalCount) * 100) : 0,
+    }));
+    const flaggedPercent = totalCount > 0 ? Math.round(((totalCount - qualityCounts.none) / totalCount) * 100) : 0;
 
     const ranked = [...chartData].sort((a, b) => b.calories - a.calories);
     const topType = ranked.find((row) => row.calories > 0) || null;
@@ -112,6 +142,8 @@ export function FoodTypeTrendsCard({ meals = [] }: { meals?: TrendMeal[] }) {
       totals: { calories: Math.round(totalCalories), count: totalCount },
       topType,
       observations: observations.slice(0, 2),
+      qualityData,
+      flaggedPercent,
     };
   }, [meals]);
 
@@ -180,6 +212,52 @@ export function FoodTypeTrendsCard({ meals = [] }: { meals?: TrendMeal[] }) {
               );
             })}
           </ul>
+
+          <div className="mt-4 rounded-lg bg-white/60 p-3" data-testid="food-quality-breakdown">
+            <div className="flex items-baseline justify-between gap-2">
+              <p className="text-sm font-semibold text-gray-900">UPF &amp; GMO foods</p>
+              <span className="text-xs font-medium text-gray-700">{flaggedPercent}% of entries flagged</span>
+            </div>
+            <div className="mt-2 flex items-center gap-4">
+              <div className="h-28 w-28 shrink-0" data-testid="chart-food-quality-pie">
+                <ResponsiveContainer width="100%" height="100%">
+                  <RechartsPieChart>
+                    <Pie
+                      data={qualityData.filter((row) => row.count > 0)}
+                      dataKey="count"
+                      nameKey="label"
+                      innerRadius="55%"
+                      outerRadius="100%"
+                      paddingAngle={2}
+                      stroke="#fffbeb"
+                      strokeWidth={2}
+                      isAnimationActive={false}
+                    >
+                      {qualityData.filter((row) => row.count > 0).map((row) => (
+                        <Cell key={row.key} fill={row.fill} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      formatter={(value: number, name: string) => [`${value} ${value === 1 ? 'entry' : 'entries'}`, name]}
+                    />
+                  </RechartsPieChart>
+                </ResponsiveContainer>
+              </div>
+              <ul className="min-w-0 max-w-xs flex-1 space-y-1.5" data-testid="list-food-quality-breakdown">
+                {qualityData.map((row) => (
+                  <li key={row.key} className="flex items-center gap-2 text-xs">
+                    <span className="h-2.5 w-2.5 shrink-0 rounded-sm" style={{ backgroundColor: row.fill }} />
+                    <span className="min-w-0 flex-1 text-gray-900">{row.label}</span>
+                    <span className="shrink-0 font-semibold tabular-nums text-gray-900">{row.percent}%</span>
+                    <span className="w-7 shrink-0 text-right tabular-nums text-gray-600">{row.count}×</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <p className="mt-2 text-[11px] leading-snug text-gray-600">
+              Estimated from the names of meals logged this week, using the same UPF and GMO tags as the Tracker.
+            </p>
+          </div>
 
           {observations.length > 0 && (
             <ul className="mt-3 space-y-1.5" data-testid="list-food-type-observations">
